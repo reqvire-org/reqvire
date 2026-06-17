@@ -194,6 +194,55 @@ Requirement
   └── verifiedBy → Verification → satisfiedBy → Test/Proof evidence
 ```
 
+## Verification Authoring
+
+Verification should be authored as a structured plan, then implemented as evidence-linked elements:
+
+- Start with `verification-objective` to define scope, intent, and grouping (capability-level or requirement-level goals). A `verification-objective` organizes intent only; it does not carry `verify` or `satisfiedBy`.
+- Add concrete verification nodes (`test-verification`, `formal-proof-verification`, `analysis-verification`, `inspection-verification`, `demonstration-verification`) with explicit `#### Details` describing pass/fail criteria and assumptions. Every concrete verification must have a `derivedFrom` relation to a `verification-objective` parent.
+- Link concrete verifications with the `verify` / `verifiedBy` relation pair:
+  - requirement or capability `- verifiedBy: [Verification](path.md#verification-element)`
+  - verification `- verify: [Requirement](path.md#requirement-element)` (or capability)
+- Record executable evidence only on evidence-backed concrete verifications using `satisfiedBy`:
+  - requirement `- satisfiedBy: [Test Report](path.md#evidence-or-asset)`
+  - test-verification `- satisfiedBy: [Evidence](path.md#artifact-or-result)`
+  - formal-proof-verification `- satisfiedBy: [Proof Artifact](path.md#proof-report)`
+- Prefer one direct objective per verification purpose; split mixed objectives instead of merging incompatible check types.
+
+Good objective titles (examples):
+
+- API performance boundary verification
+- Authentication and authorization assurance
+- Backward-compatible migration validation
+- Behavior consistency across requirement branches
+- Build and dependency reproducibility checks
+- Capability end-to-end demonstration verification
+- Data quality and schema migration validation
+- Deployment and rollback verification
+- Fault recovery and degradation handling
+- Interoperability across integrations
+- I/O contract conformance verification
+- Latency and throughput verification
+- Non-functional compliance and auditability
+- Regression protection for critical requirements
+- Resilience against resource exhaustion
+- Security controls and attack-surface verification
+- Safety constraints and failure-state validation
+- Storage and message durability verification
+- User accessibility and operability checks
+- Versioned evidence pack validation
+
+Anti-patterns to avoid:
+- adding `satisfiedBy` on non-evidence-backed verification types
+- linking constraints via `refinedBy` instead of `constrain`
+- attaching ontology directly under requirements
+- duplicating the same obligation in multiple verification nodes instead of using one node with precise criteria
+
+When authoring verifications, always update at least one of:
+- `verify` coverage expectations (`verifiedBy`/`satisfiedBy` paths)
+- `coverage`-relevant leaf requirements
+- corresponding evidence references in related files
+
 ## Document Structure
 
 - Files begin with `# Elements` (multi-element) or `# Element` (single-element)
@@ -344,6 +393,7 @@ validate [--json]
 lint [--fix] [--fixable] [--auditable]
 coverage [--json]
 format [--fix]
+migrate [--fix] [--json]
 
 # Analysis
 change-impact --git-commit=<hash> [--json]
@@ -361,6 +411,8 @@ serve [--port 8080]
 **Common flags:** `--json`, `--short`, `--dry-run`, `--output <file>` (requires `--json`)
 
 Use `--dry-run` for destructive operations. Use `<<'EOF'` (single-quoted) to prevent shell expansion in heredocs.
+
+Use `migrate` to preview or apply deterministic source migrations for known breaking model-contract changes. It defaults to dry-run preview; use `migrate --fix` only when the user has approved applying source rewrites. Current migrations cover legacy single-element `# Documents` headers and creation of one shared verification-objective holder in root `VerificationObjectiveMigration.md` with holder-owned `derive` links to standalone concrete verifications.
 
 ## Validation & Quality Checklist
 

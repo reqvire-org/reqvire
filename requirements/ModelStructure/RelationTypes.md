@@ -139,7 +139,7 @@ This section defines which element types can use which relation types as source 
 
 4. **satisfiedBy/satisfy restricted to implementable elements**: `satisfiedBy` links requirements and evidence-backed verifications to implementation/evidence files. Capability elements are not valid sources/targets for satisfaction relations.
 
-5. **verification objective special case**: `verification-objective` organizes verification intent and may form verification hierarchy through `derivedFrom`/`derive`, but it is not a concrete verification. It cannot use `verify`, cannot be a `verifiedBy` target, and cannot use `satisfiedBy`.
+5. **verification objective parent requirement**: `verification-objective` organizes verification intent and may form verification hierarchy through `derivedFrom`/`derive`, but it is not a concrete verification. Every concrete verification element must have a `derivedFrom` parent relation to a `verification-objective`. A `verification-objective` cannot use `verify`, cannot be a `verifiedBy` target, and cannot use `satisfiedBy`.
 
 6. **evidence-backed verification special cases**: Among concrete verification types, `test-verification` and `formal-proof-verification` can use `satisfiedBy` relations. `test-verification` links to test implementations. `formal-proof-verification` links to formal proof artifacts, model-checking artifacts, theorem files, generated fixtures, or proof reports. Other concrete verification types (`analysis-verification`, `inspection-verification`, `demonstration-verification`) cannot use `satisfiedBy`.
 

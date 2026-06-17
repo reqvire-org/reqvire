@@ -172,9 +172,9 @@ fi
 echo "Test 4: Verifying total elements count" >> "${TEST_DIR}/test_results.log"
 
 TOTAL_ELEMENTS=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_elements')
-# 3 capabilities + 2 requirements + 1 verification + 7 custom types = 13
-if [ "$TOTAL_ELEMENTS" -ne 13 ]; then
-    echo "FAILED: Expected 13 total elements (1+4+1+7), got: $TOTAL_ELEMENTS"
+# 3 capabilities + 2 requirements + 1 verification objective + 1 verification + 7 custom types = 14
+if [ "$TOTAL_ELEMENTS" -ne 14 ]; then
+    echo "FAILED: Expected 14 total elements (3+2+1+1+7), got: $TOTAL_ELEMENTS"
     exit 1
 fi
 

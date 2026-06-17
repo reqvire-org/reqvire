@@ -30,6 +30,8 @@ function Section({ title, desc, children }: { title: string; desc?: string; chil
 const ELEMENT_ROLES = [
   "capability", "requirement", "refinement", "source", "constraint",
   "behavior", "state", "input-output", "specification", "semantic-contract",
+  "verification-objective", "test-verification", "formal-proof-verification",
+  "analysis-verification", "inspection-verification", "demonstration-verification",
   "verification", "ontology", "resource",
 ] as const;
 
@@ -45,7 +47,7 @@ export function DataPage() {
   return (
     <div className="showcase-page">
 
-      <Section title="TypeBadge" desc="Element-type chip with the same marker shape contract as ElementIcon, without glyph text inside the marker. Use tinted for header badges.">
+      <Section title="TypeBadge" desc="Element-type chip with the same marker shape and glyph contract as ElementIcon. Use tinted for header badges.">
         <div className="showcase-col">
           <div className="showcase-label">Plain</div>
           <div className="showcase-row showcase-row--center">
@@ -64,7 +66,7 @@ export function DataPage() {
         </div>
       </Section>
 
-      <Section title="ElementIcon" desc="Colored model-element marker. Refinements = diamond with subtype glyph, other element families = square.">
+      <Section title="ElementIcon" desc="Colored model-element marker. Refinements use diamond subtype glyphs; verification subtypes use verification glyphs.">
         {(["sm", "md", "lg"] as const).map((size) => (
           <div key={size} className="showcase-col">
             <div className="showcase-label">{size}</div>

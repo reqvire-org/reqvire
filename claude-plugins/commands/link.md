@@ -84,6 +84,11 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 `satisfiedBy` / `satisfy` rule:
 - Allowed source/target model element types are `requirement`, `test-verification`, and `formal-proof-verification`.
 - `capability` is not allowed to use `satisfiedBy`/`satisfy`.
+- `verification-objective` is not allowed to use `satisfiedBy`/`satisfy`; it is a planning hierarchy node.
+
+`verifiedBy` / `verify` rule:
+- Allowed concrete verification types are `test-verification`, `formal-proof-verification`, `analysis-verification`, `inspection-verification`, and `demonstration-verification`.
+- `verification-objective` may use `derivedFrom`/`derive` inside verification-family hierarchy but is not a valid `verify` source or `verifiedBy` target.
 
 **For attaching:**
 - Internal file path (e.g., "docs/SLA.pdf")

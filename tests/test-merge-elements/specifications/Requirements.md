@@ -1,6 +1,14 @@
 # Elements
 
 
+
+### Requirements Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Test Capability Test Merge Elements Specifications Requirements Md
 
 Test capability root for migrated requirement fixtures.
@@ -104,6 +112,7 @@ A verification element for testing type compatibility error.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Requirements Verification Objective](#requirements-verification-objective)
   * verify: [Target Requirement](#target-requirement)
 ---
 

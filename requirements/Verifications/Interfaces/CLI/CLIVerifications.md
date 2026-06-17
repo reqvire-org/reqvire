@@ -60,12 +60,13 @@ This test verifies that the CLI help output displays all commands and their opti
    - output contains "Options:" section with `-h, --help`, `-V, --version`
 
 2. **Command listing completeness**
-   - All current CLI commands are listed: serve, mcp, format, validate, search, change-impact, traces, coverage, model, lint, add, rm, mv, rename, merge, mv-file, link, unlink, relink, mv-asset, rm-asset, containment, resources, ontologies, submodels, collect
+   - All current CLI commands are listed: serve, mcp, format, migrate, validate, search, change-impact, traces, coverage, model, lint, add, rm, mv, rename, merge, mv-file, link, unlink, relink, mv-asset, rm-asset, containment, resources, ontologies, submodels, collect
 
 3. **Options flattening - all command-specific option sections present**
    - SERVE OPTIONS section visible
    - MCP OPTIONS section visible
    - FORMAT OPTIONS section visible
+   - MIGRATE OPTIONS section visible
    - CHANGE IMPACT OPTIONS section visible
    - TRACES OPTIONS section visible
    - COVERAGE OPTIONS section visible
@@ -179,4 +180,3 @@ Test verifies that verification element names in the traces report are clickable
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
   * verify: [Verification Traces Element Navigation](../../../Interfaces/CLI/Commands.md#verification-traces-element-navigation)
 ---
-

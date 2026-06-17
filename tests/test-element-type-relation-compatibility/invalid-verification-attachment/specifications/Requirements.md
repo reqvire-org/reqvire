@@ -1,6 +1,14 @@
 # Elements
 
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Test Capability Test Element Type Relation Compatibility Invalid Verification Attachment
 
 Test capability root for verification attachment validation fixtures.
@@ -41,6 +49,7 @@ A verification element incorrectly authoring an attachment. Verification evidenc
   * [Reusable Verification Criteria](#reusable-verification-criteria)
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Requirement with Verification Attachment Target](#requirement-with-verification-attachment-target)
   * satisfiedBy: [test.sh](test.sh)
 ---

@@ -1,5 +1,13 @@
 # Elements
 
+### Requirements Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
+
 ### Root Capability
 
 This is the capability root.

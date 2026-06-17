@@ -41,7 +41,7 @@
                         "name": "Output Format Test",
                         "element_type": "test-verification",
                         "file_path": "specifications/Verifications/Tests.md",
-                        "file_order_index": 3,
+                        "file_order_index": 4,
                         "relations": [],
                         "attachments": []
                       }
@@ -96,7 +96,7 @@
                                     "name": "Default Filtering Test",
                                     "element_type": "test-verification",
                                     "file_path": "specifications/Verifications/Tests.md",
-                                    "file_order_index": 2,
+                                    "file_order_index": 3,
                                     "relations": [],
                                     "attachments": []
                                   }
@@ -121,7 +121,7 @@
                                     "name": "From Flag Filtering Test",
                                     "element_type": "test-verification",
                                     "file_path": "specifications/Verifications/Tests.md",
-                                    "file_order_index": 1,
+                                    "file_order_index": 2,
                                     "relations": [],
                                     "attachments": []
                                   }
@@ -133,7 +133,7 @@
                                     "name": "Reverse Traversal Test",
                                     "element_type": "test-verification",
                                     "file_path": "specifications/Verifications/Tests.md",
-                                    "file_order_index": 4,
+                                    "file_order_index": 5,
                                     "relations": [],
                                     "attachments": []
                                   }
@@ -149,7 +149,7 @@
                               "name": "Filter Type Test",
                               "element_type": "test-verification",
                               "file_path": "specifications/Verifications/Tests.md",
-                              "file_order_index": 5,
+                              "file_order_index": 6,
                               "relations": [],
                               "attachments": []
                             }
@@ -165,7 +165,7 @@
                         "name": "Model Generation Test",
                         "element_type": "test-verification",
                         "file_path": "specifications/Verifications/Tests.md",
-                        "file_order_index": 0,
+                        "file_order_index": 1,
                         "relations": [],
                         "attachments": []
                       }

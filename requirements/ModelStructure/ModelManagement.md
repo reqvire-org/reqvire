@@ -230,6 +230,7 @@ The system shall enforce element type constraints for relation types, ensuring t
 
 #### Details
 The system shall define element type relation compatibility constraints.
+Mutation commands that create or rewrite relations shall enforce the same compatibility matrix before persisting source files.
 
 #### Metadata
   * type: requirement
@@ -241,6 +242,7 @@ The system shall define element type relation compatibility constraints.
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * satisfiedBy: [relation.rs](../../core/src/relation.rs)
   * verifiedBy: [Element Type Relation Compatibility Test](../Verifications/Operations/Validation/ValidationVerifications.md#element-type-relation-compatibility-test)
+  * verifiedBy: [Verification Objective Mutation Test](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
 ---
 
 ### Refinement Element Structure Constraints
@@ -288,7 +290,7 @@ The system shall provide programmatic manipulation of element relations through 
 When linking, the system shall:
 - Add a relation entry to the element's Relations subsection
 - Create the Relations subsection if it does not exist
-- Validate the relation type and element type compatibility
+- Validate the relation type and element type compatibility before persistence
 - Skip if relation already exists (idempotent operation)
 
 When unlinking, the system shall:
@@ -309,6 +311,7 @@ When unlinking, the system shall:
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * verifiedBy: [Link Command Verification](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#unlink-command-verification)
+  * verifiedBy: [Verification Objective Mutation Test](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
 ---
 
 ### Requirement Governance Metadata

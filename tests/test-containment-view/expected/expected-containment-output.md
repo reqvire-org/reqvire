@@ -63,13 +63,10 @@ graph TD
   specifications_ParentOnly_ChildFolder --> specifications/ParentOnly/ChildFolder/DeepFile
   subgraph specifications/RootFile["📄 RootFile.md"]
     direction TB
-    8be34e37b1135168["Analysis Verification Element"]
     17cdb2bd8b866540["Custom Type Element"]
-    27ce8e2d3add00a7["Demonstration Verification Element"]
-    e65293d51dd83e69["Inspection Verification Element"]
     5ecc319b905d6e1f["Root Capability"]
     5f050040e1a84eef["Test Capability Test Containment View Specifications Rootfile Md"]
-    939fef5f29ad393f["Test Verification Element"]
+    1be2cc5dd84aadd7["Verification Objective"]
   end
   specifications --> specifications/RootFile
 
@@ -79,13 +76,10 @@ graph TD
   class 58d1cd147301f9e3 systemRequirement
   class 25af44158bf43fcc systemRequirement
   class 747610138c5b111b systemRequirement
-  class 8be34e37b1135168 verification
   class 17cdb2bd8b866540 default
-  class 27ce8e2d3add00a7 verification
-  class e65293d51dd83e69 verification
   class 5ecc319b905d6e1f systemRequirement
   class 5f050040e1a84eef capability
-  class 939fef5f29ad393f verification
+  class 1be2cc5dd84aadd7 default
 
   %% Clickable links
   click specifications_Folder1_DesignDocuments_DesignDoc1 "specifications/Folder1/DesignDocuments/DesignDoc1.md"
@@ -94,11 +88,8 @@ graph TD
   click 58d1cd147301f9e3 "specifications/Folder1/Subfolder1/FileA.md#user-authentication"
   click 25af44158bf43fcc "specifications/Folder2/FileC.md#high-performance"
   click 747610138c5b111b "specifications/ParentOnly/ChildFolder/DeepFile.md#deep-nested-element"
-  click 8be34e37b1135168 "specifications/RootFile.md#analysis-verification-element"
   click 17cdb2bd8b866540 "specifications/RootFile.md#custom-type-element"
-  click 27ce8e2d3add00a7 "specifications/RootFile.md#demonstration-verification-element"
-  click e65293d51dd83e69 "specifications/RootFile.md#inspection-verification-element"
   click 5ecc319b905d6e1f "specifications/RootFile.md#root-capability"
   click 5f050040e1a84eef "specifications/RootFile.md#test-capability-test-containment-view-specifications-rootfile-md"
-  click 939fef5f29ad393f "specifications/RootFile.md#test-verification-element"
+  click 1be2cc5dd84aadd7 "specifications/RootFile.md#verification-objective"
 ```

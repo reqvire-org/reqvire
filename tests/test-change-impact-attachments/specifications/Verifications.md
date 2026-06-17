@@ -1,5 +1,13 @@
 # Elements
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Processing Test
 
 Test that data processing works correctly.
@@ -8,6 +16,7 @@ Test that data processing works correctly.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Data Processing Requirement](Requirements.md#data-processing-requirement)
 ---
 
@@ -19,6 +28,7 @@ Test that data validation works correctly.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Data Validation Requirement](Requirements.md#data-validation-requirement)
 ---
 
@@ -30,5 +40,6 @@ Test that data export works correctly.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Independent Requirement With Same Attachment](Requirements.md#independent-requirement-with-same-attachment)
 ---

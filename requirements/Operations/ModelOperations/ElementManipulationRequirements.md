@@ -17,6 +17,7 @@ For hierarchical relinks (`derivedFrom`/`derive`), the operation shall support s
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Atomic Relation Relink Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#atomic-relation-relink-test)
+  * verifiedBy: [Verification Objective Mutation Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
 ---
 
 ### CRUD Semantic Contract Mutation Validation
@@ -126,6 +127,7 @@ When the target is an ontology element, the operation shall preserve the target 
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Merge Elements Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#merge-elements-test)
+  * verifiedBy: [Verification Objective Mutation Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
 ---
 
 ### Move Element Operation
@@ -150,6 +152,7 @@ The operation shall reject moves into an existing `# Element` file when that mov
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Move Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#move-element-test)
+  * verifiedBy: [Verification Objective Mutation Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
 ---
 
 ### Move File Operation

@@ -5,8 +5,20 @@
       "name": "Default Filtering Test",
       "element_type": "test-verification",
       "file_path": "specifications/Verifications/Tests.md",
-      "file_order_index": 2,
+      "file_order_index": 3,
       "relations": [
+        {
+          "relation_type": "derivedFrom",
+          "element": {
+            "identifier": "specifications/Verifications/Tests.md#verification-objective",
+            "name": "Verification Objective",
+            "element_type": "verification-objective",
+            "file_path": "specifications/Verifications/Tests.md",
+            "file_order_index": 0,
+            "relations": [],
+            "attachments": []
+          }
+        },
         {
           "relation_type": "verify",
           "element": {
@@ -81,8 +93,20 @@
       "name": "Filter Type Test",
       "element_type": "test-verification",
       "file_path": "specifications/Verifications/Tests.md",
-      "file_order_index": 5,
+      "file_order_index": 6,
       "relations": [
+        {
+          "relation_type": "derivedFrom",
+          "element": {
+            "identifier": "specifications/Verifications/Tests.md#verification-objective",
+            "name": "Verification Objective",
+            "element_type": "verification-objective",
+            "file_path": "specifications/Verifications/Tests.md",
+            "file_order_index": 0,
+            "relations": [],
+            "attachments": []
+          }
+        },
         {
           "relation_type": "verify",
           "element": {
@@ -144,8 +168,20 @@
       "name": "From Flag Filtering Test",
       "element_type": "test-verification",
       "file_path": "specifications/Verifications/Tests.md",
-      "file_order_index": 1,
+      "file_order_index": 2,
       "relations": [
+        {
+          "relation_type": "derivedFrom",
+          "element": {
+            "identifier": "specifications/Verifications/Tests.md#verification-objective",
+            "name": "Verification Objective",
+            "element_type": "verification-objective",
+            "file_path": "specifications/Verifications/Tests.md",
+            "file_order_index": 0,
+            "relations": [],
+            "attachments": []
+          }
+        },
         {
           "relation_type": "verify",
           "element": {
@@ -220,8 +256,20 @@
       "name": "Model Generation Test",
       "element_type": "test-verification",
       "file_path": "specifications/Verifications/Tests.md",
-      "file_order_index": 0,
+      "file_order_index": 1,
       "relations": [
+        {
+          "relation_type": "derivedFrom",
+          "element": {
+            "identifier": "specifications/Verifications/Tests.md#verification-objective",
+            "name": "Verification Objective",
+            "element_type": "verification-objective",
+            "file_path": "specifications/Verifications/Tests.md",
+            "file_order_index": 0,
+            "relations": [],
+            "attachments": []
+          }
+        },
         {
           "relation_type": "verify",
           "element": {
@@ -270,8 +318,20 @@
       "name": "Output Format Test",
       "element_type": "test-verification",
       "file_path": "specifications/Verifications/Tests.md",
-      "file_order_index": 3,
+      "file_order_index": 4,
       "relations": [
+        {
+          "relation_type": "derivedFrom",
+          "element": {
+            "identifier": "specifications/Verifications/Tests.md#verification-objective",
+            "name": "Verification Objective",
+            "element_type": "verification-objective",
+            "file_path": "specifications/Verifications/Tests.md",
+            "file_order_index": 0,
+            "relations": [],
+            "attachments": []
+          }
+        },
         {
           "relation_type": "verify",
           "element": {
@@ -357,8 +417,20 @@
       "name": "Reverse Traversal Test",
       "element_type": "test-verification",
       "file_path": "specifications/Verifications/Tests.md",
-      "file_order_index": 4,
+      "file_order_index": 5,
       "relations": [
+        {
+          "relation_type": "derivedFrom",
+          "element": {
+            "identifier": "specifications/Verifications/Tests.md#verification-objective",
+            "name": "Verification Objective",
+            "element_type": "verification-objective",
+            "file_path": "specifications/Verifications/Tests.md",
+            "file_order_index": 0,
+            "relations": [],
+            "attachments": []
+          }
+        },
         {
           "relation_type": "verify",
           "element": {
@@ -431,7 +503,7 @@
   ],
   "metadata": {
     "total_elements": 6,
-    "total_relations": 17,
+    "total_relations": 23,
     "filtered_from": null,
     "direction": "Reverse"
   }

@@ -532,6 +532,8 @@ The implementation shall use those contracts as the authoritative source for:
 - verification-objective planning hierarchy semantics
 - evidence-backed verification type semantics
 
+Validation-adjacent migration support shall expose versioned migration candidates for breaking model-contract changes without changing validation output by default. Migration candidates identify affected semantic areas, dry-run expectations, and whether deterministic source rewriting is safe.
+
 Parser-facing behavior remains:
 - When `type` metadata is omitted, the element type is `requirement`.
 - `type` metadata uses the exact element-type token declared in the semantic vocabulary.
@@ -555,7 +557,7 @@ Usage guidelines for selecting appropriate verification types.
 - `verification` - Verification through testing (equivalent to `test-verification`)
 
 **Type Selection Guidelines:**
-- **Verification-objective**: Verification planning or grouping objective. It organizes concrete verification work with `derivedFrom` but does not use `verify` or `satisfiedBy`.
+- **Verification-objective**: Verification planning or grouping objective. It is the mandatory parent for concrete verification work through `derivedFrom` and does not use `verify` or `satisfiedBy`.
 - **Test-verification**: Quantitative requirements, functional behavior, performance criteria
 - **Analysis-verification**: Design constraints, architectural requirements, compliance with standards
 - **Inspection-verification**: Documentation requirements, labeling, configuration settings

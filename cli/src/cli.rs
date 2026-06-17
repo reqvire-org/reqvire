@@ -15,6 +15,7 @@ use reqvire::format::{format_files, render_diff, render_diff_json};
 use reqvire::git_commands;
 use reqvire::graph_registry::Page;
 use reqvire::lint;
+use reqvire::migrations;
 use reqvire::report_collect;
 use reqvire::report_coverage;
 use reqvire::report_model;
@@ -123,6 +124,24 @@ pub enum Commands {
         with_full_relations: bool,
     },
 
+    /// Preview or apply source migrations for known model-breaking changes
+    #[clap(
+        override_help = "Preview or apply source migrations for known model-breaking changes. By default, shows preview without applying changes\n\nMIGRATE OPTIONS:\n      --fix              Apply migration changes to files\n      --json             Output results in JSON format\n      --output <FILE>    Save JSON output to file (requires --json)\n\nCURRENT MIGRATIONS:\n    v0.15-documents-to-element-header - rewrite legacy single-element '# Documents' headers to '# Element'\n    v0.16-verification-objective - create one shared holder verification-objective in root VerificationObjectiveMigration.md and link standalone concrete verifications from that holder with derive"
+    )]
+    Migrate {
+        /// Apply migration changes to files
+        #[clap(long, help_heading = "MIGRATE OPTIONS")]
+        fix: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MIGRATE OPTIONS")]
+        json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "MIGRATE OPTIONS")]
+        output: Option<String>,
+    },
+
     /// Validate model
     #[clap(
         override_help = "Validate model\n\nVALIDATION OPTIONS:\n      --json              Output results in JSON format\n      --output <FILE>     Save JSON output to file (requires --json)"
@@ -139,7 +158,7 @@ pub enum Commands {
 
     /// Search and filter model elements with comprehensive filtering options
     #[clap(
-        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)"
+        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)"
     )]
     Search {
         /// Output results in JSON format
@@ -162,7 +181,7 @@ pub enum Commands {
         #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
         filter_name: Option<String>,
 
-        /// Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+        /// Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
         #[clap(long, value_name = "TYPE[,TYPE...]", help_heading = "SEARCH OPTIONS")]
         filter_type: Option<String>,
 
@@ -292,7 +311,7 @@ pub enum Commands {
     /// - Markdown: Mermaid diagrams with all nested relationships
     /// - Mermaid: pure Mermaid flowchart text with --mmd
     #[clap(
-        override_help = "Generate model-centric structure with nested relations\n\nBy default, shows ontology roots and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n  - Mermaid: pure Mermaid flowchart text with --mmd\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)\n      --mmd                       Output pure Mermaid flowchart text\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save output to file (requires --json or --mmd)"
+        override_help = "Generate model-centric structure with nested relations\n\nBy default, shows ontology roots and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n  - Mermaid: pure Mermaid flowchart text with --mmd\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)\n      --mmd                       Output pure Mermaid flowchart text\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save output to file (requires --json or --mmd)"
     )]
     Model {
         /// Start from specific element by name
@@ -303,7 +322,7 @@ pub enum Commands {
         #[clap(long, help_heading = "MODEL OPTIONS")]
         reverse: bool,
 
-        /// Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+        /// Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
         #[clap(long, value_name = "TYPE", help_heading = "MODEL OPTIONS")]
         filter_type: Option<String>,
 
@@ -450,7 +469,7 @@ pub enum Commands {
 
     /// Merge multiple elements into target element
     #[clap(
-        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and attachments are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Verifications can merge into verifications (of any subtype)\n    - Refinements can merge into refinements (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
+        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and attachments are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Concrete verifications can merge into concrete verifications\n    - Verification objectives can merge only into verification objectives\n    - Refinements can merge into refinements (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
     )]
     Merge {
         /// Target element name (receives merged content)
@@ -505,7 +524,7 @@ pub enum Commands {
     /// Add relation or attachment between elements
     #[clap(
         name = "link",
-        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    refine        - Source refinement is owned by a requirement\n    refinedBy     - Source requirement owns a compatible refinement\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source requirement is verified by verification\n    verify        - Source verification verifies requirement\n    trace         - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach capability ontology context or compatible requirement-owned refinement elements\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: capability may attach ontology; requirement may attach compatible requirement-owned source, constraint, behavior, specification, state, or input-output refinement element identifiers (file.md#element-id or #element-id)\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"Billing Capability\" attaching \"ontology.md#billing-ontology\"\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\""
+        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    refine        - Source refinement is owned by a requirement\n    refinedBy     - Source requirement owns a compatible refinement\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source capability or requirement is verified by concrete verification\n    verify        - Source concrete verification verifies capability or requirement\n    trace         - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach capability ontology context or compatible requirement-owned refinement elements\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: capability may attach ontology; requirement may attach compatible requirement-owned source, constraint, behavior, specification, state, or input-output refinement element identifiers (file.md#element-id or #element-id)\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"Billing Capability\" attaching \"ontology.md#billing-ontology\"\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\""
     )]
     Link {
         /// Source element name
@@ -956,15 +975,20 @@ fn print_custom_help(cmd: &clap::Command) {
 #[derive(Serialize)]
 struct ValidationResult {
     errors: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    migration_candidates: Vec<migrations::MigrationCandidate>,
 }
 
 /// Helper function to print validation results
 fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
+    let migration_plan = migrations::candidates_for_validation_errors(errors);
+
     if json_output {
         let mut error_strings: Vec<String> = errors.iter().map(|e| e.to_string()).collect();
         error_strings.sort(); // Sort for deterministic output
         let json_result = ValidationResult {
             errors: error_strings,
+            migration_candidates: migration_plan.candidates,
         };
         println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
     } else {
@@ -974,6 +998,14 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
             println!("  {}. {}", i + 1, error);
             println!();
         }
+        if !migration_plan.is_empty() {
+            println!("Migration candidates:");
+            for candidate in migration_plan.candidates {
+                println!("  - {}: {}", candidate.id, candidate.summary);
+                println!("    Preview with `reqvire migrate`; apply with `reqvire migrate --fix`.");
+            }
+            println!();
+        }
         println!();
     }
 }
@@ -981,6 +1013,7 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
 fn wants_json(args: &Args) -> bool {
     match &args.command {
         Some(Commands::Format { json, .. }) => *json,
+        Some(Commands::Migrate { json, .. }) => *json,
         Some(Commands::Validate { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
         Some(Commands::Search { json, .. }) => *json,
@@ -1026,6 +1059,7 @@ pub async fn handle_command(
     if let Some(ref cmd) = args.command {
         let (has_output, has_json) = match cmd {
             Commands::Format { output, json, .. } => (output.is_some(), *json),
+            Commands::Migrate { output, json, .. } => (output.is_some(), *json),
             Commands::Validate { output, json, .. } => (output.is_some(), *json),
             Commands::Search { output, json, .. } => (output.is_some(), *json),
             Commands::ChangeImpact { output, json, .. } => (output.is_some(), *json),
@@ -1094,6 +1128,7 @@ pub async fn handle_command(
 
     let mut model_manager = ModelManager::new();
     let is_lint_command = matches!(args.command, Some(Commands::Lint { .. }));
+    let is_migrate_command = matches!(args.command, Some(Commands::Migrate { .. }));
     let with_size_estimates = matches!(
         args.command,
         Some(Commands::Model {
@@ -1106,7 +1141,7 @@ pub async fn handle_command(
         None,
         excluded_filename_patterns,
         ModelBuildOptions {
-            lenient: is_lint_command,
+            lenient: is_lint_command || is_migrate_command,
             with_size_estimates,
         },
     );
@@ -1123,6 +1158,7 @@ pub async fn handle_command(
             if json_output {
                 let json_result = ValidationResult {
                     errors: vec![e.to_string()],
+                    migration_candidates: Vec::new(),
                 };
                 println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
             } else {
@@ -1139,7 +1175,10 @@ pub async fn handle_command(
         Some(Commands::Validate { json, output }) => {
             // For validate command, if we get here it means no validation errors
             if json {
-                let json_result = ValidationResult { errors: vec![] };
+                let json_result = ValidationResult {
+                    errors: vec![],
+                    migration_candidates: Vec::new(),
+                };
                 let json_str = serde_json::to_string_pretty(&json_result).unwrap();
                 handle_json_output(&json_str, &output)?;
             } else {
@@ -1279,6 +1318,67 @@ pub async fn handle_command(
                 let json_str = render_diff_json(&format_result);
                 handle_json_output(&json_str, &output)?;
             } else {
+                render_diff(&format_result);
+            }
+            Ok(0)
+        }
+        Some(Commands::Migrate { fix, json, output }) => {
+            let dry_run = !fix;
+            let (documents_summary, documents_diffs) =
+                migrations::apply_documents_header_migration(excluded_filename_patterns, dry_run)?;
+            let verification_summary = migrations::apply_verification_objective_holders(
+                &mut model_manager.graph_registry,
+            )?;
+            let mut format_result = format_files(&model_manager.graph_registry, dry_run, false)?;
+            format_result.files_changed += documents_diffs.len();
+            format_result.diffs.extend(documents_diffs);
+            format_result
+                .diffs
+                .sort_by(|a, b| a.file_path.cmp(&b.file_path));
+
+            if json {
+                let diff_value: serde_json::Value =
+                    serde_json::from_str(&render_diff_json(&format_result)).map_err(|e| {
+                        ReqvireError::ProcessError(format!(
+                            "Failed to serialize migration diff: {}",
+                            e
+                        ))
+                    })?;
+                let json_str = serde_json::to_string_pretty(&serde_json::json!({
+                    "migrations": {
+                        "documents_header": documents_summary,
+                        "verification_objective": verification_summary,
+                    },
+                    "changes": diff_value,
+                }))
+                .map_err(|e| {
+                    ReqvireError::ProcessError(format!(
+                        "Failed to serialize migration result: {}",
+                        e
+                    ))
+                })?;
+                handle_json_output(&json_str, &output)?;
+            } else if documents_summary.files_changed == 0
+                && verification_summary.derive_relations_added == 0
+                && verification_summary.objectives_created == 0
+            {
+                println!("✅ No migration changes needed.");
+            } else {
+                if dry_run {
+                    println!(
+                        "Migration preview: {} legacy document header file(s), {} objective holder(s), {} derive relation(s).\n",
+                        documents_summary.files_changed,
+                        verification_summary.objectives_created,
+                        verification_summary.derive_relations_added
+                    );
+                } else {
+                    println!(
+                        "Applied migration: {} legacy document header file(s), {} objective holder(s), {} derive relation(s).\n",
+                        documents_summary.files_changed,
+                        verification_summary.objectives_created,
+                        verification_summary.derive_relations_added
+                    );
+                }
                 render_diff(&format_result);
             }
             Ok(0)

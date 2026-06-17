@@ -221,7 +221,7 @@ reqvire link "Capability Name" "specifiedBy" "System Capability Implementation"
 reqvire link "Child Requirement" "derivedFrom" "System Capability Implementation"
 ```
 
-**Relation types**: `derivedFrom` (child -> parent inside same family), `derive` (parent -> child inside same family), `specify` (requirement -> capability), `specifiedBy` (capability -> requirement), `verifiedBy` (capability or requirement -> verification), `verify` (verification -> capability or requirement), `satisfiedBy` (requirement/test-verification/formal-proof-verification -> implementation or evidence), `satisfy` (implementation/evidence -> requirement/test-verification/formal-proof-verification), `refinedBy` (requirement -> refinement), `refine` (refinement -> requirement), `trace` (non-directional traceability)
+**Relation types**: `derivedFrom` (child -> parent inside same family, including verification-family hierarchy), `derive` (parent -> child inside same family), `specify` (requirement -> capability), `specifiedBy` (capability -> requirement), `verifiedBy` (capability or requirement -> concrete verification), `verify` (concrete verification -> capability or requirement), `satisfiedBy` (requirement/test-verification/formal-proof-verification -> implementation or evidence), `satisfy` (implementation/evidence -> requirement/test-verification/formal-proof-verification), `refinedBy` (requirement -> refinement), `refine` (refinement -> requirement), `trace` (non-directional traceability)
 
 ## Step 3: Add Refinements (if needed)
 
@@ -323,6 +323,7 @@ reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
 ### Verification Types
 
 Choose appropriate type:
+- `verification-objective` - Planning/grouping objective for verification work; may parent concrete verification elements through `derivedFrom` but must not use `verify` or `satisfiedBy`
 - `test` - Automated or manual testing (can have `satisfiedBy` to test code)
 - `analysis` - Review, calculation, simulation
 - `inspection` - Visual examination, audit

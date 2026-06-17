@@ -1,6 +1,14 @@
 # Elements
 
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Test Capability Test Element Type Relation Compatibility Valid Trace Specifications
 
 Test capability root for migrated requirement fixtures.
@@ -53,6 +61,7 @@ Test verification with trace to requirement.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Capability A](#capability-a)
   * trace: [System Requirement A](#system-requirement-a)
 
@@ -66,6 +75,7 @@ Test verification with trace to another verification.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Capability B](#capability-b)
   * trace: [Test Verification A](#test-verification-a)
 
@@ -79,6 +89,7 @@ Analysis verification can use trace.
   * type: analysis-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Capability A](#capability-a)
   * trace: [Capability B](#capability-b)
 
@@ -92,6 +103,7 @@ Inspection verification can use trace.
   * type: inspection-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Capability A](#capability-a)
   * trace: [Test Verification A](#test-verification-a)
 
@@ -105,6 +117,7 @@ Demonstration verification can use trace.
   * type: demonstration-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Capability A](#capability-a)
   * trace: [Analysis Verification with Trace](#analysis-verification-with-trace)
 

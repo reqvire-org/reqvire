@@ -15,14 +15,41 @@ const baseUX = css`
   white-space: nowrap;
 
   .ds-typebadge__dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: none;
     width: var(--ds-typebadge-dot-size, calc(var(--space-3) + var(--space-1) / 2));
     height: var(--ds-typebadge-dot-size, calc(var(--space-3) + var(--space-1) / 2));
     border-radius: var(--ds-typebadge-dot-radius, calc(var(--radius-xs) / 2));
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    font-weight: var(--weight-bold);
+    letter-spacing: 0;
+    line-height: 1;
   }
 
   .ds-typebadge__dot--diamond {
     transform: rotate(45deg) scale(0.8);
+  }
+
+  .ds-typebadge__dot--glyph {
+    --ds-typebadge-dot-size: var(--type-icon-sm);
+    color: var(--text-strong);
+  }
+
+  .ds-typebadge__dot--wide-glyph {
+    font-size: calc(var(--text-micro) - var(--space-1));
+  }
+
+  .ds-typebadge__glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ds-typebadge__dot--diamond .ds-typebadge__glyph {
+    transform: rotate(-45deg);
   }
 `;
 
@@ -117,6 +144,8 @@ export function TypeBadge({
   const normalizedType = (type ?? "").toLowerCase();
   const explicitType = normalizedType in ELEMENT_TYPES ? ELEMENT_TYPES[normalizedType as ElementType] : null;
   const markerShape = explicitType?.shape ?? "square";
+  const markerGlyph = explicitType?.glyph ?? null;
+  const isWideGlyph = Boolean(markerGlyph && [...markerGlyph].length > 1);
 
   return (
     <span
@@ -124,7 +153,18 @@ export function TypeBadge({
       data-element-role={role}
       {...props}
     >
-      {dot ? <span className={cx("ds-typebadge__dot", markerShape === "diamond" ? "ds-typebadge__dot--diamond" : undefined)} /> : null}
+      {dot ? (
+        <span
+          className={cx(
+            "ds-typebadge__dot",
+            markerShape === "diamond" ? "ds-typebadge__dot--diamond" : undefined,
+            markerGlyph ? "ds-typebadge__dot--glyph" : undefined,
+            isWideGlyph ? "ds-typebadge__dot--wide-glyph" : undefined,
+          )}
+        >
+          {markerGlyph ? <span className="ds-typebadge__glyph">{markerGlyph}</span> : null}
+        </span>
+      ) : null}
       {children ?? type}
     </span>
   );

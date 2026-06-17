@@ -1,5 +1,13 @@
 # Elements
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### OAuth Flow Test
 
 This test verifies that OAuth authentication flow works correctly with session management.
@@ -8,6 +16,7 @@ This test verifies that OAuth authentication flow works correctly with session m
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [OAuth Implementation](../SystemRequirements.md#oauth-implementation)
   * verify: [Session Management](../SystemRequirements.md#session-management)
 
@@ -21,6 +30,7 @@ This test verifies session expiration functionality.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Session Management](../SystemRequirements.md#session-management)
 
 ---
@@ -33,6 +43,7 @@ This test verifies encryption implementation.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Encryption Implementation](../SystemRequirements.md#encryption-implementation)
 
 ---
@@ -45,6 +56,7 @@ This test verifies coverage calculation accuracy.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Coverage Calculator](../SystemRequirements.md#coverage-calculator)
   * verify: [Coverage Report Generator](../SystemRequirements.md#coverage-report-generator)
 
@@ -58,6 +70,7 @@ This analysis verifies security requirements through code review.
   * type: analysis-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Data Protection](../Capabilities.md#data-protection)
 
 ---
@@ -70,6 +83,7 @@ This inspection verifies code quality standards.
   * type: inspection-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [OAuth Implementation](../SystemRequirements.md#oauth-implementation)
 
 ---

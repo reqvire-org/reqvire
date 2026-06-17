@@ -141,6 +141,9 @@ impl GraphRegistry {
         // Validate non-test-verification satisfiedBy relations
         errors.extend(self.validate_non_test_verification_satisfied_by()?);
 
+        // Validate concrete verifications are organized under verification objectives
+        errors.extend(self.validate_verification_objective_parents()?);
+
         // Validate cross-component dependencies
         errors.extend(self.validate_cross_component_dependencies()?);
 
@@ -696,6 +699,45 @@ impl GraphRegistry {
         Ok(errors)
     }
 
+    fn validate_verification_objective_parents(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        log::debug!("Validating concrete verification objective parents...");
+        let mut errors = Vec::new();
+
+        let mut sorted_nodes: Vec<&ElementNode> = self.nodes.values().collect();
+        sorted_nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
+
+        for element_node in sorted_nodes {
+            let element = &element_node.element;
+            if !matches!(element.element_type, ElementType::Verification(_)) {
+                continue;
+            }
+
+            let has_objective_parent = element.relations.iter().any(|relation| {
+                relation.relation_type.name == "derivedFrom"
+                    && matches!(
+                        &relation.target.link,
+                        LinkType::Identifier(target_id)
+                            if self.nodes.get(target_id).is_some_and(|target_node| {
+                                matches!(
+                                    target_node.element.element_type,
+                                    ElementType::VerificationObjective
+                                )
+                            })
+                    )
+            });
+
+            if !has_objective_parent {
+                errors.push(ReqvireError::MissingParentRelation(format!(
+                    "File {}: Concrete verification element '{}' must have a derivedFrom relation to a verification-objective parent. Standalone concrete verifications require migration to an objective-backed verification plan.",
+                    element.file_path,
+                    element.name
+                )));
+            }
+        }
+
+        Ok(errors)
+    }
+
     /// Validates cross-component dependencies for circular dependencies and missing links.
     fn validate_cross_component_dependencies(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating cross-component dependencies...");
@@ -1071,7 +1113,9 @@ impl GraphRegistry {
 
         // For root-relative references like "/dir/File.md#x"
         if target_id.starts_with('/') {
-            if let Ok(normalized) = crate::utils::normalize_identifier(target_id, &std::path::Path::new("/")) {
+            if let Ok(normalized) =
+                crate::utils::normalize_identifier(target_id, &std::path::Path::new("/"))
+            {
                 if self.nodes.contains_key(&normalized) {
                     return Some(normalized);
                 }
@@ -1096,7 +1140,9 @@ impl GraphRegistry {
 
         // Keep fragment-only support for CRUD inputs that are scoped to the source file.
         if target_id.starts_with('#') {
-            return format!("{}{}", source_file_path, target_id) == expected_target;
+            if format!("{}{}", source_file_path, target_id) == expected_target {
+                return true;
+            }
         }
 
         let base_path = std::path::Path::new(source_file_path)
@@ -4918,7 +4964,10 @@ impl GraphRegistry {
         relation_type: &str,
         git_root: &std::path::Path,
     ) -> Result<String, ReqvireError> {
-        use crate::relation::{LinkType, Relation, RelationTarget, RELATION_TYPES};
+        use crate::relation::{
+            get_relation_element_type_description, validate_relation_element_types, LinkType,
+            Relation, RelationTarget, RELATION_TYPES,
+        };
         use std::path::PathBuf;
 
         // Validate source element exists
@@ -4962,6 +5011,26 @@ impl GraphRegistry {
             } else if is_internal_path {
                 // Internal file path
                 let source_folder = crate::utils::get_parent_dir(&source_file_path);
+                let target_type = crate::element::ElementType::File;
+
+                if !validate_relation_element_types(relation_type, &source_type, &target_type) {
+                    let description = get_relation_element_type_description(relation_type)
+                        .unwrap_or_else(|| {
+                            format!(
+                                "Relation '{}' is not compatible with source type '{}' and internal file targets",
+                                relation_type,
+                                source_type.as_str()
+                            )
+                        });
+                    return Err(ReqvireError::IncompatibleElementTypes(format!(
+                        "Relation '{}' from '{}' ({}) to '{}' (file) has incompatible element types. {}",
+                        relation_type,
+                        source_name,
+                        source_type.as_str(),
+                        target,
+                        description
+                    )));
+                }
 
                 // Calculate relative path from source file to target
                 let target_path = PathBuf::from(target);
@@ -4990,17 +5059,43 @@ impl GraphRegistry {
                 let target_display_name = target_element.name.clone();
                 let target_type = target_element.element_type.clone();
 
-                // Validate type compatibility for element-to-element relations
-                // TODO: Add relation-type-specific validation here
-                // For now, just check that we're not linking incompatible types
-                if !source_type.is_merge_compatible(&target_type) {
-                    // Note: This is a simplified check - we may want more nuanced validation
-                    // based on the specific relation type
-                    log::warn!(
-                        "Adding relation '{}' between potentially incompatible types: {} ({}) -> {} ({})",
-                        relation_type, source_name, source_type.as_str(),
-                        target_display_name, target_type.as_str()
-                    );
+                if source_node.element.attachments.iter().any(|a| {
+                    let attachment_target = a.target.as_str();
+                    attachment_target == target_id
+                        || self
+                            .resolve_relation_identifier(&source_node.element, &attachment_target)
+                            .is_some_and(|resolved| resolved == target_id)
+                        || self.relation_targets_same_identifier(
+                            &source_file_path,
+                            &attachment_target,
+                            &target_id,
+                        )
+                }) {
+                    return Err(ReqvireError::CrossSectionDuplicate(format!(
+                        "Target '{}' already exists in Attachments of '{}'. Cannot add to Relations.",
+                        target, source_name
+                    )));
+                }
+
+                if !validate_relation_element_types(relation_type, &source_type, &target_type) {
+                    let description = get_relation_element_type_description(relation_type)
+                        .unwrap_or_else(|| {
+                            format!(
+                                "Relation '{}' is not compatible with source type '{}' and target type '{}'",
+                                relation_type,
+                                source_type.as_str(),
+                                target_type.as_str()
+                            )
+                        });
+                    return Err(ReqvireError::IncompatibleElementTypes(format!(
+                        "Relation '{}' from '{}' ({}) to '{}' ({}) has incompatible element types. {}",
+                        relation_type,
+                        source_name,
+                        source_type.as_str(),
+                        target_display_name,
+                        target_type.as_str(),
+                        description
+                    )));
                 }
 
                 let relation_target = LinkType::Identifier(target_id.clone());

@@ -1,3 +1,11 @@
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
+
 #!/bin/bash
 set -uo pipefail
 
@@ -273,6 +281,7 @@ This verification illegally declares requirement governance metadata.
   * priority: high
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Root Requirement](Requirements.md#root-requirement)
 ---' \
   'governance|priority|requirement' \

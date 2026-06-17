@@ -208,10 +208,10 @@ export default function SemanticModel() {
             </thead>
             <tbody className="divide-y divide-zinc-200">
               {[
-                ["derivedFrom / derive", "Hierarchy inside the same family: capability, requirement, or ontology."],
+                ["derivedFrom / derive", "Hierarchy inside the same family: capability, requirement, ontology, or verification-family."],
                 ["specify / specifiedBy", "Requirement specifies a capability."],
                 ["refine / refinedBy", "Requirement owns a compatible refinement contract."],
-                ["verify / verifiedBy", "Verification records evidence scope for a capability or requirement."],
+                ["verify / verifiedBy", "Concrete verification records evidence scope for a capability or requirement; verification-objective is excluded."],
                 ["satisfiedBy / satisfy", "Requirement or evidence-backed verification links to implementation or proof/test evidence."],
                 ["attach", "Capability imports ontology context; requirement imports a one-way requirement-owned contract dependency."],
                 ["trace", "Soft traceability without ownership semantics."],

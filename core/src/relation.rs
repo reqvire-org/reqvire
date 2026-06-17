@@ -475,9 +475,9 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
 /// Returns true if the types are compatible, false otherwise
 ///
 /// Element Type Relation Compatibility Matrix:
-/// - derivedFrom/derive: Capability-to-capability, requirement-to-requirement, or ontology-to-ontology only
-/// - verifiedBy: Source must be capability or requirement, target must be verification
-/// - verify: Source must be verification, target must be capability or requirement
+/// - derivedFrom/derive: Capability-to-capability, requirement-to-requirement, ontology-to-ontology, or verification-family-to-verification-family only
+/// - verifiedBy: Source must be capability or requirement, target must be concrete verification
+/// - verify: Source must be concrete verification, target must be capability or requirement
 /// - satisfiedBy: Source must be system requirement (requirement) or test-verification, target must be file (implementation)
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
 /// - refinedBy: Source must be requirement, target must be compatible non-semantic-contract refinement element
@@ -656,12 +656,12 @@ pub fn validate_relation_element_types(
 /// Returns None if the relation type has no specific type restrictions
 pub fn get_relation_element_type_description(relation_type: &str) -> Option<String> {
     match relation_type {
-        "derivedFrom" => Some("'derivedFrom' can only be used within the same hierarchy family: capability-to-capability, requirement-to-requirement, ontology-to-ontology, or verification/concrete-verification-to-verification-objective hierarchy".to_string()),
-        "derive" => Some("'derive' can only be used within the same hierarchy family: capability-to-capability, requirement-to-requirement, ontology-to-ontology, or verification-objective/concrete-verification decomposition".to_string()),
+        "derivedFrom" => Some("'derivedFrom' can only be used within the same hierarchy family: capability-to-capability, requirement-to-requirement, ontology-to-ontology, or verification-family-to-verification-family".to_string()),
+        "derive" => Some("'derive' can only be used within the same hierarchy family: capability-to-capability, requirement-to-requirement, ontology-to-ontology, or verification-family-to-verification-family".to_string()),
         "specifiedBy" => Some("'specifiedBy' should connect a capability to a requirement".to_string()),
         "specify" => Some("'specify' should connect a requirement to a capability".to_string()),
-        "verifiedBy" => Some("'verifiedBy' should connect a capability or requirement to a verification element".to_string()),
-        "verify" => Some("'verify' should connect a verification element to a capability or requirement".to_string()),
+        "verifiedBy" => Some("'verifiedBy' should connect a capability or requirement to a concrete verification element; verification-objective is not allowed".to_string()),
+        "verify" => Some("'verify' should connect a concrete verification element to a capability or requirement; verification-objective is not allowed".to_string()),
         "satisfiedBy" => Some("'satisfiedBy' should connect a requirement, test-verification, or formal-proof-verification to an implementation/evidence file; capability is not allowed".to_string()),
         "satisfy" => Some("'satisfy' should connect an implementation/evidence file to a requirement, test-verification, or formal-proof-verification; capability is not allowed".to_string()),
         "refinedBy" => Some("'refinedBy' should connect a requirement to a compatible non-semantic-contract refinement element. Semantic contracts use constrainedBy/constrain instead.".to_string()),

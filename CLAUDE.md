@@ -111,14 +111,14 @@ cli/src/
 
 ### Architecture Principles
 - Follow the requirements and architecture defined in requirements/
-- Link code and implementations via satisfiedBy only on `requirement` (system) and `test-verification` elements
+- Link code and implementations via satisfiedBy only on `requirement` elements and evidence-backed concrete verification elements (`test-verification`, `formal-proof-verification`)
 - Use Result with custom error types for error handling
 - Document all public APIs with rustdoc
 - Organize code in modules by functionality
 
 ## Model Contract
 
-The Reqvire system model has four first-class layers: ontology, capability, requirement, and verification. Refinements are requirement-owned subordinate details/contracts only, not a system-model layer.
+The Reqvire system model has four first-class layers: ontology, capability, requirement, and verification-family. `verification-objective` elements are mandatory parents for concrete verification planning and hierarchy; concrete verification elements carry `verify`/`verifiedBy` and optional evidence. Refinements are requirement-owned subordinate details/contracts only, not a system-model layer.
 
 Capabilities may derive child capabilities, attach ontology, be specified by requirements, and be verified. Capabilities must not own `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, or `semantic-contract` elements through `refinedBy`/`refine`.
 

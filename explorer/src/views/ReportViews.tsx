@@ -20,7 +20,6 @@ import {
   CoverageBarFrame,
   CoverageBarList,
   CoverageBreakdownFrame,
-  CoverageBreakdownPie,
   CoverageCapabilityList,
   CoverageCapabilityRow,
   CoverageDashboard,
@@ -736,11 +735,11 @@ export function CoverageView({
                   <CoverageBreakdown
                     values={summary.verification_types ?? {}}
                     rows={[
-                      ["test", "Test", "--verification"],
-                      ["formal_proof", "Formal proof", "--verification"],
-                      ["analysis", "Analysis", "--capability"],
-                      ["inspection", "Inspection", "--ontology"],
-                      ["demonstration", "Demonstration", "--refinement"],
+                      ["test", "Test", "test-verification"],
+                      ["formal_proof", "Formal proof", "formal-proof-verification"],
+                      ["analysis", "Analysis", "analysis-verification"],
+                      ["inspection", "Inspection", "inspection-verification"],
+                      ["demonstration", "Demonstration", "demonstration-verification"],
                     ]}
                   />
                 </CoveragePanel>
@@ -834,22 +833,12 @@ function CoverageBreakdown({
   rows,
 }: {
   values: Record<string, number>;
-  rows: [string, string, DesignSystemColorToken][];
+  rows: [string, string, string][];
 }) {
-  const total = rows.reduce((sum, [key]) => sum + (values[key] ?? 0), 0);
   return (
-    <CoverageBreakdownFrame
-      pie={
-        <CoverageBreakdownPie
-          segments={rows.map(([key, , token]) => ({
-            value: total > 0 ? values[key] ?? 0 : 1,
-            colorToken: total > 0 ? token : "--bg-sunken",
-          }))}
-        />
-      }
-    >
-      {rows.map(([key, label, token]) => (
-        <CoverageLegendRow key={key} label={label} value={formatNumber(values[key] ?? 0)} token={token} />
+    <CoverageBreakdownFrame>
+      {rows.map(([key, label, type]) => (
+        <CoverageLegendRow key={key} label={label} value={formatNumber(values[key] ?? 0)} type={type} />
       ))}
     </CoverageBreakdownFrame>
   );

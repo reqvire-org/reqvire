@@ -28,6 +28,7 @@ A test verification element.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective Using Verify](#verification-objective-using-verify)
   * verify: [Target Capability](#target-capability)
 
 ---
@@ -40,6 +41,7 @@ INVALID: Verification elements cannot use verifiedBy (they use verify instead).
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective Using Verify](#verification-objective-using-verify)
   * verify: [Target Capability](#target-capability)
   * verifiedBy: [Target Test Verification](#target-test-verification)
 

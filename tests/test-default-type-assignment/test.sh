@@ -76,6 +76,14 @@ EOF
 cat > "${TEST_DIR}/specifications/root/SubfolderRequirements.md" << 'EOF'
 # Elements
 
+### Subfolder Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
+
 ### Subfolder Requirement Without Type
 
 This element has NO type metadata and is in a subfolder.
@@ -91,12 +99,21 @@ This element has explicit verification type metadata.
   * type: verification
 
 #### Relations
+  * derivedFrom: [Subfolder Verification Objective](#subfolder-verification-objective)
   * verify: ../RootRequirements.md#root-requirement-without-type
 EOF
 
 # 3. Deeper nested directory specifications/nested/deeper/
 cat > "${TEST_DIR}/specifications/nested/deeper/NestedRequirements.md" << 'EOF'
 # Elements
+
+### Nested Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 
 ### Nested Requirement Without Type
 
@@ -113,6 +130,7 @@ This element has explicit test-verification type metadata.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Nested Verification Objective](#nested-verification-objective)
   * verify: ../../RootRequirements.md#root-requirement-without-type
 EOF
 
@@ -292,6 +310,7 @@ reqvire:DefaultTypeContract a owl:Class .
   * type: verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: #explicit-requirement
 
 ### Test Verification
@@ -300,6 +319,7 @@ reqvire:DefaultTypeContract a owl:Class .
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: #explicit-requirement
 
 ### Verification Objective
@@ -322,6 +342,7 @@ reqvire:DefaultTypeContract a owl:Class .
   * type: formal-proof-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: #explicit-requirement
   * satisfiedBy: [proof-report.txt](proof-report.txt)
 
@@ -331,6 +352,7 @@ reqvire:DefaultTypeContract a owl:Class .
   * type: analysis-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: #explicit-requirement
 
 ### Inspection Verification
@@ -339,6 +361,7 @@ reqvire:DefaultTypeContract a owl:Class .
   * type: inspection-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: #explicit-requirement
 
 ### Demonstration Verification
@@ -347,6 +370,7 @@ reqvire:DefaultTypeContract a owl:Class .
   * type: demonstration-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: #explicit-requirement
 
 ### State Refinement

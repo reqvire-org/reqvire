@@ -1,5 +1,13 @@
 # Elements
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Test Capability
 
 A capability for type validation error tests.
@@ -57,6 +65,7 @@ A formal proof verification for positive type validation.
   * type: formal-proof-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Test System Requirement](#test-system-requirement)
   * satisfiedBy: [proof-report.txt](proof-report.txt)
 ---

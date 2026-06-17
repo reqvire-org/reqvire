@@ -311,6 +311,13 @@
           "content": "This test verifies that the search command supports all filter types and combines them with AND logic.\n\n\n#### Details\n\n##### Acceptance Criteria\n- Search command accepts all documented filter flags\n- Multiple filters combine with AND logic (results must match ALL filters)\n- Invalid regex patterns produce clear error messages\n\n##### Test Criteria\n1. `reqvire search --json` returns valid JSON with all elements\n2. `reqvire search --filter-type=capability` returns only capabilities\n3. Element count with two filters is <= element count with one filter (additive behavior)",
           "relations": [
             {
+              "relation_type": "derivedFrom",
+              "target": {
+                "target": "specifications/Requirements.md#verification-objective",
+                "type": "identifier"
+              }
+            },
+            {
               "relation_type": "verify",
               "target": {
                 "target": "specifications/Requirements.md#requirement-with-valid-markdown-relations",
@@ -377,12 +384,43 @@
           "attachments": []
         },
         {
+          "identifier": "specifications/Requirements.md#verification-objective",
+          "name": "Verification Objective",
+          "file": "specifications/Requirements.md",
+          "type": "verification-objective",
+          "content": "Verification objective for concrete verification fixtures in this test model.",
+          "relations": [
+            {
+              "relation_type": "derive",
+              "target": {
+                "target": "specifications/Requirements.md#search-command-verification",
+                "type": "identifier"
+              }
+            },
+            {
+              "relation_type": "derive",
+              "target": {
+                "target": "specifications/Requirements.md#verification-of-standard-relations",
+                "type": "identifier"
+              }
+            }
+          ],
+          "attachments": []
+        },
+        {
           "identifier": "specifications/Requirements.md#verification-of-standard-relations",
           "name": "Verification of Standard Relations",
           "file": "specifications/Requirements.md",
           "type": "test-verification",
           "content": "",
           "relations": [
+            {
+              "relation_type": "derivedFrom",
+              "target": {
+                "target": "specifications/Requirements.md#verification-objective",
+                "type": "identifier"
+              }
+            },
             {
               "relation_type": "verify",
               "target": {
@@ -402,11 +440,11 @@
         }
       ],
       "page_content": "",
-      "total_elements": 9
+      "total_elements": 10
     }
   },
   "global_counters": {
-    "total_elements": 9,
+    "total_elements": 10,
     "total_files": 1,
     "total_ontology_types": {
       "ontology": 0
@@ -423,7 +461,8 @@
       "demonstration-verification": 0,
       "formal-proof-verification": 0,
       "inspection-verification": 0,
-      "test-verification": 2
+      "test-verification": 2,
+      "verification-objective": 1
     },
     "total_refinements_types": {
       "behavior": 0,

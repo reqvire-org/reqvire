@@ -1,6 +1,14 @@
 # Elements
 
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Test Capability Test Containment View Specifications Rootfile Md
 
 Test capability root for migrated requirement fixtures.
@@ -36,6 +44,7 @@ This test verifies the root requirement.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Root System Requirement](#root-system-requirement)
 
 ### Analysis Verification Element
@@ -46,6 +55,7 @@ This analysis verifies performance metrics.
   * type: analysis-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Root System Requirement](#root-system-requirement)
 
 ### Inspection Verification Element
@@ -56,6 +66,7 @@ This inspection verifies code quality.
   * type: inspection-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Root System Requirement](#root-system-requirement)
 
 ### Demonstration Verification Element
@@ -66,6 +77,7 @@ This demonstration verifies usability.
   * type: demonstration-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Root System Requirement](#root-system-requirement)
 
 ### Custom Type Element

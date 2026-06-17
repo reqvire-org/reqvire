@@ -20,6 +20,7 @@ Implementation details shall follow the associated refinement specifications.
   * derive: [CLI Diff Output](#cli-diff-output)
   * derive: [CLI Lint Command](#cli-lint-command)
   * derive: [CLI Merge Element Command](#cli-merge-element-command)
+  * derive: [CLI Migrate Command](#cli-migrate-command)
   * derive: [CLI Model Diagram Command](#cli-model-diagram-command)
   * derive: [CLI Move Asset Command](#cli-move-asset-command)
   * derive: [CLI Move Element Command](#cli-move-element-command)
@@ -321,6 +322,30 @@ Implementation details shall follow the associated refinement specifications. On
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * refinedBy: [CLI Merge Element Command Refinement Specification](Specifications.md#cli-merge-element-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+---
+
+### CLI Migrate Command
+
+The system shall provide a `migrate` command that previews or applies deterministic source migrations for known breaking model-contract changes.
+
+#### Details
+Implementation details shall follow the associated refinement specifications. The command shall default to dry-run preview mode and require `--fix` to write changes.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+  * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Migrate Command Refinement Specification](Specifications.md#cli-migrate-command-refinement-specification)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [migrations](../../../core/src/migrations/mod.rs)
+  * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
 ---
 
 ### CLI Model Diagram Command

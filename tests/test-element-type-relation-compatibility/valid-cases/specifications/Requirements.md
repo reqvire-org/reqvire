@@ -80,6 +80,7 @@ Test verification can use satisfiedBy.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Capability Parent](#capability-parent)
   * satisfiedBy: [test.sh](test.sh)
 
@@ -154,6 +155,7 @@ Analysis verification verifying a requirement.
   * type: analysis-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Capability Parent](#capability-parent)
 
 ---
@@ -166,6 +168,7 @@ Inspection verification verifying a requirement.
   * type: inspection-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Capability Parent](#capability-parent)
 
 ---
@@ -178,6 +181,7 @@ Demonstration verification verifying a requirement.
   * type: demonstration-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Capability Parent](#capability-parent)
 
 ---
@@ -190,6 +194,7 @@ Analysis verification directly verifying a capability.
   * type: analysis-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Test Capability](#test-capability-test-element-type-relation-compatibility-valid-cases-specifications)
 
 ---

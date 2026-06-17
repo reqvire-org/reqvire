@@ -52,8 +52,8 @@ if ! diff <(echo "$OUTPUT" | jq --sort-keys .) <(jq --sort-keys . "$EXPECTED_JSO
 fi
 
 TOTAL=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
-if [ "$TOTAL" -ne 9 ]; then
-  echo "FAILED: expected 9 elements in JSON, got $TOTAL"
+if [ "$TOTAL" -ne 10 ]; then
+  echo "FAILED: expected 10 elements in JSON, got $TOTAL"
   exit 1
 fi
 
@@ -121,8 +121,8 @@ if ! diff "${TEST_DIR}/actual-search.txt" "$EXPECTED_TEXT" > /dev/null; then
 fi
 
 ELEMS_TEXT=$(grep -c '🔹 Element:' <<< "$OUTPUT")
-if [ "$ELEMS_TEXT" -ne 9 ]; then
-  echo "FAILED: expected 9 elements in text search, got $ELEMS_TEXT"
+if [ "$ELEMS_TEXT" -ne 10 ]; then
+  echo "FAILED: expected 10 elements in text search, got $ELEMS_TEXT"
   exit 1
 fi
 

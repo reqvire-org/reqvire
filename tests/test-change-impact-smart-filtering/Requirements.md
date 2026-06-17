@@ -1,5 +1,13 @@
 # Elements
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Existing Capability
 
 Existing capability scope.
@@ -43,4 +51,5 @@ This verifies the existing requirement.
   * type: verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Existing Requirement One](#existing-requirement-one)

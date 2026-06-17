@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
 [![Rust](https://img.shields.io/badge/Built%20with-Rust-orange?style=flat-square&logo=rust)](https://www.rust-lang.org/)
 
-[📖 **Documentation**](https://www.reqvire.org) • [🔍 **Browse Model**](https://reqvire-org.github.io/reqvire/) • [🚀 **Quick Start**](#quick-start) • [👥 **Contributing**](./doc/README.md)
+Explore Reqvire > [📖 **Documentation**](https://www.reqvire.org) • [🔍 **Browse Model**](https://reqvire-org.github.io/reqvire/) • [🚀 **Quick Start**](#quick-start) • [👥 **Contributing**](./doc/README.md)
 
 </div>
 
@@ -269,20 +269,33 @@ Semantic contracts are separate reusable SHACL profiles. They are linked to onto
 
 ---
 
-## Verification
+## Verification Plan
 
-Reqvire supports verification and validation directly in the engineering graph.
+Reqvire treats verification as an executable planning model, not a static checklist.
 
-Verifications provide evidence that:
-- requirements are satisfied
-- behaviors are correct
-- implementations meet intended capability expectations
+Verification planning in Reqvire follows this flow:
+
+1) Define plan structure with `verification-objective` elements.
+   These organize scope, sequencing, and grouping across capabilities and requirements.
+
+2) Derive concrete verification elements from a `verification-objective`, such as:
+- `test-verification`
+- `formal-proof-verification`
+- `analysis-verification`
+- `inspection-verification`
+- `demonstration-verification`
+
+3) Connect each concrete verification element with `verify` relations to target capabilities or requirements.
+
+4) Add evidence evidence in implementation-facing layers using `satisfiedBy` on concrete verifications once execution is complete.
+
+5) Track quality using Reqvire coverage and traceability outputs. Coverage reflects leaf requirements; requirements roll up through existing requirement relations.
 
 This enables:
-- coverage tracking
-- impact analysis
-- intelligent traceability
-- automated validation workflows
+- verifiable plans instead of ad-hoc test lists
+- impact-aware updates when requirements or context changes
+- traceability from obligations to evidence
+- repeatable, AI-readable validation workflows
 
 ---
 

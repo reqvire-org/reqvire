@@ -19,21 +19,6 @@ More content that should remain untouched.
   * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
 ---
 
-### Exact Blank Line Count Test
-
-Test that exactly one blank line is added before Metadata when repositioned.
-Content line 1.
-Content line 2.
-Content line 3.
-
-#### Details
-Detail content here.
-
-#### Metadata
-  * type: test-verification
-  * implementation-status: implemented
----
-
 ### Generate Diagrams
 
 As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
@@ -57,23 +42,6 @@ As an **System Engineer**, I want to manage MBSE models effectively, so that I c
   * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
   * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
   * trace: [MOE_UA](MOEs.md#moe_ua)
----
-
-### Metadata Repositioning Test
-
-Verify that metadata repositioning maintains blank line spacing.
-
-#### Details
-This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
-
-##### Acceptance Criteria
-  * [ ] Metadata is moved to end position
-  * [ ] Blank line exists before metadata after repositioning
-  * [ ] Content structure is preserved
-
-#### Metadata
-  * type: test-verification
-  * implementation-status: implemented
 ---
 
 ### Missing Blank Line Test
@@ -123,4 +91,50 @@ Personas:
 
 #### Metadata
   * type: capability
+---
+
+### User Stories Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
+
+### Exact Blank Line Count Test
+
+Test that exactly one blank line is added before Metadata when repositioned.
+Content line 1.
+Content line 2.
+Content line 3.
+
+#### Details
+Detail content here.
+
+#### Metadata
+  * type: test-verification
+  * implementation-status: implemented
+
+#### Relations
+  * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
+---
+
+### Metadata Repositioning Test
+
+Verify that metadata repositioning maintains blank line spacing.
+
+#### Details
+This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
+
+##### Acceptance Criteria
+  * [ ] Metadata is moved to end position
+  * [ ] Blank line exists before metadata after repositioning
+  * [ ] Content structure is preserved
+
+#### Metadata
+  * type: test-verification
+  * implementation-status: implemented
+
+#### Relations
+  * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
 ---

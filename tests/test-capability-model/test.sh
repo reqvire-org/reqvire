@@ -7,6 +7,14 @@ mkdir -p "${TEST_DIR}/specifications"
 cat > "${TEST_DIR}/specifications/ValidCapabilityModel.md" << 'EOF'
 # Elements
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Billing Capability
 
 Billing product capability.
@@ -94,6 +102,14 @@ EOF
 cat > "${TEST_DIR}/invalid-derive-bridge.fixture" << 'EOF'
 # Elements
 
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
+
 ### Billing Capability
 
 Capability.
@@ -135,6 +151,14 @@ EOF
 cat > "${TEST_DIR}/valid-capability-verification.fixture" << 'EOF'
 # Elements
 
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
+
 ### Billing Capability
 
 Capability.
@@ -154,6 +178,7 @@ Verification.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Billing Capability](#billing-capability)
 ---
 EOF

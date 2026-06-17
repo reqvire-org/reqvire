@@ -1,5 +1,13 @@
 # Elements
 
+
+### Format Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 This document contains various test cases.
 
 ### Format Test
@@ -9,6 +17,7 @@ This test verifies formatting capabilities.
   * type: verification
 
 #### Relations
+  * derivedFrom: [Format Verification Objective](#format-verification-objective)
   * verify: ../SystemRequirements/Requirements.md#requirements-processing
   * satisfiedBy: ../tests/test-format/test.sh
 
@@ -20,6 +29,7 @@ This test verifies validation capabilities.
   * type: verification
 
 #### Relations
+  * derivedFrom: [Format Verification Objective](#format-verification-objective)
   * verify: ../SystemRequirements/Requirements.md#validation-framework
 
 ---
@@ -32,5 +42,6 @@ This verification uses absolute paths to rs files.
   * type: verification
 
 #### Relations
+  * derivedFrom: [Format Verification Objective](#format-verification-objective)
   * verify: [../SystemRequirements/Requirements.md#path-resolution-testing](/SystemRequirements/Requirements.md#path-resolution-testing)
   * satisfiedBy: /core/src/element.rs

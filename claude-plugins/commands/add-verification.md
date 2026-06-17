@@ -44,6 +44,7 @@ ${1:-The user will specify which capability or requirement needs verification.}
 4. **If capability or leaf requirement needs verification:**
 
    Choose verification type:
+   - **verification-objective**: Mandatory planning/grouping parent for concrete verification work. Use only to organize concrete verification elements through `derivedFrom`; do not add `verify`, `verifiedBy`, or `satisfiedBy`.
    - **verification** (or test-verification): Automated testing
    - **analysis-verification**: Mathematical/computational analysis
    - **inspection-verification**: Manual inspection/review
@@ -86,11 +87,12 @@ ${1:-The user will specify which capability or requirement needs verification.}
      * type: test-verification
 
    #### Relations
+     * derivedFrom: [Verification Objective](../path/to/verifications.md#verification-objective)
      * verify: [Capability Or Leaf Requirement](../path/to/element.md#capability-or-leaf-requirement)
      * satisfiedBy: [test.sh](../../tests/test-name/test.sh)
    ```
 
-   Note: Only test-verification type can have satisfiedBy relations to test files.
+   Note: Every concrete verification must have a `derivedFrom` relation to a `verification-objective` parent. Only evidence-backed concrete verification types (`test-verification` and `formal-proof-verification`) can have satisfiedBy relations. `verification-objective` cannot verify requirements/capabilities and cannot have satisfiedBy evidence.
 
 7. **Add verification using reqvire add command:**
 
@@ -207,10 +209,12 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 - **Avoid redundancy**: Don't verify both leaf and parent directly
 - **Use traces**: Run `reqvire traces` to understand verification structure
 - **Test links for test-verification only**: Only test-verifications link to test files
+- **Verification objectives are mandatory planning parents**: Use `verification-objective` to group concrete verifications. Every concrete verification derives from one. It never uses `verify`, `verifiedBy`, or `satisfiedBy`.
 
 ## Verification Types
 
 - **test-verification**: Links to automated test files via satisfiedBy
+- **verification-objective**: Mandatory parent that groups verification intent and concrete verification work; no direct verify/satisfiedBy
 - **analysis-verification**: No test linkage, verified through analysis
 - **inspection-verification**: No test linkage, verified through manual inspection
 - **demonstration-verification**: No test linkage, verified through demonstration

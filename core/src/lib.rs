@@ -14,6 +14,7 @@ pub mod git_commands;
 pub mod graph_registry;
 pub mod html;
 pub mod lint;
+pub mod migrations;
 pub mod model;
 pub mod ontology_graph;
 pub mod parser;

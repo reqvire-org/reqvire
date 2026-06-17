@@ -9,6 +9,11 @@ export type ElementRole =
   | "state"
   | "input-output"
   | "verification-objective"
+  | "test-verification"
+  | "formal-proof-verification"
+  | "analysis-verification"
+  | "inspection-verification"
+  | "demonstration-verification"
   | "verification"
   | "specification"
   | "semantic-contract"
@@ -33,6 +38,11 @@ export const ELEMENT_ROLE_TOKENS = {
     ink: "--verification-objective-ink",
     tint: "--verification-objective-tint",
   },
+  "test-verification": { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
+  "formal-proof-verification": { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
+  "analysis-verification": { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
+  "inspection-verification": { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
+  "demonstration-verification": { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
   verification: { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
   specification: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
   "semantic-contract": { fill: "--semantic-contract", ink: "--semantic-contract-ink", tint: "--semantic-contract-tint" },
@@ -55,6 +65,11 @@ export const ELEMENT_TYPES: Record<ElementType, { color: string; shape: ElementI
     shape: "square",
     role: "verification-objective",
   },
+  "test-verification": { color: "var(--verification)", shape: "square", role: "verification", glyph: "T" },
+  "formal-proof-verification": { color: "var(--verification)", shape: "square", role: "verification", glyph: "FP" },
+  "analysis-verification": { color: "var(--verification)", shape: "square", role: "verification", glyph: "A" },
+  "inspection-verification": { color: "var(--verification)", shape: "square", role: "verification", glyph: "I" },
+  "demonstration-verification": { color: "var(--verification)", shape: "square", role: "verification", glyph: "D" },
   verification: { color: "var(--verification)", shape: "square", role: "verification" },
   specification: { color: "var(--refinement)", shape: "diamond", role: "specification", glyph: "≡" },
   "semantic-contract": { color: "var(--semantic-contract)", shape: "square", role: "semantic-contract" },

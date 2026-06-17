@@ -64,6 +64,7 @@ This is a new verification that should appear separately.
   * type: verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [New Parent Requirement](#new-parent-requirement)
 
 ---
@@ -158,8 +159,8 @@ fi
 
 # Check invalidated verifications
 INVALIDATED_COUNT=$(echo "$JSON_OUTPUT" | jq '.invalidated_verifications | length')
-if [ "$INVALIDATED_COUNT" -ne 1 ]; then
-    echo "❌ FAILED: Expected 1 invalidated verification in JSON, got $INVALIDATED_COUNT"
+if [ "$INVALIDATED_COUNT" -ne 2 ]; then
+    echo "❌ FAILED: Expected 2 invalidated verifications in JSON, got $INVALIDATED_COUNT"
     exit 1
 fi
 

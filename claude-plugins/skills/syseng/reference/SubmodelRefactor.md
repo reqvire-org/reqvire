@@ -27,7 +27,7 @@ Before applying refactor operations, confirm with the user:
 - Submodel ownership map (who owns which folders/elements)
 - Which cross-submodel dependencies are allowed as attachments
 - Which relation types are forbidden across submodels (`derive`, `derivedFrom`, `refinedBy`, `verifiedBy`)
-- Where shared contracts live (ontology elements for vocabulary, reusable semantic contracts for shape profiles, or other compatible requirement-owned refinement elements)
+- Where shared contracts live (ontology elements for vocabulary, semantic-contract elements for reusable shape profiles, or compatible requirement-owned non-semantic-contract refinement elements)
 
 Do not run bulk unlink/move operations before this confirmation.
 
@@ -66,7 +66,7 @@ A submodel may contain internal sub-boundaries (nested domains) with separate ow
 
 3. **Migrate links**
    - For each cross-submodel relation, either move element into owning submodel or replace with attachment
-   - Ensure each receiving capability submodel attaches required external ontology, and each receiving requirement attaches required reusable specifications or semantic contracts
+   - Ensure each receiving capability submodel attaches required external ontology, each receiving requirement attaches required reusable non-semantic-contract refinements, and semantic contracts are linked with `constrainedBy`/`constrain`
    - Preserve dependency visibility: if a requirement relied on a moved concept, add concept references, a local refinement, or an attachment so `collect` still explains the dependency
 
 4. **Validate semantic completeness**

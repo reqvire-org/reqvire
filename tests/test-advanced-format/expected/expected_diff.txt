@@ -300,226 +300,273 @@ Found 9 file(s) with formatting changes:
   001     # Elements
   002 +   ### Details Block Formatting Test
   003
-  004 -   ### Test Capability Test Advanced Format Userstories Md
   004 +   Element with details block that should not be formatted.
   005 +   <details>
   006 +   <summary>Click to expand</summary>
   007
-  008 -   Test capability root for migrated requirement fixtures.
+  008 -   ### User Stories Verification Objective
   008 +   #### This Should Not Get Blank Line
   009 +   Content inside details block.
   010 +   ####Another Header Without Space
   011 +   More content that should remain untouched.
   012 +   </details>
   013
-  014     #### Metadata
-  015 -     * type: capability
+  014 -   Verification objective for concrete verification fixtures in this test model.
+  014 +   #### Metadata
   015 +     * type: requirement
-  016 +   ␤
+  016
+  017 -   #### Metadata
+  017 -     * type: verification-objective
   017 +   #### Relations
   018 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
   019     ---
-  020 -   Personas:
-  020 -   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
-  020 -   2. SOI Developer: Implements capabilities and makes system changes based on MBSE models, ensuring consistency between design and code.
-  020 -   3. Contributor: An external community member contributing to Reqvire by improving models, creating capabilities, or providing feedback.
-  020 -   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
-  020 +   ### Exact Blank Line Count Test
-  021
-  022 +   Test that exactly one blank line is added before Metadata when repositioned.
-  023 +   Content line 1.
-  024 +   Content line 2.
-  025 +   Content line 3.
-  026
-  027 -   ### Managing MBSE Models
-  027 +   #### Details
-  028 +   Detail content here.
-  029
-  030 -   As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
-  030 -   ␤
-  030     #### Metadata
-  031 -     * type: requirement
-  031 -   #### Relations
-  031 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  031 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  031 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
-  031 +     * type: test-verification
-  032 +     * implementation-status: implemented
-  033 +   ---
-  034
-  035     ### Generate Diagrams
-  036 +   ␤
-  037     As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
-  038
-  039     #### Metadata
-  040       * type: requirement
-  041 +   ␤
-  042     #### Relations
-  043 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  043 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  043 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
-  044 +     * trace: [MOE_UA](MOEs.md#moe_ua)
-  045 +   ---
+  020 -   ### Test Capability Test Advanced Format Userstories Md
+  020
+  021 -   Test capability root for migrated requirement fixtures.
+  021 +   ### Generate Diagrams
+  022
+  023 +   As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
+  024 +   ␤
+  025     #### Metadata
+  026 -     * type: capability
+  026 +     * type: requirement
+  027 +   ␤
+  028 +   #### Relations
+  029 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
+  030 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  031     ---
+  032 -   Personas:
+  032 -   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
+  032 -   2. SOI Developer: Implements capabilities and makes system changes based on MBSE models, ensuring consistency between design and code.
+  032 -   3. Contributor: An external community member contributing to Reqvire by improving models, creating capabilities, or providing feedback.
+  032 -   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
+  032 -   ␤
+  032 -   ␤
+  032     ### Managing MBSE Models
+  033
+  034     As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
+  035
+  036     #### Metadata
+  037       * type: requirement
+  038 +   ␤
+  039     #### Relations
+  040 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  040 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  040 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
+  040 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
+  041 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
+  042 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  043 +   ---
+  044
+  045 -   ### Generate Diagrams
+  045 -   As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
+  045 +   ### Missing Blank Line Test
   046
-  047 -   ---
-  047 +   ### Managing MBSE Models
-  048
-  049 -   ### Missing Blank Line Test
-  049 -   This element has content but no blank line before metadata.
-  049 +   As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
-  050 +   ␤
-  051     #### Metadata
-  052       * type: requirement
-  053
-  054     #### Relations
-  055 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  055 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
-  056 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
-  057 +     * trace: [MOE_UA](MOEs.md#moe_ua)
-  058     ---
-  059
-  060     ### Metadata Repositioning Test
-  061
-  062     Verify that metadata repositioning maintains blank line spacing.
-  063 -   #### Metadata
-  063 -     * type: verification
-  063 -     * implementation-status: implemented
-  063 -   ␤
-  063     #### Details
-  064 -   ␤
-  064     This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
-  065
-  066     ##### Acceptance Criteria
-  067 -   ␤
-  067       * [ ] Metadata is moved to end position
-  068       * [ ] Blank line exists before metadata after repositioning
-  069       * [ ] Content structure is preserved
-  070 +   #### Metadata
-  071 +     * type: test-verification
-  072 +     * implementation-status: implemented
-  073     ---
-  074 -   ### Details Block Formatting Test
-  074 +   ### Missing Blank Line Test
-  075
-  076 -   Element with details block that should not be formatted.
-  076 -   <details>
-  076 -   <summary>Click to expand</summary>
-  076 +   This element has content but no blank line before metadata.
+  047 +   This element has content but no blank line before metadata.
+  048 +   ␤
+  049     #### Metadata
+  050       * type: requirement
+  051 +   ␤
+  052     #### Relations
+  053 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  053 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  053 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
+  054 +   ---
+  055
+  056 -   ---
+  056 +   ### Root Capability
+  057
+  058 -   ### Missing Blank Line Test
+  058 -   This element has content but no blank line before metadata.
+  058 +   Top-level capability used as hierarchy parent for system requirements in this fixture.
+  059 +   ␤
+  060     #### Metadata
+  061       * type: requirement
+  062
+  063     #### Relations
+  064 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  064 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
+  065     ---
+  066 -   ### Metadata Repositioning Test
+  066 +   ### External URL Preservation Test
+  067
+  068 -   Verify that metadata repositioning maintains blank line spacing.
+  068 +   This element tests that external URLs in relations are preserved exactly as written.
+  069
+  070     #### Metadata
+  071 -     * type: verification
+  071 -     * implementation-status: implemented
+  071 +     * type: requirement
+  072
+  073 -   #### Details
+  073 +   #### Relations
+  074 +     * derivedFrom: [Root Capability](#root-capability)
+  075 +     * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
+  076 +   ---
   077
-  078 -   #### This Should Not Get Blank Line
-  078 -   Content inside details block.
-  078 -   ####Another Header Without Space
-  078 -   More content that should remain untouched.
-  078 -   </details>
-  078     #### Metadata
-  079       * type: requirement
-  080
-  081     #### Relations
-  082 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  082 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
-  083     ---
-  084 -   ### Exact Blank Line Count Test
-  084 -   ␤
-  084 -   Test that exactly one blank line is added before Metadata when repositioned.
-  084 -   Content line 1.
-  084 -   Content line 2.
-  084 -   Content line 3.
-  084 -   #### Metadata
-  084 -     * type: verification
-  084 -     * implementation-status: implemented
-  084 -   #### Details
-  084 -   Detail content here.
-  084 -   ␤
-  084 -   ---
-  084 -   ␤
-  084     ### Root Capability
-  085
-  086     Top-level capability used as hierarchy parent for system requirements in this fixture.
+  078 -   This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
+  078 +   ### Test Capability Test Advanced Format Userstories Md
+  079
+  080 -   ##### Acceptance Criteria
+  080 +   Test capability root for migrated requirement fixtures.
+  081
+  082 -     * [ ] Metadata is moved to end position
+  082 -     * [ ] Blank line exists before metadata after repositioning
+  082 -     * [ ] Content structure is preserved
+  082
+  083 -   #### Relations
+  083 -     * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
+  083 +   Personas:
+  084 +   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
+  085 +   2. SOI Developer: Implements capabilities and makes system changes based on MBSE models, ensuring consistency between design and code.
+  086 +   3. Contributor: An external community member contributing to Reqvire by improving models, creating capabilities, or providing feedback.
+  087 +   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
+  088 +   ␤
+  089 +   #### Metadata
+  090 +     * type: capability
+  091     ---
+  092 -   ### Details Block Formatting Test
+  092 +   ### User Stories Verification Objective
+  093
+  094 -   Element with details block that should not be formatted.
+  094 -   <details>
+  094 -   <summary>Click to expand</summary>
+  094 +   Verification objective for concrete verification fixtures in this test model.
+  095
+  096 -   #### This Should Not Get Blank Line
+  096 -   Content inside details block.
+  096 -   ####Another Header Without Space
+  096 -   More content that should remain untouched.
+  096 -   </details>
+  096     #### Metadata
+  097 -     * type: requirement
+  097 -   ␤
+  097 -   #### Relations
+  097 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  097 +     * type: verification-objective
+  098     ---
+  099
+  100     ### Exact Blank Line Count Test
 
-  089       * type: requirement
-  090
-  091     #### Relations
-  092 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  092 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
-  093     ---
-  094
-  095     ### External URL Preservation Test
-
-  102     #### Relations
-  103       * derivedFrom: [Root Capability](#root-capability)
-  104       * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
-  105 +   ---
-  106
-  107 +   ### Test Capability Test Advanced Format Userstories Md
-  108 +   ␤
-  109 +   Test capability root for migrated requirement fixtures.
-  110 +   ␤
-  111 +   ␤
-  112 +   Personas:
-  113 +   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
-  114 +   2. SOI Developer: Implements capabilities and makes system changes based on MBSE models, ensuring consistency between design and code.
-  115 +   3. Contributor: An external community member contributing to Reqvire by improving models, creating capabilities, or providing feedback.
-  116 +   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
-  117 +   ␤
-  118 +   #### Metadata
-  119 +     * type: capability
-  120     ---
+  103     Content line 1.
+  104     Content line 2.
+  105     Content line 3.
+  106 +   ␤
+  107 +   #### Details
+  108 +   Detail content here.
+  109 +   ␤
+  110     #### Metadata
+  111 -     * type: verification
+  111 +     * type: test-verification
+  112       * implementation-status: implemented
+  113 -   #### Details
+  113 -   Detail content here.
+  113
+  114     #### Relations
+  115       * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
+  116     ---
+  117 -   ### Root Capability
+  117 +   ### Metadata Repositioning Test
+  118
+  119 -   Top-level capability used as hierarchy parent for system requirements in this fixture.
+  119 +   Verify that metadata repositioning maintains blank line spacing.
+  120
+  121 -   #### Metadata
+  121 -     * type: requirement
+  121 +   #### Details
+  122 +   This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
+  123
+  124 -   #### Relations
+  124 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  124 -   ---
+  124 +   ##### Acceptance Criteria
+  125 +     * [ ] Metadata is moved to end position
+  126 +     * [ ] Blank line exists before metadata after repositioning
+  127 +     * [ ] Content structure is preserved
+  128
+  129 -   ### External URL Preservation Test
+  129 -   ␤
+  129 -   This element tests that external URLs in relations are preserved exactly as written.
+  129 -   ␤
+  129     #### Metadata
+  130 -     * type: requirement
+  130 +     * type: test-verification
+  131 +     * implementation-status: implemented
+  132
+  133     #### Relations
+  134 -     * derivedFrom: [Root Capability](#root-capability)
+  134 -     * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
+  134 -   ␤
+  134 +     * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
+  135     ---
 
 
 
 📄 Verifications/Tests.md
   01     # Elements
-  02
-  03     This document contains various test cases.
-  04 -   ### Format Test
-  04 -   This test verifies formatting capabilities.
-  04 +   ### Absolute Path Verification
-  05
-  06 +   This verification uses absolute paths to rs files.
-  07 +   ␤
-  08     #### Metadata
-  09 -     * type: verification
-  09 +     * type: test-verification
+  02 -   ␤
+  02     ### Format Verification Objective
+  03
+  04     Verification objective for concrete verification fixtures in this test model.
+  05 +   This document contains various test cases.
+  06 +   ␤
+  07     #### Metadata
+  08       * type: verification-objective
+  09     ---
+  10 -   This document contains various test cases.
   10
-  11     #### Relations
-  12 -     * verify: ../SystemRequirements/Requirements.md#requirements-processing
-  12 -     * satisfiedBy: ../tests/test-format/test.sh
-  12 +     * satisfiedBy: [element.rs](../core/src/element.rs)
-  13 +     * verify: [Path Resolution Testing](../SystemRequirements/Requirements.md#path-resolution-testing)
-  14 +   ---
-  15
-  16 -   ### Validation Test
-  16 +   ### Format Test
+  11 -   ### Format Test
+  11 -   This test verifies formatting capabilities.
+  11 +   ### Absolute Path Verification
+  12
+  13 +   This verification uses absolute paths to rs files.
+  14 +   ␤
+  15     #### Metadata
+  16 -     * type: verification
+  16 +     * type: test-verification
   17
-  18 -   This test verifies validation capabilities.
-  18 +   This test verifies formatting capabilities.
-  19
-  20     #### Metadata
-  21 -     * type: verification
-  21 +     * type: test-verification
-  22
-  23     #### Relations
-  24 -     * verify: ../SystemRequirements/Requirements.md#validation-framework
-  24 -   ␤
-  24 +     * satisfiedBy: [test.sh](../tests/test-format/test.sh)
-  25 +     * verify: [Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
-  26     ---
-  27 -   ### Absolute Path Verification
-  27 +   ### Validation Test
-  28
-  29 -   This verification uses absolute paths to rs files.
-  29 +   This test verifies validation capabilities.
+  18     #### Relations
+  19       * derivedFrom: [Format Verification Objective](#format-verification-objective)
+  20 -     * verify: ../SystemRequirements/Requirements.md#requirements-processing
+  20 -     * satisfiedBy: ../tests/test-format/test.sh
+  20 +     * satisfiedBy: [element.rs](../core/src/element.rs)
+  21 +     * verify: [Path Resolution Testing](../SystemRequirements/Requirements.md#path-resolution-testing)
+  22 +   ---
+  23
+  24 -   ### Validation Test
+  24 +   ### Format Test
+  25
+  26 -   This test verifies validation capabilities.
+  26 +   This test verifies formatting capabilities.
+  27
+  28     #### Metadata
+  29 -     * type: verification
+  29 +     * type: test-verification
   30
-  31     #### Metadata
-  32 -     * type: verification
-  32 +     * type: test-verification
-  33
-  34     #### Relations
-  35 -     * verify: [../SystemRequirements/Requirements.md#path-resolution-testing](/SystemRequirements/Requirements.md#path-resolution-testing)
-  35 -     * satisfiedBy: /core/src/element.rs
-  35 +     * verify: [Validation Framework](../SystemRequirements/Requirements.md#validation-framework)
-  36 +   ---
+  31     #### Relations
+  32       * derivedFrom: [Format Verification Objective](#format-verification-objective)
+  33 -     * verify: ../SystemRequirements/Requirements.md#validation-framework
+  33 -   ␤
+  33 +     * satisfiedBy: [test.sh](../tests/test-format/test.sh)
+  34 +     * verify: [Requirements Processing](../SystemRequirements/Requirements.md#requirements-processing)
+  35     ---
+  36 -   ### Absolute Path Verification
+  36 +   ### Validation Test
   37
+  38 -   This verification uses absolute paths to rs files.
+  38 +   This test verifies validation capabilities.
+  39
+  40     #### Metadata
+  41 -     * type: verification
+  41 +     * type: test-verification
+  42
+  43     #### Relations
+  44       * derivedFrom: [Format Verification Objective](#format-verification-objective)
+  45 -     * verify: [../SystemRequirements/Requirements.md#path-resolution-testing](/SystemRequirements/Requirements.md#path-resolution-testing)
+  45 -     * satisfiedBy: /core/src/element.rs
+  45 +     * verify: [Validation Framework](../SystemRequirements/Requirements.md#validation-framework)
+  46 +   ---
+  47
 
 
 

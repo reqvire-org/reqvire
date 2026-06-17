@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
 import { forwardRef } from "react";
 import { css, cx } from "@linaria/atomic";
 import { Icon } from "../../components/core/Icon";
-import { BarMeterFill, ConicSwatch, DonutMeter, TokenSwatch } from "../../components/data/TokenVisual";
+import { BarMeterFill, ConicSwatch, DonutMeter } from "../../components/data/TokenVisual";
 import { ElementIcon } from "../../components/data/ElementIcon";
 import { Stat, StatRow } from "../../components/data/Stat";
 import { TypeBadge } from "../../components/data/TypeBadge";
@@ -391,6 +391,7 @@ const coverageDashboardBaseUX = css`
     align-items: center;
     gap: var(--space-8);
     padding: var(--space-8);
+    min-width: 0;
   }
 
   .coverage-donut,
@@ -402,8 +403,8 @@ const coverageDashboardBaseUX = css`
   }
 
   .coverage-donut {
-    width: var(--space-28);
-    height: var(--space-28);
+    width: clamp(var(--space-24), 5vw, calc(var(--space-32) + var(--space-10)));
+    height: clamp(var(--space-24), 5vw, calc(var(--space-32) + var(--space-10)));
   }
 
   .coverage-donut::after,
@@ -460,9 +461,13 @@ const coverageDashboardBaseUX = css`
 
   .coverage-breakdown {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
     gap: var(--space-8);
+  }
+
+  .coverage-breakdown[data-has-pie="true"] {
+    grid-template-columns: auto minmax(0, 1fr);
   }
 
   .coverage-breakdown__pie {
@@ -493,11 +498,8 @@ const coverageDashboardBaseUX = css`
     justify-content: space-between;
   }
 
-  .coverage-legend-row__swatch {
-    width: var(--space-4);
-    height: var(--space-4);
+  .coverage-legend-row__icon {
     flex: none;
-    border-radius: var(--radius-xs);
   }
 
   .coverage-legend-row span:nth-child(2),
@@ -1073,11 +1075,11 @@ export function CoverageBreakdownFrame({
   pie,
   children,
 }: {
-  pie: ReactNode;
+  pie?: ReactNode;
   children: ReactNode;
 }) {
   return (
-    <div className="coverage-breakdown">
+    <div className="coverage-breakdown" data-has-pie={pie ? "true" : undefined}>
       {pie}
       <div className="coverage-breakdown__legend">{children}</div>
     </div>
@@ -1101,15 +1103,15 @@ export function CoverageBreakdownPie({
 export function CoverageLegendRow({
   label,
   value,
-  token,
+  type,
 }: {
   label: ReactNode;
   value: ReactNode;
-  token: DesignSystemColorToken;
+  type: string;
 }) {
   return (
     <div className="coverage-legend-row">
-      <TokenSwatch colorToken={token} className="coverage-legend-row__swatch" />
+      <ElementIcon className="coverage-legend-row__icon" type={type} size="sm" />
       <span>{label}</span>
       <strong>{value}</strong>
     </div>

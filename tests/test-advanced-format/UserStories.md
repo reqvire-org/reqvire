@@ -1,6 +1,14 @@
 # Elements
 
 
+
+### User Stories Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Test Capability Test Advanced Format Userstories Md
 
 Test capability root for migrated requirement fixtures.
@@ -65,6 +73,8 @@ This test verifies that when metadata is repositioned from early position to end
   * [ ] Blank line exists before metadata after repositioning
   * [ ] Content structure is preserved
 
+#### Relations
+  * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
 ---
 
 ### Details Block Formatting Test
@@ -97,6 +107,8 @@ Content line 3.
 #### Details
 Detail content here.
 
+#### Relations
+  * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
 ---
 
 ### Root Capability

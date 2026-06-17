@@ -1,5 +1,13 @@
 # Elements
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Product Capability
 
 Product capability.
@@ -139,6 +147,7 @@ Payload verification.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Payload Requirement](#payload-requirement)
   * satisfiedBy: [payload_test.txt](payload_test.txt)
 ---

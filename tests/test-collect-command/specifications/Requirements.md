@@ -1,5 +1,13 @@
 # Elements
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Product Capability
 
 The top product capability for collect traversal.
@@ -166,5 +174,6 @@ A verification element to test error handling.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Leaf Requirement](#leaf-requirement)
 ---

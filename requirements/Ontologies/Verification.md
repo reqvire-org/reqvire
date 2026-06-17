@@ -4,7 +4,7 @@
 
 The Reqvire verification ontology defines verification objective and concrete verification element categories and their relationship to capabilities and requirements.
 
-Verification objective elements organize verification intent and planning hierarchy. Concrete verification elements verify capabilities or requirements. Evidence-backed verification types can also be satisfied by evidence artifacts such as test runs, proof reports, generated fixtures, or theorem/model-checking artifacts.
+Verification objective elements organize verification intent and planning hierarchy. Concrete verification elements derive from a verification objective and verify capabilities or requirements. Evidence-backed verification types can also be satisfied by evidence artifacts such as test runs, proof reports, generated fixtures, or theorem/model-checking artifacts.
 
 #### Ontology
 ```turtle
@@ -13,9 +13,14 @@ Verification objective elements organize verification intent and planning hierar
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+reqvire:ConcreteVerification a owl:Class ;
+  rdfs:label "Concrete verification" ;
+  rdfs:subClassOf reqvire:Verification ;
+  owl:disjointWith reqvire:VerificationObjective ;
+  rdfs:comment "Executable or reviewable verification element that derives from a verification objective and verifies a capability or requirement." .
 reqvire:EvidenceBackedVerification a owl:Class ;
   rdfs:label "Evidence-backed verification" ;
-  rdfs:subClassOf reqvire:Verification,
+  rdfs:subClassOf reqvire:ConcreteVerification,
     [ a owl:Restriction ;
       owl:onProperty reqvire:satisfiedBy ;
       owl:someValuesFrom reqvire:Artifact ] ;
@@ -23,7 +28,7 @@ reqvire:EvidenceBackedVerification a owl:Class ;
   rdfs:comment "Verification class whose instances require satisfiedBy evidence for coverage satisfaction." .
 reqvire:NonEvidenceBackedVerification a owl:Class ;
   rdfs:label "Non-evidence-backed verification" ;
-  rdfs:subClassOf reqvire:Verification ;
+  rdfs:subClassOf reqvire:ConcreteVerification ;
   rdfs:comment "Verification class whose instances do not require satisfiedBy evidence for coverage satisfaction." .
 reqvire:TestVerification a owl:Class ;
   rdfs:subClassOf reqvire:EvidenceBackedVerification ;
@@ -164,7 +169,7 @@ reqvire:rollupRequirement a owl:ObjectProperty ;
   rdfs:comment "Requirement whose coverage state is described by a requirement coverage record." .
 reqvire:coveredByVerification a owl:ObjectProperty ;
   rdfs:domain reqvire:VerificationRollup ;
-  rdfs:range reqvire:Verification ;
+  rdfs:range reqvire:ConcreteVerification ;
   rdfs:comment "Verification element contributing evidence or method coverage to the rollup record." .
 reqvire:blockedByRequirement a owl:ObjectProperty ;
   rdfs:domain reqvire:VerificationRollup ;
@@ -283,7 +288,7 @@ reqvire:RequirementCoverageShape
   ] ;
   sh:property [
     sh:path reqvire:coveredByVerification ;
-    sh:class reqvire:Verification ;
+    sh:class reqvire:ConcreteVerification ;
   ] ;
   sh:property [
     sh:path reqvire:coverageReason ;
@@ -349,9 +354,9 @@ Defines SHACL constraints for verification elements and the capabilities or requ
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-reqvire:VerificationShape
+reqvire:ConcreteVerificationShape
   a sh:NodeShape ;
-  sh:targetClass reqvire:Verification ;
+  sh:targetClass reqvire:TestVerification, reqvire:FormalProofVerification, reqvire:AnalysisVerification, reqvire:InspectionVerification, reqvire:DemonstrationVerification ;
   sh:property [
     sh:path reqvire:verify ;
     sh:minCount 1 ;
@@ -366,7 +371,8 @@ reqvire:VerificationShape
   ] ;
   sh:property [
     sh:path reqvire:derivedFrom ;
-    sh:maxCount 0 ;
+    sh:minCount 1 ;
+    sh:class reqvire:VerificationObjective ;
   ] .
 
 reqvire:EvidenceBackedVerificationShape

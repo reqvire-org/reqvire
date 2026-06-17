@@ -1,5 +1,13 @@
 # Elements
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 This document contains requirements with intentional relation errors for testing validation.
 
 
@@ -161,6 +169,7 @@ This verification has a satisfiedBy relation pointing to a non-existing file.
   * type: verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Valid Requirement](#valid-requirement)
   * satisfiedBy: [non-existing-test-script.sh](non-existing-test-script.sh)
 
@@ -194,6 +203,7 @@ This verification correctly uses satisfiedBy pointing to an existing test script
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Valid Requirement](#valid-requirement)
   * satisfiedBy: [test.sh](test.sh)
 
@@ -217,6 +227,7 @@ This verification incorrectly uses satisfiedBy pointing to another verification 
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Valid Requirement](#valid-requirement)
   * satisfiedBy: [Valid Verification with Correct SatisfiedBy](#valid-verification-with-correct-satisfiedby)
 
@@ -240,6 +251,7 @@ This analysis verification incorrectly has a satisfiedBy relation (should fail -
   * type: analysis-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Valid Requirement](#valid-requirement)
   * satisfiedBy: [analysis-document.md](analysis-document.md)
 
@@ -253,6 +265,7 @@ This inspection verification incorrectly has a satisfiedBy relation (should fail
   * type: inspection-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Valid Requirement](#valid-requirement)
   * satisfiedBy: [inspection-checklist.md](inspection-checklist.md)
 
@@ -266,6 +279,7 @@ This demonstration verification incorrectly has a satisfiedBy relation (should f
   * type: demonstration-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Valid Requirement](#valid-requirement)
   * satisfiedBy: [demo-script.sh](demo-script.sh)
 

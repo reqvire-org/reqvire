@@ -17,6 +17,10 @@ export default function Verifications() {
         <DetailGrid
           items={[
             {
+              name: "verification-objective",
+              desc: "Mandatory planning or grouping parent for concrete verification work through derivedFrom. It does not verify capabilities or requirements and must not have satisfiedBy evidence.",
+            },
+            {
               name: "test-verification",
               desc: "Formal or automated testing with documented expected outcomes. This is evidence-backed and must have satisfiedBy links to test implementations or reports.",
             },
@@ -42,12 +46,13 @@ export default function Verifications() {
 
       <Section title="Two-Level Evidence Model">
         <p className="text-zinc-600 mb-4">
-          Capabilities and requirements link to verification elements with{" "}
+          Capabilities and requirements link to concrete verification elements with{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             verifiedBy
           </code>
-          . Evidence-backed verification elements then link to concrete test or
-          proof artifacts with{" "}
+          . Each concrete verification must derive from a verification-objective parent.
+          Evidence-backed concrete verification elements then link to concrete test or proof
+          artifacts with{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             satisfiedBy
           </code>
@@ -61,12 +66,20 @@ The system shall process data within 500ms.
 
 ---
 
+### Performance Verification Objective
+
+#### Metadata
+  * type: verification-objective
+
+---
+
 ### Performance Test
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Performance Verification Objective](#performance-verification-objective)
   * verify: [Response Time Requirement](Requirements.md#response-time-requirement)
   * satisfiedBy: [test_performance.sh](../../tests/test-performance/test_performance.sh)`}</CodeBlock>
       </Section>
@@ -74,6 +87,7 @@ The system shall process data within 500ms.
       <Section title="Coverage Philosophy">
         <BulletList
           items={[
+            "Verification objectives are mandatory parents for concrete verifications and are excluded from concrete verification coverage counts.",
             "Leaf requirements are the preferred verification targets because they represent concrete testable obligations.",
             "Parent requirement coverage rolls up through the requirement hierarchy when leaf requirements are verified.",
             "Capabilities may be directly verified, and capability coverage can also roll up from the requirements that specify them.",

@@ -1,6 +1,14 @@
 # Elements
 
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Test Capability Test Json File Output Specifications Requirements Md
 
 Test capability root for migrated requirement fixtures.
@@ -42,6 +50,7 @@ Verifies the test requirement alpha.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Test Requirement Alpha](#test-requirement-alpha)
 
 ---
@@ -54,6 +63,7 @@ Another verification for merge testing.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Test Requirement Alpha](#test-requirement-alpha)
 
 ---

@@ -1,5 +1,13 @@
 # Elements
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 This file should be processed.
 
 ### Power Control
@@ -38,6 +46,8 @@ Power saving.
 #### Metadata
   * type: verification
 
+#### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
 ### CPU Throttling
 
 Cpu Throttling
@@ -45,7 +55,8 @@ Cpu Throttling
 #### Metadata
   * type: verification
 
-
+#### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
 ### Screen Brightness
 
 Screen brightness.
@@ -53,6 +64,8 @@ Screen brightness.
 #### Metadata
   * type: verification
 
+#### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
 ### Battery Saving
 
 Battery Saving.
@@ -60,9 +73,8 @@ Battery Saving.
 #### Metadata
   * type: verification
 
-
-
-
+#### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
 ### System Power Management
 
 The system shall implement power-saving mechanisms to optimize battery usage.

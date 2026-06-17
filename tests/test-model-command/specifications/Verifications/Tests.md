@@ -1,6 +1,14 @@
 # Elements
 
 
+
+### Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Model Generation Test
 
 Test verifies that model diagrams can be generated from CLI.
@@ -9,6 +17,7 @@ Test verifies that model diagrams can be generated from CLI.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Model Diagram Generation](../SystemRequirements.md#model-diagram-generation)
 
 ---
@@ -33,6 +42,7 @@ Expected files:
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Model Filtering Capability](../SystemRequirements.md#model-filtering-capability)
   * verify: [Forward Relation Traversal](../SystemRequirements.md#forward-relation-traversal)
 
@@ -57,6 +67,7 @@ Expected files:
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Default Model Roots](../SystemRequirements.md#default-model-roots)
 
 ---
@@ -88,6 +99,7 @@ Expected files:
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Markdown Output Format](../SystemRequirements.md#markdown-output-format)
   * verify: [Pure Mermaid Output Format](../SystemRequirements.md#pure-mermaid-output-format)
   * verify: [JSON Output Format](../SystemRequirements.md#json-output-format)
@@ -110,6 +122,7 @@ Test procedure:
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Forward Relation Traversal](../SystemRequirements.md#forward-relation-traversal)
 
 ---
@@ -130,6 +143,7 @@ Test procedure:
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Model Filtering Capability](../SystemRequirements.md#model-filtering-capability)
 
 ---

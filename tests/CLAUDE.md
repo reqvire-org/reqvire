@@ -305,6 +305,7 @@ Expected: Files contain valid mermaid diagrams with proper markers
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: ../Requirements.md#test-capability-requirement
 ```
 

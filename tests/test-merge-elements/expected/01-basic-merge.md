@@ -11,6 +11,26 @@ A child requirement derived from Source Requirement One.
   * derivedFrom: [Target Requirement](#target-requirement)
 ---
 
+### Requirements Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
+
+### Test Verification
+
+A verification element for testing type compatibility error.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Requirements Verification Objective](#requirements-verification-objective)
+  * verify: [Target Requirement](#target-requirement)
+---
+
 ### System Requirements
 
 Top level container for requirements.
@@ -94,17 +114,6 @@ Test capability root for migrated requirement fixtures.
 
 #### Metadata
   * type: capability
----
-
-### Test Verification
-
-A verification element for testing type compatibility error.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Target Requirement](#target-requirement)
 ---
 
 ### Unrelated Requirement

@@ -115,7 +115,7 @@ Create a complete, readable markdown document that synthesizes all collected inf
 
 ### Attached Specifications
 
-[Include content from all attached specifications, constraints, behaviors, states, input-output contracts, , and explicitly constraining semantic contracts. Rephrase this content to flow naturally as part of the document narrative. Synthesize related refinements together rather than treating them as separate items.]
+[Include content from all attached specifications, constraints, behaviors, states, input-output contracts, and explicitly constraining semantic contracts. Rephrase this content to flow naturally as part of the document narrative. Synthesize related refinements together rather than treating them as separate items.]
 
 ## Verification
 

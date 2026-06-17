@@ -144,6 +144,29 @@ The `merge` command behavior is governed by the attached merge content, compatib
   * refine: [CLI Merge Element Command](Commands.md#cli-merge-element-command)
 ---
 
+### CLI Migrate Command Refinement Specification
+
+#### Details
+Migrate command behavior:
+- Be invoked as `reqvire migrate`.
+- Default to dry-run mode and report a diff preview without writing files.
+- Support `--fix` to apply deterministic migrations to source files.
+- Support `--json` for structured migration summary and diff output.
+- Support `--output <FILE>` only with `--json`.
+- Parse the model in lenient mode so known migration-triggering validation errors can be repaired.
+- Implement the `v0.15-documents-to-element-header` migration by rewriting legacy single-element file headers from `# Documents` to `# Element`.
+- Implement the `v0.16-verification-objective` migration by creating one shared holder `verification-objective` element in the repository-root `VerificationObjectiveMigration.md` file and adding holder-owned `derive` relations from that objective to standalone concrete verification elements.
+- Preserve concrete verification `verify` and evidence relations; the shared holder objective is an explicit migration placeholder that users can later rename, split, merge, or regroup.
+- Exit with code 0 when no migration is needed, when a dry-run preview is produced, or when fixes are applied successfully.
+- Exit with non-zero status code on unsupported or unsafe migration errors.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Migrate Command](Commands.md#cli-migrate-command)
+---
+
 ### CLI Model Diagram Command Refinement Specification
 
 #### Details

@@ -843,7 +843,7 @@ The test shall verify that the `link` command adds relations to elements followi
 1. Link with invalid relation type
 2. Verify error is reported
 3. Link with incompatible element types
-4. Verify warning is reported
+4. Verify error is reported and no relation is persisted
 5. Link to non-existent target
 6. Verify error is reported
 7. Link from non-existent source
@@ -867,7 +867,7 @@ The test shall verify that the `link` command adds relations to elements followi
 - Target must be existing element name
 - Duplicate relations/attachments return error with 'already exists' message
 - Validates relation type against supported types
-- Validates element type compatibility
+- Rejects incompatible element type relations before persistence
 - Supports --dry-run preview
 - Supports --json structured output and --json --output file output
 - Reports errors for invalid inputs
@@ -881,6 +881,34 @@ The test shall verify that the `link` command adds relations to elements followi
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-link-unlink/test.sh)
   * verify: [Relation Commands](../../../Interfaces/CLI/Commands.md#relation-commands)
+  * verify: [Relation Management Operations](../../../ModelStructure/ModelManagement.md#relation-management-operations)
+---
+
+### Verification Objective Mutation Test
+
+The test shall verify that verification-objective elements participate in verification-family hierarchy mutations while remaining separate from concrete verification evidence and verification semantics.
+
+#### Details
+Test cases:
+1. **Objective hierarchy link**: `link` permits `verification-objective` to derive from another verification-family element and persists the relation.
+2. **Objective hierarchy unlink**: `unlink` removes the objective hierarchy relation and keeps the model valid.
+3. **Concrete verification relink**: `relink` can move a concrete verification from one verification objective parent to another.
+4. **Objective move**: `mv` moves a verification objective to another file and updates incoming concrete verification `derivedFrom` relations.
+5. **Objective merge**: `merge` permits objective-to-objective merge and removes the merged source element.
+6. **Mixed merge rejection**: `merge` rejects verification-objective to concrete-verification merge as a type mismatch.
+7. **Verification relation rejection**: `link` rejects `verify` and `verifiedBy` relations involving verification-objective as the verification endpoint.
+8. **Evidence relation rejection**: `link` rejects `satisfiedBy` evidence relations from verification-objective to internal file targets.
+9. **Dry-run move**: `mv --dry-run` reports the operation without mutating source or target files.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-verification-objective-mutations/test.sh)
+  * verify: [Atomic Relation Relink Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-relation-relink-operation)
+  * verify: [Element Type Relation Compatibility](../../../ModelStructure/ModelManagement.md#element-type-relation-compatibility)
+  * verify: [Merge Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#merge-element-operation)
+  * verify: [Move Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-element-operation)
   * verify: [Relation Management Operations](../../../ModelStructure/ModelManagement.md#relation-management-operations)
 ---
 

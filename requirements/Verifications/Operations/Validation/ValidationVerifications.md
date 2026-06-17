@@ -99,6 +99,7 @@ This test verifies that the system correctly validates relation types based on e
 **derivedFrom/derive Validation:**
 - System shall allow `derivedFrom` relations between elements in the same hierarchy family only (`capability` to `capability`, `requirement` to `requirement`, `ontology` to `ontology`, or verification-family to verification-family)
 - System shall allow `verification-objective` hierarchy and concrete verification elements derived from verification objectives
+- System shall reject concrete verification elements that do not derive from a `verification-objective`
 - System shall reject `derivedFrom` relations where source is `other` type
 - System shall provide clear error message indicating element type incompatibility
 

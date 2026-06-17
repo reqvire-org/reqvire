@@ -28,6 +28,7 @@ A test verification element.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective with SatisfiedBy](#verification-objective-with-satisfiedby)
   * verify: [Target Capability](#target-capability)
 
 ---
@@ -40,6 +41,7 @@ INVALID: Analysis verification cannot use satisfiedBy (only test-verification ca
   * type: analysis-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective with SatisfiedBy](#verification-objective-with-satisfiedby)
   * verify: [Target Capability](#target-capability)
   * satisfiedBy: [analysis-doc.txt](analysis-doc.txt)
 
@@ -53,6 +55,7 @@ INVALID: Inspection verification cannot use satisfiedBy.
   * type: inspection-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective with SatisfiedBy](#verification-objective-with-satisfiedby)
   * verify: [Target Capability](#target-capability)
   * satisfiedBy: [inspection-checklist.txt](inspection-checklist.txt)
 
@@ -66,6 +69,7 @@ INVALID: Demonstration verification cannot use satisfiedBy.
   * type: demonstration-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective with SatisfiedBy](#verification-objective-with-satisfiedby)
   * verify: [Target Capability](#target-capability)
   * satisfiedBy: [demo-script.sh](demo-script.sh)
 
@@ -104,6 +108,7 @@ INVALID: satisfiedBy must point to implementation file, not another verification
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Objective with SatisfiedBy](#verification-objective-with-satisfiedby)
   * verify: [Target Capability](#target-capability)
   * satisfiedBy: [Target Test Verification](#target-test-verification)
 

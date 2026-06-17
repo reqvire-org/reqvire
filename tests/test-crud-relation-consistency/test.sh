@@ -48,6 +48,14 @@ mkdir -p "${TEST_DIR}/specifications/Verifications"
 cat > "${TEST_DIR}/specifications/Requirements.md" << 'EOF'
 # Elements
 
+
+### Requirements Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+---
 ### Root Capability
 
 This is the capability root.
@@ -92,6 +100,14 @@ EOF
 cat > "${TEST_DIR}/specifications/Verifications/Tests.md" << 'EOF'
 # Elements
 
+### Tests Verification Objective
+
+Verification objective for concrete verification fixtures in this test model.
+
+#### Metadata
+  * type: verification-objective
+
+---
 
 ### Test 1
 
@@ -101,6 +117,7 @@ This test verifies derived requirement 1.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Tests Verification Objective](#tests-verification-objective)
   * verify: ../Requirements.md#derived-requirement-1
 
 ### Test 2
@@ -111,6 +128,7 @@ This test verifies derived requirement 2.
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Tests Verification Objective](#tests-verification-objective)
   * verify: ../Requirements.md#derived-requirement-2
 EOF
 

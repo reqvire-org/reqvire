@@ -10,6 +10,7 @@ This is a test verification that should appear as satisfied in the coverage repo
 * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Planning Objective](#verification-planning-objective)
 * verify: [Leaf Requirement Verified](#leaf-requirement-verified)
 * satisfiedBy: [test-satisfied.sh](test-satisfied.sh)
 
@@ -23,6 +24,7 @@ This is a test verification that should appear as unsatisfied in the coverage re
 * type: test-verification
 
 #### Relations
+  * derivedFrom: [Verification Planning Objective](#verification-planning-objective)
 * verify: [Another Leaf Requirement Verified](#another-leaf-requirement-verified)
 
 ---
@@ -35,6 +37,7 @@ This is a formal-proof verification that should appear as satisfied in the evide
 * type: formal-proof-verification
 
 #### Relations
+  * derivedFrom: [Verification Planning Objective](#verification-planning-objective)
 * verify: [Leaf Requirement Verified By Formal Proof](#leaf-requirement-verified-by-formal-proof)
 * satisfiedBy: [proof-satisfied.txt](proof-satisfied.txt)
 
@@ -48,6 +51,7 @@ This is a formal-proof verification that should appear as unsatisfied when no pr
 * type: formal-proof-verification
 
 #### Relations
+  * derivedFrom: [Verification Planning Objective](#verification-planning-objective)
 * verify: [Leaf Requirement Formal Proof Unsatisfied](#leaf-requirement-formal-proof-unsatisfied)
 
 ---
@@ -59,6 +63,8 @@ This is an analysis-type verification for testing verification type breakdown. A
 #### Metadata
 * type: analysis-verification
 
+#### Relations
+  * derivedFrom: [Verification Planning Objective](#verification-planning-objective)
 ---
 
 ### Inspection Verification Test
@@ -68,6 +74,8 @@ This is an inspection-type verification for testing verification type breakdown.
 #### Metadata
 * type: inspection-verification
 
+#### Relations
+  * derivedFrom: [Verification Planning Objective](#verification-planning-objective)
 ---
 
 ### Demonstration Verification Test
@@ -77,6 +85,8 @@ This is a demonstration-type verification for testing verification type breakdow
 #### Metadata
 * type: demonstration-verification
 
+#### Relations
+  * derivedFrom: [Verification Planning Objective](#verification-planning-objective)
 ---
 
 ### Verification Planning Objective

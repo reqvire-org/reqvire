@@ -11,6 +11,15 @@
 
 ---
 
+### Changed Elements
+
+* [Verification Objective](Requirements.md#verification-objective)
+    * derive -> [Existing Verification](Requirements.md#existing-verification)
+    * derive -> [New Verification](Requirements.md#new-verification) (new)
+
+
+---
+
 ### Impact Scope
 
 * [New Capability](Requirements.md#new-capability)
@@ -21,4 +30,5 @@
 
 ## Invalidated Verifications
 
+- [ ] [Existing Verification](Requirements.md#existing-verification)
 - [ ] [New Verification](Requirements.md#new-verification)

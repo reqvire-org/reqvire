@@ -47,13 +47,23 @@ Moved element: Capability C (specifications/OtherRequirements.md#capability-c)
 
 📄 specifications/Verifications/Tests.md
   [37m01     # Elements[0m
-  [37m02[0m
-  [37m03     ### Test for Capability C[0m
+  [31m02 -   ␤[0m
+  [37m02     ### Verification Objective[0m
+  [37m03[0m
+  [37m04     Verification objective for concrete verification fixtures in this test model.[0m
 
-  [37m08       * type: test-verification[0m
-  [37m09[0m
-  [37m10     #### Relations[0m
-  [31m11 -     * verify: [Capability C](../Requirements.md#capability-c)[0m
-  [32m11 +     * verify: [Capability C](../OtherRequirements.md#capability-c)[0m
-  [37m12     ---[0m
-  [32m13 +   ␤[0m
+  [37m06     #### Metadata[0m
+  [37m07       * type: verification-objective[0m
+  [37m08     ---[0m
+  [32m09 +   ␤[0m
+  [37m10     ### Test for Capability C[0m
+  [37m11[0m
+  [37m12     This test verifies Capability C functionality.[0m
+
+  [37m16[0m
+  [37m17     #### Relations[0m
+  [37m18       * derivedFrom: [Verification Objective](#verification-objective)[0m
+  [31m19 -     * verify: [Capability C](../Requirements.md#capability-c)[0m
+  [32m19 +     * verify: [Capability C](../OtherRequirements.md#capability-c)[0m
+  [37m20     ---[0m
+  [32m21 +   ␤[0m
