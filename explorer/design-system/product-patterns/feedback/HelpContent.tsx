@@ -94,6 +94,7 @@ const ELEMENT_LEGEND = [
   ["requirement", "Requirement"],
   ["behavior", "Behavior"],
   ["constraint", "Constraint"],
+  ["verification-objective", "Verification Objective"],
   ["test-verification", "Test Verification"],
   ["formal-proof-verification", "Formal Proof Verification"],
   ["analysis-verification", "Analysis Verification"],

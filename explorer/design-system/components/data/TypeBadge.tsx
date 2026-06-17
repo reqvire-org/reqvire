@@ -98,6 +98,12 @@ const roleSkinX = css`
     --ds-typebadge-ink: var(--semantic-contract-ink);
   }
 
+  &[data-element-role="verification-objective"] {
+    --ds-typebadge-color: var(--verification-objective);
+    --ds-typebadge-tint: var(--verification-objective-tint);
+    --ds-typebadge-ink: var(--verification-objective-ink);
+  }
+
   &[data-element-role="verification"] {
     --ds-typebadge-color: var(--verification);
     --ds-typebadge-tint: var(--verification-tint);

@@ -530,6 +530,8 @@ function mermaidClassForRole(role: ElementRole): string {
       return "inputOutput";
     case "semantic-contract":
       return "semanticContract";
+    case "verification-objective":
+      return "verificationObjective";
     default:
       return role === "other" ? "default" : role;
   }
