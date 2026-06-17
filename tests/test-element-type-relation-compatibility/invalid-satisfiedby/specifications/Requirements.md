@@ -120,3 +120,15 @@ INVALID: Other type can only use trace relations.
   * satisfiedBy: [impl.txt](impl.txt)
 
 ---
+
+### Verification Objective with SatisfiedBy
+
+INVALID: Verification objectives cannot carry evidence directly.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * satisfiedBy: [impl.txt](impl.txt)
+
+---

@@ -56,6 +56,7 @@
     --color-capability:  oklch(88.48% 0.0546 243.39);
     --color-requirement: oklch(47.42% 0.1862 294.78);
     --color-verification:oklch(67.31% 0.1624 144.21);
+    --color-verification-objective: oklch(43.2% 0.122 145.8);
     --color-refinement:  oklch(77.03% 0.1741 64.05);
     --color-semantic-contract: oklch(63.68% 0.2078 25.33);
     --color-ontology:    oklch(65.1%  0.133  89.06);
@@ -166,6 +167,9 @@
     --verification:     var(--color-verification);
     --verification-ink: #2e7d32;
     --verification-tint: color-mix(in oklch, var(--verification) 15%, var(--bg-surface));
+    --verification-objective:     var(--color-verification-objective);
+    --verification-objective-ink: #0b3d12;
+    --verification-objective-tint: color-mix(in oklch, var(--verification-objective) 15%, var(--bg-surface));
 
     --ontology:     var(--color-ontology);
     --ontology-ink: #6f5600;
@@ -287,6 +291,7 @@
       --refinement-ink:    #ffb74d;
       --semantic-contract-ink: #ef9a9a;
       --verification-ink:  #81c784;
+      --verification-objective-ink: #9ccc65;
       --ontology-ink:      #e3cd7b;
       --resource-ink:      #ffd95e;
       --other-ink:         #bdbdbd;
@@ -343,6 +348,7 @@
     --refinement-ink:    #ffb74d;
     --semantic-contract-ink: #ef9a9a;
     --verification-ink:  #81c784;
+    --verification-objective-ink: #9ccc65;
     --ontology-ink:      #e3cd7b;
     --resource-ink:      #ffd95e;
     --other-ink:         #bdbdbd;

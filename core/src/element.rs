@@ -39,6 +39,7 @@ pub const ELEMENT_TYPES: &[&str] = &[
     "analysis-verification",      // VerificationType::Analysis
     "inspection-verification",    // VerificationType::Inspection
     "demonstration-verification", // VerificationType::Demonstration
+    "verification-objective",     // ElementType::VerificationObjective
     "source",                     // RefinementType::Source
     "semantic-contract",          // ElementType::SemanticContract
     "constraint",                 // RefinementType::Constraint
@@ -251,6 +252,7 @@ pub enum ElementType {
     Requirement(RequirementType),
     Ontology,
     SemanticContract,
+    VerificationObjective,
     Verification(VerificationType),
     Refinement(RefinementType),
     File,
@@ -273,6 +275,7 @@ impl ElementType {
             },
             ElementType::Ontology => "ontology",
             ElementType::SemanticContract => "semantic-contract",
+            ElementType::VerificationObjective => "verification-objective",
             ElementType::Verification(ver) => match ver {
                 VerificationType::Default => "test-verification",
                 VerificationType::Test => "test-verification",
@@ -314,6 +317,7 @@ impl ElementType {
                 ElementType::Requirement(RequirementType::System)
             }
             "ontology" => ElementType::Ontology,
+            "verification-objective" => ElementType::VerificationObjective,
 
             // Different verification types
             "verification" => ElementType::Verification(VerificationType::Test),
@@ -386,6 +390,10 @@ impl ElementType {
         matches!(self, ElementType::SemanticContract)
     }
 
+    pub fn is_verification_objective(&self) -> bool {
+        matches!(self, ElementType::VerificationObjective)
+    }
+
     /// Returns the main type category for merge compatibility
     pub fn main_category(&self) -> &'static str {
         match self {
@@ -393,6 +401,7 @@ impl ElementType {
             ElementType::Requirement(_) => "requirement",
             ElementType::Ontology => "ontology",
             ElementType::SemanticContract => "semantic-contract",
+            ElementType::VerificationObjective => "verification-objective",
             ElementType::Verification(_) => "verification",
             ElementType::Refinement(_) => "refinement",
             ElementType::File => "file",

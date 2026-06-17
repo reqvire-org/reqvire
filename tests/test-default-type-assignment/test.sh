@@ -302,6 +302,20 @@ reqvire:DefaultTypeContract a owl:Class .
 #### Relations
   * verify: #explicit-requirement
 
+### Verification Objective
+
+#### Metadata
+  * type: verification-objective
+
+### Objective Derived Verification
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: #verification-objective
+  * verify: #explicit-requirement
+
 ### Formal Proof Verification
 
 #### Metadata
@@ -388,6 +402,8 @@ TYPES_TO_CHECK=(
     "Semantic Contract Refinement:semantic-contract"
     "Verification:test-verification"
     "Test Verification:test-verification"
+    "Verification Objective:verification-objective"
+    "Objective Derived Verification:test-verification"
     "Formal Proof Verification:formal-proof-verification"
     "Analysis Verification:analysis-verification"
     "Inspection Verification:inspection-verification"

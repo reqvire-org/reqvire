@@ -529,6 +529,7 @@ The implementation shall use those contracts as the authoritative source for:
 - capability, requirement, refinement, verification, and custom type categories
 - default element type semantics
 - requirement-owned refinement type semantics
+- verification-objective planning hierarchy semantics
 - evidence-backed verification type semantics
 
 Parser-facing behavior remains:
@@ -554,6 +555,7 @@ Usage guidelines for selecting appropriate verification types.
 - `verification` - Verification through testing (equivalent to `test-verification`)
 
 **Type Selection Guidelines:**
+- **Verification-objective**: Verification planning or grouping objective. It organizes concrete verification work with `derivedFrom` but does not use `verify` or `satisfiedBy`.
 - **Test-verification**: Quantitative requirements, functional behavior, performance criteria
 - **Analysis-verification**: Design constraints, architectural requirements, compliance with standards
 - **Inspection-verification**: Documentation requirements, labeling, configuration settings
@@ -562,4 +564,3 @@ Usage guidelines for selecting appropriate verification types.
 #### Metadata
   * type: specification
 ---
-

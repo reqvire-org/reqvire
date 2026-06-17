@@ -24,7 +24,7 @@ The TraceFlow visualization displays the traceability hierarchy as a Sankey flow
 
 **Structure:**
 - Left-to-right flow showing requirement hierarchy
-- Nodes represent elements (capabilities, requirements, verifications)
+- Nodes represent elements (capabilities, requirements, concrete verifications, and verification objectives when present in the trace dataset)
 - Links represent relations (specifiedBy, derivedFrom, verifiedBy), including direct capability verification links
 - Link width proportional to the number of connections
 - Encoded by semantic role tokens and type glyphs
@@ -32,7 +32,8 @@ The TraceFlow visualization displays the traceability hierarchy as a Sankey flow
 **Node Types:**
 - Capabilities use the capability role token and glyph
 - System requirements use the requirement role token and glyph
-- Verifications use the verification role token and glyph
+- Verification objectives use the verification-objective role token and plain square marker
+- Concrete verifications use the verification role token and glyph
 - Test verifications use the verification role token plus verification subtype label
 
 **Interactive Capabilities:**
@@ -53,7 +54,8 @@ The visualization uses the shared Explorer design-system role palette:
 | file | Source-file role token and compact source-file glyph |
 | capability | Capability role token and capability glyph |
 | requirement | Requirement role token and requirement glyph |
-| verification | Verification role token and verification glyph |
+| verification-objective | Verification-objective role token and plain square marker |
+| verification | Concrete verification role token and verification glyph |
 
 Concrete color values are owned by the Explorer design-system tokens. The Trace flow document only defines which semantic roles appear in the trace visualization.
 

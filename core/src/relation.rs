@@ -514,6 +514,13 @@ pub fn validate_relation_element_types(
                     && matches!(target_type, ElementType::Requirement(_)))
                 || (matches!(source_type, ElementType::Ontology)
                     && matches!(target_type, ElementType::Ontology))
+                || (matches!(
+                    source_type,
+                    ElementType::Verification(_) | ElementType::VerificationObjective
+                ) && matches!(
+                    target_type,
+                    ElementType::Verification(_) | ElementType::VerificationObjective
+                ))
         }
         "derive" => {
             (matches!(source_type, ElementType::Capability)
@@ -522,6 +529,13 @@ pub fn validate_relation_element_types(
                     && matches!(target_type, ElementType::Requirement(_)))
                 || (matches!(source_type, ElementType::Ontology)
                     && matches!(target_type, ElementType::Ontology))
+                || (matches!(
+                    source_type,
+                    ElementType::Verification(_) | ElementType::VerificationObjective
+                ) && matches!(
+                    target_type,
+                    ElementType::Verification(_) | ElementType::VerificationObjective
+                ))
         }
         "specifiedBy" => {
             matches!(source_type, ElementType::Capability)
@@ -642,8 +656,8 @@ pub fn validate_relation_element_types(
 /// Returns None if the relation type has no specific type restrictions
 pub fn get_relation_element_type_description(relation_type: &str) -> Option<String> {
     match relation_type {
-        "derivedFrom" => Some("'derivedFrom' can only be used within the same hierarchy family: capability-to-capability, requirement-to-requirement, or ontology-to-ontology".to_string()),
-        "derive" => Some("'derive' can only be used within the same hierarchy family: capability-to-capability, requirement-to-requirement, or ontology-to-ontology".to_string()),
+        "derivedFrom" => Some("'derivedFrom' can only be used within the same hierarchy family: capability-to-capability, requirement-to-requirement, ontology-to-ontology, or verification/concrete-verification-to-verification-objective hierarchy".to_string()),
+        "derive" => Some("'derive' can only be used within the same hierarchy family: capability-to-capability, requirement-to-requirement, ontology-to-ontology, or verification-objective/concrete-verification decomposition".to_string()),
         "specifiedBy" => Some("'specifiedBy' should connect a capability to a requirement".to_string()),
         "specify" => Some("'specify' should connect a requirement to a capability".to_string()),
         "verifiedBy" => Some("'verifiedBy' should connect a capability or requirement to a verification element".to_string()),

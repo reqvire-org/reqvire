@@ -99,7 +99,7 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # Test 4: New standard types are accepted by search and model filters
-for TYPE in state input-output formal-proof-verification source semantic-contract capability ontology; do
+for TYPE in state input-output formal-proof-verification verification-objective source semantic-contract capability ontology; do
   echo "Test 4: Valid --filter-type $TYPE is accepted by search" >> "${TEST_DIR}/test_results.log"
   set +e
   OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type="$TYPE" --json 2>&1)

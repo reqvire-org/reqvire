@@ -2,9 +2,9 @@
 
 ### Reqvire Verification Ontology
 
-The Reqvire verification ontology defines verification element categories and their relationship to capabilities and requirements.
+The Reqvire verification ontology defines verification objective and concrete verification element categories and their relationship to capabilities and requirements.
 
-Verification elements verify capabilities or requirements. Evidence-backed verification types can also be satisfied by evidence artifacts such as test runs, proof reports, generated fixtures, or theorem/model-checking artifacts.
+Verification objective elements organize verification intent and planning hierarchy. Concrete verification elements verify capabilities or requirements. Evidence-backed verification types can also be satisfied by evidence artifacts such as test runs, proof reports, generated fixtures, or theorem/model-checking artifacts.
 
 #### Ontology
 ```turtle
@@ -45,6 +45,10 @@ reqvire:DemonstrationVerification a owl:Class ;
   rdfs:subClassOf reqvire:NonEvidenceBackedVerification ;
   rdfs:label "Demonstration verification" ;
   rdfs:comment "Verification through demonstration of capability in a representative workflow or environment." .
+reqvire:VerificationObjective a owl:Class ;
+  rdfs:label "Verification objective" ;
+  rdfs:subClassOf reqvire:Verification ;
+  rdfs:comment "Planning and grouping element for verification objectives. It may participate in verification hierarchy but does not directly verify requirements or carry evidence artifacts." .
 
 reqvire:VerificationType a owl:Class ;
   rdfs:subClassOf reqvire:VerificationElementType ;
@@ -105,6 +109,11 @@ reqvire:demonstrationVerificationType a reqvire:VerificationType, reqvire:Verifi
   reqvire:verificationTypeName "demonstration-verification" ;
   reqvire:verificationEvidenceBacked false ;
   reqvire:verificationTypeDescription "Verification through demonstration of capability in a representative workflow or environment." .
+reqvire:verificationObjectiveType a reqvire:VerificationElementType ;
+  rdfs:label "verification-objective" ;
+  rdfs:comment "Verification planning objective. This type organizes concrete verification work and is not a concrete verification method." ;
+  reqvire:elementTypeName "verification-objective" ;
+  reqvire:defaultElementType false .
 ```
 
 #### Metadata
@@ -385,6 +394,26 @@ reqvire:NonEvidenceBackedVerificationShape
     sh:maxCount 0 ;
   ] .
 
+reqvire:VerificationObjectiveShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:VerificationObjective ;
+  sh:property [
+    sh:path reqvire:verify ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verifiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
+  ] .
+
 reqvire:VerificationTypeShape
   a sh:NodeShape ;
   sh:targetClass reqvire:VerificationType ;
@@ -415,4 +444,3 @@ reqvire:VerificationTypeShape
   * constrain: [Verification Upward Traceability](../Verification/Traceability/VerificationTracesRequirements.md#verification-upward-traceability)
   * use: [Reqvire Verification Ontology](#reqvire-verification-ontology)
 ---
-

@@ -112,7 +112,8 @@ Both Model route visualizations use the Explorer design-system semantic palette 
 | source file | Shared source-file icon and file surface token |
 | capability | Capability role token and capability glyph |
 | requirement | Requirement role token and requirement glyph |
-| verification | Verification role token and verification glyph |
+| verification-objective | Verification-objective role token and plain square marker |
+| verification | Concrete verification role token and verification glyph |
 | refinement | Refinement role token with subtype-specific glyph |
 | resource | Resource role token for referenced implementation, evidence, or document targets |
 | other/default | Muted/default role token for unresolved or generic infrastructure nodes |

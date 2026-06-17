@@ -91,8 +91,8 @@ This section defines which element types can use which relation types as source 
 
 | Relation Type | Allowed Source Types | Allowed Target Types | Notes |
 |---------------|---------------------|---------------------|-------|
-| **derivedFrom** | capability, requirement, ontology | same source family only | Capability, requirement, and ontology hierarchy families stay separate |
-| **derive** | capability, requirement, ontology | same source family only | Inverse of derivedFrom |
+| **derivedFrom** | capability, requirement, ontology, verification-objective, verification types | same source family only | Capability, requirement, ontology, and verification hierarchy families stay separate |
+| **derive** | capability, requirement, ontology, verification-objective, verification types | same source family only | Inverse of derivedFrom |
 | **specify** | requirement | capability | Requirement specifies a capability |
 | **specifiedBy** | capability | requirement | Capability is specified by a requirement |
 | **satisfiedBy** | requirement, test-verification, formal-proof-verification | InternalPath (files) | System requirements and evidence-backed verifications link to implementation or evidence artifacts |
@@ -103,8 +103,8 @@ This section defines which element types can use which relation types as source 
 | **constrain** | semantic-contract | requirement | Semantic contract constrains a requirement |
 | **use** | semantic-contract | ontology | Semantic contract uses ontology vocabulary |
 | **usedBy** | ontology | semantic-contract | Ontology vocabulary is used by a semantic contract |
-| **verifiedBy** | capability or requirement | All verification types | Capabilities and requirements link to verifications |
-| **verify** | All verification types | capability or requirement | Verifications link to capabilities or requirements |
+| **verifiedBy** | capability or requirement | Concrete verification types | Capabilities and requirements link to concrete verifications |
+| **verify** | Concrete verification types | capability or requirement | Concrete verifications link to capabilities or requirements |
 | **trace** | Any (except refinement types) | Any | Documentation/discovery, no type constraints |
 
 ### Element-Centric View
@@ -113,6 +113,7 @@ This section defines which element types can use which relation types as source 
 |--------------|-------------------|------------------|
 | **capability** | derivedFrom, derive, specifiedBy, refinedBy, verifiedBy, trace | derivedFrom, derive, specify, refine, verify, trace |
 | **requirement** | derivedFrom, derive, satisfiedBy, refinedBy, constrainedBy, verifiedBy, trace | derivedFrom, derive, satisfy, refine, constrain, verify, trace |
+| **verification-objective** | derivedFrom, derive, trace | derivedFrom, derive, trace |
 | **test-verification** | verify, satisfiedBy, trace | verifiedBy, satisfy, trace |
 | **analysis-verification** | verify, trace | verifiedBy, trace |
 | **inspection-verification** | verify, trace | verifiedBy, trace |
@@ -130,7 +131,7 @@ This section defines which element types can use which relation types as source 
 
 ### Key Constraints
 
-1. **derivedFrom/derive restricted to hierarchy families**: `capability` derives only from `capability`, `requirement` derives only from `requirement`, and `ontology` derives only from `ontology`. Capability, requirement, and ontology hierarchy must not be mixed through `derivedFrom`/`derive`.
+1. **derivedFrom/derive restricted to hierarchy families**: `capability` derives only from `capability`, `requirement` derives only from `requirement`, `ontology` derives only from `ontology`, and verification-family elements derive only from verification-family elements. Capability, requirement, ontology, and verification hierarchy must not be mixed through `derivedFrom`/`derive`.
 
 2. **Capability-to-requirement bridge**: requirements use `specify` to point to the capability they specify. Capabilities use `specifiedBy` to point to requirements that specify them. System requirements must have an immediate parent through either `derivedFrom` to another requirement or `specify` to a capability.
 
@@ -138,10 +139,12 @@ This section defines which element types can use which relation types as source 
 
 4. **satisfiedBy/satisfy restricted to implementable elements**: `satisfiedBy` links requirements and evidence-backed verifications to implementation/evidence files. Capability elements are not valid sources/targets for satisfaction relations.
 
-5. **evidence-backed verification special cases**: Among verification types, `test-verification` and `formal-proof-verification` can use `satisfiedBy` relations. `test-verification` links to test implementations. `formal-proof-verification` links to formal proof artifacts, model-checking artifacts, theorem files, generated fixtures, or proof reports. Other verification types (`analysis-verification`, `inspection-verification`, `demonstration-verification`) cannot use `satisfiedBy`.
+5. **verification objective special case**: `verification-objective` organizes verification intent and may form verification hierarchy through `derivedFrom`/`derive`, but it is not a concrete verification. It cannot use `verify`, cannot be a `verifiedBy` target, and cannot use `satisfiedBy`.
 
-6. **Capability verification may be direct or roll-up**: Capability elements can be directly verified through `verifiedBy`, while coverage rollup remains derived from specifying requirements.
+6. **evidence-backed verification special cases**: Among concrete verification types, `test-verification` and `formal-proof-verification` can use `satisfiedBy` relations. `test-verification` links to test implementations. `formal-proof-verification` links to formal proof artifacts, model-checking artifacts, theorem files, generated fixtures, or proof reports. Other concrete verification types (`analysis-verification`, `inspection-verification`, `demonstration-verification`) cannot use `satisfiedBy`.
 
-7. **formal-proof-verification evidence**: `formal-proof-verification` represents verification by formal proof, model checking, theorem proving, or other mathematically structured evidence. It verifies capabilities or requirements through the same `verify`/`verifiedBy` relation family as other verification types and is expected to have at least one `satisfiedBy` artifact demonstrating the proof or generated evidence.
+7. **Capability verification may be direct or roll-up**: Capability elements can be directly verified through `verifiedBy`, while coverage rollup remains derived from specifying requirements.
 
-8. **other type conservative**: Elements with type `other` can only use `trace` relations to maintain flexibility while avoiding semantic conflicts.
+8. **formal-proof-verification evidence**: `formal-proof-verification` represents verification by formal proof, model checking, theorem proving, or other mathematically structured evidence. It verifies capabilities or requirements through the same `verify`/`verifiedBy` relation family as other concrete verification types and is expected to have at least one `satisfiedBy` artifact demonstrating the proof or generated evidence.
+
+9. **other type conservative**: Elements with type `other` can only use `trace` relations to maintain flexibility while avoiding semantic conflicts.

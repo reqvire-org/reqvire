@@ -571,6 +571,11 @@ fn build_search_result(
                         .entry(type_name.to_string())
                         .or_insert(0) += 1;
                 }
+                element::ElementType::VerificationObjective => {
+                    *c.total_verifications_types
+                        .entry("verification-objective".to_string())
+                        .or_insert(0) += 1;
+                }
                 element::ElementType::SemanticContract => {
                     *c.total_semantic_contract_types
                         .entry("semantic-contract".to_string())

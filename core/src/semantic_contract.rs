@@ -1355,6 +1355,9 @@ fn element_type_classes(element_type: &ElementType) -> Vec<&'static str> {
             };
             vec!["reqvire:Element", "reqvire:Verification", subtype]
         }
+        ElementType::VerificationObjective => {
+            vec!["reqvire:Element", "reqvire:VerificationObjective"]
+        }
         ElementType::SemanticContract => {
             vec!["reqvire:Element", "reqvire:SemanticContract"]
         }

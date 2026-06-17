@@ -71,6 +71,7 @@ The filtering system **must support the following filters**, which may be active
 - `"capability"` - Capability element
 - `"requirement"` - System requirement (default type)
 - `"verification"` / `"test-verification"` - Test verification
+- `"verification-objective"` - Verification planning/grouping objective
 - `"analysis-verification"` - Analysis verification
 - `"inspection-verification"` - Inspection verification
 - `"demonstration-verification"` - Demonstration verification

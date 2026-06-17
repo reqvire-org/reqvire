@@ -79,6 +79,15 @@ This is a demonstration-type verification for testing verification type breakdow
 
 ---
 
+### Verification Planning Objective
+
+This objective organizes verification planning and must not be counted as a concrete verification or orphaned verification in coverage output.
+
+#### Metadata
+* type: verification-objective
+
+---
+
 ### Coverage Capability
 
 Capability for coverage roll-up testing.

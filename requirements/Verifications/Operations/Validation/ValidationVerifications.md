@@ -58,7 +58,7 @@ This test verifies that the system assigns the default type 'requirement' to all
 **Explicit Type Metadata Overrides:**
 - System shall allow explicit type specification via Metadata subsection
 - System shall respect explicit type metadata when present
-- System shall support all standard element types: capability, requirement, ontology, semantic-contract, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, formal-proof-verification, source, state, input-output, constraint, behavior, specification, other
+- System shall support all standard element types: capability, requirement, ontology, semantic-contract, verification-objective, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, formal-proof-verification, source, state, input-output, constraint, behavior, specification, other
 
 ##### Test Criteria
 1. **Default type assignment verification:**
@@ -97,9 +97,8 @@ This test verifies that the system correctly validates relation types based on e
 
 ##### Acceptance Criteria
 **derivedFrom/derive Validation:**
-- System shall allow `derivedFrom` relations between elements in the same hierarchy family only (`capability` to `capability`, `requirement` to `requirement`, or `ontology` to `ontology`)
-- System shall reject `derivedFrom` relations where source is a verification element
-- System shall reject `derivedFrom` relations where target is a verification element
+- System shall allow `derivedFrom` relations between elements in the same hierarchy family only (`capability` to `capability`, `requirement` to `requirement`, `ontology` to `ontology`, or verification-family to verification-family)
+- System shall allow `verification-objective` hierarchy and concrete verification elements derived from verification objectives
 - System shall reject `derivedFrom` relations where source is `other` type
 - System shall provide clear error message indicating element type incompatibility
 
@@ -112,14 +111,17 @@ This test verifies that the system correctly validates relation types based on e
 **satisfiedBy/satisfy Validation:**
 - System shall allow `satisfiedBy` relations from `requirement` elements to implementation files
 - System shall reject `satisfiedBy` relations from `capability` elements
+- System shall reject `satisfiedBy` relations from `verification-objective` elements
 - System shall allow `satisfiedBy` relations from `test-verification` to test implementation files
 - System shall allow `satisfiedBy` relations from `formal-proof-verification` to proof evidence files
 - System shall reject `satisfiedBy` relations from `analysis-verification`, `inspection-verification`, `demonstration-verification` elements
 - System shall provide clear error message for invalid element types using satisfiedBy
 
 **verifiedBy/verify Validation:**
-- System shall allow `verifiedBy` relations from `capability` and `requirement` elements to any verification type
-- System shall allow `verify` relations from any verification type to `capability` or `requirement` elements
+- System shall allow `verifiedBy` relations from `capability` and `requirement` elements to any concrete verification type
+- System shall allow `verify` relations from any concrete verification type to `capability` or `requirement` elements
+- System shall reject `verifiedBy` targets that are `verification-objective`
+- System shall reject `verify` relations authored by `verification-objective`
 - System shall reject `verifiedBy` relations from non-capability and non-requirement elements
 - System shall reject `verifiedBy` relations from verification elements
 - System shall reject `verify` relations to non-capability and non-requirement elements
@@ -653,4 +655,3 @@ This test verifies that the system correctly validates relations to excluded fil
   * satisfiedBy: [test.sh](../../../../tests/test-valid-relations/test.sh)
   * verify: [Excluded File Relation Validation](../../../Operations/Validation/ValidationRequirements.md#excluded-file-relation-validation)
 ---
-

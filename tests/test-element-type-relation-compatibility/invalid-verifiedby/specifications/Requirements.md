@@ -82,3 +82,28 @@ INVALID: Requirements should use verifiedBy, not verify.
   * verify: [Target Capability](#target-capability)
 
 ---
+
+### Verification Objective Using Verify
+
+INVALID: Verification objectives organize concrete verification work and cannot directly verify requirements.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * verify: [Target Capability](#target-capability)
+
+---
+
+### Requirement VerifiedBy Verification Objective
+
+INVALID: verifiedBy must point to a concrete verification, not a verification objective.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Target Capability](#target-capability)
+  * verifiedBy: [Verification Objective Using Verify](#verification-objective-using-verify)
+
+---

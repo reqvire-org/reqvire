@@ -53,6 +53,7 @@ Version policy:
 | | `behavior` | How the system behaves in specific conditions |
 | | `state` | Lifecycle states, state machines, transitions, and state-dependent contracts |
 | | `input-output` | Payloads, messages, documents, schemas, fixtures, and data contracts |
+| Verification planning | `verification-objective` | Verification objective or grouping node; may derive from verification-family elements but does not verify requirements/capabilities and cannot use satisfiedBy |
 | Verifications | `test-verification` | Automated/manual testing (evidence-backed; requires satisfiedBy) |
 | | `formal-proof-verification` | Formal proof, model checking, theorem proving, generated fixtures, or proof reports (evidence-backed; requires satisfiedBy) |
 | | `analysis-verification` | Review, calculation, simulation |
@@ -154,7 +155,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 | `derivedFrom` / `derive` | `capability`, `requirement`, `ontology` | Hierarchy within the same family: capability-to-capability, requirement-to-requirement, or ontology-to-ontology |
 | `specify` / `specifiedBy` | `requirement` / `capability` | Bridge from requirements to their owning capability |
 | `satisfiedBy` / `satisfy` | `requirement`, `test-verification`, `formal-proof-verification` only | Link to implementation or evidence artifacts |
-| `verifiedBy` / `verify` | `capability`, `requirement` / verification element | Link capabilities and requirements to verification elements |
+| `verifiedBy` / `verify` | `capability`, `requirement` / concrete verification element | Link capabilities and requirements to concrete verification elements; `verification-objective` is excluded |
 | `refinedBy` / `refine` | `requirement` | Ownership of subtype-compatible non-semantic-contract refinement elements |
 | `constrainedBy` / `constrain` | `requirement` / `semantic-contract` | Link requirements to semantic contracts that constrain them |
 | `use` / `usedBy` | `semantic-contract` / `ontology` | Link semantic contracts to the ontology vocabulary they use |
@@ -167,7 +168,8 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 - Requirement hierarchy uses `derivedFrom`/`derive` only between requirements
 - Ontology hierarchy uses `derivedFrom`/`derive` only between ontology elements; ontology elements do not author attachments
 - Capabilities may be directly verified but are not directly satisfied; capability coverage also rolls up from requirements that specify them
-- Among verification types, only evidence-backed verifications (`test-verification`, `formal-proof-verification`) may use `satisfiedBy`/`satisfy`
+- Verification-family hierarchy uses `derivedFrom`/`derive` between `verification-objective` and concrete verification elements; objectives organize verification work but do not use `verify`, `verifiedBy`, or `satisfiedBy`
+- Among concrete verification types, only evidence-backed verifications (`test-verification`, `formal-proof-verification`) may use `satisfiedBy`/`satisfy`
 - Each non-semantic-contract refinement is owned by exactly one valid requirement owner via `refinedBy`
 - Semantic contracts must use `constrain`/`constrainedBy` for requirement application and `use`/`usedBy` for ontology vocabulary context; they must not use `refine`/`refinedBy`
 - Capabilities must not own `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, or `semantic-contract` elements through `refinedBy`/`refine`

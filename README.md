@@ -152,6 +152,15 @@ This enables:
 - shared system understanding
 - traceable domain semantics
 
+Ontology itself defines the shared meaning; reusable constraints are authored separately as `semantic-contract` elements.
+
+`semantic-contract` elements are first-class, reusable SHACL profiles that:
+- declare constraints in a `#### Shapes` block
+- bind to ontology terms through `use` / `usedBy`
+- constrain requirements through `constrain` / `constrainedBy`
+
+This keeps constraints explicit and reusable at the ontological level, while requirements remain implementation-facing obligations and remain machine-verifiable through ontology-derived checks.
+
 ---
 
 ## Capabilities
@@ -198,7 +207,8 @@ Requirements are first-class semantic graph elements that:
 - derive from capabilities
 - connect to ontology concepts
 - refine into structured engineering contracts
-- can be constrained by reusable semantic contracts
+- can be constrained by ontologically anchored `semantic-contract`s
+- stay verifiable as ontology-derived constraints are reapplied through SHACL profiles
 - trace to implementation artifacts
 - link directly to verification evidence
 - propagate change impact throughout the engineering graph
@@ -217,13 +227,13 @@ This enables:
 - specification-driven engineering
 - semantic consistency across the lifecycle
 
-Requirements can evolve from lightweight statements into progressively refined engineering semantics through:
+Requirements can evolve from lightweight statements into progressively refined, machine-verifiable engineering semantics through:
 - behavioral refinements
 - state models
 - I/O contracts
 - constraints
 - detailed specifications
-- reusable semantic contracts that explicitly use ontology and constrain requirements
+- ontologically anchored semantic-contracts that constrain obligations via explicit ontology-shape references and remain machine-checkable
 
 Examples:
 - latency limits
@@ -255,7 +265,7 @@ Requirements can be refined into structured engineering contracts such as:
 
 This allows requirements to evolve into precise, machine-readable engineering semantics while remaining Git-native and human-readable.
 
-Semantic contracts are separate reusable SHACL profiles. They use ontology through `use`/`usedBy` relations and constrain requirements through `constrain`/`constrainedBy`; requirements may still exist without ontology or semantic-contract links.
+Semantic contracts are separate reusable SHACL profiles. They are linked to ontology terms using `use`/`usedBy`, and they constrain requirements via `constrain`/`constrainedBy`; requirements may still exist without ontology or semantic-contract links.
 
 ---
 

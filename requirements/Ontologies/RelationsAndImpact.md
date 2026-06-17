@@ -1056,23 +1056,23 @@ reqvire:deriveRelationRule a reqvire:RelationRule ;
   rdfs:label "derive" ;
   reqvire:relationName "derive" ;
   reqvire:inverseRelation reqvire:derivedFrom ;
-  reqvire:allowedSourceType "capability", "requirement", "ontology" ;
+  reqvire:allowedSourceType "capability", "requirement", "ontology", "verification-family" ;
   reqvire:allowedTargetType "same-hierarchy-family" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Parent capability, requirement, or ontology derives child elements only within the same hierarchy family." .
+  reqvire:relationRuleDescription "Parent capability, requirement, ontology, or verification-family element derives child elements only within the same hierarchy family." .
 
 reqvire:derivedFromRelationRule a reqvire:RelationRule ;
   rdfs:label "derivedFrom" ;
   reqvire:relationName "derivedFrom" ;
   reqvire:inverseRelation reqvire:derive ;
-  reqvire:allowedSourceType "capability", "requirement", "ontology" ;
+  reqvire:allowedSourceType "capability", "requirement", "ontology", "verification-family" ;
   reqvire:allowedTargetType "same-hierarchy-family" ;
   reqvire:relationDirection "inverse" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact false ;
-  reqvire:relationRuleDescription "Child capability, requirement, or ontology points to its parent in the same hierarchy family." .
+  reqvire:relationRuleDescription "Child capability, requirement, ontology, or verification-family element points to its parent in the same hierarchy family." .
 
 reqvire:specifiedByRelationRule a reqvire:RelationRule ;
   rdfs:label "specifiedBy" ;
@@ -1167,22 +1167,22 @@ reqvire:verifiedByRelationRule a reqvire:RelationRule ;
   reqvire:relationName "verifiedBy" ;
   reqvire:inverseRelation reqvire:verify ;
   reqvire:allowedSourceType "capability", "requirement" ;
-  reqvire:allowedTargetType "verification" ;
+  reqvire:allowedTargetType "concrete-verification" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Capability or requirement points to verification evidence that verifies it." .
+  reqvire:relationRuleDescription "Capability or requirement points to concrete verification evidence that verifies it. Verification objectives are excluded." .
 
 reqvire:verifyRelationRule a reqvire:RelationRule ;
   rdfs:label "verify" ;
   reqvire:relationName "verify" ;
   reqvire:inverseRelation reqvire:verifiedBy ;
-  reqvire:allowedSourceType "verification" ;
+  reqvire:allowedSourceType "concrete-verification" ;
   reqvire:allowedTargetType "capability", "requirement" ;
   reqvire:relationDirection "inverse" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact false ;
-  reqvire:relationRuleDescription "Verification element points to the capability or requirement it verifies." .
+  reqvire:relationRuleDescription "Concrete verification element points to the capability or requirement it verifies. Verification objectives are excluded." .
 
 reqvire:satisfiedByRelationRule a reqvire:RelationRule ;
   rdfs:label "satisfiedBy" ;
@@ -1253,4 +1253,3 @@ reqvire:ownedRefinementAttachmentRule a reqvire:AttachmentCompatibilityRule ;
 #### Relations
   * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
 ---
-

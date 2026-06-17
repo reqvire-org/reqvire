@@ -115,6 +115,7 @@ Explorer palette behavior:
 - Use one role palette across the Model tree, List/Grid rows, Graph mode, Search results, Ontologies, Traces, source content, and element modals.
 - Render semantic-contract elements with their own SHACL-profile role token as a plain square with no glyph. Render refinement-family subtypes with one shared refinement hue and distinct type glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
 - Render capability elements as a plain capability-colored square with no dark hub wrapper or inner pip, matching the simple square treatment used by other non-refinement element types.
+- Render `verification-objective` elements with their own darker green verification-objective role token as a plain square with no glyph, distinct from concrete verification elements that verify requirements or capabilities.
 - Render unresolved concept-reference targets with the resource/amber role treatment, but render resolved ontology-term concept references as ontology endpoints in element-detail modals. Evidence-file and artifact targets use the neutral/default role treatment and must not share the concept-reference resource color.
 - Relation and attachment endpoints shall use the shared `ElementIcon` marker contract for both element targets and non-element resource/artifact targets; they shall not use ad hoc tiny pips with local color mappings.
 - In element-detail modal headers, render only the actual element type badge. Type family remains available to design-system components for color/glyph semantics but must not appear as a redundant visible kind badge next to the actual type.
@@ -569,7 +570,7 @@ Project knowledge graph view generation behavior:
 - Builds graph nodes from actual Reqvire elements and resource targets, not from raw RDF triples or ontology vocabulary definitions.
 - Builds graph edges from actual relation facts, attachment facts, and concept-reference facts. User-authored and generated opposite relation facts shall remain distinguishable as evidence in the graph data and detail modal.
 - Emits Reqvire root submodel metadata alongside graph nodes and edges so Knowledge Graph variants can align visual subgraphs with the same capability-rooted submodel boundaries reported by the `submodels` command.
-- Classifies element nodes into four primary system-model layers: ontology definitions, capabilities, requirements, and verifications. Requirement-owned refinements are subordinate requirement detail/contract nodes, not an additional system-model layer. Custom/other elements and resource targets are supporting project-fact nodes, not additional model layers.
+- Classifies element nodes into four primary system-model layers: ontology definitions, capabilities, requirements, and verification-family elements. `verification-objective` nodes are verification planning nodes, while concrete verification nodes carry `verify`/evidence facts. Requirement-owned refinements are subordinate requirement detail/contract nodes, not an additional system-model layer. Custom/other elements and resource targets are supporting project-fact nodes, not additional model layers.
 - Separates system-model layer membership from relation semantics. Layer membership controls node role color and filtering; relation semantics control whether an edge is structural (`derive`, `specify`, `refine`) or an overlay/evidence fact (`attach`, `satisfiedBy`, `verifiedBy`, `trace`, concept reference, file target, or external target).
 - Shows file-path and external URL targets as resource nodes only when actual project facts reference them.
 - Treats ontology IRI concept-reference targets like attachment/resource targets in the main Knowledge Graph instead of exposing a separate concept-reference node category; detailed OWL/RDFS/SHACL vocabulary exploration remains the responsibility of the Ontologies view.
@@ -596,7 +597,7 @@ Project knowledge graph view generation behavior:
 - Draws relation facts in the same canonical directions used by Mermaid diagrams: `derive`, `specifiedBy`, `satisfiedBy`, `refinedBy`, `verifiedBy`, and `trace`. Opposite propagated facts such as `derivedFrom`, `specify`, `satisfy`, `refine`, and `verify` shall be reversed and deduplicated into the canonical visual edge rather than rendered as duplicate parallel relations.
 - Owns its viewport sizing directly and uses shell-provided minimum viewport dimensions so the WebGL graph remains visible.
 - Emits graph data with source and target identifiers that all resolve to Project Store graph nodes so Graphology edge insertion cannot fail before drawing.
-- Uses one semantic role color contract across the Knowledge Graph legend, graph nodes, search swatches, and detail kind badges: capability, requirement/refinement, verification, ontology, resource, and other/default all resolve through the Explorer design-system palette API.
+- Uses one semantic role color contract across the Knowledge Graph legend, graph nodes, search swatches, and detail kind badges: capability, requirement/refinement, verification-objective, concrete verification, ontology, resource, and other/default all resolve through the Explorer design-system palette API.
 - Uses darker role borders only as subtle accents so legend entries, graph nodes, search result swatches, and detail badges read as one consistent visual system instead of mixing pastel controls with saturated graph nodes.
 
 #### Metadata
@@ -795,7 +796,7 @@ Styling conventions for the served Explorer web interface.
 
 **Element Cards and Badges:**
 - Element cards, grid tiles, list rows, search results, graph nodes, relation pills, and modal badges use the same role tokens and glyph contract.
-- Capability, requirement, verification, ontology, resource, and refinement-family roles are encoded by role token, text label, and glyph. Color is never the only type cue.
+- Capability, requirement, verification-objective, concrete verification, ontology, resource, and refinement-family roles are encoded by role token, text label, and glyph. Color is never the only type cue.
 - Semantic-contract elements use their own SHACL-profile role token as a plain square with no glyph. Refinement-family subtypes use a shared refinement hue with distinct glyphs for source, specification, constraint, behavior, state, and input-output elements.
 
 **Navigation:**

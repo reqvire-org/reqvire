@@ -85,6 +85,41 @@ Test verification can use satisfiedBy.
 
 ---
 
+### Verification Objective
+
+Verification objective organizes concrete verification activities but does not verify requirements directly.
+
+#### Metadata
+  * type: verification-objective
+
+---
+
+### Derived Verification Objective
+
+Verification objectives may derive from other verification objectives to form a verification planning hierarchy.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
+
+---
+
+### Objective Derived Test Verification
+
+Concrete verification may derive from an objective and still carry the actual verify relation.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
+  * verify: [Capability Parent](#capability-parent)
+  * satisfiedBy: [test.sh](test.sh)
+
+---
+
 ### Requirement with Test Verification
 
 Requirement verified by test verification.

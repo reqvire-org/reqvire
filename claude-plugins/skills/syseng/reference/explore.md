@@ -43,7 +43,7 @@ reqvire model --filter-type="test-verification"
 reqvire model --reverse --filter-type="test-verification"
 ```
 
-**Element types for `--filter-type`:** capability, requirement, ontology, semantic-contract, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
+**Element types for `--filter-type`:** capability, requirement, ontology, semantic-contract, verification-objective, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
 
 ## Searching Elements
 
@@ -70,7 +70,7 @@ Use `--short` when analyzing model structure without needing full content. Use `
 | `--has-attachments` | Elements with attachments | `--has-attachments` |
 | `--filter-attachment` | Filter by attachment pattern | `--filter-attachment="*.pdf"` |
 
-**Element types for --filter-type (supports comma-separated list):** capability, requirement, ontology, semantic-contract, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
+**Element types for --filter-type (supports comma-separated list):** capability, requirement, ontology, semantic-contract, verification-objective, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
 
 ### By Type
 ```bash

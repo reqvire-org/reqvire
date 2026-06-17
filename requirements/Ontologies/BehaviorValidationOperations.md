@@ -579,7 +579,12 @@ reqvire:requirementMergeCategory a reqvire:MergeCompatibilityCategory ;
 reqvire:verificationMergeCategory a reqvire:MergeCompatibilityCategory ;
   rdfs:label "verification" ;
   reqvire:mergeCategoryElementType "verification", "test-verification", "analysis-verification", "inspection-verification", "demonstration-verification", "formal-proof-verification" ;
-  rdfs:comment "Verification elements merge only within the verification element family." ;
+  rdfs:comment "Concrete verification elements merge only within the concrete verification element family." ;
+  reqvire:mergeRequiresSameCategory true .
+reqvire:verificationObjectiveMergeCategory a reqvire:MergeCompatibilityCategory ;
+  rdfs:label "verification-objective" ;
+  reqvire:mergeCategoryElementType "verification-objective" ;
+  rdfs:comment "Verification objective elements merge only with other verification objectives, not with concrete verification elements." ;
   reqvire:mergeRequiresSameCategory true .
 reqvire:refinementMergeCategory a reqvire:MergeCompatibilityCategory ;
   rdfs:label "refinement" ;

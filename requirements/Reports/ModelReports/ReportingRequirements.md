@@ -355,6 +355,7 @@ The verification coverage report shall provide:
 - Count and percentage of unverified leaf requirements
 - Total count of verification artifacts with breakdown by verification type
 - Count and percentage of satisfied test-verification artifacts
+- Verification objectives shall be visible in model/search reports but excluded from verification coverage denominators because they organize verification intent rather than verifying requirements directly.
 - Count and percentage of orphaned verification artifacts
 - Detailed lists grouped by file and section
 - Output in both human-readable text and machine-readable JSON formats
@@ -459,4 +460,3 @@ When tracing structural changes, the system shall analyze the System model and d
   * specify: [Trace Changes in System Model](../../Processing/RelationsAndImpactFeature.md#trace-changes-in-system-model)
   * verifiedBy: [Structural Change Reports Verification](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#structural-change-reports-verification)
 ---
-

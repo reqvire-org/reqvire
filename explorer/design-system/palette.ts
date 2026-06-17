@@ -8,6 +8,7 @@ export type ElementRole =
   | "behavior"
   | "state"
   | "input-output"
+  | "verification-objective"
   | "verification"
   | "specification"
   | "semantic-contract"
@@ -27,6 +28,11 @@ export const ELEMENT_ROLE_TOKENS = {
   behavior: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
   state: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
   "input-output": { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  "verification-objective": {
+    fill: "--verification-objective",
+    ink: "--verification-objective-ink",
+    tint: "--verification-objective-tint",
+  },
   verification: { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
   specification: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
   "semantic-contract": { fill: "--semantic-contract", ink: "--semantic-contract-ink", tint: "--semantic-contract-tint" },
@@ -44,6 +50,11 @@ export const ELEMENT_TYPES: Record<ElementType, { color: string; shape: ElementI
   behavior: { color: "var(--refinement)", shape: "diamond", role: "behavior", glyph: "→" },
   state: { color: "var(--refinement)", shape: "diamond", role: "state", glyph: "●" },
   "input-output": { color: "var(--refinement)", shape: "diamond", role: "input-output", glyph: "↔" },
+  "verification-objective": {
+    color: "var(--verification-objective)",
+    shape: "square",
+    role: "verification-objective",
+  },
   verification: { color: "var(--verification)", shape: "square", role: "verification" },
   specification: { color: "var(--refinement)", shape: "diamond", role: "specification", glyph: "≡" },
   "semantic-contract": { color: "var(--semantic-contract)", shape: "square", role: "semantic-contract" },
@@ -133,6 +144,9 @@ const CSS_TOKEN_FALLBACKS: Partial<Record<DesignSystemColorToken, string>> = {
   "--verification": "#4caf50",
   "--verification-ink": "#2e7d32",
   "--verification-tint": "#e8f5e9",
+  "--verification-objective": "#1b5e20",
+  "--verification-objective-ink": "#0b3d12",
+  "--verification-objective-tint": "#d7ead8",
   "--ontology": "#b08a00",
   "--ontology-ink": "#6f5600",
   "--ontology-tint": "#f4e3a1",
@@ -267,6 +281,7 @@ export function getMermaidClassDefs() {
     classDef("inputOutput", "input-output", "2px"),
     classDef("specification", "specification", "2px"),
     classDef("semanticContract", "semantic-contract", "2px"),
+    classDef("verificationObjective", "verification-objective", "2px"),
     classDef("verification", "verification", "2px"),
     classDef("ontology", "ontology", "2px"),
     classDef("resource", "resource", "2px"),
