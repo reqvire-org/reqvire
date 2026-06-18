@@ -751,6 +751,7 @@ Serve command behavior:
 - Populate Project Store source-file records from modeled element source files and existing graph-referenced local implementation/evidence/resource files, without using generated Markdown files on disk as an intermediate runtime artifact
 - Keep relation-backed implementation/evidence/source targets as Project Store resources for relation semantics, and include only existing repository-relative local targets in the Model tree file hierarchy
 - Start an HTTP server serving embedded Explorer assets and generated runtime data
+- Serve existing repository-relative local static asset files, including images and documents referenced from Markdown content, from their repository-relative request paths while rejecting absolute paths, parent-directory traversal, and unsupported asset extensions
 - Serve `index.html` for the root URL so the SPA Explorer shell is the default entry point
 - Return `index.html` for non-asset browser routes so SPA navigation can handle deep links
 - Display clickable server URL for user to open in browser
@@ -762,6 +763,23 @@ Serve command behavior:
 
 #### Relations
   * define: [Serve Command](Capabilities.md#serve-command)
+---
+
+### Export Command Contract Specification
+
+#### Details
+Export command behavior:
+- Write the embedded Explorer shell, generated Project Store data, and ontology artifact to the requested output directory.
+- Preserve repository-relative path layout for copied workspace static assets so Markdown image and document links rewritten by the Explorer resolve from the exported static site.
+- Copy local static asset file types used by rendered workspace content, including PNG, JPEG, GIF, WebP, SVG, PDF, text, CSV, JSON, JSON-LD, Turtle, and TTL files.
+- Skip generated, dependency, VCS, and transient directories such as `.git`, `.index`, `node_modules`, `target`, `tmp`, and the output directory itself.
+- Do not copy Markdown model source files as static assets; source Markdown content remains represented through the Project Store.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Export Command](Capabilities.md#export-command)
 ---
 
 ### Web Interface Style Specification

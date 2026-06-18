@@ -128,6 +128,8 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 - Both GitHub-style URLs and direct file paths in mermaid click links are handled correctly
 - Paths should not have duplicated folder names (e.g., specifications/specifications)
 - Missing embedded asset paths return 404 while non-asset browser routes return the SPA shell for client-side routing
+- Existing repository-relative static assets referenced by Markdown image or document links return the file bytes with an appropriate content type
+- Repository asset requests reject parent-directory traversal and unsupported static asset extensions
 
 #### Metadata
   * type: test-verification
@@ -148,6 +150,7 @@ This test verifies that the export command writes a complete self-contained stat
 - System shall write `assets/project-store.js` containing `window.reqvireProjectStore`
 - System shall write `ontologies.ttl` to the output directory
 - System shall write all other embedded SPA bundle assets to the output directory
+- System shall copy repository-local static assets referenced by rendered workspace content using their repository-relative output paths
 - Output directory shall be self-contained and serve correctly from a static file host
 
 ##### Test Criteria:
@@ -155,6 +158,7 @@ This test verifies that the export command writes a complete self-contained stat
 - Verify `index.html` exists and contains the Explorer SPA shell
 - Verify `assets/project-store.js` exists and contains `reqvireProjectStore`
 - Verify `ontologies.ttl` exists
+- Verify an exported workspace containing a Markdown image such as `![Diagram](images/diagram.png)` includes `images/diagram.png` in the output and the exported Explorer renders it without a broken image request
 - Verify the exported assets reference no external CDN resources
 
 #### Metadata

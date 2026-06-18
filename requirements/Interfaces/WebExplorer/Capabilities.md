@@ -2,7 +2,7 @@
 
 ### Export Command
 
-The system SHALL provide an export command that writes the embedded Explorer SPA bundle and generated model data to a local output directory, producing a self-contained static site suitable for deployment to GitHub Pages or any static file host.
+The system SHALL provide an export command that writes the embedded Explorer SPA bundle, generated model data, and repository-local static assets referenced by rendered workspace content to a local output directory, producing a self-contained static site suitable for deployment to GitHub Pages or any static file host.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -11,6 +11,7 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Export Command Contract Specification](Specifications.md#export-command-contract-specification)
   * derivedFrom: [Web Interface](../InterfacesRequirements.md#web-interface)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [explorer_runtime.rs](../../../core/src/explorer_runtime.rs)
@@ -19,7 +20,7 @@ Implementation details shall follow the associated contract specifications.
 
 ### Serve Command
 
-The system SHALL provide a serve command that launches a local Explorer HTTP server for browsing the current workspace model.
+The system SHALL provide a serve command that launches a local Explorer HTTP server for browsing the current workspace model and repository-local static assets referenced by rendered workspace content.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
