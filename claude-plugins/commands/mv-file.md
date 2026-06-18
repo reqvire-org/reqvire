@@ -93,17 +93,17 @@ The mv-file operation will fail with a clear error if:
 
 **Move file within specifications directory:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "requirements/OldFile.md" "requirements/NewFile.md"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "system-model/OldFile.md" "system-model/NewFile.md"
 ```
 
 **Move file to different directory:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "requirements/Auth.md" "security/Authentication.md"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "system-model/Auth.md" "security/Authentication.md"
 ```
 
 **Preview before moving:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "specs/File.md" "requirements/File.md" --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "specs/File.md" "system-model/File.md" --dry-run
 ```
 
 **Get JSON output with element mappings:**
@@ -114,18 +114,18 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 **Works from subdirectories (paths relative to current directory):**
 ```bash
 cd submodule/
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "specs/File.md" "requirements/File.md"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "specs/File.md" "system-model/File.md"
 ```
 
 **Squash elements from multiple files:**
 ```bash
 # Merge experimental specs into main requirements
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "temp/Experiments.md" "requirements/Requirements.md" --squash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "temp/Experiments.md" "system-model/Requirements.md" --squash
 ```
 
 **Preview squash before applying:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "old/File.md" "requirements/MainFile.md" --squash --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "old/File.md" "system-model/MainFile.md" --squash --dry-run
 ```
 
 ## When to Use mv-file

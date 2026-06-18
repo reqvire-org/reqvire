@@ -80,12 +80,12 @@ The mv operation will fail with a clear error if:
 
 **Move element to different file:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "User Authentication" "requirements/Security.md"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "User Authentication" "system-model/Security.md"
 ```
 
 **Insert at specific position (index 0 = first element in file):**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "High Priority Req" "requirements/Critical.md" 0
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "High Priority Req" "system-model/Critical.md" 0
 ```
 
 **Preview before moving:**

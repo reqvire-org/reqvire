@@ -12,8 +12,8 @@ set -uo pipefail
 # Test: Requirement Governance Metadata
 # ------------------------------------
 # Satisfies:
-#   - requirements/Functional/Core/Verifications/ParsingVerifications.md#requirement-governance-metadata-verification
-#   - requirements/Functional/Operations/Verifications/FormattingVerifications.md#requirement-governance-metadata-formatting-verification
+#   - system-model/Functional/Core/Verifications/ParsingVerifications.md#requirement-governance-metadata-verification
+#   - system-model/Functional/Operations/Verifications/FormattingVerifications.md#requirement-governance-metadata-formatting-verification
 #
 # Acceptance Criteria:
 # - Requirement governance metadata is exposed as effective model evidence.

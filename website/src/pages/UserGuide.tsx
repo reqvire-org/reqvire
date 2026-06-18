@@ -98,7 +98,7 @@ reqvire ontologies --jsonld --output ontologies.jsonld`}</CodeBlock>
           ]}
         />
         <div className="mt-5">
-          <CodeBlock>{`reqvire add requirements/Auth.md --content '### Token Expiry Requirement
+          <CodeBlock>{`reqvire add system-model/Auth.md --content '### Token Expiry Requirement
 
 The system shall reject expired access tokens.
 
@@ -108,18 +108,18 @@ The system shall reject expired access tokens.
 #### Relations
   * specify: [API Authentication](Auth.md#api-authentication)'
 
-reqvire add requirements/Auth.md --dry-run < new-requirement.md
-reqvire add requirements/Auth.md --override < cleaned-merged-requirement.md
+reqvire add system-model/Auth.md --dry-run < new-requirement.md
+reqvire add system-model/Auth.md --override < cleaned-merged-requirement.md
 
 reqvire rm "Obsolete Requirement" --dry-run
 reqvire rm "Obsolete Requirement"
 
-reqvire mv "Token Expiry Requirement" requirements/Identity/AuthRequirements.md
+reqvire mv "Token Expiry Requirement" system-model/Identity/AuthRequirements.md
 reqvire rename "Token Expiry Requirement" "Access Token Expiry Requirement"
 reqvire merge "Access Token Validation" "Legacy Token Validation" --dry-run
 
-reqvire mv-file requirements/OldAuth.md requirements/Identity/Auth.md
-reqvire mv-file requirements/AuthDrafts.md requirements/Identity/Auth.md --squash
+reqvire mv-file system-model/OldAuth.md system-model/Identity/Auth.md
+reqvire mv-file system-model/AuthDrafts.md system-model/Identity/Auth.md --squash
 reqvire mv-asset docs/auth-flow.pdf docs/identity/auth-flow.pdf
 reqvire rm-asset docs/obsolete-auth-flow.pdf --dry-run`}</CodeBlock>
         </div>

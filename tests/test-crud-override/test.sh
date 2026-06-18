@@ -3,7 +3,7 @@ set -uo pipefail
 
 # Test: Create Element Override Operation
 #
-# Satisfies: requirements/System/Operations/Verifications/ElementManipulationVerifications.md#create-element-test
+# Satisfies: system-model/System/Operations/Verifications/ElementManipulationVerifications.md#create-element-test
 #
 # Acceptance Criteria:
 # - Add command with --override replaces existing element with same name

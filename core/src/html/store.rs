@@ -1099,8 +1099,8 @@ mod tests {
 
         let mut requirement = Element::new(
             "API Requirement",
-            "requirements/API.md#api-requirement",
-            "requirements/API.md",
+            "system-model/API.md#api-requirement",
+            "system-model/API.md",
             1,
             Some(ElementType::Requirement(RequirementType::System)),
         );
@@ -1117,7 +1117,7 @@ mod tests {
         );
         requirement.add_relation(
             Relation::new(
-                "trace",
+                "derivedFrom",
                 "src/generated_placeholder.rs".to_string(),
                 "src/generated_placeholder.rs",
                 None,
@@ -1125,7 +1125,7 @@ mod tests {
             .expect("relation should be valid"),
         );
         registry
-            .register_element(requirement, "requirements/API.md")
+            .register_element(requirement, "system-model/API.md")
             .expect("element should register");
 
         let elements = build_elements(&registry);
@@ -1138,7 +1138,7 @@ mod tests {
             .iter()
             .map(|file| file.path.as_str())
             .collect::<BTreeSet<_>>();
-        assert!(file_paths.contains("requirements/API.md"));
+        assert!(file_paths.contains("system-model/API.md"));
         assert!(file_paths.contains("core/src/html/store.rs"));
         assert!(!file_paths.contains("src/generated_placeholder.rs"));
         assert!(!file_paths.contains("README.md"));
@@ -1146,11 +1146,11 @@ mod tests {
 
         let model_file = files
             .iter()
-            .find(|file| file.path == "requirements/API.md")
+            .find(|file| file.path == "system-model/API.md")
             .expect("model file should be present because it owns modeled elements");
         assert_eq!(
             model_file.element_ids,
-            vec!["requirements/API.md#api-requirement".to_string()]
+            vec!["system-model/API.md#api-requirement".to_string()]
         );
         let resource_file = files
             .iter()
@@ -1170,8 +1170,8 @@ mod tests {
             .iter()
             .map(|doc| doc.id.as_str())
             .collect::<BTreeSet<_>>();
-        assert!(search_ids.contains("requirements/API.md#api-requirement"));
-        assert!(search_ids.contains("requirements/API.md"));
+        assert!(search_ids.contains("system-model/API.md#api-requirement"));
+        assert!(search_ids.contains("system-model/API.md"));
         assert!(search_ids.contains("resource:core/src/html/store.rs"));
         assert!(!search_ids.contains("resource:src/generated_placeholder.rs"));
         assert!(!search_ids.contains("core/src/html/store.rs"));
@@ -1186,30 +1186,30 @@ mod tests {
 
         let first_requirement = Element::new(
             "First Requirement",
-            "requirements/Checks.md#first-requirement",
-            "requirements/Checks.md",
+            "system-model/Checks.md#first-requirement",
+            "system-model/Checks.md",
             1,
             Some(ElementType::Requirement(RequirementType::System)),
         );
         registry
-            .register_element(first_requirement, "requirements/Checks.md")
+            .register_element(first_requirement, "system-model/Checks.md")
             .expect("first requirement should register");
 
         let second_requirement = Element::new(
             "Second Requirement",
-            "requirements/Checks.md#second-requirement",
-            "requirements/Checks.md",
+            "system-model/Checks.md#second-requirement",
+            "system-model/Checks.md",
             8,
             Some(ElementType::Requirement(RequirementType::System)),
         );
         registry
-            .register_element(second_requirement, "requirements/Checks.md")
+            .register_element(second_requirement, "system-model/Checks.md")
             .expect("second requirement should register");
 
         let mut verification = Element::new(
             "Combined Verification",
-            "requirements/Verifications.md#combined-verification",
-            "requirements/Verifications.md",
+            "system-model/Verifications.md#combined-verification",
+            "system-model/Verifications.md",
             3,
             Some(ElementType::Verification(VerificationType::Test)),
         );
@@ -1225,8 +1225,8 @@ mod tests {
         verification.add_relation(
             Relation::new(
                 "verify",
-                "requirements/Checks.md#first-requirement".to_string(),
-                "requirements/Checks.md#first-requirement",
+                "system-model/Checks.md#first-requirement".to_string(),
+                "system-model/Checks.md#first-requirement",
                 None,
             )
             .expect("first verify relation should be valid"),
@@ -1234,14 +1234,14 @@ mod tests {
         verification.add_relation(
             Relation::new(
                 "verify",
-                "requirements/Checks.md#second-requirement".to_string(),
-                "requirements/Checks.md#second-requirement",
+                "system-model/Checks.md#second-requirement".to_string(),
+                "system-model/Checks.md#second-requirement",
                 None,
             )
             .expect("second verify relation should be valid"),
         );
         registry
-            .register_element(verification, "requirements/Verifications.md")
+            .register_element(verification, "system-model/Verifications.md")
             .expect("verification should register");
 
         let elements = build_elements(&registry);
@@ -1279,17 +1279,17 @@ mod tests {
             .collect::<BTreeSet<_>>();
 
         assert!(edge_tuples.contains(&(
-            "requirements/Checks.md#first-requirement",
-            "requirements/Verifications.md#combined-verification",
+            "system-model/Checks.md#first-requirement",
+            "system-model/Verifications.md#combined-verification",
             "verifiedBy",
         )));
         assert!(edge_tuples.contains(&(
-            "requirements/Checks.md#second-requirement",
-            "requirements/Verifications.md#combined-verification",
+            "system-model/Checks.md#second-requirement",
+            "system-model/Verifications.md#combined-verification",
             "verifiedBy",
         )));
         assert!(edge_tuples.contains(&(
-            "requirements/Verifications.md#combined-verification",
+            "system-model/Verifications.md#combined-verification",
             "resource:tests/combined/test.sh",
             "satisfiedBy",
         )));

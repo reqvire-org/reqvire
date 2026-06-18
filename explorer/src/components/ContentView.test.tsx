@@ -14,10 +14,10 @@ function renderContent(path: string) {
 
 describe("ContentView", () => {
   it("renders source pages with a back to model action", () => {
-    renderContent("requirements/Specifications.md");
+    renderContent("system-model/Specifications.md");
 
     expect(screen.getByText("Source page")).toBeTruthy();
-    expect(screen.getByText("requirements/Specifications.md")).toBeTruthy();
+    expect(screen.getByText("system-model/Specifications.md")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Back to model" }).getAttribute("href")).toBe("#/model");
   });
 

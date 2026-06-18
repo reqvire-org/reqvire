@@ -93,7 +93,7 @@ Do not proceed with bulk unlink/move operations until this is confirmed.
 **Correct** (reused_contract_context boundary):
 - `Submodel A` requirement keeps internal `derive/definedBy/verifiedBy` only within `Submodel A`
 - `Submodel A` requirement reuses `Submodel B` contract/spec:
-  - `reqvire link "A Requirement" reusesContract "requirements/Contracts/B/InterfaceSpec.md#api-contract"`
+  - `reqvire link "A Requirement" reusesContract "system-model/Contracts/B/InterfaceSpec.md#api-contract"`
 - `collect` for `A Requirement` includes the reused external contract content
 
 **Incorrect** (cross-submodel relation leakage):

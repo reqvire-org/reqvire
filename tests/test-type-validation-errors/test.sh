@@ -5,7 +5,7 @@ TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Test: Type Validation Error Messages
 # --------------------------------------
-# Satisfies: requirements/System/Core/Verifications/ValidationVerifications.md#type-validation-errors-test
+# Satisfies: system-model/System/Core/Verifications/ValidationVerifications.md#type-validation-errors-test
 #
 # Acceptance Criteria:
 # - Invalid element types in --filter-type show list of valid types

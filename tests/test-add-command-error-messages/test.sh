@@ -16,7 +16,7 @@ TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Test 1: Missing ### header
 echo "Test 1: Missing ### header..."
-OUTPUT=$(cd "$TEST_DIR" && echo "This is invalid markdown without a header" | "$REQVIRE_BIN" add requirements/test.md 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "This is invalid markdown without a header" | "$REQVIRE_BIN" add system-model/test.md 2>&1)
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
@@ -39,7 +39,7 @@ echo "✅ Test 1 passed"
 
 # Test 2: Multiple ### headers
 echo "Test 2: Multiple ### headers..."
-OUTPUT=$(cd "$TEST_DIR" && cat <<'EOF' | "$REQVIRE_BIN" add requirements/test.md 2>&1
+OUTPUT=$(cd "$TEST_DIR" && cat <<'EOF' | "$REQVIRE_BIN" add system-model/test.md 2>&1
 ### First Header
 
 Description
@@ -70,7 +70,7 @@ echo "✅ Test 2 passed"
 
 # Test 3: Invalid metadata format
 echo "Test 3: Invalid metadata format..."
-OUTPUT=$(cd "$TEST_DIR" && cat <<'EOF' | "$REQVIRE_BIN" add requirements/test.md 2>&1
+OUTPUT=$(cd "$TEST_DIR" && cat <<'EOF' | "$REQVIRE_BIN" add system-model/test.md 2>&1
 ### Test Element
 
 Description
@@ -105,7 +105,7 @@ echo "✅ Test 3 passed"
 
 # Test 4: Invalid relation format
 echo "Test 4: Invalid relation format..."
-OUTPUT=$(cd "$TEST_DIR" && cat <<'EOF' | "$REQVIRE_BIN" add requirements/test.md 2>&1
+OUTPUT=$(cd "$TEST_DIR" && cat <<'EOF' | "$REQVIRE_BIN" add system-model/test.md 2>&1
 ### Test Element
 
 Description
@@ -140,7 +140,7 @@ echo "✅ Test 4 passed"
 
 # Test 5: Invalid reused_contract_context format
 echo "Test 5: Invalid reused_contract_context format..."
-OUTPUT=$(cd "$TEST_DIR" && cat <<'EOF' | "$REQVIRE_BIN" add requirements/test.md 2>&1
+OUTPUT=$(cd "$TEST_DIR" && cat <<'EOF' | "$REQVIRE_BIN" add system-model/test.md 2>&1
 ### Test Element
 
 Description
@@ -175,7 +175,7 @@ echo "✅ Test 5 passed"
 
 # Test 6: Example completeness - verify all subsections are in example
 echo "Test 6: Example completeness..."
-OUTPUT=$(cd "$TEST_DIR" && echo "invalid" | "$REQVIRE_BIN" add requirements/test.md 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "invalid" | "$REQVIRE_BIN" add system-model/test.md 2>&1)
 
 if ! echo "$OUTPUT" | grep -q "#### Details"; then
   echo "❌ FAILED: Example missing Details subsection"

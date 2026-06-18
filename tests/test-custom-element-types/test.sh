@@ -4,8 +4,8 @@ set -euo pipefail
 # Test: Custom Element Type Tracking in Model Summary
 # --------------------------------------
 # Satisfies:
-# - requirements/Functional/Output/Verifications/ReportingVerifications.md#custom-element-type-tracking-test
-# - requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-move-element-test
+# - system-model/Functional/Output/Verifications/ReportingVerifications.md#custom-element-type-tracking-test
+# - system-model/Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-move-element-test
 #
 # Acceptance Criteria:
 # - Custom element types (non-standard types) are tracked and counted in search report

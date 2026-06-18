@@ -34,7 +34,7 @@ reqvire search --has-reused-contract-context --short
 reqvire search --filter-name=".*Capability.*" --short
 
 # Find elements in specific files that might need reorganization
-reqvire search --filter-file="requirements/System/**" --short
+reqvire search --filter-file="system-model/System/**" --short
 ```
 
 These findings guide the refactoring work:
@@ -109,7 +109,7 @@ After consolidation, remove elements that are no longer needed:
 reqvire rm "Old Requirement Name"
 
 # Move element to better location before removing
-reqvire mv "Element Name" "requirements/Archive.md"
+reqvire mv "Element Name" "system-model/Archive.md"
 ```
 
 **Important**: Delete cleanly - don't leave "DEPRECATED" markers. Use git history to track what was removed and why.

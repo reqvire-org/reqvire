@@ -508,7 +508,7 @@ function TreeFolderNode({
   onOpenElement: (id: string) => void;
   depth: number;
 }) {
-  const [open, setOpen] = useState(depth < 2);
+  const [open, setOpen] = useState(depth === 0);
   const ui = useExplorerUiState();
   const selectionId = folder.path === ROOT_PATH ? "__root__" : `folder:${folder.path}`;
 

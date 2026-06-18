@@ -17,12 +17,12 @@ export const devFixture: ExplorerProjectStore = {
     branch: "dev-fixture",
   },
   folders: [
-    { path: "requirements", parent: null, children: ["requirements/Specifications.md"] },
+    { path: "system-model", parent: null, children: ["system-model/Specifications.md"] },
   ],
   files: [
     {
-      path: "requirements/Specifications.md",
-      display_path: "requirements/Specifications.md",
+      path: "system-model/Specifications.md",
+      display_path: "system-model/Specifications.md",
       markdown_content: [
         "# Elements",
         "",
@@ -33,13 +33,13 @@ export const devFixture: ExplorerProjectStore = {
         "#### Metadata",
         "  * type: requirement",
       ].join("\n"),
-      parent_folder: "requirements",
+      parent_folder: "system-model",
       element_ids: [
-        "requirements/Specifications.md#example-capability",
-        "requirements/Specifications.md#example-requirement",
-        "requirements/Specifications.md#example-unverified-requirement",
-        "requirements/Specifications.md#example-verification",
-        "requirements/Specifications.md#example-unsatisfied-verification",
+        "system-model/Specifications.md#example-capability",
+        "system-model/Specifications.md#example-requirement",
+        "system-model/Specifications.md#example-unverified-requirement",
+        "system-model/Specifications.md#example-verification",
+        "system-model/Specifications.md#example-unsatisfied-verification",
       ],
       resource_ids: [],
     },
@@ -53,67 +53,67 @@ export const devFixture: ExplorerProjectStore = {
       file_path: "core/src/lib.rs",
       source_text: "pub fn fixture_source() -> &'static str {\n    \"ok\"\n}\n",
       external_url: null,
-      referring_element_ids: ["requirements/Specifications.md#example-requirement"],
+      referring_element_ids: ["system-model/Specifications.md#example-requirement"],
       relation_types: ["satisfiedBy"],
     },
   ],
   elements: [
     {
-      id: "requirements/Specifications.md#example-capability",
+      id: "system-model/Specifications.md#example-capability",
       name: "Example Capability",
       element_type: "capability",
       type_family: "capability",
-      file_path: "requirements/Specifications.md",
+      file_path: "system-model/Specifications.md",
       line_number: 1,
-      source_anchor: "#/content/requirements/Specifications.md#example-capability",
+      source_anchor: "#/content/system-model/Specifications.md#example-capability",
       content: "The dev fixture shall expose a capability with mixed verification and implementation coverage.",
       metadata: { type: "capability" },
       governance: { status: "draft" },
     },
     {
-      id: "requirements/Specifications.md#example-requirement",
+      id: "system-model/Specifications.md#example-requirement",
       name: "Example Requirement",
       element_type: "requirement",
       type_family: "requirement",
-      file_path: "requirements/Specifications.md",
+      file_path: "system-model/Specifications.md",
       line_number: 3,
-      source_anchor: "#/content/requirements/Specifications.md#example-requirement",
+      source_anchor: "#/content/system-model/Specifications.md#example-requirement",
       content: "The system shall demonstrate the Explorer shell with fixture data.",
       metadata: { type: "requirement" },
       governance: { status: "draft" },
     },
     {
-      id: "requirements/Specifications.md#example-unverified-requirement",
+      id: "system-model/Specifications.md#example-unverified-requirement",
       name: "Unverified Fixture Requirement",
       element_type: "requirement",
       type_family: "requirement",
-      file_path: "requirements/Specifications.md",
+      file_path: "system-model/Specifications.md",
       line_number: 12,
-      source_anchor: "#/content/requirements/Specifications.md#example-unverified-requirement",
+      source_anchor: "#/content/system-model/Specifications.md#example-unverified-requirement",
       content: "The system shall demonstrate an uncovered requirement row in the Coverage view.",
       metadata: { type: "requirement" },
       governance: { status: "draft" },
     },
     {
-      id: "requirements/Specifications.md#example-verification",
+      id: "system-model/Specifications.md#example-verification",
       name: "Example Verification",
       element_type: "test-verification",
       type_family: "verification",
-      file_path: "requirements/Specifications.md",
+      file_path: "system-model/Specifications.md",
       line_number: 20,
-      source_anchor: "#/content/requirements/Specifications.md#example-verification",
+      source_anchor: "#/content/system-model/Specifications.md#example-verification",
       content: "Verifies the Example Requirement via a test.",
       metadata: { type: "test-verification" },
       governance: {},
     },
     {
-      id: "requirements/Specifications.md#example-unsatisfied-verification",
+      id: "system-model/Specifications.md#example-unsatisfied-verification",
       name: "Unsatisfied Fixture Verification",
       element_type: "test-verification",
       type_family: "verification",
-      file_path: "requirements/Specifications.md",
+      file_path: "system-model/Specifications.md",
       line_number: 28,
-      source_anchor: "#/content/requirements/Specifications.md#example-unsatisfied-verification",
+      source_anchor: "#/content/system-model/Specifications.md#example-unsatisfied-verification",
       content: "Demonstrates a verification with no satisfiedBy evidence and no verified target.",
       metadata: { type: "test-verification" },
       governance: {},
@@ -122,8 +122,8 @@ export const devFixture: ExplorerProjectStore = {
   relations: [
     {
       id: "rel:0",
-      source_id: "requirements/Specifications.md#example-verification",
-      target_id: "requirements/Specifications.md#example-requirement",
+      source_id: "system-model/Specifications.md#example-verification",
+      target_id: "system-model/Specifications.md#example-requirement",
       target_kind: "element",
       relation_type: "verify",
       canonical_relation_type: "verify",
@@ -169,20 +169,20 @@ export const devFixture: ExplorerProjectStore = {
     },
     verified_leaf_requirements: {
       files: {
-        "requirements/Specifications.md": [
+        "system-model/Specifications.md": [
           {
-            identifier: "requirements/Specifications.md#example-requirement",
+            identifier: "system-model/Specifications.md#example-requirement",
             name: "Example Requirement",
-            verified_by: ["requirements/Specifications.md#example-verification"],
+            verified_by: ["system-model/Specifications.md#example-verification"],
           },
         ],
       },
     },
     unverified_leaf_requirements: {
       files: {
-        "requirements/Specifications.md": [
+        "system-model/Specifications.md": [
           {
-            identifier: "requirements/Specifications.md#example-unverified-requirement",
+            identifier: "system-model/Specifications.md#example-unverified-requirement",
             name: "Unverified Fixture Requirement",
             verified_by: [],
           },
@@ -191,9 +191,9 @@ export const devFixture: ExplorerProjectStore = {
     },
     satisfied_test_verifications: {
       files: {
-        "requirements/Specifications.md": [
+        "system-model/Specifications.md": [
           {
-            identifier: "requirements/Specifications.md#example-verification",
+            identifier: "system-model/Specifications.md#example-verification",
             name: "Example Verification",
             verification_type: "test-verification",
             satisfied_by: ["resource:core/src/lib.rs"],
@@ -203,9 +203,9 @@ export const devFixture: ExplorerProjectStore = {
     },
     unsatisfied_test_verifications: {
       files: {
-        "requirements/Specifications.md": [
+        "system-model/Specifications.md": [
           {
-            identifier: "requirements/Specifications.md#example-unsatisfied-verification",
+            identifier: "system-model/Specifications.md#example-unsatisfied-verification",
             name: "Unsatisfied Fixture Verification",
             verification_type: "test-verification",
             satisfied_by: [],
@@ -215,9 +215,9 @@ export const devFixture: ExplorerProjectStore = {
     },
     orphaned_verifications: {
       files: {
-        "requirements/Specifications.md": [
+        "system-model/Specifications.md": [
           {
-            identifier: "requirements/Specifications.md#example-unsatisfied-verification",
+            identifier: "system-model/Specifications.md#example-unsatisfied-verification",
             name: "Unsatisfied Fixture Verification",
             verification_type: "test-verification",
             satisfied_by: [],
@@ -227,9 +227,9 @@ export const devFixture: ExplorerProjectStore = {
     },
     covered_requirements: {
       files: {
-        "requirements/Specifications.md": [
+        "system-model/Specifications.md": [
           {
-            identifier: "requirements/Specifications.md#example-requirement",
+            identifier: "system-model/Specifications.md#example-requirement",
             name: "Example Requirement",
             coverage_source: "direct_satisfied",
             evidence: ["resource:core/src/lib.rs"],
@@ -239,9 +239,9 @@ export const devFixture: ExplorerProjectStore = {
     },
     uncovered_requirements: {
       files: {
-        "requirements/Specifications.md": [
+        "system-model/Specifications.md": [
           {
-            identifier: "requirements/Specifications.md#example-unverified-requirement",
+            identifier: "system-model/Specifications.md#example-unverified-requirement",
             name: "Unverified Fixture Requirement",
           },
         ],
@@ -250,7 +250,7 @@ export const devFixture: ExplorerProjectStore = {
     capability_coverage: {
       capabilities: [
         {
-          identifier: "requirements/Specifications.md#example-capability",
+          identifier: "system-model/Specifications.md#example-capability",
           name: "Example Capability",
           local_leaf_requirements: 2,
           local_verified_leaf_requirements: 1,
@@ -279,25 +279,25 @@ export const devFixture: ExplorerProjectStore = {
         {
           iri: "urn:reqvire:test:api:ServiceEndpoint",
           role: "class",
-          element_identifier: "requirements/Specifications.md#example-requirement",
+          element_identifier: "system-model/Specifications.md#example-requirement",
         },
       ],
       "urn:reqvire:test:api:identifier": [
         {
           iri: "urn:reqvire:test:api:identifier",
           role: "datatype-property",
-          element_identifier: "requirements/Specifications.md#example-requirement",
+          element_identifier: "system-model/Specifications.md#example-requirement",
         },
       ],
     },
     blocks: [
       {
-        file_path: "requirements/Specifications.md",
+        file_path: "system-model/Specifications.md",
         kind: "ontology",
         line_number: 40,
       },
       {
-        file_path: "requirements/Specifications.md",
+        file_path: "system-model/Specifications.md",
         kind: "shapes",
         line_number: 58,
       },
@@ -345,10 +345,10 @@ export const devFixture: ExplorerProjectStore = {
           provenance: {
             derivation_mode: "direct-authored",
             source: {
-              source_block: "requirements/Specifications.md#ontology-1",
-              source_element_identifier: "requirements/Specifications.md#example-requirement",
+              source_block: "system-model/Specifications.md#ontology-1",
+              source_element_identifier: "system-model/Specifications.md#example-requirement",
               source_name: "Example Requirement",
-              file_path: "requirements/Specifications.md",
+              file_path: "system-model/Specifications.md",
               line_number: 40,
               block_kind: "ontology",
             },
@@ -377,10 +377,10 @@ export const devFixture: ExplorerProjectStore = {
           provenance: {
             derivation_mode: "direct-authored",
             source: {
-              source_block: "requirements/Specifications.md#ontology-1",
-              source_element_identifier: "requirements/Specifications.md#example-requirement",
+              source_block: "system-model/Specifications.md#ontology-1",
+              source_element_identifier: "system-model/Specifications.md#example-requirement",
               source_name: "Example Requirement",
-              file_path: "requirements/Specifications.md",
+              file_path: "system-model/Specifications.md",
               line_number: 41,
               block_kind: "ontology",
             },
@@ -410,10 +410,10 @@ export const devFixture: ExplorerProjectStore = {
           provenance: {
             derivation_mode: "direct-authored",
             source: {
-              source_block: "requirements/Specifications.md#shapes-1",
-              source_element_identifier: "requirements/Specifications.md#example-requirement",
+              source_block: "system-model/Specifications.md#shapes-1",
+              source_element_identifier: "system-model/Specifications.md#example-requirement",
               source_name: "Example Requirement",
-              file_path: "requirements/Specifications.md",
+              file_path: "system-model/Specifications.md",
               line_number: 58,
               block_kind: "shapes",
             },
@@ -439,12 +439,12 @@ export const devFixture: ExplorerProjectStore = {
           type_evidence: [],
           sources: [
             {
-              source: "requirements/Specifications.md#ontology-1",
+              source: "system-model/Specifications.md#ontology-1",
               source_name: "Example Requirement",
-              file_path: "requirements/Specifications.md",
+              file_path: "system-model/Specifications.md",
               line_number: 40,
               kind: "ontology",
-              link: "#/content/requirements/Specifications.md#example-requirement",
+              link: "#/content/system-model/Specifications.md#example-requirement",
             },
           ],
           constraints: [],
@@ -472,12 +472,12 @@ export const devFixture: ExplorerProjectStore = {
           type_evidence: [],
           sources: [
             {
-              source: "requirements/Specifications.md#ontology-1",
+              source: "system-model/Specifications.md#ontology-1",
               source_name: "Example Requirement",
-              file_path: "requirements/Specifications.md",
+              file_path: "system-model/Specifications.md",
               line_number: 41,
               kind: "ontology",
-              link: "#/content/requirements/Specifications.md#example-requirement",
+              link: "#/content/system-model/Specifications.md#example-requirement",
             },
           ],
           constraints: [],
@@ -507,15 +507,15 @@ export const devFixture: ExplorerProjectStore = {
   knowledge_graph: {
     nodes: [
       {
-        id: "requirements/Specifications.md#example-requirement",
-        identifier: "requirements/Specifications.md#example-requirement",
+        id: "system-model/Specifications.md#example-requirement",
+        identifier: "system-model/Specifications.md#example-requirement",
         label: "Example Requirement",
         type: "requirement",
         node_type: "requirement",
         element_type: "requirement",
-        file_path: "requirements/Specifications.md",
+        file_path: "system-model/Specifications.md",
         line_number: 3,
-        link: "#/content/requirements/Specifications.md#example-requirement",
+        link: "#/content/system-model/Specifications.md#example-requirement",
         description: "The system shall demonstrate the Explorer shell with fixture data.",
         metadata: [{ name: "type", value: "requirement", link: "", kind: "metadata" }],
         governance: [{ name: "status", value: "draft", link: "", kind: "governance" }],
@@ -525,15 +525,15 @@ export const devFixture: ExplorerProjectStore = {
         concept_references: [],
       },
       {
-        id: "requirements/Specifications.md#example-verification",
-        identifier: "requirements/Specifications.md#example-verification",
+        id: "system-model/Specifications.md#example-verification",
+        identifier: "system-model/Specifications.md#example-verification",
         label: "Example Verification",
         type: "verification",
         node_type: "verification",
         element_type: "test-verification",
-        file_path: "requirements/Specifications.md",
+        file_path: "system-model/Specifications.md",
         line_number: 20,
-        link: "#/content/requirements/Specifications.md#example-verification",
+        link: "#/content/system-model/Specifications.md#example-verification",
         description: "Verifies the Example Requirement via a test.",
         metadata: [{ name: "type", value: "test-verification", link: "", kind: "metadata" }],
         governance: [],
@@ -545,8 +545,8 @@ export const devFixture: ExplorerProjectStore = {
     ],
     edges: [
       {
-        source: "requirements/Specifications.md#example-verification",
-        target: "requirements/Specifications.md#example-requirement",
+        source: "system-model/Specifications.md#example-verification",
+        target: "system-model/Specifications.md#example-requirement",
         label: "verify",
         kind: "authored",
         authored: true,
@@ -554,7 +554,7 @@ export const devFixture: ExplorerProjectStore = {
     ],
     submodels: [
       {
-        root_id: "requirements/Specifications.md#example-requirement",
+        root_id: "system-model/Specifications.md#example-requirement",
         root_name: "Example Requirement",
         root_type: "requirement",
         requirement_count: 1,
@@ -571,10 +571,10 @@ export const devFixture: ExplorerProjectStore = {
   },
   search: [
     {
-      id: "requirements/Specifications.md#example-requirement",
+      id: "system-model/Specifications.md#example-requirement",
       kind: "element",
       title: "Example Requirement",
-      route: "#/elements/requirements/Specifications.md#example-requirement",
+      route: "#/elements/system-model/Specifications.md#example-requirement",
       text: "Example Requirement requirement demonstrate Explorer shell",
     },
   ],

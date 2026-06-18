@@ -202,155 +202,19 @@ pub struct OntologyGraphEdge {
 pub fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
     let mut nodes: BTreeMap<String, OntologyGraphNode> = BTreeMap::new();
     let mut edges: BTreeSet<OntologyGraphEdge> = BTreeSet::new();
-    let internal_property_shapes = collect_internal_property_shapes(report);
-    let (rdf_list_nodes, rdf_list_values) = collect_rdf_lists(report);
-    let primary_blank_nodes =
-        collect_primary_blank_nodes(report, &internal_property_shapes, &rdf_list_nodes);
 
-    for block in &report.blocks {
-        for quad in &block.quads {
-            let subject_id = subject_id(&quad.subject);
-            let predicate = quad.predicate.as_str();
-            let predicate_label = clean_uri(predicate);
-
-            if let Some(owner_id) = internal_property_shapes.get(&subject_id) {
-                ensure_node(&mut nodes, owner_id, "shacl", block);
-                append_property_shape_constraint(
-                    &mut nodes,
-                    owner_id,
-                    predicate,
-                    &quad.object,
-                    &rdf_list_values,
-                );
-                continue;
-            }
-
-            if rdf_list_nodes.contains(&subject_id) {
-                continue;
-            }
-
-            if is_blank_node_id(&subject_id) && !primary_blank_nodes.contains_key(&subject_id) {
-                continue;
-            }
-
-            let subject_hint = if matches!(block.kind, SemanticBlockKind::Shapes)
-                || predicate.starts_with(SHACL_PREFIX)
-            {
-                "shacl"
-            } else {
-                "generic"
-            };
-
-            ensure_node(&mut nodes, &subject_id, subject_hint, block);
-
-            if predicate == RDF_TYPE {
-                if let Some(node) = nodes.get_mut(&subject_id) {
-                    record_type_evidence(node, &quad.object, block);
-                }
-                continue;
-            }
-
-            if predicate == RDFS_LABEL {
-                if let Term::Literal(literal) = &quad.object {
-                    if let Some(node) = nodes.get_mut(&subject_id) {
-                        node.label = literal.value().to_string();
-                    }
-                }
-                continue;
-            }
-
-            if predicate == RDFS_COMMENT {
-                if let Term::Literal(literal) = &quad.object {
-                    if let Some(node) = nodes.get_mut(&subject_id) {
-                        node.comment = literal.value().to_string();
-                    }
-                }
-                continue;
-            }
-
-            if is_constraint_predicate(predicate) {
-                let value = term_label_with_lists(&quad.object, &rdf_list_values);
-                if let Some(node) = nodes.get_mut(&subject_id) {
-                    node.constraints.push(OntologyGraphConstraint {
-                        property: predicate_label.clone(),
-                        value,
-                    });
-                }
-                continue;
-            }
-
-            if is_projection_construct_predicate(predicate) {
-                continue;
-            }
-
-            match &quad.object {
-                Term::NamedNode(node) => {
-                    if node.as_str() == RDF_NIL {
-                        continue;
-                    }
-                    let target_id = node.as_str().to_string();
-                    if !is_hidden_primary_graph_iri(&target_id) {
-                        let target_hint = if predicate == SH_DATATYPE || is_datatype_iri(&target_id)
-                        {
-                            "generic"
-                        } else if matches!(block.kind, SemanticBlockKind::Shapes)
-                            || predicate.starts_with(SHACL_PREFIX)
-                        {
-                            "shacl"
-                        } else {
-                            "generic"
-                        };
-                        ensure_node(&mut nodes, &target_id, target_hint, block);
-                        if predicate == SH_DATATYPE {
-                            if let Some(target_node) = nodes.get_mut(&target_id) {
-                                upgrade_semantic_type_string(
-                                    &mut target_node.semantic_type,
-                                    "datatype",
-                                );
-                            }
-                        }
-                        edges.insert(OntologyGraphEdge {
-                            source: subject_id.clone(),
-                            target: target_id,
-                            label: predicate_label,
-                            layer: GRAPH_LAYER_AUTHORED.to_string(),
-                            source_kind: source_kind_for_block(block).to_string(),
-                        });
-                    }
-                }
-                Term::BlankNode(node) => {
-                    let target_id = node.to_string();
-                    if predicate == SH_PROPERTY && internal_property_shapes.contains_key(&target_id)
-                    {
-                        continue;
-                    }
-                    if rdf_list_nodes.contains(&target_id) {
-                        continue;
-                    }
-                    if !primary_blank_nodes.contains_key(&target_id) {
-                        continue;
-                    }
-                    ensure_node(&mut nodes, &target_id, subject_hint, block);
-                    edges.insert(OntologyGraphEdge {
-                        source: subject_id.clone(),
-                        target: target_id,
-                        label: predicate_label,
-                        layer: GRAPH_LAYER_AUTHORED.to_string(),
-                        source_kind: source_kind_for_block(block).to_string(),
-                    });
-                }
-                Term::Literal(literal) => {
-                    if let Some(node) = nodes.get_mut(&subject_id) {
-                        node.literal_values.push(OntologyGraphLiteralValue {
-                            predicate: predicate_label,
-                            value: literal.value().to_string(),
-                            source: source_metadata(block),
-                        });
-                    }
-                }
-            }
-        }
-    }
+    add_graph_data_from_blocks(
+        &report.blocks,
+        GRAPH_LAYER_AUTHORED,
+        &mut nodes,
+        &mut edges,
+    );
+    add_graph_data_from_blocks(
+        &report.external_blocks,
+        GRAPH_LAYER_EXTERNAL_SOURCE,
+        &mut nodes,
+        &mut edges,
+    );
 
     apply_blank_node_labels(&mut nodes);
     populate_construct_metadata(&mut nodes, &mut edges, report);
@@ -414,6 +278,165 @@ pub fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
 
     OntologyGraphData { nodes, edges }
 }
+
+fn add_graph_data_from_blocks(
+    blocks: &[SemanticBlock],
+    layer: &str,
+    nodes: &mut BTreeMap<String, OntologyGraphNode>,
+    edges: &mut BTreeSet<OntologyGraphEdge>,
+) {
+    let internal_property_shapes = collect_internal_property_shapes(blocks);
+    let (rdf_list_nodes, rdf_list_values) = collect_rdf_lists(blocks);
+    let primary_blank_nodes = collect_primary_blank_nodes(blocks, &internal_property_shapes, &rdf_list_nodes);
+
+    for block in blocks {
+        for quad in &block.quads {
+            let subject_id = subject_id(&quad.subject);
+            let predicate = quad.predicate.as_str();
+            let predicate_label = clean_uri(predicate);
+
+            if let Some(owner_id) = internal_property_shapes.get(&subject_id) {
+                ensure_node_with_layer(nodes, owner_id, "shacl", layer, block);
+                append_property_shape_constraint(
+                    nodes,
+                    owner_id,
+                    predicate,
+                    &quad.object,
+                    &rdf_list_values,
+                );
+                continue;
+            }
+
+            if rdf_list_nodes.contains(&subject_id) {
+                continue;
+            }
+
+            if is_blank_node_id(&subject_id) && !primary_blank_nodes.contains_key(&subject_id) {
+                continue;
+            }
+
+            let subject_hint = if matches!(block.kind, SemanticBlockKind::Shapes)
+                || predicate.starts_with(SHACL_PREFIX)
+            {
+                "shacl"
+            } else {
+                "generic"
+            };
+
+            ensure_node_with_layer(nodes, &subject_id, subject_hint, layer, block);
+
+            if predicate == RDF_TYPE {
+                if let Some(node) = nodes.get_mut(&subject_id) {
+                    record_type_evidence(node, &quad.object, block);
+                }
+                continue;
+            }
+
+            if predicate == RDFS_LABEL {
+                if let Term::Literal(literal) = &quad.object {
+                    if let Some(node) = nodes.get_mut(&subject_id) {
+                        node.label = literal.value().to_string();
+                    }
+                }
+                continue;
+            }
+
+            if predicate == RDFS_COMMENT {
+                if let Term::Literal(literal) = &quad.object {
+                    if let Some(node) = nodes.get_mut(&subject_id) {
+                        node.comment = literal.value().to_string();
+                    }
+                }
+                continue;
+            }
+
+            if is_constraint_predicate(predicate) {
+                let value = term_label_with_lists(&quad.object, &rdf_list_values);
+                if let Some(node) = nodes.get_mut(&subject_id) {
+                    node.constraints.push(OntologyGraphConstraint {
+                        property: predicate_label.clone(),
+                        value,
+                    });
+                }
+                continue;
+            }
+
+            if is_projection_construct_predicate(predicate) {
+                continue;
+            }
+
+            match &quad.object {
+                Term::NamedNode(node) => {
+                    if node.as_str() == RDF_NIL {
+                        continue;
+                    }
+                    let target_id = node.as_str().to_string();
+                    if !is_hidden_primary_graph_iri(&target_id) {
+                        let target_hint = if predicate == SH_DATATYPE || is_datatype_iri(&target_id)
+                        {
+                            "generic"
+                        } else if matches!(block.kind, SemanticBlockKind::Shapes)
+                            || predicate.starts_with(SHACL_PREFIX)
+                        {
+                            "shacl"
+                        } else {
+                            "generic"
+                        };
+                        ensure_node_with_layer(nodes, &target_id, target_hint, layer, block);
+                        if predicate == SH_DATATYPE {
+                            if let Some(target_node) = nodes.get_mut(&target_id) {
+                                upgrade_semantic_type_string(
+                                    &mut target_node.semantic_type,
+                                    "datatype",
+                                );
+                            }
+                        }
+                        edges.insert(OntologyGraphEdge {
+                            source: subject_id.clone(),
+                            target: target_id,
+                            label: predicate_label,
+                            layer: layer.to_string(),
+                            source_kind: source_kind_for_block(block).to_string(),
+                        });
+                    }
+                }
+                Term::BlankNode(node) => {
+                    let target_id = node.to_string();
+                    if predicate == SH_PROPERTY && internal_property_shapes.contains_key(&target_id) {
+                        continue;
+                    }
+                    if rdf_list_nodes.contains(&target_id) {
+                        continue;
+                    }
+                    if !primary_blank_nodes.contains_key(&target_id) {
+                        continue;
+                    }
+                    ensure_node_with_layer(nodes, &target_id, subject_hint, layer, block);
+                    edges.insert(OntologyGraphEdge {
+                        source: subject_id.clone(),
+                        target: target_id,
+                        label: predicate_label,
+                        layer: layer.to_string(),
+                        source_kind: source_kind_for_block(block).to_string(),
+                    });
+                }
+                Term::Literal(literal) => {
+                    if let Some(node) = nodes.get_mut(&subject_id) {
+                        node.literal_values.push(OntologyGraphLiteralValue {
+                            predicate: predicate_label,
+                            value: literal.value().to_string(),
+                            source: source_metadata(block),
+                        });
+                    }
+                }
+            }
+        }
+    }
+}
+
+let _ = {
+    use crate as _;
+};
 
 fn add_model_context_layer(
     nodes: &mut BTreeMap<String, OntologyGraphNode>,
@@ -768,6 +791,16 @@ fn ensure_node(
     node_type: &str,
     block: &SemanticBlock,
 ) {
+    ensure_node_with_layer(nodes, id, node_type, GRAPH_LAYER_AUTHORED, block)
+}
+
+fn ensure_node_with_layer(
+    nodes: &mut BTreeMap<String, OntologyGraphNode>,
+    id: &str,
+    node_type: &str,
+    layer: &str,
+    block: &SemanticBlock,
+) {
     nodes
         .entry(id.to_string())
         .and_modify(|node| {
@@ -782,7 +815,7 @@ fn ensure_node(
             label: clean_uri(id),
             node_type: node_type.to_string(),
             semantic_type: default_semantic_type(id, node_type).to_string(),
-            layer: GRAPH_LAYER_AUTHORED.to_string(),
+            layer: layer.to_string(),
             source_kind: source_kind_for_block(block).to_string(),
             full_uri: id.to_string(),
             comment: "None specified.".to_string(),

@@ -469,9 +469,9 @@ const elementsUX = css`
 
   .ux-file-browser__element-card {
     display: grid;
-    grid-template-columns: var(--control-md) minmax(0, 1fr);
+    grid-template-columns: var(--type-icon-sm) minmax(0, 1fr);
     align-items: start;
-    gap: var(--space-5);
+    gap: var(--space-3);
     min-height: var(--ux-file-row-card-min-h);
     box-sizing: border-box;
     padding: var(--space-6);
@@ -487,7 +487,7 @@ const elementsUX = css`
   .ux-file-browser__element-card-main {
     display: grid;
     min-width: 0;
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
   .ux-file-browser__element-card-title {
@@ -765,7 +765,7 @@ export function FileBrowserModeledElement({
         <span className="ux-file-browser__element-card-main">
           <span className="ux-file-browser__element-card-title">{name}</span>
           {type ? (
-            <TypeBadge type={type} family={family} tinted>
+            <TypeBadge type={type} family={family} tinted dot={false}>
               {type}
             </TypeBadge>
           ) : null}

@@ -74,15 +74,15 @@ This will install the binary to `~/.cargo/bin/reqvire`
 reqvire/
 ├── core/              # Core library (parsing, model, analysis)
 ├── cli/               # Command-line interface
-├── requirements/    # Reqvire's own requirements and model
+├── system-model/    # Reqvire's own requirements and model
 ├── tests/             # End-to-end tests
 └── doc/              # Contributor documentation (this folder)
 ```
 
 ## Key Resources
 
-- **[Project Specifications](../requirements/README.md)** - Reqvire's own requirements model
-- **[Architecture](../requirements/Architecture.md)** - System architecture documentation
+- **[Project Specifications](../system-model/README.md)** - Reqvire's own requirements model
+- **[Architecture](../system-model/Architecture.md)** - System architecture documentation
 - **[E2E Tests Guide](../tests/CLAUDE.md)** - How to write and run tests
 - **[GitHub Issues](https://github.com/reqvire-org/reqvire/issues)** - Report reproducible bugs and concrete behavior problems
 - **[GitHub Discussions](https://github.com/reqvire-org/reqvire/discussions)** - Ask questions and suggest model, ontology, requirement, verification, or architecture improvements

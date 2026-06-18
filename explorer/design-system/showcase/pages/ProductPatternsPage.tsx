@@ -114,7 +114,7 @@ const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
     title: "Traceability Coverage Requirement",
     elementType: "requirement",
     typeFamily: "requirement",
-    sourceHref: "#/content/requirements/SystemRequirements.md",
+    sourceHref: "#/content/system-model/SystemRequirements.md",
     metaBadges: DETAIL_META_BADGES,
     content: (
       <MarkdownFrame>
@@ -132,7 +132,7 @@ const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
     title: "Coverage Export Verification",
     elementType: "test-verification",
     typeFamily: "verification",
-    sourceHref: "#/content/requirements/Verifications.md",
+    sourceHref: "#/content/system-model/Verifications.md",
     metaBadges: DETAIL_META_BADGES,
     content: (
       <MarkdownFrame>
@@ -178,7 +178,7 @@ const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
     title: "Project traceability capability",
     elementType: "capability",
     typeFamily: "capability",
-    sourceHref: "#/content/requirements/Capabilities.md",
+    sourceHref: "#/content/system-model/Capabilities.md",
     metaBadges: DETAIL_META_BADGES,
     content: (
       <MarkdownFrame>
@@ -371,7 +371,7 @@ export function ProductPatternsPage() {
               layout="embedded"
               toolbar={{
                 label: "Source page",
-                title: "requirements/SystemRequirements.md",
+                title: "system-model/SystemRequirements.md",
                 actionHref: "#open-source",
                 actionLabel: "Open source",
               }}

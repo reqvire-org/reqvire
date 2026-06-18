@@ -262,7 +262,7 @@ reqvire search --filter-owner "Identity Team"`}</CodeBlock>
           model easy to browse, but authoritative semantics come from metadata,
           relations, and Reused Contract Context.
         </p>
-        <CodeBlock>{`requirements/
+        <CodeBlock>{`system-model/
   Product/
     Collaboration/
       Collaboration.md

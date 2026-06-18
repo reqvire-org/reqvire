@@ -59,9 +59,9 @@ Use `--short` when analyzing model structure without needing full content. Use `
 
 | Option | Description | Example |
 |--------|-------------|---------|
-| `--filter-file` | Filter by file glob | `--filter-file="requirements/**/*.md"` |
+| `--filter-file` | Filter by file glob | `--filter-file="system-model/**/*.md"` |
 | `--filter-name` | Filter by element name (regex) | `--filter-name=".*Auth.*"` |
-| `--filter-id` | Filter by exact identifier | `--filter-id="requirements/File.md#element"` |
+| `--filter-id` | Filter by exact identifier | `--filter-id="system-model/File.md#element"` |
 | `--filter-type` | Filter by element type (comma-separated, OR logic) | `--filter-type="capability"` or `--filter-type="requirement,behavior"` |
 | `--filter-content` | Filter by content (regex) | `--filter-content="SHALL.*validate"` |
 | `--filter-page-content` | Filter by file frontmatter | `--filter-page-content="security"` |
@@ -92,10 +92,10 @@ reqvire search --filter-type="semantic-contract" --short
 ### By File Location
 ```bash
 # Elements in specific folder
-reqvire search --filter-file="requirements/System/**" --short
+reqvire search --filter-file="system-model/System/**" --short
 
 # Elements in specific file
-reqvire search --filter-file="requirements/**/*.md" --short
+reqvire search --filter-file="system-model/**/*.md" --short
 ```
 
 ### By Name or Content

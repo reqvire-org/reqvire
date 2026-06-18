@@ -97,7 +97,7 @@ ${1:-The user will specify which capability or requirement needs verification.}
 7. **Add verification using reqvire add command:**
 
    ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "requirements/Verifications/<file>.md" <<'EOF'
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "system-model/Verifications/<file>.md" <<'EOF'
    ### Verification Name
 
    [Description of verification approach]
@@ -122,14 +122,14 @@ ${1:-The user will specify which capability or requirement needs verification.}
 
    Optional: Insert at specific position (0-based index):
    ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "requirements/Verifications/<file>.md" 0 <<'EOF'
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "system-model/Verifications/<file>.md" 0 <<'EOF'
    ...
    EOF
    ```
 
    Alternative using pipe:
    ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "requirements/Verifications/<file>.md" < element.md
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "system-model/Verifications/<file>.md" < element.md
    ```
 
    The add command automatically:
@@ -164,7 +164,7 @@ After adding verifications, you may need to reorganize:
 
 **Move verification to different file:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "<verification-name>" "requirements/Verifications/<file>.md"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "<verification-name>" "system-model/Verifications/<file>.md"
 ```
 
 **Move verification with specific position (0-based index):**
@@ -231,7 +231,7 @@ Reqvire uses **bottom roll-up verification**:
 
 ## Notes
 
-- Verifications go in `requirements/Verifications/` directory
+- Verifications go in `system-model/Verifications/` directory
 - Use two-space indentation for Relations entries
 - Always read full trace chain before writing test criteria
 - Run `reqvire lint --fix` after adding to remove redundancies

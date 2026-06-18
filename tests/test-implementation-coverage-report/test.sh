@@ -5,7 +5,7 @@ TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Test: Requirement Implementation Coverage Report
 # ------------------------------------------------
-# Verifies: requirements/Functional/Output/Reporting.md#requirement-implementation-coverage-report
+# Verifies: system-model/Functional/Output/Reporting.md#requirement-implementation-coverage-report
 
 run_text_report_test() {
   local output

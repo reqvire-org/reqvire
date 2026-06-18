@@ -46,7 +46,7 @@ Default target shape, relative to the chosen Reqvire model root:
   Verifications/
 ```
 
-Treat this as guidance, not a forced schema. `./` is the model root selected for the project, such as `requirements/` or another folder relative to the workspace/repo root. Preserve stable project naming when it is valid and understandable.
+Treat this as guidance, not a forced schema. `./` is the model root selected for the project, such as `system-model/` or another folder relative to the workspace/repo root. Preserve stable project naming when it is valid and understandable.
 
 ## Procedure
 

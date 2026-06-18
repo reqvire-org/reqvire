@@ -154,7 +154,7 @@ Create requirements using the `--content` flag or by piping element content to t
 
 ```bash
 # Add capability using --content flag (preferred)
-reqvire add requirements/Product/CapabilityName/CapabilityFeature.md --content '### Capability Name
+reqvire add system-model/Product/CapabilityName/CapabilityFeature.md --content '### Capability Name
 
 Capability scope and purpose. Describe what the system is able to accomplish, not how it is implemented.
 
@@ -163,7 +163,7 @@ Capability scope and purpose. Describe what the system is able to accomplish, no
 '
 
 # Add ontology reused by a capability
-reqvire add requirements/Ontologies/CapabilityName.md <<'EOF'
+reqvire add system-model/Ontologies/CapabilityName.md <<'EOF'
 ### Capability Ontology
 
 Defines shared domain meaning for the capability.
@@ -184,7 +184,7 @@ ex:DomainConcept a owl:Class .
 EOF
 
 # Add requirement using heredoc (stdin)
-reqvire add requirements/Product/CapabilityName/Requirements.md <<'EOF'
+reqvire add system-model/Product/CapabilityName/Requirements.md <<'EOF'
 ### System Capability Implementation
 
 The system shall implement the capability using defined algorithms.
@@ -197,7 +197,7 @@ The system shall implement the capability using defined algorithms.
 EOF
 
 # Override existing element (replace by name) - useful for cleanup after merge
-reqvire add requirements/File.md --override <<'EOF'
+reqvire add system-model/File.md --override <<'EOF'
 ### Existing Element Name
 
 Updated content with corrections.
@@ -251,7 +251,7 @@ Create contract elements when they need to be referenced by multiple requirement
 
 ```bash
 # Add specification element
-reqvire add requirements/Specifications.md <<'EOF'
+reqvire add system-model/Specifications.md <<'EOF'
 ### Data Format Specification
 
 The data format shall follow JSON Schema version 7 with strict validation.
@@ -261,7 +261,7 @@ The data format shall follow JSON Schema version 7 with strict validation.
 EOF
 
 # Add constraint element
-reqvire add requirements/Constraints.md <<'EOF'
+reqvire add system-model/Constraints.md <<'EOF'
 ### Performance Constraint
 
 All API responses shall complete within 200ms under normal load.
@@ -271,7 +271,7 @@ All API responses shall complete within 200ms under normal load.
 EOF
 
 # Add behavior element
-reqvire add requirements/Behaviors.md <<'EOF'
+reqvire add system-model/Behaviors.md <<'EOF'
 ### Error Recovery Behavior
 
 When an error occurs, the system shall log the error, notify the user, and attempt recovery.
@@ -332,7 +332,7 @@ Create verification elements for leaf requirements:
 
 ```bash
 # Add test verification
-reqvire add requirements/Verifications/Product/CapabilityName/CapabilityTests.md <<'EOF'
+reqvire add system-model/Verifications/Product/CapabilityName/CapabilityTests.md <<'EOF'
 ### Capability Test
 
 Test verifies the capability works correctly:
@@ -349,7 +349,7 @@ Test verifies the capability works correctly:
 EOF
 
 # Add analysis verification
-reqvire add requirements/Verifications/PerformanceAnalysis.md <<'EOF'
+reqvire add system-model/Verifications/PerformanceAnalysis.md <<'EOF'
 ### Performance Analysis
 
 Analysis verifies system meets performance requirements through load testing.
@@ -515,7 +515,7 @@ Test verifies user authentication flow:
 
 Typical structure:
 ```
-requirements/
+system-model/
 ├── Product/
 │   └── CapabilityA/
 │       ├── Feature.md          # Capability roots and child capabilities
@@ -533,16 +533,16 @@ Move elements between files or reposition within files:
 
 ```bash
 # Move element to different file
-reqvire mv "Capability Requirement" "requirements/Product/CapabilityName/NewFile.md"
+reqvire mv "Capability Requirement" "system-model/Product/CapabilityName/NewFile.md"
 
 # Move element to specific position (0-based index)
-reqvire mv "Capability Requirement" "requirements/Product/CapabilityName/Requirements.md" 0  # Move to top
+reqvire mv "Capability Requirement" "system-model/Product/CapabilityName/Requirements.md" 0  # Move to top
 
 # Move entire file to new location
-reqvire mv-file "requirements/Old.md" "requirements/Product/CapabilityName/New.md"
+reqvire mv-file "system-model/Old.md" "system-model/Product/CapabilityName/New.md"
 
 # Merge file into existing file (squash - combine contents)
-reqvire mv-file --squash "requirements/Source.md" "requirements/Target.md"
+reqvire mv-file --squash "system-model/Source.md" "system-model/Target.md"
 ```
 
 **When to reorganize:**

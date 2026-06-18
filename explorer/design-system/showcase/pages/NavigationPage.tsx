@@ -57,7 +57,7 @@ export function NavigationPage() {
       <Section title="TreeItem" desc="Indented tree row with expand, icon, label, count. Used in model/file sidebar.">
         <div className="showcase-tree-demo">
           <TreeItem
-            label="requirements/"
+            label="system-model/"
             icon={<Icon name="folder-open" size={14} />}
             count={3}
             depth={0}

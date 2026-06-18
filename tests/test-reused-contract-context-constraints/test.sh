@@ -4,7 +4,7 @@ set -uo pipefail
 # Test: ReusedContractContextEntry Scope Constraints
 # -------------------------------------------------------------------
 # Satisfies:
-#   - requirements/Functional/Core/Verifications/ReusedContractContextVerifications.md#reused_contract_context-scope-constraints-test
+#   - system-model/Functional/Core/Verifications/ReusedContractContextVerifications.md#reused_contract_context-scope-constraints-test
 #
 # Acceptance Criteria:
 # - Orphan contract (no define relations) reused_contract_context causes validation to fail

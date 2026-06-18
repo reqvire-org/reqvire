@@ -27,7 +27,7 @@ run_repo_health_checks() {
 
     echo "🔹  Running repository health checks"
     {
-        if rg -n "owl:deprecated true" "$repo_root/requirements/Ontologies"; then
+        if rg -n "owl:deprecated true" "$repo_root/system-model/Ontologies"; then
             echo "FAILED: Reqvire authored ontologies must not leave deprecated vocabulary declarations behind."
             echo "Use rdfs:label/rdfs:comment for presentation metadata, or remove the stale property entirely."
             exit 1

@@ -191,7 +191,7 @@ EOF
 
 **Example:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "requirements/SystemRequirements/Formatting.md" --override <<'EOF'
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "system-model/SystemRequirements/Formatting.md" --override <<'EOF'
 ### Format Consistency Enforcement
 
 The system shall provide formatting capability for maintaining consistent document structure.
@@ -257,7 +257,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 # Shows element with "Merged Details" sections
 
 # 4. Prepare and override with clean version
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "requirements/CLI/Commands.md" --override <<'EOF'
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "system-model/CLI/Commands.md" --override <<'EOF'
 ### CLI Traces Command
 
 The system shall implement traces subcommand for generating verification trace reports.

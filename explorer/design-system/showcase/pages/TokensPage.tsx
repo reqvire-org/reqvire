@@ -186,7 +186,7 @@ export function TokensPage() {
           <div className="showcase-col">
             <div className="showcase-label">Geist Mono</div>
             <div className="showcase-font-sample showcase-font-sample--mono">
-              requirements/Capabilities.md:3
+              system-model/Capabilities.md:3
             </div>
           </div>
         </div>

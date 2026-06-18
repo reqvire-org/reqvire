@@ -399,7 +399,7 @@ reqvire search --filter-type="requirement" --short
 reqvire search --filter-type="capability" --short
 
 # Find requirements in specific subsystem
-reqvire search --filter-type="requirement" --filter-file="requirements/System/**" --short
+reqvire search --filter-type="requirement" --filter-file="system-model/System/**" --short
 
 # Find requirements with reused_contract_context (may need conversion to satisfiedBy)
 reqvire search --filter-type="requirement" --has-reused-contract-context --short

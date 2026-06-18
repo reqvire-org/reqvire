@@ -501,7 +501,7 @@ Common XSD ranges for OWL datatype properties:
 
 In Reqvire, keep the split at the element boundary:
 
-- `ontology` elements under `requirements/Ontologies` own `#### Ontology` Turtle blocks with OWL class declarations plus `owl:DatatypeProperty`/`owl:ObjectProperty` declarations and stable `rdfs:domain`/`rdfs:range`.
+- `ontology` elements under `system-model/Ontologies` own `#### Ontology` Turtle blocks with OWL class declarations plus `owl:DatatypeProperty`/`owl:ObjectProperty` declarations and stable `rdfs:domain`/`rdfs:range`.
 - `semantic-contract` elements own `#### Shapes` Turtle blocks.
 - The SHACL block declares `sh:NodeShape` resources that use `sh:targetClass` and `sh:path` over OWL classes and properties declared by ontology elements reached through explicit `use` relations.
 - Do not redeclare `ex:Employee a owl:Class` or another OWL class inside the SHACL block just to make a shape parse.
@@ -895,7 +895,7 @@ ex:BusinessArtifact owl:disjointWith ex:LifecycleState .
 
 ## Reqvire-Specific Placement
 
-- Put ontology elements in `requirements/Ontologies`.
+- Put ontology elements in `system-model/Ontologies`.
 - Use one `#### Ontology` fenced Turtle block per ontology element.
 - Use `derivedFrom` only to relate ontology elements to ontology parents.
 - Keep shared ontology roots independent from capability roots; non-ontology, non-semantic-contract elements consume ontology terms through `#### Concept References`.

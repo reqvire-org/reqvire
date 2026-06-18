@@ -23,17 +23,17 @@ describe("parseHash", () => {
 
   it("treats element routes as overlays over the previous view", () => {
     const r = parseHash(
-      "#/elements/requirements/Specifications.md#example-requirement",
+      "#/elements/system-model/Specifications.md#example-requirement",
       "model",
     );
     expect(r.view).toBe("model");
-    expect(r.elementId).toBe("requirements/Specifications.md#example-requirement");
+    expect(r.elementId).toBe("system-model/Specifications.md#example-requirement");
   });
 
   it("parses file routes with their path param", () => {
-    const r = parseHash("#/files/requirements/Specifications.md", "model");
+    const r = parseHash("#/files/system-model/Specifications.md", "model");
     expect(r.view).toBe("files");
-    expect(r.param).toBe("requirements/Specifications.md");
+    expect(r.param).toBe("system-model/Specifications.md");
   });
 
   it("parses resource routes with their id param", () => {

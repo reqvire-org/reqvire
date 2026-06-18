@@ -482,7 +482,7 @@ mod tests {
     #[test]
     fn migration_candidate_detects_legacy_contract_relation_errors() {
         let errors = vec![ReqvireError::InvalidMarkdownStructure(
-            "File requirements/Example.md: Element 'Requirement' uses legacy relation 'refinedBy'. Use 'definedBy' for requirement-owned contract elements, or run `reqvire migrate`.".to_string(),
+            "File system-model/Example.md: Element 'Requirement' uses legacy relation 'refinedBy'. Use 'definedBy' for requirement-owned contract elements, or run `reqvire migrate`.".to_string(),
         )];
 
         let plan = candidates_for_validation_errors(&errors);
@@ -509,8 +509,8 @@ mod tests {
         let mut registry = GraphRegistry::new();
         let mut verification = Element::new(
             "CLI Help Structure Verification",
-            "requirements/Verifications/CLI.md#cli-help-structure-verification",
-            "requirements/Verifications/CLI.md",
+            "system-model/Verifications/CLI.md#cli-help-structure-verification",
+            "system-model/Verifications/CLI.md",
             1,
             Some(ElementType::from_metadata("test-verification")),
         );
@@ -518,12 +518,12 @@ mod tests {
             .metadata
             .insert("type".to_string(), "test-verification".to_string());
         registry
-            .register_element(verification, "requirements/Verifications/CLI.md")
+            .register_element(verification, "system-model/Verifications/CLI.md")
             .unwrap();
         let mut second_verification = Element::new(
             "CLI Search Verification",
-            "requirements/Verifications/CLI.md#cli-search-verification",
-            "requirements/Verifications/CLI.md",
+            "system-model/Verifications/CLI.md#cli-search-verification",
+            "system-model/Verifications/CLI.md",
             2,
             Some(ElementType::from_metadata("test-verification")),
         );
@@ -531,7 +531,7 @@ mod tests {
             .metadata
             .insert("type".to_string(), "test-verification".to_string());
         registry
-            .register_element(second_verification, "requirements/Verifications/CLI.md")
+            .register_element(second_verification, "system-model/Verifications/CLI.md")
             .unwrap();
 
         let summary = apply_verification_objective_holders(&mut registry).unwrap();
@@ -544,8 +544,8 @@ mod tests {
 
         let holder = &registry.nodes[VERIFICATION_OBJECTIVE_HOLDER_ID].element;
         for verification_id in [
-            "requirements/Verifications/CLI.md#cli-help-structure-verification",
-            "requirements/Verifications/CLI.md#cli-search-verification",
+            "system-model/Verifications/CLI.md#cli-help-structure-verification",
+            "system-model/Verifications/CLI.md#cli-search-verification",
         ] {
             assert!(holder.relations.iter().any(|relation| {
                 relation.user_created
@@ -561,8 +561,8 @@ mod tests {
 
         let mut requirement = Element::new(
             "Invoice Requirement",
-            "requirements/Billing.md#invoice-requirement",
-            "requirements/Billing.md",
+            "system-model/Billing.md#invoice-requirement",
+            "system-model/Billing.md",
             1,
             Some(ElementType::from_metadata("requirement")),
         );
@@ -573,19 +573,19 @@ mod tests {
             Relation::new(
                 "refinedBy",
                 "Invoice Numbering Specification".to_string(),
-                "requirements/Billing.md#invoice-numbering-specification",
+                "system-model/Billing.md#invoice-numbering-specification",
                 Some("invoice-numbering-specification".to_string()),
             )
             .unwrap(),
         );
         registry
-            .register_element(requirement, "requirements/Billing.md")
+            .register_element(requirement, "system-model/Billing.md")
             .unwrap();
 
         let mut specification = Element::new(
             "Invoice Numbering Specification",
-            "requirements/Billing.md#invoice-numbering-specification",
-            "requirements/Billing.md",
+            "system-model/Billing.md#invoice-numbering-specification",
+            "system-model/Billing.md",
             2,
             Some(ElementType::from_metadata("specification")),
         );
@@ -596,21 +596,21 @@ mod tests {
             Relation::new(
                 "refine",
                 "Invoice Requirement".to_string(),
-                "requirements/Billing.md#invoice-requirement",
+                "system-model/Billing.md#invoice-requirement",
                 Some("invoice-requirement".to_string()),
             )
             .unwrap(),
         );
         registry
-            .register_element(specification, "requirements/Billing.md")
+            .register_element(specification, "system-model/Billing.md")
             .unwrap();
 
         let summary = apply_contract_relation_migration(&mut registry).unwrap();
 
         assert_eq!(summary.relations_rewritten, 2);
-        assert_eq!(summary.affected_files, vec!["requirements/Billing.md"]);
+        assert_eq!(summary.affected_files, vec!["system-model/Billing.md"]);
 
-        let requirement = &registry.nodes["requirements/Billing.md#invoice-requirement"].element;
+        let requirement = &registry.nodes["system-model/Billing.md#invoice-requirement"].element;
         assert!(requirement
             .relations
             .iter()
@@ -621,7 +621,7 @@ mod tests {
             .any(|relation| relation.relation_type.name == "refinedBy"));
 
         let specification =
-            &registry.nodes["requirements/Billing.md#invoice-numbering-specification"].element;
+            &registry.nodes["system-model/Billing.md#invoice-numbering-specification"].element;
         assert!(specification
             .relations
             .iter()

@@ -37,7 +37,7 @@ Apply these boundaries:
 - Requirement: implementable, testable system obligation.
 - `semantic-contract`: reusable SHACL `Shapes` profile over explicitly used ontology context; constrains requirements through `constrain`/`constrainedBy`.
 
-Ontology referenced by model elements should live under `requirements/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` contracts. Shape-only `semantic-contract` elements are reusable checks with explicit ontology `use` and requirement `constrain` relations.
+Ontology referenced by model elements should live under `system-model/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` contracts. Shape-only `semantic-contract` elements are reusable checks with explicit ontology `use` and requirement `constrain` relations.
 
 ## Procedure
 

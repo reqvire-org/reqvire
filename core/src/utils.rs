@@ -793,7 +793,7 @@ mod tests {
             .output()
             .expect("Failed to initialize git repo");
 
-        let base_path = temp_path.join("requirements/documents/");
+        let base_path = temp_path.join("system-model/documents/");
         fs::create_dir_all(&base_path).expect("Failed to create base path");
 
         let file_path = temp_path.join("File4.md");
@@ -925,21 +925,21 @@ mod tests {
         // Test cases for files that should NOT be ignored (will be processed)
         let not_ignored_cases = vec![
             // Requirements files in specifications root
-            "requirements/Capabilities.md",
-            "requirements/SystemRequirements.md",
-            "requirements/MissionRequirements.md",
+            "system-model/Capabilities.md",
+            "system-model/SystemRequirements.md",
+            "system-model/MissionRequirements.md",
             // Requirements files in system requirements folder
-            "requirements/SystemRequirements/Requirements.md",
-            "requirements/SystemRequirements/Subsystem/Requirements.md",
+            "system-model/SystemRequirements/Requirements.md",
+            "system-model/SystemRequirements/Subsystem/Requirements.md",
             // Design specifications (not in ignore patterns)
-            "requirements/DesignSpecifications/DSD_Diagram.md",
-            "requirements/DSD_Architecture.md",
+            "system-model/DesignSpecifications/DSD_Diagram.md",
+            "system-model/DSD_Architecture.md",
         ];
 
         // Test cases for files that SHOULD be ignored
         let ignored_cases = vec![
             // README files match **/README*.md pattern
-            "requirements/README.md",
+            "system-model/README.md",
             "README.md",
         ];
 
@@ -997,33 +997,33 @@ mod tests {
 
         let test_files = [
             // README* pattern test files
-            ("requirements/README.md", true), // Should be excluded
-            ("requirements/READMEtest.md", true), // Should be excluded
-            ("requirements/readme.md", false), // Should NOT be excluded (case sensitive)
-            ("requirements/READ.md", false),  // Should NOT be excluded
-            ("requirements/subfolder/README.md", true), // Should be excluded
-            ("requirements/deep/nested/folder/README.md", true), // Should be excluded
+            ("system-model/README.md", true), // Should be excluded
+            ("system-model/READMEtest.md", true), // Should be excluded
+            ("system-model/readme.md", false), // Should NOT be excluded (case sensitive)
+            ("system-model/READ.md", false),  // Should NOT be excluded
+            ("system-model/subfolder/README.md", true), // Should be excluded
+            ("system-model/deep/nested/folder/README.md", true), // Should be excluded
             // Logical* pattern test files (pattern still works for other files starting with Logical*)
-            ("requirements/LOGICAL_view.md", false), // Should NOT be excluded (case sensitive)
-            ("requirements/logical_design.md", false), // Should NOT be excluded (case sensitive)
-            ("requirements/Logicless.md", false),    // Should NOT be excluded
-            ("requirements/subfolder/LogicalModel.md", true), // Should be excluded
+            ("system-model/LOGICAL_view.md", false), // Should NOT be excluded (case sensitive)
+            ("system-model/logical_design.md", false), // Should NOT be excluded (case sensitive)
+            ("system-model/Logicless.md", false),    // Should NOT be excluded
+            ("system-model/subfolder/LogicalModel.md", true), // Should be excluded
             ("external_repo/specs/LogicalView.md", true), // Should be excluded
             // Physical* pattern test files (pattern still works for other files starting with Physical*)
-            ("requirements/subfolder/PhysicalDiagram.md", true), // Should be excluded
-            ("requirements/NotPhysical.md", false),              // Should NOT be excluded
-            ("requirements/Physicalsomething.md", true),         // Should be excluded
+            ("system-model/subfolder/PhysicalDiagram.md", true), // Should be excluded
+            ("system-model/NotPhysical.md", false),              // Should NOT be excluded
+            ("system-model/Physicalsomething.md", true),         // Should be excluded
             // index.md pattern test files
-            ("requirements/index.md", true), // Should be excluded
-            ("requirements/subfolder/index.md", true), // Should be excluded
-            ("requirements/INDEX.md", false), // Should NOT be excluded (case sensitive)
-            ("requirements/indexing_guide.md", false), // Should NOT be excluded
-            ("requirements/deep/nested/folder/index.md", true), // Should be excluded
+            ("system-model/index.md", true), // Should be excluded
+            ("system-model/subfolder/index.md", true), // Should be excluded
+            ("system-model/INDEX.md", false), // Should NOT be excluded (case sensitive)
+            ("system-model/indexing_guide.md", false), // Should NOT be excluded
+            ("system-model/deep/nested/folder/index.md", true), // Should be excluded
             // Standard requirement files - should never be excluded
-            ("requirements/Requirements.md", false),
-            ("requirements/SystemRequirements.md", false),
-            ("requirements/Capabilities.md", false),
-            ("requirements/subfolder/Requirements.md", false),
+            ("system-model/Requirements.md", false),
+            ("system-model/SystemRequirements.md", false),
+            ("system-model/Capabilities.md", false),
+            ("system-model/subfolder/Requirements.md", false),
             ("external_repo/specs/Requirements.md", false),
         ];
 

@@ -5,7 +5,7 @@ TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Test: Multi-Type Search Filter
 # --------------------------------------
-# Satisfies: requirements/System/Output/Verifications/ReportingVerifications.md#multi-type-search-filter-test
+# Satisfies: system-model/System/Output/Verifications/ReportingVerifications.md#multi-type-search-filter-test
 #
 # Acceptance Criteria:
 # - System shall support comma-separated element types in --filter-type flag

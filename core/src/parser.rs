@@ -226,7 +226,7 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                         ))?;
 
                     // Normalize relation target
-                    // file_path is already relative to git root (e.g., "requirements/NewFile.md")
+                    // file_path is already relative to git root (e.g., "system-model/NewFile.md")
                     let git_root = crate::git_commands::get_git_root_dir()?;
 
                     let normalized_target = if link.starts_with('#') {

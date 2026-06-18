@@ -48,11 +48,11 @@ For comprehensive command reference, see the Reqvire skills.
 
 ### Key File Locations
 - Capability-rooted model: root-level scope folders under [requirements](requirements)
-- Shared ontology plane: [Ontologies folder](requirements/Ontologies)
+- Shared ontology plane: [Ontologies folder](system-model/Ontologies)
 - Refinements: capability-local files next to the requirements they refine
-- Architecture documentation: [Architecture.md](requirements/Architecture.md)
-- Relationship behavior: [Relation Types and Behaviors](requirements/ModelStructure/ModelManagement.md#relation-types-and-behaviors)
-- Architecture documentation: [Architecture.md](requirements/Architecture.md)
+- Architecture documentation: [Architecture.md](system-model/Architecture.md)
+- Relationship behavior: [Relation Types and Behaviors](system-model/ModelStructure/ModelManagement.md#relation-types-and-behaviors)
+- Architecture documentation: [Architecture.md](system-model/Architecture.md)
 
 
 ## Core Architecture
@@ -110,7 +110,7 @@ cli/src/
 - Prefer strong typing over string manipulation
 
 ### Architecture Principles
-- Follow the requirements and architecture defined in requirements/
+- Follow the requirements and architecture defined in system-model/
 - Link code and implementations via satisfiedBy only on `requirement` elements and evidence-backed concrete verification elements (`test-verification`, `formal-proof-verification`)
 - Use Result with custom error types for error handling
 - Document all public APIs with rustdoc

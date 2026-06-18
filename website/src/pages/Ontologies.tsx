@@ -38,7 +38,7 @@ export default function Ontologies() {
         </p>
         <BulletList
           items={[
-            "Author shared ontology elements under the ontology plane, commonly requirements/Ontologies.",
+            "Author shared ontology elements under the ontology plane, commonly system-model/Ontologies.",
             "Capabilities, requirements, contracts, verification objectives, and concrete verifications use Concept References for ontology term bindings.",
             "Semantic contracts do not author Concept References; they use ontology through explicit use relations.",
             "Reused Contract Context is for reusable requirement-owned contracts from other subgraphs.",

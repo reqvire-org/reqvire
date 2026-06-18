@@ -24,7 +24,7 @@ Graph relations answer:
 
 ## Recommended Root Layout
 
-In this reference, `./` means the chosen Reqvire model root relative to the workspace or repository root where Reqvire is run. That model root may be the workspace root, `requirements/`, `specs/system-model/`, or another project-selected folder. Do not assume the whole repository root is the model root.
+In this reference, `./` means the chosen Reqvire model root relative to the workspace or repository root where Reqvire is run. That model root may be the workspace root, `system-model/`, `specs/system-model/`, or another project-selected folder. Do not assume the whole repository root is the model root.
 
 Recommended top-level model planes:
 

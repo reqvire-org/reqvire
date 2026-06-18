@@ -31,7 +31,7 @@ Use this method when building or refactoring a system model, not only when clean
    - Run `reqvire submodels --json`.
    - Run `reqvire search --filter-type="ontology" --short`.
    - Treat each capability root as an independent coherent operational/system ability.
-   - Keep ontology and semantic-contract elements under `requirements/Ontologies`; model elements consume ontology terms through concept references, and requirements consume semantic contracts through `constrainedBy`.
+   - Keep ontology and semantic-contract elements under `system-model/Ontologies`; model elements consume ontology terms through concept references, and requirements consume semantic contracts through `constrainedBy`.
    - Treat ontology as a first-class semantic plane: it defines reusable terms and relationships that non-ontology elements reference explicitly.
    - Do not create one universal top capability just to reuse vocabulary. Shared meaning crosses roots through explicit concept references.
 
@@ -141,7 +141,7 @@ For each capability root:
 
 - Confirm it is a real independent capability root.
 - Check whether it has requirements through `specifiedBy`/`specify`.
-- If it has zero requirements, confirm it is still a meaningful capability because it has child capabilities or direct verification; otherwise add a concrete obligation that specifies it or move pure vocabulary into `requirements/Ontologies` and reference it from consuming elements.
+- If it has zero requirements, confirm it is still a meaningful capability because it has child capabilities or direct verification; otherwise add a concrete obligation that specifies it or move pure vocabulary into `system-model/Ontologies` and reference it from consuming elements.
 - Confirm cross-root dependencies are reused_contract_context, not hierarchy relations.
 - If one root is too broad, split it into child capabilities first and move local requirements to the child capabilities before editing ontology or contracts.
 
@@ -162,7 +162,7 @@ Do not delete meaning. Move it to the correct element type.
 If stable semantic meaning is currently in a requirement:
 
 - Add or update an `ontology` element.
-- Place authored ontology and semantic-contract elements in `requirements/Ontologies`, grouped by semantic area.
+- Place authored ontology and semantic-contract elements in `system-model/Ontologies`, grouped by semantic area.
 - Put ontology vocabulary in `#### Ontology`.
 - Do not put `#### Shapes` in ontology.
 - Add concept references from the model elements that need that vocabulary.
@@ -194,7 +194,7 @@ The system shall reject API requests whose access token does not conform to the 
 
 When an obligation needs specific closed-world validation:
 
-- Create a `semantic-contract` under `requirements/Ontologies` near the ontology it uses, then link it to the requirement with `constrain`/`constrainedBy`.
+- Create a `semantic-contract` under `system-model/Ontologies` near the ontology it uses, then link it to the requirement with `constrain`/`constrainedBy`.
 - Include `#### Shapes`.
 - Do not include `#### Ontology`.
 - Add `use` relations to the ontology elements that declare the SHACL terms.

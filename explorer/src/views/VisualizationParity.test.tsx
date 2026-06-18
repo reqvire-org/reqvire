@@ -95,23 +95,23 @@ describe("native visualization parity views", () => {
   it("builds per-verification roll-up Mermaid diagrams from trace trees", () => {
     const mermaid = __testBuildTraceRollupMermaid(
       {
-        id: "requirements/Traces.md#verify-api",
+        id: "system-model/Traces.md#verify-api",
         name: "Verify API",
-        file: "requirements/Traces.md",
+        file: "system-model/Traces.md",
         directCount: 1,
         totalCount: 2,
-        requirementIds: ["requirements/Traces.md#api-response"],
+        requirementIds: ["system-model/Traces.md#api-response"],
         verificationType: "test-verification",
         traceTree: {
           requirements: [
             {
-              id: "requirements/Traces.md#api-response",
+              id: "system-model/Traces.md#api-response",
               name: "API Response",
               type: "system-requirement",
               is_directly_verified: true,
               children: [
                 {
-                  id: "requirements/Traces.md#api-root",
+                  id: "system-model/Traces.md#api-root",
                   name: "API Root",
                   type: "user-requirement",
                   is_directly_verified: false,

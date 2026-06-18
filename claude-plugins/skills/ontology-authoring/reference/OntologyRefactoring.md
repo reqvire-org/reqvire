@@ -28,7 +28,7 @@ Improve:
 
 1. Inventory the existing ontology plane before editing.
    - Run `reqvire search --filter-type=ontology --short`.
-   - Read the affected `requirements/Ontologies/*.md` files and nearby semantic-contract shape profiles.
+   - Read the affected `system-model/Ontologies/*.md` files and nearby semantic-contract shape profiles.
    - Check which elements author concept references to ontology terms and which semantic contracts use the ontology.
 2. Identify the refactoring driver.
    - unclear class hierarchy

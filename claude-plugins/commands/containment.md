@@ -133,9 +133,9 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 Provide clear, actionable recommendations:
 
 **Files to Split:**
-- `requirements/LargeFile.md` (45 elements) → Consider splitting into:
-  - `requirements/Capability1.md` (requirements for Capability 1)
-  - `requirements/Capability2.md` (requirements for Capability 2)
+- `system-model/LargeFile.md` (45 elements) → Consider splitting into:
+  - `system-model/Capability1.md` (requirements for Capability 1)
+  - `system-model/Capability2.md` (requirements for Capability 2)
 
 **Files to Consolidate:**
 - `temp/A.md` (2 elements) + `temp/B.md` (3 elements) → Use:
@@ -144,7 +144,7 @@ Provide clear, actionable recommendations:
   ```
 
 **Folder Reorganization:**
-- Move security-related files from `requirements/` to new `security/` folder
+- Move security-related files from `system-model/` to new `security/` folder
 
 ## Related Commands
 

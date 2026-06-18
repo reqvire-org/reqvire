@@ -300,15 +300,15 @@ reqvire collect "Authentication Capability" --json --output /tmp/context_auth_ca
 reqvire collect "Authentication Capability" > /tmp/trace_context_auth_capability.md
 
 # 4. Get element details
-reqvire search --filter-id="requirements/Auth.md#authentication-capability" --json
+reqvire search --filter-id="system-model/Auth.md#authentication-capability" --json
 
 # 5. Get verification and test paths
-reqvire traces --filter-id="requirements/Auth.md#authentication-capability" --json
-reqvire search --filter-id="requirements/Verifications/AuthTests.md#auth-test" --json
+reqvire traces --filter-id="system-model/Auth.md#authentication-capability" --json
+reqvire search --filter-id="system-model/Verifications/AuthTests.md#auth-test" --json
 
 # 6. Generate git blob URL
 REPO_URL=$(git remote get-url origin | sed 's/\.git$//' | sed 's/git@github.com:/https:\/\/github.com\//')
-BLOB_URL="${REPO_URL}/blob/${BASE_COMMIT}/requirements/Auth.md#authentication-capability"
+BLOB_URL="${REPO_URL}/blob/${BASE_COMMIT}/system-model/Auth.md#authentication-capability"
 
 # 7. Create task plan (manual or automated)
 ```
@@ -316,7 +316,7 @@ BLOB_URL="${REPO_URL}/blob/${BASE_COMMIT}/requirements/Auth.md#authentication-ca
 **Resulting task:**
 
 ```markdown
-☐ Implement requirements under "Authentication Capability" (requirements/Auth.md#authentication-capability)
+☐ Implement requirements under "Authentication Capability" (system-model/Auth.md#authentication-capability)
   Context: The capability enables secure authentication for protected
   resources. Its specifying requirements define JWT token handling, refresh
   behavior, password hashing, and session constraints.
@@ -325,7 +325,7 @@ BLOB_URL="${REPO_URL}/blob/${BASE_COMMIT}/requirements/Auth.md#authentication-ca
   ⚠️ IMPORTANT: Read full capability and requirement context - this is only a summary!
 
   ☐ Review full capability and requirement context: /tmp/trace_context_auth_capability.md
-  ☐ Review capability and specifying requirements: https://github.com/org/repo/blob/abc123/requirements/Auth.md#authentication-capability
+  ☐ Review capability and specifying requirements: https://github.com/org/repo/blob/abc123/system-model/Auth.md#authentication-capability
   ☐ Implement JWT token generation per specification
   ☐ Implement password hashing using bcrypt
   ☐ Implement session management with timeout constraints

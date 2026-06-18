@@ -9,8 +9,8 @@ describe("ElementDetailModal", () => {
     render(
       <StoreProvider store={devFixture} schemaMismatch={null}>
         <ElementDetailModal
-          identifier="requirements/Specifications.md#example-capability"
-          previousElementLabel="requirements/Specifications.md#example-requirement"
+          identifier="system-model/Specifications.md#example-capability"
+          previousElementLabel="system-model/Specifications.md#example-requirement"
           onClose={vi.fn()}
           onOpenElement={vi.fn()}
           onOpenOntologyNode={vi.fn()}
@@ -32,7 +32,7 @@ describe("ElementDetailModal", () => {
           concept_refs: [
             {
               id: "concept:service-endpoint",
-              source_id: "requirements/Specifications.md#example-requirement",
+              source_id: "system-model/Specifications.md#example-requirement",
               label: "API endpoint",
               iri: "urn:reqvire:test:api:ServiceEndpoint",
               line_number: 9,
@@ -42,7 +42,7 @@ describe("ElementDetailModal", () => {
         schemaMismatch={null}
       >
         <ElementDetailModal
-          identifier="requirements/Specifications.md#example-requirement"
+          identifier="system-model/Specifications.md#example-requirement"
           onClose={vi.fn()}
           onOpenElement={vi.fn()}
           onOpenOntologyNode={onOpenOntologyNode}

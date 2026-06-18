@@ -29,7 +29,7 @@ cd "${TEST_DIR}" && "${REQVIRE_BIN}" format --fix > /dev/null 2>&1
 
 # Compare with expected output
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/Unordered.md" \
-    "${TEST_DIR}/requirements/Unordered.md" \
+    "${TEST_DIR}/system-model/Unordered.md" \
     "Element ordering after format does not match expected"
 
 exit 0

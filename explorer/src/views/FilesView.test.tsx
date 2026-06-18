@@ -35,21 +35,21 @@ describe("FilesView", () => {
   });
 
   it("preserves file selection and modeled element detail routing", () => {
-    const { onOpenElement } = renderFiles("requirements/Specifications.md");
+    const { onOpenElement } = renderFiles("system-model/Specifications.md");
 
     expect(screen.queryByRole("heading", { name: "Modeled elements" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /Example Requirement/ }));
 
     expect(onOpenElement).toHaveBeenCalledWith(
-      "requirements/Specifications.md#example-requirement",
+      "system-model/Specifications.md#example-requirement",
     );
   });
 
   it("opens source content from the file-row open icon", () => {
-    renderFiles("requirements/Specifications.md");
+    renderFiles("system-model/Specifications.md");
 
     expect(screen.getByRole("link", { name: /open content for specifications\.md/i }).getAttribute("href")).toBe(
-      "#/content/requirements/Specifications.md",
+      "#/content/system-model/Specifications.md",
     );
   });
 
@@ -60,7 +60,7 @@ describe("FilesView", () => {
     });
 
     expect(screen.getByText("1 items")).toBeTruthy();
-    expect(screen.getByRole("button", { name: /requirements/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /system-model/ })).toBeTruthy();
   });
 
   it("renders empty source files as inline source previews", () => {

@@ -2,7 +2,7 @@
 
 # Test: Export Command Functionality
 # --------------------------------------
-# Satisfies: requirements/Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#export-command-verification
+# Satisfies: system-model/Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#export-command-verification
 #
 # Acceptance Criteria:
 # - System writes index.html to the output directory

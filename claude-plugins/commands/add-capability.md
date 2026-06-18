@@ -58,7 +58,7 @@ This command orchestrates the complete workflow:
 
 3. **Add ontology context when needed:**
 
-   Use `ontology` elements when the capability needs reusable vocabulary, ontology terms, source authority, or shared OWL contract language. Add ontology elements under `requirements/Ontologies`, then bind capability prose to declared terms with `#### Concept References` when needed.
+   Use `ontology` elements when the capability needs reusable vocabulary, ontology terms, source authority, or shared OWL contract language. Add ontology elements under `system-model/Ontologies`, then bind capability prose to declared terms with `#### Concept References` when needed.
    Ontology referenced by model elements should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible contracts owned by the relevant requirement. Semantic contracts are reusable SHACL profiles that explicitly `use` ontology and `constrain` requirements.
 
    For broader semantic contract refactoring, use:

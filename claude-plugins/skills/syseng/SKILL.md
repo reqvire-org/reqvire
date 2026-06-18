@@ -95,7 +95,7 @@ Use an `ontology` when content defines reusable domain or model meaning:
 - `X relates to Y`
 - this domain term means...
 
-Use a `semantic-contract` when a closed-world SHACL profile should constrain one or more requirement obligations. Semantic contracts are first-class elements in the ontology plane; author them under `requirements/Ontologies` near the ontology they use. They must have `#### Shapes`, must not contain `#### Ontology`, must use one or more ontology elements through `use`/`usedBy`, and constrain requirements through `constrain`/`constrainedBy`.
+Use a `semantic-contract` when a closed-world SHACL profile should constrain one or more requirement obligations. Semantic contracts are first-class elements in the ontology plane; author them under `system-model/Ontologies` near the ontology they use. They must have `#### Shapes`, must not contain `#### Ontology`, must use one or more ontology elements through `use`/`usedBy`, and constrain requirements through `constrain`/`constrainedBy`.
 
 Use `#### Concept References` on non-ontology, non-semantic-contract elements when readable prose should bind human labels to ontology terms without filling text with CURIEs. The referenced IRI or CURIE must be declared by an ontology element in the model. Markdown concept references should use an absolute term IRI unless the referenced prefix is explicitly declared in reachable ontology Turtle. Semantic contracts must not author concept references; they are already semantic graph elements and depend on ontology through `use`/`usedBy`.
 
@@ -109,7 +109,7 @@ When constructing or refactoring a Reqvire system model:
 
 1. Inspect capability-root subgraphs with `submodels` and inspect the ontology plane with `search --filter-type=ontology`.
 2. Decide whether work belongs to an existing capability root, a child capability, a new independent capability root, or the shared ontology hierarchy.
-3. Keep ontology and semantic-contract elements in `requirements/Ontologies`; capabilities, requirements, contracts, and verifications bind prose to ontology terms with `#### Concept References`, and requirements link to semantic contracts there through `constrainedBy`.
+3. Keep ontology and semantic-contract elements in `system-model/Ontologies`; capabilities, requirements, contracts, and verifications bind prose to ontology terms with `#### Concept References`, and requirements link to semantic contracts there through `constrainedBy`.
 4. Treat ontology as first-class and orthogonal to capability/requirement structure: ontology defines reusable terms and relationships, non-ontology model elements reference those terms explicitly, and semantic contracts depend on ontology through `use`.
 5. Keep hierarchy inside capability, requirement, or ontology families; cross-root contract reuse must be explicit requirement-owned reused_contract_context.
 6. Move stable reusable meaning to ontology; keep obligations in requirements and exact implementation/interface behavior in requirement-owned contracts.
@@ -304,7 +304,7 @@ Requirements should contain EARS statements only (body + `#### Details`). Techni
 ## Core Rules
 
 1. Always run commands from the git root folder
-2. Use full paths starting with `requirements/` (if other content root, ask user)
+2. Use full paths starting with `system-model/` (if other content root, ask user)
 3. Never guess — read files before making changes
 4. Validate after each significant change
 5. When reading requirements, always check for **reused_contract_context**
