@@ -81,7 +81,7 @@ export function DetailDialog({
               </IconButton>
             ) : null}
             {elementType ? (
-              <TypeBadge type={elementType} family={typeFamily} tinted>
+              <TypeBadge type={elementType} family={typeFamily} tinted dot={false}>
                 {elementType}
               </TypeBadge>
             ) : null}

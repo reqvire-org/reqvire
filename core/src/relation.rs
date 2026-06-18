@@ -39,7 +39,7 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
                 opposite: Some("derivedFrom"),
                 description: "Element is source for a derived element",
                 arrow: "-.->",
-                label: "deriveReqT",
+                label: "derive",
             },
         );
 

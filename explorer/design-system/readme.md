@@ -1,6 +1,6 @@
 # Reqvire Explorer — Design System
 
-A design system for **Reqvire Explorer**, the interactive viewer for [Reqvire](https://www.reqvire.org/) system models. Reqvire is a Git-native MBSE (model-based systems engineering) toolkit: engineering knowledge — capabilities, requirements, contracts, semantic contracts, verifications and traceability links — lives as semi-structured Markdown in a repository, and Reqvire compiles it into a typed knowledge graph with auto-generated diagrams and reports.
+A design system for **Reqvire Explorer**, the interactive viewer for [Reqvire](https://www.reqvire.org/) system models. Reqvire is a Git-native MBSE (model-based systems engineering) toolkit: engineering knowledge — capabilities, requirements, contracts, semantic contracts, verifications and traceability links — lives as semi-structured Markdown in a repository, and Reqvire compiles it into typed graph projections and reports.
 
 The **Explorer** is the read/navigate surface over that graph. It is one application with several *modes*, switched from a top tab bar:
 

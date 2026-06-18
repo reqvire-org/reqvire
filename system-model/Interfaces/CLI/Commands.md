@@ -300,6 +300,7 @@ Implementation details shall follow the associated contract specifications. The 
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [mod.rs](../../../core/src/migrations/mod.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
+  * verifiedBy: [CLI Migrate Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-migrate-command-verification)
 ---
 
 ### CLI Model Diagram Command
@@ -324,7 +325,7 @@ Implementation details shall follow the associated contract specifications. The 
   * definedBy: [CLI Model Diagram Command Contract Specification](Specifications.md#cli-model-diagram-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Model Command Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#model-command-verification)
 ---
@@ -824,4 +825,3 @@ Implementation details shall follow the associated contract specifications.
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
 ---
-

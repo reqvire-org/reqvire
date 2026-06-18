@@ -134,7 +134,8 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Diagram Reused Contract Context Display Contract Specification](Specifications.md#diagram-reused-contract-context-display-contract-specification)
   * definedBy: [Explorer Mermaid Diagram Style Specification](Specifications.md#explorer-mermaid-diagram-style-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
+  * satisfiedBy: [verification_trace.rs](../../../core/src/verification_trace.rs)
   * verifiedBy: [Diagram Reused Contract Context Display Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#diagram-reused-contract-context-display-verification)
 ---
 

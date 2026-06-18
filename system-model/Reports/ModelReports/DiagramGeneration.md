@@ -17,39 +17,22 @@ The system shall produce interactive visual representations of relationships wit
 
 ### Diagram Generation
 
-When requested, the system shall automatically generate diagrams with relation filtering and save them to the required locations of the model.
+When requested through reporting commands, the system shall generate Mermaid diagrams with relation filtering in command output without mutating authored model files.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derive: [File Diagram Reused Contract Context Display](#file-diagram-reused-contract-context-display)
   * derive: [Interactive Mermaid Diagram Node Behavior](#interactive-mermaid-diagram-node-behavior)
-  * derive: [SysML-Compatible Relationship Rendering](#sysml-compatible-relationship-rendering)
+  * derive: [Reqvire Relationship Rendering](#reqvire-relationship-rendering)
   * derivedFrom: [Interactive Mermaid Diagrams](#interactive-mermaid-diagrams)
-  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
-  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
----
-
-### File Diagram Reused Contract Context Display
-
-The system shall display element reused_contract_context in file-based mermaid diagrams as clickable links to referenced contract elements below the element name within the node box.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [File Diagram Reused Contract Context Display Contract Specification](Specifications.md#file-diagram-reused-contract-context-display-contract-specification)
-  * derivedFrom: [Diagram Generation](#diagram-generation)
+  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 
 ### Interactive Mermaid Diagram Node Behavior
 
-The system shall implement interactive click behavior for Mermaid diagram nodes that redirects to the referenced element.
+The system shall implement interactive click behavior for Mermaid diagram nodes emitted by model, containment, and trace report outputs.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -62,16 +45,17 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Interactive Mermaid Diagram Node Behavior Contract Specification](Specifications.md#interactive-mermaid-diagram-node-behavior-contract-specification)
   * derivedFrom: [Diagram Generation](#diagram-generation)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 
-### SysML-Compatible Relationship Rendering
+### Reqvire Relationship Rendering
 
-The system shall implement a relationship rendering engine that adheres to SysML notation standards following clearly defined specifications, ensuring diagram consistency and standards compliance.
+The system shall implement a relationship rendering engine that uses Reqvire relation names and consistent visual conventions, ensuring diagram consistency and relation semantics remain clear.
 
 #### Details
 The system shall render relationships using:
-- SysML stereotypes («deriveReqt», «verify», «satisfy»)
+- Reqvire relation labels (`derive`, `verifiedBy`, `satisfiedBy`, and related canonical relation names)
 - Appropriate line styles (dashed or solid)
 - Open (hollow) arrowheads
 - Correct arrow directions based on hierarchy semantics
@@ -82,8 +66,7 @@ Each relation type has specific visual properties and directional semantics defi
   * type: requirement
 
 #### Relations
-  * definedBy: [SysML Rendering Specification](Specifications.md#sysml-rendering-specification)
+  * definedBy: [Reqvire Relation Rendering Specification](Specifications.md#reqvire-relation-rendering-specification)
   * derivedFrom: [Diagram Generation](#diagram-generation)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
-

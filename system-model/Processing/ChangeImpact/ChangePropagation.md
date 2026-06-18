@@ -330,11 +330,11 @@ flowchart TD;
 
     %% Requirements Hierarchy
     A[System Power Management]:::requirement
-    A -->|deriveReqt| B[Power Saving Mode]:::requirement
-    B -->|deriveReqt| C[CPU Power Reduction]:::requirement
-    B -->|deriveReqt| D[Screen Brightness Adjustment]:::requirement
-    A -->|deriveReqt| E[Battery Optimization]:::requirement
-    E -->|deriveReqt| G[Network Power Optimization]:::requirement
+    A -->|derive| B[Power Saving Mode]:::requirement
+    B -->|derive| C[CPU Power Reduction]:::requirement
+    B -->|derive| D[Screen Brightness Adjustment]:::requirement
+    A -->|derive| E[Battery Optimization]:::requirement
+    E -->|derive| G[Network Power Optimization]:::requirement
 
     %% Implementations (Satisfied By)
     B -->|satisfiedBy| SB1[software/power_control.md]:::implementation

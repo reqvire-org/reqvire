@@ -155,6 +155,7 @@ Migrate command behavior:
 - Support `--json` for structured migration summary and diff output.
 - Support `--output <FILE>` only with `--json`.
 - Parse the model in lenient mode so known migration-triggering validation errors can be repaired.
+- When launched from a repository subdirectory, apply source rewrites to the model files identified by git-root-relative registry paths without duplicating the subdirectory prefix in the write location.
 - Implement the `v0.15-documents-to-element-header` migration by rewriting legacy single-element file headers from `# Documents` to `# Element`.
 - Implement the `v0.16-verification-objective` migration by creating one shared holder `verification-objective` element in the repository-root `VerificationObjectiveMigration.md` file and adding holder-owned `derive` relations from that objective to standalone concrete verification elements.
 - Preserve concrete verification `verify` and evidence relations; the shared holder objective is an explicit migration placeholder that users can later rename, split, merge, or regroup.
@@ -477,4 +478,3 @@ Verification trace element navigation behavior is governed by the reused verific
 #### Relations
   * define: [Verification Traces Element Navigation](Commands.md#verification-traces-element-navigation)
 ---
-

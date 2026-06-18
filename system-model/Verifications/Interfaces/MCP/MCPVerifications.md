@@ -386,11 +386,10 @@ Expected checks:
 - Verify the Explorer root URL still returns the SPA shell.
 - Verify standard MCP Streamable HTTP requests are accepted at `http://127.0.0.1:<PORT>/mcp`.
 - Verify MCP `tools/list` does not include mutation tools when only `--enable-mcp` is present.
-- Start `reqvire serve --enable-mcp --mcp-enable-mutations --host 127.0.0.1 --port <PORT>` and verify MCP `tools/list` includes mutation tools.
-- Start `reqvire serve --enable-mcp --enable-mutations --host 127.0.0.1 --port <PORT>` and verify the alias form also includes mutation tools.
+- Start `reqvire serve --enable-mcp --enable-mutations --host 127.0.0.1 --port <PORT>` and verify MCP `tools/list` includes mutation tools.
 - Execute an embedded MCP mutation and verify a subsequent `assets/project-store.js` request contains the updated model datastore after browser/client reload.
 - Verify `assets/project-store.js` and `ontologies.ttl` responses include no-store cache control.
-- Verify `--mcp-enable-mutations` is rejected unless `--enable-mcp` is also provided.
+- Verify `--enable-mutations` is rejected unless `--enable-mcp` is also provided for `reqvire serve`.
 - Verify `/mcp` is handled by RMCP transport and is not served by the Explorer SPA fallback.
 
 #### Metadata

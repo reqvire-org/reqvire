@@ -1237,7 +1237,7 @@ This test verifies that the verification-traces command filter options work corr
 
 3. **Correct Arrow Directions**
    - Mermaid diagrams use `SYS001 -.->|verify| VER001` or `CAP001 -.->|verify| VER001` format (verified element links to verification)
-   - Mermaid diagrams use `USER001 -.->|deriveReqT| SYS001` format (parent derives child)
+   - Mermaid diagrams use `USER001 -.->|derive| SYS001` format (parent derives child)
    - Arrow directions match Reqvire relation semantics (TargetToElement, ElementToTarget)
 
 4. **Specific Verification Filter**
@@ -1348,4 +1348,3 @@ This test verifies that the --from-folder option correctly generates relative li
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
   * verify: [CLI Traces Command](../../../Interfaces/CLI/Commands.md#cli-traces-command)
 ---
-

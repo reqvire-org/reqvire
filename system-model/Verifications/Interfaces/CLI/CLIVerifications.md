@@ -10,6 +10,7 @@ This objective groups verification that the Reqvire command-line interface expos
 #### Relations
   * derive: [CLI Git Commit Hash Flag Test](#cli-git-commit-hash-flag-test)
   * derive: [CLI Help Structure Verification](#cli-help-structure-verification)
+  * derive: [CLI Migrate Command Verification](#cli-migrate-command-verification)
   * derive: [CLI Ontologies Command Verification](#cli-ontologies-command-verification)
   * derive: [CLI Size Estimate JSON Option Verification](#cli-size-estimate-json-option-verification)
   * derive: [Explicit Workspace Selection Verification](#explicit-workspace-selection-verification)
@@ -109,6 +110,26 @@ This test verifies that the CLI help output displays all commands and their opti
   * verify: [Served Explorer Browser Interface](../../../Interfaces/WebExplorer/Capabilities.md#served-explorer-browser-interface)
 ---
 
+### CLI Migrate Command Verification
+
+This verification shall prove that the migrate command previews and applies deterministic source migrations without writing outside the intended model file locations.
+
+#### Details
+Expected checks:
+- Run `reqvire validate` on a fixture with legacy contract relations and verify migration candidates are reported.
+- Run `reqvire migrate` and verify the dry-run preview reports legacy contract relation rewrites without changing source files.
+- Run `reqvire migrate --fix` and verify legacy `refinedBy` and `refine` relations are rewritten to `definedBy` and `define`.
+- Run `reqvire migrate --fix` from a repository subdirectory and verify changed files are written to the git-root-relative source path rather than a duplicated subdirectory path.
+- Run `reqvire validate` after migration and verify the migrated model passes.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-contract-relation-migration/test.sh)
+  * verify: [CLI Migrate Command](../../../Interfaces/CLI/Commands.md#cli-migrate-command)
+---
+
 ### CLI Ontologies Command Verification
 
 This verification shall prove that the ontologies command collects ontology `Ontology` content and semantic-contract `Shapes` content.
@@ -201,4 +222,3 @@ Test verifies that verification element names in the traces report are clickable
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
   * verify: [Verification Traces Element Navigation](../../../Interfaces/CLI/Commands.md#verification-traces-element-navigation)
 ---
-

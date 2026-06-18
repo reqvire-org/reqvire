@@ -24,6 +24,25 @@ if ! grep -q "refinedBy" specifications/Requirements.md; then
   exit 1
 fi
 
+mkdir -p submodule/specifications
+cp specifications/Requirements.md submodule/specifications/Requirements.md
+
+(cd submodule && $REQVIRE migrate --fix > ../migrate-submodule-fix.out 2>&1)
+
+if grep -q "refinedBy\\|refine:" submodule/specifications/Requirements.md; then
+  echo "FAILED: migrate --fix from a subdirectory should rewrite the git-root-relative source file"
+  cat submodule/specifications/Requirements.md
+  exit 1
+fi
+
+if [ -e submodule/submodule/specifications/Requirements.md ]; then
+  echo "FAILED: migrate --fix from a subdirectory should not create duplicated submodule path"
+  find submodule -maxdepth 4 -type f | sort
+  exit 1
+fi
+
+rm -rf submodule
+
 $REQVIRE migrate --fix > migrate-fix.out 2>&1
 
 if grep -q "refinedBy\\|refine:" specifications/Requirements.md; then
@@ -45,4 +64,3 @@ if ! grep -q "define: \\[Invoice Number Requirement\\]" specifications/Requireme
 fi
 
 $REQVIRE validate > validate-after.out 2>&1
-

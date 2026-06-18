@@ -472,9 +472,8 @@ The Explorer serve command is expected to optionally mount the same Reqvire MCP 
 Embedded MCP behavior:
 - `reqvire serve` starts the Explorer HTTP server only and does not expose MCP by default.
 - `reqvire serve --enable-mcp` mounts the Reqvire MCP Streamable HTTP service at `/mcp` on the same host and port as the Explorer server.
-- `reqvire serve --enable-mcp --mcp-enable-mutations` enables MCP mutation tools for the embedded `/mcp` endpoint.
-- `reqvire serve --enable-mcp --enable-mutations` is accepted as an alias form for enabling mutation tools on the embedded `/mcp` endpoint.
-- `--mcp-enable-mutations` and its `--enable-mutations` alias require `--enable-mcp`; mutation tools are not advertised or executable for embedded MCP unless both capabilities are present.
+- `reqvire serve --enable-mcp --enable-mutations` enables MCP mutation tools for the embedded `/mcp` endpoint.
+- `--enable-mutations` requires `--enable-mcp`; mutation tools are not advertised or executable for embedded MCP unless both capabilities are present.
 - The embedded `/mcp` endpoint reuses the same MCP adapter, shared Reqvire tool registry, RMCP Streamable HTTP transport configuration, allowed-origin policy, stateless JSON response mode, and mutation serialization behavior as `reqvire mcp`.
 - The embedded MCP endpoint uses the current serve workspace and excluded-file-pattern configuration.
 - After embedded MCP mutations, the served Explorer runtime data endpoints rebuild `assets/project-store.js` and `ontologies.ttl` from the current workspace on subsequent requests so browser reloads observe the updated model datastore.

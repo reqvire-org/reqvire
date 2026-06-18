@@ -716,7 +716,7 @@ This keeps served Explorer content complete with navigable contract reused_contr
 - Route changes shall update the document title and route metadata to match the active Explorer view.
 - Routes shall be deep-linkable: loading `index.html#/elements/<identifier>` shall open the selected element inside the Explorer shell without leaving the current view family.
 - Element-detail routes shall render as an in-shell, scrollable modal/dialog over the active Explorer view. The modal shall use Project Store element records as the primary data source and shall show at minimum element name, type, source file, source anchor, metadata, governance context, content, relations, reused_contract_context, concept references, and available verification/coverage/resource evidence.
-- Element-detail modal headers shall show the actual element type as the single primary type badge. They shall not show a second canonical family/kind badge when the actual element type already carries the meaningful user-facing classification.
+- Element-detail modal headers shall show the actual element type as the single primary text badge. They shall not show a second canonical family/kind badge, marker dot, shape, or glyph when the actual element type already carries the meaningful user-facing classification.
 - Element-detail modal relation navigation shall maintain a local previous-element stack. Opening a related element from the modal shall replace the modal content with the related element and show a compact back icon button whose accessible label and browser tooltip name the previous element.
 - Element-detail modal headers shall not render a second visible previous-element context line such as `From:` when the back button already carries the previous element name through its accessible label/title.
 - Element-detail modal concept references that resolve to ontology projection nodes shall render the ontology term display name as the visible target first, show the authored concept-reference label as secondary bracketed context, keep the IRI/CURIE as tooltip/location metadata, and open the ontology-node detail modal using the same endpoint interaction model as normal relation targets.
@@ -769,7 +769,7 @@ Serve command behavior:
 - Accept `--host <HOST>` option to specify the bind address (default: localhost)
 - Accept `--port <PORT>` option to specify the server port (default: 8080)
 - Accept `--enable-mcp` to also expose the Reqvire MCP Streamable HTTP endpoint at `/mcp` on the same HTTP listener.
-- Accept `--mcp-enable-mutations` only when `--enable-mcp` is present, and use it to enable mutation tools for the embedded MCP endpoint. Accept `--enable-mutations` as the serve-command alias for the same embedded MCP mutation option.
+- Accept `--enable-mutations` only when `--enable-mcp` is present, and use it to enable mutation tools for the embedded MCP endpoint.
 - Assemble the embedded Explorer shell, Project Store data, and ontology artifact in memory
 - Regenerate runtime Project Store data and ontology artifacts from the current workspace when `assets/project-store.js` or `ontologies.ttl` are requested, so served Explorer reloads can observe model changes made through embedded MCP mutation tools.
 - Serialize runtime data regeneration with embedded MCP mutation execution to avoid reading partial filesystem updates.
@@ -825,7 +825,7 @@ Styling conventions for the served Explorer web interface.
 - Programmatic renderers resolve graph, Mermaid, D3, and badge colors through the Explorer palette API.
 
 **Element Cards and Badges:**
-- Element cards, grid tiles, list rows, search results, graph nodes, relation pills, and modal badges use the same role tokens and glyph contract.
+- Element cards, grid tiles, list rows, search results, graph nodes, relation pills, and modal badges use the same role tokens. Element icons and legends carry the glyph contract; modal and adjacent type badges stay text-only when a separate element marker already identifies the element type.
 - Capability, requirement, verification-objective, concrete verification, ontology, resource, and contract-family roles are encoded by role token, text label, and glyph. Color is never the only type cue.
 - Semantic-contract elements use their own SHACL-profile role token as a plain square with no glyph. Contract-family subtypes use a shared contract hue with distinct glyphs for source, specification, constraint, behavior, state, and input-output elements.
 

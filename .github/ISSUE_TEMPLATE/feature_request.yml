@@ -8,7 +8,7 @@ body:
     attributes:
       value: |
         Thanks for suggesting a new feature.
-        Code, requirements, specifications, ontologies, verifications, and other model contributions are closed at the moment.
+        Public pull requests are not open at the moment.
         This issue is the place to discuss use cases, scope, design, and tradeoffs.
 
   - type: textarea
@@ -64,5 +64,5 @@ body:
       options:
         - label: I have searched existing issues to avoid duplicates
           required: true
-        - label: I understand code and model pull requests are currently closed
+        - label: I understand public pull requests are not open at the moment
           required: true

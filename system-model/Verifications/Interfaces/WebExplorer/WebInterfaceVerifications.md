@@ -342,7 +342,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - File containers and modeled resources shall be represented as separate record families with explicit cross-references when the same path appears in both roles.
 - Route definitions shall include canonical hash routes for current views and element/file/search detail workflows.
 - Element-detail routes shall open a Project Store-backed scrollable modal/dialog in the Explorer shell instead of using the source content route as the primary element navigation target.
-- Element-detail modal headers shall show only the actual element type badge and shall not show an additional type-family/kind badge when the element type is more specific.
+- Element-detail modal headers shall show only the actual element type as a text badge and shall not show an additional type-family/kind badge, marker dot, shape, or glyph when the element type is more specific.
 - Opening a related element from within the element-detail modal shall show a compact back control whose accessible label names the previous element and shall not render a duplicate visible `From:` context line.
 - Resolved concept references in the element-detail modal shall show the ontology term name first, show the authored concept-reference label as bracketed secondary context, expose the IRI as tooltip/location metadata, and open the ontology-node modal when activated.
 - Element-detail modals shall expose source navigation as a secondary action using the source anchor.
@@ -361,7 +361,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - Assert `files` records carry source navigation metadata while `resources` records carry referring-fact evidence.
 - Assert canonical routes include primary `#/model`, specialist `#/ontologies` and `#/traces`, and supporting `#/files`, `#/files/<path>`, `#/coverage`, `#/resources`, `#/elements/<identifier>`, and `#/search`; do not require a separate Containment route or a separate Knowledge Graph route/page file.
 - Assert at least one Explorer element link or search result targets `#/elements/<identifier>` and that the element-detail UI contains a modal/dialog marker plus a secondary source link.
-- Assert element-detail modal headers render the actual element type as the only visible type badge; for example a `behavior` element shall not also show a separate `contract` badge.
+- Assert element-detail modal headers render the actual element type as the only visible type badge and do not render a marker dot, shape, or glyph inside that badge; for example a `behavior` element shall not also show a separate `contract` badge.
 - Assert the Model view List/Grid modes render from Project Store `folders` and `files` without an iframe or third-party file-manager widget, expose breadcrumb navigation, sortable file rows, grid cards, central workspace search, icon/color legends, source-page secondary actions, and modeled-element rows that open the shared element-detail modal. Assert clicking anywhere on a Grid mode folder/file card opens or selects that card's item, while the source-page secondary action remains a separate control. Assert `#/files` and `#/files/<path>` deep-link into that behavior without creating a separate primary Filesystem view.
 - Assert the Model tree, grid cards, modeled-element lists, relation/reused_contract_context endpoints, and element legends use the shared Explorer `ElementIcon` type glyphs, that capability, semantic-contract, and verification-objective elements use their own role colors as plain squares with no glyph, that verification-objective uses the darker verification-objective token distinct from concrete verification, that concept-reference targets use the resource/amber treatment, that evidence-file artifacts use the neutral/default treatment, and that contract-family subtypes keep the shared contract color while rendering distinct glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
 - Assert selecting a folder, file, or modeled element in the left Model project tree updates the active Model workspace mode: List/Grid browse the selected folder or file, Graph focuses the matching graph node when one exists, and modeled-element rows open the shared element-detail modal without leaving the Model workspace.
@@ -392,7 +392,7 @@ This test verifies that the serve command starts an HTTP server for the embedded
 - System shall serve embedded Explorer assets and generated Project Store data with correct paths
 - System shall serve generated `ontologies.ttl`
 - System shall expose `/mcp` on the same listener only when `--enable-mcp` is present
-- System shall expose embedded MCP mutation tools only when both `--enable-mcp` and `--mcp-enable-mutations` are present
+- System shall expose embedded MCP mutation tools only when both `--enable-mcp` and `--enable-mutations` are present
 - System shall return index.html for non-asset browser routes
 - System shall not return Explorer `index.html` for `/mcp` requests when embedded MCP is enabled
 - System shall return 404 for missing asset paths
@@ -411,11 +411,10 @@ This test verifies that the serve command starts an HTTP server for the embedded
 - Non-asset browser routes return index.html for SPA fallback
 - `reqvire serve --enable-mcp` accepts MCP protocol requests at `/mcp` while root and SPA routes still serve Explorer content
 - `reqvire serve --enable-mcp` omits mutation tools from MCP `tools/list`
-- `reqvire serve --enable-mcp --mcp-enable-mutations` includes mutation tools in MCP `tools/list`
 - `reqvire serve --enable-mcp --enable-mutations` includes mutation tools in MCP `tools/list`
 - After an embedded MCP mutation changes model files, a subsequent `assets/project-store.js` request returns regenerated Project Store data that reflects the current workspace.
 - Runtime data responses include no-store cache control to avoid stale browser datastores after mutation.
-- `reqvire serve --mcp-enable-mutations` without `--enable-mcp` fails CLI argument validation
+- `reqvire serve --enable-mutations` without `--enable-mcp` fails CLI argument validation
 - Runtime-generation verbose output is suppressed (quiet mode active)
 
 #### Metadata

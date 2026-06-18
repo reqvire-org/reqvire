@@ -197,9 +197,9 @@ System shall produce interactive visual representations.
 
 #### Details
 **Diagram Generation Approach:**
-- File-based generation
-- Shows all elements and relationships
-- External resources as linked boxes
+- Report-output generation
+- Shows the selected model scope and relationships
+- Emits Markdown-embedded Mermaid or pure Mermaid text depending on command mode
 
 **Diagram Styling:**
 - Containment structure with subgraphs

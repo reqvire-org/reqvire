@@ -1,0 +1,9 @@
+### Serve Embedded MCP Added Requirement
+
+Requirement added through embedded serve MCP e2e.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Parent Requirement](#parent-requirement)

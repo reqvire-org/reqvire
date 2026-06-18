@@ -52,7 +52,7 @@ pub struct Args {
 pub enum Commands {
     /// Serve the embedded Explorer UI via HTTP server
     #[clap(
-        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>              Bind address (default: localhost)\n      --port <PORT>              Server port (default: 8080)\n      --enable-mcp               Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --mcp-enable-mutations     Advertise and allow mutation tools on the embedded MCP endpoint\n      --enable-mutations         Alias for --mcp-enable-mutations"
+        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>             Bind address (default: localhost)\n      --port <PORT>             Server port (default: 8080)\n      --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint"
     )]
     Serve {
         /// Bind address
@@ -69,8 +69,7 @@ pub enum Commands {
 
         /// Advertise and allow mutation tools on the embedded MCP endpoint
         #[clap(
-            long,
-            visible_alias = "enable-mutations",
+            long = "enable-mutations",
             requires = "enable_mcp",
             help_heading = "SERVE OPTIONS"
         )]
@@ -2593,20 +2592,6 @@ mod tests {
 
     #[test]
     fn parses_serve_with_embedded_mcp() {
-        let args =
-            Args::parse_from(&["reqvire", "serve", "--enable-mcp", "--mcp-enable-mutations"]);
-        assert!(matches!(
-            args.command,
-            Some(Commands::Serve {
-                enable_mcp: true,
-                mcp_enable_mutations: true,
-                ..
-            })
-        ));
-    }
-
-    #[test]
-    fn parses_serve_with_embedded_mcp_mutation_alias() {
         let args = Args::parse_from(&["reqvire", "serve", "--enable-mcp", "--enable-mutations"]);
         assert!(matches!(
             args.command,

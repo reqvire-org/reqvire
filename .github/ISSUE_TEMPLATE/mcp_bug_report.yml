@@ -1,0 +1,165 @@
+name: MCP Bug Report
+description: Report a bug in the Reqvire MCP server, tools, resources, prompts, or semantic query interface
+title: "[MCP Bug]: "
+labels: ["bug", "mcp", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for Reqvire MCP server, MCP tool, MCP prompt, MCP resource, and semantic query bugs.
+        Public pull requests are not open at the moment. Please use this form for reproducible MCP bug reports and detailed analysis.
+
+  - type: dropdown
+    id: mcp_area
+    attributes:
+      label: MCP Area
+      description: Which MCP capability is affected?
+      multiple: true
+      options:
+        - Server startup or Streamable HTTP transport
+        - Tool discovery or tool metadata
+        - Read-only model evidence tools
+        - Mutation tools or mutation enablement
+        - Workspace/session tools
+        - Resources
+        - Prompts
+        - Semantic prefixes
+        - Semantic vocabulary
+        - Semantic ontologies RDF/SHACL export
+        - Semantic SPARQL query execution
+        - MCP client compatibility
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of the MCP problem.
+      placeholder: Describe the MCP bug...
+    validations:
+      required: true
+
+  - type: textarea
+    id: server
+    attributes:
+      label: MCP Server Startup
+      description: Include the exact command and endpoint.
+      render: shell
+      placeholder: |
+        reqvire mcp --host 127.0.0.1 --port 8081
+        # or
+        reqvire serve --enable-mcp --port 8080
+        # endpoint: http://127.0.0.1:8081/mcp
+    validations:
+      required: true
+
+  - type: textarea
+    id: client
+    attributes:
+      label: MCP Client
+      description: Which client called the MCP server?
+      placeholder: |
+        - Client: Codex, Claude Desktop, custom client, curl, SDK, other
+        - Client version:
+        - Transport: Streamable HTTP
+    validations:
+      required: true
+
+  - type: textarea
+    id: request
+    attributes:
+      label: MCP Request
+      description: Include the tool/resource/prompt name and arguments. Remove secrets or private model data.
+      render: json
+      placeholder: |
+        {
+          "method": "tools/call",
+          "params": {
+            "name": "reqvire.semantic.sparql",
+            "arguments": {
+              "query": "SELECT * WHERE { ?s ?p ?o } LIMIT 10"
+            }
+          }
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: response
+    attributes:
+      label: Actual MCP Response or Error
+      description: Paste the response body, client error, server error, or timeout behavior.
+      render: json
+      placeholder: |
+        {
+          "error": "..."
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected MCP Behavior
+      description: What should the MCP server/tool/prompt/resource have returned or done?
+      placeholder: Expected result...
+    validations:
+      required: true
+
+  - type: textarea
+    id: model_context
+    attributes:
+      label: Relevant Model or Semantic Context
+      description: Include minimal `system-model/...` files, element identifiers, ontology prefixes, SHACL contracts, or SPARQL query context needed to reproduce.
+      render: markdown
+      placeholder: |
+        - Relevant files:
+        - Relevant elements:
+        - Relevant ontology prefixes:
+        - Relevant semantic contracts:
+
+        ```sparql
+        # Query, if this is a semantic query issue
+        ```
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Provide the details that apply.
+      placeholder: |
+        - OS:
+        - Reqvire version: output of `reqvire --version` or `npx -y @reqvire-org/reqvire@latest --version`
+        - Install/run method: npm, binary, cargo, source checkout, Docker, other
+        - Node/npm version, if using npm:
+        - Browser, if using `reqvire serve --enable-mcp` from Explorer workflow:
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Server Logs or Diagnostics
+      description: Paste MCP server logs, validation diagnostics, or relevant command output.
+      render: shell
+      placeholder: Paste logs here...
+
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Root-Cause Hypothesis
+      description: If you have a hypothesis about why this happens, share it here.
+      placeholder: Potential root cause, impacted modules, or suspected regression source...
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I understand public pull requests are not open at the moment
+          required: true

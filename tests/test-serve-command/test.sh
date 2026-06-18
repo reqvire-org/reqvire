@@ -37,12 +37,17 @@ cd "$TEST_DIR"
 "$REQVIRE_BIN" serve --host "$TEST_HOST" --port "$TEST_PORT" > "${TEST_DIR}/serve_output.log" 2>&1 &
 SERVE_PID=$!
 
-# Function to cleanup server on exit
-cleanup() {
-    if [ -n "$SERVE_PID" ]; then
+stop_server() {
+    if [ -n "${SERVE_PID:-}" ]; then
         kill "$SERVE_PID" 2>/dev/null || true
         wait "$SERVE_PID" 2>/dev/null || true
+        SERVE_PID=""
     fi
+}
+
+# Function to cleanup server on exit
+cleanup() {
+    stop_server
     rm -rf "${TEST_DIR}"
 }
 trap cleanup EXIT
@@ -179,6 +184,100 @@ fi
 if grep -q "Updated diagrams" "${TEST_DIR}/serve_output.log"; then
     echo "❌ FAILED: Diagram update messages present (quiet mode not working)"
     cat "${TEST_DIR}/serve_output.log"
+    exit 1
+fi
+
+stop_server
+
+# Test 8: Embedded MCP endpoint can mutate the workspace and the served datastore refreshes.
+MCP_PORT=$((9000 + RANDOM % 1000))
+MCP_PROTOCOL_VERSION="2025-11-25"
+MCP_CONTENT="$(cat "${TEST_DIR}/fixtures/serve-embedded-mcp-added-requirement.md.txt")"
+
+"$REQVIRE_BIN" serve --host "$TEST_HOST" --port "$MCP_PORT" --enable-mcp --enable-mutations > "${TEST_DIR}/serve_mcp_output.log" 2>&1 &
+SERVE_PID=$!
+
+echo "Waiting for embedded MCP server to start on $TEST_HOST:$MCP_PORT..."
+for i in {1..20}; do
+    if curl -s "http://$TEST_HOST:$MCP_PORT/" >/dev/null 2>&1; then
+        echo "Embedded MCP server started successfully on $TEST_HOST:$MCP_PORT"
+        break
+    fi
+    if [ $i -eq 20 ]; then
+        if grep -qi "Operation not permitted" "${TEST_DIR}/serve_mcp_output.log"; then
+            echo "⚠ SKIPPED: Embedded MCP serve test cannot bind in this environment"
+            exit 0
+        fi
+        echo "❌ FAILED: Embedded MCP server did not start within 10 seconds"
+        cat "${TEST_DIR}/serve_mcp_output.log"
+        exit 1
+    fi
+    sleep 0.5
+done
+
+if ! grep -q "MCP endpoint: http://$TEST_HOST:$MCP_PORT/mcp" "${TEST_DIR}/serve_mcp_output.log"; then
+    echo "❌ FAILED: Embedded MCP endpoint URL not displayed"
+    cat "${TEST_DIR}/serve_mcp_output.log"
+    exit 1
+fi
+
+MCP_INIT_REQUEST="$(jq -n -c --arg version "$MCP_PROTOCOL_VERSION" '{jsonrpc:"2.0",id:1,method:"initialize",params:{protocolVersion:$version,capabilities:{},clientInfo:{name:"reqvire-serve-test",version:"0"}}}')"
+MCP_TOOLS_REQUEST="$(jq -n -c '{jsonrpc:"2.0",id:2,method:"tools/list",params:{}}')"
+MCP_MUTATION_REQUEST="$(jq -n -c --arg content "$MCP_CONTENT" '{jsonrpc:"2.0",id:3,method:"tools/call",params:{name:"reqvire.add_element",arguments:{file:"specifications/Requirements.md",content:$content,dry_run:false}}}')"
+
+curl -sS -o "${TEST_DIR}/serve_mcp_init.json" \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  --data "$MCP_INIT_REQUEST" \
+  "http://$TEST_HOST:$MCP_PORT/mcp"
+
+if ! jq -e '.result.protocolVersion == "2025-11-25"' "${TEST_DIR}/serve_mcp_init.json" >/dev/null; then
+    echo "❌ FAILED: Embedded MCP initialize failed"
+    cat "${TEST_DIR}/serve_mcp_init.json"
+    exit 1
+fi
+
+curl -sS -o "${TEST_DIR}/serve_mcp_tools.json" \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -H "Mcp-Protocol-Version: $MCP_PROTOCOL_VERSION" \
+  --data "$MCP_TOOLS_REQUEST" \
+  "http://$TEST_HOST:$MCP_PORT/mcp"
+
+if ! jq -e '[.result.tools[].name] | index("reqvire.add_element") != null and index("reqvire.link") != null' "${TEST_DIR}/serve_mcp_tools.json" >/dev/null; then
+    echo "❌ FAILED: Embedded MCP mutation tools are not advertised"
+    cat "${TEST_DIR}/serve_mcp_tools.json"
+    exit 1
+fi
+
+curl -sS -o "${TEST_DIR}/serve_mcp_mutation.json" \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -H "Mcp-Protocol-Version: $MCP_PROTOCOL_VERSION" \
+  --data "$MCP_MUTATION_REQUEST" \
+  "http://$TEST_HOST:$MCP_PORT/mcp"
+
+if ! jq -e '.result.structuredContent.dry_run == false and (.result.structuredContent.diffs | length) >= 1' "${TEST_DIR}/serve_mcp_mutation.json" >/dev/null; then
+    echo "❌ FAILED: Embedded MCP mutation did not execute"
+    cat "${TEST_DIR}/serve_mcp_mutation.json"
+    exit 1
+fi
+
+grep -q "Serve Embedded MCP Added Requirement" "$TEST_DIR/specifications/Requirements.md" || {
+    echo "❌ FAILED: Embedded MCP mutation did not persist to the fixture file"
+    exit 1
+}
+
+STORE_HEADERS="${TEST_DIR}/serve_mcp_project_store.headers"
+curl -sS -D "$STORE_HEADERS" -o "${TEST_DIR}/serve_mcp_project_store.js" "http://$TEST_HOST:$MCP_PORT/assets/project-store.js"
+if ! grep -qi '^cache-control: no-store' "$STORE_HEADERS"; then
+    echo "❌ FAILED: Project Store response is missing no-store cache control"
+    cat "$STORE_HEADERS"
+    exit 1
+fi
+
+if ! grep -q "Serve Embedded MCP Added Requirement" "${TEST_DIR}/serve_mcp_project_store.js"; then
+    echo "❌ FAILED: Project Store did not refresh after embedded MCP mutation"
     exit 1
 fi
 

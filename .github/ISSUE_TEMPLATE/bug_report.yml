@@ -9,12 +9,33 @@ body:
       value: |
         Thanks for taking the time to report a bug.
         Reproducible bugs are the most useful external contribution to Reqvire right now.
-        Code, requirements, specifications, ontologies, verifications, and other model contributions are closed at the moment, so please focus on detailed analysis here.
+        Public pull requests are not open at the moment. Please use this form for reproducible bug reports and detailed analysis.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Area
+      description: Which Reqvire capability or interface is affected?
+      multiple: true
+      options:
+        - CLI command
+        - Model parsing or formatting
+        - Model mutation commands
+        - Validation or linting
+        - Search, coverage, traces, change impact, resources, or submodels report
+        - Ontologies, semantic contracts, SHACL, RDF export, or SPARQL
+        - MCP server, MCP tools, or MCP prompts
+        - Explorer UI, exported Explorer, or serve command
+        - Codex or Claude assistant skills/plugins
+        - Installation, packaging, release, or documentation website
+        - Other
+    validations:
+      required: true
 
   - type: textarea
     id: description
     attributes:
-      label: 🐛 Bug Description
+      label: Bug Description
       description: A clear and concise description of what the bug is.
       placeholder: Describe the bug...
     validations:
@@ -23,20 +44,20 @@ body:
   - type: textarea
     id: reproduction
     attributes:
-      label: 🔄 Steps to Reproduce
-      description: Steps to reproduce the behavior
+      label: Steps to Reproduce
+      description: Include the exact command, Explorer action, MCP request, or model workflow that triggers the behavior.
       placeholder: |
-        1. Go to '...'
-        2. Click on '...'  
-        3. Run command '...'
-        4. See error
+        1. Run `reqvire ...`
+        2. Or open Explorer at `...` and click `...`
+        3. Or call MCP tool/prompt `...` with arguments `...`
+        4. See `...`
     validations:
       required: true
 
   - type: textarea
     id: expected
     attributes:
-      label: ✅ Expected Behavior
+      label: Expected Behavior
       description: A clear and concise description of what you expected to happen.
       placeholder: What should have happened?
     validations:
@@ -45,7 +66,7 @@ body:
   - type: textarea
     id: actual
     attributes:
-      label: ❌ Actual Behavior
+      label: Actual Behavior
       description: What actually happened instead?
       placeholder: What actually happened?
     validations:
@@ -54,55 +75,86 @@ body:
   - type: textarea
     id: environment
     attributes:
-      label: 🖥️ Environment
-      description: Please provide information about your environment
+      label: Environment
+      description: Provide the details that apply. Delete lines that are not relevant.
       placeholder: |
-        - OS: [e.g. Ubuntu 22.04, macOS 13.0, Windows 11]
-        - Reqvire Version: [e.g. 0.3.2]
-        - Rust Version: [e.g. 1.70.0]
-        - Git Version: [e.g. 2.40.0]
+        - OS:
+        - Reqvire version: output of `reqvire --version` or `npx -y @reqvire-org/reqvire@latest --version`
+        - Install/run method: npm, binary, cargo, source checkout, Docker, other
+        - Node/npm version, if using npm or Explorer tooling:
+        - Browser, if Explorer UI/export/serve issue:
+        - MCP client and server URL, if MCP issue:
+        - Git version, if change-impact or repository workflow issue:
     validations:
       required: true
 
   - type: textarea
-    id: config
+    id: model
     attributes:
-      label: ⚙️ Configuration
-      description: Please share your reqvire.yaml configuration (remove any sensitive information)
-      render: yaml
+      label: Relevant Model or Workspace Details
+      description: Share the smallest model/workspace snippet needed to reproduce. Remove private information.
+      render: markdown
       placeholder: |
-        specifications_folder: "specifications"
-        output_folder: "html"
-        # ... rest of your config
+        - Relevant files under `system-model/...`:
+        - Relevant element identifiers:
+        - Relevant relations, concept references, semantic contracts, or ontology prefixes:
+
+        ```markdown
+        # Minimal model snippet, if useful
+        ```
+
+  - type: textarea
+    id: mcp
+    attributes:
+      label: MCP Details
+      description: For MCP bugs, include the tool/prompt/resource name, arguments, and response shape. Remove sensitive information.
+      render: json
+      placeholder: |
+        {
+          "server": "http://127.0.0.1:8081/mcp",
+          "tool_or_prompt": "reqvire.semantic.sparql",
+          "arguments": {}
+        }
+
+  - type: textarea
+    id: explorer
+    attributes:
+      label: Explorer or Browser Details
+      description: For Explorer bugs, include URL/hash route, console errors, network errors, and screenshots if useful.
+      placeholder: |
+        - URL/hash route:
+        - Console errors:
+        - Network errors:
+        - Screenshot or screen recording:
 
   - type: textarea
     id: logs
     attributes:
-      label: 📋 Error Logs
-      description: If applicable, add any error messages or logs
+      label: Error Logs or Command Output
+      description: If applicable, add error messages, command output, validation diagnostics, browser console output, or MCP responses.
       render: shell
       placeholder: Paste error messages or logs here...
 
   - type: textarea
     id: additional
     attributes:
-      label: 📎 Additional Context
+      label: Additional Context
       description: Add any other context about the problem here (screenshots, links, etc.)
       placeholder: Any additional information that might help...
 
   - type: textarea
     id: hypothesis
     attributes:
-      label: 🧠 Root-Cause Hypothesis
+      label: Root-Cause Hypothesis
       description: If you have a hypothesis about why this happens, share it here.
       placeholder: Potential root cause, impacted modules, or suspected regression source...
 
   - type: checkboxes
     id: terms
     attributes:
-      label: 📋 Checklist
+      label: Checklist
       options:
         - label: I have searched existing issues to avoid duplicates
           required: true
-        - label: I understand code and model pull requests are currently closed
+        - label: I understand public pull requests are not open at the moment
           required: true
