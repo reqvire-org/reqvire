@@ -10,8 +10,6 @@ Access capability.
 #### Relations
   * constrainedBy: [Capability Shape Contract](#capability-shape-contract)
 
-#### Attachments
-  * [Access Ontology](#access-ontology)
 ---
 
 ### Access Ontology

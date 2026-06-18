@@ -16,13 +16,6 @@ Report requirements define traversal direction, output structure, filters, JSON 
   * risk: medium
   * status: approved
 
-#### Attachments
-  * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
-  * [Reqvire Relation Ontology](../Ontologies/RelationsAndImpact.md#reqvire-relation-ontology)
-  * [Reqvire Verification Ontology](../Ontologies/Verification.md#reqvire-verification-ontology)
-  * [Reqvire Verification Rollup Ontology](../Ontologies/Verification.md#reqvire-verification-rollup-ontology)
-  * [Reqvire Report Ontology](../Ontologies/ReportsAndQuery.md#reqvire-report-ontology)
-
 #### Relations
   * specifiedBy: [Model Reports](ModelReports/ReportingRequirements.md#model-reports)
 ---
@@ -42,11 +35,6 @@ Semantic export contracts may define the intended graph patterns for generated p
   * priority: medium
   * risk: medium
   * status: approved
-
-#### Attachments
-  * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
-  * [Reqvire Semantic Contract Ontology](../Ontologies/CapabilityRequirementModel.md#reqvire-semantic-contract-ontology)
-  * [Reqvire Semantic Export Ontology](../Ontologies/ReportsAndQuery.md#reqvire-semantic-export-ontology)
 
 #### Relations
   * specifiedBy: [Ontology and Shapes Collection](ModelReports/ReportingRequirements.md#ontology-and-shapes-collection)

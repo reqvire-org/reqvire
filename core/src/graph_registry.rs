@@ -1213,9 +1213,9 @@ impl GraphRegistry {
             let element = &element_node.element;
 
             for attachment in &element.attachments {
-                if !element.element_type.is_capability() && !element.element_type.is_requirement() {
+                if !element.element_type.is_requirement() {
                     errors.push(ReqvireError::InvalidAttachmentTarget(format!(
-                        "File {}: Element '{}' (type: {}) cannot author attachments. Only capability and requirement elements may author attachments; verification evidence must use satisfiedBy and verified targets must use verify.",
+                        "File {}: Element '{}' (type: {}) cannot author attachments. Only requirement elements may author attachments to reusable requirement-owned refinements; ontology vocabulary uses Concept References and semantic contracts use use/usedBy.",
                         element.file_path,
                         element.name,
                         element.element_type.as_str(),
@@ -1236,9 +1236,7 @@ impl GraphRegistry {
                     crate::element::AttachmentTarget::ElementIdentifier(identifier) => {
                         // Validate that the identifier points to an existing Refinement element
                         if let Some(target_node) = self.nodes.get(identifier) {
-                            if !target_node.element.element_type.is_refinement()
-                                && !target_node.element.element_type.is_ontology()
-                            {
+                            if !target_node.element.element_type.is_refinement() {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
                                         "File {}: Element '{}' has attachment to '{}' which is not an attachable element",
@@ -1250,17 +1248,13 @@ impl GraphRegistry {
                                 continue;
                             }
 
-                            let target_is_ontology = target_node.element.element_type.is_ontology();
-                            let attachment_type_valid = if element.element_type.is_capability() {
-                                target_is_ontology
-                            } else {
-                                target_node.element.element_type.is_requirement_refinement()
-                            };
+                            let attachment_type_valid =
+                                target_node.element.element_type.is_requirement_refinement();
 
                             if !attachment_type_valid {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
-                                        "File {}: Element '{}' (type: {}) has invalid attachment to '{}' (type: {}). Capability attachments may target ontology only; requirement attachments may target requirement-owned source, constraint, behavior, specification, state, or input-output. Semantic contracts constrain requirements through constrainedBy/constrain.",
+                                        "File {}: Element '{}' (type: {}) has invalid attachment to '{}' (type: {}). Requirement attachments may target requirement-owned source, constraint, behavior, specification, state, or input-output only. Ontology vocabulary uses Concept References; semantic contracts constrain requirements through constrainedBy/constrain.",
                                         element.file_path,
                                         element.name,
                                         element.element_type.as_str(),
@@ -1277,16 +1271,12 @@ impl GraphRegistry {
                             {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
-                                        "'{}' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements. (file: {}, element: {})",
+                                        "'{}' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not refined by implementation-detail refinements. (file: {}, element: {})",
                                         target_node.element.name,
                                         element.file_path,
                                         element.name
                                     ),
                                 ));
-                                continue;
-                            }
-
-                            if target_is_ontology {
                                 continue;
                             }
 
@@ -1449,82 +1439,6 @@ impl GraphRegistry {
         }
     }
 
-    pub fn get_capability_attached_ontologies(&self, capability_id: &str) -> Vec<String> {
-        let Some(capability_node) = self.nodes.get(capability_id) else {
-            return Vec::new();
-        };
-
-        let mut ontologies = Vec::new();
-        for attachment in &capability_node.element.attachments {
-            let crate::element::AttachmentTarget::ElementIdentifier(target_id) = &attachment.target
-            else {
-                continue;
-            };
-            if self
-                .nodes
-                .get(target_id)
-                .is_some_and(|node| node.element.element_type.is_ontology())
-            {
-                ontologies.push(target_id.clone());
-            }
-        }
-        ontologies.sort();
-        ontologies.dedup();
-        ontologies
-    }
-
-    pub fn get_capability_ancestor_ids(&self, capability_id: &str) -> Vec<String> {
-        let mut ancestors = Vec::new();
-        let mut visited = HashSet::new();
-        let mut stack = vec![capability_id.to_string()];
-
-        while let Some(current_id) = stack.pop() {
-            let Some(node) = self.nodes.get(&current_id) else {
-                continue;
-            };
-
-            let mut parents = Vec::new();
-            for relation in &node.element.relations {
-                if relation.relation_type.name != "derivedFrom" {
-                    continue;
-                }
-                let LinkType::Identifier(parent_id) = &relation.target.link else {
-                    continue;
-                };
-                if self
-                    .nodes
-                    .get(parent_id)
-                    .is_some_and(|parent| parent.element.element_type.is_capability())
-                {
-                    parents.push(parent_id.clone());
-                }
-            }
-            parents.sort();
-            for parent_id in parents {
-                if visited.insert(parent_id.clone()) {
-                    ancestors.push(parent_id.clone());
-                    stack.push(parent_id);
-                }
-            }
-        }
-
-        ancestors
-    }
-
-    pub fn build_capability_ontology_context(&self, capability_id: &str) -> Vec<String> {
-        let mut context = BTreeSet::new();
-        let mut capability_ids = self.get_capability_ancestor_ids(capability_id);
-        capability_ids.push(capability_id.to_string());
-
-        for current_capability_id in capability_ids {
-            for ontology_id in self.get_capability_attached_ontologies(&current_capability_id) {
-                context.insert(ontology_id);
-            }
-        }
-
-        self.expand_ontology_context(context)
-    }
-
     pub fn get_requirement_ancestor_ids(&self, requirement_id: &str) -> Vec<String> {
         let mut ancestors = Vec::new();
         let mut visited = HashSet::new();
@@ -1563,16 +1477,38 @@ impl GraphRegistry {
         ancestors
     }
 
-    pub fn build_requirement_ontology_context(&self, requirement_id: &str) -> Vec<String> {
-        let mut context = BTreeSet::new();
+    pub fn build_concept_reference_ontology_context(&self, element_id: &str) -> Vec<String> {
+        let Some(node) = self.nodes.get(element_id) else {
+            return Vec::new();
+        };
+        let element = &node.element;
+        if element.element_type.is_ontology() || element.element_type.is_semantic_contract() {
+            return Vec::new();
+        }
 
-        if let Some(capability_id) = self.resolve_single_owning_capability(requirement_id) {
-            for ontology_id in self.build_capability_ontology_context(&capability_id) {
-                context.insert(ontology_id);
+        let (references, _) = crate::element::extract_concept_references(&element.content);
+        if references.is_empty() {
+            return Vec::new();
+        }
+
+        let semantic_index = semantic_contract::build_semantic_index(self);
+        let context = self.build_concept_reference_context(element_id);
+        let prefixes = self.build_ontology_prefix_map(&context, &semantic_index);
+        let mut ontology_ids = BTreeSet::new();
+
+        for reference in references {
+            let Ok(resolved_iri) = resolve_concept_reference_iri(&reference.iri, &prefixes) else {
+                continue;
+            };
+            let Some(declarations) = semantic_index.ontology_declarations.get(&resolved_iri) else {
+                continue;
+            };
+            for declaration in declarations {
+                ontology_ids.insert(declaration.element_identifier.clone());
             }
         }
 
-        self.expand_ontology_context(context)
+        self.expand_ontology_context(ontology_ids)
     }
 
     fn expand_ontology_context(&self, ontology_ids: BTreeSet<String>) -> Vec<String> {
@@ -1989,7 +1925,7 @@ impl GraphRegistry {
 
             if !element.attachments.is_empty() {
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "File {}: Ontology element '{}' cannot have attachments. Capabilities attach ontology elements as semantic context consumers.",
+                    "File {}: Ontology element '{}' cannot have attachments. Ontology vocabulary is referenced through Concept References or semantic-contract use relations.",
                     element.file_path, element.name
                 )));
             }
@@ -2428,6 +2364,14 @@ impl GraphRegistry {
                     element.file_path, element.name
                 )));
             }
+            if element.element_type.is_semantic_contract()
+                && crate::element::has_subsection(&element.content, "Concept References")
+            {
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "File {}: Semantic contract element '{}' must not contain a #### Concept References section. Semantic contracts are semantic graph artifacts and use ontology through use/usedBy relations.",
+                    element.file_path, element.name
+                )));
+            }
 
             for diagnostic in diagnostics {
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
@@ -2486,18 +2430,7 @@ impl GraphRegistry {
                     continue;
                 }
 
-                let declaring_ontology = declaration_sources
-                    .iter()
-                    .next()
-                    .cloned()
-                    .unwrap_or_else(|| "unknown ontology".to_string());
-                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "Concept reference outside context: element '{}' label '{}' references <{}>, declared by ontology '{}', but that ontology is not reachable from the element's capability-attached ontology context. Attach the declaring ontology to the owning or consuming capability, or move the reference to an element with reachable capability ontology context.",
-                    element.identifier,
-                    reference.label,
-                    resolved_iri,
-                    declaring_ontology
-                )));
+                continue;
             }
         }
 
@@ -2510,55 +2443,20 @@ impl GraphRegistry {
         };
         let element = &node.element;
 
-        if element.element_type.is_capability() {
-            return self.build_capability_ontology_context(element_id);
-        }
-        if element.element_type.is_requirement() {
-            return self.build_requirement_ontology_context(element_id);
-        }
-        if element.element_type.is_semantic_contract() {
-            return self.semantic_contract_used_ontology_context(element_id);
-        }
-        if element.element_type.is_refinement() {
-            let owners = self.get_refinement_owners(element_id);
-            if owners.len() == 1 {
-                let owner_id = &owners[0];
-                if let Some(owner) = self.nodes.get(owner_id) {
-                    if owner.element.element_type.is_capability() {
-                        return self.build_capability_ontology_context(owner_id);
-                    }
-                    if owner.element.element_type.is_requirement() {
-                        return self.build_requirement_ontology_context(owner_id);
-                    }
-                }
-            }
+        if element.element_type.is_ontology() || element.element_type.is_semantic_contract() {
             return Vec::new();
         }
 
-        if element.element_type.is_ontology() {
-            return Vec::new();
-        }
-
-        let mut context = BTreeSet::new();
-        for relation in &element.relations {
-            if relation.relation_type.name != "verify" {
-                continue;
-            }
-            let LinkType::Identifier(requirement_id) = &relation.target.link else {
-                continue;
-            };
-            if self
-                .nodes
-                .get(requirement_id)
-                .is_some_and(|target| target.element.element_type.is_requirement())
-            {
-                for ontology_id in self.build_requirement_ontology_context(requirement_id) {
-                    context.insert(ontology_id);
+        self.nodes
+            .iter()
+            .filter_map(|(id, node)| {
+                if node.element.element_type.is_ontology() {
+                    Some(id.clone())
+                } else {
+                    None
                 }
-            }
-        }
-
-        context.into_iter().collect()
+            })
+            .collect()
     }
 
     fn build_ontology_prefix_map(
@@ -5811,7 +5709,7 @@ impl GraphRegistry {
                         .unwrap_or(att_id);
                     return Err(ReqvireError::InvalidAttachmentTarget(
                         format!(
-                            "'{}' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.",
+                            "'{}' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not refined by implementation-detail refinements.",
                             att_name
                         ),
                     ));

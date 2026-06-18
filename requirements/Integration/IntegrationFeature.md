@@ -16,10 +16,6 @@ Requirements under this capability define the concrete skill contracts, generate
   * risk: medium
   * status: approved
 
-#### Attachments
-  * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
-  * [Reqvire AI Assistance Ontology](../Ontologies/Integration.md#reqvire-ai-assistance-ontology)
-
 #### Relations
   * specifiedBy: [AI Assistant Skill-Guided Reqvire Modeling](AIAssistance/AISkills.md#ai-assistant-skill-guided-reqvire-modeling)
 ---
@@ -40,10 +36,6 @@ Requirements under this capability define concrete parsing, marker, comment-styl
   * risk: medium
   * status: approved
 
-#### Attachments
-  * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
-  * [Reqvire Code Traceability Ontology](../Ontologies/Integration.md#reqvire-code-traceability-ontology)
-
 #### Relations
   * specifiedBy: [Code Traceability](CodeAlignment/CodeAlignmentRequirements.md#code-traceability)
 ---
@@ -63,10 +55,6 @@ Requirements under this capability define concrete workflow behavior and reposit
   * priority: medium
   * risk: medium
   * status: approved
-
-#### Attachments
-  * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
-  * [Reqvire GitHub Workflow Ontology](../Ontologies/Integration.md#reqvire-github-workflow-ontology)
 
 #### Relations
   * specifiedBy: [Automate Pull Request Validations](GitHubWorkflow/GitHubWorkflowRequirements.md#automate-pull-request-validations)

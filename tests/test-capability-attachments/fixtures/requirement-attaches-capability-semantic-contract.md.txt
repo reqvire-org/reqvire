@@ -9,7 +9,6 @@ Billing capability.
 
 #### Attachments
   * [Shared Shape Contract](#shared-shape-contract)
-  * [Billing Ontology](#billing-ontology)
 
 #### Relations
   * specifiedBy: [Billing Requirement](#billing-requirement)

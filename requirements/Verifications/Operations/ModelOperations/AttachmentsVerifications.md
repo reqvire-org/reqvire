@@ -18,7 +18,7 @@ This objective groups verification that attachment and asset operations parse, v
   * derive: [Attachments Validation Verification](#attachments-validation-verification)
   * derive: [Detach Command Verification](#detach-command-verification)
   * derive: [Move Asset Command Verification](#move-asset-command-verification)
-  * derive: [Ontology and Contract Attachment Verification](#ontology-and-contract-attachment-verification)
+  * derive: [Contract Attachment Verification](#contract-attachment-verification)
   * derive: [Remove Asset Command Verification](#remove-asset-command-verification)
 ---
 
@@ -290,18 +290,16 @@ Test cases for filesystem and reporting:
   * verify: [CLI Move Asset Command](../../../Interfaces/CLI/Commands.md#cli-move-asset-command)
 ---
 
-### Ontology and Contract Attachment Verification
+### Contract Attachment Verification
 
-Verify attachment rules for ontology elements and requirement-owned refinement elements.
+Verify attachment rules for requirement-owned refinement elements and rejection of ontology attachments.
 
 #### Details
 Test cases:
-- Capability attachment to an `ontology` element validates.
-- Capability attachment to a `semantic-contract` fails.
-- Capability attachment to a requirement-detail refinement such as `input-output` fails.
+- Capability attachment to any target fails; capabilities use `#### Concept References` for semantic vocabulary and relations for verification/specification.
 - Requirement attachment to an `ontology` element fails.
 - Requirement attachment to a `semantic-contract` fails; requirements use `constrainedBy` instead.
-- Requirement attachment to ontology is forbidden because semantic-contract ontology dependencies use explicit `use` relations.
+- Requirement attachment to ontology is forbidden because ontology vocabulary dependencies use concept references or semantic-contract `use` relations.
 - Requirement attachment to ordinary refinements is limited to requirement-owned refinement elements.
 - Verification element attachment to any target fails; verification evidence must use `satisfiedBy`, and verified targets must use `verify`.
 

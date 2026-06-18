@@ -7,8 +7,8 @@ API capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [API Ontology](#api-ontology)
+#### Concept References
+  * Service Endpoint: https://example.test/ontology#ServiceEndpoint
 
 #### Relations
   * specifiedBy: [API Endpoint Requirement](#api-endpoint-requirement)
@@ -96,6 +96,9 @@ The system shall expose service endpoint contracts.
 
 #### Metadata
   * type: requirement
+
+#### Concept References
+  * Service Endpoint: https://example.test/ontology#ServiceEndpoint
 
 #### Relations
   * specify: [API Capability](#api-capability)

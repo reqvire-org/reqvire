@@ -11,7 +11,7 @@ export default function SemanticModel() {
       <p className="text-base text-zinc-600 leading-relaxed mb-10">
         The semantic model is Reqvire's typed representation of
         engineering knowledge. It defines the element types, relations, ownership
-        rules, ontology context, verification links, and implementation evidence
+        rules, semantic references, verification links, and implementation evidence
         that make traceability queryable and validation possible.
       </p>
 
@@ -37,9 +37,9 @@ export default function SemanticModel() {
           ))}
         </ul>
         <p className="text-zinc-600 mt-4">
-          Attachments bring ontology context, reusable contracts, and compatible
-          model context into scope without forcing unrelated concerns into the
-          same hierarchy.
+          Concept references bind prose to ontology terms. Attachments bring
+          reusable requirement-owned contracts into scope without forcing
+          unrelated concerns into the same hierarchy.
         </p>
       </Section>
 
@@ -60,13 +60,13 @@ export default function SemanticModel() {
             },
             {
               name: "Cross-boundary reuse",
-              desc: "Cross-capability semantic dependencies stay explicit through attachments and semantic-contract use relations so context, review impact, and AI collection remain auditable.",
+              desc: "Cross-capability semantic dependencies stay explicit through concept references and semantic-contract use relations so context, review impact, and AI collection remain auditable.",
             },
           ]}
         />
       </Section>
 
-      <Section title="Submodels and Attachments">
+      <Section title="Submodels and Semantic References">
         <p className="text-zinc-600 mb-4">
           Capability-rooted submodels are intentionally independent. A capability
           can own its operational meaning, the requirements that specify it, and
@@ -76,12 +76,12 @@ export default function SemanticModel() {
         <div className="space-y-4">
           <div className="border border-zinc-200 rounded-lg p-4">
             <h4 className="font-semibold text-zinc-900 mb-1">
-              Capability attachments
+              Concept references
             </h4>
             <p className="text-sm text-zinc-600">
-              Capabilities attach ontology elements to define reachable
-              semantic context for descendant capabilities and specifying
-              requirements.
+              Capabilities, requirements, refinements, verification objectives,
+              and concrete verifications use concept references to bind
+              readable labels to ontology terms.
             </p>
           </div>
           <div className="border border-zinc-200 rounded-lg p-4">
@@ -90,11 +90,11 @@ export default function SemanticModel() {
             </h4>
             <p className="text-sm text-zinc-600">
               Requirements attach reusable requirement-owned contracts such as
-              semantic contracts, specifications, constraints, behaviors,
-              states, and input/output definitions. The
-              attaching requirement declares that its subgraph must fulfill the
-              attached contract across that requirement, its child requirements,
-              and the refinements that detail those obligations.
+              specifications, constraints, behaviors, states, and input/output
+              definitions. The attaching requirement declares that its subgraph
+              must fulfill the attached contract across that requirement, its
+              child requirements, and the refinements that detail those
+              obligations. Semantic contracts are linked through constrainedBy.
             </p>
           </div>
           <div className="border border-zinc-200 rounded-lg p-4">
@@ -183,7 +183,7 @@ export default function SemanticModel() {
             },
             {
               name: "Concept References",
-              desc: "Use concept references when readable requirement prose should bind labels to reachable ontology CURIEs or IRIs without crowding the requirement text.",
+              desc: "Use concept references when readable capability, requirement, refinement, or verification prose should bind labels to ontology CURIEs or IRIs without crowding the text.",
             },
             {
               name: "Semantic Contract",
@@ -211,9 +211,11 @@ export default function SemanticModel() {
                 ["derivedFrom / derive", "Hierarchy inside the same family: capability, requirement, ontology, or verification-family."],
                 ["specify / specifiedBy", "Requirement specifies a capability."],
                 ["refine / refinedBy", "Requirement owns a compatible refinement contract."],
+                ["constrain / constrainedBy", "Semantic contract constrains one or more requirements."],
+                ["use / usedBy", "Semantic contract uses ontology vocabulary."],
                 ["verify / verifiedBy", "Concrete verification records evidence scope for a capability or requirement; verification-objective is excluded."],
                 ["satisfiedBy / satisfy", "Requirement or evidence-backed verification links to implementation or proof/test evidence."],
-                ["attach", "Capability imports ontology context; requirement imports a one-way requirement-owned contract dependency."],
+                ["attach", "Requirement imports a one-way non-semantic requirement-owned contract dependency."],
                 ["trace", "Soft traceability without ownership semantics."],
               ].map(([relation, meaning]) => (
                 <tr key={relation}>

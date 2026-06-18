@@ -15,9 +15,9 @@ Billing capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Billing Ontology](#billing-ontology)
-  * [Shared Tax Ontology](#shared-tax-ontology)
+#### Concept References
+  * Invoice: urn:reqvire:test:billing:Invoice
+  * Tax Invoice: urn:reqvire:test:tax:TaxInvoice
 
 #### Relations
   * specifiedBy: [Billing Requirement](#billing-requirement)
@@ -117,7 +117,7 @@ EOF
 
 write_valid_model
 if ! (cd "$TEST_DIR" && "$REQVIRE_BIN" validate > /tmp/capability-refinements-valid.out 2>&1); then
-  echo "FAILED: valid ontology attachment and requirement-owned semantic contract should validate"
+  echo "FAILED: valid concept references and requirement-owned semantic contract should validate"
   cat /tmp/capability-refinements-valid.out
   exit 1
 fi
@@ -197,9 +197,6 @@ Capability.
 
 #### Metadata
   * type: capability
-
-#### Attachments
-  * [Billing Ontology](#billing-ontology)
 
 #### Relations
   * specifiedBy: [Billing Requirement](#billing-requirement)

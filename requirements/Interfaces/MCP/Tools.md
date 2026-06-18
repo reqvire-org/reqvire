@@ -139,7 +139,7 @@ The system shall expose mutation tools only through typed Reqvire core operation
 #### Details
 - The MCP interface shall expose mutation tools only after explicit mutation enablement.
 - MCP mutation tools shall use Reqvire core mutation logic.
-- MCP mutation tools shall preserve Reqvire semantic model validation, including ontology attachment compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, and single ontology-root validation.
+- MCP mutation tools shall preserve Reqvire semantic model validation, including attachment compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, and single ontology-root validation.
 - MCP mutation tools shall preserve Reqvire filesystem persistence behavior.
 - MCP mutation results shall report changed model evidence.
 - MCP mutation execution shall refresh MCP-visible model state after successful mutation.

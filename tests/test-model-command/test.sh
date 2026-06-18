@@ -98,8 +98,8 @@ if ! grep -q 'Model Command Ontology' <<< "$MMD_OUTPUT"; then
     exit 1
 fi
 
-if ! grep -q -- '-->|attaches|' <<< "$MMD_OUTPUT"; then
-    echo "❌ FAILED: model --mmd output should include attachment edges"
+if grep -q -- '-->|attaches|' <<< "$MMD_OUTPUT"; then
+    echo "❌ FAILED: model --mmd output should not include capability ontology attachment edges"
     echo "$MMD_OUTPUT"
     exit 1
 fi

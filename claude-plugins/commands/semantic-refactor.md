@@ -32,12 +32,12 @@ Use the syseng skill reference:
 
 Apply these boundaries:
 
-- Capability: coherent operational/system ability, stakeholder/regulatory/source scope, ownership, ontology context, optional semantic-enrichment context, and direct verification context.
+- Capability: coherent operational/system ability, stakeholder/regulatory/source scope, ownership, optional concept-reference context, optional semantic-enrichment context, and direct verification context.
 - `ontology`: reusable ontology/domain meaning and shared semantic structures.
 - Requirement: implementable, testable system obligation.
 - `semantic-contract`: reusable SHACL `Shapes` profile over explicitly used ontology context; constrains requirements through `constrain`/`constrainedBy`.
 
-Ontology attached by capabilities should live under `requirements/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Shape-only `semantic-contract` elements are reusable checks with explicit ontology `use` and requirement `constrain` relations.
+Ontology referenced by model elements should live under `requirements/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Shape-only `semantic-contract` elements are reusable checks with explicit ontology `use` and requirement `constrain` relations.
 
 ## Procedure
 
@@ -52,11 +52,11 @@ For each touched capability root:
 
 - Confirm it is a real independent capability root.
 - Confirm it has specifying requirements, child capabilities, or intentional direct verification. Move pure vocabulary into ontology.
-- Confirm cross-root dependencies are explicit attachments, not hierarchy relations.
+- Confirm cross-root refinement dependencies are explicit attachments, not hierarchy relations.
 - If a root is too broad, split it into meaningful child capabilities first and move requirements to specify their local child capability.
-- Do not make one universal capability root just to reuse ontology. Shared ontology crosses roots through attachments.
+- Do not make one universal capability root just to reuse ontology. Shared ontology terms cross roots through explicit concept references.
 - Confirm reusable terms are in ontology elements, not hidden in requirement prose or semantic contracts.
-- Confirm capabilities attach the ontology their requirements need; requirements inherit ontology through the owning capability path.
+- Confirm model elements author concept references for the ontology terms their prose depends on; semantic contracts use ontology through `use`.
 
 ### 2. Find refactor candidates
 
@@ -92,13 +92,13 @@ Use:
 
 - `requirement specify capability`
 - `capability specifiedBy requirement`
-- capability `Attachments` to ontology elements
+- `#### Concept References` from non-ontology elements to ontology terms
 - `semantic-contract use ontology` for vocabulary context
 - `semantic-contract constrain requirement` or `requirement constrainedBy semantic-contract` for shape profile application
-- Attachments for intentional cross-capability ontology dependencies and reusable requirement-owned non-semantic-contract refinements
+- Attachments for reusable requirement-owned non-semantic-contract refinements
 
 Do not use `trace` to replace ownership or dependency.
-Do not remove a cross-root dependency unless an explicit attachment preserves the dependency for `collect` and change impact.
+Do not remove a cross-root dependency unless an explicit concept reference, semantic-contract relation, or requirement attachment preserves the dependency for `collect` and change impact.
 
 ### 5. Update verification and tests
 

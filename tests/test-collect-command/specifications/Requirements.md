@@ -26,12 +26,13 @@ The child product capability that specifies the root requirement.
 #### Metadata
   * type: capability
 
+#### Concept References
+  * Collect Contract: urn:reqvire:test:collect:CollectContract
+
 #### Relations
   * derivedFrom: [Product Capability](#product-capability)
   * specifiedBy: [Root Requirement](#root-requirement)
 
-#### Attachments
-  * [Collect Ontology](#collect-ontology)
 ---
 
 ### Collect Ontology

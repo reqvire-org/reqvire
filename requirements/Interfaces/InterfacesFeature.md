@@ -16,12 +16,6 @@ Interface requirements define the concrete commands, generated views, transports
   * risk: medium
   * status: approved
 
-#### Attachments
-  * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
-  * [Reqvire Operation Ontology](../Ontologies/BehaviorValidationOperations.md#reqvire-operation-ontology)
-  * [Reqvire Report Ontology](../Ontologies/ReportsAndQuery.md#reqvire-report-ontology)
-  * [Reqvire Interface Ontology](../Ontologies/Interfaces.md#reqvire-interface-ontology)
-
 #### Relations
   * derive: [Command-Line Interface](#command-line-interface)
   * derive: [MCP Tool Interface](#mcp-tool-interface)
@@ -35,7 +29,7 @@ As a **System Engineer**, I want Reqvire to expose command-line operations, so t
 #### Details
 Command-line interface is the capability for CLI commands, arguments, workspace selection, output modes, and command error behavior.
 
-CLI requirements define concrete command behavior. Shared interface vocabulary is inherited from the parent capability and attached interface ontology.
+CLI requirements define concrete command behavior. Shared interface vocabulary is bound by explicit concept references on the elements that use those terms.
 
 #### Metadata
   * type: capability

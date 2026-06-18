@@ -229,9 +229,6 @@ This is the root requirement for testing all types.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Ontology Element](#ontology-element)
-
 ### Default Requirement
 
 No type metadata - should default to requirement.
@@ -255,9 +252,6 @@ No type metadata - should default to requirement.
 
 #### Metadata
   * type: capability
-
-#### Attachments
-  * [Ontology Element](#ontology-element)
 
 ### Source Refinement
 

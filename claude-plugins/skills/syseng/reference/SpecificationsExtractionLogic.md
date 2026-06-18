@@ -395,7 +395,7 @@ Use search to identify requirements that may need specification extraction:
 # Find all requirements (candidates for review)
 reqvire search --filter-type="requirement" --short
 
-# Find all capabilities that attach ontology context
+# Find capabilities whose prose may need concept references
 reqvire search --filter-type="capability" --short
 
 # Find requirements in specific subsystem
@@ -404,7 +404,7 @@ reqvire search --filter-type="requirement" --filter-file="requirements/System/**
 # Find requirements with attachments (may need conversion to satisfiedBy)
 reqvire search --filter-type="requirement" --has-attachments --short
 
-# Find refinements without refine relations (orphaned specifications, constraints, behaviors, state, input-output, semantic contracts)
+# Find refinements without refine relations (orphaned specifications, constraints, behaviors, state, input-output, sources, and )
 reqvire search --filter-type="specification,constraint,behavior,state,input-output,source" --not-have-relations="refine" --short
 ```
 

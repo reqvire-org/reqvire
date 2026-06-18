@@ -203,8 +203,8 @@ Test cases:
 2. Collecting a requirement DOWNSTREAM includes requirement descendants only.
 3. Collecting a capability UPSTREAM includes capability ancestors only.
 4. Collecting a capability DOWNSTREAM includes child capabilities, requirements that specify each capability, and requirement descendants.
-5. Attached ontology context is included when collecting capability context.
-6. Collecting a requirement includes ontology context inherited from the owning capability path without requiring direct requirement ontology attachments.
+5. Authored concept references are included when collecting capability context.
+6. Collecting a requirement includes authored concept references without requiring ontology attachments.
 
 #### Metadata
   * type: test-verification

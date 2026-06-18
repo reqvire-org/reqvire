@@ -286,7 +286,7 @@ reqvire:lintRepairMode a owl:DatatypeProperty ;
 reqvire:crossSubmodelHierarchyLintRule a reqvire:LintingRule ;
   reqvire:lintRuleName "cross-submodel-hierarchy" ;
   reqvire:lintScope "capability-rooted subgraphs" ;
-  reqvire:lintCondition "A hierarchical relation crosses capability-root boundaries where an attachment or specify relation would preserve ownership more clearly." ;
+  reqvire:lintCondition "A hierarchical relation crosses capability-root boundaries where a specify relation, concept reference, semantic-contract relation, or requirement-owned refinement attachment would preserve ownership more clearly." ;
   reqvire:lintFindingKind "cross-submodel-coupling" ;
   reqvire:lintRepairMode "auditable-user-action" .
 
@@ -418,7 +418,7 @@ reqvire:attachmentSubgraphDirectionRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "attachment-subgraph-direction" ;
   reqvire:validationScope "capability-root-subgraphs" ;
   reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "Two capability-root subgraphs attach refinements to each other in both directions." ;
+  reqvire:validationCondition "Two requirement subgraphs attach refinements to each other in both directions." ;
   reqvire:validationOutcome "Validation fails because cross-subgraph attachment contracts must be one-directional." ;
   reqvire:validationRepair "Keep one dependency direction and move shared contracts into a common attached source if needed." .
 

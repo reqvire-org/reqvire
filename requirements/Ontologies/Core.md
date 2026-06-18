@@ -332,10 +332,10 @@ reqvire:detailsSubsection a reqvire:ReservedSubsection ;
   rdfs:comment "Narrative requirement context and clarification that remains part of the owning element." .
 reqvire:attachmentsSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Attachments" ;
-  rdfs:comment "Explicit attached ontology or reusable refinement contract dependencies." .
+  rdfs:comment "Explicit reusable requirement-owned refinement contract dependencies." .
 reqvire:conceptReferencesSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Concept References" ;
-  rdfs:comment "Human-readable bindings from element prose to reachable ontology terms." .
+  rdfs:comment "Human-readable bindings from non-ontology, non-semantic-contract element prose to declared ontology terms." .
 reqvire:ontologySubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Ontology" ;
   rdfs:comment "Inline Turtle ontology content for ontology elements." .

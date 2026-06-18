@@ -313,7 +313,7 @@ The SPA Explorer shell shall:
 - Do not generate separate Explorer/report document entry points.
 - Seed a normalized project snapshot that distinguishes modeled source-file containers from modeled resource and evidence-file targets. The Model tree shall contain modeled element files plus existing repository-relative local implementation/evidence/resource files referenced by graph-registry facts, while unrelated repository files remain absent.
 - Keep containment, model, knowledge graph, verification traces, coverage, resources, ontology, search, summaries, and route state as view-neutral store projections rather than separate page-local data models.
-- Preserve the current relation model: capabilities attach ontology and are specified/verified; requirements own refinements, satisfaction evidence, verification evidence, and reusable refinement attachments.
+- Preserve the current relation model: capabilities may author concept references and are specified/verified; requirements own refinements, satisfaction evidence, verification evidence, reusable refinement attachments, and concept references.
 
 #### Concept References
   * Project Store: reqvire:BrowserLocalProjectStore

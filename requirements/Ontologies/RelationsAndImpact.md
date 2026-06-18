@@ -307,12 +307,12 @@ reqvire:NonEvidenceBackedVerificationRelationShape
     sh:maxCount 0 ;
   ] .
 
-reqvire:CapabilityAttachmentShape
+reqvire:CapabilityAttachmentRejectionShape
   a sh:NodeShape ;
   sh:targetClass reqvire:Capability ;
   sh:property [
     sh:path reqvire:attaches ;
-    sh:class reqvire:Ontology ;
+    sh:maxCount 0 ;
   ] .
 
 reqvire:RequirementAttachmentShape
@@ -478,7 +478,7 @@ reqvire:RelationSemanticCategoryShape
 
 The Reqvire change impact ontology defines impact analysis concepts and propagation rules.
 
-Change impact is based on auditable graph paths. Native relations and explicit attachments define reachable context. This ontology defines propagation rule categories and impact semantics.
+Change impact is based on auditable graph paths. Native relations, concept references, semantic-contract use/constrain edges, and explicit requirement-owned refinement attachments define reachable context. This ontology defines propagation rule categories and impact semantics.
 
 #### Ontology
 ```turtle
@@ -658,7 +658,7 @@ reqvire:capabilityToRequirementImpactRule a reqvire:ChangePropagationRule ;
   reqvire:impactDirection "downstream" ;
   reqvire:propagationTarget "requirement" ;
   reqvire:propagationMode "review-required" ;
-  reqvire:impactReason "Capability scope and attached ontology context changes can affect requirements that specify the capability." .
+  reqvire:impactReason "Capability scope and authored concept-reference context changes can affect requirements that specify the capability." .
 
 reqvire:requirementToImplementationImpactRule a reqvire:ChangePropagationRule ;
   rdfs:label "Requirement to implementation impact" ;
@@ -720,6 +720,16 @@ reqvire:semanticContractOntologyUseDependencyRule a reqvire:ChangePropagationRul
   reqvire:propagationMode "dependency-record" ;
   reqvire:impactReason "Semantic contracts record ontology vocabulary dependencies through use relations, while ontology content changes propagate back through the inverse usedBy relation." .
 
+reqvire:conceptReferenceDependencyRule a reqvire:ChangePropagationRule ;
+  rdfs:label "Concept reference dependency" ;
+  reqvire:changeRuleName "concept-reference-dependency" ;
+  reqvire:changedThing "concept-reference" ;
+  reqvire:impactRelation "conceptReference" ;
+  reqvire:impactDirection "dependency" ;
+  reqvire:propagationTarget "referenced-ontology-term" ;
+  reqvire:propagationMode "dependency-record" ;
+  reqvire:impactReason "Non-ontology, non-semantic-contract elements record ontology term dependencies through explicit concept references." .
+
 reqvire:requirementToSemanticContractReviewRule a reqvire:ChangePropagationRule ;
   rdfs:label "Requirement to semantic contract review" ;
   reqvire:changeRuleName "requirement-to-semantic-contract-review" ;
@@ -743,12 +753,12 @@ reqvire:attachmentContentImpactRule a reqvire:ChangePropagationRule ;
 reqvire:semanticReferenceReachabilityRule a reqvire:ChangePropagationRule ;
   rdfs:label "Semantic reference reachability" ;
   reqvire:changeRuleName "semantic-reference-reachability" ;
-  reqvire:changedThing "semantic-contract-reference" ;
-  reqvire:impactRelation "capability-hierarchy-or-attachment" ;
+  reqvire:changedThing "semantic-reference" ;
+  reqvire:impactRelation "conceptReference-or-use" ;
   reqvire:impactDirection "downstream" ;
-  reqvire:propagationTarget "referencing-semantic-contract" ;
+  reqvire:propagationTarget "referencing-element-or-semantic-contract" ;
   reqvire:propagationMode "validation-error-when-unreachable" ;
-  reqvire:impactReason "Semantic references must resolve through native capability-root context or explicit attachment so change impact remains auditable." .
+  reqvire:impactReason "Concept references must resolve to declared ontology terms, and semantic-contract SHACL references must resolve through explicit use relations." .
 
 reqvire:relocationNoPropagationRule a reqvire:ChangePropagationRule ;
   rdfs:label "Relocation without content change" ;
@@ -879,12 +889,12 @@ reqvire:attach a owl:ObjectProperty ;
   rdfs:domain reqvire:Element ;
   rdfs:range reqvire:Element ;
   owl:inverseOf reqvire:attaches ;
-  rdfs:comment "Inverse attachment relation from an attached ontology or reusable contract back to its consuming element." .
+  rdfs:comment "Inverse attachment relation from a reusable requirement-owned contract back to its consuming requirement." .
 reqvire:attaches a owl:ObjectProperty ;
   rdfs:domain reqvire:Element ;
   rdfs:range reqvire:Element ;
   owl:inverseOf reqvire:attach ;
-  rdfs:comment "Forward attachment relation from a capability or requirement to explicit ontology or reusable contract context." .
+  rdfs:comment "Forward attachment relation from a requirement to explicit reusable requirement-owned contract context." .
 reqvire:implementedByArtifact a owl:ObjectProperty ;
   rdfs:domain reqvire:Capability ;
   rdfs:range reqvire:Artifact ;
@@ -1047,9 +1057,9 @@ reqvire:traceabilityRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryRelationName "trace" .
 reqvire:attachmentRelationCategory a reqvire:RelationSemanticCategory ;
   rdfs:label "Attachment dependency relation" ;
-  rdfs:comment "Explicit dependency from a capability to ontology context or from a requirement to a reusable requirement-owned contract." ;
+  rdfs:comment "Explicit dependency from a requirement to a reusable requirement-owned contract." ;
   reqvire:semanticCategoryName "attachment-dependency" ;
-  reqvire:semanticCategoryMeaning "Explicit dependency from a capability to ontology context or from a requirement to a reusable requirement-owned contract." ;
+  reqvire:semanticCategoryMeaning "Explicit dependency from a requirement to a reusable requirement-owned contract." ;
   reqvire:semanticCategoryRelationName "attachment" .
 
 reqvire:deriveRelationRule a reqvire:RelationRule ;
@@ -1219,24 +1229,17 @@ reqvire:traceRelationRule a reqvire:RelationRule ;
 reqvire:attachmentRelationRule a reqvire:RelationRule ;
   rdfs:label "attachment" ;
   reqvire:relationName "attachment" ;
-  reqvire:allowedSourceType "capability", "requirement" ;
-  reqvire:allowedTargetType "capability-attached-ontology-or-requirement-owned-refinement" ;
+  reqvire:allowedSourceType "requirement" ;
+  reqvire:allowedTargetType "requirement-owned-refinement" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Attachment references capability-attached ontology context or a compatible requirement-owned refinement contract across explicit subgraph boundaries." .
-
-reqvire:capabilityAttachmentCompatibilityRule a reqvire:AttachmentCompatibilityRule ;
-  rdfs:label "Capability attachment compatibility" ;
-  reqvire:attachmentSourceType "capability" ;
-  reqvire:attachmentTargetType "ontology" ;
-  reqvire:attachmentOwnerType "capability" ;
-  reqvire:attachmentRuleDescription "Capability attachments reference ontology elements from explicit capability-root dependency contexts." .
+  reqvire:relationRuleDescription "Attachment references a compatible requirement-owned refinement contract across explicit subgraph boundaries." .
 
 reqvire:requirementAttachmentCompatibilityRule a reqvire:AttachmentCompatibilityRule ;
   rdfs:label "Requirement attachment compatibility" ;
   reqvire:attachmentSourceType "requirement" ;
-  reqvire:attachmentTargetType "constraint", "behavior", "specification", "state", "input-output" ;
+  reqvire:attachmentTargetType "source", "constraint", "behavior", "specification", "state", "input-output" ;
   reqvire:attachmentOwnerType "requirement" ;
   reqvire:attachmentRuleDescription "Requirement attachments reference requirement-owned refinements from explicit dependency contexts." .
 

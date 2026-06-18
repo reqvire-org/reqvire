@@ -48,7 +48,7 @@ A capability represents a coherent operational, product, business, regulatory, o
 
 `Ontologies/` contains first-class `ontology` elements.
 
-Ontologies define reusable semantic vocabulary: domain concepts, relationships, categories, and stable model meaning. Capabilities attach ontology elements to make vocabulary reachable for the capability and the requirements that specify it.
+Ontologies define reusable semantic vocabulary: domain concepts, relationships, categories, and stable model meaning. Capabilities, requirements, refinements, and verifications use concept references to bind prose to ontology terms.
 
 ### Verifications
 
@@ -109,7 +109,7 @@ A capability subgraph may own:
 
 Use child capabilities when concerns differ in verification, ownership, lifecycle, architecture impact, operational semantics, or requirement clusters.
 
-Avoid creating child capabilities only to share vocabulary. Shared vocabulary belongs in `Ontologies/` and is attached by capabilities.
+Avoid creating child capabilities only to share vocabulary. Shared vocabulary belongs in `Ontologies/` and is referenced by consuming elements.
 
 ## Ontology Plane Rules
 
@@ -129,7 +129,7 @@ Keep content in capabilities, requirements, or refinements when it says:
 - This workflow step or exact output must occur.
 - This code, service, or architecture component must exist.
 
-Ontology hierarchy uses `derivedFrom` / `derive` between ontology elements. Capabilities consume ontology by attachments.
+Ontology hierarchy uses `derivedFrom` / `derive` between ontology elements. Non-ontology, non-semantic-contract elements consume ontology terms through `#### Concept References`; semantic contracts consume ontology through `use` / `usedBy`.
 
 ## Requirement and Refinement Files
 
@@ -161,7 +161,7 @@ Use semantic contracts when requirements need a machine-readable SHACL profile o
 
 Use architecture folders for service-level design specifications, interface implementation architecture, service responsibility boundaries, deployment or runtime architecture, and architectural details that refine the owning capability or requirements.
 
-Do not put shared ontology in architecture folders. Shared vocabulary belongs in `Ontologies/` and is attached by capabilities.
+Do not put shared ontology in architecture folders. Shared vocabulary belongs in `Ontologies/` and is referenced by consuming elements.
 
 If architecture content becomes shared across many independent capability roots, extract reusable meaning into ontology or create an explicit reusable refinement contract and attach it where needed.
 
@@ -220,7 +220,7 @@ Hierarchy should stay inside one logical subgraph:
 
 Cross-subgraph reuse should use attachments, not hierarchy.
 
-Avoid cross-submodel requirement hierarchy. If a requirement in one capability needs context from another capability, attach reusable ontology or a compatible requirement-owned refinement contract instead of creating a parent/child requirement relation across subgraphs.
+Avoid cross-submodel requirement hierarchy. If a requirement in one capability needs context from another capability, use concept references for ontology terms or attach a compatible requirement-owned refinement contract instead of creating a parent/child requirement relation across subgraphs.
 
 ## File Placement Heuristics
 
@@ -232,7 +232,7 @@ When adding or moving model content:
 4. If it elaborates an obligation or capability, put it as a refinement in the same capability folder.
 5. If it is service or architecture detail for one capability, put it under that capability's `Architecture/` folder.
 6. If it proves behavior, put it under `Verifications/<Domain>/`.
-7. If another subgraph needs vocabulary, attach ontology from `Ontologies/`.
+7. If another subgraph needs vocabulary, add concept references to terms declared under `Ontologies/`.
 8. If another subgraph needs a reusable requirement-owned contract, attach that contract explicitly.
 
 ## Refactor Workflow

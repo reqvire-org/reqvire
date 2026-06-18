@@ -1467,7 +1467,7 @@ fn resolve_attachment_identifier_for_element(
     })
 }
 
-/// Attach an ontology or compatible refinement element identifier to an element.
+/// Attach a compatible requirement-owned refinement element identifier to a requirement.
 pub fn attach_element_identifier(
     model_manager: &mut ModelManager,
     element_name: &str,
@@ -1499,34 +1499,26 @@ pub fn attach_element_identifier(
             ))
         })?;
 
-    if !attachment_element.element_type.is_refinement()
-        && !attachment_element.element_type.is_ontology()
-    {
+    if !attachment_element.element_type.is_refinement() {
         return Err(ReqvireError::InvalidAttachmentTarget(format!(
-            "Element '{}' is not an attachable type. Only ontology elements and compatible Refinement elements can be attached.",
+            "Element '{}' is not an attachable type. Only compatible requirement-owned Refinement elements can be attached; ontology vocabulary uses Concept References.",
             attachment_element.name
         )));
     }
 
-    let target_is_ontology = attachment_element.element_type.is_ontology();
-    if !target_element.element_type.is_capability() && !target_element.element_type.is_requirement()
-    {
+    if !target_element.element_type.is_requirement() {
         return Err(ReqvireError::InvalidAttachmentTarget(format!(
-            "Element '{}' (type: {}) cannot author attachments. Only capability and requirement elements may author attachments; verification evidence must use satisfiedBy and verified targets must use verify.",
+            "Element '{}' (type: {}) cannot author attachments. Only requirement elements may author attachments to reusable requirement-owned refinements; ontology vocabulary uses Concept References and semantic contracts use use/usedBy.",
             element_name,
             target_element.element_type.as_str(),
         )));
     }
 
-    let attachment_type_valid = if target_element.element_type.is_capability() {
-        target_is_ontology
-    } else {
-        attachment_element.element_type.is_requirement_refinement()
-    };
+    let attachment_type_valid = attachment_element.element_type.is_requirement_refinement();
 
     if !attachment_type_valid {
         return Err(ReqvireError::InvalidAttachmentTarget(format!(
-            "Element '{}' (type: {}) cannot attach '{}' (type: {}). Capability attachments may target ontology only; requirement attachments may target requirement-owned source, constraint, behavior, specification, state, or input-output. Semantic contracts constrain requirements through constrainedBy/constrain.",
+            "Element '{}' (type: {}) cannot attach '{}' (type: {}). Requirement attachments may target requirement-owned source, constraint, behavior, specification, state, or input-output only. Ontology vocabulary uses Concept References; semantic contracts constrain requirements through constrainedBy/constrain.",
             element_name,
             target_element.element_type.as_str(),
             attachment_element.name,
@@ -1541,7 +1533,7 @@ pub fn attach_element_identifier(
     {
         return Err(ReqvireError::InvalidAttachmentTarget(
             format!(
-                "'{}' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.",
+                "'{}' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not refined by implementation-detail refinements.",
                 attachment_element.name
             )
         ));

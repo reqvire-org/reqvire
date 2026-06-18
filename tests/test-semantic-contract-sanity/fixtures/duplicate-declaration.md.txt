@@ -7,8 +7,6 @@ Billing capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Billing Ontology](#billing-ontology)
 ---
 
 ### Billing Ontology
@@ -37,8 +35,6 @@ Reporting capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Reporting Ontology](#reporting-ontology)
 ---
 
 ### Reporting Ontology

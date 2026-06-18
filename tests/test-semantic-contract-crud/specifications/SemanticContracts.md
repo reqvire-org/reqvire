@@ -7,10 +7,6 @@ Billing capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Billing Ontology](#billing-ontology)
-  * [Tax Ontology](#tax-ontology)
-
 #### Relations
   * specifiedBy: [Billing Requirement](#billing-requirement)
 ---

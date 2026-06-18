@@ -24,7 +24,7 @@ ${1:-The user will provide capability details.}
 
 This command orchestrates the complete workflow:
 1. Define the coherent operational/system ability.
-2. Attach ontology when shared domain language matters.
+2. Add concept references when shared ontology terms matter.
 3. Create requirements that `specify` the capability.
 4. Create verifications for the capability or leaf requirements.
 5. Validate and check coverage.
@@ -58,8 +58,8 @@ This command orchestrates the complete workflow:
 
 3. **Add ontology context when needed:**
 
-   Use `ontology` elements when the capability needs reusable vocabulary, ontology terms, source authority, or shared OWL contract language. Add ontology elements under `requirements/Ontologies`, then attach them from the consuming capability.
-   Ontology attached by capabilities should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible refinements owned by the relevant requirement. Semantic contracts are reusable SHACL profiles that explicitly `use` ontology and `constrain` requirements.
+   Use `ontology` elements when the capability needs reusable vocabulary, ontology terms, source authority, or shared OWL contract language. Add ontology elements under `requirements/Ontologies`, then bind capability prose to declared terms with `#### Concept References` when needed.
+   Ontology referenced by model elements should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible refinements owned by the relevant requirement. Semantic contracts are reusable SHACL profiles that explicitly `use` ontology and `constrain` requirements.
 
    For broader semantic contract refactoring, use:
    ```bash
@@ -105,7 +105,7 @@ This command orchestrates the complete workflow:
 ```
 /reqvire:add-capability
   ├─> create capability graph node
-  ├─> add ontology attachments when needed
+  ├─> add concept references when needed
   ├─> /reqvire:add-requirement (specifies capability)
   ├─> /reqvire:add-requirement (child requirement, if needed)
   ├─> /reqvire:add-verification (for leaf requirement)
@@ -118,7 +118,7 @@ This command orchestrates the complete workflow:
 - **Capability vs obligation**: Capability answers what the system can accomplish; requirement answers what the system shall do
 - **Capability boundaries**: Do not model UI screens, deployment artifacts, code modules, tickets, or low-level implementation details as capabilities
 - **Decompose intentionally**: Use child capabilities when verification, ownership, lifecycle, architecture impact, operational semantics, or requirement clusters differ
-- **Semantic contracts when useful**: Put reusable meaning in ontology elements attached by capabilities; put SHACL profiles in semantic contracts that explicitly use ontology and constrain requirements
+- **Semantic contracts when useful**: Put reusable meaning in ontology elements referenced by model elements; put SHACL profiles in semantic contracts that explicitly use ontology and constrain requirements
 - **Requirements first**: Create all requirements before verifications
 - **Hierarchical**: Capability hierarchy uses capability `derivedFrom`; requirement hierarchy uses requirement `derivedFrom`
 - **Traceable**: Requirements point to their capability with `specify`

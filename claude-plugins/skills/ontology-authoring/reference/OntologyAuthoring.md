@@ -898,17 +898,17 @@ ex:BusinessArtifact owl:disjointWith ex:LifecycleState .
 - Put ontology elements in `requirements/Ontologies`.
 - Use one `#### Ontology` fenced Turtle block per ontology element.
 - Use `derivedFrom` only to relate ontology elements to ontology parents.
-- Keep shared ontology roots independent from capability roots; capabilities consume ontology through `#### Attachments`.
+- Keep shared ontology roots independent from capability roots; non-ontology, non-semantic-contract elements consume ontology terms through `#### Concept References`.
 - Do not put `#### Shapes` in ontology elements.
 
-Capability attachment example:
+Concept reference example:
 
 ```markdown
-#### Attachments
-  * [Example Domain Ontology](../Ontologies/Example.md#example-domain-ontology)
+#### Concept References
+  * Managed Resource: https://example.org/ontology#ManagedResource
 ```
 
-Requirement prose can bind readable terms with `#### Concept References` when useful, but the referenced IRI must be reachable through the owning capability ontology context. Markdown concept references should use an absolute term IRI unless the referenced prefix is explicitly declared in reachable ontology Turtle.
+Capability, requirement, refinement, verification-objective, and concrete verification prose can bind readable terms with `#### Concept References` when useful. The referenced IRI or CURIE must be declared by an ontology element in the model. Semantic contracts must not author concept references; their semantic dependencies are declared with `use`/`usedBy`.
 
 ## Semantic Contract Boundary
 
@@ -956,6 +956,7 @@ ex:SystemInterfaceShape
 - Domain/range axioms are stable and useful.
 - Vocabulary individuals are typed by ontology classes.
 - SHACL shape references point to declared, reachable ontology terms.
-- Capabilities attach ontology; requirements do not.
+- Non-ontology, non-semantic-contract elements use concept references for ontology term bindings.
+- Semantic contracts use ontology through `use`/`usedBy` and do not author concept references.
 - `reqvire validate` passes.
 - `reqvire ontologies` emits the expected terms.

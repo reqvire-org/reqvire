@@ -15,9 +15,9 @@ Product capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Product Ontology](#product-ontology)
-  * [Shared Ontology](#shared-ontology)
+#### Concept References
+  * Product Payload: urn:reqvire:test:product:ProductPayload
+  * Shared Property: urn:reqvire:test:shared:SharedProperty
 
 #### Relations
   * specifiedBy: [Payload Requirement](#payload-requirement)

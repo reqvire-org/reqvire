@@ -16,12 +16,6 @@ Verification objectives organize mandatory verification planning hierarchy. Ever
   * risk: high
   * status: approved
 
-#### Attachments
-  * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
-  * [Reqvire Relation Ontology](../Ontologies/RelationsAndImpact.md#reqvire-relation-ontology)
-  * [Reqvire Verification Ontology](../Ontologies/Verification.md#reqvire-verification-ontology)
-  * [Reqvire Verification Rollup Ontology](../Ontologies/Verification.md#reqvire-verification-rollup-ontology)
-
 #### Relations
   * specifiedBy: [Verification Upward Traceability](Traceability/VerificationTracesRequirements.md#verification-upward-traceability)
 ---

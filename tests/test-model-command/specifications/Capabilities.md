@@ -9,8 +9,6 @@ Test capability root for migrated requirement fixtures.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Model Command Ontology](Ontologies.md#model-command-ontology)
 ---
 
 ### Model Structure Exploration

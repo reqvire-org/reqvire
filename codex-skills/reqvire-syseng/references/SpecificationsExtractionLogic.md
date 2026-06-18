@@ -395,7 +395,7 @@ Use search to identify requirements that may need specification extraction:
 # Find all requirements (candidates for review)
 reqvire search --filter-type="requirement" --short
 
-# Find all capabilities that attach ontology context
+# Find capabilities whose prose may need concept references
 reqvire search --filter-type="capability" --short
 
 # Find requirements in specific subsystem

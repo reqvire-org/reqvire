@@ -33,14 +33,15 @@ export default function Ontologies() {
       <Section title="Reachability Model">
         <p className="text-zinc-600 mb-4">
           Reqvire keeps ontology orthogonal to capability and requirement
-          hierarchy. Capabilities attach ontology; requirements inherit ontology
-          context from their owning capability path.
+          hierarchy. Non-ontology elements reference ontology terms explicitly;
+          semantic contracts use ontology through use relations.
         </p>
         <BulletList
           items={[
             "Author shared ontology elements under the ontology plane, commonly requirements/Ontologies.",
-            "Capabilities attach ontology elements to make vocabulary reachable for descendant capabilities and specifying requirements.",
-            "Requirements do not attach ontology directly; requirement attachments are for reusable requirement-owned non-semantic-contract refinements.",
+            "Capabilities, requirements, refinements, verification objectives, and concrete verifications use Concept References for ontology term bindings.",
+            "Semantic contracts do not author Concept References; they use ontology through explicit use relations.",
+            "Requirement attachments are for reusable requirement-owned non-semantic-contract refinements.",
             "Ontology hierarchy uses derive or derivedFrom only with other ontology elements.",
             "Ontology elements do not author attachments.",
           ]}
@@ -83,10 +84,9 @@ auth:subject a owl:ObjectProperty ;
 
       <Section title="Concept References">
         <p className="text-zinc-600 mb-4">
-          Concept references let requirement prose stay readable while binding
-          terms to reachable ontology CURIEs or IRIs. The referenced term must
-          be reachable from the requirement through the capability that owns the
-          requirement.
+          Concept references let non-ontology prose stay readable while binding
+          terms to declared ontology CURIEs or IRIs. The referenced term must be
+          declared by an ontology element in the model.
         </p>
         <CodeBlock>{`### API Authentication
 
@@ -95,8 +95,8 @@ API authentication capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Access Token Ontology](AuthOntology.md#access-token-ontology)
+#### Concept References
+  * Access Token: https://example.org/ontology/auth#AccessToken
 
 #### Relations
   * specifiedBy: [API Access Token Validation](#api-access-token-validation)
@@ -127,6 +127,7 @@ The system shall reject API requests whose access token is invalid.
             "semantic-contract may constrain zero, one, or many requirements.",
             "semantic-contract requires one Shapes block.",
             "semantic-contract must not contain an Ontology block.",
+            "semantic-contract must not contain Concept References.",
             "semantic-contract must use ontology through explicit use relations, and SHACL references must resolve through that used ontology graph.",
           ]}
         />
@@ -181,10 +182,21 @@ auth:AccessTokenValidationShape
 
       <Section title="Export and Tools">
         <p className="text-zinc-600 mb-4">
-          The ontology command collects authored ontology and SHACL content.
-          Full mode adds generated Reqvire model context triples for downstream
-          semantic tools and the Explorer ontology view.
+          The ontology command collects authored ontology and SHACL content by
+          default. That default output is the reusable semantic vocabulary
+          document. Full mode adds generated Reqvire model context triples for
+          downstream graph/database consumers, including relations,
+          attachments, concept references, term declarations, shape references,
+          and ontology projection facts.
         </p>
+        <BulletList
+          items={[
+            "Use reqvire ontologies when a tool needs the clean ontology and SHACL document.",
+            "Use reqvire ontologies --full when a graph/database should also know which model elements reference ontology terms.",
+            "Concept References appear in full export as model-context facts such as conceptReference and referencesTerm; they do not rewrite authored OWL/SHACL semantics.",
+            "Concept References are model-context term-reference edges, not generated OntologyConstruct records. OntologyConstruct is reserved for projected OWL/RDFS/SHACL patterns such as subclass, membership, restriction, property-chain, inverse-property, and shape-overlay constructs.",
+          ]}
+        />
         <CodeBlock>{`reqvire ontologies
 reqvire ontologies --output ontologies.ttl
 reqvire ontologies --jsonld --output ontologies.jsonld

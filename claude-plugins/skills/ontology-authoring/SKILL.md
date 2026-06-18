@@ -1,6 +1,6 @@
 ---
 name: reqvire-ontology-authoring
-description: Expert workflow for creating, extending, and validating Reqvire ontology elements for IT engineering, systems engineering, MBSE, and system-of-interest modeling. Use for competency-question-driven ontology scoping, OWL/Turtle vocabulary, capability attachment context, semantic-contract boundaries, ontology hierarchy, domain/range/property modeling, individuals, axioms, and Reqvire validation; trigger when Codex needs to add or revise files under requirements/Ontologies, author #### Ontology Turtle blocks, decide whether meaning belongs in ontology vs requirement/specification/semantic-contract, or prepare ontology terms for Reqvire HTML visualization and semantic export.
+description: Expert workflow for creating, extending, and validating Reqvire ontology elements for IT engineering, systems engineering, MBSE, and system-of-interest modeling. Use for competency-question-driven ontology scoping, OWL/Turtle vocabulary, concept-reference context, semantic-contract boundaries, ontology hierarchy, domain/range/property modeling, individuals, axioms, and Reqvire validation; trigger when Codex needs to add or revise files under requirements/Ontologies, author #### Ontology Turtle blocks, decide whether meaning belongs in ontology vs requirement/specification/semantic-contract, or prepare ontology terms for Reqvire HTML visualization and semantic export.
 ---
 
 # Reqvire Ontology Authoring
@@ -29,15 +29,16 @@ Author Reqvire ontology content as reusable building blocks for system-of-intere
    - Read the existing `requirements/Ontologies/*.md` file that owns nearby vocabulary.
 5. Decide whether to extend an existing ontology or create a new ontology element.
    - Extend when the new terms belong to an existing vocabulary root.
-   - Create a new ontology when the terms form a coherent reusable vocabulary with separate ownership, lifecycle, or capability attachment scope.
+   - Create a new ontology when the terms form a coherent reusable vocabulary with separate ownership, lifecycle, or concept-reference scope.
 6. Derive candidate classes, properties, individuals, and axioms from the domain frame and competency questions.
 7. For a top parent ontology element, define `ontology_base` and `ontology_prefix` metadata before authoring Turtle. Descendant ontology elements inherit both through `derivedFrom` hierarchy. Use the corresponding hash namespace for terms, normally `<ontology_base>#`, with the inherited prefix as the canonical CURIE label. When rebasing an existing ontology element, use `add --override` as the command path and require it to rewrite the dependent ontology boundary chain atomically, including `ontology_base`, `ontology_prefix`, inherited prefix bindings, imports, and any reachable SHACL references.
 8. Place ontology elements under `requirements/Ontologies`.
 9. Author exactly one `#### Ontology` fenced Turtle block per ontology element.
 10. Link ontology hierarchy with `derivedFrom` only between ontology elements.
-11. Attach ontology from consuming capabilities. Do not attach ontology directly from requirements.
-12. Add or update semantic contracts only when a closed-world SHACL profile is needed; link each contract to ontology with `use`/`usedBy` and to governed requirements with `constrain`/`constrainedBy`.
-13. Validate before finishing.
+11. Use `#### Concept References` on non-ontology, non-semantic-contract elements when their prose needs explicit bindings to ontology terms.
+12. Add or update semantic contracts only when a closed-world SHACL profile is needed; link each contract to ontology with `use`/`usedBy` and to governed requirements with `constrain`/`constrainedBy`. Do not add `#### Concept References` to semantic contracts.
+13. Use `reqvire ontologies` for the clean authored ontology/SHACL document. Use `reqvire ontologies --full` when downstream graph/database tooling also needs model-context facts for element relations, attachments, concept references, term declarations, shape references, and ontology projection facts. Concept references are term-reference edges, not generated `OntologyConstruct` records.
+14. Validate before finishing.
 
 ## Ontology From Existing Model Content
 

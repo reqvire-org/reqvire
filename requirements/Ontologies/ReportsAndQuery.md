@@ -322,7 +322,7 @@ reqvire:relationTarget a owl:ObjectProperty ;
   rdfs:range reqvire:Element .
 reqvire:conceptReference a owl:ObjectProperty ;
   rdfs:domain reqvire:RdfProjection ;
-  rdfs:range reqvire:Element .
+  rdfs:range reqvire:OntologyTerm .
 reqvire:projectedConstruct a owl:ObjectProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range reqvire:OntologyConstruct .

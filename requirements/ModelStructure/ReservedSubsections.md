@@ -112,7 +112,7 @@ Some details.
 
 Must be defined with a level 4 header: `#### Attachments`.
 
-The Attachments subsection links an element to explicit dependency elements. Capability attachments consume ontology context. Requirement attachments consume reusable requirement-owned contracts.
+The Attachments subsection links an element to explicit reusable dependency elements. Attachments do not provide ontology context. Semantic vocabulary bindings belong in `#### Concept References`; semantic-contract ontology dependencies belong in `use`/`usedBy` relations.
 
 ### Element Identifier Attachments
 
@@ -127,22 +127,13 @@ Element identifier attachments link to model elements that are attachable under 
 
 **Validation Rules:**
 - Target element must exist in the model
-- Capability attachment targets must be ontology elements.
-- Requirement attachment targets must be reusable requirement-owned `constraint`, `behavior`, `specification`, `state`, or `input-output` elements. Semantic-contract dependencies use `constrainedBy`/`constrain` and ontology `use` relations.
+- Requirement attachment targets must be reusable requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` elements. Semantic-contract dependencies use `constrainedBy`/`constrain` and ontology `use` relations.
+- Capability, verification, refinement, and requirement semantic vocabulary references use `#### Concept References`, not attachments.
 - Requirement-owned refinement targets must have exactly one compatible `refine` relation before they are attachable.
 - Non-attachable element identifiers are rejected with a validation error.
 - Redundant same-hierarchy attachments and invalid cross-subgraph attachment flow are rejected by attachment validation.
 
 **Examples:**
-```markdown
-### API Capability
-
-Capability context.
-
-#### Attachments
-* [API Ontology](../Ontologies/Interfaces.md#api-ontology)
-```
-
 ```markdown
 ### API Requirement
 
@@ -151,3 +142,9 @@ The system shall expose an API contract.
 #### Attachments
 * [Reusable Payload Shape](Contracts.md#reusable-payload-shape)
 ```
+
+## Concept References Subsection
+
+Must be defined with a level 4 header: `#### Concept References`.
+
+Concept references bind readable element prose to declared ontology terms. They may be authored on capability, requirement, refinement, verification-objective, and concrete verification elements. They must not be authored on ontology elements, because ontology elements declare terms in `#### Ontology`. They must not be authored on semantic-contract elements, because semantic contracts are semantic graph artifacts that use ontology through `use`/`usedBy` relations and SHACL `#### Shapes`.

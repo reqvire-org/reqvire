@@ -99,9 +99,9 @@ Semantic model evidence rules:
 - `filter_type` accepts all canonical element type tokens supported by Reqvire core, including `capability`, `requirement`, `ontology`, `semantic-contract`, `source`, `specification`, `constraint`, `behavior`, `state`, `input-output`, and verification types.
 - `reqvire.search --filter-type=ontology` through MCP returns ontology elements with parsed ontology ADT content when full results are requested.
 - `reqvire.search --filter-type=semantic-contract` through MCP returns reusable shape contracts with parsed semantic-contract ADT content, constrained requirements, and ontology-use relations when full results are requested.
-- `reqvire.read_element` returns `concept_references` for elements that author `#### Concept References`.
-- `reqvire.collect` includes capability-attached ontology context for capability/requirement collection and semantic-contract ontology-use context for semantic-contract evidence where the underlying Reqvire operation returns it.
-- `reqvire.model` and `reqvire.submodels` preserve capability roots, requirement ownership through `specify`/`specifiedBy`, ontology hierarchy through `derive`/`derivedFrom`, and attachment edges needed for semantic dependency traceability.
+- `reqvire.read_element` returns `concept_references` for non-ontology, non-semantic-contract elements that author `#### Concept References`.
+- `reqvire.collect` includes authored concept references for capability/requirement collection and semantic-contract ontology-use context for semantic-contract evidence where the underlying Reqvire operation returns it.
+- `reqvire.model` and `reqvire.submodels` preserve capability roots, requirement ownership through `specify`/`specifiedBy`, ontology hierarchy through `derive`/`derivedFrom`, and concept-reference facts needed for semantic dependency traceability.
 - `reqvire.ontologies` exposes the same semantic collection as the CLI `ontologies` command.
 - `reqvire.ontologies` accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`.
 - `reqvire.ontologies` accepts optional `full` boolean; omitted or false returns generated ontology document declarations plus authored ontology and SHACL artifacts, while true also includes generated Reqvire model context triples and ontology projection facts. Generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors.
@@ -194,7 +194,7 @@ Mutation exposure and safety rules:
 - Mutation tools are registered and returned by MCP `tools/list` only when the server is started with `reqvire mcp --enable-mutations`.
 - Mutation operation semantics are inherited from attached Reqvire functional/operation contracts.
 - Controlled mutations update the Reqvire in-memory graph through core mutation logic before filesystem flush.
-- Controlled mutations run the same semantic model validation gates as Reqvire core before persistence. This includes ontology element structure, single connected ontology root, ontology attachment compatibility, semantic-contract `Shapes` reference reachability, and `Concept References` resolution.
+- Controlled mutations run the same semantic model validation gates as Reqvire core before persistence. This includes ontology element structure, single connected ontology root, attachment compatibility, semantic-contract `Shapes` reference reachability, and `Concept References` resolution.
 - Durable writes flush modified files to the filesystem with the same guarantees as attached file persistence behavior.
 - The MCP server keeps its internal graph synchronized from the updated core graph after each successful mutation before serving subsequent model reads.
 - The MCP server avoids mandatory full reparse after controlled mutations; full reparse is reserved for external filesystem drift, changed source fingerprints, or operations that require it.

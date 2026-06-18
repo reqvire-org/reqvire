@@ -31,16 +31,16 @@ This test verifies that capability, specified requirement, ontology, and semanti
 - Semantic-contract content changes propagate to constrained requirements through `constrain`.
 - Semantic-contract content changes do not propagate backward to ontology vocabulary through `use`.
 - Ontology content changes propagate to semantic contracts through `usedBy`, then to constrained requirements and downstream verifications.
-- Attached ontology content changes mark the attaching capability as changed and propagate through that capability context to descendant capabilities and specified requirements.
+- Ontology term changes propagate through explicit concept references and semantic-contract use/constrain paths.
 
 ##### Test Criteria
-- Modify a capability, its specified requirement, the constraining semantic contract, a contract-only ontology, and an attached ontology.
+- Modify a capability, its specified requirement, the constraining semantic contract, a contract-only ontology, and an ontology term referenced by concept references.
 - Run `reqvire change-impact --json`; assert exit code 0 and valid JSON.
 - Assert the capability impact tree contains the specified requirement.
 - Assert the requirement impact tree contains the semantic contract and verification.
 - Assert the semantic-contract impact tree contains the constrained requirement and verification, but not the used ontology.
 - Assert the contract-only ontology impact tree contains the semantic contract, constrained requirement, and verification.
-- Assert the attaching capability reports the attached ontology in `changed_attachments`.
+- Assert concept-reference and semantic-contract dependency paths are represented without capability ontology attachments.
 
 #### Metadata
   * type: test-verification

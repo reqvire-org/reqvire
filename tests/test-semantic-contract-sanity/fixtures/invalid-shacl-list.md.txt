@@ -10,8 +10,6 @@ Billing capability.
 #### Relations
   * specifiedBy: [Billing Requirement](#billing-requirement)
 
-#### Attachments
-  * [Billing Ontology](#billing-ontology)
 ---
 
 ### Billing Ontology

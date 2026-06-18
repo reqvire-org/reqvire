@@ -577,7 +577,7 @@ Project knowledge graph view generation behavior:
 - Provides search over element names, identifiers, file paths, relation facts, attachment facts, governance, metadata, and concept references.
 - Is rendered as the canonical `Graph` mode inside `index.html#/model`; the Model route owns List, Grid, and Graph modes.
 - Receives role visibility filters and overlay toggles from the Model left Explorer pane when Graph mode is active. The graph controls are reserved for filters, overlays, legends, and reset/layout controls. The graph canvas shall not render a page-local `Model Show` toolbar, top control band, or floating boxed filter surface.
-- Preserves the four-layer model when overlays are enabled: ontology attachments, requirement-owned refinement details/contracts, verification evidence, satisfaction evidence, and trace links may connect across layers or subordinate nodes, but they must not imply a new layer or a new capability-root submodel boundary.
+- Preserves the four-layer model when overlays are enabled: concept references, requirement-owned refinement details/contracts, verification evidence, satisfaction evidence, and trace links may connect across layers or subordinate nodes, but they must not imply a new layer or a new capability-root submodel boundary.
 - Renders search results with the same role-color swatch used by the graph and legend, and omits redundant parenthesized type suffixes so result lists remain scan-friendly.
 - Centers the graph viewport on a node selected from search or direct graph click.
 - Exposes selected-node detail through the left Explorer pane: the selected node remains pinned in the graph, a compact selected-element link appears near the pane summary, and that link opens the shared element-detail modal with element type, identifier, source file/line link, description, governance, metadata, incoming facts, outgoing facts, attachments, and concept references.
@@ -656,7 +656,7 @@ Breakpoints:
 - `resources`: modeled resource and evidence-file targets referenced by relations or attachments, keyed separately from `files`.
 - `elements`: normalized Reqvire elements keyed by full identifier, including name, type, canonical type family, source file path, line number when available, content summary, governance metadata, authored metadata, and source anchor.
 - `relations`: normalized relation facts with source id, target id or target resource id, canonical relation direction, authored relation token, generated/opposite provenance, source location evidence, and relation family.
-- `attachments`: attachment facts from capability or requirement elements, with target kind distinguishing ontology attachments, requirement-owned refinement attachments, local file resources, and external resources.
+- `attachments`: attachment facts for reusable requirement-owned refinement attachments, local file resources, and external resources.
 - `concept_refs`: concept-reference facts with element id, label, IRI or CURIE, resolution status, source evidence, and ontology-term linkage when known.
 - `submodels`: capability-rooted submodel summaries matching the `submodels` command boundary contract.
 - `traces`: verification trace paths and requirement/capability trace summaries needed by the Traces view.
@@ -676,7 +676,7 @@ Breakpoints:
 
 **Relation and Trace Semantics**
 - The Project Store shall preserve Reqvire's current relation model and canonical directions used by diagrams and graph views.
-- Capability records may attach ontology and be specified or verified; they shall not be treated as directly satisfied implementation units.
+- Capability records may author concept references and be specified or verified; they shall not be treated as directly satisfied implementation units.
 - Requirement records may own refinements, be constrained by semantic contracts, be satisfied by implementation/evidence, be verified, derive child requirements, and attach compatible requirement-owned refinement elements.
 - Opposite/generated relation facts shall remain available as evidence but shall not create duplicate canonical graph edges.
 - Verification traces and coverage records shall be derivable from the same element and relation records used by the Model and Knowledge Graph views.

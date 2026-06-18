@@ -8,7 +8,7 @@
 
 ```
 1. Capability first       → Define the coherent operational/system ability
-2. Semantic context    → Attach ontology when shared domain meaning matters
+2. Semantic context    → Add concept references when shared ontology terms matter
 3. Requirements        → Define what the system shall do (never skip implementable obligations)
 4. Refinements         → Add specifications, constraints, behaviors, state, and input-output refinements as needed
    Semantic contracts  → Add reusable SHACL contracts with explicit ontology use when closed-world checks are needed
@@ -24,10 +24,10 @@ When constructing or refactoring a system model, work from model boundaries inwa
 2. Run `reqvire search --filter-type="ontology" --short` and identify the ontology terms already available.
 3. Decide whether the new content belongs under an existing capability root, a child capability, a new independent capability root, or the shared ontology hierarchy.
 4. Add subcapabilities only for meaningful capability slices; do not use capability hierarchy just to share ontology.
-5. Put shared vocabulary and stable semantic relationships in ontology; attach that ontology from the owning or consuming capability so requirements inherit it through capability context.
+5. Put shared vocabulary and stable semantic relationships in ontology; bind capability, requirement, refinement, and verification prose to ontology terms with `#### Concept References`.
 6. Put implementable obligations in requirements that `specify` the local capability.
 7. Put local details in compatible refinements owned by the relevant requirement.
-8. Use attachments, not hierarchy, when another capability root needs ontology or reusable requirement-owned non-semantic-contract refinements from this one. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
+8. Use attachments, not hierarchy, when another requirement root needs reusable requirement-owned non-semantic-contract refinements. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
 9. Validate `submodels`, `collect`, and change-impact paths after each boundary slice.
 
 ## Capability Design Rules
@@ -58,7 +58,7 @@ Optional subsections such as `#### Stakeholder Need`, `#### Feature`, `#### Oper
 
 Before creating requirements, answer:
 - What coherent operational, product, business, regulatory, or system ability does this address? (`capability`)
-- What semantic meaning, domain vocabulary, data shape, or policy contract must be shared? (`ontology` for vocabulary attached by capabilities, `semantic-contract` for reusable SHACL profiles that explicitly use ontology and constrain requirements)
+- What semantic meaning, domain vocabulary, data shape, or policy contract must be shared? (`ontology` for vocabulary referenced through concept references, `semantic-contract` for reusable SHACL profiles that explicitly use ontology and constrain requirements)
 - What technical capabilities are needed? (`requirement`)
 - Are there constraints or limits to define?
 - How will this be verified?
@@ -67,7 +67,7 @@ Before creating requirements, answer:
 
 ```
 Capability (coherent operational/system ability)
-    ├── attach → ontology
+    ├── Concept References → ontology terms
     ├── derive → Subcapability
     ├── verifiedBy → Verification
     └── specifiedBy ← Requirement
@@ -231,10 +231,10 @@ Add refinements only when:
 - **Behaviors** - Complex state/flow logic needs documentation
 - **State** - State machines, lifecycle states, and state-dependent contracts
 - **Input-output** - Payloads, messages, schemas, examples, and fixtures
-- **Ontology** - Shared semantic meaning and vocabulary attached by capabilities
+- **Ontology** - Shared semantic meaning and vocabulary referenced by model elements
 - **Semantic contracts** - Reusable SHACL shape profiles over explicitly used ontology that constrain requirements
 
-Link requirement-owned non-semantic-contract refinements via `refinedBy` from the requirement that owns the refinement. Attach ontology elements from capabilities. Link semantic contracts to ontology with `use` and to requirements with `constrain`/`constrainedBy`.
+Link requirement-owned non-semantic-contract refinements via `refinedBy` from the requirement that owns the refinement. Link semantic contracts to ontology with `use` and to requirements with `constrain`/`constrainedBy`. Use `#### Concept References` when capability, requirement, refinement, or verification prose needs explicit ontology term bindings.
 
 ### Refinement Best Practices
 
@@ -291,9 +291,6 @@ reqvire link "Data Processing Requirement" "refinedBy" "Data Format Specificatio
 # The refinement must be owned by a requirement via refinedBy
 reqvire link "Other Capability Requirement" attaching "Performance Constraint"
 
-# Attach ontology element across capability subgraph boundaries
-reqvire link "Other Capability" attaching "Capability Ontology"
-
 # Link a reusable semantic contract to a requirement and ontology
 reqvire link "Requirement Shape Contract" "constrain" "Other Capability Requirement"
 reqvire link "Requirement Shape Contract" "use" "Capability Ontology"
@@ -309,9 +306,9 @@ reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
 
 **Attachment constraints:**
 - Refinements must have a `refine` relation before being attached
-- Capabilities may attach only `ontology` elements
+- Capabilities do not author attachments; use `#### Concept References` for ontology term bindings
 - Requirements may attach only requirement-owned `specification`, `constraint`, `behavior`, `state`, or `input-output` refinements
-- Cross-capability semantic dependencies must be explicit attachments so change impact is preserved
+- Semantic contracts must not author `#### Concept References`; they depend on ontology through `use`
 
 ## Step 4: Add Verifications
 

@@ -2,7 +2,7 @@
 
 ### Capability Structure and Relation Shape
 
-Defines SHACL constraints for capability structure, ontology attachment context, specification, verification, and forbidden implementation satisfaction or refinement ownership edges.
+Defines SHACL constraints for capability structure, concept-reference semantics, specification, verification, and forbidden implementation satisfaction or refinement ownership edges.
 
 #### Shapes
 ```turtle
@@ -405,7 +405,7 @@ reqvire:RequirementOwnedRefinementShape
 
 The Reqvire capability ontology defines capability elements as first-class operational, product, business, regulatory, or system abilities.
 
-Capabilities decompose into child capabilities, attach ontology elements from the ontology plane, derive implementation-facing requirements through `specifiedBy`/`specify`, and may be directly verified. Requirements specify capabilities and own subordinate refinement details/contracts; they do not replace capability ownership of operational meaning, ontology attachment context, or direct verification context.
+Capabilities decompose into child capabilities, bind vocabulary through concept references, derive implementation-facing requirements through `specifiedBy`/`specify`, and may be directly verified. Requirements specify capabilities and own subordinate refinement details/contracts; they do not replace capability ownership of operational meaning, concept-reference context, or direct verification context.
 
 #### Ontology
 ```turtle
@@ -436,7 +436,7 @@ reqvire:sourceType a reqvire:RefinementElementType ;
 
 The Reqvire requirement ontology defines requirement obligations and requirement-owned refinement types.
 
-Requirements are implementation-facing obligations. They can own source context, specifications, constraints, behavior descriptions, state contracts, and input-output contracts. Requirements may also be constrained by reusable shapes-only semantic contracts. Capabilities attach ontology, derive child capabilities, are specified by requirements, and may be verified; capabilities must not own refinement elements through `refinedBy`/`refine`. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts.
+Requirements are implementation-facing obligations. They can own source context, specifications, constraints, behavior descriptions, state contracts, and input-output contracts. Requirements may also be constrained by reusable shapes-only semantic contracts. Capabilities bind ontology terms through concept references, derive child capabilities, are specified by requirements, and may be verified; capabilities must not own refinement elements through `refinedBy`/`refine`. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts.
 
 #### Ontology
 ```turtle

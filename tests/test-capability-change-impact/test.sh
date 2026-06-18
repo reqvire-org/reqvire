@@ -109,17 +109,4 @@ assert_tree_contains "$CONTRACT_ONTOLOGY_TREE" "Payload Shape Contract" "Contrac
 assert_tree_contains "$CONTRACT_ONTOLOGY_TREE" "Payload Requirement" "Contract Only Ontology change should propagate through Payload Shape Contract to Payload Requirement"
 assert_tree_contains "$CONTRACT_ONTOLOGY_TREE" "Payload Verification" "Contract Only Ontology change should propagate to downstream Payload Verification"
 
-ATTACHED_ONTOLOGY_WORK=$(create_workspace "attached-ontology-change")
-sed -i 's/shared:Initial/shared:Changed/' "${ATTACHED_ONTOLOGY_WORK}/Requirements.md"
-ATTACHED_ONTOLOGY_JSON=$(run_change_impact_json "$ATTACHED_ONTOLOGY_WORK")
-assert_changed_element "$ATTACHED_ONTOLOGY_JSON" "Product Capability"
-ATTACHED_CHANGED=$(echo "$ATTACHED_ONTOLOGY_JSON" | jq -r '.changed[] | select(.name == "Product Capability") | .changed_attachments[]?')
-if ! echo "$ATTACHED_CHANGED" | grep -q "shared-ontology"; then
-  echo "FAILED: Shared Ontology content change should mark Product Capability attachment as changed"
-  echo "$ATTACHED_ONTOLOGY_JSON" | jq '.changed[] | select(.name == "Product Capability")'
-  exit 1
-fi
-ATTACHED_TREE=$(echo "$ATTACHED_ONTOLOGY_JSON" | jq '.changed[] | select(.name == "Product Capability") | .change_impact_tree')
-assert_tree_contains "$ATTACHED_TREE" "Payload Requirement" "Attached ontology change should propagate from attaching capability to specified requirement"
-
 exit 0

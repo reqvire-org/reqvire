@@ -6,11 +6,11 @@ Use this workflow when migrating an existing Reqvire model toward clear capabili
 
 Separate three concerns without losing traceability:
 
-- Capabilities own coherent operational/system ability, reusable ontology attachment context, and direct verification context.
+- Capabilities own coherent operational/system ability, authored concept-reference context, and direct verification context.
 - `ontology` elements own stable model/domain meaning: `X is`, `X has`, `X relates to Y`, allowed semantic structure, and shared OWL/Turtle vocabulary.
 - Requirements own implementable obligations: what the system shall do, what can satisfy it, and what verification proves it.
 - Reusable `semantic-contract` elements own SHACL shape profiles over ontology terms reached through explicit `use`/`usedBy` relations and constrain requirements through `constrain`/`constrainedBy`.
-- Ontology attached by capabilities should define nouns, relationships, allowed semantic categories, and stable model rules.
+- Ontology referenced by model elements should define nouns, relationships, allowed semantic categories, and stable model rules.
 - Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Shape-only `semantic-contract` elements capture reusable SHACL profiles through explicit ontology use.
 
 ## Capability Modeling Philosophy
@@ -31,9 +31,9 @@ Use this method when building or refactoring a system model, not only when clean
    - Run `reqvire submodels --json`.
    - Run `reqvire search --filter-type="ontology" --short`.
    - Treat each capability root as an independent coherent operational/system ability.
-   - Keep ontology and semantic-contract elements under `requirements/Ontologies`; capability files consume ontology through attachments, and requirements consume semantic contracts through `constrainedBy`.
-   - Treat ontology as a first-class semantic plane: it defines reusable terms and relationships that capabilities explicitly attach so requirements inherit them through capability context.
-   - Do not create one universal top capability just to reuse vocabulary. Shared meaning crosses roots through attachments.
+   - Keep ontology and semantic-contract elements under `requirements/Ontologies`; model elements consume ontology terms through concept references, and requirements consume semantic contracts through `constrainedBy`.
+   - Treat ontology as a first-class semantic plane: it defines reusable terms and relationships that non-ontology elements reference explicitly.
+   - Do not create one universal top capability just to reuse vocabulary. Shared meaning crosses roots through explicit concept references.
 
 2. **Shape the capability hierarchy before moving requirements**
    - Add child capabilities only when they are real independently verifiable capability slices with their own local requirements or verification concerns.
@@ -54,7 +54,7 @@ Use this method when building or refactoring a system model, not only when clean
 
 5. **Preserve boundaries through attachments**
    - Use hierarchy only inside a capability, requirement, or ontology family.
-   - Use capability attachments for cross-root ontology reuse.
+   - Use concept references for cross-root ontology term reuse.
    - Use requirement attachments for cross-root reusable requirement-owned non-semantic-contract refinements.
    - Use `use` for semantic-contract ontology dependencies and `constrain` for semantic-contract requirement dependencies.
    - After changing attachments or hierarchy, check `submodels --json` for unintended cross-submodel couplings.
@@ -141,7 +141,7 @@ For each capability root:
 
 - Confirm it is a real independent capability root.
 - Check whether it has requirements through `specifiedBy`/`specify`.
-- If it has zero requirements, confirm it is still a meaningful capability because it has child capabilities or direct verification; otherwise add a concrete obligation that specifies it or move pure vocabulary into `requirements/Ontologies` and attach it from consuming capabilities.
+- If it has zero requirements, confirm it is still a meaningful capability because it has child capabilities or direct verification; otherwise add a concrete obligation that specifies it or move pure vocabulary into `requirements/Ontologies` and reference it from consuming elements.
 - Confirm cross-root dependencies are attachments, not hierarchy relations.
 - If one root is too broad, split it into child capabilities first and move local requirements to the child capabilities before editing ontology or refinements.
 
@@ -165,7 +165,7 @@ If stable semantic meaning is currently in a requirement:
 - Place authored ontology and semantic-contract elements in `requirements/Ontologies`, grouped by semantic area.
 - Put ontology vocabulary in `#### Ontology`.
 - Do not put `#### Shapes` in ontology.
-- Attach the ontology from the capability that needs that vocabulary.
+- Add concept references from the model elements that need that vocabulary.
 - Remove duplicated semantic prose from the requirement after preserving the obligation.
 - Keep ontology focused on terms and relationships. If a statement names concrete CLI/MCP commands, exact output fields, file paths, report sections, validation messages, or mutation steps, move it to `specification`, `behavior`, `state`, `input-output`, or a semantic-contract shape profile instead.
 
@@ -205,14 +205,14 @@ When an obligation needs specific closed-world validation:
 Use:
 
 - `capability specifiedBy requirement` or `requirement specify capability` for ownership.
-- capability `Attachments` to ontology elements.
+- concept references from model elements to ontology terms.
 - `semantic-contract constrain requirement` or `requirement constrainedBy semantic-contract` for SHACL profile application.
 - `semantic-contract use ontology` or `ontology usedBy semantic-contract` for ontology vocabulary dependencies.
-- Capability attachments only for ontology elements from other capability roots.
+- Capabilities do not author attachments; they use concept references for ontology terms.
 - Requirement attachments only for compatible requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements.
 
 Do not use `trace` as a substitute for ownership or dependency.
-Do not remove a cross-root dependency unless the consumer now has an explicit attachment that gives `collect` and change impact the same dependency path.
+Do not remove a cross-root dependency unless the consumer now has an explicit concept reference, semantic-contract relation, or requirement attachment that gives `collect` and change impact the same dependency path.
 
 ### 7. Update Verifications And Tests
 
@@ -239,7 +239,7 @@ Run focused e2e tests for touched behavior, then full e2e before finishing.
 ## Completion Criteria
 
 - Every requirement resolves to exactly one owning capability root.
-- Capability roots have specifying requirements, child capabilities, or intentional direct verification. Pure vocabulary belongs in ontology and is attached by consuming capabilities.
+- Capability roots have specifying requirements, child capabilities, or intentional direct verification. Pure vocabulary belongs in ontology and is referenced by consuming elements.
 - Semantic meaning is not duplicated in requirements and ontology elements.
 - Semantic contracts contain `Shapes` only and no `Ontology`.
 - Semantic-contract references resolve through explicit ontology `use` context and ontology hierarchy.

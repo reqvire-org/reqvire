@@ -532,7 +532,7 @@ The output shall:
   - all parsed capability, requirement, ontology, semantic-contract, verification, and refinement elements
   - element id, identifier, name, type, file path, and source line
   - internal model relations, including `derive`, `derivedFrom`, `specify`, `specifiedBy`, `refine`, `refinedBy`, `verify`, `verifiedBy`, `satisfy`, `satisfiedBy`, and `trace`
-  - element attachments, including capability-to-ontology attachments and requirement-to-contract attachments
+  - element attachments for reusable requirement-owned contracts
   - concept references from model elements to ontology terms
   - ontology term declaration edges from ontology elements to declared terms
   - semantic-contract shape reference edges from semantic contracts to referenced ontology terms

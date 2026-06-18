@@ -453,9 +453,9 @@ Test cases:
 4. `semantic-contract` using `refinedBy`/`refine` fails validation.
 5. `source` refining `capability` fails.
 6. `constraint`, `behavior`, `specification`, `state`, or `input-output` refining `capability` fails.
-7. Capability attachment to `ontology` validates.
+7. Capability attachment to `ontology` fails; capabilities use concept references for ontology terms.
 8. Requirement `constrainedBy` to `semantic-contract` validates.
-9. Requirement attachment to `ontology` fails because ontology use for semantic contracts is explicit through `use`.
+9. Requirement attachment to `ontology` fails because ontology terms use concept references and semantic-contract ontology use is explicit through `use`.
 10. Capability attachment to `semantic-contract` fails.
 
 #### Metadata

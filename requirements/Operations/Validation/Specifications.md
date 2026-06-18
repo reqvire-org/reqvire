@@ -20,15 +20,14 @@ Attachment scope validation is expected to enforce:
 Attachment targets support model element identifier references with family-specific compatibility rules.
 
 **Identifier Targets:**
-- Capability attachments must point to `ontology` elements only
-- Requirement attachments must point to reusable requirement-owned non-semantic-contract refinement element types only (`constraint`, `behavior`, `specification`, `state`, `input-output`)
-- Requirement attachment to `ontology` is invalid; requirements inherit ontology context from their owning capability path
+- Requirement attachments must point to reusable requirement-owned non-semantic-contract refinement element types only (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
+- Attachment to `ontology` is invalid; ontology vocabulary bindings use `#### Concept References` on non-ontology, non-semantic-contract elements or `use`/`usedBy` on semantic contracts
 - Normalized like relation targets (resolved to full identifier path)
 - Validation is expected to reject identifiers pointing to non-attachable element types
 - Validation is expected to reject unresolved identifiers
 - Provides clear error message indicating the expected element type
 
-This validation ensures that ontology context is owned by capabilities and that requirement attachments reference reusable requirement-owned contracts.
+This validation ensures that attachments reference reusable requirement-owned contracts and do not carry ontology semantics.
 
 #### Metadata
   * type: specification

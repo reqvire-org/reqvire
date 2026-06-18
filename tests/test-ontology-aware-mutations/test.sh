@@ -55,9 +55,6 @@ Billing capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-* [Billing Ontology](#billing-ontology)
-
 ---
 
 ### Billing Requirement

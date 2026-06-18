@@ -677,7 +677,7 @@ The test shall verify that existing model elements can be deleted, all relations
 - Delete ontology that would leave dangling semantic references (rejected)
 - Add semantic contract with dangling semantic references (rejected)
 - Add semantic contract with outside-context semantic references (rejected)
-- Unlink capability ontology attachment required for ontology context reachability (rejected)
+- Remove ontology declaration required by concept references (rejected)
 - Override ontology declaration source with replacement that drops the declaration (rejected)
 
 #### Metadata

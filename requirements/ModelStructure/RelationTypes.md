@@ -119,7 +119,7 @@ This section defines which element types can use which relation types as source 
 | **inspection-verification** | verify, trace | verifiedBy, trace |
 | **demonstration-verification** | verify, trace | verifiedBy, trace |
 | **formal-proof-verification** | verify, satisfiedBy, trace | verifiedBy, satisfy, trace |
-| **ontology** | derivedFrom, derive, usedBy, trace | derivedFrom, derive, use, trace, Capability Attachment |
+| **ontology** | derivedFrom, derive, usedBy, trace | derivedFrom, derive, use, trace |
 | **source** | refine | refinedBy |
 | **semantic-contract** | constrain, use | constrainedBy, usedBy |
 | **constraint** | refine | refinedBy, Requirement Attachment |

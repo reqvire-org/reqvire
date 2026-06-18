@@ -68,7 +68,7 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 | `refinedBy` | Source owns target as refinement | Requirement to requirement-owned refinement |
 | `refine` | Source refines target | Refinement element to compatible owner (auto-generated) |
 | `trace` | General traceability link | Any traceability relationship |
-| `attaching` | Attach file or element | Attach ontology to capabilities, or compatible requirement-owned refinements to requirements |
+| `attaching` | Attach file or element | Attach compatible requirement-owned refinements to requirements |
 
 ## Target Types
 
@@ -147,11 +147,6 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 **Attach a refinement element:**
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" attaching "Performance Constraint"
-```
-
-**Attach ontology to a capability:**
-```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Authentication Capability" attaching "Access Token Ontology"
 ```
 
 **Preview before linking:**

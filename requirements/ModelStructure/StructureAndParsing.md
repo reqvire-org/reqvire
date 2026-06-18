@@ -85,8 +85,8 @@ Reserved subsection vocabulary is defined by the Reqvire core element ontology. 
  * **Relations**: authored relation edges
  * **Details**: narrative element context
  * **Metadata**: element metadata, element type, and governance metadata where valid
- * **Attachments**: explicit attached ontology or requirement-owned contract dependencies
- * **Concept References**: readable bindings to reachable ontology terms
+ * **Attachments**: explicit reusable requirement-owned contract dependencies
+ * **Concept References**: readable bindings from non-ontology, non-semantic-contract elements to declared ontology terms
  * **Ontology**: ontology-element Turtle content
  * **Shapes**: semantic-contract SHACL content
 

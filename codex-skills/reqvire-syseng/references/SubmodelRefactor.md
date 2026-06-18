@@ -18,7 +18,7 @@ Use this reference when splitting the model into independent submodels with atta
 - Cross-submodel dependencies are expressed through explicit attachment contracts, not hierarchical coupling
 - This preserves boundary clarity and keeps `collect`, change-impact, and coverage outputs deterministic
 - A broad capability root may own child capabilities, but requirements should specify the local child capability when that child is the real capability slice
-- Do not collapse unrelated work under one capability root just to share ontology; attach the shared ontology from the consuming capability instead
+- Do not collapse unrelated work under one capability root just to share ontology; use explicit concept references from the consuming elements instead
 
 ## Mandatory Human Boundary Check
 
@@ -66,11 +66,11 @@ A submodel may contain internal sub-boundaries (nested domains) with separate ow
 
 3. **Migrate links**
    - For each cross-submodel relation, either move element into owning submodel or replace with attachment
-   - Ensure each receiving capability submodel attaches required external ontology, each receiving requirement attaches required reusable non-semantic-contract refinements, and semantic contracts are linked with `constrainedBy`/`constrain`
+   - Ensure each receiving element authors required concept references, each receiving requirement attaches required reusable non-semantic-contract refinements, and semantic contracts are linked with `constrainedBy`/`constrain`
    - Preserve dependency visibility: if a requirement relied on a moved concept, add concept references, a local refinement, or an attachment so `collect` still explains the dependency
 
 4. **Validate semantic completeness**
-   - `reqvire collect "<capability-or-requirement>" --json` must include required capability-attached ontology, attached/refining specs, and explicitly constraining semantic contracts
+   - `reqvire collect "<capability-or-requirement>" --json` must include authored concept references, attached/refining specs, and explicitly constraining semantic contracts
    - `reqvire change-impact --git-commit="<base>"` must report impacts when attached contracts change
    - Repeat `reqvire lint --json` — target: fewer or no `cross_submodel_hierarchical_relation` findings
 

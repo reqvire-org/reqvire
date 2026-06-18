@@ -7,11 +7,6 @@ Billing capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Billing Ontology](#billing-ontology)
-  * [Customer Ontology](#customer-ontology)
-  * [Tax Ontology](#tax-ontology)
-
 #### Relations
   * specifiedBy: [Billing Requirement](#billing-requirement)
 ---
@@ -91,7 +86,7 @@ tax:VatRate a owl:DatatypeProperty .
 
 ### Billing Shape Contract
 
-Billing shape references native and attached ontology terms.
+Billing shape references ontology terms through explicit `use` relations.
 
 #### Metadata
   * type: semantic-contract

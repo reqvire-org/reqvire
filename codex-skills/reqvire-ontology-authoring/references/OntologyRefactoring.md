@@ -9,7 +9,7 @@ Refactoring should make the ontology more coherent without changing valid system
 Preserve:
 
 - stable IRIs and model identifiers unless the user explicitly approves a rename
-- capability attachments and requirement reachability
+- concept references, semantic-contract use relations, and requirement reachability
 - SHACL contracts that validate existing requirements
 - controlled-vocabulary tokens used by Markdown metadata, CLI output, API payloads, reports, or validation
 - source traceability, verification links, and existing evidence
@@ -29,7 +29,7 @@ Improve:
 1. Inventory the existing ontology plane before editing.
    - Run `reqvire search --filter-type=ontology --short`.
    - Read the affected `requirements/Ontologies/*.md` files and nearby semantic-contract shape profiles.
-   - Check which capabilities attach the ontology and which requirements inherit it.
+   - Check which elements author concept references to ontology terms and which semantic contracts use the ontology.
 2. Identify the refactoring driver.
    - unclear class hierarchy
    - duplicate or synonym classes
@@ -146,7 +146,7 @@ Examples:
 - an ontology using relation-rule vocabulary should derive from the relation ontology
 - a projection/export ontology can derive from the report or core ontology that defines the reused terms
 
-Do not use capability attachments as a substitute for ontology hierarchy.
+Do not use model-element concept references as a substitute for ontology hierarchy.
 
 ### SHACL Reachability
 

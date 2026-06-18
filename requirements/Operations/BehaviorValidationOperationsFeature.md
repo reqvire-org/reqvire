@@ -14,10 +14,6 @@ Formatting model documents is the capability for normalizing Reqvire Markdown st
   * risk: medium
   * status: approved
 
-#### Attachments
-  * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
-  * [Reqvire Formatting Ontology](../Ontologies/BehaviorValidationOperations.md#reqvire-formatting-ontology)
-
 #### Relations
   * specifiedBy: [Format Consistency Enforcement](Formatting/FormattingRequirements.md#format-consistency-enforcement)
   * specifiedBy: [Formatting Output](Formatting/FormattingRequirements.md#formatting-output)
@@ -39,11 +35,6 @@ Linting model quality is the capability for auditable model quality checks that 
   * risk: medium
   * status: approved
 
-#### Attachments
-  * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
-  * [Reqvire Validation Ontology](../Ontologies/BehaviorValidationOperations.md#reqvire-validation-ontology)
-  * [Reqvire Linting Ontology](../Ontologies/BehaviorValidationOperations.md#reqvire-linting-ontology)
-
 #### Relations
   * specifiedBy: [Model Linting](Linting/LintingRequirements.md#model-linting)
 ---
@@ -63,12 +54,6 @@ Operation requirements define concrete command inputs, validation gates, dry-run
   * priority: high
   * risk: high
   * status: approved
-
-#### Attachments
-  * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
-  * [Reqvire Relation Ontology](../Ontologies/RelationsAndImpact.md#reqvire-relation-ontology)
-  * [Reqvire Validation Ontology](../Ontologies/BehaviorValidationOperations.md#reqvire-validation-ontology)
-  * [Reqvire Operation Ontology](../Ontologies/BehaviorValidationOperations.md#reqvire-operation-ontology)
 
 #### Relations
   * specifiedBy: [Default Requirement Type Assignment](../ModelStructure/ModelManagement.md#default-requirement-type-assignment)
@@ -93,14 +78,6 @@ Validation requirements define when model state is acceptable, when a mutation m
   * priority: high
   * risk: high
   * status: approved
-
-#### Attachments
-  * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
-  * [Reqvire Relation Ontology](../Ontologies/RelationsAndImpact.md#reqvire-relation-ontology)
-  * [Reqvire Requirement Ontology](../Ontologies/CapabilityRequirementModel.md#reqvire-requirement-ontology)
-  * [Reqvire Semantic Contract Ontology](../Ontologies/CapabilityRequirementModel.md#reqvire-semantic-contract-ontology)
-  * [Reqvire Validation Ontology](../Ontologies/BehaviorValidationOperations.md#reqvire-validation-ontology)
-  * [Reqvire Behavior Rule Ontology](../Ontologies/BehaviorValidationOperations.md#reqvire-behavior-rule-ontology)
 
 #### Relations
   * specifiedBy: [Validate Cross-Component Dependencies](Validation/ValidationRequirements.md#validate-cross-component-dependencies)

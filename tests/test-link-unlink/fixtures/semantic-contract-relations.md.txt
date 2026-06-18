@@ -7,8 +7,6 @@ Capability root.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Semantic Ontology](#semantic-ontology)
 ---
 
 ### API Requirement

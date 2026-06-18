@@ -28,7 +28,7 @@ When requested the system shall provide human readable and machine readable Syst
 
 ### Collect Capability and Requirement Context
 
-The system shall collect and consolidate context from a capability or requirement element, including directional capability and requirement traversal, inherited capability ontology context, requirement-owned `refinedBy` targets, attached requirement contract contents, and source citations in text or JSON format.
+The system shall collect and consolidate context from a capability or requirement element, including directional capability and requirement traversal, authored concept references, requirement-owned `refinedBy` targets, attached requirement contract contents, and source citations in text or JSON format.
 
 #### Details
 The system shall define:
@@ -425,7 +425,7 @@ The system shall collect ontology `#### Ontology` and semantic-contract `#### Sh
 #### Details
 The default collection shall expose authored ontology RDF content and semantic-contract SHACL RDF content without changing the Markdown model as the source of truth.
 
-When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, capability-to-ontology attachments, requirement-to-capability specification relations, requirement-to-semantic-contract constraint relations, semantic-contract-to-ontology use relations, ontology hierarchy relations, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts materialized from direct-authored OWL/RDFS/SHACL constructs.
+When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, requirement-to-capability specification relations, requirement-to-semantic-contract constraint relations, semantic-contract-to-ontology use relations, ontology hierarchy relations, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts materialized from direct-authored OWL/RDFS/SHACL constructs.
 
 The collection shall preserve source element identifiers, source file paths, section kind, and line numbers so CLI, Explorer rendering, and downstream semantic tooling can cite the model source of each RDF block.
 

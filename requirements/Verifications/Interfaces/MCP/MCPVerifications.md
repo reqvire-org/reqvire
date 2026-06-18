@@ -109,7 +109,7 @@ Expected checks:
 - Search, read element, model, containment, collect, and submodels tools return data matching Reqvire core reports.
 - Search supports `filter_type=ontology` and returns parsed ontology ADT content.
 - Read element returns `concept_references` for elements that author `#### Concept References`.
-- Collect returns capability-attached ontology context for capability and requirement elements and semantic-contract ontology-use context where the underlying operation returns semantic-contract evidence.
+- Collect returns authored concept references for capability and requirement elements and semantic-contract ontology-use context where the underlying operation returns semantic-contract evidence.
 - Results include evidence references for relevant files, elements, relations, and attachments.
 - Read tools are allowed on dirty worktrees only when the result marks dirty state.
 - Read tools do not mutate the filesystem.
@@ -155,7 +155,7 @@ Expected checks:
 - Mutation tools are present in MCP `tools/list` and accept execution requests only when the server was started with `--enable-mutations`.
 - Operation-specific preview mutation requests, such as `dry_run: true`, return changed files and diffs or equivalent change descriptions without filesystem changes.
 - Non-dry-run requests use Reqvire core mutation logic and flush filesystem changes before reporting success.
-- Non-dry-run mutation requests that would break capability-only ontology attachment compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, or single ontology-root validation are rejected before persistence.
+- Non-dry-run mutation requests that would break requirement attachment compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, or single ontology-root validation are rejected before persistence.
 - After successful mutation, subsequent MCP reads observe the refreshed internal graph state.
 - Post-mutation results include validation summary, refreshed model revision, and affected element/submodel metadata.
 

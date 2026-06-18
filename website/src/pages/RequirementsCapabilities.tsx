@@ -54,7 +54,7 @@ export default function RequirementsCapabilities() {
         <BulletList
           items={[
             "Use capability hierarchy only between capability elements with derive or derivedFrom.",
-            "Attach ontology to a capability to make domain terms reachable to descendant capabilities and specifying requirements.",
+            "Use Concept References when capability prose should bind readable labels to ontology terms.",
             "Create child capabilities when ownership, lifecycle, verification, stakeholder scope, architecture impact, or requirement clusters differ.",
             "Do not create one universal top capability that hides all submodel boundaries.",
           ]}
@@ -71,8 +71,8 @@ API authentication capability and access-token domain context.
   * risk: medium
   * owner: Identity Team
 
-#### Attachments
-  * [Access Token Ontology](../Ontologies/Auth.md#access-token-ontology)
+#### Concept References
+  * Access Token: https://example.org/ontology/auth#AccessToken
 
 #### Relations
   * specifiedBy: [API Access Token Validation](AuthRequirements.md#api-access-token-validation)`}</CodeBlock>
@@ -160,16 +160,18 @@ and signature before the request reaches protected application logic.`}</CodeBlo
 
       <Section title="Attachments as Contracts">
         <p className="text-zinc-600 mb-4">
-          Attachments make cross-boundary context explicit. A capability imports
-          ontology context. A requirement can import a one-way contract dependency
-          from a compatible requirement-owned non-semantic-contract refinement in another subgraph;
-          semantic-contract dependencies use constrainedBy/constrain and use/usedBy instead.
+          Attachments make cross-boundary requirement contracts explicit.
+          Ontology term usage is modeled with concept references. A requirement
+          can import a one-way contract dependency from a compatible
+          requirement-owned non-semantic-contract refinement in another
+          subgraph; semantic-contract dependencies use constrainedBy/constrain
+          and use/usedBy instead.
         </p>
         <DetailGrid
           items={[
             {
-              name: "Capability attachments",
-              desc: "Capabilities attach ontology elements to define reachable semantic context for descendant capabilities and specifying requirements.",
+              name: "Concept references",
+              desc: "Capabilities, requirements, refinements, and verifications bind prose to ontology terms with Concept References.",
             },
             {
               name: "Requirement attachments",
@@ -188,13 +190,13 @@ and signature before the request reaches protected application logic.`}</CodeBlo
         <div className="mt-5">
           <CodeBlock>{`### API Consumer Token Handling
 
-The consumer service shall fulfill the shared access-token validation contract.
+The consumer service shall fulfill the shared access-token validation behavior.
 
 #### Metadata
   * type: requirement
 
 #### Attachments
-  * [Access Token Validation Shape Contract](../Identity/AuthContracts.md#access-token-validation-shape-contract)
+  * [Access Token Validation Behavior](../Identity/AuthBehaviors.md#access-token-validation-behavior)
 
 #### Relations
   * specify: [API Consumer](Consumer.md#api-consumer)`}</CodeBlock>
@@ -284,7 +286,7 @@ reqvire search --filter-owner "Identity Team"`}</CodeBlock>
           <BulletList
             items={[
               "Capabilities holds capability-rooted subgraphs with child capabilities, specifying requirements, and requirement-owned refinements.",
-              "Ontologies holds reusable semantic vocabulary attached by capabilities instead of nested into unrelated capability files.",
+              "Ontologies holds reusable semantic vocabulary referenced by model elements instead of nested into unrelated capability files.",
               "Verifications holds verification elements grouped by domain and linked through verify or verifiedBy.",
               "Folder names are guidance, not schema. Reqvire validates element metadata and graph relations.",
             ]}

@@ -120,7 +120,7 @@ and signature before the request reaches protected application logic.`}</CodeBlo
               ],
               [
                 "Ontologies/",
-                "reusable ontology elements attached by capabilities instead of nested into unrelated capability files.",
+                "reusable ontology elements referenced by model elements instead of nested into unrelated capability files.",
               ],
               [
                 "Verifications/",

@@ -29,7 +29,7 @@ set +e
 EXIT_CODE=$?
 set -e
 if [ $EXIT_CODE -ne 0 ]; then
-  echo "FAILED: valid capability ontology attachment should validate"
+  echo "FAILED: valid requirement-owned refinement attachment model should validate"
   cat /tmp/capability-attachments-valid.out
   exit 1
 fi
@@ -44,7 +44,7 @@ if [ $EXIT_CODE -eq 0 ]; then
   echo "FAILED: requirement attachment to ontology should fail"
   exit 1
 fi
-if grep -qi "Requirement attachments" <<< "$OUTPUT" && grep -qi "ontology" <<< "$OUTPUT"; then
+if grep -qi "not an attachable element" <<< "$OUTPUT" && grep -qi "billing-ontology" <<< "$OUTPUT"; then
   printf "Requirement attachment to ontology is rejected\n" > /tmp/capability-attachments-requirement-ontology-invalid.out
 else
   printf "%s\n" "$OUTPUT" > /tmp/capability-attachments-requirement-ontology-invalid.out
@@ -63,7 +63,7 @@ if [ $EXIT_CODE -eq 0 ]; then
   echo "FAILED: capability attachment to requirement-detail refinement should fail"
   exit 1
 fi
-if grep -qi "Capability attachments may target ontology only" <<< "$OUTPUT"; then
+if grep -qi "cannot author attachments" <<< "$OUTPUT"; then
   printf "Capability attachment to requirement-detail refinement is rejected\n" > /tmp/capability-attachments-capability-invalid.out
 else
   printf "%s\n" "$OUTPUT" > /tmp/capability-attachments-capability-invalid.out

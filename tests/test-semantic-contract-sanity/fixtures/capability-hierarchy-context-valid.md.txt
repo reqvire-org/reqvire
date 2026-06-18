@@ -7,8 +7,6 @@ Billing capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Billing Terms Ontology](#billing-terms-ontology)
 ---
 
 ### Billing Terms Ontology
@@ -41,8 +39,6 @@ Corrective invoice capability.
   * derivedFrom: [Billing Capability](#billing-capability)
   * specifiedBy: [Corrective Invoice Requirement](#corrective-invoice-requirement)
 
-#### Attachments
-  * [Corrective Invoice Ontology](#corrective-invoice-ontology)
 ---
 
 ### Corrective Invoice Ontology

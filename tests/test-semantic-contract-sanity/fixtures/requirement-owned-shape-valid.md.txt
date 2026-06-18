@@ -10,8 +10,6 @@ Access capability.
 #### Relations
   * specifiedBy: [Token Response Requirement](#token-response-requirement)
 
-#### Attachments
-  * [Access Ontology](#access-ontology)
 ---
 
 ### Access Ontology

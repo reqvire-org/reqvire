@@ -18,8 +18,6 @@ A capability for type validation error tests.
 #### Relations
   * specifiedBy: [Test System Requirement](#test-system-requirement)
 
-#### Attachments
-  * [Test Ontology](#test-ontology)
 ---
 
 ### Test System Requirement

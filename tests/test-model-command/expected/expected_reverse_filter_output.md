@@ -24,7 +24,7 @@ graph TD
       458b8fd2c32e6014["Model Structure Exploration"];
       class 458b8fd2c32e6014 systemRequirement;
       click 458b8fd2c32e6014 "specifications/Capabilities.md#model-structure-exploration";
-      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md<br/>📎 Model Command Ontology"];
+      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md"];
       class 8c7466173ee6b05d capability;
       click 8c7466173ee6b05d "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md";
     end
@@ -79,7 +79,7 @@ graph TD
       458b8fd2c32e6014["Model Structure Exploration"];
       class 458b8fd2c32e6014 systemRequirement;
       click 458b8fd2c32e6014 "specifications/Capabilities.md#model-structure-exploration";
-      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md<br/>📎 Model Command Ontology"];
+      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md"];
       class 8c7466173ee6b05d capability;
       click 8c7466173ee6b05d "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md";
     end
@@ -130,7 +130,7 @@ graph TD
       458b8fd2c32e6014["Model Structure Exploration"];
       class 458b8fd2c32e6014 systemRequirement;
       click 458b8fd2c32e6014 "specifications/Capabilities.md#model-structure-exploration";
-      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md<br/>📎 Model Command Ontology"];
+      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md"];
       class 8c7466173ee6b05d capability;
       click 8c7466173ee6b05d "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md";
     end
@@ -185,7 +185,7 @@ graph TD
       458b8fd2c32e6014["Model Structure Exploration"];
       class 458b8fd2c32e6014 systemRequirement;
       click 458b8fd2c32e6014 "specifications/Capabilities.md#model-structure-exploration";
-      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md<br/>📎 Model Command Ontology"];
+      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md"];
       class 8c7466173ee6b05d capability;
       click 8c7466173ee6b05d "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md";
     end
@@ -232,7 +232,7 @@ graph TD
       458b8fd2c32e6014["Model Structure Exploration"];
       class 458b8fd2c32e6014 systemRequirement;
       click 458b8fd2c32e6014 "specifications/Capabilities.md#model-structure-exploration";
-      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md<br/>📎 Model Command Ontology"];
+      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md"];
       class 8c7466173ee6b05d capability;
       click 8c7466173ee6b05d "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md";
     end
@@ -291,7 +291,7 @@ graph TD
       458b8fd2c32e6014["Model Structure Exploration"];
       class 458b8fd2c32e6014 systemRequirement;
       click 458b8fd2c32e6014 "specifications/Capabilities.md#model-structure-exploration";
-      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md<br/>📎 Model Command Ontology"];
+      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md"];
       class 8c7466173ee6b05d capability;
       click 8c7466173ee6b05d "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md";
     end

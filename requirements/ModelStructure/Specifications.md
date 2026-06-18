@@ -10,12 +10,12 @@ Default collection excludes implementation/evidence relations (`satisfiedBy`, `v
 When starting from a `requirement`:
 - UPSTREAM traverses requirement parents through `derivedFrom`, then crosses to the owning capability through `specify` or inherited capability ownership, then traverses parent capabilities through `derivedFrom`.
 - DOWNSTREAM traverses child requirements through `derive` only and does not cross to capabilities.
-- The collected content includes ontology context inherited from the owning capability path, plus each traversed requirement's requirement-detail refinements and requirement-owned contract attachments.
+- The collected content includes authored concept references, plus each traversed requirement's requirement-detail refinements and requirement-owned contract attachments.
 
 When starting from a `capability`:
 - UPSTREAM traverses parent capabilities through `derivedFrom` only and does not include requirements that specify those capabilities.
 - DOWNSTREAM traverses child capabilities through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`.
-- The collected content includes attached ontology context for capability elements, inherited ontology context for descendant capability and requirement elements, requirement-detail refinements, and attachments for requirement elements.
+- The collected content includes authored concept references for capability, descendant capability, and requirement elements, requirement-detail refinements, and attachments for requirement elements.
 
 When starting from an `ontology`:
 - UPSTREAM traverses parent ontology elements through `derivedFrom`.

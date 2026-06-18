@@ -42,9 +42,6 @@ API capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [API Ontology](#api-ontology)
-
 #### Relations
   * specifiedBy: [API Requirement](#api-requirement)
 ---

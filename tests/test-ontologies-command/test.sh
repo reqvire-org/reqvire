@@ -187,8 +187,14 @@ if ! grep -q "urn:reqvire:element:api-capability" <<< "$FULL_TTL_OUTPUT"; then
   exit 1
 fi
 
-if ! grep -q "reqvire:attaches <urn:reqvire:element:api-ontology>" <<< "$FULL_TTL_OUTPUT"; then
-  echo "FAILED: full Turtle output missing capability ontology attachment edge"
+if ! grep -q "reqvire:conceptReference <https://example.test/ontology#ServiceEndpoint>" <<< "$FULL_TTL_OUTPUT"; then
+  echo "FAILED: full Turtle output missing concept-reference term edge"
+  echo "$FULL_TTL_OUTPUT"
+  exit 1
+fi
+
+if grep -q "reqvire:attaches <urn:reqvire:element:api-ontology>" <<< "$FULL_TTL_OUTPUT"; then
+  echo "FAILED: full Turtle output must not contain capability ontology attachment edge"
   echo "$FULL_TTL_OUTPUT"
   exit 1
 fi

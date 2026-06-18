@@ -16,9 +16,6 @@ API capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [API Ontology](#api-ontology)
-
 #### Relations
   * specifiedBy: [API Requirement](#api-requirement)
 ---
@@ -142,9 +139,6 @@ API capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [API Ontology](#api-ontology)
-
 #### Relations
   * specifiedBy: [API Requirement](#api-requirement)
 ---
@@ -195,9 +189,6 @@ API capability.
 
 #### Metadata
   * type: capability
-
-#### Attachments
-  * [API Ontology](#api-ontology)
 
 #### Relations
   * specifiedBy: [API Requirement](#api-requirement)
@@ -258,7 +249,11 @@ The system shall publish service endpoint contracts.
   * specify: [API Capability](#api-capability)
 ---
 EOF
-assert_invalid_model "Concept reference outside context"
+if ! (cd "$TEST_DIR" && "$REQVIRE_BIN" validate > /tmp/concept-references-global-context-valid.out 2>&1); then
+  echo "FAILED: concept reference to any declared ontology term should validate"
+  cat /tmp/concept-references-global-context-valid.out
+  exit 1
+fi
 
 rm -rf "${TEST_DIR}/specifications"
 mkdir -p "${TEST_DIR}/specifications"
@@ -288,5 +283,55 @@ testonto:ServiceEndpoint a owl:Class .
 ---
 EOF
 assert_invalid_model "must not contain a #### Concept References section"
+
+rm -rf "${TEST_DIR}/specifications"
+mkdir -p "${TEST_DIR}/specifications"
+cat > "${TEST_DIR}/specifications/ConceptReferences.md" << 'EOF'
+# Elements
+
+### API Ontology
+
+API ontology terms.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
+
+#### Ontology
+```turtle
+@prefix testonto: <https://example.test/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/ontology> a owl:Ontology .
+testonto:ServiceEndpoint a owl:Class .
+```
+---
+
+### API Shape
+
+API shape.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Concept References
+  * Service Endpoint: https://example.test/ontology#ServiceEndpoint
+
+#### Relations
+  * use: [API Ontology](#api-ontology)
+
+#### Shapes
+```turtle
+@prefix testonto: <https://example.test/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+testonto:EndpointShape
+  a sh:NodeShape ;
+  sh:targetClass testonto:ServiceEndpoint .
+```
+---
+EOF
+assert_invalid_model "Semantic contract element 'API Shape' must not contain a #### Concept References section"
 
 exit 0

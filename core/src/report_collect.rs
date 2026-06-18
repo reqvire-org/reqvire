@@ -40,7 +40,7 @@ pub enum SourceType {
     AttachmentFile,
     /// Content from an attached refinement element
     AttachmentElement,
-    /// Content from ontology context reachable through capability attachments
+    /// Authored concept references and reachable semantic context
     OntologyContext,
 }
 
@@ -192,13 +192,8 @@ pub fn generate_collect_report(
                 }
             }
 
-            let ontology_context = if elem.element_type.is_capability() {
-                registry.build_capability_ontology_context(&elem.identifier)
-            } else if elem.element_type.is_requirement() {
-                registry.build_requirement_ontology_context(&elem.identifier)
-            } else {
-                Vec::new()
-            };
+            let ontology_context =
+                registry.build_concept_reference_ontology_context(&elem.identifier);
 
             for ontology_id in ontology_context {
                 if !collected_ontology_context.insert(ontology_id.clone()) {
