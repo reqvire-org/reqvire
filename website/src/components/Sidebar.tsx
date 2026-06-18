@@ -66,8 +66,8 @@ export function Sidebar() {
           to="/"
           className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-all duration-150 ${
             isActive("/")
-              ? "bg-white/[0.06] text-white border-l-[3px] border-blue-500"
-              : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200 border-l-[3px] border-transparent"
+              ? "bg-white/[0.06] text-white"
+              : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
           }`}
           onClick={() => setMobileOpen(false)}
         >
@@ -86,8 +86,8 @@ export function Sidebar() {
                   to={item.href}
                   className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-all duration-150 ${
                     isActive(item.href)
-                      ? "bg-white/[0.06] text-white border-l-[3px] border-blue-500"
-                      : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200 border-l-[3px] border-transparent"
+                      ? "bg-white/[0.06] text-white"
+                      : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
                   }`}
                   onClick={() => setMobileOpen(false)}
                 >
