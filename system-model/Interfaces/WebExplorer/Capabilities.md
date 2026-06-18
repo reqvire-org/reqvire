@@ -35,9 +35,30 @@ Implementation details shall follow the associated contract specifications.
 
 #### Relations
   * definedBy: [Serve Command Contract Specification](Specifications.md#serve-command-contract-specification)
+  * derive: [Serve Command Embedded MCP Endpoint](#serve-command-embedded-mcp-endpoint)
   * derivedFrom: [Web Interface](../InterfacesRequirements.md#web-interface)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [serve.rs](../../../cli/src/serve.rs)
+  * verifiedBy: [Serve Command Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#serve-command-verification)
+---
+
+### Serve Command Embedded MCP Endpoint
+
+The system shall allow the Explorer serve command to expose the Reqvire MCP Streamable HTTP endpoint at `/mcp` on the same HTTP listener when explicitly enabled.
+
+#### Details
+When enabled, the embedded MCP endpoint shall reuse the normal Reqvire MCP tool registry, transport behavior, and mutation gating while preserving Explorer SPA routing for non-MCP paths.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
+  * derivedFrom: [Serve Command](#serve-command)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
+  * satisfiedBy: [serve.rs](../../../cli/src/serve.rs)
+  * verifiedBy: [Embedded MCP Serve Endpoint Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#embedded-mcp-serve-endpoint-verification)
   * verifiedBy: [Serve Command Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#serve-command-verification)
 ---
 
@@ -400,4 +421,3 @@ The system shall ensure color consistency between:
   * satisfiedBy: [ReusedContractContextList.tsx](../../../explorer/design-system/product-patterns/detail/ReusedContractContextList.tsx)
   * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
 ---
-

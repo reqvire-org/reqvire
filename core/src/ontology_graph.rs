@@ -11,6 +11,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 const GRAPH_LAYER_AUTHORED: &str = "authored";
 const GRAPH_LAYER_REQVIRE_CONTEXT: &str = "reqvire-context";
+const GRAPH_LAYER_EXTERNAL_SOURCE: &str = "external-source";
 const GRAPH_SOURCE_ONTOLOGY: &str = "ontology";
 const GRAPH_SOURCE_SHAPE: &str = "shape";
 const GRAPH_SOURCE_EXTERNAL_ONTOLOGY: &str = "external-ontology";
@@ -202,13 +203,15 @@ pub struct OntologyGraphEdge {
 pub fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
     let mut nodes: BTreeMap<String, OntologyGraphNode> = BTreeMap::new();
     let mut edges: BTreeSet<OntologyGraphEdge> = BTreeSet::new();
+    let all_blocks: Vec<SemanticBlock> = report
+        .blocks
+        .iter()
+        .cloned()
+        .chain(report.external_blocks.iter().cloned())
+        .collect();
+    let (_, rdf_list_values) = collect_rdf_lists(&all_blocks);
 
-    add_graph_data_from_blocks(
-        &report.blocks,
-        GRAPH_LAYER_AUTHORED,
-        &mut nodes,
-        &mut edges,
-    );
+    add_graph_data_from_blocks(&report.blocks, GRAPH_LAYER_AUTHORED, &mut nodes, &mut edges);
     add_graph_data_from_blocks(
         &report.external_blocks,
         GRAPH_LAYER_EXTERNAL_SOURCE,
@@ -218,7 +221,7 @@ pub fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
 
     apply_blank_node_labels(&mut nodes);
     populate_construct_metadata(&mut nodes, &mut edges, report);
-    apply_shape_slot_facets(&mut nodes, report, &rdf_list_values);
+    apply_shape_slot_facets(&mut nodes, &all_blocks, &rdf_list_values);
     add_model_context_layer(&mut nodes, &mut edges, report);
     promote_typed_named_individuals(&mut nodes);
 
@@ -287,7 +290,8 @@ fn add_graph_data_from_blocks(
 ) {
     let internal_property_shapes = collect_internal_property_shapes(blocks);
     let (rdf_list_nodes, rdf_list_values) = collect_rdf_lists(blocks);
-    let primary_blank_nodes = collect_primary_blank_nodes(blocks, &internal_property_shapes, &rdf_list_nodes);
+    let primary_blank_nodes =
+        collect_primary_blank_nodes(blocks, &internal_property_shapes, &rdf_list_nodes);
 
     for block in blocks {
         for quad in &block.quads {
@@ -402,7 +406,8 @@ fn add_graph_data_from_blocks(
                 }
                 Term::BlankNode(node) => {
                     let target_id = node.to_string();
-                    if predicate == SH_PROPERTY && internal_property_shapes.contains_key(&target_id) {
+                    if predicate == SH_PROPERTY && internal_property_shapes.contains_key(&target_id)
+                    {
                         continue;
                     }
                     if rdf_list_nodes.contains(&target_id) {
@@ -433,10 +438,6 @@ fn add_graph_data_from_blocks(
         }
     }
 }
-
-let _ = {
-    use crate as _;
-};
 
 fn add_model_context_layer(
     nodes: &mut BTreeMap<String, OntologyGraphNode>,
@@ -514,9 +515,9 @@ fn insert_semantic_context_node(
         });
 }
 
-fn collect_internal_property_shapes(report: &SemanticIndex) -> BTreeMap<String, String> {
+fn collect_internal_property_shapes(blocks: &[SemanticBlock]) -> BTreeMap<String, String> {
     let mut property_shapes = BTreeMap::new();
-    for block in &report.blocks {
+    for block in blocks {
         for quad in &block.quads {
             if quad.predicate.as_str() != SH_PROPERTY {
                 continue;
@@ -531,7 +532,7 @@ fn collect_internal_property_shapes(report: &SemanticIndex) -> BTreeMap<String, 
 
 fn apply_shape_slot_facets(
     nodes: &mut BTreeMap<String, OntologyGraphNode>,
-    report: &SemanticIndex,
+    blocks: &[SemanticBlock],
     rdf_list_values: &BTreeMap<String, Vec<String>>,
 ) {
     let mut target_classes: BTreeMap<String, Vec<OntologyGraphTermRef>> = BTreeMap::new();
@@ -539,7 +540,7 @@ fn apply_shape_slot_facets(
         BTreeMap::new();
     let mut property_shape_quads: BTreeMap<String, Vec<(String, Term)>> = BTreeMap::new();
 
-    for block in &report.blocks {
+    for block in blocks {
         for quad in &block.quads {
             let predicate = quad.predicate.as_str();
             let subject = subject_id(&quad.subject);
@@ -688,12 +689,14 @@ fn slot_facet_value(
     })
 }
 
-fn collect_rdf_lists(report: &SemanticIndex) -> (BTreeSet<String>, BTreeMap<String, Vec<String>>) {
+fn collect_rdf_lists(
+    blocks: &[SemanticBlock],
+) -> (BTreeSet<String>, BTreeMap<String, Vec<String>>) {
     let mut list_nodes = BTreeSet::new();
     let mut first_values = BTreeMap::new();
     let mut rest_targets = BTreeMap::new();
 
-    for block in &report.blocks {
+    for block in blocks {
         for quad in &block.quads {
             let subject = subject_id(&quad.subject);
             match quad.predicate.as_str() {
@@ -749,12 +752,12 @@ fn collect_rdf_lists(report: &SemanticIndex) -> (BTreeSet<String>, BTreeMap<Stri
 }
 
 fn collect_primary_blank_nodes(
-    report: &SemanticIndex,
+    blocks: &[SemanticBlock],
     internal_property_shapes: &BTreeMap<String, String>,
     rdf_list_nodes: &BTreeSet<String>,
 ) -> BTreeMap<String, &'static str> {
     let mut blank_nodes = BTreeMap::new();
-    for block in &report.blocks {
+    for block in blocks {
         for quad in &block.quads {
             if quad.predicate.as_str() != RDF_TYPE {
                 continue;
@@ -783,15 +786,6 @@ fn collect_primary_blank_nodes(
         }
     }
     blank_nodes
-}
-
-fn ensure_node(
-    nodes: &mut BTreeMap<String, OntologyGraphNode>,
-    id: &str,
-    node_type: &str,
-    block: &SemanticBlock,
-) {
-    ensure_node_with_layer(nodes, id, node_type, GRAPH_LAYER_AUTHORED, block)
 }
 
 fn ensure_node_with_layer(
@@ -1656,7 +1650,10 @@ fn source_html_link(source: &str, file_path: &str) -> String {
     } else {
         source
     };
-    target.replace(".md", ".html")
+    if target.is_empty() || target.starts_with("http://") || target.starts_with("https://") {
+        return target.to_string();
+    }
+    format!("#/content/{target}")
 }
 
 fn record_type_evidence(node: &mut OntologyGraphNode, term: &Term, block: &SemanticBlock) {
@@ -2008,4 +2005,28 @@ fn is_blank_node_id(id: &str) -> bool {
 
 fn is_datatype_iri(iri: &str) -> bool {
     owl_reserved::is_builtin_datatype_iri(iri) || iri == RDFS_DATATYPE
+}
+
+#[cfg(test)]
+mod tests {
+    use super::source_html_link;
+
+    #[test]
+    fn source_html_link_routes_markdown_identifiers_to_explorer_content() {
+        assert_eq!(
+            source_html_link(
+                "system-model/Interfaces/MCP/Specifications.md#mcp-tool-side-effect-classification-specification",
+                "system-model/Interfaces/MCP/Specifications.md",
+            ),
+            "#/content/system-model/Interfaces/MCP/Specifications.md#mcp-tool-side-effect-classification-specification"
+        );
+    }
+
+    #[test]
+    fn source_html_link_uses_file_path_when_source_is_not_a_markdown_identifier() {
+        assert_eq!(
+            source_html_link("reqvire:Requirement", "system-model/Ontologies/Core.md"),
+            "#/content/system-model/Ontologies/Core.md"
+        );
+    }
 }

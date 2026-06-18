@@ -50,16 +50,17 @@ struct ReqvireMcpServer {
 }
 
 impl ReqvireMcpServer {
-    fn new(
+    fn new_with_write_lock(
         enable_mutations: bool,
         with_size_estimates: bool,
         excluded_filename_patterns: &GlobSet,
+        write_lock: Arc<Mutex<()>>,
     ) -> Self {
         Self {
             enable_mutations,
             with_size_estimates,
             excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
-            write_lock: Arc::new(Mutex::new(())),
+            write_lock,
         }
     }
 
@@ -255,21 +256,11 @@ pub async fn serve_http(
         ReqvireError::ProcessError(format!("Failed to start MCP HTTP server: {}", e))
     })?;
 
-    let server = ReqvireMcpServer::new(
+    let app = router(
         enable_mutations,
         with_size_estimates,
         excluded_filename_patterns,
     );
-    let service: StreamableHttpService<ReqvireMcpServer, LocalSessionManager> =
-        StreamableHttpService::new(
-            move || Ok(server.clone()),
-            LocalSessionManager::default().into(),
-            StreamableHttpServerConfig::default()
-                .with_allowed_origins(loopback_allowed_origins())
-                .with_stateful_mode(false)
-                .with_json_response(true),
-        );
-    let app = axum::Router::new().nest_service("/mcp", service);
 
     eprintln!("MCP HTTP server listening at http://{}/mcp", addr);
 
@@ -281,6 +272,62 @@ pub async fn serve_http(
         .map_err(|e| ReqvireError::ProcessError(format!("MCP HTTP server error: {}", e)))?;
 
     Ok(())
+}
+
+pub(crate) fn router(
+    enable_mutations: bool,
+    with_size_estimates: bool,
+    excluded_filename_patterns: &GlobSet,
+) -> axum::Router {
+    router_with_write_lock(
+        enable_mutations,
+        with_size_estimates,
+        excluded_filename_patterns,
+        Arc::new(Mutex::new(())),
+    )
+}
+
+pub(crate) fn router_with_write_lock(
+    enable_mutations: bool,
+    with_size_estimates: bool,
+    excluded_filename_patterns: &GlobSet,
+    write_lock: Arc<Mutex<()>>,
+) -> axum::Router {
+    mount_service(
+        axum::Router::new(),
+        enable_mutations,
+        with_size_estimates,
+        excluded_filename_patterns,
+        write_lock,
+    )
+}
+
+pub(crate) fn mount_service<S>(
+    router: axum::Router<S>,
+    enable_mutations: bool,
+    with_size_estimates: bool,
+    excluded_filename_patterns: &GlobSet,
+    write_lock: Arc<Mutex<()>>,
+) -> axum::Router<S>
+where
+    S: Clone + Send + Sync + 'static,
+{
+    let server = ReqvireMcpServer::new_with_write_lock(
+        enable_mutations,
+        with_size_estimates,
+        excluded_filename_patterns,
+        write_lock,
+    );
+    let service: StreamableHttpService<ReqvireMcpServer, LocalSessionManager> =
+        StreamableHttpService::new(
+            move || Ok(server.clone()),
+            LocalSessionManager::default().into(),
+            StreamableHttpServerConfig::default()
+                .with_allowed_origins(loopback_allowed_origins())
+                .with_stateful_mode(false)
+                .with_json_response(true),
+        );
+    router.nest_service("/mcp", service)
 }
 
 fn loopback_allowed_origins() -> [&'static str; 6] {

@@ -106,7 +106,8 @@ Semantic model evidence rules:
 - `reqvire.semantic.ontologies` accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`.
 - `reqvire.semantic.ontologies` accepts optional `content` with values `rdf`, `shacl`, or `both`; omitted content defaults to `both`.
 - `reqvire.semantic.ontologies` accepts optional `full` boolean; omitted or false returns generated ontology document declarations plus authored ontology and SHACL artifacts, while true also includes generated Reqvire model context triples and ontology projection facts. Generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors.
-- `reqvire.semantic.ontologies` returns selected serialized semantic content, effective content filter, semantic index summary, collected block metadata, diagnostics, generated ontology document declarations, ontology term declarations, and SHACL shape references.
+- `reqvire.semantic.ontologies` accepts optional `include_external` boolean; omitted or false excludes local `#### External Ontology` source triples, while true includes parsed local external ontology source triples in the serialized semantic content.
+- `reqvire.semantic.ontologies` returns selected serialized semantic content, effective content filter, effective `include_external` state, semantic index summary, collected block metadata, diagnostics, generated ontology document declarations, ontology term declarations, and SHACL shape references.
 - `reqvire.semantic.prefixes` returns ontology element-defined prefixes, namespaces, source provenance, source prose content, and a reusable SPARQL prefix block.
 - `reqvire.semantic.vocabulary` returns compact paged semantic vocabulary with prefixes included in every response for SPARQL query construction.
 - `reqvire.semantic.sparql` executes SPARQL against the same semantic collection used by `reqvire.semantic.ontologies`.
@@ -463,6 +464,33 @@ Command behavior:
   * define: [MCP Server Command](Tools.md#mcp-server-command)
 ---
 
+### Serve Command Embedded MCP Endpoint Specification
+
+The Explorer serve command is expected to optionally mount the same Reqvire MCP Streamable HTTP service on the Explorer HTTP listener.
+
+#### Details
+Embedded MCP behavior:
+- `reqvire serve` starts the Explorer HTTP server only and does not expose MCP by default.
+- `reqvire serve --enable-mcp` mounts the Reqvire MCP Streamable HTTP service at `/mcp` on the same host and port as the Explorer server.
+- `reqvire serve --enable-mcp --mcp-enable-mutations` enables MCP mutation tools for the embedded `/mcp` endpoint.
+- `reqvire serve --enable-mcp --enable-mutations` is accepted as an alias form for enabling mutation tools on the embedded `/mcp` endpoint.
+- `--mcp-enable-mutations` and its `--enable-mutations` alias require `--enable-mcp`; mutation tools are not advertised or executable for embedded MCP unless both capabilities are present.
+- The embedded `/mcp` endpoint reuses the same MCP adapter, shared Reqvire tool registry, RMCP Streamable HTTP transport configuration, allowed-origin policy, stateless JSON response mode, and mutation serialization behavior as `reqvire mcp`.
+- The embedded MCP endpoint uses the current serve workspace and excluded-file-pattern configuration.
+- After embedded MCP mutations, the served Explorer runtime data endpoints rebuild `assets/project-store.js` and `ontologies.ttl` from the current workspace on subsequent requests so browser reloads observe the updated model datastore.
+- Explorer runtime data rebuilds and embedded MCP mutation execution share a workspace lock so runtime data generation does not read partially written model files.
+- Runtime data responses for `assets/project-store.js` and `ontologies.ttl` use no-store cache control so clients do not reuse stale generated datastores after mutation.
+- The Explorer SPA fallback must not handle `/mcp` requests when embedded MCP is enabled.
+- Embedded MCP startup is a server startup concern; it must not expose `reqvire.serve` or `reqvire.mcp` as MCP tools.
+- Non-local exposure of an embedded `/mcp` endpoint requires an explicit deployment-layer authentication and authorization decision; enabling embedded MCP only starts the in-process endpoint.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Serve Command Embedded MCP Endpoint](../WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
+---
+
 ### MCP Server State and Cache Specification
 
 The MCP server is expected to cache parsed model state only as a performance optimization.
@@ -798,4 +826,3 @@ These tools are read-only and must not mutate the model.
 #### Relations
   * define: [MCP Workspace Session Tools](Tools.md#mcp-workspace-session-tools)
 ---
-

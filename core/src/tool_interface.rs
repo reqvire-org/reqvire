@@ -260,6 +260,10 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                     json!({ "type": "string", "enum": ["rdf", "shacl", "both"], "default": "both" }),
                 ),
                 ("full", json!({ "type": "boolean", "default": false })),
+                (
+                    "include_external",
+                    json!({ "type": "boolean", "default": false }),
+                ),
             ]),
         ),
         read_tool(
@@ -809,50 +813,59 @@ fn ontologies_tool(
     let format = string_arg(args, "format").unwrap_or_else(|| "turtle".to_string());
     let content_filter = ontology_content_filter(args)?;
     let full = bool_arg(args, "full", false);
-    let index = filtered_semantic_index(&semantic_store.index, content_filter);
-    match format.as_str() {
+    let include_external = bool_arg(args, "include_external", false);
+
+    let mut serializable_index = filtered_semantic_index(&semantic_store.index, content_filter);
+    if !include_external {
+        serializable_index.external_blocks.clear();
+    }
+
+    let (format_name, export_format) = match format.as_str() {
+        "turtle" => ("turtle", SemanticExportFormat::Turtle),
+        "jsonld" => ("jsonld", SemanticExportFormat::JsonLd),
+        other => {
+            return Err(ReqvireError::ProcessError(format!(
+                "Invalid ontology format '{}'. Valid values: turtle, jsonld",
+                other
+            )))
+        }
+    };
+    let content =
+        serializable_index.serialize_with_options(export_format, full, include_external)?;
+
+    match format_name {
         "turtle" => Ok(json!({
-            "format": "turtle",
+            "format": format_name,
             "content_filter": content_filter.as_str(),
+            "include_external": include_external,
             "full": full,
-            "content": if full {
-                index.serialize_full(SemanticExportFormat::Turtle)?
-            } else {
-                index.serialize(SemanticExportFormat::Turtle)?
-            },
-            "summary": index.summary,
-            "blocks": index.blocks,
-            "diagnostics": index.diagnostics,
-            "ontology_documents": index.ontology_documents,
-            "ontology_declarations": index.ontology_declarations,
-            "shape_references": index.shape_references
+            "content": content,
+            "summary": serializable_index.summary,
+            "blocks": serializable_index.blocks,
+            "diagnostics": serializable_index.diagnostics,
+            "ontology_documents": serializable_index.ontology_documents,
+            "ontology_declarations": serializable_index.ontology_declarations,
+            "shape_references": serializable_index.shape_references
         })),
         "jsonld" => {
-            let content = if full {
-                index.serialize_full(SemanticExportFormat::JsonLd)?
-            } else {
-                index.serialize(SemanticExportFormat::JsonLd)?
-            };
             let jsonld: Value = serde_json::from_str(&content)
                 .map_err(|e| ReqvireError::SerializationError(e.to_string()))?;
             Ok(json!({
-                "format": "jsonld",
+                "format": format_name,
                 "content_filter": content_filter.as_str(),
+                "include_external": include_external,
                 "full": full,
                 "content": content,
                 "jsonld": jsonld,
-                "summary": index.summary,
-                "blocks": index.blocks,
-                "diagnostics": index.diagnostics,
-                "ontology_documents": index.ontology_documents,
-                "ontology_declarations": index.ontology_declarations,
-                "shape_references": index.shape_references
+                "summary": serializable_index.summary,
+                "blocks": serializable_index.blocks,
+                "diagnostics": serializable_index.diagnostics,
+                "ontology_documents": serializable_index.ontology_documents,
+                "ontology_declarations": serializable_index.ontology_declarations,
+                "shape_references": serializable_index.shape_references
             }))
         }
-        other => Err(ReqvireError::ProcessError(format!(
-            "Invalid ontology format '{}'. Valid values: turtle, jsonld",
-            other
-        ))),
+        _ => unreachable!(),
     }
 }
 
@@ -1102,7 +1115,8 @@ fn semantic_prefix_source_content(content: &str) -> String {
 
     for line in content.lines() {
         if let Some(section) = line.trim().strip_prefix("#### ") {
-            skip_semantic_section = matches!(section.trim(), "Ontology" | "Shapes");
+            skip_semantic_section =
+                matches!(section.trim(), "Ontology" | "Shapes" | "External Ontology");
             if skip_semantic_section {
                 continue;
             }

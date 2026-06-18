@@ -165,6 +165,10 @@ ontologies_full_request() {
   jq -n -c '{jsonrpc:"2.0",id:16,method:"tools/call",params:{name:"reqvire.semantic.ontologies",arguments:{full:true}}}'
 }
 
+ontologies_include_external_request() {
+  jq -n -c '{jsonrpc:"2.0",id:29,method:"tools/call",params:{name:"reqvire.semantic.ontologies",arguments:{include_external:true}}}'
+}
+
 ontologies_rdf_request() {
   jq -n -c '{jsonrpc:"2.0",id:20,method:"tools/call",params:{name:"reqvire.semantic.ontologies",arguments:{content:"rdf"}}}'
 }
@@ -234,6 +238,22 @@ format_fix_rejected_request() {
 
 cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/specifications" "$TEST_DIR/"
 cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/docs" "$TEST_DIR/"
+mkdir -p "$TEST_DIR/specifications/references"
+cat > "$TEST_DIR/specifications/references/mcp-external.ttl" <<'EOF'
+@prefix ext: <https://example.test/mcp-external#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://example.test/mcp-external> a owl:Ontology ;
+  rdfs:label "MCP external test vocabulary" .
+
+ext:ExternalResource a owl:Class ;
+  rdfs:label "MCP external resource" .
+
+ext:ExternalCode a rdfs:Datatype ;
+  rdfs:label "MCP external code datatype" .
+EOF
+
 cat >> "$TEST_DIR/specifications/Requirements.md" <<'EOF'
 
 ### MCP Semantic Capability
@@ -255,6 +275,13 @@ Access token ontology for MCP semantic evidence.
   * type: ontology
   * ontology_base: https://example.test/ontology
   * ontology_prefix: testonto
+
+#### External Ontology
+  * prefix: ext
+  * namespace: https://example.test/mcp-external#
+  * resource: https://example.test/mcp-external
+  * source: references/mcp-external.ttl
+  * format: turtle
 
 #### Ontology
 ```turtle
@@ -288,6 +315,7 @@ mcp:testContractRelationRule a reqvire:RelationRule ;
   reqvire:relationDirection "forward" ;
   reqvire:allowedSourceType "requirement" ;
   reqvire:allowedTargetType "contract" .
+mcp:code a owl:DatatypeProperty .
 ```
 ---
 
@@ -345,6 +373,7 @@ MCP access token shape contract.
 #### Shapes
 ```turtle
 @prefix mcp: <urn:reqvire:test:mcp:> .
+@prefix ext: <https://example.test/mcp-external#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
 mcp:AccessTokenShape
@@ -352,6 +381,10 @@ mcp:AccessTokenShape
   sh:targetClass mcp:AccessToken ;
   sh:property [
     sh:path mcp:subject ;
+  ] ;
+  sh:property [
+    sh:path mcp:code ;
+    sh:datatype ext:ExternalCode ;
   ] .
 ```
 ---
@@ -403,7 +436,8 @@ run_http_mcp_sequence "$DEFAULT_PORT" "$DEFAULT_OUTPUT" \
   "$(prompts_list_request)" \
   "$(semantic_query_prompt_request)" \
   "$(workflow_explore_prompt_request)" \
-  "$(unknown_prompt_request)" || fail "default MCP HTTP request sequence failed"
+  "$(unknown_prompt_request)" \
+  "$(ontologies_include_external_request)" || fail "default MCP HTTP request sequence failed"
 stop_http_mcp
 trap - EXIT
 
@@ -425,6 +459,7 @@ assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.comm
 assert_jq_line "$DEFAULT_OUTPUT" 2 'all(.result.tools[]; (.name|type=="string") and (.description|type=="string") and (.inputSchema.type=="object") and (.outputSchema|type=="object") and (.annotations|type=="object"))' "each tool has MCP tool contract fields"
 assert_jq_line "$DEFAULT_OUTPUT" 2 'all(.result.tools[]; ((.inputSchema.properties // {}) | has("json") | not) and ((.inputSchema.properties // {}) | has("output") | not))' "tool schemas omit CLI transport options"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.search") | .inputSchema.properties | has("filter_status") and has("filter_priority") and has("filter_risk") and has("filter_owner")' "search tool schema advertises governance metadata filters"
+assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.semantic.ontologies") | .inputSchema.properties.include_external.default == false' "semantic ontologies schema advertises include_external flag"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.format") | .annotations.readOnlyHint == true and .inputSchema.properties.fix.enum == [false]' "format is preview-only in default mode"
 
 assert_jq_line "$DEFAULT_OUTPUT" 3 '[.result.resources[].uri] | index("reqvire://workspace/status") != null' "resources/list exposes workspace status"
@@ -444,6 +479,7 @@ assert_jq_line "$DEFAULT_OUTPUT" 12 '.result.structuredContent.files[]?.elements
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.format == "turtle" and .result.structuredContent.content_filter == "both" and (.result.structuredContent.content | contains("mcp:AccessToken")) and (.result.structuredContent.content | contains("mcp:AccessTokenShape"))' "semantic ontologies tool returns Turtle semantic content"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.summary.ontology_blocks >= 1 and .result.structuredContent.summary.shape_blocks >= 1' "ontologies tool returns semantic index summary"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.blocks[] | select(.source_name=="MCP Access Token Ontology" and .kind=="ontology")' "ontologies tool returns ontology block metadata"
+assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.include_external == false and (.result.structuredContent.content | contains("MCP external resource") | not) and (.result.structuredContent.content | contains("MCP external code datatype") | not)' "semantic ontologies default excludes external source triples"
 assert_jq_line "$DEFAULT_OUTPUT" 14 '.result.structuredContent.format == "jsonld" and (.result.structuredContent.jsonld | type == "array") and (.result.structuredContent.jsonld | length) > 0' "ontologies tool returns JSON-LD semantic content"
 assert_jq_line "$DEFAULT_OUTPUT" 15 '.result.structuredContent.full == true and (.result.structuredContent.content | contains("reqvire:conceptReference")) and (.result.structuredContent.content | contains("urn:reqvire:element:mcp-semantic-requirement")) and (.result.structuredContent.content | contains("reqvire:OntologyProjectionGraph"))' "ontologies tool returns full model context triples and ontology projection facts"
 assert_jq_line "$DEFAULT_OUTPUT" 16 '.result.structuredContent.result_type == "select" and .result.structuredContent.full == true and .result.structuredContent.row_count == 1 and .result.structuredContent.variables == ["requirement","verification","relation"]' "sparql tool returns SELECT result metadata"
@@ -465,6 +501,7 @@ assert_jq_line "$DEFAULT_OUTPUT" 24 '.result.prompts[] | select(.name=="reqvire.
 assert_jq_line "$DEFAULT_OUTPUT" 25 '.result.messages[0].role == "user" and (.result.messages[0].content.text | contains("reqvire.semantic.vocabulary") and contains("reqvire.semantic.prefixes") and contains("reqvire.semantic.sparql") and contains("Client arguments"))' "prompts/get returns semantic query guidance"
 assert_jq_line "$DEFAULT_OUTPUT" 26 '.result.messages[0].role == "user" and (.result.messages[0].content.text | contains("reqvire.workspace_status") and contains("reqvire.search") and contains("reqvire.read_element"))' "prompts/get returns regular Reqvire workflow guidance"
 assert_jq_line "$DEFAULT_OUTPUT" 27 '.error.code == -32602 and (.error.data.message | contains("Unknown MCP prompt"))' "unknown prompt returns protocol error"
+assert_jq_line "$DEFAULT_OUTPUT" 28 '.result.structuredContent.include_external == true and (.result.structuredContent.content | contains("MCP external resource")) and (.result.structuredContent.content | contains("MCP external code datatype")) and (.result.structuredContent.content | contains("<https://example.test/mcp-external#ExternalResource>"))' "semantic ontologies include_external includes external source triples"
 
 UNSUPPORTED_PORT="$(pick_port)"
 UNSUPPORTED_OUTPUT_PREFIX="$TEST_DIR/output/mcp-unsupported-protocol"

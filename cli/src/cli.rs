@@ -52,7 +52,7 @@ pub struct Args {
 pub enum Commands {
     /// Serve the embedded Explorer UI via HTTP server
     #[clap(
-        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>          Bind address (default: localhost)\n      --port <PORT>          Server port (default: 8080)"
+        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>              Bind address (default: localhost)\n      --port <PORT>              Server port (default: 8080)\n      --enable-mcp               Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --mcp-enable-mutations     Advertise and allow mutation tools on the embedded MCP endpoint\n      --enable-mutations         Alias for --mcp-enable-mutations"
     )]
     Serve {
         /// Bind address
@@ -62,6 +62,19 @@ pub enum Commands {
         /// Server port
         #[clap(long, default_value = "8080", help_heading = "SERVE OPTIONS")]
         port: u16,
+
+        /// Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp
+        #[clap(long, help_heading = "SERVE OPTIONS")]
+        enable_mcp: bool,
+
+        /// Advertise and allow mutation tools on the embedded MCP endpoint
+        #[clap(
+            long,
+            visible_alias = "enable-mutations",
+            requires = "enable_mcp",
+            help_heading = "SERVE OPTIONS"
+        )]
+        mcp_enable_mutations: bool,
     },
 
     /// Export the Explorer SPA as a static site to a directory
@@ -1580,7 +1593,12 @@ pub async fn handle_command(
 
             Ok(0)
         }
-        Some(Commands::Serve { host, port }) => {
+        Some(Commands::Serve {
+            host,
+            port,
+            enable_mcp,
+            mcp_enable_mutations,
+        }) => {
             // Enable quiet mode for serve command runtime generation.
             reqvire::utils::enable_quiet_mode();
 
@@ -1589,7 +1607,15 @@ pub async fn handle_command(
 
             // Start HTTP server (runs until Ctrl-C)
             info!("Starting HTTP server at http://{}:{}/", host, port);
-            serve::serve_explorer(explorer_assets, &host, port).await?;
+            serve::serve_explorer(
+                explorer_assets,
+                &host,
+                port,
+                enable_mcp,
+                mcp_enable_mutations,
+                excluded_filename_patterns,
+            )
+            .await?;
 
             Ok(0)
         }
@@ -2560,7 +2586,35 @@ mod tests {
         let args = Args::parse_from(&["reqvire", "serve", "--host", "127.0.0.1", "--port", "9000"]);
         assert!(matches!(
             args.command,
-            Some(Commands::Serve { host, port }) if host == "127.0.0.1" && port == 9000
+            Some(Commands::Serve { host, port, enable_mcp, mcp_enable_mutations })
+                if host == "127.0.0.1" && port == 9000 && !enable_mcp && !mcp_enable_mutations
+        ));
+    }
+
+    #[test]
+    fn parses_serve_with_embedded_mcp() {
+        let args =
+            Args::parse_from(&["reqvire", "serve", "--enable-mcp", "--mcp-enable-mutations"]);
+        assert!(matches!(
+            args.command,
+            Some(Commands::Serve {
+                enable_mcp: true,
+                mcp_enable_mutations: true,
+                ..
+            })
+        ));
+    }
+
+    #[test]
+    fn parses_serve_with_embedded_mcp_mutation_alias() {
+        let args = Args::parse_from(&["reqvire", "serve", "--enable-mcp", "--enable-mutations"]);
+        assert!(matches!(
+            args.command,
+            Some(Commands::Serve {
+                enable_mcp: true,
+                mcp_enable_mutations: true,
+                ..
+            })
         ));
     }
 

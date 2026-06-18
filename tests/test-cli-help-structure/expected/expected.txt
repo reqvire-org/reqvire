@@ -41,6 +41,8 @@ Options:
 SERVE OPTIONS:
       --host <HOST>             Bind address
       --port <PORT>             Server port
+      --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp
+      --mcp-enable-mutations    Advertise and allow mutation tools on the embedded MCP endpoint
 
 EXPORT OPTIONS:
       --output <OUTPUT>         Output directory

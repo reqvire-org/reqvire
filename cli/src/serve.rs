@@ -1,5 +1,8 @@
+use crate::mcp;
+use globset::GlobSet;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
+use tokio::sync::Mutex;
 
 use axum::body::Body;
 use axum::extract::State;
@@ -8,19 +11,25 @@ use axum::routing::any;
 use axum::Router;
 use percent_encoding::percent_decode_str;
 use reqvire::error::ReqvireError;
-use reqvire::explorer_runtime::{embedded_asset, index_html, ExplorerRuntimeAssets};
+use reqvire::explorer_runtime::{
+    build_runtime_assets, embedded_asset, index_html, ExplorerRuntimeAssets,
+};
+use reqvire::{ModelBuildOptions, ModelManager};
 
 #[derive(Clone)]
 pub(crate) struct ServeState {
-    project_store_js: Arc<String>,
-    ontologies_ttl: Arc<String>,
+    excluded_filename_patterns: Arc<GlobSet>,
+    refresh_lock: Arc<Mutex<()>>,
 }
 
 /// Starts an HTTP server for the embedded Explorer SPA and generated runtime data.
 pub async fn serve_explorer(
-    assets: ExplorerRuntimeAssets,
+    _assets: ExplorerRuntimeAssets,
     host: &str,
     port: u16,
+    enable_mcp: bool,
+    mcp_enable_mutations: bool,
+    excluded_filename_patterns: &GlobSet,
 ) -> Result<(), ReqvireError> {
     let addr = format!("{}:{}", host, port);
     let listener = tokio::net::TcpListener::bind(&addr)
@@ -28,13 +37,23 @@ pub async fn serve_explorer(
         .map_err(|e| ReqvireError::ProcessError(format!("Failed to start server: {}", e)))?;
 
     let state = ServeState {
-        project_store_js: Arc::new(assets.project_store_js),
-        ontologies_ttl: Arc::new(assets.ontologies_ttl),
+        excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
+        refresh_lock: Arc::new(Mutex::new(())),
     };
-    let app = Router::new()
+    let mut app = Router::new()
         .route("/", any(serve_static))
-        .route("/{*path}", any(serve_static))
-        .with_state(state);
+        .fallback(serve_static);
+
+    if enable_mcp {
+        app = mcp::mount_service(
+            app,
+            mcp_enable_mutations,
+            false,
+            excluded_filename_patterns,
+            state.refresh_lock.clone(),
+        );
+    }
+    let app = app.with_state(state);
 
     let url = format!("http://{}:{}", host, port);
     println!(
@@ -44,6 +63,9 @@ pub async fn serve_explorer(
     println!();
     println!("📖 Instructions:");
     println!("  • Open the link above in your browser");
+    if enable_mcp {
+        println!("  • MCP endpoint: {}/mcp", url);
+    }
     println!("  • Press Ctrl-C to stop server");
     println!();
 
@@ -68,19 +90,11 @@ async fn serve_static(State(state): State<ServeState>, method: Method, uri: Uri)
     };
 
     if request_path == "assets/project-store.js" {
-        return bytes_response(
-            method,
-            "application/javascript",
-            state.project_store_js.as_bytes().to_vec(),
-        );
+        return runtime_asset_response(state, method, RuntimeAssetKind::ProjectStore).await;
     }
 
     if request_path == "ontologies.ttl" {
-        return bytes_response(
-            method,
-            "text/turtle; charset=utf-8",
-            state.ontologies_ttl.as_bytes().to_vec(),
-        );
+        return runtime_asset_response(state, method, RuntimeAssetKind::Ontologies).await;
     }
 
     if let Some(content) = embedded_asset(&request_path) {
@@ -121,6 +135,81 @@ fn bytes_response(method: Method, content_type: &'static str, content: Vec<u8>) 
         .status(StatusCode::OK)
         .header(header::CONTENT_TYPE, content_type)
         .body(Body::from(content))
+        .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR))
+}
+
+enum RuntimeAssetKind {
+    ProjectStore,
+    Ontologies,
+}
+
+async fn runtime_asset_response(
+    state: ServeState,
+    method: Method,
+    kind: RuntimeAssetKind,
+) -> Response<Body> {
+    if method == Method::HEAD {
+        return no_store_response(match kind {
+            RuntimeAssetKind::ProjectStore => "application/javascript",
+            RuntimeAssetKind::Ontologies => "text/turtle; charset=utf-8",
+        });
+    }
+
+    let assets = match refreshed_runtime_assets(&state).await {
+        Ok(assets) => assets,
+        Err(error) => {
+            return Response::builder()
+                .status(StatusCode::INTERNAL_SERVER_ERROR)
+                .body(Body::from(format!(
+                    "Failed to refresh Explorer runtime data: {error}"
+                )))
+                .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR));
+        }
+    };
+
+    match kind {
+        RuntimeAssetKind::ProjectStore => runtime_bytes_response(
+            "application/javascript",
+            assets.project_store_js.into_bytes(),
+        ),
+        RuntimeAssetKind::Ontologies => runtime_bytes_response(
+            "text/turtle; charset=utf-8",
+            assets.ontologies_ttl.into_bytes(),
+        ),
+    }
+}
+
+async fn refreshed_runtime_assets(
+    state: &ServeState,
+) -> Result<ExplorerRuntimeAssets, ReqvireError> {
+    let _guard = state.refresh_lock.lock().await;
+    let mut model = ModelManager::new();
+    model.parse_and_validate_with_options(
+        None,
+        state.excluded_filename_patterns.as_ref(),
+        ModelBuildOptions {
+            lenient: false,
+            with_size_estimates: false,
+        },
+    )?;
+    build_runtime_assets(&model.graph_registry)
+}
+
+fn runtime_bytes_response(content_type: &'static str, content: Vec<u8>) -> Response<Body> {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, content_type)
+        .header(header::CACHE_CONTROL, "no-store")
+        .body(Body::from(content))
+        .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR))
+}
+
+fn no_store_response(content_type: &'static str) -> Response<Body> {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, content_type)
+        .header(header::CACHE_CONTROL, "no-store")
+        .body(Body::empty())
         .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR))
 }
 

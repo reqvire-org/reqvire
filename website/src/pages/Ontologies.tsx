@@ -128,7 +128,7 @@ The system shall reject API requests whose access token is invalid.
             "Use External Ontology sections only on ontology elements.",
             "The source must be a local .ttl/Turtle file; Reqvire does not fetch remote ontology URLs during validation.",
             "Authored Turtle and SHACL blocks still declare their own prefixes explicitly. External source sections do not inject hidden Turtle.",
-            "OWL/RDF/RDFS/XSD reserved vocabulary and built-in datatypes are recognized by Reqvire without local External Ontology declarations.",
+            "OWL/RDF/RDFS/XSD reserved vocabulary and core SHACL shape syntax are recognized by Reqvire without local External Ontology declarations.",
           ]}
         />
         <div className="mt-4">
@@ -220,7 +220,7 @@ auth:AccessTokenValidationShape
             "Use reqvire ontologies --include-external when the exported graph should include local external ontology source triples.",
             "Use reqvire ontologies --full when a graph/database should also know which model elements reference ontology terms.",
             "Use reqvire ontologies --full --include-external when a graph/database should receive authored triples, external source triples, model context, and generated ontology projection facts.",
-            "Use reqvire.semantic.ontologies through MCP with content set to rdf, shacl, or both when an assistant needs only part of the semantic document.",
+            "Use reqvire.semantic.ontologies through MCP with content set to rdf, shacl, or both when an assistant needs only part of the semantic document; set include_external to include local external ontology source triples.",
             "Use reqvire.semantic.prefixes through MCP when an assistant needs ontology-defined namespaces and source prose before writing SPARQL.",
             "Use reqvire.semantic.vocabulary through MCP when an assistant needs paged classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source maps, diagnostics, and prefixes before writing SPARQL.",
             "Use reqvire.semantic.sparql through MCP when an assistant needs to query the model-owned Oxigraph semantic store directly.",
@@ -238,6 +238,7 @@ reqvire ontologies --full --include-external
 
 # MCP tool
 reqvire.semantic.ontologies({ "format": "turtle", "content": "both", "full": true })
+reqvire.semantic.ontologies({ "include_external": true })
 reqvire.semantic.ontologies({ "content": "shacl" })
 reqvire.semantic.prefixes()
 reqvire.semantic.vocabulary({ "section": "relation_families", "limit": 50 })

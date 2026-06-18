@@ -608,6 +608,8 @@ Reqvire shall not treat arbitrary custom IRIs as reserved vocabulary simply beca
 
 OWL reserved vocabulary recognition is a semantic validation rule. It does not make standard namespaces authored ontology namespaces, does not synthesize external source triples, and does not require standard reserved prefixes to appear as External Sources in Explorer.
 
+Core SHACL vocabulary used to parse and validate `#### Shapes` blocks is handled by Reqvire's semantic-contract parser and SHACL sanity checks. It is not modeled as a local `#### External Ontology` source. External ontology sources are reserved for additional pinned vocabularies authored outside the Reqvire model, such as project-specific exported ontologies or SHACL extension vocabularies.
+
 #### Metadata
   * type: specification
 
@@ -1086,4 +1088,3 @@ Reqvire supports verification coverage analysis for requirement verification and
 #### Relations
   * define: [Verification Coverage Report](ReportingRequirements.md#verification-coverage-report)
 ---
-

@@ -114,7 +114,7 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             },
             {
               name: "Ontologies",
-              desc: "reqvire.semantic.ontologies returns authored RDF ontology, SHACL, or both as Turtle or JSON-LD, with full mode for generated Reqvire model context triples.",
+              desc: "reqvire.semantic.ontologies returns authored RDF ontology, SHACL, or both as Turtle or JSON-LD, with full mode for generated model context and include_external for local external ontology source triples.",
             },
             {
               name: "Semantic prefixes",

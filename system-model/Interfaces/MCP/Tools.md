@@ -69,6 +69,7 @@ The system shall expose MCP read tools that return model evidence needed by exte
 - The MCP interface shall expose read tools for authoritative Reqvire model evidence.
 - Model evidence tools shall support element lookup, model structure, containment, collection, submodel analysis, and ontology/SHACL semantic collection.
 - The ontology/SHACL semantic collection tool shall be named under the `reqvire.semantic` namespace and shall filter serialized content to RDF only, SHACL only, or both.
+- The ontology/SHACL semantic collection tool shall support optional external ontology source materialization through a typed `include_external` argument without changing the default authored-only export.
 - Model evidence tools shall support read-only semantic query execution over collected ontology, SHACL, model-context, and ontology projection RDF when requested by a typed MCP operation.
 - Model evidence tools shall expose the canonical capability/requirement/ontology model, including `ontology` elements, `#### Concept References`, reusable `semantic-contract` shape profiles, constrained requirements, and ontology-use relations where the underlying Reqvire operation returns them.
 - Model evidence tools shall include revision metadata when model state affects interpretation.
@@ -84,6 +85,7 @@ The system shall expose MCP read tools that return model evidence needed by exte
   * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
+  * [Local External Ontology Source Specification](../../Reports/ModelReports/Specifications.md#local-external-ontology-source-specification)
 
 #### Relations
   * definedBy: [MCP Model Evidence Tools Specification](Specifications.md#mcp-model-evidence-tools-specification)
@@ -471,6 +473,7 @@ The system shall provide MCP service through RMCP Streamable HTTP transport.
 
 #### Relations
   * definedBy: [MCP Streamable HTTP Transport Specification](Specifications.md#mcp-streamable-http-transport-specification)
+  * derive: [Serve Command Embedded MCP Endpoint](../WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
@@ -576,4 +579,3 @@ The system shall expose MCP-only workspace/session tools for workspace status, t
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Workspace Session Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-workspace-session-tools-verification)
 ---
-

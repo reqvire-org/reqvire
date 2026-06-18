@@ -768,14 +768,20 @@ This keeps served Explorer content complete with navigable contract reused_contr
 Serve command behavior:
 - Accept `--host <HOST>` option to specify the bind address (default: localhost)
 - Accept `--port <PORT>` option to specify the server port (default: 8080)
+- Accept `--enable-mcp` to also expose the Reqvire MCP Streamable HTTP endpoint at `/mcp` on the same HTTP listener.
+- Accept `--mcp-enable-mutations` only when `--enable-mcp` is present, and use it to enable mutation tools for the embedded MCP endpoint. Accept `--enable-mutations` as the serve-command alias for the same embedded MCP mutation option.
 - Assemble the embedded Explorer shell, Project Store data, and ontology artifact in memory
+- Regenerate runtime Project Store data and ontology artifacts from the current workspace when `assets/project-store.js` or `ontologies.ttl` are requested, so served Explorer reloads can observe model changes made through embedded MCP mutation tools.
+- Serialize runtime data regeneration with embedded MCP mutation execution to avoid reading partial filesystem updates.
 - Populate Project Store source-file records from modeled element source files and existing graph-referenced local implementation/evidence/resource files, without using generated Markdown files on disk as an intermediate runtime artifact
 - Keep relation-backed implementation/evidence/source targets as Project Store resources for relation semantics, and include only existing repository-relative local targets in the Model tree file hierarchy
 - Start an HTTP server serving embedded Explorer assets and generated runtime data
 - Serve existing repository-relative local static asset files, including images and documents referenced from Markdown content, from their repository-relative request paths while rejecting absolute paths, parent-directory traversal, and unsupported asset extensions
 - Serve `index.html` for the root URL so the SPA Explorer shell is the default entry point
 - Return `index.html` for non-asset browser routes so SPA navigation can handle deep links
+- Preserve `/mcp` as an MCP endpoint when embedded MCP is enabled; SPA fallback routing shall not intercept MCP protocol requests.
 - Display clickable server URL for user to open in browser
+- Display the `/mcp` endpoint URL when embedded MCP is enabled.
 - Display instructions to press Ctrl-C to stop server
 - Continue serving until terminated by the user (Ctrl-C)
 

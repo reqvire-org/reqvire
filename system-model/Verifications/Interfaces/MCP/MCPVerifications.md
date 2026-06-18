@@ -11,6 +11,7 @@ This objective groups verification that Reqvire MCP servers, tools, resources, p
   * derive: [MCP Access Control Baseline Verification](#mcp-access-control-baseline-verification)
   * derive: [MCP Contract Layer Boundary Verification](#mcp-contract-layer-boundary-verification)
   * derive: [MCP Contract Versioning Verification](#mcp-contract-versioning-verification)
+  * derive: [Embedded MCP Serve Endpoint Verification](#embedded-mcp-serve-endpoint-verification)
   * derive: [MCP HTTP Transport End-to-End Verification](#mcp-http-transport-end-to-end-verification)
   * derive: [MCP Model Evidence Tools Verification](#mcp-model-evidence-tools-verification)
   * derive: [MCP Mutation Execution Flow Verification](#mcp-mutation-execution-flow-verification)
@@ -113,8 +114,10 @@ Expected checks:
 - Search, read element, model, containment, collect, and submodels tools return data matching Reqvire core reports.
 - Search supports `filter_type=ontology` and returns parsed ontology ADT content.
 - Verify `tools/list` advertises `reqvire.semantic.ontologies` as a read-only semantic model evidence tool.
+- Verify `tools/list` advertises the `include_external` argument on `reqvire.semantic.ontologies`.
 - Verify `reqvire.semantic.ontologies` returns both RDF ontology and SHACL shape content by default.
 - Verify `reqvire.semantic.ontologies` filters to RDF-only or SHACL-only content when the `content` argument is set.
+- Verify `reqvire.semantic.ontologies` excludes local External Ontology source triples by default and includes them when `include_external` is true.
 - Read element returns `concept_references` for elements that author `#### Concept References`.
 - Collect returns authored concept references for capability and requirement elements and semantic-contract ontology-use context where the underlying operation returns semantic-contract evidence.
 - Results include evidence references for relevant files, elements, relations, and reused_contract_context.
@@ -373,6 +376,30 @@ The e2e test starts `reqvire mcp` in a fixture workspace and verifies MCP initia
   * verify: [MCP Workspace Session Tools](../../../Interfaces/MCP/Tools.md#mcp-workspace-session-tools)
 ---
 
+### Embedded MCP Serve Endpoint Verification
+
+This verification shall prove that `reqvire serve --enable-mcp` exposes the Reqvire MCP Streamable HTTP endpoint on the same listener as the Explorer without enabling mutations by default.
+
+#### Details
+Expected checks:
+- Start `reqvire serve --enable-mcp --host 127.0.0.1 --port <PORT>` in a fixture workspace.
+- Verify the Explorer root URL still returns the SPA shell.
+- Verify standard MCP Streamable HTTP requests are accepted at `http://127.0.0.1:<PORT>/mcp`.
+- Verify MCP `tools/list` does not include mutation tools when only `--enable-mcp` is present.
+- Start `reqvire serve --enable-mcp --mcp-enable-mutations --host 127.0.0.1 --port <PORT>` and verify MCP `tools/list` includes mutation tools.
+- Start `reqvire serve --enable-mcp --enable-mutations --host 127.0.0.1 --port <PORT>` and verify the alias form also includes mutation tools.
+- Execute an embedded MCP mutation and verify a subsequent `assets/project-store.js` request contains the updated model datastore after browser/client reload.
+- Verify `assets/project-store.js` and `ontologies.ttl` responses include no-store cache control.
+- Verify `--mcp-enable-mutations` is rejected unless `--enable-mcp` is also provided.
+- Verify `/mcp` is handled by RMCP transport and is not served by the Explorer SPA fallback.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Serve Command Embedded MCP Endpoint](../../../Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
+---
+
 ### MCP Server State and Cache Verification
 
 This verification shall prove that MCP cached state is subordinate to Reqvire source files and Reqvire core parsing.
@@ -543,4 +570,3 @@ Expected checks:
 #### Relations
   * verify: [MCP Workspace Session Tools](../../../Interfaces/MCP/Tools.md#mcp-workspace-session-tools)
 ---
-

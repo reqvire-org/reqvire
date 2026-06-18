@@ -225,7 +225,7 @@ Expected analysis checks:
 - Confirm datatype-property literal values are not graph nodes or visibility filter layers, but remain searchable and appear in the selected subject node modal as predicate/value evidence.
 - Confirm a named IRI typed only by a declared ontology class, without explicit `owl:NamedIndividual`, is shown in graph data and the ontology node modal as a named individual while retaining its `∈` membership construct evidence.
 - Confirm visual coloring is driven by semantic kind, not by source provenance, so a class referenced by SHACL remains class-colored, property metadata remains property-typed in links/modal/search, and actual SHACL node shapes and property shapes use SHACL-specific colors.
-- Confirm built-in XSD, RDF, RDFS, OWL, and SHACL namespace references are available as an external-reference layer that is hidden by default and can be enabled for datatype/range audit.
+- Confirm RDF, RDFS, XSD, OWL reserved vocabulary and core SHACL shape syntax do not require local External Ontology source files and are not presented as imported external-source vocabulary. The external-source layer is reserved for actual `#### External Ontology` source triples.
 - Confirm object and datatype properties are first-class relationship semantics with aggregated domain and range information rendered as labeled links and modal property usage evidence, not as standalone graph nodes.
 - Confirm SHACL node-shape target classes and property usage rows receive derived slot/facet modal sections from property-shape paths, datatype/class range constraints, node kind, cardinality, pattern, allowed values, and source-shape evidence.
 - Confirm target-class slot/facet sections are labeled as class slots, property usage sections are labeled as usages of the selected property by target classes, and repeated usages with different target classes or source shapes are not presented as duplicate property definitions.
@@ -391,7 +391,10 @@ This test verifies that the serve command starts an HTTP server for the embedded
 - System shall serve index.html when accessing root URL
 - System shall serve embedded Explorer assets and generated Project Store data with correct paths
 - System shall serve generated `ontologies.ttl`
+- System shall expose `/mcp` on the same listener only when `--enable-mcp` is present
+- System shall expose embedded MCP mutation tools only when both `--enable-mcp` and `--mcp-enable-mutations` are present
 - System shall return index.html for non-asset browser routes
+- System shall not return Explorer `index.html` for `/mcp` requests when embedded MCP is enabled
 - System shall return 404 for missing asset paths
 - System shall set correct Content-Type headers for different file types
 - System shall run in quiet mode without verbose runtime-generation output
@@ -406,6 +409,13 @@ This test verifies that the serve command starts an HTTP server for the embedded
 - SVG files are served with image/svg+xml content type
 - Missing embedded asset paths return 404 status
 - Non-asset browser routes return index.html for SPA fallback
+- `reqvire serve --enable-mcp` accepts MCP protocol requests at `/mcp` while root and SPA routes still serve Explorer content
+- `reqvire serve --enable-mcp` omits mutation tools from MCP `tools/list`
+- `reqvire serve --enable-mcp --mcp-enable-mutations` includes mutation tools in MCP `tools/list`
+- `reqvire serve --enable-mcp --enable-mutations` includes mutation tools in MCP `tools/list`
+- After an embedded MCP mutation changes model files, a subsequent `assets/project-store.js` request returns regenerated Project Store data that reflects the current workspace.
+- Runtime data responses include no-store cache control to avoid stale browser datastores after mutation.
+- `reqvire serve --mcp-enable-mutations` without `--enable-mcp` fails CLI argument validation
 - Runtime-generation verbose output is suppressed (quiet mode active)
 
 #### Metadata
@@ -414,4 +424,5 @@ This test verifies that the serve command starts an HTTP server for the embedded
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
   * verify: [Serve Command](../../../Interfaces/WebExplorer/Capabilities.md#serve-command)
+  * verify: [Serve Command Embedded MCP Endpoint](../../../Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
 ---

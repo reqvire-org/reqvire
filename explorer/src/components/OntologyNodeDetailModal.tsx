@@ -34,6 +34,7 @@ export function OntologyNodeDetailModal({
       onOpenSource={(source) => {
         if (source.link) {
           window.location.hash = source.link;
+          onClose();
         }
       }}
     />
