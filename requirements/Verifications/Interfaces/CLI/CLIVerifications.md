@@ -1,5 +1,21 @@
 # Elements
 
+### CLI Interface Verification Objective
+
+This objective groups verification that the Reqvire command-line interface exposes stable commands, options, workspace selection, ontology output, and navigation behavior.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [CLI Git Commit Hash Flag Test](#cli-git-commit-hash-flag-test)
+  * derive: [CLI Help Structure Verification](#cli-help-structure-verification)
+  * derive: [CLI Ontologies Command Verification](#cli-ontologies-command-verification)
+  * derive: [CLI Size Estimate JSON Option Verification](#cli-size-estimate-json-option-verification)
+  * derive: [Explicit Workspace Selection Verification](#explicit-workspace-selection-verification)
+  * derive: [Verification Traces Element Navigation Test](#verification-traces-element-navigation-test)
+---
+
 ### CLI Git Commit Hash Flag Test
 
 This test verifies that the system properly handles the git commit hash flag for change impact analysis.

@@ -1,5 +1,23 @@
 # Elements
 
+### Model Parsing and Structure Verification Objective
+
+This objective groups verification that Reqvire parses element structure, subsections, fragments, governance metadata, refinements, and specification files consistently.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [Element Size Estimate Model Build Verification](#element-size-estimate-model-build-verification)
+  * derive: [Element Subsection Parsing Test](#element-subsection-parsing-test)
+  * derive: [Fragment Normalization Test](#fragment-normalization-test)
+  * derive: [Non-Reserved Subsections Content Test](#non-reserved-subsections-content-test)
+  * derive: [Refinement Element Type Parsing Test](#refinement-element-type-parsing-test)
+  * derive: [Refinement Relations Rejection Test](#refinement-relations-rejection-test)
+  * derive: [Requirement Governance Metadata Verification](#requirement-governance-metadata-verification)
+  * derive: [Specification File Identification Test](#specification-file-identification-test)
+---
+
 ### Element Size Estimate Model Build Verification
 
 This verification shall prove that element size estimates are computed only when model building explicitly enables them.

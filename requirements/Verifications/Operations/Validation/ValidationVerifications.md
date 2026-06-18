@@ -1,5 +1,33 @@
 # Elements
 
+### Validation and Semantic Integrity Verification Objective
+
+This objective groups verification that Reqvire validation enforces element typing, relation compatibility, hierarchy ownership, file structure, semantic contracts, SHACL sanity, and duplicate integrity.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [Capability Element Relation Compatibility Test](#capability-element-relation-compatibility-test)
+  * derive: [Cross-Section Duplicate Validation Test](#cross-section-duplicate-validation-test)
+  * derive: [Default Element Type Assignment Test](#default-element-type-assignment-test)
+  * derive: [Element Type Relation Compatibility Test](#element-type-relation-compatibility-test)
+  * derive: [File Exclusion Test](#file-exclusion-test)
+  * derive: [Invalid Header Structure Test](#invalid-header-structure-test)
+  * derive: [Invalid Relations Test](#invalid-relations-test)
+  * derive: [Requirements Files Search and Detection Test](#requirements-files-search-and-detection-test)
+  * derive: [Same-File Fragment Relations Test](#same-file-fragment-relations-test)
+  * derive: [Semantic Contract Ontology Declaration Validation Test](#semantic-contract-ontology-declaration-validation-test)
+  * derive: [Semantic Contract Relation Validation Test](#semantic-contract-relation-validation-test)
+  * derive: [Semantic Contract Section Validation Test](#semantic-contract-section-validation-test)
+  * derive: [Semantic Contract SHACL Sanity Validation Test](#semantic-contract-shacl-sanity-validation-test)
+  * derive: [Single Element Refinement Validation Test](#single-element-refinement-validation-test)
+  * derive: [Single Root Hierarchy Ownership Validation Test](#single-root-hierarchy-ownership-validation-test)
+  * derive: [Subdirectory Processing Verification](#subdirectory-processing-verification)
+  * derive: [Type Validation Errors Test](#type-validation-errors-test)
+  * derive: [Unstructured Documents Test](#unstructured-documents-test)
+---
+
 ### Capability Element Relation Compatibility Test
 
 This test verifies capability hierarchy, requirement-to-capability specification, and rejection of unsupported stakeholder requirement typing.

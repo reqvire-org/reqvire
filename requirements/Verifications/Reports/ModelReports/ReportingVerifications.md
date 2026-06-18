@@ -1,5 +1,38 @@
 # Elements
 
+### Reporting, Search, Coverage, and Model Export Verification Objective
+
+This objective groups verification that Reqvire reporting commands expose collect, search, coverage, traces, containment, resources, submodels, model traversal, JSON, and diagram output correctly.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [Capability Collect Traversal Test](#capability-collect-traversal-test)
+  * derive: [Capability Coverage Rollup Test](#capability-coverage-rollup-test)
+  * derive: [CLI Collect Command Test](#cli-collect-command-test)
+  * derive: [CLI JSON File Output Test](#cli-json-file-output-test)
+  * derive: [Containment Hierarchy Extraction Test](#containment-hierarchy-extraction-test)
+  * derive: [Containment View Design Documents Test](#containment-view-design-documents-test)
+  * derive: [Containment View JSON Output Test](#containment-view-json-output-test)
+  * derive: [Containment View Mermaid Diagram Test](#containment-view-mermaid-diagram-test)
+  * derive: [Containment View Text Output Test](#containment-view-text-output-test)
+  * derive: [Custom Element Type Tracking Test](#custom-element-type-tracking-test)
+  * derive: [JSON Element Size Estimate Output Verification](#json-element-size-estimate-output-verification)
+  * derive: [Model Command Verification](#model-command-verification)
+  * derive: [Model Containment Report Integration Test](#model-containment-report-integration-test)
+  * derive: [Multi-Type Search Filter Test](#multi-type-search-filter-test)
+  * derive: [Resources Report Verification](#resources-report-verification)
+  * derive: [Reverse Model Traversal Test](#reverse-model-traversal-test)
+  * derive: [Search Command Tests](#search-command-tests)
+  * derive: [Semantic Contract Search JSON Test](#semantic-contract-search-json-test)
+  * derive: [Start Type Filter Test](#start-type-filter-test)
+  * derive: [Submodels Report Verification](#submodels-report-verification)
+  * derive: [Verification Coverage Report Test](#verification-coverage-report-test)
+  * derive: [Verification Traces Filter Options Test](#verification-traces-filter-options-test)
+  * derive: [Verification Traces From-Folder Test](#verification-traces-from-folder-test)
+---
+
 ### CLI Collect Command Test
 
 This test verifies that the collect command aggregates capability, requirement, and ontology context with proper source citations.

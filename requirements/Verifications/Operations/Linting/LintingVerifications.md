@@ -1,5 +1,16 @@
 # Elements
 
+### Linting and Model Hygiene Verification Objective
+
+This objective groups verification that Reqvire linting reports model hygiene findings and fixable issues consistently.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [Lint Command Verification](#lint-command-verification)
+---
+
 ### Lint Command Verification
 
 This test verifies that the lint command analyzes model quality, detects issues in requirements relations, and provides categorized output distinguishing between auto-fixable issues and those requiring manual review.

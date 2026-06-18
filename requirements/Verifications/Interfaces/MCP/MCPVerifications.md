@@ -1,5 +1,35 @@
 # Elements
 
+### MCP Protocol and Tool Verification Objective
+
+This objective groups verification that Reqvire MCP servers, tools, resources, payload contracts, access controls, and mutation boundaries conform to the supported protocol behavior.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [MCP Access Control Baseline Verification](#mcp-access-control-baseline-verification)
+  * derive: [MCP Contract Layer Boundary Verification](#mcp-contract-layer-boundary-verification)
+  * derive: [MCP Contract Versioning Verification](#mcp-contract-versioning-verification)
+  * derive: [MCP HTTP Transport End-to-End Verification](#mcp-http-transport-end-to-end-verification)
+  * derive: [MCP Model Evidence Tools Verification](#mcp-model-evidence-tools-verification)
+  * derive: [MCP Mutation Execution Flow Verification](#mcp-mutation-execution-flow-verification)
+  * derive: [MCP Mutation Tool Safety Verification](#mcp-mutation-tool-safety-verification)
+  * derive: [MCP Protocol Standard Conformance Verification](#mcp-protocol-standard-conformance-verification)
+  * derive: [MCP Quality Traceability Tools Verification](#mcp-quality-traceability-tools-verification)
+  * derive: [MCP Resource Interface Verification](#mcp-resource-interface-verification)
+  * derive: [MCP Server Command Verification](#mcp-server-command-verification)
+  * derive: [MCP Server End-to-End Verification](#mcp-server-end-to-end-verification)
+  * derive: [MCP Server State and Cache Verification](#mcp-server-state-and-cache-verification)
+  * derive: [MCP Shared Operation Contracts Verification](#mcp-shared-operation-contracts-verification)
+  * derive: [MCP Size Estimate Startup Verification](#mcp-size-estimate-startup-verification)
+  * derive: [MCP Structured Payload Contracts Verification](#mcp-structured-payload-contracts-verification)
+  * derive: [MCP Tool Call Contracts Verification](#mcp-tool-call-contracts-verification)
+  * derive: [MCP Tool Exposure Scope Verification](#mcp-tool-exposure-scope-verification)
+  * derive: [MCP Tool Side Effect Classification Verification](#mcp-tool-side-effect-classification-verification)
+  * derive: [MCP Workspace Session Tools Verification](#mcp-workspace-session-tools-verification)
+---
+
 ### MCP Access Control Baseline Verification
 
 This verification shall prove that MCP does not expose arbitrary shell execution, arbitrary filesystem reads, or mutation tools unless mutation capability is enabled.

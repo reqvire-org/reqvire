@@ -1,5 +1,27 @@
 # Elements
 
+### Attachment and Resource Operation Verification Objective
+
+This objective groups verification that attachment and asset operations parse, validate, render, search, move, remove, and report attached resources correctly.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [Attach Command Verification](#attach-command-verification)
+  * derive: [Attachment Identifier CRUD Verification](#attachment-identifier-crud-verification)
+  * derive: [Attachment Output Rendering Verification](#attachment-output-rendering-verification)
+  * derive: [Attachment Scope Constraints Test](#attachment-scope-constraints-test)
+  * derive: [Attachment Search Filters Verification](#attachment-search-filters-verification)
+  * derive: [Attachments Change Impact Verification](#attachments-change-impact-verification)
+  * derive: [Attachments Subsection Parsing Verification](#attachments-subsection-parsing-verification)
+  * derive: [Attachments Validation Verification](#attachments-validation-verification)
+  * derive: [Detach Command Verification](#detach-command-verification)
+  * derive: [Move Asset Command Verification](#move-asset-command-verification)
+  * derive: [Ontology and Contract Attachment Verification](#ontology-and-contract-attachment-verification)
+  * derive: [Remove Asset Command Verification](#remove-asset-command-verification)
+---
+
 ### Attach Command Verification
 
 Verify attach command creates Attachments subsection and adds links.

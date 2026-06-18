@@ -1,5 +1,37 @@
 # Elements
 
+### Element Mutation and File Operation Verification Objective
+
+This objective groups verification that element creation, removal, movement, renaming, linking, relinking, merging, file movement, and ontology-aware mutations preserve model validity.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [Add Command Duplicate Detection Test](#add-command-duplicate-detection-test)
+  * derive: [Add Command Error Messages Test](#add-command-error-messages-test)
+  * derive: [Atomic Relation Relink Test](#atomic-relation-relink-test)
+  * derive: [CLI Add Element Test](#cli-add-element-test)
+  * derive: [CLI Move Element Test](#cli-move-element-test)
+  * derive: [CLI Move File Test](#cli-move-file-test)
+  * derive: [CLI Remove Element Test](#cli-remove-element-test)
+  * derive: [CLI Rename Element Test](#cli-rename-element-test)
+  * derive: [Create Element Override Test](#create-element-override-test)
+  * derive: [Create Element Test](#create-element-test)
+  * derive: [Delete Element Test](#delete-element-test)
+  * derive: [File Persistence Test](#file-persistence-test)
+  * derive: [Link Command Cross-Section Detection Test](#link-command-cross-section-detection-test)
+  * derive: [Link Command Verification](#link-command-verification)
+  * derive: [Merge Elements Test](#merge-elements-test)
+  * derive: [Move Element Test](#move-element-test)
+  * derive: [Move File Squash Test](#move-file-squash-test)
+  * derive: [Ontology Boundary-Changing Mutation Test](#ontology-boundary-changing-mutation-test)
+  * derive: [Relation Consistency Test](#relation-consistency-test)
+  * derive: [Target Location Validation Test](#target-location-validation-test)
+  * derive: [Unlink Command Verification](#unlink-command-verification)
+  * derive: [Verification Objective Mutation Test](#verification-objective-mutation-test)
+---
+
 ### Add Command Duplicate Detection Test
 
 Test verifies that the add command rejects elements with duplicate entries.

@@ -1,5 +1,21 @@
 # Elements
 
+### Formatting and Relation Normalization Verification Objective
+
+This objective groups verification that formatting preserves model semantics while normalizing element ordering, relation ordering, duplicates, governance metadata, and full relation insertion.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [Element Ordering Verification](#element-ordering-verification)
+  * derive: [Format Command Requirements Verification](#format-command-requirements-verification)
+  * derive: [Format Duplicate Removal Test](#format-duplicate-removal-test)
+  * derive: [Full Relations Insertion Verification](#full-relations-insertion-verification)
+  * derive: [Relation Ordering Verification](#relation-ordering-verification)
+  * derive: [Requirement Governance Metadata Formatting Verification](#requirement-governance-metadata-formatting-verification)
+---
+
 ### Element Ordering Verification
 
 This test verifies that the format command reorders elements following the Element Ordering Behavior, ensuring parent elements appear before their children based on file-local derivedFrom hierarchy.

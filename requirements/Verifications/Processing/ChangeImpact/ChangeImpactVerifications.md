@@ -1,5 +1,23 @@
 # Elements
 
+### Change Impact Analysis Verification Objective
+
+This objective groups verification that change impact analysis detects changed model content, relation impact, smart filtering, attachment context, semantic contract context, and structural summaries.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [Capability Ontology and Semantic Contract Change Impact Test](#capability-ontology-and-semantic-contract-change-impact-test)
+  * derive: [Change Impact Analysis Verification](#change-impact-analysis-verification)
+  * derive: [Change Impact Detection Test](#change-impact-detection-test)
+  * derive: [Change Impact Relations Test](#change-impact-relations-test)
+  * derive: [Change Impact Smart Filtering Test](#change-impact-smart-filtering-test)
+  * derive: [Element Content Extraction Test](#element-content-extraction-test)
+  * derive: [Impact Scope Summary Test](#impact-scope-summary-test)
+  * derive: [Structural Change Reports Verification](#structural-change-reports-verification)
+---
+
 ### Capability Ontology and Semantic Contract Change Impact Test
 
 This test verifies that capability, specified requirement, ontology, and semantic-contract changes propagate through the model.

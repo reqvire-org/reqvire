@@ -1,5 +1,27 @@
 # Elements
 
+### Web Explorer Interface Verification Objective
+
+This objective groups verification that the served Web Explorer renders model data, assets, diagrams, navigation, responsive layouts, and export flows correctly.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [Attachment Link Serving Verification](#attachment-link-serving-verification)
+  * derive: [Component Reuse Verification](#component-reuse-verification)
+  * derive: [Diagram Attachment Display Verification](#diagram-attachment-display-verification)
+  * derive: [Explorer Serve Verification](#explorer-serve-verification)
+  * derive: [Export Command Verification](#export-command-verification)
+  * derive: [Mobile Responsiveness Verification](#mobile-responsiveness-verification)
+  * derive: [Model Containment Attachment Links Verification](#model-containment-attachment-links-verification)
+  * derive: [Model View Element Navigation Test](#model-view-element-navigation-test)
+  * derive: [Ontology Model Viewer Analysis Verification](#ontology-model-viewer-analysis-verification)
+  * derive: [Responsive Design Verification](#responsive-design-verification)
+  * derive: [Serve Command Verification](#serve-command-verification)
+  * derive: [SPA Explorer Store Contract Verification](#spa-explorer-store-contract-verification)
+---
+
 ### Attachment Link Serving Verification
 
 This test verifies that the served Explorer preserves attachment identifier links to referenced refinement elements.
