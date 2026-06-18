@@ -1,0 +1,1 @@
+error: Invalid reused_contract_context scope: 'Spec-X' cannot be reused to 'Req D' because subgraph 'User Req X Capability' already reuses contracts owned by subgraph 'User Req A Capability'. ReusedContractContextEntry flow between subgraphs must remain one-directional.

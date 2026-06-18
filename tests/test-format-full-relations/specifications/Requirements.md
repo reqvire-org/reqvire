@@ -33,7 +33,7 @@ A child requirement that derives from parent.
 
 ### Target Requirement
 
-A requirement that is refined by a constraint.
+A requirement that is defined by a constraint.
 
 #### Metadata
   * type: requirement
@@ -45,7 +45,7 @@ A requirement that is refined by a constraint.
 
 ### Test Constraint
 
-A constraint that refines the target requirement.
+A constraint that defines the target requirement.
 
 #### Metadata
   * type: constraint

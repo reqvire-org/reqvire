@@ -1,10 +1,10 @@
 ### Test Element With Cross-Section Duplicate
 
-This element has the same target in both Relations and Attachments.
+This element has the same target in both Relations and Reused Contract Context.
 
-#### Attachments
-  * [Refinement Element](specifications/Requirements.md#refinement-element)
+#### Reused Contract Context
+  * [Contract Element](specifications/Requirements.md#contract-element)
 
 #### Relations
-  * satisfiedBy: [Refinement Element](specifications/Requirements.md#refinement-element)
+  * satisfiedBy: [Contract Element](specifications/Requirements.md#contract-element)
 ---

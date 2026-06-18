@@ -11,8 +11,8 @@ pub struct Filters {
     content_re: Option<Regex>,
     not_verified: bool,
     not_satisfied: bool,
-    has_attachments: bool,
-    attachment_glob: Option<GlobMatcher>,
+    has_reused_contract_context: bool,
+    reused_contract_context_glob: Option<GlobMatcher>,
 }
 
 impl Filters {
@@ -25,8 +25,8 @@ impl Filters {
         content: Option<&str>,
         is_not_verified: bool,
         is_not_satisfied: bool,
-        has_attachments: bool,
-        attachment: Option<&str>,
+        has_reused_contract_context: bool,
+        reused_contract_context: Option<&str>,
     ) -> Result<Self, ReqvireError> {
         fn compile_glob(pat: &str) -> Result<GlobMatcher, ReqvireError> {
             let glob = Glob::new(pat)
@@ -58,7 +58,7 @@ impl Filters {
             Some(r) => Some(Regex::new(r).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))?),
             None => None,
         };
-        let attachment_glob = attachment.map(compile_glob).transpose()?;
+        let reused_contract_context_glob = reused_contract_context.map(compile_glob).transpose()?;
 
         Ok(Filters {
             file_glob,
@@ -67,8 +67,8 @@ impl Filters {
             content_re,
             not_verified: is_not_verified,
             not_satisfied: is_not_satisfied,
-            has_attachments,
-            attachment_glob,
+            has_reused_contract_context,
+            reused_contract_context_glob,
         })
     }
 
@@ -134,17 +134,17 @@ impl Filters {
         if self.not_satisfied && satisfied_count > 0 {
             return false;
         }
-        // 8) has_attachments: only include elements that have at least one attachment
-        if self.has_attachments && e.attachments.is_empty() {
+        // 8) has_reused_contract_context: only include elements that have at least one reused_contract_context
+        if self.has_reused_contract_context && e.reused_contract_context.is_empty() {
             return false;
         }
-        // 9) attachment_glob: only include elements with attachments matching the glob
-        if let Some(g) = &self.attachment_glob {
-            let has_matching_attachment = e
-                .attachments
+        // 9) reused_contract_context_glob: only include elements with reused_contract_context matching the glob
+        if let Some(g) = &self.reused_contract_context_glob {
+            let has_matching_reused_context = e
+                .reused_contract_context
                 .iter()
                 .any(|a| g.is_match(a.target.as_str().as_str()));
-            if !has_matching_attachment {
+            if !has_matching_reused_context {
                 return false;
             }
         }

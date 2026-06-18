@@ -434,7 +434,7 @@ ex:TestVerification owl:disjointWith ex:AnalysisVerification .
 
 Classes alone rarely provide enough information to answer competency questions. Once a few classes exist, describe the internal structure of each concept by defining its slots: the datatype properties and object properties that characterize instances of the class.
 
-Use the candidate term list from discovery and competency questions. Terms that are not classes often become slots. For each slot candidate, decide which class it describes and attach it to the most general class that can validly have that property. Subclasses inherit the slots of their superclasses.
+Use the candidate term list from discovery and competency questions. Terms that are not classes often become slots. For each slot candidate, decide which class it describes and reuse it to the most general class that can validly have that property. Subclasses inherit the slots of their superclasses.
 
 For a managed platform or system-of-interest ontology:
 
@@ -453,7 +453,7 @@ Common slot categories:
 | Part slots | Physical or logical parts of a structured concept. | deployment has replica, environment has network access, interface has endpoint, system has subsystem |
 | Relationship slots | Links from instances of one class to instances of another. | deployment belongs to environment, resource owned by actor, interface exposes resource, evidence verifies requirement |
 
-Attach a slot at the most general valid class. For example, `resourceIdentifier` belongs on `ManagedResource` if every managed resource needs an identifier. `deploymentHasReplica` belongs on `Deployment`, not on `ManagedResource`, because not every managed resource has replicas. `interfaceProtocol` belongs on `InterfaceSurface` if all interface surfaces have a protocol or interaction mechanism.
+Reuse a slot at the most general valid class. For example, `resourceIdentifier` belongs on `ManagedResource` if every managed resource needs an identifier. `deploymentHasReplica` belongs on `Deployment`, not on `ManagedResource`, because not every managed resource has replicas. `interfaceProtocol` belongs on `InterfaceSurface` if all interface surfaces have a protocol or interaction mechanism.
 
 ## Defining Slot Facets
 
@@ -581,7 +581,7 @@ System-of-interest examples:
 | Slot | Good domain | Good range | Why |
 |------|-------------|------------|-----|
 | `ownedByActor` | `PlatformResource` | `Actor` | Any managed platform resource can have an owning or accountable actor. |
-| `deploymentBelongsToEnvironment` | `Deployment` | `Environment` | Deployments are hosted inside environments; the slot should not be attached to every managed resource. |
+| `deploymentBelongsToEnvironment` | `Deployment` | `Environment` | Deployments are hosted inside environments; the slot should not be reused to every managed resource. |
 | `deploymentHasReplica` | `Deployment` | `Replica` | Replicas are parts of deployments, not of every platform resource. |
 | `interfaceExposesResource` | `InterfaceSurface` | `PlatformResource` | Web, API, MCP, and BFF surfaces can expose platform resources. |
 | `environmentHasNetworkAccess` | `Environment` | `NetworkAccess` | Network access belongs to the environment boundary. |
@@ -593,7 +593,7 @@ Reqvire and `red`-style ontology refactoring rules:
 - If a proposed domain or range lists all subclasses of a parent class, use the parent class instead.
 - If a proposed domain or range lists almost all subclasses of a parent class, consider the parent only if the exceptions are not semantically important.
 - If a slot applies only to a specialized class, keep it there. For example, `deploymentHasReplica` belongs on `Deployment`, not on `PlatformResource`.
-- If a slot applies to all managed resources, attach it at the shared parent. For example, `resourceIdentifier` belongs on `PlatformResource` or `ManagedResource`, not separately on `Deployment`, `Environment`, and `Database`.
+- If a slot applies to all managed resources, reuse it at the shared parent. For example, `resourceIdentifier` belongs on `PlatformResource` or `ManagedResource`, not separately on `Deployment`, `Environment`, and `Database`.
 
 Compact OWL/Turtle mapping:
 
@@ -698,7 +698,7 @@ Avoid:
 - Class and slot names that differ only by case, such as `Environment` and `environment`, when a clearer relation name exists.
 - Product/UI labels as canonical class names when a stable domain concept exists.
 
-Use comments or annotation properties for presentation labels, aliases, translations, old names, and product terms. For example, keep `MissionControlInterface` as the canonical class only if it is a stable domain concept; otherwise model it as a label or individual attached to `WebInterface`.
+Use comments or annotation properties for presentation labels, aliases, translations, old names, and product terms. For example, keep `MissionControlInterface` as the canonical class only if it is a stable domain concept; otherwise model it as a label or individual reused to `WebInterface`.
 
 ### Singular Or Plural
 
@@ -865,7 +865,7 @@ ex:criticalLifecycleState a owl:NamedIndividual, ex:LifecycleState ;
 
 ex:collectReportKind a owl:NamedIndividual, ex:ReportKind ;
   ex:reportKindName "collect" ;
-  rdfs:comment "Report kind that gathers element context, contracts, attachments, and reachable semantic context." .
+  rdfs:comment "Report kind that gathers element context, contracts, reused_contract_context, and reachable semantic context." .
 ```
 
 ### Axioms

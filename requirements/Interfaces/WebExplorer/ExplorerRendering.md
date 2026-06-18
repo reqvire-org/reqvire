@@ -18,13 +18,13 @@ The system shall provide a mobile-friendly Explorer interface accessible on smar
 The system shall use component-based architecture in the Explorer SPA to eliminate duplicated browser rendering code and improve maintainability.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Component-Based Explorer Architecture Refinement Specification](Specifications.md#component-based-explorer-architecture-refinement-specification)
+  * definedBy: [Component-Based Explorer Architecture Contract Specification](Specifications.md#component-based-explorer-architecture-contract-specification)
   * derivedFrom: [Mobile-Friendly Explorer](#mobile-friendly-explorer)
   * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
   * satisfiedBy: [MarkdownContent.tsx](../../../explorer/src/components/MarkdownContent.tsx)
@@ -36,13 +36,13 @@ Implementation details shall follow the associated refinement specifications.
 The system shall render the Explorer with responsive design supporting desktop, tablet, and mobile viewports.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Responsive Explorer Rendering Refinement Specification](Specifications.md#responsive-explorer-rendering-refinement-specification)
+  * definedBy: [Responsive Explorer Rendering Contract Specification](Specifications.md#responsive-explorer-rendering-contract-specification)
   * derive: [Explorer Design System Styling](#explorer-design-system-styling)
   * derivedFrom: [Mobile-Friendly Explorer](#mobile-friendly-explorer)
   * satisfiedBy: [index.html](../../../explorer/index.html)
@@ -55,13 +55,13 @@ Implementation details shall follow the associated refinement specifications.
 The system shall integrate the Reqvire Explorer design system, local Geist fonts, and compiled local CSS tokens for consistent responsive styling.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Explorer Design System Styling Refinement Specification](Specifications.md#explorer-design-system-styling-refinement-specification)
+  * definedBy: [Explorer Design System Styling Contract Specification](Specifications.md#explorer-design-system-styling-contract-specification)
   * derivedFrom: [Responsive Explorer Rendering](#responsive-explorer-rendering)
   * satisfiedBy: [ElementIcon.tsx](../../../explorer/design-system/components/data/ElementIcon.tsx)
   * satisfiedBy: [DetailDialog.tsx](../../../explorer/design-system/product-patterns/detail/DetailDialog.tsx)

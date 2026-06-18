@@ -8,6 +8,7 @@ pub const GOVERNANCE_METADATA_KEYS: &[&str] = &["status", "priority", "risk", "o
 pub const GOVERNANCE_STATUS_VALUES: &[&str] = &["draft", "review", "approved"];
 pub const GOVERNANCE_PRIORITY_VALUES: &[&str] = &["low", "medium", "high", "critical"];
 pub const GOVERNANCE_RISK_VALUES: &[&str] = &["low", "medium", "high", "critical"];
+pub const REUSED_CONTRACT_CONTEXT_SECTION: &str = "Reused Contract Context";
 
 pub fn is_governance_metadata_key(key: &str) -> bool {
     GOVERNANCE_METADATA_KEYS.contains(&key)
@@ -25,6 +26,10 @@ pub fn is_valid_governance_risk(value: &str) -> bool {
     GOVERNANCE_RISK_VALUES.contains(&value)
 }
 
+pub fn is_reused_contract_context_section(value: &str) -> bool {
+    value == REUSED_CONTRACT_CONTEXT_SECTION
+}
+
 /// All valid element types that can be used in --filter-type arguments.
 /// These values match what ElementType::as_str() returns for each variant.
 ///
@@ -40,13 +45,13 @@ pub const ELEMENT_TYPES: &[&str] = &[
     "inspection-verification",    // VerificationType::Inspection
     "demonstration-verification", // VerificationType::Demonstration
     "verification-objective",     // ElementType::VerificationObjective
-    "source",                     // RefinementType::Source
+    "source",                     // ContractType::Source
     "semantic-contract",          // ElementType::SemanticContract
-    "constraint",                 // RefinementType::Constraint
-    "behavior",                   // RefinementType::Behavior
-    "specification",              // RefinementType::Specification
-    "state",                      // RefinementType::State
-    "input-output",               // RefinementType::InputOutput
+    "constraint",                 // ContractType::Constraint
+    "behavior",                   // ContractType::Behavior
+    "specification",              // ContractType::Specification
+    "state",                      // ContractType::State
+    "input-output",               // ContractType::InputOutput
 ];
 
 /// Element type aliases that are also accepted (mapped to canonical types)
@@ -87,40 +92,40 @@ pub fn element_types_help() -> String {
     )
 }
 
-/// Represents the target of an attachment - either a file path or an element identifier
+/// Represents the target of an reused_contract_context - either a file path or an element identifier
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub enum AttachmentTarget {
-    /// File path attachment (git-root-relative, normalized)
+pub enum ReusedContractContextTarget {
+    /// File path reused_contract_context (git-root-relative, normalized)
     FilePath(PathBuf),
-    /// Element identifier attachment (must point to a Refinement element)
+    /// Element identifier reused_contract_context (must point to a Contract element)
     ElementIdentifier(String),
 }
 
-impl AttachmentTarget {
-    /// Returns a string representation of the attachment target
+impl ReusedContractContextTarget {
+    /// Returns a string representation of the reused_contract_context target
     pub fn as_str(&self) -> String {
         match self {
-            AttachmentTarget::FilePath(path) => path.to_string_lossy().to_string(),
-            AttachmentTarget::ElementIdentifier(id) => id.clone(),
+            ReusedContractContextTarget::FilePath(path) => path.to_string_lossy().to_string(),
+            ReusedContractContextTarget::ElementIdentifier(id) => id.clone(),
         }
     }
 
-    /// Returns true if this is a file path attachment
+    /// Returns true if this is a file path reused_contract_context
     pub fn is_file_path(&self) -> bool {
-        matches!(self, AttachmentTarget::FilePath(_))
+        matches!(self, ReusedContractContextTarget::FilePath(_))
     }
 
-    /// Returns true if this is an element identifier attachment
+    /// Returns true if this is an element identifier reused_contract_context
     pub fn is_element_identifier(&self) -> bool {
-        matches!(self, AttachmentTarget::ElementIdentifier(_))
+        matches!(self, ReusedContractContextTarget::ElementIdentifier(_))
     }
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct Attachment {
-    pub target: AttachmentTarget,
-    /// Content hash for file attachments (FilePath only).
-    /// For ElementIdentifier attachments, the hash is looked up from registry.
+pub struct ReusedContractContextEntry {
+    pub target: ReusedContractContextTarget,
+    /// Content hash for file reused_contract_context (FilePath only).
+    /// For ElementIdentifier reused_contract_context, the hash is looked up from registry.
     pub content_hash: Option<String>,
 }
 
@@ -190,8 +195,9 @@ pub enum SubSection {
     Metadata,
     Details,
     Properties,
-    Attachments,
+    ReusedContractContext,
     ConceptReferences,
+    ExternalOntology,
 }
 impl SubSection {
     pub fn name(&self) -> &str {
@@ -201,10 +207,25 @@ impl SubSection {
             SubSection::Metadata => "Metadata",
             SubSection::Details => "Details",
             SubSection::Properties => "Properties",
-            SubSection::Attachments => "Attachments",
+            SubSection::ReusedContractContext => REUSED_CONTRACT_CONTEXT_SECTION,
             SubSection::ConceptReferences => "Concept References",
+            SubSection::ExternalOntology => "External Ontology",
             SubSection::Other(name) => name.as_str(),
         }
+    }
+
+    pub fn is_repeatable(&self) -> bool {
+        matches!(self, SubSection::ExternalOntology)
+    }
+
+    pub fn is_content_bearing(&self) -> bool {
+        matches!(
+            self,
+            SubSection::Details
+                | SubSection::ConceptReferences
+                | SubSection::ExternalOntology
+                | SubSection::Other(_)
+        )
     }
 
     pub fn parse(s: &str) -> Self {
@@ -214,8 +235,9 @@ impl SubSection {
             "Metadata" => SubSection::Metadata,
             "Details" => SubSection::Details,
             "Properties" => SubSection::Properties,
-            "Attachments" => SubSection::Attachments,
+            REUSED_CONTRACT_CONTEXT_SECTION => SubSection::ReusedContractContext,
             "Concept References" => SubSection::ConceptReferences,
+            "External Ontology" => SubSection::ExternalOntology,
             other => SubSection::Other(other.to_string()),
         }
     }
@@ -237,7 +259,7 @@ pub enum VerificationType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub enum RefinementType {
+pub enum ContractType {
     Source,
     Constraint,
     Behavior,
@@ -254,7 +276,7 @@ pub enum ElementType {
     SemanticContract,
     VerificationObjective,
     Verification(VerificationType),
-    Refinement(RefinementType),
+    Contract(ContractType),
     File,
     Other(String),
 }
@@ -284,13 +306,13 @@ impl ElementType {
                 VerificationType::Inspection => "inspection-verification",
                 VerificationType::Demonstration => "demonstration-verification",
             },
-            ElementType::Refinement(ref_type) => match ref_type {
-                RefinementType::Source => "source",
-                RefinementType::Constraint => "constraint",
-                RefinementType::Behavior => "behavior",
-                RefinementType::Specification => "specification",
-                RefinementType::State => "state",
-                RefinementType::InputOutput => "input-output",
+            ElementType::Contract(ref_type) => match ref_type {
+                ContractType::Source => "source",
+                ContractType::Constraint => "constraint",
+                ContractType::Behavior => "behavior",
+                ContractType::Specification => "specification",
+                ContractType::State => "state",
+                ContractType::InputOutput => "input-output",
             },
             ElementType::File => "file",
             ElementType::Other(s) => s.as_str(),
@@ -331,13 +353,13 @@ impl ElementType {
 
             "semantic-contract" => ElementType::SemanticContract,
 
-            // Refinement types
-            "source" => ElementType::Refinement(RefinementType::Source),
-            "constraint" => ElementType::Refinement(RefinementType::Constraint),
-            "behavior" => ElementType::Refinement(RefinementType::Behavior),
-            "specification" => ElementType::Refinement(RefinementType::Specification),
-            "state" => ElementType::Refinement(RefinementType::State),
-            "input-output" => ElementType::Refinement(RefinementType::InputOutput),
+            // Contract types
+            "source" => ElementType::Contract(ContractType::Source),
+            "constraint" => ElementType::Contract(ContractType::Constraint),
+            "behavior" => ElementType::Contract(ContractType::Behavior),
+            "specification" => ElementType::Contract(ContractType::Specification),
+            "state" => ElementType::Contract(ContractType::State),
+            "input-output" => ElementType::Contract(ContractType::InputOutput),
 
             "file" => ElementType::File,
             other if other.starts_with("other-") && other.len() > 6 => {
@@ -347,9 +369,9 @@ impl ElementType {
         }
     }
 
-    /// Returns true if this element type is a requirement-owned refinement type.
-    pub fn is_refinement(&self) -> bool {
-        matches!(self, ElementType::Refinement(_))
+    /// Returns true if this element type is a requirement-owned contract type.
+    pub fn is_contract(&self) -> bool {
+        matches!(self, ElementType::Contract(_))
     }
 
     pub fn is_capability(&self) -> bool {
@@ -368,20 +390,20 @@ impl ElementType {
         self.is_capability() || self.is_requirement()
     }
 
-    pub fn is_capability_refinement(&self) -> bool {
+    pub fn is_capability_contract(&self) -> bool {
         false
     }
 
-    pub fn is_requirement_refinement(&self) -> bool {
+    pub fn is_requirement_contract(&self) -> bool {
         matches!(
             self,
-            ElementType::Refinement(
-                RefinementType::Source
-                    | RefinementType::Constraint
-                    | RefinementType::Behavior
-                    | RefinementType::Specification
-                    | RefinementType::State
-                    | RefinementType::InputOutput
+            ElementType::Contract(
+                ContractType::Source
+                    | ContractType::Constraint
+                    | ContractType::Behavior
+                    | ContractType::Specification
+                    | ContractType::State
+                    | ContractType::InputOutput
             )
         )
     }
@@ -403,7 +425,7 @@ impl ElementType {
             ElementType::SemanticContract => "semantic-contract",
             ElementType::VerificationObjective => "verification-objective",
             ElementType::Verification(_) => "verification",
-            ElementType::Refinement(_) => "refinement",
+            ElementType::Contract(_) => "contract",
             ElementType::File => "file",
             ElementType::Other(_) => "other",
         }
@@ -439,8 +461,8 @@ pub struct Element {
     // Order index within the file (used for preserving original order)
     pub file_order_index: usize,
     //
-    // Attachments - external documents linked to this element
-    pub attachments: Vec<Attachment>,
+    // Reused Contract Context - external documents linked to this element
+    pub reused_contract_context: Vec<ReusedContractContextEntry>,
     //
     // Optional model-build metadata for JSON evidence consumers.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -483,7 +505,7 @@ impl Element {
             metadata: HashMap::new(),
             changed_since_commit: false,
             file_order_index: 0, // Will be set during parsing
-            attachments: vec![],
+            reused_contract_context: vec![],
             size_estimate: None,
             semantic_contract: None,
             ontology: None,

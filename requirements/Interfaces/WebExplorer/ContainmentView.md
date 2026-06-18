@@ -17,7 +17,7 @@ Model browsing modes display the physical organization and graph structure of th
 Three workspace modes are available:
 - **List**: Tabular folder/file/element browsing with sortable fields
 - **Grid**: Card-based folder/file/element browsing
-- **Graph**: Interactive project graph over elements, resources, relations, attachments, and trace facts
+- **Graph**: Interactive project graph over elements, resources, relations, reused_contract_context, and trace facts
 
 Users switch between Model modes using compact controls in the left Explorer pane.
 
@@ -30,26 +30,26 @@ The containment hierarchy extraction must:
 - Traverse folder structure recursively
 - For each folder: collect subfolders and files
 - For each file: collect all elements (H3 headers with Metadata)
-- For each element: collect attachments as children
+- For each element: collect reused_contract_context as children
 - Skip sections (H2 headers) in the hierarchy representation
 
 **Element Information:**
 - Extract element identifier, name, and type
 - Preserve file path and folder structure
 - Maintain insertion order for elements within files
-- Extract all attachments distinguishing between element and file attachments
+- Extract all reused_contract_context distinguishing between element and file reused_contract_context
 
 **Data Structure:**
 - Represent as tree: `Folder -> [Subfolders, Files]`
 - Files contain: `File -> [Elements]`
-- Elements contain: identifier, name, type, attachments
-- Attachments displayed as children of elements
+- Elements contain: identifier, name, type, reused_contract_context
+- Reused Contract Context displayed as children of elements
 
 **Ordering:**
 - Folders sorted alphabetically
 - Files sorted alphabetically within folders
 - Elements preserve document order within files
-- Attachments preserve document order within elements
+- Reused Contract Context preserve document order within elements
 
 ---
 
@@ -91,7 +91,7 @@ The Graph view renders the project knowledge graph inside the Model workspace.
 
 **Structure:**
 - Nodes represent modeled elements and opt-in resource/evidence targets
-- Edges represent relation facts, attachment facts, concept-reference facts, verification/satisfaction facts, and trace overlays
+- Edges represent relation facts, reused_contract_context facts, concept-reference facts, verification/satisfaction facts, and trace overlays
 - Left-pane controls expose graph filters, overlays, layout reset, and selected element actions
 
 **Interactive Capabilities:**
@@ -114,7 +114,7 @@ Both Model route visualizations use the Explorer design-system semantic palette 
 | requirement | Requirement role token and requirement glyph |
 | verification-objective | Verification-objective role token and plain square marker |
 | verification | Concrete verification role token and verification glyph |
-| refinement | Refinement role token with subtype-specific glyph |
+| contract | Contract role token with subtype-specific glyph |
 | resource | Resource role token for referenced implementation, evidence, or document targets |
 | other/default | Muted/default role token for unresolved or generic infrastructure nodes |
 
@@ -169,12 +169,12 @@ Both visualizations consume JSON data in this format:
               "children": [
                 {
                   "name": "auth-design",
-                  "type": "attachment-element",
+                  "type": "reused-contract-context-element",
                   "link": "#/content/requirements/Design.md#auth-design"
                 },
                 {
                   "name": "AuthSpec.pdf",
-                  "type": "attachment-file",
+                  "type": "reused-contract-context-file",
                   "link": "docs/AuthSpec.pdf"
                 }
               ]
@@ -193,9 +193,9 @@ Both visualizations consume JSON data in this format:
 - `link`: Optional source or Explorer route link for clickable nodes
 - `children`: Array of child nodes (empty array omitted in serialization)
 
-**Attachment Node Types:**
-- `attachment-element`: Element identifier (navigable to element definition)
-- `attachment-file`: File name only, link contains the full path
+**Reused Contract Context Node Types:**
+- `reused-contract-context-element`: Element identifier (navigable to element definition)
+- `reused-contract-context-file`: File name only, link contains the full path
 
 ---
 

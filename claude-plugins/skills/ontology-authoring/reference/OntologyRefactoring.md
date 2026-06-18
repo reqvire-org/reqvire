@@ -142,7 +142,7 @@ If an ontology element uses terms declared by another ontology element, its `der
 
 Examples:
 
-- an ontology using `RequirementOwnedRefinement` should derive from the requirement ontology
+- an ontology using `RequirementOwnedContract` should derive from the requirement ontology
 - an ontology using relation-rule vocabulary should derive from the relation ontology
 - a projection/export ontology can derive from the report or core ontology that defines the reused terms
 
@@ -187,7 +187,7 @@ ex:EmployeeShape a sh:NodeShape ;
 
 If prose says a class is owned by a specific model element type, the OWL hierarchy should reflect that when the owner class exists.
 
-For example, requirement-owned semantic refinements should subclass `reqvire:RequirementOwnedRefinement`, not only generic `reqvire:Refinement`.
+For example, requirement-owned semantic contracts should subclass `reqvire:RequirementOwnedContract`, not only generic `reqvire:Contract`.
 
 ### Preserve Tokens
 

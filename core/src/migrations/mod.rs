@@ -1,5 +1,5 @@
 use crate::diff::{generate_file_diff, FileDiff};
-use crate::element::{Element, ElementType};
+use crate::element::{Element, ElementType, REUSED_CONTRACT_CONTEXT_SECTION};
 use crate::error::ReqvireError;
 use crate::filesystem;
 use crate::graph_registry::{ElementNode, GraphRegistry};
@@ -48,6 +48,9 @@ pub const VERIFICATION_OBJECTIVE_HOLDER_ID: &str =
     "VerificationObjectiveMigration.md#verification-objective";
 pub const DOCUMENTS_HEADER_MIGRATION_ID: &str = "v0.15-documents-to-element-header";
 pub const CONTRACT_RELATION_MIGRATION_ID: &str = "v1.0-contract-relations";
+pub const REUSED_CONTRACT_CONTEXT_SECTION_MIGRATION_ID: &str =
+    "v1.1-reused-contract-context-section";
+const LEGACY_ATTACHMENTS_SECTION: &str = "Attachments";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct VerificationObjectiveMigrationSummary {
@@ -60,6 +63,13 @@ pub struct VerificationObjectiveMigrationSummary {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct DocumentsHeaderMigrationSummary {
+    pub migration_id: &'static str,
+    pub files_changed: usize,
+    pub affected_files: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ReusedContractContextSectionMigrationSummary {
     pub migration_id: &'static str,
     pub files_changed: usize,
     pub affected_files: Vec<String>,
@@ -93,7 +103,7 @@ pub fn candidates_for_validation_errors(errors: &[ReqvireError]) -> MigrationPla
             from_version: "0.x",
             to_version: "1.0",
             safety: MigrationSafety::Automatic,
-            summary: "Rewrite legacy refinement relation names to requirement-owned contract relation names: refinedBy -> definedBy and refine -> define.",
+            summary: "Rewrite legacy contract relation names to requirement-owned contract relation names: refinedBy -> definedBy and refine -> define.",
             dry_run_hint: "A dry run should show every relation key rewrite before applying source edits.",
         });
     }
@@ -329,6 +339,94 @@ fn rewrite_documents_header_content(content: &str) -> Option<String> {
     changed.then(|| output.concat())
 }
 
+pub fn apply_reused_contract_context_section_migration(
+    excluded_filename_patterns: &GlobSet,
+    dry_run: bool,
+) -> Result<(ReusedContractContextSectionMigrationSummary, Vec<FileDiff>), ReqvireError> {
+    let mut affected_files = Vec::new();
+    let mut diffs = Vec::new();
+
+    for path in utils::scan_markdown_files(None, excluded_filename_patterns) {
+        let current = filesystem::read_file(&path)?;
+        let Some(next) = rewrite_reused_contract_context_section_content(&current) else {
+            continue;
+        };
+        let relative = utils::get_relative_path(&path)
+            .map(|path| path.to_string_lossy().to_string())
+            .unwrap_or_else(|_| path.to_string_lossy().to_string());
+        let diff = generate_file_diff(&relative, &current, &next);
+        if !diff.lines.is_empty() {
+            diffs.push(diff);
+        }
+        if !dry_run {
+            filesystem::write_file(&path, next.as_bytes())?;
+        }
+        affected_files.push(relative);
+    }
+
+    affected_files.sort();
+
+    Ok((
+        ReusedContractContextSectionMigrationSummary {
+            migration_id: REUSED_CONTRACT_CONTEXT_SECTION_MIGRATION_ID,
+            files_changed: affected_files.len(),
+            affected_files,
+        },
+        diffs,
+    ))
+}
+
+fn rewrite_reused_contract_context_section_content(content: &str) -> Option<String> {
+    let mut output = Vec::new();
+    let mut changed = false;
+
+    for line in content.split_inclusive('\n') {
+        let (body, suffix) = if let Some(body) = line.strip_suffix("\r\n") {
+            (body, "\r\n")
+        } else if let Some(body) = line.strip_suffix('\n') {
+            (body, "\n")
+        } else {
+            (line, "")
+        };
+        let trimmed = body.trim();
+        let replacement = if trimmed == format!("#### {}", LEGACY_ATTACHMENTS_SECTION) {
+            Some(format!("#### {}", REUSED_CONTRACT_CONTEXT_SECTION))
+        } else if trimmed == format!("## {}", LEGACY_ATTACHMENTS_SECTION) {
+            Some(format!("## {}", REUSED_CONTRACT_CONTEXT_SECTION))
+        } else {
+            None
+        };
+
+        if let Some(replacement) = replacement {
+            let leading_len = body.len() - body.trim_start().len();
+            output.push(format!("{}{}{}", &body[..leading_len], replacement, suffix));
+            changed = true;
+        } else {
+            output.push(line.to_string());
+        }
+    }
+
+    if content.is_empty() {
+        return None;
+    }
+
+    if !content.ends_with('\n') && output.is_empty() {
+        let trimmed = content.trim();
+        let replacement = if trimmed == format!("#### {}", LEGACY_ATTACHMENTS_SECTION) {
+            Some(format!("#### {}", REUSED_CONTRACT_CONTEXT_SECTION))
+        } else if trimmed == format!("## {}", LEGACY_ATTACHMENTS_SECTION) {
+            Some(format!("## {}", REUSED_CONTRACT_CONTEXT_SECTION))
+        } else {
+            None
+        };
+        if let Some(replacement) = replacement {
+            return Some(replacement);
+        }
+    }
+
+    changed.then(|| output.concat())
+}
+
 fn has_user_created_objective_parent(registry: &GraphRegistry, verification_id: &str) -> bool {
     let Some(node) = registry.nodes.get(verification_id) else {
         return false;
@@ -544,5 +642,20 @@ mod tests {
         );
         assert!(rewrite_documents_header_content("# Elements\n").is_none());
         assert!(rewrite_documents_header_content("# Other\n\n# Documents\n").is_none());
+    }
+
+    #[test]
+    fn reused_contract_context_migration_rewrites_legacy_attachment_headings() {
+        let input = "### Requirement\n\n#### Attachments\n  * [Contract](Contracts.md#contract)\n\n## Attachments\n";
+        let rewritten = rewrite_reused_contract_context_section_content(input).unwrap();
+
+        assert_eq!(
+            rewritten,
+            "### Requirement\n\n#### Reused Contract Context\n  * [Contract](Contracts.md#contract)\n\n## Reused Contract Context\n"
+        );
+        assert!(
+            rewrite_reused_contract_context_section_content("#### Reused Contract Context\n")
+                .is_none()
+        );
     }
 }

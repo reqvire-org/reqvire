@@ -132,7 +132,7 @@ When deleting an element, the system is expected to:
   * type: specification
 ---
 
-### Element Manipulation File Persistence Refinement Specification
+### Element Manipulation File Persistence Contract Specification
 
 #### Details
 The system is expected to persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.
@@ -219,7 +219,7 @@ Document format rule:
   * type: specification
 ---
 
-### Move File Operation Refinement Specification
+### Move File Operation Contract Specification
 
 #### Details
 When moving a file, the system is expected to:
@@ -263,7 +263,7 @@ The error message for orphaned children prevention is expected to include:
   * type: specification
 ---
 
-### Relation Consistency Maintenance Refinement Specification
+### Relation Consistency Maintenance Contract Specification
 
 #### Details
 Relation consistency maintenance behavior during element manipulation:
@@ -312,7 +312,7 @@ Rules for validating and normalizing relation targets during element creation an
   * type: specification
 ---
 
-### Rename Element Operation Refinement Specification
+### Rename Element Operation Contract Specification
 
 #### Details
 When renaming an element, the system is expected to:

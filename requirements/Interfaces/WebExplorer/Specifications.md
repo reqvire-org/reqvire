@@ -1,24 +1,24 @@
 # Elements
 
-### Attachment Link Serving Refinement Specification
+### Reused Contract Context Link Serving Contract Specification
 
 #### Details
-Attachment link behavior in the served Explorer:
-- Collects attachment references from `element.attachments` across the model.
-- Resolves each attachment as a refinement element identifier target.
-- Skips duplicate identifier processing when the same refinement is referenced by multiple elements.
-- Keeps attachment-link evidence available in Project Store data for content routes, graph views, search results, and element modals.
+Reused Contract Context link behavior in the served Explorer:
+- Collects reused_contract_context references from `element.reused_contract_context` across the model.
+- Resolves each reused_contract_context as a contract element identifier target.
+- Skips duplicate identifier processing when the same contract is referenced by multiple elements.
+- Keeps reused-contract-context-link evidence available in Project Store data for content routes, graph views, search results, and element modals.
 
-This keeps served Explorer content complete with navigable refinement attachment links.
+This keeps served Explorer content complete with navigable contract reused_contract_context links.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * define: [Attachment Link Serving](Capabilities.md#attachment-link-serving)
+  * define: [Reused Contract Context Link Serving](Capabilities.md#reused-contract-context-link-serving)
 ---
 
-### Component-Based Explorer Architecture Refinement Specification
+### Component-Based Explorer Architecture Contract Specification
 
 #### Details
 The Explorer UI system is expected to be organized into reusable components:
@@ -46,32 +46,32 @@ Each component is expected to be defined once and reused across SPA view modules
   * type: specification
 ---
 
-### Containment View Attachment Links Refinement Specification
+### Containment View Reused Contract Context Links Contract Specification
 
 #### Details
-Model containment-mode attachment rendering behavior:
-- For each element with attachments, preserves attachment records in the Project Store data consumed by Model List/Grid and element-detail workflows.
-- Uses the shared Explorer element-role and refinement-subtype glyph contract for attachment records that target refinement elements, with `attachment-element` retained as data classification only.
-- Element-attachment records navigate to the referenced element detail/source route from supported Explorer surfaces.
+Model containment-mode reused_contract_context rendering behavior:
+- For each element with reused_contract_context, preserves reused_contract_context records in the Project Store data consumed by Model List/Grid and element-detail workflows.
+- Uses the shared Explorer element-role and contract-subtype glyph treatment for reused_contract_context records that target contract elements, with `reused-contract-context-element` retained as data classification only.
+- Element-reused_contract_context records navigate to the referenced element detail/source route from supported Explorer surfaces.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * define: [Containment View Attachment Links](Capabilities.md#containment-view-attachment-links)
+  * define: [Containment View Reused Contract Context Links](Capabilities.md#containment-view-reused-contract-context-links)
 ---
 
-### Diagram Attachment Display Refinement Specification
+### Diagram Reused Contract Context Display Contract Specification
 
 #### Details
-Diagram attachment rendering behavior in Mermaid output:
-- Renders attachment links under the element name inside node labels.
-- Prefixes each attachment with paperclip icon (`📎`).
-- Displays referenced refinement element names.
-- Does not display full attachment identifier paths in node labels; identifier paths remain link targets or structured report data.
-- Produces clickable links to the referenced refinement element.
+Diagram reused_contract_context rendering behavior in Mermaid output:
+- Renders reused_contract_context links under the element name inside node labels.
+- Prefixes each reused_contract_context with paperclip icon (`📎`).
+- Displays referenced contract element names.
+- Does not display full reused_contract_context identifier paths in node labels; identifier paths remain link targets or structured report data.
+- Produces clickable links to the referenced contract element.
 - Uses Mermaid multiline label formatting (`<br/>`).
-- Applies the same compact display-name rule to Model, Knowledge Graph, and Traces diagrams so a late-page verification or graph view cannot be widened or clipped by full `file#fragment` attachment identifiers.
+- Applies the same compact display-name rule to Model, Knowledge Graph, and Traces diagrams so a late-page verification or graph view cannot be widened or clipped by full `file#fragment` reused_contract_context identifiers.
 
 Example node:
 ```
@@ -82,7 +82,7 @@ elementId["Element Name<br/>📎 Deterministic Output Specification"]
   * type: specification
 
 #### Relations
-  * define: [Diagram Attachment Display](Capabilities.md#diagram-attachment-display)
+  * define: [Diagram Reused Contract Context Display](Capabilities.md#diagram-reused-contract-context-display)
 ---
 
 ### Explorer Branding Specification
@@ -113,11 +113,11 @@ Explorer palette behavior:
 - Treat primitive color values as token implementation details. Explorer code and specifications shall name colors by purpose, such as model canvas, selected row, capability node, requirement node, verification node, ontology node, resource node, and relation edge.
 - Use local Geist font assets and warm-neutral Reqvire surfaces for Explorer chrome, source pages, modals, graph canvases, and routed report views.
 - Use one role palette across the Model tree, List/Grid rows, Graph mode, Search results, Ontologies, Traces, source content, and element modals.
-- Render semantic-contract elements with their own SHACL-profile role token as a plain square with no glyph. Render refinement-family subtypes with one shared refinement hue and distinct type glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
-- Render capability elements as a plain capability-colored square with no dark hub wrapper or inner pip, matching the simple square treatment used by other non-refinement element types.
+- Render semantic-contract elements with their own SHACL-profile role token as a plain square with no glyph. Render contract-family subtypes with one shared contract hue and distinct type glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
+- Render capability elements as a plain capability-colored square with no dark hub wrapper or inner pip, matching the simple square treatment used by other non-contract element types.
 - Render `verification-objective` elements with their own darker green verification-objective role token as a plain square with no glyph, distinct from concrete verification elements that verify requirements or capabilities.
 - Render unresolved concept-reference targets with the resource/amber role treatment, but render resolved ontology-term concept references as ontology endpoints in element-detail modals. Evidence-file and artifact targets use the neutral/default role treatment and must not share the concept-reference resource color.
-- Relation and attachment endpoints shall use the shared `ElementIcon` marker contract for both element targets and non-element resource/artifact targets; they shall not use ad hoc tiny pips with local color mappings.
+- Relation and reused_contract_context endpoints shall use the shared `ElementIcon` marker contract for both element targets and non-element resource/artifact targets; they shall not use ad hoc tiny pips with local color mappings.
 - In element-detail modal headers, render only the actual element type badge. Type family remains available to design-system components for color/glyph semantics but must not appear as a redundant visible kind badge next to the actual type.
 - Keep color as a secondary cue: every type color must be paired with text, glyph shape, or accessible label.
 
@@ -126,7 +126,7 @@ The Explorer element color contract uses saturated role colors for graph nodes a
 | Role | Purpose |
 |------|---------|
 | Capability | Capability roots and capability-owned context |
-| Requirement / refinement | Requirement obligations and requirement-owned refinement contracts |
+| Requirement / contract | Requirement obligations and requirement-owned contracts |
 | Verification | Verification elements and evidence-backed tests |
 | Ontology | Authored ontology vocabulary and ontology-derived terms |
 | Resource | Local implementation, concept-reference, document, or resource targets referenced by the model |
@@ -141,7 +141,7 @@ Raw hexadecimal values belong in design-system token files or generated assets, 
   * define: [Web Interface Color Scheme](Capabilities.md#web-interface-color-scheme)
 ---
 
-### Explorer Design System Styling Refinement Specification
+### Explorer Design System Styling Contract Specification
 
 #### Details
 Explorer design-system styling behavior:
@@ -175,13 +175,13 @@ Explorer Mermaid rendering behavior:
 - Mermaid diagrams embedded in source pages, model content, and trace roll-up views use the same typography, background, border, zoom/pan controls, and selected/hovered visual treatment as the rest of the Explorer.
 - Each Mermaid diagram initializes independently after its route content is visible. Rendering many diagrams must not block the initial Explorer shell or require all diagrams to finish before the page becomes usable.
 - Small diagrams shrink to natural height. Large diagrams receive their own pan/zoom viewport and shall not force unrelated page content or later diagrams into a fixed full-screen scroll region.
-- Attachment labels in Model and Traces diagrams use display names rather than full `file#fragment` identifiers, while the full identifier remains the link target and structured data value.
+- Reused Contract Context labels in Model and Traces diagrams use display names rather than full `file#fragment` identifiers, while the full identifier remains the link target and structured data value.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * define: [Diagram Attachment Display](Capabilities.md#diagram-attachment-display)
+  * define: [Diagram Reused Contract Context Display](Capabilities.md#diagram-reused-contract-context-display)
 ---
 
 ### Explorer Navigation Chrome Specification
@@ -231,7 +231,7 @@ Technical specification for the Explorer serve runtime pipeline.
 #### Details
 **Runtime Data Setup:**
 - Assemble Project Store data in memory from the validated registry, semantic index, report projections, modeled resources, and existing graph-referenced local resource/evidence files.
-- Resolve and preserve attachment identifier links to refinement elements.
+- Resolve and preserve reused_contract_context identifier links to contract elements.
 
 **Serve Pipeline:**
 1. Serve the embedded Explorer shell: `index.html` plus deterministic compiled Vite/TypeScript/React and Reqvire Explorer design-system assets, with no CDN-loaded framework or stylesheet.
@@ -273,7 +273,7 @@ The seed output shall:
 - Preserve full repository-relative hierarchy for every Project Store file path so the Model tree renders folders, files, and file-owned elements without flattening single-element files or registry-linked resource files.
 - Be deterministic for unchanged model input, excluding explicitly documented volatile metadata.
 - Be available to the native SPA view modules in `index.html` before any Explorer view attempts to render, and be consumable from local static assets without a CDN-loaded framework or stylesheet.
-- Contain required top-level sections for `project`, `folders`, `files`, `resources`, `elements`, `relations`, `attachments`, `concept_refs`, `submodels`, `traces`, `coverage`, `ontology`, `knowledge_graph`, `search`, `summaries`, and `routes`.
+- Contain required top-level sections for `project`, `folders`, `files`, `resources`, `elements`, `relations`, `reused_contract_context`, `concept_refs`, `submodels`, `traces`, `coverage`, `ontology`, `knowledge_graph`, `search`, `summaries`, and `routes`.
 - Represent file containers and modeled resources as distinct record families.
 - Preserve source links from elements, ontology terms, traces, coverage records, search documents, and resource references back to served file containers when a browsable source file exists.
 - Preserve element detail route data so Explorer links can open `index.html#/elements/<identifier>` as a Project Store-backed modal while retaining source-page anchors as secondary source actions.
@@ -339,7 +339,7 @@ The Model view remains the default Explorer route and visual overview of the mod
   * type: specification
 ---
 
-### Model View Element Navigation Refinement Specification
+### Model View Element Navigation Contract Specification
 
 #### Details
 Model-view element navigation behavior:
@@ -355,7 +355,7 @@ Model-view element navigation behavior:
   * define: [Model View Element Navigation](Capabilities.md#model-view-element-navigation)
 ---
 
-### Model-Centric View Generation Refinement Specification
+### Model-Centric View Generation Contract Specification
 
 #### Details
 Model-centric view generation behavior:
@@ -378,15 +378,15 @@ Model-centric view generation behavior:
   * define: [Model-Centric View Generation](Capabilities.md#model-centric-view-generation)
 ---
 
-### OWL Semantic Ontology Projection Refinement Specification
+### OWL Semantic Ontology Projection Contract Specification
 
 #### Details
 Semantic projection behavior:
 - Classifies resources into semantic node kinds, including OWL/RDFS class, object property, datatype property, RDF property, named individual, SHACL node shape, SHACL property shape, datatype, and generic RDF resource when no stronger kind is known. Literal values are not primary graph nodes; they are subject-owned modal/search evidence.
 - Promotes otherwise-generic named resources to named-individual view nodes when their RDF type evidence references a class declared in the same ontology graph, even when the authored RDF does not explicitly include `owl:NamedIndividual`.
-- Materializes direct-authored OWL/RDFS/SHACL constructs as generated ontology projection facts attached to `SemanticIndex` before full semantic export or Explorer rendering.
+- Materializes direct-authored OWL/RDFS/SHACL constructs as generated ontology projection facts reused to `SemanticIndex` before full semantic export or Explorer rendering.
 - Preserves full IRI, compact label, RDF types, source element identifiers, source file paths, source line numbers, comments, related SHACL constraints, normalized slot/facet evidence, optional raw SHACL evidence, and projection provenance in the Explorer ontology model derived from `SemanticIndex.ontology_projection`.
-- Derives SHACL slot/facet records from property-shape blank nodes and attaches them to the target class plus named property metadata as viewer-facing construct evidence. Target class nodes present those records as slots of the class; property usage rows present those records as class-specific usages of the selected property.
+- Derives SHACL slot/facet records from property-shape blank nodes and reuses them to the target class plus named property metadata as viewer-facing construct evidence. Target class nodes present those records as slots of the class; property usage rows present those records as class-specific usages of the selected property.
 - Separates direct-authored generated facts from inferred facts. Direct-authored facts may drive semantic export and Explorer rendering now; inferred facts require a later inference or materialization requirement.
 - Suppresses `rdf:type` edges, OWL/RDFS metaclass nodes such as `owl:Class`, `owl:ObjectProperty`, `owl:DatatypeProperty`, and `rdfs:Class`, and RDF list plumbing from the primary graph.
 - Suppresses anonymous blank nodes from the primary graph unless the blank node represents a meaningful semantic construct such as a property chain, equivalence group, SHACL shape, or collection member.
@@ -399,7 +399,7 @@ Semantic projection behavior:
   * define: [OWL Semantic Ontology Projection](Capabilities.md#owl-semantic-ontology-projection)
 ---
 
-### Ontologies View Generation Refinement Specification
+### Ontologies View Generation Contract Specification
 
 #### Details
 Ontologies view generation behavior:
@@ -407,6 +407,8 @@ Ontologies view generation behavior:
 - Displays summary counts for ontology blocks, shape blocks, RDF quads, total blocks, and the `ontologies.ttl` download action in the Ontologies left Explorer pane near the reset/search controls.
 - Aligns ontology summary and download controls with the shared left-pane summary treatment: compact entries, muted surface tokens, visible grouping, wrapping when needed, and no clipped `Download .ttl` action.
 - Builds the browser visualization, search index, and ontology node modal metadata from `SemanticIndex.ontology_projection` facts; raw quads may support labels, comments, RDF type evidence, SHACL constraint display, and generic low-level links, but shall not be a separate authoritative extraction path for OWL/RDFS construct metadata.
+- Emits `ontology.graph_data.nodes[]` and `ontology.graph_data.edges[]` with explicit `layer` and `source_kind` fields. The canonical layers are `authored`, `reqvire-context`, and `external-source`; authored OWL/RDFS/SHACL projection facts remain the default layer, generated semantic context is an opt-in layer limited to model-to-term `declaresTerm` and `referencesTerm` provenance, and external vocabulary triples are reserved for explicit external source ingestion.
+- Exposes Ontologies left-pane overlay controls for Semantic Context and External Sources only. Authored ontology content is the implicit base graph and must not appear as a layer row or toggle. Semantic Context and External Sources are opt-in so model-context or external-vocabulary facts do not change the primary authored ontology view.
 - Does not expose the raw RDF triple graph as the primary user-facing ontology visualization.
 - Reuses the same generated ontology construct projection that full semantic export emits so the Ontologies SPA route uses the canonical semantic projection.
 - Uses the Explorer-bundled Ontologies route renderer over `ontology.projection`, declarations, shape references, diagnostics, and `ontologies.ttl` link data. Rust serve runtime generation shall not provide executable ontology renderer JavaScript or CSS through the Project Store.
@@ -442,13 +444,13 @@ Ontologies view generation behavior:
 - Does not render literal values as primary graph nodes or as a visibility filter layer. Literal object values from datatype properties remain searchable and are shown in the modal as predicate/value evidence owned by the selected subject node.
 - Labels class-expression nodes with their property usage context when the expression is used as a property domain or range, for example a valid union-valued range from the ontology model, so OWL domain/range constraints do not look like authored Reqvire model relations. The `define` relation specifically must not render as `Capability ∪ Requirement`; its range is `Requirement` only.
 - Derives class and property slot facets from SHACL node shapes by combining `sh:targetClass`, `sh:property`, `sh:path`, `sh:datatype`, `sh:class`, `sh:nodeKind`, `sh:minCount`, `sh:maxCount`, `sh:pattern`, and `sh:in`. The target class modal shall show those slots and facets directly, with source-shape evidence, without requiring users to inspect the shape node first.
-- Attaches SHACL-derived slot facets to the named property metadata as well when the `sh:path` value is a named property already present in the graph model. On a selected class or term, those records represent property usages as slots; they must be labeled as property usages rather than as duplicate property definitions.
+- Reuses Contract SHACL-derived slot facets to the named property metadata as well when the `sh:path` value is a named property already present in the graph model. On a selected class or term, those records represent property usages as slots; they must be labeled as property usages rather than as duplicate property definitions.
 
 Interaction behavior:
 - Provides search over ontology labels, IRIs, semantic kinds, source elements, and SHACL constraint terms.
 - Provides node or construct focus, neighbor highlighting, and an ontology element modal for full IRI, semantic kind, RDF type evidence, comments, datatype-property literal values, source citations, property usages, domain/range, property characteristics, equivalence membership, inverse relationships, property chains, normalized SHACL-derived slots/facets, and optional raw SHACL evidence.
 - Treats graph visibility controls as canvas-only controls. Role and relation visibility controls shall not remove facts, properties, badges, SHACL facets, constructs, or source evidence from the ontology element modal for the selected node.
-- Shows raw SHACL evidence only when direct raw constraints are attached to the inspected node. Class and property nodes that only receive normalized SHACL overlays must not show an empty raw-evidence section, and normalized slots/facets remain the primary readable representation of those SHACL overlays.
+- Shows raw SHACL evidence only when direct raw constraints are reused to the inspected node. Class and property nodes that only receive normalized SHACL overlays must not show an empty raw-evidence section, and normalized slots/facets remain the primary readable representation of those SHACL overlays.
 - Provides one `Show` visibility group using a shared button design for canvas visibility filters: datatype property links, object property links, class disjointness, restrictions, class expressions, SHACL shapes, resources, and external references. Ontology terms and class-membership context are always available rather than exposed as toggles. For these visibility toggles, active means shown on the canvas. Equivalence, inverse properties, property chains, property characteristics, and SHACL overlay notation remain passive notation/modal evidence until they have a direct canvas-visible control.
 - Renders the Ontologies `Reset`, active `Show` visibility controls, passive `Types` color key, and passive `Notation` legend in the shared left Explorer pane; the Ontologies route shall not inherit the Model project tree, and the ontology canvas shall not render a duplicate in-canvas legend/filter box.
 - Preserves interactive graph manipulation while filtering, focusing, panning, zooming, dragging nodes, and resizing; filtering shall not reset the current camera, focusing shall center the selected node, and reset shall rerun the ForceAtlas2 layout and fit the graph without losing ontology-diagram visual conventions. The viewer exposes a single visible `Reset` view control rather than separate fit and reset buttons.
@@ -477,7 +479,7 @@ Interaction behavior:
   * define: [Ontologies View Generation](Capabilities.md#ontologies-view-generation)
 ---
 
-### Ontology Construct Grouping Refinement Specification
+### Ontology Construct Grouping Contract Specification
 
 #### Details
 OWL construct grouping behavior:
@@ -485,7 +487,7 @@ OWL construct grouping behavior:
 - Assigns each equivalence group a stable identifier derived from a canonical sorted member list rather than a random UUID.
 - Renders equivalence groups as collapsible group nodes or grouped regions so users can inspect group membership without requiring pairwise equivalence edges to dominate the graph.
 - Represents `owl:inverseOf` as inverse property metadata with clear visual treatment where applicable and modal evidence.
-- Parses `owl:propertyChainAxiom` RDF lists into ordered chain members and attaches the ordered chain to the defining object property.
+- Parses `owl:propertyChainAxiom` RDF lists into ordered chain members and reuses the ordered chain to the defining object property.
 - Renders property chains as collapsible ordered chain constructs, preserving the member order from the RDF list.
 - Allows an object property to participate in multiple property chains without duplicating graph nodes for the property.
 - Presents SHACL node shapes and property shapes as an overlay on referenced ontology terms and as modal constraints, not as raw blank-node plumbing mixed with the ontology model.
@@ -498,7 +500,7 @@ OWL construct grouping behavior:
   * define: [Ontology Construct Grouping](Capabilities.md#ontology-construct-grouping)
 ---
 
-### Ontology Property-Centric Visualization Refinement Specification
+### Ontology Property-Centric Visualization Contract Specification
 
 #### Details
 Property-centric visualization behavior:
@@ -518,7 +520,7 @@ Property-centric visualization behavior:
   * define: [Ontology Property-Centric Visualization](Capabilities.md#ontology-property-centric-visualization)
 ---
 
-### Ontology Symbol and Badge Vocabulary Refinement Specification
+### Ontology Symbol and Badge Vocabulary Contract Specification
 
 #### Details
 The ontology viewer symbol vocabulary defines canonical rendered symbols for OWL and set-theoretic concepts. The viewer shall render the `Rendered Unicode Character` value for visual badges and shall keep the `Raw Unicode` code point available in source/specification evidence.
@@ -561,26 +563,26 @@ Symbols shall:
   * define: [Ontology Symbol and Badge Vocabulary](Capabilities.md#ontology-symbol-and-badge-vocabulary)
 ---
 
-### Project Knowledge Graph View Refinement Specification
+### Project Knowledge Graph View Contract Specification
 
 #### Details
 Project knowledge graph view generation behavior:
 - Uses the parsed `GraphRegistry` after validation and opposite-relation propagation so the view reflects the actual current model state.
 - Exposes the project Knowledge Graph as the Model route's Graph mode during serve workflows without generating a separate Knowledge Graph document entry point.
 - Builds graph nodes from actual Reqvire elements and resource targets, not from raw RDF triples or ontology vocabulary definitions.
-- Builds graph edges from actual relation facts, attachment facts, and concept-reference facts. User-authored and generated opposite relation facts shall remain distinguishable as evidence in the graph data and detail modal.
+- Builds graph edges from actual relation facts, reused_contract_context facts, and concept-reference facts. User-authored and generated opposite relation facts shall remain distinguishable as evidence in the graph data and detail modal.
 - Emits Reqvire root submodel metadata alongside graph nodes and edges so Knowledge Graph variants can align visual subgraphs with the same capability-rooted submodel boundaries reported by the `submodels` command.
-- Classifies element nodes into four primary system-model layers: ontology definitions, capabilities, requirements, and verification-family elements. `verification-objective` nodes are verification planning nodes, while concrete verification nodes carry `verify`/evidence facts. Requirement-owned refinements are subordinate requirement detail/contract nodes, not an additional system-model layer. Custom/other elements and resource targets are supporting project-fact nodes, not additional model layers.
-- Separates system-model layer membership from relation semantics. Layer membership controls node role color and filtering; relation semantics control whether an edge is structural (`derive`, `specify`, `define`) or an overlay/evidence fact (`attach`, `satisfiedBy`, `verifiedBy`, `trace`, concept reference, file target, or external target).
+- Classifies element nodes into four primary system-model layers: ontology definitions, capabilities, requirements, and verification-family elements. `verification-objective` nodes are verification planning nodes, while concrete verification nodes carry `verify`/evidence facts. Requirement-owned contracts are subordinate requirement detail/contract nodes, not an additional system-model layer. Custom/other elements and resource targets are supporting project-fact nodes, not additional model layers.
+- Separates system-model layer membership from relation semantics. Layer membership controls node role color and filtering; relation semantics control whether an edge is structural (`derive`, `specify`, `define`) or an overlay/evidence fact (`reuse`, `satisfiedBy`, `verifiedBy`, concept reference, file target, or external target).
 - Shows file-path and external URL targets as resource nodes only when actual project facts reference them.
-- Treats ontology IRI concept-reference targets like attachment/resource targets in the main Knowledge Graph instead of exposing a separate concept-reference node category; detailed OWL/RDFS/SHACL vocabulary exploration remains the responsibility of the Ontologies view.
-- Provides search over element names, identifiers, file paths, relation facts, attachment facts, governance, metadata, and concept references.
+- Treats ontology IRI concept-reference targets like reused_contract_context/resource targets in the main Knowledge Graph instead of exposing a separate concept-reference node category; detailed OWL/RDFS/SHACL vocabulary exploration remains the responsibility of the Ontologies view.
+- Provides search over element names, identifiers, file paths, relation facts, reused_contract_context facts, governance, metadata, and concept references.
 - Is rendered as the canonical `Graph` mode inside `index.html#/model`; the Model route owns List, Grid, and Graph modes.
 - Receives role visibility filters and overlay toggles from the Model left Explorer pane when Graph mode is active. The graph controls are reserved for filters, overlays, legends, and reset/layout controls. The graph canvas shall not render a page-local `Model Show` toolbar, top control band, or floating boxed filter surface.
-- Preserves the four-layer model when overlays are enabled: concept references, requirement-owned refinement details/contracts, verification evidence, satisfaction evidence, and trace links may connect across layers or subordinate nodes, but they must not imply a new layer or a new capability-root submodel boundary.
+- Preserves the four-layer model when overlays are enabled: concept references, requirement-owned contract details/contracts, verification evidence, satisfaction evidence, and trace links may connect across layers or subordinate nodes, but they must not imply a new layer or a new capability-root submodel boundary.
 - Renders search results with the same role-color swatch used by the graph and legend, and omits redundant parenthesized type suffixes so result lists remain scan-friendly.
 - Centers the graph viewport on a node selected from search or direct graph click.
-- Exposes selected-node detail through the left Explorer pane: the selected node remains pinned in the graph, a compact selected-element link appears near the pane summary, and that link opens the shared element-detail modal with element type, identifier, source file/line link, description, governance, metadata, incoming facts, outgoing facts, attachments, and concept references.
+- Exposes selected-node detail through the left Explorer pane: the selected node remains pinned in the graph, a compact selected-element link appears near the pane summary, and that link opens the shared element-detail modal with element type, identifier, source file/line link, description, governance, metadata, incoming facts, outgoing facts, reused_contract_context, and concept references.
 - Renders long modal fields such as element identifiers and source paths as stacked label/value field rows so labels do not consume horizontal space from long values.
 - Colors detail badges with the same role color used by the graph node and legend entry so node type recognition is consistent across graph, pane summary, and modal detail.
 - Uses a dense full-height WebGL graph canvas and persistent left Explorer pane so graph space is prioritized without a top header or always-open detail pane.
@@ -590,14 +592,14 @@ Project knowledge graph view generation behavior:
 - Uses Sigma 3 default node-label and hover rendering for project fact graph labels, without a custom node-label canvas renderer or disabled hover renderer. Normal graph labels may be density-truncated, but the selected or hovered node label shall switch to the full element label.
 - Uses Graphology ForceAtlas2 with size-aware settings, Barnes-Hut optimization, deterministic initial positions, and a visible initialization diagnostic if renderer startup fails.
 - Preserves Sigma pan/zoom, search, filters, click inspection, and relation topology while treating resource targets as opt-in visual noise controls.
-- Keeps attachments/concept references, verification/satisfaction, and trace as opt-in overlay edge groups in the main Knowledge Graph renderer; those overlay facts may appear during focused exploration but must not drive initial layout partitioning.
+- Keeps reused_contract_context/concept references, verification/satisfaction, and trace as opt-in overlay edge groups in the main Knowledge Graph renderer; those overlay facts may appear during focused exploration but must not drive initial layout partitioning.
 - Hides relation edges in the default full-graph view to avoid a hairball. On node hover or click selection, shows only relation edges directly incident to the focused node, keeps the focused node and directly connected neighbors visually prominent, and fades unconnected nodes to low visual strength without changing active filters or graph data. The dimmed color shall be computed as a 20% original-node-color blend over the graph canvas background rather than by passing WebGL-sensitive alpha color strings to Sigma. A clicked node remains the pinned focus after pointer rollout; clicking empty graph space clears the pinned focus and returns to the default edge-hidden view.
 - Supports additive focus exploration: when a node is clicked, its direct neighborhood remains pinned; hovering another visible node, including a neighbor selected by the clicked focus, temporarily adds that hovered node's direct neighborhood and incident edges to the visible focus set without clearing the clicked focus.
 - Does not use renderer glow/highlight effects for selection; selection is communicated through pinned focus, forced label visibility, direct incident edges, and alpha fading of unrelated nodes.
-- Draws relation facts in the same canonical directions used by Mermaid diagrams: `derive`, `specifiedBy`, `satisfiedBy`, `definedBy`, `verifiedBy`, and `trace`. Opposite propagated facts such as `derivedFrom`, `specify`, `satisfy`, `define`, and `verify` shall be reversed and deduplicated into the canonical visual edge rather than rendered as duplicate parallel relations.
+- Draws relation facts in the same canonical directions used by Mermaid diagrams: `derive`, `specifiedBy`, `satisfiedBy`, `definedBy`, and `verifiedBy`. Opposite propagated facts such as `derivedFrom`, `specify`, `satisfy`, `define`, and `verify` shall be reversed and deduplicated into the canonical visual edge rather than rendered as duplicate parallel relations.
 - Owns its viewport sizing directly and uses shell-provided minimum viewport dimensions so the WebGL graph remains visible.
 - Emits graph data with source and target identifiers that all resolve to Project Store graph nodes so Graphology edge insertion cannot fail before drawing.
-- Uses one semantic role color contract across the Knowledge Graph legend, graph nodes, search swatches, and detail kind badges: capability, requirement/refinement, verification-objective, concrete verification, ontology, resource, and other/default all resolve through the Explorer design-system palette API.
+- Uses one semantic role color contract across the Knowledge Graph legend, graph nodes, search swatches, and detail kind badges: capability, requirement/contract, verification-objective, concrete verification, ontology, resource, and other/default all resolve through the Explorer design-system palette API.
 - Uses darker role borders only as subtle accents so legend entries, graph nodes, search result swatches, and detail badges read as one consistent visual system instead of mixing pastel controls with saturated graph nodes.
 
 #### Metadata
@@ -607,7 +609,7 @@ Project knowledge graph view generation behavior:
   * define: [Project Knowledge Graph View](Capabilities.md#project-knowledge-graph-view)
 ---
 
-### Responsive Explorer Rendering Refinement Specification
+### Responsive Explorer Rendering Contract Specification
 
 #### Details
 Responsive Explorer behavior:
@@ -629,7 +631,7 @@ Breakpoints:
   * define: [Responsive Explorer Rendering](ExplorerRendering.md#responsive-explorer-rendering)
 ---
 
-### SPA Explorer Store Contract Refinement Specification
+### SPA Explorer Store Contract Specification
 
 #### Details
 `index.html` is the single-page Reqvire Explorer shell. It owns the browser-local Project Store and uses hash routing to present primary Explorer views and supporting report/detail workflows from one normalized project snapshot. The canonical target is a native static SPA whose view content is rendered by compiled application code; this contract defines store shape and the build/runtime target, not route-local graph rewrites.
@@ -653,16 +655,16 @@ Breakpoints:
 - `project`: project identity, repository name when available, current branch when available, Reqvire version when available, generation timestamp policy, workspace-relative root label, and aggregate counts.
 - `files`: source/document file containers keyed by repository-relative path, with display path, source route path, parent folder, child element ids, local asset links, and containment metadata.
 - `folders`: virtual filesystem folder containers used by containment and file navigation.
-- `resources`: modeled resource and evidence-file targets referenced by relations or attachments, keyed separately from `files`.
+- `resources`: modeled resource and evidence-file targets referenced by relations or reused_contract_context, keyed separately from `files`.
 - `elements`: normalized Reqvire elements keyed by full identifier, including name, type, canonical type family, source file path, line number when available, content summary, governance metadata, authored metadata, and source anchor.
 - `relations`: normalized relation facts with source id, target id or target resource id, canonical relation direction, authored relation token, generated/opposite provenance, source location evidence, and relation family.
-- `attachments`: attachment facts for reusable requirement-owned refinement attachments, local file resources, and external resources.
+- `reused_contract_context`: reused_contract_context facts for reusable requirement-owned contract reused_contract_context, local file resources, and external resources.
 - `concept_refs`: concept-reference facts with element id, label, IRI or CURIE, resolution status, source evidence, and ontology-term linkage when known.
 - `submodels`: capability-rooted submodel summaries matching the `submodels` command boundary contract.
 - `traces`: verification trace paths and requirement/capability trace summaries needed by the Traces view.
 - `coverage`: verification and implementation coverage records, including leaf requirement status, evidence links, coverage source type, and capability roll-up summaries.
 - `ontology`: ontology terms, source blocks, projection constructs, SHACL-derived slots/facets, symbol metadata, and `ontologies.ttl` artifact link.
-- `knowledge_graph`: graph-ready node and edge ids derived from the normalized element, relation, attachment, concept-reference, submodel, and resource records.
+- `knowledge_graph`: graph-ready node and edge ids derived from the normalized element, relation, reused_contract_context, concept-reference, submodel, and resource records.
 - `search`: search documents for elements, files, resources, ontology terms, relation facts, traces, coverage records, and summaries.
 - `summaries`: aggregate counts and status summaries needed by dashboards, document headers, Explorer panes, selected-detail modals, and empty states.
 - `routes`: canonical route definitions for the SPA Explorer and supporting source/report workflows.
@@ -670,14 +672,14 @@ Breakpoints:
 **Files Versus Resources**
 - `files` are browser-local filesystem/source containers. They represent Markdown/source documents that contain model elements and are used for containment, file navigation, source links, and breadcrumbs.
 - `resources` are modeled or evidence targets referenced by the model, such as implementation files, proof artifacts, linked evidence documents, external URLs, or local non-Markdown files.
-- A path may appear as a `file` only when it is included as a Project Store source/document container for browsing. A path appears as a `resource` when it is referenced as evidence or a modeled target by relation, attachment, or resource-report facts.
+- A path may appear as a `file` only when it is included as a Project Store source/document container for browsing. A path appears as a `resource` when it is referenced as evidence or a modeled target by relation, reused_contract_context, or resource-report facts.
 - When the same repository-relative path is both browsable and referenced as evidence, the store shall preserve both identities and link them through an explicit cross-reference instead of collapsing the resource into the file container.
 - Resources shall retain relation evidence, referring elements, relation types, external/local classification, and availability/copy status when known.
 
 **Relation and Trace Semantics**
 - The Project Store shall preserve Reqvire's current relation model and canonical directions used by diagrams and graph views.
 - Capability records may author concept references and be specified or verified; they shall not be treated as directly satisfied implementation units.
-- Requirement records may own refinements, be constrained by semantic contracts, be satisfied by implementation/evidence, be verified, derive child requirements, and attach compatible requirement-owned refinement elements.
+- Requirement records may own contracts, be constrained by semantic contracts, be satisfied by implementation/evidence, be verified, derive child requirements, and reuse compatible requirement-owned contract elements.
 - Opposite/generated relation facts shall remain available as evidence but shall not create duplicate canonical graph edges.
 - Verification traces and coverage records shall be derivable from the same element and relation records used by the Model and Knowledge Graph views.
 
@@ -692,7 +694,7 @@ Breakpoints:
 - Native view modules shall fill the full viewport between the persistent left Explorer pane and right tool rail while preserving the canonical `index.html#/<view>` browser URL.
 - Route changes shall update the document title and route metadata to match the active Explorer view.
 - Routes shall be deep-linkable: loading `index.html#/elements/<identifier>` shall open the selected element inside the Explorer shell without leaving the current view family.
-- Element-detail routes shall render as an in-shell, scrollable modal/dialog over the active Explorer view. The modal shall use Project Store element records as the primary data source and shall show at minimum element name, type, source file, source anchor, metadata, governance context, content, relations, attachments, concept references, and available verification/coverage/resource evidence.
+- Element-detail routes shall render as an in-shell, scrollable modal/dialog over the active Explorer view. The modal shall use Project Store element records as the primary data source and shall show at minimum element name, type, source file, source anchor, metadata, governance context, content, relations, reused_contract_context, concept references, and available verification/coverage/resource evidence.
 - Element-detail modal headers shall show the actual element type as the single primary type badge. They shall not show a second canonical family/kind badge when the actual element type already carries the meaningful user-facing classification.
 - Element-detail modal relation navigation shall maintain a local previous-element stack. Opening a related element from the modal shall replace the modal content with the related element and show a compact back icon button whose accessible label and browser tooltip name the previous element.
 - Element-detail modal headers shall not render a second visible previous-element context line such as `From:` when the back button already carries the previous element name through its accessible label/title.
@@ -713,7 +715,7 @@ Breakpoints:
 - Element detail views shall resolve source file containers through element source metadata, not by inferring model ownership from folders.
 - Resource navigation shall use `resources` records and referring facts; it shall not imply that evidence files contain model elements unless a corresponding `files` record exists.
 - The Model view's List and Grid modes shall render native read-only file-manager/model-browser views from the Project Store virtual filesystem, including breadcrumb navigation, sortable list columns, grid cards, search across folders/files/modeled elements, color/icon legends, file selection, source-page secondary actions, and modeled-element rows that open the shared Explorer element-detail modal. In Grid mode, the full folder/file card surface shall be the primary open/select target; opening shall not be limited to the title text.
-- Model tree rows, grid cards, modeled-element lists, and element legends shall use the shared Explorer `ElementIcon` type glyph system. Semantic-contract elements shall use their own SHACL-profile color as a plain square with no glyph; refinement-family elements shall retain the shared refinement hue while using distinct subtype glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`, so users can distinguish element families and refinement subtypes without relying on text labels alone.
+- Model tree rows, grid cards, modeled-element lists, and element legends shall use the shared Explorer `ElementIcon` type glyph system. Semantic-contract elements shall use their own SHACL-profile color as a plain square with no glyph; contract-family elements shall retain the shared contract hue while using distinct subtype glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`, so users can distinguish element families and contract subtypes without relying on text labels alone.
 - The Model project tree shall share one Model selection state with the active Model workspace. Selecting a folder, file, or modeled element in the left tree shall drive the current List, Grid, or Graph workspace selection/focus rather than navigating to an unrelated middle-pane route.
 - The supporting `#/files/<path>` route shall deep-link into the same Model List/Grid filesystem browser behavior for a selected file or folder; it shall not introduce a separate primary Filesystem mode.
 - Model List/Grid shall use the Explorer design-system shell and styling contract; it shall not import a third-party file-manager stylesheet or mount an external file-manager widget that visually diverges from the Explorer application.
@@ -722,7 +724,7 @@ Breakpoints:
 - Search documents shall include enough normalized ids to route to element detail, file detail, resource detail, ontology term detail, trace detail, or coverage detail without rebuilding view-local indexes from HTML text.
 - Search shall render as a full-width result-list workspace between the left Explorer pane and right tool rail. Search results shall carry the canonical route/detail information directly without requiring a separate detail pane.
 - The Search left-pane controls shall expose reset and result-type filter controls directly. They shall not render a second passive legend for the same result-type swatches when the filter controls already carry the visible type colors and labels.
-- Element detail shall show source, content, governance, metadata, relations, attachments, concept references, verification traces, coverage status, ontology context, and resource evidence from the Project Store in a scrollable route-backed modal.
+- Element detail shall show source, content, governance, metadata, relations, reused_contract_context, concept references, verification traces, coverage status, ontology context, and resource evidence from the Project Store in a scrollable route-backed modal.
 - Element detail shall retain a direct source route link using the element's served source route and anchor so users can inspect the source content without making that content route the primary Explorer destination.
 - Store consumers shall tolerate unknown future fields and shall reject or visibly diagnose a missing required store seed.
 
@@ -739,7 +741,7 @@ Breakpoints:
   * define: [SPA Explorer Shell and Project Store](Capabilities.md#spa-explorer-shell-and-project-store)
 ---
 
-### Serve Command Refinement Specification
+### Serve Command Contract Specification
 
 #### Details
 Serve command behavior:
@@ -796,8 +798,8 @@ Styling conventions for the served Explorer web interface.
 
 **Element Cards and Badges:**
 - Element cards, grid tiles, list rows, search results, graph nodes, relation pills, and modal badges use the same role tokens and glyph contract.
-- Capability, requirement, verification-objective, concrete verification, ontology, resource, and refinement-family roles are encoded by role token, text label, and glyph. Color is never the only type cue.
-- Semantic-contract elements use their own SHACL-profile role token as a plain square with no glyph. Refinement-family subtypes use a shared refinement hue with distinct glyphs for source, specification, constraint, behavior, state, and input-output elements.
+- Capability, requirement, verification-objective, concrete verification, ontology, resource, and contract-family roles are encoded by role token, text label, and glyph. Color is never the only type cue.
+- Semantic-contract elements use their own SHACL-profile role token as a plain square with no glyph. Contract-family subtypes use a shared contract hue with distinct glyphs for source, specification, constraint, behavior, state, and input-output elements.
 
 **Navigation:**
 - Breadcrumb trail for element hierarchy

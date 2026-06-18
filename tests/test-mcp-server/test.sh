@@ -121,6 +121,22 @@ resources_list_request() {
   jq -n -c '{jsonrpc:"2.0",id:3,method:"resources/list",params:{}}'
 }
 
+prompts_list_request() {
+  jq -n -c '{jsonrpc:"2.0",id:25,method:"prompts/list",params:{}}'
+}
+
+semantic_query_prompt_request() {
+  jq -n -c '{jsonrpc:"2.0",id:26,method:"prompts/get",params:{name:"reqvire.semantic.query",arguments:{question:"How many requirements are verified?",scope:"MCP interface"}}}'
+}
+
+workflow_explore_prompt_request() {
+  jq -n -c '{jsonrpc:"2.0",id:27,method:"prompts/get",params:{name:"reqvire.workflow.explore_model",arguments:{question:"Show relevant requirements"}}}'
+}
+
+unknown_prompt_request() {
+  jq -n -c '{jsonrpc:"2.0",id:28,method:"prompts/get",params:{name:"reqvire.unknown.prompt"}}'
+}
+
 workspace_status_request() {
   jq -n -c '{jsonrpc:"2.0",id:4,method:"tools/call",params:{name:"reqvire.workspace_status",arguments:{}}}'
 }
@@ -161,13 +177,30 @@ semantic_prefixes_request() {
   jq -n -c '{jsonrpc:"2.0",id:19,method:"tools/call",params:{name:"reqvire.semantic.prefixes",arguments:{}}}'
 }
 
+semantic_vocabulary_all_request() {
+  jq -n -c '{jsonrpc:"2.0",id:22,method:"tools/call",params:{name:"reqvire.semantic.vocabulary",arguments:{section:"all"}}}'
+}
+
+semantic_vocabulary_relation_families_request() {
+  jq -n -c '{jsonrpc:"2.0",id:23,method:"tools/call",params:{name:"reqvire.semantic.vocabulary",arguments:{section:"relation_families",limit:1}}}'
+}
+
+semantic_vocabulary_query_patterns_request() {
+  jq -n -c '{jsonrpc:"2.0",id:24,method:"tools/call",params:{name:"reqvire.semantic.vocabulary",arguments:{section:"query_patterns",include_examples:true}}}'
+}
+
 sparql_request() {
   jq -n -c --arg query 'PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX reqvire: <https://www.reqvire.org/ontology#>
-SELECT ?element ?term WHERE {
-  ?term a owl:Class .
-  ?ontology reqvire:declaresTerm ?term .
-  ?element reqvire:elementId "mcp-semantic-requirement" .
+SELECT ?requirement ?verification ?relation WHERE {
+  ?requirement a reqvire:Requirement ;
+    reqvire:elementId "mcp-semantic-requirement" ;
+    reqvire:elementVerifiedByVerification ?verification .
+  ?verification reqvire:elementId "mcp-semantic-verification" .
+  ?relation a reqvire:ModelRelation ;
+    reqvire:relationSource ?requirement ;
+    reqvire:relationTarget ?verification ;
+    reqvire:relationType "verifiedBy" .
 }' '{jsonrpc:"2.0",id:17,method:"tools/call",params:{name:"reqvire.semantic.sparql",arguments:{query:$query}}}'
 }
 
@@ -227,11 +260,34 @@ Access token ontology for MCP semantic evidence.
 ```turtle
 @prefix testonto: <https://example.test/ontology#> .
 @prefix mcp: <urn:reqvire:test:mcp:> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 <https://example.test/ontology> a owl:Ontology .
 mcp:AccessToken a owl:Class .
 mcp:subject a owl:ObjectProperty .
+mcp:testVerificationRelationFamily a reqvire:RelationFamily ;
+  reqvire:relationFamilyName "test-verification" ;
+  reqvire:relationFamilyMeaning "Test verification relation family." ;
+  reqvire:relationFamilyForwardProperty mcp:subject ;
+  reqvire:relationFamilyInverseProperty mcp:subject .
+mcp:testVerificationRelationRule a reqvire:RelationRule ;
+  reqvire:relationName "testVerifiedBy" ;
+  reqvire:relationFamily mcp:testVerificationRelationFamily ;
+  reqvire:relationDirection "forward" ;
+  reqvire:allowedSourceType "requirement" ;
+  reqvire:allowedTargetType "verification" .
+mcp:testContractRelationFamily a reqvire:RelationFamily ;
+  reqvire:relationFamilyName "test-contract" ;
+  reqvire:relationFamilyMeaning "Test contract relation family." ;
+  reqvire:relationFamilyForwardProperty mcp:subject ;
+  reqvire:relationFamilyInverseProperty mcp:subject .
+mcp:testContractRelationRule a reqvire:RelationRule ;
+  reqvire:relationName "testDefinedBy" ;
+  reqvire:relationFamily mcp:testContractRelationFamily ;
+  reqvire:relationDirection "forward" ;
+  reqvire:allowedSourceType "requirement" ;
+  reqvire:allowedTargetType "contract" .
 ```
 ---
 
@@ -248,6 +304,31 @@ The system shall expose MCP semantic evidence for readable Access Token model co
 #### Relations
   * specify: [MCP Semantic Capability](#mcp-semantic-capability)
   * constrainedBy: [MCP Access Token Shape Contract](#mcp-access-token-shape-contract)
+  * verifiedBy: [MCP Semantic Verification](#mcp-semantic-verification)
+---
+
+### MCP Semantic Verification Objective
+
+Verification objective for MCP semantic relation-family query projection.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [MCP Semantic Verification](#mcp-semantic-verification)
+---
+
+### MCP Semantic Verification
+
+Verifies that MCP semantic query projection exposes normalized verification relations.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Semantic Verification Objective](#mcp-semantic-verification-objective)
+  * verify: [MCP Semantic Requirement](#mcp-semantic-requirement)
+  * satisfiedBy: [asset.txt](../docs/asset.txt)
 ---
 
 ### MCP Access Token Shape Contract
@@ -315,20 +396,29 @@ run_http_mcp_sequence "$DEFAULT_PORT" "$DEFAULT_OUTPUT" \
   "$(invalid_sparql_request)" \
   "$(semantic_prefixes_request)" \
   "$(ontologies_rdf_request)" \
-  "$(ontologies_shacl_request)" || fail "default MCP HTTP request sequence failed"
+  "$(ontologies_shacl_request)" \
+  "$(semantic_vocabulary_all_request)" \
+  "$(semantic_vocabulary_relation_families_request)" \
+  "$(semantic_vocabulary_query_patterns_request)" \
+  "$(prompts_list_request)" \
+  "$(semantic_query_prompt_request)" \
+  "$(workflow_explore_prompt_request)" \
+  "$(unknown_prompt_request)" || fail "default MCP HTTP request sequence failed"
 stop_http_mcp
 trap - EXIT
 
 assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.protocolVersion == "2025-11-25"' "initialize reports supported protocol"
 assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.capabilities.tools | type == "object"' "initialize reports standard tools capability"
 assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.capabilities.resources | type == "object"' "initialize reports standard resources capability"
-assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.capabilities.prompts == null and .result.capabilities.logging == null and .result.capabilities.completions == null' "initialize does not advertise unsupported capabilities"
+assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.capabilities.prompts | type == "object"' "initialize reports standard prompts capability"
+assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.capabilities.logging == null and .result.capabilities.completions == null and .result.capabilities.tasks == null' "initialize does not advertise unsupported capabilities"
 assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.serverInfo.name == "reqvire"' "initialize reports serverInfo"
 
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.search") != null' "tools/list includes read tools"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.semantic.ontologies") != null' "tools/list includes semantic ontology tool"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.semantic.sparql") != null' "tools/list includes semantic query tool"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.semantic.prefixes") != null' "tools/list includes semantic prefix registry tool"
+assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.semantic.vocabulary") != null' "tools/list includes semantic vocabulary tool"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.add_element") == null and index("reqvire.link") == null' "default tools/list omits mutation tools"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.mcp") == null and index("reqvire.serve") == null and index("reqvire.validate") == null' "tools/list omits server and validate commands"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.command") == null and index("reqvire.shell") == null and index("reqvire.sout") == null' "tools/list omits shell-style tools"
@@ -356,8 +446,8 @@ assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.summary.ontology_
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.blocks[] | select(.source_name=="MCP Access Token Ontology" and .kind=="ontology")' "ontologies tool returns ontology block metadata"
 assert_jq_line "$DEFAULT_OUTPUT" 14 '.result.structuredContent.format == "jsonld" and (.result.structuredContent.jsonld | type == "array") and (.result.structuredContent.jsonld | length) > 0' "ontologies tool returns JSON-LD semantic content"
 assert_jq_line "$DEFAULT_OUTPUT" 15 '.result.structuredContent.full == true and (.result.structuredContent.content | contains("reqvire:conceptReference")) and (.result.structuredContent.content | contains("urn:reqvire:element:mcp-semantic-requirement")) and (.result.structuredContent.content | contains("reqvire:OntologyProjectionGraph"))' "ontologies tool returns full model context triples and ontology projection facts"
-assert_jq_line "$DEFAULT_OUTPUT" 16 '.result.structuredContent.result_type == "select" and .result.structuredContent.full == true and .result.structuredContent.row_count == 1 and .result.structuredContent.variables == ["element","term"]' "sparql tool returns SELECT result metadata"
-assert_jq_line "$DEFAULT_OUTPUT" 16 '.result.structuredContent.bindings[0].term.iri == "urn:reqvire:test:mcp:AccessToken" and .result.structuredContent.bindings[0].element.iri == "urn:reqvire:element:mcp-semantic-requirement"' "sparql tool queries authored ontology and generated model context from built semantic store"
+assert_jq_line "$DEFAULT_OUTPUT" 16 '.result.structuredContent.result_type == "select" and .result.structuredContent.full == true and .result.structuredContent.row_count == 1 and .result.structuredContent.variables == ["requirement","verification","relation"]' "sparql tool returns SELECT result metadata"
+assert_jq_line "$DEFAULT_OUTPUT" 16 '.result.structuredContent.bindings[0].requirement.iri == "urn:reqvire:element:mcp-semantic-requirement" and .result.structuredContent.bindings[0].verification.iri == "urn:reqvire:element:mcp-semantic-verification" and (.result.structuredContent.bindings[0].relation.iri | startswith("urn:reqvire:model-relation:"))' "sparql tool queries normalized relation-family facts from built semantic store"
 assert_jq_line "$DEFAULT_OUTPUT" 16 '.result.structuredContent.summary.ontology_blocks >= 1 and (.result.structuredContent.model_fingerprint | type == "string")' "sparql tool returns semantic summary and model fingerprint"
 assert_jq_line "$DEFAULT_OUTPUT" 17 '.result.isError == true and (.result.structuredContent.error.message | contains("Invalid SPARQL query"))' "invalid sparql returns MCP tool error"
 assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.prefixes[] | select(.prefix=="testonto" and .namespace=="https://example.test/ontology#") | .source.content == "Access token ontology for MCP semantic evidence."' "semantic prefixes returns ontology-defined namespace with source prose content"
@@ -367,6 +457,14 @@ assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.sparql_prefix_blo
 assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.prefixes[] | select(.prefix=="testonto") | (.source.content | contains("@prefix") | not)' "semantic prefixes source content omits Turtle prefix block"
 assert_jq_line "$DEFAULT_OUTPUT" 19 '.result.structuredContent.content_filter == "rdf" and .result.structuredContent.summary.ontology_blocks >= 1 and .result.structuredContent.summary.shape_blocks == 0 and (.result.structuredContent.content | contains("mcp:AccessTokenShape") | not)' "semantic ontologies RDF filter excludes SHACL shapes"
 assert_jq_line "$DEFAULT_OUTPUT" 20 '.result.structuredContent.content_filter == "shacl" and .result.structuredContent.summary.ontology_blocks == 0 and .result.structuredContent.summary.shape_blocks >= 1 and (.result.structuredContent.content | contains("mcp:AccessTokenShape")) and (.result.structuredContent.content | contains("owl:Ontology") | not)' "semantic ontologies SHACL filter excludes ontology declarations"
+assert_jq_line "$DEFAULT_OUTPUT" 21 '.result.structuredContent.section == "all" and .result.structuredContent.summary.relation_families >= 1 and (.result.structuredContent.prefixes[] | select(.prefix=="testonto")) and (.result.structuredContent.sparql_prefix_block | contains("PREFIX testonto: <https://example.test/ontology#>"))' "semantic vocabulary all section returns counts and prefixes"
+assert_jq_line "$DEFAULT_OUTPUT" 22 '.result.structuredContent.section == "relation_families" and .result.structuredContent.items[0].raw_relations and (.result.structuredContent.items[0] | has("forward_property")) and .result.structuredContent.paging.has_more == true and (.result.structuredContent.paging.next_cursor | type == "string")' "semantic vocabulary relation families are paged with normalized properties"
+assert_jq_line "$DEFAULT_OUTPUT" 23 '.result.structuredContent.section == "query_patterns" and (.result.structuredContent.items[] | select(.id=="verified_requirements" and (.sparql | contains("elementVerifiedByVerification")))) and (.result.structuredContent.prefixes[] | select(.prefix=="testonto"))' "semantic vocabulary query patterns include SPARQL examples and prefixes"
+assert_jq_line "$DEFAULT_OUTPUT" 24 '[.result.prompts[].name] | index("reqvire.semantic.query") != null and index("reqvire.semantic.verification_search") != null and index("reqvire.workflow.explore_model") != null and index("reqvire.workflow.verify_coverage") != null' "prompts/list includes semantic and regular Reqvire prompts"
+assert_jq_line "$DEFAULT_OUTPUT" 24 '.result.prompts[] | select(.name=="reqvire.semantic.query") | .title == "Reqvire Semantic Query" and (.arguments[] | select(.name=="question"))' "prompts/list returns prompt metadata and arguments"
+assert_jq_line "$DEFAULT_OUTPUT" 25 '.result.messages[0].role == "user" and (.result.messages[0].content.text | contains("reqvire.semantic.vocabulary") and contains("reqvire.semantic.prefixes") and contains("reqvire.semantic.sparql") and contains("Client arguments"))' "prompts/get returns semantic query guidance"
+assert_jq_line "$DEFAULT_OUTPUT" 26 '.result.messages[0].role == "user" and (.result.messages[0].content.text | contains("reqvire.workspace_status") and contains("reqvire.search") and contains("reqvire.read_element"))' "prompts/get returns regular Reqvire workflow guidance"
+assert_jq_line "$DEFAULT_OUTPUT" 27 '.error.code == -32602 and (.error.data.message | contains("Unknown MCP prompt"))' "unknown prompt returns protocol error"
 
 UNSUPPORTED_PORT="$(pick_port)"
 UNSUPPORTED_OUTPUT_PREFIX="$TEST_DIR/output/mcp-unsupported-protocol"

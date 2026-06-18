@@ -52,8 +52,8 @@ export default function ModelingLanguage() {
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             ###
           </code>{" "}
-          Markdown headers. Metadata, relations, details, attachments, ontology
-          blocks, shapes, queries, and concept references use reserved{" "}
+          Markdown headers. Metadata, relations, details, Reused Contract
+          Context, ontology blocks, shapes, queries, and concept references use reserved{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             ####
           </code>{" "}

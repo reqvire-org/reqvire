@@ -1,13 +1,13 @@
 ---
 allowed-tools: Read, Bash(npx:*)
-argument-hint: <source> <relation-type-or-attaching> <target>
-description: Link elements with a relation or attach files/elements
+argument-hint: <source> <relation-type-or-reusesContract> <target>
+description: Link elements with a relation or reuse files/elements
 model: claude-sonnet-4-5
 ---
 
 # Link Elements
 
-Create a relation between elements or attach files/contract elements. This unified command handles both relations and attachments.
+Create a relation between elements or reuse files/contract elements. This unified command handles both relations and reused_contract_context.
 
 ## Current Model Context
 
@@ -16,39 +16,39 @@ Create a relation between elements or attach files/contract elements. This unifi
 ## User Request
 
 ${1:+Source element: $1}
-${2:+Relation type or 'attaching': $2}
+${2:+Relation type or 'reusesContract': $2}
 ${3:+Target: $3}
-${1:-The user will provide source element, relation type (or 'attaching'), and target.}
+${1:-The user will provide source element, relation type (or 'reusesContract'), and target.}
 
 ## Steps
 
 1. **Understand the context:**
    - Identify the source element (by name)
-   - Determine if this is a relation or attachment ('attaching' keyword)
+   - Determine if this is a relation or reused_contract_context ('reusesContract' keyword)
    - Identify the target (element name, file path, or URL)
    - Verify source element exists
 
 2. **Preview the link operation:**
    ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "<source-element>" "<relation-type-or-attaching>" "<target>" --dry-run
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "<source-element>" "<relation-type-or-reusesContract>" "<target>" --dry-run
    ```
 
    This shows:
    - Which file will be modified
-   - The relation/attachment that will be added
+   - The relation/reused_contract_context that will be added
    - Git-style diff for the affected file
 
 3. **Apply the link:**
    ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "<source-element>" "<relation-type-or-attaching>" "<target>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "<source-element>" "<relation-type-or-reusesContract>" "<target>"
    ```
 
    The link command automatically:
    - For relations: Adds to the source element's Relations section
-   - For attachments: Adds to the source element's Attachments section
+   - For reused_contract_context: Adds to the source element's Reused Contract Context section
    - Calculates correct relative path for cross-file links
    - Creates the section if it doesn't exist
-   - Maintains idempotency (no duplicate relations/attachments)
+   - Maintains idempotency (no duplicate relations/reused_contract_context)
 
 4. **Verify the changes:**
    ```bash
@@ -66,9 +66,8 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 | `satisfiedBy` | Source is satisfied by target | Requirement to implementation |
 | `satisfy` | Source satisfies target | Implementation to requirement |
 | `definedBy` | Source owns target as contract | Requirement to requirement-owned contract |
-| `define` | Source refines target | Contract element to compatible owner (auto-generated) |
-| `trace` | General traceability link | Any traceability relationship |
-| `attaching` | Attach file or element | Attach compatible requirement-owned contracts to requirements |
+| `define` | Source defines target | Contract element to compatible owner (auto-generated) |
+| `reusesContract` | Reuse file or element | Reuse compatible requirement-owned contracts to requirements |
 
 ## Target Types
 
@@ -90,23 +89,23 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 - Allowed concrete verification types are `test-verification`, `formal-proof-verification`, `analysis-verification`, `inspection-verification`, and `demonstration-verification`.
 - `verification-objective` may use `derivedFrom`/`derive` inside verification-family hierarchy but is not a valid `verify` source or `verifiedBy` target.
 
-**For attaching:**
+**For reusesContract:**
 - Internal file path (e.g., "docs/SLA.pdf")
 - Contract element name (e.g., "Performance Constraint")
 
 ## Important Notes
 
-- **Duplicate detection**: The link command fails with an error if the relation or attachment already exists
-- **Cross-section duplicates**: Cannot add a relation to a target that already exists as an attachment (and vice versa) - this is a validation error
+- **Duplicate detection**: The link command fails with an error if the relation or reused_contract_context already exists
+- **Cross-section duplicates**: Cannot add a relation to a target that already exists as an reused_contract_context (and vice versa) - this is a validation error
 - **Element names**: Use the exact element name as it appears in the heading
 - **Cross-file links**: Relative paths are calculated automatically
 - **Inverse relations**: Reqvire auto-generates inverse relations (e.g., derive from derivedFrom)
-- **Attachments**: Only Contract elements (constraint, behavior, specification) can be attached
+- **Reused Contract Context**: Only Contract elements (constraint, behavior, specification) can be reused
 
 ## Link Options
 
 - `<source>`: Name of source element (required)
-- `<relation-type-or-attaching>`: Relation type OR 'attaching' keyword (required)
+- `<relation-type-or-reusesContract>`: Relation type OR 'reusesContract' keyword (required)
 - `<target>`: Element name, file path, or URL (required)
 - `--dry-run`: Preview changes without applying
 
@@ -116,10 +115,10 @@ The link operation will fail with a clear error if:
 - The source element does not exist
 - The target element does not exist (for element relations)
 - The relation type is invalid
-- For attaching: the target element is not a Contract type
-- For attaching: the contract has no `define` relation (must be owned by a requirement via `definedBy` first)
-- For attaching: source and contract's owner are in the same derivation hierarchy
-- The relation or attachment already exists (duplicate)
+- For reusesContract: the target element is not a Contract type
+- For reusesContract: the contract has no `define` relation (must be owned by a requirement via `definedBy` first)
+- For reusesContract: source and contract's owner are in the same derivation hierarchy
+- The relation or reused_contract_context already exists (duplicate)
 - The target already exists in the other section (cross-section duplicate)
 
 ## Examples
@@ -139,14 +138,14 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Compliance Requirement" trace "https://example.com/regulations.html"
 ```
 
-**Attach a document:**
+**Reuse a document:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" attaching "docs/SLA.pdf"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" reusesContract "docs/SLA.pdf"
 ```
 
-**Attach a contract element:**
+**Reuse a contract element:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" attaching "Performance Constraint"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" reusesContract "Performance Constraint"
 ```
 
 **Preview before linking:**
@@ -160,13 +159,13 @@ Use link when:
 - Establishing traceability between requirements
 - Connecting requirements to verifications
 - Creating derivation hierarchies
-- Adding trace relations for impact analysis
+- Adding semantically specific relations for impact analysis
 - Linking to implementation files
-- Attaching documents or reference materials
-- Attaching contract elements (constraints, behaviors, specifications)
+- Reusing Contract documents or reference materials
+- Reusing Contract contract elements (constraints, behaviors, specifications)
 
 ## Related Commands
 
-- **Unlink**: `reqvire unlink <source> <target>` (auto-detects relation vs attachment)
+- **Unlink**: `reqvire unlink <source> <target>` (auto-detects relation vs reused_contract_context)
 - **Search relations**: `reqvire search --have-relations="derivedFrom"`
-- **Search attachments**: `reqvire search --has-attachments`
+- **Search reused_contract_context**: `reqvire search --has-reused-contract-context`

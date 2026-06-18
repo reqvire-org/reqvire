@@ -163,7 +163,7 @@ Use architecture folders for service-level design specifications, interface impl
 
 Do not put shared ontology in architecture folders. Shared vocabulary belongs in `Ontologies/` and is referenced by consuming elements.
 
-If architecture content becomes shared across many independent capability roots, extract reusable meaning into ontology or create an explicit reusable contract contract and attach it where needed.
+If architecture content becomes shared across many independent capability roots, extract reusable meaning into ontology or create an explicit reusable contract and reuse it where needed.
 
 ## Verification Plane
 
@@ -199,14 +199,14 @@ requirement --satisfiedBy--> implementation/evidence
 test-verification/formal-proof-verification --satisfiedBy--> evidence
 ```
 
-Attachments are separate from normal relations:
+Reused Contract Context are separate from normal relations:
 
 ```text
-capability --Attachment--> ontology
-requirement --Attachment--> compatible requirement-owned contract contract
+capability --Reused Contract Context--> ontology
+requirement --Reused Contract Context--> compatible requirement-owned contract
 ```
 
-Attachments are the approved way to reuse ontology or contracts across otherwise independent subgraphs.
+Reused Contract Context are the approved way to reuse ontology or contracts across otherwise independent subgraphs.
 
 ## Submodel Boundary Rule
 
@@ -218,9 +218,9 @@ Hierarchy should stay inside one logical subgraph:
 - requirement-to-requirement hierarchy stays inside the owning capability subgraph
 - ontology-to-ontology hierarchy stays inside the ontology plane
 
-Cross-subgraph reuse should use attachments, not hierarchy.
+Cross-subgraph reuse should use reused_contract_context, not hierarchy.
 
-Avoid cross-submodel requirement hierarchy. If a requirement in one capability needs context from another capability, use concept references for ontology terms or attach a compatible requirement-owned contract contract instead of creating a parent/child requirement relation across subgraphs.
+Avoid cross-submodel requirement hierarchy. If a requirement in one capability needs context from another capability, use concept references for ontology terms or reuse a compatible requirement-owned contract instead of creating a parent/child requirement relation across subgraphs.
 
 ## File Placement Heuristics
 
@@ -233,7 +233,7 @@ When adding or moving model content:
 5. If it is service or architecture detail for one capability, put it under that capability's `Architecture/` folder.
 6. If it proves behavior, put it under `Verifications/<Domain>/`.
 7. If another subgraph needs vocabulary, add concept references to terms declared under `Ontologies/`.
-8. If another subgraph needs a reusable requirement-owned contract, attach that contract explicitly.
+8. If another subgraph needs a reusable requirement-owned contract, reuse that contract explicitly.
 
 ## Refactor Workflow
 
@@ -248,7 +248,7 @@ When adding or moving model content:
 4. Produce a move plan before editing:
    - element/file moves
    - relation rewrites
-   - attachment substitutions
+   - reused_contract_context substitutions
    - validation risks
 5. Confirm high-risk boundary decisions with the user before bulk moves.
 6. Apply changes in slices with `mv`, `mv-file`, `link`, `unlink`, or `relink`.
@@ -264,7 +264,7 @@ When adding or moving model content:
 - Do not force every repo into the example area names.
 - Do not move content only to satisfy a folder pattern when the current graph is valid and understandable.
 - Do not replace graph relations with path naming conventions.
-- Do not remove cross-subgraph relations without preserving required context through attachments.
+- Do not remove cross-subgraph relations without preserving required context through reused_contract_context.
 - Do not create a broad capability root only to share ontology.
 
 The goal is clearer navigation and maintainability with graph semantics preserved.

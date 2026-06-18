@@ -37,17 +37,17 @@ Author Reqvire ontology content as reusable building blocks for system-of-intere
 10. Link ontology hierarchy with `derivedFrom` only between ontology elements.
 11. Use `#### Concept References` on non-ontology, non-semantic-contract elements when their prose needs explicit bindings to ontology terms.
 12. Add or update semantic contracts only when a closed-world SHACL profile is needed; link each contract to ontology with `use`/`usedBy` and to governed requirements with `constrain`/`constrainedBy`. Do not add `#### Concept References` to semantic contracts.
-13. Use `reqvire ontologies` for the clean authored ontology/SHACL document. Use `reqvire ontologies --full` when downstream graph/database tooling also needs model-context facts for element relations, attachments, concept references, term declarations, shape references, and ontology projection facts. Concept references are term-reference edges, not generated `OntologyConstruct` records.
+13. Use `reqvire ontologies` for the clean authored ontology/SHACL document. Use `reqvire ontologies --include-external` when local External Ontology source triples must be materialized. Use `reqvire ontologies --full` when downstream graph/database tooling also needs model-context facts for element relations, reused_contract_context, concept references, term declarations, shape references, and ontology projection facts. Use `reqvire ontologies --full --include-external` when both materialized external source triples and full model context are needed. Concept references are term-reference edges, not generated `OntologyConstruct` records.
 14. Validate before finishing.
 
 ## Ontology From Existing Model Content
 
-Ontology work does not have to come first. If capabilities, requirements, specifications, behaviors, constraints, input/output refinements, or verifications already exist, derive ontology and semantic contracts from that authored model rather than forcing a greenfield ontology pass.
+Ontology work does not have to come first. If capabilities, requirements, specifications, behaviors, constraints, input/output contracts, or verifications already exist, derive ontology and semantic contracts from that authored model rather than forcing a greenfield ontology pass.
 
 Use this workflow when a project has partial or no ontology coverage:
 
 1. Read the existing capability and requirement subgraph first.
-2. Extract repeated domain nouns, states, relation words, artifact types, payload concepts, governed tokens, and validation conditions from requirements and refinements.
+2. Extract repeated domain nouns, states, relation words, artifact types, payload concepts, governed tokens, and validation conditions from requirements and contracts.
 3. Promote stable reusable vocabulary into ontology elements only where it improves shared meaning, queryability, impact analysis, or semantic validation.
 4. Promote repeated closed-world validation rules into semantic-contract SHACL shapes only when machine-checkable constraints add value.
 5. Leave requirements prose-only when ontology or SHACL formalization is not useful.
@@ -72,6 +72,46 @@ Use `semantic-contract` for reusable SHACL `sh:NodeShape` profiles. A semantic c
 For greenfield ontology creation templates and examples, read `references/OntologyAuthoring.md`.
 
 For refactoring or improving existing ontology files, read `references/OntologyRefactoring.md`. Do not load the refactoring reference for new ontology creation unless the user explicitly asks to refactor or improve existing ontology content.
+
+## OWL 2 Authoring Mental Model
+
+When authoring ontology Turtle, distinguish the OWL 2 syntactic roles:
+
+- Entities are named IRI terms such as classes, object properties, datatype properties, annotation properties, and individuals. These are the primitive vocabulary terms that Reqvire elements, concept references, SHACL shapes, SPARQL queries, and semantic exports can reference.
+- Expressions are complex OWL descriptions such as restrictions, unions, intersections, complements, RDF-list class expressions, and property-chain expressions. Use them only when the intended inferred meaning is stable and worth exposing to downstream semantic tooling.
+- Axioms are asserted truths such as subclass, domain/range, inverse property, disjointness, equivalence, restrictions, individual typing, and property chains. Axioms affect logical meaning and future reasoning behavior.
+- Annotations are labels, comments, definitions, and presentation metadata attached to entities, axioms, or ontologies. They help humans and applications render or explain the ontology, but they do not define logical meaning.
+
+OWL and SHACL answer different questions:
+
+- OWL is about meaning and inference: given these facts and domain truths, what else follows?
+- SHACL is about validation: given these expected data shapes, is this graph acceptable?
+
+OWL uses an open-world assumption, so missing facts are usually unknown rather than invalid. SHACL validation is closed-world for the selected shapes, so missing required facts are validation errors.
+
+Reqvire rule of thumb:
+
+- Use OWL entities and axioms for reusable domain meaning.
+- Use SHACL semantic contracts for closed-world validation.
+- Use `rdfs:label` and `rdfs:comment` for human-readable explanation, not as substitutes for formal terms.
+- If queries, SHACL, exports, report payloads, or model behavior depend on a value, model it as a real class, property, individual, or axiom rather than only as annotation text.
+- Do not encode required fields, cardinality checks, enum validation, parser behavior, command behavior, or report formatting as OWL axioms unless they are true domain semantics intended for reasoning.
+
+### Common OWL Axioms
+
+Common OWL/RDFS axioms authored in Reqvire `#### Ontology` blocks:
+
+- `rdfs:subClassOf` defines class hierarchy.
+- `rdfs:subPropertyOf` defines property hierarchy.
+- `rdfs:domain` and `rdfs:range` define stable subject/object or subject/literal meaning for a property.
+- `owl:inverseOf` defines inverse object-property relationships.
+- `owl:equivalentClass` and `owl:equivalentProperty` define semantic equivalence.
+- `owl:disjointWith` defines classes that cannot share the same individual when reasoning is applied.
+- `owl:Restriction` with `owl:onProperty`, `owl:someValuesFrom`, `owl:allValuesFrom`, cardinality terms, or `owl:hasValue` defines class expressions over property constraints.
+- `owl:propertyChainAxiom` defines inferred relationships across a property path.
+- Individual typing, such as `ex:prod a ex:Environment`, asserts that a named individual belongs to a class.
+
+Use OWL axioms for reusable truths that semantic tools or future reasoners should understand. Use SHACL semantic contracts for closed-world validation rules such as required explicit fields, exact cardinality, allowed string values, and parser/report conformance checks.
 
 ## Labels, Definitions, and Domain Tokens
 
@@ -109,6 +149,7 @@ Use canonical Reqvire ontology identity boundaries:
 - Authored Turtle that uses the inherited prefix must explicitly declare it to `<ontology_base>#`; missing or conflicting declarations fail validation.
 - The root ontology Turtle block should declare `<ontology_base> a owl:Ontology` for authored OWL document identity. Child ontology blocks normally define vocabulary terms only. Do not manually model the ontology itself as a vocabulary term inside the term namespace, such as `ex:ManagedPlatformOntology a owl:Ontology`.
 - Link ontology hierarchy with `derivedFrom` between ontology elements. Reqvire derives one ontology document declaration per resolved `ontology_base`; same-base `derivedFrom` contributes to the same document, while cross-base hierarchy can become `owl:imports`.
+- Use repeatable `#### External Ontology` sections on ontology elements for pinned local external Turtle vocabularies that are not authored by the Reqvire model. Each section requires `prefix`, `namespace`, `resource`, and `source`; `format` defaults to Turtle. Sources must be local `.ttl`/Turtle files, not network fetches. These sections make imported terms available to that ontology context and to semantic contracts that `use` it, but they do not inject prefixes or triples into authored Turtle. Do not add external sections for standard OWL/RDF/RDFS/XSD built-in vocabulary; Reqvire recognizes those reserved IRIs internally.
 
 ```turtle
 @prefix ex: <https://example.org/ontology/managed-platform#> .
@@ -166,7 +207,7 @@ ex:resourceImpactedByPolicy a owl:ObjectProperty ;
 ex:PublicApiSurface owl:disjointWith ex:PrivateApiSurface .
 ```
 
-Use `owl:Class` for concepts, explicit `owl:NamedIndividual` plus domain-class typing for stable vocabulary records, `owl:DatatypeProperty` for literal slots, `owl:ObjectProperty` for relationship slots, `rdfs:subClassOf` for is-a hierarchy, `rdfs:domain`/`rdfs:range` for stable slot attachment and allowed values, and OWL axioms such as `owl:Restriction`, `owl:inverseOf`, `owl:equivalentClass`, `owl:equivalentProperty`, `owl:disjointWith`, and `owl:propertyChainAxiom` only when the semantics are true. Use SHACL shapes for closed-world validation such as required fields, cardinality, enumerations, or datatype checks.
+Use `owl:Class` for concepts, explicit `owl:NamedIndividual` plus domain-class typing for stable vocabulary records, `owl:DatatypeProperty` for literal slots, `owl:ObjectProperty` for relationship slots, `rdfs:subClassOf` for is-a hierarchy, `rdfs:domain`/`rdfs:range` for stable slot semantics and allowed values, and OWL axioms such as `owl:Restriction`, `owl:inverseOf`, `owl:equivalentClass`, `owl:equivalentProperty`, `owl:disjointWith`, and `owl:propertyChainAxiom` only when the semantics are true. Use SHACL shapes for closed-world validation such as required fields, cardinality, enumerations, or datatype checks.
 
 ## Validation
 

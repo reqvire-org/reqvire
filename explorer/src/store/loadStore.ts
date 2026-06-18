@@ -27,7 +27,7 @@ const REQUIRED_SECTIONS = [
   "resources",
   "elements",
   "relations",
-  "attachments",
+  "reused_contract_context",
   "concept_refs",
   "submodels",
   "traces",
@@ -45,7 +45,7 @@ const ARRAY_SECTIONS = [
   "resources",
   "elements",
   "relations",
-  "attachments",
+  "reused_contract_context",
   "concept_refs",
   "search",
 ] as const;

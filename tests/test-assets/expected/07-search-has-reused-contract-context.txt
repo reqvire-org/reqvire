@@ -1,0 +1,2 @@
+[requirement] specifications/Requirements.md#performance-requirement - Performance Requirement
+[capability] specifications/Requirements.md#contract-target-requirement - Contract Target Requirement

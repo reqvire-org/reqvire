@@ -13,9 +13,9 @@ Change impact detection encompasses:
 
 When generating a change impact report, the system shall compute and display the per-branch lowest common ancestors of all impacted, added, and deleted requirements through the derivedFrom hierarchy, providing reviewers with a summary of affected model areas.
 
-**Refinement Element Changes:**
-- Refinement element content changes (hash changes) shall propagate change impact through the model via their attachment relationships
-- Attachment identifier location changes (moved/renamed Refinement elements) shall be reported but do NOT propagate impact (same behavior as relation relocations)
+**Contract Element Changes:**
+- Contract element content changes (hash changes) shall propagate change impact through the model via their reused_contract_context relationships
+- Reused Contract Context identifier location changes (moved/renamed Contract elements) shall be reported but do NOT propagate impact (same behavior as relation relocations)
 
 #### Metadata
   * type: requirement
@@ -26,7 +26,7 @@ When generating a change impact report, the system shall compute and display the
   * derive: [Structural Change Analyzer](#structural-change-analyzer)
   * derivedFrom: [Tracing Structural Changes](../../Reports/ModelReports/ReportingRequirements.md#tracing-structural-changes)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
-  * verifiedBy: [Attachments Change Impact Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachments-change-impact-verification)
+  * verifiedBy: [Reused Contract Context Change Impact Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-change-impact-verification)
   * verifiedBy: [Impact Scope Summary Test](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#impact-scope-summary-test)
 ---
 

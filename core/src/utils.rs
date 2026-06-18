@@ -469,7 +469,7 @@ pub fn normalize_identifier(identifier: &str, base_path: &Path) -> Result<String
         .to_string_lossy()
         .into_owned();
 
-    // 5) Re-attach the fragment, if present
+    // 5) Re-reuse the fragment, if present
     let final_result = match fragment_opt {
         Some(frag) => {
             let fragment = normalize_fragment(frag);
@@ -674,16 +674,16 @@ pub fn hash_content(content: &str) -> String {
     format!("{:x}", hasher.finish()).to_string()
 }
 
-/// Parses an attachment line from the Attachments subsection.
+/// Parses an reused_contract_context line from the Reused Contract Context subsection.
 /// Format: * [display-text](path) - display text can be filename or full path
 /// Returns the path (href) if valid, or an error if format is invalid.
-pub fn parse_attachment_line(line: &str) -> Result<String, ReqvireError> {
+pub fn parse_reused_contract_context_line(line: &str) -> Result<String, ReqvireError> {
     let trimmed = line.trim();
 
     // Must start with bullet point
     if !trimmed.starts_with("* ") && !trimmed.starts_with("- ") {
-        return Err(ReqvireError::InvalidAttachmentFormat(format!(
-            "Attachment must start with '* ' or '- ': '{}'",
+        return Err(ReqvireError::InvalidReusedContractContextFormat(format!(
+            "ReusedContractContextEntry must start with '* ' or '- ': '{}'",
             line
         )));
     }
@@ -698,8 +698,8 @@ pub fn parse_attachment_line(line: &str) -> Result<String, ReqvireError> {
     if let Some((_text, href)) = extract_markdown_link(link_part) {
         Ok(href)
     } else {
-        Err(ReqvireError::InvalidAttachmentFormat(format!(
-            "Invalid attachment format, expected '[text](path)': '{}'",
+        Err(ReqvireError::InvalidReusedContractContextFormat(format!(
+            "Invalid reused_contract_context format, expected '[text](path)': '{}'",
             line
         )))
     }

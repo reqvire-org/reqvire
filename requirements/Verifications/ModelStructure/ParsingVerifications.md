@@ -2,7 +2,7 @@
 
 ### Model Parsing and Structure Verification Objective
 
-This objective groups verification that Reqvire parses element structure, subsections, fragments, governance metadata, refinements, and specification files consistently.
+This objective groups verification that Reqvire parses element structure, subsections, fragments, governance metadata, contracts, and specification files consistently.
 
 #### Metadata
   * type: verification-objective
@@ -12,8 +12,8 @@ This objective groups verification that Reqvire parses element structure, subsec
   * derive: [Element Subsection Parsing Test](#element-subsection-parsing-test)
   * derive: [Fragment Normalization Test](#fragment-normalization-test)
   * derive: [Non-Reserved Subsections Content Test](#non-reserved-subsections-content-test)
-  * derive: [Refinement Element Type Parsing Test](#refinement-element-type-parsing-test)
-  * derive: [Refinement Relations Rejection Test](#refinement-relations-rejection-test)
+  * derive: [Contract Element Type Parsing Test](#contract-element-type-parsing-test)
+  * derive: [Contract Relations Rejection Test](#contract-relations-rejection-test)
   * derive: [Requirement Governance Metadata Verification](#requirement-governance-metadata-verification)
   * derive: [Specification File Identification Test](#specification-file-identification-test)
 ---
@@ -198,7 +198,7 @@ This test verifies that the system correctly normalizes element name fragments a
 
 ### Non-Reserved Subsections Content Test
 
-This test verifies that non-reserved subsections (subsections other than Relations, Details, Metadata, Attachments) are correctly included in the element's content field.
+This test verifies that non-reserved subsections (subsections other than Relations, Details, Metadata, Reused Contract Context) are correctly included in the element's content field.
 
 #### Details
 
@@ -210,7 +210,7 @@ This test verifies that non-reserved subsections (subsections other than Relatio
 - Non-reserved subsections shall behave like `#### Details` (content goes into element's content field)
 
 **Reserved Subsection Behavior:**
-- Reserved subsections (Relations, Metadata, Attachments) shall NOT be included in element content
+- Reserved subsections (Relations, Metadata, Reused Contract Context) shall NOT be included in element content
 - `#### Details` subsection header and its content shall be included in element content
 
 **Format Command:**
@@ -242,9 +242,9 @@ This test verifies that non-reserved subsections (subsections other than Relatio
   * verify: [Reserved Subsections Support](../../ModelStructure/StructureAndParsing.md#reserved-subsections-support)
 ---
 
-### Refinement Element Type Parsing Test
+### Contract Element Type Parsing Test
 
-This test verifies that the system parses Refinement element types (constraint, behavior, specification, state, input-output) from metadata and that type-based search filters return the expected elements.
+This test verifies that the system parses Contract element types (constraint, behavior, specification, state, input-output) from metadata and that type-based search filters return the expected elements.
 
 #### Details
 
@@ -261,8 +261,8 @@ This test verifies that the system parses Refinement element types (constraint, 
 - `reqvire search --filter-type=specification --json` returns exactly 1 element.
 
 ##### Test Criteria
-1. Remove invalid refinement fixture and run `reqvire validate`; assert exit code is 0.
-2. Run `reqvire search --json`; assert the three refinement elements have exact types `constraint`, `behavior`, `specification`.
+1. Remove invalid contract fixture and run `reqvire validate`; assert exit code is 0.
+2. Run `reqvire search --json`; assert the three contract elements have exact types `constraint`, `behavior`, `specification`.
 3. Run `reqvire search --filter-type=constraint --json`; assert element count is 1.
 4. Run `reqvire search --filter-type=behavior --json`; assert element count is 1.
 5. Run `reqvire search --filter-type=specification --json`; assert element count is 1.
@@ -271,13 +271,13 @@ This test verifies that the system parses Refinement element types (constraint, 
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../tests/test-refinement-elements/test.sh)
-  * verify: [Refinement Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
+  * satisfiedBy: [test.sh](../../../tests/test-contract-elements/test.sh)
+  * verify: [Contract Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
 ---
 
-### Refinement Relations Rejection Test
+### Contract Relations Rejection Test
 
-This test verifies that the system rejects Refinement elements that include a Relations subsection during validation.
+This test verifies that the system rejects Contract elements that include a Relations subsection during validation.
 
 #### Details
 
@@ -285,20 +285,20 @@ This test verifies that the system rejects Refinement elements that include a Re
 - When an invalid `constraint` element includes a Relations subsection, `reqvire validate` fails (non-zero exit code).
 - When an invalid `behavior` element includes a Relations subsection, `reqvire validate` fails (non-zero exit code).
 - When an invalid `specification` element includes a Relations subsection, `reqvire validate` fails (non-zero exit code).
-- Validation output contains at least one of: `constraint`, `refinement`, or `relations`.
+- Validation output contains at least one of: `constraint`, `contract`, or `relations`.
 
 ##### Test Criteria
 1. Write an invalid `constraint` element containing a Relations subsection, run `reqvire validate`, and assert non-zero exit.
 2. Write an invalid `behavior` element containing a Relations subsection, run `reqvire validate`, and assert non-zero exit.
 3. Write an invalid `specification` element containing a Relations subsection, run `reqvire validate`, and assert non-zero exit.
-4. Assert validation output mentions refinement/type/relations context.
+4. Assert validation output mentions contract/type/relations context.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../tests/test-refinement-elements/test.sh)
-  * verify: [Refinement Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
+  * satisfiedBy: [test.sh](../../../tests/test-contract-elements/test.sh)
+  * verify: [Contract Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
 ---
 
 ### Requirement Governance Metadata Verification
@@ -317,14 +317,14 @@ Expected checks:
 - Verify `owner` accepts a free-form string.
 - Verify inherited or default `status: approved` is not treated as explicit approval evidence.
 - Verify non-governance-bearing elements that declare `status`, `priority`, `risk`, or `owner` metadata are rejected with clear diagnostics.
-- Verify governance context for a refinement element is resolved from its owning requirement through `define` / `definedBy`, not from metadata authored on the refinement.
+- Verify governance context for a contract element is resolved from its owning requirement through `define` / `definedBy`, not from metadata authored on the contract.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../tests/test-requirement-governance-metadata/test.sh)
-  * verify: [Refinement Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
+  * verify: [Contract Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
   * verify: [Requirement Governance Metadata](../../ModelStructure/ModelManagement.md#requirement-governance-metadata)
 ---
 

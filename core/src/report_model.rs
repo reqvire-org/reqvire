@@ -18,7 +18,7 @@ pub struct ModelCentricReport {
 /// Direction of traversal for model report
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TraversalDirection {
-    Forward, // Root to leaves (derive, satisfiedBy, verifiedBy, trace)
+    Forward, // Root to leaves through diagram traversal relations.
     Reverse, // Leaves to roots (derivedFrom, satisfy, verify)
 }
 
@@ -33,9 +33,9 @@ pub struct ModelCentricElement {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size_estimate: Option<SizeEstimate>,
     pub relations: Vec<ModelCentricRelation>,
-    pub attachments: Vec<String>,
+    pub reused_contract_context: Vec<String>,
     #[serde(skip)]
-    pub attachment_labels: Vec<String>,
+    pub reused_contract_context_labels: Vec<String>,
 }
 
 /// Relation in model-centric view with target details
@@ -307,21 +307,21 @@ fn build_element_recursive(
 
     // Relations are already sorted from sorted_relations above
 
-    // Build attachments list
-    let attachments: Vec<String> = element
-        .attachments
+    // Build reused_contract_context list
+    let reused_contract_context: Vec<String> = element
+        .reused_contract_context
         .iter()
         .map(|a| a.target.as_str())
         .collect();
-    let attachment_labels: Vec<String> = element
-        .attachments
+    let reused_contract_context_labels: Vec<String> = element
+        .reused_contract_context
         .iter()
         .map(|a| {
             let target_id = a.target.as_str();
             registry
                 .get_element(&target_id)
                 .map(|target| target.name.clone())
-                .unwrap_or_else(|| attachment_target_label(&target_id))
+                .unwrap_or_else(|| reused_contract_context_target_label(&target_id))
         })
         .collect();
 
@@ -333,12 +333,12 @@ fn build_element_recursive(
         file_order_index: element.file_order_index,
         size_estimate: element.size_estimate.clone(),
         relations,
-        attachments,
-        attachment_labels,
+        reused_contract_context,
+        reused_contract_context_labels,
     })
 }
 
-fn attachment_target_label(target: &str) -> String {
+fn reused_contract_context_target_label(target: &str) -> String {
     let fragment_or_path = target.rsplit('#').next().unwrap_or(target);
     let basename = fragment_or_path
         .rsplit('/')
@@ -434,7 +434,7 @@ struct MmdNode {
     identifier: String,
     name: String,
     element_type: String,
-    attachments: Vec<String>,
+    reused_contract_context: Vec<String>,
 }
 
 fn generate_model_mmd_text(
@@ -452,8 +452,8 @@ fn generate_model_mmd_text(
 
     let discovered_nodes: Vec<MmdNode> = nodes.values().cloned().collect();
     for node in discovered_nodes {
-        for attachment_id in &node.attachments {
-            if let Some(target) = registry.get_element(attachment_id) {
+        for reused_context_id in &node.reused_contract_context {
+            if let Some(target) = registry.get_element(reused_context_id) {
                 insert_mmd_node(
                     &mut nodes,
                     &mut node_order,
@@ -461,16 +461,16 @@ fn generate_model_mmd_text(
                         identifier: target.identifier.clone(),
                         name: target.name.clone(),
                         element_type: target.element_type.as_str().to_string(),
-                        attachments: target
-                            .attachments
+                        reused_contract_context: target
+                            .reused_contract_context
                             .iter()
-                            .map(|attachment| attachment.target.as_str())
+                            .map(|reused_contract_context| reused_contract_context.target.as_str())
                             .collect(),
                     },
                 );
                 edges.insert((
                     node.identifier.clone(),
-                    "attaches".to_string(),
+                    "reuses contract".to_string(),
                     target.identifier.clone(),
                 ));
             }
@@ -537,7 +537,7 @@ fn collect_mmd_nodes_and_edges(
             identifier: element.identifier.clone(),
             name: element.name.clone(),
             element_type: element.element_type.clone(),
-            attachments: element.attachments.clone(),
+            reused_contract_context: element.reused_contract_context.clone(),
         },
     );
 
@@ -560,7 +560,7 @@ fn collect_mmd_nodes_and_edges(
                         identifier: target_id.clone(),
                         name: path.clone(),
                         element_type: "file".to_string(),
-                        attachments: Vec::new(),
+                        reused_contract_context: Vec::new(),
                     },
                 );
                 edges.insert((
@@ -578,7 +578,7 @@ fn collect_mmd_nodes_and_edges(
                         identifier: target_id.clone(),
                         name: url.clone(),
                         element_type: "external".to_string(),
-                        attachments: Vec::new(),
+                        reused_contract_context: Vec::new(),
                     },
                 );
                 edges.insert((
@@ -753,10 +753,13 @@ fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> 
                 let elem_id = hash_identifier(&elem.identifier);
                 let elem_class = get_element_class(&elem.element_type);
 
-                // Build label with attachments
+                // Build label with reused_contract_context
                 let mut elem_label = escape_label(&elem.name);
-                for attachment in &elem.attachment_labels {
-                    elem_label.push_str(&format!("<br/>📎 {}", escape_label(attachment)));
+                for reused_contract_context in &elem.reused_contract_context_labels {
+                    elem_label.push_str(&format!(
+                        "<br/>📎 {}",
+                        escape_label(reused_contract_context)
+                    ));
                 }
 
                 output.push_str(&format!(

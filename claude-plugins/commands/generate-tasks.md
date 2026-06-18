@@ -57,7 +57,7 @@ Generate implementation task plan from capability-scoped requirement changes on 
    - Complete upstream chain, including owning capabilities and parent requirements
    - Capability meaning, ontology references, and requirement obligations for context
    - Contract elements that define the requirement
-   - Attached design documents
+   - Reused design documents
    - Full implementation context
 
    Also get direct details:
@@ -178,7 +178,7 @@ Each context document shows:
 - Complete capability and requirement trace chain
 - Capability purpose and parent requirement obligations
 - Contracts, specifications, and implementation details
-- Attached design documents
+- Reused design documents
 - Constraints and validation rules
 ```
 

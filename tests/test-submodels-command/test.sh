@@ -106,7 +106,7 @@ assert_file_matches \
   "Submodels text output mismatch"
 assert_summary_counts \
   "$TEST_DIR/output/submodels.actual.md" \
-  2 8 2 \
+  2 8 0 \
   "Submodels text summary counts mismatch"
 
 # Test 2: JSON stdout
@@ -132,7 +132,7 @@ if ! diff -u \
 fi
 assert_json_summary_counts \
   "$TEST_DIR/output/submodels.actual.json" \
-  2 8 2 \
+  2 8 0 \
   "Submodels JSON summary counts mismatch"
 
 # Test 3: JSON file output
@@ -181,7 +181,7 @@ assert_file_matches \
   "Submodels --from Capability One text output mismatch"
 assert_summary_counts \
   "$TEST_DIR/output/submodels.from-capability-one.actual.md" \
-  1 5 2 \
+  1 5 0 \
   "Submodels --from Capability One summary counts mismatch"
 
 # Test 5: --from capability JSON output
@@ -207,7 +207,7 @@ if ! diff -u \
 fi
 assert_json_summary_counts \
   "$TEST_DIR/output/submodels.from-capability-one.actual.json" \
-  1 5 2 \
+  1 5 0 \
   "Submodels --from Capability One JSON summary counts mismatch"
 
 # Test 6: --from requirement text output
@@ -229,7 +229,7 @@ assert_file_matches \
   "Submodels --from text output mismatch"
 assert_summary_counts \
   "$TEST_DIR/output/submodels.from-root-one.actual.md" \
-  2 4 2 \
+  2 4 0 \
   "Submodels --from summary counts mismatch"
 
 # Test 7: --from requirement JSON output
@@ -255,7 +255,7 @@ if ! diff -u \
 fi
 assert_json_summary_counts \
   "$TEST_DIR/output/submodels.from-root-one.actual.json" \
-  2 4 2 \
+  2 4 0 \
   "Submodels --from JSON summary counts mismatch"
 
 # Test 8: --from branch output should report only branch submodels

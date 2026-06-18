@@ -83,8 +83,8 @@
 #### Coverage Sources
 
 - direct_satisfied: 0
-- refinement_contract_satisfied_via_attachment: 0
-- refinement_contract_satisfied_via_child: 0
+- contract_satisfied_via_reused_contract_context: 0
+- contract_satisfied_via_child: 0
 
 ## Uncovered Requirements
 

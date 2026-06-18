@@ -10,7 +10,7 @@ export default function Submodels() {
       <p className="text-base text-zinc-600 leading-relaxed mb-10">
         The submodels report analyzes independent capability-rooted subgraphs
         and the explicit couplings between them. It is useful when reviewing
-        architecture boundaries, attachment contracts, refactors, and AI
+        architecture boundaries, reused contract context, refactors, and AI
         context collection.
       </p>
 
@@ -18,8 +18,8 @@ export default function Submodels() {
         <p className="text-zinc-600 mb-4">
           A submodel is a graph rooted at a capability with no capability
           parent. Reqvire resolves capability hierarchy, specified requirements,
-          requirement hierarchy, contracts, verifications, attachments, and
-          implementation evidence from that root.
+          requirement hierarchy, contracts, verifications, Reused Contract
+          Context, and implementation evidence from that root.
         </p>
         <BulletList
           items={[
@@ -40,12 +40,12 @@ export default function Submodels() {
               desc: "Submodels reveal whether independent capability areas are cleanly separated or coupled through hidden hierarchy links.",
             },
             {
-              name: "Attachment validation",
-              desc: "Cross-submodel dependencies should be explicit one-way attachment contracts rather than hierarchy relations that blur ownership.",
+              name: "Reused context validation",
+              desc: "Cross-submodel dependencies should be explicit one-way reused contract context rather than hierarchy relations that blur ownership.",
             },
             {
               name: "Change impact",
-              desc: "Change-impact analysis follows native relations and explicit attachments. Clear submodel boundaries make the resulting review scope easier to interpret and route.",
+              desc: "Change-impact analysis follows native relations and explicit reused contract context. Clear submodel boundaries make the resulting review scope easier to interpret and route.",
             },
             {
               name: "AI context",
@@ -59,15 +59,16 @@ export default function Submodels() {
         <p className="text-zinc-600 mb-4">
           The report includes user-authored identifier relations from one
           requirement to another requirement when those requirements resolve to
-          different capability-root ownership boundaries. Attachments are not
-          counted in this coupling list; they are explicit dependency edges with
-          their own attachment semantics.
+          different capability-root ownership boundaries. Reused Contract
+          Context entries are not counted in this coupling list; they are
+          explicit dependency edges with their own cross-subgraph reuse
+          semantics.
         </p>
         <p className="text-zinc-600 mb-4">
           Use lint with auditable output when you need cleanup hints for the
           hierarchical subset of those problems, such as cross-boundary
           requirement hierarchy links that should usually be modeled with
-          ownership-preserving hierarchy or explicit attachments instead.
+          ownership-preserving hierarchy or explicit Reused Contract Context instead.
         </p>
         <CodeBlock>{`reqvire submodels
 reqvire submodels --json
@@ -98,9 +99,9 @@ reqvire lint --auditable --json`}</CodeBlock>
 
       <Section title="Modeling Rule of Thumb">
         <p className="text-zinc-600">
-          Keep shared domain meaning in ontology and attach it to consuming
+          Keep shared domain meaning in ontology and reference it from consuming
           capabilities. Keep reusable obligation detail as requirement-owned
-          contracts and attach those contracts from consuming requirements. Use
+          contracts and reuse those contracts from consuming requirements. Use
           hierarchy only when ownership really belongs inside the same
           capability-rooted subgraph.
         </p>

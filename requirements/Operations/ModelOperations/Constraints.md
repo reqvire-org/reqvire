@@ -29,7 +29,7 @@ Canonical merge compatibility categories are defined by the Reqvire operation on
 
 **Compatibility Rules:**
 - Source and target must be in the same semantic merge compatibility category.
-- Merge categories must preserve ontology, capability, requirement, verification, refinement, and semantic-contract ownership.
+- Merge categories must preserve ontology, capability, requirement, verification, contract, and semantic-contract ownership.
 - Merging across semantic categories is forbidden.
 
 **Error Messages:**

@@ -699,10 +699,6 @@ const coverageDashboardSkinX = css`
     color: var(--text-muted);
   }
 
-  .coverage-bar__fill {
-    background: var(--coverage-color);
-  }
-
   .coverage-capability-row,
   .coverage-gap-row {
     background: transparent;
@@ -730,8 +726,8 @@ const coverageDashboardSkinX = css`
   }
 
   .coverage-more:focus-visible {
-    outline: var(--focus-ring-w) solid var(--focus-ring);
-    outline-offset: var(--focus-ring-offset);
+    outline: var(--focus-w) solid var(--focus-ring);
+    outline-offset: var(--space-1);
   }
 
   .coverage-gap-row {

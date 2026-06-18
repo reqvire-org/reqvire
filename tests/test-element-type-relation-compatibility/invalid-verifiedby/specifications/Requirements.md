@@ -62,7 +62,7 @@ INVALID: verifiedBy must point to verification element, not requirement.
 
 ### Other Element with VerifiedBy
 
-INVALID: Other type can only use trace relations.
+INVALID: Other type cannot author canonical semantic relations.
 
 #### Metadata
   * type: other-other

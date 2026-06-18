@@ -1,5 +1,5 @@
-export { AttachmentList } from "./AttachmentList";
-export type { AttachmentListProps } from "./AttachmentList";
+export { ReusedContractContextList } from "./ReusedContractContextList";
+export type { ReusedContractContextListProps } from "./ReusedContractContextList";
 export { ConceptReferenceList } from "./ConceptReferenceList";
 export type { ConceptReferenceListProps } from "./ConceptReferenceList";
 export { DetailDialog } from "./DetailDialog";
@@ -15,7 +15,7 @@ export type { RelationEndpointProps } from "./RelationEndpoint";
 export { RelationList } from "./RelationList";
 export type { RelationListProps } from "./RelationList";
 export type {
-  DetailAttachmentItem,
+  DetailReusedContractContextItem,
   DetailConceptReferenceItem,
   DetailMetaBadge,
   DetailMetaProvenance,

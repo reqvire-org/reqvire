@@ -34,16 +34,16 @@
       "identifier": "specifications/DesignDoc.md#design-doc-specification",
       "file_path": "specifications/DesignDoc.md",
       "element_type": "specification",
-      "content": "This is attached design documentation content.\n\n\n#### Details\nThis document provides additional context for the leaf requirement.",
+      "content": "This is reused design documentation content.\n\n\n#### Details\nThis document provides additional context for the leaf requirement.",
       "depth": 2,
-      "source_type": "attachment_element",
-      "attached_to": "specifications/Requirements.md#leaf-requirement"
+      "source_type": "reused_contract_context_element",
+      "reused_by": "specifications/Requirements.md#leaf-requirement"
     }
   ],
   "metadata": {
     "element_count": 3,
-    "refinement_count": 0,
-    "attachment_count": 1,
+    "contract_count": 0,
+    "reused_contract_context_count": 1,
     "total_items": 4
   }
 }

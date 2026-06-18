@@ -571,7 +571,7 @@ const missingMessageSkinX = css`
 
 const missingPathUX = css`
   padding: var(--space-1) var(--space-2);
-  font-size: var(--text-xs);
+  font-size: var(--text-caption);
 `;
 
 const missingPathSkinX = css`

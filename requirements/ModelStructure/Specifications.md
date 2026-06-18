@@ -5,17 +5,17 @@
 #### Details
 Collect supports `capability`, `requirement`, and `ontology` start elements.
 
-Default collection excludes implementation/evidence relations (`satisfiedBy`, `verify`, `verifiedBy`) and generic `trace` relations.
+Default collection excludes implementation/evidence relations (`satisfiedBy`, `satisfy`, `verify`, `verifiedBy`) from structural hierarchy views.
 
 When starting from a `requirement`:
 - UPSTREAM traverses requirement parents through `derivedFrom`, then crosses to the owning capability through `specify` or inherited capability ownership, then traverses parent capabilities through `derivedFrom`.
 - DOWNSTREAM traverses child requirements through `derive` only and does not cross to capabilities.
-- The collected content includes authored concept references, plus each traversed requirement's requirement-detail refinements and requirement-owned contract attachments.
+- The collected content includes authored concept references, plus each traversed requirement's requirement-detail contracts and requirement-owned contract reused_contract_context.
 
 When starting from a `capability`:
 - UPSTREAM traverses parent capabilities through `derivedFrom` only and does not include requirements that specify those capabilities.
 - DOWNSTREAM traverses child capabilities through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`.
-- The collected content includes authored concept references for capability, descendant capability, and requirement elements, requirement-detail refinements, and attachments for requirement elements.
+- The collected content includes authored concept references for capability, descendant capability, and requirement elements, requirement-detail contracts, and reused_contract_context for requirement elements.
 
 When starting from an `ontology`:
 - UPSTREAM traverses parent ontology elements through `derivedFrom`.
@@ -83,7 +83,7 @@ Reqvire implements containment hierarchy through filesystem structure.
   * define: [Git Repository as Project Root](ModelManagement.md#git-repository-as-project-root)
 ---
 
-### Default Requirement Type Assignment Refinement Specification
+### Default Requirement Type Assignment Contract Specification
 
 #### Details
 When an element does not have a `#### Metadata` subsection with a `type` property, the system assigns the default type `requirement`.
@@ -92,7 +92,7 @@ This behavior is location-independent: all elements default to type `requirement
 
 To use other element types, users must explicitly specify the type in the element's Metadata subsection, for example: `type: capability`.
 
-Supported element types, type categories, refinement ownership semantics, and evidence-backed verification semantics are defined by the Reqvire ontology and semantic-contract model plus the Supported Element Types Specification.
+Supported element types, type categories, contract ownership semantics, and evidence-backed verification semantics are defined by the Reqvire ontology and semantic-contract model plus the Supported Element Types Specification.
 
 #### Metadata
   * type: specification
@@ -158,7 +158,7 @@ Git repository scope defines source-file discovery and path normalization. It do
 - When run from git root: all files in the repository are processed
 - When run from a subdirectory: processing is limited to files within that subdirectory scope
 - Markdown files parsed as model documents become source file containers in the Explorer Project Store when the served Explorer runtime data is generated
-- Relation and attachment targets outside parsed model documents remain modeled resources or evidence targets, not source file containers
+- Relation and reused_contract_context targets outside parsed model documents remain modeled resources or evidence targets, not source file containers
 
 **Scope Boundary Validation:**
 - Relations referencing elements outside the subdirectory scope report missing relation target errors
@@ -170,7 +170,7 @@ Git repository scope defines source-file discovery and path normalization. It do
   * type: specification
 ---
 
-### Identifiers and Relations Refinement Specification
+### Identifiers and Relations Contract Specification
 
 #### Details
 The system is expected to implement **Identifiers** and **Relations** following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.
@@ -207,7 +207,7 @@ Rules for processing .gitignore and .reqvireignore exclusion patterns.
   * type: specification
 ---
 
-### Ignoring Unstructured Documents Refinement Specification
+### Ignoring Unstructured Documents Contract Specification
 
 #### Details
 Unstructured document exclusion behavior:
@@ -267,9 +267,9 @@ Each graph-backed operation specification is expected to define:
 - whether the operation can persist source-file changes
 - validation gates that must pass before persistence
 - rollback behavior and error reporting when a candidate mutation is rejected
-- relation, attachment, and semantic-contract consistency guarantees preserved by the operation
+- relation, reused_contract_context, and semantic-contract consistency guarantees preserved by the operation
 
-Concrete command names, flags, output fields, file paths, workflow steps, and persistence behavior belong in these operation specifications or behavior refinements.
+Concrete command names, flags, output fields, file paths, workflow steps, and persistence behavior belong in these operation specifications or behavior contracts.
 
 #### Metadata
   * type: specification
@@ -283,7 +283,7 @@ Concrete command names, flags, output fields, file paths, workflow steps, and pe
 #### Details
 Contract elements serve as requirement-owned subordinate details that drive implementation. Their relation usage is restricted because:
 - They represent atomic pieces of information focused on documenting requirements
-- They are primarily referenced through the Attachments subsection of other elements
+- They are primarily referenced through the Reused Contract Context subsection of other elements
 - Their `define` relation links back to the requirement they define, establishing ownership
 - Each contract can only be owned by one compatible requirement according to its subtype
 - They do not define requirement governance metadata; governance context for a contract is obtained from its owning requirement
@@ -304,14 +304,14 @@ Reqvire implements requirement contracts through explicit contract elements link
 **Contract Ownership:**
 - Contract content is captured in dedicated requirement-owned elements (`source`, `specification`, `constraint`, `behavior`, `state`, `input-output`)
 - Requirement owns contract elements via `definedBy`; contract elements point back via `define`
-- Contract elements can be attached by external requirements when ownership constraints allow
+- Contract elements can be reused by external requirements when ownership constraints allow
 - Semantic contracts are first-class SHACL shape contracts outside contract ownership; requirements are constrained by them through `constrainedBy`/`constrain`, and semantic contracts use ontology through `use`/`usedBy`.
 
 **Usage:**
 - Acceptance criteria and technical details reside in contract elements
 - Requirement text stays intent-focused (EARS-style), with concise detail pointers
 - Clarifying information and rationale are captured in linked contracts
-- Contract elements provide attachment-ready specification contracts across submodels
+- Contract elements provide reused-contract-context-ready specification contracts across submodels
 - `state` contract elements capture lifecycle states, state machines, allowed transitions, terminal states, and state-dependent contract behavior.
 - `input-output` contract elements capture payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries.
 
@@ -319,7 +319,7 @@ Reqvire implements requirement contracts through explicit contract elements link
   * type: specification
 
 #### Relations
-  * define: [Refinement Element Structure Constraints](ModelManagement.md#contract-element-structure-constraints)
+  * define: [Contract Element Structure Constraints](ModelManagement.md#contract-element-structure-constraints)
 ---
 
 ### Relation Operations Specification
@@ -354,22 +354,29 @@ Technical specification for relation link and unlink operations.
 
 ### Relation Semantics Specification
 
-Reqvire implements relation semantics for ownership, hierarchy, verification, implementation satisfaction, attachments, and traceability.
+Reqvire implements relation semantics for ownership, hierarchy, capability specification, semantic-contract constraint, semantic-contract ontology use, verification, implementation satisfaction, and reused_contract_context.
 
 #### Details
 - Relation names, inverse names, allowed source/target families, ownership semantics, and change-impact propagation are defined by the Reqvire relation ontology.
+- Relation families group authored relation tokens and inverse pairs by stable model meaning so semantic search and SPARQL queries can ask for hierarchy, capability specification, ownership, semantic-contract constraint, ontology-use dependency, verification, satisfaction, and cross-subgraph contract-dependency relations without hard-coding every relation string.
+- Each relation rule is expected to declare exactly one relation family and one semantic pattern. Only hierarchy-family relations have transitive closure properties; the other families are direct relation families unless a separate ontology rule defines derived behavior.
 - Implementation relation validators shall enforce the relation ontology together with element-type compatibility constraints.
 - Report and mutation code shall use the same relation direction and propagation semantics so validation, collect, submodels, coverage, and change impact remain consistent.
-- `trace` remains non-owning documentation traceability and must not be used as a substitute for hierarchy, contract ownership, verification, satisfaction, or attachment dependencies.
+- Authored relation tokens must map to a declared semantic relation family. Generic semantic escape-hatch relations are not part of the canonical model; authors should use a semantically specific relation family or ontology concept references.
 
 #### Metadata
   * type: specification
+
+#### Concept References
+  * Relation Family: https://www.reqvire.org/ontology#RelationFamily
+  * Relation Rule: https://www.reqvire.org/ontology#RelationRule
+  * Relation Semantic Pattern: https://www.reqvire.org/ontology#RelationSemanticPattern
 
 #### Relations
   * define: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
 ---
 
-### Relation Types and behaviors Refinement Specification
+### Relation Types and behaviors Contract Specification
 
 #### Details
 The system is expected to implement relations following clearly defined specifications for types and behaviors.
@@ -387,7 +394,7 @@ Requirement governance metadata is declared in the `#### Metadata` subsection of
 
 Requirement governance metadata covers requirement management accountability and decision context: `status` represents the requirement lifecycle state, `priority` represents planning importance, `risk` represents realization risk, and `owner` represents maintenance accountability.
 
-Elements outside the governance-bearing family are not requirement governance metadata authors and must not declare `status`, `priority`, `risk`, or `owner` metadata. Non-governance-bearing elements include ontology elements, semantic-contract elements, verification elements, and refinement elements (`source`, `constraint`, `behavior`, `specification`, `state`, and `input-output`). Requirement-owned refinements obtain governance context from their owning requirement instead of authored metadata; semantic contracts are governed through the requirements they constrain.
+Elements outside the governance-bearing family are not requirement governance metadata authors and must not declare `status`, `priority`, `risk`, or `owner` metadata. Non-governance-bearing elements include ontology elements, semantic-contract elements, verification elements, and contract elements (`source`, `constraint`, `behavior`, `specification`, `state`, and `input-output`). Requirement-owned contracts obtain governance context from their owning requirement instead of authored metadata; semantic contracts are governed through the requirements they constrain.
 
 When any non-governance-bearing element declares requirement governance metadata keys, the validator is expected to report an error indicating that governance metadata is only valid on capability and requirement elements.
 
@@ -407,7 +414,7 @@ Risk represents requirement realization risk in the systems engineering sense: u
   * type: specification
 ---
 
-### Requirements Processing Refinement Specification
+### Requirements Processing Contract Specification
 
 #### Details
 Requirements-processing scope behavior:
@@ -443,7 +450,7 @@ The implementation shall enforce the ontology and semantic-contract structure:
 - Ontology elements that inherit the same `ontology_base` contribute vocabulary to the same generated `owl:Ontology` document declaration. A `derivedFrom` relation between ontology elements becomes `owl:imports` only when the source and target resolve to different ontology bases.
 - Reqvire uses inherited `ontology_prefix` as the canonical CURIE label for the derived term namespace. Authored Turtle that uses the inherited prefix must explicitly declare it to `<ontology_base>#`; missing or conflicting declarations fail validation.
 - Reqvire derives the semantic contract IRI as `urn:reqvire:semantic-contract:<element.id>`.
-- The graph registry indexes ontology elements by `element.id`, `element.identifier`, derived IRI, ontology hierarchy, attachment consumers, and parsed `Ontology` content.
+- The graph registry indexes ontology elements by `element.id`, `element.identifier`, derived IRI, ontology hierarchy, reused_contract_context consumers, and parsed `Ontology` content.
 - The graph registry indexes semantic contracts by `element.id`, `element.identifier`, derived IRI, constrained requirements, used ontology context, and parsed `Shapes` content.
 - Reqvire builds a reusable semantic index from the graph registry for ontology validation, semantic-contract validation, ontology export, parsing each Turtle block once and reusing the parsed RDF quads for diagnostics, ontology term declarations, SHACL references, Turtle export, and JSON-LD export.
 - `reqvire validate` parses `Ontology` and `Shapes` Turtle content with Oxigraph and inspects the parsed RDF graph instead of using raw text matching.
@@ -478,7 +485,7 @@ The implementation shall enforce the ontology and semantic-contract structure:
   * define: [Ontology and Semantic Contract Model](ModelManagement.md#ontology-and-semantic-contract-model)
 ---
 
-### Specification File Identification Refinement Specification
+### Specification File Identification Contract Specification
 
 #### Details
 - Supported first H1 headings:
@@ -493,7 +500,7 @@ The implementation shall enforce the ontology and semantic-contract structure:
   * type: specification
 ---
 
-### Structure and Addressing in Markdown Documents Refinement Specification
+### Structure and Addressing in Markdown Documents Contract Specification
 
 #### Details
 The system is expected to implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
@@ -502,7 +509,7 @@ The system is expected to implement semi-structured markdown format specificatio
   * type: specification
 ---
 
-### Structured Markdown Files Search and Detection Refinement Specification
+### Structured Markdown Files Search and Detection Contract Specification
 
 #### Details
 Structured markdown detection behavior:
@@ -526,9 +533,9 @@ Element types supported by the system for classification and behavior determinat
 The canonical type vocabulary is defined by the Reqvire core element, capability, requirement, ontology, semantic-contract, and verification model contracts.
 
 The implementation shall use those contracts as the authoritative source for:
-- capability, requirement, refinement, verification, and custom type categories
+- capability, requirement, contract, verification, and custom type categories
 - default element type semantics
-- requirement-owned refinement type semantics
+- requirement-owned contract type semantics
 - verification-objective planning hierarchy semantics
 - evidence-backed verification type semantics
 
@@ -537,9 +544,9 @@ Validation-adjacent migration support shall expose versioned migration candidate
 Parser-facing behavior remains:
 - When `type` metadata is omitted, the element type is `requirement`.
 - `type` metadata uses the exact element-type token declared in the semantic vocabulary.
-- `other` and `other-TYPENAME` are custom trace-only types.
+- `other` and `other-TYPENAME` are custom extension types that cannot author semantic relations.
 - `other-TYPENAME` requires at least one character after `other-`; `other-` alone is invalid.
-- Custom types can only use `trace` relations.
+- Custom types should be used only when no supported canonical element type fits; semantic meaning should be expressed through ontology concept references or a specific supported type.
 
 #### Metadata
   * type: specification

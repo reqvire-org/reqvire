@@ -7,8 +7,8 @@
 #### Coverage Sources
 
 - direct_satisfied: 3
-- refinement_contract_satisfied_via_attachment: 1
-- refinement_contract_satisfied_via_child: 1
+- contract_satisfied_via_reused_contract_context: 1
+- contract_satisfied_via_child: 1
 
 ## Covered Requirements
 
@@ -17,13 +17,13 @@
 - ✅ **[Contract Consumer Implemented](specifications/Requirements.md#contract-consumer-implemented)** (direct_satisfied)
   - Evidence:
     - [specifications/src/contract_consumer.rs](specifications/src/contract_consumer.rs)
-- ✅ **[Contract Owner](specifications/Requirements.md#contract-owner)** (refinement_contract_satisfied_via_attachment)
+- ✅ **[Contract Owner](specifications/Requirements.md#contract-owner)** (contract_satisfied_via_reused_contract_context)
   - Evidence:
     - [specifications/Requirements.md#contract-consumer-implemented](specifications/Requirements.md#contract-consumer-implemented)
 - ✅ **[Derived Child Implemented](specifications/Requirements.md#derived-child-implemented)** (direct_satisfied)
   - Evidence:
     - [specifications/src/derived_child.rs](specifications/src/derived_child.rs)
-- ✅ **[Derived Parent](specifications/Requirements.md#derived-parent)** (refinement_contract_satisfied_via_child)
+- ✅ **[Derived Parent](specifications/Requirements.md#derived-parent)** (contract_satisfied_via_child)
   - Evidence:
     - [specifications/Requirements.md#derived-child-implemented](specifications/Requirements.md#derived-child-implemented)
 - ✅ **[Direct Implemented](specifications/Requirements.md#direct-implemented)** (direct_satisfied)

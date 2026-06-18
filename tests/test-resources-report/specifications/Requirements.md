@@ -42,7 +42,7 @@ The system shall ensure data integrity across all operations.
 #### Relations
   * derivedFrom: [Root Capability](#root-capability)
   * satisfiedBy: [impl.rs](../core/src/impl.rs)
-  * trace: [design.md](../docs/design.md)
+  * satisfiedBy: [design.md](../docs/design.md)
 ---
 
 ### User Interface
@@ -52,7 +52,7 @@ The system shall provide a user-friendly interface.
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [UI Mockup Spec](#ui-mockup-spec)
 
 #### Relations
@@ -66,7 +66,7 @@ The system shall provide a RESTful API.
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [API Contract Spec](#api-contract-spec)
 
 #### Relations
@@ -76,7 +76,7 @@ The system shall provide a RESTful API.
 
 ### Documentation Contract Owner
 
-Owner requirement for documentation refinement contracts.
+Owner requirement for documentation contracts.
 
 #### Metadata
   * type: requirement
@@ -88,7 +88,7 @@ Owner requirement for documentation refinement contracts.
 
 ### UI Mockup Spec
 
-Refinement contract describing UI mockup expectations.
+Contract contract describing UI mockup expectations.
 
 #### Metadata
   * type: specification
@@ -96,7 +96,7 @@ Refinement contract describing UI mockup expectations.
 
 ### API Contract Spec
 
-Refinement contract describing API specification constraints.
+Contract contract describing API specification constraints.
 
 #### Metadata
   * type: specification

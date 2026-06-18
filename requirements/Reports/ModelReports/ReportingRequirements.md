@@ -28,11 +28,11 @@ When requested the system shall provide human readable and machine readable Syst
 
 ### Collect Capability and Requirement Context
 
-The system shall collect and consolidate context from a capability or requirement element, including directional capability and requirement traversal, authored concept references, requirement-owned `definedBy` targets, attached requirement contract contents, and source citations in text or JSON format.
+The system shall collect and consolidate context from a capability or requirement element, including directional capability and requirement traversal, authored concept references, requirement-owned `definedBy` targets, reused requirement contract contents, and source citations in text or JSON format.
 
 #### Details
 The system shall define:
-- Content collection rules for elements, definedBy targets, and attachments
+- Content collection rules for elements, definedBy targets, and reused_contract_context
 - Output format specifications for text and JSON modes
 - Direction-based traversal over capability hierarchy, requirement hierarchy, and the `specify`/`specifiedBy` bridge where defined by the collect traversal specification
 
@@ -87,18 +87,18 @@ When requested the system shall generate reports summarizing the structure and r
 The system shall generate containment view reports showing the physical hierarchical structure of the model.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Containment Specification](../../ModelStructure/Specifications.md#containment-specification)
   * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
 #### Relations
-  * definedBy: [Containment View Report Refinement Specification](Specifications.md#containment-view-report-refinement-specification)
+  * definedBy: [Containment View Report Contract Specification](Specifications.md#containment-view-report-contract-specification)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
   * verifiedBy: [Containment View Design Documents Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#containment-view-design-documents-test)
 ---
@@ -108,17 +108,17 @@ Implementation details shall follow the associated refinement specifications.
 System shall support Markdown, pure Mermaid, and JSON output formats.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
   * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
 
 #### Relations
-  * definedBy: [Model Diagram Output Formats Refinement Specification](Specifications.md#model-diagram-output-formats-refinement-specification)
+  * definedBy: [Model Diagram Output Formats Contract Specification](Specifications.md#model-diagram-output-formats-contract-specification)
   * derive: [Forward-Only Relation Traversal](#forward-only-relation-traversal)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
@@ -130,7 +130,7 @@ Implementation details shall follow the associated refinement specifications.
 When filtering by root element, system shall traverse only forward relations down to leaf elements.
 
 #### Details
-Traversal behavior shall follow the associated behavior refinement.
+Traversal behavior shall follow the associated behavior contract.
 
 #### Metadata
   * type: requirement
@@ -185,13 +185,10 @@ The report shall support:
 - The report summary includes deterministic counts for total submodels, total requirements represented in scope, and total cross-submodel couplings; in scoped mode, counts are computed from the scoped submodels and couplings only.
 - Summary content follows the report paragraph: `Submodels`, `Requirements`, and `Cross-Submodel Couplings`.
 
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
-
-#### Attachments
-  * [RelationTypes](../../ModelStructure/RelationTypes.md#relationtypes)
 
 #### Relations
   * definedBy: [Requirement Submodels Report Specification](Specifications.md#requirement-submodels-report-specification)
@@ -216,7 +213,7 @@ The system shall define comprehensive search filtering capabilities:
 - By requirement governance metadata values
 - By element content patterns
 - By presence/absence of relations
-- By presence/absence of attachments
+- By presence/absence of reused_contract_context
 
 Search result element evidence shall include effective requirement governance metadata when applicable.
 Search result summaries shall include effective governance metadata counts for matched governance-bearing elements.
@@ -230,7 +227,7 @@ Search report kinds, search filter kinds, collect source types, coverage source 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
@@ -249,13 +246,13 @@ Search report kinds, search filter kinds, collect source types, coverage source 
 The system shall support filtering search results by multiple element types simultaneously to enable flexible querying across type categories.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Flexible Search Type Filtering Refinement Specification](Specifications.md#flexible-search-type-filtering-refinement-specification)
+  * definedBy: [Flexible Search Type Filtering Contract Specification](Specifications.md#flexible-search-type-filtering-contract-specification)
   * derivedFrom: [Search Report Generator](#search-report-generator)
 ---
 
@@ -264,13 +261,13 @@ Implementation details shall follow the associated refinement specifications.
 The system shall parse comma-separated element type values in the `--filter-type` flag, validating each type and applying OR logic to match elements.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Comma-Separated Type Filter Parsing Refinement Specification](Specifications.md#comma-separated-type-filter-parsing-refinement-specification)
+  * definedBy: [Comma-Separated Type Filter Parsing Contract Specification](Specifications.md#comma-separated-type-filter-parsing-contract-specification)
   * derivedFrom: [Flexible Search Type Filtering](#flexible-search-type-filtering)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)
@@ -305,7 +302,7 @@ The system shall implement a validation report generator that compiles and forma
 
 ### Requirement Implementation Coverage Report
 
-The system shall generate requirement implementation coverage reports that identify which requirements are implemented using direct `satisfiedBy` evidence and refinement-contract consumption evidence.
+The system shall generate requirement implementation coverage reports that identify which requirements are implemented using direct `satisfiedBy` evidence and contract consumption evidence.
 
 #### Details
 The implementation coverage report shall provide:
@@ -314,8 +311,8 @@ The implementation coverage report shall provide:
 - Count and percentage of implementation-uncovered requirements
 - Coverage source classification for covered requirements:
   - direct `satisfiedBy` on the requirement
-  - refinement-contract coverage through owned refinement elements attached by directly satisfied requirements
-  - refinement-contract coverage when a requirement that owns refinement has directly satisfied derived descendants
+  - contract coverage through owned contract elements reused by directly satisfied requirements
+  - contract coverage when a requirement that owns contract has directly satisfied derived descendants
 - Detailed lists grouped by file and section, including coverage source and evidence references
 - Output in both human-readable text and machine-readable JSON formats
 - Coverage percentages shall be reported with at most 2 decimal places
@@ -333,7 +330,7 @@ The implementation coverage report shall provide:
 
 ### Resources Report
 
-The system shall provide a resources report showing all files referenced by the model through relations and attachments in text, JSON, and Explorer views.
+The system shall provide a resources report showing all files referenced by the model through relations and reused_contract_context in text, JSON, and Explorer views.
 
 #### Metadata
   * type: requirement
@@ -365,7 +362,7 @@ The report helps track verification completeness and identify gaps in requiremen
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Verification Roll-up Specification](../../Verification/Traceability/Specifications.md#verification-roll-up-specification)
   * [Verification Type Selection Guidelines](../../ModelStructure/Specifications.md#verification-type-selection-guidelines)
 
@@ -382,7 +379,7 @@ The system shall seed TraceFlow/Traces SPA route data showing verification trace
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
@@ -397,7 +394,7 @@ The system shall materialize generated ontology construct facts as a subgraph of
 #### Details
 The ontology projection subgraph shall:
 - Extend the existing in-memory RDF projection used by full semantic export; it is not a separate database, persistent store, or route-local model.
-- Be attached to the reusable `SemanticIndex` as structured generated projection data so semantic export, JSON-LD export, and Explorer rendering share one authoritative projection source.
+- Be reused to the reusable `SemanticIndex` as structured generated projection data so semantic export, JSON-LD export, and Explorer rendering share one authoritative projection source.
 - Be generated from authored ontology and semantic-contract RDF quads during semantic index processing or immediately after parsing.
 - Materialize direct-authored OWL/RDFS/SHACL constructs into Reqvire ontology projection facts without changing authored Markdown ontology or semantic-contract blocks.
 - Preserve source element identifier, source name, source file, source line, source block kind, construct subject, construct object, construct members, construct property, ordered sequence index when relevant, symbol code point, rendered symbol, and derivation mode.
@@ -409,13 +406,40 @@ The ontology projection subgraph shall:
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
 
 #### Relations
   * definedBy: [Ontology Projection Subgraph Materialization Specification](Specifications.md#ontology-projection-subgraph-materialization-specification)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+---
+
+### Semantic Relation Family Projection
+
+The system shall materialize ontology-defined relation-family projection facts as part of full semantic model export so semantic search can query relation meaning independently of raw Markdown relation token direction.
+
+#### Details
+- Full semantic model export shall treat authored model relations and reused contract context edges as first-class semantic relation records.
+- Full semantic model export shall emit deterministic `reqvire:ModelRelation` resources with source, target, relation type, and target identifier facts.
+- Full semantic model export shall emit canonical forward and inverse normalized predicates for ontology-defined relation families without removing raw authored relation predicates.
+- The relation-family projection shall be an in-memory semantic export projection, not a source Markdown mutation and not an MCP-owned materialization step.
+- The projection shall follow the ontology-authored `reqvire:RelationRule` semantics and the relation-family construct-query contract.
+
+#### Concept References
+  * Relation family construct query: https://www.reqvire.org/ontology#RelationFamilyConstructQuery
+  * Model relation: https://www.reqvire.org/ontology#ModelRelation
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/ReportsAndQuery.md#semantic-export-projection-shape)
+  * definedBy: [Semantic Relation Family Projection Specification](Specifications.md#semantic-relation-family-projection-specification)
+  * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
+  * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
+  * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+  * verifiedBy: [MCP Semantic Query Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-query-tools-verification)
 ---
 
 ### Ontology and Shapes Collection
@@ -425,21 +449,84 @@ The system shall collect ontology `#### Ontology` and semantic-contract `#### Sh
 #### Details
 The default collection shall expose authored ontology RDF content and semantic-contract SHACL RDF content without changing the Markdown model as the source of truth.
 
-When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, requirement-to-capability specification relations, requirement-to-semantic-contract constraint relations, semantic-contract-to-ontology use relations, ontology hierarchy relations, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts materialized from direct-authored OWL/RDFS/SHACL constructs.
+When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, relation-family projection facts, requirement-to-capability specification relations, requirement-to-semantic-contract constraint relations, semantic-contract-to-ontology use relations, ontology hierarchy relations, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts materialized from direct-authored OWL/RDFS/SHACL constructs.
 
 The collection shall preserve source element identifiers, source file paths, section kind, and line numbers so CLI, Explorer rendering, and downstream semantic tooling can cite the model source of each RDF block.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
 
 #### Relations
   * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/ReportsAndQuery.md#semantic-export-projection-shape)
   * definedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
+  * derive: [OWL Reserved Vocabulary Recognition](#owl-reserved-vocabulary-recognition)
   * satisfiedBy: [explorer_runtime.rs](../../../core/src/explorer_runtime.rs)
   * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
+  * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
+  * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+---
+
+### OWL Reserved Vocabulary Recognition
+
+The system shall recognize fixed OWL reserved vocabulary IRIs in ontology and semantic-contract RDF positions without requiring local external ontology source declarations for those IRIs.
+
+#### Details
+Reserved vocabulary recognition shall be fixed-list based over expanded IRIs, not prefix-name or namespace-prefix matching. Turtle prefix names are aliases: `xsd:string` and `xs:string` are equivalent when both expand to `http://www.w3.org/2001/XMLSchema#string`.
+
+Reqvire shall treat known reserved vocabulary IRIs as model-valid references in positions where their OWL role is valid without requiring `#### External Ontology` sections for those namespaces.
+
+Built-in datatype IRIs are one reserved vocabulary subset and shall be accepted in datatype positions such as ontology datatype property ranges and SHACL `sh:datatype` values.
+
+Custom IRIs outside the reserved vocabulary registry remain subject to normal authored or external ontology resolution when term existence validation applies.
+
+#### Concept References
+  * OWL reserved vocabulary registry: https://www.reqvire.org/ontology#OwlReservedVocabularyRegistry
+  * OWL reserved vocabulary term: https://www.reqvire.org/ontology#OwlReservedVocabularyTerm
+  * OWL built-in datatype: https://www.reqvire.org/ontology#OwlBuiltInDatatype
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [OWL Reserved Vocabulary Recognition Specification](Specifications.md#owl-reserved-vocabulary-recognition-specification)
+  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
+  * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
+  * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+---
+
+### Local External Ontology Sources
+
+The system shall allow ontology elements to declare local external ontology source files that provide imported vocabulary namespaces for validation and optional semantic export materialization.
+
+#### Details
+External ontology sources shall be declared with repeatable `#### External Ontology` sections on ontology elements. Each section shall define `prefix`, `namespace`, `resource`, `source`, and an optional `format` value. The initial supported format is Turtle/.ttl only.
+
+The `source` path shall be local and resolved like a model path; Reqvire shall not fetch network ontology sources during validation or export.
+
+External ontology source triples shall be parsed into the semantic index before validating ontology and semantic-contract references. Terms declared by the local source shall be available to the declaring ontology element, its ontology descendants, and semantic contracts that use that ontology context.
+
+Turtle blocks remain explicit. External source sections do not inject prefixes, ontology declarations, imports, or semantic triples into authored ontology or SHACL blocks.
+
+Default semantic export shall include authored ontology and SHACL triples only. `reqvire ontologies --include-external` shall include parsed external source triples. `reqvire ontologies --full --include-external` shall include authored triples, external source triples, Reqvire model context, and generated ontology projection facts.
+
+Standard OWL reserved vocabulary and built-in datatype IRIs remain recognized by the fixed reserved vocabulary registry and do not require `#### External Ontology` declarations.
+
+#### Concept References
+  * External ontology source: https://www.reqvire.org/ontology#ExternalOntologySource
+  * External ontology prefix: https://www.reqvire.org/ontology#externalOntologyPrefix
+  * External ontology namespace: https://www.reqvire.org/ontology#externalOntologyNamespace
+  * External ontology resource: https://www.reqvire.org/ontology#externalOntologyResource
+  * External ontology source path: https://www.reqvire.org/ontology#externalOntologySourcePath
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Local External Ontology Source Specification](Specifications.md#local-external-ontology-source-specification)
+  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
 ---
@@ -451,7 +538,7 @@ When tracing structural changes, the system shall analyze the System model and d
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Traceability Reporting Specification](Specifications.md#traceability-reporting-specification)
 
 #### Relations

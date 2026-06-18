@@ -140,7 +140,7 @@ Analyze the merged content and create a **clean, restructured version**:
 3. **Remove duplicate information** - Merge may have introduced redundancy
 4. **Ensure proper EARS statement structure** - Main content should be clear requirement statement
 5. **Maintain all Relations** - These are already correctly merged, keep them intact
-6. **Keep Metadata and Attachments** - Preserve these unchanged
+6. **Keep Metadata and Reused Contract Context** - Preserve these unchanged
 
 **Example of clean, restructured content:**
 ```markdown

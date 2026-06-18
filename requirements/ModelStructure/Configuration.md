@@ -7,8 +7,8 @@ The system shall allow structured markdown and unstructured. (eg., markdown, PDF
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Refinement Specification](Specifications.md#contract-specification)
+#### Reused Contract Context
+  * [Contract Specification](Specifications.md#contract-specification)
 
 #### Relations
   * derive: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
@@ -20,13 +20,13 @@ The system shall allow structured markdown and unstructured. (eg., markdown, PDF
 The system shall support configurable glob patterns to exclude specific files from requirement processing.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Ignoring Unstructured Documents Refinement Specification](Specifications.md#ignoring-unstructured-documents-refinement-specification)
+  * definedBy: [Ignoring Unstructured Documents Contract Specification](Specifications.md#ignoring-unstructured-documents-contract-specification)
   * derive: [Ignore Files Integration](#ignore-files-integration)
   * derive: [Requirements Processing](#requirements-processing)
   * derive: [File Pattern Exclusion for Format](../Operations/Formatting/FormattingRequirements.md#file-pattern-exclusion-for-format)
@@ -59,13 +59,13 @@ The system shall integrate with Git workflows by reading exclusion patterns from
 The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Requirements Processing Refinement Specification](Specifications.md#requirements-processing-refinement-specification)
+  * definedBy: [Requirements Processing Contract Specification](Specifications.md#requirements-processing-contract-specification)
   * derive: [Structured Markdown Files Search and Detection](#structured-markdown-files-search-and-detection)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
@@ -79,13 +79,13 @@ Implementation details shall follow the associated refinement specifications.
 The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the git repository root based on predefined rules.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Structured Markdown Files Search and Detection Refinement Specification](Specifications.md#structured-markdown-files-search-and-detection-refinement-specification)
+  * definedBy: [Structured Markdown Files Search and Detection Contract Specification](Specifications.md#structured-markdown-files-search-and-detection-contract-specification)
   * derivedFrom: [Requirements Processing](#requirements-processing)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * verifiedBy: [Requirements Files Search and Detection Test](../Verifications/Operations/Validation/ValidationVerifications.md#requirements-files-search-and-detection-test)

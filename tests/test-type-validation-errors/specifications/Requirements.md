@@ -29,13 +29,13 @@ A system requirement specified by the capability.
 
 #### Relations
   * specify: [Test Capability](#test-capability)
-  * definedBy: [Test Source Refinement](#test-source-refinement)
+  * definedBy: [Test Source Contract](#test-source-contract)
   * constrainedBy: [Test Semantic Contract](#test-semantic-contract)
 ---
 
-### Test State Refinement
+### Test State Contract
 
-A state refinement for positive type validation.
+A state contract for positive type validation.
 
 #### Metadata
   * type: state
@@ -44,9 +44,9 @@ A state refinement for positive type validation.
   * define: [Test System Requirement](#test-system-requirement)
 ---
 
-### Test Input Output Refinement
+### Test Input Output Contract
 
-An input-output refinement for positive type validation.
+An input-output contract for positive type validation.
 
 #### Metadata
   * type: input-output
@@ -68,9 +68,9 @@ A formal proof verification for positive type validation.
   * satisfiedBy: [proof-report.txt](proof-report.txt)
 ---
 
-### Test Source Refinement
+### Test Source Contract
 
-A source refinement for positive type validation.
+A source contract for positive type validation.
 
 #### Metadata
   * type: source

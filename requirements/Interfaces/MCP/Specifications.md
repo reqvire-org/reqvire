@@ -75,7 +75,7 @@ Compatibility rules:
 The MCP interface is expected to expose read-only model evidence tools grounded in Reqvire core reports and lookup behavior.
 
 #### Details
-Model evidence tool behavior is inherited from attached Reqvire search, model, containment, collect, submodel, and ontology collection contracts. MCP adds typed request/result schemas, workspace/model revision metadata, and evidence references describing which elements, files, relations, attachments, ontology blocks, and shape blocks were included.
+Model evidence tool behavior is inherited from reused Reqvire search, model, containment, collect, submodel, and ontology collection contracts. MCP adds typed request/result schemas, workspace/model revision metadata, and evidence references describing which elements, files, relations, reused_contract_context, ontology blocks, and shape blocks were included.
 
 `reqvire.search` tool calls are expected to expose typed request fields equivalent to the stable Reqvire search filters:
 - `short`: optional boolean controlling abbreviated output.
@@ -90,8 +90,8 @@ Model evidence tool behavior is inherited from attached Reqvire search, model, c
 - `filter_page_content`: optional parent file page content regex.
 - `have_relations`: optional comma-separated relation type list requiring all listed relations.
 - `not_have_relations`: optional comma-separated relation type list excluding elements that have all listed relations.
-- `has_attachments`: optional boolean requiring at least one attachment.
-- `filter_attachment`: optional attachment target glob.
+- `has_reused_contract_context`: optional boolean requiring at least one reused_contract_context.
+- `filter_reused_contract_context`: optional reused_contract_context target glob.
 
 Governance metadata filters apply to effective governance metadata values and exclude non-governance-bearing elements when active. Successful `reqvire.search` structured results include effective governance metadata for capability and requirement element evidence.
 
@@ -108,6 +108,7 @@ Semantic model evidence rules:
 - `reqvire.semantic.ontologies` accepts optional `full` boolean; omitted or false returns generated ontology document declarations plus authored ontology and SHACL artifacts, while true also includes generated Reqvire model context triples and ontology projection facts. Generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors.
 - `reqvire.semantic.ontologies` returns selected serialized semantic content, effective content filter, semantic index summary, collected block metadata, diagnostics, generated ontology document declarations, ontology term declarations, and SHACL shape references.
 - `reqvire.semantic.prefixes` returns ontology element-defined prefixes, namespaces, source provenance, source prose content, and a reusable SPARQL prefix block.
+- `reqvire.semantic.vocabulary` returns compact paged semantic vocabulary with prefixes included in every response for SPARQL query construction.
 - `reqvire.semantic.sparql` executes SPARQL against the same semantic collection used by `reqvire.semantic.ontologies`.
 
 #### Metadata
@@ -177,7 +178,7 @@ Durable mutation flow:
 Mutation flow constraints:
 - Mutation requests that bypass Reqvire model semantics are rejected.
 - Arbitrary file writes are not exposed as model mutation tools.
-- Single-root ownership, relation type compatibility, attachment contracts, and file persistence guarantees are inherited from Reqvire core operation contracts.
+- Single-root ownership, relation type compatibility, reused_contract_context contracts, and file persistence guarantees are inherited from Reqvire core operation contracts.
 - Operation-specific preview requests for mutation-class tools are available only when mutation tools are advertised, except for conditional mutation tools such as `reqvire.format` where the read-only preview form may be advertised by default.
 
 #### Metadata
@@ -195,10 +196,10 @@ The MCP interface is expected to expose mutation tools only through typed Reqvir
 Mutation exposure and safety rules:
 - Mutation tools are omitted from MCP `tools/list` by default.
 - Mutation tools are registered and returned by MCP `tools/list` only when the server is started with `reqvire mcp --enable-mutations`.
-- Mutation operation semantics are inherited from attached Reqvire functional/operation contracts.
+- Mutation operation semantics are inherited from reused Reqvire functional/operation contracts.
 - Controlled mutations update the Reqvire in-memory graph through core mutation logic before filesystem flush.
-- Controlled mutations run the same semantic model validation gates as Reqvire core before persistence. This includes ontology element structure, single connected ontology root, attachment compatibility, semantic-contract `Shapes` reference reachability, and `Concept References` resolution.
-- Durable writes flush modified files to the filesystem with the same guarantees as attached file persistence behavior.
+- Controlled mutations run the same semantic model validation gates as Reqvire core before persistence. This includes ontology element structure, single connected ontology root, reused_contract_context compatibility, semantic-contract `Shapes` reference reachability, and `Concept References` resolution.
+- Durable writes flush modified files to the filesystem with the same guarantees as reused file persistence behavior.
 - The MCP server keeps its internal graph synchronized from the updated core graph after each successful mutation before serving subsequent model reads.
 - The MCP server avoids mandatory full reparse after controlled mutations; full reparse is reserved for external filesystem drift, changed source fingerprints, or operations that require it.
 - MCP mutation results add protocol metadata, refreshed model revision metadata, and affected scope metadata.
@@ -219,12 +220,14 @@ Protocol conformance rules:
 - The server implements MCP lifecycle initialization and version negotiation for protocol revision `2025-11-25`.
 - The server rejects unsupported MCP protocol revisions using standard MCP initialization error handling.
 - The server `initialize` result includes `protocolVersion`, standard `capabilities`, and `serverInfo`.
-- The server declares standard MCP server capabilities using MCP capability objects. MVP server capabilities are `tools` and `resources` only unless another MCP capability is implemented.
+- The server declares standard MCP server capabilities using MCP capability objects. Implemented server capabilities include `tools`, `resources`, and `prompts`.
 - The `tools` capability is declared as a standard MCP tools capability object. Because Reqvire tool availability is fixed for a server process after startup flags are parsed, `tools.listChanged` is omitted or false in MVP.
 - The `resources` capability is declared as a standard MCP resources capability object only when resource listing/reading is implemented. Resource `subscribe` and `listChanged` are omitted or false in MVP.
+- The `prompts` capability is declared as a standard MCP prompts capability object. Prompt templates are fixed at build time, so `prompts.listChanged` is omitted or false.
 - The server does not advertise Reqvire domain capabilities as a custom top-level capability array.
 - Concrete callable operations are advertised through MCP `tools/list`.
 - Concrete resource views are advertised through MCP `resources/list` and read through MCP `resources/read` when resource capability is enabled.
+- Concrete prompt templates are advertised through MCP `prompts/list` and retrieved through MCP `prompts/get` when prompt capability is enabled.
 - Reqvire-specific state such as workspace status, dirty state, model revision, Reqvire tool contract version, and mutation mode is returned by Reqvire MCP tools/resources.
 - Tool definitions use MCP `inputSchema`, optional `outputSchema`, and tool annotations.
 - Read/report tools use `readOnlyHint: true`.
@@ -242,7 +245,7 @@ Protocol conformance rules:
 The MCP interface is expected to expose read-only quality and traceability tools grounded in Reqvire core reports.
 
 #### Details
-Quality and traceability tool behavior is inherited from attached Reqvire lint, coverage, traces, resources, and change-impact contracts. These tools return structured diagnostics and evidence after server startup validation has passed. Validation is not exposed as an MCP tool because validation is the prerequisite for starting the MCP server, matching normal Reqvire command execution behavior. Tools that compare against git commits include the compared commit and current `HEAD` in result metadata.
+Quality and traceability tool behavior is inherited from reused Reqvire lint, coverage, traces, resources, and change-impact contracts. These tools return structured diagnostics and evidence after server startup validation has passed. Validation is not exposed as an MCP tool because validation is the prerequisite for starting the MCP server, matching normal Reqvire command execution behavior. Tools that compare against git commits include the compared commit and current `HEAD` in result metadata.
 
 #### Metadata
   * type: specification
@@ -284,7 +287,7 @@ The MCP interface is expected to expose read-only SPARQL query execution over Re
 SPARQL tool request:
 - Tool name is `reqvire.semantic.sparql`.
 - Required `query` string contains a SPARQL 1.1 query.
-- Optional `full` boolean defaults to `true`. When true, the queried graph includes authored ontology and SHACL RDF plus generated Reqvire model-context triples and ontology projection facts. When false, the queried graph includes generated ontology document declarations plus authored ontology and SHACL RDF only.
+- Optional `full` boolean defaults to `true`. When true, the queried graph includes authored ontology and SHACL RDF plus generated Reqvire model-context triples, semantic-export relation-family projection facts, and ontology projection facts. When false, the queried graph includes generated ontology document declarations plus authored ontology and SHACL RDF only.
 
 Execution behavior:
 - The validated Reqvire model owns an in-memory Oxigraph semantic store built after parsing and graph validation.
@@ -305,6 +308,24 @@ Result behavior:
 
 #### Relations
   * define: [MCP Semantic Query Tools](Tools.md#mcp-semantic-query-tools)
+---
+
+### MCP Semantic Relation Family Projection Access Specification
+
+The MCP interface is expected to make relation-family projection facts available as queryable semantic graph content produced by the semantic export model.
+
+#### Details
+- `reqvire.semantic.sparql` queries relation-family projection facts only from the selected model-owned semantic store.
+- `reqvire.semantic.vocabulary` may expose normalized relation-family properties and query examples from authored ontology vocabulary and semantic export contracts.
+- MCP does not own relation-family projection materialization, execute the projection-side construct query, or rebuild relation-family triples per tool call.
+- When `full` is false, relation-family projection facts are outside the queried graph.
+- MCP does not write generated relation-family projection facts back to Markdown source.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Semantic Relation Family Projection Access](Tools.md#mcp-semantic-relation-family-projection-access)
 ---
 
 ### MCP Semantic Prefix Registry Tools Specification
@@ -335,6 +356,89 @@ Execution behavior:
 
 #### Relations
   * define: [MCP Semantic Prefix Registry Tools](Tools.md#mcp-semantic-prefix-registry-tools)
+---
+
+### MCP Semantic Vocabulary Tools Specification
+
+The MCP interface is expected to expose compact paged semantic vocabulary for ontology-aware query construction.
+
+#### Details
+Vocabulary tool request:
+- Tool name is `reqvire.semantic.vocabulary`.
+- Optional `section` defaults to `all` and accepts `all`, `prefixes`, `classes`, `properties`, `relation_families`, `controlled_vocabularies`, `semantic_contracts`, `query_patterns`, `source_map`, or `diagnostics`.
+- Optional `limit` defaults to 50 and is capped at 200.
+- Optional `cursor` continues a previous section page.
+- Optional `filter` performs a text match over compact item content.
+- Optional `include_source` defaults to true and controls source provenance where supported.
+- Optional `include_examples` defaults to false and controls whether query pattern entries include SPARQL examples.
+
+Result behavior:
+- Every response includes `prefixes` and `sparql_prefix_block`.
+- `section: "all"` returns section counts, section cursors, summary, prefixes, diagnostics, and model fingerprint instead of dumping every vocabulary item.
+- Item section responses return `items`, `paging`, prefixes, diagnostics, and model fingerprint.
+- `relation_families` items include family name, IRI/CURIE, meaning, normalized forward property, normalized inverse property, raw relation rules, and transitive flag.
+- `classes` and `properties` items include IRI/CURIE, role, label/comment where authored, source when requested, and domain/range when available.
+- `semantic_contracts` items include shape source and referenced SHACL target/path/class IRIs.
+
+Execution behavior:
+- The tool reads from the parsed semantic model index and ontology document declarations.
+- The tool does not rebuild, reload, or mutate the semantic RDF store.
+- The tool does not write generated vocabulary data back to Markdown source.
+
+#### Metadata
+  * type: specification
+
+#### Concept References
+  * MCP semantic vocabulary contract: https://www.reqvire.org/ontology#McpSemanticVocabularyContract
+  * MCP semantic vocabulary tool contract: https://www.reqvire.org/ontology#McpSemanticVocabularyToolContract
+  * Relation Family: https://www.reqvire.org/ontology#RelationFamily
+
+#### Relations
+  * define: [MCP Semantic Vocabulary Tools](Tools.md#mcp-semantic-vocabulary-tools)
+---
+
+### MCP Prompt Guidance Specification
+
+The MCP interface is expected to expose build-time prompt templates for regular Reqvire usage and semantic query workflows.
+
+#### Details
+Prompt capability behavior:
+- The server advertises standard MCP `prompts` capability during initialization.
+- The server implements `prompts/list` and `prompts/get`.
+- Prompt definitions include `name`, `title`, `description`, and optional argument definitions.
+- Prompt retrieval returns standard MCP prompt messages with text content.
+- Prompt templates are compiled into the Rust binary using build-time string inclusion and are not loaded from workspace files.
+- Prompt templates are versioned with the Reqvire binary and MCP contract implementation.
+
+Prompt set:
+- `reqvire.semantic.query` guides ontology-aware SPARQL query construction.
+- `reqvire.semantic.verification_search` guides semantic verification counts and evidence lookup.
+- `reqvire.semantic.contract_context_search` guides semantic-contract and reused contract context search.
+- `reqvire.workflow.explore_model` guides regular read-only Reqvire model exploration.
+- `reqvire.workflow.plan_change` guides model and implementation change planning.
+- `reqvire.workflow.verify_coverage` guides validation, lint, coverage, and verification trace review.
+
+Prompt content rules:
+- Semantic prompts direct clients to discover prefixes and vocabulary before writing SPARQL.
+- Semantic prompts reference `reqvire.semantic.vocabulary`, `reqvire.semantic.prefixes`, and `reqvire.semantic.sparql`.
+- Regular workflow prompts reference non-semantic tools such as workspace status, search, read element, model, collect, lint, coverage, and traces.
+- Prompt content warns clients not to rebuild semantic stores or infer prefixes from raw Turtle when MCP vocabulary/prefix tools are available.
+- Prompt content distinguishes capability, requirement, contract, ontology, semantic-contract, verification, and reused contract context semantics where relevant.
+
+Safety behavior:
+- Prompt listing and retrieval do not parse arbitrary files, execute shell commands, fetch remote URLs, or mutate workspace state.
+- Prompt retrieval may append client-supplied prompt arguments as context but shall not treat them as executable instructions.
+
+#### Metadata
+  * type: specification
+
+#### Concept References
+  * MCP prompt contract: https://www.reqvire.org/ontology#McpPromptContract
+  * MCP semantic query prompt contract: https://www.reqvire.org/ontology#McpSemanticQueryPromptContract
+  * MCP regular workflow prompt contract: https://www.reqvire.org/ontology#McpWorkflowPromptContract
+
+#### Relations
+  * define: [MCP Prompt Guidance](Tools.md#mcp-prompt-guidance)
 ---
 
 ### MCP Server Command Specification
@@ -401,7 +505,7 @@ Contract rules:
 - Operation parameters become typed request fields.
 - `--json` is not an MCP argument because MCP responses are structured.
 - File-output transport options are not MCP arguments because MCP clients receive protocol responses.
-- MCP tools inherit operation behavior from attached Reqvire functional/output contracts.
+- MCP tools inherit operation behavior from reused Reqvire functional/output contracts.
 - MCP tool definitions include JSON object `inputSchema`; no-argument tools use an empty object schema.
 - MCP tool definitions include `outputSchema` for structured results when the result contract is stable.
 - MCP tool calls return `structuredContent` for machine-readable results and include a text content copy when needed for client compatibility.
@@ -509,8 +613,8 @@ Common semantic obligations:
 - Results identify the Reqvire operation/tool that produced them.
 - Results identify the relevant workspace/model revision when the operation depends on model state.
 - Results indicate dirty/clean workspace state when that affects interpretation.
-- Results expose evidence references to the files, elements, relations, attachments, reports, or diffs used to produce the result when those concepts are relevant.
-- Element-shaped results expose stable element identity, element type, source location, and requested relation/attachment/content views when those concepts are relevant.
+- Results expose evidence references to the files, elements, relations, reused_contract_context, reports, or diffs used to produce the result when those concepts are relevant.
+- Element-shaped results expose stable element identity, element type, source location, and requested relation/reused_contract_context/content views when those concepts are relevant.
 - Element-shaped results preserve semantic model ADT fields when present: `ontology`, `semantic_contract`, and `concept_references`.
 - Model-shaped results expose enough hierarchy, containment, and submodel boundary information to match the corresponding Reqvire operation contract.
 - Mutation-shaped results expose preview/executed state, changed files, diffs or equivalent change descriptions, diagnostics, affected scope, and refreshed revision metadata when available.
@@ -548,7 +652,7 @@ Common output envelope fields:
 - `mcp_protocol_revision`: negotiated MCP protocol revision.
 - `reqvire_tool_contract_version`: Reqvire MCP tool contract version.
 - `model_revision`: model fingerprint or revision identifier.
-- `evidence`: files, elements, relations, attachments, or reports used to produce the result.
+- `evidence`: files, elements, relations, reused_contract_context, or reports used to produce the result.
 - `warnings`: non-fatal diagnostics.
 
 Workspace/session tools:
@@ -565,6 +669,7 @@ Model evidence tools:
 - `reqvire.submodels`
 - `reqvire.semantic.ontologies`
 - `reqvire.semantic.prefixes`
+- `reqvire.semantic.vocabulary`
 - `reqvire.semantic.sparql`
 
 Quality and traceability tools:
@@ -606,7 +711,7 @@ Exposure rules:
 - Do not expose `reqvire mcp` as an MCP tool because it starts the server.
 - Do not expose `reqvire serve` as an MCP tool because it starts an HTTP Explorer server.
 - Do not expose `reqvire validate` as an MCP tool because successful validation is a server startup prerequisite.
-- Do not expose MCP prompts in MVP; future Reqvire prompts, if added, must be generic and grounded in Reqvire reports rather than client-specific behavior.
+- Expose Reqvire workflow prompts through standard MCP prompt methods rather than as MCP tools.
 - CLI flags, modes, and sub-options become typed request fields on one stable MCP operation instead of nested MCP tool names.
 - CLI-only transport flags such as `--json` and `--output` are never MCP tool arguments.
 
@@ -644,6 +749,7 @@ Read-only tools:
 - `reqvire.submodels`
 - `reqvire.semantic.ontologies`
 - `reqvire.semantic.prefixes`
+- `reqvire.semantic.vocabulary`
 - `reqvire.semantic.sparql`
 - `reqvire.lint`
 - `reqvire.coverage`

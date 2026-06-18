@@ -38,12 +38,12 @@ Content transformation rules for the merge elements operation.
 - First occurrence is kept (target's relations take precedence)
 - Different relation types to same target are NOT duplicates
 
-**Attachment Deduplication:**
-- Attachments are deduplicated by target identifier/path
-- First occurrence is kept (target's attachments take precedence)
+**Reused Contract Context Deduplication:**
+- Reused Contract Context are deduplicated by target identifier/path
+- First occurrence is kept (target's reused_contract_context take precedence)
 
 **Cross-Section Duplicate Check:**
-- Before merge completes, validate no target appears in both Relations AND Attachments
+- Before merge completes, validate no target appears in both Relations AND Reused Contract Context
 - If cross-section duplicate detected, abort merge with error listing duplicates
 - User must resolve by removing one of the duplicates before retrying
 

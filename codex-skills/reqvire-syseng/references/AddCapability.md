@@ -27,7 +27,7 @@ When constructing or refactoring a system model, work from model boundaries inwa
 5. Put shared vocabulary and stable semantic relationships in ontology; bind capability, requirement, contract, and verification prose to ontology terms with `#### Concept References`.
 6. Put implementable obligations in requirements that `specify` the local capability.
 7. Put local details in compatible contracts owned by the relevant requirement.
-8. Use attachments, not hierarchy, when another requirement root needs reusable requirement-owned non-semantic-contract contracts. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
+8. Use reused_contract_context, not hierarchy, when another requirement root needs reusable requirement-owned contracts. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
 9. Validate `submodels`, `collect`, and change-impact paths after each boundary slice.
 
 ## Capability Design Rules
@@ -162,7 +162,7 @@ Capability scope and purpose. Describe what the system is able to accomplish, no
   * type: capability
 '
 
-# Add ontology attached by a capability
+# Add ontology reused by a capability
 reqvire add requirements/Ontologies/CapabilityName.md <<'EOF'
 ### Capability Ontology
 
@@ -221,7 +221,7 @@ reqvire link "Capability Name" "specifiedBy" "System Capability Implementation"
 reqvire link "Child Requirement" "derivedFrom" "System Capability Implementation"
 ```
 
-**Relation types**: `derivedFrom` (child -> parent inside same family, including verification-family hierarchy), `derive` (parent -> child inside same family), `specify` (requirement -> capability), `specifiedBy` (capability -> requirement), `verifiedBy` (capability or requirement -> concrete verification), `verify` (concrete verification -> capability or requirement), `satisfiedBy` (requirement/test-verification/formal-proof-verification -> implementation or evidence), `satisfy` (implementation/evidence -> requirement/test-verification/formal-proof-verification), `definedBy` (requirement -> contract), `define` (contract -> requirement), `trace` (non-directional traceability)
+**Relation types**: `derivedFrom` (child -> parent inside same family, including verification-family hierarchy), `derive` (parent -> child inside same family), `specify` (requirement -> capability), `specifiedBy` (capability -> requirement), `verifiedBy` (capability or requirement -> concrete verification), `verify` (concrete verification -> capability or requirement), `satisfiedBy` (requirement/test-verification/formal-proof-verification -> implementation or evidence), `satisfy` (implementation/evidence -> requirement/test-verification/formal-proof-verification), `definedBy` (requirement -> contract), `define` (contract -> requirement)
 
 ## Step 3: Add Contracts (if needed)
 
@@ -234,7 +234,7 @@ Add contracts only when:
 - **Ontology** - Shared semantic meaning and vocabulary referenced by model elements
 - **Semantic contracts** - Reusable SHACL shape profiles over explicitly used ontology that constrain requirements
 
-Link requirement-owned non-semantic-contract contracts via `definedBy` from the requirement that owns the contract. Link semantic contracts to ontology with `use` and to requirements with `constrain`/`constrainedBy`. Use `#### Concept References` when capability, requirement, contract, or verification prose needs explicit ontology term bindings.
+Link requirement-owned contracts via `definedBy` from the requirement that owns the contract. Link semantic contracts to ontology with `use` and to requirements with `constrain`/`constrainedBy`. Use `#### Concept References` when capability, requirement, contract, or verification prose needs explicit ontology term bindings.
 
 ### Contract Best Practices
 
@@ -281,22 +281,22 @@ When an error occurs, the system shall log the error, notify the user, and attem
 EOF
 ```
 
-Link contracts to requirements using relations or attachments:
+Link contracts to requirements using relations or reused_contract_context:
 
 ```bash
 # Link contract to requirement using definedBy relation (owner defines it)
 reqvire link "Data Processing Requirement" "definedBy" "Data Format Specification"
 
-# Attach requirement contract element across explicit requirement subgraph boundaries
+# Reuse requirement contract element across explicit requirement subgraph boundaries
 # The contract must be owned by a requirement via definedBy
-reqvire link "Other Capability Requirement" attaching "Performance Constraint"
+reqvire link "Other Capability Requirement" reusesContract "Performance Constraint"
 
 # Link a reusable semantic contract to a requirement and ontology
 reqvire link "Requirement Shape Contract" "constrain" "Other Capability Requirement"
 reqvire link "Requirement Shape Contract" "use" "Capability Ontology"
 
-# Attach file (design document, specification document)
-reqvire link "Architecture Requirement" attaching "docs/architecture.pdf"
+# Reuse file (design document, specification document)
+reqvire link "Architecture Requirement" reusesContract "docs/architecture.pdf"
 
 # Link to implementation file or external URL
 # Note: capability must not use satisfiedBy/satisfy.
@@ -304,10 +304,10 @@ reqvire link "System Requirement" "satisfiedBy" "src/auth/login.rs"
 reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
 ```
 
-**Attachment constraints:**
-- Contracts must have a `define` relation before being attached
-- Capabilities do not author attachments; use `#### Concept References` for ontology term bindings
-- Requirements may attach only requirement-owned `specification`, `constraint`, `behavior`, `state`, or `input-output` contracts
+**Reused Contract Context constraints:**
+- Contracts must have a `define` relation before being reused
+- Capabilities do not author reused_contract_context; use `#### Concept References` for ontology term bindings
+- Requirements may reuse only requirement-owned `specification`, `constraint`, `behavior`, `state`, or `input-output` contracts
 - Semantic contracts must not author `#### Concept References`; they depend on ontology through `use`
 
 ## Step 4: Add Verifications
@@ -384,7 +384,7 @@ After adding requirements and verifications, follow the standard validation work
 3. `reqvire coverage` - Verify leaf verification coverage and requirement-only implementation coverage
 4. `reqvire format --fix` - Normalize formatting
 
-Additionally, use `reqvire resources` to see all files referenced by the model through `satisfiedBy`, `trace` relations and attachments.
+Additionally, use `reqvire resources` to see all files referenced by the model through `satisfiedBy` relations and reused_contract_context.
 
 ## Complete Example
 
@@ -397,7 +397,7 @@ Authentication capability for access-controlled product areas.
 #### Metadata
   * type: capability
 
-#### Attachments
+#### Reused Contract Context
   * [Authentication Ontology](Ontologies/Auth.md#authentication-ontology)
 
 #### Relations

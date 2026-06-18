@@ -38,4 +38,6 @@ Semantic export contracts may define the intended graph patterns for generated p
 
 #### Relations
   * specifiedBy: [Ontology and Shapes Collection](ModelReports/ReportingRequirements.md#ontology-and-shapes-collection)
+  * specifiedBy: [OWL Reserved Vocabulary Recognition](ModelReports/ReportingRequirements.md#owl-reserved-vocabulary-recognition)
+  * specifiedBy: [Local External Ontology Sources](ModelReports/ReportingRequirements.md#local-external-ontology-sources)
 ---

@@ -29,7 +29,7 @@ export default function RequirementsCapabilities() {
             ],
             [
               "Requirement",
-              "a testable obligation that specifies a capability and can be verified, satisfied, decomposed, and refined.",
+              "a testable obligation that specifies a capability and can be verified, satisfied, decomposed, and defined by contracts.",
             ],
             [
               "Ontology",
@@ -130,7 +130,7 @@ The system shall reject API requests whose access token is invalid.
       <Section title="Requirement-Owned Contracts and Semantic Contracts">
         <p className="text-zinc-600 mb-4">
           Contracts carry detailed engineering terms for a requirement.
-          Non-semantic-contract contract elements are owned through define or definedBy
+          Non-semantic-contract elements are owned through define or definedBy
           and should not author governance metadata. Semantic contracts are separate
           ontology-plane elements that constrain requirements through constrainedBy and constrain,
           and use ontology through use and usedBy.
@@ -158,14 +158,14 @@ and signature before the request reaches protected application logic.`}</CodeBlo
         </div>
       </Section>
 
-      <Section title="Attachments as Contracts">
+      <Section title="Reused Contract Context">
         <p className="text-zinc-600 mb-4">
-          Attachments make cross-boundary requirement contracts explicit.
-          Ontology term usage is modeled with concept references. A requirement
-          can import a one-way contract dependency from a compatible
-          requirement-owned non-semantic-contract element in another
-          subgraph; semantic-contract dependencies use constrainedBy/constrain
-          and use/usedBy instead.
+          Reused Contract Context makes cross-boundary requirement contracts
+          explicit. Ontology term usage is modeled with concept references. A
+          requirement can reuse a one-way contract dependency from a compatible
+          requirement-owned non-semantic-contract element in another subgraph;
+          semantic-contract dependencies use constrainedBy/constrain and
+          use/usedBy instead.
         </p>
         <DetailGrid
           items={[
@@ -174,12 +174,12 @@ and signature before the request reaches protected application logic.`}</CodeBlo
               desc: "Capabilities, requirements, contracts, and verifications bind prose to ontology terms with Concept References.",
             },
             {
-              name: "Requirement attachments",
-              desc: "Requirements attach specifications, constraints, behaviors, states, and input-output contracts owned by requirement subgraphs. Semantic contracts are linked through constrainedBy/constrain.",
+              name: "Reused contract context",
+              desc: "Requirements reuse specifications, constraints, behaviors, states, and input-output contracts owned by requirement subgraphs. Semantic contracts are linked through constrainedBy/constrain.",
             },
             {
               name: "One-way flow",
-              desc: "The attaching requirement declares that its subgraph must fulfill the attached contract. Reciprocal cross-submodel attachment is rejected because it hides the intended dependency direction.",
+              desc: "The consuming requirement declares that its subgraph must fulfill the reused contract. Reciprocal cross-submodel reuse is rejected because it hides the intended dependency direction.",
             },
             {
               name: "Review impact",
@@ -195,7 +195,7 @@ The consumer service shall fulfill the shared access-token validation behavior.
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Access Token Validation Behavior](../Identity/AuthBehaviors.md#access-token-validation-behavior)
 
 #### Relations
@@ -260,7 +260,7 @@ reqvire search --filter-owner "Identity Team"`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           Folders and files are physical containment only. They should make the
           model easy to browse, but authoritative semantics come from metadata,
-          relations, and attachments.
+          relations, and Reused Contract Context.
         </p>
         <CodeBlock>{`requirements/
   Product/

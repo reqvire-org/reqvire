@@ -78,6 +78,7 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             "reqvire.submodels",
             "reqvire.semantic.ontologies",
             "reqvire.semantic.prefixes",
+            "reqvire.semantic.vocabulary",
             "reqvire.semantic.sparql",
             "reqvire.lint",
             "reqvire.coverage",
@@ -105,7 +106,7 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             },
             {
               name: "Read element",
-              desc: "reqvire.read_element returns element details, relations, attachments, concept references, and optional size estimates.",
+              desc: "reqvire.read_element returns element details, relations, Reused Contract Context entries, concept references, and optional size estimates.",
             },
             {
               name: "Collect",
@@ -120,9 +121,43 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
               desc: "reqvire.semantic.prefixes returns ontology-defined prefixes, namespaces, source element prose content, and a SPARQL prefix block for query construction.",
             },
             {
+              name: "Semantic vocabulary",
+              desc: "reqvire.semantic.vocabulary returns paged classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source maps, diagnostics, and prefixes for query construction.",
+            },
+            {
               name: "SPARQL",
               desc: "reqvire.semantic.sparql runs read-only SPARQL queries against the model-owned Oxigraph semantic store and returns structured SELECT, ASK, CONSTRUCT, or DESCRIBE results.",
             },
+            {
+              name: "Prompts",
+              desc: "MCP prompts provide build-time guidance for regular Reqvire exploration, change planning, coverage review, semantic query construction, semantic verification search, and contract-context search.",
+            },
+          ]}
+        />
+      </Section>
+
+      <Section title="Prompts">
+        <p className="text-zinc-600 mb-4">
+          The server advertises MCP prompts in addition to tools and resources.
+          Prompt templates are compiled into the Reqvire binary and retrieved
+          through standard{" "}
+          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
+            prompts/list
+          </code>{" "}
+          and{" "}
+          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
+            prompts/get
+          </code>{" "}
+          requests.
+        </p>
+        <BulletList
+          items={[
+            "reqvire.workflow.explore_model",
+            "reqvire.workflow.plan_change",
+            "reqvire.workflow.verify_coverage",
+            "reqvire.semantic.query",
+            "reqvire.semantic.verification_search",
+            "reqvire.semantic.contract_context_search",
           ]}
         />
       </Section>
@@ -171,7 +206,7 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             "duplicate_element",
             "element_not_found",
             "invalid_relation_type",
-            "attachment_contract_violation",
+            "reused_contract_context_contract_violation",
             "single_root_ownership_violation",
             "filesystem_error",
           ]}

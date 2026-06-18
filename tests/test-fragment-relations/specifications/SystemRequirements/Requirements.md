@@ -42,7 +42,6 @@ The system should implement efficient delivery of notifications to recipients.
 The system should store notifications for retrieval and audit purposes.
 
 #### Relations
-  * trace: [NOTIF-IMPL-001 Notifications Publishing](#notif-impl-001-notifications-publishing)
   * derivedFrom: [NOTIF-IMPL-002 Notifications Delivery](#notif-impl-002-notifications-delivery)
   * derivedFrom: [Notification Interaction](../BasicRequirements.md#user-ux-001-notification-interaction)
 

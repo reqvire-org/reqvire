@@ -21,11 +21,11 @@ Commands:
   rename            Rename element
   merge             Merge multiple elements into target element
   mv-file           Move entire specification file with all its elements
-  link              Add relation or attachment between elements
-  unlink            Remove relation or attachment between elements (auto-detects type)
+  link              Add relation or reused_contract_context between elements
+  unlink            Remove relation or reused_contract_context between elements (auto-detects type)
   relink            Replace an existing relation target with a new target in one operation
-  mv-asset          Move/rename asset file and update all references (Attachments and Relations)
-  rm-asset          Remove asset file and remove all references (Attachments and Relations)
+  mv-asset          Move/rename asset file and update all references (Reused Contract Context and Relations)
+  rm-asset          Remove asset file and remove all references (Reused Contract Context and Relations)
   containment       Generate containment view showing folder/file/element hierarchy
   resources         Generate resources report showing files referenced by the model
   ontologies        Collect ontology elements and semantic-contract SHACL shapes
@@ -81,8 +81,8 @@ SEARCH OPTIONS:
       --filter-page-content <REGEX> Only include elements whose parent file page content matches this regular expression
       --have-relations <LIST>   Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")
       --not-have-relations <LIST> Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
-      --has-attachments         Only include elements that have attachments
-      --filter-attachment <GLOB> Only include elements with attachments matching this glob pattern (e.g., "*.pdf", "docs/**/*")
+      --has-reused-contract-context Only include elements that have reused_contract_context
+      --filter-reused-contract-context <GLOB> Only include elements with reused_contract_context matching this glob pattern (e.g., "*.pdf", "docs/**/*")
 
 CHANGE IMPACT OPTIONS:
       --git-commit <GIT_COMMIT> Git commit hash to use when comparing models
@@ -163,8 +163,8 @@ MV FILE OPTIONS:
 
 LINK OPTIONS:
        <SOURCE>                 Source element name
-       <RELATION_TYPE>          Relation type OR 'attaching'. Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, satisfiedBy, satisfy, verifiedBy, verify, trace. Use 'attaching' to attach compatible requirement-owned contract elements
-       <TARGET>                 Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement attachments
+       <RELATION_TYPE>          Relation type OR 'reusesContract'. Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, satisfiedBy, satisfy, verifiedBy, verify. Use 'reusesContract' to reuse compatible requirement-owned contract elements
+       <TARGET>                 Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement reused_contract_context
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
@@ -210,6 +210,7 @@ RESOURCES OPTIONS:
 ONTOLOGIES OPTIONS:
       --jsonld                  Output JSON-LD format instead of RDF/Turtle (.ttl)
       --full                    Include Reqvire model context triples and ontology projection facts in the semantic export
+      --include-external        Include local external ontology source triples
       --output <FILE>           Save output to file
 
 SUBMODELS OPTIONS:

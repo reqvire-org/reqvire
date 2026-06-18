@@ -109,14 +109,15 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
             },
         );
 
-        // Legacy refinement relations. Kept parseable so `reqvire migrate`
+        // Legacy contract relations. Kept parseable so `reqvire migrate`
         // can rewrite older workspaces to `define` / `definedBy`.
         m.insert(
             "refinedBy",
             RelationTypeInfo {
                 name: "refinedBy",
                 opposite: Some("refine"),
-                description: "A requirement being refined by a refinement element.",
+                description:
+                    "Legacy relation for a requirement being defined by a contract element.",
                 arrow: "-->",
                 label: "refinedBy",
             },
@@ -126,9 +127,9 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
             RelationTypeInfo {
                 name: "refine",
                 opposite: Some("refinedBy"),
-                description: "Element refines a requirement",
+                description: "Legacy relation for a contract element defining a requirement.",
                 arrow: "-->",
-                label: "refines",
+                label: "refine",
             },
         );
 
@@ -196,18 +197,6 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
             },
         );
 
-        // Trace relations
-        m.insert(
-            "trace",
-            RelationTypeInfo {
-                name: "trace",
-                opposite: None,
-                description: "Element is related to another element in a non-directional way",
-                arrow: "-.->",
-                label: "trace",
-            },
-        );
-
         m
     });
 
@@ -223,7 +212,6 @@ pub const DIAGRAM_RELATIONS: &[&str] = &[
     "constrainedBy",
     "use",
     "verifiedBy", // Not verify
-    "trace",
 ];
 
 /// Relations that propagate changes in impact analysis
@@ -265,7 +253,7 @@ pub const SATISFACTION_RELATIONS: &[&str] = &[
 
 /// Relations for requirement-owned contract connections.
 /// Used to determine if contract elements are connected and find defining owners.
-pub const REFINEMENT_RELATIONS: &[&str] = &[
+pub const CONTRACT_RELATIONS: &[&str] = &[
     "define",    // Contract defines requirement (forward from contract)
     "definedBy", // Requirement defined by contract (forward from requirement)
 ];
@@ -497,8 +485,8 @@ pub fn is_satisfaction_relation(rtype: &RelationTypeInfo) -> bool {
     matches!(rtype.name, "satisfiedBy" | "satisfy")
 }
 
-/// Returns whether the relation is a refinement-related type (refinement ownership)
-pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
+/// Returns whether the relation is a contract-related type (contract ownership)
+pub fn is_contract_relation(rtype: &RelationTypeInfo) -> bool {
     matches!(rtype.name, "definedBy" | "define" | "refinedBy" | "refine")
 }
 
@@ -511,28 +499,26 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
 /// - verify: Source must be concrete verification, target must be capability or requirement
 /// - satisfiedBy: Source must be system requirement (requirement) or test-verification, target must be file (implementation)
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
-/// - definedBy: Source must be requirement, target must be compatible non-semantic-contract contract element
-/// - define: Source must be compatible non-semantic-contract contract element, target must be requirement
+/// - definedBy: Source must be requirement, target must be compatible non-semantic contract element
+/// - define: Source must be compatible non-semantic contract element, target must be requirement
 /// - constrainedBy: Source must be requirement, target must be semantic-contract
 /// - constrain: Source must be semantic-contract, target must be requirement
 /// - use: Source must be semantic-contract, target must be ontology
 /// - usedBy: Source must be ontology, target must be semantic-contract
-/// - trace: Any non-refinement element type can use trace
 /// - Contract types (constraint, behavior, specification): Can only have define relations
-/// - Other type: Can only use trace relations
+/// - Other type: Cannot author semantic relations
 pub fn validate_relation_element_types(
     relation_type: &str,
     source_type: &crate::element::ElementType,
     target_type: &crate::element::ElementType,
 ) -> bool {
-    use crate::element::{ElementType, RefinementType};
+    use crate::element::{ContractType, ElementType};
 
     // First check: source element type restrictions based on relation type
-    // Refinement types cannot have ANY relations (this is checked elsewhere in parser)
-    // Other type can only use trace relations
+    // Contract types cannot have ANY relations (this is checked elsewhere in parser)
+    // Explicit "other" type cannot author semantic relations.
     if let ElementType::Other(type_str) = source_type {
-        // "other" type (explicit) can only use trace
-        if type_str == "other" && relation_type != "trace" {
+        if type_str == "other" {
             return false;
         }
     }
@@ -607,7 +593,7 @@ pub fn validate_relation_element_types(
                 }
                 _ => false,
             };
-            // For target, we allow File type or Other (for implementation files) - NOT Refinement types
+            // For target, we allow File type or Other (for implementation files) - NOT Contract types
             let target_valid = matches!(target_type, ElementType::File | ElementType::Other(_));
             source_valid && target_valid
         }
@@ -632,26 +618,26 @@ pub fn validate_relation_element_types(
         "definedBy" | "refinedBy" => match (source_type, target_type) {
             (
                 ElementType::Requirement(_),
-                ElementType::Refinement(
-                    RefinementType::Source
-                    | RefinementType::Constraint
-                    | RefinementType::Behavior
-                    | RefinementType::Specification
-                    | RefinementType::State
-                    | RefinementType::InputOutput,
+                ElementType::Contract(
+                    ContractType::Source
+                    | ContractType::Constraint
+                    | ContractType::Behavior
+                    | ContractType::Specification
+                    | ContractType::State
+                    | ContractType::InputOutput,
                 ),
             ) => true,
             _ => false,
         },
         "define" | "refine" => match (source_type, target_type) {
             (
-                ElementType::Refinement(
-                    RefinementType::Source
-                    | RefinementType::Constraint
-                    | RefinementType::Behavior
-                    | RefinementType::Specification
-                    | RefinementType::State
-                    | RefinementType::InputOutput,
+                ElementType::Contract(
+                    ContractType::Source
+                    | ContractType::Constraint
+                    | ContractType::Behavior
+                    | ContractType::Specification
+                    | ContractType::State
+                    | ContractType::InputOutput,
                 ),
                 ElementType::Requirement(_),
             ) => true,
@@ -673,11 +659,6 @@ pub fn validate_relation_element_types(
             (ElementType::Ontology, ElementType::SemanticContract) => true,
             _ => false,
         },
-        "trace" => {
-            // Trace is allowed for any non-refinement element type, including ontology
-            // Refinement types cannot have relations at all (checked in parser)
-            !matches!(source_type, ElementType::Refinement(_))
-        }
         // For other relation types, no specific element type validation
         _ => true,
     }
@@ -695,15 +676,14 @@ pub fn get_relation_element_type_description(relation_type: &str) -> Option<Stri
         "verify" => Some("'verify' should connect a concrete verification element to a capability or requirement; verification-objective is not allowed".to_string()),
         "satisfiedBy" => Some("'satisfiedBy' should connect a requirement, test-verification, or formal-proof-verification to an implementation/evidence file; capability is not allowed".to_string()),
         "satisfy" => Some("'satisfy' should connect an implementation/evidence file to a requirement, test-verification, or formal-proof-verification; capability is not allowed".to_string()),
-        "definedBy" => Some("'definedBy' should connect a requirement to a compatible non-semantic-contract contract element. Semantic contracts use constrainedBy/constrain instead.".to_string()),
-        "define" => Some("'define' should connect a compatible non-semantic-contract contract element to a requirement. Semantic contracts use constrain/constrainedBy instead.".to_string()),
+        "definedBy" => Some("'definedBy' should connect a requirement to a compatible non-semantic contract element. Semantic contracts use constrainedBy/constrain instead.".to_string()),
+        "define" => Some("'define' should connect a compatible non-semantic contract element to a requirement. Semantic contracts use constrain/constrainedBy instead.".to_string()),
         "refinedBy" => Some("'refinedBy' is a legacy relation. Use 'definedBy' for requirement-owned contract elements, or run `reqvire migrate`.".to_string()),
         "refine" => Some("'refine' is a legacy relation. Use 'define' for requirement-owned contract elements, or run `reqvire migrate`.".to_string()),
         "constrainedBy" => Some("'constrainedBy' should connect a requirement to a semantic-contract element".to_string()),
         "constrain" => Some("'constrain' should connect a semantic-contract element to a requirement".to_string()),
         "use" => Some("'use' should connect a semantic-contract element to an ontology element".to_string()),
         "usedBy" => Some("'usedBy' should connect an ontology element to a semantic-contract element".to_string()),
-        "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),
         _ => None
     }
 }

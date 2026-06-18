@@ -134,7 +134,7 @@ The leaf requirement at the bottom of the hierarchy.
 #### Details
 This is the leaf requirement that derives from the mid-level.
 
-#### Attachments
+#### Reused Contract Context
   * [Design Doc Specification](DesignDoc.md#design-doc-specification)
 
 #### Metadata
@@ -146,7 +146,7 @@ This is the leaf requirement that derives from the mid-level.
 
 ### Design Owner Requirement
 
-Owner requirement for design refinement specification.
+Owner requirement for design contract specification.
 
 #### Metadata
   * type: requirement

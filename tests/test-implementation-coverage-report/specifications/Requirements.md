@@ -61,7 +61,7 @@ Intermediate descendant requirement in transitive child path.
 
 ### Derived Parent Contract Specification
 
-Refinement contract owned by Derived Parent.
+Contract contract owned by Derived Parent.
 
 #### Metadata
   * type: specification
@@ -84,7 +84,7 @@ Derived requirement directly implemented in code.
 
 ### Contract Owner
 
-Requirement that owns a refinement contract and has no direct implementation.
+Requirement that owns a contract and has no direct implementation.
 
 #### Metadata
   * type: requirement
@@ -96,7 +96,7 @@ Requirement that owns a refinement contract and has no direct implementation.
 
 ### Contract Specification
 
-Refinement contract owned by Contract Owner.
+Contract contract owned by Contract Owner.
 
 #### Metadata
   * type: specification
@@ -112,7 +112,7 @@ Requirement that consumes contract specification and is directly implemented.
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Contract Specification](#contract-specification)
 
 #### Relations

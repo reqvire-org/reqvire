@@ -1,18 +1,18 @@
 # Elements
 
-### Attachment Identifier CRUD Update Behavior
+### Reused Contract Context Identifier CRUD Update Behavior
 
-When a Refinement element is moved or renamed through CRUD operations, all attachment identifiers referencing that element must be updated using the same update mechanism as relation target updates.
+When a Contract element is moved or renamed through CRUD operations, all reused_contract_context identifiers referencing that element must be updated using the same update mechanism as relation target updates.
 
 #### Details
 The update process follows these steps:
 
-1. **Identify affected attachments**: Find all elements that have attachment identifiers pointing to the affected Refinement element
-2. **Update identifier paths**: For each affected attachment:
+1. **Identify affected reused_contract_context**: Find all elements that have reused_contract_context identifiers pointing to the affected Contract element
+2. **Update identifier paths**: For each affected reused_contract_context:
    - **On move**: Update the file path portion of the identifier to reflect the new location
    - **On rename**: Update the element name portion of the identifier (fragment) to reflect the new name
 3. **Preserve link text**: The display text of the markdown link is preserved
-4. **File persistence**: Modified files are written back to disk with updated attachments
+4. **File persistence**: Modified files are written back to disk with updated reused_contract_context
 
 This behavior mirrors the existing relation target update behavior used when moving or renaming elements, ensuring consistency across the model.
 
@@ -61,7 +61,7 @@ Resolution follows this order for each governance metadata key independently:
 2. **Inherited value**: If the current element omits the key, walk requirement hierarchy ancestors through `derivedFrom` / `derive` relations and use the nearest explicit value.
 3. **Default value**: If no ancestor defines the key, use the default value from the Requirement Governance Metadata Specification.
 
-Refinement elements do not participate in governance metadata inheritance as metadata authors. When model evidence needs governance context for a refinement element, the context shall be resolved from the refinement's directly owning requirement.
+Contract elements do not participate in governance metadata inheritance as metadata authors. When model evidence needs governance context for a contract element, the context shall be resolved from the contract's directly owning requirement.
 
 The model shall retain enough source information for consumers to distinguish explicit, inherited, and default effective values.
 

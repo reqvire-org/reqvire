@@ -44,7 +44,13 @@ export const ONTOLOGY_ORIGIN_FILTERS = [
   ["construct", "Constructs", "construct"],
 ] as const;
 
+export const ONTOLOGY_LAYER_FILTERS = [
+  ["layer-reqvire-context", "Semantic Context", "semantic"],
+  ["layer-external-source", "External Sources", "external"],
+] as const;
+
 export const ONTOLOGY_DEFAULT_FILTERS = [
+  "layer-authored",
   "ontology-term",
   "shacl-shape",
   "resource",

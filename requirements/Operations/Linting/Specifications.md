@@ -8,7 +8,7 @@
  - `source`, `target`, and `relation_type`
  - owning source root
  - owning target root
- - rationale that states why the relation breaks submodel ownership and should be converted to attachment-based coupling.
+ - rationale that states why the relation breaks submodel ownership and should be converted to reused-contract-context-based coupling.
 - Report such findings in:
  - default text output under **Needs Manual Review**
  - `--auditable` output
@@ -23,7 +23,7 @@
   * define: [Cross-Submodel Hierarchical Relation Detection](LintingRequirements.md#cross-submodel-hierarchical-relation-detection)
 ---
 
-### Lint Auto-fix Capability Refinement Specification
+### Lint Auto-fix Capability Contract Specification
 
 #### Details
 Auto-fix behavior:
@@ -184,7 +184,7 @@ When auto-fix mode is activated, the system is expected to:
   * type: specification
 ---
 
-### Redundant Verify Relations Detection Refinement Specification
+### Redundant Verify Relations Detection Contract Specification
 
 #### Details
 Redundant verify relation detection behavior:

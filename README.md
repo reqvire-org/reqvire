@@ -39,7 +39,7 @@ reqvire migrate
 reqvire migrate --fix
 ```
 
-`reqvire migrate` is dry-run by default; `--fix` applies deterministic migrations such as legacy document header cleanup and verification-objective holder creation.
+`reqvire migrate` is dry-run by default; `--fix` applies deterministic migrations such as legacy document header cleanup, verification-objective holder creation, contract relation cleanup, and legacy `Reused Contract Context` heading migration to `Reused Contract Context`.
 
 ---
 
@@ -120,6 +120,11 @@ Example MCP client configuration:
 }
 ```
 
+The MCP server exposes tools, resources, and prompts. Prompt templates include
+regular Reqvire workflows such as model exploration, change planning, and
+verification coverage review, plus semantic workflows for vocabulary-driven
+SPARQL query construction and verification search.
+
 Enable mutation tools:
 
 ```bash
@@ -156,6 +161,7 @@ Ontologies define:
 
 Reqvire supports ontology modeling directly inside the engineering workflow.
 Ontology boundary metadata and Turtle are explicit: a top ontology element declares `ontology_base` and `ontology_prefix`, and its Turtle must agree with the generated ontology IRI and term namespace.
+Ontology elements may also declare local `External Ontology` source sections for pinned `.ttl` vocabularies that should be used for validation and optional `reqvire ontologies --include-external` export materialization.
 
 This enables:
 - semantic consistency
@@ -218,6 +224,7 @@ Requirements are first-class semantic graph elements that:
 - derive from capabilities
 - connect to ontology concepts
 - are defined by structured engineering contracts
+- reuse compatible cross-subgraph contract context through `#### Reused Contract Context`
 - can be constrained by ontologically anchored `semantic-contract`s
 - stay verifiable as ontology-derived constraints are reapplied through SHACL profiles
 - trace to implementation artifacts
@@ -278,6 +285,8 @@ Requirements can be defined by structured engineering contracts such as:
 This allows requirements to evolve into precise, machine-readable engineering semantics while remaining Git-native and human-readable.
 
 Semantic contracts are separate reusable SHACL profiles. They are linked to ontology terms using `use`/`usedBy`, and they constrain requirements via `constrain`/`constrainedBy`; requirements may still exist without ontology or semantic-contract links.
+
+Requirements can also reuse compatible requirement-owned contracts from another subgraph through the `#### Reused Contract Context` section. This is a dependency/context mechanism, not ownership: the reused contract remains owned by its defining requirement, while the consuming requirement makes the cross-subgraph obligation explicit.
 
 ---
 
@@ -588,7 +597,7 @@ contributions are closed at the moment.
 Reqvire currently uses its own repository as an experiment in AI-driven
 engineering with a human in the loop: humans work primarily as architects on
 higher-level planes such as ontology, architecture, requirements, and
-specification intent, while implementation is generated and refined through
+specification intent, while implementation is generated and improved through
 agentic coding workflows. The goal is to produce high-quality code that is not
 directly human-authored, while keeping architectural accountability human-led.
 

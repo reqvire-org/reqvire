@@ -793,8 +793,8 @@ export const skinX = css`
   }
 
   .${paneNavRowClass}:focus-visible {
-    outline: var(--focus-ring-w) solid var(--focus-ring);
-    outline-offset: var(--focus-ring-offset);
+    outline: var(--focus-w) solid var(--focus-ring);
+    outline-offset: var(--space-1);
   }
 
   .${paneNavRowIconClass} {

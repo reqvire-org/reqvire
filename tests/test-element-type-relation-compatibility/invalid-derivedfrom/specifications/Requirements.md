@@ -123,7 +123,7 @@ INVALID: Requirement cannot derive from verification element.
 
 ### Other Element with DerivedFrom
 
-INVALID: Other type can only use trace relations.
+INVALID: Other type cannot author canonical semantic relations.
 
 #### Metadata
   * type: other-other

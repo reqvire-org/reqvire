@@ -3,7 +3,7 @@ import {
   DetailDialog,
   ElementDetailContent,
   ElementDetailMissingState,
-  type DetailAttachmentItem,
+  type DetailReusedContractContextItem,
   type DetailConceptReferenceItem,
   type DetailMetaBadge,
   type DetailRelationEndpointData,
@@ -51,13 +51,13 @@ export function ElementDetailModal({
     return byIri;
   }, [store.ontology.graph_data?.nodes]);
 
-  const { relations, attachments, conceptRefs } = useMemo(() => {
+  const { relations, reused_contract_context, conceptRefs } = useMemo(() => {
     if (!identifier) {
-      return { relations: [], attachments: [], conceptRefs: [] };
+      return { relations: [], reused_contract_context: [], conceptRefs: [] };
     }
     return {
       relations: store.relations.filter((r) => r.source_id === identifier || r.target_id === identifier),
-      attachments: store.attachments.filter((a) => a.source_id === identifier),
+      reused_contract_context: store.reused_contract_context.filter((a) => a.source_id === identifier),
       conceptRefs: store.concept_refs.filter((c) => c.source_id === identifier),
     };
   }, [identifier, store]);
@@ -69,14 +69,14 @@ export function ElementDetailModal({
       .filter(isDetailRelationItem);
   }, [element, elementById, relations, resourceById]);
 
-  const attachmentItems = useMemo(
+  const reusedContractContextItems = useMemo(
     () =>
-      attachments.map((attachment): DetailAttachmentItem => {
-        const target = attachmentDisplayTarget(attachment, elementById, resourceById);
+      reused_contract_context.map((reused_contract_context): DetailReusedContractContextItem => {
+        const target = reusedContractContextDisplayTarget(reused_contract_context, elementById, resourceById);
         return {
-          id: attachment.id,
-          targetId: attachment.target,
-          kind: attachment.target_kind,
+          id: reused_contract_context.id,
+          targetId: reused_contract_context.target,
+          kind: reused_contract_context.target_kind,
           resourceKind: target.resourceKind,
           label: target.label,
           elementType: target.elementType,
@@ -85,7 +85,7 @@ export function ElementDetailModal({
           external: target.external,
         };
       }),
-    [attachments, elementById, resourceById],
+    [reused_contract_context, elementById, resourceById],
   );
 
   const conceptReferenceItems = useMemo(
@@ -135,7 +135,7 @@ export function ElementDetailModal({
             />
           }
           relations={relationItems}
-          attachments={attachmentItems}
+          reused_contract_context={reusedContractContextItems}
           conceptReferences={conceptReferenceItems}
           onOpenElement={onOpenElement}
           onOpenConceptReference={(reference) => {
@@ -307,23 +307,23 @@ function relationTargetEndpoint(
   };
 }
 
-function attachmentDisplayTarget(
-  attachment: { target: string; target_kind: string; resource_id: string | null },
+function reusedContractContextDisplayTarget(
+  reused_contract_context: { target: string; target_kind: string; resource_id: string | null },
   elementById: (id: string) => Pick<ProjectStoreElement, "name" | "element_type" | "type_family"> | undefined,
   resourceById: Map<string, { display: string; target: string; kind: string; file_path: string | null; external_url: string | null }>,
 ): { label: string; resourceKind?: string; elementType?: string; typeFamily?: string; href: string | null; external: boolean } {
-  if (attachment.target_kind === "element") {
-    const element = elementById(attachment.target);
+  if (reused_contract_context.target_kind === "element") {
+    const element = elementById(reused_contract_context.target);
     return {
-      label: element?.name ?? attachment.target,
+      label: element?.name ?? reused_contract_context.target,
       elementType: element?.element_type,
       typeFamily: element?.type_family,
-      href: routeForElement(attachment.target),
+      href: routeForElement(reused_contract_context.target),
       external: false,
     };
   }
-  if (attachment.resource_id) {
-    const resource = resourceById.get(attachment.resource_id);
+  if (reused_contract_context.resource_id) {
+    const resource = resourceById.get(reused_contract_context.resource_id);
     if (resource) {
       if (resource.external_url) {
         return { label: resource.display || resource.target, resourceKind: resource.kind, href: resource.external_url, external: true };
@@ -334,5 +334,5 @@ function attachmentDisplayTarget(
       return { label: resource.display || resource.target, resourceKind: resource.kind, href: null, external: false };
     }
   }
-  return { label: attachment.target, href: null, external: false };
+  return { label: reused_contract_context.target, href: null, external: false };
 }

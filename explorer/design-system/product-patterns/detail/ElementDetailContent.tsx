@@ -1,13 +1,13 @@
 import { cx } from "@linaria/atomic";
 import { CodeRef } from "../../components/data/CodeRef";
 import { detailContentFlowUX, detailMutedUX } from "./detailStyles";
-import { AttachmentList } from "./AttachmentList";
+import { ReusedContractContextList } from "./ReusedContractContextList";
 import { ConceptReferenceList } from "./ConceptReferenceList";
 import { DetailSection } from "./DetailSection";
 import { MetadataStrip } from "./MetadataStrip";
 import { RelationList } from "./RelationList";
 import type {
-  DetailAttachmentItem,
+  DetailReusedContractContextItem,
   DetailConceptReferenceItem,
   DetailMetaBadge,
   DetailRelationItem,
@@ -21,7 +21,7 @@ export interface ElementDetailContentProps {
   metaBadges?: DetailMetaBadge[];
   content: ElementDetailContentSlot;
   relations?: DetailRelationItem[];
-  attachments?: DetailAttachmentItem[];
+  reused_contract_context?: DetailReusedContractContextItem[];
   conceptReferences?: DetailConceptReferenceItem[];
   onOpenElement: OpenElementHandler;
   onOpenConceptReference?: OpenConceptReferenceHandler;
@@ -32,7 +32,7 @@ export function ElementDetailContent({
   metaBadges = [],
   content,
   relations = [],
-  attachments = [],
+  reused_contract_context = [],
   conceptReferences = [],
   onOpenElement,
   onOpenConceptReference,
@@ -45,8 +45,8 @@ export function ElementDetailContent({
       <div className={cx(detailContentFlowUX)}>
         <DetailSection title="Content">{content}</DetailSection>
         <RelationList relations={relations} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <AttachmentList
-          attachments={attachments}
+        <ReusedContractContextList
+          reused_contract_context={reused_contract_context}
           onOpenElement={onOpenElement}
           onOpenResource={onOpenResource}
         />

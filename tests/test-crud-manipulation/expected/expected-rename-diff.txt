@@ -48,11 +48,11 @@ Renamed element: Capability A → Capability Alpha (specifications/Requirements.
   [32m19 +   ### Capability E[0m
   [37m20[0m
   [31m21 -   This is a test requirement for capability A.[0m
-  [32m21 +   This capability has an attachment to a refinement element.[0m
+  [32m21 +   This capability has an reused_contract_context to a contract element.[0m
   [37m22[0m
   [37m23     #### Metadata[0m
   [37m24       * type: requirement[0m
-  [32m25 +   #### Attachments[0m
+  [32m25 +   #### Reused Contract Context[0m
   [32m26 +     * [Capability D Constraint](Requirements.md#capability-d-constraint)[0m
   [32m27 +   ␤[0m
   [37m28     #### Relations[0m
@@ -75,12 +75,12 @@ Renamed element: Capability A → Capability Alpha (specifications/Requirements.
   [31m41 -   ### Capability E[0m
   [32m41 +   ### Parent Capability[0m
   [37m42[0m
-  [31m43 -   This capability has an attachment to a refinement element.[0m
+  [31m43 -   This capability has an reused_contract_context to a contract element.[0m
   [32m43 +   This is a parent requirement.[0m
   [37m44[0m
   [37m45     #### Metadata[0m
   [37m46       * type: requirement[0m
-  [31m47 -   #### Attachments[0m
+  [31m47 -   #### Reused Contract Context[0m
   [31m47 -     * [Capability D Constraint](Requirements.md#capability-d-constraint)[0m
   [31m47 -   ␤[0m
   [37m47     #### Relations[0m

@@ -299,7 +299,7 @@ screl:PayloadShape
 
 ### Requirement Refined By Behavior
 
-Requirement that asks for behavior definition, refined by a behavior element.
+Requirement that asks for behavior definition, defined by a behavior element.
 
 #### Metadata
   * type: requirement
@@ -312,7 +312,7 @@ Requirement that asks for behavior definition, refined by a behavior element.
 
 ### Requirement Refined By Specification
 
-Requirement that asks for specification, refined by a specification element.
+Requirement that asks for specification, defined by a specification element.
 
 #### Metadata
   * type: requirement
@@ -325,7 +325,7 @@ Requirement that asks for specification, refined by a specification element.
 
 ### Requirement Refined By Constraint
 
-Requirement that asks for constraint definition, refined by a constraint element.
+Requirement that asks for constraint definition, defined by a constraint element.
 
 #### Metadata
   * type: requirement
@@ -338,7 +338,7 @@ Requirement that asks for constraint definition, refined by a constraint element
 
 ### Requirement Refined By Source
 
-Requirement that traces source material through a requirement-owned source refinement.
+Requirement that traces source material through a requirement-owned source contract.
 
 #### Metadata
   * type: requirement

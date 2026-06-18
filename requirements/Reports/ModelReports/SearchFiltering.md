@@ -76,13 +76,13 @@ The filtering system **must support the following filters**, which may be active
 - `"inspection-verification"` - Inspection verification
 - `"demonstration-verification"` - Demonstration verification
 - `"formal-proof-verification"` - Formal proof/model-checking/theorem verification
-- `"source"` - Requirement-owned source refinement
+- `"source"` - Requirement-owned source contract
 - `"semantic-contract"` - SHACL semantic contract that constrains requirements
-- `"constraint"` - Requirement-owned constraint refinement
-- `"behavior"` - Requirement-owned behavior refinement
-- `"specification"` - Requirement-owned specification refinement
-- `"state"` - Requirement-owned lifecycle state refinement
-- `"input-output"` - Requirement-owned payload, message, fixture, or data contract refinement
+- `"constraint"` - Requirement-owned constraint contract
+- `"behavior"` - Requirement-owned behavior contract
+- `"specification"` - Requirement-owned specification contract
+- `"state"` - Requirement-owned lifecycle state contract
+- `"input-output"` - Requirement-owned payload, message, fixture, or data contract
 - `"file"` - File element
 - Any user-defined type (e.g., `"interface"`, `"design"`)
 
@@ -189,9 +189,9 @@ The filtering system must evaluate filters with minimal passes over element data
 | Filter Combination | Expected Result |
 |--------------------|------------------|
 | `type = verification` | Only verification elements |
-| `type = constraint` | Only constraint refinement elements |
-| `type = behavior` | Only behavior refinement elements |
-| `type = specification` | Only specification refinement elements |
+| `type = constraint` | Only constraint contract elements |
+| `type = behavior` | Only behavior contract elements |
+| `type = specification` | Only specification contract elements |
 | `status = approved` | Capability and requirement elements whose effective status is approved |
 | `priority = high,critical` | Capability and requirement elements whose effective priority is high or critical |
 | `risk = critical` | Capability and requirement elements whose effective risk is critical |

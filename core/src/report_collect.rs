@@ -1,4 +1,4 @@
-use crate::element::{AttachmentTarget, ElementType};
+use crate::element::{ElementType, ReusedContractContextTarget};
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::relation;
@@ -36,10 +36,10 @@ pub enum SourceType {
     RefinedByElement,
     /// Content from a contract file (via definedBy relation)
     RefinedByFile,
-    /// Content from an attached file
-    AttachmentFile,
-    /// Content from an attached refinement element
-    AttachmentElement,
+    /// Content from an reused file
+    ReusedContractContextFile,
+    /// Content from an reused contract element
+    ReusedContractContextElement,
     /// Authored concept references and reachable semantic context
     OntologyContext,
 }
@@ -55,15 +55,15 @@ pub struct CollectedItem {
     pub depth: usize,
     pub source_type: SourceType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub attached_to: Option<String>,
+    pub reused_by: Option<String>,
 }
 
 /// Metadata about the collection
 #[derive(Debug, Serialize)]
 pub struct CollectMetadata {
     pub element_count: usize,
-    pub refinement_count: usize,
-    pub attachment_count: usize,
+    pub contract_count: usize,
+    pub reused_contract_context_count: usize,
     pub ontology_count: usize,
     pub total_items: usize,
 }
@@ -128,8 +128,8 @@ pub fn generate_collect_report(
     // Build collected items
     let mut items: Vec<CollectedItem> = Vec::new();
     let mut element_count = 0;
-    let mut refinement_count = 0;
-    let mut attachment_count = 0;
+    let mut contract_count = 0;
+    let mut reused_contract_context_count = 0;
     let mut ontology_count = 0;
     let mut collected_ontology_context: HashSet<String> = HashSet::new();
 
@@ -151,31 +151,31 @@ pub fn generate_collect_report(
                 content: elem.content.clone(),
                 depth,
                 source_type: SourceType::Element,
-                attached_to: None,
+                reused_by: None,
             });
             element_count += 1;
 
             // Collect definedBy targets (requirement-owned contract elements and files)
             for rel in &elem.relations {
                 if rel.relation_type.name == "definedBy" {
-                    if let Some(item) = collect_refinement_content(
+                    if let Some(item) = collect_contract_content(
                         registry,
                         &rel.target,
                         &elem.identifier,
                         depth,
                         git_root,
                     ) {
-                        refinement_count += 1;
+                        contract_count += 1;
                         items.push(item);
                     }
                 }
             }
 
-            // Collect attachment contents
-            for attachment in &elem.attachments {
-                if let Some(item) = collect_attachment_content(
+            // Collect reused_contract_context contents
+            for reused_contract_context in &elem.reused_contract_context {
+                if let Some(item) = collect_reused_contract_context_content(
                     registry,
-                    attachment,
+                    reused_contract_context,
                     &elem.identifier,
                     depth,
                     git_root,
@@ -186,7 +186,7 @@ pub fn generate_collect_report(
                         }
                         ontology_count += 1;
                     } else {
-                        attachment_count += 1;
+                        reused_contract_context_count += 1;
                     }
                     items.push(item);
                 }
@@ -209,7 +209,7 @@ pub fn generate_collect_report(
                         content: ontology.content.clone(),
                         depth: depth + 1,
                         source_type: SourceType::OntologyContext,
-                        attached_to: Some(elem.identifier.clone()),
+                        reused_by: Some(elem.identifier.clone()),
                     });
                 }
             }
@@ -222,10 +222,13 @@ pub fn generate_collect_report(
         items,
         metadata: CollectMetadata {
             element_count,
-            refinement_count,
-            attachment_count,
+            contract_count,
+            reused_contract_context_count,
             ontology_count,
-            total_items: element_count + refinement_count + attachment_count + ontology_count,
+            total_items: element_count
+                + contract_count
+                + reused_contract_context_count
+                + ontology_count,
         },
     };
 
@@ -596,16 +599,16 @@ fn find_owning_capability(registry: &GraphRegistry, requirement_id: &str) -> Opt
     None
 }
 
-/// Collect content from an attachment
-fn collect_attachment_content(
+/// Collect content from an reused_contract_context
+fn collect_reused_contract_context_content(
     registry: &GraphRegistry,
-    attachment: &crate::element::Attachment,
+    reused_contract_context: &crate::element::ReusedContractContextEntry,
     parent_identifier: &str,
     depth: usize,
     git_root: &Path,
 ) -> Option<CollectedItem> {
-    match &attachment.target {
-        AttachmentTarget::FilePath(path) => {
+    match &reused_contract_context.target {
+        ReusedContractContextTarget::FilePath(path) => {
             let full_path = git_root.join(path);
             let path_str = path.to_string_lossy().to_string();
 
@@ -620,11 +623,11 @@ fn collect_attachment_content(
                             .unwrap_or_else(|| path_str.clone()),
                         identifier: path_str,
                         file_path: path.to_string_lossy().to_string(),
-                        element_type: "attachment".to_string(),
+                        element_type: "reused_contract_context".to_string(),
                         content,
                         depth,
-                        source_type: SourceType::AttachmentFile,
-                        attached_to: Some(parent_identifier.to_string()),
+                        source_type: SourceType::ReusedContractContextFile,
+                        reused_by: Some(parent_identifier.to_string()),
                     }),
                     Err(_) => {
                         // File not found - create link instead
@@ -635,11 +638,11 @@ fn collect_attachment_content(
                                 .unwrap_or_else(|| path_str.clone()),
                             identifier: path_str.clone(),
                             file_path: path.to_string_lossy().to_string(),
-                            element_type: "attachment".to_string(),
+                            element_type: "reused_contract_context".to_string(),
                             content: format!("[{}]({})", path_str, path_str),
                             depth,
-                            source_type: SourceType::AttachmentFile,
-                            attached_to: Some(parent_identifier.to_string()),
+                            source_type: SourceType::ReusedContractContextFile,
+                            reused_by: Some(parent_identifier.to_string()),
                         })
                     }
                 }
@@ -652,21 +655,21 @@ fn collect_attachment_content(
                         .unwrap_or_else(|| path_str.clone()),
                     identifier: path_str.clone(),
                     file_path: path.to_string_lossy().to_string(),
-                    element_type: "attachment".to_string(),
+                    element_type: "reused_contract_context".to_string(),
                     content: format!("[{}]({})", path_str, path_str),
                     depth,
-                    source_type: SourceType::AttachmentFile,
-                    attached_to: Some(parent_identifier.to_string()),
+                    source_type: SourceType::ReusedContractContextFile,
+                    reused_by: Some(parent_identifier.to_string()),
                 })
             }
         }
-        AttachmentTarget::ElementIdentifier(elem_id) => {
+        ReusedContractContextTarget::ElementIdentifier(elem_id) => {
             // Look up element content from registry
             registry.get_element(elem_id).map(|elem| {
                 let source_type = if elem.element_type.is_ontology() {
                     SourceType::OntologyContext
                 } else {
-                    SourceType::AttachmentElement
+                    SourceType::ReusedContractContextElement
                 };
                 CollectedItem {
                     name: elem.name.clone(),
@@ -676,7 +679,7 @@ fn collect_attachment_content(
                     content: elem.content.clone(),
                     depth,
                     source_type,
-                    attached_to: Some(parent_identifier.to_string()),
+                    reused_by: Some(parent_identifier.to_string()),
                 }
             })
         }
@@ -684,7 +687,7 @@ fn collect_attachment_content(
 }
 
 /// Collect content from a definedBy relation target
-fn collect_refinement_content(
+fn collect_contract_content(
     registry: &GraphRegistry,
     target: &relation::RelationTarget,
     parent_identifier: &str,
@@ -693,7 +696,7 @@ fn collect_refinement_content(
 ) -> Option<CollectedItem> {
     match &target.link {
         relation::LinkType::Identifier(elem_id) => {
-            // Element identifier - look up refinement element content
+            // Element identifier - look up contract element content
             registry.get_element(elem_id).map(|elem| CollectedItem {
                 name: elem.name.clone(),
                 identifier: elem.identifier.clone(),
@@ -702,11 +705,11 @@ fn collect_refinement_content(
                 content: elem.content.clone(),
                 depth,
                 source_type: SourceType::RefinedByElement,
-                attached_to: Some(parent_identifier.to_string()),
+                reused_by: Some(parent_identifier.to_string()),
             })
         }
         relation::LinkType::InternalPath(path) => {
-            // File path - read file content (same logic as attachment file handling)
+            // File path - read file content (same logic as reused_contract_context file handling)
             let full_path = git_root.join(path);
             let path_str = path.to_string_lossy().to_string();
 
@@ -719,11 +722,11 @@ fn collect_refinement_content(
                             .unwrap_or_else(|| path_str.clone()),
                         identifier: path_str,
                         file_path: path.to_string_lossy().to_string(),
-                        element_type: "refinement".to_string(),
+                        element_type: "contract".to_string(),
                         content,
                         depth,
                         source_type: SourceType::RefinedByFile,
-                        attached_to: Some(parent_identifier.to_string()),
+                        reused_by: Some(parent_identifier.to_string()),
                     }),
                     Err(_) => Some(CollectedItem {
                         name: path
@@ -732,11 +735,11 @@ fn collect_refinement_content(
                             .unwrap_or_else(|| path_str.clone()),
                         identifier: path_str.clone(),
                         file_path: path.to_string_lossy().to_string(),
-                        element_type: "refinement".to_string(),
+                        element_type: "contract".to_string(),
                         content: format!("[{}]({})", path_str, path_str),
                         depth,
                         source_type: SourceType::RefinedByFile,
-                        attached_to: Some(parent_identifier.to_string()),
+                        reused_by: Some(parent_identifier.to_string()),
                     }),
                 }
             } else {
@@ -748,11 +751,11 @@ fn collect_refinement_content(
                         .unwrap_or_else(|| path_str.clone()),
                     identifier: path_str.clone(),
                     file_path: path.to_string_lossy().to_string(),
-                    element_type: "refinement".to_string(),
+                    element_type: "contract".to_string(),
                     content: format!("[{}]({})", path_str, path_str),
                     depth,
                     source_type: SourceType::RefinedByFile,
-                    attached_to: Some(parent_identifier.to_string()),
+                    reused_by: Some(parent_identifier.to_string()),
                 })
             }
         }
@@ -778,7 +781,7 @@ fn generate_text_output(report: &CollectReport) -> String {
                 output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
             }
             SourceType::RefinedByElement => {
-                if let Some(ref parent) = item.attached_to {
+                if let Some(ref parent) = item.reused_by {
                     output.push_str(&format!(
                         "— Source: [{}]({}) refining [{}]({})\n",
                         item.name,
@@ -791,7 +794,7 @@ fn generate_text_output(report: &CollectReport) -> String {
                 }
             }
             SourceType::RefinedByFile => {
-                if let Some(ref parent) = item.attached_to {
+                if let Some(ref parent) = item.reused_by {
                     output.push_str(&format!(
                         "— Source: [{}]({}) refining [{}]({})\n",
                         item.name,
@@ -803,10 +806,10 @@ fn generate_text_output(report: &CollectReport) -> String {
                     output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
                 }
             }
-            SourceType::AttachmentFile => {
-                if let Some(ref parent) = item.attached_to {
+            SourceType::ReusedContractContextFile => {
+                if let Some(ref parent) = item.reused_by {
                     output.push_str(&format!(
-                        "— Source: [{}]({}) attached to [{}]({})\n",
+                        "— Source: [{}]({}) reused to [{}]({})\n",
                         item.name,
                         item.identifier,
                         extract_element_name(parent),
@@ -816,10 +819,10 @@ fn generate_text_output(report: &CollectReport) -> String {
                     output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
                 }
             }
-            SourceType::AttachmentElement => {
-                if let Some(ref parent) = item.attached_to {
+            SourceType::ReusedContractContextElement => {
+                if let Some(ref parent) = item.reused_by {
                     output.push_str(&format!(
-                        "— Source: [{}]({}) attached to [{}]({})\n",
+                        "— Source: [{}]({}) reused to [{}]({})\n",
                         item.name,
                         item.identifier,
                         extract_element_name(parent),
@@ -830,7 +833,7 @@ fn generate_text_output(report: &CollectReport) -> String {
                 }
             }
             SourceType::OntologyContext => {
-                if let Some(ref parent) = item.attached_to {
+                if let Some(ref parent) = item.reused_by {
                     output.push_str(&format!(
                         "— Source: [{}]({}) ontology context for [{}]({})\n",
                         item.name,

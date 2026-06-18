@@ -5,7 +5,7 @@
 The system SHALL provide an export command that writes the embedded Explorer SPA bundle and generated model data to a local output directory, producing a self-contained static site suitable for deployment to GitHub Pages or any static file host.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
@@ -22,18 +22,18 @@ Implementation details shall follow the associated refinement specifications.
 The system SHALL provide a serve command that launches a local Explorer HTTP server for browsing the current workspace model.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Two-Pass Validation Behavior](../../Operations/Validation/Behaviors.md#two-pass-validation-behavior)
   * [Validation Error Reporting Behavior](../../Operations/Validation/Behaviors.md#validation-error-reporting-behavior)
   * [Explorer Serve Pipeline Specification](Specifications.md#explorer-serve-pipeline-specification)
 
 #### Relations
-  * definedBy: [Serve Command Refinement Specification](Specifications.md#serve-command-refinement-specification)
+  * definedBy: [Serve Command Contract Specification](Specifications.md#serve-command-contract-specification)
   * derivedFrom: [Web Interface](../InterfacesRequirements.md#web-interface)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [serve.rs](../../../cli/src/serve.rs)
@@ -54,9 +54,9 @@ The system SHALL serve the embedded Reqvire Explorer SPA with all model artifact
   * definedBy: [Explorer Serve Pipeline Specification](Specifications.md#explorer-serve-pipeline-specification)
   * definedBy: [Model Browser and Graph Specification](Specifications.md#model-browser-and-graph-specification)
   * definedBy: [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
-  * derive: [Attachment Link Serving](#attachment-link-serving)
-  * derive: [Containment View Attachment Links](#containment-view-attachment-links)
-  * derive: [Diagram Attachment Display](#diagram-attachment-display)
+  * derive: [Reused Contract Context Link Serving](#reused-contract-context-link-serving)
+  * derive: [Containment View Reused Contract Context Links](#containment-view-reused-contract-context-links)
+  * derive: [Diagram Reused Contract Context Display](#diagram-reused-contract-context-display)
   * derive: [Model-Centric View Generation](#model-centric-view-generation)
   * derive: [Ontologies View Generation](#ontologies-view-generation)
   * derive: [Project Knowledge Graph View](#project-knowledge-graph-view)
@@ -81,56 +81,56 @@ The system SHALL serve the embedded Reqvire Explorer SPA with all model artifact
   * verifiedBy: [Explorer Serve Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#explorer-serve-verification)
 ---
 
-### Attachment Link Serving
+### Reused Contract Context Link Serving
 
-The system shall preserve attachment identifier links to referenced refinement elements in the served Explorer to preserve document completeness and enable navigation.
+The system shall preserve reused_contract_context identifier links to referenced contract elements in the served Explorer to preserve document completeness and enable navigation.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Attachment Link Serving Refinement Specification](Specifications.md#attachment-link-serving-refinement-specification)
+  * definedBy: [Reused Contract Context Link Serving Contract Specification](Specifications.md#reused-contract-context-link-serving-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
-  * verifiedBy: [Attachment Link Serving Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#attachment-link-serving-verification)
+  * verifiedBy: [Reused Contract Context Link Serving Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#reused-contract-context-link-serving-verification)
 ---
 
-### Containment View Attachment Links
+### Containment View Reused Contract Context Links
 
-The system shall preserve element attachment links in Model containment data and expose them from supported Explorer surfaces to provide quick access to associated refinement elements and documents.
+The system shall preserve element reused_contract_context links in Model containment data and expose them from supported Explorer surfaces to provide quick access to associated contract elements and documents.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Containment View Attachment Links Refinement Specification](Specifications.md#containment-view-attachment-links-refinement-specification)
+  * definedBy: [Containment View Reused Contract Context Links Contract Specification](Specifications.md#containment-view-reused-contract-context-links-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
-  * verifiedBy: [Model Containment Attachment Links Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-containment-attachment-links-verification)
+  * verifiedBy: [Model Containment Reused Contract Context Links Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-containment-reused-contract-context-links-verification)
 ---
 
-### Diagram Attachment Display
+### Diagram Reused Contract Context Display
 
-The system shall display attachment links within element boxes in generated diagrams to show document associations visually.
+The system shall display reused_contract_context links within element boxes in generated diagrams to show document associations visually.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Diagram Attachment Display Refinement Specification](Specifications.md#diagram-attachment-display-refinement-specification)
+  * definedBy: [Diagram Reused Contract Context Display Contract Specification](Specifications.md#diagram-reused-contract-context-display-contract-specification)
   * definedBy: [Explorer Mermaid Diagram Style Specification](Specifications.md#explorer-mermaid-diagram-style-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
-  * verifiedBy: [Diagram Attachment Display Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#diagram-attachment-display-verification)
+  * verifiedBy: [Diagram Reused Contract Context Display Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#diagram-reused-contract-context-display-verification)
 ---
 
 ### Model-Centric View Generation
@@ -138,13 +138,13 @@ Implementation details shall follow the associated refinement specifications.
 The system shall render a model-centric Explorer visualization showing model roots with nested relations containing full element details.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Model-Centric View Generation Refinement Specification](Specifications.md#model-centric-view-generation-refinement-specification)
+  * definedBy: [Model-Centric View Generation Contract Specification](Specifications.md#model-centric-view-generation-contract-specification)
   * derive: [Model View Element Navigation](#model-view-element-navigation)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
@@ -156,13 +156,13 @@ Implementation details shall follow the associated refinement specifications.
 The system shall make element names in the model-centric view clickable links that navigate to the element's definition in its source file.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Model View Element Navigation Refinement Specification](Specifications.md#model-view-element-navigation-refinement-specification)
+  * definedBy: [Model View Element Navigation Contract Specification](Specifications.md#model-view-element-navigation-contract-specification)
   * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
   * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
   * verifiedBy: [Model View Element Navigation Test](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-view-element-navigation-test)
@@ -181,21 +181,22 @@ The Ontologies view shall:
 - Show named properties as reusable slots in the selected class or term modal, including each target class and source shape that uses that property as a `sh:path`, so repeated property usages are understandable rather than presented as duplicate property definitions.
 - Use a defined ontology symbol and badge vocabulary so rendered symbols are stable, documented, and accessible.
 - Consume generated ontology projection facts from the semantic export context so the Ontologies Explorer and `reqvire ontologies --full` describe the same ontology constructs.
+- Expose ontology graph layers so users can inspect authored semantic content by default, optionally overlay semantic context for model-to-term declaration/reference provenance, and separately enable external source vocabulary when external ontology source triples are present.
 - Prioritize graph canvas space by using a dense full-height viewer layout, left-pane ontology controls, and modal detail for selected ontology nodes.
 - Separate normalized ontology constructs and SHACL-derived slots/facets from optional raw SHACL evidence; empty raw-evidence sections shall not be shown.
-- Apply viewer filters as explicit canvas visibility contracts: ontology terms and class-membership context stay available, the `Show` control group governs optional property-link, construct, SHACL, resource, and external-reference visibility, the SHACL shapes control governs both SHACL shape nodes and SHACL overlay relations, and other construct notation remains available as passive legend and modal evidence.
+- Apply viewer filters as explicit canvas visibility contracts: authored ontology semantics are enabled by default, semantic context and external source layers are opt-in, ontology terms and class-membership context stay available, role controls govern optional SHACL, resource, and external-reference visibility, and construct notation remains available as passive legend and modal evidence.
 - Keep linked source citations in the viewer and the served `ontologies.ttl` artifact available for traceability and downstream tooling without rendering raw Turtle blocks as the primary page content.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
   * [Ontology Projection Subgraph Materialization Specification](../../Reports/ModelReports/Specifications.md#ontology-projection-subgraph-materialization-specification)
 
 #### Relations
   * definedBy: [Ontology Rendering Details](OntologyRenderingDetails.md#ontology-rendering-details)
-  * definedBy: [Ontologies View Generation Refinement Specification](Specifications.md#ontologies-view-generation-refinement-specification)
+  * definedBy: [Ontologies View Generation Contract Specification](Specifications.md#ontologies-view-generation-contract-specification)
   * derive: [Ontology Construct Grouping](#ontology-construct-grouping)
   * derive: [Ontology Property-Centric Visualization](#ontology-property-centric-visualization)
   * derive: [Ontology Symbol and Badge Vocabulary](#ontology-symbol-and-badge-vocabulary)
@@ -208,13 +209,13 @@ The Ontologies view shall:
 The system shall transform semantic-index RDF quads into generated ontology projection facts that suppress RDF serialization mechanics and expose stable ontology concepts for both full semantic export and Explorer visualization.
 
 #### Details
-The projection shall classify terms by semantic role, preserve source traceability, attach generated direct-authored OWL/RDFS/SHACL construct data to `SemanticIndex`, expose that data as a reusable ontology projection subgraph inside the existing in-memory RDF projection, derive normalized slot/facet records from SHACL property shapes, and omit primary rendering of `rdf:type` edges, RDF list plumbing, metaclass resources, and anonymous blank-node implementation details unless those nodes represent a meaningful ontology construct.
+The projection shall classify terms by semantic role, preserve source traceability, reuse generated direct-authored OWL/RDFS/SHACL construct data to `SemanticIndex`, expose that data as a reusable ontology projection subgraph inside the existing in-memory RDF projection, derive normalized slot/facet records from SHACL property shapes, and omit primary rendering of `rdf:type` edges, RDF list plumbing, metaclass resources, and anonymous blank-node implementation details unless those nodes represent a meaningful ontology construct.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [OWL Semantic Ontology Projection Refinement Specification](Specifications.md#owl-semantic-ontology-projection-refinement-specification)
+  * definedBy: [OWL Semantic Ontology Projection Contract Specification](Specifications.md#owl-semantic-ontology-projection-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
@@ -230,7 +231,7 @@ Construct grouping shall cover equivalence groups, inverse properties, property-
   * type: requirement
 
 #### Relations
-  * definedBy: [Ontology Construct Grouping Refinement Specification](Specifications.md#ontology-construct-grouping-refinement-specification)
+  * definedBy: [Ontology Construct Grouping Contract Specification](Specifications.md#ontology-construct-grouping-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
@@ -246,7 +247,7 @@ The property visualization shall aggregate many domain and range classes without
   * type: requirement
 
 #### Relations
-  * definedBy: [Ontology Property-Centric Visualization Refinement Specification](Specifications.md#ontology-property-centric-visualization-refinement-specification)
+  * definedBy: [Ontology Property-Centric Visualization Contract Specification](Specifications.md#ontology-property-centric-visualization-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
@@ -262,7 +263,7 @@ The symbol vocabulary shall define each symbol with its semantic meaning, raw Un
   * type: requirement
 
 #### Relations
-  * definedBy: [Ontology Symbol and Badge Vocabulary Refinement Specification](Specifications.md#ontology-symbol-and-badge-vocabulary-refinement-specification)
+  * definedBy: [Ontology Symbol and Badge Vocabulary Contract Specification](Specifications.md#ontology-symbol-and-badge-vocabulary-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
@@ -275,19 +276,19 @@ The system shall expose a Project Knowledge Graph view during serve workflows as
 The Knowledge Graph view shall:
 - Answer what actual project elements and facts exist right now.
 - Be reached through the canonical `index.html#/model` Explorer route by selecting Graph mode; a separate Knowledge Graph route or document entry point shall not be generated.
-- Render the four system-model layers as first-class graph nodes: ontologies, capabilities, requirements, and verifications. Requirement-owned refinements may appear as subordinate requirement detail/contract nodes when actual project facts reference them, but they are not a separate system-model layer.
-- Render actual relation facts, attachment facts, concept-reference facts, file targets, and external targets as graph edges or resource nodes.
-- Use Reqvire capability-root submodels as the structural graph partitioning contract; attachments, concept references, verification/satisfaction, and trace facts are overlays rather than submodel boundaries.
-- Treat structural ownership/backbone relations separately from cross-layer evidence relations: `derive` and `specify` organize the capability/requirement submodel backbone, while requirement-owned `define`, `attach`, `satisfiedBy`, `verifiedBy`, `trace`, and concept-reference facts connect subordinate details or layers as inspectable overlays.
+- Render the four system-model layers as first-class graph nodes: ontologies, capabilities, requirements, and verifications. Requirement-owned contracts may appear as subordinate requirement detail/contract nodes when actual project facts reference them, but they are not a separate system-model layer.
+- Render actual relation facts, reused_contract_context facts, concept-reference facts, file targets, and external targets as graph edges or resource nodes.
+- Use Reqvire capability-root submodels as the structural graph partitioning contract; reused_contract_context, concept references, verification/satisfaction, and trace facts are overlays rather than submodel boundaries.
+- Treat structural ownership/backbone relations separately from cross-layer evidence relations: `derive` and `specify` organize the capability/requirement submodel backbone, while requirement-owned `define`, `reuse`, `satisfiedBy`, `verifiedBy`, and concept-reference facts connect subordinate details or layers as inspectable overlays.
 - Reuse the dense Explorer graph and modal-detail interaction pattern used by the ontology viewer, while focusing on project instances rather than ontology vocabulary definitions.
-- Provide modal detail evidence for element type, identifier, source location, governance, metadata, incoming facts, outgoing facts, attachments, and concept references.
+- Provide modal detail evidence for element type, identifier, source location, governance, metadata, incoming facts, outgoing facts, reused_contract_context, and concept references.
 - Keep ontology vocabulary exploration in the Ontologies view; the Knowledge Graph view may show ontology terms only when they are referenced by actual project elements.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Project Knowledge Graph View Refinement Specification](Specifications.md#project-knowledge-graph-view-refinement-specification)
+  * definedBy: [Project Knowledge Graph View Contract Specification](Specifications.md#project-knowledge-graph-view-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
   * satisfiedBy: [GraphLibraryViews.tsx](../../../explorer/src/views/GraphLibraryViews.tsx)
@@ -313,7 +314,7 @@ The SPA Explorer shell shall:
 - Do not generate separate Explorer/report document entry points.
 - Seed a normalized project snapshot that distinguishes modeled source-file containers from modeled resource and evidence-file targets. The Model tree shall contain modeled element files plus existing repository-relative local implementation/evidence/resource files referenced by graph-registry facts, while unrelated repository files remain absent.
 - Keep containment, model, knowledge graph, verification traces, coverage, resources, ontology, search, summaries, and route state as view-neutral store projections rather than separate page-local data models.
-- Preserve the current relation model: capabilities may author concept references and are specified/verified; requirements own refinements, satisfaction evidence, verification evidence, reusable refinement attachments, and concept references.
+- Preserve the current relation model: capabilities may author concept references and are specified/verified; requirements own contracts, satisfaction evidence, verification evidence, reusable contract reused_contract_context, and concept references.
 
 #### Concept References
   * Project Store: reqvire:BrowserLocalProjectStore
@@ -326,7 +327,7 @@ The SPA Explorer shell shall:
 
 #### Relations
   * definedBy: [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
-  * definedBy: [SPA Explorer Store Contract Refinement Specification](Specifications.md#spa-explorer-store-contract-refinement-specification)
+  * definedBy: [SPA Explorer Store Contract Specification](Specifications.md#spa-explorer-store-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [git_commands.rs](../../../core/src/git_commands.rs)
   * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
@@ -354,7 +355,7 @@ The Traces view shall:
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
@@ -394,7 +395,7 @@ The system shall ensure color consistency between:
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
   * satisfiedBy: [ElementIcon.tsx](../../../explorer/design-system/components/data/ElementIcon.tsx)
   * satisfiedBy: [palette.ts](../../../explorer/design-system/palette.ts)
-  * satisfiedBy: [AttachmentList.tsx](../../../explorer/design-system/product-patterns/detail/AttachmentList.tsx)
+  * satisfiedBy: [ReusedContractContextList.tsx](../../../explorer/design-system/product-patterns/detail/ReusedContractContextList.tsx)
   * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
   * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
 ---

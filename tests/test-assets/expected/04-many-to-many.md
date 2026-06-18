@@ -9,7 +9,7 @@ Top-level container for test requirements.
 
 #### Relations
   * derive: [Performance Requirement](#performance-requirement)
-  * derive: [No Attachments Requirement](#no-attachments-requirement)
+  * derive: [No Reused Contract Context Requirement](#no-reused-contract-context-requirement)
 ---
 
 
@@ -18,7 +18,7 @@ Top-level container for test requirements.
 The system shall meet defined performance criteria.
 
 #### Details
-This requirement has an attached SLA document.
+This requirement has an reused SLA document.
 
 #### Metadata
   * type: requirement
@@ -27,7 +27,7 @@ This requirement has an attached SLA document.
   * derivedFrom: [System Requirements](#system-requirements)
   * derive: [Implementation Detail](#implementation-detail)
 
-#### Attachments
+#### Reused Contract Context
 * [../docs/SLA.txt](../docs/SLA.txt)
 * [../docs/benchmarks.txt](../docs/benchmarks.txt)
 ---
@@ -43,9 +43,9 @@ The implementation shall follow the SLA guidelines.
   * derivedFrom: [Performance Requirement](#performance-requirement)
 ---
 
-### No Attachments Requirement
+### No Reused Contract Context Requirement
 
-This requirement has no attachments.
+This requirement has no reused_contract_context.
 
 #### Metadata
   * type: requirement
@@ -54,9 +54,9 @@ This requirement has no attachments.
   * derivedFrom: [System Requirements](#system-requirements)
 ---
 
-### Refinement Target Requirement
+### Contract Target Requirement
 
-A separate requirement that owns refinements (outside main hierarchy).
+A separate requirement that owns contracts (outside main hierarchy).
 
 #### Metadata
   * type: capability
@@ -65,13 +65,13 @@ A separate requirement that owns refinements (outside main hierarchy).
   * definedBy: [Test Constraint Element](#test-constraint-element)
   * definedBy: [Test Behavior Element](#test-behavior-element)
 
-#### Attachments
+#### Reused Contract Context
 * [../docs/SLA.txt](../docs/SLA.txt)
 ---
 
 ### Test Constraint Element
 
-This is a constraint Refinement element for testing element attachments.
+This is a constraint Contract element for testing element reused_contract_context.
 
 #### Details
 This constraint defines limits on system behavior.
@@ -83,7 +83,7 @@ This constraint defines limits on system behavior.
 
 ### Test Behavior Element
 
-This is a behavior Refinement element for testing element attachments.
+This is a behavior Contract element for testing element reused_contract_context.
 
 #### Details
 This behavior defines expected system operation.

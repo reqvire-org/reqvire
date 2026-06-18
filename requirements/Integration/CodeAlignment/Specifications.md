@@ -1,6 +1,6 @@
 # Elements
 
-### CSS Style Comment Refinement Specification
+### CSS Style Comment Contract Specification
 
 #### Details
 CSS/SCSS traceability comment behavior:
@@ -44,7 +44,7 @@ Traceability relation kinds and comment style kinds are defined by the Reqvire c
   * define: [Comment Style by File Extension](CodeAlignmentRequirements.md#comment-style-by-file-extension)
 ---
 
-### Slash Style Comment Refinement Specification
+### Slash Style Comment Contract Specification
 
 #### Details
 Slash-style traceability comment behavior:
@@ -67,7 +67,7 @@ void processSensorData() {
   * define: [Slash style comment](CodeAlignmentRequirements.md#slash-style-comment)
 ---
 
-### Traceability Format Refinement Specification
+### Traceability Format Contract Specification
 
 #### Details
 Traceability marker relation kinds are defined by the Reqvire code traceability ontology.
@@ -86,7 +86,7 @@ Traceability marker syntax behavior:
   * define: [Traceability Format](CodeAlignmentRequirements.md#traceability-format)
 ---
 
-### XML Style Comment Refinement Specification
+### XML Style Comment Contract Specification
 
 #### Details
 XML/HTML traceability comment behavior:

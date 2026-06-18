@@ -1,27 +1,27 @@
 # Elements
 
-### CLI Add Element Command Refinement Specification
+### CLI Add Element Command Contract Specification
 
 #### Details
-The `add` command behavior is governed by the attached create-element workflow, override behavior, and ontology-aware mutation contracts.
+The `add` command behavior is governed by the reused create-element workflow, override behavior, and ontology-aware mutation contracts.
 
 #### Metadata
   * type: specification
 ---
 
-### CLI Collect Command Refinement Specification
+### CLI Collect Command Contract Specification
 
 #### Details
-The `collect` command behavior is governed by the attached collection traversal and output contracts.
+The `collect` command behavior is governed by the reused collection traversal and output contracts.
 
 #### Metadata
   * type: specification
 ---
 
-### CLI Coverage Command Refinement Specification
+### CLI Coverage Command Contract Specification
 
 #### Details
-The `coverage` command behavior is governed by the attached coverage report contracts.
+The `coverage` command behavior is governed by the reused coverage report contracts.
 
 #### Metadata
   * type: specification
@@ -30,7 +30,7 @@ The `coverage` command behavior is governed by the attached coverage report cont
   * define: [CLI Coverage Command](Commands.md#cli-coverage-command)
 ---
 
-### CLI Interface Structure Refinement Specification
+### CLI Interface Structure Contract Specification
 
 #### Details
 The CLI must display all commands and options and command's options flattened in the main help output which must also be a default command:
@@ -56,8 +56,8 @@ mv Move element to different location
 rename Rename element
 merge Merge multiple elements into target element
 mv-file Move entire specification file
-link Add relation or attachment between elements
-unlink Remove relation or attachment (auto-detects)
+link Add relation or reused_contract_context between elements
+unlink Remove relation or reused_contract_context (auto-detects)
 relink Replace an existing relation target with a new target in one operation
 mv-asset Move/rename asset file and update references
 rm-asset Remove asset file and remove references
@@ -71,6 +71,7 @@ help Print help for commands
 Ontologies options:
 --jsonld Output JSON-LD format instead of RDF/Turtle (.ttl)
 --full Include Reqvire model context triples and ontology projection facts in the semantic export
+--include-external Include local external ontology source triples
 --output <FILE> Save output to file
 
 Options:
@@ -88,7 +89,7 @@ Each command has its own options displayed in a flattened section
   * define: [CLI Interface Structure](Commands.md#cli-interface-structure)
 ---
 
-### CLI JSON File Output Option Refinement Specification
+### CLI JSON File Output Option Contract Specification
 
 #### Details
 `--output` option behavior:
@@ -106,7 +107,7 @@ Each command has its own options displayed in a flattened section
   * define: [CLI JSON File Output Option](Commands.md#cli-json-file-output-option)
 ---
 
-### CLI Lint Command Refinement Specification
+### CLI Lint Command Contract Specification
 
 #### Details
 Lint command behavior:
@@ -132,10 +133,10 @@ Command output is written to stdout for easy redirection to files.
   * define: [CLI Lint Command](Commands.md#cli-lint-command)
 ---
 
-### CLI Merge Element Command Refinement Specification
+### CLI Merge Element Command Contract Specification
 
 #### Details
-The `merge` command behavior is governed by the attached merge content, compatibility, and workflow contracts.
+The `merge` command behavior is governed by the reused merge content, compatibility, and workflow contracts.
 
 #### Metadata
   * type: specification
@@ -144,7 +145,7 @@ The `merge` command behavior is governed by the attached merge content, compatib
   * define: [CLI Merge Element Command](Commands.md#cli-merge-element-command)
 ---
 
-### CLI Migrate Command Refinement Specification
+### CLI Migrate Command Contract Specification
 
 #### Details
 Migrate command behavior:
@@ -167,10 +168,10 @@ Migrate command behavior:
   * define: [CLI Migrate Command](Commands.md#cli-migrate-command)
 ---
 
-### CLI Model Diagram Command Refinement Specification
+### CLI Model Diagram Command Contract Specification
 
 #### Details
-The `model` command behavior is governed by the attached model-diagram output contracts.
+The `model` command behavior is governed by the reused model-diagram output contracts.
 
 #### Metadata
   * type: specification
@@ -179,10 +180,10 @@ The `model` command behavior is governed by the attached model-diagram output co
   * define: [CLI Model Diagram Command](Commands.md#cli-model-diagram-command)
 ---
 
-### CLI Move Asset Command Refinement Specification
+### CLI Move Asset Command Contract Specification
 
 #### Details
-The `mv-asset` command behavior is governed by the attached asset-move and reference-update contracts.
+The `mv-asset` command behavior is governed by the reused asset-move and reference-update contracts.
 
 #### Metadata
   * type: specification
@@ -191,28 +192,28 @@ The `mv-asset` command behavior is governed by the attached asset-move and refer
   * define: [CLI Move Asset Command](Commands.md#cli-move-asset-command)
 ---
 
-### CLI Move Element Command Refinement Specification
+### CLI Move Element Command Contract Specification
 
 #### Details
-The `mv` command behavior is governed by the attached move workflow and target-location contracts.
+The `mv` command behavior is governed by the reused move workflow and target-location contracts.
 
 #### Metadata
   * type: specification
 ---
 
-### CLI Move File Command Refinement Specification
+### CLI Move File Command Contract Specification
 
 #### Details
-The `mv-file` command behavior is governed by the attached file-move workflow and file-format contracts.
+The `mv-file` command behavior is governed by the reused file-move workflow and file-format contracts.
 
 #### Metadata
   * type: specification
 ---
 
-### CLI Ontologies Command Refinement Specification
+### CLI Ontologies Command Contract Specification
 
 #### Details
-The `ontologies` command behavior is governed by the attached ontology collection and semantic export contracts.
+The `ontologies` command behavior is governed by the reused ontology collection and semantic export contracts.
 
 #### Metadata
   * type: specification
@@ -221,10 +222,10 @@ The `ontologies` command behavior is governed by the attached ontology collectio
   * define: [CLI Ontologies Command](Commands.md#cli-ontologies-command)
 ---
 
-### CLI Relink Command Refinement Specification
+### CLI Relink Command Contract Specification
 
 #### Details
-The `relink` command behavior is governed by the attached relink workflow and atomic validity contracts.
+The `relink` command behavior is governed by the reused relink workflow and atomic validity contracts.
 
 #### Metadata
   * type: specification
@@ -233,10 +234,10 @@ The `relink` command behavior is governed by the attached relink workflow and at
   * define: [CLI Relink Command](Commands.md#cli-relink-command)
 ---
 
-### CLI Remove Asset Command Refinement Specification
+### CLI Remove Asset Command Contract Specification
 
 #### Details
-The `rm-asset` command behavior is governed by the attached asset-move/remove and output contracts.
+The `rm-asset` command behavior is governed by the reused asset-move/remove and output contracts.
 
 #### Metadata
   * type: specification
@@ -245,10 +246,10 @@ The `rm-asset` command behavior is governed by the attached asset-move/remove an
   * define: [CLI Remove Asset Command](Commands.md#cli-remove-asset-command)
 ---
 
-### CLI Remove Element Command Refinement Specification
+### CLI Remove Element Command Contract Specification
 
 #### Details
-The `rm` command behavior is governed by the attached delete workflow and relation-cleanup contracts.
+The `rm` command behavior is governed by the reused delete workflow and relation-cleanup contracts.
 
 #### Metadata
   * type: specification
@@ -257,10 +258,10 @@ The `rm` command behavior is governed by the attached delete workflow and relati
   * define: [CLI Remove Element Command](Commands.md#cli-remove-element-command)
 ---
 
-### CLI Rename Element Command Refinement Specification
+### CLI Rename Element Command Contract Specification
 
 #### Details
-The `rename` command behavior is governed by the attached rename workflow and relation-update contracts.
+The `rename` command behavior is governed by the reused rename workflow and relation-update contracts.
 
 #### Metadata
   * type: specification
@@ -269,10 +270,10 @@ The `rename` command behavior is governed by the attached rename workflow and re
   * define: [CLI Rename Element Command](Commands.md#cli-rename-element-command)
 ---
 
-### CLI Resources Command Refinement Specification
+### CLI Resources Command Contract Specification
 
 #### Details
-The `resources` command behavior is governed by the attached relation and attachment inventory contracts.
+The `resources` command behavior is governed by the reused relation and reused_contract_context inventory contracts.
 
 #### Metadata
   * type: specification
@@ -281,10 +282,10 @@ The `resources` command behavior is governed by the attached relation and attach
   * define: [CLI Resources Command](Commands.md#cli-resources-command)
 ---
 
-### CLI Search Command Refinement Specification
+### CLI Search Command Contract Specification
 
 #### Details
-The `search` command behavior is governed by the attached search/filter/output contracts.
+The `search` command behavior is governed by the reused search/filter/output contracts.
 
 #### Metadata
   * type: specification
@@ -295,7 +296,7 @@ The `search` command behavior is governed by the attached search/filter/output c
 The CLI `--with-size-estimates` option is expected to be an opt-in JSON evidence option.
 
 #### Details
-The `--with-size-estimates` option behavior is governed by the attached report-evidence contracts.
+The `--with-size-estimates` option behavior is governed by the reused report-evidence contracts.
 
 #### Metadata
   * type: specification
@@ -304,10 +305,10 @@ The `--with-size-estimates` option behavior is governed by the attached report-e
   * define: [CLI Size Estimate JSON Option](Commands.md#cli-size-estimate-json-option)
 ---
 
-### CLI Submodels Command Refinement Specification
+### CLI Submodels Command Contract Specification
 
 #### Details
-The `submodels` command behavior is governed by the attached submodel analysis and output contracts.
+The `submodels` command behavior is governed by the reused submodel analysis and output contracts.
 
 #### Metadata
   * type: specification
@@ -316,16 +317,16 @@ The `submodels` command behavior is governed by the attached submodel analysis a
   * define: [CLI Submodels Command](Commands.md#cli-submodels-command)
 ---
 
-### CLI Traces Command Refinement Specification
+### CLI Traces Command Contract Specification
 
 #### Details
-The `traces` command behavior is governed by the attached verification trace and link-format contracts.
+The `traces` command behavior is governed by the reused verification trace and link-format contracts.
 
 #### Metadata
   * type: specification
 ---
 
-### Detailed Error Handling and Logging Refinement Specification
+### Detailed Error Handling and Logging Contract Specification
 
 #### Details
 CLI error handling and logging behavior:
@@ -411,7 +412,7 @@ Structure for error and warning messages.
 The CLI is expected to resolve and enter an explicitly selected workspace before executing Reqvire operations.
 
 #### Details
-The `--workspace` behavior is governed by the attached workspace-selection and startup contracts.
+The `--workspace` behavior is governed by the reused workspace-selection and startup contracts.
 
 #### Metadata
   * type: specification
@@ -420,19 +421,19 @@ The `--workspace` behavior is governed by the attached workspace-selection and s
   * define: [Explicit Workspace Selection](Commands.md#explicit-workspace-selection)
 ---
 
-### Format Command Refinement Specification
+### Format Command Contract Specification
 
 #### Details
-The `format` command behavior is governed by the attached formatting behavior and output contracts.
+The `format` command behavior is governed by the reused formatting behavior and output contracts.
 
 #### Metadata
   * type: specification
 ---
 
-### Mutating Command Hierarchy Safety Refinement Specification
+### Mutating Command Hierarchy Safety Contract Specification
 
 #### Details
-Mutating command hierarchy safety is governed by the attached validation and atomicity contracts.
+Mutating command hierarchy safety is governed by the reused validation and atomicity contracts.
 
 #### Metadata
   * type: specification
@@ -441,10 +442,10 @@ Mutating command hierarchy safety is governed by the attached validation and ato
   * define: [CLI Relink Command](Commands.md#cli-relink-command)
 ---
 
-### Relation Commands Refinement Specification
+### Relation Commands Contract Specification
 
 #### Details
-Relation command behavior is governed by the attached relation, attachment, and atomicity contracts.
+Relation command behavior is governed by the reused relation, reused_contract_context, and atomicity contracts.
 
 #### Metadata
   * type: specification
@@ -453,10 +454,10 @@ Relation command behavior is governed by the attached relation, attachment, and 
   * define: [Relation Commands](Commands.md#relation-commands)
 ---
 
-### Validate Command Refinement Specification
+### Validate Command Contract Specification
 
 #### Details
-The `validate` command behavior is governed by the attached validation strategy and output contracts.
+The `validate` command behavior is governed by the reused validation strategy and output contracts.
 
 #### Metadata
   * type: specification
@@ -465,10 +466,10 @@ The `validate` command behavior is governed by the attached validation strategy 
   * define: [Validate Command](Commands.md#validate-command)
 ---
 
-### Verification Traces Element Navigation Refinement Specification
+### Verification Traces Element Navigation Contract Specification
 
 #### Details
-Verification trace element navigation behavior is governed by the attached verification-trace link-format contracts.
+Verification trace element navigation behavior is governed by the reused verification-trace link-format contracts.
 
 #### Metadata
   * type: specification

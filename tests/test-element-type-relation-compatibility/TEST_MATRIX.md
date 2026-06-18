@@ -22,9 +22,9 @@ Based on the Element Type Relation Compatibility specification, the following te
 | analysis-verification | requirement | ❌ FAIL | invalid-derivedfrom/analysis-to-req |
 | requirement | test-verification | ❌ FAIL | invalid-derivedfrom/req-to-verification |
 | other | requirement | ❌ FAIL | invalid-derivedfrom/other-to-req |
-| constraint | requirement | ❌ FAIL | invalid-refinement/constraint-derivedfrom |
-| behavior | requirement | ❌ FAIL | invalid-refinement/behavior-derivedfrom |
-| specification | requirement | ❌ FAIL | invalid-refinement/specification-derivedfrom |
+| constraint | requirement | ❌ FAIL | invalid-contract/constraint-derivedfrom |
+| behavior | requirement | ❌ FAIL | invalid-contract/behavior-derivedfrom |
+| specification | requirement | ❌ FAIL | invalid-contract/specification-derivedfrom |
 
 ## satisfiedBy Relation Tests
 
@@ -64,40 +64,26 @@ Based on the Element Type Relation Compatibility specification, the following te
 | test-verification | test-verification | ❌ FAIL | (covered by verifiedBy inverse) |
 | requirement | requirement | ❌ FAIL | invalid-verifiedby/req-using-verify |
 
-## trace Relation Tests
+## ReusedContractContextEntry Author Tests
 
 | Source Type | Target Type | Expected | Test Case |
 |-------------|-------------|----------|-----------|
-| requirement | requirement | ✅ PASS | valid-trace/req-to-req |
-| requirement | test-verification | ✅ PASS | valid-trace/req-to-verif |
-| test-verification | requirement | ✅ PASS | valid-trace/verif-to-req |
-| test-verification | test-verification | ✅ PASS | valid-trace/verif-to-verif |
-| other | requirement | ✅ PASS | valid-trace/other-to-req |
-| other | other | ✅ PASS | valid-trace/other-to-other |
-| constraint | requirement | ❌ FAIL | invalid-refinement/constraint-trace |
-| behavior | requirement | ❌ FAIL | invalid-refinement/behavior-trace |
-| specification | requirement | ❌ FAIL | invalid-refinement/specification-trace |
+| contract | requirement-owned contract | ❌ FAIL | invalid-contract-reused-context |
+| test-verification | requirement-owned contract | ❌ FAIL | invalid-verification-reused-context |
 
-## Attachment Author Tests
+## Ordinary Contract Type Tests (Only define Allowed)
 
-| Source Type | Target Type | Expected | Test Case |
-|-------------|-------------|----------|-----------|
-| refinement | requirement-owned refinement | ❌ FAIL | invalid-refinement-attachment |
-| test-verification | requirement-owned refinement | ❌ FAIL | invalid-verification-attachment |
-
-## Ordinary Refinement Type Tests (Only define Allowed)
-
-### Valid Refinement Relations
+### Valid Contract Relations
 
 | Element Type | Relation | Target Type | Expected | Test Case |
 |--------------|----------|-------------|----------|-----------|
-| source | define | requirement | ✅ PASS | valid-refinement/source-define-requirement |
+| source | define | requirement | ✅ PASS | valid-contract/source-define-requirement |
 | ontology | derivedFrom | ontology | ✅ PASS | valid-hierarchy/ontology-derived-from-ontology |
-| constraint | define | requirement | ✅ PASS | valid-refinement/constraint-define-requirement |
-| behavior | define | requirement | ✅ PASS | valid-refinement/behavior-define-requirement |
-| specification | define | requirement | ✅ PASS | valid-refinement/specification-define-requirement |
-| state | define | requirement | ✅ PASS | valid-refinement/state-define-requirement |
-| input-output | define | requirement | ✅ PASS | valid-refinement/input-output-define-requirement |
+| constraint | define | requirement | ✅ PASS | valid-contract/constraint-define-requirement |
+| behavior | define | requirement | ✅ PASS | valid-contract/behavior-define-requirement |
+| specification | define | requirement | ✅ PASS | valid-contract/specification-define-requirement |
+| state | define | requirement | ✅ PASS | valid-contract/state-define-requirement |
+| input-output | define | requirement | ✅ PASS | valid-contract/input-output-define-requirement |
 
 ## Semantic Contract Relation Tests
 
@@ -107,26 +93,23 @@ Based on the Element Type Relation Compatibility specification, the following te
 | semantic-contract | constrain | requirement | ✅ PASS | valid-cases/semantic-contract-constrain-requirement |
 | semantic-contract | use | ontology | ✅ PASS | valid-cases/semantic-contract-use-ontology |
 | ontology | usedBy | semantic-contract | ✅ PASS | valid-cases/ontology-usedby-semantic-contract |
-| semantic-contract | define | requirement | ❌ FAIL | invalid-refinement/semantic-contract-define-requirement |
-| requirement | definedBy | semantic-contract | ❌ FAIL | invalid-refinement/requirement-refinedby-semantic-contract |
+| semantic-contract | define | requirement | ❌ FAIL | invalid-contract/semantic-contract-define-requirement |
+| requirement | definedBy | semantic-contract | ❌ FAIL | invalid-contract/requirement-definedby-semantic-contract |
 
-### Invalid Refinement Relations
+### Invalid Contract Relations
 
 | Element Type | Any Relation | Expected | Test Case |
 |--------------|--------------|----------|-----------|
-| constraint | derivedFrom | ❌ FAIL | invalid-refinement/constraint-derivedfrom |
-| constraint | trace | ❌ FAIL | invalid-refinement/constraint-trace |
-| behavior | derivedFrom | ❌ FAIL | invalid-refinement/behavior-derivedfrom |
-| behavior | trace | ❌ FAIL | invalid-refinement/behavior-trace |
-| specification | derivedFrom | ❌ FAIL | invalid-refinement/specification-derivedfrom |
-| specification | trace | ❌ FAIL | invalid-refinement/specification-trace |
-| source | define capability | ❌ FAIL | invalid-capability-refinements/source-define-capability |
-| semantic-contract | define requirement | ❌ FAIL | invalid-refinement/semantic-contract-define-requirement |
-| constraint | define capability | ❌ FAIL | invalid-capability-refinements/constraint-define-capability |
-| behavior | define capability | ❌ FAIL | invalid-capability-refinements/behavior-define-capability |
-| specification | define capability | ❌ FAIL | invalid-capability-refinements/specification-define-capability |
-| state | define capability | ❌ FAIL | invalid-capability-refinements/state-define-capability |
-| input-output | define capability | ❌ FAIL | invalid-capability-refinements/input-output-define-capability |
+| constraint | derivedFrom | ❌ FAIL | invalid-contract/constraint-derivedfrom |
+| behavior | derivedFrom | ❌ FAIL | invalid-contract/behavior-derivedfrom |
+| specification | derivedFrom | ❌ FAIL | invalid-contract/specification-derivedfrom |
+| source | define capability | ❌ FAIL | invalid-capability-contracts/source-define-capability |
+| semantic-contract | define requirement | ❌ FAIL | invalid-contract/semantic-contract-define-requirement |
+| constraint | define capability | ❌ FAIL | invalid-capability-contracts/constraint-define-capability |
+| behavior | define capability | ❌ FAIL | invalid-capability-contracts/behavior-define-capability |
+| specification | define capability | ❌ FAIL | invalid-capability-contracts/specification-define-capability |
+| state | define capability | ❌ FAIL | invalid-capability-contracts/state-define-capability |
+| input-output | define capability | ❌ FAIL | invalid-capability-contracts/input-output-define-capability |
 
 ## Summary
 
@@ -136,7 +119,6 @@ Based on the Element Type Relation Compatibility specification, the following te
 | satisfiedBy | 12 | 5 | 7 |
 | verifiedBy | 6 | 3 | 3 |
 | verify | 4 | 2 | 2 |
-| trace | 9 | 6 | 3 |
-| attachments | 2 | 0 | 2 |
-| Refinement | 9 | 3 | 6 |
-| **TOTAL** | **54** | **23** | **31** |
+| reused_contract_context | 2 | 0 | 2 |
+| Contract | 9 | 3 | 6 |
+| **TOTAL** | **45** | **17** | **28** |

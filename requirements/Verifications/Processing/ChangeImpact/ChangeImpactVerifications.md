@@ -2,7 +2,7 @@
 
 ### Change Impact Analysis Verification Objective
 
-This objective groups verification that change impact analysis detects changed model content, relation impact, smart filtering, attachment context, semantic contract context, and structural summaries.
+This objective groups verification that change impact analysis detects changed model content, relation impact, smart filtering, reused_contract_context context, semantic contract context, and structural summaries.
 
 #### Metadata
   * type: verification-objective
@@ -40,7 +40,7 @@ This test verifies that capability, specified requirement, ontology, and semanti
 - Assert the requirement impact tree contains the semantic contract and verification.
 - Assert the semantic-contract impact tree contains the constrained requirement and verification, but not the used ontology.
 - Assert the contract-only ontology impact tree contains the semantic contract, constrained requirement, and verification.
-- Assert concept-reference and semantic-contract dependency paths are represented without capability ontology attachments.
+- Assert concept-reference and semantic-contract dependency paths are represented without capability ontology reused_contract_context.
 
 #### Metadata
   * type: test-verification

@@ -1,7 +1,7 @@
 // Resources Report Module
-// Generates reports showing all files referenced by the model through relations and attachments
+// Generates reports showing all files referenced by the model through relations and reused_contract_context
 
-use crate::element::AttachmentTarget;
+use crate::element::{ReusedContractContextTarget, REUSED_CONTRACT_CONTEXT_SECTION};
 use crate::graph_registry::GraphRegistry;
 use crate::relation::LinkType;
 use serde::Serialize;
@@ -11,7 +11,7 @@ use std::path::PathBuf;
 #[derive(Serialize)]
 pub struct ResourcesReport {
     pub relations: Vec<FileReferences>,
-    pub attachments: Vec<FileReferences>,
+    pub reused_contract_context: Vec<FileReferences>,
     pub summary: ResourcesSummary,
 }
 
@@ -32,9 +32,9 @@ pub struct Reference {
 #[derive(Serialize)]
 pub struct ResourcesSummary {
     pub total_relation_files: usize,
-    pub total_attachment_files: usize,
+    pub total_reused_contract_context_files: usize,
     pub total_relation_references: usize,
-    pub total_attachment_references: usize,
+    pub total_reused_contract_context_references: usize,
 }
 
 /// Helper function to format an identifier as a markdown link
@@ -66,7 +66,7 @@ impl ResourcesReport {
 
         // Relations Section
         output.push_str("## Relations\n\n");
-        output.push_str("Files referenced via relations (satisfiedBy, trace, etc.):\n\n");
+        output.push_str("Files referenced via relations such as satisfiedBy:\n\n");
 
         if self.relations.is_empty() {
             output.push_str("*No files referenced via relations.*\n\n");
@@ -86,14 +86,16 @@ impl ResourcesReport {
             }
         }
 
-        // Attachments Section
-        output.push_str("## Attachments\n\n");
-        output.push_str("Files referenced via attachments:\n\n");
+        // Reused Contract Context Section
+        output.push_str("## ");
+        output.push_str(REUSED_CONTRACT_CONTEXT_SECTION);
+        output.push_str("\n\n");
+        output.push_str("Files referenced via reused_contract_context:\n\n");
 
-        if self.attachments.is_empty() {
-            output.push_str("*No files referenced via attachments.*\n\n");
+        if self.reused_contract_context.is_empty() {
+            output.push_str("*No files referenced via reused_contract_context.*\n\n");
         } else {
-            for file_ref in &self.attachments {
+            for file_ref in &self.reused_contract_context {
                 output.push_str(&format!("### {}\n", file_ref.file_path));
                 for reference in &file_ref.references {
                     let link =
@@ -111,8 +113,9 @@ impl ResourcesReport {
             self.summary.total_relation_files, self.summary.total_relation_references
         ));
         output.push_str(&format!(
-            "- **Attachment Files:** {} ({} references)\n",
-            self.summary.total_attachment_files, self.summary.total_attachment_references
+            "- **ReusedContractContextEntry Files:** {} ({} references)\n",
+            self.summary.total_reused_contract_context_files,
+            self.summary.total_reused_contract_context_references
         ));
 
         output
@@ -124,8 +127,8 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
     // Collect InternalPath relations: file_path -> Vec<(relation_type, element_id, element_name)>
     let mut relation_map: HashMap<PathBuf, Vec<(String, String, String)>> = HashMap::new();
 
-    // Collect FilePath attachments: file_path -> Vec<(element_id, element_name)>
-    let mut attachment_map: HashMap<PathBuf, Vec<(String, String)>> = HashMap::new();
+    // Collect FilePath reused_contract_context: file_path -> Vec<(element_id, element_name)>
+    let mut reused_context_map: HashMap<PathBuf, Vec<(String, String)>> = HashMap::new();
 
     // Iterate all elements
     for element in registry.get_all_elements() {
@@ -144,15 +147,15 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
             }
         }
 
-        // Process attachments with FilePath targets
-        for attachment in &element.attachments {
-            if let AttachmentTarget::FilePath(path) = &attachment.target {
-                attachment_map
+        // Process reused_contract_context with FilePath targets
+        for reused_contract_context in &element.reused_contract_context {
+            if let ReusedContractContextTarget::FilePath(path) = &reused_contract_context.target {
+                reused_context_map
                     .entry(path.clone())
                     .or_default()
                     .push((element_id.clone(), element_name.clone()));
             }
-            // Skip ElementIdentifier attachments - they reference model elements, not files
+            // Skip ElementIdentifier reused_contract_context - they reference model elements, not files
         }
     }
 
@@ -182,8 +185,8 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
     // Sort by file path
     relations.sort_by(|a, b| a.file_path.cmp(&b.file_path));
 
-    // Build sorted attachments list
-    let mut attachments: Vec<FileReferences> = attachment_map
+    // Build sorted reused_contract_context list
+    let mut reused_contract_context: Vec<FileReferences> = reused_context_map
         .into_iter()
         .map(|(path, mut refs)| {
             // Sort references by element_id
@@ -206,20 +209,23 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
         .collect();
 
     // Sort by file path
-    attachments.sort_by(|a, b| a.file_path.cmp(&b.file_path));
+    reused_contract_context.sort_by(|a, b| a.file_path.cmp(&b.file_path));
 
     // Calculate totals
     let total_relation_references: usize = relations.iter().map(|f| f.references.len()).sum();
-    let total_attachment_references: usize = attachments.iter().map(|f| f.references.len()).sum();
+    let total_reused_contract_context_references: usize = reused_contract_context
+        .iter()
+        .map(|f| f.references.len())
+        .sum();
 
     ResourcesReport {
         summary: ResourcesSummary {
             total_relation_files: relations.len(),
-            total_attachment_files: attachments.len(),
+            total_reused_contract_context_files: reused_contract_context.len(),
             total_relation_references,
-            total_attachment_references,
+            total_reused_contract_context_references,
         },
         relations,
-        attachments,
+        reused_contract_context,
     }
 }

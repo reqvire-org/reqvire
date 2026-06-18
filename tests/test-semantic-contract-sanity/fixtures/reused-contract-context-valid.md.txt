@@ -1,0 +1,103 @@
+# Elements
+
+### Billing Capability
+
+Billing capability.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * specifiedBy: [Billing Requirement](#billing-requirement)
+---
+
+### Billing Ontology
+
+Billing ontology.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
+
+#### Ontology
+```turtle
+@prefix test: <https://example.test/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/ontology> a owl:Ontology .
+test:BillingPayload a owl:Class .
+```
+
+---
+
+### Billing Requirement
+
+The system shall validate billing payloads with customer identifiers.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Billing Capability](#billing-capability)
+  * constrainedBy: [Billing Shape Contract](#billing-shape-contract)
+---
+
+### Billing Shape Contract
+
+Billing shape contract.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Billing Requirement](#billing-requirement)
+  * use: [Customer Ontology](#customer-ontology)
+
+#### Shapes
+```turtle
+@prefix test: <https://example.test/ontology#> .
+@prefix test: <https://example.test/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+test:BillingPayloadShape
+  a sh:NodeShape ;
+  sh:targetClass test:BillingPayload ;
+  sh:property [
+    sh:path test:customerId ;
+    sh:minCount 1 ;
+  ] .
+```
+---
+
+### Customer Capability
+
+Customer capability.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+---
+
+### Customer Ontology
+
+Customer ontology.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
+
+#### Relations
+  * derivedFrom: [Billing Ontology](#billing-ontology)
+
+#### Ontology
+```turtle
+@prefix test: <https://example.test/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/ontology> a owl:Ontology .
+test:customerId a owl:DatatypeProperty .
+```
+---

@@ -11,7 +11,7 @@ graph TD
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:2px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
-  classDef attachment fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;
+  classDef reused_contract_context fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;
 
   root["📁 Reqvire root"]
   class root folder
@@ -27,7 +27,7 @@ graph TD
   class specifications_Folder1_DesignDocuments folder
   specifications_Folder1_DesignDocuments_DesignDoc1["📝 DesignDoc1.md"]
   specifications_Folder1_DesignDocuments --> specifications_Folder1_DesignDocuments_DesignDoc1
-  class specifications_Folder1_DesignDocuments_DesignDoc1 attachment
+  class specifications_Folder1_DesignDocuments_DesignDoc1 reused_contract_context
   specifications_Folder1_Subfolder1["📁 Subfolder1"]
   specifications_Folder1 --> specifications_Folder1_Subfolder1
   class specifications_Folder1_Subfolder1 folder

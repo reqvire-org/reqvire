@@ -481,7 +481,7 @@ product patterns compose those primitives through typed semantic/token props.
 | `shell/` | `AppShell`, `ShellPane`, `PaneResizer`, `ShellMain`, `RouteFrame`, `RouteLayout`, `RoutePanel` |
 | `chrome/` | `WorkspaceToolbar`, `PaneChromeHeader`, `ReqvireRailMark` |
 | `side-pane/` | `SidePaneFrame`, pane filters, summaries, selections, trees, legends, and action rows |
-| `detail/` | `DetailDialog`, element detail content, relation and attachment lists, concept references, and ontology detail bodies |
+| `detail/` | `DetailDialog`, element detail content, relation and Reused Contract Context lists, concept references, and ontology detail bodies |
 | `content/` | `DocumentPanel`, `MarkdownFrame`, `DiagramBlockFrame`, `CodePreviewFrame`, `CodeToolbar`, `CodeBody`, `RendererNotice` |
 | `feedback/` | `StoreNotice`, `HelpContent`, `HelpDialog` |
 
@@ -745,6 +745,11 @@ Rejects undocumented primitive variable customization:
   - `--ds-*-active-*`
   - `--ds-*-focus-*`
   - `--ds-*-off-*`
+- rejects unknown custom properties:
+  - product patterns and app UI own `--ux-*`
+  - showcase scaffolding owns `--showcase-*`
+  - every other `var(--*)` must resolve to a token, documented `--ds-*`
+    customization, or owned local variable
 
 Rejects inline visual styling:
 
@@ -920,7 +925,11 @@ application code, `design-system/product-patterns/`, and
 `--ds-*` assignments: customizations are deny-by-default, and primitive
 interaction/state policy variables such as `--ds-*-sel-*`,
 `--ds-*-hover-*`, `--ds-*-active-*`, `--ds-*-focus-*`, and `--ds-*-off-*`
-are forbidden outside primitive components. The guard also rejects inline
+are forbidden outside primitive components. Unknown custom properties are also
+rejected outside their owning namespace: product patterns and application UI
+own `--ux-*`, showcase scaffolding owns `--showcase-*`, and every other
+`var(--*)` must resolve to a token, documented `--ds-*` customization, or an
+owned local variable. The guard also rejects inline
 visual styling in reusable components, product patterns, showcase pages, and
 application UI: `style={...}`, `CSSProperties`, and imperative `.style.*` /
 `setProperty(...)` mutation must live behind reusable primitive APIs such as

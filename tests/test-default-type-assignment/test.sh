@@ -243,17 +243,17 @@ No type metadata - should default to requirement.
 
 #### Relations
   * specify: #root-capability
-  * definedBy: [Source Refinement](#source-refinement)
-  * definedBy: [State Refinement](#state-refinement)
-  * definedBy: [Input Output Refinement](#input-output-refinement)
-  * constrainedBy: [Semantic Contract Refinement](#semantic-contract-refinement)
+  * definedBy: [Source Contract](#source-contract)
+  * definedBy: [State Contract](#state-contract)
+  * definedBy: [Input Output Contract](#input-output-contract)
+  * constrainedBy: [Semantic Contract](#semantic-contract)
 
 ### Capability
 
 #### Metadata
   * type: capability
 
-### Source Refinement
+### Source Contract
 
 #### Metadata
   * type: source
@@ -261,7 +261,7 @@ No type metadata - should default to requirement.
 #### Relations
   * define: #explicit-requirement
 
-### Semantic Contract Refinement
+### Semantic Contract
 
 #### Metadata
   * type: semantic-contract
@@ -367,7 +367,7 @@ reqvire:DefaultTypeContract a owl:Class .
   * derivedFrom: [Verification Objective](#verification-objective)
   * verify: #explicit-requirement
 
-### State Refinement
+### State Contract
 
 #### Metadata
   * type: state
@@ -375,7 +375,7 @@ reqvire:DefaultTypeContract a owl:Class .
 #### Relations
   * define: #explicit-requirement
 
-### Input Output Refinement
+### Input Output Contract
 
 #### Metadata
   * type: input-output
@@ -387,9 +387,6 @@ reqvire:DefaultTypeContract a owl:Class .
 
 #### Metadata
   * type: other-custom
-
-#### Relations
-  * trace: #explicit-requirement
 EOF
 
 printf "formal proof evidence placeholder\n" > "${TEST_DIR}/specifications/proof-report.txt"
@@ -416,8 +413,8 @@ TYPES_TO_CHECK=(
     "Explicit Requirement:requirement"
     "Capability:capability"
     "Ontology Element:ontology"
-    "Source Refinement:source"
-    "Semantic Contract Refinement:semantic-contract"
+    "Source Contract:source"
+    "Semantic Contract:semantic-contract"
     "Verification:test-verification"
     "Test Verification:test-verification"
     "Verification Objective:verification-objective"
@@ -426,8 +423,8 @@ TYPES_TO_CHECK=(
     "Analysis Verification:analysis-verification"
     "Inspection Verification:inspection-verification"
     "Demonstration Verification:demonstration-verification"
-    "State Refinement:state"
-    "Input Output Refinement:input-output"
+    "State Contract:state"
+    "Input Output Contract:input-output"
     "Other Type:custom"
 )
 

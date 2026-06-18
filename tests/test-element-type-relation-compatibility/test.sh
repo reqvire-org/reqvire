@@ -10,9 +10,8 @@
 # - invalid-derivedfrom/ - Invalid derivedFrom usages (should FAIL)
 # - invalid-satisfiedby/ - Invalid satisfiedBy usages (should FAIL)
 # - invalid-verifiedby/  - Invalid verifiedBy/verify usages (should FAIL)
-# - invalid-refinement/  - Refinement types with relations (should FAIL)
-# - invalid-capability-refinements/ - Capability-owned refinements (should FAIL)
-# - valid-trace/         - Valid trace relations for all types (should PASS)
+# - invalid-contract/  - Contract types with relations (should FAIL)
+# - invalid-capability-contracts/ - Capability-owned contracts (should FAIL)
 #
 # See TEST_MATRIX.md for complete test case documentation.
 
@@ -112,115 +111,99 @@ if ! echo "$OUTPUT_VERIFIEDBY" | grep -qi "verifiedBy\|verify\|incompatible"; th
   exit 1
 fi
 
-# Test 5: Refinement types with relations should fail
-echo "Test 5: Refinement types with relations"
+# Test 5: Contract types with relations should fail
+echo "Test 5: Contract types with relations"
 
 set +e
-OUTPUT_REFINEMENT=$(cd "${TEST_DIR}/invalid-refinement" && "$REQVIRE_BIN" validate 2>&1)
-EXIT_CODE_REFINEMENT=$?
+OUTPUT_CONTRACT=$(cd "${TEST_DIR}/invalid-contract" && "$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE_CONTRACT=$?
 set -e
 
-if [ $EXIT_CODE_REFINEMENT -eq 0 ]; then
-  echo "FAILED: Refinement types with relations should fail validation but returned success"
-  echo "Output: $OUTPUT_REFINEMENT"
+if [ $EXIT_CODE_CONTRACT -eq 0 ]; then
+  echo "FAILED: Contract types with relations should fail validation but returned success"
+  echo "Output: $OUTPUT_CONTRACT"
   exit 1
 fi
 
-# Check for refinement type error
-if ! echo "$OUTPUT_REFINEMENT" | grep -qi "refinement\|constraint\|behavior\|specification\|cannot.*relation\|not.*allowed"; then
-  echo "FAILED: Expected error message about refinement types not allowed to have relations"
-  echo "Output: $OUTPUT_REFINEMENT"
+# Check for contract type error
+if ! echo "$OUTPUT_CONTRACT" | grep -qi "contract\|constraint\|behavior\|specification\|cannot.*relation\|not.*allowed"; then
+  echo "FAILED: Expected error message about contract types not allowed to have relations"
+  echo "Output: $OUTPUT_CONTRACT"
   exit 1
 fi
 
-# Test 6: Valid trace relations should pass
-# Test 6: Capability-owned refinements should fail
-echo "Test 6: Capability-owned refinements"
+# Test 6: Capability-owned contracts should fail
+echo "Test 6: Capability-owned contracts"
 
 set +e
-OUTPUT_CAPABILITY_REFINEMENTS=$(cd "${TEST_DIR}/invalid-capability-refinements" && "$REQVIRE_BIN" validate 2>&1)
-EXIT_CODE_CAPABILITY_REFINEMENTS=$?
+OUTPUT_CAPABILITY_CONTRACTS=$(cd "${TEST_DIR}/invalid-capability-contracts" && "$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE_CAPABILITY_CONTRACTS=$?
 set -e
 
-if [ $EXIT_CODE_CAPABILITY_REFINEMENTS -eq 0 ]; then
-  echo "FAILED: Capability-owned refinements should fail validation but returned success"
-  echo "Output: $OUTPUT_CAPABILITY_REFINEMENTS"
+if [ $EXIT_CODE_CAPABILITY_CONTRACTS -eq 0 ]; then
+  echo "FAILED: Capability-owned contracts should fail validation but returned success"
+  echo "Output: $OUTPUT_CAPABILITY_CONTRACTS"
   exit 1
 fi
 
-if ! echo "$OUTPUT_CAPABILITY_REFINEMENTS" | grep -qi "definedBy.*should connect a requirement\\|define.*should connect.*to a requirement"; then
-  echo "FAILED: Expected error message about capability-owned refinement restrictions"
-  echo "Output: $OUTPUT_CAPABILITY_REFINEMENTS"
+if ! echo "$OUTPUT_CAPABILITY_CONTRACTS" | grep -qi "definedBy.*should connect a requirement\\|define.*should connect.*to a requirement"; then
+  echo "FAILED: Expected error message about capability-owned contract restrictions"
+  echo "Output: $OUTPUT_CAPABILITY_CONTRACTS"
   exit 1
 fi
 
-# Test 7: Valid trace relations should pass
-echo "Test 7: Valid trace relations"
+# Test 7: Valid contract define relations should pass
+echo "Test 7: Valid contract define relations"
 
 set +e
-OUTPUT_TRACE=$(cd "${TEST_DIR}/valid-trace" && "$REQVIRE_BIN" validate 2>&1)
-EXIT_CODE_TRACE=$?
+OUTPUT_CONTRACT_SATISFY=$(cd "${TEST_DIR}/valid-contract-satisfy" && "$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE_CONTRACT_SATISFY=$?
 set -e
 
-if [ $EXIT_CODE_TRACE -ne 0 ]; then
-  echo "FAILED: Valid trace relations should pass validation"
-  echo "Exit code: $EXIT_CODE_TRACE"
-  echo "Output: $OUTPUT_TRACE"
+if [ $EXIT_CODE_CONTRACT_SATISFY -ne 0 ]; then
+  echo "FAILED: Valid contract define relations should pass validation"
+  echo "Exit code: $EXIT_CODE_CONTRACT_SATISFY"
+  echo "Output: $OUTPUT_CONTRACT_SATISFY"
   exit 1
 fi
 
-# Test 8: Valid refinement define relations should pass
-echo "Test 8: Valid refinement define relations"
+# Test 8: Contract types with reused_contract_context should fail
+echo "Test 8: Contract types with reused_contract_context"
 
 set +e
-OUTPUT_REFINEMENT_SATISFY=$(cd "${TEST_DIR}/valid-refinement-satisfy" && "$REQVIRE_BIN" validate 2>&1)
-EXIT_CODE_REFINEMENT_SATISFY=$?
+OUTPUT_CONTRACT_ATTACH=$(cd "${TEST_DIR}/invalid-contract-reused-context" && "$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE_CONTRACT_ATTACH=$?
 set -e
 
-if [ $EXIT_CODE_REFINEMENT_SATISFY -ne 0 ]; then
-  echo "FAILED: Valid refinement define relations should pass validation"
-  echo "Exit code: $EXIT_CODE_REFINEMENT_SATISFY"
-  echo "Output: $OUTPUT_REFINEMENT_SATISFY"
+if [ $EXIT_CODE_CONTRACT_ATTACH -eq 0 ]; then
+  echo "FAILED: Contract types with reused_contract_context should fail validation but returned success"
+  echo "Output: $OUTPUT_CONTRACT_ATTACH"
   exit 1
 fi
 
-# Test 9: Refinement types with attachments should fail
-echo "Test 9: Refinement types with attachments"
+# Check for contract reused_contract_context error
+if ! echo "$OUTPUT_CONTRACT_ATTACH" | grep -qi "contract.*cannot have reused_contract_context\|cannot.*reused_contract_context"; then
+  echo "FAILED: Expected error message about contract types not allowed to have reused_contract_context"
+  echo "Output: $OUTPUT_CONTRACT_ATTACH"
+  exit 1
+fi
+
+# Test 10: Verification types with reused_contract_context should fail
+echo "Test 10: Verification types with reused_contract_context"
 
 set +e
-OUTPUT_REFINEMENT_ATTACH=$(cd "${TEST_DIR}/invalid-refinement-attachment" && "$REQVIRE_BIN" validate 2>&1)
-EXIT_CODE_REFINEMENT_ATTACH=$?
-set -e
-
-if [ $EXIT_CODE_REFINEMENT_ATTACH -eq 0 ]; then
-  echo "FAILED: Refinement types with attachments should fail validation but returned success"
-  echo "Output: $OUTPUT_REFINEMENT_ATTACH"
-  exit 1
-fi
-
-# Check for refinement attachment error
-if ! echo "$OUTPUT_REFINEMENT_ATTACH" | grep -qi "refinement.*cannot have attachments\|cannot.*attachment"; then
-  echo "FAILED: Expected error message about refinement types not allowed to have attachments"
-  echo "Output: $OUTPUT_REFINEMENT_ATTACH"
-  exit 1
-fi
-
-# Test 10: Verification types with attachments should fail
-echo "Test 10: Verification types with attachments"
-
-set +e
-OUTPUT_VERIFICATION_ATTACH=$(cd "${TEST_DIR}/invalid-verification-attachment" && "$REQVIRE_BIN" validate 2>&1)
+OUTPUT_VERIFICATION_ATTACH=$(cd "${TEST_DIR}/invalid-verification-reused-context" && "$REQVIRE_BIN" validate 2>&1)
 EXIT_CODE_VERIFICATION_ATTACH=$?
 set -e
 
 if [ $EXIT_CODE_VERIFICATION_ATTACH -eq 0 ]; then
-  echo "FAILED: Verification types with attachments should fail validation but returned success"
+  echo "FAILED: Verification types with reused_contract_context should fail validation but returned success"
   echo "Output: $OUTPUT_VERIFICATION_ATTACH"
   exit 1
 fi
 
-if ! echo "$OUTPUT_VERIFICATION_ATTACH" | grep -qi "cannot author attachments\|verification evidence.*satisfiedBy\|verified targets.*verify"; then
-  echo "FAILED: Expected error message about verification elements not authoring attachments"
+if ! echo "$OUTPUT_VERIFICATION_ATTACH" | grep -qi "cannot author reused_contract_context\|verification evidence.*satisfiedBy\|verified targets.*verify"; then
+  echo "FAILED: Expected error message about verification elements not authoring reused_contract_context"
   echo "Output: $OUTPUT_VERIFICATION_ATTACH"
   exit 1
 fi

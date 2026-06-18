@@ -1,8 +1,0 @@
-
-❌ 3 validation failed with error(s):
-
-  1. Invalid attachment scope: 'Spec-1' cannot be attached to 'User Req A With Attachment' because it is within the contract's defining hierarchy. Attachments are only allowed from elements outside the definedBy chain. (file: specifications/TestDefiningAttachment.md, element: User Req A With Attachment)
-
-  2. Invalid markdown structure: Contract 'Spec-1' is owned by multiple elements: 'User Req A' and 'User Req A With Attachment'. Each contract can only be owned by one requirement via definedBy; contracts are requirement-owned only.
-
-  3. Cross-section duplicate: Cross-section duplicate in element 'User Req A With Attachment': target 'specifications/Refinements.md#spec-1' appears in both Relations and Attachments (file: specifications/TestDefiningAttachment.md)

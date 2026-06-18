@@ -109,7 +109,7 @@ This requirement is owned by `Standalone Submodel Root`.
 
 ### Cross-Submodel Linked Requirement
 
-This requirement should only be modeled via attachment, not by hierarchical relation.
+This requirement should only be modeled via reused_contract_context, not by hierarchical relation.
 
 #### Metadata
   * type: requirement

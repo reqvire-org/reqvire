@@ -67,8 +67,8 @@ Use `--short` when analyzing model structure without needing full content. Use `
 | `--filter-page-content` | Filter by file frontmatter | `--filter-page-content="security"` |
 | `--have-relations` | Elements with ALL relations | `--have-relations="verifiedBy,satisfiedBy"` |
 | `--not-have-relations` | Elements without ALL relations | `--not-have-relations="verifiedBy"` |
-| `--has-attachments` | Elements with attachments | `--has-attachments` |
-| `--filter-attachment` | Filter by attachment pattern | `--filter-attachment="*.pdf"` |
+| `--has-reused-contract-context` | Elements with reused_contract_context | `--has-reused-contract-context` |
+| `--filter-reused-contract-context` | Filter by reused_contract_context pattern | `--filter-reused-contract-context="*.pdf"` |
 
 **Element types for --filter-type (supports comma-separated list):** capability, requirement, ontology, semantic-contract, verification-objective, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
 
@@ -122,13 +122,13 @@ reqvire search --have-relations="verifiedBy,satisfiedBy" --short
 reqvire search --filter-type="specification" --not-have-relations="define" --short
 ```
 
-### By Attachments
+### By Reused Contract Context
 ```bash
-# Find elements with attachments
-reqvire search --has-attachments --short
+# Find elements with reused_contract_context
+reqvire search --has-reused-contract-context --short
 
-# Find elements with specific attachment type
-reqvire search --filter-attachment="*.pdf" --short
+# Find elements with specific reused_contract_context type
+reqvire search --filter-reused-contract-context="*.pdf" --short
 reqvire search --filter-type="specification" --short
 ```
 
@@ -161,7 +161,7 @@ reqvire resources
 
 When you find an element of interest:
 1. Read the full element content (not just --short output)
-2. Check for **attachments** - they contain critical details
+2. Check for **reused_contract_context** - they contain critical details
 3. Follow relations to understand context:
    - `derivedFrom` → parent requirements (why this exists)
    - `satisfiedBy` → implementations (how it's fulfilled)
@@ -170,7 +170,7 @@ When you find an element of interest:
 To gather complete context for a requirement, use the collect command:
 
 ```bash
-# Get full requirement chain with all ancestor content and attachments
+# Get full requirement chain with all ancestor content and reused_contract_context
 reqvire collect "<requirement-name>" [--json]
 
 # Example: collect all context for a capability
@@ -182,8 +182,8 @@ reqvire collect "System Requirement" --json
 
 The collect command traverses `derivedFrom` relations upward and includes:
 - All ancestor requirement content
-- Attached markdown files (read as content)
-- Attached contract elements (specifications, constraints, behaviors)
+- Reused markdown files (read as content)
+- Reused contract elements (specifications, constraints, behaviors)
 - Source citations for traceability
 
 **When to use collect:**

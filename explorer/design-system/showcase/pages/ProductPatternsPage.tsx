@@ -32,7 +32,7 @@ import {
   StoreNotice,
   TreeItem,
   TypeBadge,
-  type DetailAttachmentItem,
+  type DetailReusedContractContextItem,
   type DetailConceptReferenceItem,
   type DetailMetaBadge,
   type DetailRelationItem,
@@ -104,7 +104,7 @@ interface ShowcaseDetailElement {
   metaBadges: DetailMetaBadge[];
   content: ReactNode;
   relations: DetailRelationItem[];
-  attachments: DetailAttachmentItem[];
+  reused_contract_context: DetailReusedContractContextItem[];
   conceptReferences: DetailConceptReferenceItem[];
 }
 
@@ -124,7 +124,7 @@ const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
       </MarkdownFrame>
     ),
     relations: DETAIL_RELATIONS,
-    attachments: DETAIL_ATTACHMENTS,
+    reused_contract_context: DETAIL_ATTACHMENTS,
     conceptReferences: DETAIL_CONCEPT_REFERENCES,
   },
   "VER-DET-010": {
@@ -170,7 +170,7 @@ const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
         },
       },
     ],
-    attachments: DETAIL_ATTACHMENTS,
+    reused_contract_context: DETAIL_ATTACHMENTS,
     conceptReferences: DETAIL_CONCEPT_REFERENCES,
   },
   "CAP-DET-001": {
@@ -203,7 +203,7 @@ const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
         },
       },
     ],
-    attachments: [],
+    reused_contract_context: [],
     conceptReferences: DETAIL_CONCEPT_REFERENCES,
   },
 };
@@ -393,7 +393,7 @@ export function ProductPatternsPage() {
                   <rect x="448" y="42" width="156" height="76" rx="8" fill="var(--resource-tint)" stroke="var(--resource)" />
                   <text x="526" y="76" textAnchor="middle" fill="var(--text-strong)">Evidence</text>
                   <path d="M176 80 H232" stroke="var(--edge-trace)" strokeWidth="3" />
-                  <path d="M392 80 H448" stroke="var(--edge-attach)" strokeWidth="3" />
+                  <path d="M392 80 H448" stroke="var(--edge-reuse)" strokeWidth="3" />
                 </svg>
               </DiagramBlockFrame>
               <RendererNotice title="Renderer note">
@@ -455,7 +455,7 @@ export function ProductPatternsPage() {
                 </MarkdownFrame>
               }
               relations={DETAIL_RELATIONS}
-              attachments={DETAIL_ATTACHMENTS}
+              reused_contract_context={DETAIL_ATTACHMENTS}
               conceptReferences={DETAIL_CONCEPT_REFERENCES}
               onOpenElement={openElementDialog}
               onOpenConceptReference={(reference) => {
@@ -546,7 +546,7 @@ export function ProductPatternsPage() {
           metaBadges={currentElement.metaBadges}
           content={currentElement.content}
           relations={currentElement.relations}
-          attachments={currentElement.attachments}
+          reused_contract_context={currentElement.reused_contract_context}
           conceptReferences={currentElement.conceptReferences}
           onOpenElement={pushElementDialog}
           onOpenConceptReference={(reference) => {

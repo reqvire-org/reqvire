@@ -48,6 +48,7 @@ config, and dist output are build/runtime artifacts, never tracked source.
 - No app or product-pattern CSS targeting `.ds-*` internals. Consumers use public props, `data-*`, documented CSS variables, or exported product-pattern components.
 - No undocumented `--ds-*` assignments outside DS primitives. The allowlist is deny-by-default and should contain only context, density, or composition variables.
 - No primitive state-policy variables outside primitives: `--ds-*-sel-*`, `--ds-*-hover-*`, `--ds-*-active-*`, `--ds-*-focus-*`, `--ds-*-off-*`.
+- No unknown custom-property plumbing. Product patterns and app UI may use owned `--ux-*`; showcase scaffolding may use `--showcase-*`; any other `var(--*)` must be a real token, documented `--ds-*` customization, or owned local variable.
 - No raw visual values outside token/source-of-truth files: raw px/rem/colors, `color-mix`, raw filter functions, durations, easing, z-index, or font stacks.
 - No generated artifacts tracked as source, no hand-maintained generated CSS/icons/bundles, and no direct DS internal imports from consumer app code.
 - Exported component/product-pattern prop types that extend React DOM attributes must omit `"style"` by default.

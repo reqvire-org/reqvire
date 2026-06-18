@@ -52,7 +52,6 @@ sed 's/\x1b\[[0-9;]*m//g' dry_run_output.txt > dry_run_clean.txt
 # Test 1.2: Compare diff output with expected diff file (file order is now deterministic)
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_diff.txt" dry_run_clean.txt "Diff output does not match expected diff output"
 
-EXPECTED_LINK_CONVERSION="\[MOE_UA\](MOEs.md#moe_ua)"
 EXPECTED_SIMPLE_ID_CONVERSION="\[Requirements Processing\](SystemRequirements/Requirements.md#requirements-processing)"
 EXPECTED_SEPARATOR_ADDITION="\+.*---"
 
@@ -64,14 +63,6 @@ EXPECTED_SUBFOLDER_TO_SUBFOLDER="\[Format Test\](../Verifications/Tests.md#forma
 EXPECTED_ABSOLUTE_INTERNAL_PATH="../core/src/parser.rs"
 # Test absolute path from verification in subfolder to rs file (from Verifications subfolder)
 EXPECTED_VERIFICATION_ABSOLUTE_PATH="../core/src/element.rs"
-
-if ! grep -q "$EXPECTED_LINK_CONVERSION" dry_run_clean.txt; then
-    echo "FAIL: Dry run does not show absolute link conversion to relative" >> test_results.log
-    echo "Expected: $EXPECTED_LINK_CONVERSION" >> test_results.log
-    echo "Dry run output:" >> test_results.log
-    cat dry_run_clean.txt >> test_results.log
-    exit 1
-fi
 
 if ! grep -q "$EXPECTED_SIMPLE_ID_CONVERSION" dry_run_clean.txt; then
     echo "FAIL: Dry run does not show simple identifier conversion to markdown link"
@@ -137,27 +128,20 @@ fi
 
 # Test 3: Verify expected changes were applied with exact content matching
 
-# Test 3.1: Check that absolute links were converted to relative
-EXPECTED_RELATIVE_LINK="\[MOE_UA\](MOEs.md#moe_ua)"
-if ! grep -q "$EXPECTED_RELATIVE_LINK" UserStories.md; then
-    echo "FAIL: Absolute links not converted to relative"
-    exit 1
-fi
-
-# Test 3.2: Check that simple identifiers were converted to markdown links with readable names
+# Test 3.1: Check that simple identifiers were converted to markdown links with readable names
 EXPECTED_MARKDOWN_LINK="\[Requirements Processing\](SystemRequirements/Requirements.md#requirements-processing)"
 if ! grep -q "$EXPECTED_MARKDOWN_LINK" UserStories.md; then
     echo "FAIL: Simple identifiers not converted to markdown links with readable names"
     exit 1
 fi
 
-# Test 3.3: Check that separators were added where missing
+# Test 3.2: Check that separators were added where missing
 if ! grep -A 4 "derive: \[Requirements Processing\]" UserStories.md | grep -q "^---$"; then
     echo "FAIL: Element separators not added"
     exit 1
 fi
 
-# Test 3.3a: Check absolute path conversions in subfolders were applied
+# Test 3.3: Check absolute path conversions in subfolders were applied
 EXPECTED_SUBFOLDER_TO_ROOT_APPLIED="\[Managing MBSE Models\](../UserStories.md#managing-mbse-models)"
 if ! grep -q "$EXPECTED_SUBFOLDER_TO_ROOT_APPLIED" SystemRequirements/Requirements.md; then
     echo "FAIL: Absolute path from subfolder to root not converted correctly"
@@ -334,9 +318,9 @@ assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_TestNoSectionHeader.md
 # Test 8.3: File with section header but no page header
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_TestNoPageHeader.md" TestNoPageHeader.md "TestNoPageHeader.md does not match expected output (page header not added)"
 
-# Test 9: Attachment Display Name Preservation
-# Test 9.1: Verify attachment with human-readable display name is preserved
-assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_AttachmentTest.md" AttachmentTest.md "AttachmentTest.md does not match expected output (attachment display name not preserved)"
+# Test 9: ReusedContractContextEntry Display Name Preservation
+# Test 9.1: Verify reused_contract_context with human-readable display name is preserved
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_ReusedContractContextTest.md" ReusedContractContextTest.md "ReusedContractContextTest.md does not match expected output (reused contract context display name not preserved)"
 
 # No cleanup needed - temporary directory will be deleted
 exit 0

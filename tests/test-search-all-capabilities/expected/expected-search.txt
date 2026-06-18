@@ -35,7 +35,6 @@
         ↪ derive: specifications/Requirements.md#requirement-with-valid-standard-relations (identifier)
         ↪ derivedFrom: specifications/Requirements.md#root-capability (identifier)
         ↪ satisfiedBy: specifications/DesignSpecifications/SampleDSD.md (internal-path)
-        ↪ trace: specifications/DesignSpecifications/SampleDSD.md (internal-path)
         ↪ verifiedBy: specifications/Requirements.md#search-command-verification (identifier)
         ↪ verifiedBy: specifications/Requirements.md#verification-of-standard-relations (identifier)
 
@@ -141,7 +140,7 @@ Total elements: 10
 📋 Semantic Contract Types:
   semantic-contract: 0
 
-📋 Refinement Types:
+📋 Contract Types:
   behavior: 0
   constraint: 0
   input-output: 0

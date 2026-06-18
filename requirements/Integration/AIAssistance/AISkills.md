@@ -7,8 +7,8 @@ The system shall define a dedicated AI-assistant skills submodel that provides i
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Refinement Specification](../../ModelStructure/Specifications.md#contract-specification)
+#### Reused Contract Context
+  * [Contract Specification](../../ModelStructure/Specifications.md#contract-specification)
   * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
   * [Traceability Reporting Specification](../../Reports/ModelReports/Specifications.md#traceability-reporting-specification)
@@ -24,7 +24,7 @@ The system shall define a dedicated AI-assistant skills submodel that provides i
 The system shall define AI skill instruction contracts that describe MBSE-first Reqvire workflows, including boundary clarification and verification-aligned change sequencing.
 
 #### Details
-Instruction contract details shall follow the associated refinement specification.
+Instruction contract details shall follow the associated contract specification.
 
 #### Metadata
   * type: requirement
@@ -39,7 +39,7 @@ Instruction contract details shall follow the associated refinement specificatio
 The system shall produce traceable markdown skill artifacts that implement the AI assistant skill guidance contracts for supported assistant ecosystems.
 
 #### Details
-Artifact contract details shall follow the associated refinement specification.
+Artifact contract details shall follow the associated contract specification.
 
 #### Metadata
   * type: requirement

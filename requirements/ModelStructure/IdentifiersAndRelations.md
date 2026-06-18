@@ -35,7 +35,7 @@ Reference target kind vocabulary is defined by the Reqvire core element ontology
   - **Example**: `"https://example.com"`
 - **InternalPath**
   - An internal filesystem file path without fragment, pointing to implementation files.
-  - Used for satisfaction and traceability relations (e.g., `satisfiedBy`, `satisfy`, `trace`)
+  - Used for implementation and evidence satisfaction relations (e.g., `satisfiedBy`, `satisfy`)
   - **Example**: `"../../core/src/diagrams.rs"`
 
 
@@ -242,7 +242,7 @@ If the referenced file is located in a subfolder relative to the current documen
 ```markdown
 
 #### Relations
-  * derive: [subfolder/details.md#refined-section](subfolder/details.html#refined-section)
+  * derive: [subfolder/details.md#detail-section](subfolder/details.html#detail-section)
 
 ```
 
@@ -267,7 +267,7 @@ This element contains invalid relation entries.
   * derivedFrom: [Element2](#element2)
 * InvalidEntry
 * : MissingRelationType
-  * trace: [path/to/file.md](path/to/file.html)
+  * invalidRelation: [path/to/file.md](path/to/file.html)
 ```
 
 ## Identifier Usage in Relations

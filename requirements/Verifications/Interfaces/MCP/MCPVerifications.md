@@ -15,11 +15,13 @@ This objective groups verification that Reqvire MCP servers, tools, resources, p
   * derive: [MCP Model Evidence Tools Verification](#mcp-model-evidence-tools-verification)
   * derive: [MCP Mutation Execution Flow Verification](#mcp-mutation-execution-flow-verification)
   * derive: [MCP Mutation Tool Safety Verification](#mcp-mutation-tool-safety-verification)
+  * derive: [MCP Prompt Guidance Verification](#mcp-prompt-guidance-verification)
   * derive: [MCP Protocol Standard Conformance Verification](#mcp-protocol-standard-conformance-verification)
   * derive: [MCP Quality Traceability Tools Verification](#mcp-quality-traceability-tools-verification)
   * derive: [MCP Resource Interface Verification](#mcp-resource-interface-verification)
   * derive: [MCP Semantic Prefix Registry Tools Verification](#mcp-semantic-prefix-registry-tools-verification)
   * derive: [MCP Semantic Query Tools Verification](#mcp-semantic-query-tools-verification)
+  * derive: [MCP Semantic Vocabulary Tools Verification](#mcp-semantic-vocabulary-tools-verification)
   * derive: [MCP Server Command Verification](#mcp-server-command-verification)
   * derive: [MCP Server End-to-End Verification](#mcp-server-end-to-end-verification)
   * derive: [MCP Server State and Cache Verification](#mcp-server-state-and-cache-verification)
@@ -115,7 +117,7 @@ Expected checks:
 - Verify `reqvire.semantic.ontologies` filters to RDF-only or SHACL-only content when the `content` argument is set.
 - Read element returns `concept_references` for elements that author `#### Concept References`.
 - Collect returns authored concept references for capability and requirement elements and semantic-contract ontology-use context where the underlying operation returns semantic-contract evidence.
-- Results include evidence references for relevant files, elements, relations, and attachments.
+- Results include evidence references for relevant files, elements, relations, and reused_contract_context.
 - Read tools are allowed on dirty worktrees only when the result marks dirty state.
 - Read tools do not mutate the filesystem.
 
@@ -160,7 +162,7 @@ Expected checks:
 - Mutation tools are present in MCP `tools/list` and accept execution requests only when the server was started with `--enable-mutations`.
 - Operation-specific preview mutation requests, such as `dry_run: true`, return changed files and diffs or equivalent change descriptions without filesystem changes.
 - Non-dry-run requests use Reqvire core mutation logic and flush filesystem changes before reporting success.
-- Non-dry-run mutation requests that would break requirement attachment compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, or single ontology-root validation are rejected before persistence.
+- Non-dry-run mutation requests that would break requirement reused_contract_context compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, or single ontology-root validation are rejected before persistence.
 - After successful mutation, subsequent MCP reads observe the refreshed internal graph state.
 - Post-mutation results include validation summary, refreshed model revision, and affected element/submodel metadata.
 
@@ -181,7 +183,7 @@ Expected checks:
 - Send a request with an unsupported `Mcp-Protocol-Version` HTTP header and verify RMCP rejects it before tool execution.
 - Verify the server declares MCP `tools` capability when tool calls are available.
 - Verify the server declares MCP `resources` capability only when resources are available.
-- Verify MVP capability objects do not advertise prompts, logging, completions, or tasks unless those capabilities are implemented.
+- Verify implemented capability objects advertise tools, resources, and prompts, and do not advertise logging, completions, or tasks unless those capabilities are implemented.
 - Verify `tools.listChanged`, `resources.listChanged`, and `resources.subscribe` are omitted or false in MVP.
 - Verify Reqvire-specific fields such as workspace status, model revision, Reqvire tool contract version, and mutation mode are returned through Reqvire tools/resources, not custom top-level MCP capabilities.
 - Verify `tools/list` returns concrete tool definitions with valid `inputSchema` and expected annotations.
@@ -193,6 +195,27 @@ Expected checks:
 
 #### Relations
   * verify: [MCP Protocol Standard Conformance](../../../Interfaces/MCP/Tools.md#mcp-protocol-standard-conformance)
+---
+
+### MCP Prompt Guidance Verification
+
+This verification shall prove that MCP prompt templates are discoverable, retrievable, build-time static, and useful for regular Reqvire and semantic query workflows.
+
+#### Details
+Expected checks:
+- Verify initialization advertises a standard MCP prompts capability.
+- Verify `prompts/list` returns regular workflow prompts and semantic query prompts.
+- Verify `prompts/get` for `reqvire.semantic.query` returns text that references semantic vocabulary, prefix, and SPARQL tools.
+- Verify `prompts/get` for a regular workflow prompt returns text that references standard Reqvire model exploration tools.
+- Verify unknown prompt names return a protocol error.
+- Verify prompt retrieval does not mutate model source files.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * verify: [MCP Prompt Guidance](../../../Interfaces/MCP/Tools.md#mcp-prompt-guidance)
 ---
 
 ### MCP Quality Traceability Tools Verification
@@ -246,6 +269,7 @@ Expected checks:
 - Verify `tools/list` advertises `reqvire.semantic.sparql` as a read-only tool.
 - Verify `reqvire.semantic.sparql` executes a SELECT query over authored ontology and SHACL RDF.
 - Verify `reqvire.semantic.sparql` uses full semantic graph context by default, including generated model-context triples.
+- Verify the full semantic graph materializes relation-family normalized predicates equivalent to the relation-family CONSTRUCT query specification.
 - Verify SELECT results include ordered variables, bindings, RDF term metadata, row count, semantic index summary, diagnostics, and model fingerprint.
 - Verify invalid SPARQL returns an MCP tool error rather than mutating files.
 
@@ -277,6 +301,27 @@ Expected checks:
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Semantic Prefix Registry Tools](../../../Interfaces/MCP/Tools.md#mcp-semantic-prefix-registry-tools)
+---
+
+### MCP Semantic Vocabulary Tools Verification
+
+This verification shall prove that MCP vocabulary discovery exposes compact paged semantic vocabulary with prefixes for SPARQL query construction.
+
+#### Details
+Expected checks:
+- Verify `tools/list` advertises `reqvire.semantic.vocabulary` as a read-only tool.
+- Verify `reqvire.semantic.vocabulary` with `section: "all"` returns section counts, prefixes, a SPARQL prefix block, diagnostics, and model fingerprint.
+- Verify `section: "relation_families"` returns relation family entries with normalized forward and inverse properties.
+- Verify paging returns `next_cursor` when a section has more items than the requested limit.
+- Verify query patterns include SPARQL examples when `include_examples` is true.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * verify: [MCP Semantic Vocabulary Tools](../../../Interfaces/MCP/Tools.md#mcp-semantic-vocabulary-tools)
 ---
 
 ### MCP Server Command Verification
@@ -399,7 +444,7 @@ Expected checks:
 - Verify each MCP `outputSchema` is generated from or explicitly checked against its shared Reqvire operation result contract.
 - Verify successful tool calls return `structuredContent` conforming to the declared `outputSchema`.
 - Verify structured results identify relevant workspace/model revision and dirty state when model state affects interpretation.
-- Verify structured results expose evidence references when the underlying Reqvire operation produces file, element, relation, attachment, report, or diff evidence.
+- Verify structured results expose evidence references when the underlying Reqvire operation produces file, element, relation, reused_contract_context, report, or diff evidence.
 - Verify element-shaped results preserve semantic model ADT fields when present, including `ontology`, `semantic_contract`, and `concept_references`.
 - Verify element/model/mutation/error-shaped results preserve the semantic obligations of the corresponding shared Reqvire result contract without requiring terminal-output parsing.
 - Verify removing or renaming stable structured fields requires a Reqvire tool contract version change.
@@ -448,7 +493,7 @@ Expected checks:
 - Verify `tools/list` does not include a generic shell or `reqvire.command` tool.
 - Verify `tools/list` does not include hidden/internal `shell` or `sout` commands.
 - Verify `tools/list` does not include `reqvire.mcp`, `reqvire.serve`, or `reqvire.validate` in MVP.
-- Verify no MCP prompts are advertised in MVP.
+- Verify prompt templates are advertised through `prompts/list`, not `tools/list`.
 - Verify CLI-only transport flags such as `--json` and `--output` are absent from MCP input schemas.
 - Verify CLI flags, modes, and sub-options are represented as typed request fields rather than nested tool names.
 

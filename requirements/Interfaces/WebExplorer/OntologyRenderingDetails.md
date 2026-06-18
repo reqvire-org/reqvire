@@ -15,11 +15,20 @@ The renderer is intentionally not a raw RDF triple viewer. It is an ontology-dia
 Rendering starts from the `SemanticIndex`:
 1. Authored ontology and SHACL blocks provide parsed RDF quads.
 2. The semantic contract projection materializes direct OWL/RDFS/SHACL constructs such as domain/range, subclass, membership, equivalence, inverse properties, property chains, property characteristics, restrictions, class expressions, and SHACL overlays.
-3. `build_graph_data` builds an `ontologyGraphData` JSON model containing semantic nodes, construct edges, property metadata, SHACL slot/facet records, badges, source links, and ontology-node detail evidence.
+3. `build_graph_data` builds an `ontologyGraphData` JSON model containing semantic nodes, construct edges, property metadata, SHACL slot/facet records, badges, source links, ontology-node detail evidence, and explicit graph layer/source-kind metadata.
 4. The browser module imports Graphology, Sigma, ForceAtlas2, `@sigma/edge-curve`, and `@sigma/node-image`.
 5. The browser creates a Sigma graph from the projected nodes and rendered links, applies layout, and declares typed Sigma node/edge programs for construct glyphs and ontology connectors.
 
 The generated `ontologyGraphData` is the contract between Rust projection logic and browser rendering. Filters and layout may hide graph items on the canvas, but they must not remove evidence from the selected ontology node modal.
+
+#### Graph Layers
+
+Ontology graph data uses explicit layers:
+- `authored` contains authored ontology and SHACL semantics plus projection facts derived from that authored content.
+- `reqvire-context` contains generated semantic context for model-to-term provenance only: model elements that `declaresTerm` or `referencesTerm` ontology terms.
+- `external-source` is reserved for imported external ontology vocabulary triples.
+
+The Ontologies view treats `authored` as the implicit base graph, not as an optional layer control. The left pane must not render an Authored row because disabling or selecting authored ontology content would remove the point of the ontology view itself. Semantic Context and External Sources are the only visible overlay filters, letting users inspect model-to-term provenance or external vocabulary without changing the primary authored ontology view.
 
 #### Semantic Projection
 The graph projection applies these rules before Sigma sees the graph:
@@ -125,6 +134,8 @@ The `Show` controls expose canvas visibility toggles in one button group:
 - External references
 
 Ontology terms and class-membership context are always available because hiding them removes the meaningful ontology graph backbone. Checked means shown. The default state shows the remaining visibility controls so the ontology map opens as a complete authored graph; relationship density is managed through hover/selection focus rather than by hiding the core graph by default.
+
+The `Overlays` controls expose only optional non-authored graph additions. Authored ontology content is implicit and is not shown as a layer row. Semantic Context and External Sources are the only checkable overlay rows. Semantic Context must not appear in the `Types` legend because it is provenance for model-to-term declaration/reference facts, not an ontology semantic node kind.
 
 The single `SHACL shapes` role filter controls both SHACL shape nodes and their SHACL overlay relations. The renderer must not expose a second SHACL slot-overlay checkbox that can hide overlay relations while leaving SHACL shape nodes visible, or vice versa.
 

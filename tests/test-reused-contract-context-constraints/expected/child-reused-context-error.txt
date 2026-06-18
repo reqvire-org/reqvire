@@ -1,0 +1,4 @@
+
+❌ 1 validation failed with error(s):
+
+  1. Invalid reused_contract_context scope: 'Spec-1' cannot be reused to 'Child Reusing Contract Spec' because it is within the contract's defining hierarchy. Reused Contract Context are only allowed from elements outside the definedBy chain. (file: specifications/TestChildReusedContractContext.md, element: Child Reusing Contract Spec)

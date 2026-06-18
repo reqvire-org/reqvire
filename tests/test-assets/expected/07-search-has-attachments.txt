@@ -1,2 +1,0 @@
-[requirement] specifications/Requirements.md#performance-requirement - Performance Requirement
-[capability] specifications/Requirements.md#refinement-target-requirement - Refinement Target Requirement

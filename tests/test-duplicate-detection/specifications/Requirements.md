@@ -31,20 +31,20 @@ This is the target element that will be linked to.
   * specify: [Test Capability](#test-capability-test-duplicate-detection-specifications-requirements-md)
 ---
 
-### Refinement Target
+### Contract Target
 
-A separate requirement for refinement ownership.
+A separate requirement for contract ownership.
 
 #### Metadata
   * type: requirement
 #### Relations
   * specify: [Test Capability](#test-capability-test-duplicate-detection-specifications-requirements-md)
-  * definedBy: [Refinement Element](#refinement-element)
+  * definedBy: [Contract Element](#contract-element)
 ---
 
-### Refinement Element
+### Contract Element
 
-This is a refinement element.
+This is a contract element.
 
 #### Metadata
   * type: behavior

@@ -20,7 +20,7 @@ Boundary rules:
   * define: [MCP Interface](InterfacesRequirements.md#mcp-interface)
 ---
 
-### Web Interface Refinement Specification
+### Web Interface Contract Specification
 
 #### Details
 The browse interface allows users to:

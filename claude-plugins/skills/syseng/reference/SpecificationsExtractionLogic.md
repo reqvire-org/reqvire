@@ -21,7 +21,7 @@ Extract technical specifications from requirement Details sections into separate
  - Main body has one more general statement and all other must be written in '#### Details' subsection
 - **Reusable Specifications**: Technical details in standalone elements
 - **Clear Ownership**: `definedBy` relations show which requirement owns the specification
-- **Cross-References**: Attachment relations provide supporting context without ownership
+- **Cross-References**: Reused Contract Context relations provide supporting context without ownership
 
 ## Refactoring Methodology
 
@@ -111,18 +111,18 @@ Concise EARS-style statement (1 sentence).
 **Ownership vs Reference:**
 
 - **definedBy Relation**: Used by the requirement that OWNS the specification (one-to-one or one-to-many)
-- **Attachment Relation**: Used by requirements OUTSIDE the owner's derivation hierarchy
+- **Reused Contract Context Relation**: Used by requirements OUTSIDE the owner's derivation hierarchy
 
-**Attachment Scope Constraints:**
+**Reused Contract Context Scope Constraints:**
 
 1. Contracts must have a `define` relation (established via requirement's `definedBy`)
-2. Only requirements OUTSIDE the owner's hierarchy can attach the contract
-3. Requirements in the same hierarchy (ancestors or descendants of owner) CANNOT attach
+2. Only requirements OUTSIDE the owner's hierarchy can reuse the contract
+3. Requirements in the same hierarchy (ancestors or descendants of owner) CANNOT reuse
 
 **Example:**
 ```markdown
 # In the plan
-**Deterministic Output Specification** - Owned by `Model Reports`, attach to:
+**Deterministic Output Specification** - Owned by `Model Reports`, reuse to:
 - `Some Other Capability` - *not in Model Reports hierarchy* ✓
   - MUST NOT ATTACH TO (in owner's hierarchy):
      - `Model Structure and Summaries` - *child of Model Reports* ✗
@@ -281,7 +281,7 @@ Extract when ANY of these conditions are true:
 3. Content includes algorithms, workflows, or processing rules
 4. Content defines output formats or data structures
 5. Content describes technical constraints or ordering rules
-6. Multiple requirements could benefit from referencing (attaching) this content
+6. Multiple requirements could benefit from referencing (reusesContract) this content
 
 ### When NOT to Extract
 
@@ -310,23 +310,23 @@ Examples:
 
 Specifications MUST NOT use EARS statements as those are not requirements.
 
-### Attachment vs definedBy
+### Reused Contract Context vs definedBy
 
 **Use definedBy when:**
 - Requirement OWNS the specification
 - Specification was extracted FROM this requirement
 - Requirement has primary responsibility for the technical content
 
-**Use Attachment when:**
+**Use Reused Contract Context when:**
 - Requirement REFERENCES specification for context
 - Specification owned by a requirement in a DIFFERENT derivation hierarchy
 - Specification provides supporting technical details
 - Multiple requirements (from different hierarchies) benefit from this specification
 
-**Attachment Constraint:**
-- Requirements in the same hierarchy as the owner CANNOT attach the contract
+**Reused Contract Context Constraint:**
+- Requirements in the same hierarchy as the owner CANNOT reuse the contract
 - They access the contract through the hierarchy relationship instead
-- Cross-hierarchy attachments enable requirements from separate branches to reference shared specs
+- Cross-hierarchy reused_contract_context enable requirements from separate branches to reference shared specs
 
 ## Quality Metrics
 
@@ -345,7 +345,7 @@ After refactoring, verify:
 Track these metrics:
 - **Line Reduction**: Requirements should be reduced by 80-90%
 - **Specifications Created**: Typically 1-2 per complex requirement
-- **Cross-References**: Average 3-5 attachments per specification
+- **Cross-References**: Average 3-5 reused_contract_context per specification
 
 ### Example Metrics (Phase 2)
 
@@ -353,8 +353,8 @@ Track these metrics:
 Specifications Extracted:     5
 Requirements Refactored:      4
 Total Line Reduction:         ~179 → ~20 lines (88.8%)
-Cross-Reference Attachments:  22 total
-Hierarchical Attachments:     15 total
+Cross-Reference Reused Contract Context:  22 total
+Hierarchical Reused Contract Context:     15 total
 Validation Errors:            0
 ```
 
@@ -373,7 +373,7 @@ Validation Errors:            0
 ### Pitfall 3: Unclear Ownership
 
 **Problem**: Multiple requirements use definedBy for same specification
-**Solution**: Only owner uses definedBy, others use attachments
+**Solution**: Only owner uses definedBy, others use reused_contract_context
 
 ### Pitfall 4: Orphaned Specifications
 
@@ -401,8 +401,8 @@ reqvire search --filter-type="capability" --short
 # Find requirements in specific subsystem
 reqvire search --filter-type="requirement" --filter-file="requirements/System/**" --short
 
-# Find requirements with attachments (may need conversion to satisfiedBy)
-reqvire search --filter-type="requirement" --has-attachments --short
+# Find requirements with reused_contract_context (may need conversion to satisfiedBy)
+reqvire search --filter-type="requirement" --has-reused-contract-context --short
 
 # Find contracts without define relations (orphaned specifications, constraints, behaviors, state, input-output, sources, and )
 reqvire search --filter-type="specification,constraint,behavior,state,input-output,source" --not-have-relations="define" --short

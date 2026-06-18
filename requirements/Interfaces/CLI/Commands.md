@@ -5,14 +5,14 @@
 The CLI interface shall implement the clear `[OPTIONS] <COMMAND> [COMMAND OPTIONS]` structure.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [CLI Interface Structure Refinement Specification](Specifications.md#cli-interface-structure-refinement-specification)
-  * derive: [Attachment Commands](#attachment-commands)
+  * definedBy: [CLI Interface Structure Contract Specification](Specifications.md#cli-interface-structure-contract-specification)
+  * derive: [Reused Contract Context Commands](#reused-contract-context-commands)
   * derive: [CLI Add Element Command](#cli-add-element-command)
   * derive: [CLI Change Impact Report Command](#cli-change-impact-report-command)
   * derive: [CLI Collect Command](#cli-collect-command)
@@ -43,28 +43,28 @@ Implementation details shall follow the associated refinement specifications.
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
-### Attachment Commands
+### Reused Contract Context Commands
 
-The system shall provide attachment management through the unified link/unlink commands using the 'attaching' keyword.
+The system shall provide reused_contract_context management through the unified link/unlink commands using the 'reusesContract' keyword.
 
 #### Details
-Attachment management behavior:
+Reused Contract Context management behavior:
 
-**Attach (via link):**
-- Syntax: `reqvire link <element-name> attaching <target> [--dry-run] [--json] [--output <FILE>]`
-- Target: Refinement element identifier
-- Create Attachments subsection if doesn't exist
-- Add link to subsection with format `* [display-name](file.md#refinement-id)`
-- Skip if already attached (idempotent)
-- Support many-to-many (same attachment to multiple elements)
+**Reuse (via link):**
+- Syntax: `reqvire link <element-name> reusesContract <target> [--dry-run] [--json] [--output <FILE>]`
+- Target: Contract element identifier
+- Create Reused Contract Context subsection if doesn't exist
+- Add link to subsection with format `* [display-name](file.md#contract-id)`
+- Skip if already reused (idempotent)
+- Support many-to-many (same reused_contract_context to multiple elements)
 - Support dry-run mode for preview
 - Support structured JSON output and JSON file output
 
-**Detach (via unlink):**
+**Remove Reused Context (via unlink):**
 - Syntax: `reqvire unlink <element-name> <target> [--dry-run] [--json] [--output <FILE>]`
-- Auto-detects whether target is relation or attachment
-- Remove link from Attachments subsection
-- Remove subsection if no attachments remain
+- Auto-detects whether target is relation or reused_contract_context
+- Remove link from Reused Contract Context subsection
+- Remove subsection if no reused_contract_context remain
 - Trigger change impact on element
 - Support dry-run mode for preview
 - Support structured JSON output and JSON file output
@@ -72,21 +72,21 @@ Attachment management behavior:
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
+  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
+  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
 
 #### Relations
-  * definedBy: [Attachment Input Auto-Detection Behavior](Behaviors.md#attachment-input-auto-detection-behavior)
+  * definedBy: [Reused Contract Context Input Auto-Detection Behavior](Behaviors.md#reused-contract-context-input-auto-detection-behavior)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
-  * verifiedBy: [Attach Command Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attach-command-verification)
-  * verifiedBy: [Detach Command Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#detach-command-verification)
+  * verifiedBy: [Reuse Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reuse-command-verification)
+  * verifiedBy: [Remove Reused Context Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#remove reused context-command-verification)
 ---
 
 ### CLI Add Element Command
@@ -94,12 +94,12 @@ Attachment management behavior:
 The system shall provide an `add` command to create new model elements by accepting element definition in Markdown format from stdin or the `--content` argument, validating the structure, and inserting it into the target file.
 
 #### Details
-Implementation details shall follow the associated refinement specifications. Ontology rebasing under override is governed by the attached create-element workflow and ontology-aware mutation contracts.
+Implementation details shall follow the associated contract specifications. Ontology rebasing under override is governed by the reused create-element workflow and ontology-aware mutation contracts.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
@@ -108,11 +108,11 @@ Implementation details shall follow the associated refinement specifications. On
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Create Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#create-element-workflow-specification)
-  * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
+  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
+  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
 
 #### Relations
-  * definedBy: [CLI Add Element Command Refinement Specification](Specifications.md#cli-add-element-command-refinement-specification)
+  * definedBy: [CLI Add Element Command Contract Specification](Specifications.md#cli-add-element-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Add Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-add-element-test)
@@ -147,7 +147,7 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Text Output Formatting](../../Reports/ModelReports/Specifications.md#text-output-formatting)
   * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
@@ -165,20 +165,20 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 
 ### CLI Collect Command
 
-The system shall provide a `collect` command that performs content collection as specified in the attached specifications.
+The system shall provide a `collect` command that performs content collection as specified in the reused specifications.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
   * [Collect Output Format Specification](../../Reports/ModelReports/Specifications.md#collect-output-format-specification)
 
 #### Relations
-  * definedBy: [CLI Collect Command Refinement Specification](Specifications.md#cli-collect-command-refinement-specification)
+  * definedBy: [CLI Collect Command Contract Specification](Specifications.md#cli-collect-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Collect Command Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#cli-collect-command-test)
@@ -205,7 +205,7 @@ The markdown output shall include:
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
   * [ContainmentView](../WebExplorer/ContainmentView.md#containmentview)
@@ -224,19 +224,19 @@ The markdown output shall include:
 The system shall provide a `coverage` command that generates both verification coverage and requirement implementation coverage reports.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Verification Type Selection Guidelines](../../ModelStructure/Specifications.md#verification-type-selection-guidelines)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Implementation Coverage Output Structure Specification](../../Reports/ModelReports/Specifications.md#implementation-coverage-output-structure-specification)
   * [Text Output Formatting](../../Reports/ModelReports/Specifications.md#text-output-formatting)
 
 #### Relations
-  * definedBy: [CLI Coverage Command Refinement Specification](Specifications.md#cli-coverage-command-refinement-specification)
+  * definedBy: [CLI Coverage Command Contract Specification](Specifications.md#cli-coverage-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
@@ -264,13 +264,13 @@ The diff output contract shall define a shared presentation format for command r
 The system shall provide an `--output <FILE>` option on all commands that support `--json`, allowing JSON output to be written to a file instead of stdout.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [CLI JSON File Output Option Refinement Specification](Specifications.md#cli-json-file-output-option-refinement-specification)
+  * definedBy: [CLI JSON File Output Option Contract Specification](Specifications.md#cli-json-file-output-option-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI JSON File Output Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#cli-json-file-output-test)
@@ -281,12 +281,12 @@ Implementation details shall follow the associated refinement specifications.
 The system shall implement a `lint` command that analyzes model quality and detects issues in requirements relations, providing categorized output that distinguishes between auto-fixable issues and those requiring manual review.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
@@ -295,7 +295,7 @@ Implementation details shall follow the associated refinement specifications.
   * [Multi-Branch Convergence Detection Specification](../../Operations/Linting/Specifications.md#multi-branch-convergence-detection-specification)
 
 #### Relations
-  * definedBy: [CLI Lint Command Refinement Specification](Specifications.md#cli-lint-command-refinement-specification)
+  * definedBy: [CLI Lint Command Contract Specification](Specifications.md#cli-lint-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
@@ -305,21 +305,21 @@ Implementation details shall follow the associated refinement specifications.
 The system shall provide a `merge` command to combine multiple elements into a target element.
 
 #### Details
-Implementation details shall follow the associated refinement specifications. Ontology merge behavior is governed by the attached merge content, compatibility, and workflow contracts.
+Implementation details shall follow the associated contract specifications. Ontology merge behavior is governed by the reused merge content, compatibility, and workflow contracts.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Merge Content Transformation Behavior](../../Operations/ModelOperations/Behaviors.md#merge-content-transformation-behavior)
   * [Merge Type Compatibility Constraint](../../Operations/ModelOperations/Constraints.md#merge-type-compatibility-constraint)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Merge Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#merge-element-workflow-specification)
-  * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
+  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
+  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
 
 #### Relations
-  * definedBy: [CLI Merge Element Command Refinement Specification](Specifications.md#cli-merge-element-command-refinement-specification)
+  * definedBy: [CLI Merge Element Command Contract Specification](Specifications.md#cli-merge-element-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
@@ -329,19 +329,19 @@ Implementation details shall follow the associated refinement specifications. On
 The system shall provide a `migrate` command that previews or applies deterministic source migrations for known breaking model-contract changes.
 
 #### Details
-Implementation details shall follow the associated refinement specifications. The command shall default to dry-run preview mode and require `--fix` to write changes.
+Implementation details shall follow the associated contract specifications. The command shall default to dry-run preview mode and require `--fix` to write changes.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
 
 #### Relations
-  * definedBy: [CLI Migrate Command Refinement Specification](Specifications.md#cli-migrate-command-refinement-specification)
+  * definedBy: [CLI Migrate Command Contract Specification](Specifications.md#cli-migrate-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [mod.rs](../../../core/src/migrations/mod.rs)
@@ -353,21 +353,21 @@ Implementation details shall follow the associated refinement specifications. Th
 System shall provide CLI command to generate model diagrams with optional filtering and output format selection.
 
 #### Details
-Implementation details shall follow the associated refinement specifications. The command shall support default model-root traversal, filtered traversal, Markdown output, pure Mermaid output, and JSON output.
+Implementation details shall follow the associated contract specifications. The command shall support default model-root traversal, filtered traversal, Markdown output, pure Mermaid output, and JSON output.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
-  * [Model Diagram Output Formats Refinement Specification](../../Reports/ModelReports/Specifications.md#model-diagram-output-formats-refinement-specification)
+  * [Model Diagram Output Formats Contract Specification](../../Reports/ModelReports/Specifications.md#model-diagram-output-formats-contract-specification)
   * [Reverse Relation Traversal Behavior](../../Reports/ModelReports/Behaviors.md#reverse-relation-traversal-behavior)
   * [Start Element Type Filter Behavior](../../Reports/ModelReports/Behaviors.md#start-element-type-filter-behavior)
   * [Type Validation Error Behavior](../../Operations/Validation/Behaviors.md#type-validation-error-behavior)
 
 #### Relations
-  * definedBy: [CLI Model Diagram Command Refinement Specification](Specifications.md#cli-model-diagram-command-refinement-specification)
+  * definedBy: [CLI Model Diagram Command Contract Specification](Specifications.md#cli-model-diagram-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
@@ -380,22 +380,22 @@ Implementation details shall follow the associated refinement specifications. Th
 The system shall provide a `mv-asset` command to move or rename InternalPath files and automatically update all references across the model.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
-  * definedBy: [CLI Move Asset Command Refinement Specification](Specifications.md#cli-move-asset-command-refinement-specification)
+  * definedBy: [CLI Move Asset Command Contract Specification](Specifications.md#cli-move-asset-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * verifiedBy: [Move Asset Command Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#move-asset-command-verification)
+  * verifiedBy: [Move Asset Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#move-asset-command-verification)
 ---
 
 ### CLI Move Element Command
@@ -408,7 +408,7 @@ The command shall reject moving an element into an existing `# Element` file whe
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
@@ -418,7 +418,7 @@ The command shall reject moving an element into an existing `# Element` file whe
   * [Move Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#move-element-workflow-specification)
 
 #### Relations
-  * definedBy: [CLI Move Element Command Refinement Specification](Specifications.md#cli-move-element-command-refinement-specification)
+  * definedBy: [CLI Move Element Command Contract Specification](Specifications.md#cli-move-element-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Move Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-move-element-test)
@@ -435,7 +435,7 @@ The command shall reject `mv-file --squash` when the target file is an existing 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
@@ -443,7 +443,7 @@ The command shall reject `mv-file --squash` when the target file is an existing 
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
-  * definedBy: [CLI Move File Command Refinement Specification](Specifications.md#cli-move-file-command-refinement-specification)
+  * definedBy: [CLI Move File Command Contract Specification](Specifications.md#cli-move-file-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Move File Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-move-file-test)
@@ -452,25 +452,26 @@ The command shall reject `mv-file --squash` when the target file is an existing 
 
 ### CLI Ontologies Command
 
-The system shall provide an `ontologies` command that collects all ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry, emits generated ontology document declarations derived from root ontology metadata, and supports an optional full semantic model projection. The command shall emit one `owl:Ontology` declaration per resolved `ontology_base`; ontology elements in the same base contribute vocabulary to that document, while cross-base ontology hierarchy may emit `owl:imports`.
+The system shall provide an `ontologies` command that collects all ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry, emits generated ontology document declarations derived from root ontology metadata, supports optional local external ontology source inclusion, and supports an optional full semantic model projection. The command shall emit one `owl:Ontology` declaration per resolved `ontology_base`; ontology elements in the same base contribute vocabulary to that document, while cross-base ontology hierarchy may emit `owl:imports`.
 
 #### Details
 The command shall:
 - Emit RDF/Turtle by default.
 - Support `--jsonld` to emit JSON-LD instead of Turtle.
-- Support `--full` to include RDF triples for Reqvire model elements, relations, attachments, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts.
+- Support `--full` to include RDF triples for Reqvire model elements, relations, reused_contract_context, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts.
+- Support `--include-external` to include triples loaded from local ontology `#### External Ontology` source files.
 - Support `--output <FILE>` to write the selected format to a file.
 - Reuse the semantic index built from the graph registry instead of reparsing Turtle separately from validation.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
 
 #### Relations
-  * definedBy: [CLI Ontologies Command Refinement Specification](Specifications.md#cli-ontologies-command-refinement-specification)
+  * definedBy: [CLI Ontologies Command Contract Specification](Specifications.md#cli-ontologies-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
@@ -483,20 +484,20 @@ The command shall:
 The system shall provide a `relink` command that exposes the atomic relation relink operation.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Atomic Relation Relink Workflow Specification](../../Operations/ModelOperations/Specifications.md#atomic-relation-relink-workflow-specification)
   * [Atomic Relink Validity Constraint](../../Operations/ModelOperations/Constraints.md#atomic-relink-validity-constraint)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
-  * definedBy: [CLI Relink Command Refinement Specification](Specifications.md#cli-relink-command-refinement-specification)
-  * definedBy: [Mutating Command Hierarchy Safety Refinement Specification](Specifications.md#mutating-command-hierarchy-safety-refinement-specification)
+  * definedBy: [CLI Relink Command Contract Specification](Specifications.md#cli-relink-command-contract-specification)
+  * definedBy: [Mutating Command Hierarchy Safety Contract Specification](Specifications.md#mutating-command-hierarchy-safety-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * verifiedBy: [Atomic Relation Relink Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#atomic-relation-relink-test)
 ---
@@ -506,22 +507,22 @@ Implementation details shall follow the associated refinement specifications.
 The system shall provide an `rm-asset` command to remove InternalPath files and automatically remove all references from the model.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
-  * definedBy: [CLI Remove Asset Command Refinement Specification](Specifications.md#cli-remove-asset-command-refinement-specification)
+  * definedBy: [CLI Remove Asset Command Contract Specification](Specifications.md#cli-remove-asset-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * verifiedBy: [Remove Asset Command Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#remove-asset-command-verification)
+  * verifiedBy: [Remove Asset Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#remove-asset-command-verification)
 ---
 
 ### CLI Remove Element Command
@@ -529,12 +530,12 @@ Implementation details shall follow the associated refinement specifications.
 The system shall provide an `rm` command to delete existing model elements and automatically remove all relations referencing the deleted element.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -542,7 +543,7 @@ Implementation details shall follow the associated refinement specifications.
   * [Delete Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#delete-element-workflow-specification)
 
 #### Relations
-  * definedBy: [CLI Remove Element Command Refinement Specification](Specifications.md#cli-remove-element-command-refinement-specification)
+  * definedBy: [CLI Remove Element Command Contract Specification](Specifications.md#cli-remove-element-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Remove Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-remove-element-test)
@@ -553,19 +554,19 @@ Implementation details shall follow the associated refinement specifications.
 The system shall provide a `rename` command to rename existing model elements while automatically updating all relations that reference the renamed element.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
-  * definedBy: [CLI Rename Element Command Refinement Specification](Specifications.md#cli-rename-element-command-refinement-specification)
+  * definedBy: [CLI Rename Element Command Contract Specification](Specifications.md#cli-rename-element-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Rename Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-rename-element-test)
@@ -573,16 +574,16 @@ Implementation details shall follow the associated refinement specifications.
 
 ### CLI Resources Command
 
-The system shall provide a `resources` command that generates a report showing all files referenced by the model through relations and attachments.
+The system shall provide a `resources` command that generates a report showing all files referenced by the model through relations and reused_contract_context.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [CLI Resources Command Refinement Specification](Specifications.md#cli-resources-command-refinement-specification)
+  * definedBy: [CLI Resources Command Contract Specification](Specifications.md#cli-resources-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Resources Report Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#resources-report-verification)
@@ -593,12 +594,12 @@ Implementation details shall follow the associated refinement specifications.
 The system shall provide a unified search function, activated by the `search` root command, which shall search and report on model elements with comprehensive filtering capabilities.
 
 #### Details
-Implementation details shall follow the associated refinement specifications. Search JSON shall expose parsed semantic ADT fields for ontology elements and semantic-contract elements when full results are requested.
+Implementation details shall follow the associated contract specifications. Search JSON shall expose parsed semantic ADT fields for ontology elements and semantic-contract elements when full results are requested.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
@@ -607,11 +608,11 @@ Implementation details shall follow the associated refinement specifications. Se
   * [Type Validation Error Behavior](../../Operations/Validation/Behaviors.md#type-validation-error-behavior)
 
 #### Relations
-  * definedBy: [CLI Search Command Refinement Specification](Specifications.md#cli-search-command-refinement-specification)
+  * definedBy: [CLI Search Command Contract Specification](Specifications.md#cli-search-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
-  * verifiedBy: [Attachment Search Filters Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachment-search-filters-verification)
+  * verifiedBy: [Reused Contract Context Search Filters Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-search-filters-verification)
   * verifiedBy: [Search Command Tests](../../Verifications/Reports/ModelReports/ReportingVerifications.md#search-command-tests)
 ---
 
@@ -646,17 +647,17 @@ The command shall support:
 - `--json` and `--output <FILE>` for machine-readable output
 - In `--from` mode, selected capability scopes are listed as the scoped capability submodel; selected requirement scopes are treated as boundaries and are not listed as submodel entries
 
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
 
 #### Relations
-  * definedBy: [CLI Submodels Command Refinement Specification](Specifications.md#cli-submodels-command-refinement-specification)
+  * definedBy: [CLI Submodels Command Contract Specification](Specifications.md#cli-submodels-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
@@ -668,19 +669,19 @@ Implementation details shall follow the associated refinement specifications.
 The system shall provide a `traces` command that generates and outputs upward trace trees for verification elements, showing the complete requirement hierarchy and owning capability context.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
   * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
   * [Type Validation Error Behavior](../../Operations/Validation/Behaviors.md#type-validation-error-behavior)
 
 #### Relations
-  * definedBy: [CLI Traces Command Refinement Specification](Specifications.md#cli-traces-command-refinement-specification)
+  * definedBy: [CLI Traces Command Contract Specification](Specifications.md#cli-traces-command-contract-specification)
   * derive: [Verification Traces Element Navigation](#verification-traces-element-navigation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
@@ -694,13 +695,13 @@ Implementation details shall follow the associated refinement specifications.
 The system shall make verification element names in the traces report clickable links that navigate to the element's definition in its source file.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Verification Traces Element Navigation Refinement Specification](Specifications.md#verification-traces-element-navigation-refinement-specification)
+  * definedBy: [Verification Traces Element Navigation Contract Specification](Specifications.md#verification-traces-element-navigation-contract-specification)
   * derivedFrom: [CLI Traces Command](#cli-traces-command)
   * satisfiedBy: [verification_trace.rs](../../../core/src/verification_trace.rs)
   * verifiedBy: [Verification Traces Element Navigation Test](../../Verifications/Interfaces/CLI/CLIVerifications.md#verification-traces-element-navigation-test)
@@ -711,16 +712,16 @@ Implementation details shall follow the associated refinement specifications.
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Validation Error Reporting Behavior](../../Operations/Validation/Behaviors.md#validation-error-reporting-behavior)
 
 #### Relations
-  * definedBy: [Detailed Error Handling and Logging Refinement Specification](Specifications.md#detailed-error-handling-and-logging-refinement-specification)
+  * definedBy: [Detailed Error Handling and Logging Contract Specification](Specifications.md#detailed-error-handling-and-logging-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [error.rs](../../../core/src/error.rs)
 ---
@@ -739,7 +740,7 @@ The system shall allow command invocations to select the Reqvire workspace expli
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
 
 #### Relations
@@ -754,18 +755,18 @@ The system shall allow command invocations to select the Reqvire workspace expli
 The system shall provide a formatting function, activated by the (format command), which shall execute the formatting process upon user request.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
-  * definedBy: [Format Command Refinement Specification](Specifications.md#format-command-refinement-specification)
+  * definedBy: [Format Command Contract Specification](Specifications.md#format-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
@@ -776,23 +777,22 @@ Implementation details shall follow the associated refinement specifications.
 
 ### Relation Commands
 
-The system shall provide unified CLI commands for relation and attachment management: link and unlink.
+The system shall provide unified CLI commands for relation and reused_contract_context management: link and unlink.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Relation Operations Specification](../../ModelStructure/Specifications.md#relation-operations-specification)
-  * [RelationTypes](../../ModelStructure/RelationTypes.md#relationtypes)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
-  * definedBy: [Relation Commands Refinement Specification](Specifications.md#relation-commands-refinement-specification)
+  * definedBy: [Relation Commands Contract Specification](Specifications.md#relation-commands-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Link Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
@@ -804,21 +804,21 @@ Implementation details shall follow the associated refinement specifications.
 The system shall provide a validation command that executes model validation and reports any issues found.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Two-Pass Validation Behavior](../../Operations/Validation/Behaviors.md#two-pass-validation-behavior)
   * [Validation Error Reporting Behavior](../../Operations/Validation/Behaviors.md#validation-error-reporting-behavior)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Error Message Format Specification](Specifications.md#error-message-format-specification)
-  * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
+  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
+  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
 
 #### Relations
-  * definedBy: [Validate Command Refinement Specification](Specifications.md#validate-command-refinement-specification)
+  * definedBy: [Validate Command Contract Specification](Specifications.md#validate-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)

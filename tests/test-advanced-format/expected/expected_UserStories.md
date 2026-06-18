@@ -28,7 +28,6 @@ As a **System Engineer**, I want to generate diagrams for different system viewp
 
 #### Relations
   * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
-  * trace: [MOE_UA](MOEs.md#moe_ua)
 ---
 
 ### Managing MBSE Models
@@ -41,7 +40,6 @@ As an **System Engineer**, I want to manage MBSE models effectively, so that I c
 #### Relations
   * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
   * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
-  * trace: [MOE_UA](MOEs.md#moe_ua)
 ---
 
 ### Missing Blank Line Test

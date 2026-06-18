@@ -1,0 +1,88 @@
+# Elements
+
+### Billing Capability
+
+Billing capability.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * specifiedBy: [Billing Requirement](#billing-requirement)
+---
+
+### Billing Ontology
+
+Billing ontology.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
+
+#### Ontology
+```turtle
+@prefix testonto: <https://example.test/ontology#> .
+@prefix billing: <urn:reqvire:test:billing:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/ontology> a owl:Ontology .
+billing:Invoice a owl:Class .
+```
+---
+
+### Shared Capability
+
+Shared capability.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+---
+
+### Shared Ontology
+
+Shared ontology.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
+
+#### Relations
+  * derivedFrom: [Billing Ontology](#billing-ontology)
+
+#### Ontology
+```turtle
+@prefix testonto: <https://example.test/ontology#> .
+@prefix shared: <urn:reqvire:test:shared:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/ontology> a owl:Ontology .
+shared:Money a owl:Class .
+```
+---
+
+### Billing Requirement
+
+The system shall support billing.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Billing Capability](#billing-capability)
+  * definedBy: [Billing Detail](#billing-detail)
+---
+
+### Billing Detail
+
+Billing detail.
+
+#### Metadata
+  * type: input-output
+
+#### Relations
+  * define: [Billing Requirement](#billing-requirement)
+---

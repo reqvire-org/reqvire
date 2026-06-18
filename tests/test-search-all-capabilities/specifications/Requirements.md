@@ -77,7 +77,6 @@ This requirement has valid relations to existing files, using markdown link form
 #### Relations
 * derivedFrom: #root-capability
 * satisfiedBy: [./DesignSpecifications/SampleDSD.md](./DesignSpecifications/SampleDSD.md)
-* trace: [Design Specification](DesignSpecifications/SampleDSD.md)
 * verifiedBy: [Verification of Standard Relations](#verification-of-standard-relations)
 * verifiedBy: #search-command-verification
 

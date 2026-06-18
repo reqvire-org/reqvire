@@ -76,7 +76,7 @@ export interface ProjectStoreRelation {
   resource_id: string | null;
 }
 
-export interface ProjectStoreAttachment {
+export interface ProjectStoreReusedContractContextEntry {
   id: string;
   source_id: string;
   target: string;
@@ -107,7 +107,7 @@ export interface ProjectStoreSummaries {
   folders: number;
   resources: number;
   relations: number;
-  attachments: number;
+  reused_contract_context: number;
   concept_refs: number;
   ontology_blocks: number;
   shape_blocks: number;
@@ -295,6 +295,8 @@ export interface OntologyGraphNode {
   type?: string;
   node_type?: string;
   semantic_type: string;
+  layer: "authored" | "reqvire-context" | "external-source";
+  source_kind: "ontology" | "shape" | "model-context" | "external-ontology";
   full_uri: string;
   comment: string;
   rdf_types: string[];
@@ -316,6 +318,8 @@ export interface OntologyGraphEdge {
   source: string;
   target: string;
   label: string;
+  layer: "authored" | "reqvire-context" | "external-source";
+  source_kind: "ontology" | "shape" | "model-context" | "external-ontology";
 }
 
 export interface OntologyGraphSource {
@@ -374,7 +378,7 @@ export interface KnowledgeGraphNode {
   governance?: KnowledgeGraphFact[];
   outgoing?: KnowledgeGraphFact[];
   incoming?: KnowledgeGraphFact[];
-  attachments?: KnowledgeGraphFact[];
+  reused_contract_context?: KnowledgeGraphFact[];
   concept_references?: KnowledgeGraphFact[];
 }
 
@@ -396,7 +400,7 @@ export interface KnowledgeGraphProjection {
   summary?: {
     elements?: number;
     relations?: number;
-    attachments?: number;
+    reused_contract_context?: number;
     concept_references?: number;
     resources?: number;
     submodels?: number;
@@ -414,7 +418,7 @@ export interface ExplorerProjectStore {
   resources: ProjectStoreResource[];
   elements: ProjectStoreElement[];
   relations: ProjectStoreRelation[];
-  attachments: ProjectStoreAttachment[];
+  reused_contract_context: ProjectStoreReusedContractContextEntry[];
   concept_refs: ProjectStoreConceptReference[];
   /** Opaque: capability-rooted submodel report projection. */
   submodels: unknown;

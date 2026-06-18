@@ -52,15 +52,15 @@ When a requirement changes, impact analysis must be conducted based on its relat
      - **Additions**: Element ID exists only in current version
      - **Removals**: Element ID exists only in previous version
      - **Relocations**: Element ID exists in both, but file_path or section differs
-   - **Attachment Content Changes**:
-     - Attachment hashes are stored separately from element content hash
-     - For file attachments: content_hash is computed from file content during parsing
-     - For element attachments: hash is looked up from referenced element's hash_impact_content in registry
-     - Change impact compares both element hash AND attachment hashes independently
-     - Attach operation: new attachment hash appears -> triggers impact
-     - Detach operation: attachment hash removed -> triggers impact
+   - **Reused Contract Context Content Changes**:
+     - Reused Contract Context hashes are stored separately from element content hash
+     - For file reused_contract_context: content_hash is computed from file content during parsing
+     - For element reused_contract_context: hash is looked up from referenced element's hash_impact_content in registry
+     - Change impact compares both element hash AND reused_contract_context hashes independently
+     - Reuse operation: new reused_contract_context hash appears -> triggers impact
+     - Remove Reused Context operation: reused_contract_context hash removed -> triggers impact
      - mv-asset operation: path change only -> does NOT trigger impact (tracked for reporting like relation renames)
-     - If attached document content changes: attachment hash differs -> triggers impact on element
+     - If reused document content changes: reused_contract_context hash differs -> triggers impact on element
      - Path renames are tracked separately for reference updates without impact propagation
    - Generate a ChangeSet representing all detected changes
    - Associate changes with specific elements in the model
@@ -203,16 +203,16 @@ If Safety Requirement changes, the Overheat Shutdown Test must be reviewed for u
 
 ---
 
-### Requirement with Attached Document Change
+### Requirement with Reused Document Change
 
 ```markdown
 ---
 
 ### Performance Requirements
 
-The system shall meet defined performance criteria as specified in the attached SLA document.
+The system shall meet defined performance criteria as specified in the reused SLA document.
 
-#### Attachments
+#### Reused Contract Context
 * [docs/SLA.pdf](docs/SLA.pdf)
 
 #### Relations
@@ -220,7 +220,7 @@ The system shall meet defined performance criteria as specified in the attached 
   * verifiedBy: [test_cases/performance_tests.md](test_cases/performance_tests.md)
 ```
 
-**Scenario 1: Attachment Content Changes**
+**Scenario 1: Reused Contract Context Content Changes**
 
 If `docs/SLA.pdf` content is modified (e.g., performance targets updated from 99.9% to 99.99% uptime):
 - Document content hash changes
@@ -228,7 +228,7 @@ If `docs/SLA.pdf` content is modified (e.g., performance targets updated from 99
 - Change impact propagates through satisfiedBy -> `architecture/load_balancer.md` requires review
 - Change impact propagates through verifiedBy -> `test_cases/performance_tests.md` requires update
 
-**Scenario 2: Attachment Path Rename**
+**Scenario 2: Reused Contract Context Path Rename**
 
 If `docs/SLA.pdf` is renamed to `docs/service_level_agreement.pdf` using `mv-asset`:
 - Path changes but document content unchanged
@@ -237,8 +237,8 @@ If `docs/SLA.pdf` is renamed to `docs/service_level_agreement.pdf` using `mv-ass
 - References automatically updated across all elements
 
 **Key Distinction**:
-- **Content change** in attached document = real change requiring review and verification
-- **Path rename** of attached document = metadata update only, no impact propagation
+- **Content change** in reused document = real change requiring review and verification
+- **Path rename** of reused document = metadata update only, no impact propagation
 
 
 ---

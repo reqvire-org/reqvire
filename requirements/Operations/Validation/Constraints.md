@@ -4,13 +4,13 @@
 
 Rules for detecting duplicate link targets across subsections.
 
-**Cross-section duplicates** (same target in BOTH Relations AND Attachments):
+**Cross-section duplicates** (same target in BOTH Relations AND Reused Contract Context):
 - Applies to identifier targets
 - Treated as semantic errors requiring user resolution
 - The validate command fails with error
 - The format command does not auto-fix (user must decide which section to keep)
 
-**Within-section duplicates** (same entry repeated in Relations OR in Attachments):
+**Within-section duplicates** (same entry repeated in Relations OR in Reused Contract Context):
 - Treated as formatting issues, not validation errors
 - The format fix operation removes duplicate entries
 - The validate command does not fail for within-section duplicates

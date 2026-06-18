@@ -27,8 +27,8 @@ reqvire search --filter-type='specification' --not-have-relations='define' --sho
 # Find constraints without satisfy relations
 reqvire search --filter-type='constraint' --not-have-relations='define' --short
 
-# Find requirements with attachments (candidates for conversion to relations)
-reqvire search --has-attachments --short
+# Find requirements with reused_contract_context (candidates for conversion to relations)
+reqvire search --has-reused-contract-context --short
 
 # Find duplicate or similar requirement names
 reqvire search --filter-name=".*Capability.*" --short
@@ -39,7 +39,7 @@ reqvire search --filter-file="requirements/System/**" --short
 
 These findings guide the refactoring work:
 - Orphaned specifications need `definedBy` relations from appropriate requirements
-- Attachments may need conversion to `definedBy` relations
+- Reused Contract Context may need conversion to `definedBy` relations
 - Duplicate names suggest potential merge candidates
 
 ### Step 2: Find Requirements Asking for Specifications
@@ -53,32 +53,32 @@ Search for patterns like:
 
 These requirements should have `definedBy` relations to the specifications they ask for.
 
-### Step 3: Convert Attachments to definedBy Where Appropriate
+### Step 3: Convert Reused Contract Context to definedBy Where Appropriate
 
-For each specification attachment, ask:
+For each specification reused_contract_context, ask:
 - Does this requirement *define* this specification? → Use `definedBy`
-- Does this requirement *reference* or *depend on* this specification? → Keep as `Attachment`
+- Does this requirement *reference* or *depend on* this specification? → Keep as `Reused Contract Context`
 
-Convert attachments to relations using link and unlink commands:
+Convert reused_contract_context to relations using link and unlink commands:
 
 ```bash
-# Remove attachment from requirement
+# Remove reused_contract_context from requirement
 reqvire unlink "API Authorization Specification" "Authorization System Specification"
 
 # Add definedBy relation instead
 reqvire link "API Authorization Specification" "definedBy" "Authorization System Specification"
 ```
 
-**When to keep attachments:**
+**When to keep reused_contract_context:**
 - Requirement references but doesn't define the specification
 - Specification is defined by a different requirement
-- The attaching requirement is OUTSIDE the owner's derivation hierarchy
-- The attachment target is a contract element identifier owned by another requirement
+- The reusesContract requirement is OUTSIDE the owner's derivation hierarchy
+- The reused_contract_context target is a contract element identifier owned by another requirement
 
-**Attachment constraints:**
+**Reused Contract Context constraints:**
 - Contracts must have a `define` relation (established via requirement's `definedBy`)
-- Only requirements outside the owner's hierarchy can attach a contract
-- Requirements in the same hierarchy cannot attach - they access through the hierarchy
+- Only requirements outside the owner's hierarchy can reuse a contract
+- Requirements in the same hierarchy cannot reuse - they access through the hierarchy
 
 ### Step 4: Consolidate Constraints
 
@@ -126,8 +126,8 @@ Quick validation: `reqvire validate && reqvire lint --fix && reqvire coverage`
 Look for specification elements with empty relations. For each:
 
 1. Find which requirement asks for this specification to be defined
-2. Change the attachment to a `definedBy` relation on that requirement
-3. Keep attachments on other requirements that just reference (don't define) the specification
+2. Change the reused_contract_context to a `definedBy` relation on that requirement
+3. Keep reused_contract_context on other requirements that just reference (don't define) the specification
 
 ## Merging Duplicate Requirements
 
@@ -165,7 +165,7 @@ The merge command:
 When merge is **not** acceptable:
 - `derivedFrom` becomes one upstream source instead of two.
 - Impact analysis gets weaker: downstream behaviors cannot be attributed to either a billing-type concern or a usage-period concern.
-- Verification mapping becomes blurrier: tests/evidence are attached to a combined requirement rather than the specific concern.
+- Verification mapping becomes blurrier: tests/evidence are reused to a combined requirement rather than the specific concern.
 - Change churn increases: edits to either concern now touch the same merged requirement.
 
 When merge is acceptable:
@@ -195,7 +195,7 @@ When merge is acceptable:
 
 ## Example: Before and After
 
-### Before (Attachment):
+### Before (Reused Contract Context):
 ```markdown
 ### API Authorization Specification
 
@@ -204,7 +204,7 @@ The system shall implement API Access Authorization following clearly defined sp
 #### Metadata
   * type: capability
 
-#### Attachments
+#### Reused Contract Context
   * [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
 ```
 
@@ -221,13 +221,13 @@ The system shall implement API Access Authorization following clearly defined sp
   * definedBy: [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
 ```
 
-Referencing requirement (keeps attachment):
+Referencing requirement (keeps reused_contract_context):
 ```markdown
 ### Add IP to Whitelist
 
 The system shall allow adding IPs to whitelist.
 
-#### Attachments
+#### Reused Contract Context
   * [Environment Limits](../Specifications/Constraints.md#environment-limits)
 ```
 
@@ -249,7 +249,7 @@ reqvire format --fix --with-full-relations
 The format command ensures:
 - Consistent markdown structure
 - Proper element separator lines (`---`)
-- Correct subsection ordering (Metadata, Relations, Details, Attachments)
+- Correct subsection ordering (Metadata, Relations, Details, Reused Contract Context)
 - Clean whitespace and indentation
 
 ## Git Philosophy

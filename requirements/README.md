@@ -161,7 +161,7 @@ Tool interfaces are **CLI** (Command Line Interface), **Web Explorer Interface**
 - Web Explorer Interface: Human browsing and visualization interface for served model content, diagrams, reports, and traces.
 - MCP Server: Typed external interface for AI agents, IDE integrations, CI adapters, and other tools.
 
-The MCP server exposes shared tool contracts, including semantic model evidence through `reqvire.semantic.ontologies`. It does not expose arbitrary shell execution, does not own model state, and does not bypass Reqvire core semantics.
+The MCP server exposes shared tool contracts, resources, and build-time prompt templates, including semantic model evidence through `reqvire.semantic.ontologies`, semantic vocabulary through `reqvire.semantic.vocabulary`, and semantic query guidance through standard MCP prompts. It does not expose arbitrary shell execution, does not own model state, and does not bypass Reqvire core semantics.
 
 #### Core Capabilities
 
@@ -236,7 +236,7 @@ Humans interact with Reqvire tools to manage, define, and validate System models
 - Invalid merges are prevented based on the validation results.
 
 ### SOI Feedback Loop
-- The Developed System provides feedback to the Syetem Model, enabling iterative refinement.
+- The Developed System provides feedback to the Syetem Model, enabling iterative contract.
 - The model guides the development of the system, ensuring alignment with requirements and objectives.
 
 
@@ -244,6 +244,6 @@ Humans interact with Reqvire tools to manage, define, and validate System models
 
 - The System Model is implemented into the Developed System, which is stored and versioned in the Git repository.
 - The Reqvire CLI provides tools to validate, analyze, and generate artifacts from the model.
-- The Reqvire MCP server provides typed, protocol-level access to the same Reqvire core operations for AI agents, IDE integrations, and CI adapters.
+- The Reqvire MCP server provides typed, protocol-level access to the same Reqvire core operations and Reqvire-authored prompt guidance for AI agents, IDE integrations, and CI adapters.
 - AI Agents assist humans by generating suggestions and preparing approved changes through MCP-backed evidence and mutation contracts.
 - The **CI/CD System** ensures quality control and prevents invalid changes from being merged.

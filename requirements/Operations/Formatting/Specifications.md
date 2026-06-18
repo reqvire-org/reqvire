@@ -56,7 +56,7 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
   * type: specification
 ---
 
-### Full Relations Insertion Refinement Specification
+### Full Relations Insertion Contract Specification
 
 #### Details
 Auto-generated relations are inverse relations created by the parser during model loading but not persisted to files by default. See Relation Types Specification for opposite relation pairs.
@@ -75,7 +75,7 @@ Rules for sorting relations within elements for deterministic output.
 
 #### Details
 **Sort Criteria:**
-1. Primary sort: Alphabetically by relation type name (e.g., `derivedFrom` before `satisfiedBy`, `trace` before `verifiedBy`)
+1. Primary sort: Alphabetically by relation type name (e.g., `derivedFrom` before `satisfiedBy`, `satisfiedBy` before `verifiedBy`)
 2. Secondary sort: Alphabetically by target identifier within the same relation type
 
 **Benefits:**

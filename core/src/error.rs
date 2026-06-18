@@ -114,28 +114,28 @@ pub enum ReqvireError {
     SerializationError(String),
 
     #[allow(dead_code)]
-    #[error("Invalid attachment format: {0}")]
-    InvalidAttachmentFormat(String),
+    #[error("Invalid reused_contract_context format: {0}")]
+    InvalidReusedContractContextFormat(String),
 
     #[allow(dead_code)]
-    #[error("Missing attachment target: {0}")]
-    MissingAttachmentTarget(String),
+    #[error("Missing reused_contract_context target: {0}")]
+    MissingReusedContractContextTarget(String),
 
     #[allow(dead_code)]
-    #[error("Missing attachment file: {0}")]
-    MissingAttachmentFile(String),
+    #[error("Missing reused_contract_context file: {0}")]
+    MissingReusedContractContextFile(String),
 
     #[allow(dead_code)]
-    #[error("Invalid attachment target: {0}")]
-    InvalidAttachmentTarget(String),
+    #[error("Invalid reused_contract_context target: {0}")]
+    InvalidReusedContractContextTarget(String),
 
     #[allow(dead_code)]
-    #[error("Invalid attachment scope: {0}")]
-    InvalidAttachmentScope(String),
+    #[error("Invalid reused_contract_context scope: {0}")]
+    InvalidReusedContractContextScope(String),
 
     #[allow(dead_code)]
-    #[error("Duplicate attachment: {0}")]
-    DuplicateAttachment(String),
+    #[error("Duplicate reused_contract_context: {0}")]
+    DuplicateReusedContractContext(String),
 
     #[allow(dead_code)]
     #[error("Cross-section duplicate: {0}")]

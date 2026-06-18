@@ -1,0 +1,1 @@
+Requirement reused_contract_context to ontology is rejected

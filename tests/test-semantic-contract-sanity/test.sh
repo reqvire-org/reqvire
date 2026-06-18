@@ -60,7 +60,7 @@ assert_diff \
   /tmp/semantic-contract-sanity-valid.out \
   "valid semantic contract sanity output mismatch"
 
-for valid_fixture in attached-context-valid.md.txt capability-hierarchy-context-valid.md.txt requirement-owned-shape-valid.md.txt
+for valid_fixture in reused-contract-context-valid.md.txt capability-hierarchy-context-valid.md.txt requirement-owned-shape-valid.md.txt
 do
   copy_fixture "$valid_fixture"
   set +e

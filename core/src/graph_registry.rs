@@ -9,12 +9,13 @@ use crate::crud::replace_prefix_token;
 use crate::element::{
     extract_single_fenced_subsection, Element, ElementType, GovernanceMetadataEntry,
     GovernanceMetadataSource, RequirementGovernanceMetadata, SizeEstimate,
+    REUSED_CONTRACT_CONTEXT_SECTION,
 };
 use crate::error::ReqvireError;
 use crate::git_commands;
 use crate::relation::{
-    self, get_hierarchical_relation_types, LinkType, IMPACT_PROPAGATION_RELATIONS,
-    REFINEMENT_RELATIONS, SATISFACTION_RELATIONS,
+    self, get_hierarchical_relation_types, LinkType, CONTRACT_RELATIONS,
+    IMPACT_PROPAGATION_RELATIONS, SATISFACTION_RELATIONS,
 };
 use crate::semantic_contract;
 use crate::Relation;
@@ -147,15 +148,15 @@ impl GraphRegistry {
         // Validate cross-component dependencies
         errors.extend(self.validate_cross_component_dependencies()?);
 
-        // Validate attachments exist
-        errors.extend(self.validate_attachments()?);
+        // Validate reused_contract_context exist
+        errors.extend(self.validate_reused_contract_context()?);
 
         // Validate legacy contract relation names before the stricter
         // contract-element ownership checks.
         errors.extend(self.validate_legacy_contract_relations()?);
 
         // Validate contract elements have only define relations
-        errors.extend(self.validate_refinement_elements()?);
+        errors.extend(self.validate_contract_elements()?);
 
         // Validate ontology elements and ontology graph shape
         errors.extend(self.validate_ontology_elements()?);
@@ -164,12 +165,12 @@ impl GraphRegistry {
         errors.extend(self.validate_governance_metadata()?);
 
         // Validate contract ownership uniqueness (each contract owned by at most one requirement)
-        errors.extend(self.validate_refinement_ownership_uniqueness()?);
+        errors.extend(self.validate_contract_ownership_uniqueness()?);
 
-        // Validate 'other' type elements only use trace relations
+        // Validate explicit 'other' type elements do not author semantic relations
         errors.extend(self.validate_other_element_relations()?);
 
-        // Validate no cross-section duplicates (same target in Relations and Attachments)
+        // Validate no cross-section duplicates (same target in Relations and Reused Contract Context)
         errors.extend(self.validate_cross_section_duplicates()?);
 
         // Validate semantic-contract reserved sections, declarations, and references
@@ -202,7 +203,7 @@ impl GraphRegistry {
         Ok(())
     }
 
-    /// Validates that no element has the same target in both Relations and Attachments subsections
+    /// Validates that no element has the same target in both Relations and Reused Contract Context subsections
     fn validate_cross_section_duplicates(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         log::debug!("Running cross-section duplicate validation...");
         let mut errors = Vec::new();
@@ -218,13 +219,13 @@ impl GraphRegistry {
                 .map(|r| r.target.link.as_str().to_string())
                 .collect();
 
-            // Check attachments against relations
-            for attachment in &element.attachments {
-                let attachment_target = attachment.target.as_str();
-                if relation_targets.contains(&attachment_target) {
+            // Check reused_contract_context against relations
+            for reused_contract_context in &element.reused_contract_context {
+                let reused_contract_context_target = reused_contract_context.target.as_str();
+                if relation_targets.contains(&reused_contract_context_target) {
                     let msg = format!(
-                        "Cross-section duplicate in element '{}': target '{}' appears in both Relations and Attachments (file: {})",
-                        element.name, attachment_target, element.file_path
+                        "Cross-section duplicate in element '{}': target '{}' appears in both Relations and Reused Contract Context (file: {})",
+                        element.name, reused_contract_context_target, element.file_path
                     );
                     errors.push(ReqvireError::CrossSectionDuplicate(msg));
                 }
@@ -911,7 +912,7 @@ impl GraphRegistry {
             .unwrap_or_else(|| element_id.to_string())
     }
 
-    fn has_attachment_flow_between_roots(
+    fn has_reused_contract_context_flow_between_roots(
         &self,
         source_root_id: &str,
         target_root_id: &str,
@@ -920,11 +921,11 @@ impl GraphRegistry {
         sorted_ids.sort();
 
         for element_id in sorted_ids {
-            let Some(attacher_root_id) = self.resolve_single_owning_capability(element_id) else {
+            let Some(reuser_root_id) = self.resolve_single_owning_capability(element_id) else {
                 continue;
             };
 
-            if attacher_root_id != source_root_id {
+            if reuser_root_id != source_root_id {
                 continue;
             }
 
@@ -932,18 +933,18 @@ impl GraphRegistry {
                 continue;
             };
 
-            for attachment in &node.element.attachments {
-                let crate::element::AttachmentTarget::ElementIdentifier(refinement_id) =
-                    &attachment.target
+            for reused_contract_context in &node.element.reused_contract_context {
+                let crate::element::ReusedContractContextTarget::ElementIdentifier(contract_id) =
+                    &reused_contract_context.target
                 else {
                     continue;
                 };
 
-                if !self.refinement_has_refine_relation(refinement_id) {
+                if !self.contract_has_define_relation(contract_id) {
                     continue;
                 }
 
-                for defining_req_id in self.get_defining_requirements(refinement_id) {
+                for defining_req_id in self.get_defining_requirements(contract_id) {
                     let Some(defining_root_id) =
                         self.resolve_single_owning_capability(&defining_req_id)
                     else {
@@ -960,9 +961,9 @@ impl GraphRegistry {
         false
     }
 
-    pub fn build_attachment_direction_scope_error(
+    pub fn build_reused_contract_context_direction_scope_error(
         &self,
-        attachment_identifier: &str,
+        reused_contract_context_identifier: &str,
         element_id: &str,
         element_name: &str,
         file_path: Option<&str>,
@@ -970,7 +971,7 @@ impl GraphRegistry {
         let source_root_id = self.resolve_single_owning_capability(element_id)?;
 
         let mut cross_subgraph_target = false;
-        for defining_req_id in self.get_defining_requirements(attachment_identifier) {
+        for defining_req_id in self.get_defining_requirements(reused_contract_context_identifier) {
             let Some(defining_root_id) = self.resolve_single_owning_capability(&defining_req_id)
             else {
                 continue;
@@ -987,20 +988,23 @@ impl GraphRegistry {
         }
 
         let conflicting_root_id = self
-            .get_defining_requirements(attachment_identifier)
+            .get_defining_requirements(reused_contract_context_identifier)
             .into_iter()
             .filter_map(|defining_req_id| self.resolve_single_owning_capability(&defining_req_id))
             .find(|target_root_id| {
                 target_root_id != &source_root_id
-                    && self.has_attachment_flow_between_roots(target_root_id, &source_root_id)
+                    && self.has_reused_contract_context_flow_between_roots(
+                        target_root_id,
+                        &source_root_id,
+                    )
             })?;
-        let attachment_name = self.display_name_for_element(attachment_identifier);
+        let reused_context_name = self.display_name_for_element(reused_contract_context_identifier);
         let conflicting_root_name = self.display_name_for_element(&conflicting_root_id);
         let source_root_name = self.display_name_for_element(&source_root_id);
 
         let mut msg = format!(
-            "'{}' cannot be attached to '{}' because subgraph '{}' already attaches refinements owned by subgraph '{}'. Attachment flow between subgraphs must remain one-directional.",
-            attachment_name,
+            "'{}' cannot be reused to '{}' because subgraph '{}' already reuses contracts owned by subgraph '{}'. ReusedContractContextEntry flow between subgraphs must remain one-directional.",
+            reused_context_name,
             element_name,
             conflicting_root_name,
             source_root_name
@@ -1205,9 +1209,9 @@ impl GraphRegistry {
         }
     }
 
-    /// Validates attachment targets and scope rules.
-    fn validate_attachments(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
-        debug!("Validating attachment targets...");
+    /// Validates reused_contract_context targets and scope rules.
+    fn validate_reused_contract_context(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating reused_contract_context targets...");
         let mut errors = Vec::new();
 
         let mut sorted_nodes: Vec<&ElementNode> = self.nodes.values().collect();
@@ -1216,10 +1220,10 @@ impl GraphRegistry {
         for element_node in sorted_nodes {
             let element = &element_node.element;
 
-            for attachment in &element.attachments {
+            for reused_contract_context in &element.reused_contract_context {
                 if !element.element_type.is_requirement() {
-                    errors.push(ReqvireError::InvalidAttachmentTarget(format!(
-                        "File {}: Element '{}' (type: {}) cannot author attachments. Only requirement elements may author attachments to reusable requirement-owned refinements; ontology vocabulary uses Concept References and semantic contracts use use/usedBy.",
+                    errors.push(ReqvireError::InvalidReusedContractContextTarget(format!(
+                        "File {}: Element '{}' (type: {}) cannot author reused_contract_context. Only requirement elements may author reused_contract_context to reusable requirement-owned contracts; ontology vocabulary uses Concept References and semantic contracts use use/usedBy.",
                         element.file_path,
                         element.name,
                         element.element_type.as_str(),
@@ -1227,23 +1231,23 @@ impl GraphRegistry {
                     continue;
                 }
 
-                match &attachment.target {
-                    crate::element::AttachmentTarget::FilePath(file_path) => {
-                        errors.push(ReqvireError::InvalidAttachmentTarget(format!(
-                            "File {}: Element '{}' has attachment '{}' which is a file path. Attachments must target attachable element identifiers (file.md#element-id).",
+                match &reused_contract_context.target {
+                    crate::element::ReusedContractContextTarget::FilePath(file_path) => {
+                        errors.push(ReqvireError::InvalidReusedContractContextTarget(format!(
+                            "File {}: Element '{}' has reused_contract_context '{}' which is a file path. Reused Contract Context must target reusable element identifiers (file.md#element-id).",
                             element.file_path,
                             element.name,
                             file_path.display()
                         )));
                         continue;
                     }
-                    crate::element::AttachmentTarget::ElementIdentifier(identifier) => {
-                        // Validate that the identifier points to an existing Refinement element
+                    crate::element::ReusedContractContextTarget::ElementIdentifier(identifier) => {
+                        // Validate that the identifier points to an existing Contract element
                         if let Some(target_node) = self.nodes.get(identifier) {
-                            if !target_node.element.element_type.is_refinement() {
-                                errors.push(ReqvireError::InvalidAttachmentTarget(
+                            if !target_node.element.element_type.is_contract() {
+                                errors.push(ReqvireError::InvalidReusedContractContextTarget(
                                     format!(
-                                        "File {}: Element '{}' has attachment to '{}' which is not an attachable element",
+                                        "File {}: Element '{}' has reused_contract_context to '{}' which is not an reusable element",
                                         element.file_path,
                                         element.name,
                                         identifier
@@ -1252,13 +1256,13 @@ impl GraphRegistry {
                                 continue;
                             }
 
-                            let attachment_type_valid =
-                                target_node.element.element_type.is_requirement_refinement();
+                            let reused_context_type_valid =
+                                target_node.element.element_type.is_requirement_contract();
 
-                            if !attachment_type_valid {
-                                errors.push(ReqvireError::InvalidAttachmentTarget(
+                            if !reused_context_type_valid {
+                                errors.push(ReqvireError::InvalidReusedContractContextTarget(
                                     format!(
-                                        "File {}: Element '{}' (type: {}) has invalid attachment to '{}' (type: {}). Requirement attachments may target requirement-owned source, constraint, behavior, specification, state, or input-output only. Ontology vocabulary uses Concept References; semantic contracts constrain requirements through constrainedBy/constrain.",
+                                        "File {}: Element '{}' (type: {}) has invalid reused_contract_context to '{}' (type: {}). Requirement reused_contract_context may target requirement-owned source, constraint, behavior, specification, state, or input-output only. Ontology vocabulary uses Concept References; semantic contracts constrain requirements through constrainedBy/constrain.",
                                         element.file_path,
                                         element.name,
                                         element.element_type.as_str(),
@@ -1270,12 +1274,12 @@ impl GraphRegistry {
                             }
 
                             // Check 1: Contract targets must have a define relation. Ontology is not a contract.
-                            if target_node.element.element_type.is_refinement()
-                                && !self.refinement_has_refine_relation(identifier)
+                            if target_node.element.element_type.is_contract()
+                                && !self.contract_has_define_relation(identifier)
                             {
-                                errors.push(ReqvireError::InvalidAttachmentTarget(
+                                errors.push(ReqvireError::InvalidReusedContractContextTarget(
                                     format!(
-                                        "'{}' has no define relation. Contracts must define a requirement before they can be attached; contracts are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not defined by implementation-detail contracts. (file: {}, element: {})",
+                                        "'{}' has no define relation. Contracts must define a requirement before they can be reused; contracts are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not defined by implementation-detail contracts. (file: {}, element: {})",
                                         target_node.element.name,
                                         element.file_path,
                                         element.name
@@ -1284,14 +1288,14 @@ impl GraphRegistry {
                                 continue;
                             }
 
-                            // Check 2: Hierarchical Independence Constraint - attaching element must not be in defining hierarchy
+                            // Check 2: Hierarchical Independence Constraint - reusesContract element must not be in defining hierarchy
                             let defining_reqs = self.get_defining_requirements(identifier);
                             let mut hierarchy_violation = false;
                             for defining_req_id in defining_reqs {
                                 if self.is_in_hierarchy(&element.identifier, &defining_req_id) {
-                                    errors.push(ReqvireError::InvalidAttachmentScope(
+                                    errors.push(ReqvireError::InvalidReusedContractContextScope(
                                         format!(
-                                            "'{}' cannot be attached to '{}' because it is within the contract's defining hierarchy. Attachments are only allowed from elements outside the definedBy chain. (file: {}, element: {})",
+                                            "'{}' cannot be reused to '{}' because it is within the contract's defining hierarchy. Reused Contract Context are only allowed from elements outside the definedBy chain. (file: {}, element: {})",
                                             target_node.element.name,
                                             element.name,
                                             element.file_path,
@@ -1305,13 +1309,16 @@ impl GraphRegistry {
 
                             // Check 3: One-direction subgraph flow constraint (only if no hierarchy violation)
                             if !hierarchy_violation {
-                                if let Some(msg) = self.build_attachment_direction_scope_error(
-                                    identifier,
-                                    &element.identifier,
-                                    &element.name,
-                                    Some(&element.file_path),
-                                ) {
-                                    errors.push(ReqvireError::InvalidAttachmentScope(msg));
+                                if let Some(msg) = self
+                                    .build_reused_contract_context_direction_scope_error(
+                                        identifier,
+                                        &element.identifier,
+                                        &element.name,
+                                        Some(&element.file_path),
+                                    )
+                                {
+                                    errors
+                                        .push(ReqvireError::InvalidReusedContractContextScope(msg));
                                     hierarchy_violation = true;
                                 }
                             }
@@ -1319,9 +1326,9 @@ impl GraphRegistry {
                             // Check 4: Upstream propagation constraint (only if no other scope violation)
                             if !hierarchy_violation {
                                 if let Some((direction, other_id)) = self
-                                    .find_duplicate_attachment_in_hierarchy(
+                                    .find_duplicate_reused_contract_context_in_hierarchy(
                                         &element.identifier,
-                                        &attachment.target,
+                                        &reused_contract_context.target,
                                     )
                                 {
                                     let other_name = self
@@ -1331,7 +1338,7 @@ impl GraphRegistry {
                                         .unwrap_or(&other_id);
                                     let msg = if direction == "ancestor" {
                                         format!(
-                                            "'{}' is already attached at '{}' which is an ancestor. Attachments propagate downstream. (file: {}, element: {})",
+                                            "'{}' is already reused at '{}' which is an ancestor. Reused Contract Context propagate downstream. (file: {}, element: {})",
                                             target_node.element.name,
                                             other_name,
                                             element.file_path,
@@ -1339,7 +1346,7 @@ impl GraphRegistry {
                                         )
                                     } else {
                                         format!(
-                                            "'{}' is already attached at '{}' which is a descendant. Move attachment to '{}' if you want it at higher level. (file: {}, element: {})",
+                                            "'{}' is already reused at '{}' which is a descendant. Move reused_contract_context to '{}' if you want it at higher level. (file: {}, element: {})",
                                             target_node.element.name,
                                             other_name,
                                             element.name,
@@ -1347,12 +1354,13 @@ impl GraphRegistry {
                                             element.name
                                         )
                                     };
-                                    errors.push(ReqvireError::InvalidAttachmentScope(msg));
+                                    errors
+                                        .push(ReqvireError::InvalidReusedContractContextScope(msg));
                                 }
                             }
                         } else {
-                            errors.push(ReqvireError::MissingAttachmentTarget(format!(
-                                "File {}: Element '{}' references missing attachment element: {}",
+                            errors.push(ReqvireError::MissingReusedContractContextTarget(format!(
+                                "File {}: Element '{}' references missing reused_contract_context element: {}",
                                 element.file_path, element.name, identifier
                             )));
                         }
@@ -1362,9 +1370,12 @@ impl GraphRegistry {
         }
 
         if errors.is_empty() {
-            debug!("No attachment validation errors found.");
+            debug!("No reused_contract_context validation errors found.");
         } else {
-            debug!("{} attachment validation errors found.", errors.len());
+            debug!(
+                "{} reused_contract_context validation errors found.",
+                errors.len()
+            );
         }
 
         Ok(errors)
@@ -1381,7 +1392,7 @@ impl GraphRegistry {
     }
 
     /// Get the elements that own a contract via `definedBy`.
-    pub fn get_refinement_owners(&self, refinement_id: &str) -> Vec<String> {
+    pub fn get_contract_owners(&self, contract_id: &str) -> Vec<String> {
         let mut owners = Vec::new();
 
         let mut sorted_nodes: Vec<(&String, &ElementNode)> = self.nodes.iter().collect();
@@ -1390,13 +1401,13 @@ impl GraphRegistry {
         for (element_id, element_node) in sorted_nodes {
             // Check if this element has a definedBy relation pointing to the contract
             for relation in &element_node.element.relations {
-                // Use REFINEMENT_RELATIONS - definedBy is the forward contract relation from requirement
-                if relation::is_refinement_relation(relation.relation_type)
-                    && relation.relation_type.name == REFINEMENT_RELATIONS[1]
+                // Use CONTRACT_RELATIONS - definedBy is the forward contract relation from requirement
+                if relation::is_contract_relation(relation.relation_type)
+                    && relation.relation_type.name == CONTRACT_RELATIONS[1]
                 // definedBy
                 {
                     if let LinkType::Identifier(target_id) = &relation.target.link {
-                        if target_id == refinement_id {
+                        if target_id == contract_id {
                             owners.push(element_id.clone());
                         }
                     }
@@ -1407,16 +1418,16 @@ impl GraphRegistry {
         owners
     }
 
-    /// Get the defining owners for a refinement element.
+    /// Get the defining owners for a contract element.
     ///
     /// Kept for existing callers; the returned IDs may now be capability or requirement
-    /// owners depending on the refinement subtype.
-    pub fn get_defining_requirements(&self, refinement_id: &str) -> Vec<String> {
-        self.get_refinement_owners(refinement_id)
+    /// owners depending on the contract subtype.
+    pub fn get_defining_requirements(&self, contract_id: &str) -> Vec<String> {
+        self.get_contract_owners(contract_id)
     }
 
-    pub fn get_capability_refinement_owner(&self, refinement_id: &str) -> Option<String> {
-        let owners = self.get_refinement_owners(refinement_id);
+    pub fn get_capability_contract_owner(&self, contract_id: &str) -> Option<String> {
+        let owners = self.get_contract_owners(contract_id);
         if owners.len() != 1 {
             return None;
         }
@@ -1429,8 +1440,8 @@ impl GraphRegistry {
         }
     }
 
-    pub fn get_requirement_refinement_owner(&self, refinement_id: &str) -> Option<String> {
-        let owners = self.get_refinement_owners(refinement_id);
+    pub fn get_requirement_contract_owner(&self, contract_id: &str) -> Option<String> {
+        let owners = self.get_contract_owners(contract_id);
         if owners.len() != 1 {
             return None;
         }
@@ -1559,15 +1570,15 @@ impl GraphRegistry {
 
     /// Check if a contract element has at least one `define` relation.
     /// Returns true if the contract has a define relation, false otherwise.
-    pub fn refinement_has_refine_relation(&self, refinement_id: &str) -> bool {
-        if let Some(node) = self.nodes.get(refinement_id) {
+    pub fn contract_has_define_relation(&self, contract_id: &str) -> bool {
+        if let Some(node) = self.nodes.get(contract_id) {
             node.element
                 .relations
                 .iter()
-                // Use REFINEMENT_RELATIONS - define is the backward contract relation from contract
+                // Use CONTRACT_RELATIONS - define is the backward contract relation from contract
                 .any(|r| {
-                    relation::is_refinement_relation(r.relation_type)
-                        && r.relation_type.name == REFINEMENT_RELATIONS[0]
+                    relation::is_contract_relation(r.relation_type)
+                        && r.relation_type.name == CONTRACT_RELATIONS[0]
                 }) // define
         } else {
             false
@@ -1576,7 +1587,7 @@ impl GraphRegistry {
 
     /// Check if an element is in the derivation hierarchy of a root element.
     /// Returns true if element_id is the root itself, an ancestor, or a descendant of root_id.
-    /// Used for attachment scope validation to check hierarchical independence.
+    /// Used for reused_contract_context scope validation to check hierarchical independence.
     pub fn is_in_hierarchy(&self, element_id: &str, root_id: &str) -> bool {
         // Same element
         if element_id == root_id {
@@ -1648,7 +1659,7 @@ impl GraphRegistry {
         self.is_ancestor_of(element_id, potential_descendant)
     }
 
-    /// Get the owner requirements for a file attachment (via satisfiedBy or definedBy relation).
+    /// Get the owner requirements for a file reused_contract_context (via satisfiedBy or definedBy relation).
     pub fn get_file_owners(&self, file_path: &std::path::Path) -> Vec<String> {
         let mut owners = Vec::new();
         let file_path_str = file_path.to_string_lossy();
@@ -1658,8 +1669,8 @@ impl GraphRegistry {
                 // File ownership can come from satisfiedBy (implementations) or definedBy (contracts)
                 let is_ownership_relation = (relation::is_satisfaction_relation(relation.relation_type)
                     && relation.relation_type.name == SATISFACTION_RELATIONS[1]) // satisfiedBy
-                    || (relation::is_refinement_relation(relation.relation_type)
-                    && relation.relation_type.name == REFINEMENT_RELATIONS[1]); // definedBy
+                    || (relation::is_contract_relation(relation.relation_type)
+                    && relation.relation_type.name == CONTRACT_RELATIONS[1]); // definedBy
                 if is_ownership_relation {
                     if let LinkType::InternalPath(ref target_path) = relation.target.link {
                         if target_path.to_string_lossy() == file_path_str {
@@ -1672,43 +1683,47 @@ impl GraphRegistry {
         owners
     }
 
-    /// Find if the same attachment exists in hierarchy (ancestor or descendant).
+    /// Find if the same reused_contract_context exists in hierarchy (ancestor or descendant).
     /// Returns (direction, element_id) where direction is "ancestor" or "descendant".
-    pub fn find_duplicate_attachment_in_hierarchy(
+    pub fn find_duplicate_reused_contract_context_in_hierarchy(
         &self,
         element_id: &str,
-        attachment: &crate::element::AttachmentTarget,
+        reused_contract_context: &crate::element::ReusedContractContextTarget,
     ) -> Option<(&'static str, String)> {
         // Check ancestors
-        if let Some(ancestor) = self.find_attachment_in_ancestors(element_id, attachment) {
+        if let Some(ancestor) =
+            self.find_reused_contract_context_in_ancestors(element_id, reused_contract_context)
+        {
             return Some(("ancestor", ancestor));
         }
         // Check descendants
-        if let Some(descendant) = self.find_attachment_in_descendants(element_id, attachment) {
+        if let Some(descendant) =
+            self.find_reused_contract_context_in_descendants(element_id, reused_contract_context)
+        {
             return Some(("descendant", descendant));
         }
         None
     }
 
-    fn find_attachment_in_ancestors(
+    fn find_reused_contract_context_in_ancestors(
         &self,
         element_id: &str,
-        attachment: &crate::element::AttachmentTarget,
+        reused_contract_context: &crate::element::ReusedContractContextTarget,
     ) -> Option<String> {
         let hierarchical_types = get_hierarchical_relation_types();
         let mut visited = HashSet::new();
-        self.find_attachment_in_ancestors_recursive(
+        self.find_reused_contract_context_in_ancestors_recursive(
             element_id,
-            attachment,
+            reused_contract_context,
             &hierarchical_types,
             &mut visited,
         )
     }
 
-    fn find_attachment_in_ancestors_recursive(
+    fn find_reused_contract_context_in_ancestors_recursive(
         &self,
         element_id: &str,
-        attachment: &crate::element::AttachmentTarget,
+        reused_contract_context: &crate::element::ReusedContractContextTarget,
         hierarchical_types: &[&str],
         visited: &mut HashSet<String>,
     ) -> Option<String> {
@@ -1722,23 +1737,25 @@ impl GraphRegistry {
                 if hierarchical_types.contains(&relation.relation_type.name) {
                     if let LinkType::Identifier(parent_id) = &relation.target.link {
                         if let Some(parent_node) = self.nodes.get(parent_id) {
-                            // Check if parent has this attachment
-                            if parent_node
-                                .element
-                                .attachments
-                                .iter()
-                                .any(|a| self.attachments_equal(&a.target, attachment))
-                            {
+                            // Check if parent has this reused_contract_context
+                            if parent_node.element.reused_contract_context.iter().any(|a| {
+                                self.reused_contract_context_targets_equal(
+                                    &a.target,
+                                    reused_contract_context,
+                                )
+                            }) {
                                 return Some(parent_id.clone());
                             }
                         }
                         // Check ancestors recursively
-                        if let Some(found) = self.find_attachment_in_ancestors_recursive(
-                            parent_id,
-                            attachment,
-                            hierarchical_types,
-                            visited,
-                        ) {
+                        if let Some(found) = self
+                            .find_reused_contract_context_in_ancestors_recursive(
+                                parent_id,
+                                reused_contract_context,
+                                hierarchical_types,
+                                visited,
+                            )
+                        {
                             return Some(found);
                         }
                     }
@@ -1748,19 +1765,23 @@ impl GraphRegistry {
         None
     }
 
-    fn find_attachment_in_descendants(
+    fn find_reused_contract_context_in_descendants(
         &self,
         element_id: &str,
-        attachment: &crate::element::AttachmentTarget,
+        reused_contract_context: &crate::element::ReusedContractContextTarget,
     ) -> Option<String> {
         let mut visited = HashSet::new();
-        self.find_attachment_in_descendants_recursive(element_id, attachment, &mut visited)
+        self.find_reused_contract_context_in_descendants_recursive(
+            element_id,
+            reused_contract_context,
+            &mut visited,
+        )
     }
 
-    fn find_attachment_in_descendants_recursive(
+    fn find_reused_contract_context_in_descendants_recursive(
         &self,
         element_id: &str,
-        attachment: &crate::element::AttachmentTarget,
+        reused_contract_context: &crate::element::ReusedContractContextTarget,
         visited: &mut HashSet<String>,
     ) -> Option<String> {
         if visited.contains(element_id) {
@@ -1776,19 +1797,18 @@ impl GraphRegistry {
             });
 
             if is_child {
-                // Check if child has this attachment
-                if child_node
-                    .element
-                    .attachments
-                    .iter()
-                    .any(|a| self.attachments_equal(&a.target, attachment))
-                {
+                // Check if child has this reused_contract_context
+                if child_node.element.reused_contract_context.iter().any(|a| {
+                    self.reused_contract_context_targets_equal(&a.target, reused_contract_context)
+                }) {
                     return Some(child_id.clone());
                 }
                 // Check descendants recursively
-                if let Some(found) =
-                    self.find_attachment_in_descendants_recursive(child_id, attachment, visited)
-                {
+                if let Some(found) = self.find_reused_contract_context_in_descendants_recursive(
+                    child_id,
+                    reused_contract_context,
+                    visited,
+                ) {
                     return Some(found);
                 }
             }
@@ -1796,19 +1816,19 @@ impl GraphRegistry {
         None
     }
 
-    fn attachments_equal(
+    fn reused_contract_context_targets_equal(
         &self,
-        a: &crate::element::AttachmentTarget,
-        b: &crate::element::AttachmentTarget,
+        a: &crate::element::ReusedContractContextTarget,
+        b: &crate::element::ReusedContractContextTarget,
     ) -> bool {
         match (a, b) {
             (
-                crate::element::AttachmentTarget::FilePath(p1),
-                crate::element::AttachmentTarget::FilePath(p2),
+                crate::element::ReusedContractContextTarget::FilePath(p1),
+                crate::element::ReusedContractContextTarget::FilePath(p2),
             ) => p1 == p2,
             (
-                crate::element::AttachmentTarget::ElementIdentifier(id1),
-                crate::element::AttachmentTarget::ElementIdentifier(id2),
+                crate::element::ReusedContractContextTarget::ElementIdentifier(id1),
+                crate::element::ReusedContractContextTarget::ElementIdentifier(id2),
             ) => id1 == id2,
             _ => false,
         }
@@ -1843,9 +1863,9 @@ impl GraphRegistry {
 
     /// Validate contract element constraints
     /// Contract elements (constraint, behavior, specification) can only have define relations
-    /// and cannot have attachments.
-    fn validate_refinement_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
-        debug!("Validating Refinement element constraints...");
+    /// and cannot have reused_contract_context.
+    fn validate_contract_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating Contract element constraints...");
         let mut errors = Vec::new();
 
         for element_node in self.nodes.values() {
@@ -1870,9 +1890,9 @@ impl GraphRegistry {
                     )));
                 }
 
-                if !element.attachments.is_empty() {
+                if !element.reused_contract_context.is_empty() {
                     errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "File {}: Semantic contract element '{}' cannot have attachments. Semantic contracts use ontology through use relations and constrain requirements through constrain/constrainedBy.",
+                        "File {}: Semantic contract element '{}' cannot have reused_contract_context. Semantic contracts use ontology through use relations and constrain requirements through constrain/constrainedBy.",
                         element.file_path, element.name
                     )));
                 }
@@ -1880,8 +1900,8 @@ impl GraphRegistry {
                 continue;
             }
 
-            // Check if this is a non-semantic-contract Refinement element type
-            if element.element_type.is_refinement() {
+            // Check if this is a non-semantic-contract Contract element type
+            if element.element_type.is_contract() {
                 // Contract elements can only have define relations
                 let invalid_relations: Vec<_> = element
                     .relations
@@ -1906,11 +1926,11 @@ impl GraphRegistry {
                     ));
                 }
 
-                // Refinement elements cannot have attachments
-                if !element.attachments.is_empty() {
+                // Contract elements cannot have reused_contract_context
+                if !element.reused_contract_context.is_empty() {
                     errors.push(ReqvireError::InvalidMarkdownStructure(
                         format!(
-                            "File {}: Contract element '{}' (type: {}) cannot have attachments. Contract elements are atomic documentation units meant to be attached to requirements.",
+                            "File {}: Contract element '{}' (type: {}) cannot have reused_contract_context. Contract elements are atomic documentation units meant to be reused to requirements.",
                             element.file_path,
                             element.name,
                             element.element_type.as_str(),
@@ -1921,12 +1941,9 @@ impl GraphRegistry {
         }
 
         if errors.is_empty() {
-            debug!("No Refinement element validation errors found.");
+            debug!("No Contract element validation errors found.");
         } else {
-            debug!(
-                "{} Refinement element validation errors found.",
-                errors.len()
-            );
+            debug!("{} Contract element validation errors found.", errors.len());
         }
 
         Ok(errors)
@@ -1954,9 +1971,9 @@ impl GraphRegistry {
             };
             let element = &node.element;
 
-            if !element.attachments.is_empty() {
+            if !element.reused_contract_context.is_empty() {
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "File {}: Ontology element '{}' cannot have attachments. Ontology vocabulary is referenced through Concept References or semantic-contract use relations.",
+                    "File {}: Ontology element '{}' cannot have reused_contract_context. Ontology vocabulary is referenced through Concept References or semantic-contract use relations.",
                     element.file_path, element.name
                 )));
             }
@@ -1964,10 +1981,10 @@ impl GraphRegistry {
             for relation in element.relations.iter().filter(|r| r.user_created) {
                 if !matches!(
                     relation.relation_type.name,
-                    "derive" | "derivedFrom" | "trace" | "usedBy"
+                    "derive" | "derivedFrom" | "usedBy"
                 ) {
                     errors.push(ReqvireError::IncompatibleElementTypes(format!(
-                        "Ontology element '{}' can only use derive, derivedFrom, trace, or usedBy relations. Invalid relation: {}.",
+                        "Ontology element '{}' can only use derive, derivedFrom, or usedBy relations. Invalid relation: {}.",
                         element.identifier, relation.relation_type.name
                     )));
                 }
@@ -2246,7 +2263,11 @@ impl GraphRegistry {
             .extend(self.validate_concept_references(&semantic_index, removed_declaration_source));
 
         for (iri, declarations) in semantic_index.ontology_declarations {
-            let owners: BTreeSet<String> = declarations
+            let authored_declarations: Vec<_> = declarations
+                .iter()
+                .filter(|declaration| !declaration.external)
+                .collect();
+            let owners: BTreeSet<String> = authored_declarations
                 .iter()
                 .map(|declaration| declaration.element_identifier.clone())
                 .collect();
@@ -2259,8 +2280,8 @@ impl GraphRegistry {
             }
 
             let mut conflicting_roles = BTreeSet::new();
-            for left in &declarations {
-                for right in &declarations {
+            for left in &authored_declarations {
+                for right in &authored_declarations {
                     if left.role.conflicts_with(right.role) {
                         conflicting_roles.insert(left.role);
                         conflicting_roles.insert(right.role);
@@ -2522,6 +2543,14 @@ impl GraphRegistry {
             }
         }
 
+        for source in &semantic_index.external_sources {
+            if context.contains(source.owner_identifier.as_str()) {
+                prefixes
+                    .entry(source.prefix.clone())
+                    .or_insert(source.namespace.clone());
+            }
+        }
+
         prefixes
     }
 
@@ -2592,6 +2621,21 @@ impl GraphRegistry {
                 .insert(declaration.ontology_prefix.clone());
         }
 
+        for source in &semantic_index.external_sources {
+            if !ontology_context.contains(source.owner_identifier.as_str()) {
+                continue;
+            }
+
+            by_prefix
+                .entry(source.prefix.clone())
+                .or_default()
+                .insert(source.namespace.clone());
+            prefix_by_namespace
+                .entry(source.namespace.clone())
+                .or_default()
+                .insert(source.prefix.clone());
+        }
+
         UsedOntologyProjectNamespaces {
             by_prefix,
             prefix_by_namespace,
@@ -2600,17 +2644,17 @@ impl GraphRegistry {
 
     /// Validates that each contract is owned by at most one requirement via definedBy.
     /// A contract element or file can only appear as a target of definedBy from one owner.
-    fn validate_refinement_ownership_uniqueness(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
-        debug!("Validating refinement ownership uniqueness...");
+    fn validate_contract_ownership_uniqueness(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating contract ownership uniqueness...");
         let mut errors = Vec::new();
-        // Map from refinement target (identifier or file path) to owning element identifier
+        // Map from contract target (identifier or file path) to owning element identifier
         let mut ownership_map: std::collections::HashMap<String, String> =
             std::collections::HashMap::new();
 
         for (element_id, element_node) in &self.nodes {
             for relation in &element_node.element.relations {
-                if relation::is_refinement_relation(relation.relation_type)
-                    && relation.relation_type.name == REFINEMENT_RELATIONS[1]
+                if relation::is_contract_relation(relation.relation_type)
+                    && relation.relation_type.name == CONTRACT_RELATIONS[1]
                 // definedBy
                 {
                     let target_key = relation.target.link.as_str().to_string();
@@ -2643,10 +2687,10 @@ impl GraphRegistry {
         }
 
         if errors.is_empty() {
-            debug!("No refinement ownership uniqueness violations found.");
+            debug!("No contract ownership uniqueness violations found.");
         } else {
             debug!(
-                "{} refinement ownership uniqueness violations found.",
+                "{} contract ownership uniqueness violations found.",
                 errors.len()
             );
         }
@@ -2654,8 +2698,7 @@ impl GraphRegistry {
         Ok(errors)
     }
 
-    /// Validates that 'other' type elements only use trace relations
-    /// Returns a list of validation errors for 'other' elements using non-trace relations
+    /// Validates that explicit 'other' type elements do not author semantic relations.
     fn validate_other_element_relations(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating 'other' element type relation constraints...");
         let mut errors = Vec::new();
@@ -2666,17 +2709,16 @@ impl GraphRegistry {
             // Check if this is an 'other' type element
             if let crate::element::ElementType::Other(type_str) = &element.element_type {
                 if type_str == "other" {
-                    // 'other' type can only use trace relations
-                    let non_trace_relations: Vec<_> = element
+                    let authored_relations: Vec<_> = element
                         .relations
                         .iter()
-                        .filter(|r| r.user_created && r.relation_type.name != "trace")
+                        .filter(|r| r.user_created)
                         .collect();
 
-                    for relation in non_trace_relations {
+                    for relation in authored_relations {
                         errors.push(ReqvireError::IncompatibleElementTypes(
                             format!(
-                                "Element type 'other' can only use 'trace' relations: '{}' uses '{}' relation to '{}'. See Element Type Relation Compatibility specification.",
+                                "Element type 'other' cannot author semantic relations: '{}' uses '{}' relation to '{}'. Use a specific supported element type or ontology concept reference.",
                                 element.identifier,
                                 relation.relation_type.name,
                                 &relation.target.text
@@ -2731,7 +2773,7 @@ impl GraphRegistry {
         // Traverse relations using their metadata to determine canonical direction
         for relation in &element.relations {
             if let LinkType::Identifier(ref target_id) = relation.target.link {
-                // Skip relations that don't participate in dependency propagation (like trace and backward relations)
+                // Skip relations that don't participate in dependency propagation, including backward relations.
                 // Only traverse relations that are in IMPACT_PROPAGATION_RELATIONS for cycle detection
                 if !IMPACT_PROPAGATION_RELATIONS.contains(&relation.relation_type.name) {
                     continue;
@@ -3467,23 +3509,25 @@ impl GraphRegistry {
         }
         markdown.push('\n');
 
-        // Add attachments subsection if there are attachments
-        // Deduplicate attachments by target, keeping first occurrence
-        let mut seen_attachments: std::collections::HashSet<String> =
+        // Add reused_contract_context subsection if there are reused_contract_context
+        // Deduplicate reused_contract_context by target, keeping first occurrence
+        let mut seen_reused_contract_context: std::collections::HashSet<String> =
             std::collections::HashSet::new();
-        let unique_attachments: Vec<_> = element
-            .attachments
+        let unique_reused_contract_context: Vec<_> = element
+            .reused_contract_context
             .iter()
-            .filter(|a| seen_attachments.insert(a.target.as_str()))
+            .filter(|a| seen_reused_contract_context.insert(a.target.as_str()))
             .collect();
 
-        if !unique_attachments.is_empty() {
-            markdown.push_str("#### Attachments\n");
-            for attachment in unique_attachments {
-                match &attachment.target {
-                    crate::element::AttachmentTarget::FilePath(file_path) => {
-                        // Attachment paths are stored as git-root-relative paths
-                        let attachment_path = file_path.to_string_lossy().to_string();
+        if !unique_reused_contract_context.is_empty() {
+            markdown.push_str("#### ");
+            markdown.push_str(REUSED_CONTRACT_CONTEXT_SECTION);
+            markdown.push('\n');
+            for reused_contract_context in unique_reused_contract_context {
+                match &reused_contract_context.target {
+                    crate::element::ReusedContractContextTarget::FilePath(file_path) => {
+                        // ReusedContractContextEntry paths are stored as git-root-relative paths
+                        let reused_context_path = file_path.to_string_lossy().to_string();
 
                         // Make the path relative to the current file's directory (same as relations)
                         let current_file_path = std::path::PathBuf::from(_current_file);
@@ -3494,24 +3538,24 @@ impl GraphRegistry {
 
                         // Use to_relative_identifier like we do for InternalPath relations
                         // Prepend "/" to indicate git-root-relative path
-                        let absolute_path = format!("/{}", attachment_path);
+                        let absolute_path = format!("/{}", reused_context_path);
                         let relative_path = crate::utils::to_relative_identifier(
                             &absolute_path,
                             &current_folder,
                             false,
                         )
-                        .unwrap_or_else(|_| attachment_path.clone());
+                        .unwrap_or_else(|_| reused_context_path.clone());
 
                         // Use filename as display text for cleaner markdown
                         let display_name = file_path
                             .file_name()
                             .and_then(|name| name.to_str())
-                            .unwrap_or(&attachment_path);
+                            .unwrap_or(&reused_context_path);
 
                         markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_path));
                     }
-                    crate::element::AttachmentTarget::ElementIdentifier(identifier) => {
-                        // Element identifier attachments - format as markdown link
+                    crate::element::ReusedContractContextTarget::ElementIdentifier(identifier) => {
+                        // Element identifier reused_contract_context - format as markdown link
                         let current_file_path = std::path::PathBuf::from(_current_file);
                         let current_folder = current_file_path
                             .parent()
@@ -3951,15 +3995,17 @@ impl GraphRegistry {
             markdown.push('\n');
         }
 
-        if !element.attachments.is_empty() {
-            markdown.push_str("## Attachments\n");
-            for attachment in &element.attachments {
-                match &attachment.target {
-                    crate::element::AttachmentTarget::FilePath(path) => {
+        if !element.reused_contract_context.is_empty() {
+            markdown.push_str("## ");
+            markdown.push_str(REUSED_CONTRACT_CONTEXT_SECTION);
+            markdown.push('\n');
+            for reused_contract_context in &element.reused_contract_context {
+                match &reused_contract_context.target {
+                    crate::element::ReusedContractContextTarget::FilePath(path) => {
                         let path_str = path.to_string_lossy().to_string();
                         markdown.push_str(&format!("  * [{}]({})\n", path_str, path_str));
                     }
-                    crate::element::AttachmentTarget::ElementIdentifier(id) => {
+                    crate::element::ReusedContractContextTarget::ElementIdentifier(id) => {
                         let display = self
                             .get_element(id)
                             .map(|e| e.name.clone())
@@ -4147,8 +4193,8 @@ impl GraphRegistry {
             }
         }
 
-        // Find all files with attachments pointing to this element
-        for file in self.find_files_with_attachment_to(element_id) {
+        // Find all files with reused_contract_context pointing to this element
+        for file in self.find_files_with_reused_contract_context_to(element_id) {
             if !modified_files.contains(&file) {
                 modified_files.push(file);
             }
@@ -4180,8 +4226,8 @@ impl GraphRegistry {
             }
         }
 
-        // Update all attachment identifiers pointing to this element
-        self.update_attachment_identifiers(&old_id, &new_identifier);
+        // Update all reused_contract_context identifiers pointing to this element
+        self.update_reused_contract_context_identifiers(&old_id, &new_identifier);
 
         // Track all modified files
         for file in &modified_files {
@@ -4297,9 +4343,9 @@ impl GraphRegistry {
             }
         }
 
-        // Find all files with attachments to elements in the source file
+        // Find all files with reused_contract_context to elements in the source file
         for old_id in &elements_in_source {
-            for file in self.find_files_with_attachment_to(old_id) {
+            for file in self.find_files_with_reused_contract_context_to(old_id) {
                 if !modified_files.contains(&file) {
                     modified_files.push(file);
                 }
@@ -4326,9 +4372,9 @@ impl GraphRegistry {
             }
         }
 
-        // Update all attachment identifiers pointing to moved elements
+        // Update all reused_contract_context identifiers pointing to moved elements
         for (old_id, new_id) in &identifier_mappings {
-            self.update_attachment_identifiers(old_id, new_id);
+            self.update_reused_contract_context_identifiers(old_id, new_id);
         }
 
         modified_files.push(target_file.to_string());
@@ -4572,14 +4618,18 @@ impl GraphRegistry {
         }
     }
 
-    /// Updates attachment identifiers when a Refinement element is moved or renamed
-    /// Similar to update_relation_identifiers but for attachment references
-    fn update_attachment_identifiers(&mut self, old_identifier: &str, new_identifier: &str) {
-        // Find and update all attachment identifiers pointing to the old identifier
+    /// Updates reused_contract_context identifiers when a Contract element is moved or renamed
+    /// Similar to update_relation_identifiers but for reused_contract_context references
+    fn update_reused_contract_context_identifiers(
+        &mut self,
+        old_identifier: &str,
+        new_identifier: &str,
+    ) {
+        // Find and update all reused_contract_context identifiers pointing to the old identifier
         for node in self.nodes.values_mut() {
-            for attachment in &mut node.element.attachments {
-                if let crate::element::AttachmentTarget::ElementIdentifier(ref mut id) =
-                    attachment.target
+            for reused_contract_context in &mut node.element.reused_contract_context {
+                if let crate::element::ReusedContractContextTarget::ElementIdentifier(ref mut id) =
+                    reused_contract_context.target
                 {
                     if id == old_identifier {
                         *id = new_identifier.to_string();
@@ -4589,14 +4639,14 @@ impl GraphRegistry {
         }
     }
 
-    /// Finds all files that have attachments pointing to the given element identifier
-    fn find_files_with_attachment_to(&self, element_id: &str) -> Vec<String> {
+    /// Finds all files that have reused_contract_context pointing to the given element identifier
+    fn find_files_with_reused_contract_context_to(&self, element_id: &str) -> Vec<String> {
         let mut files = Vec::new();
         for node in self.nodes.values() {
-            let has_attachment = node.element.attachments.iter().any(|att| {
-                matches!(&att.target, crate::element::AttachmentTarget::ElementIdentifier(id) if id == element_id)
+            let has_reused_contract_context = node.element.reused_contract_context.iter().any(|att| {
+                matches!(&att.target, crate::element::ReusedContractContextTarget::ElementIdentifier(id) if id == element_id)
             });
-            if has_attachment {
+            if has_reused_contract_context {
                 let file = node.element.file_path.clone();
                 if !files.contains(&file) {
                     files.push(file);
@@ -4826,25 +4876,25 @@ impl GraphRegistry {
         Ok(())
     }
 
-    /// Remove an attachment from an element
-    pub fn remove_element_attachment(
+    /// Remove an reused_contract_context from an element
+    pub fn remove_element_reused_contract_context(
         &mut self,
         element_id: &str,
-        attachment: &str,
+        reused_contract_context: &str,
     ) -> Result<(), ReqvireError> {
         if let Some(node) = self.nodes.get_mut(element_id) {
-            let original_len = node.element.attachments.len();
+            let original_len = node.element.reused_contract_context.len();
             node.element
-                .attachments
-                .retain(|a| a.target.as_str() != attachment);
+                .reused_contract_context
+                .retain(|a| a.target.as_str() != reused_contract_context);
 
-            if node.element.attachments.len() < original_len {
+            if node.element.reused_contract_context.len() < original_len {
                 self.modified_files.insert(node.element.file_path.clone());
                 Ok(())
             } else {
                 Err(ReqvireError::ProcessError(format!(
-                    "Attachment '{}' not found on element '{}'",
-                    attachment, element_id
+                    "ReusedContractContextEntry '{}' not found on element '{}'",
+                    reused_contract_context, element_id
                 )))
             }
         } else {
@@ -5000,20 +5050,23 @@ impl GraphRegistry {
                 let target_display_name = target_element.name.clone();
                 let target_type = target_element.element_type.clone();
 
-                if source_node.element.attachments.iter().any(|a| {
-                    let attachment_target = a.target.as_str();
-                    attachment_target == target_id
+                if source_node.element.reused_contract_context.iter().any(|a| {
+                    let reused_contract_context_target = a.target.as_str();
+                    reused_contract_context_target == target_id
                         || self
-                            .resolve_relation_identifier(&source_node.element, &attachment_target)
+                            .resolve_relation_identifier(
+                                &source_node.element,
+                                &reused_contract_context_target,
+                            )
                             .is_some_and(|resolved| resolved == target_id)
                         || self.relation_targets_same_identifier(
                             &source_file_path,
-                            &attachment_target,
+                            &reused_contract_context_target,
                             &target_id,
                         )
                 }) {
                     return Err(ReqvireError::CrossSectionDuplicate(format!(
-                        "Target '{}' already exists in Attachments of '{}'. Cannot add to Relations.",
+                        "Target '{}' already exists in Reused Contract Context of '{}'. Cannot add to Relations.",
                         target, source_name
                     )));
                 }
@@ -5065,16 +5118,16 @@ impl GraphRegistry {
             )));
         }
 
-        // Validate: Check for cross-section duplicate (target in Attachments)
-        let in_attachments = source_node
+        // Validate: Check for cross-section duplicate (target in Reused Contract Context)
+        let in_reused_contract_context = source_node
             .element
-            .attachments
+            .reused_contract_context
             .iter()
             .any(|a| a.target.as_str() == target_id_for_check);
 
-        if in_attachments {
+        if in_reused_contract_context {
             return Err(ReqvireError::CrossSectionDuplicate(format!(
-                "Target '{}' already exists in Attachments of '{}'. Cannot add to Relations.",
+                "Target '{}' already exists in Reused Contract Context of '{}'. Cannot add to Relations.",
                 target, source_name
             )));
         }
@@ -5187,7 +5240,7 @@ impl GraphRegistry {
 
             Ok(Some((source_file_path, relation_type, target_display_name)))
         } else {
-            // No relation found - could be an attachment (handled by crud layer)
+            // No relation found - could be an reused_contract_context (handled by crud layer)
             Ok(None)
         }
     }
@@ -5507,8 +5560,8 @@ impl GraphRegistry {
             }
         }
 
-        // Find all files with attachments pointing to this element
-        for file in self.find_files_with_attachment_to(element_id) {
+        // Find all files with reused_contract_context pointing to this element
+        for file in self.find_files_with_reused_contract_context_to(element_id) {
             if !modified_files.contains(&file) {
                 modified_files.push(file);
             }
@@ -5530,8 +5583,8 @@ impl GraphRegistry {
             self.nodes.insert(new_identifier.clone(), node);
         }
 
-        // Update all attachment identifiers pointing to this element
-        self.update_attachment_identifiers(&old_identifier, &new_identifier);
+        // Update all reused_contract_context identifiers pointing to this element
+        self.update_reused_contract_context_identifiers(&old_identifier, &new_identifier);
 
         // CRITICAL: Recreate opposite relations with updated identifiers
         // After moving, opposite relations pointing to the old identifier must be updated
@@ -5554,7 +5607,7 @@ impl GraphRegistry {
     /// # Behavior
     /// - Source content is appended to target's Details section
     /// - Source Details sections become "Merged Details (source name)" subsections
-    /// - Relations and attachments are merged with deduplication
+    /// - Relations and reused_contract_context are merged with deduplication
     /// - Source elements are deleted after successful merge
     /// - Relations pointing to source elements are redirected to target
     pub fn merge_elements(
@@ -5584,7 +5637,7 @@ impl GraphRegistry {
             String,
             String,
             Vec<crate::relation::Relation>,
-            Vec<crate::element::Attachment>,
+            Vec<crate::element::ReusedContractContextEntry>,
             Element,
         )> = Vec::new();
         for source_id in source_ids {
@@ -5616,7 +5669,7 @@ impl GraphRegistry {
             if !target_type.is_merge_compatible(&source_element.element_type) {
                 return Err(ReqvireError::MergeTypeMismatch(format!(
                     "Cannot merge '{}' ({}) into '{}' ({}): type mismatch. \
-                     Elements must be in the same category (requirement/verification/refinement/other).",
+                     Elements must be in the same category (requirement/verification/contract/other).",
                     source_element.name, source_element.element_type.as_str(),
                     target_name, target_type.as_str()
                 )));
@@ -5632,7 +5685,7 @@ impl GraphRegistry {
                     .filter(|r| r.user_created)
                     .cloned()
                     .collect(),
-                source_element.attachments.clone(),
+                source_element.reused_contract_context.clone(),
                 source_element.clone(),
             ));
         }
@@ -5647,8 +5700,8 @@ impl GraphRegistry {
             .filter(|r| r.user_created)
             .cloned()
             .collect();
-        let mut merged_attachments: Vec<crate::element::Attachment> =
-            target_node.element.attachments.clone();
+        let mut merged_reused_contract_context: Vec<crate::element::ReusedContractContextEntry> =
+            target_node.element.reused_contract_context.clone();
         let target_is_ontology = target_type.is_ontology();
         let target_element_for_merge = target_node.element.clone();
         let mut merged_source_ids: HashSet<String> = source_ids.iter().cloned().collect();
@@ -5660,7 +5713,7 @@ impl GraphRegistry {
             source_name,
             source_content,
             source_relations,
-            source_attachments,
+            source_reused_contract_context,
             source_element,
         ) in &source_data
         {
@@ -5701,9 +5754,9 @@ impl GraphRegistry {
                 }
             }
 
-            // Collect attachments
-            for att in source_attachments {
-                merged_attachments.push(att.clone());
+            // Collect reused_contract_context
+            for att in source_reused_contract_context {
+                merged_reused_contract_context.push(att.clone());
             }
 
             // Track source file as modified
@@ -5726,33 +5779,33 @@ impl GraphRegistry {
             }
         });
 
-        // Deduplicate attachments by target
-        let mut seen_attachments: HashSet<String> = HashSet::new();
-        merged_attachments.retain(|a| {
+        // Deduplicate reused_contract_context by target
+        let mut seen_reused_contract_context: HashSet<String> = HashSet::new();
+        merged_reused_contract_context.retain(|a| {
             let key = a.target.as_str().to_string();
-            if seen_attachments.contains(&key) {
+            if seen_reused_contract_context.contains(&key) {
                 false
             } else {
-                seen_attachments.insert(key);
+                seen_reused_contract_context.insert(key);
                 true
             }
         });
 
-        // Validate attachment scope constraints for target element
-        for attachment in &merged_attachments {
-            if let crate::element::AttachmentTarget::ElementIdentifier(ref att_id) =
-                attachment.target
+        // Validate reused_contract_context scope constraints for target element
+        for reused_contract_context in &merged_reused_contract_context {
+            if let crate::element::ReusedContractContextTarget::ElementIdentifier(ref att_id) =
+                reused_contract_context.target
             {
-                // Check orphan refinement constraint
-                if !self.refinement_has_refine_relation(att_id) {
+                // Check orphan contract constraint
+                if !self.contract_has_define_relation(att_id) {
                     let att_name = self
                         .nodes
                         .get(att_id)
                         .map(|n| n.element.name.as_str())
                         .unwrap_or(att_id);
-                    return Err(ReqvireError::InvalidAttachmentTarget(
+                    return Err(ReqvireError::InvalidReusedContractContextTarget(
                         format!(
-                            "'{}' has no define relation. Contracts must define a requirement before they can be attached; contracts are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not defined by implementation-detail contracts.",
+                            "'{}' has no define relation. Contracts must define a requirement before they can be reused; contracts are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not defined by implementation-detail contracts.",
                             att_name
                         ),
                     ));
@@ -5767,9 +5820,9 @@ impl GraphRegistry {
                             .get(att_id)
                             .map(|n| n.element.name.as_str())
                             .unwrap_or(att_id);
-                        return Err(ReqvireError::InvalidAttachmentScope(
+                        return Err(ReqvireError::InvalidReusedContractContextScope(
                             format!(
-                                "'{}' cannot be attached to '{}' because it is within the contract's defining hierarchy. Attachments are only allowed from elements outside the definedBy chain.",
+                                "'{}' cannot be reused to '{}' because it is within the contract's defining hierarchy. Reused Contract Context are only allowed from elements outside the definedBy chain.",
                                 att_name,
                                 target_name
                             ),
@@ -5777,13 +5830,13 @@ impl GraphRegistry {
                     }
                 }
 
-                if let Some(msg) = self.build_attachment_direction_scope_error(
+                if let Some(msg) = self.build_reused_contract_context_direction_scope_error(
                     att_id,
                     target_id,
                     &target_name,
                     None,
                 ) {
-                    return Err(ReqvireError::InvalidAttachmentScope(msg));
+                    return Err(ReqvireError::InvalidReusedContractContextScope(msg));
                 }
             }
         }
@@ -5794,11 +5847,11 @@ impl GraphRegistry {
             .map(|r| r.target.link.as_str().to_string())
             .collect();
 
-        for attachment in &merged_attachments {
-            let target = attachment.target.as_str();
+        for reused_contract_context in &merged_reused_contract_context {
+            let target = reused_contract_context.target.as_str();
             if relation_targets.contains(&target) {
                 return Err(ReqvireError::MergeCrossSectionDuplicate(format!(
-                    "Target '{}' would appear in both Relations and Attachments after merge. Remove one before merging.",
+                    "Target '{}' would appear in both Relations and Reused Contract Context after merge. Remove one before merging.",
                     target
                 )));
             }
@@ -5832,7 +5885,7 @@ impl GraphRegistry {
             }
 
             target_element.relations = merged_relations;
-            target_element.attachments = merged_attachments;
+            target_element.reused_contract_context = merged_reused_contract_context;
         }
 
         self.modified_files.insert(target_file_path);

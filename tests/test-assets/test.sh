@@ -3,18 +3,18 @@ set -uo pipefail
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-attachment_count() {
+reused_contract_context_count() {
   local element_name="$1"
   (cd "$TEST_DIR" && "$REQVIRE_BIN" search --json) | jq -r --arg name "$element_name" '
-    [.files | to_entries[]?.value.elements[]? | select(.name==$name) | .attachments[]?] | length
+    [.. | objects | select(.name? == $name and has("reused_contract_context")) | .reused_contract_context[]?] | length
   '
 }
 
-has_attachment() {
+has_reused_contract_context() {
   local element_name="$1"
   local expected_target="$2"
   (cd "$TEST_DIR" && "$REQVIRE_BIN" search --json) | jq -r --arg name "$element_name" '
-    .files | to_entries[]?.value.elements[]? | select(.name==$name) | .attachments[]?
+    .. | objects | select(.name? == $name and has("reused_contract_context")) | .reused_contract_context[]?
   ' | grep -Fxq "$expected_target"
 }
 
@@ -32,23 +32,23 @@ assert_file_matches() {
 }
 
 echo "===================================="
-echo "Identifier Attachments Capability Tests"
+echo "Identifier Reused Contract Context Capability Tests"
 echo "===================================="
 echo ""
 
 # ==================================
-# Test 1: Attach refinement identifier
+# Test 1: Reuse contract identifier
 # ==================================
-echo "Test 1: Attach refinement identifier..."
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "#test-constraint-element" > /dev/null 2>&1
+echo "Test 1: Reuse contract identifier..."
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#test-constraint-element" > /dev/null 2>&1
 
-if [ "$(attachment_count "Performance Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: Performance Requirement should have 1 attachment"
+if [ "$(reused_contract_context_count "Performance Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: Performance Requirement should have 1 reused_contract_context"
   exit 1
 fi
 
-if ! has_attachment "Performance Requirement" "specifications/Requirements.md#test-constraint-element"; then
-  echo "❌ FAILED: Expected attachment target not found"
+if ! has_reused_contract_context "Performance Requirement" "specifications/Requirements.md#test-constraint-element"; then
+  echo "❌ FAILED: Expected reused_contract_context target not found"
   exit 1
 fi
 
@@ -56,21 +56,21 @@ echo "✅ Test 1 passed"
 echo ""
 
 # ==================================
-# Test 2: Duplicate attach fails
+# Test 2: Duplicate reuse fails
 # ==================================
-echo "Test 2: Duplicate attach returns error..."
+echo "Test 2: Duplicate reuse returns error..."
 set +e
-ATTACH_DUP_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "#test-constraint-element" 2>&1)
+ATTACH_DUP_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#test-constraint-element" 2>&1)
 ATTACH_DUP_EXIT=$?
 set -e
 
 if [ $ATTACH_DUP_EXIT -eq 0 ]; then
-  echo "❌ FAILED: Duplicate attach should fail"
+  echo "❌ FAILED: Duplicate reuse should fail"
   exit 1
 fi
 
 if ! echo "$ATTACH_DUP_OUTPUT" | grep -qi "already exists"; then
-  echo "❌ FAILED: Duplicate attach error should mention 'already exists'"
+  echo "❌ FAILED: Duplicate reuse error should mention 'already exists'"
   echo "$ATTACH_DUP_OUTPUT"
   exit 1
 fi
@@ -79,13 +79,13 @@ echo "✅ Test 2 passed"
 echo ""
 
 # ==================================
-# Test 3: Multiple refinement attachments
+# Test 3: Multiple contract reused_contract_context
 # ==================================
-echo "Test 3: Multiple refinement attachments..."
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "#test-behavior-element" > /dev/null 2>&1
+echo "Test 3: Multiple contract reused_contract_context..."
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#test-behavior-element" > /dev/null 2>&1
 
-if [ "$(attachment_count "Performance Requirement")" -ne 2 ]; then
-  echo "❌ FAILED: Performance Requirement should have 2 attachments"
+if [ "$(reused_contract_context_count "Performance Requirement")" -ne 2 ]; then
+  echo "❌ FAILED: Performance Requirement should have 2 reused_contract_context"
   exit 1
 fi
 
@@ -93,13 +93,13 @@ echo "✅ Test 3 passed"
 echo ""
 
 # ==================================
-# Test 4: Same refinement to multiple elements
+# Test 4: Same contract to multiple elements
 # ==================================
-echo "Test 4: Same refinement on multiple elements..."
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "No Attachments Requirement" attaching "#test-constraint-element" > /dev/null 2>&1
+echo "Test 4: Same contract on multiple elements..."
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "No Reused Contract Context Requirement" reusesContract "#test-constraint-element" > /dev/null 2>&1
 
-if [ "$(attachment_count "No Attachments Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: No Attachments Requirement should have 1 attachment"
+if [ "$(reused_contract_context_count "No Reused Contract Context Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: No Reused Contract Context Requirement should have 1 reused_contract_context"
   exit 1
 fi
 
@@ -107,18 +107,18 @@ echo "✅ Test 4 passed"
 echo ""
 
 # ==================================
-# Test 5: Detach isolation
+# Test 5: Remove Reused Context isolation
 # ==================================
-echo "Test 5: Detach one attachment without affecting others..."
+echo "Test 5: Remove Reused Context one reused_contract_context without affecting others..."
 cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Performance Requirement" "Test Behavior Element" > /dev/null 2>&1
 
-if [ "$(attachment_count "Performance Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: Performance Requirement should have 1 attachment after detach"
+if [ "$(reused_contract_context_count "Performance Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: Performance Requirement should have 1 reused_contract_context after remove reused context"
   exit 1
 fi
 
-if [ "$(attachment_count "No Attachments Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: No Attachments Requirement attachment should remain unchanged"
+if [ "$(reused_contract_context_count "No Reused Contract Context Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: No Reused Contract Context Requirement reused_contract_context should remain unchanged"
   exit 1
 fi
 
@@ -126,13 +126,13 @@ echo "✅ Test 5 passed"
 echo ""
 
 # ==================================
-# Test 6: Detach all from source element
+# Test 6: Remove Reused Context all from source element
 # ==================================
-echo "Test 6: Detach remaining attachment from source..."
+echo "Test 6: Remove Reused Context remaining reused_contract_context from source..."
 cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Performance Requirement" "Test Constraint Element" > /dev/null 2>&1
 
-if [ "$(attachment_count "Performance Requirement")" -ne 0 ]; then
-  echo "❌ FAILED: Performance Requirement should have no attachments"
+if [ "$(reused_contract_context_count "Performance Requirement")" -ne 0 ]; then
+  echo "❌ FAILED: Performance Requirement should have no reused_contract_context"
   exit 1
 fi
 
@@ -140,19 +140,19 @@ echo "✅ Test 6 passed"
 echo ""
 
 # ==================================
-# Test 7: Search filter has-attachments
+# Test 7: Search filter has-reused_contract_context
 # ==================================
-echo "Test 7: Search --has-attachments..."
-SEARCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --has-attachments --short 2>&1)
+echo "Test 7: Search --has-reused-contract-context..."
+SEARCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --has-reused-contract-context --short 2>&1)
 
-if ! echo "$SEARCH_OUTPUT" | grep -q "No Attachments Requirement"; then
-  echo "❌ FAILED: Search should include 'No Attachments Requirement'"
+if ! echo "$SEARCH_OUTPUT" | grep -q "No Reused Contract Context Requirement"; then
+  echo "❌ FAILED: Search should include 'No Reused Contract Context Requirement'"
   echo "$SEARCH_OUTPUT"
   exit 1
 fi
 
 if echo "$SEARCH_OUTPUT" | grep -q "Performance Requirement"; then
-  echo "❌ FAILED: Search should not include 'Performance Requirement' after detach"
+  echo "❌ FAILED: Search should not include 'Performance Requirement' after remove reused context"
   echo "$SEARCH_OUTPUT"
   exit 1
 fi
@@ -161,21 +161,21 @@ echo "✅ Test 7 passed"
 echo ""
 
 # ==================================
-# Test 8: File-path target rejected for attaching
+# Test 8: File-path target rejected for reusesContract
 # ==================================
 echo "Test 8: File-path target is rejected..."
 set +e
-ATTACH_PATH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "docs/SLA.txt" 2>&1)
+ATTACH_PATH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "docs/SLA.txt" 2>&1)
 ATTACH_PATH_EXIT=$?
 set -e
 
 if [ $ATTACH_PATH_EXIT -eq 0 ]; then
-  echo "❌ FAILED: File-path attaching target should fail"
+  echo "❌ FAILED: File-path reusesContract target should fail"
   exit 1
 fi
 
-if ! echo "$ATTACH_PATH_OUTPUT" | grep -qi "must use attachable element identifiers"; then
-  echo "❌ FAILED: Error should explain identifier-only attachment targets"
+if ! echo "$ATTACH_PATH_OUTPUT" | grep -qi "must use reusable element identifiers"; then
+  echo "❌ FAILED: Error should explain identifier-only reused_contract_context targets"
   echo "$ATTACH_PATH_OUTPUT"
   exit 1
 fi
@@ -184,19 +184,19 @@ echo "✅ Test 8 passed"
 echo ""
 
 # ==================================
-# Test 9: Validation rejects file-path attachment syntax
+# Test 9: Validation rejects file-path reused_contract_context syntax
 # ==================================
-echo "Test 9: Validation rejects file-path attachment syntax..."
+echo "Test 9: Validation rejects file-path reused_contract_context syntax..."
 cat >> "$TEST_DIR/specifications/Requirements.md" << 'EOF'
 
-### Invalid File Attachment Requirement
+### Invalid File ReusedContractContextEntry Requirement
 
-This requirement intentionally uses invalid file-path attachment syntax.
+This requirement intentionally uses invalid file-path reused_contract_context syntax.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [SLA](../docs/SLA.txt)
 ---
 EOF
@@ -207,17 +207,17 @@ VALIDATE_EXIT=$?
 set -e
 
 if [ $VALIDATE_EXIT -eq 0 ]; then
-  echo "❌ FAILED: Validation should fail for file-path attachment syntax"
+  echo "❌ FAILED: Validation should fail for file-path reused_contract_context syntax"
   exit 1
 fi
 
-if ! echo "$VALIDATE_OUTPUT" | grep -qi "Invalid attachment"; then
-  echo "❌ FAILED: Validation error should mention invalid attachment format"
+if ! echo "$VALIDATE_OUTPUT" | grep -qi "Invalid reused_contract_context"; then
+  echo "❌ FAILED: Validation error should mention invalid reused_contract_context format"
   echo "$VALIDATE_OUTPUT"
   exit 1
 fi
 
-sed -i '/### Invalid File Attachment Requirement/,/^---$/d' "$TEST_DIR/specifications/Requirements.md"
+sed -i '/### Invalid File ReusedContractContextEntry Requirement/,/^---$/d' "$TEST_DIR/specifications/Requirements.md"
 
 echo "✅ Test 9 passed"
 echo ""
@@ -228,7 +228,7 @@ echo ""
 echo "Test 10: Dry-run mode..."
 cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "#test-behavior-element" --dry-run > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#test-behavior-element" --dry-run > /dev/null 2>&1
 
 if ! cmp -s "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"; then
   echo "❌ FAILED: Dry-run mode should not modify the file"
@@ -240,22 +240,22 @@ echo "✅ Test 10 passed"
 echo ""
 
 # ==================================
-# Test 11: Non-refinement target rejected
+# Test 11: Non-contract target rejected
 # ==================================
-echo "Test 11: Non-refinement attachment target is rejected..."
+echo "Test 11: Non-contract reused_contract_context target is rejected..."
 set +e
-ATTACH_NON_REFINEMENT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "#no-attachments-requirement" 2>&1)
-ATTACH_NON_REFINEMENT_EXIT=$?
+ATTACH_NON_CONTRACT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#no-reused-contract-context-requirement" 2>&1)
+ATTACH_NON_CONTRACT_EXIT=$?
 set -e
 
-if [ $ATTACH_NON_REFINEMENT_EXIT -eq 0 ]; then
-  echo "❌ FAILED: Non-refinement attachment target should fail"
+if [ $ATTACH_NON_CONTRACT_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Non-contract reused_contract_context target should fail"
   exit 1
 fi
 
-if ! echo "$ATTACH_NON_REFINEMENT_OUTPUT" | grep -qi "not an attachable type"; then
-  echo "❌ FAILED: Error should mention attachable type constraint"
-  echo "$ATTACH_NON_REFINEMENT_OUTPUT"
+if ! echo "$ATTACH_NON_CONTRACT_OUTPUT" | grep -qi "not an reusable type"; then
+  echo "❌ FAILED: Error should mention reusable type constraint"
+  echo "$ATTACH_NON_CONTRACT_OUTPUT"
   exit 1
 fi
 
@@ -267,7 +267,7 @@ echo ""
 # ==================================
 echo "Test 12: Unresolved identifier target is rejected..."
 set +e
-ATTACH_MISSING_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "#missing-refinement" 2>&1)
+ATTACH_MISSING_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#missing-contract" 2>&1)
 ATTACH_MISSING_EXIT=$?
 set -e
 
@@ -277,7 +277,7 @@ if [ $ATTACH_MISSING_EXIT -eq 0 ]; then
 fi
 
 if ! echo "$ATTACH_MISSING_OUTPUT" | grep -qi "could not be resolved"; then
-  echo "❌ FAILED: Error should mention unresolved attachment target"
+  echo "❌ FAILED: Error should mention unresolved reused_contract_context target"
   echo "$ATTACH_MISSING_OUTPUT"
   exit 1
 fi
@@ -333,8 +333,8 @@ if [ ! -f "$TEST_DIR/src/test_script.sh" ]; then
   exit 1
 fi
 
-if [ "$(attachment_count "No Attachments Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: mv-asset should not change refinement identifier attachments"
+if [ "$(reused_contract_context_count "No Reused Contract Context Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: mv-asset should not change contract identifier reused_contract_context"
   exit 1
 fi
 
@@ -355,8 +355,8 @@ if [ -f "$TEST_DIR/src/test_script.sh" ]; then
   exit 1
 fi
 
-if [ "$(attachment_count "No Attachments Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: rm-asset should not change refinement identifier attachments"
+if [ "$(reused_contract_context_count "No Reused Contract Context Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: rm-asset should not change contract identifier reused_contract_context"
   exit 1
 fi
 
@@ -364,6 +364,6 @@ echo "✅ Test 14 passed"
 echo ""
 
 echo "===================================="
-echo "All Identifier Attachments tests passed"
+echo "All Identifier Reused Contract Context tests passed"
 echo "===================================="
 exit 0

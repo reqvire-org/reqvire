@@ -2,7 +2,7 @@
 
 ### Behavior Rule Structure Shape
 
-Defines SHACL constraints for behavior rules, state transitions, and behavior refinements.
+Defines SHACL constraints for behavior rules, state transitions, and behavior contracts.
 
 #### Shapes
 ```turtle
@@ -151,7 +151,7 @@ reqvire:LintingRuleShape
 
 ### Reqvire Behavior Rule Ontology
 
-The Reqvire behavior rule ontology defines behavior rules, state transitions, and input-output mappings used by requirement refinements.
+The Reqvire behavior rule ontology defines behavior rules, state transitions, and input-output mappings used by requirement contracts.
 
 Behavior rules, state transitions, and input-output mappings are semantic model terms owned by this capability. Requirements state the system obligations that apply those rules.
 
@@ -166,7 +166,7 @@ reqvire:BehaviorRule a owl:Class ;
   rdfs:subClassOf reqvire:ContractRule ;
   rdfs:comment "Contract rule that describes behavior-specific conditions and outcomes." .
 reqvire:StateTransition a owl:Class ;
-  rdfs:comment "Modeled transition between named states in a behavior refinement." .
+  rdfs:comment "Modeled transition between named states in a behavior contract." .
 reqvire:InputOutputMapping a owl:Class ;
   rdfs:comment "Mapping from modeled input elements to modeled output elements." .
 reqvire:ContractRule a owl:Class ;
@@ -175,11 +175,11 @@ reqvire:ContractRule a owl:Class ;
 reqvire:hasRule a owl:ObjectProperty ;
   rdfs:domain reqvire:Behavior ;
   rdfs:range reqvire:BehaviorRule ;
-  rdfs:comment "Associates a behavior refinement with a behavior rule." .
+  rdfs:comment "Associates a behavior contract with a behavior rule." .
 reqvire:hasTransition a owl:ObjectProperty ;
   rdfs:domain reqvire:Behavior ;
   rdfs:range reqvire:StateTransition ;
-  rdfs:comment "Associates a behavior refinement with a state transition." .
+  rdfs:comment "Associates a behavior contract with a state transition." .
 reqvire:usesInput a owl:ObjectProperty ;
   rdfs:domain reqvire:InputOutputMapping ;
   rdfs:range reqvire:Element ;
@@ -286,14 +286,14 @@ reqvire:lintRepairMode a owl:DatatypeProperty ;
 reqvire:crossSubmodelHierarchyLintRule a reqvire:LintingRule ;
   reqvire:lintRuleName "cross-submodel-hierarchy" ;
   reqvire:lintScope "capability-rooted subgraphs" ;
-  reqvire:lintCondition "A hierarchical relation crosses capability-root boundaries where a specify relation, concept reference, semantic-contract relation, or requirement-owned refinement attachment would preserve ownership more clearly." ;
+  reqvire:lintCondition "A hierarchical relation crosses capability-root boundaries where a specify relation, concept reference, semantic-contract relation, or requirement-owned contract reused_contract_context would preserve ownership more clearly." ;
   reqvire:lintFindingKind "cross-submodel-coupling" ;
   reqvire:lintRepairMode "auditable-user-action" .
 
 reqvire:redundantRelationLintRule a reqvire:LintingRule ;
   reqvire:lintRuleName "redundant-relation" ;
-  reqvire:lintScope "relations and attachments" ;
-  reqvire:lintCondition "A relation or attachment duplicates an already implied or repeated model edge." ;
+  reqvire:lintScope "relations and reused_contract_context" ;
+  reqvire:lintCondition "A relation or reused_contract_context duplicates an already implied or repeated model edge." ;
   reqvire:lintFindingKind "redundant-relation" ;
   reqvire:lintRepairMode "explicit-fix-or-format-when-lossless" .
 
@@ -406,29 +406,29 @@ reqvire:relationTypeCompatibilityRule a reqvire:ValidationRule ;
   reqvire:validationOutcome "Validation fails before the graph is used." ;
   reqvire:validationRepair "Use a compatible relation type or change element types/ownership." .
 
-reqvire:attachmentHierarchyIndependenceRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "attachment-hierarchy-independence" ;
-  reqvire:validationScope "attachments" ;
+reqvire:reusedContractContextHierarchyIndependenceRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "reused-contract-context-hierarchy-independence" ;
+  reqvire:validationScope "reused_contract_context" ;
   reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "An element attaches a refinement already available through owner hierarchy or ancestor attachment propagation." ;
-  reqvire:validationOutcome "Validation fails because the attachment is redundant or hides the intended dependency boundary." ;
-  reqvire:validationRepair "Remove the redundant attachment or attach the contract at the highest valid boundary." .
+  reqvire:validationCondition "An element reuses a contract already available through owner hierarchy or ancestor reused_contract_context propagation." ;
+  reqvire:validationOutcome "Validation fails because the reused_contract_context is redundant or hides the intended dependency boundary." ;
+  reqvire:validationRepair "Remove the redundant reused_contract_context or reuse the contract at the highest valid boundary." .
 
-reqvire:attachmentSubgraphDirectionRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "attachment-subgraph-direction" ;
+reqvire:reusedContractContextSubgraphDirectionRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "reused-contract-context-subgraph-direction" ;
   reqvire:validationScope "capability-root-subgraphs" ;
   reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "Two requirement subgraphs attach refinements to each other in both directions." ;
-  reqvire:validationOutcome "Validation fails because cross-subgraph attachment contracts must be one-directional." ;
-  reqvire:validationRepair "Keep one dependency direction and move shared contracts into a common attached source if needed." .
+  reqvire:validationCondition "Two requirement subgraphs reuse contracts to each other in both directions." ;
+  reqvire:validationOutcome "Validation fails because cross-subgraph reused_contract_context contracts must be one-directional." ;
+  reqvire:validationRepair "Keep one dependency direction and move shared contracts into a common reused source if needed." .
 
 reqvire:crossSectionDuplicateRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "cross-section-duplicate" ;
   reqvire:validationScope "element-subsections" ;
   reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "The same target appears in both Relations and Attachments for one element." ;
+  reqvire:validationCondition "The same target appears in both Relations and Reused Contract Context for one element." ;
   reqvire:validationOutcome "Validation fails because the model cannot infer which semantic channel is intended." ;
-  reqvire:validationRepair "Remove either the relation entry or the attachment entry." .
+  reqvire:validationRepair "Remove either the relation entry or the reused_contract_context entry." .
 
 reqvire:semanticReferenceReachabilityValidationRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "semantic-reference-reachability-validation" ;
@@ -452,7 +452,7 @@ reqvire:crossSubmodelHierarchicalLintRule a reqvire:ValidationRule ;
   reqvire:validationSeverity "warning" ;
   reqvire:validationCondition "A user-authored hierarchical relation crosses capability-root submodel ownership boundaries." ;
   reqvire:validationOutcome "Report as manual review because ownership boundary intent is ambiguous." ;
-  reqvire:validationRepair "Replace with attachment/trace or remodel hierarchy under one capability root." .
+  reqvire:validationRepair "Replace with reused_contract_context/trace or remodel hierarchy under one capability root." .
 
 reqvire:redundantHierarchicalLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-redundant-hierarchical-relation" ;
@@ -564,7 +564,7 @@ reqvire:formatOperationFamily a reqvire:OperationFamily ;
   rdfs:comment "Operation family that normalizes Markdown representation while preserving semantic model meaning." .
 reqvire:relationMaintenanceOperationFamily a reqvire:OperationFamily ;
   rdfs:label "relation-maintenance" ;
-  rdfs:comment "Operation family that links, unlinks, relinks, or rewires relation and attachment edges while preserving graph validity." .
+  rdfs:comment "Operation family that links, unlinks, relinks, or rewires relation and reused_contract_context edges while preserving graph validity." .
 
 reqvire:capabilityMergeCategory a reqvire:MergeCompatibilityCategory ;
   rdfs:label "capability" ;
@@ -586,15 +586,15 @@ reqvire:verificationObjectiveMergeCategory a reqvire:MergeCompatibilityCategory 
   reqvire:mergeCategoryElementType "verification-objective" ;
   rdfs:comment "Verification objective elements merge only with other verification objectives, not with concrete verification elements." ;
   reqvire:mergeRequiresSameCategory true .
-reqvire:refinementMergeCategory a reqvire:MergeCompatibilityCategory ;
-  rdfs:label "refinement" ;
+reqvire:contractMergeCategory a reqvire:MergeCompatibilityCategory ;
+  rdfs:label "contract" ;
   reqvire:mergeCategoryElementType "source", "constraint", "behavior", "specification", "state", "input-output" ;
-  rdfs:comment "Requirement-owned refinements merge only with compatible requirement-owned refinements." ;
+  rdfs:comment "Requirement-owned contracts merge only with compatible requirement-owned contracts." ;
   reqvire:mergeRequiresSameCategory true .
-reqvire:requirementRefinementMergeCategory a reqvire:MergeCompatibilityCategory ;
-  rdfs:label "requirement-refinement" ;
+reqvire:requirementContractMergeCategory a reqvire:MergeCompatibilityCategory ;
+  rdfs:label "requirement-contract" ;
   reqvire:mergeCategoryElementType "constraint", "behavior", "specification", "state", "input-output" ;
-  rdfs:comment "Requirement-owned refinements merge only with requirement-owned refinements." ;
+  rdfs:comment "Requirement-owned contracts merge only with requirement-owned contracts." ;
   reqvire:mergeRequiresSameCategory true .
 reqvire:semanticContractMergeCategory a reqvire:MergeCompatibilityCategory ;
   rdfs:label "semantic-contract" ;

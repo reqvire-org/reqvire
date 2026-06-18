@@ -16,7 +16,7 @@
             "file_path": "specifications/Verifications/Tests.md",
             "file_order_index": 0,
             "relations": [],
-            "attachments": []
+            "reused_contract_context": []
           }
         },
         {
@@ -64,27 +64,27 @@
                                     "file_path": "specifications/Capabilities.md",
                                     "file_order_index": 0,
                                     "relations": [],
-                                    "attachments": []
+                                    "reused_contract_context": []
                                   }
                                 }
                               ],
-                              "attachments": []
+                              "reused_contract_context": []
                             }
                           }
                         ],
-                        "attachments": []
+                        "reused_contract_context": []
                       }
                     }
                   ],
-                  "attachments": []
+                  "reused_contract_context": []
                 }
               }
             ],
-            "attachments": []
+            "reused_contract_context": []
           }
         }
       ],
-      "attachments": []
+      "reused_contract_context": []
     },
     {
       "identifier": "specifications/Verifications/Tests.md#filter-type-test",
@@ -102,7 +102,7 @@
             "file_path": "specifications/Verifications/Tests.md",
             "file_order_index": 0,
             "relations": [],
-            "attachments": []
+            "reused_contract_context": []
           }
         },
         {
@@ -141,23 +141,23 @@
                               "file_path": "specifications/Capabilities.md",
                               "file_order_index": 0,
                               "relations": [],
-                              "attachments": []
+                              "reused_contract_context": []
                             }
                           }
                         ],
-                        "attachments": []
+                        "reused_contract_context": []
                       }
                     }
                   ],
-                  "attachments": []
+                  "reused_contract_context": []
                 }
               }
             ],
-            "attachments": []
+            "reused_contract_context": []
           }
         }
       ],
-      "attachments": []
+      "reused_contract_context": []
     },
     {
       "identifier": "specifications/Verifications/Tests.md#from-flag-filtering-test",
@@ -175,7 +175,7 @@
             "file_path": "specifications/Verifications/Tests.md",
             "file_order_index": 0,
             "relations": [],
-            "attachments": []
+            "reused_contract_context": []
           }
         },
         {
@@ -223,27 +223,27 @@
                                     "file_path": "specifications/Capabilities.md",
                                     "file_order_index": 0,
                                     "relations": [],
-                                    "attachments": []
+                                    "reused_contract_context": []
                                   }
                                 }
                               ],
-                              "attachments": []
+                              "reused_contract_context": []
                             }
                           }
                         ],
-                        "attachments": []
+                        "reused_contract_context": []
                       }
                     }
                   ],
-                  "attachments": []
+                  "reused_contract_context": []
                 }
               }
             ],
-            "attachments": []
+            "reused_contract_context": []
           }
         }
       ],
-      "attachments": []
+      "reused_contract_context": []
     },
     {
       "identifier": "specifications/Verifications/Tests.md#model-generation-test",
@@ -261,7 +261,7 @@
             "file_path": "specifications/Verifications/Tests.md",
             "file_order_index": 0,
             "relations": [],
-            "attachments": []
+            "reused_contract_context": []
           }
         },
         {
@@ -291,19 +291,19 @@
                         "file_path": "specifications/Capabilities.md",
                         "file_order_index": 0,
                         "relations": [],
-                        "attachments": []
+                        "reused_contract_context": []
                       }
                     }
                   ],
-                  "attachments": []
+                  "reused_contract_context": []
                 }
               }
             ],
-            "attachments": []
+            "reused_contract_context": []
           }
         }
       ],
-      "attachments": []
+      "reused_contract_context": []
     },
     {
       "identifier": "specifications/Verifications/Tests.md#output-format-test",
@@ -321,7 +321,7 @@
             "file_path": "specifications/Verifications/Tests.md",
             "file_order_index": 0,
             "relations": [],
-            "attachments": []
+            "reused_contract_context": []
           }
         },
         {
@@ -360,19 +360,19 @@
                               "file_path": "specifications/Capabilities.md",
                               "file_order_index": 0,
                               "relations": [],
-                              "attachments": []
+                              "reused_contract_context": []
                             }
                           }
                         ],
-                        "attachments": []
+                        "reused_contract_context": []
                       }
                     }
                   ],
-                  "attachments": []
+                  "reused_contract_context": []
                 }
               }
             ],
-            "attachments": []
+            "reused_contract_context": []
           }
         },
         {
@@ -384,7 +384,7 @@
             "file_path": "specifications/SystemRequirements.md",
             "file_order_index": 4,
             "relations": [],
-            "attachments": []
+            "reused_contract_context": []
           }
         },
         {
@@ -396,11 +396,11 @@
             "file_path": "specifications/SystemRequirements.md",
             "file_order_index": 5,
             "relations": [],
-            "attachments": []
+            "reused_contract_context": []
           }
         }
       ],
-      "attachments": []
+      "reused_contract_context": []
     },
     {
       "identifier": "specifications/Verifications/Tests.md#reverse-traversal-test",
@@ -418,7 +418,7 @@
             "file_path": "specifications/Verifications/Tests.md",
             "file_order_index": 0,
             "relations": [],
-            "attachments": []
+            "reused_contract_context": []
           }
         },
         {
@@ -466,27 +466,27 @@
                                     "file_path": "specifications/Capabilities.md",
                                     "file_order_index": 0,
                                     "relations": [],
-                                    "attachments": []
+                                    "reused_contract_context": []
                                   }
                                 }
                               ],
-                              "attachments": []
+                              "reused_contract_context": []
                             }
                           }
                         ],
-                        "attachments": []
+                        "reused_contract_context": []
                       }
                     }
                   ],
-                  "attachments": []
+                  "reused_contract_context": []
                 }
               }
             ],
-            "attachments": []
+            "reused_contract_context": []
           }
         }
       ],
-      "attachments": []
+      "reused_contract_context": []
     }
   ],
   "metadata": {

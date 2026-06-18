@@ -51,7 +51,7 @@ The Details subsection provides supporting requirement context and intent-level 
 The system shall perform action X.
 
 #### Details
-Implementation details shall follow associated refinement specifications.
+Implementation details shall follow associated contract specifications.
 Additional context about action X:
 - Operational assumption 1
 - Clarification 2
@@ -108,15 +108,15 @@ Some details.
   * verify: [Some Requirement](#some-requirement)
 ```
 
-## Attachments Subsection
+## Reused Contract Context Subsection
 
-Must be defined with a level 4 header: `#### Attachments`.
+Must be defined with a level 4 header: `#### Reused Contract Context`.
 
-The Attachments subsection links an element to explicit reusable dependency elements. Attachments do not provide ontology context. Semantic vocabulary bindings belong in `#### Concept References`; semantic-contract ontology dependencies belong in `use`/`usedBy` relations.
+The Reused Contract Context subsection links a requirement to explicit reusable contract context from another subgraph. Reused contract context does not provide ontology context. Semantic vocabulary bindings belong in `#### Concept References`; semantic-contract ontology dependencies belong in `use`/`usedBy` relations.
 
-### Element Identifier Attachments
+### Element Identifier Reused Contract Context
 
-Element identifier attachments link to model elements that are attachable under the Reqvire relation and attachment compatibility model.
+Element identifier reused_contract_context link to model elements that are reusable under the Reqvire relation and reused_contract_context compatibility model.
 
 **Parsing Rules:**
 - Support markdown link syntax with fragment identifiers: `* [Element Name](path#element-id)`
@@ -127,11 +127,11 @@ Element identifier attachments link to model elements that are attachable under 
 
 **Validation Rules:**
 - Target element must exist in the model
-- Requirement attachment targets must be reusable requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` contract elements. Semantic-contract dependencies use `constrainedBy`/`constrain` and ontology `use` relations.
-- Capability, verification, contract, and requirement semantic vocabulary references use `#### Concept References`, not attachments.
-- Requirement-owned contract targets must have exactly one compatible `define` relation before they are attachable.
-- Non-attachable element identifiers are rejected with a validation error.
-- Redundant same-hierarchy attachments and invalid cross-subgraph attachment flow are rejected by attachment validation.
+- Requirement reused_contract_context targets must be reusable requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` contract elements. Semantic-contract dependencies use `constrainedBy`/`constrain` and ontology `use` relations.
+- Capability, verification, contract, and requirement semantic vocabulary references use `#### Concept References`, not reused_contract_context.
+- Requirement-owned contract targets must have exactly one compatible `define` relation before they are reusable.
+- Non-reusable element identifiers are rejected with a validation error.
+- Redundant same-hierarchy reused_contract_context and invalid cross-subgraph reused_contract_context flow are rejected by reused_contract_context validation.
 
 **Examples:**
 ```markdown
@@ -139,7 +139,7 @@ Element identifier attachments link to model elements that are attachable under 
 
 The system shall expose an API contract.
 
-#### Attachments
+#### Reused Contract Context
 * [Reusable Payload Shape](Contracts.md#reusable-payload-shape)
 ```
 

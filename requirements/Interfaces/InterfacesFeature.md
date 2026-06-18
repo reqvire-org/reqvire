@@ -62,7 +62,7 @@ MCP requirements define concrete protocol behavior while reusing the same model 
 As an **AI Tool Integrator**, I want Reqvire MCP to run SPARQL over model-owned semantic RDF evidence, so that agents can ask precise ontology and traceability questions without exporting and reloading the graph themselves.
 
 #### Details
-MCP semantic query interface is the capability for read-only SPARQL query execution over authored ontology, SHACL, generated model-context, and ontology projection facts through MCP.
+MCP semantic query interface is the capability for read-only SPARQL query execution over authored ontology, SHACL, generated model-context, normalized relation-family facts, and ontology projection facts through MCP.
 
 #### Concept References
   * MCP semantic query contract: https://www.reqvire.org/ontology#McpSemanticQueryContract

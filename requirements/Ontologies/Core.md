@@ -159,9 +159,9 @@ reqvire:Capability a owl:Class ;
 reqvire:Requirement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   rdfs:comment "Implementation-facing obligation that can be verified and satisfied by implementation or evidence." .
-reqvire:Refinement a owl:Class ;
+reqvire:Contract a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
-  rdfs:comment "Requirement-owned detail element that refines a requirement with source, behavioral, structural, query, or contract information." .
+  rdfs:comment "Requirement-owned detail element that defines a requirement with source, behavioral, structural, query, or contract information." .
 reqvire:Verification a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   rdfs:comment "Evidence or method used to verify a capability or requirement." .
@@ -169,10 +169,10 @@ reqvire:Artifact a owl:Class ;
   rdfs:comment "Referenced implementation, evidence, document, or external resource artifact." .
 reqvire:File a owl:Class ;
   rdfs:subClassOf reqvire:Artifact ;
-  rdfs:comment "Repository-internal file artifact referenced by Reqvire relations, attachments, or evidence links." .
+  rdfs:comment "Repository-internal file artifact referenced by Reqvire relations, reused_contract_context, or evidence links." .
 reqvire:CustomElement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
-  rdfs:comment "Trace-only custom model element whose authored metadata type follows other-TYPENAME." .
+  rdfs:comment "Custom model extension element whose authored metadata type follows other-TYPENAME and cannot author canonical semantic relations." .
 reqvire:ElementType a owl:Class ;
   rdfs:comment "Canonical metadata type value used to classify Reqvire elements." .
 reqvire:CapabilityElementType a owl:Class ;
@@ -181,9 +181,9 @@ reqvire:CapabilityElementType a owl:Class ;
 reqvire:RequirementElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
   rdfs:comment "Element type category for requirement obligations." .
-reqvire:RefinementElementType a owl:Class ;
+reqvire:ContractElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
-  rdfs:comment "Element type category for requirement-owned refinements." .
+  rdfs:comment "Element type category for requirement-owned contracts." .
 reqvire:SemanticContractElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
   rdfs:comment "Element type category for reusable semantic-contract SHACL profile elements." .
@@ -192,7 +192,7 @@ reqvire:VerificationElementType a owl:Class ;
   rdfs:comment "Element type category for verification methods and evidence records." .
 reqvire:CustomElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
-  rdfs:comment "Element type category for custom other-TYPENAME extensions that are trace-only." .
+  rdfs:comment "Element type category for custom other-TYPENAME extensions that cannot author canonical semantic relations." .
 reqvire:ElementIdentity a owl:Class ;
   rdfs:comment "Stable identity concept used to track an element independently of its current file location." .
 reqvire:ElementId a owl:Class ;
@@ -204,7 +204,7 @@ reqvire:ElementIdentifier a owl:Class ;
 reqvire:ElementLocation a owl:Class ;
   rdfs:comment "File and section location context for an element, separate from stable identity." .
 reqvire:ReferenceTargetKind a owl:Class ;
-  rdfs:comment "Stable semantic category for relation or attachment target resolution." .
+  rdfs:comment "Stable semantic category for relation or reused_contract_context target resolution." .
 reqvire:ElementIdentifierTarget a owl:Class ;
   rdfs:subClassOf reqvire:ReferenceTargetKind ;
   rdfs:comment "Reference target category that resolves to a specific model element." .
@@ -288,7 +288,7 @@ reqvire:referenceTargetKindName a owl:DatatypeProperty ;
 reqvire:capabilityType a reqvire:CapabilityElementType ;
   reqvire:elementTypeName "capability" ;
   reqvire:elementTypeCategory "capability" ;
-  rdfs:comment "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, connected to ontology through attachments, and verified by evidence." ;
+  rdfs:comment "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, connected to ontology through reused_contract_context, and verified by evidence." ;
   reqvire:defaultElementType false .
 
 reqvire:requirementType a reqvire:RequirementElementType ;
@@ -330,9 +330,9 @@ reqvire:relationsSubsection a reqvire:ReservedSubsection ;
 reqvire:detailsSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Details" ;
   rdfs:comment "Narrative requirement context and clarification that remains part of the owning element." .
-reqvire:attachmentsSubsection a reqvire:ReservedSubsection ;
-  reqvire:subsectionName "Attachments" ;
-  rdfs:comment "Explicit reusable requirement-owned refinement contract dependencies." .
+reqvire:reusedContractContextSubsection a reqvire:ReservedSubsection ;
+  reqvire:subsectionName "Reused Contract Context" ;
+  rdfs:comment "Explicit cross-subgraph reuse of requirement-owned contract context." .
 reqvire:conceptReferencesSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Concept References" ;
   rdfs:comment "Human-readable bindings from non-ontology, non-semantic-contract element prose to declared ontology terms." .

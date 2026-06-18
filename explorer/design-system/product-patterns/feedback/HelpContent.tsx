@@ -70,14 +70,6 @@ const helpLegendLabelSkinX = css`
   font-size: var(--text-sm);
 `;
 
-const helpColorSwatchUX = css`
-  width: var(--space-6);
-  height: var(--space-6);
-  border-radius: var(--radius-xs);
-  background: var(--help-color);
-  box-shadow: inset 0 0 0 var(--border-w) var(--border-strong);
-`;
-
 const helpNotationGlyphUX = css`
   display: inline-flex;
   min-width: var(--space-10);
@@ -151,7 +143,7 @@ export function HelpContent() {
               {RESULT_LEGEND.map(([kind, label, token]) => (
                 <LegendRow
                   key={kind}
-                  marker={<TokenSwatch colorToken={token} className={cx(helpColorSwatchUX)} />}
+                  marker={<TokenSwatch colorToken={token} />}
                   label={label}
                 />
               ))}
@@ -186,7 +178,7 @@ export function HelpContent() {
               {ONTOLOGY_TYPE_LEGEND.map(([token, label]) => (
                 <LegendRow
                   key={label}
-                  marker={<TokenSwatch colorToken={token} className={cx(helpColorSwatchUX)} />}
+                  marker={<TokenSwatch colorToken={token} />}
                   label={label}
                 />
               ))}

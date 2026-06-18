@@ -116,7 +116,7 @@ INVALID: satisfiedBy must point to implementation file, not another verification
 
 ### Other Element with SatisfiedBy
 
-INVALID: Other type can only use trace relations.
+INVALID: Other type cannot author canonical semantic relations.
 
 #### Metadata
   * type: other-other

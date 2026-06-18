@@ -27,7 +27,7 @@ export default function CodingAssistants() {
             },
             {
               name: "MCP server",
-              desc: "Standard Streamable HTTP tool interface for MCP-capable clients. Read/report tools are available by default; mutation tools require explicit enablement.",
+              desc: "Standard Streamable HTTP interface for MCP-capable clients. Read/report tools, resources, and prompts are available by default; mutation tools require explicit enablement.",
             },
           ]}
         />
@@ -70,7 +70,7 @@ $CODEX_HOME/skills/reqvire-ontology-authoring`}</CodeBlock>
       <Section title="MCP Server">
         <p className="text-zinc-600 mb-4">
           Start Reqvire as an MCP Streamable HTTP server when an assistant
-          should discover tools dynamically.
+          should discover tools, resources, and prompts dynamically.
         </p>
         <CodeBlock>{`reqvire mcp
 reqvire mcp --with-size-estimates
@@ -93,8 +93,8 @@ reqvire mcp --enable-mutations`}</CodeBlock>
             full: true
           </code>{" "}
           when it also needs generated model context triples for elements,
-          relations, attachments, concept references, ontology declarations, and
-          shape references.
+          relations, Reused Contract Context entries, concept references,
+          ontology declarations, and shape references.
         </p>
       </Section>
 
@@ -102,7 +102,7 @@ reqvire mcp --enable-mutations`}</CodeBlock>
         <div className="bg-zinc-50 rounded-lg p-5 space-y-3">
           {[
             "Capability first: understand or define the operational ability being changed.",
-            "Ontology context: inspect or attach semantic vocabulary that gives the capability meaning.",
+            "Ontology context: inspect or reuse semantic vocabulary that gives the capability meaning.",
             "Requirements: define implementable obligations that specify the capability.",
             "Contracts: add specifications, constraints, behaviors, states, or I/O contracts.",
             "Semantic contracts: add reusable SHACL shape profiles under the ontology plane and link them with constrainedBy/constrain and use/usedBy.",

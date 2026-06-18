@@ -14,7 +14,7 @@ Owner for the behavior element (separate hierarchy).
 
 ### My Test Behavior
 
-This is a behavior element that is referenced as an attachment.
+This is a behavior element that is referenced as an reused_contract_context.
 
 #### Metadata
   * type: behavior

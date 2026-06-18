@@ -44,7 +44,7 @@ Top level container for requirements.
 
 ### Another Link
 
-Just a placeholder for trace relation.
+Just a placeholder for merge relation content.
 
 #### Metadata
   * type: requirement
@@ -78,7 +78,6 @@ Details from source two with more info.
 
 #### Relations
   * derivedFrom: [System Requirements](#system-requirements)
-  * trace: [Another Link](#another-link)
   * verifiedBy: [Source Two Test](Verifications.md#source-two-test)
 ---
 
@@ -103,8 +102,6 @@ Details from source one.
 #### Relations
   * derive: [Child Requirement](#child-requirement)
   * derivedFrom: [System Requirements](#system-requirements)
-  * trace: [Another Link](#another-link)
-  * trace: [Placeholder Requirement](#placeholder-requirement)
   * verifiedBy: [Target Test](Verifications.md#target-test)
 ---
 

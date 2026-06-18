@@ -23,6 +23,7 @@ const dsRoot = resolve(root, "design-system");
 const dsComponentsRoot = resolve(dsRoot, "components");
 const dsProductPatternsRoot = resolve(dsRoot, "product-patterns");
 const dsShowcaseRoot = resolve(dsRoot, "showcase");
+const dsTokensRoot = resolve(dsRoot, "tokens");
 const dsStylesEntryPath = resolve(dsRoot, "styles.css");
 const htmlMountStyleFiles = [
   resolve(root, "index.html"),
@@ -155,10 +156,7 @@ function walk(dir, options = {}) {
 }
 
 function stripComments(src) {
-  return src.replace(/\/\*[\s\S]*?\*\//g, (m) => {
-    const lines = m.split("\n");
-    return lines.map((line, index) => (index === 0 || index === lines.length - 1 ? " ".repeat(line.length) : "")).join("\n");
-  });
+  return src.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "));
 }
 
 function lineInfo(source, index) {
@@ -244,6 +242,102 @@ function assertDsVariableCustomizationContract(findings) {
             lineText,
           });
         }
+      }
+    }
+  }
+}
+
+function collectTokenVariables() {
+  const variables = new Set();
+  const declarationPattern = /--[A-Za-z0-9_-]+\s*:/g;
+  for (const file of walk(dsTokensRoot)) {
+    const source = readFileSync(file, "utf8");
+    const clean = stripComments(source);
+    for (const match of clean.matchAll(declarationPattern)) {
+      variables.add(match[0].replace(/\s*:$/, ""));
+    }
+  }
+  return variables;
+}
+
+function customPropertyOwner(file) {
+  if (isInside(dsShowcaseRoot, file)) {
+    return {
+      declarationPrefixes: ["--showcase-", "--ux-"],
+      usagePrefixes: ["--showcase-", "--ux-"],
+      owner: "Showcase",
+    };
+  }
+  if (isInside(dsProductPatternsRoot, file)) {
+    return {
+      declarationPrefixes: ["--ux-"],
+      usagePrefixes: ["--ux-"],
+      owner: "Product patterns",
+    };
+  }
+  return {
+    declarationPrefixes: ["--ux-"],
+    usagePrefixes: ["--ux-"],
+    owner: "Application UI",
+  };
+}
+
+function startsWithAny(value, prefixes) {
+  return prefixes.some((prefix) => value.startsWith(prefix));
+}
+
+function assertCustomPropertyOwnership(findings) {
+  const tokenVariables = collectTokenVariables();
+  const scannedRoots = [
+    { root: srcRoot, includeShowcase: false },
+    { root: dsProductPatternsRoot, includeShowcase: false },
+    { root: dsShowcaseRoot, includeShowcase: true },
+  ];
+  const declarationPattern = /--[A-Za-z0-9_-]+\s*:/g;
+  const usagePattern = /var\(\s*(--[A-Za-z0-9_-]+)/g;
+
+  for (const scanned of scannedRoots) {
+    for (const file of walk(scanned.root, { includeShowcase: scanned.includeShowcase })) {
+      const rel = projectRelative(file);
+      const owner = customPropertyOwner(file);
+      const source = readFileSync(file, "utf8");
+      const clean = stripComments(source);
+
+      for (const match of clean.matchAll(declarationPattern)) {
+        const variable = match[0].replace(/\s*:$/, "");
+        if (allowedProductPatternDsVariables.has(variable)) continue;
+        if (startsWithAny(variable, owner.declarationPrefixes)) continue;
+
+        const index = match.index ?? 0;
+        const { line, column, lineText } = lineInfo(source, index);
+        findings.push({
+          file: rel,
+          line,
+          column,
+          label: "Undocumented local custom property",
+          message:
+            `${owner.owner} custom properties are deny-by-default. Use the canonical primitive API first; otherwise discuss the exception and add an owned --ux-* or --showcase-* variable, or a documented --ds-* customization allowlist entry in the same change.`,
+          lineText,
+        });
+      }
+
+      for (const match of clean.matchAll(usagePattern)) {
+        const variable = match[1];
+        if (tokenVariables.has(variable)) continue;
+        if (allowedProductPatternDsVariables.has(variable)) continue;
+        if (startsWithAny(variable, owner.usagePrefixes)) continue;
+
+        const index = match.index ?? 0;
+        const { line, column, lineText } = lineInfo(source, index);
+        findings.push({
+          file: rel,
+          line,
+          column,
+          label: "Unknown custom property usage",
+          message:
+            `${owner.owner} uses an undocumented custom property. Use the canonical DS prop/token first; only add a namespaced variable or guard allowlist entry after deciding there is no existing canonical API.`,
+          lineText,
+        });
       }
     }
   }
@@ -670,6 +764,7 @@ for (const file of walk(dsProductPatternsRoot)) {
 assertDsStylesEntry(findings);
 assertHtmlMountStyles(findings);
 assertDsVariableCustomizationContract(findings);
+assertCustomPropertyOwnership(findings);
 assertNoInlineVisualStyles(findings);
 assertExportedPropsOmitStyle(findings);
 assertNoArbitraryVisualStringProps(findings);

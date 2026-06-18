@@ -19,13 +19,13 @@ use globset::GlobSet;
 use oxigraph::model::{NamedOrBlankNode, Term, Triple};
 use oxigraph::sparql::{QueryResults, SparqlEvaluator};
 use serde_json::{json, Value};
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
 use std::process::Command;
 
 pub const MCP_PROTOCOL_VERSION: &str = "2025-11-25";
-pub const TOOL_CONTRACT_VERSION: &str = "1";
+pub const TOOL_CONTRACT_VERSION: &str = "2";
 
 pub struct ReqvireToolRegistry<'a> {
     enable_mutations: bool,
@@ -207,8 +207,11 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 ("filter_page_content", json!({ "type": "string" })),
                 ("have_relations", json!({ "type": "string" })),
                 ("not_have_relations", json!({ "type": "string" })),
-                ("has_attachments", json!({ "type": "boolean" })),
-                ("filter_attachment", json!({ "type": "string" })),
+                ("has_reused_contract_context", json!({ "type": "boolean" })),
+                (
+                    "filter_reused_contract_context",
+                    json!({ "type": "string" }),
+                ),
             ]),
         ),
         read_tool(
@@ -263,6 +266,42 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             "reqvire.semantic.prefixes",
             "List ontology-defined semantic prefixes and namespaces.",
             object_schema(vec![]),
+        ),
+        read_tool(
+            "reqvire.semantic.vocabulary",
+            "Page compact semantic vocabulary for SPARQL query construction.",
+            object_schema(vec![
+                (
+                    "section",
+                    json!({
+                        "type": "string",
+                        "enum": [
+                            "all",
+                            "prefixes",
+                            "classes",
+                            "properties",
+                            "relation_families",
+                            "controlled_vocabularies",
+                            "semantic_contracts",
+                            "query_patterns",
+                            "source_map",
+                            "diagnostics"
+                        ],
+                        "default": "all"
+                    }),
+                ),
+                ("limit", json!({ "type": "integer", "default": 50 })),
+                ("cursor", json!({ "type": "string" })),
+                ("filter", json!({ "type": "string" })),
+                (
+                    "include_source",
+                    json!({ "type": "boolean", "default": true }),
+                ),
+                (
+                    "include_examples",
+                    json!({ "type": "boolean", "default": false }),
+                ),
+            ]),
         ),
         read_tool(
             "reqvire.semantic.sparql",
@@ -426,7 +465,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             ),
             mutation_tool(
                 "reqvire.link",
-                "Add a relation or attachment.",
+                "Add a relation or reused_contract_context.",
                 required_object_schema(
                     vec![
                         ("source", json!({ "type": "string" })),
@@ -439,7 +478,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             ),
             mutation_tool(
                 "reqvire.unlink",
-                "Remove a relation or attachment.",
+                "Remove a relation or reused_contract_context.",
                 required_object_schema(
                     vec![
                         ("source", json!({ "type": "string" })),
@@ -564,6 +603,9 @@ fn dispatch_tool(
         "reqvire.semantic.prefixes" => {
             semantic_prefixes_tool(excluded_filename_patterns, with_size_estimates)
         }
+        "reqvire.semantic.vocabulary" => {
+            semantic_vocabulary_tool(args, excluded_filename_patterns, with_size_estimates)
+        }
         "reqvire.semantic.sparql" => {
             sparql_tool(args, excluded_filename_patterns, with_size_estimates)
         }
@@ -675,8 +717,8 @@ fn search_tool(args: &Value, excluded_filename_patterns: &GlobSet) -> Result<Val
         string_arg(args, "filter_page_content").as_deref(),
         string_arg(args, "have_relations").as_deref(),
         string_arg(args, "not_have_relations").as_deref(),
-        bool_arg(args, "has_attachments", false),
-        string_arg(args, "filter_attachment").as_deref(),
+        bool_arg(args, "has_reused_contract_context", false),
+        string_arg(args, "filter_reused_contract_context").as_deref(),
     )?;
     parse_json_string(search::generate_search_report(
         &model.graph_registry,
@@ -774,7 +816,7 @@ fn ontologies_tool(
             "content_filter": content_filter.as_str(),
             "full": full,
             "content": if full {
-                index.serialize_full(SemanticExportFormat::Turtle, &model.graph_registry)?
+                index.serialize_full(SemanticExportFormat::Turtle)?
             } else {
                 index.serialize(SemanticExportFormat::Turtle)?
             },
@@ -787,7 +829,7 @@ fn ontologies_tool(
         })),
         "jsonld" => {
             let content = if full {
-                index.serialize_full(SemanticExportFormat::JsonLd, &model.graph_registry)?
+                index.serialize_full(SemanticExportFormat::JsonLd)?
             } else {
                 index.serialize(SemanticExportFormat::JsonLd)?
             };
@@ -1071,6 +1113,693 @@ fn semantic_prefix_source_content(content: &str) -> String {
     }
 
     result.join("\n").trim().to_string()
+}
+
+#[derive(Clone)]
+struct VocabularyPrefix {
+    prefix: String,
+    namespace: String,
+}
+
+fn semantic_vocabulary_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<Value, ReqvireError> {
+    let section = string_arg(args, "section").unwrap_or_else(|| "all".to_string());
+    let limit = usize_arg(args, "limit", 50).clamp(1, 200);
+    let offset = string_arg(args, "cursor")
+        .and_then(|cursor| cursor.parse::<usize>().ok())
+        .unwrap_or(0);
+    let filter = string_arg(args, "filter").map(|value| value.to_lowercase());
+    let include_source = bool_arg(args, "include_source", true);
+    let include_examples = bool_arg(args, "include_examples", false);
+
+    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
+    let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
+        ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
+    })?;
+
+    let prefixes = vocabulary_prefixes(&model, &semantic_store.index);
+    let compact_prefixes: Vec<VocabularyPrefix> = prefixes
+        .iter()
+        .filter_map(|entry| {
+            Some(VocabularyPrefix {
+                prefix: entry.get("prefix")?.as_str()?.to_string(),
+                namespace: entry.get("namespace")?.as_str()?.to_string(),
+            })
+        })
+        .collect();
+    let sparql_prefix_block = prefixes
+        .iter()
+        .filter_map(|entry| {
+            Some(format!(
+                "PREFIX {}: <{}>",
+                entry.get("prefix")?.as_str()?,
+                entry.get("namespace")?.as_str()?
+            ))
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    let sparql_prefix_block = if sparql_prefix_block.is_empty() {
+        String::new()
+    } else {
+        format!("{}\n", sparql_prefix_block)
+    };
+
+    let vocabulary = build_vocabulary_sections(
+        &model,
+        &semantic_store.index,
+        &compact_prefixes,
+        include_source,
+        include_examples,
+    );
+
+    if section == "all" {
+        let sections = vocabulary
+            .iter()
+            .map(|(name, items)| {
+                json!({
+                    "name": name,
+                    "count": items.len(),
+                    "cursor": if items.is_empty() { Value::Null } else { json!("0") }
+                })
+            })
+            .collect::<Vec<_>>();
+        let summary = vocabulary
+            .iter()
+            .map(|(name, items)| (name.clone(), json!(items.len())))
+            .collect::<serde_json::Map<_, _>>();
+
+        return Ok(json!({
+            "section": "all",
+            "prefixes": prefixes,
+            "sparql_prefix_block": sparql_prefix_block,
+            "summary": summary,
+            "sections": sections,
+            "paging": {
+                "limit": limit,
+                "next_cursor": Value::Null,
+                "has_more": false
+            },
+            "diagnostics": semantic_store.index.diagnostics,
+            "model_fingerprint": model_fingerprint(&model)
+        }));
+    }
+
+    let Some(items) = vocabulary.get(&section) else {
+        return Err(ReqvireError::ProcessError(format!(
+            "Invalid semantic vocabulary section '{}'",
+            section
+        )));
+    };
+
+    let filtered_items = filter_items(items, filter.as_deref());
+    let total = filtered_items.len();
+    let page_items = filtered_items
+        .into_iter()
+        .skip(offset)
+        .take(limit)
+        .collect::<Vec<_>>();
+    let next_offset = offset + page_items.len();
+    let has_more = next_offset < total;
+
+    Ok(json!({
+        "section": section,
+        "items": page_items,
+        "prefixes": prefixes,
+        "sparql_prefix_block": sparql_prefix_block,
+        "paging": {
+            "limit": limit,
+            "cursor": if offset == 0 { Value::Null } else { json!(offset.to_string()) },
+            "next_cursor": if has_more { json!(next_offset.to_string()) } else { Value::Null },
+            "has_more": has_more,
+            "total": total
+        },
+        "diagnostics": semantic_store.index.diagnostics,
+        "model_fingerprint": model_fingerprint(&model)
+    }))
+}
+
+fn vocabulary_prefixes(
+    model: &ModelManager,
+    index: &semantic_contract::SemanticIndex,
+) -> Vec<Value> {
+    let mut prefixes = Vec::new();
+    for declaration in &index.ontology_documents {
+        let source = ontology_prefix_source(model, declaration);
+        prefixes.push(json!({
+            "prefix": declaration.ontology_prefix,
+            "namespace": declaration.term_namespace,
+            "ontology_base": declaration.ontology_base,
+            "term_namespace": declaration.term_namespace,
+            "ontology_document_iri": declaration.iri,
+            "source": source
+        }));
+    }
+    prefixes.sort_by(|left, right| {
+        left.get("prefix")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .cmp(
+                right
+                    .get("prefix")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default(),
+            )
+    });
+    prefixes
+}
+
+fn build_vocabulary_sections(
+    model: &ModelManager,
+    index: &semantic_contract::SemanticIndex,
+    prefixes: &[VocabularyPrefix],
+    include_source: bool,
+    include_examples: bool,
+) -> BTreeMap<String, Vec<Value>> {
+    let term_index = collect_term_index(index);
+    let mut sections = BTreeMap::new();
+
+    sections.insert(
+        "prefixes".to_string(),
+        vocabulary_prefixes(model, index)
+            .into_iter()
+            .collect::<Vec<_>>(),
+    );
+    sections.insert(
+        "classes".to_string(),
+        ontology_terms_section(
+            model,
+            index,
+            &term_index,
+            prefixes,
+            include_source,
+            |role| role == "class",
+        ),
+    );
+    sections.insert(
+        "properties".to_string(),
+        ontology_terms_section(
+            model,
+            index,
+            &term_index,
+            prefixes,
+            include_source,
+            |role| role != "class",
+        ),
+    );
+    sections.insert(
+        "relation_families".to_string(),
+        relation_families_section(index, &term_index, prefixes, include_source),
+    );
+    sections.insert(
+        "controlled_vocabularies".to_string(),
+        controlled_vocabularies_section(index, &term_index, prefixes, include_source),
+    );
+    sections.insert(
+        "semantic_contracts".to_string(),
+        semantic_contracts_section(model, index, prefixes, include_source),
+    );
+    sections.insert(
+        "query_patterns".to_string(),
+        query_patterns_section(include_examples),
+    );
+    sections.insert(
+        "source_map".to_string(),
+        source_map_section(model, index, prefixes),
+    );
+    sections.insert(
+        "diagnostics".to_string(),
+        index
+            .diagnostics
+            .iter()
+            .map(|diagnostic| json!(diagnostic))
+            .collect(),
+    );
+
+    sections
+}
+
+#[derive(Clone, Default)]
+struct TermInfo {
+    label: Option<String>,
+    comment: Option<String>,
+    types: BTreeSet<String>,
+    string_properties: BTreeMap<String, Vec<String>>,
+    iri_properties: BTreeMap<String, Vec<String>>,
+    source_block: Option<usize>,
+}
+
+fn collect_term_index(index: &semantic_contract::SemanticIndex) -> BTreeMap<String, TermInfo> {
+    let mut terms = BTreeMap::new();
+    for (block_index, block) in index.blocks.iter().enumerate() {
+        for quad in &block.quads {
+            let Some(subject) = subject_iri(&quad.subject) else {
+                continue;
+            };
+            let entry = terms
+                .entry(subject.to_string())
+                .or_insert_with(TermInfo::default);
+            entry.source_block.get_or_insert(block_index);
+            match quad.predicate.as_str() {
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" => {
+                    if let Some(iri) = term_iri(&quad.object) {
+                        entry.types.insert(iri.to_string());
+                    }
+                }
+                "http://www.w3.org/2000/01/rdf-schema#label" => {
+                    if let Some(value) = literal_value(&quad.object) {
+                        entry.label = Some(value.to_string());
+                    }
+                }
+                "http://www.w3.org/2000/01/rdf-schema#comment" => {
+                    if let Some(value) = literal_value(&quad.object) {
+                        entry.comment = Some(value.to_string());
+                    }
+                }
+                predicate => {
+                    if let Some(value) = literal_value(&quad.object) {
+                        entry
+                            .string_properties
+                            .entry(predicate.to_string())
+                            .or_default()
+                            .push(value.to_string());
+                    } else if let Some(iri) = term_iri(&quad.object) {
+                        entry
+                            .iri_properties
+                            .entry(predicate.to_string())
+                            .or_default()
+                            .push(iri.to_string());
+                    }
+                }
+            }
+        }
+    }
+    terms
+}
+
+fn ontology_terms_section(
+    model: &ModelManager,
+    index: &semantic_contract::SemanticIndex,
+    term_index: &BTreeMap<String, TermInfo>,
+    prefixes: &[VocabularyPrefix],
+    include_source: bool,
+    include_role: impl Fn(&str) -> bool,
+) -> Vec<Value> {
+    let mut items = Vec::new();
+    for declarations in index.ontology_declarations.values() {
+        for declaration in declarations {
+            let role = declaration.role.to_string();
+            if !include_role(&role) {
+                continue;
+            }
+            let info = term_index.get(&declaration.iri);
+            let mut item = serde_json::Map::new();
+            item.insert("iri".to_string(), json!(declaration.iri));
+            item.insert(
+                "curie".to_string(),
+                json!(curie(&declaration.iri, prefixes)),
+            );
+            item.insert("role".to_string(), json!(role));
+            item.insert(
+                "label".to_string(),
+                json!(info.and_then(|entry| entry.label.clone())),
+            );
+            item.insert(
+                "comment".to_string(),
+                json!(info.and_then(|entry| entry.comment.clone())),
+            );
+            if let Some(info) = info {
+                if let Some(domain) = first_iri_property(
+                    info,
+                    "http://www.w3.org/2000/01/rdf-schema#domain",
+                    prefixes,
+                ) {
+                    item.insert("domain".to_string(), json!(domain));
+                }
+                if let Some(range) =
+                    first_iri_property(info, "http://www.w3.org/2000/01/rdf-schema#range", prefixes)
+                {
+                    item.insert("range".to_string(), json!(range));
+                }
+            }
+            if include_source {
+                item.insert(
+                    "source".to_string(),
+                    source_for_element_identifier(model, &declaration.element_identifier),
+                );
+            }
+            items.push(Value::Object(item));
+        }
+    }
+    sort_items(&mut items);
+    items
+}
+
+fn relation_families_section(
+    index: &semantic_contract::SemanticIndex,
+    term_index: &BTreeMap<String, TermInfo>,
+    prefixes: &[VocabularyPrefix],
+    include_source: bool,
+) -> Vec<Value> {
+    let relation_family_type = "https://www.reqvire.org/ontology#RelationFamily";
+    let relation_rule_type = "https://www.reqvire.org/ontology#RelationRule";
+    let mut rule_items_by_family: BTreeMap<String, Vec<Value>> = BTreeMap::new();
+
+    for (iri, info) in term_index {
+        if !info.types.contains(relation_rule_type) {
+            continue;
+        }
+        let Some(family) = first_iri(info, "https://www.reqvire.org/ontology#relationFamily")
+        else {
+            continue;
+        };
+        let rule_item = json!({
+            "name": first_string(info, "https://www.reqvire.org/ontology#relationName"),
+            "direction": first_string(info, "https://www.reqvire.org/ontology#relationDirection"),
+            "allowed_source_type": strings(info, "https://www.reqvire.org/ontology#allowedSourceType"),
+            "allowed_target_type": strings(info, "https://www.reqvire.org/ontology#allowedTargetType"),
+            "iri": iri,
+            "curie": curie(iri, prefixes)
+        });
+        rule_items_by_family
+            .entry(family.to_string())
+            .or_default()
+            .push(rule_item);
+    }
+
+    let mut items = Vec::new();
+    for (iri, info) in term_index {
+        if !info.types.contains(relation_family_type) {
+            continue;
+        }
+        let mut raw_relations = rule_items_by_family.remove(iri).unwrap_or_default();
+        sort_items(&mut raw_relations);
+        let mut item = serde_json::Map::new();
+        item.insert(
+            "name".to_string(),
+            json!(first_string(
+                info,
+                "https://www.reqvire.org/ontology#relationFamilyName"
+            )),
+        );
+        item.insert("iri".to_string(), json!(iri));
+        item.insert("curie".to_string(), json!(curie(iri, prefixes)));
+        item.insert(
+            "meaning".to_string(),
+            json!(first_string(
+                info,
+                "https://www.reqvire.org/ontology#relationFamilyMeaning"
+            )),
+        );
+        item.insert(
+            "forward_property".to_string(),
+            json!(first_iri_property(
+                info,
+                "https://www.reqvire.org/ontology#relationFamilyForwardProperty",
+                prefixes
+            )),
+        );
+        item.insert(
+            "inverse_property".to_string(),
+            json!(first_iri_property(
+                info,
+                "https://www.reqvire.org/ontology#relationFamilyInverseProperty",
+                prefixes
+            )),
+        );
+        item.insert("raw_relations".to_string(), json!(raw_relations));
+        item.insert(
+            "transitive".to_string(),
+            json!(
+                first_string(info, "https://www.reqvire.org/ontology#relationFamilyName")
+                    .as_deref()
+                    == Some("hierarchy")
+            ),
+        );
+        if include_source {
+            item.insert("source".to_string(), source_for_term(index, info));
+        }
+        items.push(Value::Object(item));
+    }
+    sort_items(&mut items);
+    items
+}
+
+fn controlled_vocabularies_section(
+    index: &semantic_contract::SemanticIndex,
+    term_index: &BTreeMap<String, TermInfo>,
+    prefixes: &[VocabularyPrefix],
+    include_source: bool,
+) -> Vec<Value> {
+    let named_individual = "http://www.w3.org/2002/07/owl#NamedIndividual";
+    let excluded_types = BTreeSet::from([
+        "https://www.reqvire.org/ontology#RelationFamily",
+        "https://www.reqvire.org/ontology#RelationRule",
+    ]);
+    let mut items = Vec::new();
+    for (iri, info) in term_index {
+        if !info.types.contains(named_individual) {
+            continue;
+        }
+        let semantic_types: Vec<String> = info
+            .types
+            .iter()
+            .filter(|kind| {
+                kind.as_str() != named_individual && !excluded_types.contains(kind.as_str())
+            })
+            .map(|kind| curie(kind, prefixes))
+            .collect();
+        if semantic_types.is_empty() {
+            continue;
+        }
+        let mut item = serde_json::Map::new();
+        item.insert("iri".to_string(), json!(iri));
+        item.insert("curie".to_string(), json!(curie(iri, prefixes)));
+        item.insert("types".to_string(), json!(semantic_types));
+        item.insert("label".to_string(), json!(info.label));
+        item.insert("comment".to_string(), json!(info.comment));
+        if include_source {
+            item.insert("source".to_string(), source_for_term(index, info));
+        }
+        items.push(Value::Object(item));
+    }
+    sort_items(&mut items);
+    items
+}
+
+fn semantic_contracts_section(
+    model: &ModelManager,
+    index: &semantic_contract::SemanticIndex,
+    prefixes: &[VocabularyPrefix],
+    include_source: bool,
+) -> Vec<Value> {
+    index
+        .blocks
+        .iter()
+        .filter(|block| matches!(block.kind, semantic_contract::SemanticBlockKind::Shapes))
+        .map(|block| {
+            let shape_references = index
+                .shape_references
+                .iter()
+                .filter(|reference| reference.element_identifier == block.source)
+                .map(|reference| {
+                    json!({
+                        "iri": reference.iri,
+                        "curie": curie(&reference.iri, prefixes),
+                        "kind": reference.kind
+                    })
+                })
+                .collect::<Vec<_>>();
+            let mut item = serde_json::Map::new();
+            item.insert("element_identifier".to_string(), json!(block.source));
+            item.insert("element_name".to_string(), json!(block.source_name));
+            item.insert("file_path".to_string(), json!(block.file_path));
+            item.insert("line_number".to_string(), json!(block.line_number));
+            item.insert("shape_references".to_string(), json!(shape_references));
+            if include_source {
+                item.insert(
+                    "source".to_string(),
+                    source_for_element_identifier(model, &block.source),
+                );
+            }
+            Value::Object(item)
+        })
+        .collect()
+}
+
+fn source_map_section(
+    model: &ModelManager,
+    index: &semantic_contract::SemanticIndex,
+    prefixes: &[VocabularyPrefix],
+) -> Vec<Value> {
+    index
+        .ontology_declarations
+        .values()
+        .flat_map(|declarations| declarations.iter())
+        .map(|declaration| {
+            json!({
+                "term": curie(&declaration.iri, prefixes),
+                "iri": declaration.iri,
+                "role": declaration.role.to_string(),
+                "source": source_for_element_identifier(model, &declaration.element_identifier)
+            })
+        })
+        .collect()
+}
+
+fn query_patterns_section(include_examples: bool) -> Vec<Value> {
+    let mut patterns = vec![
+        json!({
+            "id": "discover_relation_families",
+            "title": "Discover relation families",
+            "preferred_classes": ["reqvire:RelationFamily"],
+            "preferred_properties": ["reqvire:relationFamilyName", "reqvire:relationFamilyForwardProperty", "reqvire:relationFamilyInverseProperty"]
+        }),
+        json!({
+            "id": "verified_requirements",
+            "title": "Requirements verified by verification elements",
+            "preferred_property": "reqvire:elementVerifiedByVerification"
+        }),
+        json!({
+            "id": "cross_subgraph_contract_context",
+            "title": "Requirements using Reused Contract Context",
+            "preferred_property": "reqvire:requirementUsesCrossSubgraphContract"
+        }),
+    ];
+
+    if include_examples {
+        if let Some(Value::Object(pattern)) = patterns.get_mut(0) {
+            pattern.insert(
+                "sparql".to_string(),
+                json!("SELECT ?family ?name ?forward ?inverse WHERE { ?family a reqvire:RelationFamily ; reqvire:relationFamilyName ?name . OPTIONAL { ?family reqvire:relationFamilyForwardProperty ?forward } OPTIONAL { ?family reqvire:relationFamilyInverseProperty ?inverse } } ORDER BY ?name"),
+            );
+        }
+        if let Some(Value::Object(pattern)) = patterns.get_mut(1) {
+            pattern.insert(
+                "sparql".to_string(),
+                json!("SELECT ?requirement ?verification WHERE { ?requirement a reqvire:Requirement ; reqvire:elementVerifiedByVerification ?verification . } ORDER BY ?requirement ?verification"),
+            );
+        }
+        if let Some(Value::Object(pattern)) = patterns.get_mut(2) {
+            pattern.insert(
+                "sparql".to_string(),
+                json!("SELECT ?requirement ?contract WHERE { ?requirement a reqvire:Requirement ; reqvire:requirementUsesCrossSubgraphContract ?contract . } ORDER BY ?requirement ?contract"),
+            );
+        }
+    }
+
+    patterns
+}
+
+fn filter_items(items: &[Value], filter: Option<&str>) -> Vec<Value> {
+    let Some(filter) = filter else {
+        return items.to_vec();
+    };
+    items
+        .iter()
+        .filter(|item| item.to_string().to_lowercase().contains(filter))
+        .cloned()
+        .collect()
+}
+
+fn source_for_element_identifier(model: &ModelManager, identifier: &str) -> Value {
+    match model.graph_registry.get_element(identifier) {
+        Some(element) => json!({
+            "element_identifier": element.identifier,
+            "element_name": element.name,
+            "file_path": element.file_path,
+            "line_number": element.line_number,
+            "content": semantic_prefix_source_content(&element.content)
+        }),
+        None => Value::Null,
+    }
+}
+
+fn source_for_term(index: &semantic_contract::SemanticIndex, info: &TermInfo) -> Value {
+    info.source_block
+        .and_then(|block_index| index.blocks.get(block_index))
+        .map(|block| {
+            json!({
+                "element_identifier": block.source,
+                "element_name": block.source_name,
+                "file_path": block.file_path,
+                "line_number": block.line_number
+            })
+        })
+        .unwrap_or(Value::Null)
+}
+
+fn first_string(info: &TermInfo, predicate: &str) -> Option<String> {
+    info.string_properties
+        .get(predicate)
+        .and_then(|values| values.first())
+        .cloned()
+}
+
+fn strings(info: &TermInfo, predicate: &str) -> Vec<String> {
+    info.string_properties
+        .get(predicate)
+        .cloned()
+        .unwrap_or_default()
+}
+
+fn first_iri<'a>(info: &'a TermInfo, predicate: &str) -> Option<&'a str> {
+    info.iri_properties
+        .get(predicate)
+        .and_then(|values| values.first())
+        .map(String::as_str)
+}
+
+fn first_iri_property(
+    info: &TermInfo,
+    predicate: &str,
+    prefixes: &[VocabularyPrefix],
+) -> Option<String> {
+    first_iri(info, predicate).map(|iri| curie(iri, prefixes))
+}
+
+fn sort_items(items: &mut [Value]) {
+    items.sort_by(|left, right| left.to_string().cmp(&right.to_string()));
+}
+
+fn subject_iri(subject: &NamedOrBlankNode) -> Option<&str> {
+    match subject {
+        NamedOrBlankNode::NamedNode(node) => Some(node.as_str()),
+        NamedOrBlankNode::BlankNode(_) => None,
+    }
+}
+
+fn term_iri(term: &Term) -> Option<&str> {
+    match term {
+        Term::NamedNode(node) => Some(node.as_str()),
+        _ => None,
+    }
+}
+
+fn literal_value(term: &Term) -> Option<&str> {
+    match term {
+        Term::Literal(literal) => Some(literal.value()),
+        _ => None,
+    }
+}
+
+fn curie(iri: &str, prefixes: &[VocabularyPrefix]) -> String {
+    let mut best: Option<&VocabularyPrefix> = None;
+    for prefix in prefixes {
+        if iri.starts_with(&prefix.namespace)
+            && best
+                .as_ref()
+                .is_none_or(|current| prefix.namespace.len() > current.namespace.len())
+        {
+            best = Some(prefix);
+        }
+    }
+    match best {
+        Some(prefix) => format!("{}:{}", prefix.prefix, &iri[prefix.namespace.len()..]),
+        None => iri.to_string(),
+    }
 }
 
 fn sparql_tool(
@@ -1424,14 +2153,14 @@ fn link_tool(args: &Value, excluded_filename_patterns: &GlobSet) -> Result<Value
     let relation_type = required_string_arg(args, "relation_type")?;
     let target = required_string_arg(args, "target")?;
     let git_root = git_commands::get_git_root_dir()?;
-    let result = if relation_type == "attaching" {
+    let result = if relation_type == "reusesContract" {
         if crate::utils::is_external_url(&target) {
             return Err(ReqvireError::ProcessError(
-                "External URLs cannot be attached. Use a relation type such as trace instead."
+                "External URLs cannot be reused as contract context. Use a semantically specific relation only when the URL is valid evidence for that relation."
                     .to_string(),
             ));
         }
-        crud::attach_element_identifier(
+        crud::reuse_contract_element_identifier(
             &mut model,
             &source,
             &target,
@@ -1552,6 +2281,13 @@ fn bool_arg(args: &Value, name: &str, default: bool) -> bool {
     args.get(name).and_then(Value::as_bool).unwrap_or(default)
 }
 
+fn usize_arg(args: &Value, name: &str, default: usize) -> usize {
+    args.get(name)
+        .and_then(Value::as_u64)
+        .and_then(|value| usize::try_from(value).ok())
+        .unwrap_or(default)
+}
+
 fn string_array_arg(args: &Value, name: &str) -> Result<Vec<String>, ReqvireError> {
     let values = args.get(name).and_then(Value::as_array).ok_or_else(|| {
         ReqvireError::ProcessError(format!("Missing required string array argument '{}'", name))
@@ -1585,6 +2321,7 @@ fn read_tool_names() -> Vec<&'static str> {
         "reqvire.submodels",
         "reqvire.semantic.ontologies",
         "reqvire.semantic.prefixes",
+        "reqvire.semantic.vocabulary",
         "reqvire.semantic.sparql",
         "reqvire.lint",
         "reqvire.coverage",
@@ -1802,8 +2539,8 @@ fn model_fingerprint(model: &ModelManager) -> String {
             relation.relation_type.name.hash(&mut hasher);
             relation.target.link.as_str().hash(&mut hasher);
         }
-        for attachment in &element.attachments {
-            attachment.target.as_str().hash(&mut hasher);
+        for reused_contract_context in &element.reused_contract_context {
+            reused_contract_context.target.as_str().hash(&mut hasher);
         }
     }
 

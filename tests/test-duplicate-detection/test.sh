@@ -2,10 +2,10 @@
 
 # Test: Duplicate Detection and Removal
 # -------------------------------------------------------------------
-# This test validates duplicate detection in Relations and Attachments:
+# This test validates duplicate detection in Relations and Reused Contract Context:
 # - Duplicate relations detection during parsing (add command rejects)
-# - Duplicate attachments detection during parsing (add command rejects)
-# - Cross-section duplicate detection (same target in Relations AND Attachments)
+# - Duplicate reused_contract_context detection during parsing (add command rejects)
+# - Cross-section duplicate detection (same target in Relations AND Reused Contract Context)
 # - Format removes within-section duplicates
 # - Format does NOT remove cross-section duplicates (validation error)
 # - Validate fails for cross-section duplicates
@@ -51,22 +51,22 @@ if ! echo "$OUTPUT" | grep -qi "duplicate.*relation"; then
 fi
 
 # =============================================================================
-# Test 2: Add command rejects duplicate attachments
+# Test 2: Add command rejects duplicate reused_contract_context
 # =============================================================================
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" add "specifications/Requirements.md" < "${TEST_SCRIPT_DIR}/duplicate-attachment-input.md" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" add "specifications/Requirements.md" < "${TEST_SCRIPT_DIR}/duplicate-reused-contract-context-input.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
 if [ $EXIT_CODE -eq 0 ]; then
-  echo "❌ FAILED: Add command should reject duplicate attachments"
+  echo "❌ FAILED: Add command should reject duplicate reused_contract_context"
   echo "OUTPUT: $OUTPUT"
   exit 1
 fi
 
-if ! echo "$OUTPUT" | grep -qi "duplicate.*attachment"; then
-  echo "❌ FAILED: Expected 'duplicate attachment' error message"
+if ! echo "$OUTPUT" | grep -qi "duplicate.*reused_contract_context"; then
+  echo "❌ FAILED: Expected 'duplicate reused_contract_context' error message"
   echo "OUTPUT: $OUTPUT"
   exit 1
 fi
@@ -77,7 +77,7 @@ fi
 
 # First remove files with within-section duplicates so we can test cross-section
 rm -f "$TEST_DIR/specifications/FormatTestDuplicateRelations.md"
-rm -f "$TEST_DIR/specifications/FormatTestDuplicateAttachments.md"
+rm -f "$TEST_DIR/specifications/FormatTestDuplicateReusedContractContext.md"
 
 set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
@@ -105,7 +105,7 @@ rm -f "$TEST_DIR/specifications/CrossSectionDuplicate.md"
 
 # Restore the files with within-section duplicates
 cp "${TEST_SCRIPT_DIR}/specifications/FormatTestDuplicateRelations.md" "$TEST_DIR/specifications/"
-cp "${TEST_SCRIPT_DIR}/specifications/FormatTestDuplicateAttachments.md" "$TEST_DIR/specifications/"
+cp "${TEST_SCRIPT_DIR}/specifications/FormatTestDuplicateReusedContractContext.md" "$TEST_DIR/specifications/"
 
 # First ensure validate fails due to duplicate parsing errors
 set +e
@@ -158,17 +158,16 @@ This element has a single relation.
 #### Relations
   * specify: [Test Capability Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-capability-test-duplicate-detection-specifications-requirements-md)
   * derivedFrom: [Base Requirement](Requirements.md#base-requirement)
-  * trace: [Target Element](Requirements.md#target-element)
 ---
 
 EOF
 
-cat > "$TEST_DIR/specifications/FormatTestDuplicateAttachments.md" << 'EOF'
+cat > "$TEST_DIR/specifications/FormatTestDuplicateReusedContractContext.md" << 'EOF'
 # Elements
 
-### Format Test With Duplicate Attachments
+### Format Test With Duplicate Reused Contract Context
 
-This element has a single attachment.
+This element has a single reused_contract_context.
 
 #### Metadata
   * type: requirement
@@ -176,8 +175,8 @@ This element has a single attachment.
 #### Relations
   * specify: [Test Capability Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-capability-test-duplicate-detection-specifications-requirements-md)
 
-#### Attachments
-  * [Refinement Element](Requirements.md#refinement-element)
+#### Reused Contract Context
+  * [Contract Element](Requirements.md#contract-element)
 ---
 
 EOF
@@ -195,35 +194,35 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # =============================================================================
-# Test 6: Link command rejects when target already in Attachments
+# Test 6: Link command rejects when target already in Reused Contract Context
 # =============================================================================
 
-# Add an attachment to Base Requirement
+# Add an reused_contract_context to Base Requirement
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" attaching "#refinement-element" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" reusesContract "#contract-element" 2>&1)
 EXIT_CODE=$?
 set -e
 
 if [ $EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: Link attaching should succeed initially"
+  echo "❌ FAILED: Link reusesContract should succeed initially"
   echo "OUTPUT: $OUTPUT"
   exit 1
 fi
 
 # Now try to add a relation to the same target - should fail
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" satisfiedBy "Refinement Element" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" satisfiedBy "Contract Element" 2>&1)
 EXIT_CODE=$?
 set -e
 
 if [ $EXIT_CODE -eq 0 ]; then
-  echo "❌ FAILED: Link should reject when target already in Attachments"
+  echo "❌ FAILED: Link should reject when target already in Reused Contract Context"
   echo "OUTPUT: $OUTPUT"
   exit 1
 fi
 
-if ! echo "$OUTPUT" | grep -qi "already.*exists.*attachments\|cross.*section"; then
-  echo "❌ FAILED: Expected error about target already in Attachments"
+if ! echo "$OUTPUT" | grep -qi "already.*exists.*reused_contract_context\|cross.*section"; then
+  echo "❌ FAILED: Expected error about target already in Reused Contract Context"
   echo "OUTPUT: $OUTPUT"
   exit 1
 fi

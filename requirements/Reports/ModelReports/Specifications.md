@@ -33,11 +33,11 @@ Technical specification for content collection from capability, requirement, and
  - ElementIdentifier (contract element): Include element's content
  - FilePath pointing to .md file: Read and include file content
  - FilePath pointing to other file types: Include as markdown link
-- For each attachment:
+- For each reused_contract_context:
  - FilePath pointing to .md file: Read and include file content
  - FilePath pointing to other file types: Include as markdown link
  - ElementIdentifier: Include referenced element's content
-- Skip external URL attachments
+- Skip external URL reused_contract_context
 
 **Output Ordering:**
 - Flat list structure (no nesting)
@@ -48,7 +48,7 @@ Technical specification for content collection from capability, requirement, and
 **Error Handling:**
 - Element not found: Error with message
 - Element not a capability, requirement, or ontology type: Error with message
-- Attachment file not found: Warning, continue with other content
+- Reused Contract Context file not found: Warning, continue with other content
 - Circular reference: Detect and break cycle
 
 #### Metadata
@@ -67,7 +67,7 @@ Output format specification for collect command text and JSON modes.
 Each collected content block followed by source citation and separator:
 
 ```
-[Content from element or attachment]
+[Content from element or reused_contract_context]
 
 — Source: [Element Name](file.md#element-id)
 
@@ -79,7 +79,7 @@ Each collected content block followed by source citation and separator:
 |-------------|-----------------|
 | Element | `— Source: [Element Name](file.md#element-id)` |
 | Contract Element (via definedBy) | `— Source: [Contract Name](file.md#contract-id) defining [Element Name](file.md#element-id)` |
-| Attachment Element | `— Source: [Contract Name](file.md#contract-id) attached to [Element Name](file.md#element-id)` |
+| Reused Contract Context Element | `— Source: [Contract Name](file.md#contract-id) reused to [Element Name](file.md#element-id)` |
 
 **JSON Format:**
 ```json
@@ -96,20 +96,20 @@ Each collected content block followed by source citation and separator:
  "source_type": "element"
  },
  {
- "name": "Attached Refinement",
- "identifier": "Refinements.md#deterministic-output-specification",
- "file_path": "Refinements.md",
+ "name": "Reused Contract",
+ "identifier": "Contracts.md#deterministic-output-specification",
+ "file_path": "Contracts.md",
  "element_type": "specification",
- "content": "Technical refinement details...",
+ "content": "Technical contract details...",
  "depth": 0,
- "source_type": "attachment_element",
- "attached_to": "file.md#element-id"
+ "source_type": "reused_contract_context_element",
+ "reused_by": "file.md#element-id"
  }
  ],
  "metadata": {
  "element_count": 5,
- "refinement_count": 3,
- "attachment_count": 1,
+ "contract_count": 3,
+ "reused_contract_context_count": 1,
  "total_items": 9
  }
 }
@@ -143,7 +143,7 @@ Explorer route colors, element glyphs, graph colors, Mermaid rendering colors, a
   * type: specification
 ---
 
-### Comma-Separated Type Filter Parsing Refinement Specification
+### Comma-Separated Type Filter Parsing Contract Specification
 
 #### Details
 `--filter-type` parsing behavior:
@@ -165,7 +165,7 @@ Filtering behavior:
   * define: [Comma-Separated Type Filter Parsing](ReportingRequirements.md#comma-separated-type-filter-parsing)
 ---
 
-### Containment View Report Refinement Specification
+### Containment View Report Contract Specification
 
 #### Details
 The containment report and Model containment modes show the physical organization of the model:
@@ -254,16 +254,16 @@ The filtering ensures that:
   * type: specification
 ---
 
-### File Diagram Attachment Display Refinement Specification
+### File Diagram Reused Contract Context Display Contract Specification
 
 #### Details
-File-diagram attachment rendering behavior:
-- Renders attachments below the element name using `<br/>` separators.
-- Prefixes each attachment entry with `📎`.
-- Displays attached refinement element names.
-- Emits clickable attachment links to refinement identifier targets.
-- Renders each attachment on its own line.
-- For elements without attachments, renders only the element name.
+File-diagram reused_contract_context rendering behavior:
+- Renders reused_contract_context below the element name using `<br/>` separators.
+- Prefixes each reused_contract_context entry with `📎`.
+- Displays reused contract element names.
+- Emits clickable reused_contract_context links to contract identifier targets.
+- Renders each reused_contract_context on its own line.
+- For elements without reused_contract_context, renders only the element name.
 
 Label format example:
 `Element Name<br/>📎 Deterministic Output Specification<br/>📎 Rate Limits`
@@ -272,16 +272,16 @@ Label format example:
   * type: specification
 
 #### Relations
-  * define: [File Diagram Attachment Display](DiagramGeneration.md#file-diagram-attachment-display)
+  * define: [File Diagram Reused Contract Context Display](DiagramGeneration.md#file-diagram-reused-contract-context-display)
 ---
 
-### Flexible Search Type Filtering Refinement Specification
+### Flexible Search Type Filtering Contract Specification
 
 #### Details
 Users is expected to be able to specify multiple element types in a single search operation using comma-separated values (e.g., `requirement,test-verification,behavior`).
 
 This capability enables:
-- Searching across related type categories (capabilities, requirements, verification types, and refinement types)
+- Searching across related type categories (capabilities, requirements, verification types, and contract types)
 - Building complex queries without multiple search invocations
 - Improved workflow efficiency for model analysis and reporting
 
@@ -321,7 +321,7 @@ Technical specification for implementation coverage report output structure.
   * define: [Requirement Implementation Coverage Report](ReportingRequirements.md#requirement-implementation-coverage-report)
 ---
 
-### Interactive Mermaid Diagram Node Behavior Refinement Specification
+### Interactive Mermaid Diagram Node Behavior Contract Specification
 
 #### Details
 Clickable mermaid diagrams links by default must use relative links to the git repository.
@@ -385,7 +385,7 @@ JSON output conventions:
 - `type`: Element type string
 - `file_path`: Relative path from git root
 - `relations`: Array of relation objects with `type` and `target` fields
-- `attachments`: Array of refinement element identifier strings
+- `reused_contract_context`: Array of contract element identifier strings
 
 **Error Handling:**
 - Error responses include `error` field with message
@@ -498,7 +498,7 @@ The visualization helps users:
   * type: specification
 ---
 
-### Model Diagram Output Formats Refinement Specification
+### Model Diagram Output Formats Contract Specification
 
 #### Details
 Model output format rules:
@@ -506,9 +506,9 @@ Model output format rules:
 - Pure Mermaid format includes only Mermaid flowchart text with no Markdown wrapper.
 - Markdown shows hierarchical structure using containment subgraphs (folders > files > elements).
 - Mermaid diagrams use folder and file subgraphs to visually group elements by physical location.
-- JSON format uses structured data with folders, files, sections, elements, relations, and attachments.
+- JSON format uses structured data with folders, files, sections, elements, relations, and reused_contract_context.
 - Both formats represent the same filtered or complete model data.
-- Element attachments are included as an array of refinement element identifier strings in both formats.
+- Element reused_contract_context are included as an array of contract element identifier strings in both formats.
 
 #### Metadata
   * type: specification
@@ -531,14 +531,16 @@ The output shall:
 - In full semantic model export mode, append RDF triples for Reqvire model context:
   - all parsed capability, requirement, ontology, semantic-contract, verification, and contract elements
   - element id, identifier, name, type, file path, and source line
-  - internal model relations, including `derive`, `derivedFrom`, `specify`, `specifiedBy`, `define`, `definedBy`, `verify`, `verifiedBy`, `satisfy`, `satisfiedBy`, and `trace`
-  - element attachments for reusable requirement-owned contracts
+  - internal model relations, including `derive`, `derivedFrom`, `specify`, `specifiedBy`, `define`, `definedBy`, `constrain`, `constrainedBy`, `use`, `usedBy`, `verify`, `verifiedBy`, `satisfy`, `satisfiedBy`, and `reused_contract_context`
+  - deterministic first-class `reqvire:ModelRelation` resources with `reqvire:relationSource`, `reqvire:relationTarget`, `reqvire:relationType`, and `reqvire:relationTargetIdentifier`
+  - normalized relation-family predicates equivalent to the relation-family CONSTRUCT query specification, including canonical forward and inverse facts for authored forward, inverse, and non-directional relation tokens
+  - element reused_contract_context for reusable requirement-owned contracts
   - concept references from model elements to ontology terms
   - ontology term declaration edges from ontology elements to declared terms
   - semantic-contract shape reference edges from semantic contracts to referenced ontology terms
   - generated ontology projection facts for direct-authored OWL/RDFS/SHACL constructs
 - Include source element identifier, source name, file path, section kind, and line number in the semantic index used by rendering and semantic output.
-- Avoid requiring a persistent RDF store for this collection path; full semantic output uses the existing in-memory RDF projection over the graph registry and semantic index, extended with a generated ontology construct subprojection. Persistent RDF stores, SPARQL-backed search, general query execution, query output, and inferred reasoning are reserved for later query support.
+- Avoid requiring a persistent RDF store for this collection path; full semantic output uses the existing in-memory RDF projection over the graph registry and semantic index, extended with generated relation-family and ontology construct subprojections. MCP semantic query execution may load this projection into the model-owned in-memory Oxigraph store. Persistent RDF stores and inferred reasoning are reserved for later requirements.
 
 **Explorer Serve:**
 - Explorer serve shall include `ontologies.ttl`.
@@ -552,19 +554,172 @@ The output shall:
   * define: [Ontology and Shapes Collection](ReportingRequirements.md#ontology-and-shapes-collection)
 ---
 
+### OWL Reserved Vocabulary Recognition Specification
+
+The OWL reserved vocabulary recognition contract defines fixed reserved IRIs that Reqvire recognizes without loading a local external ontology source.
+
+#### Details
+Reqvire shall maintain an internal OWL reserved vocabulary registry for RDF, RDFS, XSD, and OWL IRIs with special treatment.
+
+Standard prefix declarations shall be recognized only for exact namespace bindings:
+- `rdf`: `http://www.w3.org/1999/02/22-rdf-syntax-ns#`
+- `rdfs`: `http://www.w3.org/2000/01/rdf-schema#`
+- `xsd`: `http://www.w3.org/2001/XMLSchema#`
+- `owl`: `http://www.w3.org/2002/07/owl#`
+
+Reserved vocabulary validation shall be fixed-list based over expanded IRIs. Prefix-name matching shall not be used: Turtle aliases such as `xsd:string` and `xs:string` are equivalent once parsed to the same full IRI. Namespace-prefix matching may be used only as an early namespace classification helper; it must not prove that an arbitrary IRI under a standard namespace is valid.
+
+The registry shall classify reserved IRIs by semantic position, including:
+- built-in datatypes
+- datatype facets
+- annotation vocabulary
+- reserved classes
+- reserved object properties
+- reserved data properties
+
+Built-in datatype positions include:
+- `rdfs:range` values of datatype properties when the object is a datatype IRI
+- SHACL `sh:datatype` values
+- datatype classification in ontology projection and semantic export
+
+The built-in datatype subset shall include:
+- `rdf:PlainLiteral`
+- `rdf:XMLLiteral`
+- `rdfs:Literal`
+- `owl:real`
+- `owl:rational`
+- standard XML Schema datatype IRIs with OWL special treatment: `xsd:anyURI`, `xsd:base64Binary`, `xsd:boolean`, `xsd:byte`, `xsd:dateTime`, `xsd:dateTimeStamp`, `xsd:decimal`, `xsd:double`, `xsd:float`, `xsd:hexBinary`, `xsd:int`, `xsd:integer`, `xsd:language`, `xsd:long`, `xsd:Name`, `xsd:NCName`, `xsd:negativeInteger`, `xsd:NMTOKEN`, `xsd:nonNegativeInteger`, `xsd:nonPositiveInteger`, `xsd:normalizedString`, `xsd:positiveInteger`, `xsd:short`, `xsd:string`, `xsd:token`, `xsd:unsignedByte`, `xsd:unsignedInt`, `xsd:unsignedLong`, and `xsd:unsignedShort`
+
+The datatype facet subset shall include supported XSD facet IRIs such as `xsd:length`, `xsd:minLength`, `xsd:maxLength`, `xsd:pattern`, `xsd:minInclusive`, `xsd:maxInclusive`, `xsd:minExclusive`, and `xsd:maxExclusive`. Facet IRIs are valid only in facet/constraint positions, not as datatypes.
+
+Reqvire shall not require local `#### External Ontology` source declarations for standard reserved prefixes or reserved vocabulary IRIs.
+
+Reqvire shall not treat arbitrary custom IRIs as reserved vocabulary simply because Turtle parsing succeeds or because an IRI starts with a standard namespace. A non-reserved IRI shall resolve through authored ontology terms or local external ontology sources when term existence validation applies.
+
+OWL reserved vocabulary recognition is a semantic validation rule. It does not make standard namespaces authored ontology namespaces, does not synthesize external source triples, and does not require standard reserved prefixes to appear as External Sources in Explorer.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [OWL Reserved Vocabulary Recognition](ReportingRequirements.md#owl-reserved-vocabulary-recognition)
+---
+
+### Local External Ontology Source Specification
+
+The local external ontology source contract defines how ontology elements declare pinned external vocabulary graphs.
+
+#### Details
+An ontology element may define one or more repeatable `#### External Ontology` sections:
+
+Example section body, under an `External Ontology` subsection:
+
+```markdown
+  * prefix: ext
+  * namespace: https://example.org/external#
+  * resource: https://example.org/external
+  * source: references/ontologies/external.ttl
+  * format: turtle
+```
+
+Rules:
+- Only ontology elements may define `#### External Ontology`.
+- The section is repeatable.
+- Each section requires `prefix`, `namespace`, `resource`, and `source`.
+- `format` is optional and defaults to Turtle. The only supported source format for this version is Turtle/.ttl.
+- `source` must be a local path. `http://` and `https://` source paths are rejected; network ontology fetches are not part of validation or export.
+- Source paths are resolved as model paths using the repository root, with file-relative resolution as a fallback for local fixture and authoring ergonomics.
+- The source Turtle must explicitly declare the configured prefix/namespace pair.
+- The source Turtle must contain `<resource> a owl:Ontology`.
+- The source Turtle must declare or reference at least one term in the configured namespace.
+- The same prefix may not be bound to different namespaces.
+- The same namespace may not be bound to different prefixes; aliases are rejected in this version.
+- Imported terms are available for semantic-reference validation through the ontology element that declared the external source.
+- Imported terms do not count as authored project-owned term declarations for duplicate authored-term validation.
+
+Export modes:
+- `reqvire ontologies` emits generated ontology document declarations plus authored ontology and SHACL triples only.
+- `reqvire ontologies --include-external` additionally emits local external source triples.
+- `reqvire ontologies --full` emits authored triples, Reqvire model context, and generated ontology projection facts.
+- `reqvire ontologies --full --include-external` emits authored triples, external source triples, Reqvire model context, and generated ontology projection facts.
+
+External sections are source declarations, not hidden Turtle injection. Authored ontology and SHACL blocks must still be complete Turtle with their own explicit prefixes and semantic statements.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Local External Ontology Sources](ReportingRequirements.md#local-external-ontology-sources)
+---
+
+### Semantic Relation Family Projection Specification
+
+The semantic model export is expected to materialize ontology-defined relation-family facts from authored Reqvire relations as part of full semantic model export.
+
+#### Details
+Normative construct-query contract:
+- Relation-family normalization is defined for every `reqvire:RelationRule` that declares `reqvire:normalizedForwardProperty` and `reqvire:normalizedInverseProperty`.
+- Each authored relation edge is treated as a first-class `reqvire:ModelRelation` with `reqvire:relationSource`, `reqvire:relationTarget`, and `reqvire:relationType` so source/target pairing is preserved.
+- For relation rules with `reqvire:relationDirection "forward"`, the authored source is the canonical forward source and the authored target is the canonical forward target.
+- For relation rules with `reqvire:relationDirection "inverse"`, the authored target is the canonical forward source and the authored source is the canonical forward target.
+- The projection emits both canonical forward and canonical inverse normalized predicates.
+- Raw authored relation predicates remain present; normalized predicates are additional semantic-search facts.
+
+```sparql
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+
+CONSTRUCT {
+  ?canonicalSource ?forwardProperty ?canonicalTarget .
+  ?canonicalTarget ?inverseProperty ?canonicalSource .
+}
+WHERE {
+  ?relation a reqvire:ModelRelation ;
+    reqvire:relationSource ?source ;
+    reqvire:relationTarget ?target ;
+    reqvire:relationType ?relationName .
+
+  ?rule a reqvire:RelationRule ;
+    reqvire:relationName ?relationName ;
+    reqvire:relationDirection ?direction ;
+    reqvire:normalizedForwardProperty ?forwardProperty ;
+    reqvire:normalizedInverseProperty ?inverseProperty .
+
+  BIND(IF(?direction = "inverse", ?target, ?source) AS ?canonicalSource)
+  BIND(IF(?direction = "inverse", ?source, ?target) AS ?canonicalTarget)
+}
+```
+
+Implementation contract:
+- Current Rust semantic export projection shall implement the same canonicalization without executing the CONSTRUCT query.
+- Full semantic model export shall emit deterministic `reqvire:ModelRelation` resources for authored Markdown relations and reused contract context edges.
+- Full semantic model export shall emit normalized forward and inverse predicates for `derive`/`derivedFrom`, `specify`/`specifiedBy`, `define`/`definedBy`, `constrain`/`constrainedBy`, `use`/`usedBy`, `verify`/`verifiedBy`, `satisfy`/`satisfiedBy`, and `reused_contract_context`.
+- Future reasoner-backed or SPARQL-backed materialization must produce triples equivalent to the construct-query result.
+- Generated relation-family projection facts shall not be written back to authored Markdown ontology, semantic-contract, requirement, or contract blocks.
+
+#### Metadata
+  * type: specification
+
+#### Concept References
+  * Relation family construct query: https://www.reqvire.org/ontology#RelationFamilyConstructQuery
+  * Model relation: https://www.reqvire.org/ontology#ModelRelation
+
+#### Relations
+  * define: [Semantic Relation Family Projection](ReportingRequirements.md#semantic-relation-family-projection)
+---
+
 ### Ontology Projection Subgraph Materialization Specification
 
 #### Details
 Projection subgraph generation behavior:
 - Extend the existing full semantic export in-memory RDF projection with a generated `reqvire:OntologyProjectionGraph` subprojection after RDF/Turtle and SHACL parsing has produced semantic-index quads.
-- Attach generated projection data to `SemanticIndex` as structured Rust data, not as a renderer-local object. The `SemanticIndex` projection data is the authoritative in-process source for full Turtle output, full JSON-LD output, and Ontologies Explorer rendering.
+- Reuse generated projection data to `SemanticIndex` as structured Rust data, not as a renderer-local object. The `SemanticIndex` projection data is the authoritative in-process source for full Turtle output, full JSON-LD output, and Ontologies Explorer rendering.
 - Store generated construct facts in the existing semantic export context as in-memory RDF statements derived from `SemanticIndex` projection data. Generated facts are not written back to authored Markdown ontology or semantic-contract blocks.
 - Keep projection data deterministic and serializable from `SemanticIndex` without reparsing raw Turtle in the Ontologies renderer.
 - Use stable generated IRIs or blank-node identifiers derived from canonical source evidence and construct membership so repeated exports remain deterministic.
 - Materialize one `reqvire:OntologyConstructProjection` record per projection pass or construct family and one or more `reqvire:OntologyConstruct` records for extracted constructs.
 - Record `reqvire:projectionDerivationMode "direct-authored"` for facts derived only from authored quads without reasoning.
 - Record `reqvire:constructSourceBlock`, source element metadata, source line, construct subject, construct object, construct property, construct member, and `reqvire:constructSequenceIndex` where order matters.
-- Attach `reqvire:OntologySymbol` facts for rendered symbols with `reqvire:symbolConceptName`, `reqvire:rawUnicodeCodePoint`, and `reqvire:renderedUnicodeCharacter`.
+- Reuse `reqvire:OntologySymbol` facts for rendered symbols with `reqvire:symbolConceptName`, `reqvire:rawUnicodeCodePoint`, and `reqvire:renderedUnicodeCharacter`.
 
 Direct-authored construct families:
 - `rdfs:domain` and `rdfs:range` become property-domain and property-range constructs.
@@ -578,7 +733,7 @@ Direct-authored construct families:
 - `owl:Restriction` with `owl:onProperty`, `owl:allValuesFrom`, `owl:someValuesFrom`, cardinality predicates, `owl:hasValue`, or similar authored restriction predicates becomes restriction constructs using the matching symbol vocabulary.
 - `owl:intersectionOf`, `owl:unionOf`, and `owl:complementOf` RDF list or expression structures become class-expression constructs. Set difference uses `U+2216` / `∖` only when represented by an explicit supported class-expression pattern.
 - SHACL node shapes and property shapes become shape-overlay constructs over their target classes, paths, datatypes, class constraints, node kinds, cardinality constraints, and allowed-value lists.
-- SHACL node-shape target classes plus property-shape paths and facets become viewer-facing slot/facet records attached to the target class and, when present, the named property node. On target classes these records define normalized class slots; on named properties they define source-backed usages of that property as a slot by each target class.
+- SHACL node-shape target classes plus property-shape paths and facets become viewer-facing slot/facet records reused to the target class and, when present, the named property node. On target classes these records define normalized class slots; on named properties they define source-backed usages of that property as a slot by each target class.
 - Class-expression projection records shall preserve list members in RDF list order and expose usage evidence so consumers can distinguish the expression itself from the property, subclass, or restriction construct that references it.
 
 Consumer behavior:
@@ -603,9 +758,9 @@ Report commands:
 - `collect`: capability-or-requirement context collection, with upstream or downstream traversal and source citations.
 - `coverage`: requirement verification coverage, evidence-backed verification satisfaction, implementation coverage, and capability coverage rollup.
 - `traces`: verification-to-capability-root traceability trees.
-- `search`: model element search with relations, attachments, semantic-contract fields, and effective governance metadata.
+- `search`: model element search with relations, reused_contract_context, semantic-contract fields, and effective governance metadata.
 - `submodels`: independent capability-rooted subgraphs, cross-submodel couplings, and summary totals.
-- `resources`: relation file targets and attachment identifier targets grouped by resource.
+- `resources`: relation file targets and reused_contract_context identifier targets grouped by resource.
 - `ontologies`: collected ontology `Ontology` and semantic-contract `Shapes` Turtle blocks.
 - `model`: logical model graph traversal with optional direction and type filtering.
 - `lint`: model quality findings grouped for auto-fix or manual review.
@@ -686,7 +841,7 @@ Implementation coverage source vocabulary is defined by the Reqvire report ontol
 
 Implementation coverage scope includes only elements of type `requirement`. Elements of type `capability` are excluded from direct implementation coverage and receive implementation coverage through capability roll-up.
 
-The report shall classify each requirement using the semantic coverage source vocabulary and the available `satisfiedBy`, `definedBy`, attachment, and child requirement evidence.
+The report shall classify each requirement using the semantic coverage source vocabulary and the available `satisfiedBy`, `definedBy`, reused_contract_context, and child requirement evidence.
 
 #### Metadata
   * type: specification
@@ -706,7 +861,7 @@ Canonical submodel, capability-root submodel, scoped submodel, and cross-submode
 **Refactor Rule:**
 When a relation crosses intended submodel boundaries, either:
 1. Move/reparent to restore hierarchical ownership, or
-2. Replace cross-boundary hierarchy links with attachment-based refinement contracts.
+2. Replace cross-boundary hierarchy links with reused-contract-context-based contracts.
 
 **Refactor Procedure:**
 Apply boundary refactoring recursively, top-down:
@@ -715,15 +870,15 @@ Apply boundary refactoring recursively, top-down:
 3. Continue recursively for each descendant branch until leaf requirements.
 4. At each level, enforce:
  - hierarchical relations remain internal to that branch/submodel,
- - cross-branch dependencies are attachment contracts.
+ - cross-branch dependencies are reused_contract_context contracts.
 5. If a cross-boundary hierarchical relation is found, either:
  - move/reparent to restore ownership, or
- - replace with attachment-based refinement contract.
+ - replace with reused-contract-context-based contract.
 6. Re-run validation and submodel analysis after each boundary slice before continuing recursion.
 
 **Internal Sub-Boundaries:**
 A submodel may contain internal sub-boundaries (nested domains) with separate ownership and lifecycle.
-Cross-internal-boundary dependencies should be modeled as explicit attachment contracts when they represent contractual dependency, not hierarchical ownership.
+Cross-internal-boundary dependencies should be modeled as explicit reused_contract_context contracts when they represent contractual dependency, not hierarchical ownership.
 
 **Submodel Resolution Rules:**
 - A submodel root is a capability element with no capability parent relation.
@@ -796,27 +951,27 @@ Technical specification for resources report structure and output formats.
 **Report Structure:**
 The resources report is expected to consist of two sections:
 1. Relations section
-2. Attachments section
+2. Reused Contract Context section
 
 **Relations Section:**
-- Files from InternalPath relation targets (satisfiedBy, trace, etc.)
+- Files from internal path relation targets such as `satisfiedBy`
 - Shows relation type and source element for each reference
 - Sorted by relation type, then by element identifier
 - Each file lists all elements that reference it with their relation types
 
-**Attachments Section:**
-- Refinement element identifiers from attachment targets
+**Reused Contract Context Section:**
+- Contract element identifiers from reused_contract_context targets
 - Shows source element for each reference
 - Sorted by element identifier
-- Each refinement identifier lists all elements that attach it
+- Each contract identifier lists all elements that reuse it
 
 **Output Formats:**
 
 *Text/Markdown Format:*
 - Human-readable with markdown links
-- Entries listed alphabetically by path (relations) and identifier (attachments)
+- Entries listed alphabetically by path (relations) and identifier (reused_contract_context)
 - Element references shown as clickable markdown links
-- Clear section headers separating Relations and Attachments
+- Clear section headers separating Relations and Reused Contract Context
 
 *JSON Format:*
 - Structured data for programmatic use
@@ -859,11 +1014,6 @@ Each relationship type is represented using SysML standard notation with specifi
 | satisfy | «satisfy» | solid | Implementation → Requirement |
 | satisfiedBy | «satisfy» | solid | Requirement → Implementation |
 
-**Trace Relations:**
-| Relation | Stereotype | Line Style | Arrow Direction |
-|----------|------------|------------|-----------------|
-| trace | «trace» | dashed | Tracing → Traced (neutral) |
-
 **Arrowhead Style:**
 All relation types use open (hollow) arrowheads per SysML specification.
 
@@ -887,7 +1037,7 @@ Default text output (when neither `--json` nor other format flags specified):
 - Full element name and identifier
 - Element type in brackets: `[requirement]`, `[test-verification]`
 - Relations listed with target identifiers
-- Attachments listed as refinement element identifiers
+- Reused Contract Context listed as contract element identifiers
 
 **Formatting:**
 - Color output when terminal supports it (errors in red, warnings in yellow)
@@ -903,48 +1053,15 @@ Default text output (when neither `--json` nor other format flags specified):
   * type: specification
 ---
 
-### Trace Relation Non-Directional Behavior Refinement Specification
-
-#### Details
-Canonical trace relation meaning, direction, and change-impact propagation semantics are defined by the Reqvire relation ontology.
-
-The implementation behavior is expected to include:
-
-1. **Circular Dependency Exclusion**:
-- Trace relations is expected to not be traversed during circular dependency detection
-- The cycle detection algorithm is expected to skip trace relations to prevent false positive cycles
-- Trace relations exist solely for traceability and documentation purposes
-
-2. **Non-Propagation Behavior**:
-- Changes is expected to not propagate through trace relations
-- Trace relations is expected to not be included in change impact analysis
-- Impact trees is expected to not traverse trace relation connections
-
-3. **Bidirectional Traceability**:
-- Trace relations is expected to provide bidirectional navigational capability
-- Users can navigate from source to target and target to source
-- Both directions are semantically equivalent for traceability purposes
-
-4. **Validation Behavior**:
-- Trace relations is expected to be validated for target existence
-- Trace relations is expected to not require type compatibility validation
-- Trace relations can connect any element type to any other element type
-
-This ensures that trace relations serve their intended purpose of establishing lightweight traceability connections without creating artificial dependency constraints or participating in architectural validation logic.
-
-#### Metadata
-  * type: specification
----
-
 ### Traceability Reporting Specification
 
-Reqvire provides traceability reports over the Reqvire capability, requirement, verification, refinement, attachment, and implementation graph.
+Reqvire provides traceability reports over the Reqvire capability, requirement, verification, contract, reused_contract_context, and implementation graph.
 
 #### Details
 - Traceability reports shall use Reqvire relation semantics for traversal direction, ownership, and evidence links.
 - Upward reports shall trace implementation and verification evidence to requirements and owning capability roots where applicable.
 - Downstream reports shall trace capability roots to specified requirements and requirement descendants.
-- Change-impact reports shall use propagation relations, attachments, semantic dependencies, and impact scope rules to identify affected elements.
+- Change-impact reports shall use propagation relations, reused_contract_context, semantic dependencies, and impact scope rules to identify affected elements.
 
 #### Metadata
   * type: specification

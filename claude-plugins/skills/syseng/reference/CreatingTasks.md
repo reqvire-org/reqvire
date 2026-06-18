@@ -66,7 +66,7 @@ This ensures no elements are missed — `impact_scope` entries are common parent
 For each changed capability or requirement (from `added[]`, `changed[]`, or enumerated via downstream collect), gather upstream context:
 
 ```bash
-# Get full ancestor chain with attachments (upstream - default)
+# Get full ancestor chain with reused_contract_context (upstream - default)
 reqvire collect "<element-name>" --json --output /tmp/context_<element-id>.json
 
 # Also save human-readable format for reference
@@ -95,8 +95,8 @@ reqvire search --filter-risk="high,critical" --json
 **What collect provides:**
 - **Upstream**: All ancestor requirement content (parent chain to root)
 - **Downstream**: All descendant requirement content (children to leaves)
-- Attached markdown files (read as content)
-- Attached contract elements (specifications, constraints, behaviors)
+- Reused markdown files (read as content)
+- Reused contract elements (specifications, constraints, behaviors)
 - Source citations for traceability
 
 **Governance metadata in task planning:**
@@ -228,7 +228,7 @@ Each context document shows:
 - Complete capability and requirement trace chain
 - Capability purpose and parent requirement obligations
 - Contracts, specifications, and implementation details
-- Attached design documents
+- Reused design documents
 - Constraints and validation rules
 ```
 

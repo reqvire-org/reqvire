@@ -849,8 +849,8 @@ function CoverageBreakdown({
 function CoverageSourceBars({ values }: { values: Record<string, number> }) {
   const rows: [string, string, DesignSystemColorToken][] = [
     ["direct_satisfied", "Direct evidence", "--resource"],
-    ["refinement_contract_satisfied_via_attachment", "Attached contract", "--ontology"],
-    ["refinement_contract_satisfied_via_child", "Child contract", "--capability"],
+    ["contract_satisfied_via_reused_contract_context", "Reused contract", "--ontology"],
+    ["contract_satisfied_via_child", "Child contract", "--capability"],
   ];
   const max = Math.max(1, ...rows.map(([key]) => values[key] ?? 0));
   return (

@@ -126,7 +126,7 @@ pub enum Commands {
 
     /// Preview or apply source migrations for known model-breaking changes
     #[clap(
-        override_help = "Preview or apply source migrations for known model-breaking changes. By default, shows preview without applying changes\n\nMIGRATE OPTIONS:\n      --fix              Apply migration changes to files\n      --json             Output results in JSON format\n      --output <FILE>    Save JSON output to file (requires --json)\n\nCURRENT MIGRATIONS:\n    v0.15-documents-to-element-header - rewrite legacy single-element '# Documents' headers to '# Element'\n    v0.16-verification-objective - create one shared holder verification-objective in root VerificationObjectiveMigration.md and link standalone concrete verifications from that holder with derive\n    v1.0-contract-relations - rewrite legacy refinement relation names to contract relation names: refinedBy -> definedBy and refine -> define"
+        override_help = "Preview or apply source migrations for known model-breaking changes. By default, shows preview without applying changes\n\nMIGRATE OPTIONS:\n      --fix              Apply migration changes to files\n      --json             Output results in JSON format\n      --output <FILE>    Save JSON output to file (requires --json)\n\nCURRENT MIGRATIONS:\n    v0.15-documents-to-element-header - rewrite legacy single-element '# Documents' headers to '# Element'\n    v0.16-verification-objective - create one shared holder verification-objective in root VerificationObjectiveMigration.md and link standalone concrete verifications from that holder with derive\n    v1.0-contract-relations - rewrite legacy contract relation names to contract relation names: refinedBy -> definedBy and refine -> define\n    v1.1-reused-contract-context-section - rewrite legacy 'Reused Contract Context' reserved section headings to 'Reused Contract Context'"
     )]
     Migrate {
         /// Apply migration changes to files
@@ -225,13 +225,13 @@ pub enum Commands {
         #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
         not_have_relations: Option<String>,
 
-        /// Only include elements that have attachments
+        /// Only include elements that have reused_contract_context
         #[clap(long, help_heading = "SEARCH OPTIONS")]
-        has_attachments: bool,
+        has_reused_contract_context: bool,
 
-        /// Only include elements with attachments matching this glob pattern (e.g., "*.pdf", "docs/**/*")
+        /// Only include elements with reused_contract_context matching this glob pattern (e.g., "*.pdf", "docs/**/*")
         #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
-        filter_attachment: Option<String>,
+        filter_reused_contract_context: Option<String>,
     },
 
     /// Analyze change impact and provide report
@@ -469,7 +469,7 @@ pub enum Commands {
 
     /// Merge multiple elements into target element
     #[clap(
-        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and attachments are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Concrete verifications can merge into concrete verifications\n    - Verification objectives can merge only into verification objectives\n    - Refinements can merge into refinements (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
+        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and reused_contract_context are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Concrete verifications can merge into concrete verifications\n    - Verification objectives can merge only into verification objectives\n    - Contracts can merge into contracts (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
     )]
     Merge {
         /// Target element name (receives merged content)
@@ -521,21 +521,21 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Add relation or attachment between elements
+    /// Add relation or reused_contract_context between elements
     #[clap(
         name = "link",
-        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    define        - Source contract element defines a requirement\n    definedBy     - Source requirement owns a compatible contract element\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source capability or requirement is verified by concrete verification\n    verify        - Source concrete verification verifies capability or requirement\n    trace         - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach compatible requirement-owned contract elements\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: requirement may attach compatible requirement-owned source, constraint, behavior, specification, state, or input-output contract element identifiers (file.md#element-id or #element-id). Ontology vocabulary uses Concept References; semantic contracts use use/usedBy.\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" definedBy \"Invoice Numbering Specification\"\n    reqvire link \"Invoice Numbering Specification\" define \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\""
+        override_help = "Add relation or reused_contract_context between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or reusesContract>  Relation type OR 'reusesContract' keyword for reused_contract_context\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    define        - Source contract element defines a requirement\n    definedBy     - Source requirement owns a compatible contract element\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source capability or requirement is verified by concrete verification\n    verify        - Source concrete verification verifies capability or requirement\n\nREUSED CONTRACT CONTEXT:\n    Use 'reusesContract' keyword to reuse compatible requirement-owned contract elements\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For reusesContract: requirement may reuse compatible requirement-owned source, constraint, behavior, specification, state, or input-output contract element identifiers (file.md#element-id or #element-id). Ontology vocabulary uses Concept References; semantic contracts use use/usedBy.\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" definedBy \"Invoice Numbering Specification\"\n    reqvire link \"Invoice Numbering Specification\" define \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"System Requirement\" reusesContract \"constraints.md#latency-limit\""
     )]
     Link {
         /// Source element name
         source: String,
 
-        /// Relation type OR 'attaching'.
-        /// Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, satisfiedBy, satisfy, verifiedBy, verify, trace.
-        /// Use 'attaching' to attach compatible requirement-owned contract elements
+        /// Relation type OR 'reusesContract'.
+        /// Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, satisfiedBy, satisfy, verifiedBy, verify.
+        /// Use 'reusesContract' to reuse compatible requirement-owned contract elements
         relation_type: String,
 
-        /// Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement attachments
+        /// Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement reused_contract_context
         target: String,
 
         /// Preview changes without applying
@@ -551,10 +551,10 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Remove relation or attachment between elements (auto-detects type)
+    /// Remove relation or reused_contract_context between elements (auto-detects type)
     #[clap(
         name = "unlink",
-        override_help = "Remove relation or attachment between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Searches relations first, then attachments.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Capability Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
+        override_help = "Remove relation or reused_contract_context between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Searches relations first, then reused_contract_context.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Capability Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
     )]
     Unlink {
         /// Source element name
@@ -607,7 +607,7 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Move/rename asset file and update all references (Attachments and Relations)
+    /// Move/rename asset file and update all references (Reused Contract Context and Relations)
     #[clap(
         name = "mv-asset",
         override_help = "Move/rename asset file and update all references\n\nMV-ASSET OPTIONS:\n       <OLD_PATH>               Current file path\n       <NEW_PATH>               New file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv-asset docs/old.pdf docs/new.pdf"
@@ -632,7 +632,7 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Remove asset file and remove all references (Attachments and Relations)
+    /// Remove asset file and remove all references (Reused Contract Context and Relations)
     #[clap(
         name = "rm-asset",
         override_help = "Remove asset file and remove all references\n\nRM-ASSET OPTIONS:\n       <FILE_PATH>              Path to file to remove\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rm-asset docs/obsolete.pdf"
@@ -688,7 +688,7 @@ pub enum Commands {
 
     /// Collect ontology elements and semantic-contract SHACL shapes
     #[clap(
-        override_help = "Collect ontology elements and semantic-contract SHACL shapes\n\nONTOLOGIES OPTIONS:\n      --jsonld            Output JSON-LD format instead of RDF/Turtle (.ttl)\n      --full              Include Reqvire model context triples and ontology projection facts in the semantic export\n      --output <FILE>     Save output to file"
+        override_help = "Collect ontology elements and semantic-contract SHACL shapes\n\nONTOLOGIES OPTIONS:\n      --jsonld                Output JSON-LD format instead of RDF/Turtle (.ttl)\n      --full                  Include Reqvire model context triples and ontology projection facts in the semantic export\n      --include-external      Include local external ontology source triples\n      --output <FILE>         Save output to file"
     )]
     Ontologies {
         /// Output JSON-LD format instead of RDF/Turtle (.ttl)
@@ -698,6 +698,10 @@ pub enum Commands {
         /// Include Reqvire model context triples and ontology projection facts in the semantic export
         #[clap(long, help_heading = "ONTOLOGIES OPTIONS")]
         full: bool,
+
+        /// Include local external ontology source triples
+        #[clap(long, help_heading = "ONTOLOGIES OPTIONS")]
+        include_external: bool,
 
         /// Save output to file
         #[clap(long, value_name = "FILE", help_heading = "ONTOLOGIES OPTIONS")]
@@ -724,7 +728,7 @@ pub enum Commands {
 
     /// Collect content from capability, requirement, or ontology context
     #[clap(
-        override_help = "Collect content from capability, requirement, or ontology context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the capability, requirement, or ontology element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)\n\nCOLLECTED CONTEXT:\n    Capability/requirement starts include traversed elements, authored concept references, requirement refinements, and attachments.\n    Ontology starts include ontology hierarchy and downstream semantic contracts that use reachable ontology."
+        override_help = "Collect content from capability, requirement, or ontology context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the capability, requirement, or ontology element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)\n\nCOLLECTED CONTEXT:\n    Capability/requirement starts include traversed elements, authored concept references, requirement contracts, and reused_contract_context.\n    Ontology starts include ontology hierarchy and downstream semantic contracts that use reachable ontology."
     )]
     Collect {
         /// Name of the capability, requirement, or ontology element to collect from
@@ -1201,8 +1205,8 @@ pub async fn handle_command(
             filter_page_content,
             have_relations,
             not_have_relations,
-            has_attachments,
-            filter_attachment,
+            has_reused_contract_context,
+            filter_reused_contract_context,
         }) => {
             // Build search filters
             let filters = reqvire::search::SearchFilters::new(
@@ -1217,8 +1221,8 @@ pub async fn handle_command(
                 filter_page_content.as_deref(),
                 have_relations.as_deref(),
                 not_have_relations.as_deref(),
-                has_attachments,
-                filter_attachment.as_deref(),
+                has_reused_contract_context,
+                filter_reused_contract_context.as_deref(),
             )?;
 
             // Generate search report
@@ -1326,6 +1330,25 @@ pub async fn handle_command(
             let dry_run = !fix;
             let (documents_summary, documents_diffs) =
                 migrations::apply_documents_header_migration(excluded_filename_patterns, dry_run)?;
+            let (reused_context_summary, reused_context_diffs) =
+                migrations::apply_reused_contract_context_section_migration(
+                    excluded_filename_patterns,
+                    dry_run,
+                )?;
+
+            if !dry_run
+                && (documents_summary.files_changed > 0 || reused_context_summary.files_changed > 0)
+            {
+                model_manager.parse_and_validate_with_options(
+                    None,
+                    excluded_filename_patterns,
+                    ModelBuildOptions {
+                        lenient: true,
+                        with_size_estimates: false,
+                    },
+                )?;
+            }
+
             let contract_summary =
                 migrations::apply_contract_relation_migration(&mut model_manager.graph_registry)?;
             let verification_summary = migrations::apply_verification_objective_holders(
@@ -1334,6 +1357,8 @@ pub async fn handle_command(
             let mut format_result = format_files(&model_manager.graph_registry, dry_run, false)?;
             format_result.files_changed += documents_diffs.len();
             format_result.diffs.extend(documents_diffs);
+            format_result.files_changed += reused_context_diffs.len();
+            format_result.diffs.extend(reused_context_diffs);
             format_result
                 .diffs
                 .sort_by(|a, b| a.file_path.cmp(&b.file_path));
@@ -1349,6 +1374,7 @@ pub async fn handle_command(
                 let json_str = serde_json::to_string_pretty(&serde_json::json!({
                     "migrations": {
                         "documents_header": documents_summary,
+                        "reused_contract_context_section": reused_context_summary,
                         "contract_relations": contract_summary,
                         "verification_objective": verification_summary,
                     },
@@ -1362,6 +1388,7 @@ pub async fn handle_command(
                 })?;
                 handle_json_output(&json_str, &output)?;
             } else if documents_summary.files_changed == 0
+                && reused_context_summary.files_changed == 0
                 && contract_summary.relations_rewritten == 0
                 && verification_summary.derive_relations_added == 0
                 && verification_summary.objectives_created == 0
@@ -1370,16 +1397,18 @@ pub async fn handle_command(
             } else {
                 if dry_run {
                     println!(
-                        "Migration preview: {} legacy document header file(s), {} contract relation rewrite(s), {} objective holder(s), {} derive relation(s).\n",
+                        "Migration preview: {} legacy document header file(s), {} reused contract context heading file(s), {} contract relation rewrite(s), {} objective holder(s), {} derive relation(s).\n",
                         documents_summary.files_changed,
+                        reused_context_summary.files_changed,
                         contract_summary.relations_rewritten,
                         verification_summary.objectives_created,
                         verification_summary.derive_relations_added
                     );
                 } else {
                     println!(
-                        "Applied migration: {} legacy document header file(s), {} contract relation rewrite(s), {} objective holder(s), {} derive relation(s).\n",
+                        "Applied migration: {} legacy document header file(s), {} reused contract context heading file(s), {} contract relation rewrite(s), {} objective holder(s), {} derive relation(s).\n",
                         documents_summary.files_changed,
+                        reused_context_summary.files_changed,
                         contract_summary.relations_rewritten,
                         verification_summary.objectives_created,
                         verification_summary.derive_relations_added
@@ -1771,17 +1800,17 @@ pub async fn handle_command(
         }) => {
             let git_root = git_commands::get_git_root_dir()?;
 
-            // Check if relation_type is 'attaching' - special keyword for attachments
-            let result = if relation_type == "attaching" {
-                // External URLs are not allowed for attachments
+            // Check if relation_type is 'reusesContract' - special keyword for reused_contract_context
+            let result = if relation_type == "reusesContract" {
+                // External URLs are not allowed for reused_contract_context
                 if reqvire::utils::is_external_url(&target) {
-                    return Err(ReqvireError::ProcessError(format!(
-                        "External URLs cannot be attached. Use a relation type (e.g., 'trace') instead:\n  reqvire link \"{}\" trace \"{}\"",
-                        source, target
-                    )));
+                    return Err(ReqvireError::ProcessError(
+                        "External URLs cannot be reused as contract context. Use a semantically specific relation only when the URL is valid evidence for that relation."
+                            .to_string(),
+                    ));
                 }
 
-                reqvire::crud::attach_element_identifier(
+                reqvire::crud::reuse_contract_element_identifier(
                     &mut model_manager,
                     &source,
                     &target,
@@ -1930,6 +1959,7 @@ pub async fn handle_command(
         Some(Commands::Ontologies {
             jsonld,
             full,
+            include_external,
             output,
         }) => {
             let index = semantic_contract::build_semantic_index(&model_manager.graph_registry);
@@ -1938,11 +1968,7 @@ pub async fn handle_command(
             } else {
                 SemanticExportFormat::Turtle
             };
-            let output_content = if full {
-                index.serialize_full(format, &model_manager.graph_registry)?
-            } else {
-                index.serialize(format)?
-            };
+            let output_content = index.serialize_with_options(format, full, include_external)?;
             if let Some(path) = output {
                 std::fs::write(&path, output_content).map_err(|e| {
                     ReqvireError::ProcessError(format!(

@@ -42,7 +42,6 @@ Second capability root for submodels command fixtures.
 
 #### Relations
   * derivedFrom: [Payments Requirement](#payments-requirement)
-  * trace: [Identity Requirement](#identity-requirement)
 ---
 
 ### Billing Requirement
@@ -88,5 +87,4 @@ Second capability root for submodels command fixtures.
 
 #### Relations
   * derivedFrom: [Identity Requirement](#identity-requirement)
-  * trace: [Payments Requirement](#payments-requirement)
 ---

@@ -79,7 +79,6 @@ Tax capability.
   * type: capability
 
 #### Relations
-  * trace: [Tax Ontology](#tax-ontology)
 ---
 
 ### Tax Ontology

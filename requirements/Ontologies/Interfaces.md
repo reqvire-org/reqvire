@@ -92,6 +92,15 @@ reqvire:McpCompatibilityVersionContract a owl:Class ;
 reqvire:McpResourceContract a owl:Class ;
   rdfs:subClassOf reqvire:McpInterfaceContract ;
   rdfs:comment "Contract vocabulary for MCP resource exposure." .
+reqvire:McpPromptContract a owl:Class ;
+  rdfs:subClassOf reqvire:McpInterfaceContract ;
+  rdfs:comment "Contract vocabulary for standard MCP prompt discovery and retrieval." .
+reqvire:McpWorkflowPromptContract a owl:Class ;
+  rdfs:subClassOf reqvire:McpPromptContract ;
+  rdfs:comment "MCP prompt contract for regular Reqvire model exploration, change planning, and verification coverage workflows." .
+reqvire:McpSemanticQueryPromptContract a owl:Class ;
+  rdfs:subClassOf reqvire:McpPromptContract ;
+  rdfs:comment "MCP prompt contract for ontology-aware semantic query and SPARQL workflow guidance." .
 reqvire:McpSemanticQueryContract a owl:Class ;
   rdfs:subClassOf reqvire:McpInterfaceContract ;
   rdfs:comment "Contract vocabulary for read-only semantic query execution over Reqvire RDF evidence through MCP." .
@@ -104,6 +113,12 @@ reqvire:McpSemanticPrefixRegistryContract a owl:Class ;
 reqvire:McpSemanticPrefixToolContract a owl:Class ;
   rdfs:subClassOf reqvire:McpSemanticPrefixRegistryContract ;
   rdfs:comment "MCP tool contract for listing ontology element prefix metadata, namespace IRIs, source provenance, and source prose content." .
+reqvire:McpSemanticVocabularyContract a owl:Class ;
+  rdfs:subClassOf reqvire:McpSemanticQueryContract ;
+  rdfs:comment "Contract vocabulary for compact paged semantic vocabulary discovery that helps clients construct ontology-aware SPARQL queries." .
+reqvire:McpSemanticVocabularyToolContract a owl:Class ;
+  rdfs:subClassOf reqvire:McpSemanticVocabularyContract ;
+  rdfs:comment "MCP tool contract for paging prefixes, classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source map entries, and diagnostics." .
 reqvire:McpToolSideEffectClass a owl:Class ;
   rdfs:subClassOf reqvire:McpToolSideEffectContract ;
   rdfs:comment "Controlled vocabulary class for MCP tool side-effect categories." .

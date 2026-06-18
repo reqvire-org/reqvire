@@ -1,6 +1,6 @@
 ## Relations
 
-Files referenced via relations (satisfiedBy, trace, etc.):
+Files referenced via relations such as satisfiedBy:
 
 ### core/src/api.rs
   * [API Requirements](specifications/Requirements.md#api-requirements) (via satisfiedBy)
@@ -16,16 +16,16 @@ Files referenced via relations (satisfiedBy, trace, etc.):
 ---
 
 ### docs/design.md
-  * [Data Integrity](specifications/Requirements.md#data-integrity) (via trace)
+  * [Data Integrity](specifications/Requirements.md#data-integrity) (via satisfiedBy)
 ---
 
-## Attachments
+## Reused Contract Context
 
-Files referenced via attachments:
+Files referenced via reused_contract_context:
 
-*No files referenced via attachments.*
+*No files referenced via reused_contract_context.*
 
 ## Summary
 
 - **Relation Files:** 4 (5 references)
-- **Attachment Files:** 0 (0 references)
+- **ReusedContractContextEntry Files:** 0 (0 references)

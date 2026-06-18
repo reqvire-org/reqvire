@@ -23,10 +23,18 @@ API vocabulary.
   * ontology_base: https://example.test/ontology
   * ontology_prefix: testonto
 
+#### External Ontology
+  * prefix: ext
+  * namespace: https://example.test/external#
+  * resource: https://example.test/external
+  * source: references/external.ttl
+  * format: turtle
+
 #### Ontology
 ```turtle
 @prefix testonto: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
@@ -42,7 +50,10 @@ testonto:Response a owl:Class .
 testonto:ServiceEndpointAlias a owl:Class ;
   owl:equivalentClass testonto:ServiceEndpoint .
 testonto:VerifiedEndpoint a owl:Class ;
-  rdfs:subClassOf [
+  rdfs:label "Verified endpoint" ;
+  rdfs:comment "Endpoint class that exercises standard reserved annotation vocabulary in the test fixture." ;
+  rdfs:subClassOf owl:Thing,
+    [
     a owl:Restriction ;
     owl:onProperty testonto:produces ;
     owl:someValuesFrom testonto:Response
@@ -83,6 +94,34 @@ testonto:identifier a owl:DatatypeProperty ;
   rdfs:domain testonto:ServiceEndpoint ;
   rdfs:range xsd:string .
 
+testonto:isActive a owl:DatatypeProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range xsd:boolean .
+
+testonto:retryCount a owl:DatatypeProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range xsd:integer .
+
+testonto:documentationUri a owl:DatatypeProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range xsd:anyURI .
+
+testonto:literalText a owl:DatatypeProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range rdf:PlainLiteral .
+
+testonto:anyLiteral a owl:DatatypeProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range rdfs:Literal .
+
+testonto:realValue a owl:DatatypeProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range owl:real .
+
+testonto:rationalValue a owl:DatatypeProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range owl:rational .
+
 testonto:endpointName a owl:DatatypeProperty ;
   rdfs:domain testonto:ServiceEndpoint ;
   rdfs:range xsd:string ;
@@ -119,16 +158,33 @@ API endpoint shape contract.
 #### Shapes
 ```turtle
 @prefix testonto: <https://example.test/ontology#> .
+@prefix ext: <https://example.test/external#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix xs: <http://www.w3.org/2001/XMLSchema#> .
 
 testonto:ServiceEndpointShape
   a sh:NodeShape ;
   sh:targetClass testonto:ServiceEndpoint ;
   sh:property [
     sh:path testonto:identifier ;
-    sh:datatype xsd:string ;
+    sh:datatype xs:string ;
     sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path testonto:isActive ;
+    sh:datatype xs:boolean ;
+  ] ;
+  sh:property [
+    sh:path testonto:retryCount ;
+    sh:datatype xs:integer ;
+  ] ;
+  sh:property [
+    sh:path testonto:documentationUri ;
+    sh:datatype xs:anyURI ;
+  ] ;
+  sh:property [
+    sh:path testonto:identifier ;
+    sh:datatype ext:ExternalCode ;
   ] .
 ```
 ---

@@ -1,0 +1,8 @@
+
+❌ 3 validation failed with error(s):
+
+  1. Invalid reused_contract_context scope: 'Spec-1' cannot be reused to 'User Req A With ReusedContractContextEntry' because it is within the contract's defining hierarchy. Reused Contract Context are only allowed from elements outside the definedBy chain. (file: specifications/TestDefiningReusedContractContext.md, element: User Req A With ReusedContractContextEntry)
+
+  2. Invalid markdown structure: Contract 'Spec-1' is owned by multiple elements: 'User Req A' and 'User Req A With ReusedContractContextEntry'. Each contract can only be owned by one requirement via definedBy; contracts are requirement-owned only.
+
+  3. Cross-section duplicate: Cross-section duplicate in element 'User Req A With ReusedContractContextEntry': target 'specifications/Contracts.md#spec-1' appears in both Relations and Reused Contract Context (file: specifications/TestDefiningReusedContractContext.md)

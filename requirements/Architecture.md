@@ -93,23 +93,13 @@ graph TD
 
 #### Metadata
   * type: block
-
-#### Relations
-  * trace: [Operating on Model Elements](Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
-  * trace: [AI-Assisted System Model Management](Integration/IntegrationFeature.md#ai-assisted-system-model-management)
-  * trace: [CLI interface](Interfaces/InterfacesRequirements.md#cli-interface)
-  * trace: [Web Interface](Interfaces/InterfacesRequirements.md#web-interface)
-  * trace: [MCP Interface](Interfaces/InterfacesRequirements.md#mcp-interface)
-  * trace: [GitHub Workflow Automation](Integration/IntegrationFeature.md#github-workflow-automation)
-  * trace: [Model Reports](Reports/ModelReports/ReportingRequirements.md#model-reports)
-  * trace: [Validating Structures](Operations/BehaviorValidationOperationsFeature.md#validating-structures)
 ---
 
 ## Logical Architecture
 
 ### Logical Architecture Block
 
-The Logical Architecture for Reqvire defines the high-level functional organization of the tool, focusing on the main components that deliver its core functionalities. This architecture serves as the foundation for further refinement into physical architecture and implementation-facing requirements.
+The Logical Architecture for Reqvire defines the high-level functional organization of the tool, focusing on the main components that deliver its core functionalities. This architecture serves as the foundation for further contract into physical architecture and implementation-facing requirements.
 
 ```mermaid
 classDiagram
@@ -232,16 +222,6 @@ classDiagram
 
 #### Metadata
   * type: block
-
-#### Relations
-  * trace: [Operating on Model Elements](Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
-  * trace: [AI-Assisted System Model Management](Integration/IntegrationFeature.md#ai-assisted-system-model-management)
-  * trace: [CLI interface](Interfaces/InterfacesRequirements.md#cli-interface)
-  * trace: [Web Interface](Interfaces/InterfacesRequirements.md#web-interface)
-  * trace: [MCP Interface](Interfaces/InterfacesRequirements.md#mcp-interface)
-  * trace: [GitHub Workflow Automation](Integration/IntegrationFeature.md#github-workflow-automation)
-  * trace: [Model Reports](Reports/ModelReports/ReportingRequirements.md#model-reports)
-  * trace: [Validating Structures](Operations/BehaviorValidationOperationsFeature.md#validating-structures)
 ---
 
 ## Implementation Architecture

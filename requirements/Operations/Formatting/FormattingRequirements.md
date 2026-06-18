@@ -84,7 +84,7 @@ The system shall remove duplicate entries within the same subsection during form
 #### Details
 A behavior defines the detailed deduplication rules.
 
-This operation only removes within-section duplicates (entries repeated in the same Relations or Attachments subsection). Cross-section duplicates are semantic errors that require user resolution.
+This operation only removes within-section duplicates (entries repeated in the same Relations or Reused Contract Context subsection). Cross-section duplicates are semantic errors that require user resolution.
 
 #### Metadata
   * type: requirement
@@ -102,7 +102,7 @@ When formatting or persisting specification files, the system shall sort relatio
 
 #### Details
 Relations are sorted using the following criteria:
-1. Primary sort: Alphabetically by relation type name (e.g., `derivedFrom` before `satisfiedBy`, `trace` before `verifiedBy`)
+1. Primary sort: Alphabetically by relation type name (e.g., `derivedFrom` before `satisfiedBy`, `satisfiedBy` before `verifiedBy`)
 2. Secondary sort: Alphabetically by target identifier within the same relation type
 
 This ensures:
@@ -151,16 +151,13 @@ The system shall display formatting change suggestions in a git-style diff forma
 When the --with-full-relations flag is provided, the system shall insert all registered relations into elements, including both user-created and auto-generated relations.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [RelationTypes](../../ModelStructure/RelationTypes.md#relationtypes)
-
 #### Relations
-  * definedBy: [Full Relations Insertion Refinement Specification](Specifications.md#full-relations-insertion-refinement-specification)
+  * definedBy: [Full Relations Insertion Contract Specification](Specifications.md#full-relations-insertion-contract-specification)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)

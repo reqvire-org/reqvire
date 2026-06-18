@@ -20,7 +20,7 @@ This is a valid requirement.
   * type: requirement
 #### Relations
   * specify: [Test Capability](#test-capability-test-invalid-relations-pass1-errors-specifications-requirements-md)
-  * trace: [ValidImplementation.txt](ValidImplementation.txt)
+  * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
 

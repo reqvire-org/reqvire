@@ -468,7 +468,7 @@ fn detect_cross_submodel_hierarchical_relations(
                 rationale: format!(
                     "Hierarchical relation '{}' from '{}' crosses from submodel '{}' to '{}'. \
                     Hierarchical structure should remain internal to a single ownership boundary. \
-                    Replace this relation with an explicit attachment contract.",
+                    Replace this relation with an explicit reused_contract_context contract.",
                     relation.relation_type.name,
                     source_elem.identifier,
                     source_root_id,

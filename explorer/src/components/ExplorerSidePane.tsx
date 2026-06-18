@@ -32,7 +32,7 @@ import type {
   ProjectStoreElement,
   ProjectStoreFile,
 } from "../store/types";
-import { useExplorerUiState } from "../state/ExplorerUiState";
+import { ONTOLOGY_LAYER_FILTERS, useExplorerUiState } from "../state/ExplorerUiState";
 import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
 import { buildTraceFiles, type TraceFileNode } from "../lib/traces";
 
@@ -211,8 +211,8 @@ function ExplorerViewControls({
               value: formatSummaryValue(store.knowledge_graph.summary?.relations ?? store.relations.length),
             },
             {
-              label: "Attachments",
-              value: formatSummaryValue(store.knowledge_graph.summary?.attachments ?? store.attachments.length),
+              label: "Reused Context",
+              value: formatSummaryValue(store.knowledge_graph.summary?.reused_contract_context ?? store.reused_contract_context.length),
             },
           ]}
         />
@@ -303,6 +303,10 @@ function ExplorerViewControls({
 
   if (activeView === "ontologies") {
     const summary = store.ontology.summary ?? {};
+    const ontologyLayerCounts = new Map<string, number>();
+    for (const node of store.ontology.graph_data?.nodes ?? []) {
+      ontologyLayerCounts.set(node.layer, (ontologyLayerCounts.get(node.layer) ?? 0) + 1);
+    }
     return (
       <PaneFilterSection aria-label="Ontology controls">
         <PaneSummary
@@ -353,6 +357,23 @@ function ExplorerViewControls({
               Reset layout
             </Button>
           </PaneActionRow>
+        </PaneFilterGroup>
+        <PaneFilterGroup label="Overlays">
+          {ONTOLOGY_LAYER_FILTERS.map(([value, label]) => {
+            const layer = value.replace("layer-", "");
+            const count = formatCompactCount(ontologyLayerCounts.get(layer) ?? 0);
+            return (
+              <ToggleRow
+                key={value}
+                label={label}
+                colorToken={ontologyLayerColorToken(value)}
+                on={ui.ontologyFilters.has(value)}
+                meta={count}
+                title={ontologyLayerDescription(value)}
+                onToggle={() => ui.toggleOntologyFilter(value)}
+              />
+            );
+          })}
         </PaneFilterGroup>
         <PaneFilterGroup label="Types">
           <PaneLegend
@@ -1035,4 +1056,21 @@ function ontologyColorToken(value: string): DesignSystemColorToken {
     relation: "--edge-default",
   };
   return colors[value] ?? colors.resource;
+}
+
+function ontologyLayerColorToken(value: string): DesignSystemColorToken {
+  const colors: Record<string, DesignSystemColorToken> = {
+    "layer-authored": "--ontology",
+    "layer-reqvire-context": "--info",
+    "layer-external-source": "--other",
+  };
+  return colors[value] ?? "--text-muted";
+}
+
+function ontologyLayerDescription(value: string): string {
+  const descriptions: Record<string, string> = {
+    "layer-reqvire-context": "Semantic context: model elements that declare or reference ontology terms.",
+    "layer-external-source": "External ontology source triples, when external vocabulary sources are present.",
+  };
+  return descriptions[value] ?? "";
 }

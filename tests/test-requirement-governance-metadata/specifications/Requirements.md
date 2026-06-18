@@ -70,9 +70,9 @@ The system shall provide a root requirement without authored governance metadata
   * specify: [Test Capability](#test-capability-test-requirement-governance-metadata-specifications-requirements-md)
 ---
 
-### Refinement Contract
+### Contract
 
-This refinement augments the root requirement and must not author governance metadata.
+This contract augments the root requirement and must not author governance metadata.
 
 #### Metadata
   * type: specification

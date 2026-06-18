@@ -2,7 +2,7 @@
 
 ### Capability Structure and Relation Shape
 
-Defines SHACL constraints for capability structure, concept-reference semantics, specification, verification, and forbidden implementation satisfaction or refinement ownership edges.
+Defines SHACL constraints for capability structure, concept-reference semantics, specification, verification, and forbidden implementation satisfaction or contract ownership edges.
 
 #### Shapes
 ```turtle
@@ -60,9 +60,9 @@ reqvire:CapabilityShape
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
 
-### Custom Element Trace Boundary Shape
+### Custom Element Semantic Boundary Shape
 
-Defines SHACL constraints for custom `other-*` elements as trace-only extension nodes.
+Defines SHACL constraints for custom `other-*` elements as extension nodes that cannot author canonical semantic relations.
 
 #### Shapes
 ```turtle
@@ -121,7 +121,7 @@ reqvire:CustomElementShape
     sh:maxCount 0 ;
   ] ;
   sh:property [
-    sh:path reqvire:attaches ;
+    sh:path reqvire:reusesContract ;
     sh:maxCount 0 ;
   ] .
 ```
@@ -130,7 +130,7 @@ reqvire:CustomElementShape
   * type: semantic-contract
 
 #### Relations
-  * constrain: [Refinement Element Structure Constraints](../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
+  * constrain: [Contract Element Structure Constraints](../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
   * use: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
@@ -159,7 +159,7 @@ reqvire:OntologyElementShape
     sh:maxCount 0 ;
   ] ;
   sh:property [
-    sh:path reqvire:attaches ;
+    sh:path reqvire:reusesContract ;
     sh:maxCount 0 ;
   ] ;
   sh:property [
@@ -193,18 +193,18 @@ reqvire:OntologyElementShape
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
 
-### Refinement Ownership Shape
+### Contract Ownership Shape
 
-Defines SHACL constraints for concrete refinement subtype ownership and traceability.
+Defines SHACL constraints for concrete contract subtype ownership.
 
 #### Shapes
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
-reqvire:RefinementShape
+reqvire:ContractShape
   a sh:NodeShape ;
-  sh:targetClass reqvire:Refinement ;
+  sh:targetClass reqvire:Contract ;
   sh:property [
     sh:path reqvire:define ;
     sh:minCount 1 ;
@@ -309,7 +309,7 @@ reqvire:InputOutputShape
   * type: semantic-contract
 
 #### Relations
-  * constrain: [Refinement Element Structure Constraints](../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
+  * constrain: [Contract Element Structure Constraints](../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
   * use: [Reqvire Capability Ontology](#reqvire-capability-ontology)
   * use: [Reqvire Requirement Ontology](#reqvire-requirement-ontology)
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
@@ -317,7 +317,7 @@ reqvire:InputOutputShape
 
 ### Requirement Ownership and Coverage Shape
 
-Defines SHACL constraints for requirement ownership, hierarchy, refinements, verification, and capability specification.
+Defines SHACL constraints for requirement ownership, hierarchy, contracts, verification, and capability specification.
 
 #### Shapes
 ```turtle
@@ -358,7 +358,7 @@ reqvire:RequirementShape
   ] ;
   sh:property [
     sh:path reqvire:definedBy ;
-    sh:class reqvire:Refinement ;
+    sh:class reqvire:Contract ;
   ] ;
   sh:property [
     sh:path reqvire:verifiedBy ;
@@ -381,9 +381,9 @@ reqvire:RequirementShape
     sh:maxCount 0 ;
   ] .
 
-reqvire:RequirementOwnedRefinementShape
+reqvire:RequirementOwnedContractShape
   a sh:NodeShape ;
-  sh:targetClass reqvire:RequirementOwnedRefinement ;
+  sh:targetClass reqvire:RequirementOwnedContract ;
   sh:property [
     sh:path reqvire:define ;
     sh:minCount 1 ;
@@ -405,7 +405,7 @@ reqvire:RequirementOwnedRefinementShape
 
 The Reqvire capability ontology defines capability elements as first-class operational, product, business, regulatory, or system abilities.
 
-Capabilities decompose into child capabilities, bind vocabulary through concept references, derive implementation-facing requirements through `specifiedBy`/`specify`, and may be directly verified. Requirements specify capabilities and own subordinate refinement details/contracts; they do not replace capability ownership of operational meaning, concept-reference context, or direct verification context.
+Capabilities decompose into child capabilities, bind vocabulary through concept references, derive implementation-facing requirements through `specifiedBy`/`specify`, and may be directly verified. Requirements specify capabilities and own subordinate contract details/contracts; they do not replace capability ownership of operational meaning, concept-reference context, or direct verification context.
 
 #### Ontology
 ```turtle
@@ -415,12 +415,12 @@ Capabilities decompose into child capabilities, bind vocabulary through concept 
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:Source a owl:Class ;
-  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
-  rdfs:comment "Requirement-owned source refinement for stakeholder, regulatory, contractual, policy, or other source context that explains why a requirement exists." .
+  rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  rdfs:comment "Requirement-owned source contract for stakeholder, regulatory, contractual, policy, or other source context that explains why a requirement exists." .
 
-reqvire:sourceType a reqvire:RefinementElementType ;
+reqvire:sourceType a reqvire:ContractElementType ;
   reqvire:elementTypeName "source" ;
-  reqvire:elementTypeCategory "refinement" ;
+  reqvire:elementTypeCategory "contract" ;
   rdfs:comment "Requirement-owned source context such as stakeholder statements, regulations, policies, standards, contracts, or external obligations." ;
   reqvire:defaultElementType false .
 ```
@@ -434,9 +434,9 @@ reqvire:sourceType a reqvire:RefinementElementType ;
 
 ### Reqvire Requirement Ontology
 
-The Reqvire requirement ontology defines requirement obligations and requirement-owned refinement types.
+The Reqvire requirement ontology defines requirement obligations and requirement-owned contract types.
 
-Requirements are implementation-facing obligations. They can own source context, specifications, constraints, behavior descriptions, state contracts, and input-output contracts. Requirements may also be constrained by reusable shapes-only semantic contracts. Capabilities bind ontology terms through concept references, derive child capabilities, are specified by requirements, and may be verified; capabilities must not own refinement elements through `definedBy`/`define`. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts.
+Requirements are implementation-facing obligations. They can own source context, specifications, constraints, behavior descriptions, state contracts, and input-output contracts. Requirements may also be constrained by reusable shapes-only semantic contracts. Capabilities bind ontology terms through concept references, derive child capabilities, are specified by requirements, and may be verified; capabilities must not own contract elements through `definedBy`/`define`. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts.
 
 #### Ontology
 ```turtle
@@ -445,65 +445,65 @@ Requirements are implementation-facing obligations. They can own source context,
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-reqvire:RequirementOwnedRefinement a owl:Class ;
-  rdfs:subClassOf reqvire:Refinement ;
-  rdfs:comment "Refinement class whose instances are owned by requirement elements through define/definedBy." .
+reqvire:RequirementOwnedContract a owl:Class ;
+  rdfs:subClassOf reqvire:Contract ;
+  rdfs:comment "Contract class whose instances are owned by requirement elements through define/definedBy." .
 reqvire:Specification a owl:Class ;
-  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
-  rdfs:comment "Requirement-owned refinement for detailed specifications and technical descriptions." .
+  rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  rdfs:comment "Requirement-owned contract for detailed specifications and technical descriptions." .
 reqvire:Constraint a owl:Class ;
-  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
-  rdfs:comment "Requirement-owned refinement that limits or bounds valid system behavior." .
+  rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  rdfs:comment "Requirement-owned contract that limits or bounds valid system behavior." .
 reqvire:Behavior a owl:Class ;
-  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
-  rdfs:comment "Requirement-owned refinement that describes behavior details, operational rules, or scenario-specific behavior." .
+  rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  rdfs:comment "Requirement-owned contract that describes behavior details, operational rules, or scenario-specific behavior." .
 reqvire:State a owl:Class ;
-  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
-  rdfs:comment "Requirement-owned refinement for lifecycle states, state machines, transitions, terminal states, and state-dependent contract behavior." .
+  rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  rdfs:comment "Requirement-owned contract for lifecycle states, state machines, transitions, terminal states, and state-dependent contract behavior." .
 reqvire:InputOutput a owl:Class ;
-  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
-  rdfs:comment "Requirement-owned refinement for payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries." .
+  rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  rdfs:comment "Requirement-owned contract for payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries." .
 
 reqvire:ownedByRequirement a owl:ObjectProperty ;
-  rdfs:domain reqvire:Refinement ;
+  rdfs:domain reqvire:Contract ;
   rdfs:range reqvire:Requirement ;
-  rdfs:comment "Links a requirement-owned refinement to the requirement that owns it." .
-reqvire:refinementPurpose a owl:DatatypeProperty ;
-  rdfs:domain reqvire:Refinement ;
+  rdfs:comment "Links a requirement-owned contract to the requirement that owns it." .
+reqvire:contractPurpose a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Contract ;
   rdfs:range xsd:string ;
-  rdfs:comment "Purpose or intent of a refinement in the requirement model." .
-reqvire:allowedRefinementRelation a owl:DatatypeProperty ;
-  rdfs:domain reqvire:Refinement ;
+  rdfs:comment "Purpose or intent of a contract in the requirement model." .
+reqvire:allowedContractRelation a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Contract ;
   rdfs:range xsd:string ;
-  rdfs:comment "Allowed relation used to connect a requirement to a compatible refinement." .
+  rdfs:comment "Allowed relation used to connect a requirement to a compatible contract." .
 reqvire:requirementObligationText a owl:DatatypeProperty ;
   rdfs:domain reqvire:Requirement ;
   rdfs:range xsd:string ;
   rdfs:comment "Normative obligation text associated with a requirement." .
 
-reqvire:specificationType a reqvire:RefinementElementType ;
+reqvire:specificationType a reqvire:ContractElementType ;
   reqvire:elementTypeName "specification" ;
-  reqvire:elementTypeCategory "refinement" ;
+  reqvire:elementTypeCategory "contract" ;
   rdfs:comment "Requirement-owned detailed specification or technical description." ;
   reqvire:defaultElementType false .
-reqvire:constraintType a reqvire:RefinementElementType ;
+reqvire:constraintType a reqvire:ContractElementType ;
   reqvire:elementTypeName "constraint" ;
-  reqvire:elementTypeCategory "refinement" ;
+  reqvire:elementTypeCategory "contract" ;
   rdfs:comment "Requirement-owned limit or boundary on valid system behavior." ;
   reqvire:defaultElementType false .
-reqvire:behaviorType a reqvire:RefinementElementType ;
+reqvire:behaviorType a reqvire:ContractElementType ;
   reqvire:elementTypeName "behavior" ;
-  reqvire:elementTypeCategory "refinement" ;
+  reqvire:elementTypeCategory "contract" ;
   rdfs:comment "Requirement-owned behavior detail, operational rule, or scenario-specific behavior." ;
   reqvire:defaultElementType false .
-reqvire:stateType a reqvire:RefinementElementType ;
+reqvire:stateType a reqvire:ContractElementType ;
   reqvire:elementTypeName "state" ;
-  reqvire:elementTypeCategory "refinement" ;
+  reqvire:elementTypeCategory "contract" ;
   rdfs:comment "Requirement-owned lifecycle state, state machine, transition, terminal state, or state-dependent contract behavior." ;
   reqvire:defaultElementType false .
-reqvire:inputOutputType a reqvire:RefinementElementType ;
+reqvire:inputOutputType a reqvire:ContractElementType ;
   reqvire:elementTypeName "input-output" ;
-  reqvire:elementTypeCategory "refinement" ;
+  reqvire:elementTypeCategory "contract" ;
   rdfs:comment "Requirement-owned payload, message, document, schema, fixture, or data contract crossing a system or component boundary." ;
   reqvire:defaultElementType false .
 ```

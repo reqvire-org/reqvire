@@ -1,5 +1,5 @@
 use crate::element;
-use crate::element::AttachmentTarget;
+use crate::element::ReusedContractContextTarget;
 use crate::graph_registry::GraphRegistry;
 use crate::relation;
 use serde::Serialize;
@@ -60,8 +60,8 @@ struct VerificationTypeCounts {
 #[derive(Serialize)]
 struct CoverageSourceCounts {
     direct_satisfied: usize,
-    refinement_contract_satisfied_via_attachment: usize,
-    refinement_contract_satisfied_via_child: usize,
+    contract_satisfied_via_reused_contract_context: usize,
+    contract_satisfied_via_child: usize,
 }
 
 #[derive(Serialize)]
@@ -396,16 +396,14 @@ impl CoverageReport {
             self.summary.coverage_sources.direct_satisfied
         ));
         output.push_str(&format!(
-            "- refinement_contract_satisfied_via_attachment: {}\n",
+            "- contract_satisfied_via_reused_contract_context: {}\n",
             self.summary
                 .coverage_sources
-                .refinement_contract_satisfied_via_attachment
+                .contract_satisfied_via_reused_contract_context
         ));
         output.push_str(&format!(
-            "- refinement_contract_satisfied_via_child: {}\n\n",
-            self.summary
-                .coverage_sources
-                .refinement_contract_satisfied_via_child
+            "- contract_satisfied_via_child: {}\n\n",
+            self.summary.coverage_sources.contract_satisfied_via_child
         ));
 
         if !self.covered_requirements.files.is_empty() {
@@ -601,7 +599,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         }
     }
 
-    // Third pass: implementation coverage (direct / refinement-contract via attachment / via child)
+    // Third pass: implementation coverage (direct / contract via reused_contract_context / via child)
     let requirements: Vec<&element::Element> = registry
         .get_all_elements()
         .into_iter()
@@ -613,9 +611,9 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         })
         .collect();
 
-    let mut owned_refinements: HashMap<String, Vec<String>> = HashMap::new();
+    let mut owned_contracts: HashMap<String, Vec<String>> = HashMap::new();
     let mut children_by_requirement: HashMap<String, Vec<String>> = HashMap::new();
-    let mut attached_refinement_consumers: HashMap<String, Vec<String>> = HashMap::new();
+    let mut reused_contract_context_consumers: HashMap<String, Vec<String>> = HashMap::new();
     let mut direct_satisfaction: HashMap<String, Vec<String>> = HashMap::new();
 
     for req in &requirements {
@@ -651,7 +649,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         children_by_requirement.insert(req.identifier.clone(), children);
 
         // Owned requirement contracts
-        let mut refinements: Vec<String> = req
+        let mut contracts: Vec<String> = req
             .relations
             .iter()
             .filter(|r| r.relation_type.name == "definedBy")
@@ -660,14 +658,16 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                 _ => None,
             })
             .collect();
-        refinements.sort();
-        refinements.dedup();
-        owned_refinements.insert(req.identifier.clone(), refinements);
+        contracts.sort();
+        contracts.dedup();
+        owned_contracts.insert(req.identifier.clone(), contracts);
 
-        // Refinement identifier attachments (consumer -> contract)
-        for attachment in &req.attachments {
-            if let AttachmentTarget::ElementIdentifier(id) = &attachment.target {
-                attached_refinement_consumers
+        // Contract identifier reused_contract_context (consumer -> contract)
+        for reused_contract_context in &req.reused_contract_context {
+            if let ReusedContractContextTarget::ElementIdentifier(id) =
+                &reused_contract_context.target
+            {
+                reused_contract_context_consumers
                     .entry(id.clone())
                     .or_default()
                     .push(req.identifier.clone());
@@ -675,7 +675,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         }
     }
 
-    for consumers in attached_refinement_consumers.values_mut() {
+    for consumers in reused_contract_context_consumers.values_mut() {
         consumers.sort();
         consumers.dedup();
     }
@@ -694,19 +694,19 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
             continue;
         }
 
-        let owns_refinement = owned_refinements
+        let owns_contract = owned_contracts
             .get(&req.identifier)
             .map(|v| !v.is_empty())
             .unwrap_or(false);
-        if !owns_refinement {
+        if !owns_contract {
             continue;
         }
 
-        // refinement contract covered via attachment by directly satisfied requirement
-        if let Some(refinements) = owned_refinements.get(&req.identifier) {
+        // contract covered via reused_contract_context by directly satisfied requirement
+        if let Some(contracts) = owned_contracts.get(&req.identifier) {
             let mut matched_consumer: Option<String> = None;
-            for contract_id in refinements {
-                if let Some(consumers) = attached_refinement_consumers.get(contract_id) {
+            for contract_id in contracts {
+                if let Some(consumers) = reused_contract_context_consumers.get(contract_id) {
                     if let Some(consumer) = consumers
                         .iter()
                         .find(|consumer_id| {
@@ -725,7 +725,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                 impl_coverage.insert(
                     req.identifier.clone(),
                     CoverageState {
-                        source: "refinement_contract_satisfied_via_attachment".to_string(),
+                        source: "contract_satisfied_via_reused_contract_context".to_string(),
                         evidence: vec![consumer_id],
                     },
                 );
@@ -733,7 +733,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
             }
         }
 
-        // refinement contract covered via directly satisfied descendant requirement
+        // contract covered via directly satisfied descendant requirement
         if let Some(descendant_id) = find_directly_satisfied_descendant(
             &req.identifier,
             &children_by_requirement,
@@ -742,7 +742,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
             impl_coverage.insert(
                 req.identifier.clone(),
                 CoverageState {
-                    source: "refinement_contract_satisfied_via_child".to_string(),
+                    source: "contract_satisfied_via_child".to_string(),
                     evidence: vec![descendant_id],
                 },
             );
@@ -755,19 +755,19 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
 
     let mut coverage_sources = CoverageSourceCounts {
         direct_satisfied: 0,
-        refinement_contract_satisfied_via_attachment: 0,
-        refinement_contract_satisfied_via_child: 0,
+        contract_satisfied_via_reused_contract_context: 0,
+        contract_satisfied_via_child: 0,
     };
 
     for req in &requirements {
         if let Some(state) = impl_coverage.get(&req.identifier) {
             match state.source.as_str() {
                 "direct_satisfied" => coverage_sources.direct_satisfied += 1,
-                "refinement_contract_satisfied_via_attachment" => {
-                    coverage_sources.refinement_contract_satisfied_via_attachment += 1
+                "contract_satisfied_via_reused_contract_context" => {
+                    coverage_sources.contract_satisfied_via_reused_contract_context += 1
                 }
-                "refinement_contract_satisfied_via_child" => {
-                    coverage_sources.refinement_contract_satisfied_via_child += 1
+                "contract_satisfied_via_child" => {
+                    coverage_sources.contract_satisfied_via_child += 1
                 }
                 _ => {}
             }

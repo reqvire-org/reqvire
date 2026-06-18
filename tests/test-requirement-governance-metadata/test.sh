@@ -251,12 +251,12 @@ This requirement uses an invalid governance risk.
 
 echo "Test 5: Non-requirement elements cannot author governance metadata"
 assert_validation_rejects_file \
-  "$TEST_DIR/specifications/InvalidRefinementGovernance.md" \
+  "$TEST_DIR/specifications/InvalidContractGovernance.md" \
   '# Elements
 
-### Invalid Refinement Governance
+### Invalid Contract Governance
 
-This refinement illegally declares governance metadata.
+This contract illegally declares governance metadata.
 
 #### Metadata
   * type: specification
@@ -266,7 +266,7 @@ This refinement illegally declares governance metadata.
   * define: [Root Requirement](Requirements.md#root-requirement)
 ---' \
   'governance|owner|requirement' \
-  "refinement governance metadata"
+  "contract governance metadata"
 
 assert_validation_rejects_file \
   "$TEST_DIR/specifications/InvalidVerificationGovernance.md" \
@@ -305,9 +305,9 @@ else
     fail "format should not insert default governance metadata into requirement"
   fi
 
-  REFINEMENT_BLOCK=$(awk '/^### Refinement Contract$/,/^---$/' "$TEST_DIR/specifications/Requirements.md")
-  if echo "$REFINEMENT_BLOCK" | grep -Eq '  \* (status|priority|risk|owner):'; then
-    fail "format should not insert governance metadata into refinement element"
+  CONTRACT_BLOCK=$(awk '/^### Contract$/,/^---$/' "$TEST_DIR/specifications/Requirements.md")
+  if echo "$CONTRACT_BLOCK" | grep -Eq '  \* (status|priority|risk|owner):'; then
+    fail "format should not insert governance metadata into contract element"
   fi
 fi
 

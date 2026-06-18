@@ -136,9 +136,9 @@ This test verifies the format command requirements, focusing on normalizing and 
 - System shall convert implementation file paths to clean filename references
 - System shall preserve external URLs without modification
 
-**Attachment Formatting:**
-- System shall format element identifier attachments with human-readable element names
-- System shall look up actual element name from registry for attachment display names
+**Reused Contract Context Formatting:**
+- System shall format element identifier reused_contract_context with human-readable element names
+- System shall look up actual element name from registry for reused contract context display names
 - System shall NOT use identifier fragment as display name (e.g., NOT `[my-behavior]` but `[My Behavior]`)
 
 ##### Test Criteria
@@ -184,8 +184,8 @@ This test verifies the format command requirements, focusing on normalizing and 
    - Added lines show correct position in final file
    - Line numbering reflects final file structure accurately
 
-7. **Attachment display name preservation**
-   - Element identifier attachments use actual element name as display text
+7. **Reused Contract Context display name preservation**
+   - Element identifier reused_contract_context use actual element name as display text
    - Format does NOT replace human-readable names with identifier fragments
 
 #### Metadata
@@ -208,7 +208,7 @@ Test verifies that format removes within-section duplicates but not cross-sectio
 #### Details
 Test cases:
 1. File with duplicate relations -> `format --fix` -> Duplicates removed
-2. File with duplicate attachments -> `format --fix` -> Duplicates removed
+2. File with duplicate reused_contract_context -> `format --fix` -> Duplicates removed
 3. File with cross-section duplicate -> `format --fix` -> No change (validation error, not format issue)
 
 #### Metadata
@@ -252,7 +252,7 @@ This test verifies that the --with-full-relations flag correctly inserts all reg
    - Verify element B now has satisfiedBy relation to element A
 
 2. **Multiple inverse relation types**
-   - Create elements with derivedFrom, satisfiedBy, verifiedBy, trace relations
+   - Create elements with derivedFrom, satisfiedBy, and verifiedBy relations
    - Run format --with-full-relations --fix
    - Verify all inverse relations (derive, satisfy, verify, tracedFrom) are inserted
 
@@ -335,7 +335,7 @@ Expected checks:
 - Verify explicitly authored governance metadata remains in each element's `#### Metadata` subsection.
 - Verify inherited governance metadata is not inserted into child requirement Markdown.
 - Verify default governance metadata is not inserted into requirement Markdown.
-- Verify governance metadata is not inserted into refinement element Markdown.
+- Verify governance metadata is not inserted into contract element Markdown.
 - Verify metadata indentation and ordering remain deterministic after formatting.
 
 #### Metadata

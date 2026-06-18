@@ -1,16 +1,16 @@
 # Elements
 
-### Attachment Input Auto-Detection Behavior
+### Reused Contract Context Input Auto-Detection Behavior
 
-When attaching or detaching via CLI commands, the system shall resolve attachment targets as refinement-element identifiers.
+When reusesContract or removing reused context via CLI commands, the system shall resolve reused_contract_context targets as contract-element identifiers.
 
 #### Details
 The resolution follows this order:
 
-1. **Identifier Parse**: Parse target input as an element identifier (for example `file.md#refinement-id`).
+1. **Identifier Parse**: Parse target input as an element identifier (for example `file.md#contract-id`).
 2. **Identifier Normalization**: Resolve and normalize identifier to full internal identifier format.
-3. **Type Validation**: Confirm target element type is a Refinement type (`constraint`, `behavior`, `specification`).
-4. **Error Handling**: If parsing or resolution fails, report a clear error message indicating that a refinement identifier target is required.
+3. **Type Validation**: Confirm target element type is a Contract type (`constraint`, `behavior`, `specification`).
+4. **Error Handling**: If parsing or resolution fails, report a clear error message indicating that a contract identifier target is required.
 
 #### Metadata
   * type: behavior
@@ -23,7 +23,7 @@ How changes propagate through model based on relation types.
 #### Details
 Propagation categories and relation impact rules are defined by the Reqvire relation and change-impact ontologies.
 
-**Attachment Impact:**
+**Reused Contract Context Impact:**
 - Content changes → propagate impact
 - Path renames → track but no impact
 
@@ -44,7 +44,7 @@ Short mode reduces output verbosity for quick scanning:
 - Suitable for piping to other tools
 
 **JSON Output (--short with --json):**
-- Omit verbose fields: `content`, `page_content`, `attachments`
+- Omit verbose fields: `content`, `page_content`, `reused_contract_context`
 - Omit computed fields: `element_count`, `total_elements`, `global_counters`
 - Retain: `identifier`, `name`, `type`, `file_path`
 - Retain: `relations` (for traceability)

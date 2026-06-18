@@ -1,13 +1,13 @@
 ---
 allowed-tools: Read, Bash(npx:*)
 argument-hint: <source> <target>
-description: Remove a relation or attachment (auto-detects type)
+description: Remove a relation or reused_contract_context (auto-detects type)
 model: claude-sonnet-4-5
 ---
 
 # Unlink Elements
 
-Remove an existing relation or attachment between elements. The command auto-detects whether the target is a relation or attachment.
+Remove an existing relation or reused_contract_context between elements. The command auto-detects whether the target is a relation or reused_contract_context.
 
 ## Current Model Context
 
@@ -24,7 +24,7 @@ ${1:-The user will provide source element and target.}
 1. **Understand the context:**
    - Identify the source element (by name)
    - Identify the target (element name or file path)
-   - The command will auto-detect if it's a relation or attachment
+   - The command will auto-detect if it's a relation or reused_contract_context
 
 2. **Preview the unlink operation:**
    ```bash
@@ -33,7 +33,7 @@ ${1:-The user will provide source element and target.}
 
    This shows:
    - Which file will be modified
-   - The relation/attachment that will be removed
+   - The relation/reused_contract_context that will be removed
    - Git-style diff for the affected file
 
 3. **Apply the unlink:**
@@ -42,8 +42,8 @@ ${1:-The user will provide source element and target.}
    ```
 
    The unlink command automatically:
-   - Searches relations first, then attachments
-   - Removes the relation/attachment from the source element
+   - Searches relations first, then reused_contract_context
+   - Removes the relation/reused_contract_context from the source element
    - Cleans up empty sections automatically
    - Maintains model consistency
 
@@ -56,7 +56,7 @@ ${1:-The user will provide source element and target.}
 
 The unlink command auto-detects the type:
 1. **First**: Searches for a relation from source to target element
-2. **Then**: If no relation found, searches for an attachment matching the target
+2. **Then**: If no relation found, searches for an reused_contract_context matching the target
 3. Only one relation per source-target pair is allowed, so no ambiguity
 
 ## Important Notes
@@ -64,7 +64,7 @@ The unlink command auto-detects the type:
 - **Auto-detection**: No need to specify relation type - the command finds it automatically
 - **Explicit relations only**: Only removes user-created relations (not auto-generated inverse relations)
 - **Element names**: Use the exact element name as it appears in the heading
-- **Cleanup**: Empty Relations/Attachments sections are removed automatically
+- **Cleanup**: Empty Relations/Reused Contract Context sections are removed automatically
 - **Validation**: Consider model validity after unlinking (orphaned elements may cause validation errors)
 
 ## Unlink Options
@@ -77,7 +77,7 @@ The unlink command auto-detects the type:
 
 The unlink operation will fail with a clear error if:
 - The source element does not exist
-- No relation or attachment found from source to target
+- No relation or reused_contract_context found from source to target
 
 ## Examples
 
@@ -86,12 +86,12 @@ The unlink operation will fail with a clear error if:
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "Password Login Requirement" "Authentication Requirement"
 ```
 
-**Remove an attachment file:**
+**Remove an reused_contract_context file:**
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "System Requirement" "docs/SLA.pdf"
 ```
 
-**Remove an attached element:**
+**Remove an reused element:**
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "System Requirement" "Performance Constraint"
 ```
@@ -107,12 +107,12 @@ Use unlink when:
 - Removing incorrect traceability links
 - Refactoring requirement hierarchies
 - Disconnecting deprecated verifications
-- Cleaning up obsolete trace relations
-- Detaching documents or files
-- Removing attached contract elements
+- Cleaning up obsolete semantic relations
+- Removing reused context from documents or files
+- Removing reused contract elements
 
 ## Related Commands
 
-- **Link elements**: `reqvire link <source> <relation-type-or-attaching> <target>`
+- **Link elements**: `reqvire link <source> <relation-type-or-reusesContract> <target>`
 - **Search relations**: `reqvire search --have-relations="derivedFrom"`
-- **Search attachments**: `reqvire search --has-attachments`
+- **Search reused_contract_context**: `reqvire search --has-reused-contract-context`

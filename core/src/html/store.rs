@@ -1,4 +1,4 @@
-use crate::element::{AttachmentTarget, Element, GovernanceMetadataSource};
+use crate::element::{Element, GovernanceMetadataSource, ReusedContractContextTarget};
 use crate::git_commands;
 use crate::graph_registry::GraphRegistry;
 use crate::ontology_graph::build_graph_data;
@@ -21,7 +21,7 @@ pub struct ExplorerProjectStore {
     pub resources: Vec<ProjectStoreResource>,
     pub elements: Vec<ProjectStoreElement>,
     pub relations: Vec<ProjectStoreRelation>,
-    pub attachments: Vec<ProjectStoreAttachment>,
+    pub reused_contract_context: Vec<ProjectStoreReusedContractContextEntry>,
     pub concept_refs: Vec<ProjectStoreConceptReference>,
     pub submodels: Value,
     pub traces: Value,
@@ -100,7 +100,7 @@ pub struct ProjectStoreRelation {
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct ProjectStoreAttachment {
+pub struct ProjectStoreReusedContractContextEntry {
     pub id: String,
     pub source_id: String,
     pub target: String,
@@ -134,7 +134,7 @@ pub struct ProjectStoreSummaries {
     pub folders: usize,
     pub resources: usize,
     pub relations: usize,
-    pub attachments: usize,
+    pub reused_contract_context: usize,
     pub concept_refs: usize,
     pub ontology_blocks: usize,
     pub shape_blocks: usize,
@@ -158,7 +158,7 @@ pub fn build_project_store(
 ) -> ExplorerProjectStore {
     let elements = build_elements(registry);
     let (relations, mut resources) = build_relations(registry);
-    let attachments = build_attachments(registry, &mut resources);
+    let reused_contract_context = build_reused_contract_context(registry, &mut resources);
     let concept_refs = build_concept_refs(registry, &mut resources);
     enrich_resource_sources(&mut resources);
     let (files, folders) = build_files_and_folders(registry, &resources);
@@ -170,7 +170,7 @@ pub fn build_project_store(
     let knowledge_graph = build_knowledge_graph_projection(
         &elements,
         &relations,
-        &attachments,
+        &reused_contract_context,
         &concept_refs,
         &resources,
         &submodels,
@@ -197,7 +197,7 @@ pub fn build_project_store(
         folders: folders.len(),
         resources: resources.len(),
         relations: relations.len(),
-        attachments: attachments.len(),
+        reused_contract_context: reused_contract_context.len(),
         concept_refs: concept_refs.len(),
         ontology_blocks: semantic_index.summary.ontology_blocks,
         shape_blocks: semantic_index.summary.shape_blocks,
@@ -213,7 +213,7 @@ pub fn build_project_store(
         resources: resources.into_values().collect(),
         elements,
         relations,
-        attachments,
+        reused_contract_context,
         concept_refs,
         submodels,
         traces,
@@ -285,7 +285,7 @@ pub fn project_store_javascript(
 fn build_knowledge_graph_projection(
     elements: &[ProjectStoreElement],
     relations: &[ProjectStoreRelation],
-    attachments: &[ProjectStoreAttachment],
+    reused_contract_context: &[ProjectStoreReusedContractContextEntry],
     concept_refs: &[ProjectStoreConceptReference],
     resources: &BTreeMap<String, ProjectStoreResource>,
     submodels: &Value,
@@ -328,15 +328,15 @@ fn build_knowledge_graph_projection(
                 })
             })
             .collect::<Vec<_>>();
-        let attachment_facts = attachments
+        let reused_context_facts = reused_contract_context
             .iter()
-            .filter(|attachment| attachment.source_id == element.id)
-            .map(|attachment| {
+            .filter(|reused_contract_context| reused_contract_context.source_id == element.id)
+            .map(|reused_contract_context| {
                 json!({
-                    "name": "attaches",
-                    "value": attachment.target,
-                    "link": relation_link(&attachment.target, &attachment.resource_id),
-                    "kind": attachment.target_kind
+                    "name": "reuses contract",
+                    "value": reused_contract_context.target,
+                    "link": relation_link(&reused_contract_context.target, &reused_contract_context.resource_id),
+                    "kind": reused_contract_context.target_kind
                 })
             })
             .collect::<Vec<_>>();
@@ -367,7 +367,7 @@ fn build_knowledge_graph_projection(
             "governance": governance,
             "outgoing": outgoing,
             "incoming": incoming,
-            "attachments": attachment_facts,
+            "reused_contract_context": reused_context_facts,
             "concept_references": concept_reference_facts
         }));
     }
@@ -388,7 +388,7 @@ fn build_knowledge_graph_projection(
             "governance": [],
             "outgoing": [],
             "incoming": [],
-            "attachments": [],
+            "reused_contract_context": [],
             "concept_references": []
         }));
     }
@@ -414,26 +414,29 @@ fn build_knowledge_graph_projection(
         }))
     });
 
-    let attachment_edges = attachments.iter().filter_map(|attachment| {
-        let target = attachment
-            .resource_id
-            .as_ref()
-            .filter(|resource_id| resources.contains_key(resource_id.as_str()))
-            .cloned()
-            .unwrap_or_else(|| attachment.target.clone());
-        if !element_ids.contains(attachment.source_id.as_str())
-            || (!element_ids.contains(target.as_str()) && !resources.contains_key(&target))
-        {
-            return None;
-        }
-        Some(json!({
-            "source": attachment.source_id,
-            "target": target,
-            "label": "attaches",
-            "kind": "attachment",
-            "authored": true
-        }))
-    });
+    let reused_context_edges =
+        reused_contract_context
+            .iter()
+            .filter_map(|reused_contract_context| {
+                let target = reused_contract_context
+                    .resource_id
+                    .as_ref()
+                    .filter(|resource_id| resources.contains_key(resource_id.as_str()))
+                    .cloned()
+                    .unwrap_or_else(|| reused_contract_context.target.clone());
+                if !element_ids.contains(reused_contract_context.source_id.as_str())
+                    || (!element_ids.contains(target.as_str()) && !resources.contains_key(&target))
+                {
+                    return None;
+                }
+                Some(json!({
+                    "source": reused_contract_context.source_id,
+                    "target": target,
+                    "label": "reuses contract",
+                    "kind": "reused_contract_context",
+                    "authored": true
+                }))
+            });
 
     let concept_edges = concept_refs.iter().map(|concept_ref| {
         let concept_id = format!("concept:{}", concept_ref.iri);
@@ -465,7 +468,7 @@ fn build_knowledge_graph_projection(
                 "governance": [],
                 "outgoing": [],
                 "incoming": [],
-                "attachments": [],
+                "reused_contract_context": [],
                 "concept_references": []
             })
         });
@@ -473,7 +476,7 @@ fn build_knowledge_graph_projection(
 
     nodes.extend(concept_nodes.into_values());
     let edges = relation_edges
-        .chain(attachment_edges)
+        .chain(reused_context_edges)
         .chain(concept_edges)
         .collect::<Vec<_>>();
 
@@ -491,7 +494,7 @@ fn build_knowledge_graph_projection(
         "summary": {
             "elements": elements.len(),
             "relations": relations.len(),
-            "attachments": attachments.len(),
+            "reused_contract_context": reused_contract_context.len(),
             "concept_references": concept_refs.len(),
             "resources": resources.len(),
             "submodels": submodel_count
@@ -787,41 +790,41 @@ fn build_relations(
     (relations, resources)
 }
 
-fn build_attachments(
+fn build_reused_contract_context(
     registry: &GraphRegistry,
     resources: &mut BTreeMap<String, ProjectStoreResource>,
-) -> Vec<ProjectStoreAttachment> {
-    let mut attachments = Vec::new();
+) -> Vec<ProjectStoreReusedContractContextEntry> {
+    let mut entries = Vec::new();
     for element in registry.get_all_elements() {
-        for attachment in &element.attachments {
-            let (target, target_kind, resource_id) = match &attachment.target {
-                AttachmentTarget::ElementIdentifier(id) => {
+        for entry in &element.reused_contract_context {
+            let (target, target_kind, resource_id) = match &entry.target {
+                ReusedContractContextTarget::ElementIdentifier(id) => {
                     (id.clone(), "element".to_string(), None)
                 }
-                AttachmentTarget::FilePath(path) => {
+                ReusedContractContextTarget::FilePath(path) => {
                     let target = path.to_string_lossy().to_string();
                     let resource_id = ensure_resource(
                         resources,
-                        "attachment-file",
+                        "reused_contract_context-file",
                         &target,
                         &element.identifier,
-                        "attaches",
+                        "reuses contract",
                     );
                     (target, "resource".to_string(), Some(resource_id))
                 }
             };
-            attachments.push(ProjectStoreAttachment {
-                id: format!("attachment:{}:{}", element.identifier, target),
+            entries.push(ProjectStoreReusedContractContextEntry {
+                id: format!("reused_contract_context:{}:{}", element.identifier, target),
                 source_id: element.identifier.clone(),
                 target,
                 target_kind,
                 resource_id,
-                content_hash: attachment.content_hash.clone(),
+                content_hash: entry.content_hash.clone(),
             });
         }
     }
-    attachments.sort_by(|a, b| a.id.cmp(&b.id));
-    attachments
+    entries.sort_by(|a, b| a.id.cmp(&b.id));
+    entries
 }
 
 fn build_concept_refs(
@@ -952,7 +955,7 @@ fn ensure_resource(
             target: target.to_string(),
             display: short_label(target),
             file_path: if kind == "local-file"
-                || kind == "attachment-file"
+                || kind == "reused_contract_context-file"
                 || kind == "evidence-file"
             {
                 Some(target.to_string())
@@ -1243,12 +1246,12 @@ mod tests {
 
         let elements = build_elements(&registry);
         let (relations, mut resources) = build_relations(&registry);
-        let attachments = build_attachments(&registry, &mut resources);
+        let reused_contract_context = build_reused_contract_context(&registry, &mut resources);
         let concept_refs = build_concept_refs(&registry, &mut resources);
         let graph = build_knowledge_graph_projection(
             &elements,
             &relations,
-            &attachments,
+            &reused_contract_context,
             &concept_refs,
             &resources,
             &serde_json::json!({"submodels":[]}),

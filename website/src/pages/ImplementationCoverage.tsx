@@ -38,16 +38,16 @@ export default function ImplementationCoverage() {
               desc: "The requirement has direct satisfiedBy relation links to implementation or evidence artifacts.",
             },
             {
-              name: "contract_contract_satisfied_via_attachment",
-              desc: "The requirement owns a contract contract and a directly satisfied requirement attaches that contract.",
+              name: "contract_satisfied_via_reused_contract_context",
+              desc: "The requirement owns a contract and a directly satisfied requirement reuses that contract.",
             },
             {
-              name: "contract_contract_satisfied_via_child",
-              desc: "The requirement owns a contract contract and a derived descendant requirement is directly satisfied.",
+              name: "contract_satisfied_via_child",
+              desc: "The requirement owns a contract and a derived descendant requirement is directly satisfied.",
             },
             {
               name: "uncovered",
-              desc: "The requirement has no direct satisfaction, no attachment coverage, and no child coverage path.",
+              desc: "The requirement has no direct satisfaction, no reused-context coverage, and no child coverage path.",
             },
           ]}
         />
@@ -70,16 +70,16 @@ export default function ImplementationCoverage() {
 
       <Section title="Contract Fulfillment">
         <p className="text-zinc-600 mb-4">
-          Requirement attachments can make one subgraph depend on a
-          requirement-owned contract from another subgraph. The attachment is
-          the dependency edge; fulfillment comes from satisfied requirements,
+          Reused Contract Context can make one subgraph depend on a
+          requirement-owned contract from another subgraph. The reused context
+          is the dependency edge; fulfillment comes from satisfied requirements,
           descendant requirement coverage, and verification evidence.
         </p>
         <BulletList
           items={[
-            "The attaching requirement declares the contract obligation for its requirement subtree.",
+            "The reusesContract requirement declares the contract obligation for its requirement subtree.",
             "Child requirements and contracts can provide the detailed implementation route.",
-            "Coverage and change-impact reports keep the attached contract visible for review and hardening.",
+            "Coverage and change-impact reports keep the reused contract visible for review and hardening.",
           ]}
         />
       </Section>

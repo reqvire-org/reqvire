@@ -16,11 +16,10 @@ Independent capability-rooted subgraphs resolved via capability ownership relati
 
 Requirement-to-requirement relations where source and target belong to different capability roots.
 
-  * [Invoice Requirement](specifications/Requirements.md#invoice-requirement) --trace--> [Identity Requirement](specifications/Requirements.md#identity-requirement) (Capability One -> Capability Two)
-  * [Session Requirement](specifications/Requirements.md#session-requirement) --trace--> [Payments Requirement](specifications/Requirements.md#payments-requirement) (Capability Two -> Capability One)
+*No cross-submodel requirement couplings found.*
 
 ## Summary
 
 - **Submodels:** 2
 - **Requirements:** 4
-- **Cross-Submodel Couplings:** 2
+- **Cross-Submodel Couplings:** 0

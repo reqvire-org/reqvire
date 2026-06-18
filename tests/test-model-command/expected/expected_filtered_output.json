@@ -25,11 +25,11 @@
                   "file_path": "specifications/Verifications/Tests.md",
                   "file_order_index": 4,
                   "relations": [],
-                  "attachments": []
+                  "reused_contract_context": []
                 }
               }
             ],
-            "attachments": []
+            "reused_contract_context": []
           }
         },
         {
@@ -59,11 +59,11 @@
                         "file_path": "specifications/Verifications/Tests.md",
                         "file_order_index": 3,
                         "relations": [],
-                        "attachments": []
+                        "reused_contract_context": []
                       }
                     }
                   ],
-                  "attachments": []
+                  "reused_contract_context": []
                 }
               },
               {
@@ -84,7 +84,7 @@
                         "file_path": "specifications/Verifications/Tests.md",
                         "file_order_index": 2,
                         "relations": [],
-                        "attachments": []
+                        "reused_contract_context": []
                       }
                     },
                     {
@@ -96,11 +96,11 @@
                         "file_path": "specifications/Verifications/Tests.md",
                         "file_order_index": 5,
                         "relations": [],
-                        "attachments": []
+                        "reused_contract_context": []
                       }
                     }
                   ],
-                  "attachments": []
+                  "reused_contract_context": []
                 }
               },
               {
@@ -112,11 +112,11 @@
                   "file_path": "specifications/Verifications/Tests.md",
                   "file_order_index": 6,
                   "relations": [],
-                  "attachments": []
+                  "reused_contract_context": []
                 }
               }
             ],
-            "attachments": []
+            "reused_contract_context": []
           }
         },
         {
@@ -128,11 +128,11 @@
             "file_path": "specifications/Verifications/Tests.md",
             "file_order_index": 1,
             "relations": [],
-            "attachments": []
+            "reused_contract_context": []
           }
         }
       ],
-      "attachments": []
+      "reused_contract_context": []
     }
   ],
   "metadata": {

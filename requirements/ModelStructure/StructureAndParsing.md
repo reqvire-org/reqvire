@@ -15,12 +15,12 @@ Unsupported first H1 headings shall be ignored by element parsing.
   * type: requirement
 
 #### Relations
-  * definedBy: [Specification File Identification Refinement Specification](Specifications.md#specification-file-identification-refinement-specification)
+  * definedBy: [Specification File Identification Contract Specification](Specifications.md#specification-file-identification-contract-specification)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
   * specify: [Defining Model Structure](ModelStructureFeature.md#defining-model-structure)
   * verifiedBy: [Specification File Identification Test](../Verifications/ModelStructure/ParsingVerifications.md#specification-file-identification-test)
-  * verifiedBy: [Single Element Refinement Validation Test](../Verifications/Operations/Validation/ValidationVerifications.md#single-element-refinement-validation-test)
+  * verifiedBy: [Single Element Contract Validation Test](../Verifications/Operations/Validation/ValidationVerifications.md#single-element-contract-validation-test)
 ---
 
 ### Structure and Addressing in Markdown Documents
@@ -32,7 +32,7 @@ The system shall implement semi-structured markdown format specifications that d
 
 #### Relations
   * definedBy: [MarkdownStructure](MarkdownStructure.md#markdownstructure)
-  * definedBy: [Structure and Addressing in Markdown Documents Refinement Specification](Specifications.md#structure-and-addressing-in-markdown-documents-refinement-specification)
+  * definedBy: [Structure and Addressing in Markdown Documents Contract Specification](Specifications.md#structure-and-addressing-in-markdown-documents-contract-specification)
   * derive: [Element Identity Model](#element-identity-model)
   * derive: [Reserved Subsections Support](#reserved-subsections-support)
   * satisfiedBy: [element.rs](../../core/src/element.rs)
@@ -70,7 +70,7 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
 
 #### Relations
   * definedBy: [IdentifiersAndRelations](IdentifiersAndRelations.md#identifiersandrelations)
-  * definedBy: [Identifiers and Relations Refinement Specification](Specifications.md#identifiers-and-relations-refinement-specification)
+  * definedBy: [Identifiers and Relations Contract Specification](Specifications.md#identifiers-and-relations-contract-specification)
   * derive: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
   * derivedFrom: [Element Identity Model](#element-identity-model)
   * satisfiedBy: [relation.rs](../../core/src/relation.rs)
@@ -85,7 +85,7 @@ Reserved subsection vocabulary is defined by the Reqvire core element ontology. 
  * **Relations**: authored relation edges
  * **Details**: narrative element context
  * **Metadata**: element metadata, element type, and governance metadata where valid
- * **Attachments**: explicit reusable requirement-owned contract dependencies
+ * **Reused Contract Context**: explicit reusable requirement-owned contract dependencies
  * **Concept References**: readable bindings from non-ontology, non-semantic-contract elements to declared ontology terms
  * **Ontology**: ontology-element Turtle content
  * **Shapes**: semantic-contract SHACL content
@@ -105,7 +105,7 @@ Each reserved subsection has specific parsing rules, validation requirements, an
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
   * verifiedBy: [Element Subsection Parsing Test](../Verifications/ModelStructure/ParsingVerifications.md#element-subsection-parsing-test)
   * verifiedBy: [Non-Reserved Subsections Content Test](../Verifications/ModelStructure/ParsingVerifications.md#non-reserved-subsections-content-test)
-  * verifiedBy: [Attachment Output Rendering Verification](../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachment-output-rendering-verification)
-  * verifiedBy: [Attachments Subsection Parsing Verification](../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachments-subsection-parsing-verification)
-  * verifiedBy: [Attachments Validation Verification](../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachments-validation-verification)
+  * verifiedBy: [Reused Contract Context Output Rendering Verification](../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-output-rendering-verification)
+  * verifiedBy: [Reused Contract Context Subsection Parsing Verification](../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-subsection-parsing-verification)
+  * verifiedBy: [Reused Contract Context Validation Verification](../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-validation-verification)
 ---

@@ -1,1 +1,0 @@
-error: Invalid attachment target: 'Orphan-Spec' has no define relation. Contracts must define a requirement before they can be attached; contracts are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not defined by implementation-detail contracts.

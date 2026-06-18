@@ -10,7 +10,7 @@ set -uo pipefail  # NOTE: Do NOT use -e, it causes silent failures with diff
 # - Command exits with error (non-zero) for invalid input
 # - Error output contains example element markdown
 # - Error output contains specific format guidance
-# - Example includes all subsections: Details, Metadata, Relations, Attachments
+# - Example includes all subsections: Details, Metadata, Relations, Reused Contract Context
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -138,36 +138,36 @@ fi
 
 echo "✅ Test 4 passed"
 
-# Test 5: Invalid attachment format
-echo "Test 5: Invalid attachment format..."
+# Test 5: Invalid reused_contract_context format
+echo "Test 5: Invalid reused_contract_context format..."
 OUTPUT=$(cd "$TEST_DIR" && cat <<'EOF' | "$REQVIRE_BIN" add requirements/test.md 2>&1
 ### Test Element
 
 Description
 
-#### Attachments
-invalid attachment
+#### Reused Contract Context
+invalid reused_contract_context
 EOF
 )
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
-  echo "❌ FAILED: Expected error for invalid attachment"
+  echo "❌ FAILED: Expected error for invalid reused_contract_context"
   exit 1
 fi
 
 if ! echo "$OUTPUT" | grep -q "Expected format.*Text.*link"; then
-  echo "❌ FAILED: Error message missing format guidance for attachments"
+  echo "❌ FAILED: Error message missing format guidance for reused_contract_context"
   exit 1
 fi
 
 if ! echo "$OUTPUT" | grep -q "Example of correctly formatted element"; then
-  echo "❌ FAILED: Error message missing example for attachment error"
+  echo "❌ FAILED: Error message missing example for reused_contract_context error"
   exit 1
 fi
 
-if ! echo "$OUTPUT" | grep -q "#### Attachments"; then
-  echo "❌ FAILED: Example missing Attachments subsection"
+if ! echo "$OUTPUT" | grep -q "#### Reused Contract Context"; then
+  echo "❌ FAILED: Example missing Reused Contract Context subsection"
   exit 1
 fi
 

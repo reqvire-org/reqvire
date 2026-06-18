@@ -5,13 +5,13 @@
 The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and formatting operations.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Excluded File Relation Validation Refinement Specification](Specifications.md#excluded-file-relation-validation-refinement-specification)
+  * definedBy: [Excluded File Relation Validation Contract Specification](Specifications.md#excluded-file-relation-validation-contract-specification)
   * derivedFrom: [File Pattern Exclusion for Format](../Formatting/FormattingRequirements.md#file-pattern-exclusion-for-format)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Unstructured Documents Test](../../Verifications/Operations/Validation/ValidationVerifications.md#unstructured-documents-test)
@@ -88,45 +88,45 @@ The system shall check the internal consistency of the system model, ensuring th
   * specify: [Validating Structures](../BehaviorValidationOperationsFeature.md#validating-structures)
 ---
 
-### Attachment Target Validation
+### Reused Contract Context Target Validation
 
-The system shall validate attachment targets and reject invalid attachment references during model validation.
+The system shall validate reused_contract_context targets and reject invalid reused_contract_context references during model validation.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Attachment Target Validation Refinement Specification](Specifications.md#attachment-target-validation-refinement-specification)
+  * definedBy: [Reused Contract Context Target Validation Contract Specification](Specifications.md#reused-contract-context-target-validation-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
-  * verifiedBy: [Attachments Subsection Parsing Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachments-subsection-parsing-verification)
-  * verifiedBy: [Attachments Validation Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachments-validation-verification)
+  * verifiedBy: [Reused Contract Context Subsection Parsing Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-subsection-parsing-verification)
+  * verifiedBy: [Reused Contract Context Validation Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-validation-verification)
 ---
 
-### Attachment Scope Validation
+### Reused Contract Context Scope Validation
 
-The system shall validate attachment scope constraints and report validation errors for violations.
+The system shall validate reused_contract_context scope constraints and report validation errors for violations.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Subgraph Direction Constraint](../../ModelStructure/Constraints.md#attachment-subgraph-direction-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
+#### Reused Contract Context
+  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
+  * [Reused Contract Context Subgraph Direction Constraint](../../ModelStructure/Constraints.md#reused-contract-context-subgraph-direction-constraint)
+  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
 
 #### Relations
-  * definedBy: [Attachment Scope Validation Refinement Specification](Specifications.md#attachment-scope-validation-refinement-specification)
-  * derivedFrom: [Attachment Target Validation](#attachment-target-validation)
+  * definedBy: [Reused Contract Context Scope Validation Contract Specification](Specifications.md#reused-contract-context-scope-validation-contract-specification)
+  * derivedFrom: [Reused Contract Context Target Validation](#reused-contract-context-target-validation)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * verifiedBy: [Attachment Scope Constraints Test](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachment-scope-constraints-test)
+  * verifiedBy: [Reused Contract Context Scope Constraints Test](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-scope-constraints-test)
 ---
 
 ### GraphRegistry as Primary Registry
@@ -161,16 +161,16 @@ The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 com
 The system shall automatically perform validation when any command requires the parsed model, eliminating the need for a separate validate command.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
 
 #### Relations
-  * definedBy: [Integrated Validation Refinement Specification](Specifications.md#integrated-validation-refinement-specification)
+  * definedBy: [Integrated Validation Contract Specification](Specifications.md#integrated-validation-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
@@ -180,13 +180,13 @@ Implementation details shall follow the associated refinement specifications.
 The system shall implement a consistency validator that verifies logical coherence within the model, including checking for circular dependencies, orphaned elements, inconsistent relationship patterns, and element name uniqueness, with detailed error reporting.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Internal Consistency Validator Refinement Specification](Specifications.md#internal-consistency-validator-refinement-specification)
+  * definedBy: [Internal Consistency Validator Contract Specification](Specifications.md#internal-consistency-validator-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
@@ -195,14 +195,14 @@ Implementation details shall follow the associated refinement specifications.
 
 ### Cross-Section Duplicate Validation
 
-The system shall detect when the same target appears in both the Relations and Attachments subsections of an element, treating this as a validation error.
+The system shall detect when the same target appears in both the Relations and Reused Contract Context subsections of an element, treating this as a validation error.
 
 #### Details
 A constraint defines the detailed rules for cross-section duplicate detection.
 
 This applies to identifier targets.
 
-Within-section duplicates (same entry repeated within Relations OR within Attachments) are formatting issues handled by the format operation, not validation errors.
+Within-section duplicates (same entry repeated within Relations OR within Reused Contract Context) are formatting issues handled by the format operation, not validation errors.
 
 #### Metadata
   * type: requirement
@@ -352,18 +352,18 @@ The system shall validate relation types and allow only supported types.
 The system shall implement validation that verifies relation endpoints have appropriate element types based on the relation type, following the Element Type Relation Compatibility matrix.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Relation Element Type Validator Refinement Specification](Specifications.md#relation-element-type-validator-refinement-specification)
+  * definedBy: [Relation Element Type Validator Contract Specification](Specifications.md#relation-element-type-validator-contract-specification)
   * derivedFrom: [Validate Relation Types](#validate-relation-types)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Element Type Relation Compatibility Test](../../Verifications/Operations/Validation/ValidationVerifications.md#element-type-relation-compatibility-test)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
-  * verifiedBy: [Single Element Refinement Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#single-element-refinement-validation-test)
+  * verifiedBy: [Single Element Contract Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#single-element-contract-validation-test)
 ---

@@ -37,9 +37,9 @@ export default function SemanticModel() {
           ))}
         </ul>
         <p className="text-zinc-600 mt-4">
-          Concept references bind prose to ontology terms. Attachments bring
-          reusable requirement-owned contracts into scope without forcing
-          unrelated concerns into the same hierarchy.
+          Concept references bind prose to ontology terms. Reused Contract
+          Context brings reusable requirement-owned contracts into scope without
+          forcing unrelated concerns into the same hierarchy.
         </p>
       </Section>
 
@@ -56,7 +56,7 @@ export default function SemanticModel() {
             },
             {
               name: "Contract ownership",
-              desc: "A non-semantic-contract contract is owned by exactly one compatible requirement through define or definedBy. Semantic contracts constrain requirements through constrain and constrainedBy.",
+              desc: "A non-semantic-contract is owned by exactly one compatible requirement through define or definedBy. Semantic contracts constrain requirements through constrain and constrainedBy.",
             },
             {
               name: "Cross-boundary reuse",
@@ -86,13 +86,13 @@ export default function SemanticModel() {
           </div>
           <div className="border border-zinc-200 rounded-lg p-4">
             <h4 className="font-semibold text-zinc-900 mb-1">
-              Requirement attachments
+              Reused contract context
             </h4>
             <p className="text-sm text-zinc-600">
-              Requirements attach reusable requirement-owned contracts such as
+              Requirements reuse requirement-owned contracts such as
               specifications, constraints, behaviors, states, and input/output
-              definitions. The attaching requirement declares that its subgraph
-              must fulfill the attached contract across that requirement, its
+              definitions. The consuming requirement declares that its subgraph
+              must fulfill the reused contract across that requirement, its
               child requirements, and the contracts that detail those
               obligations. Semantic contracts are linked through constrainedBy.
             </p>
@@ -102,7 +102,7 @@ export default function SemanticModel() {
               Fulfillment evidence
             </h4>
             <p className="text-sm text-zinc-600">
-              The attachment creates the contract dependency; fulfillment is
+              The reused context creates the contract dependency; fulfillment is
               shown by satisfied requirements, child requirement coverage, and
               verifications linked to evidence. Trace and change-impact views
               keep that dependency visible so affected contracts, requirements,
@@ -115,8 +115,8 @@ export default function SemanticModel() {
               One-way dependency flow
             </h4>
             <p className="text-sm text-zinc-600">
-              Attachment flow between capability-rooted subgraphs is
-              one-directional. If two submodels attach contracts to each other in
+              Reused contract context flow between capability-rooted subgraphs is
+              one-directional. If two submodels reuse contracts from each other in
               both directions, the boundary becomes ambiguous, so validation
               rejects that pattern and forces the dependency direction to be
               explicit.
@@ -215,7 +215,7 @@ export default function SemanticModel() {
                 ["use / usedBy", "Semantic contract uses ontology vocabulary."],
                 ["verify / verifiedBy", "Concrete verification records evidence scope for a capability or requirement; verification-objective is excluded."],
                 ["satisfiedBy / satisfy", "Requirement or evidence-backed verification links to implementation or proof/test evidence."],
-                ["attach", "Requirement imports a one-way non-semantic requirement-owned contract dependency."],
+                ["reuse", "Requirement imports a one-way non-semantic requirement-owned contract dependency."],
                 ["trace", "Soft traceability without ownership semantics."],
               ].map(([relation, meaning]) => (
                 <tr key={relation}>

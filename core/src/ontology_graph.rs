@@ -1,3 +1,4 @@
+use crate::owl_reserved;
 use crate::semantic_contract::{
     OntologyClassExpressionKind, OntologyConstruct, OntologyConstructFamily, OntologyConstructKind,
     OntologyProjectionSource, OntologyProjectionTerm, OntologyProjectionTermKind,
@@ -7,6 +8,13 @@ use crate::semantic_contract::{
 use oxigraph::model::{NamedOrBlankNode, Term};
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
+
+const GRAPH_LAYER_AUTHORED: &str = "authored";
+const GRAPH_LAYER_REQVIRE_CONTEXT: &str = "reqvire-context";
+const GRAPH_SOURCE_ONTOLOGY: &str = "ontology";
+const GRAPH_SOURCE_SHAPE: &str = "shape";
+const GRAPH_SOURCE_EXTERNAL_ONTOLOGY: &str = "external-ontology";
+const GRAPH_SOURCE_MODEL_CONTEXT: &str = "model-context";
 
 const RDF_TYPE: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 const RDF_FIRST: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#first";
@@ -63,7 +71,6 @@ const SH_MIN_COUNT: &str = "http://www.w3.org/ns/shacl#minCount";
 const SH_MAX_COUNT: &str = "http://www.w3.org/ns/shacl#maxCount";
 const SH_PATTERN: &str = "http://www.w3.org/ns/shacl#pattern";
 const SH_IN: &str = "http://www.w3.org/ns/shacl#in";
-const XSD_PREFIX: &str = "http://www.w3.org/2001/XMLSchema#";
 
 #[derive(Debug, Clone, Serialize)]
 pub struct OntologyGraphData {
@@ -78,6 +85,8 @@ pub struct OntologyGraphNode {
     #[serde(rename = "type")]
     pub node_type: String,
     pub semantic_type: String,
+    pub layer: String,
+    pub source_kind: String,
     pub full_uri: String,
     pub comment: String,
     pub rdf_types: Vec<String>,
@@ -186,6 +195,8 @@ pub struct OntologyGraphEdge {
     pub source: String,
     pub target: String,
     pub label: String,
+    pub layer: String,
+    pub source_kind: String,
 }
 
 pub fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
@@ -302,6 +313,8 @@ pub fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
                             source: subject_id.clone(),
                             target: target_id,
                             label: predicate_label,
+                            layer: GRAPH_LAYER_AUTHORED.to_string(),
+                            source_kind: source_kind_for_block(block).to_string(),
                         });
                     }
                 }
@@ -322,6 +335,8 @@ pub fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
                         source: subject_id.clone(),
                         target: target_id,
                         label: predicate_label,
+                        layer: GRAPH_LAYER_AUTHORED.to_string(),
+                        source_kind: source_kind_for_block(block).to_string(),
                     });
                 }
                 Term::Literal(literal) => {
@@ -340,6 +355,7 @@ pub fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
     apply_blank_node_labels(&mut nodes);
     populate_construct_metadata(&mut nodes, &mut edges, report);
     apply_shape_slot_facets(&mut nodes, report, &rdf_list_values);
+    add_model_context_layer(&mut nodes, &mut edges, report);
     promote_typed_named_individuals(&mut nodes);
 
     for node in nodes.values_mut() {
@@ -397,6 +413,82 @@ pub fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
         .collect();
 
     OntologyGraphData { nodes, edges }
+}
+
+fn add_model_context_layer(
+    nodes: &mut BTreeMap<String, OntologyGraphNode>,
+    edges: &mut BTreeSet<OntologyGraphEdge>,
+    report: &SemanticIndex,
+) {
+    let context_nodes: BTreeMap<_, _> = report
+        .model_context
+        .nodes
+        .iter()
+        .map(|node| (node.id.as_str(), node))
+        .collect();
+
+    for context_edge in &report.model_context.edges {
+        if !is_semantic_context_edge(&context_edge.label) {
+            continue;
+        }
+
+        if let Some(context_node) = context_nodes.get(context_edge.source.as_str()) {
+            insert_semantic_context_node(nodes, context_node);
+        }
+        if let Some(context_node) = context_nodes.get(context_edge.target.as_str()) {
+            insert_semantic_context_node(nodes, context_node);
+        }
+
+        edges.insert(OntologyGraphEdge {
+            source: context_edge.source.clone(),
+            target: context_edge.target.clone(),
+            label: context_edge.label.clone(),
+            layer: GRAPH_LAYER_REQVIRE_CONTEXT.to_string(),
+            source_kind: GRAPH_SOURCE_MODEL_CONTEXT.to_string(),
+        });
+    }
+}
+
+fn is_semantic_context_edge(label: &str) -> bool {
+    matches!(label, "declaresTerm" | "referencesTerm")
+}
+
+fn insert_semantic_context_node(
+    nodes: &mut BTreeMap<String, OntologyGraphNode>,
+    context_node: &crate::semantic_contract::ModelContextNode,
+) {
+    nodes
+        .entry(context_node.id.clone())
+        .or_insert_with(|| OntologyGraphNode {
+            id: context_node.id.clone(),
+            label: context_node.label.clone(),
+            node_type: "resource".to_string(),
+            semantic_type: "resource".to_string(),
+            layer: GRAPH_LAYER_REQVIRE_CONTEXT.to_string(),
+            source_kind: GRAPH_SOURCE_MODEL_CONTEXT.to_string(),
+            full_uri: context_node.id.clone(),
+            comment: "Reqvire semantic context.".to_string(),
+            rdf_types: context_node.rdf_types.clone(),
+            type_evidence: Vec::new(),
+            sources: vec![OntologyGraphSource {
+                source: context_node.identifier.clone(),
+                source_name: context_node.label.clone(),
+                file_path: context_node.file_path.clone(),
+                line_number: context_node.line_number,
+                kind: GRAPH_SOURCE_MODEL_CONTEXT.to_string(),
+                link: source_html_link(&context_node.identifier, &context_node.file_path),
+            }],
+            constraints: Vec::new(),
+            badges: Vec::new(),
+            equivalence_group: String::new(),
+            inverse_properties: Vec::new(),
+            property_chains: Vec::new(),
+            domain: Vec::new(),
+            range: Vec::new(),
+            literal_values: Vec::new(),
+            slot_facets: Vec::new(),
+            constructs: Vec::new(),
+        });
 }
 
 fn collect_internal_property_shapes(report: &SemanticIndex) -> BTreeMap<String, String> {
@@ -690,6 +782,8 @@ fn ensure_node(
             label: clean_uri(id),
             node_type: node_type.to_string(),
             semantic_type: default_semantic_type(id, node_type).to_string(),
+            layer: GRAPH_LAYER_AUTHORED.to_string(),
+            source_kind: source_kind_for_block(block).to_string(),
             full_uri: id.to_string(),
             comment: "None specified.".to_string(),
             rdf_types: Vec::new(),
@@ -838,6 +932,9 @@ fn apply_property_domain_range_construct(
                 } else {
                     "range".to_string()
                 },
+                layer: GRAPH_LAYER_AUTHORED.to_string(),
+                source_kind: source_kind_from_projection_source(&construct.provenance.source)
+                    .to_string(),
             });
         }
     }
@@ -907,6 +1004,8 @@ fn apply_inverse_property_construct(
         source: subject_id,
         target: object_id,
         label: "inverse".to_string(),
+        layer: GRAPH_LAYER_AUTHORED.to_string(),
+        source_kind: source_kind_from_projection_source(&construct.provenance.source).to_string(),
     });
 }
 
@@ -966,6 +1065,9 @@ fn apply_restriction_construct(
                 source: subject_id.clone(),
                 target: property_id,
                 label: "on property".to_string(),
+                layer: GRAPH_LAYER_AUTHORED.to_string(),
+                source_kind: source_kind_from_projection_source(&construct.provenance.source)
+                    .to_string(),
             });
         }
     }
@@ -1034,6 +1136,9 @@ fn apply_shape_overlay_construct(
                 source: subject_id,
                 target: object_id,
                 label: construct_label(construct).to_lowercase(),
+                layer: GRAPH_LAYER_AUTHORED.to_string(),
+                source_kind: source_kind_from_projection_source(&construct.provenance.source)
+                    .to_string(),
             });
         }
     }
@@ -1081,6 +1186,8 @@ fn add_projection_object_edge(
         source: subject_id.to_string(),
         target: object_id,
         label: label.to_string(),
+        layer: GRAPH_LAYER_AUTHORED.to_string(),
+        source_kind: source_kind_from_projection_source(&construct.provenance.source).to_string(),
     });
 }
 
@@ -1126,6 +1233,8 @@ fn ensure_projection_node(
                 label: projection_node_label(term, semantic_hint),
                 node_type: visual_node_type_for_semantic_type(&semantic_type).to_string(),
                 semantic_type,
+                layer: GRAPH_LAYER_AUTHORED.to_string(),
+                source_kind: source_kind_from_source_value(&source.kind).to_string(),
                 full_uri: id,
                 comment: "None specified.".to_string(),
                 rdf_types: Vec::new(),
@@ -1483,6 +1592,26 @@ fn source_metadata(block: &SemanticBlock) -> OntologyGraphSource {
         line_number: block.line_number,
         kind: block.kind.as_str().to_string(),
         link: source_html_link(&block.source, &block.file_path),
+    }
+}
+
+fn source_kind_for_block(block: &SemanticBlock) -> &'static str {
+    match block.kind {
+        SemanticBlockKind::Ontology => GRAPH_SOURCE_ONTOLOGY,
+        SemanticBlockKind::Shapes => GRAPH_SOURCE_SHAPE,
+        SemanticBlockKind::ExternalOntology => GRAPH_SOURCE_EXTERNAL_ONTOLOGY,
+    }
+}
+
+fn source_kind_from_projection_source(source: &OntologyProjectionSource) -> &'static str {
+    source_kind_from_source_value(&source.block_kind)
+}
+
+fn source_kind_from_source_value(value: &str) -> &'static str {
+    match value {
+        "shapes" | "shape" => GRAPH_SOURCE_SHAPE,
+        "model-context" => GRAPH_SOURCE_MODEL_CONTEXT,
+        _ => GRAPH_SOURCE_ONTOLOGY,
     }
 }
 
@@ -1845,5 +1974,5 @@ fn is_blank_node_id(id: &str) -> bool {
 }
 
 fn is_datatype_iri(iri: &str) -> bool {
-    iri.starts_with(XSD_PREFIX) || iri == RDFS_DATATYPE
+    owl_reserved::is_builtin_datatype_iri(iri) || iri == RDFS_DATATYPE
 }

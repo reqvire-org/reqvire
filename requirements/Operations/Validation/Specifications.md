@@ -1,39 +1,39 @@
 # Elements
 
-### Attachment Scope Validation Refinement Specification
+### Reused Contract Context Scope Validation Contract Specification
 
 #### Details
-When validating attachments, the system is expected to enforce attachment scope constraints for contract-element identifier targets and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.
+When validating reused_contract_context, the system is expected to enforce reused_contract_context scope constraints for contract-element identifier targets and report errors with clear messages indicating the reusesContract element, the reused_contract_context target, and the reason for the violation.
 
-Attachment scope validation is expected to enforce:
+Reused Contract Context scope validation is expected to enforce:
 - Hierarchical independence from the contract's defining hierarchy
 - Upstream propagation within a hierarchy branch
-- One-direction attachment flow between capability-root subgraphs
+- One-direction reused_contract_context flow between capability-root subgraphs
 
 #### Metadata
   * type: specification
 ---
 
-### Attachment Target Validation Refinement Specification
+### Reused Contract Context Target Validation Contract Specification
 
 #### Details
-Attachment targets support model element identifier references with family-specific compatibility rules.
+Reused Contract Context targets support model element identifier references with family-specific compatibility rules.
 
 **Identifier Targets:**
-- Requirement attachments must point to reusable requirement-owned non-semantic-contract element types only (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
-- Attachment to `ontology` is invalid; ontology vocabulary bindings use `#### Concept References` on non-ontology, non-semantic-contract elements or `use`/`usedBy` on semantic contracts
+- Requirement reused_contract_context must point to reusable requirement-owned non-semantic-contract element types only (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
+- Reused Contract Context to `ontology` is invalid; ontology vocabulary bindings use `#### Concept References` on non-ontology, non-semantic-contract elements or `use`/`usedBy` on semantic contracts
 - Normalized like relation targets (resolved to full identifier path)
-- Validation is expected to reject identifiers pointing to non-attachable element types
+- Validation is expected to reject identifiers pointing to non-reusable element types
 - Validation is expected to reject unresolved identifiers
 - Provides clear error message indicating the expected element type
 
-This validation ensures that attachments reference reusable requirement-owned contracts and do not carry ontology semantics.
+This validation ensures that reused_contract_context reference reusable requirement-owned contracts and do not carry ontology semantics.
 
 #### Metadata
   * type: specification
 ---
 
-### Excluded File Relation Validation Refinement Specification
+### Excluded File Relation Validation Contract Specification
 
 #### Details
 Excluded-file relation validation behavior:
@@ -48,7 +48,7 @@ Excluded-file relation validation behavior:
   * define: [Excluded File Relation Validation](ValidationRequirements.md#excluded-file-relation-validation)
 ---
 
-### Integrated Validation Refinement Specification
+### Integrated Validation Contract Specification
 
 #### Details
 Integrated validation execution behavior:
@@ -64,7 +64,7 @@ Integrated validation execution behavior:
   * define: [Integrated Validation](ValidationRequirements.md#integrated-validation)
 ---
 
-### Internal Consistency Validator Refinement Specification
+### Internal Consistency Validator Contract Specification
 
 #### Details
 The consistency validator is expected to verify:
@@ -82,17 +82,17 @@ Rationale: Element names serve as stable IDs for element identity, independent o
   * type: specification
 ---
 
-### Relation Element Type Validator Refinement Specification
+### Relation Element Type Validator Contract Specification
 
 #### Details
 The validator enforces the Reqvire relation ontology together with the canonical element type vocabulary.
 
 Validation shall check:
 - relation endpoint families and inverse relation compatibility from the relation ontology
-- ontology, capability, requirement, and contract compatibility from the ontology, capability, requirement, and semantic-contract contracts
+- ontology, capability, requirement, and contract compatibility from the ontology, capability, requirement, and semantic-contracts
 - evidence-backed verification compatibility from the verification contracts
-- trace-only behavior for custom `other` and `other-TYPENAME` element types
-- contract restrictions: contract elements use only `define` relations and cannot have Attachments subsections
+- canonical semantic relations are rejected for custom `other` and `other-TYPENAME` element types
+- contract restrictions: contract elements use only `define` relations and cannot have Reused Contract Context subsections
 - `definedBy` targets resolve to element identifiers, not plain file paths or `# Element` file links without element fragments
 
 This validation occurs:
@@ -145,7 +145,7 @@ For each referenced IRI, validation determines whether the IRI is declared by an
 - Outside-context errors include the declaring ontology identifier and guidance to add a `use` relation when that dependency is intentional.
 
 The rule is intentionally strict:
-- It does not infer or create attachments.
+- It does not infer or create reused_contract_context.
 - It does not rewrite Turtle.
 - It enforces explicit `use` relations and ontology hierarchy as the valid semantic dependency path for semantic contracts.
 - It prevents model changes that would bypass change-impact traceability.

@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use axum::body::Body;
@@ -87,6 +87,10 @@ async fn serve_static(State(state): State<ServeState>, method: Method, uri: Uri)
         return static_response(method, content_type_for_path(&request_path), content);
     }
 
+    if let Some(response) = workspace_file_response(method.clone(), &request_path) {
+        return response;
+    }
+
     if request_path.starts_with("assets/") {
         return response_with_status(StatusCode::NOT_FOUND);
     }
@@ -128,6 +132,55 @@ fn empty_response(content_type: &'static str) -> Response<Body> {
         .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR))
 }
 
+fn workspace_file_response(method: Method, request_path: &str) -> Option<Response<Body>> {
+    let path = Path::new(request_path);
+    if path.is_absolute()
+        || path
+            .components()
+            .any(|component| matches!(component, std::path::Component::ParentDir))
+        || !is_workspace_asset_path(path)
+    {
+        return None;
+    }
+
+    let absolute_path = PathBuf::from(".").join(path);
+    if !absolute_path.is_file() {
+        return None;
+    }
+
+    match std::fs::read(&absolute_path) {
+        Ok(content) => Some(bytes_response(
+            method,
+            content_type_for_path(request_path),
+            content,
+        )),
+        Err(_) => Some(response_with_status(StatusCode::NOT_FOUND)),
+    }
+}
+
+fn is_workspace_asset_path(path: &Path) -> bool {
+    matches!(
+        path.extension().and_then(|ext| ext.to_str()).map(|ext| ext.to_ascii_lowercase()),
+        Some(ext)
+            if matches!(
+                ext.as_str(),
+                "png"
+                    | "jpg"
+                    | "jpeg"
+                    | "gif"
+                    | "webp"
+                    | "svg"
+                    | "pdf"
+                    | "txt"
+                    | "csv"
+                    | "json"
+                    | "jsonld"
+                    | "ttl"
+                    | "turtle"
+            )
+    )
+}
+
 fn resolve_request_path(raw_request_path: &str) -> Result<String, StatusCode> {
     let decoded = percent_decode_str(raw_request_path)
         .decode_utf8()
@@ -167,6 +220,12 @@ fn content_type_for_path(path: &str) -> &'static str {
         Some("html") => "text/html; charset=utf-8",
         Some("svg") => "image/svg+xml",
         Some("png") => "image/png",
+        Some("jpg") | Some("jpeg") => "image/jpeg",
+        Some("gif") => "image/gif",
+        Some("webp") => "image/webp",
+        Some("pdf") => "application/pdf",
+        Some("txt") => "text/plain; charset=utf-8",
+        Some("csv") => "text/csv; charset=utf-8",
         Some("ico") => "image/x-icon",
         Some("woff2") => "font/woff2",
         Some("css") => "text/css",

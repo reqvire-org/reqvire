@@ -2,14 +2,14 @@
 
 ### Cross Section Duplicate Element
 
-This element has the same target in both Relations and Attachments, which is a validation error.
+This element has the same target in both Relations and Reused Contract Context, which is a validation error.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Refinement Element](Requirements.md#refinement-element)
+#### Reused Contract Context
+  * [Contract Element](Requirements.md#contract-element)
 
 #### Relations
-  * satisfiedBy: [Refinement Element](Requirements.md#refinement-element)
+  * satisfiedBy: [Contract Element](Requirements.md#contract-element)
 ---

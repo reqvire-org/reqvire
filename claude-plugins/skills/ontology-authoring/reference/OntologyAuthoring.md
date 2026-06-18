@@ -88,16 +88,16 @@ For refactoring existing ontology/source material, first inventory the existing 
 
 ## Ontology From Existing Model Content
 
-Ontology work does not have to be first in the systems-engineering process. Reqvire models may start with capabilities, requirements, specifications, behaviors, constraints, input/output refinements, verifications, and evidence. Ontology and semantic contracts can be extracted later from that authored model.
+Ontology work does not have to be first in the systems-engineering process. Reqvire models may start with capabilities, requirements, specifications, behaviors, constraints, input/output contracts, verifications, and evidence. Ontology and semantic contracts can be extracted later from that authored model.
 
-Use this workflow when requirements or refinements exist but ontology coverage is missing, partial, or uneven:
+Use this workflow when requirements or contracts exist but ontology coverage is missing, partial, or uneven:
 
 1. Read the capability and requirement subgraph before creating ontology.
 2. Inventory repeated nouns, states, lifecycle labels, role names, relation words, artifact types, interface concepts, payload fields, governed tokens, and validation conditions.
 3. Separate reusable meaning from one-off implementation detail.
 4. Promote stable shared vocabulary into ontology elements when it improves shared meaning, queryability, semantic validation, change impact, or agent retrieval.
 5. Promote repeated closed-world validation rules into semantic-contract SHACL shapes only when machine-checkable constraints add value.
-6. Keep implementation-specific details in requirements, specifications, behaviors, constraints, state, or input/output refinements.
+6. Keep implementation-specific details in requirements, specifications, behaviors, constraints, state, or input/output contracts.
 7. Leave requirements prose-only when formal ontology or SHACL modeling does not add enough value.
 8. Keep verification traceability anchored on requirements.
 
@@ -403,7 +403,7 @@ Avoid unnecessary properties:
 - Do not add slots such as UI color, marketing copy, label text, favorite resource, internal implementation field, or arbitrary preference unless they answer competency questions.
 - Do not add all conceivable relationships among included terms. Add relationships that support navigation, validation, reasoning, traceability, visualization, or known queries.
 
-Document intentional omissions. If a term could be classified another way in a broader ontology, add a short comment explaining the chosen scope. For example, document that `Operator` is modeled as an `Actor` role rather than as a general `Person`, or that region/provider details are intentionally handled by deployment configuration refinements instead of ontology class expansion.
+Document intentional omissions. If a term could be classified another way in a broader ontology, add a short comment explaining the chosen scope. For example, document that `Operator` is modeled as an `Actor` role rather than as a general `Person`, or that region/provider details are intentionally handled by deployment configuration contracts instead of ontology class expansion.
 
 ### Use Disjointness For Mutually Exclusive Classes
 
@@ -434,7 +434,7 @@ ex:TestVerification owl:disjointWith ex:AnalysisVerification .
 
 Classes alone rarely provide enough information to answer competency questions. Once a few classes exist, describe the internal structure of each concept by defining its slots: the datatype properties and object properties that characterize instances of the class.
 
-Use the candidate term list from discovery and competency questions. Terms that are not classes often become slots. For each slot candidate, decide which class it describes and attach it to the most general class that can validly have that property. Subclasses inherit the slots of their superclasses.
+Use the candidate term list from discovery and competency questions. Terms that are not classes often become slots. For each slot candidate, decide which class it describes and reuse it to the most general class that can validly have that property. Subclasses inherit the slots of their superclasses.
 
 For a managed platform or system-of-interest ontology:
 
@@ -453,7 +453,7 @@ Common slot categories:
 | Part slots | Physical or logical parts of a structured concept. | deployment has replica, environment has network access, interface has endpoint, system has subsystem |
 | Relationship slots | Links from instances of one class to instances of another. | deployment belongs to environment, resource owned by actor, interface exposes resource, evidence verifies requirement |
 
-Attach a slot at the most general valid class. For example, `resourceIdentifier` belongs on `ManagedResource` if every managed resource needs an identifier. `deploymentHasReplica` belongs on `Deployment`, not on `ManagedResource`, because not every managed resource has replicas. `interfaceProtocol` belongs on `InterfaceSurface` if all interface surfaces have a protocol or interaction mechanism.
+Reuse a slot at the most general valid class. For example, `resourceIdentifier` belongs on `ManagedResource` if every managed resource needs an identifier. `deploymentHasReplica` belongs on `Deployment`, not on `ManagedResource`, because not every managed resource has replicas. `interfaceProtocol` belongs on `InterfaceSurface` if all interface surfaces have a protocol or interaction mechanism.
 
 ## Defining Slot Facets
 
@@ -581,7 +581,7 @@ System-of-interest examples:
 | Slot | Good domain | Good range | Why |
 |------|-------------|------------|-----|
 | `ownedByActor` | `PlatformResource` | `Actor` | Any managed platform resource can have an owning or accountable actor. |
-| `deploymentBelongsToEnvironment` | `Deployment` | `Environment` | Deployments are hosted inside environments; the slot should not be attached to every managed resource. |
+| `deploymentBelongsToEnvironment` | `Deployment` | `Environment` | Deployments are hosted inside environments; the slot should not be reused to every managed resource. |
 | `deploymentHasReplica` | `Deployment` | `Replica` | Replicas are parts of deployments, not of every platform resource. |
 | `interfaceExposesResource` | `InterfaceSurface` | `PlatformResource` | Web, API, MCP, and BFF surfaces can expose platform resources. |
 | `environmentHasNetworkAccess` | `Environment` | `NetworkAccess` | Network access belongs to the environment boundary. |
@@ -593,7 +593,7 @@ Reqvire and `red`-style ontology refactoring rules:
 - If a proposed domain or range lists all subclasses of a parent class, use the parent class instead.
 - If a proposed domain or range lists almost all subclasses of a parent class, consider the parent only if the exceptions are not semantically important.
 - If a slot applies only to a specialized class, keep it there. For example, `deploymentHasReplica` belongs on `Deployment`, not on `PlatformResource`.
-- If a slot applies to all managed resources, attach it at the shared parent. For example, `resourceIdentifier` belongs on `PlatformResource` or `ManagedResource`, not separately on `Deployment`, `Environment`, and `Database`.
+- If a slot applies to all managed resources, reuse it at the shared parent. For example, `resourceIdentifier` belongs on `PlatformResource` or `ManagedResource`, not separately on `Deployment`, `Environment`, and `Database`.
 
 Compact OWL/Turtle mapping:
 
@@ -698,7 +698,7 @@ Avoid:
 - Class and slot names that differ only by case, such as `Environment` and `environment`, when a clearer relation name exists.
 - Product/UI labels as canonical class names when a stable domain concept exists.
 
-Use comments or annotation properties for presentation labels, aliases, translations, old names, and product terms. For example, keep `MissionControlInterface` as the canonical class only if it is a stable domain concept; otherwise model it as a label or individual attached to `WebInterface`.
+Use comments or annotation properties for presentation labels, aliases, translations, old names, and product terms. For example, keep `MissionControlInterface` as the canonical class only if it is a stable domain concept; otherwise model it as a label or individual reused to `WebInterface`.
 
 ### Singular Or Plural
 
@@ -780,7 +780,7 @@ ex:createDeploymentApiTest a reqvire:TestVerification ;
   ex:evidencePassed true .
 ```
 
-Prefer individuals for stable vocabulary values such as `activeDeploymentState`, `failedDeploymentState`, `publicAccessMode`, `privateAccessMode`, `testVerificationMethod`, or `criticalRiskLevel`. Type stable vocabulary records explicitly as `owl:NamedIndividual` and their domain class. Prefer requirements, refinements, evidence files, source data, or generated semantic export for volatile facts such as every customer deployment, every test run, every log entry, or every observed metric sample.
+Prefer individuals for stable vocabulary values such as `activeDeploymentState`, `failedDeploymentState`, `publicAccessMode`, `privateAccessMode`, `testVerificationMethod`, or `criticalRiskLevel`. Type stable vocabulary records explicitly as `owl:NamedIndividual` and their domain class. Prefer requirements, contracts, evidence files, source data, or generated semantic export for volatile facts such as every customer deployment, every test run, every log entry, or every observed metric sample.
 
 ## Core Building Blocks
 
@@ -865,7 +865,7 @@ ex:criticalLifecycleState a owl:NamedIndividual, ex:LifecycleState ;
 
 ex:collectReportKind a owl:NamedIndividual, ex:ReportKind ;
   ex:reportKindName "collect" ;
-  rdfs:comment "Report kind that gathers element context, refinements, attachments, and reachable semantic context." .
+  rdfs:comment "Report kind that gathers element context, contracts, reused_contract_context, and reachable semantic context." .
 ```
 
 ### Axioms
@@ -908,7 +908,7 @@ Concept reference example:
   * Managed Resource: https://example.org/ontology#ManagedResource
 ```
 
-Capability, requirement, refinement, verification-objective, and concrete verification prose can bind readable terms with `#### Concept References` when useful. The referenced IRI or CURIE must be declared by an ontology element in the model. Semantic contracts must not author concept references; their semantic dependencies are declared with `use`/`usedBy`.
+Capability, requirement, contract, verification-objective, and concrete verification prose can bind readable terms with `#### Concept References` when useful. The referenced IRI or CURIE must be declared by an ontology element in the model. Semantic contracts must not author concept references; their semantic dependencies are declared with `use`/`usedBy`.
 
 ## Semantic Contract Boundary
 

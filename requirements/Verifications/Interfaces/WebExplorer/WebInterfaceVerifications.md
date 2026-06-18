@@ -8,13 +8,13 @@ This objective groups verification that the served Web Explorer renders model da
   * type: verification-objective
 
 #### Relations
-  * derive: [Attachment Link Serving Verification](#attachment-link-serving-verification)
+  * derive: [Reused Contract Context Link Serving Verification](#reused-contract-context-link-serving-verification)
   * derive: [Component Reuse Verification](#component-reuse-verification)
-  * derive: [Diagram Attachment Display Verification](#diagram-attachment-display-verification)
+  * derive: [Diagram Reused Contract Context Display Verification](#diagram-reused-contract-context-display-verification)
   * derive: [Explorer Serve Verification](#explorer-serve-verification)
   * derive: [Export Command Verification](#export-command-verification)
   * derive: [Mobile Responsiveness Verification](#mobile-responsiveness-verification)
-  * derive: [Model Containment Attachment Links Verification](#model-containment-attachment-links-verification)
+  * derive: [Model Containment Reused Contract Context Links Verification](#model-containment-reused-contract-context-links-verification)
   * derive: [Model View Element Navigation Test](#model-view-element-navigation-test)
   * derive: [Ontology Model Viewer Analysis Verification](#ontology-model-viewer-analysis-verification)
   * derive: [Responsive Design Verification](#responsive-design-verification)
@@ -22,28 +22,28 @@ This objective groups verification that the served Web Explorer renders model da
   * derive: [SPA Explorer Store Contract Verification](#spa-explorer-store-contract-verification)
 ---
 
-### Attachment Link Serving Verification
+### Reused Contract Context Link Serving Verification
 
-This test verifies that the served Explorer preserves attachment identifier links to referenced refinement elements.
+This test verifies that the served Explorer preserves reused_contract_context identifier links to referenced contract elements.
 
 #### Details
 
 ##### Acceptance Criteria:
-- System shall preserve all refinement-identifier attachments referenced by elements
-- Attachment identifier links shall resolve to referenced refinement elements in Explorer content and element detail workflows
-- Duplicate attachments (same refinement referenced multiple times) shall be processed consistently
+- System shall preserve all contract-identifier reused_contract_context referenced by elements
+- Reused Contract Context identifier links shall resolve to referenced contract elements in Explorer content and element detail workflows
+- Duplicate reused_contract_context (same contract referenced multiple times) shall be processed consistently
 
 ##### Test Criteria:
-- Create model with elements having attachments
+- Create model with elements having reused_contract_context
 - Run the Explorer through the serve workflow or a Project Store fixture
-- Verify attachment links resolve to refinement element records and source anchors
+- Verify reused_contract_context links resolve to contract element records and source anchors
 - Verify identifier targets are navigable from rendered content routes and element modals
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Attachment Link Serving](../../../Interfaces/WebExplorer/Capabilities.md#attachment-link-serving)
+  * verify: [Reused Contract Context Link Serving](../../../Interfaces/WebExplorer/Capabilities.md#reused-contract-context-link-serving)
 ---
 
 ### Component Reuse Verification
@@ -64,32 +64,32 @@ Expected checks:
   * verify: [Component-Based Explorer Architecture](../../../Interfaces/WebExplorer/ExplorerRendering.md#component-based-explorer-architecture)
 ---
 
-### Diagram Attachment Display Verification
+### Diagram Reused Contract Context Display Verification
 
-This test verifies that diagrams display attachment links within element boxes.
+This test verifies that diagrams display reused_contract_context links within element boxes.
 
 #### Details
 
 ##### Acceptance Criteria:
-- Element boxes in diagrams shall include attached refinement element names
-- Attachments shall be prefixed with paperclip icon (📎)
-- Attachments shall appear below element name using line breaks
-- Attachment display shall not break diagram rendering
-- Model and Traces diagram labels shall not expose full `file#fragment` attachment identifiers as visible node text
+- Element boxes in diagrams shall include reused contract element names
+- Reused Contract Context shall be prefixed with paperclip icon (📎)
+- Reused Contract Context shall appear below element name using line breaks
+- Reused Contract Context display shall not break diagram rendering
+- Model and Traces diagram labels shall not expose full `file#fragment` reused_contract_context identifiers as visible node text
 
 ##### Test Criteria:
-- Create model with element having attachments
+- Create model with element having reused_contract_context
 - Generate diagram (format or model command)
-- Verify Mermaid output contains multiline labels with attachments
-- Verify attached refinement element names appear with 📎 prefix
-- Verify Model route/source content and Traces route data use compact attachment labels and still render Mermaid containers for the final graph where Mermaid output is present
-- Verify diagram renders correctly with attachment labels
+- Verify Mermaid output contains multiline labels with reused_contract_context
+- Verify reused contract element names appear with 📎 prefix
+- Verify Model route/source content and Traces route data use compact reused_contract_context labels and still render Mermaid containers for the final graph where Mermaid output is present
+- Verify diagram renders correctly with reused_contract_context labels
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Diagram Attachment Display](../../../Interfaces/WebExplorer/Capabilities.md#diagram-attachment-display)
+  * verify: [Diagram Reused Contract Context Display](../../../Interfaces/WebExplorer/Capabilities.md#diagram-reused-contract-context-display)
 ---
 
 ### Explorer Serve Verification
@@ -116,7 +116,7 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 - Command exits with success (0) return code
 - The served root URL returns `index.html`
 - `/assets/project-store.js` contains an Explorer Project Store seed
-- The Project Store seed includes required sections for files, resources, elements, relations, attachments, concept references, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes
+- The Project Store seed includes required sections for files, resources, elements, relations, reused_contract_context, concept references, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes
 - The Project Store seed distinguishes modeled file containers from modeled resources/evidence files
 - Project Store file records include normalized source Markdown content derived from the registry for modeled files and raw source-preview content for existing registry-linked local resources
 - Relation-backed local resource targets are present as resources with source-preview content when the local file exists, and existing resource-only paths appear in the Project Store `files` and `folders` hierarchy under their full repository-relative path
@@ -183,28 +183,28 @@ Expected checks:
   * verify: [Responsive Explorer Rendering](../../../Interfaces/WebExplorer/ExplorerRendering.md#responsive-explorer-rendering)
 ---
 
-### Model Containment Attachment Links Verification
+### Model Containment Reused Contract Context Links Verification
 
-This test verifies that the served Explorer Model containment data preserves attachment links from modeled elements to referenced refinement elements.
+This test verifies that the served Explorer Model containment data preserves reused_contract_context links from modeled elements to referenced contract elements.
 
 #### Details
 
 ##### Acceptance Criteria:
-- Elements with attachments shall expose attachment records or equivalent Project Store containment attachment records
-- Element attachment records that target refinement elements shall use the shared Explorer element-role and subtype glyph contract rather than a report-specific symbol
-- Element attachments shall be clickable from supported Explorer surfaces and navigate to the referenced element detail/source route
+- Elements with reused_contract_context shall expose reused_contract_context records or equivalent Project Store containment reused_contract_context records
+- Element reused_contract_context records that target contract elements shall use the shared Explorer element-role and subtype glyph contract rather than a report-specific symbol
+- Element reused_contract_context shall be clickable from supported Explorer surfaces and navigate to the referenced element detail/source route
 
 ##### Test Criteria:
-- Create model with element having attachments
+- Create model with element having reused_contract_context
 - Run the Explorer through the serve workflow or a Project Store fixture
-- Verify Model List/Grid data contains attachment records or equivalent Project Store containment attachment records
-- Verify attachment-element records have links to element definitions or element-detail routes
+- Verify Model List/Grid data contains reused_contract_context records or equivalent Project Store containment reused_contract_context records
+- Verify reused-contract-context-element records have links to element definitions or element-detail routes
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Containment View Attachment Links](../../../Interfaces/WebExplorer/Capabilities.md#containment-view-attachment-links)
+  * verify: [Containment View Reused Contract Context Links](../../../Interfaces/WebExplorer/Capabilities.md#containment-view-reused-contract-context-links)
 ---
 
 ### Model View Element Navigation Test
@@ -235,6 +235,7 @@ This analysis verifies that the Ontologies page behaves as an ontology model vie
 #### Details
 Expected analysis checks:
 - Confirm the primary Ontologies visualization, search data, and ontology node modal construct metadata are built from `SemanticIndex.ontology_projection`, the same generated ontology construct projection used by full semantic export.
+- Confirm ontology graph data includes explicit `authored`, `reqvire-context`, and `external-source` layer semantics; authored ontology/projection facts are enabled by default, generated semantic context is hidden until its layer is enabled and is limited to model-to-term `declaresTerm` and `referencesTerm` provenance, and external-source vocabulary is a separate opt-in layer.
 - Confirm the primary viewer does not render `rdf:type` edges, OWL/RDFS metaclass nodes, RDF list plumbing, anonymous SHACL property-shape blank nodes, or generic literal plumbing as the main user-facing graph.
 - Confirm classes, object properties, datatype properties, RDF properties, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources are classified into distinct semantic kinds when present, while property terms are projected as graph relationship semantics rather than standalone graph nodes.
 - Confirm datatype-property literal values are not graph nodes or visibility filter layers, but remain searchable and appear in the selected subject node modal as predicate/value evidence.
@@ -244,10 +245,10 @@ Expected analysis checks:
 - Confirm object and datatype properties are first-class relationship semantics with aggregated domain and range information rendered as labeled links and modal property usage evidence, not as standalone graph nodes.
 - Confirm SHACL node-shape target classes and property usage rows receive derived slot/facet modal sections from property-shape paths, datatype/class range constraints, node kind, cardinality, pattern, allowed values, and source-shape evidence.
 - Confirm target-class slot/facet sections are labeled as class slots, property usage sections are labeled as usages of the selected property by target classes, and repeated usages with different target classes or source shapes are not presented as duplicate property definitions.
-- Confirm raw SHACL evidence is shown only when direct raw constraints are attached to the inspected node and that classes or property metadata with only normalized SHACL overlays do not show an empty raw-evidence section.
+- Confirm raw SHACL evidence is shown only when direct raw constraints are reused to the inspected node and that classes or property metadata with only normalized SHACL overlays do not show an empty raw-evidence section.
 - Confirm equivalence groups use stable deterministic identifiers derived from canonical member lists.
 - Confirm domain/range, subclass/member-of, disjointness, equivalence groups, inverse properties, property chains, property characteristics, class-expression/restriction constructs, SHACL overlays, provenance/source citations, and symbols are represented from generated semantic projection constructs when present in the ontology input.
-- Confirm class-expression nodes used as property domain/range expressions display contextual labels for actual union-valued ontology constraints while preserving expression members and property usage evidence in the ontology node modal, and confirm `define` does not render as a `Capability ∪ Requirement` range expression because refinement ownership is requirement-only.
+- Confirm class-expression nodes used as property domain/range expressions display contextual labels for actual union-valued ontology constraints while preserving expression members and property usage evidence in the ontology node modal, and confirm `define` does not render as a `Capability ∪ Requirement` range expression because contract ownership is requirement-only.
 - Confirm ontology viewer symbols are defined with semantic meaning, raw Unicode code point, rendered Unicode character, allowed viewer usage, tooltip text, and accessible labels.
 - Confirm ontology modal badges render the symbol and semantic label without rendering the raw Unicode code point as visible badge text, and that visible badge labels prefer domain wording such as `Subclass`.
 - Confirm subclass and membership badges are directional and are not mirrored onto superclass or class-object nodes solely because those nodes are construct targets.
@@ -275,6 +276,7 @@ Expected analysis checks:
 - Confirm the Ontologies and Model/project graph left legend/filter panels use the shared graph control width and selected-control treatment: active controls use selected-control background/foreground tokens and inactive/hover controls use shared warm-neutral surface tokens.
 - Confirm selected Model Graph nodes expose a selected-element link in the left Explorer pane that opens the shared element-detail modal, and selected Ontologies graph nodes expose a selected ontology-node link in the left Explorer pane that opens the ontology element modal.
 - Confirm the detailed semantic type color key and construct notation key are passive, while the `Show` group contains the active role and relation visibility controls.
+- Confirm Ontologies left-pane overlay controls expose only Semantic Context and External Sources as active overlay filters with node counts, do not expose Authored as a layer row or toggle, and that toggling overlay controls changes graph visibility without changing ontology node modal evidence for selected authored nodes.
 - Confirm the passive type legend exposes separate color swatches only for semantic kinds that can render as nodes, including classes, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources; property kinds remain visible through property links, modal badges, search metadata, and relation visibility controls.
 - Confirm the `Show` visibility group exposes one shared button design for datatype property links, object property links, class disjointness, restrictions, class expressions, SHACL shapes, resources, and external references without replacing Reqvire's richer passive type and notation legends, and that active means shown on the canvas.
 - Confirm ontology terms and class-membership context are not exposed as hideable toggles, property links are controlled through datatype-property and object-property visibility controls, and the single SHACL shapes role filter controls both SHACL shape nodes and SHACL overlay relations.
@@ -328,7 +330,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - The served shell shall reference local compiled bundle, stylesheet, design-system, and font assets with no CDN-loaded framework, no CDN-loaded styling runtime, and no runtime CSS compiler.
 - The Project Store seed shall be present before view rendering and shall include a schema/version marker.
 - The Project Store `project` section shall include repository and branch metadata when Git metadata is available, and the Model tree root shall render that identity instead of a generic `Project` label.
-- The store shall expose normalized top-level sections for project, folders, files, resources, elements, relations, attachments, concept references, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes.
+- The store shall expose normalized top-level sections for project, folders, files, resources, elements, relations, reused_contract_context, concept references, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes.
 - File containers and modeled resources shall be represented as separate record families with explicit cross-references when the same path appears in both roles.
 - Route definitions shall include canonical hash routes for current views and element/file/search detail workflows.
 - Element-detail routes shall open a Project Store-backed scrollable modal/dialog in the Explorer shell instead of using the source content route as the primary element navigation target.
@@ -341,19 +343,19 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - Missing or malformed store seed data shall be detectable by automated checks and visible to users as an Explorer diagnostic.
 
 ##### Test Criteria:
-- Run `reqvire serve` on a minimal model with at least one capability, requirement, verification relation, satisfiedBy evidence file, attachment or concept-reference fact, and ontology term when available.
+- Run `reqvire serve` on a minimal model with at least one capability, requirement, verification relation, satisfiedBy evidence file, reused_contract_context or concept-reference fact, and ontology term when available.
 - Run the Explorer component/unit tests that cover element-detail modal back context rendering and resolved concept-reference ontology modal routing.
 - Parse the generated store seed from `index.html` or its referenced static asset.
 - Assert all required top-level store sections exist.
 - Assert the `project` section exposes repository and branch metadata when running from a Git repository, and that Explorer tree roots render the combined repository/branch label.
 - Assert at least one Markdown source path appears in `files`.
-- Assert at least one implementation or evidence path referenced by `satisfiedBy`, `trace`, or an attachment appears in `resources`.
+- Assert at least one implementation or evidence path referenced by `satisfiedBy` or reused_contract_context appears in `resources`.
 - Assert `files` records carry source navigation metadata while `resources` records carry referring-fact evidence.
 - Assert canonical routes include primary `#/model`, specialist `#/ontologies` and `#/traces`, and supporting `#/files`, `#/files/<path>`, `#/coverage`, `#/resources`, `#/elements/<identifier>`, and `#/search`; do not require a separate Containment route or a separate Knowledge Graph route/page file.
 - Assert at least one Explorer element link or search result targets `#/elements/<identifier>` and that the element-detail UI contains a modal/dialog marker plus a secondary source link.
-- Assert element-detail modal headers render the actual element type as the only visible type badge; for example a `behavior` element shall not also show a separate `refinement` badge.
+- Assert element-detail modal headers render the actual element type as the only visible type badge; for example a `behavior` element shall not also show a separate `contract` badge.
 - Assert the Model view List/Grid modes render from Project Store `folders` and `files` without an iframe or third-party file-manager widget, expose breadcrumb navigation, sortable file rows, grid cards, central workspace search, icon/color legends, source-page secondary actions, and modeled-element rows that open the shared element-detail modal. Assert clicking anywhere on a Grid mode folder/file card opens or selects that card's item, while the source-page secondary action remains a separate control. Assert `#/files` and `#/files/<path>` deep-link into that behavior without creating a separate primary Filesystem view.
-- Assert the Model tree, grid cards, modeled-element lists, relation/attachment endpoints, and element legends use the shared Explorer `ElementIcon` type glyphs, that capability, semantic-contract, and verification-objective elements use their own role colors as plain squares with no glyph, that verification-objective uses the darker verification-objective token distinct from concrete verification, that concept-reference targets use the resource/amber treatment, that evidence-file artifacts use the neutral/default treatment, and that refinement-family subtypes keep the shared refinement color while rendering distinct glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
+- Assert the Model tree, grid cards, modeled-element lists, relation/reused_contract_context endpoints, and element legends use the shared Explorer `ElementIcon` type glyphs, that capability, semantic-contract, and verification-objective elements use their own role colors as plain squares with no glyph, that verification-objective uses the darker verification-objective token distinct from concrete verification, that concept-reference targets use the resource/amber treatment, that evidence-file artifacts use the neutral/default treatment, and that contract-family subtypes keep the shared contract color while rendering distinct glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
 - Assert selecting a folder, file, or modeled element in the left Model project tree updates the active Model workspace mode: List/Grid browse the selected folder or file, Graph focuses the matching graph node when one exists, and modeled-element rows open the shared element-detail modal without leaving the Model workspace.
 - Assert the Search route's left-pane result-type controls do not render a duplicate passive legend for the same result-type colors and labels.
 - Assert the Coverage route's left Explorer pane renders the coverage explorer section rows with counts, that selecting a row scrolls or selects the matching central Coverage section, and that the left pane does not duplicate the Coverage dashboard summaries or legend content.

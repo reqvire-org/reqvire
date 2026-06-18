@@ -36,7 +36,7 @@ A requirement to be linked/unlinked.
 #### Relations
   * derive: [No Relations Requirement](#no-relations-requirement)
   * derivedFrom: [System Requirements](#system-requirements)
-  * trace: [https://example.com/spec.html](https://example.com/spec.html)
+  * satisfiedBy: [https://example.com/spec.html](https://example.com/spec.html)
   * verifiedBy: [Capability Test](Verifications.md#capability-test)
 ---
 

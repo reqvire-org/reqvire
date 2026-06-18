@@ -129,7 +129,7 @@ test_json_output "merge" "merge.json" merge "Test Verification Alpha" "Test Veri
 
 test_json_output "mv-file" "mv-file.json" mv-file "specifications/Requirements.md" "specifications/Moved.md" --dry-run
 
-test_json_output "link" "link.json" link "Test Requirement Beta" trace "https://example.com/trace" --dry-run
+test_json_output "link" "link.json" link "Test Requirement Beta" satisfiedBy "https://example.com/evidence" --dry-run
 
 test_json_output "unlink" "unlink.json" unlink "Test Verification Alpha" "Test Requirement Alpha" --dry-run
 

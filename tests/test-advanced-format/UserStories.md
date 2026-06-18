@@ -32,7 +32,6 @@ As an **System Engineer**, I want to manage MBSE models effectively, so that I c
   * type: requirement
 #### Relations
   * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
 * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
 
 ### Generate Diagrams
@@ -42,7 +41,6 @@ As a **System Engineer**, I want to generate diagrams for different system viewp
   * type: requirement
 #### Relations
   * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
 
 ---
 

@@ -45,11 +45,11 @@ The system shall provide the capability to create new model elements by acceptin
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
-  * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
+  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
+  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
   * [Element Type Metadata Specification](../../ModelStructure/Specifications.md#element-type-metadata-specification)
 
 #### Relations
@@ -91,11 +91,11 @@ The system shall persist all element manipulation operations to the source files
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
 
 #### Relations
-  * definedBy: [Element Manipulation File Persistence Refinement Specification](Specifications.md#element-manipulation-file-persistence-refinement-specification)
+  * definedBy: [Element Manipulation File Persistence Contract Specification](Specifications.md#element-manipulation-file-persistence-contract-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
@@ -104,7 +104,7 @@ The system shall persist all element manipulation operations to the source files
 
 ### Merge Element Operation
 
-The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and attachments while enforcing type compatibility and removing source elements after successful merge.
+The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and reused_contract_context while enforcing type compatibility and removing source elements after successful merge.
 
 #### Details
 When the merge target is a `# Element` model file element, the operation shall preserve the `# Element` file format and keep the result as a single-element file.
@@ -114,9 +114,9 @@ When the target is an ontology element, the operation shall preserve the target 
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
+#### Reused Contract Context
+  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
+  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
 
 #### Relations
   * definedBy: [Merge Content Transformation Behavior](Behaviors.md#merge-content-transformation-behavior)
@@ -140,7 +140,7 @@ The operation shall reject moves into an existing `# Element` file when that mov
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
 
@@ -165,11 +165,11 @@ When `--squash` is requested, the operation shall reject squashing into an exist
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Target Location Constraint](Constraints.md#target-location-constraint)
 
 #### Relations
-  * definedBy: [Move File Operation Refinement Specification](Specifications.md#move-file-operation-refinement-specification)
+  * definedBy: [Move File Operation Contract Specification](Specifications.md#move-file-operation-contract-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
@@ -183,13 +183,13 @@ When `--squash` is requested, the operation shall reject squashing into an exist
 The system shall maintain bidirectional relation consistency when elements are manipulated, ensuring that forward and backward relations remain synchronized.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Relation Consistency Maintenance Refinement Specification](Specifications.md#relation-consistency-maintenance-refinement-specification)
+  * definedBy: [Relation Consistency Maintenance Contract Specification](Specifications.md#relation-consistency-maintenance-contract-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Relation Consistency Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#relation-consistency-test)
@@ -200,13 +200,13 @@ Implementation details shall follow the associated refinement specifications.
 The system shall provide the capability to rename existing model elements by changing their heading text while updating all relation references and the registry.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Rename Element Operation Refinement Specification](Specifications.md#rename-element-operation-refinement-specification)
+  * definedBy: [Rename Element Operation Contract Specification](Specifications.md#rename-element-operation-contract-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
@@ -223,7 +223,7 @@ The system shall define target location validation constraints.
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Ignore Files Specification](../../ModelStructure/Specifications.md#ignore-files-specification)
   * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
 

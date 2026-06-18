@@ -48,7 +48,7 @@ npx -y @reqvire-org/reqvire@latest --workspace /path/to/repository mcp`}</CodeBl
       <Section title="Core Commands">
         <CommandList
           items={[
-            { cmd: "reqvire validate", desc: "Parse and validate model structure, relations, attachments, ontology, and semantic contracts." },
+            { cmd: "reqvire validate", desc: "Parse and validate model structure, relations, Reused Contract Context, ontology, and semantic contracts." },
             { cmd: "reqvire format", desc: "Preview canonical formatting, ordering, and relation layout." },
             { cmd: "reqvire format --fix", desc: "Apply formatting fixes." },
             { cmd: "reqvire lint", desc: "Find model quality issues such as redundant relations and cross-boundary hierarchy problems." },
@@ -125,16 +125,16 @@ reqvire rm-asset docs/obsolete-auth-flow.pdf --dry-run`}</CodeBlock>
         </div>
       </Section>
 
-      <Section title="Linking and Attachments">
+      <Section title="Linking and Reused Contract Context">
         <p className="text-zinc-600 mb-4">
-          The link and unlink commands manage both relations and attachments.
-          Attachments use a distinct command form so cross-subgraph contract
-          dependencies stay visible.
+          The link and unlink commands manage both relations and Reused Contract
+          Context. Reused context uses the `reusesContract` command form so
+          cross-subgraph contract dependencies stay visible.
         </p>
         <CodeBlock>{`reqvire link "Authentication" "specifiedBy" "Authentication Requirement"
 reqvire link "Authentication Requirement" "verifiedBy" "Auth Test Case"
 reqvire link "System Requirement" "satisfiedBy" "src/auth/login.rs"
-reqvire link "Performance Requirement" attaching "#rate-limiting-constraint"
+reqvire link "Performance Requirement" reusesContract "#rate-limiting-constraint"
 
 reqvire unlink "Authentication Requirement" "Auth Test Case"
 reqvire unlink "Performance Requirement" "#rate-limiting-constraint"
@@ -167,7 +167,7 @@ reqvire lint --json --output reports/lint.json`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           Search is the fastest way to inspect a large model. Collect gathers an
           element and related upstream or downstream context with source
-          citations, including attachment contents.
+          citations, including reused contract context.
         </p>
         <CodeBlock>{`reqvire search --filter-type requirement --short
 reqvire search --filter-type capability,requirement --filter-name ".*auth.*"
@@ -210,7 +210,7 @@ reqvire submodels --json --output reports/submodels.json`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           Change impact turns repository diffs into a review queue. Use it to
           find changed requirements, affected descendants, linked verifications,
-          attached contracts, satisfied implementation artifacts, and governance
+          reused contracts, satisfied implementation artifacts, and governance
           context that should guide review order.
         </p>
         <CodeBlock>{`reqvire change-impact
@@ -224,7 +224,7 @@ reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
           <BulletList
             items={[
               "Start with changed high-risk or critical requirements.",
-              "Review attached contracts and child requirements before treating a change as isolated.",
+              "Review reused contracts and child requirements before treating a change as isolated.",
               "Use traces to find verification evidence that must be rerun or hardened.",
               "Use coverage to confirm affected obligations still have implementation or evidence links.",
             ]}

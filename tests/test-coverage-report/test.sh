@@ -178,13 +178,13 @@ if ! echo "$OUTPUT" | jq '.summary.coverage_sources | has("direct_satisfied")' |
     exit 1
 fi
 
-if ! echo "$OUTPUT" | jq '.summary.coverage_sources | has("refinement_contract_satisfied_via_attachment")' | grep -q true; then
-    echo "❌ FAILED: JSON summary coverage_sources missing 'refinement_contract_satisfied_via_attachment'"
+if ! echo "$OUTPUT" | jq '.summary.coverage_sources | has("contract_satisfied_via_reused_contract_context")' | grep -q true; then
+    echo "❌ FAILED: JSON summary coverage_sources missing 'contract_satisfied_via_reused_contract_context'"
     exit 1
 fi
 
-if ! echo "$OUTPUT" | jq '.summary.coverage_sources | has("refinement_contract_satisfied_via_child")' | grep -q true; then
-    echo "❌ FAILED: JSON summary coverage_sources missing 'refinement_contract_satisfied_via_child'"
+if ! echo "$OUTPUT" | jq '.summary.coverage_sources | has("contract_satisfied_via_child")' | grep -q true; then
+    echo "❌ FAILED: JSON summary coverage_sources missing 'contract_satisfied_via_child'"
     exit 1
 fi
 

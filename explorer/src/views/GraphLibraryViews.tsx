@@ -26,7 +26,7 @@ type RelationCategory =
   | "define"
   | "verify"
   | "satisfy"
-  | "attach"
+  | "reuse"
   | "concept-reference"
   | "trace";
 
@@ -54,7 +54,7 @@ function roleColor(kind: string) {
 function relationCategory(edge: Pick<GraphEdge, "label" | "kind">): RelationCategory {
   const label = String(edge.label || "").toLowerCase();
   const kind = String(edge.kind || "").toLowerCase();
-  if (kind === "attachment" || label === "attaches") return "attach";
+  if (kind === "reused_contract_context" || label === "reuses contract") return "reuse";
   if (kind === "concept-reference" || label === "conceptref") return "concept-reference";
   if (label.includes("derive")) return "derive";
   if (label.includes("specif")) return "specify";
@@ -65,8 +65,17 @@ function relationCategory(edge: Pick<GraphEdge, "label" | "kind">): RelationCate
   return "trace";
 }
 
+function displayEdgeLabel(edge: Pick<GraphEdge, "label" | "kind">): string {
+  const label = String(edge.label || "");
+  const kind = String(edge.kind || "").toLowerCase();
+  if (kind === "reused_contract_context" || label.toLowerCase() === "reuses contract") {
+    return "reused context";
+  }
+  return label;
+}
+
 function overlayVisible(category: RelationCategory, activeOverlays: Set<OverlayKey>) {
-  if (category === "attach" || category === "concept-reference") {
+  if (category === "reuse" || category === "concept-reference") {
     return activeOverlays.has("cross");
   }
   if (category === "verify" || category === "satisfy") {
@@ -293,8 +302,8 @@ export function KnowledgeGraphView({
         graph?.addDirectedEdgeWithKey(`e${index}`, edge.source, edge.target, {
           ...edge,
           type: "arrow",
-          label: edge.label,
-          size: edge.kind === "attachment" || edge.kind === "concept-reference" ? 0.8 : 1.1,
+          label: displayEdgeLabel(edge),
+          size: edge.kind === "reused_contract_context" || edge.kind === "concept-reference" ? 0.8 : 1.1,
           color: mutedHexColor(),
           hidden: !visibleEdge(edge),
         });
@@ -321,8 +330,8 @@ export function KnowledgeGraphView({
         graph?.addDirectedEdgeWithKey(key, edge.source, edge.target, {
           ...edge,
           type: "arrow",
-          label: edge.label,
-          size: edge.kind === "attachment" || edge.kind === "concept-reference" ? 0.8 : 1.1,
+          label: displayEdgeLabel(edge),
+          size: edge.kind === "reused_contract_context" || edge.kind === "concept-reference" ? 0.8 : 1.1,
           color: mutedHexColor(),
           hidden: !visibleEdge(edge),
         });

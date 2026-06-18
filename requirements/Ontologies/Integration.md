@@ -69,9 +69,6 @@ reqvire:commentStyleName a owl:DatatypeProperty ;
 reqvire:satisfiesTraceabilityRelationKind a reqvire:TraceabilityRelationKind ;
   reqvire:traceabilityRelationKindName "satisfies" ;
   rdfs:comment "Code marker relation kind that links implementation content to a requirement it satisfies." .
-reqvire:traceTraceabilityRelationKind a reqvire:TraceabilityRelationKind ;
-  reqvire:traceabilityRelationKindName "trace" ;
-  rdfs:comment "Code marker relation kind that creates documentation traceability without satisfaction semantics." .
 
 reqvire:lineHashCommentStyle a reqvire:CommentStyleKind ;
   reqvire:commentStyleName "hash-line" ;
@@ -146,7 +143,7 @@ reqvire:TraceabilityRelationKindShape
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("satisfies" "trace") ;
+    sh:in ("satisfies") ;
     sh:message "Traceability relation kinds must use a supported code marker relation token." ;
   ] .
 

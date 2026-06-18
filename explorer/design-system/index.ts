@@ -102,7 +102,7 @@ export type { TreeItemProps } from "./components/navigation/TreeItem";
 
 export {
   AppShell,
-  AttachmentList,
+  ReusedContractContextList,
   CodeBody,
   CodePreviewFrame,
   CodeToolbar,
@@ -217,12 +217,12 @@ export {
 } from "./product-patterns";
 export type {
   AppShellProps,
-  AttachmentListProps,
+  ReusedContractContextListProps,
   CodeBodyProps,
   CodePreviewFrameProps,
   CodeToolbarProps,
   ConceptReferenceListProps,
-  DetailAttachmentItem,
+  DetailReusedContractContextItem,
   DetailConceptReferenceItem,
   DetailDialogProps,
   DetailMetaBadge,

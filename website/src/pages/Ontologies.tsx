@@ -41,9 +41,9 @@ export default function Ontologies() {
             "Author shared ontology elements under the ontology plane, commonly requirements/Ontologies.",
             "Capabilities, requirements, contracts, verification objectives, and concrete verifications use Concept References for ontology term bindings.",
             "Semantic contracts do not author Concept References; they use ontology through explicit use relations.",
-            "Requirement attachments are for reusable requirement-owned non-semantic-contract contracts.",
+            "Reused Contract Context is for reusable requirement-owned contracts from other subgraphs.",
             "Ontology hierarchy uses derive or derivedFrom only with other ontology elements.",
-            "Ontology elements do not author attachments.",
+            "Ontology elements do not author Reused Contract Context.",
           ]}
         />
       </Section>
@@ -116,6 +116,31 @@ The system shall reject API requests whose access token is invalid.
   * specify: [API Authentication](#api-authentication)`}</CodeBlock>
       </Section>
 
+      <Section title="External Ontology Sources">
+        <p className="text-zinc-600 mb-4">
+          Ontology elements can declare pinned local Turtle files for external
+          vocabularies that are not authored by the Reqvire model. These files
+          are loaded for validation and can be included in semantic exports on
+          demand.
+        </p>
+        <BulletList
+          items={[
+            "Use External Ontology sections only on ontology elements.",
+            "The source must be a local .ttl/Turtle file; Reqvire does not fetch remote ontology URLs during validation.",
+            "Authored Turtle and SHACL blocks still declare their own prefixes explicitly. External source sections do not inject hidden Turtle.",
+            "OWL/RDF/RDFS/XSD reserved vocabulary and built-in datatypes are recognized by Reqvire without local External Ontology declarations.",
+          ]}
+        />
+        <div className="mt-4">
+          <CodeBlock>{`#### External Ontology
+  * prefix: ext
+  * namespace: https://example.org/external#
+  * resource: https://example.org/external
+  * source: references/ontologies/external.ttl
+  * format: turtle`}</CodeBlock>
+        </div>
+      </Section>
+
       <Section title="Semantic Contracts">
         <p className="text-zinc-600 mb-4">
           Semantic contracts are reusable SHACL profiles that explicitly use
@@ -185,17 +210,21 @@ auth:AccessTokenValidationShape
           The ontology command collects authored ontology and SHACL content by
           default. That default output is the reusable semantic vocabulary
           document. Full mode adds generated Reqvire model context triples for
-          downstream graph/database consumers, including relations,
-          attachments, concept references, term declarations, shape references,
-          and ontology projection facts.
+          downstream graph/database consumers, including relations, Reused
+          Contract Context entries, concept references, term declarations, shape
+          references, and ontology projection facts.
         </p>
         <BulletList
           items={[
             "Use reqvire ontologies when a tool needs the clean ontology and SHACL document.",
+            "Use reqvire ontologies --include-external when the exported graph should include local external ontology source triples.",
             "Use reqvire ontologies --full when a graph/database should also know which model elements reference ontology terms.",
+            "Use reqvire ontologies --full --include-external when a graph/database should receive authored triples, external source triples, model context, and generated ontology projection facts.",
             "Use reqvire.semantic.ontologies through MCP with content set to rdf, shacl, or both when an assistant needs only part of the semantic document.",
             "Use reqvire.semantic.prefixes through MCP when an assistant needs ontology-defined namespaces and source prose before writing SPARQL.",
+            "Use reqvire.semantic.vocabulary through MCP when an assistant needs paged classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source maps, diagnostics, and prefixes before writing SPARQL.",
             "Use reqvire.semantic.sparql through MCP when an assistant needs to query the model-owned Oxigraph semantic store directly.",
+            "Use MCP prompts such as reqvire.semantic.query when an assistant needs query-construction guidance before calling vocabulary, prefix, or SPARQL tools.",
             "Concept References appear in full export as model-context facts such as conceptReference and referencesTerm; they do not rewrite authored OWL/SHACL semantics.",
             "Concept References are model-context term-reference edges, not generated OntologyConstruct records. OntologyConstruct is reserved for projected OWL/RDFS/SHACL patterns such as subclass, membership, restriction, property-chain, inverse-property, and shape-overlay constructs.",
           ]}
@@ -204,12 +233,19 @@ auth:AccessTokenValidationShape
 reqvire ontologies --output ontologies.ttl
 reqvire ontologies --jsonld --output ontologies.jsonld
 reqvire ontologies --full
+reqvire ontologies --include-external
+reqvire ontologies --full --include-external
 
 # MCP tool
 reqvire.semantic.ontologies({ "format": "turtle", "content": "both", "full": true })
 reqvire.semantic.ontologies({ "content": "shacl" })
 reqvire.semantic.prefixes()
-reqvire.semantic.sparql({ "query": "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 20" })`}</CodeBlock>
+reqvire.semantic.vocabulary({ "section": "relation_families", "limit": 50 })
+reqvire.semantic.sparql({ "query": "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 20" })
+
+# MCP prompts
+prompts/list
+prompts/get({ "name": "reqvire.semantic.query" })`}</CodeBlock>
       </Section>
 
       <Footer />

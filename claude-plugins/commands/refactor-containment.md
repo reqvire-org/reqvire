@@ -90,7 +90,7 @@ Return a concrete plan grouped by operation type:
 - **Move files** with `mv-file`.
 - **Move elements** with `mv`.
 - **Rewrite relations** with `link`, `unlink`, or `relink`.
-- **Add attachments** where cross-subgraph context must be preserved.
+- **Add reused_contract_context** where cross-subgraph context must be preserved.
 - **Leave in place** when current containment is valid and moving would only create churn.
 
 Flag high-risk changes:
@@ -130,14 +130,14 @@ Final report should include:
 
 - files moved,
 - elements moved,
-- relations or attachments changed,
+- relations or reused_contract_context changed,
 - intentional exceptions to the recommended structure,
 - validation/lint/coverage status.
 
 ## Guardrails
 
 - Do not change requirements intent during containment refactors.
-- Do not use folder paths as a substitute for `specify`, `define`, `verify`, or attachments.
+- Do not use folder paths as a substitute for `specify`, `define`, `verify`, or reused_contract_context.
 - Do not force example area names like `Product/` or `Platform/` if the project already has clearer stable names.
 - Do not move ontology into capability folders.
 - Do not move shared architecture content blindly; extract reusable meaning to ontology or reusable contracts when needed.

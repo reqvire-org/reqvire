@@ -28,7 +28,7 @@ This is a valid capability that serves as a parent.
   * type: requirement
 #### Relations
   * specify: [Test Capability](#test-capability-test-invalid-relations-pass2-errors-specifications-requirements-md)
-  * trace: [ValidImplementation.txt](ValidImplementation.txt)
+  * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
 

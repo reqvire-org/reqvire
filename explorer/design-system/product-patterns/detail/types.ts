@@ -24,7 +24,7 @@ export interface DetailRelationItem {
   target: DetailRelationEndpointData;
 }
 
-export interface DetailAttachmentItem {
+export interface DetailReusedContractContextItem {
   id: string;
   targetId: string;
   kind: string;

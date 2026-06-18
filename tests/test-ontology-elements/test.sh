@@ -157,16 +157,16 @@ assert_invalid_model "must not contain a #### Shapes section"
 write_model << 'EOF'
 # Elements
 
-### Ontology With Attachments
+### Ontology With Reused Contract Context
 
-Ontology with attachments.
+Ontology with reused_contract_context.
 
 #### Metadata
   * type: ontology
   * ontology_base: https://example.test/ontology
   * ontology_prefix: testonto
 
-#### Attachments
+#### Reused Contract Context
   * [Other Ontology](#other-ontology)
 
 #### Ontology
@@ -187,7 +187,7 @@ Other ontology.
   * ontology_prefix: testonto
 
 #### Relations
-  * derivedFrom: [Ontology With Attachments](#ontology-with-attachments)
+  * derivedFrom: [Ontology With Reused Contract Context](#ontology-with-reused_contract_context)
 
 #### Ontology
 ```turtle
@@ -197,6 +197,6 @@ other:Thing a owl:Class .
 ```
 ---
 EOF
-assert_invalid_model "cannot have attachments"
+assert_invalid_model "cannot have reused_contract_context"
 
 exit 0

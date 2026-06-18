@@ -1,6 +1,7 @@
 import { css, cx } from "@linaria/atomic";
 import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from "react";
 import { Badge } from "../core/Badge";
+import { TokenSwatch } from "../data/TokenVisual";
 import type { DesignSystemColorToken } from "../../palette";
 
 const baseUX = css`
@@ -23,11 +24,12 @@ const baseUX = css`
 
   .ds-togglerow__swatch {
     flex: none;
+    --ds-token-swatch-size: var(--ds-togglerow-swatch-size, var(--icon-xs));
     width: var(--ds-togglerow-swatch-w, var(--icon-xs));
     height: var(--ds-togglerow-swatch-h, var(--icon-xs));
     border-radius: var(--radius-xs);
-    background: var(--ds-togglerow-swatch-color, transparent);
-    border-color: var(--ds-togglerow-swatch-color, transparent);
+    background: var(--ds-token-swatch-color, transparent);
+    border-color: var(--ds-token-swatch-color, transparent);
     box-shadow: inset 0 0 0 var(--border-w) var(--control-swatch-ring);
   }
 
@@ -75,6 +77,11 @@ const skinX = css`
   border-radius: var(--ds-togglerow-radius, 0);
   box-shadow: var(--ds-togglerow-shadow, none);
 
+  &.is-on:not(.ds-togglerow--static) {
+    color: var(--ds-togglerow-on-color, var(--text-strong));
+    background: var(--ds-togglerow-on-bg, var(--bg-selected));
+  }
+
   &:hover {
     background: var(--ds-togglerow-hover-bg, var(--bg-hover));
     border-color: var(--ds-togglerow-hover-border, var(--border-strong));
@@ -83,6 +90,16 @@ const skinX = css`
   .ds-togglerow__meta {
     color: var(--ds-togglerow-meta-color, var(--text-secondary));
     background: var(--ds-togglerow-meta-bg, var(--bg-sunken));
+  }
+
+  &.is-on:not(.ds-togglerow--static) .ds-togglerow__meta {
+    color: var(--ds-togglerow-on-meta-color, var(--text-strong));
+    background: var(--ds-togglerow-on-meta-bg, var(--bg-raised));
+  }
+
+  &.is-on:not(.ds-togglerow--static):not([data-color-token]) .ds-togglerow__swatch {
+    background: var(--accent);
+    border-color: var(--accent);
   }
 
   &.is-off {
@@ -124,25 +141,6 @@ const skinX = css`
   }
 `;
 
-const tokenSkinX = css`
-  &[data-color-token="--accent"] { --ds-togglerow-swatch-color: var(--accent); }
-  &[data-color-token="--success"] { --ds-togglerow-swatch-color: var(--success); }
-  &[data-color-token="--text-muted"] { --ds-togglerow-swatch-color: var(--text-muted); }
-  &[data-color-token="--border-default"] { --ds-togglerow-swatch-color: var(--border-default); }
-  &[data-color-token="--capability"] { --ds-togglerow-swatch-color: var(--capability); }
-  &[data-color-token="--requirement"] { --ds-togglerow-swatch-color: var(--requirement); }
-  &[data-color-token="--contract"] { --ds-togglerow-swatch-color: var(--contract); }
-  &[data-color-token="--semantic-contract"] { --ds-togglerow-swatch-color: var(--semantic-contract); }
-  &[data-color-token="--verification"] { --ds-togglerow-swatch-color: var(--verification); }
-  &[data-color-token="--ontology"] { --ds-togglerow-swatch-color: var(--ontology); }
-  &[data-color-token="--resource"] { --ds-togglerow-swatch-color: var(--resource); }
-  &[data-color-token="--other"] { --ds-togglerow-swatch-color: var(--other); }
-  &[data-color-token="--edge-derive"] { --ds-togglerow-swatch-color: var(--edge-derive); }
-  &[data-color-token="--edge-satisfy"] { --ds-togglerow-swatch-color: var(--edge-satisfy); }
-  &[data-color-token="--edge-attach"] { --ds-togglerow-swatch-color: var(--edge-attach); }
-  &[data-color-token="--edge-trace"] { --ds-togglerow-swatch-color: var(--edge-trace); }
-`;
-
 const skinLineX = css`
   --ds-togglerow-h: var(--ds-togglerow-line-h, var(--control-sm));
   --ds-togglerow-min-h: var(--ds-togglerow-line-min-h, var(--control-sm));
@@ -161,7 +159,7 @@ const skinLineX = css`
   .ds-togglerow__swatch {
     height: 0;
     border-top: var(--border-w-thick) solid;
-    border-color: var(--ds-togglerow-line-swatch-border, var(--ds-togglerow-swatch-color, currentColor));
+    border-color: var(--ds-togglerow-line-swatch-border, var(--ds-token-swatch-color, currentColor));
     border-radius: 0;
     background: var(--ds-togglerow-line-swatch-bg, transparent) !important;
     box-shadow: none;
@@ -213,11 +211,11 @@ export function ToggleRow({
         "ds-togglerow",
         baseUX,
         skinX,
-        tokenSkinX,
         line && "ds-togglerow--line",
         line && skinLineX,
         (isStatic || hasStaticClass) && "ds-togglerow--static",
         (isStatic || hasStaticClass) && skinStaticX,
+        on && "is-on",
         !on && "is-off",
         className,
       )}
@@ -226,7 +224,13 @@ export function ToggleRow({
       {...props}
       onClick={toggle}
     >
-      {icon ? <span className="ds-togglerow__icon">{icon}</span> : <span className="ds-togglerow__swatch" />}
+      {icon ? (
+        <span className="ds-togglerow__icon">{icon}</span>
+      ) : colorToken ? (
+        <TokenSwatch colorToken={colorToken} className="ds-togglerow__swatch" />
+      ) : (
+        <span className="ds-togglerow__swatch" />
+      )}
       <span className="ds-togglerow__label">{label}</span>
       {meta != null ? <Badge className="ds-togglerow__meta">{meta}</Badge> : null}
     </button>

@@ -136,7 +136,10 @@ pub fn get_branch_name() -> Result<String, ReqvireError> {
     let mut branch = String::from_utf8_lossy(&output.stdout).trim().to_string();
     if branch.is_empty() {
         let commit = get_commit_hash()?;
-        branch = format!("detached@{}", commit.chars().take(7).collect::<String>());
+        branch = format!(
+            "removed reused context@{}",
+            commit.chars().take(7).collect::<String>()
+        );
     }
 
     *cached = Some(branch.clone());

@@ -52,7 +52,7 @@ For each touched capability root:
 
 - Confirm it is a real independent capability root.
 - Confirm it has specifying requirements, child capabilities, or intentional direct verification. Move pure vocabulary into ontology.
-- Confirm cross-root contract dependencies are explicit attachments, not hierarchy relations.
+- Confirm cross-root contract dependencies are explicit reused_contract_context, not hierarchy relations.
 - If a root is too broad, split it into meaningful child capabilities first and move requirements to specify their local child capability.
 - Do not make one universal capability root just to reuse ontology. Shared ontology terms cross roots through explicit concept references.
 - Confirm reusable terms are in ontology elements, not hidden in requirement prose or semantic contracts.
@@ -95,10 +95,10 @@ Use:
 - `#### Concept References` from non-ontology elements to ontology terms
 - `semantic-contract use ontology` for vocabulary context
 - `semantic-contract constrain requirement` or `requirement constrainedBy semantic-contract` for shape profile application
-- Attachments for reusable requirement-owned non-semantic-contract contracts
+- Reused Contract Context for reusable requirement-owned requirement-owned contracts
 
-Do not use `trace` to replace ownership or dependency.
-Do not remove a cross-root dependency unless an explicit concept reference, semantic-contract relation, or requirement attachment preserves the dependency for `collect` and change impact.
+Use semantic relation families or concept references instead of a generic relation to preserve ownership or dependency meaning.
+Do not remove a cross-root dependency unless an explicit concept reference, semantic-contract relation, or requirement reused_contract_context preserves the dependency for `collect` and change impact.
 
 ### 5. Update verification and tests
 

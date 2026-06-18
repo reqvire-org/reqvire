@@ -1,5 +1,6 @@
 use globset::GlobSet;
 use reqvire::error::ReqvireError;
+use reqvire::mcp_prompts::{prompt_definitions_json, prompt_get_result_json};
 use reqvire::tool_interface::{
     request_requires_write_tool, resource_definitions as shared_resource_definitions,
     tool_definitions as shared_tool_definitions,
@@ -8,9 +9,10 @@ use reqvire::tool_interface::{
 use rmcp::{
     handler::server::ServerHandler,
     model::{
-        CallToolRequestParams, CallToolResult, ErrorCode, Implementation,
-        ListResourceTemplatesResult, ListResourcesResult, ListToolsResult, PaginatedRequestParams,
-        ReadResourceRequestParams, ReadResourceResult, ServerCapabilities, ServerInfo, Tool,
+        CallToolRequestParams, CallToolResult, ErrorCode, GetPromptRequestParams, GetPromptResult,
+        Implementation, ListPromptsResult, ListResourceTemplatesResult, ListResourcesResult,
+        ListToolsResult, PaginatedRequestParams, Prompt, ReadResourceRequestParams,
+        ReadResourceResult, ServerCapabilities, ServerInfo, Tool,
     },
     service::{MaybeSendFuture, RequestContext, RoleServer},
     transport::streamable_http_server::{
@@ -110,6 +112,7 @@ impl ServerHandler for ReqvireMcpServer {
             ServerCapabilities::builder()
                 .enable_tools()
                 .enable_resources()
+                .enable_prompts()
                 .build(),
         )
         .with_server_info(Implementation::new("reqvire", env!("CARGO_PKG_VERSION")))
@@ -191,6 +194,50 @@ impl ServerHandler for ReqvireMcpServer {
     ) -> impl Future<Output = Result<ListResourceTemplatesResult, McpError>> + MaybeSendFuture + '_
     {
         std::future::ready(Ok(ListResourceTemplatesResult::with_all_items(vec![])))
+    }
+
+    fn list_prompts(
+        &self,
+        _request: Option<PaginatedRequestParams>,
+        _context: RequestContext<RoleServer>,
+    ) -> impl Future<Output = Result<ListPromptsResult, McpError>> + MaybeSendFuture + '_ {
+        async move {
+            let result = self.call_handler("prompts/list", json!({}), false).await?;
+            let prompts = serde_json::from_value::<Vec<Prompt>>(
+                result.get("prompts").cloned().unwrap_or_else(|| json!([])),
+            )
+            .map_err(|error| McpError::internal_error(error.to_string(), None))?;
+            Ok(ListPromptsResult {
+                prompts,
+                next_cursor: None,
+                meta: None,
+            })
+        }
+    }
+
+    fn get_prompt(
+        &self,
+        request: GetPromptRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> impl Future<Output = Result<GetPromptResult, McpError>> + MaybeSendFuture + '_ {
+        async move {
+            let arguments = request
+                .arguments
+                .map(Value::Object)
+                .unwrap_or_else(|| json!({}));
+            let result = self
+                .call_handler(
+                    "prompts/get",
+                    json!({
+                        "name": request.name,
+                        "arguments": arguments
+                    }),
+                    false,
+                )
+                .await?;
+            serde_json::from_value::<GetPromptResult>(result)
+                .map_err(|error| McpError::internal_error(error.to_string(), None))
+        }
     }
 }
 
@@ -295,6 +342,11 @@ fn handle_rpc_value(
             excluded_filename_patterns,
         )),
         "resources/templates/list" => Some(rpc_result(id, json!({ "resourceTemplates": [] }))),
+        "prompts/list" => Some(rpc_result(
+            id,
+            json!({ "prompts": prompt_definitions_json() }),
+        )),
+        "prompts/get" => Some(handle_prompt_get(id, request.params)),
         _ => Some(rpc_error(
             id,
             -32601,
@@ -367,6 +419,31 @@ fn handle_tool_call(
     }
 }
 
+fn handle_prompt_get(id: Value, params: Value) -> Value {
+    let name = match params.get("name").and_then(Value::as_str) {
+        Some(name) => name,
+        None => {
+            return rpc_error(
+                id,
+                -32602,
+                "Invalid params",
+                Some(json!({ "message": "prompts/get requires string field 'name'" })),
+            );
+        }
+    };
+    let arguments = params.get("arguments").and_then(Value::as_object);
+
+    match prompt_get_result_json(name, arguments) {
+        Ok(value) => rpc_result(id, value),
+        Err(err) => rpc_error(
+            id,
+            -32602,
+            "Prompt not found",
+            Some(json!({ "message": err.to_string(), "prompt": name })),
+        ),
+    }
+}
+
 fn handle_resource_read(
     id: Value,
     params: Value,
@@ -433,8 +510,9 @@ fn reqvire_error(tool_name: &str, err: ReqvireError) -> Value {
         }
         ReqvireError::UnsupportedRelationType(_) => ("invalid_relation_type", None),
         ReqvireError::IncompatibleElementTypes(_) => ("invalid_element_type_for_relation", None),
-        ReqvireError::InvalidAttachmentScope(_) | ReqvireError::InvalidAttachmentTarget(_) => {
-            ("attachment_contract_violation", None)
+        ReqvireError::InvalidReusedContractContextScope(_)
+        | ReqvireError::InvalidReusedContractContextTarget(_) => {
+            ("reused_contract_context_contract_violation", None)
         }
         ReqvireError::InvalidOperation(message)
             if message.contains("Single-root hierarchy ownership violation") =>
@@ -461,8 +539,8 @@ fn recoverability_hint(code: &str) -> &'static str {
         "element_not_found" => "Check element name or identifier and retry.",
         "validation_failed" => "Run reqvire validate and resolve model errors before retrying.",
         "duplicate_element" => "Rename or remove duplicate elements before retrying.",
-        "attachment_contract_violation" => {
-            "Use a valid refinement attachment that respects submodel attachment contracts."
+        "reused_contract_context_contract_violation" => {
+            "Use a valid contract reused_contract_context that respects submodel reused_contract_context contracts."
         }
         "single_root_ownership_violation" => {
             "Adjust hierarchy so each requirement branch has a single root owner."

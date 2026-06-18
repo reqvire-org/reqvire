@@ -11,7 +11,7 @@
           "name": "Contract Consumer Implemented"
         },
         {
-          "coverage_source": "refinement_contract_satisfied_via_attachment",
+          "coverage_source": "contract_satisfied_via_reused_contract_context",
           "evidence": [
             "specifications/Requirements.md#contract-consumer-implemented"
           ],
@@ -27,7 +27,7 @@
           "name": "Derived Child Implemented"
         },
         {
-          "coverage_source": "refinement_contract_satisfied_via_child",
+          "coverage_source": "contract_satisfied_via_child",
           "evidence": [
             "specifications/Requirements.md#derived-child-implemented"
           ],
@@ -47,9 +47,9 @@
   },
   "summary": {
     "coverage_sources": {
-      "direct_satisfied": 3,
-      "refinement_contract_satisfied_via_attachment": 1,
-      "refinement_contract_satisfied_via_child": 1
+      "contract_satisfied_via_child": 1,
+      "contract_satisfied_via_reused_contract_context": 1,
+      "direct_satisfied": 3
     },
     "covered_requirements": 5,
     "implementation_coverage_percentage": 62.5,

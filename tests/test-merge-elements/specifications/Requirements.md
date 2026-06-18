@@ -43,7 +43,6 @@ Target details section content.
 #### Relations
   * derivedFrom: [System Requirements](#system-requirements)
   * verifiedBy: Verifications.md#target-test
-  * trace: [Another Link](#another-link)
 ---
 
 ### Source Requirement One
@@ -61,7 +60,6 @@ Details from source one.
 #### Relations
   * derivedFrom: [System Requirements](#system-requirements)
   * derive: [Child Requirement](#child-requirement)
-  * trace: [Placeholder Requirement](#placeholder-requirement)
 ---
 
 ### Source Requirement Two
@@ -78,7 +76,6 @@ Details from source two with more info.
 
 #### Relations
   * derivedFrom: [System Requirements](#system-requirements)
-  * trace: [Another Link](#another-link)
   * verifiedBy: Verifications.md#source-two-test
 ---
 
@@ -118,7 +115,7 @@ A verification element for testing type compatibility error.
 
 ### Another Link
 
-Just a placeholder for trace relation.
+Just a placeholder for merge relation content.
 
 #### Metadata
   * type: requirement

@@ -77,10 +77,10 @@ The system shall expose MCP read tools that return model evidence needed by exte
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
-  * [Flexible Search Type Filtering Refinement Specification](../../Reports/ModelReports/Specifications.md#flexible-search-type-filtering-refinement-specification)
-  * [Containment View Report Refinement Specification](../../Reports/ModelReports/Specifications.md#containment-view-report-refinement-specification)
+  * [Flexible Search Type Filtering Contract Specification](../../Reports/ModelReports/Specifications.md#flexible-search-type-filtering-contract-specification)
+  * [Containment View Report Contract Specification](../../Reports/ModelReports/Specifications.md#containment-view-report-contract-specification)
   * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
@@ -99,7 +99,7 @@ The system shall expose an MCP read tool for SPARQL queries over Reqvire semanti
 #### Details
 - The MCP interface shall execute SPARQL queries against Reqvire's collected semantic RDF graph.
 - The semantic query tool shall use the existing in-memory semantic export and Oxigraph query engine.
-- The semantic query tool shall support authored ontology and SHACL RDF, and shall include generated Reqvire model-context and ontology projection facts by default.
+- The semantic query tool shall support authored ontology and SHACL RDF, and shall include generated Reqvire model-context, relation-family projection, and ontology projection facts by default when they are present in the full semantic export.
 - The semantic query tool shall return structured results for SELECT, ASK, CONSTRUCT, and DESCRIBE queries.
 - The semantic query interface shall provide ontology-defined prefix discovery so clients can construct namespace-correct SPARQL without rebuilding the RDF store.
 - The semantic query tool shall not mutate the model or filesystem.
@@ -111,6 +111,9 @@ The system shall expose an MCP read tool for SPARQL queries over Reqvire semanti
 
 #### Metadata
   * type: requirement
+
+#### Reused Contract Context
+  * [Semantic Relation Family Projection Specification](../../Reports/ModelReports/Specifications.md#semantic-relation-family-projection-specification)
 
 #### Relations
   * definedBy: [MCP Semantic Query Tools Specification](Specifications.md#mcp-semantic-query-tools-specification)
@@ -145,6 +148,87 @@ The system shall expose an MCP read tool that lists ontology-defined prefixes an
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * satisfiedBy: [tool_interface.rs](../../../core/src/tool_interface.rs)
   * verifiedBy: [MCP Semantic Prefix Registry Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-prefix-registry-tools-verification)
+---
+
+### MCP Semantic Vocabulary Tools
+
+The system shall expose an MCP read tool that pages compact semantic vocabulary for SPARQL query construction.
+
+#### Details
+- The MCP interface shall expose semantic vocabulary from the parsed semantic model index.
+- The vocabulary tool shall include ontology-defined prefixes and a SPARQL prefix block in every response.
+- The vocabulary tool shall support section paging for prefixes, classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source map entries, and diagnostics.
+- The vocabulary tool shall expose relation families with normalized forward and inverse properties so clients can query semantic relation meaning instead of hard-coding raw relation tokens.
+- The vocabulary tool shall not mutate the model or filesystem.
+- The vocabulary tool shall not rebuild or reload the semantic store to answer vocabulary discovery.
+
+#### Concept References
+  * MCP semantic vocabulary contract: https://www.reqvire.org/ontology#McpSemanticVocabularyContract
+  * MCP semantic vocabulary tool contract: https://www.reqvire.org/ontology#McpSemanticVocabularyToolContract
+  * Relation Family: https://www.reqvire.org/ontology#RelationFamily
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [MCP Semantic Vocabulary Tools Specification](Specifications.md#mcp-semantic-vocabulary-tools-specification)
+  * derivedFrom: [MCP Semantic Query Tools](#mcp-semantic-query-tools)
+  * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
+  * satisfiedBy: [tool_interface.rs](../../../core/src/tool_interface.rs)
+  * verifiedBy: [MCP Semantic Vocabulary Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-vocabulary-tools-verification)
+---
+
+### MCP Semantic Relation Family Projection Access
+
+The system shall make semantic-export relation-family projection facts available through MCP semantic query and vocabulary tools.
+
+#### Details
+- MCP shall expose normalized relation-family vocabulary and query examples sourced from the ontology/semantic export contract.
+- MCP shall query relation-family projection facts from the existing full semantic graph; MCP does not own relation-family materialization.
+- MCP shall not rebuild relation-family facts, execute projection-side construct materialization, mutate model source files, or write generated triples back to Markdown.
+
+#### Concept References
+  * Relation family construct query: https://www.reqvire.org/ontology#RelationFamilyConstructQuery
+  * Model relation: https://www.reqvire.org/ontology#ModelRelation
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [MCP Semantic Relation Family Projection Access Specification](Specifications.md#mcp-semantic-relation-family-projection-access-specification)
+  * derivedFrom: [MCP Semantic Query Tools](#mcp-semantic-query-tools)
+  * satisfiedBy: [tool_interface.rs](../../../core/src/tool_interface.rs)
+  * verifiedBy: [MCP Semantic Query Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-query-tools-verification)
+---
+
+### MCP Prompt Guidance
+
+The system shall expose MCP prompts that guide regular Reqvire workflows and semantic query construction.
+
+#### Details
+- The MCP interface shall advertise the standard MCP prompts capability.
+- The MCP interface shall support `prompts/list` and `prompts/get` for Reqvire-authored prompt templates.
+- Prompt templates shall include regular Reqvire model exploration, change planning, and verification coverage review workflows.
+- Prompt templates shall include semantic query, semantic verification search, and semantic contract-context search workflows.
+- Semantic prompt templates shall direct clients to use `reqvire.semantic.vocabulary`, `reqvire.semantic.prefixes`, and `reqvire.semantic.sparql` for ontology-aware questions.
+- Prompt templates shall be imported into Rust at build time and shall not be read from workspace source files at runtime.
+- Prompt retrieval shall not mutate the model or filesystem.
+
+#### Concept References
+  * MCP prompt contract: https://www.reqvire.org/ontology#McpPromptContract
+  * MCP semantic query prompt contract: https://www.reqvire.org/ontology#McpSemanticQueryPromptContract
+  * MCP regular workflow prompt contract: https://www.reqvire.org/ontology#McpWorkflowPromptContract
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [MCP Prompt Guidance Specification](Specifications.md#mcp-prompt-guidance-specification)
+  * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+  * derivedFrom: [MCP Semantic Query Tools](#mcp-semantic-query-tools)
+  * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
+  * satisfiedBy: [mcp_prompts.rs](../../../core/src/mcp_prompts.rs)
+  * verifiedBy: [MCP Prompt Guidance Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-prompt-guidance-verification)
 ---
 
 ### MCP Mutation Concurrency Control
@@ -196,7 +280,7 @@ The system shall expose mutation tools only through typed Reqvire core operation
 #### Details
 - The MCP interface shall expose mutation tools only after explicit mutation enablement.
 - MCP mutation tools shall use Reqvire core mutation logic.
-- MCP mutation tools shall preserve Reqvire semantic model validation, including attachment compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, and single ontology-root validation.
+- MCP mutation tools shall preserve Reqvire semantic model validation, including reused_contract_context compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, and single ontology-root validation.
 - MCP mutation tools shall preserve Reqvire filesystem persistence behavior.
 - MCP mutation results shall report changed model evidence.
 - MCP mutation execution shall refresh MCP-visible model state after successful mutation.
@@ -204,18 +288,18 @@ The system shall expose mutation tools only through typed Reqvire core operation
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Create Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#create-element-workflow-specification)
   * [Delete Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#delete-element-workflow-specification)
   * [Move Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#move-element-workflow-specification)
-  * [Rename Element Operation Refinement Specification](../../Operations/ModelOperations/Specifications.md#rename-element-operation-refinement-specification)
+  * [Rename Element Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#rename-element-operation-contract-specification)
   * [Merge Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#merge-element-workflow-specification)
-  * [Move File Operation Refinement Specification](../../Operations/ModelOperations/Specifications.md#move-file-operation-refinement-specification)
+  * [Move File Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#move-file-operation-contract-specification)
   * [Relation Operations Specification](../../ModelStructure/Specifications.md#relation-operations-specification)
   * [Atomic Relation Relink Workflow Specification](../../Operations/ModelOperations/Specifications.md#atomic-relation-relink-workflow-specification)
-  * [Relation Consistency Maintenance Refinement Specification](../../Operations/ModelOperations/Specifications.md#relation-consistency-maintenance-refinement-specification)
+  * [Relation Consistency Maintenance Contract Specification](../../Operations/ModelOperations/Specifications.md#relation-consistency-maintenance-contract-specification)
 
 #### Relations
   * definedBy: [MCP Mutation Tool Safety Specification](Specifications.md#mcp-mutation-tool-safety-specification)
@@ -260,7 +344,7 @@ The system shall expose MCP read tools for linting, coverage, verification trace
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
   * [Requirement Implementation Coverage Logic Specification](../../Reports/ModelReports/Specifications.md#requirement-implementation-coverage-logic-specification)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
@@ -287,9 +371,9 @@ The system shall expose MCP resources only as read-only, revision-tagged views o
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Resources Report Format Specification](../../Reports/ModelReports/Specifications.md#resources-report-format-specification)
-  * [Containment View Report Refinement Specification](../../Reports/ModelReports/Specifications.md#containment-view-report-refinement-specification)
+  * [Containment View Report Contract Specification](../../Reports/ModelReports/Specifications.md#containment-view-report-contract-specification)
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
 
 #### Relations
@@ -359,7 +443,7 @@ The system shall expose MCP tools through shared typed request and result interf
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations

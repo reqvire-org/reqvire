@@ -49,7 +49,7 @@ pub struct ElementNode {
     pub identifier: String,
     pub name: String,
     pub element_type: String,
-    pub attachments: Vec<String>,
+    pub reused_contract_context: Vec<String>,
 }
 
 /// Relation between elements in the model
@@ -147,26 +147,28 @@ impl<'a> ModelDiagramGenerator<'a> {
                     let mut sorted_elements = elements.clone();
                     sorted_elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
                     for element in sorted_elements {
-                        let attachments: Vec<String> = element
-                            .attachments
+                        let reused_contract_context: Vec<String> = element
+                            .reused_contract_context
                             .iter()
                             .map(|a| match &a.target {
-                                crate::element::AttachmentTarget::FilePath(path) => path
+                                crate::element::ReusedContractContextTarget::FilePath(path) => path
                                     .file_name()
                                     .map(|n| n.to_string_lossy().into_owned())
                                     .unwrap_or_else(|| path.to_string_lossy().into_owned()),
-                                crate::element::AttachmentTarget::ElementIdentifier(id) => self
+                                crate::element::ReusedContractContextTarget::ElementIdentifier(
+                                    id,
+                                ) => self
                                     .registry
                                     .get_element(id)
                                     .map(|target| target.name.clone())
-                                    .unwrap_or_else(|| attachment_target_label(id)),
+                                    .unwrap_or_else(|| reused_contract_context_target_label(id)),
                             })
                             .collect();
                         element_nodes.push(ElementNode {
                             identifier: element.identifier.clone(),
                             name: element.name.clone(),
                             element_type: element.element_type.as_str().to_string(),
-                            attachments,
+                            reused_contract_context,
                         });
                     }
 
@@ -256,7 +258,9 @@ impl<'a> ModelDiagramGenerator<'a> {
         diagram.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
         diagram.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n");
         diagram.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
-        diagram.push_str("  classDef attachment fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;\n");
+        diagram.push_str(
+            "  classDef reused_contract_context fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;\n",
+        );
         diagram.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n\n");
 
         // Add folders, files, and elements
@@ -279,10 +283,13 @@ impl<'a> ModelDiagramGenerator<'a> {
                 for element in &file.elements {
                     let element_id = utils::hash_identifier(&element.identifier);
 
-                    // Build label with element name and attachments
+                    // Build label with element name and reused_contract_context
                     let mut label = escape_label(&element.name);
-                    for attachment in &element.attachments {
-                        label.push_str(&format!("<br/>📎 {}", escape_label(attachment)));
+                    for reused_contract_context in &element.reused_contract_context {
+                        label.push_str(&format!(
+                            "<br/>📎 {}",
+                            escape_label(reused_contract_context)
+                        ));
                     }
 
                     diagram.push_str(&format!("      {}[\"{}\"];\n", element_id, label));
@@ -557,20 +564,22 @@ fn generate_file_diagram(
             for elem in sorted_elements {
                 let elem_id = utils::hash_identifier(&elem.identifier);
 
-                // Build label with attachments
+                // Build label with reused_contract_context
                 let mut label = elem.name.replace('"', "&quot;");
-                for attachment in &elem.attachments {
-                    let attachment_name = match &attachment.target {
-                        crate::element::AttachmentTarget::FilePath(path) => path
+                for reused_contract_context in &elem.reused_contract_context {
+                    let reused_context_name = match &reused_contract_context.target {
+                        crate::element::ReusedContractContextTarget::FilePath(path) => path
                             .file_name()
                             .map(|n| n.to_string_lossy().into_owned())
                             .unwrap_or_else(|| path.to_string_lossy().into_owned()),
-                        crate::element::AttachmentTarget::ElementIdentifier(id) => registry
-                            .get_element(id)
-                            .map(|target| target.name.clone())
-                            .unwrap_or_else(|| attachment_target_label(id)),
+                        crate::element::ReusedContractContextTarget::ElementIdentifier(id) => {
+                            registry
+                                .get_element(id)
+                                .map(|target| target.name.clone())
+                                .unwrap_or_else(|| reused_contract_context_target_label(id))
+                        }
                     };
-                    label.push_str(&format!("<br/>📎 {}", escape_label(&attachment_name)));
+                    label.push_str(&format!("<br/>📎 {}", escape_label(&reused_context_name)));
                 }
 
                 let class = match &elem.element_type {
@@ -963,7 +972,7 @@ pub fn generate_model_diagram(
 /// # Arguments
 /// * `registry` - The graph registry containing all elements
 /// * `root_element_id` - Optional element ID to filter from. If provided with forward_only=true, only includes forward-reachable elements
-/// * `forward_only` - If true and root_element_id is provided, only traverses forward relations (derive, satisfiedBy, verifiedBy, trace)
+/// * `forward_only` - If true and root_element_id is provided, only traverses forward relations used by diagram traversal.
 /// * `json_output` - If true, returns JSON; otherwise returns markdown with embedded Mermaid diagram
 pub fn generate_model_report(
     registry: &GraphRegistry,
@@ -1028,7 +1037,7 @@ fn collect_related_elements(registry: &GraphRegistry, root_id: &str) -> HashSet<
 }
 
 /// Collects all elements reachable from a root element by traversing only forward relations
-/// This includes the root element and all elements reachable via DIAGRAM_RELATIONS (derive, satisfiedBy, verifiedBy, trace)
+/// This includes the root element and all elements reachable via DIAGRAM_RELATIONS.
 /// Does NOT traverse backward - only follows outgoing relations from each element
 fn collect_forward_related_elements(registry: &GraphRegistry, root_id: &str) -> HashSet<String> {
     let mut result = HashSet::new();
@@ -1103,7 +1112,7 @@ pub fn escape_label(text: &str) -> String {
         .replace(')', "&#41;")
 }
 
-fn attachment_target_label(target: &str) -> String {
+fn reused_contract_context_target_label(target: &str) -> String {
     let fragment_or_path = target.rsplit('#').next().unwrap_or(target);
     let basename = fragment_or_path
         .rsplit('/')
@@ -1147,7 +1156,9 @@ pub fn generate_containment_diagram(
     output.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n");
     output.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:2px;\n");
     output.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
-    output.push_str("  classDef attachment fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;\n\n");
+    output.push_str(
+        "  classDef reused_contract_context fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;\n\n",
+    );
 
     // Define root node
     output.push_str("  root[\"📁 Reqvire root\"]\n");
@@ -1213,7 +1224,7 @@ fn generate_folder_tree(
         let doc_id = sanitize_design_doc_id(&doc.path);
         output.push_str(&format!("  {}[\"📝 {}\"]\n", doc_id, doc.name));
         output.push_str(&format!("  {} --> {}\n", parent_id, doc_id));
-        output.push_str(&format!("  class {} attachment\n", doc_id));
+        output.push_str(&format!("  class {} reused_contract_context\n", doc_id));
     }
 
     // Generate files
@@ -1224,13 +1235,16 @@ fn generate_folder_tree(
         output.push_str(&format!("  subgraph {}[\"📄 {}\"]\n", file_id, file.name));
         output.push_str("    direction TB\n");
 
-        // Generate element nodes with attachments
+        // Generate element nodes with reused_contract_context
         for element in &file.elements {
             let hash_id = generate_element_hash(&element.identifier);
             let mut label = escape_label(&element.name);
-            // Add attachments to label
-            for attachment in &element.attachments {
-                label.push_str(&format!("<br/>📎 {}", escape_label(&attachment.name)));
+            // Add reused_contract_context to label
+            for reused_contract_context in &element.reused_contract_context {
+                label.push_str(&format!(
+                    "<br/>📎 {}",
+                    escape_label(&reused_contract_context.name)
+                ));
             }
             output.push_str(&format!("    {}[\"{}\"]\n", hash_id, label));
         }

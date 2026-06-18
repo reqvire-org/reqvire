@@ -21,7 +21,7 @@ This objective groups verification that Reqvire validation enforces element typi
   * derive: [Semantic Contract Relation Validation Test](#semantic-contract-relation-validation-test)
   * derive: [Semantic Contract Section Validation Test](#semantic-contract-section-validation-test)
   * derive: [Semantic Contract SHACL Sanity Validation Test](#semantic-contract-shacl-sanity-validation-test)
-  * derive: [Single Element Refinement Validation Test](#single-element-refinement-validation-test)
+  * derive: [Single Element Contract Validation Test](#single-element-contract-validation-test)
   * derive: [Single Root Hierarchy Ownership Validation Test](#single-root-hierarchy-ownership-validation-test)
   * derive: [Subdirectory Processing Verification](#subdirectory-processing-verification)
   * derive: [Type Validation Errors Test](#type-validation-errors-test)
@@ -58,7 +58,7 @@ Test verifies that validation detects and reports cross-section duplicates.
 
 #### Details
 Test cases:
-1. Element with same target in both Relations (as satisfiedBy) and Attachments
+1. Element with same target in both Relations (as satisfiedBy) and Reused Contract Context
 2. Run `reqvire validate`
 3. Verify validation fails with error mentioning "cross-section duplicate" or similar
 4. Verify error identifies the element and the duplicate target
@@ -155,19 +155,19 @@ This test verifies that the system correctly validates relation types based on e
 - System shall reject `verifiedBy` relations from verification elements
 - System shall reject `verify` relations to non-capability and non-requirement elements
 
-**Refinement Type Validation:**
+**Contract Type Validation:**
 - System shall allow `define` relations on `constraint` type elements pointing to requirements
 - System shall allow `define` relations on `behavior` type elements pointing to requirements
 - System shall allow `define` relations on `specification` type elements pointing to requirements
 - System shall allow `define` relations on `state` and `input-output` elements pointing to requirements
 - System shall allow `define` relations on `source` elements pointing to capabilities
 - System shall allow `constrain` relations on `semantic-contract` elements pointing to requirements
-- System shall reject all other relation types on refinement elements (derivedFrom, verifiedBy, trace, satisfiedBy)
-- System shall provide clear error message indicating non-semantic-contract refinement types can only have define relations
+- System shall reject all other relation types on contract elements (derivedFrom, verifiedBy, trace, satisfiedBy)
+- System shall provide clear error message indicating non-semantic-contract types can only have define relations
 
 **trace Relation Validation:**
-- System shall allow `trace` relations for any non-refinement element type
-- System shall allow `trace` relations to any target type
+- System shall reject unsupported generic relation tokens for every element type
+- System shall require authors to use a declared semantic relation family or concept reference
 
 ##### Test Criteria
 1. **derivedFrom type constraint tests:**
@@ -184,22 +184,20 @@ This test verifies that the system correctly validates relation types based on e
    - Create analysis-verification with `satisfiedBy` to file - FAIL with type error
    - Verify error message indicates `capability` is not allowed for satisfiedBy
 
-3. **Refinement type relation tests:**
+3. **Contract type relation tests:**
    - Create constraint element with `define` relation to requirement - PASS
    - Create behavior element with `define` relation to requirement - PASS
    - Create specification element with `define` relation to requirement - PASS
-   - Create constraint element with `trace` relation - FAIL with error
+   - Create constraint element with unsupported generic relation - FAIL with error
    - Create behavior element with `derivedFrom` relation - FAIL with error
    - Create specification element with `satisfiedBy` relation - FAIL with error
-   - Verify error messages indicate refinement types can only have define relations
-   - Create constraint element with Attachments subsection - FAIL with error
-   - Verify error message indicates refinement types cannot have attachments
+   - Verify error messages indicate contract types can only have define relations
+   - Create constraint element with Reused Contract Context subsection - FAIL with error
+   - Verify error message indicates contract types cannot have reused_contract_context
 
-4. **trace relation permissiveness tests:**
-   - Create requirement with `trace` to verification - PASS
-   - Create verification with `trace` to requirement - PASS
-   - Create verification with `trace` to other verification - PASS
-   - Verify trace relations do not trigger type compatibility errors
+4. **Unsupported generic relation tests:**
+   - Create requirement with unsupported generic relation - FAIL with unsupported relation error
+   - Verify the relation validator accepts only ontology-defined canonical relation types
 
 #### Metadata
   * type: test-verification
@@ -368,7 +366,6 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * verify: [Relation Element Type Validator](../../../Operations/Validation/ValidationRequirements.md#relation-element-type-validator)
   * verify: [Relation Type Validation](../../../Operations/Validation/ValidationRequirements.md#relation-type-validation)
   * verify: [Validation Error Handling](../../../Operations/Validation/ValidationRequirements.md#validation-error-handling)
-  * verify: [Trace Relation Non-Directional Behavior](../../../Reports/ModelReports/DiagramGeneration.md#trace-relation-non-directional-behavior)
 ---
 
 ### Requirements Files Search and Detection Test
@@ -443,7 +440,7 @@ Test cases:
 
 ### Semantic Contract Relation Validation Test
 
-This test verifies that ontology and semantic-contract relation rules are enforced and that non-semantic refinement types are not mixed.
+This test verifies that ontology and semantic-contract relation rules are enforced and that non-semantic contract types are not mixed.
 
 #### Details
 Test cases:
@@ -453,16 +450,16 @@ Test cases:
 4. `semantic-contract` using `definedBy`/`define` fails validation.
 5. `source` refining `capability` fails.
 6. `constraint`, `behavior`, `specification`, `state`, or `input-output` refining `capability` fails.
-7. Capability attachment to `ontology` fails; capabilities use concept references for ontology terms.
+7. Capability reused_contract_context to `ontology` fails; capabilities use concept references for ontology terms.
 8. Requirement `constrainedBy` to `semantic-contract` validates.
-9. Requirement attachment to `ontology` fails because ontology terms use concept references and semantic-contract ontology use is explicit through `use`.
-10. Capability attachment to `semantic-contract` fails.
+9. Requirement reused_contract_context to `ontology` fails because ontology terms use concept references and semantic-contract ontology use is explicit through `use`.
+10. Capability reused_contract_context to `semantic-contract` fails.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-capability-refinements/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-capability-contracts/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-semantic-contract-sanity/test.sh)
   * verify: [Ontology and Semantic Contract Model](../../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
 ---
@@ -519,14 +516,14 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-capability-refinements/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-capability-contracts/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-ontology-single-root/test.sh)
   * verify: [Ontology and Semantic Contract Model](../../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
 ---
 
-### Single Element Refinement Validation Test
+### Single Element Contract Validation Test
 
-This test verifies that `# Element` files are parsed as single-element model files and that `definedBy` targets must resolve to refinement elements (including those defined in `# Element` files).
+This test verifies that `# Element` files are parsed as single-element model files and that `definedBy` targets must resolve to contract elements (including those defined in `# Element` files).
 
 #### Details
 
@@ -534,12 +531,12 @@ This test verifies that `# Element` files are parsed as single-element model fil
 - System shall parse `# Element` files as model files with one element.
 - The single element shall use metadata type from `## Metadata`.
 - Content under `## <Actual Element Name>` shall allow arbitrary markdown headers, and the heading text shall define the element name.
-- `definedBy` targets shall be identifier links that resolve to refinement elements.
+- `definedBy` targets shall be identifier links that resolve to contract elements.
 - `definedBy` plain file-path targets shall be rejected.
 - `definedBy` identifier targets into `# Element` files shall satisfy existing relation type compatibility rules based on target element type.
 
 ##### Test Criteria
-1. Create valid `# Element` refinement file with:
+1. Create valid `# Element` contract file with:
    - `## Metadata` type `specification`
    - `## Relations` containing `define` relation
    - `## <Actual Element Name>` body containing nested markdown headers
@@ -552,7 +549,7 @@ This test verifies that `# Element` files are parsed as single-element model fil
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-document-refinement-format/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-document-contract-format/test.sh)
   * verify: [Specification File Identification](../../../ModelStructure/StructureAndParsing.md#specification-file-identification)
   * verify: [Relation Element Type Validator](../../../Operations/Validation/ValidationRequirements.md#relation-element-type-validator)
 ---

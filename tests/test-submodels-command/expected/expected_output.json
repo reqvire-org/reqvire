@@ -13,33 +13,10 @@
       "requirement_count": 3
     }
   ],
-  "cross_submodel_couplings": [
-    {
-      "source_id": "specifications/Requirements.md#invoice-requirement",
-      "source_name": "Invoice Requirement",
-      "source_root_id": "specifications/Requirements.md#capability-one",
-      "source_root_name": "Capability One",
-      "relation_type": "trace",
-      "target_id": "specifications/Requirements.md#identity-requirement",
-      "target_name": "Identity Requirement",
-      "target_root_id": "specifications/Requirements.md#capability-two",
-      "target_root_name": "Capability Two"
-    },
-    {
-      "source_id": "specifications/Requirements.md#session-requirement",
-      "source_name": "Session Requirement",
-      "source_root_id": "specifications/Requirements.md#capability-two",
-      "source_root_name": "Capability Two",
-      "relation_type": "trace",
-      "target_id": "specifications/Requirements.md#payments-requirement",
-      "target_name": "Payments Requirement",
-      "target_root_id": "specifications/Requirements.md#capability-one",
-      "target_root_name": "Capability One"
-    }
-  ],
+  "cross_submodel_couplings": [],
   "summary": {
     "total_submodels": 2,
     "total_requirements": 8,
-    "total_cross_submodel_couplings": 2
+    "total_cross_submodel_couplings": 0
   }
 }

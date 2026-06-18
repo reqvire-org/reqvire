@@ -9,6 +9,7 @@ reqvire.collect
 reqvire.submodels
 reqvire.semantic.ontologies
 reqvire.semantic.prefixes
+reqvire.semantic.vocabulary
 reqvire.semantic.sparql
 reqvire.lint
 reqvire.coverage

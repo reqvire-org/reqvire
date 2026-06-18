@@ -16,7 +16,7 @@ the primitive `ds-*` component layer and below app containers.
 - `shell/` - application shell layout targets such as `AppShell`, `ShellPane`, `PaneResizer`, `ShellMain`, `RouteFrame`, `RouteLayout`, and `RoutePanel`.
 - `chrome/` - workspace chrome targets such as `WorkspaceToolbar`.
 - `side-pane/` - Explorer side-pane frames, selections, filters, trees, and legends.
-- `detail/` - detail dialogs and relation, attachment, concept, and ontology detail bodies.
+- `detail/` - detail dialogs and relation, Reused Contract Context, concept, and ontology detail bodies.
 - `content/` - document, markdown, diagram, and code preview frames.
 - `feedback/` - product notices and help content.
 

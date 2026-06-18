@@ -3,7 +3,7 @@
 ### Forward-Only Relation Traversal Behavior
 
 When filtering model output from a starting requirement:
-1. Follow only forward relations (`derive`, `satisfiedBy`, `verifiedBy`, `trace`).
+1. Follow only forward relations (`derive`, `specifiedBy`, `definedBy`, `constrainedBy`, `usedBy`, `satisfiedBy`, `verifiedBy`, and `reused_contract_context`) that are enabled for the selected traversal mode.
 2. Start from the specified root element when `--from` is provided.
 3. Recursively traverse outgoing relations until leaf elements are reached.
 4. Do not traverse backward relations during forward traversal mode.
@@ -24,13 +24,13 @@ Coverage behavior for requirement implementation reporting.
 Implementation coverage source vocabulary is defined by the Reqvire report ontology. Implementation coverage classification shall follow:
 
 - **Directly satisfied**: requirement has one or more `satisfiedBy` relations.
-- **Contract via attachment**: requirement owns contract elements via `definedBy`, and at least one owned contract is attached by a requirement that is directly satisfied.
+- **Contract via reused_contract_context**: requirement owns contract elements via `definedBy`, and at least one owned contract is reused by a requirement that is directly satisfied.
 - **Contract via child**: requirement owns contract elements via `definedBy`, and at least one derived descendant requirement has `satisfiedBy`.
 - **Uncovered**: requirement has no coverage evidence from the above sources.
 
 Rules:
 - Scope includes only `requirement` elements. Capability elements are excluded from direct implementation coverage and receive implementation coverage through capability roll-up.
-- Refinement-contract attachment propagation uses only refinement element identifiers as contracts.
+- Contract reused_contract_context propagation uses only contract element identifiers as contracts.
 - Generic derivation roll-up is not used for implementation coverage.
 - Coverage source and evidence identifiers shall be reported in text and JSON outputs.
 

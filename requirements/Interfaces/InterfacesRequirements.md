@@ -34,6 +34,7 @@ The system shall provide a Model Context Protocol interface for external tools, 
   * derive: [MCP Mutation Concurrency Control](MCP/Tools.md#mcp-mutation-concurrency-control)
   * derive: [MCP Mutation Execution Flow](MCP/Tools.md#mcp-mutation-execution-flow)
   * derive: [MCP Mutation Tool Safety](MCP/Tools.md#mcp-mutation-tool-safety)
+  * derive: [MCP Prompt Guidance](MCP/Tools.md#mcp-prompt-guidance)
   * derive: [MCP Protocol Standard Conformance](MCP/Tools.md#mcp-protocol-standard-conformance)
   * derive: [MCP Quality Traceability Tools](MCP/Tools.md#mcp-quality-traceability-tools)
   * derive: [MCP Resource Interface](MCP/Tools.md#mcp-resource-interface)
@@ -54,13 +55,13 @@ The system shall provide a Model Context Protocol interface for external tools, 
 The system SHALL provide a web-based interface to browse the System model, including Explorer-rendered diagrams, reports, and verification traces.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Web Interface Refinement Specification](Specifications.md#web-interface-refinement-specification)
+  * definedBy: [Web Interface Contract Specification](Specifications.md#web-interface-contract-specification)
   * derive: [Serve Command](WebExplorer/Capabilities.md#serve-command)
   * derive: [Served Explorer Browser Interface](WebExplorer/Capabilities.md#served-explorer-browser-interface)
   * specify: [Web Explorer Interface](InterfacesFeature.md#web-explorer-interface)

@@ -1,5 +1,6 @@
 use crate::element::{
-    Attachment, AttachmentTarget, Element, ElementType, RequirementType, SubSection,
+    Element, ElementType, RequirementType, ReusedContractContextEntry, ReusedContractContextTarget,
+    SubSection, REUSED_CONTRACT_CONTEXT_SECTION,
 };
 use crate::error::ReqvireError;
 use crate::relation::{self, Relation};
@@ -80,8 +81,8 @@ You can use **markdown formatting**.
   * derivedFrom: [Parent Element](../ParentFile.md#parent-element)
   * satisfiedBy: [Implementation](../code/impl.rs)
 
-#### Attachments
-  * [Attached Specification](Specifications.md#specification-name)
+#### Reused Contract Context
+  * [Reused Specification](Specifications.md#specification-name)
 ---
 "#
 }
@@ -154,19 +155,18 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
         } else if trimmed.starts_with("#### ") && current_element.is_some() {
             let subsection = SubSection::parse(trimmed[5..].trim());
 
-            if seen_subsections.contains(&subsection) {
+            if !subsection.is_repeatable() && seen_subsections.contains(&subsection) {
                 return Err(ReqvireError::DuplicateSubsection(format!(
                     "Duplicate subsection '{}'",
                     subsection.name()
                 )));
             }
-            seen_subsections.insert(subsection.clone());
+            if !subsection.is_repeatable() {
+                seen_subsections.insert(subsection.clone());
+            }
 
             // If transitioning to content-bearing subsection, add the header to content
-            if subsection == SubSection::Details
-                || subsection == SubSection::ConceptReferences
-                || matches!(subsection, SubSection::Other(_))
-            {
+            if subsection.is_content_bearing() {
                 if let Some(element) = &mut current_element {
                     element.add_content(&format!("\n{}\n", line));
                 }
@@ -186,9 +186,7 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
 
         // Parse content for Requirement or Details subsections
         } else if current_subsection == SubSection::Requirement
-            || current_subsection == SubSection::Details
-            || current_subsection == SubSection::ConceptReferences
-            || matches!(current_subsection, SubSection::Other(_))
+            || current_subsection.is_content_bearing()
         {
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("<details") {
@@ -268,16 +266,16 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                 }
             }
 
-        // Parse attachments
-        } else if current_subsection == SubSection::Attachments {
+        // Parse reused_contract_context
+        } else if current_subsection == SubSection::ReusedContractContext {
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                    match utils::parse_attachment_line(trimmed) {
+                    match utils::parse_reused_contract_context_line(trimmed) {
                         Ok(href) => {
                             if !href.contains('#') {
-                                return Err(ReqvireError::InvalidAttachmentFormat(
+                                return Err(ReqvireError::InvalidReusedContractContextFormat(
                                     format!(
-                                        "Invalid attachment target '{}'. Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
+                                        "Invalid reused contract context target '{}'. Reused Contract Context entries must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
                                         href
                                     )
                                 ));
@@ -300,23 +298,29 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                                 let base_path = git_root.join(file_parent);
                                 utils::normalize_identifier(&href, &base_path)?
                             };
-                            let target = AttachmentTarget::ElementIdentifier(normalized);
+                            let target = ReusedContractContextTarget::ElementIdentifier(normalized);
 
-                            // Check for duplicate attachments
-                            if element.attachments.iter().any(|a| a.target == target) {
-                                return Err(ReqvireError::DuplicateAttachment(format!(
-                                    "Duplicate attachment '{}'",
+                            // Check for duplicate reused_contract_context
+                            if element
+                                .reused_contract_context
+                                .iter()
+                                .any(|a| a.target == target)
+                            {
+                                return Err(ReqvireError::DuplicateReusedContractContext(format!(
+                                    "Duplicate reused_contract_context '{}'",
                                     href
                                 )));
                             }
-                            element.attachments.push(Attachment {
-                                target,
-                                content_hash: None,
-                            });
+                            element
+                                .reused_contract_context
+                                .push(ReusedContractContextEntry {
+                                    target,
+                                    content_hash: None,
+                                });
                         }
                         Err(e) => {
-                            return Err(ReqvireError::InvalidAttachmentFormat(format!(
-                                "Invalid attachment format '{}': {}.\n{}",
+                            return Err(ReqvireError::InvalidReusedContractContextFormat(format!(
+                                "Invalid reused_contract_context format '{}': {}.\n{}",
                                 trimmed,
                                 e,
                                 get_element_example()
@@ -324,8 +328,8 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                         }
                     }
                 } else if !trimmed.is_empty() {
-                    return Err(ReqvireError::InvalidAttachmentFormat(format!(
-                        "Invalid attachment format: '{}'. Expected format: '  * [Text](link)'\n{}",
+                    return Err(ReqvireError::InvalidReusedContractContextFormat(format!(
+                        "Invalid reused_contract_context format: '{}'. Expected format: '  * [Text](link)'\n{}",
                         trimmed,
                         get_element_example()
                     )));
@@ -380,27 +384,27 @@ pub fn detect_model_file_type(content: &str) -> ModelFileType {
 }
 
 #[derive(Debug, Clone)]
-pub struct ParsedSingleElementRefinement {
+pub struct ParsedSingleElementContract {
     pub element_type: ElementType,
-    pub refine_targets: Vec<String>,
+    pub define_targets: Vec<String>,
 }
 
 /// Parses a `# Element` contract document and extracts metadata/define relations.
-pub fn parse_single_element_refinement(
+pub fn parse_single_element_contract(
     file: &str,
     content: &str,
     file_path: &Path,
-) -> Result<ParsedSingleElementRefinement, ReqvireError> {
+) -> Result<ParsedSingleElementContract, ReqvireError> {
     if detect_model_file_type(content) != ModelFileType::SingleElement {
         return Err(ReqvireError::InvalidMarkdownStructure(format!(
-            "File '{}' is not a supported single-element refinement. First H1 must be '{}'.",
+            "File '{}' is not a supported single-element contract. First H1 must be '{}'.",
             file, SINGLE_ELEMENT_HEADER
         )));
     }
 
     let mut current_section: Option<&str> = None;
     let mut metadata_type: Option<ElementType> = None;
-    let mut refine_targets: Vec<String> = Vec::new();
+    let mut define_targets: Vec<String> = Vec::new();
     let mut seen_metadata = false;
     let mut seen_relations = false;
     let mut seen_element_name = false;
@@ -418,7 +422,7 @@ pub fn parse_single_element_refinement(
                 seen_metadata = true;
             } else if section.eq_ignore_ascii_case("Relations") {
                 seen_relations = true;
-            } else if !section.eq_ignore_ascii_case("Attachments") {
+            } else if !section.eq_ignore_ascii_case(REUSED_CONTRACT_CONTEXT_SECTION) {
                 // Dynamic element name section header: `## <Element Name>`
                 seen_element_name = true;
             }
@@ -469,7 +473,7 @@ pub fn parse_single_element_refinement(
                         ))
                     })?;
                     let normalized_target = utils::normalize_identifier(&final_link, file_folder)?;
-                    refine_targets.push(normalized_target);
+                    define_targets.push(normalized_target);
                 } else {
                     return Err(ReqvireError::InvalidRelationFormat(format!(
                         "Invalid relation entry in '{}', line {}: '{}'.",
@@ -485,35 +489,35 @@ pub fn parse_single_element_refinement(
 
     if !seen_metadata || !seen_relations || !seen_element_name {
         return Err(ReqvireError::InvalidMarkdownStructure(format!(
-            "Single-element refinement '{}' must include '## Metadata', '## Relations', and '## <Element Name>' sections.",
+            "Single-element contract '{}' must include '## Metadata', '## Relations', and '## <Element Name>' sections.",
             file
         )));
     }
 
     let element_type = metadata_type.ok_or_else(|| {
         ReqvireError::InvalidMetadataFormat(format!(
-            "Single-element refinement '{}' must define metadata type.",
+            "Single-element contract '{}' must define metadata type.",
             file
         ))
     })?;
 
-    if !element_type.is_refinement() {
+    if !element_type.is_contract() {
         return Err(ReqvireError::IncompatibleElementTypes(format!(
-            "Single-element refinement '{}' must use a refinement type (constraint, behavior, specification).",
+            "Single-element contract '{}' must use a contract type (constraint, behavior, specification).",
             file
         )));
     }
 
-    if refine_targets.is_empty() {
+    if define_targets.is_empty() {
         return Err(ReqvireError::InvalidRelationFormat(format!(
             "Single-element contract '{}' must define at least one 'define' relation.",
             file
         )));
     }
 
-    Ok(ParsedSingleElementRefinement {
+    Ok(ParsedSingleElementContract {
         element_type,
-        refine_targets,
+        define_targets,
     })
 }
 
@@ -526,14 +530,14 @@ fn parse_single_element_file(
     let mut errors = Vec::new();
     let mut element_content = String::new();
     let mut element_relations: Vec<Relation> = Vec::new();
-    let mut element_attachments: Vec<Attachment> = Vec::new();
+    let mut element_reused_contract_context: Vec<ReusedContractContextEntry> = Vec::new();
     let mut metadata: std::collections::HashMap<String, String> = std::collections::HashMap::new();
 
     enum DocSection {
         None,
         Metadata,
         Relations,
-        Attachments,
+        ReusedContractContext,
         Document,
     }
     let mut section = DocSection::None;
@@ -565,7 +569,7 @@ fn parse_single_element_file(
                     DocSection::Metadata
                 }
                 "Relations" => DocSection::Relations,
-                "Attachments" => DocSection::Attachments,
+                REUSED_CONTRACT_CONTEXT_SECTION => DocSection::ReusedContractContext,
                 _ => {
                     // Dynamic element name section header (e.g., `## Change Propagation`)
                     seen_element_name = true;
@@ -653,16 +657,16 @@ fn parse_single_element_file(
                     )));
                 }
             }
-            DocSection::Attachments => {
+            DocSection::ReusedContractContext => {
                 if trimmed.is_empty() {
                     continue;
                 }
                 if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                    match utils::parse_attachment_line(trimmed) {
+                    match utils::parse_reused_contract_context_line(trimmed) {
                         Ok(href) => {
                             if !href.contains('#') {
-                                errors.push(ReqvireError::InvalidAttachmentFormat(format!(
-                                    "Invalid attachment identifier in single-element file '{}', line {}: '{}'. Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
+                                errors.push(ReqvireError::InvalidReusedContractContextFormat(format!(
+                                    "Invalid reused contract context identifier in single-element file '{}', line {}: '{}'. Reused Contract Context entries must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
                                     file,
                                     line_num + 1,
                                     href
@@ -683,10 +687,10 @@ fn parse_single_element_file(
                                 &href_to_normalize,
                                 &file_dir,
                             ) {
-                                Ok(normalized) => AttachmentTarget::ElementIdentifier(normalized),
+                                Ok(normalized) => ReusedContractContextTarget::ElementIdentifier(normalized),
                                 Err(e) => {
-                                    errors.push(ReqvireError::InvalidAttachmentFormat(format!(
-                                        "Invalid attachment identifier in single-element file '{}', line {}: {}",
+                                    errors.push(ReqvireError::InvalidReusedContractContextFormat(format!(
+                                        "Invalid reused_contract_context identifier in single-element file '{}', line {}: {}",
                                         file,
                                         line_num + 1,
                                         e
@@ -696,30 +700,30 @@ fn parse_single_element_file(
                             };
                             let content_hash = None;
 
-                            if !element_attachments.iter().any(|a| a.target == target) {
-                                element_attachments.push(Attachment {
+                            if !element_reused_contract_context.iter().any(|a| a.target == target) {
+                                element_reused_contract_context.push(ReusedContractContextEntry {
                                     target,
                                     content_hash,
                                 });
                             } else {
-                                errors.push(ReqvireError::DuplicateAttachment(format!(
-                                    "Duplicate attachment '{}' in single-element file '{}' (line {})",
+                                errors.push(ReqvireError::DuplicateReusedContractContext(format!(
+                                    "Duplicate reused_contract_context '{}' in single-element file '{}' (line {})",
                                     href,
                                     file,
                                     line_num + 1
                                 )));
                             }
                         }
-                        Err(e) => errors.push(ReqvireError::InvalidAttachmentFormat(format!(
-                            "Invalid attachment in single-element file '{}', line {}: {}",
+                        Err(e) => errors.push(ReqvireError::InvalidReusedContractContextFormat(format!(
+                            "Invalid reused_contract_context in single-element file '{}', line {}: {}",
                             file,
                             line_num + 1,
                             e
                         ))),
                     }
                 } else {
-                    errors.push(ReqvireError::InvalidAttachmentFormat(format!(
-                        "Invalid attachments entry in single-element file '{}', line {}: '{}'",
+                    errors.push(ReqvireError::InvalidReusedContractContextFormat(format!(
+                        "Invalid reused_contract_context entry in single-element file '{}', line {}: '{}'",
                         file,
                         line_num + 1,
                         trimmed
@@ -769,7 +773,7 @@ fn parse_single_element_file(
     element.metadata = metadata;
     element.set_type_from_metadata();
     element.relations = element_relations;
-    element.attachments = element_attachments;
+    element.reused_contract_context = element_reused_contract_context;
     element.freeze_content();
     element.file_order_index = 0;
 
@@ -779,7 +783,7 @@ fn parse_single_element_file(
 /// Parses a markdown document and extracts elements with metadata and relations.
 /// Returns: (elements, errors, page_content)
 /// Only parses files where the first H1 heading is "# Elements" or "# Element".
-/// If git_commit is Some, file attachment hashes are computed from the git commit, not working directory.
+/// If git_commit is Some, file reused_contract_context hashes are computed from the git commit, not working directory.
 pub fn parse_elements(
     file: &str,
     content: &str,
@@ -949,7 +953,7 @@ pub fn parse_elements(
             let subsection = SubSection::parse(trimmed[5..].trim());
 
             if !skip_current_element {
-                if seen_subsections.contains(&subsection) {
+                if !subsection.is_repeatable() && seen_subsections.contains(&subsection) {
                     let msg = format!(
                         "Duplicate subsection '{}' in element '{}' (file: {}, line {})",
                         subsection.name(),
@@ -959,7 +963,7 @@ pub fn parse_elements(
                     );
                     errors.push(ReqvireError::DuplicateSubsection(msg.clone()));
                     debug!("Error: {}", msg);
-                } else {
+                } else if !subsection.is_repeatable() {
                     seen_subsections.insert(subsection.clone());
                 }
             }
@@ -967,10 +971,7 @@ pub fn parse_elements(
             // If transitioning to content-bearing subsection, add the header to content
             if !skip_current_element {
                 if let Some(element) = &mut current_element {
-                    if subsection == SubSection::Details
-                        || subsection == SubSection::ConceptReferences
-                        || matches!(subsection, SubSection::Other(_))
-                    {
+                    if subsection.is_content_bearing() {
                         element.add_content(&format!("\n{}\n", line));
                     }
                 }
@@ -978,9 +979,7 @@ pub fn parse_elements(
 
             current_subsection = subsection;
         } else if (current_subsection == SubSection::Requirement
-            || current_subsection == SubSection::Details
-            || current_subsection == SubSection::ConceptReferences
-            || matches!(current_subsection, SubSection::Other(_)))
+            || current_subsection.is_content_bearing())
             && current_element.is_some()
             && !skip_current_element
         {
@@ -1128,21 +1127,23 @@ pub fn parse_elements(
                     current_subsection = SubSection::Other("".to_string());
                 }
             }
-        } else if current_subsection == SubSection::Attachments && !skip_current_element {
-            // Parse Attachments subsection
+        } else if current_subsection == SubSection::ReusedContractContext && !skip_current_element {
+            // Parse Reused Contract Context subsection
             // Format: * [text](identifier) where identifier is:
             // - Same-file identifier (#fragment)
             // - Cross-file identifier (file.md#fragment)
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                    match utils::parse_attachment_line(trimmed) {
+                    match utils::parse_reused_contract_context_line(trimmed) {
                         Ok(href) => {
                             if !href.contains('#') {
                                 let msg = format!(
-                                    "Invalid attachment identifier in element '{}': '{}' (file: {}, line {}). Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
+                                    "Invalid reused contract context identifier in element '{}': '{}' (file: {}, line {}). Reused Contract Context entries must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
                                     element.name, href, file, line_num + 1
                                 );
-                                errors.push(ReqvireError::InvalidAttachmentFormat(msg.clone()));
+                                errors.push(ReqvireError::InvalidReusedContractContextFormat(
+                                    msg.clone(),
+                                ));
                                 debug!("Error: {}", msg);
                                 continue;
                             }
@@ -1158,57 +1159,70 @@ pub fn parse_elements(
                                 .parent()
                                 .unwrap_or_else(|| Path::new("."))
                                 .to_path_buf();
-                            let (target, content_hash): (AttachmentTarget, Option<String>) =
-                                match utils::normalize_identifier(&href_to_normalize, &file_dir) {
-                                    Ok(normalized) => {
-                                        (AttachmentTarget::ElementIdentifier(normalized), None)
-                                    }
-                                    Err(e) => {
-                                        let msg = format!(
-                                            "Invalid attachment identifier in element '{}': {} (file: {}, line {})",
+                            let (target, content_hash): (
+                                ReusedContractContextTarget,
+                                Option<String>,
+                            ) = match utils::normalize_identifier(&href_to_normalize, &file_dir) {
+                                Ok(normalized) => (
+                                    ReusedContractContextTarget::ElementIdentifier(normalized),
+                                    None,
+                                ),
+                                Err(e) => {
+                                    let msg = format!(
+                                            "Invalid reused_contract_context identifier in element '{}': {} (file: {}, line {})",
                                             element.name, e, file, line_num + 1
                                         );
-                                        errors.push(ReqvireError::InvalidAttachmentFormat(
-                                            msg.clone(),
-                                        ));
-                                        debug!("Error: {}", msg);
-                                        continue;
-                                    }
-                                };
+                                    errors.push(ReqvireError::InvalidReusedContractContextFormat(
+                                        msg.clone(),
+                                    ));
+                                    debug!("Error: {}", msg);
+                                    continue;
+                                }
+                            };
 
                             // Check for duplicates
-                            if !element.attachments.iter().any(|a| a.target == target) {
-                                element.attachments.push(Attachment {
-                                    target,
-                                    content_hash,
-                                });
+                            if !element
+                                .reused_contract_context
+                                .iter()
+                                .any(|a| a.target == target)
+                            {
+                                element
+                                    .reused_contract_context
+                                    .push(ReusedContractContextEntry {
+                                        target,
+                                        content_hash,
+                                    });
                             } else {
                                 let msg =
                                     format!(
-                                    "Duplicate attachment '{}' in element '{}' (file: {}, line {})",
+                                    "Duplicate reused_contract_context '{}' in element '{}' (file: {}, line {})",
                                     href, element.name, file, line_num + 1
                                 );
-                                errors.push(ReqvireError::DuplicateAttachment(msg.clone()));
+                                errors.push(ReqvireError::DuplicateReusedContractContext(
+                                    msg.clone(),
+                                ));
                                 debug!("Warning: {}", msg);
                             }
                         }
                         Err(e) => {
                             let msg = format!(
-                                "Invalid attachment in element '{}': {} (file: {}, line {})",
+                                "Invalid reused_contract_context in element '{}': {} (file: {}, line {})",
                                 element.name,
                                 e,
                                 file,
                                 line_num + 1
                             );
-                            errors.push(ReqvireError::InvalidAttachmentFormat(msg.clone()));
+                            errors.push(ReqvireError::InvalidReusedContractContextFormat(
+                                msg.clone(),
+                            ));
                             debug!("Error: {}", msg);
                         }
                     }
                 } else if !trimmed.is_empty() {
-                    // Non-empty line that's not a bullet point - end of Attachments subsection
+                    // Non-empty line that's not a bullet point - end of Reused Contract Context subsection
                     current_subsection = SubSection::Other("".to_string());
                 }
-                // Empty lines are ignored within Attachments subsection
+                // Empty lines are ignored within Reused Contract Context subsection
             }
         } else if matches!(current_subsection, SubSection::Other(_)) {
             // Accumulate page content: everything outside of elements, but skip the # Elements title

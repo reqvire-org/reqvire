@@ -34,7 +34,6 @@ This requirement has valid relations to existing files, using markdown link form
 #### Relations
 * specify: #root-capability
 * satisfiedBy: [./DesignSpecifications/SampleDSD.md](./DesignSpecifications/SampleDSD.md)
-* trace: [Design Specification](DesignSpecifications/SampleDSD.md)
 
 ---
 

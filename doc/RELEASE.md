@@ -63,7 +63,7 @@ When a tag is pushed, GitHub Actions automatically:
    - Triggered by tag push (e.g., `v0.3.4`)
    - Builds binaries for multiple platforms (Linux, macOS)
    - Runs comprehensive tests
-   - Creates GitHub Release with binaries attached
+   - Creates GitHub Release with binaries reused
    - Publishes release artifacts
 
 ## Available Makefile Commands

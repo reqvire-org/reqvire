@@ -18,13 +18,13 @@ The system shall support code traceability by using structured comments to link 
 When parsing a source file for traceability, the system shall identify and extract all `[reqvire::...]` markers along with their associated requirement element identifiers.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Traceability Format Refinement Specification](Specifications.md#traceability-format-refinement-specification)
+  * definedBy: [Traceability Format Contract Specification](Specifications.md#traceability-format-contract-specification)
   * derive: [Comment Style by File Extension](#comment-style-by-file-extension)
   * derive: [Validating Traceability Format](#validating-traceability-format)
   * derivedFrom: [Code Traceability](#code-traceability)
@@ -77,13 +77,13 @@ REM [reqvire::satisfies: Req1] END
 When a source file has a `.css` or `.scss` extension, the system shall use `/* */` for comments.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [CSS Style Comment Refinement Specification](Specifications.md#css-style-comment-refinement-specification)
+  * definedBy: [CSS Style Comment Contract Specification](Specifications.md#css-style-comment-contract-specification)
   * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
 ---
 
@@ -128,13 +128,13 @@ SELECT * FROM users;
 When a source file has a `.c`, `.cpp`, `.cs`, `.java`, `.js`, or `.ts` extension, the system shall use `//` for single-line comments.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Slash Style Comment Refinement Specification](Specifications.md#slash-style-comment-refinement-specification)
+  * definedBy: [Slash Style Comment Contract Specification](Specifications.md#slash-style-comment-contract-specification)
   * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
 ---
 
@@ -143,13 +143,13 @@ Implementation details shall follow the associated refinement specifications.
 When a source file has a `.html`, `.xml`, or `.xsl` extension, the system shall use `<!-- -->` for comments.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [XML Style Comment Refinement Specification](Specifications.md#xml-style-comment-refinement-specification)
+  * definedBy: [XML Style Comment Contract Specification](Specifications.md#xml-style-comment-contract-specification)
   * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
 ---
 

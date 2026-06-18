@@ -23,8 +23,8 @@ pub struct SearchFilters {
     page_content_re: Option<Regex>,
     have_relations: Vec<String>,
     not_have_relations: Vec<String>,
-    has_attachments: bool,
-    attachment_glob: Option<GlobMatcher>,
+    has_reused_contract_context: bool,
+    reused_contract_context_glob: Option<GlobMatcher>,
 }
 
 impl SearchFilters {
@@ -42,8 +42,8 @@ impl SearchFilters {
         page_content: Option<&str>,
         have_relations: Option<&str>,
         not_have_relations: Option<&str>,
-        has_attachments: bool,
-        attachment: Option<&str>,
+        has_reused_contract_context: bool,
+        reused_contract_context: Option<&str>,
     ) -> Result<Self, ReqvireError> {
         fn compile_glob(pat: &str) -> Result<GlobMatcher, ReqvireError> {
             let glob = Glob::new(pat)
@@ -115,7 +115,7 @@ impl SearchFilters {
         let owner_re = owner_regex.map(compile_regex).transpose()?;
         let content_re = content.map(compile_regex).transpose()?;
         let page_content_re = page_content.map(compile_regex).transpose()?;
-        let attachment_glob = attachment.map(compile_glob).transpose()?;
+        let reused_contract_context_glob = reused_contract_context.map(compile_glob).transpose()?;
 
         // Parse and validate comma-separated relation lists
         let have_relations = if let Some(s) = have_relations {
@@ -166,8 +166,8 @@ impl SearchFilters {
             page_content_re,
             have_relations,
             not_have_relations,
-            has_attachments,
-            attachment_glob,
+            has_reused_contract_context,
+            reused_contract_context_glob,
         })
     }
 
@@ -297,18 +297,18 @@ impl SearchFilters {
             }
         }
 
-        // Has attachments filter - must have at least one attachment
-        if self.has_attachments && elem.attachments.is_empty() {
+        // Has reused_contract_context filter - must have at least one reused_contract_context
+        if self.has_reused_contract_context && elem.reused_contract_context.is_empty() {
             return false;
         }
 
-        // Attachment glob filter - must have an attachment matching the glob
-        if let Some(g) = &self.attachment_glob {
-            let has_matching_attachment = elem
-                .attachments
+        // ReusedContractContextEntry glob filter - must have an reused_contract_context matching the glob
+        if let Some(g) = &self.reused_contract_context_glob {
+            let has_matching_reused_context = elem
+                .reused_contract_context
                 .iter()
                 .any(|a| g.is_match(a.target.as_str().as_str()));
-            if !has_matching_attachment {
+            if !has_matching_reused_context {
                 return false;
             }
         }
@@ -353,7 +353,7 @@ struct ElementSearchResult {
     concept_references: Vec<element::ConceptReference>,
     relations: Vec<RelationSearchResult>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    attachments: Option<Vec<String>>,
+    reused_contract_context: Option<Vec<String>>,
 }
 
 #[derive(Serialize)]
@@ -377,7 +377,7 @@ struct GlobalSearchCounters {
     total_requirements_types: BTreeMap<String, usize>,
     total_semantic_contract_types: BTreeMap<String, usize>,
     total_verifications_types: BTreeMap<String, usize>,
-    total_refinements_types: BTreeMap<String, usize>,
+    total_contracts_types: BTreeMap<String, usize>,
     total_governance_metadata: GovernanceMetadataCounters,
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     total_other_types: BTreeMap<String, usize>,
@@ -411,13 +411,13 @@ impl Default for GlobalSearchCounters {
         verifications.insert("inspection-verification".to_string(), 0);
         verifications.insert("demonstration-verification".to_string(), 0);
 
-        let mut refinements = BTreeMap::new();
-        refinements.insert("source".to_string(), 0);
-        refinements.insert("behavior".to_string(), 0);
-        refinements.insert("constraint".to_string(), 0);
-        refinements.insert("specification".to_string(), 0);
-        refinements.insert("state".to_string(), 0);
-        refinements.insert("input-output".to_string(), 0);
+        let mut contracts = BTreeMap::new();
+        contracts.insert("source".to_string(), 0);
+        contracts.insert("behavior".to_string(), 0);
+        contracts.insert("constraint".to_string(), 0);
+        contracts.insert("specification".to_string(), 0);
+        contracts.insert("state".to_string(), 0);
+        contracts.insert("input-output".to_string(), 0);
 
         let mut governance_status = BTreeMap::new();
         for value in element::GOVERNANCE_STATUS_VALUES {
@@ -444,7 +444,7 @@ impl Default for GlobalSearchCounters {
             total_requirements_types: requirements,
             total_semantic_contract_types: semantic_contracts,
             total_verifications_types: verifications,
-            total_refinements_types: refinements,
+            total_contracts_types: contracts,
             total_governance_metadata: GovernanceMetadataCounters {
                 status: governance_status,
                 priority: governance_priority,
@@ -581,16 +581,16 @@ fn build_search_result(
                         .entry("semantic-contract".to_string())
                         .or_insert(0) += 1;
                 }
-                element::ElementType::Refinement(ref_t) => {
+                element::ElementType::Contract(ref_t) => {
                     let type_name = match ref_t {
-                        element::RefinementType::Source => "source",
-                        element::RefinementType::Constraint => "constraint",
-                        element::RefinementType::Behavior => "behavior",
-                        element::RefinementType::Specification => "specification",
-                        element::RefinementType::State => "state",
-                        element::RefinementType::InputOutput => "input-output",
+                        element::ContractType::Source => "source",
+                        element::ContractType::Constraint => "constraint",
+                        element::ContractType::Behavior => "behavior",
+                        element::ContractType::Specification => "specification",
+                        element::ContractType::State => "state",
+                        element::ContractType::InputOutput => "input-output",
                     };
-                    *c.total_refinements_types
+                    *c.total_contracts_types
                         .entry(type_name.to_string())
                         .or_insert(0) += 1;
                 }
@@ -633,11 +633,16 @@ fn build_search_result(
                 .then_with(|| a.target.target.cmp(&b.target.target))
         });
 
-        // Build attachments list (omit in short mode)
-        let attachments = if short_mode {
+        // Build reused_contract_context list (omit in short mode)
+        let reused_contract_context = if short_mode {
             None
         } else {
-            Some(elem.attachments.iter().map(|a| a.target.as_str()).collect())
+            Some(
+                elem.reused_contract_context
+                    .iter()
+                    .map(|a| a.target.as_str())
+                    .collect(),
+            )
         };
 
         // Build element summary
@@ -672,7 +677,7 @@ fn build_search_result(
                 elem.concept_references.clone()
             },
             relations: rels,
-            attachments,
+            reused_contract_context,
         };
 
         // Insert into flat file→elements map
@@ -829,10 +834,10 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
                 output.push('\n');
             }
 
-            // Refinement types
-            if !c.total_refinements_types.is_empty() {
-                output.push_str("📋 Refinement Types:\n");
-                for (type_name, count) in &c.total_refinements_types {
+            // Contract types
+            if !c.total_contracts_types.is_empty() {
+                output.push_str("📋 Contract Types:\n");
+                for (type_name, count) in &c.total_contracts_types {
                     output.push_str(&format!("  {}: {}\n", type_name, count));
                 }
                 output.push('\n');

@@ -74,7 +74,7 @@ reqvire:RequirementGovernanceShape
 
 reqvire:NonGovernanceElementShape
   a sh:NodeShape ;
-  sh:targetClass reqvire:Refinement, reqvire:Verification, reqvire:Ontology, reqvire:CustomElement ;
+  sh:targetClass reqvire:Contract, reqvire:Verification, reqvire:Ontology, reqvire:CustomElement ;
   sh:property [
     sh:path reqvire:status ;
     sh:maxCount 0 ;
@@ -233,11 +233,11 @@ reqvire:governanceAuthoringRule a reqvire:GovernanceRule ;
   reqvire:governanceRuleName "governance-authoring" ;
   reqvire:governanceAppliesTo "capability, requirement" ;
   reqvire:ruleCondition "An element declares status, priority, risk, or owner metadata." ;
-  reqvire:ruleOutcome "Only capability and requirement elements may author governance metadata; refinements and verifications obtain context from their owner or linked requirement." .
+  reqvire:ruleOutcome "Only capability and requirement elements may author governance metadata; contracts and verifications obtain context from their owner or linked requirement." .
 
 reqvire:governanceEffectiveValueRule a reqvire:GovernanceRule ;
   reqvire:governanceRuleName "governance-effective-value" ;
-  reqvire:governanceAppliesTo "capability, requirement, refinement, verification" ;
+  reqvire:governanceAppliesTo "capability, requirement, contract, verification" ;
   reqvire:governanceSourceOrder "explicit, inherited, default" ;
   reqvire:ruleCondition "A consumer requests effective governance metadata." ;
   reqvire:ruleOutcome "Return value and source for status, priority, risk, and owner; inherited values include source_identifier; defaults omit source_identifier." .

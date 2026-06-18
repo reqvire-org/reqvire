@@ -24,7 +24,7 @@ impl SemanticModelStore {
     pub fn build(registry: &GraphRegistry) -> Result<Self, ReqvireError> {
         let index = semantic_contract::build_semantic_index(registry);
         let authored_turtle = index.serialize(SemanticExportFormat::Turtle)?;
-        let full_turtle = index.serialize_full(SemanticExportFormat::Turtle, registry)?;
+        let full_turtle = index.serialize_full(SemanticExportFormat::Turtle)?;
 
         Ok(Self {
             index,

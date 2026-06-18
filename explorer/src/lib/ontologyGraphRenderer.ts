@@ -366,6 +366,10 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         'property-shape': { fill: cssVar('--rdf-propshape'), stroke: cssVar('--rdf-nodeshape'), text: textInverse },
         resource: { fill: reqvireSurfaceHover, stroke: cssVar('--other-ink'), text: textStrong }
     };
+    const colorByLayer = {
+        'reqvire-context': { fill: cssVar('--info'), stroke: cssVar('--info-border'), text: textInverse },
+        'external-source': { fill: cssVar('--other'), stroke: cssVar('--other-ink'), text: textStrong }
+    };
     const ontologyZIndex = {
         mutedNode: -10,
         base: 0,
@@ -379,6 +383,9 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         keepLabelUpright: true
     });
     function nodePalette(nodeData) {
+        if (nodeData.layer && nodeData.layer !== 'authored') {
+            return colorByLayer[nodeData.layer] || colorBySemanticType.resource;
+        }
         return colorBySemanticType[nodeData.semantic_type] || colorBySemanticType.resource;
     }
     const rawConnectionCounts = new Map();
@@ -426,6 +433,9 @@ function createSubclassTriangleEdgeProgram(options = {}) {
             'registry',
             'construct'
         ]),
+        layer: new Set([
+            'layer-authored'
+        ]),
         construct: new Set([
             'domain-range',
             'subclass',
@@ -448,9 +458,11 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         node._ontologyRoles = nodeRoleValues(node);
         node._ontologyConstructs = nodeConstructValues(node);
         node._ontologyOrigins = nodeOriginValues(node);
+        node._ontologyLayers = nodeLayerValues(node);
     });
     links.forEach(link => {
         link._ontologyConstructs = edgeConstructValues(link);
+        link._ontologyLayers = edgeLayerValues(link);
     });
     let visibleNodeIds = new Set(nodes.map(node => node.id));
     let selectedNodeId = null;
@@ -1910,6 +1922,20 @@ ${body}
         return origins;
     }
 
+    function nodeLayerValues(nodeData) {
+        return new Set([layerFilterValue(nodeData && nodeData.layer)]);
+    }
+
+    function edgeLayerValues(edgeData) {
+        return new Set([layerFilterValue(edgeData && edgeData.layer)]);
+    }
+
+    function layerFilterValue(layer) {
+        if (layer === 'reqvire-context') return 'layer-reqvire-context';
+        if (layer === 'external-source') return 'layer-external-source';
+        return 'layer-authored';
+    }
+
     function nodeRoleFilterValue(nodeData) {
         if (isExternalReferenceNode(nodeData)) {
             return 'external-reference';
@@ -2013,6 +2039,9 @@ ${body}
     }
 
     function nodePassesOwnFilters(nodeData) {
+        if (!hasAny(nodeData._ontologyLayers, filterState.layer)) {
+            return false;
+        }
         if (!hasAny(nodeData._ontologyRoles, filterState.role)) {
             return false;
         }
@@ -2025,13 +2054,22 @@ ${body}
         if (isConstructOnlyNode(nodeData)) {
             return hasAny(nodeData._ontologyConstructs, filterState.construct);
         }
+        if ((nodeData.layer || 'authored') !== 'authored') {
+            return true;
+        }
         return hasAuthoredSource(nodeData);
     }
 
     function edgePassesFilters(edgeData) {
         const hasConstructRole = edgeData._ontologyConstructs && edgeData._ontologyConstructs.size > 0;
+        if (!hasAny(edgeData._ontologyLayers, filterState.layer)) {
+            return false;
+        }
         if (!edgePassesRelationFilters(edgeData)) {
             return false;
+        }
+        if ((edgeData.layer || 'authored') !== 'authored') {
+            return true;
         }
         return hasConstructRole
             && hasAny(edgeData._ontologyConstructs, filterState.construct);
@@ -2377,6 +2415,7 @@ ${body}
         filterState.role.clear();
         filterState.construct.clear();
         filterState.origin.clear();
+        filterState.layer.clear();
         relationFilterState.clear();
         filterState.role.add('ontology-term');
         filterState.role.add('shacl-shape');
@@ -2402,6 +2441,9 @@ ${body}
         });
         ['authored', 'registry', 'construct'].forEach(value => {
             if (activeSet.has(value)) filterState.origin.add(value);
+        });
+        ['layer-authored', 'layer-reqvire-context', 'layer-external-source'].forEach(value => {
+            if (activeSet.has(value)) filterState.layer.add(value);
         });
         [
             'class-disjointness',

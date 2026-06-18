@@ -38,13 +38,13 @@ const documents: ProjectSearchDocument[] = [
     text: "The --output option writes JSON content to the specified file path.",
   },
   {
-    id: "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attach-command-verification",
+    id: "requirements/Functional/Core/Verifications/ReusedContractContextVerifications.md#reuse-command-verification",
     kind: "element",
     displayKind: "element",
     elementType: "test-verification",
-    title: "Attach Command Verification",
-    route: "#/elements/requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attach-command-verification",
-    text: "test-verification for attachment behavior.",
+    title: "Reuse Command Verification",
+    route: "#/elements/requirements/Functional/Core/Verifications/ReusedContractContextVerifications.md#reuse-command-verification",
+    text: "test-verification for reused_contract_context behavior.",
   },
   {
     id: "requirements/Ontologies/Core.md",
@@ -95,9 +95,9 @@ describe("project search index", () => {
 
   it("supports fuzzy and prefix matching", () => {
     const index = createProjectSearchIndex(documents);
-    const results = searchProjectDocuments(index, "verificaton attach", allKinds);
+    const results = searchProjectDocuments(index, "verificaton reuse", allKinds);
 
-    expect(results[0]?.title).toBe("Attach Command Verification");
+    expect(results[0]?.title).toBe("Reuse Command Verification");
   });
 
   it("filters by visible search kind", () => {

@@ -52,13 +52,13 @@ The system shall use this detection during lint analysis to identify and report 
 The system shall provide automatic fixing capability for auto-fixable lint issues, applying changes directly to model files when the `--fix` flag is used.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Lint Auto-fix Capability Refinement Specification](Specifications.md#lint-auto-fix-capability-refinement-specification)
+  * definedBy: [Lint Auto-fix Capability Contract Specification](Specifications.md#lint-auto-fix-capability-contract-specification)
   * derivedFrom: [Model Linting](#model-linting)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
@@ -71,7 +71,7 @@ The system shall detect when an element reaches a common ancestor through multip
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
@@ -88,7 +88,7 @@ The system shall detect and auto-remove redundant derivedFrom relations where an
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
@@ -103,16 +103,16 @@ The system shall detect and auto-remove redundant derivedFrom relations where an
 The system shall detect redundant verify relations where a verification directly verifies both a child element and its ancestor in the capability or requirement hierarchy, leveraging the existing verification trace tree logic from the Verification Trace Builder.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
-  * definedBy: [Redundant Verify Relations Detection Refinement Specification](Specifications.md#redundant-verify-relations-detection-refinement-specification)
+  * definedBy: [Redundant Verify Relations Detection Contract Specification](Specifications.md#redundant-verify-relations-detection-contract-specification)
   * derivedFrom: [Model Linting](#model-linting)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * satisfiedBy: [trace_tree_builder.rs](../../../core/src/trace_tree_builder.rs)

@@ -32,7 +32,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 This command collects:
 - The target element's content and metadata
 - Full upstream trace chain, including owning capabilities and ancestor requirements
-- Attached/refining specifications, constraints, behaviors, states, and input-output contracts, plus semantic contracts reached through explicit `constrain`/`constrainedBy` relations
+- Reused/refining specifications, constraints, behaviors, states, and input-output contracts, plus semantic contracts reached through explicit `constrain`/`constrainedBy` relations
 - Related documentation files
 - Source citations and file paths
 - Verification, satisfaction, and contract relations
@@ -53,7 +53,7 @@ Read the collected JSON file:
 The JSON structure includes:
 - **`element`**: The target element's content, metadata, and type
 - **`ancestors`**: Array of upstream trace elements from root to target
-- **`attachments`**: Specifications, constraints, behaviors, states, and input-output contracts refining the context; semantic contracts are reached through explicit `constrain`/`constrainedBy` relations
+- **`reused_contract_context`**: Specifications, constraints, behaviors, states, and input-output contracts refining the context; semantic contracts are reached through explicit `constrain`/`constrainedBy` relations
 - **`documents`**: Related markdown documentation files with content
 - **`citations`**: Source file paths and anchors for traceability
 - **`relations`**: verifiedBy, satisfiedBy, and definedBy links to other elements
@@ -61,8 +61,8 @@ The JSON structure includes:
 Extract and organize:
 - **Target element details**: Name, type, full content
 - **Trace hierarchy**: Owning capability path and requirement contract path
-- **Attached contracts**: All specifications, constraints, behaviors, states, input-output contracts, and semantic contracts
-- **Documentation**: Content from attached markdown files
+- **Reused contracts**: All specifications, constraints, behaviors, states, input-output contracts, and semantic contracts
+- **Documentation**: Content from reused markdown files
 - **Verification info**: verifiedBy relations and test criteria
 - **Implementation info**: satisfiedBy relations and code references
 - **Contract info**: definedBy relations to compatible contract elements
@@ -100,7 +100,7 @@ Create a complete, readable markdown document that synthesizes all collected inf
 
 ### Implementation Details
 
-[Describe how this requirement is implemented and refined. Extract information from satisfiedBy and definedBy relations and attached specifications:]
+[Describe how this requirement is implemented and defined. Extract information from satisfiedBy and definedBy relations and reused specifications:]
 
 - **Code/Components**: [List and describe all satisfiedBy elements - what they are and how they satisfy the requirement]
 - **Contracts**: [List and describe all definedBy elements - specifications, constraints, behaviors that define the requirement]
@@ -111,15 +111,15 @@ Create a complete, readable markdown document that synthesizes all collected inf
 
 ### Constraints and Validation
 
-[Detail all constraints, state rules, semantic contracts, and validation rules from attached contracts and explicit semantic-contract constraint/use relations. Explain what each rule means, why it exists, and what it prevents or ensures.]
+[Detail all constraints, state rules, semantic contracts, and validation rules from reused contracts and explicit semantic-contract constraint/use relations. Explain what each rule means, why it exists, and what it prevents or ensures.]
 
-### Attached Specifications
+### Reused Specifications
 
-[Include content from all attached specifications, constraints, behaviors, states, input-output contracts, and explicitly constraining semantic contracts. Rephrase this content to flow naturally as part of the document narrative. Synthesize related contracts together rather than treating them as separate items.]
+[Include content from all reused specifications, constraints, behaviors, states, input-output contracts, and explicitly constraining semantic contracts. Rephrase this content to flow naturally as part of the document narrative. Synthesize related contracts together rather than treating them as separate items.]
 
 ## Verification
 
-[Describe how this element is verified, extracted from verifiedBy relations and attached verification elements:]
+[Describe how this element is verified, extracted from verifiedBy relations and reused verification elements:]
 
 - **Verification Methods**: [List and describe verifiedBy elements - what type of verification (test, inspection, analysis, demonstration)]
 - **Test Criteria**: [Explain what the tests validate and how they prove the capability or requirement is satisfied]
@@ -128,7 +128,7 @@ Create a complete, readable markdown document that synthesizes all collected inf
 
 ## Related Documentation
 
-[Describe attached documentation files and their relevance. Include key insights and important information from these documents. Summarize what developers need to know from the documentation.]
+[Describe reused documentation files and their relevance. Include key insights and important information from these documents. Summarize what developers need to know from the documentation.]
 
 ## References
 
@@ -158,13 +158,13 @@ Create a complete, readable markdown document that synthesizes all collected inf
 - [Specification 1](path/to/file.md#spec-1)
 - [Constraint 1](path/to/file.md#constraint-1)
 
-**Attached Elements:**
-[List all attached specifications, constraints, behaviors]
+**Reused Elements:**
+[List all reused specifications, constraints, behaviors]
 - [Specification 1](path/to/file.md#spec-1)
 - [Constraint 1](path/to/file.md#constraint-1)
 
 **Related Documents:**
-[List all attached documentation files]
+[List all reused documentation files]
 - [Document 1](path/to/doc.md)
 
 ---

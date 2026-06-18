@@ -38,7 +38,7 @@ If you are interested in becoming a collaborator, start a
 - the amount of time and responsibility you can realistically take on
 - how you would work within Reqvire's AI-driven engineering process, where
   humans guide architecture and model intent while implementation is generated
-  and refined through agentic coding workflows
+  and improved through agentic coding workflows
 - any conflicts of interest, vendor interests, or production use cases that may
   shape your perspective
 
@@ -53,7 +53,7 @@ access level.
 Reqvire uses its own repository as an experiment in AI-driven engineering with a
 human in the loop. Humans work primarily as architects on higher-level planes:
 ontology, architecture, requirements, specifications, verification strategy, and
-system behavior. Implementation is generated, tested, and refined through
+system behavior. Implementation is generated, tested, and improved through
 agentic coding workflows.
 
 The goal is to achieve high-quality code that is not directly human-authored,

@@ -139,11 +139,11 @@ echo "✓ Element added via --content flag successfully"
 echo ""
 
 # ==================================
-# Test 1b: Add Element with Attachments
+# Test 1b: Add Element with Reused Contract Context
 # ==================================
-echo "Test 1b: Add element with attachments..."
+echo "Test 1b: Add element with reused_contract_context..."
 
-# First add a refinement element (constraint) that will be attached
+# First add a contract element (constraint) that will be reused
 # The constraint must be owned by a requirement (via definedBy), and Capability E must be outside that hierarchy
 CONSTRAINT_ELEMENT='### Capability D Constraint
 
@@ -176,10 +176,10 @@ if [ $LINK_EXIT -ne 0 ]; then
   exit 1
 fi
 
-# Now add a requirement with attachment to the constraint
+# Now add a requirement with reused_contract_context to the constraint
 ELEMENT_WITH_ATTACHMENT='### Capability E
 
-This capability has an attachment to a refinement element.
+This capability has an reused_contract_context to a contract element.
 
 #### Metadata
   * type: requirement
@@ -187,7 +187,7 @@ This capability has an attachment to a refinement element.
 #### Relations
   * derivedFrom: [Capability A](#capability-a)
 
-#### Attachments
+#### Reused Contract Context
   * [Capability D Constraint](#capability-d-constraint)
 '
 
@@ -197,20 +197,20 @@ ADD_ATTACH_EXIT=$?
 set -e
 
 if [ $ADD_ATTACH_EXIT -ne 0 ]; then
-  echo "❌ FAILED: Add element with attachment failed with exit code $ADD_ATTACH_EXIT"
+  echo "❌ FAILED: Add element with reused_contract_context failed with exit code $ADD_ATTACH_EXIT"
   echo "$ADD_ATTACH_OUTPUT"
   exit 1
 fi
 
-# Verify attachment section exists in file
-if ! grep -q "#### Attachments" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "❌ FAILED: Attachments section not found in file"
+# Verify reused_contract_context section exists in file
+if ! grep -q "#### Reused Contract Context" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Reused Contract Context section not found in file"
   exit 1
 fi
 
-# Verify attachment link exists
+# Verify reused_contract_context link exists
 if ! grep -q "Capability D Constraint" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "❌ FAILED: Attachment link not found in file"
+  echo "❌ FAILED: ReusedContractContextEntry link not found in file"
   exit 1
 fi
 
@@ -221,12 +221,12 @@ VALIDATION_EXIT=$?
 set -e
 
 if [ $VALIDATION_EXIT -ne 0 ]; then
-  echo "❌ FAILED: Model validation failed after add with attachment"
+  echo "❌ FAILED: Model validation failed after add with reused_contract_context"
   echo "$VALIDATION_OUTPUT"
   exit 1
 fi
 
-echo "✓ Element with attachment added successfully"
+echo "✓ Element with reused_contract_context added successfully"
 echo ""
 
 # ==================================

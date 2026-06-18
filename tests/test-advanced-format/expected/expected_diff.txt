@@ -1,25 +1,5 @@
 Found 9 file(s) with formatting changes:
 
-📄 AttachmentTest.md
-  01     # Elements
-  02
-  03     ### Attachment Display Name Test
-  04
-  05     This requirement tests that attachment display names are preserved by format.
-  06 -   #### Attachments
-  06 -     * [Human Readable Behavior Name](Behaviors.md#my-test-behavior)
-  06 -   ␤
-  06     #### Metadata
-  07       * type: requirement
-  08 +   #### Attachments
-  09 +     * [My Test Behavior](Behaviors.md#my-test-behavior)
-  10 +   ␤
-  11     #### Relations
-  12       * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
-  13     ---
-
-
-
 📄 Behaviors.md
   01 -   # Elements
   01 +   # Elements
@@ -109,6 +89,26 @@ Found 9 file(s) with formatting changes:
 
 
 
+📄 ReusedContractContextTest.md
+  01     # Elements
+  02
+  03     ### ReusedContractContextEntry Display Name Test
+  04
+  05     This requirement tests that reused contract context display names are preserved by format.
+  06 -   #### Reused Contract Context
+  06 -     * [Human Readable Behavior Name](Behaviors.md#my-test-behavior)
+  06 -   ␤
+  06     #### Metadata
+  07       * type: requirement
+  08 +   #### Reused Contract Context
+  09 +     * [My Test Behavior](Behaviors.md#my-test-behavior)
+  10 +   ␤
+  11     #### Relations
+  12       * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
+  13     ---
+
+
+
 📄 SystemRequirements/Requirements.md
   01     # Elements
   02 -   ### Requirements Processing
@@ -125,44 +125,42 @@ Found 9 file(s) with formatting changes:
   10 -     * satisfiedBy: ../core/src/model.rs
   10 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
   11 +     * satisfiedBy: [parser.rs](../core/src/parser.rs)
-  12 +     * trace: [MOE_UA](../MOEs.md#moe_ua)
-  13 +     * verifiedBy: [Format Test](../Verifications/Tests.md#format-test)
-  14 +   ---
-  15
-  16 -   ### Validation Framework
-  16 +   ### Requirements Processing
-  17
-  18 -   The system shall implement a two-pass validation architecture for comprehensive error detection.
-  18 +   The system shall parse the files in all folders and subfolders from the root of git repository.
-  19
-  20     #### Metadata
-  21       * type: requirement
-  22
-  23     #### Relations
-  24 -     * derivedFrom: #requirements-processing
-  24 -     * satisfiedBy: ../core/src/graph_registry.rs
-  24 -   ␤
-  24 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
-  25 +     * satisfiedBy: [model.rs](../core/src/model.rs)
-  26     ---
-  27 -   ### Path Resolution Testing
-  27 +   ### Validation Framework
-  28
-  29 -   This requirement tests various absolute path conversions from a subfolder.
-  29 +   The system shall implement a two-pass validation architecture for comprehensive error detection.
-  30
-  31     #### Metadata
-  32       * type: requirement
-  33
-  34     #### Relations
-  35 -     * derivedFrom: [../UserStories.md#managing-mbse-models](/UserStories.md#managing-mbse-models)
-  35 -     * trace: [../MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  35 -     * verifiedBy: [../Verifications/Tests.md#format-test](/Verifications/Tests.md#format-test)
-  35 -     * satisfiedBy: /core/src/parser.rs
-  35 +     * derivedFrom: [Requirements Processing](#requirements-processing)
-  36 +     * satisfiedBy: [graph_registry.rs](../core/src/graph_registry.rs)
-  37 +   ---
-  38
+  12 +     * verifiedBy: [Format Test](../Verifications/Tests.md#format-test)
+  13 +   ---
+  14
+  15 -   ### Validation Framework
+  15 +   ### Requirements Processing
+  16
+  17 -   The system shall implement a two-pass validation architecture for comprehensive error detection.
+  17 +   The system shall parse the files in all folders and subfolders from the root of git repository.
+  18
+  19     #### Metadata
+  20       * type: requirement
+  21
+  22     #### Relations
+  23 -     * derivedFrom: #requirements-processing
+  23 -     * satisfiedBy: ../core/src/graph_registry.rs
+  23 -   ␤
+  23 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
+  24 +     * satisfiedBy: [model.rs](../core/src/model.rs)
+  25     ---
+  26 -   ### Path Resolution Testing
+  26 +   ### Validation Framework
+  27
+  28 -   This requirement tests various absolute path conversions from a subfolder.
+  28 +   The system shall implement a two-pass validation architecture for comprehensive error detection.
+  29
+  30     #### Metadata
+  31       * type: requirement
+  32
+  33     #### Relations
+  34 -     * derivedFrom: [../UserStories.md#managing-mbse-models](/UserStories.md#managing-mbse-models)
+  34 -     * verifiedBy: [../Verifications/Tests.md#format-test](/Verifications/Tests.md#format-test)
+  34 -     * satisfiedBy: /core/src/parser.rs
+  34 +     * derivedFrom: [Requirements Processing](#requirements-processing)
+  35 +     * satisfiedBy: [graph_registry.rs](../core/src/graph_registry.rs)
+  36 +   ---
+  37
 
 
 
@@ -333,172 +331,168 @@ Found 9 file(s) with formatting changes:
   027 +   ␤
   028 +   #### Relations
   029 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
-  030 +     * trace: [MOE_UA](MOEs.md#moe_ua)
-  031     ---
-  032 -   Personas:
-  032 -   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
-  032 -   2. SOI Developer: Implements capabilities and makes system changes based on MBSE models, ensuring consistency between design and code.
-  032 -   3. Contributor: An external community member contributing to Reqvire by improving models, creating capabilities, or providing feedback.
-  032 -   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
-  032 -   ␤
-  032 -   ␤
-  032     ### Managing MBSE Models
-  033
-  034     As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
-  035
-  036     #### Metadata
-  037       * type: requirement
-  038 +   ␤
-  039     #### Relations
-  040 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  040 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  040 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
-  040 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
-  041 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
-  042 +     * trace: [MOE_UA](MOEs.md#moe_ua)
-  043 +   ---
+  030     ---
+  031 -   Personas:
+  031 -   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
+  031 -   2. SOI Developer: Implements capabilities and makes system changes based on MBSE models, ensuring consistency between design and code.
+  031 -   3. Contributor: An external community member contributing to Reqvire by improving models, creating capabilities, or providing feedback.
+  031 -   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
+  031 -   ␤
+  031 -   ␤
+  031     ### Managing MBSE Models
+  032
+  033     As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
+  034
+  035     #### Metadata
+  036       * type: requirement
+  037 +   ␤
+  038     #### Relations
+  039 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  039 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
+  039 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
+  040 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
+  041 +   ---
+  042
+  043 -   ### Generate Diagrams
+  043 -   As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
+  043 +   ### Missing Blank Line Test
   044
-  045 -   ### Generate Diagrams
-  045 -   As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
-  045 +   ### Missing Blank Line Test
-  046
-  047 +   This element has content but no blank line before metadata.
-  048 +   ␤
-  049     #### Metadata
-  050       * type: requirement
-  051 +   ␤
-  052     #### Relations
-  053 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  053 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  053 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
-  054 +   ---
+  045 +   This element has content but no blank line before metadata.
+  046 +   ␤
+  047     #### Metadata
+  048       * type: requirement
+  049 +   ␤
+  050     #### Relations
+  051 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  051 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
+  052 +   ---
+  053
+  054 -   ---
+  054 +   ### Root Capability
   055
-  056 -   ---
-  056 +   ### Root Capability
-  057
-  058 -   ### Missing Blank Line Test
-  058 -   This element has content but no blank line before metadata.
-  058 +   Top-level capability used as hierarchy parent for system requirements in this fixture.
-  059 +   ␤
-  060     #### Metadata
-  061       * type: requirement
-  062
-  063     #### Relations
-  064 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  064 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
-  065     ---
-  066 -   ### Metadata Repositioning Test
-  066 +   ### External URL Preservation Test
+  056 -   ### Missing Blank Line Test
+  056 -   This element has content but no blank line before metadata.
+  056 +   Top-level capability used as hierarchy parent for system requirements in this fixture.
+  057 +   ␤
+  058     #### Metadata
+  059       * type: requirement
+  060
+  061     #### Relations
+  062 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  062 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
+  063     ---
+  064 -   ### Metadata Repositioning Test
+  064 +   ### External URL Preservation Test
+  065
+  066 -   Verify that metadata repositioning maintains blank line spacing.
+  066 +   This element tests that external URLs in relations are preserved exactly as written.
   067
-  068 -   Verify that metadata repositioning maintains blank line spacing.
-  068 +   This element tests that external URLs in relations are preserved exactly as written.
-  069
-  070     #### Metadata
-  071 -     * type: verification
-  071 -     * implementation-status: implemented
-  071 +     * type: requirement
-  072
-  073 -   #### Details
-  073 +   #### Relations
-  074 +     * derivedFrom: [Root Capability](#root-capability)
-  075 +     * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
-  076 +   ---
+  068     #### Metadata
+  069 -     * type: verification
+  069 -     * implementation-status: implemented
+  069 +     * type: requirement
+  070
+  071 -   #### Details
+  071 +   #### Relations
+  072 +     * derivedFrom: [Root Capability](#root-capability)
+  073 +     * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
+  074 +   ---
+  075
+  076 -   This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
+  076 +   ### Test Capability Test Advanced Format Userstories Md
   077
-  078 -   This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
-  078 +   ### Test Capability Test Advanced Format Userstories Md
+  078 -   ##### Acceptance Criteria
+  078 +   Test capability root for migrated requirement fixtures.
   079
-  080 -   ##### Acceptance Criteria
-  080 +   Test capability root for migrated requirement fixtures.
-  081
-  082 -     * [ ] Metadata is moved to end position
-  082 -     * [ ] Blank line exists before metadata after repositioning
-  082 -     * [ ] Content structure is preserved
-  082
-  083 -   #### Relations
-  083 -     * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
-  083 +   Personas:
-  084 +   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
-  085 +   2. SOI Developer: Implements capabilities and makes system changes based on MBSE models, ensuring consistency between design and code.
-  086 +   3. Contributor: An external community member contributing to Reqvire by improving models, creating capabilities, or providing feedback.
-  087 +   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
-  088 +   ␤
-  089 +   #### Metadata
-  090 +     * type: capability
-  091     ---
-  092 -   ### Details Block Formatting Test
-  092 +   ### User Stories Verification Objective
+  080 -     * [ ] Metadata is moved to end position
+  080 -     * [ ] Blank line exists before metadata after repositioning
+  080 -     * [ ] Content structure is preserved
+  080
+  081 -   #### Relations
+  081 -     * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
+  081 +   Personas:
+  082 +   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
+  083 +   2. SOI Developer: Implements capabilities and makes system changes based on MBSE models, ensuring consistency between design and code.
+  084 +   3. Contributor: An external community member contributing to Reqvire by improving models, creating capabilities, or providing feedback.
+  085 +   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
+  086 +   ␤
+  087 +   #### Metadata
+  088 +     * type: capability
+  089     ---
+  090 -   ### Details Block Formatting Test
+  090 +   ### User Stories Verification Objective
+  091
+  092 -   Element with details block that should not be formatted.
+  092 -   <details>
+  092 -   <summary>Click to expand</summary>
+  092 +   Verification objective for concrete verification fixtures in this test model.
   093
-  094 -   Element with details block that should not be formatted.
-  094 -   <details>
-  094 -   <summary>Click to expand</summary>
-  094 +   Verification objective for concrete verification fixtures in this test model.
-  095
-  096 -   #### This Should Not Get Blank Line
-  096 -   Content inside details block.
-  096 -   ####Another Header Without Space
-  096 -   More content that should remain untouched.
-  096 -   </details>
-  096     #### Metadata
-  097 -     * type: requirement
-  097 -   ␤
-  097 -   #### Relations
-  097 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  097 +     * type: verification-objective
-  098     ---
-  099
-  100     ### Exact Blank Line Count Test
+  094 -   #### This Should Not Get Blank Line
+  094 -   Content inside details block.
+  094 -   ####Another Header Without Space
+  094 -   More content that should remain untouched.
+  094 -   </details>
+  094     #### Metadata
+  095 -     * type: requirement
+  095 -   ␤
+  095 -   #### Relations
+  095 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  095 +     * type: verification-objective
+  096     ---
+  097
+  098     ### Exact Blank Line Count Test
 
-  103     Content line 1.
-  104     Content line 2.
-  105     Content line 3.
-  106 +   ␤
-  107 +   #### Details
-  108 +   Detail content here.
-  109 +   ␤
-  110     #### Metadata
-  111 -     * type: verification
-  111 +     * type: test-verification
-  112       * implementation-status: implemented
-  113 -   #### Details
-  113 -   Detail content here.
-  113
-  114     #### Relations
-  115       * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
-  116     ---
-  117 -   ### Root Capability
-  117 +   ### Metadata Repositioning Test
+  101     Content line 1.
+  102     Content line 2.
+  103     Content line 3.
+  104 +   ␤
+  105 +   #### Details
+  106 +   Detail content here.
+  107 +   ␤
+  108     #### Metadata
+  109 -     * type: verification
+  109 +     * type: test-verification
+  110       * implementation-status: implemented
+  111 -   #### Details
+  111 -   Detail content here.
+  111
+  112     #### Relations
+  113       * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
+  114     ---
+  115 -   ### Root Capability
+  115 +   ### Metadata Repositioning Test
+  116
+  117 -   Top-level capability used as hierarchy parent for system requirements in this fixture.
+  117 +   Verify that metadata repositioning maintains blank line spacing.
   118
-  119 -   Top-level capability used as hierarchy parent for system requirements in this fixture.
-  119 +   Verify that metadata repositioning maintains blank line spacing.
-  120
-  121 -   #### Metadata
-  121 -     * type: requirement
-  121 +   #### Details
-  122 +   This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
-  123
-  124 -   #### Relations
-  124 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
-  124 -   ---
-  124 +   ##### Acceptance Criteria
-  125 +     * [ ] Metadata is moved to end position
-  126 +     * [ ] Blank line exists before metadata after repositioning
-  127 +     * [ ] Content structure is preserved
-  128
-  129 -   ### External URL Preservation Test
-  129 -   ␤
-  129 -   This element tests that external URLs in relations are preserved exactly as written.
-  129 -   ␤
-  129     #### Metadata
-  130 -     * type: requirement
-  130 +     * type: test-verification
-  131 +     * implementation-status: implemented
-  132
-  133     #### Relations
-  134 -     * derivedFrom: [Root Capability](#root-capability)
-  134 -     * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
-  134 -   ␤
-  134 +     * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
-  135     ---
+  119 -   #### Metadata
+  119 -     * type: requirement
+  119 +   #### Details
+  120 +   This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
+  121
+  122 -   #### Relations
+  122 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  122 -   ---
+  122 +   ##### Acceptance Criteria
+  123 +     * [ ] Metadata is moved to end position
+  124 +     * [ ] Blank line exists before metadata after repositioning
+  125 +     * [ ] Content structure is preserved
+  126
+  127 -   ### External URL Preservation Test
+  127 -   ␤
+  127 -   This element tests that external URLs in relations are preserved exactly as written.
+  127 -   ␤
+  127     #### Metadata
+  128 -     * type: requirement
+  128 +     * type: test-verification
+  129 +     * implementation-status: implemented
+  130
+  131     #### Relations
+  132 -     * derivedFrom: [Root Capability](#root-capability)
+  132 -     * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
+  132 -   ␤
+  132 +     * derivedFrom: [User Stories Verification Objective](#user-stories-verification-objective)
+  133     ---
 
 
 

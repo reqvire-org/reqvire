@@ -5,16 +5,16 @@
 The system shall automatically assign the **default type `requirement`** to all elements if not explicitly specified in their `metadata` subsection.
 
 #### Details
-Type assignment behavior shall follow the associated refinement specifications.
+Type assignment behavior shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Element Type Metadata Specification](Specifications.md#element-type-metadata-specification)
 
 #### Relations
-  * definedBy: [Default Requirement Type Assignment Refinement Specification](Specifications.md#default-requirement-type-assignment-refinement-specification)
+  * definedBy: [Default Requirement Type Assignment Contract Specification](Specifications.md#default-requirement-type-assignment-contract-specification)
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
   * verifiedBy: [Element Subsection Parsing Test](../Verifications/ModelStructure/ParsingVerifications.md#element-subsection-parsing-test)
   * verifiedBy: [Default Element Type Assignment Test](../Verifications/Operations/Validation/ValidationVerifications.md#default-element-type-assignment-test)
@@ -72,7 +72,7 @@ All manipulation operations shall:
   * definedBy: [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
   * definedBy: [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * definedBy: [Operation Command Contract Specification](Specifications.md#operation-command-contract-specification)
-  * derive: [Attachment Identifier Updates](#attachment-identifier-updates)
+  * derive: [Reused Contract Context Identifier Updates](#reused-contract-context-identifier-updates)
   * derive: [Create Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
   * derive: [Delete Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#delete-element-operation)
   * derive: [Element Manipulation File Persistence](../Operations/ModelOperations/ElementManipulationRequirements.md#element-manipulation-file-persistence)
@@ -84,26 +84,26 @@ All manipulation operations shall:
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
 ---
 
-### Attachment Identifier Updates
+### Reused Contract Context Identifier Updates
 
-When moving or renaming Refinement elements, the system shall update attachment identifiers in all referencing elements, using the same behavior as relation target updates.
+When moving or renaming Contract elements, the system shall update reused_contract_context identifiers in all referencing elements, using the same behavior as relation target updates.
 
 #### Details
-This requirement ensures consistency between relation updates and attachment identifier updates during CRUD operations:
+This requirement ensures consistency between relation updates and reused_contract_context identifier updates during CRUD operations:
 
-- When a Refinement element is **moved** to a different file, all attachments referencing that element shall be updated with the new identifier path
-- When a Refinement element is **renamed**, all attachments referencing that element shall be updated with the new element name in the identifier
+- When a Contract element is **moved** to a different file, all reused_contract_context referencing that element shall be updated with the new identifier path
+- When a Contract element is **renamed**, all reused_contract_context referencing that element shall be updated with the new element name in the identifier
 - The update behavior mirrors how relation targets are updated during move/rename operations
-- All files containing attachments that reference the affected element shall be modified
+- All files containing reused_contract_context that reference the affected element shall be modified
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Attachment Identifier CRUD Update Behavior](Behaviors.md#attachment-identifier-crud-update-behavior)
+  * definedBy: [Reused Contract Context Identifier CRUD Update Behavior](Behaviors.md#reused-contract-context-identifier-crud-update-behavior)
   * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../core/src/crud.rs)
-  * verifiedBy: [Attachment Identifier CRUD Verification](../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachment-identifier-crud-verification)
+  * verifiedBy: [Reused Contract Context Identifier CRUD Verification](../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-identifier-crud-verification)
 ---
 
 ### Git Repository as Project Root
@@ -136,12 +136,10 @@ The system shall implement relations following clearly defined specifications fo
   * type: requirement
 
 #### Relations
-  * definedBy: [RelationTypes](RelationTypes.md#relationtypes)
   * definedBy: [Relation Semantics Specification](Specifications.md#relation-semantics-specification)
-  * definedBy: [Relation Types and behaviors Refinement Specification](Specifications.md#relation-types-and-behaviors-refinement-specification)
+  * definedBy: [Relation Types and behaviors Contract Specification](Specifications.md#relation-types-and-behaviors-contract-specification)
   * derive: [Element Type Relation Compatibility](#element-type-relation-compatibility)
   * derive: [Relation Management Operations](#relation-management-operations)
-  * derive: [Trace Relation Non-Directional Behavior](../Reports/ModelReports/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
   * satisfiedBy: [relation.rs](../../core/src/relation.rs)
   * verifiedBy: [Element Subsection Parsing Test](../Verifications/ModelStructure/ParsingVerifications.md#element-subsection-parsing-test)
@@ -255,31 +253,31 @@ Contract relation validation shall enforce the subtype-compatible contract vocab
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
 
 #### Relations
-  * constrainedBy: [Custom Element Trace Boundary Shape](../Ontologies/CapabilityRequirementModel.md#custom-element-trace-boundary-shape)
-  * constrainedBy: [Refinement Ownership Shape](../Ontologies/CapabilityRequirementModel.md#refinement-ownership-shape)
-  * definedBy: [Refinement Element Structure Constraints Refinement Specification](Specifications.md#contract-element-structure-constraints-specification)
+  * constrainedBy: [Custom Element Semantic Boundary Shape](../Ontologies/CapabilityRequirementModel.md#custom-element-semantic-boundary-shape)
+  * constrainedBy: [Contract Ownership Shape](../Ontologies/CapabilityRequirementModel.md#contract-ownership-shape)
+  * definedBy: [Contract Element Structure Constraints Contract Specification](Specifications.md#contract-element-structure-constraints-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
-  * verifiedBy: [Refinement Relations Rejection Test](../Verifications/ModelStructure/ParsingVerifications.md#refinement-relations-rejection-test)
+  * verifiedBy: [Contract Relations Rejection Test](../Verifications/ModelStructure/ParsingVerifications.md#contract-relations-rejection-test)
 ---
 
-### Attachment Scope Constraints
+### Reused Contract Context Scope Constraints
 
-The system shall enforce scope constraints on contract-element attachments to ensure proper cross-submodel traceability while preventing redundant or invalid attachment relationships.
+The system shall enforce scope constraints on contract-element reused_contract_context to ensure proper cross-submodel traceability while preventing redundant or invalid reused_contract_context relationships.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
-  * definedBy: [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-contract-constraint)
-  * definedBy: [Attachment Subgraph Direction Constraint](Constraints.md#attachment-subgraph-direction-constraint)
-  * derivedFrom: [Refinement Element Structure Constraints](#contract-element-structure-constraints)
-  * verifiedBy: [Attachment Scope Constraints Test](../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachment-scope-constraints-test)
+  * definedBy: [Reused Contract Context Hierarchical Independence Constraint](Constraints.md#reused-contract-context-hierarchical-independence-constraint)
+  * definedBy: [Reused Contract Context Satisfied Contract Constraint](Constraints.md#reused-contract-context-satisfied-contract-constraint)
+  * definedBy: [Reused Contract Context Subgraph Direction Constraint](Constraints.md#reused-contract-context-subgraph-direction-constraint)
+  * derivedFrom: [Contract Element Structure Constraints](#contract-element-structure-constraints)
+  * verifiedBy: [Reused Contract Context Scope Constraints Test](../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-scope-constraints-test)
 ---
 
 ### Relation Management Operations
@@ -300,9 +298,9 @@ When unlinking, the system shall:
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-contract-constraint)
+#### Reused Contract Context
+  * [Reused Contract Context Hierarchical Independence Constraint](Constraints.md#reused-contract-context-hierarchical-independence-constraint)
+  * [Reused Contract Context Satisfied Contract Constraint](Constraints.md#reused-contract-context-satisfied-contract-constraint)
 
 #### Relations
   * definedBy: [Relation Operations Specification](Specifications.md#relation-operations-specification)
@@ -319,12 +317,12 @@ When unlinking, the system shall:
 The system shall support governance metadata for requirement elements, including status, priority, risk, and owner, with effective values resolved from authored metadata, hierarchy inheritance, and defaults.
 
 #### Details
-Governance metadata behavior shall follow the associated refinement specifications.
+Governance metadata behavior shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Requirement Governance Metadata Specification](Specifications.md#requirement-governance-metadata-specification)
 
 #### Relations
@@ -372,7 +370,7 @@ The system shall support defined verification categories following clearly defin
 #### Metadata
   * type: requirement
 
-#### Attachments
+#### Reused Contract Context
   * [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
 
 #### Relations

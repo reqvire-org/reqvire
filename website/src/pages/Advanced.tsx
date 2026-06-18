@@ -11,12 +11,12 @@ const advancedPages = [
   {
     name: "Implementation Coverage",
     href: "/implementation-coverage",
-    desc: "Requirement implementation evidence, satisfiedBy links, attachment contract coverage, and JSON report shape.",
+    desc: "Requirement implementation evidence, satisfiedBy links, reused-context contract coverage, and JSON report shape.",
   },
   {
     name: "Submodels and Subgraphs",
     href: "/submodels",
-    desc: "Capability-rooted subgraphs, cross-submodel couplings, one-way attachments, and boundary review.",
+    desc: "Capability-rooted subgraphs, cross-submodel couplings, one-way reused contract context, and boundary review.",
   },
 ];
 
@@ -56,7 +56,7 @@ export default function Advanced() {
             },
             {
               name: "reqvire change-impact",
-              desc: "Shows elements that need review because requirements, contracts, attachments, verification links, or semantic dependencies changed.",
+              desc: "Shows elements that need review because requirements, contracts, reused contract context, verification links, or semantic dependencies changed.",
             },
             {
               name: "reqvire ontologies",
@@ -75,7 +75,7 @@ export default function Advanced() {
           items={[
             "Verify leaf requirements where possible and let coverage roll up through the hierarchy.",
             "Use satisfiedBy for implementation and evidence artifacts, not as a substitute for verification scope.",
-            "Model cross-subgraph contract reuse with one-way attachments.",
+            "Model cross-subgraph contract reuse with one-way Reused Contract Context.",
             "Run validate, lint, coverage, traces, submodels, and change-impact before high-risk reviews.",
           ]}
         />

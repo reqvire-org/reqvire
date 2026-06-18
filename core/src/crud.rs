@@ -3,7 +3,7 @@
 // CLI should only parse arguments and call these functions
 
 use crate::diff::{generate_crud_diffs, generate_file_diff, CrudOperation, CrudResult, FileDiff};
-use crate::element::{Attachment, AttachmentTarget};
+use crate::element::{ReusedContractContextEntry, ReusedContractContextTarget};
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::model::ModelManager;
@@ -838,11 +838,11 @@ fn validate_semantic_contracts_after_mutation(
     }
 }
 
-fn validate_semantic_contracts_after_attachment_candidate(
+fn validate_semantic_contracts_after_reused_contract_context_candidate(
     model_manager: &ModelManager,
     element_id: &str,
-    attachment_identifier: &str,
-    attach: bool,
+    reused_contract_context_identifier: &str,
+    reuse: bool,
 ) -> Result<(), ReqvireError> {
     let mut candidate = model_manager.graph_registry.clone();
     let Some(node) = candidate.nodes.get_mut(element_id) else {
@@ -852,22 +852,30 @@ fn validate_semantic_contracts_after_attachment_candidate(
         )));
     };
 
-    if attach {
+    if reuse {
         if !node
             .element
-            .attachments
+            .reused_contract_context
             .iter()
-            .any(|attachment| attachment.target.as_str() == attachment_identifier)
+            .any(|reused_contract_context| {
+                reused_contract_context.target.as_str() == reused_contract_context_identifier
+            })
         {
-            node.element.attachments.push(Attachment {
-                target: AttachmentTarget::ElementIdentifier(attachment_identifier.to_string()),
-                content_hash: None,
-            });
+            node.element
+                .reused_contract_context
+                .push(ReusedContractContextEntry {
+                    target: ReusedContractContextTarget::ElementIdentifier(
+                        reused_contract_context_identifier.to_string(),
+                    ),
+                    content_hash: None,
+                });
         }
     } else {
         node.element
-            .attachments
-            .retain(|attachment| attachment.target.as_str() != attachment_identifier);
+            .reused_contract_context
+            .retain(|reused_contract_context| {
+                reused_contract_context.target.as_str() != reused_contract_context_identifier
+            });
     }
 
     let semantic_errors = candidate.validate_semantic_contracts_in_memory()?;
@@ -1281,18 +1289,18 @@ pub fn move_file(
     })
 }
 
-/// Attach a file to an element by adding it to the Attachments subsection
+/// Reuse a file to an element by adding it to the Reused Contract Context subsection
 ///
 /// # Arguments
 /// * `model_manager` - The model manager
-/// * `element_name` - Name of the element to attach to
-/// * `attachment_path` - Path to the file to attach (git-root-relative)
+/// * `element_name` - Name of the element to reuse to
+/// * `reused_context_path` - Path to the file to reuse (git-root-relative)
 /// * `git_root` - Git root directory
 /// * `dry_run` - If true, don't write changes to disk
-pub fn attach(
+pub fn reuse(
     model_manager: &mut ModelManager,
     element_name: &str,
-    attachment_path: &str,
+    reused_context_path: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
@@ -1314,15 +1322,15 @@ pub fn attach(
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
-    // Check if attachment already exists - return error
+    // Check if reused_contract_context already exists - return error
     if element
-        .attachments
+        .reused_contract_context
         .iter()
-        .any(|a| a.target.as_str() == attachment_path)
+        .any(|a| a.target.as_str() == reused_context_path)
     {
         return Err(ReqvireError::ElementError(format!(
-            "Attachment '{}' already exists on '{}'",
-            attachment_path, element_name
+            "ReusedContractContextEntry '{}' already exists on '{}'",
+            reused_context_path, element_name
         )));
     }
 
@@ -1330,24 +1338,28 @@ pub fn attach(
     let in_relations = element
         .relations
         .iter()
-        .any(|r| r.target.link.as_str() == attachment_path);
+        .any(|r| r.target.link.as_str() == reused_context_path);
 
     if in_relations {
         return Err(ReqvireError::CrossSectionDuplicate(format!(
-            "Target '{}' already exists in Relations of '{}'. Cannot add to Attachments.",
-            attachment_path, element_name
+            "Target '{}' already exists in Relations of '{}'. Cannot add to Reused Contract Context.",
+            reused_context_path, element_name
         )));
     }
 
-    // Calculate file-relative path for the attachment link in markdown
+    // Calculate file-relative path for the reused_contract_context link in markdown
     let file_dir = crate::utils::get_parent_dir(&file_path);
-    let attachment_path_buf = PathBuf::from(attachment_path);
-    let relative_attachment_path = pathdiff::diff_paths(&attachment_path_buf, &file_dir)
-        .unwrap_or_else(|| attachment_path_buf.clone());
-    let relative_attachment_str = relative_attachment_path.to_string_lossy();
+    let reused_context_path_buf = PathBuf::from(reused_context_path);
+    let relative_reused_context_path = pathdiff::diff_paths(&reused_context_path_buf, &file_dir)
+        .unwrap_or_else(|| reused_context_path_buf.clone());
+    let relative_reused_context_str = relative_reused_context_path.to_string_lossy();
 
-    // Find the element in the file and add/update Attachments subsection
-    let new_content = add_attachment_to_element(&content, element_name, &relative_attachment_str)?;
+    // Find the element in the file and add/update Reused Contract Context subsection
+    let new_content = add_reused_contract_context_to_element(
+        &content,
+        element_name,
+        &relative_reused_context_str,
+    )?;
 
     // Generate diff
     let diff = generate_file_diff(&file_path, &content, &new_content);
@@ -1366,17 +1378,17 @@ pub fn attach(
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id,
-        element_name: format!("Attached {} to {}", attachment_path, element_name),
+        element_name: format!("Reused {} to {}", reused_context_path, element_name),
         diffs: vec![diff],
         dry_run,
     })
 }
 
-/// Detach a file from an element by removing it from the Attachments subsection
-pub fn detach(
+/// Remove Reused Context a file from an element by removing it from the Reused Contract Context subsection
+pub fn remove_reused_contract_context(
     model_manager: &mut ModelManager,
     element_name: &str,
-    attachment_path: &str,
+    reused_context_path: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
@@ -1398,16 +1410,19 @@ pub fn detach(
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
-    // Calculate file-relative path for finding the attachment link in markdown
+    // Calculate file-relative path for finding the reused_contract_context link in markdown
     let file_dir = crate::utils::get_parent_dir(&file_path);
-    let attachment_path_buf = PathBuf::from(attachment_path);
-    let relative_attachment_path = pathdiff::diff_paths(&attachment_path_buf, &file_dir)
-        .unwrap_or_else(|| attachment_path_buf.clone());
-    let relative_attachment_str = relative_attachment_path.to_string_lossy();
+    let reused_context_path_buf = PathBuf::from(reused_context_path);
+    let relative_reused_context_path = pathdiff::diff_paths(&reused_context_path_buf, &file_dir)
+        .unwrap_or_else(|| reused_context_path_buf.clone());
+    let relative_reused_context_str = relative_reused_context_path.to_string_lossy();
 
-    // Remove attachment from element
-    let new_content =
-        remove_attachment_from_element(&content, element_name, &relative_attachment_str)?;
+    // Remove reused_contract_context from element
+    let new_content = remove_reused_contract_context_from_element(
+        &content,
+        element_name,
+        &relative_reused_context_str,
+    )?;
 
     // Generate diff
     let diff = generate_file_diff(&file_path, &content, &new_content);
@@ -1426,52 +1441,58 @@ pub fn detach(
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id,
-        element_name: format!("Detached {} from {}", attachment_path, element_name),
+        element_name: format!(
+            "Removed Reused Context {} from {}",
+            reused_context_path, element_name
+        ),
         diffs: vec![diff],
         dry_run,
     })
 }
 
-fn resolve_attachment_identifier_for_element(
+fn resolve_reused_contract_context_identifier_for_element(
     model_manager: &ModelManager,
     target_element_file_path: &str,
-    attachment_target: &str,
+    reused_contract_context_target: &str,
 ) -> Result<String, ReqvireError> {
-    if !attachment_target.contains('#') {
-        return Err(ReqvireError::InvalidAttachmentTarget(format!(
-            "Invalid attachment target '{}'. Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
-            attachment_target
+    if !reused_contract_context_target.contains('#') {
+        return Err(ReqvireError::InvalidReusedContractContextTarget(format!(
+            "Invalid reused_contract_context target '{}'. Reused Contract Context must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
+            reused_contract_context_target
         )));
     }
 
-    if attachment_target.starts_with('#') {
-        return Ok(format!("{}{}", target_element_file_path, attachment_target));
+    if reused_contract_context_target.starts_with('#') {
+        return Ok(format!(
+            "{}{}",
+            target_element_file_path, reused_contract_context_target
+        ));
     }
 
     if model_manager
         .graph_registry
-        .get_element(attachment_target)
+        .get_element(reused_contract_context_target)
         .is_some()
     {
-        return Ok(attachment_target.to_string());
+        return Ok(reused_contract_context_target.to_string());
     }
 
     let base_path = std::path::Path::new(target_element_file_path)
         .parent()
         .unwrap_or_else(|| std::path::Path::new("."));
-    crate::utils::normalize_identifier(attachment_target, base_path).map_err(|e| {
-        ReqvireError::InvalidAttachmentTarget(format!(
-            "Invalid attachment target '{}': {}. Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
-            attachment_target, e
+    crate::utils::normalize_identifier(reused_contract_context_target, base_path).map_err(|e| {
+        ReqvireError::InvalidReusedContractContextTarget(format!(
+            "Invalid reused_contract_context target '{}': {}. Reused Contract Context must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
+            reused_contract_context_target, e
         ))
     })
 }
 
-/// Attach a compatible requirement-owned refinement element identifier to a requirement.
-pub fn attach_element_identifier(
+/// Reuse a compatible requirement-owned contract element identifier to a requirement.
+pub fn reuse_contract_element_identifier(
     model_manager: &mut ModelManager,
     element_name: &str,
-    attachment_target: &str,
+    reused_contract_context_target: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
@@ -1486,127 +1507,134 @@ pub fn attach_element_identifier(
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
-    let attachment_identifier =
-        resolve_attachment_identifier_for_element(model_manager, &file_path, attachment_target)?;
+    let reused_contract_context_identifier =
+        resolve_reused_contract_context_identifier_for_element(
+            model_manager,
+            &file_path,
+            reused_contract_context_target,
+        )?;
 
-    let attachment_element = model_manager
+    let reused_contract_context_element = model_manager
         .graph_registry
-        .get_element(&attachment_identifier)
+        .get_element(&reused_contract_context_identifier)
         .ok_or_else(|| {
-            ReqvireError::MissingAttachmentTarget(format!(
-                "Attachment target '{}' could not be resolved to an existing element identifier.",
-                attachment_target
+            ReqvireError::MissingReusedContractContextTarget(format!(
+                "ReusedContractContextEntry target '{}' could not be resolved to an existing element identifier.",
+                reused_contract_context_target
             ))
         })?;
 
-    if !attachment_element.element_type.is_refinement() {
-        return Err(ReqvireError::InvalidAttachmentTarget(format!(
-            "Element '{}' is not an attachable type. Only compatible requirement-owned Refinement elements can be attached; ontology vocabulary uses Concept References.",
-            attachment_element.name
+    if !reused_contract_context_element.element_type.is_contract() {
+        return Err(ReqvireError::InvalidReusedContractContextTarget(format!(
+            "Element '{}' is not an reusable type. Only compatible requirement-owned Contract elements can be reused; ontology vocabulary uses Concept References.",
+            reused_contract_context_element.name
         )));
     }
 
     if !target_element.element_type.is_requirement() {
-        return Err(ReqvireError::InvalidAttachmentTarget(format!(
-            "Element '{}' (type: {}) cannot author attachments. Only requirement elements may author attachments to reusable requirement-owned refinements; ontology vocabulary uses Concept References and semantic contracts use use/usedBy.",
+        return Err(ReqvireError::InvalidReusedContractContextTarget(format!(
+            "Element '{}' (type: {}) cannot author reused_contract_context. Only requirement elements may author reused_contract_context to reusable requirement-owned contracts; ontology vocabulary uses Concept References and semantic contracts use use/usedBy.",
             element_name,
             target_element.element_type.as_str(),
         )));
     }
 
-    let attachment_type_valid = attachment_element.element_type.is_requirement_refinement();
+    let reused_context_type_valid = reused_contract_context_element
+        .element_type
+        .is_requirement_contract();
 
-    if !attachment_type_valid {
-        return Err(ReqvireError::InvalidAttachmentTarget(format!(
-            "Element '{}' (type: {}) cannot attach '{}' (type: {}). Requirement attachments may target requirement-owned source, constraint, behavior, specification, state, or input-output only. Ontology vocabulary uses Concept References; semantic contracts constrain requirements through constrainedBy/constrain.",
+    if !reused_context_type_valid {
+        return Err(ReqvireError::InvalidReusedContractContextTarget(format!(
+            "Element '{}' (type: {}) cannot reuse '{}' (type: {}). Requirement reused_contract_context may target requirement-owned source, constraint, behavior, specification, state, or input-output only. Ontology vocabulary uses Concept References; semantic contracts constrain requirements through constrainedBy/constrain.",
             element_name,
             target_element.element_type.as_str(),
-            attachment_element.name,
-            attachment_element.element_type.as_str()
+            reused_contract_context_element.name,
+            reused_contract_context_element.element_type.as_str()
         )));
     }
 
-    if attachment_element.element_type.is_refinement()
+    if reused_contract_context_element.element_type.is_contract()
         && !model_manager
             .graph_registry
-            .refinement_has_refine_relation(&attachment_identifier)
+            .contract_has_define_relation(&reused_contract_context_identifier)
     {
-        return Err(ReqvireError::InvalidAttachmentTarget(
+        return Err(ReqvireError::InvalidReusedContractContextTarget(
             format!(
-                "'{}' has no define relation. Contracts must define a requirement before they can be attached; contracts are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not defined by implementation-detail contracts.",
-                attachment_element.name
+                "'{}' has no define relation. Contracts must define a requirement before they can be reused; contracts are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not defined by implementation-detail contracts.",
+                reused_contract_context_element.name
             )
         ));
     }
 
     let defining_reqs = model_manager
         .graph_registry
-        .get_defining_requirements(&attachment_identifier);
+        .get_defining_requirements(&reused_contract_context_identifier);
     for defining_req_id in defining_reqs {
         if model_manager
             .graph_registry
             .is_in_hierarchy(&element_id, &defining_req_id)
         {
-            return Err(ReqvireError::InvalidAttachmentScope(
+            return Err(ReqvireError::InvalidReusedContractContextScope(
                 format!(
-                    "'{}' cannot be attached to '{}' because it is within the contract's defining hierarchy. Attachments are only allowed from elements outside the definedBy chain.",
-                    attachment_element.name, element_name
+                    "'{}' cannot be reused to '{}' because it is within the contract's defining hierarchy. Reused Contract Context are only allowed from elements outside the definedBy chain.",
+                    reused_contract_context_element.name, element_name
                 )
             ));
         }
     }
 
-    if attachment_element.element_type.is_refinement() {
+    if reused_contract_context_element.element_type.is_contract() {
         if let Some(msg) = model_manager
             .graph_registry
-            .build_attachment_direction_scope_error(
-                &attachment_identifier,
+            .build_reused_contract_context_direction_scope_error(
+                &reused_contract_context_identifier,
                 &element_id,
                 element_name,
                 None,
             )
         {
-            return Err(ReqvireError::InvalidAttachmentScope(msg));
+            return Err(ReqvireError::InvalidReusedContractContextScope(msg));
         }
     }
 
     if target_element
-        .attachments
+        .reused_contract_context
         .iter()
-        .any(|a| a.target.as_str() == attachment_identifier)
+        .any(|a| a.target.as_str() == reused_contract_context_identifier)
     {
         return Err(ReqvireError::ElementError(format!(
-            "Attachment '{}' already exists on '{}'",
-            attachment_target, element_name
+            "ReusedContractContextEntry '{}' already exists on '{}'",
+            reused_contract_context_target, element_name
         )));
     }
 
     let in_relations = target_element
         .relations
         .iter()
-        .any(|r| r.target.link.as_str() == attachment_identifier);
+        .any(|r| r.target.link.as_str() == reused_contract_context_identifier);
     if in_relations {
         return Err(ReqvireError::CrossSectionDuplicate(format!(
-            "Target '{}' already exists in Relations of '{}'. Cannot add to Attachments.",
-            attachment_target, element_name
+            "Target '{}' already exists in Relations of '{}'. Cannot add to Reused Contract Context.",
+            reused_contract_context_target, element_name
         )));
     }
 
-    validate_semantic_contracts_after_attachment_candidate(
+    validate_semantic_contracts_after_reused_contract_context_candidate(
         model_manager,
         &element_id,
-        &attachment_identifier,
+        &reused_contract_context_identifier,
         true,
     )?;
 
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
-    let attachment_display_name = attachment_element.name.clone();
-    let attachment_file_path = attachment_element.file_path.clone();
+    let reused_context_display_name = reused_contract_context_element.name.clone();
+    let reused_context_file_path = reused_contract_context_element.file_path.clone();
 
-    let relative_identifier = if file_path == attachment_file_path {
-        let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&attachment_identifier);
-        let fragment = fragment_opt.unwrap_or(&attachment_identifier);
+    let relative_identifier = if file_path == reused_context_file_path {
+        let (_path, fragment_opt) =
+            crate::utils::extract_path_and_fragment(&reused_contract_context_identifier);
+        let fragment = fragment_opt.unwrap_or(&reused_contract_context_identifier);
         format!("#{}", fragment)
     } else {
         let target_file_path_buf = std::path::PathBuf::from(&file_path);
@@ -1614,14 +1642,18 @@ pub fn attach_element_identifier(
             .parent()
             .unwrap_or_else(|| std::path::Path::new("."))
             .to_path_buf();
-        crate::utils::to_relative_identifier(&attachment_identifier, &target_folder, true)
-            .unwrap_or_else(|_| attachment_identifier.clone())
+        crate::utils::to_relative_identifier(
+            &reused_contract_context_identifier,
+            &target_folder,
+            true,
+        )
+        .unwrap_or_else(|_| reused_contract_context_identifier.clone())
     };
 
-    let new_content = add_element_attachment_to_element(
+    let new_content = add_element_reused_contract_context_to_element(
         &content,
         element_name,
-        &attachment_display_name,
+        &reused_context_display_name,
         &relative_identifier,
     )?;
     let diff = generate_file_diff(&file_path, &content, &new_content);
@@ -1637,45 +1669,48 @@ pub fn attach_element_identifier(
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id,
-        element_name: format!("Attached element {} to {}", attachment_target, element_name),
+        element_name: format!(
+            "Reused element {} to {}",
+            reused_contract_context_target, element_name
+        ),
         diffs: vec![diff],
         dry_run,
     })
 }
 
-/// Attach a Refinement element by name to another element.
-pub fn attach_element(
+/// Reuse a Contract element by name to another element.
+pub fn reuse_contract_element(
     model_manager: &mut ModelManager,
     element_name: &str,
-    attachment_element_name: &str,
+    reused_contract_context_element_name: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    let attachment_identifier = model_manager
+    let reused_contract_context_identifier = model_manager
         .graph_registry
-        .get_element_by_name(attachment_element_name)
+        .get_element_by_name(reused_contract_context_element_name)
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!(
-                "Attachment '{}' not found",
-                attachment_element_name
+                "ReusedContractContextEntry '{}' not found",
+                reused_contract_context_element_name
             ))
         })?
         .identifier
         .clone();
-    attach_element_identifier(
+    reuse_contract_element_identifier(
         model_manager,
         element_name,
-        &attachment_identifier,
+        &reused_contract_context_identifier,
         git_root,
         dry_run,
     )
 }
 
-/// Detach a Refinement element identifier from an element.
-pub fn detach_element_identifier(
+/// Remove Reused Context a Contract element identifier from an element.
+pub fn remove_reused_contract_element_identifier(
     model_manager: &mut ModelManager,
     element_name: &str,
-    attachment_target: &str,
+    reused_contract_context_target: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
@@ -1690,14 +1725,18 @@ pub fn detach_element_identifier(
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
-    let attachment_identifier =
-        resolve_attachment_identifier_for_element(model_manager, &file_path, attachment_target)?;
+    let reused_contract_context_identifier =
+        resolve_reused_contract_context_identifier_for_element(
+            model_manager,
+            &file_path,
+            reused_contract_context_target,
+        )?;
 
-    let attachment_display_name = model_manager
+    let reused_context_display_name = model_manager
         .graph_registry
-        .get_element(&attachment_identifier)
+        .get_element(&reused_contract_context_identifier)
         .map(|e| e.name.clone())
-        .unwrap_or_else(|| attachment_identifier.clone());
+        .unwrap_or_else(|| reused_contract_context_identifier.clone());
 
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
@@ -1709,26 +1748,33 @@ pub fn detach_element_identifier(
         .to_path_buf();
     let relative_identifier = {
         let (identifier_path, fragment_opt) =
-            crate::utils::extract_path_and_fragment(&attachment_identifier);
+            crate::utils::extract_path_and_fragment(&reused_contract_context_identifier);
         if identifier_path == file_path {
-            format!("#{}", fragment_opt.unwrap_or(&attachment_identifier))
+            format!(
+                "#{}",
+                fragment_opt.unwrap_or(&reused_contract_context_identifier)
+            )
         } else {
-            crate::utils::to_relative_identifier(&attachment_identifier, &target_folder, true)
-                .unwrap_or_else(|_| attachment_identifier.clone())
+            crate::utils::to_relative_identifier(
+                &reused_contract_context_identifier,
+                &target_folder,
+                true,
+            )
+            .unwrap_or_else(|_| reused_contract_context_identifier.clone())
         }
     };
 
-    let new_content = remove_element_attachment_from_element(
+    let new_content = remove_element_reused_contract_context_from_element(
         &content,
         element_name,
-        &attachment_display_name,
+        &reused_context_display_name,
         &relative_identifier,
     )?;
 
-    validate_semantic_contracts_after_attachment_candidate(
+    validate_semantic_contracts_after_reused_contract_context_candidate(
         model_manager,
         &element_id,
-        &attachment_identifier,
+        &reused_contract_context_identifier,
         false,
     )?;
 
@@ -1746,43 +1792,43 @@ pub fn detach_element_identifier(
         operation: CrudOperation::Update,
         element_id,
         element_name: format!(
-            "Detached element {} from {}",
-            attachment_target, element_name
+            "Removed Reused Context element {} from {}",
+            reused_contract_context_target, element_name
         ),
         diffs: vec![diff],
         dry_run,
     })
 }
 
-/// Detach a Refinement element by name from another element.
-pub fn detach_element(
+/// Remove Reused Context a Contract element by name from another element.
+pub fn remove_reused_contract_element(
     model_manager: &mut ModelManager,
     element_name: &str,
-    attachment_element_name: &str,
+    reused_contract_context_element_name: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    let attachment_identifier = model_manager
+    let reused_contract_context_identifier = model_manager
         .graph_registry
-        .get_element_by_name(attachment_element_name)
+        .get_element_by_name(reused_contract_context_element_name)
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!(
-                "Attachment '{}' not found",
-                attachment_element_name
+                "ReusedContractContextEntry '{}' not found",
+                reused_contract_context_element_name
             ))
         })?
         .identifier
         .clone();
-    detach_element_identifier(
+    remove_reused_contract_element_identifier(
         model_manager,
         element_name,
-        &attachment_identifier,
+        &reused_contract_context_identifier,
         git_root,
         dry_run,
     )
 }
 
-/// Move an asset file and update all references across elements (Attachments and Relations)
+/// Move an asset file and update all references across elements (Reused Contract Context and Relations)
 pub fn mv_asset(
     model_manager: &mut ModelManager,
     old_path: &str,
@@ -1796,19 +1842,19 @@ pub fn mv_asset(
 
     let old_path_buf = PathBuf::from(old_path);
 
-    // Find all elements with this file as attachment OR as InternalPath relation target
+    // Find all elements with this file as reused_contract_context OR as InternalPath relation target
     let mut affected_files: std::collections::HashSet<String> = std::collections::HashSet::new();
-    let mut attachment_count = 0;
+    let mut reused_contract_context_count = 0;
     let mut relation_count = 0;
 
     for node in model_manager.graph_registry.nodes.values() {
         let elem = &node.element;
 
-        // Check attachments
-        for attachment in &elem.attachments {
-            if attachment.target.as_str() == old_path {
+        // Check reused_contract_context
+        for reused_contract_context in &elem.reused_contract_context {
+            if reused_contract_context.target.as_str() == old_path {
                 affected_files.insert(elem.file_path.clone());
-                attachment_count += 1;
+                reused_contract_context_count += 1;
             }
         }
 
@@ -1824,7 +1870,7 @@ pub fn mv_asset(
     }
 
     if affected_files.is_empty() {
-        return Err(ReqvireError::MissingAttachmentTarget(format!(
+        return Err(ReqvireError::MissingReusedContractContextTarget(format!(
             "No elements reference file '{}'",
             old_path
         )));
@@ -1852,7 +1898,7 @@ pub fn mv_asset(
         let old_relative_str = old_relative.to_string_lossy();
         let new_relative_str = new_relative.to_string_lossy();
 
-        // Replace attachment links: [path](path)
+        // Replace reused_contract_context links: [path](path)
         let old_link = format!("[{}]({})", old_relative_str, old_relative_str);
         let new_link = format!("[{}]({})", new_relative_str, new_relative_str);
         new_content = new_content.replace(&old_link, &new_link);
@@ -1895,10 +1941,10 @@ pub fn mv_asset(
         operation: CrudOperation::Move,
         element_id: old_path.to_string(),
         element_name: format!(
-            "Moved {} → {} ({} attachment(s), {} relation(s) in {} file(s))",
+            "Moved {} → {} ({} reused_contract_context(s), {} relation(s) in {} file(s))",
             old_path,
             new_path,
-            attachment_count,
+            reused_contract_context_count,
             relation_count,
             affected_files.len()
         ),
@@ -1907,7 +1953,7 @@ pub fn mv_asset(
     })
 }
 
-/// Remove an asset file and remove all references from elements (Attachments and Relations)
+/// Remove an asset file and remove all references from elements (Reused Contract Context and Relations)
 pub fn rm_asset(
     model_manager: &mut ModelManager,
     file_path_arg: &str,
@@ -1918,19 +1964,19 @@ pub fn rm_asset(
     use std::fs;
     use std::path::PathBuf;
 
-    // Find all elements with this file as attachment OR as InternalPath relation target
+    // Find all elements with this file as reused_contract_context OR as InternalPath relation target
     let mut affected_files: std::collections::HashSet<String> = std::collections::HashSet::new();
-    let mut attachment_count = 0;
+    let mut reused_contract_context_count = 0;
     let mut relation_count = 0;
 
     for node in model_manager.graph_registry.nodes.values() {
         let elem = &node.element;
 
-        // Check attachments
-        for attachment in &elem.attachments {
-            if attachment.target.as_str() == file_path_arg {
+        // Check reused_contract_context
+        for reused_contract_context in &elem.reused_contract_context {
+            if reused_contract_context.target.as_str() == file_path_arg {
                 affected_files.insert(elem.file_path.clone());
-                attachment_count += 1;
+                reused_contract_context_count += 1;
             }
         }
 
@@ -1959,8 +2005,9 @@ pub fn rm_asset(
             .unwrap_or_else(|| file_path_buf.clone());
         let relative_path_str = relative_path.to_string_lossy();
 
-        // Remove attachments
-        let mut new_content = remove_attachment_from_file(&content, &relative_path_str)?;
+        // Remove reused_contract_context
+        let mut new_content =
+            remove_reused_contract_context_from_file(&content, &relative_path_str)?;
 
         // Remove InternalPath relations
         new_content = remove_relation_with_path(&new_content, &relative_path_str)?;
@@ -1992,9 +2039,9 @@ pub fn rm_asset(
         operation: CrudOperation::Remove,
         element_id: file_path_arg.to_string(),
         element_name: format!(
-            "Removed {} ({} attachment(s), {} relation(s) from {} file(s))",
+            "Removed {} ({} reused_contract_context(s), {} relation(s) from {} file(s))",
             file_path_arg,
-            attachment_count,
+            reused_contract_context_count,
             relation_count,
             affected_files.len()
         ),
@@ -2209,18 +2256,19 @@ fn remove_relation_with_path(content: &str, path: &str) -> Result<String, Reqvir
     Ok(result)
 }
 
-// Helper function to add attachment to element in markdown content
-fn add_attachment_to_element(
+// Helper function to add reused_contract_context to element in markdown content
+fn add_reused_contract_context_to_element(
     content: &str,
     element_name: &str,
-    attachment_path: &str,
+    reused_context_path: &str,
 ) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let mut in_target_element = false;
     let mut inserted = false;
     let mut lines_iter = content.lines().peekable();
 
-    let attachment_line = format!("* [{}]({})", attachment_path, attachment_path);
+    let reused_contract_context_line =
+        format!("* [{}]({})", reused_context_path, reused_context_path);
 
     while let Some(line) = lines_iter.next() {
         let trimmed = line.trim();
@@ -2231,12 +2279,12 @@ fn add_attachment_to_element(
             in_target_element = name == element_name;
         }
 
-        // Check for Attachments subsection
-        if in_target_element && trimmed == "#### Attachments" {
+        // Check for Reused Contract Context subsection
+        if in_target_element && trimmed == "#### Reused Contract Context" {
             result.push_str(line);
             result.push('\n');
 
-            // Add the new attachment after existing ones
+            // Add the new reused_contract_context after existing ones
             while let Some(next_line) = lines_iter.peek() {
                 let next_trimmed = next_line.trim();
                 if next_trimmed.starts_with("* ")
@@ -2250,18 +2298,18 @@ fn add_attachment_to_element(
                 }
             }
 
-            // Add our new attachment
-            result.push_str(&attachment_line);
+            // Add our new reused_contract_context
+            result.push_str(&reused_contract_context_line);
             result.push('\n');
             inserted = true;
             continue;
         }
 
-        // Check for separator (end of element) - insert Attachments section if not found
+        // Check for separator (end of element) - insert Reused Contract Context section if not found
         if in_target_element && !inserted && trimmed == "---" {
-            // Need to add Attachments section before the separator
-            result.push_str("\n#### Attachments\n");
-            result.push_str(&attachment_line);
+            // Need to add Reused Contract Context section before the separator
+            result.push_str("\n#### Reused Contract Context\n");
+            result.push_str(&reused_contract_context_line);
             result.push('\n');
             inserted = true;
         }
@@ -2272,7 +2320,7 @@ fn add_attachment_to_element(
 
     if !inserted {
         return Err(ReqvireError::ElementNotFound(format!(
-            "Could not find element '{}' to add attachment",
+            "Could not find element '{}' to add reused_contract_context",
             element_name
         )));
     }
@@ -2280,19 +2328,19 @@ fn add_attachment_to_element(
     Ok(result)
 }
 
-// Helper function to remove attachment from element in markdown content
-fn remove_attachment_from_element(
+// Helper function to remove reused_contract_context from element in markdown content
+fn remove_reused_contract_context_from_element(
     content: &str,
     element_name: &str,
-    attachment_path: &str,
+    reused_context_path: &str,
 ) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let mut in_target_element = false;
-    let mut in_attachments_section = false;
+    let mut in_reused_contract_context_section = false;
     let mut removed = false;
-    let mut remaining_attachments_count = 0;
+    let mut remaining_reused_contract_context_count = 0;
 
-    let attachment_link = format!("[{}]({})", attachment_path, attachment_path);
+    let reused_context_link = format!("[{}]({})", reused_context_path, reused_context_path);
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -2307,31 +2355,32 @@ fn remove_attachment_from_element(
                 // We're leaving the target element
                 in_target_element = false;
             }
-            in_attachments_section = false;
+            in_reused_contract_context_section = false;
         }
 
-        // Check for Attachments subsection
-        if in_target_element && trimmed == "#### Attachments" {
-            in_attachments_section = true;
+        // Check for Reused Contract Context subsection
+        if in_target_element && trimmed == "#### Reused Contract Context" {
+            in_reused_contract_context_section = true;
         }
 
-        // Check for end of Attachments section (another h4 header or element separator)
-        if in_attachments_section
-            && ((trimmed.starts_with("####") && trimmed != "#### Attachments") || trimmed == "---")
+        // Check for end of Reused Contract Context section (another h4 header or element separator)
+        if in_reused_contract_context_section
+            && ((trimmed.starts_with("####") && trimmed != "#### Reused Contract Context")
+                || trimmed == "---")
         {
-            in_attachments_section = false;
+            in_reused_contract_context_section = false;
         }
 
-        // Skip the attachment line we want to remove
-        if in_target_element && in_attachments_section {
+        // Skip the reused_contract_context line we want to remove
+        if in_target_element && in_reused_contract_context_section {
             if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
-                && trimmed.contains(&attachment_link)
+                && trimmed.contains(&reused_context_link)
             {
                 removed = true;
                 continue; // Skip this line
             }
             if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                remaining_attachments_count += 1;
+                remaining_reused_contract_context_count += 1;
             }
         }
 
@@ -2339,16 +2388,16 @@ fn remove_attachment_from_element(
         result.push('\n');
     }
 
-    // If we removed the last attachment, clean up the empty Attachments section
-    if removed && remaining_attachments_count == 0 {
-        result = remove_empty_attachments_section(&result, element_name);
+    // If we removed the last reused_contract_context, clean up the empty Reused Contract Context section
+    if removed && remaining_reused_contract_context_count == 0 {
+        result = remove_empty_reused_contract_context_section(&result, element_name);
     }
 
     Ok(result)
 }
 
-// Helper function to add element attachment (with display name) to element in markdown content
-fn add_element_attachment_to_element(
+// Helper function to add element reused_contract_context (with display name) to element in markdown content
+fn add_element_reused_contract_context_to_element(
     content: &str,
     element_name: &str,
     display_name: &str,
@@ -2360,7 +2409,7 @@ fn add_element_attachment_to_element(
     let mut lines_iter = content.lines().peekable();
 
     // Format: * [Display Name](#identifier) or * [Display Name](file.md#identifier)
-    let attachment_line = format!("* [{}]({})", display_name, identifier);
+    let reused_contract_context_line = format!("* [{}]({})", display_name, identifier);
 
     while let Some(line) = lines_iter.next() {
         let trimmed = line.trim();
@@ -2371,12 +2420,12 @@ fn add_element_attachment_to_element(
             in_target_element = name == element_name;
         }
 
-        // Check for Attachments subsection
-        if in_target_element && trimmed == "#### Attachments" {
+        // Check for Reused Contract Context subsection
+        if in_target_element && trimmed == "#### Reused Contract Context" {
             result.push_str(line);
             result.push('\n');
 
-            // Add the new attachment after existing ones
+            // Add the new reused_contract_context after existing ones
             while let Some(next_line) = lines_iter.peek() {
                 let next_trimmed = next_line.trim();
                 if next_trimmed.starts_with("* ")
@@ -2390,18 +2439,18 @@ fn add_element_attachment_to_element(
                 }
             }
 
-            // Add our new attachment
-            result.push_str(&attachment_line);
+            // Add our new reused_contract_context
+            result.push_str(&reused_contract_context_line);
             result.push('\n');
             inserted = true;
             continue;
         }
 
-        // Check for separator (end of element) - insert Attachments section if not found
+        // Check for separator (end of element) - insert Reused Contract Context section if not found
         if in_target_element && !inserted && trimmed == "---" {
-            // Need to add Attachments section before the separator
-            result.push_str("\n#### Attachments\n");
-            result.push_str(&attachment_line);
+            // Need to add Reused Contract Context section before the separator
+            result.push_str("\n#### Reused Contract Context\n");
+            result.push_str(&reused_contract_context_line);
             result.push('\n');
             inserted = true;
         }
@@ -2412,7 +2461,7 @@ fn add_element_attachment_to_element(
 
     if !inserted {
         return Err(ReqvireError::ElementNotFound(format!(
-            "Could not find element '{}' to add attachment",
+            "Could not find element '{}' to add reused_contract_context",
             element_name
         )));
     }
@@ -2420,8 +2469,8 @@ fn add_element_attachment_to_element(
     Ok(result)
 }
 
-// Helper function to remove element attachment from element in markdown content
-fn remove_element_attachment_from_element(
+// Helper function to remove element reused_contract_context from element in markdown content
+fn remove_element_reused_contract_context_from_element(
     content: &str,
     element_name: &str,
     display_name: &str,
@@ -2429,14 +2478,14 @@ fn remove_element_attachment_from_element(
 ) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let mut in_target_element = false;
-    let mut in_attachments_section = false;
+    let mut in_reused_contract_context_section = false;
     let mut removed = false;
-    let mut remaining_attachments_count = 0;
+    let mut remaining_reused_contract_context_count = 0;
 
     // Match by either identifier or display name in the link
-    let attachment_link_by_id = format!("]({})", identifier);
-    let attachment_link_full = format!("[{}]({})", display_name, identifier);
-    let attachment_link_by_name = format!("[{}](", display_name);
+    let reused_context_link_by_id = format!("]({})", identifier);
+    let reused_context_link_full = format!("[{}]({})", display_name, identifier);
+    let reused_context_link_by_name = format!("[{}](", display_name);
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -2449,33 +2498,34 @@ fn remove_element_attachment_from_element(
             } else if in_target_element {
                 in_target_element = false;
             }
-            in_attachments_section = false;
+            in_reused_contract_context_section = false;
         }
 
-        // Check for Attachments subsection
-        if in_target_element && trimmed == "#### Attachments" {
-            in_attachments_section = true;
+        // Check for Reused Contract Context subsection
+        if in_target_element && trimmed == "#### Reused Contract Context" {
+            in_reused_contract_context_section = true;
         }
 
-        // Check for end of Attachments section
-        if in_attachments_section
-            && ((trimmed.starts_with("####") && trimmed != "#### Attachments") || trimmed == "---")
+        // Check for end of Reused Contract Context section
+        if in_reused_contract_context_section
+            && ((trimmed.starts_with("####") && trimmed != "#### Reused Contract Context")
+                || trimmed == "---")
         {
-            in_attachments_section = false;
+            in_reused_contract_context_section = false;
         }
 
-        // Skip the attachment line we want to remove
-        if in_target_element && in_attachments_section {
+        // Skip the reused_contract_context line we want to remove
+        if in_target_element && in_reused_contract_context_section {
             if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
-                && (trimmed.contains(&attachment_link_by_id)
-                    || trimmed.contains(&attachment_link_full)
-                    || trimmed.contains(&attachment_link_by_name))
+                && (trimmed.contains(&reused_context_link_by_id)
+                    || trimmed.contains(&reused_context_link_full)
+                    || trimmed.contains(&reused_context_link_by_name))
             {
                 removed = true;
                 continue; // Skip this line
             }
             if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                remaining_attachments_count += 1;
+                remaining_reused_contract_context_count += 1;
             }
         }
 
@@ -2483,28 +2533,28 @@ fn remove_element_attachment_from_element(
         result.push('\n');
     }
 
-    // If we removed the last attachment, clean up the empty Attachments section
-    if removed && remaining_attachments_count == 0 {
-        result = remove_empty_attachments_section(&result, element_name);
+    // If we removed the last reused_contract_context, clean up the empty Reused Contract Context section
+    if removed && remaining_reused_contract_context_count == 0 {
+        result = remove_empty_reused_contract_context_section(&result, element_name);
     }
 
     Ok(result)
 }
 
-// Helper function to remove attachment from all elements in a file
-fn remove_attachment_from_file(
+// Helper function to remove reused_contract_context from all elements in a file
+fn remove_reused_contract_context_from_file(
     content: &str,
-    attachment_path: &str,
+    reused_context_path: &str,
 ) -> Result<String, ReqvireError> {
     let mut result = String::new();
-    let attachment_link = format!("[{}]({})", attachment_path, attachment_path);
+    let reused_context_link = format!("[{}]({})", reused_context_path, reused_context_path);
 
     for line in content.lines() {
         let trimmed = line.trim();
 
-        // Skip attachment lines matching our path
+        // Skip reused_contract_context lines matching our path
         if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
-            && trimmed.contains(&attachment_link)
+            && trimmed.contains(&reused_context_link)
         {
             continue; // Skip this line
         }
@@ -2513,14 +2563,14 @@ fn remove_attachment_from_file(
         result.push('\n');
     }
 
-    // Clean up any empty Attachments sections
-    result = remove_all_empty_attachments_sections(&result);
+    // Clean up any empty Reused Contract Context sections
+    result = remove_all_empty_reused_contract_context_sections(&result);
 
     Ok(result)
 }
 
-// Helper function to remove empty Attachments section for a specific element
-fn remove_empty_attachments_section(content: &str, element_name: &str) -> String {
+// Helper function to remove empty Reused Contract Context section for a specific element
+fn remove_empty_reused_contract_context_section(content: &str, element_name: &str) -> String {
     let mut result = String::new();
     let mut in_target_element = false;
     let mut lines_iter = content.lines().peekable();
@@ -2534,10 +2584,10 @@ fn remove_empty_attachments_section(content: &str, element_name: &str) -> String
             in_target_element = name == element_name;
         }
 
-        // Check for empty Attachments subsection to remove
-        if in_target_element && trimmed == "#### Attachments" {
-            // Look ahead to see if there are any attachment lines
-            let mut has_attachments = false;
+        // Check for empty Reused Contract Context subsection to remove
+        if in_target_element && trimmed == "#### Reused Contract Context" {
+            // Look ahead to see if there are any reused_contract_context lines
+            let mut has_reused_contract_context = false;
             let mut temp_lines = vec![];
 
             while let Some(next_line) = lines_iter.peek() {
@@ -2545,14 +2595,14 @@ fn remove_empty_attachments_section(content: &str, element_name: &str) -> String
                 if next_trimmed.is_empty() {
                     temp_lines.push(lines_iter.next().unwrap());
                 } else if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
-                    has_attachments = true;
+                    has_reused_contract_context = true;
                     break;
                 } else {
                     break;
                 }
             }
 
-            if has_attachments {
+            if has_reused_contract_context {
                 // Keep the header and empty lines
                 result.push_str(line);
                 result.push('\n');
@@ -2561,7 +2611,7 @@ fn remove_empty_attachments_section(content: &str, element_name: &str) -> String
                     result.push('\n');
                 }
             }
-            // If no attachments, skip the header (and empty lines are already consumed)
+            // If no reused_contract_context, skip the header (and empty lines are already consumed)
             continue;
         }
 
@@ -2572,18 +2622,18 @@ fn remove_empty_attachments_section(content: &str, element_name: &str) -> String
     result
 }
 
-// Helper function to remove all empty Attachments sections
-fn remove_all_empty_attachments_sections(content: &str) -> String {
+// Helper function to remove all empty Reused Contract Context sections
+fn remove_all_empty_reused_contract_context_sections(content: &str) -> String {
     let mut result = String::new();
     let mut lines_iter = content.lines().peekable();
 
     while let Some(line) = lines_iter.next() {
         let trimmed = line.trim();
 
-        // Check for Attachments subsection
-        if trimmed == "#### Attachments" {
-            // Look ahead to see if there are any attachment lines
-            let mut has_attachments = false;
+        // Check for Reused Contract Context subsection
+        if trimmed == "#### Reused Contract Context" {
+            // Look ahead to see if there are any reused_contract_context lines
+            let mut has_reused_contract_context = false;
             let mut temp_lines = vec![];
 
             while let Some(next_line) = lines_iter.peek() {
@@ -2591,14 +2641,14 @@ fn remove_all_empty_attachments_sections(content: &str) -> String {
                 if next_trimmed.is_empty() {
                     temp_lines.push(lines_iter.next().unwrap());
                 } else if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
-                    has_attachments = true;
+                    has_reused_contract_context = true;
                     break;
                 } else {
                     break;
                 }
             }
 
-            if has_attachments {
+            if has_reused_contract_context {
                 // Keep the header and empty lines
                 result.push_str(line);
                 result.push('\n');
@@ -2607,7 +2657,7 @@ fn remove_all_empty_attachments_sections(content: &str) -> String {
                     result.push('\n');
                 }
             }
-            // If no attachments, skip the header
+            // If no reused_contract_context, skip the header
             continue;
         }
 
@@ -2623,7 +2673,7 @@ fn remove_all_empty_attachments_sections(content: &str) -> String {
 /// # Arguments
 /// * `model_manager` - The model manager
 /// * `source` - Source element name
-/// * `relation_type` - The relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
+/// * `relation_type` - The relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, etc.)
 /// * `target` - Target element name, internal file path, or external URL
 /// * `git_root` - Git root directory
 /// * `dry_run` - If true, don't write changes to disk
@@ -2816,9 +2866,9 @@ pub fn relink(
     })
 }
 
-/// Unlink a relation or attachment between two elements (auto-detects type)
+/// Unlink a relation or reused_contract_context between two elements (auto-detects type)
 ///
-/// Searches relations first, then attachments. Only one relation per source-target pair is allowed.
+/// Searches relations first, then reused_contract_context. Only one relation per source-target pair is allowed.
 ///
 /// # Arguments
 /// * `model_manager` - The model manager
@@ -2850,7 +2900,7 @@ pub fn unlink(
     let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
 
     // Try to remove relation via graph_registry
-    // This handles element-to-element relations (NOT attachments)
+    // This handles element-to-element relations (NOT reused_contract_context)
     match model_manager
         .graph_registry
         .remove_element_relation_full(&source_id, target)?
@@ -2885,7 +2935,7 @@ pub fn unlink(
             })
         }
         None => {
-            // No relation found - check if it's an attachment instead
+            // No relation found - check if it's an reused_contract_context instead
             // Get fresh source element (in case graph was modified)
             let source_element = model_manager
                 .graph_registry
@@ -2894,41 +2944,59 @@ pub fn unlink(
                     ReqvireError::ElementNotFound(format!("Source element '{}' not found", source))
                 })?;
 
-            // Check if target is an element attachment
+            // Check if target is an element reused_contract_context
             if let Some(target_element) = model_manager.graph_registry.get_element_by_name(target) {
                 let target_id = &target_element.identifier;
-                let attachment_match = source_element
-                    .attachments
+                let reused_context_match = source_element
+                    .reused_contract_context
                     .iter()
                     .find(|a| a.target.as_str() == target_id.as_str());
 
-                if attachment_match.is_some() {
-                    return detach_element(model_manager, source, target, git_root, dry_run);
+                if reused_context_match.is_some() {
+                    return remove_reused_contract_element(
+                        model_manager,
+                        source,
+                        target,
+                        git_root,
+                        dry_run,
+                    );
                 }
             }
 
-            // Check if target is a file path attachment
+            // Check if target is a file path reused_contract_context
             let cwd = std::env::current_dir().unwrap_or_default();
             let file_exists_cwd = cwd.join(target).exists();
             let file_exists_git_root = git_root.join(target).exists();
 
             if file_exists_cwd || file_exists_git_root {
-                return detach(model_manager, source, target, git_root, dry_run);
+                return remove_reused_contract_context(
+                    model_manager,
+                    source,
+                    target,
+                    git_root,
+                    dry_run,
+                );
             }
 
-            // Check attachments by path string (even if file doesn't exist anymore)
-            let attachment_by_path = source_element
-                .attachments
+            // Check reused_contract_context by path string (even if file doesn't exist anymore)
+            let reused_context_by_path = source_element
+                .reused_contract_context
                 .iter()
                 .find(|a| a.target.as_str() == target || a.target.as_str().ends_with(target));
 
-            if attachment_by_path.is_some() {
-                return detach(model_manager, source, target, git_root, dry_run);
+            if reused_context_by_path.is_some() {
+                return remove_reused_contract_context(
+                    model_manager,
+                    source,
+                    target,
+                    git_root,
+                    dry_run,
+                );
             }
 
             // Nothing found
             Err(ReqvireError::RelationError(format!(
-                "No relation or attachment found from '{}' to '{}'",
+                "No relation or reused_contract_context found from '{}' to '{}'",
                 source, target
             )))
         }

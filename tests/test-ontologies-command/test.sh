@@ -48,10 +48,13 @@ fi
 
 for prefix in \
   "@prefix owl:" \
+  "@prefix rdf:" \
   "@prefix rdfs:" \
   "@prefix reqvire:" \
   "@prefix testonto:" \
+  "@prefix ext:" \
   "@prefix sh:" \
+  "@prefix xs:" \
   "@prefix xsd:"; do
   PREFIX_COUNT=$(count_occurrences "$prefix" "$TTL_OUTPUT")
   if [ "$PREFIX_COUNT" -gt 1 ]; then
@@ -97,6 +100,69 @@ fi
 if ! grep -q "<http://www.w3.org/ns/shacl#targetClass> <https://example.test/ontology#ServiceEndpoint>" <<< "$TTL_OUTPUT"; then
   echo "FAILED: Turtle output missing SHACL target class"
   echo "$TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "<http://www.w3.org/ns/shacl#datatype> <https://example.test/external#ExternalCode>" <<< "$TTL_OUTPUT"; then
+  echo "FAILED: Turtle output missing SHACL reference to external custom datatype"
+  echo "$TTL_OUTPUT"
+  exit 1
+fi
+
+for external_source_token in \
+  "ExternalResource" \
+  "externalCode" \
+  "External code datatype"; do
+  if grep -qF "$external_source_token" <<< "$TTL_OUTPUT"; then
+    echo "FAILED: default Turtle output must not include external ontology source triples: $external_source_token"
+    echo "$TTL_OUTPUT"
+    exit 1
+  fi
+done
+
+set +e
+EXTERNAL_TTL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies --include-external 2>&1)
+EXTERNAL_TTL_EXIT=$?
+set -e
+
+if [ $EXTERNAL_TTL_EXIT -ne 0 ]; then
+  echo "FAILED: ontologies --include-external command failed"
+  echo "$EXTERNAL_TTL_OUTPUT"
+  exit 1
+fi
+
+for external_source_token in \
+  "<https://example.test/external> a <http://www.w3.org/2002/07/owl#Ontology>" \
+  "<https://example.test/external#ExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/external#ExternalCode> a <http://www.w3.org/2000/01/rdf-schema#Datatype>" \
+  "<https://example.test/external#externalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>"; do
+  if ! grep -qF "$external_source_token" <<< "$EXTERNAL_TTL_OUTPUT"; then
+    echo "FAILED: --include-external Turtle output missing external source triple: $external_source_token"
+    echo "$EXTERNAL_TTL_OUTPUT"
+    exit 1
+  fi
+done
+
+set +e
+FULL_EXTERNAL_TTL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies --full --include-external 2>&1)
+FULL_EXTERNAL_TTL_EXIT=$?
+set -e
+
+if [ $FULL_EXTERNAL_TTL_EXIT -ne 0 ]; then
+  echo "FAILED: ontologies --full --include-external command failed"
+  echo "$FULL_EXTERNAL_TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -qF "<https://example.test/external#ExternalResource> a <http://www.w3.org/2002/07/owl#Class>" <<< "$FULL_EXTERNAL_TTL_OUTPUT"; then
+  echo "FAILED: full external Turtle output missing external source class"
+  echo "$FULL_EXTERNAL_TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -qF "reqvire:OntologyProjectionGraph" <<< "$FULL_EXTERNAL_TTL_OUTPUT"; then
+  echo "FAILED: full external Turtle output missing ontology projection facts"
+  echo "$FULL_EXTERNAL_TTL_OUTPUT"
   exit 1
 fi
 
@@ -193,8 +259,8 @@ if ! grep -q "reqvire:conceptReference <https://example.test/ontology#ServiceEnd
   exit 1
 fi
 
-if grep -q "reqvire:attaches <urn:reqvire:element:api-ontology>" <<< "$FULL_TTL_OUTPUT"; then
-  echo "FAILED: full Turtle output must not contain capability ontology attachment edge"
+if grep -q "reqvire:reusesContract <urn:reqvire:element:api-ontology>" <<< "$FULL_TTL_OUTPUT"; then
+  echo "FAILED: full Turtle output must not contain capability ontology reused_contract_context edge"
   echo "$FULL_TTL_OUTPUT"
   exit 1
 fi
@@ -370,9 +436,28 @@ for construct in \
   fi
 done
 
-# xsd:string range must survive serialization (prefixed or full IRI form).
-if ! grep -Eq "xsd:string|http://www\.w3\.org/2001/XMLSchema#string" <<< "$TTL_OUTPUT"; then
-  echo "FAILED: default Turtle output missing xsd:string range"
+# Representative OWL reserved vocabulary IRIs must survive serialization without requiring local External Ontology sources.
+for reserved_iri in \
+  "http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral" \
+  "http://www.w3.org/2000/01/rdf-schema#label" \
+  "http://www.w3.org/2000/01/rdf-schema#comment" \
+  "http://www.w3.org/2000/01/rdf-schema#Literal" \
+  "http://www.w3.org/2002/07/owl#rational" \
+  "http://www.w3.org/2002/07/owl#real" \
+  "http://www.w3.org/2002/07/owl#Thing" \
+  "http://www.w3.org/2001/XMLSchema#anyURI" \
+  "http://www.w3.org/2001/XMLSchema#string" \
+  "http://www.w3.org/2001/XMLSchema#boolean" \
+  "http://www.w3.org/2001/XMLSchema#integer"; do
+  if ! grep -qF "$reserved_iri" <<< "$TTL_OUTPUT"; then
+    echo "FAILED: default Turtle output missing OWL reserved vocabulary IRI: $reserved_iri"
+    echo "$TTL_OUTPUT"
+    exit 1
+  fi
+done
+
+if grep -A4 "#### External Ontology" specifications/SemanticContracts.md | grep -Eq "prefix: (rdf|rdfs|owl|xs|xsd)"; then
+  echo "FAILED: OWL reserved vocabulary fixture must not use External Ontology declarations"
   exit 1
 fi
 

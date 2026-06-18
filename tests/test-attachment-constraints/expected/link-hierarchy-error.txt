@@ -1,1 +1,0 @@
-error: Invalid attachment scope: 'Spec-1' cannot be attached to 'Req B' because it is within the contract's defining hierarchy. Attachments are only allowed from elements outside the definedBy chain.

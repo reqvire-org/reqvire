@@ -20,5 +20,4 @@ This element has duplicate relations that format should remove.
   * specify: [Test Capability Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-capability-test-duplicate-detection-specifications-requirements-md)
   * derivedFrom: [Base Requirement](Requirements.md#base-requirement)
   * derivedFrom: [Base Requirement](Requirements.md#base-requirement)
-  * trace: [Target Element](Requirements.md#target-element)
 ---

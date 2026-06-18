@@ -11,14 +11,14 @@ use serde::Serialize;
 use std::collections::BTreeMap;
 use std::path::Path;
 
-/// Represents an attachment for display in containment hierarchy
+/// Represents an reused_contract_context for display in containment hierarchy
 #[derive(Debug, Clone, Serialize)]
-pub struct ContainmentAttachment {
+pub struct ContainmentReusedContractContext {
     /// Display name (element name or file name)
     pub name: String,
-    /// Whether this is an element attachment (true) or file attachment (false)
+    /// Whether this is an element reused_contract_context (true) or file reused_contract_context (false)
     pub is_element: bool,
-    /// Link to the attachment (element identifier or file path)
+    /// Link to the reused_contract_context (element identifier or file path)
     pub link: Option<String>,
 }
 
@@ -30,7 +30,7 @@ pub struct ContainmentElement {
     pub element_type: ElementType,
     pub file_path: String,
     pub identifier: String,
-    pub attachments: Vec<ContainmentAttachment>,
+    pub reused_contract_context: Vec<ContainmentReusedContractContext>,
 }
 
 impl ContainmentElement {
@@ -41,28 +41,28 @@ impl ContainmentElement {
             element_type: element.element_type.clone(),
             file_path: element.file_path.clone(),
             identifier: element.identifier.clone(),
-            attachments: element
-                .attachments
+            reused_contract_context: element
+                .reused_contract_context
                 .iter()
                 .map(|a| match &a.target {
-                    crate::element::AttachmentTarget::FilePath(path) => {
+                    crate::element::ReusedContractContextTarget::FilePath(path) => {
                         let file_name = path
                             .file_name()
                             .map(|n| n.to_string_lossy().into_owned())
                             .unwrap_or_else(|| path.to_string_lossy().into_owned());
-                        ContainmentAttachment {
+                        ContainmentReusedContractContext {
                             name: file_name,
                             is_element: false,
                             link: Some(path.to_string_lossy().into_owned()),
                         }
                     }
-                    crate::element::AttachmentTarget::ElementIdentifier(id) => {
+                    crate::element::ReusedContractContextTarget::ElementIdentifier(id) => {
                         // Look up element name from registry using the identifier
                         let name = registry
                             .get_element(id)
                             .map(|e| e.name.clone())
                             .unwrap_or_else(|| id.clone());
-                        ContainmentAttachment {
+                        ContainmentReusedContractContext {
                             name,
                             is_element: true,
                             link: Some(id.clone()),
@@ -431,27 +431,33 @@ fn folder_to_d3_node(folder: &ContainmentFolder) -> D3TreeNode {
                     "system-requirement"
                 }
                 ElementType::Verification(_) => "verification",
-                ElementType::Refinement(_) => "refinement",
+                ElementType::Contract(_) => "contract",
                 _ => "element",
             };
 
-            // Build element children: attachments only (relations removed)
+            // Build element children: reused_contract_context only (relations removed)
             let mut element_children = Vec::new();
 
-            // Add attachments as children
-            for attachment in &element.attachments {
-                let (node_type, link) = if attachment.is_element {
-                    // Element attachment - show as refinement with link
+            // Add reused_contract_context as children
+            for reused_contract_context in &element.reused_contract_context {
+                let (node_type, link) = if reused_contract_context.is_element {
+                    // Element reused_contract_context - show as contract with link
                     (
-                        "attachment-element".to_string(),
-                        attachment.link.as_ref().map(|l| md_to_html_link(l)),
+                        "reused_contract_context-element".to_string(),
+                        reused_contract_context
+                            .link
+                            .as_ref()
+                            .map(|l| md_to_html_link(l)),
                     )
                 } else {
-                    // File attachment - show path without conversion
-                    ("attachment-file".to_string(), attachment.link.clone())
+                    // File reused_contract_context - show path without conversion
+                    (
+                        "reused_contract_context-file".to_string(),
+                        reused_contract_context.link.clone(),
+                    )
                 };
                 element_children.push(D3TreeNode {
-                    name: attachment.name.clone(),
+                    name: reused_contract_context.name.clone(),
                     node_type,
                     link,
                     children: Vec::new(),
