@@ -514,15 +514,23 @@ Read more in:
 
 ---
 
-## Codex Skill (Reqvire SysEng)
+## Codex Skills
 
-This repository includes an installable Codex skill package at:
+This repository includes installable Codex skill packages for Reqvire model work:
 
 ```text
 codex-skills/reqvire-syseng
+codex-skills/reqvire-ontology-authoring
 ```
 
-The skill uses the npm package directly:
+Use `reqvire-syseng` for semantic engineering, capability, requirement,
+verification, traceability, migration, and general Reqvire CLI workflows.
+
+Use `reqvire-ontology-authoring` for ontology scoping, OWL/Turtle vocabulary,
+semantic contracts, concept references, namespace decisions, and ontology
+refactoring.
+
+The skills use the npm package directly:
 
 ```bash
 npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace validate
@@ -548,10 +556,11 @@ The installer uses `CODEX_HOME` if set, otherwise defaults to:
 ~/.codex
 ```
 
-Installed location:
+Installed locations:
 
 ```text
 $CODEX_HOME/skills/reqvire-syseng
+$CODEX_HOME/skills/reqvire-ontology-authoring
 ```
 
 Restart Codex after installing or updating the skill.
@@ -570,16 +579,44 @@ See:
 
 # Contributing
 
-External pull request contributions are by invitation only.
+Reproducible bug reports are very welcome.
+
+Code, requirements, specification, ontology, verification, and other model
+contributions are closed at the moment.
+
+Reqvire currently uses its own repository as an experiment in AI-driven
+engineering with a human in the loop: humans work primarily as architects on
+higher-level planes such as ontology, architecture, requirements, and
+specification intent, while implementation is generated and refined through
+agentic coding workflows. The goal is to produce high-quality code that is not
+directly human-authored, while keeping architectural accountability human-led.
+
+For that reason, the most useful external contribution right now is a clear,
+reproducible issue: what happened, what should have happened, the exact command
+or workflow, the model/files involved, and any root-cause hypothesis.
+
+Suggestions for improving Reqvire's own model, ontology, requirements,
+verification structure, or architecture should be opened as
+[GitHub Discussions](https://github.com/reqvire-org/reqvire/discussions), not
+pull requests. Discussions are the right place to compare modeling options
+before maintainers decide whether and how to update the model.
+
+The collaborator program may open selectively over time. If you are interested,
+start a GitHub Discussion with your background, the areas where you want to
+help, examples of relevant work, and how you would support Reqvire's AI-driven
+engineering process. The normal path is sustained useful participation through
+reproducible bug reports, model discussions, and design analysis before any
+repository access is considered.
 
 ---
 
 ## How to Contribute
 
 1. **Read the [Contributing Guide](./doc/CONTRIBUTING.md)**
-2. **Open or upvote an issue**
-3. **Contribute analysis and design discussion**
-4. **Submit a PR only if invited**
+2. **Open or upvote a bug report**
+3. **Use Discussions for model-improvement suggestions and design discussion**
+4. **Use Discussions to express collaborator interest**
+5. **Do not open pull requests for code or model changes**
 
 ---
 
@@ -587,7 +624,7 @@ External pull request contributions are by invitation only.
 
 Reqvire follows a semantic MBSE workflow.
 
-Invited code changes should include:
+Maintainer-authored changes should include:
 - capability updates
 - requirements
 - refinements
@@ -605,6 +642,8 @@ See:
 
 - **[Report a Bug](https://github.com/reqvire-org/reqvire/issues/new?template=bug_report.yml)**
 - **[Request a Feature](https://github.com/reqvire-org/reqvire/issues/new?template=feature_request.yml)**
+- **[Suggest a Model Improvement](https://github.com/reqvire-org/reqvire/discussions)**
+- **[Express Collaborator Interest](https://github.com/reqvire-org/reqvire/discussions)**
 - **[Ask a Question](https://github.com/reqvire-org/reqvire/discussions)**
 - **[Contributor Guide](./doc/README.md)**
 
@@ -612,7 +651,9 @@ See:
 
 ## Contributor License Agreement
 
-All contributors must accept the [Contributor License Agreement](./doc/CLA.md).
+If external code or model contributions are reopened in the future, merged
+contributions will require acceptance of the
+[Contributor License Agreement](./doc/CLA.md).
 
 The CLA process is automated through GitHub PR comments.
 

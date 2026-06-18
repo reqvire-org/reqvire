@@ -84,30 +84,34 @@ reqvire/
 - **[Project Specifications](../requirements/README.md)** - Reqvire's own requirements model
 - **[Architecture](../requirements/Architecture.md)** - System architecture documentation
 - **[E2E Tests Guide](../tests/CLAUDE.md)** - How to write and run tests
-- **[GitHub Issues](https://github.com/reqvire-org/reqvire/issues)** - Report bugs and request capabilities
-- **[GitHub Discussions](https://github.com/reqvire-org/reqvire/discussions)** - Ask questions and share ideas
+- **[GitHub Issues](https://github.com/reqvire-org/reqvire/issues)** - Report reproducible bugs and concrete behavior problems
+- **[GitHub Discussions](https://github.com/reqvire-org/reqvire/discussions)** - Ask questions and suggest model, ontology, requirement, verification, or architecture improvements
+- **[Collaborator Interest](https://github.com/reqvire-org/reqvire/discussions)** - Express interest in future collaborator roles
 
 ## Contribution Workflow
 
 1. **Read** the [Contributing Guide](./CONTRIBUTING.md)
-2. **Open or join** an issue discussion before code changes
-3. **Wait for maintainer invitation** before opening a PR
-4. **Follow MBSE workflow for invited PRs** (see [CLAUDE.md](../CLAUDE.md)):
+2. **Open or join** an issue discussion for reproducible bugs and concrete behavior problems
+3. **Use GitHub Discussions** for model-improvement suggestions and design tradeoffs
+4. **Use GitHub Discussions** to express collaborator interest
+5. **Do not open pull requests** for code, requirements, specifications, ontologies, verifications, or other model changes
+6. **For maintainer-authored changes, follow the MBSE workflow** (see [CLAUDE.md](../CLAUDE.md)):
    - Add requirements first
    - Define verifications
    - Implement tests
    - Write code
    - Link implementation to requirements
-5. **Test** your changes
-6. **Submit** an invited pull request
+7. **Test** your changes
+8. **Use issues** to share reproduction details and analysis
 
 ## Need Help?
 
 - Review the [user documentation](https://www.reqvire.org) to understand how Reqvire works
 - Check the [CLAUDE.md](../CLAUDE.md) guide for development patterns
-- Open a [GitHub Discussion](https://github.com/reqvire-org/reqvire/discussions) to ask questions
-- Join our community to connect with other contributors
+- Open a [GitHub Discussion](https://github.com/reqvire-org/reqvire/discussions) to ask questions or suggest model improvements
+- Open a GitHub Discussion to express interest in future collaborator roles
+- Open a reproducible bug report when behavior does not match the documentation
 
 ---
 
-Thank you for contributing to Reqvire!
+Thank you for helping improve Reqvire through reproducible reports and thoughtful model discussion.

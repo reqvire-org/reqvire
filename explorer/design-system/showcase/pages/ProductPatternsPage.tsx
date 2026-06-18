@@ -497,7 +497,6 @@ export function ProductPatternsPage() {
           </div>
         </div>
         <div className="showcase-canvas">
-          <ElementDetailMissingState identifier="REQ-MISSING-404" />
           <OntologyMetadata
             node={ONTOLOGY_REQUIREMENT_NODE}
             copiedUri={copiedUri}
@@ -525,6 +524,9 @@ export function ProductPatternsPage() {
               reason="No Project Store seed was found for this showcase scenario."
               detail="assets/project-store.js"
             />
+          </div>
+          <div className="showcase-pattern-card showcase-pattern-card--notice">
+            <ElementDetailMissingState identifier="REQ-MISSING-404" />
           </div>
         </div>
       </Section>

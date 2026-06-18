@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
   - name: 📖 Documentation
-    url: https://github.com/Reqvire/reqvire/tree/main/doc
+    url: https://github.com/reqvire-org/reqvire/tree/main/doc
     about: Check out the documentation and user guide
   - name: 💬 Discussions
-    url: https://github.com/Reqvire/reqvire/discussions
-    about: Join community discussions, share examples, and get help from other users
+    url: https://github.com/reqvire-org/reqvire/discussions
+    about: Ask questions, share examples, suggest model improvements, or express collaborator interest
   - name: 🔒 Security Issues
-    url: https://github.com/Reqvire/reqvire/security/advisories
+    url: https://github.com/reqvire-org/reqvire/security/advisories
     about: Report security vulnerabilities privately
