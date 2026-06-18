@@ -37,7 +37,7 @@ Apply these boundaries:
 - Requirement: implementable, testable system obligation.
 - `semantic-contract`: reusable SHACL `Shapes` profile over explicitly used ontology context; constrains requirements through `constrain`/`constrainedBy`.
 
-Ontology referenced by model elements should live under `requirements/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Shape-only `semantic-contract` elements are reusable checks with explicit ontology `use` and requirement `constrain` relations.
+Ontology referenced by model elements should live under `requirements/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` contracts. Shape-only `semantic-contract` elements are reusable checks with explicit ontology `use` and requirement `constrain` relations.
 
 ## Procedure
 
@@ -52,7 +52,7 @@ For each touched capability root:
 
 - Confirm it is a real independent capability root.
 - Confirm it has specifying requirements, child capabilities, or intentional direct verification. Move pure vocabulary into ontology.
-- Confirm cross-root refinement dependencies are explicit attachments, not hierarchy relations.
+- Confirm cross-root contract dependencies are explicit attachments, not hierarchy relations.
 - If a root is too broad, split it into meaningful child capabilities first and move requirements to specify their local child capability.
 - Do not make one universal capability root just to reuse ontology. Shared ontology terms cross roots through explicit concept references.
 - Confirm reusable terms are in ontology elements, not hidden in requirement prose or semantic contracts.
@@ -77,12 +77,12 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 For each candidate, classify each sentence:
 
-- Capability/source context goes to capability text or requirement-owned source refinements.
+- Capability/source context goes to capability text or requirement-owned source contracts.
 - Stable semantic meaning goes to `ontology`.
 - System obligation stays in requirement.
 - Local SHACL profile goes to a reusable `semantic-contract` with explicit `use` and `constrain` relations.
 - Verification criteria stays in verification elements.
-- Exact commands, fields, URI patterns, workflow steps, output formats, file paths, persistence behavior, and reject/write/emit behavior stay in compatible requirement-owned refinements, not ontology.
+- Exact commands, fields, URI patterns, workflow steps, output formats, file paths, persistence behavior, and reject/write/emit behavior stay in compatible requirement-owned contracts, not ontology.
 
 Do not delete content until it has a new owner.
 
@@ -95,7 +95,7 @@ Use:
 - `#### Concept References` from non-ontology elements to ontology terms
 - `semantic-contract use ontology` for vocabulary context
 - `semantic-contract constrain requirement` or `requirement constrainedBy semantic-contract` for shape profile application
-- Attachments for reusable requirement-owned non-semantic-contract refinements
+- Attachments for reusable requirement-owned non-semantic-contract contracts
 
 Do not use `trace` to replace ownership or dependency.
 Do not remove a cross-root dependency unless an explicit concept reference, semantic-contract relation, or requirement attachment preserves the dependency for `collect` and change impact.

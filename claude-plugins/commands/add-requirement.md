@@ -147,7 +147,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 ## Best Practices
 
 - **Atomic requirements**: One capability per requirement
-- **Refinement in Details**: Clarifications go in `#### Details`, not new requirements
+- **Contract in Details**: Clarifications go in `#### Details`, not new requirements
 - **Capability ownership**: Every requirement should specify exactly one owning capability
 - **Leaf verification**: Leaf requirements need direct verification; capabilities may also be directly verified when evidence is capability-level
 - **Roll-up coverage**: Parent requirements inherit verification from children
@@ -168,7 +168,7 @@ Reqvire uses **bottom roll-up verification coverage**:
 
 - Element names become URL fragments (spaces → hyphens, lowercase)
 - Use two-space indentation for Relations entries
-- Use `#### Details` for refinements that don't add capabilities
+- Use `#### Details` for contracts that don't add capabilities
 - Use `ontology` for shared ontology meaning referenced through concept references and `semantic-contract` elements for reusable SHACL shape profiles that explicitly `use` ontology and `constrain` requirements.
-- Keep exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Use shape-only `semantic-contract` elements only for semantic checks that need explicit ontology-use and requirement-constraint relations.
+- Keep exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` contracts. Use shape-only `semantic-contract` elements only for semantic checks that need explicit ontology-use and requirement-constraint relations.
 - For complete capability (requirement + verification + test), use `/reqvire:add-capability`

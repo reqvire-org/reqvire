@@ -385,7 +385,7 @@ pub struct ParsedSingleElementRefinement {
     pub refine_targets: Vec<String>,
 }
 
-/// Parses a `# Element` refinement document and extracts metadata/refine relations.
+/// Parses a `# Element` contract document and extracts metadata/define relations.
 pub fn parse_single_element_refinement(
     file: &str,
     content: &str,
@@ -450,9 +450,9 @@ pub fn parse_single_element_refinement(
                             trimmed
                         )))?;
 
-                    if relation_type != "refine" {
+                    if !matches!(relation_type.as_str(), "define" | "refine") {
                         return Err(ReqvireError::InvalidRelationFormat(format!(
-                            "Single-element refinement '{}' can only contain 'refine' relations. Found '{}' at line {}.",
+                            "Single-element contract '{}' can only contain 'define' relations. Found '{}' at line {}.",
                             file, relation_type, line_num + 1
                         )));
                     }
@@ -506,7 +506,7 @@ pub fn parse_single_element_refinement(
 
     if refine_targets.is_empty() {
         return Err(ReqvireError::InvalidRelationFormat(format!(
-            "Single-element refinement '{}' must define at least one 'refine' relation.",
+            "Single-element contract '{}' must define at least one 'define' relation.",
             file
         )));
     }

@@ -3,6 +3,7 @@ use anyhow::Result;
 use crate::error::ReqvireError;
 use crate::filesystem;
 use crate::graph_registry::GraphRegistry;
+use crate::semantic_store::SemanticModelStore;
 use log::debug;
 
 use crate::parser;
@@ -13,6 +14,8 @@ use globset::GlobSet;
 pub struct ModelManager {
     /// In-memory graph registry of elements and relations
     pub graph_registry: GraphRegistry,
+    /// Semantic RDF query state built from the validated graph.
+    pub semantic_store: Option<SemanticModelStore>,
 }
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -32,6 +35,7 @@ impl ModelManager {
     pub fn new() -> Self {
         Self {
             graph_registry: GraphRegistry::new(),
+            semantic_store: None,
         }
     }
 
@@ -71,6 +75,7 @@ impl ModelManager {
         );
         // Reset state so repeated parse/validate calls always start from a clean model.
         self.graph_registry = GraphRegistry::new();
+        self.semantic_store = None;
 
         // Pass 1: Element collection with local validation
         let pass1_errors =
@@ -108,6 +113,8 @@ impl ModelManager {
         if options.with_size_estimates {
             self.graph_registry.populate_size_estimates()?;
         }
+
+        self.semantic_store = Some(SemanticModelStore::build(&self.graph_registry)?);
 
         debug!("Validation completed");
         Ok(Vec::new())

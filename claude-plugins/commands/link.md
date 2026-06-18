@@ -7,7 +7,7 @@ model: claude-sonnet-4-5
 
 # Link Elements
 
-Create a relation between elements or attach files/refinement elements. This unified command handles both relations and attachments.
+Create a relation between elements or attach files/contract elements. This unified command handles both relations and attachments.
 
 ## Current Model Context
 
@@ -65,10 +65,10 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 | `verify` | Source verifies target | Verification to requirement |
 | `satisfiedBy` | Source is satisfied by target | Requirement to implementation |
 | `satisfy` | Source satisfies target | Implementation to requirement |
-| `refinedBy` | Source owns target as refinement | Requirement to requirement-owned refinement |
-| `refine` | Source refines target | Refinement element to compatible owner (auto-generated) |
+| `definedBy` | Source owns target as contract | Requirement to requirement-owned contract |
+| `define` | Source refines target | Contract element to compatible owner (auto-generated) |
 | `trace` | General traceability link | Any traceability relationship |
-| `attaching` | Attach file or element | Attach compatible requirement-owned refinements to requirements |
+| `attaching` | Attach file or element | Attach compatible requirement-owned contracts to requirements |
 
 ## Target Types
 
@@ -77,9 +77,9 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 - Internal file path (e.g., "src/impl.rs")
 - External URL (e.g., "https://example.com/spec.html")
 
-`refinedBy` rule:
-- `refinedBy` must target a refinement element (by name/identifier).
-- Plain file-path targets are invalid for `refinedBy` (including `DesignDocuments/*.md` without `#fragment`).
+`definedBy` rule:
+- `definedBy` must target a contract element (by name/identifier).
+- Plain file-path targets are invalid for `definedBy` (including `DesignDocuments/*.md` without `#fragment`).
 
 `satisfiedBy` / `satisfy` rule:
 - Allowed source/target model element types are `requirement`, `test-verification`, and `formal-proof-verification`.
@@ -92,7 +92,7 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 
 **For attaching:**
 - Internal file path (e.g., "docs/SLA.pdf")
-- Refinement element name (e.g., "Performance Constraint")
+- Contract element name (e.g., "Performance Constraint")
 
 ## Important Notes
 
@@ -101,7 +101,7 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 - **Element names**: Use the exact element name as it appears in the heading
 - **Cross-file links**: Relative paths are calculated automatically
 - **Inverse relations**: Reqvire auto-generates inverse relations (e.g., derive from derivedFrom)
-- **Attachments**: Only Refinement elements (constraint, behavior, specification) can be attached
+- **Attachments**: Only Contract elements (constraint, behavior, specification) can be attached
 
 ## Link Options
 
@@ -116,9 +116,9 @@ The link operation will fail with a clear error if:
 - The source element does not exist
 - The target element does not exist (for element relations)
 - The relation type is invalid
-- For attaching: the target element is not a Refinement type
-- For attaching: the refinement has no `refine` relation (must be owned by a requirement via `refinedBy` first)
-- For attaching: source and refinement's owner are in the same derivation hierarchy
+- For attaching: the target element is not a Contract type
+- For attaching: the contract has no `define` relation (must be owned by a requirement via `definedBy` first)
+- For attaching: source and contract's owner are in the same derivation hierarchy
 - The relation or attachment already exists (duplicate)
 - The target already exists in the other section (cross-section duplicate)
 
@@ -144,7 +144,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" attaching "docs/SLA.pdf"
 ```
 
-**Attach a refinement element:**
+**Attach a contract element:**
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" attaching "Performance Constraint"
 ```
@@ -163,7 +163,7 @@ Use link when:
 - Adding trace relations for impact analysis
 - Linking to implementation files
 - Attaching documents or reference materials
-- Attaching refinement elements (constraints, behaviors, specifications)
+- Attaching contract elements (constraints, behaviors, specifications)
 
 ## Related Commands
 

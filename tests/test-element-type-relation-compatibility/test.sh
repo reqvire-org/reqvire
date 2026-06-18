@@ -148,7 +148,7 @@ if [ $EXIT_CODE_CAPABILITY_REFINEMENTS -eq 0 ]; then
   exit 1
 fi
 
-if ! echo "$OUTPUT_CAPABILITY_REFINEMENTS" | grep -qi "refinedBy.*should connect a requirement\\|refine.*should connect.*to a requirement"; then
+if ! echo "$OUTPUT_CAPABILITY_REFINEMENTS" | grep -qi "definedBy.*should connect a requirement\\|define.*should connect.*to a requirement"; then
   echo "FAILED: Expected error message about capability-owned refinement restrictions"
   echo "Output: $OUTPUT_CAPABILITY_REFINEMENTS"
   exit 1
@@ -169,8 +169,8 @@ if [ $EXIT_CODE_TRACE -ne 0 ]; then
   exit 1
 fi
 
-# Test 8: Valid refinement refine relations should pass
-echo "Test 8: Valid refinement refine relations"
+# Test 8: Valid refinement define relations should pass
+echo "Test 8: Valid refinement define relations"
 
 set +e
 OUTPUT_REFINEMENT_SATISFY=$(cd "${TEST_DIR}/valid-refinement-satisfy" && "$REQVIRE_BIN" validate 2>&1)
@@ -178,7 +178,7 @@ EXIT_CODE_REFINEMENT_SATISFY=$?
 set -e
 
 if [ $EXIT_CODE_REFINEMENT_SATISFY -ne 0 ]; then
-  echo "FAILED: Valid refinement refine relations should pass validation"
+  echo "FAILED: Valid refinement define relations should pass validation"
   echo "Exit code: $EXIT_CODE_REFINEMENT_SATISFY"
   echo "Output: $OUTPUT_REFINEMENT_SATISFY"
   exit 1

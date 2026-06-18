@@ -18,7 +18,7 @@ Example:
   * type: specification
 
 #### Relations
-  * refine: [CSS style comment](CodeAlignmentRequirements.md#css-style-comment)
+  * define: [CSS style comment](CodeAlignmentRequirements.md#css-style-comment)
 ---
 
 ### Comment Style Specification
@@ -41,7 +41,7 @@ Traceability relation kinds and comment style kinds are defined by the Reqvire c
   * type: specification
 
 #### Relations
-  * refine: [Comment Style by File Extension](CodeAlignmentRequirements.md#comment-style-by-file-extension)
+  * define: [Comment Style by File Extension](CodeAlignmentRequirements.md#comment-style-by-file-extension)
 ---
 
 ### Slash Style Comment Refinement Specification
@@ -64,7 +64,7 @@ void processSensorData() {
   * type: specification
 
 #### Relations
-  * refine: [Slash style comment](CodeAlignmentRequirements.md#slash-style-comment)
+  * define: [Slash style comment](CodeAlignmentRequirements.md#slash-style-comment)
 ---
 
 ### Traceability Format Refinement Specification
@@ -83,7 +83,7 @@ Traceability marker syntax behavior:
   * type: specification
 
 #### Relations
-  * refine: [Traceability Format](CodeAlignmentRequirements.md#traceability-format)
+  * define: [Traceability Format](CodeAlignmentRequirements.md#traceability-format)
 ---
 
 ### XML Style Comment Refinement Specification
@@ -104,5 +104,5 @@ Example:
   * type: specification
 
 #### Relations
-  * refine: [XML style comment](CodeAlignmentRequirements.md#xml-style-comment)
+  * define: [XML style comment](CodeAlignmentRequirements.md#xml-style-comment)
 ---

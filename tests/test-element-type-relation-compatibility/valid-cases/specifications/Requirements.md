@@ -306,7 +306,7 @@ Requirement that asks for behavior definition, refined by a behavior element.
 
 #### Relations
   * derivedFrom: [Capability Parent](#capability-parent)
-  * refinedBy: [Behavior Element](#behavior-element)
+  * definedBy: [Behavior Element](#behavior-element)
 
 ---
 
@@ -319,7 +319,7 @@ Requirement that asks for specification, refined by a specification element.
 
 #### Relations
   * derivedFrom: [Capability Parent](#capability-parent)
-  * refinedBy: [Specification Element](#specification-element)
+  * definedBy: [Specification Element](#specification-element)
 
 ---
 
@@ -332,7 +332,7 @@ Requirement that asks for constraint definition, refined by a constraint element
 
 #### Relations
   * derivedFrom: [Capability Parent](#capability-parent)
-  * refinedBy: [Constraint Element](#constraint-element)
+  * definedBy: [Constraint Element](#constraint-element)
 
 ---
 
@@ -345,6 +345,6 @@ Requirement that traces source material through a requirement-owned source refin
 
 #### Relations
   * derivedFrom: [Capability Parent](#capability-parent)
-  * refinedBy: [Source Element](#source-element)
+  * definedBy: [Source Element](#source-element)
 
 ---

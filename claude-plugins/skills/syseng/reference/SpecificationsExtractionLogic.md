@@ -20,7 +20,7 @@ Extract technical specifications from requirement Details sections into separate
 - **Concise Requirements**: EARS-style statements focused on user value (under 15 lines)
  - Main body has one more general statement and all other must be written in '#### Details' subsection
 - **Reusable Specifications**: Technical details in standalone elements
-- **Clear Ownership**: `refinedBy` relations show which requirement owns the specification
+- **Clear Ownership**: `definedBy` relations show which requirement owns the specification
 - **Cross-References**: Attachment relations provide supporting context without ownership
 
 ## Refactoring Methodology
@@ -34,7 +34,7 @@ Extract technical specifications from requirement Details sections into separate
 - Requirements with ordering rules or processing workflows
 
 **NOT Candidates:**
-- Elements already typed as `specification` or `constraints` (refinement elements)
+- Elements already typed as `specification` or `constraints` (contract elements)
 - Requirements where Details add essential context without implementation details like success criteria and such
 
 **Examples of hardcoded limits to extract as constraints:**
@@ -84,7 +84,7 @@ Brief description of what this specification defines.
 
 ```
 
-`  * type: specification` can be other refinement type depending on what this refinement element represents.
+`  * type: specification` can be other contract type depending on what this contract element represents.
 
 **Reducing the Requirement:**
 
@@ -102,7 +102,7 @@ Concise EARS-style statement (1 sentence).
   * type: requirement
 
 #### Relations
-  * refinedBy: [Specification Name](path#specification-name)
+  * definedBy: [Specification Name](path#specification-name)
   [... other existing relations ...]
 ```
 
@@ -110,13 +110,13 @@ Concise EARS-style statement (1 sentence).
 
 **Ownership vs Reference:**
 
-- **refinedBy Relation**: Used by the requirement that OWNS the specification (one-to-one or one-to-many)
+- **definedBy Relation**: Used by the requirement that OWNS the specification (one-to-one or one-to-many)
 - **Attachment Relation**: Used by requirements OUTSIDE the owner's derivation hierarchy
 
 **Attachment Scope Constraints:**
 
-1. Refinements must have a `refine` relation (established via requirement's `refinedBy`)
-2. Only requirements OUTSIDE the owner's hierarchy can attach the refinement
+1. Contracts must have a `define` relation (established via requirement's `definedBy`)
+2. Only requirements OUTSIDE the owner's hierarchy can attach the contract
 3. Requirements in the same hierarchy (ancestors or descendants of owner) CANNOT attach
 
 **Example:**
@@ -170,7 +170,7 @@ Applies to: model summary, verification tracing, coverage, change impact, valida
 When requested the system shall provide human readable and machine readable System model reports with deterministic output and consistent ordering following clearly defined specifications.
 
 #### Relations
-  * refinedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
+  * definedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
 
 ---
 
@@ -219,8 +219,8 @@ System shall produce interactive visual representations.
 System shall produce interactive visual representations enabling users to explore relations and navigate model structure following clearly defined specifications.
 
 #### Relations
-  * refinedBy: [Mermaid Diagram Generation Specification](...)
-  * refinedBy: [Mermaid Interactive Capabilities Specification](...)
+  * definedBy: [Mermaid Diagram Generation Specification](...)
+  * definedBy: [Mermaid Interactive Capabilities Specification](...)
 
 ---
 
@@ -267,8 +267,8 @@ The system shall implement operational constraints and rate limits.
   * type: capability
 
 #### Relations
-  * refinedBy: [Rate Limits](../Specifications/Constraints.md#rate-limits)
-  * refinedBy: [Session Limits](../Specifications/Constraints.md#session-limits)
+  * definedBy: [Rate Limits](../Specifications/Constraints.md#rate-limits)
+  * definedBy: [Session Limits](../Specifications/Constraints.md#session-limits)
 ```
 
 
@@ -310,9 +310,9 @@ Examples:
 
 Specifications MUST NOT use EARS statements as those are not requirements.
 
-### Attachment vs refinedBy
+### Attachment vs definedBy
 
-**Use refinedBy when:**
+**Use definedBy when:**
 - Requirement OWNS the specification
 - Specification was extracted FROM this requirement
 - Requirement has primary responsibility for the technical content
@@ -324,8 +324,8 @@ Specifications MUST NOT use EARS statements as those are not requirements.
 - Multiple requirements (from different hierarchies) benefit from this specification
 
 **Attachment Constraint:**
-- Requirements in the same hierarchy as the owner CANNOT attach the refinement
-- They access the refinement through the hierarchy relationship instead
+- Requirements in the same hierarchy as the owner CANNOT attach the contract
+- They access the contract through the hierarchy relationship instead
 - Cross-hierarchy attachments enable requirements from separate branches to reference shared specs
 
 ## Quality Metrics
@@ -336,7 +336,7 @@ After refactoring, verify:
 1. **Conciseness**: All requirements have Details under 15 lines
 2. **Clarity**: Requirements focus on user value, not implementation
 3. **Reusability**: Specifications referenced by multiple requirements where appropriate
-4. **Traceability**: Clear ownership via refinedBy relations
+4. **Traceability**: Clear ownership via definedBy relations
 5. **Validation**: `reqvire validate` shows no errors
 7. **Formatting**: All files properly formatted
 
@@ -372,13 +372,13 @@ Validation Errors:            0
 
 ### Pitfall 3: Unclear Ownership
 
-**Problem**: Multiple requirements use refinedBy for same specification
-**Solution**: Only owner uses refinedBy, others use attachments
+**Problem**: Multiple requirements use definedBy for same specification
+**Solution**: Only owner uses definedBy, others use attachments
 
 ### Pitfall 4: Orphaned Specifications
 
 **Problem**: Creating specifications not owned by any requirement
-**Solution**: Always create refinedBy relation from owner to specification
+**Solution**: Always create definedBy relation from owner to specification
 
 ### Pitfall 5: Inconsistent Granularity
 
@@ -404,8 +404,8 @@ reqvire search --filter-type="requirement" --filter-file="requirements/System/**
 # Find requirements with attachments (may need conversion to satisfiedBy)
 reqvire search --filter-type="requirement" --has-attachments --short
 
-# Find refinements without refine relations (orphaned specifications, constraints, behaviors, state, input-output, sources, and )
-reqvire search --filter-type="specification,constraint,behavior,state,input-output,source" --not-have-relations="refine" --short
+# Find contracts without define relations (orphaned specifications, constraints, behaviors, state, input-output, sources, and )
+reqvire search --filter-type="specification,constraint,behavior,state,input-output,source" --not-have-relations="define" --short
 ```
 
 ### Validation Commands (Phase 5)

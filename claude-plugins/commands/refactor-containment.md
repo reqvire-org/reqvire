@@ -80,7 +80,7 @@ Classify content:
 - `capability` roots and child capability subgraphs,
 - `ontology` elements and shared semantic vocabulary,
 - requirements that specify capabilities,
-- refinements owned by requirement elements,
+- contracts owned by requirement elements,
 - verification elements and evidence links.
 
 ### 3. Produce a plan before editing
@@ -137,7 +137,7 @@ Final report should include:
 ## Guardrails
 
 - Do not change requirements intent during containment refactors.
-- Do not use folder paths as a substitute for `specify`, `refine`, `verify`, or attachments.
+- Do not use folder paths as a substitute for `specify`, `define`, `verify`, or attachments.
 - Do not force example area names like `Product/` or `Platform/` if the project already has clearer stable names.
 - Do not move ontology into capability folders.
 - Do not move shared architecture content blindly; extract reusable meaning to ontology or reusable contracts when needed.

@@ -33,12 +33,12 @@ The system shall provide a valid owner requirement for single-element refinement
 
 ### Requirement Using Single Element Refinement
 
-The system shall allow refinedBy only to refinement element identifiers, including elements defined in `# Element` files.
+The system shall allow definedBy only to refinement element identifiers, including elements defined in `# Element` files.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Parent Requirement](#parent-requirement)
-  * refinedBy: [ChangePropagation](DesignDocuments/ChangePropagation.md#changepropagation)
+  * definedBy: [ChangePropagation](DesignDocuments/ChangePropagation.md#changepropagation)
 ---

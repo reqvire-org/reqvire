@@ -20,7 +20,7 @@ The system shall support billing payloads.
 
 #### Relations
   * specify: [Billing Capability](#billing-capability)
-  * refinedBy: [Billing Shape Contract](#billing-shape-contract)
+  * definedBy: [Billing Shape Contract](#billing-shape-contract)
 ---
 
 ### Billing Ontology

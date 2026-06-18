@@ -38,12 +38,12 @@ export default function ImplementationCoverage() {
               desc: "The requirement has direct satisfiedBy relation links to implementation or evidence artifacts.",
             },
             {
-              name: "refinement_contract_satisfied_via_attachment",
-              desc: "The requirement owns a refinement contract and a directly satisfied requirement attaches that contract.",
+              name: "contract_contract_satisfied_via_attachment",
+              desc: "The requirement owns a contract contract and a directly satisfied requirement attaches that contract.",
             },
             {
-              name: "refinement_contract_satisfied_via_child",
-              desc: "The requirement owns a refinement contract and a derived descendant requirement is directly satisfied.",
+              name: "contract_contract_satisfied_via_child",
+              desc: "The requirement owns a contract contract and a derived descendant requirement is directly satisfied.",
             },
             {
               name: "uncovered",
@@ -78,7 +78,7 @@ export default function ImplementationCoverage() {
         <BulletList
           items={[
             "The attaching requirement declares the contract obligation for its requirement subtree.",
-            "Child requirements and refinements can provide the detailed implementation route.",
+            "Child requirements and contracts can provide the detailed implementation route.",
             "Coverage and change-impact reports keep the attached contract visible for review and hardening.",
           ]}
         />

@@ -52,8 +52,48 @@ MCP requirements define concrete protocol behavior while reusing the same model 
   * type: capability
 
 #### Relations
+  * derive: [MCP Semantic Query Interface](#mcp-semantic-query-interface)
   * derivedFrom: [System Model Interfaces](#system-model-interfaces)
   * specifiedBy: [MCP Interface](InterfacesRequirements.md#mcp-interface)
+---
+
+### MCP Semantic Query Interface
+
+As an **AI Tool Integrator**, I want Reqvire MCP to run SPARQL over model-owned semantic RDF evidence, so that agents can ask precise ontology and traceability questions without exporting and reloading the graph themselves.
+
+#### Details
+MCP semantic query interface is the capability for read-only SPARQL query execution over authored ontology, SHACL, generated model-context, and ontology projection facts through MCP.
+
+#### Concept References
+  * MCP semantic query contract: https://www.reqvire.org/ontology#McpSemanticQueryContract
+  * MCP SPARQL query tool contract: https://www.reqvire.org/ontology#McpSparqlQueryToolContract
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derive: [MCP Semantic Prefix Registry Interface](#mcp-semantic-prefix-registry-interface)
+  * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
+  * specifiedBy: [MCP Semantic Query Tools](MCP/Tools.md#mcp-semantic-query-tools)
+---
+
+### MCP Semantic Prefix Registry Interface
+
+As an **AI Tool Integrator**, I want Reqvire MCP to list ontology-defined prefixes and namespaces with source element context, so that agents can construct correct SPARQL queries without guessing or rebuilding semantic stores.
+
+#### Details
+MCP semantic prefix registry interface is the capability for exposing ontology element prefix metadata, namespace IRIs, source provenance, source prose content, and reusable SPARQL prefix blocks through MCP.
+
+#### Concept References
+  * MCP semantic prefix registry contract: https://www.reqvire.org/ontology#McpSemanticPrefixRegistryContract
+  * MCP semantic prefix tool contract: https://www.reqvire.org/ontology#McpSemanticPrefixToolContract
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [MCP Semantic Query Interface](#mcp-semantic-query-interface)
+  * specifiedBy: [MCP Semantic Prefix Registry Tools](MCP/Tools.md#mcp-semantic-prefix-registry-tools)
 ---
 
 ### Web Explorer Interface

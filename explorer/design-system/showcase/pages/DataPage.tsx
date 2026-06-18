@@ -28,7 +28,7 @@ function Section({ title, desc, children }: { title: string; desc?: string; chil
 }
 
 const ELEMENT_ROLES = [
-  "capability", "requirement", "refinement", "source", "constraint",
+  "capability", "requirement", "contract", "source", "constraint",
   "behavior", "state", "input-output", "specification", "semantic-contract",
   "verification-objective", "test-verification", "formal-proof-verification",
   "analysis-verification", "inspection-verification", "demonstration-verification",
@@ -66,7 +66,7 @@ export function DataPage() {
         </div>
       </Section>
 
-      <Section title="ElementIcon" desc="Colored model-element marker. Refinements use diamond subtype glyphs; verification subtypes use verification glyphs.">
+      <Section title="ElementIcon" desc="Colored model-element marker. Contracts use diamond subtype glyphs; verification subtypes use verification glyphs.">
         {(["sm", "md", "lg"] as const).map((size) => (
           <div key={size} className="showcase-col">
             <div className="showcase-label">{size}</div>
@@ -85,7 +85,7 @@ export function DataPage() {
           <Chip className="is-active">Requirement</Chip>
           <Chip>Verification</Chip>
           <Chip>Capability</Chip>
-          <Chip>Refinement</Chip>
+          <Chip>Contract</Chip>
           <Chip>12 results</Chip>
         </div>
       </Section>

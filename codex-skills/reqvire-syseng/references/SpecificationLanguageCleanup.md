@@ -11,7 +11,7 @@ Use this workflow when auditing specification/constraint/behavior language that 
 ## Goal
 
 Keep requirements (and their `#### Details`) as the place for intent and intent-level constraints.
-Keep refinements focused on mechanism, constraints, and behaviors in non-normative language where possible.
+Keep contracts focused on mechanism, constraints, and behaviors in non-normative language where possible.
 Ensure every cleanup decision is tied to a parent or sibling requirement through ownership/attachment traceability.
 
 ## Procedure
@@ -28,18 +28,18 @@ reqvire search --filter-content="(?i)(\bshall\b|\bmust\b|\bmust not\b)" --filter
 
 ### 2) Decide action per element
 
-For each candidate refinement:
+For each candidate contract:
 
 - `move`: normative requirement-intent sentence belongs to the owning requirement, move it to that requirement `#### Details`.
-- `rephrase`: keep in refinement but rewrite without `shall`-style statements.
+- `rephrase`: keep in contract but rewrite without `shall`-style statements.
 
 Before each batch, confirm expected ownership boundaries and keep one-shot changes small.
 
 ### 3) Apply and verify ownership links
 
-- If you move ownership text out of a refinement, ensure the parent requirement still has clear traceability via `refinedBy`/`Attachments`.
+- If you move ownership text out of a contract, ensure the parent requirement still has clear traceability via `definedBy`/`Attachments`.
 - Do not leave duplicated normative language after move.
-- Keep refinements useful even after cleanup (no placeholder-only content).
+- Keep contracts useful even after cleanup (no placeholder-only content).
 
 ### 4) Validate behavior boundaries
 
@@ -54,14 +54,14 @@ reqvire coverage --json
 Expected clean state:
 
 - requirements retain clear EARS intent and traceability
-- refinements are mechanism-focused and non-normative
+- contracts are mechanism-focused and non-normative
 - no placeholder/no-op cleanup artifacts remain
 
 ## Example "good" result
 
 - Parent requirement carries intent in body/`#### Details`.
-- Linked refinement explains interfaces, constraints, and implementation details without `shall`.
-- `reqvire collect` for the parent still includes needed refinement context through normal traceability paths.
+- Linked contract explains interfaces, constraints, and implementation details without `shall`.
+- `reqvire collect` for the parent still includes needed contract context through normal traceability paths.
 
 ## How Not To Do It
 

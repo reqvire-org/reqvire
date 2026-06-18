@@ -126,7 +126,7 @@ pub enum Commands {
 
     /// Preview or apply source migrations for known model-breaking changes
     #[clap(
-        override_help = "Preview or apply source migrations for known model-breaking changes. By default, shows preview without applying changes\n\nMIGRATE OPTIONS:\n      --fix              Apply migration changes to files\n      --json             Output results in JSON format\n      --output <FILE>    Save JSON output to file (requires --json)\n\nCURRENT MIGRATIONS:\n    v0.15-documents-to-element-header - rewrite legacy single-element '# Documents' headers to '# Element'\n    v0.16-verification-objective - create one shared holder verification-objective in root VerificationObjectiveMigration.md and link standalone concrete verifications from that holder with derive"
+        override_help = "Preview or apply source migrations for known model-breaking changes. By default, shows preview without applying changes\n\nMIGRATE OPTIONS:\n      --fix              Apply migration changes to files\n      --json             Output results in JSON format\n      --output <FILE>    Save JSON output to file (requires --json)\n\nCURRENT MIGRATIONS:\n    v0.15-documents-to-element-header - rewrite legacy single-element '# Documents' headers to '# Element'\n    v0.16-verification-objective - create one shared holder verification-objective in root VerificationObjectiveMigration.md and link standalone concrete verifications from that holder with derive\n    v1.0-contract-relations - rewrite legacy refinement relation names to contract relation names: refinedBy -> definedBy and refine -> define"
     )]
     Migrate {
         /// Apply migration changes to files
@@ -524,18 +524,18 @@ pub enum Commands {
     /// Add relation or attachment between elements
     #[clap(
         name = "link",
-        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    refine        - Source refinement is owned by a requirement\n    refinedBy     - Source requirement owns a compatible refinement\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source capability or requirement is verified by concrete verification\n    verify        - Source concrete verification verifies capability or requirement\n    trace         - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach compatible requirement-owned refinement elements\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: requirement may attach compatible requirement-owned source, constraint, behavior, specification, state, or input-output refinement element identifiers (file.md#element-id or #element-id). Ontology vocabulary uses Concept References; semantic contracts use use/usedBy.\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\""
+        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    define        - Source contract element defines a requirement\n    definedBy     - Source requirement owns a compatible contract element\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source capability or requirement is verified by concrete verification\n    verify        - Source concrete verification verifies capability or requirement\n    trace         - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach compatible requirement-owned contract elements\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: requirement may attach compatible requirement-owned source, constraint, behavior, specification, state, or input-output contract element identifiers (file.md#element-id or #element-id). Ontology vocabulary uses Concept References; semantic contracts use use/usedBy.\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" definedBy \"Invoice Numbering Specification\"\n    reqvire link \"Invoice Numbering Specification\" define \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\""
     )]
     Link {
         /// Source element name
         source: String,
 
         /// Relation type OR 'attaching'.
-        /// Relations: derivedFrom, derive, specify, specifiedBy, refine, refinedBy, constrain, constrainedBy, use, usedBy, satisfiedBy, satisfy, verifiedBy, verify, trace.
-        /// Use 'attaching' to attach compatible requirement-owned refinement elements
+        /// Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, satisfiedBy, satisfy, verifiedBy, verify, trace.
+        /// Use 'attaching' to attach compatible requirement-owned contract elements
         relation_type: String,
 
-        /// Target: element name, internal path, or external URL (for relations); compatible refinement element identifier for requirement attachments
+        /// Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement attachments
         target: String,
 
         /// Preview changes without applying
@@ -1326,6 +1326,8 @@ pub async fn handle_command(
             let dry_run = !fix;
             let (documents_summary, documents_diffs) =
                 migrations::apply_documents_header_migration(excluded_filename_patterns, dry_run)?;
+            let contract_summary =
+                migrations::apply_contract_relation_migration(&mut model_manager.graph_registry)?;
             let verification_summary = migrations::apply_verification_objective_holders(
                 &mut model_manager.graph_registry,
             )?;
@@ -1347,6 +1349,7 @@ pub async fn handle_command(
                 let json_str = serde_json::to_string_pretty(&serde_json::json!({
                     "migrations": {
                         "documents_header": documents_summary,
+                        "contract_relations": contract_summary,
                         "verification_objective": verification_summary,
                     },
                     "changes": diff_value,
@@ -1359,6 +1362,7 @@ pub async fn handle_command(
                 })?;
                 handle_json_output(&json_str, &output)?;
             } else if documents_summary.files_changed == 0
+                && contract_summary.relations_rewritten == 0
                 && verification_summary.derive_relations_added == 0
                 && verification_summary.objectives_created == 0
             {
@@ -1366,15 +1370,17 @@ pub async fn handle_command(
             } else {
                 if dry_run {
                     println!(
-                        "Migration preview: {} legacy document header file(s), {} objective holder(s), {} derive relation(s).\n",
+                        "Migration preview: {} legacy document header file(s), {} contract relation rewrite(s), {} objective holder(s), {} derive relation(s).\n",
                         documents_summary.files_changed,
+                        contract_summary.relations_rewritten,
                         verification_summary.objectives_created,
                         verification_summary.derive_relations_added
                     );
                 } else {
                     println!(
-                        "Applied migration: {} legacy document header file(s), {} objective holder(s), {} derive relation(s).\n",
+                        "Applied migration: {} legacy document header file(s), {} contract relation rewrite(s), {} objective holder(s), {} derive relation(s).\n",
                         documents_summary.files_changed,
+                        contract_summary.relations_rewritten,
                         verification_summary.objectives_created,
                         verification_summary.derive_relations_added
                     );

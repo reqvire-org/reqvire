@@ -10,7 +10,7 @@ Use this reference when reorganizing the model structure without changing requir
 
 - Splitting mixed-type requirements (user vs system)
 - Moving elements between files for better organization
-- Adding missing relations (refinedBy, derivedFrom)
+- Adding missing relations (definedBy, derivedFrom)
 - Removing redundant verify relations
 - Consolidating scattered specifications
 
@@ -22,10 +22,10 @@ Find elements that need attention during refactoring:
 
 ```bash
 # Find specifications not linked to any requirement
-reqvire search --filter-type='specification' --not-have-relations='refine' --short --json
+reqvire search --filter-type='specification' --not-have-relations='define' --short --json
 
 # Find constraints without satisfy relations
-reqvire search --filter-type='constraint' --not-have-relations='refine' --short
+reqvire search --filter-type='constraint' --not-have-relations='define' --short
 
 # Find requirements with attachments (candidates for conversion to relations)
 reqvire search --has-attachments --short
@@ -38,8 +38,8 @@ reqvire search --filter-file="requirements/System/**" --short
 ```
 
 These findings guide the refactoring work:
-- Orphaned specifications need `refinedBy` relations from appropriate requirements
-- Attachments may need conversion to `refinedBy` relations
+- Orphaned specifications need `definedBy` relations from appropriate requirements
+- Attachments may need conversion to `definedBy` relations
 - Duplicate names suggest potential merge candidates
 
 ### Step 2: Find Requirements Asking for Specifications
@@ -51,12 +51,12 @@ Search for patterns like:
 - "shall implement constraints"
 - "shall enforce standardized policies"
 
-These requirements should have `refinedBy` relations to the specifications they ask for.
+These requirements should have `definedBy` relations to the specifications they ask for.
 
-### Step 3: Convert Attachments to refinedBy Where Appropriate
+### Step 3: Convert Attachments to definedBy Where Appropriate
 
 For each specification attachment, ask:
-- Does this requirement *define* this specification? → Use `refinedBy`
+- Does this requirement *define* this specification? → Use `definedBy`
 - Does this requirement *reference* or *depend on* this specification? → Keep as `Attachment`
 
 Convert attachments to relations using link and unlink commands:
@@ -65,29 +65,29 @@ Convert attachments to relations using link and unlink commands:
 # Remove attachment from requirement
 reqvire unlink "API Authorization Specification" "Authorization System Specification"
 
-# Add refinedBy relation instead
-reqvire link "API Authorization Specification" "refinedBy" "Authorization System Specification"
+# Add definedBy relation instead
+reqvire link "API Authorization Specification" "definedBy" "Authorization System Specification"
 ```
 
 **When to keep attachments:**
 - Requirement references but doesn't define the specification
 - Specification is defined by a different requirement
 - The attaching requirement is OUTSIDE the owner's derivation hierarchy
-- The attachment target is a refinement element identifier owned by another requirement
+- The attachment target is a contract element identifier owned by another requirement
 
 **Attachment constraints:**
-- Refinements must have a `refine` relation (established via requirement's `refinedBy`)
-- Only requirements outside the owner's hierarchy can attach a refinement
+- Contracts must have a `define` relation (established via requirement's `definedBy`)
+- Only requirements outside the owner's hierarchy can attach a contract
 - Requirements in the same hierarchy cannot attach - they access through the hierarchy
 
 ### Step 4: Consolidate Constraints
 
-Find the owning requirement that asks for constraints to be defined. Add `refinedBy` relations to all constraint elements using the link command:
+Find the owning requirement that asks for constraints to be defined. Add `definedBy` relations to all constraint elements using the link command:
 
 ```bash
 # Link constraint to requirement that defines it
-reqvire link "System Constraints Requirement" "refinedBy" "Performance Constraint"
-reqvire link "System Constraints Requirement" "refinedBy" "Security Constraint"
+reqvire link "System Constraints Requirement" "definedBy" "Performance Constraint"
+reqvire link "System Constraints Requirement" "definedBy" "Security Constraint"
 ```
 
 When you find duplicate constraints, merge them:
@@ -126,7 +126,7 @@ Quick validation: `reqvire validate && reqvire lint --fix && reqvire coverage`
 Look for specification elements with empty relations. For each:
 
 1. Find which requirement asks for this specification to be defined
-2. Change the attachment to a `refinedBy` relation on that requirement
+2. Change the attachment to a `definedBy` relation on that requirement
 3. Keep attachments on other requirements that just reference (don't define) the specification
 
 ## Merging Duplicate Requirements
@@ -153,7 +153,7 @@ The merge command:
 **Type compatibility:**
 - Requirements merge with requirements (all subtypes compatible)
 - Verifications merge with verifications
-- Refinements (constraint, behavior, specification) merge with each other
+- Contracts (constraint, behavior, specification) merge with each other
 
 **When to merge vs when to link:**
 - **Merge**: Elements express the same capability (duplicates)
@@ -208,7 +208,7 @@ The system shall implement API Access Authorization following clearly defined sp
   * [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
 ```
 
-### After (refinedBy):
+### After (definedBy):
 ```markdown
 ### API Authorization Specification
 
@@ -218,7 +218,7 @@ The system shall implement API Access Authorization following clearly defined sp
   * type: capability
 
 #### Relations
-  * refinedBy: [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
+  * definedBy: [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
 ```
 
 Referencing requirement (keeps attachment):

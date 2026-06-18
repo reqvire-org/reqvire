@@ -24,8 +24,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Component-Based Explorer Architecture Refinement Specification](Specifications.md#component-based-explorer-architecture-refinement-specification)
   * derivedFrom: [Mobile-Friendly Explorer](#mobile-friendly-explorer)
-  * refinedBy: [Component-Based Explorer Architecture Refinement Specification](Specifications.md#component-based-explorer-architecture-refinement-specification)
   * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
   * satisfiedBy: [MarkdownContent.tsx](../../../explorer/src/components/MarkdownContent.tsx)
   * verifiedBy: [Component Reuse Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#component-reuse-verification)
@@ -42,9 +42,9 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Responsive Explorer Rendering Refinement Specification](Specifications.md#responsive-explorer-rendering-refinement-specification)
   * derive: [Explorer Design System Styling](#explorer-design-system-styling)
   * derivedFrom: [Mobile-Friendly Explorer](#mobile-friendly-explorer)
-  * refinedBy: [Responsive Explorer Rendering Refinement Specification](Specifications.md#responsive-explorer-rendering-refinement-specification)
   * satisfiedBy: [index.html](../../../explorer/index.html)
   * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
   * verifiedBy: [Responsive Design Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#responsive-design-verification)
@@ -61,8 +61,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Explorer Design System Styling Refinement Specification](Specifications.md#explorer-design-system-styling-refinement-specification)
   * derivedFrom: [Responsive Explorer Rendering](#responsive-explorer-rendering)
-  * refinedBy: [Explorer Design System Styling Refinement Specification](Specifications.md#explorer-design-system-styling-refinement-specification)
   * satisfiedBy: [ElementIcon.tsx](../../../explorer/design-system/components/data/ElementIcon.tsx)
   * satisfiedBy: [DetailDialog.tsx](../../../explorer/design-system/product-patterns/detail/DetailDialog.tsx)
   * satisfiedBy: [styles.css](../../../explorer/design-system/styles.css)

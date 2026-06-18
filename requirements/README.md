@@ -31,7 +31,7 @@ flowchart LR
             modelStructure[Model Structure]
             traceability((Traceability))
             handleDiffs((Trace Changes))
-            browseModel((Browse Model))
+            browseModel((Explore Model))
         end
     end
 
@@ -161,7 +161,7 @@ Tool interfaces are **CLI** (Command Line Interface), **Web Explorer Interface**
 - Web Explorer Interface: Human browsing and visualization interface for served model content, diagrams, reports, and traces.
 - MCP Server: Typed external interface for AI agents, IDE integrations, CI adapters, and other tools.
 
-The MCP server exposes shared tool contracts, including semantic model evidence through `reqvire.ontologies`. It does not expose arbitrary shell execution, does not own model state, and does not bypass Reqvire core semantics.
+The MCP server exposes shared tool contracts, including semantic model evidence through `reqvire.semantic.ontologies`. It does not expose arbitrary shell execution, does not own model state, and does not bypass Reqvire core semantics.
 
 #### Core Capabilities
 
@@ -212,7 +212,7 @@ These capabilities allow teams to seamlessly integrate System practices into the
 
 ### Human Interaction
 
-Humans interact with Reqvire tools to manage, refine, and validate System models, as well as to collaborate effectively within development workflows:
+Humans interact with Reqvire tools to manage, define, and validate System models, as well as to collaborate effectively within development workflows:
 - Via CLI: Users leverage Reqvire’s CLI to perform tasks such as managing models, generating diagrams, analyzing relationships, and validating structures.
 - Via Browser: Users browse the served Explorer UI for model content, diagrams, reports, and traces.
 - Via AI Agents: Users interact with AI agents to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.

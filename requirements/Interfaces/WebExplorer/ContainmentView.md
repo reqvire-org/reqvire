@@ -4,7 +4,7 @@
   * type: specification
 
 ## Relations
-  * refine: [Model-Centric View Generation](Capabilities.md#model-centric-view-generation)
+  * define: [Model-Centric View Generation](Capabilities.md#model-centric-view-generation)
 
 ## ContainmentView
 

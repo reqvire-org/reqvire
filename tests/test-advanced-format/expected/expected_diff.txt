@@ -42,7 +42,7 @@ Found 9 file(s) with formatting changes:
   09 +   ␤
   10     #### Relations
   11 -     * specify: [Test Capability](#test-capability-test-advanced-format-behaviors-md)
-  11       * refinedBy: [My Test Behavior](#my-test-behavior)
+  11       * definedBy: [My Test Behavior](#my-test-behavior)
   12 +     * specify: [Test Capability Test Advanced Format Behaviors Md](#test-capability-test-advanced-format-behaviors-md)
   13     ---
   14

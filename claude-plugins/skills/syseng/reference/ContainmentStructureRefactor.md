@@ -17,7 +17,7 @@ Physical containment answers:
 Graph relations answer:
 
 - Which capability does this requirement specify?
-- Which requirement owns this refinement?
+- Which requirement owns this contract?
 - Which ontology gives this subgraph meaning?
 - Which verification proves this capability or requirement?
 - Which evidence satisfies this requirement or verification?
@@ -42,13 +42,13 @@ Optional project-level files such as `UseCases.md`, `Stakeholders.md`, or `Gloss
 
 Root-level area folders contain capability-rooted subgraphs directly under the model root.
 
-A capability represents a coherent operational, product, business, regulatory, or system ability. Capability folders group the requirements, refinements, architecture notes, and local contracts that belong to that ability.
+A capability represents a coherent operational, product, business, regulatory, or system ability. Capability folders group the requirements, contracts, architecture notes, and local contracts that belong to that ability.
 
 ### Ontologies
 
 `Ontologies/` contains first-class `ontology` elements.
 
-Ontologies define reusable semantic vocabulary: domain concepts, relationships, categories, and stable model meaning. Capabilities, requirements, refinements, and verifications use concept references to bind prose to ontology terms.
+Ontologies define reusable semantic vocabulary: domain concepts, relationships, categories, and stable model meaning. Capabilities, requirements, contracts, and verifications use concept references to bind prose to ontology terms.
 
 ### Verifications
 
@@ -102,9 +102,9 @@ A capability subgraph may own:
 - the root `type: capability` element
 - child capabilities when decomposition is useful
 - requirements that specify the capability
-- requirement-owned refinements
+- requirement-owned contracts
 - reusable semantic contracts that explicitly use ontology and constrain requirements
-- local architecture or design specifications that refine elements in that subgraph
+- local architecture or design specifications that define elements in that subgraph
 - verification links to external verification elements
 
 Use child capabilities when concerns differ in verification, ownership, lifecycle, architecture impact, operational semantics, or requirement clusters.
@@ -121,7 +121,7 @@ Put content in `Ontologies/` when it says:
 - This domain term means this.
 - These terms form a reusable semantic vocabulary.
 
-Keep content in capabilities, requirements, or refinements when it says:
+Keep content in capabilities, requirements, or contracts when it says:
 
 - The system shall...
 - The system must reject, write, emit, show, route, or store...
@@ -131,7 +131,7 @@ Keep content in capabilities, requirements, or refinements when it says:
 
 Ontology hierarchy uses `derivedFrom` / `derive` between ontology elements. Non-ontology, non-semantic-contract elements consume ontology terms through `#### Concept References`; semantic contracts consume ontology through `use` / `usedBy`.
 
-## Requirement and Refinement Files
+## Requirement and Contract Files
 
 Requirement files usually use names like:
 
@@ -140,7 +140,7 @@ Requirement files usually use names like:
 <Topic>Requirements.md
 ```
 
-Refinement files usually use names like:
+Contract files usually use names like:
 
 ```text
 <Topic>Specifications.md
@@ -151,19 +151,19 @@ Refinement files usually use names like:
 <Topic>SemanticContracts.md
 ```
 
-Refinements are owned by exactly one compatible requirement through `refine` / `refinedBy`. Use refinements when content is too detailed for a requirement statement but still needs traceability.
+Contracts are owned by exactly one compatible requirement through `define` / `definedBy`. Use contracts when content is too detailed for a requirement statement but still needs traceability.
 
 Use semantic contracts when requirements need a machine-readable SHACL profile over ontology terms. Semantic contracts must use ontology through `use`/`usedBy`, constrain requirements through `constrain`/`constrainedBy`, contain `#### Shapes`, and not contain `#### Ontology`.
 
 ## Architecture Folders
 
-`Architecture/` folders may be kept inside the capability subgraph they refine.
+`Architecture/` folders may be kept inside the capability subgraph they define.
 
-Use architecture folders for service-level design specifications, interface implementation architecture, service responsibility boundaries, deployment or runtime architecture, and architectural details that refine the owning capability or requirements.
+Use architecture folders for service-level design specifications, interface implementation architecture, service responsibility boundaries, deployment or runtime architecture, and architectural details that define the owning capability or requirements.
 
 Do not put shared ontology in architecture folders. Shared vocabulary belongs in `Ontologies/` and is referenced by consuming elements.
 
-If architecture content becomes shared across many independent capability roots, extract reusable meaning into ontology or create an explicit reusable refinement contract and attach it where needed.
+If architecture content becomes shared across many independent capability roots, extract reusable meaning into ontology or create an explicit reusable contract contract and attach it where needed.
 
 ## Verification Plane
 
@@ -191,8 +191,8 @@ requirement --derivedFrom/derive--> requirement
 ontology --derivedFrom/derive--> ontology
 requirement --specify--> capability
 capability --specifiedBy--> requirement
-capability/requirement --refinedBy--> refinement
-refinement --refine--> capability/requirement
+capability/requirement --definedBy--> contract
+contract --define--> capability/requirement
 capability/requirement --verifiedBy--> verification
 verification --verify--> capability/requirement
 requirement --satisfiedBy--> implementation/evidence
@@ -203,7 +203,7 @@ Attachments are separate from normal relations:
 
 ```text
 capability --Attachment--> ontology
-requirement --Attachment--> compatible requirement-owned refinement contract
+requirement --Attachment--> compatible requirement-owned contract contract
 ```
 
 Attachments are the approved way to reuse ontology or contracts across otherwise independent subgraphs.
@@ -220,7 +220,7 @@ Hierarchy should stay inside one logical subgraph:
 
 Cross-subgraph reuse should use attachments, not hierarchy.
 
-Avoid cross-submodel requirement hierarchy. If a requirement in one capability needs context from another capability, use concept references for ontology terms or attach a compatible requirement-owned refinement contract instead of creating a parent/child requirement relation across subgraphs.
+Avoid cross-submodel requirement hierarchy. If a requirement in one capability needs context from another capability, use concept references for ontology terms or attach a compatible requirement-owned contract contract instead of creating a parent/child requirement relation across subgraphs.
 
 ## File Placement Heuristics
 
@@ -229,7 +229,7 @@ When adding or moving model content:
 1. If it defines reusable meaning, put it in `Ontologies/`.
 2. If it defines a system ability, put it as a `capability` under `<Area>/<CapabilityName>/` at the model root.
 3. If it states an obligation, put it as a `requirement` in the owning capability folder.
-4. If it elaborates an obligation or capability, put it as a refinement in the same capability folder.
+4. If it elaborates an obligation or capability, put it as a contract in the same capability folder.
 5. If it is service or architecture detail for one capability, put it under that capability's `Architecture/` folder.
 6. If it proves behavior, put it under `Verifications/<Domain>/`.
 7. If another subgraph needs vocabulary, add concept references to terms declared under `Ontologies/`.

@@ -272,7 +272,7 @@ This test verifies that the system parses Refinement element types (constraint, 
 
 #### Relations
   * satisfiedBy: [test.sh](../../../tests/test-refinement-elements/test.sh)
-  * verify: [Refinement Element Structure Constraints](../../ModelStructure/ModelManagement.md#refinement-element-structure-constraints)
+  * verify: [Refinement Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
 ---
 
 ### Refinement Relations Rejection Test
@@ -298,7 +298,7 @@ This test verifies that the system rejects Refinement elements that include a Re
 
 #### Relations
   * satisfiedBy: [test.sh](../../../tests/test-refinement-elements/test.sh)
-  * verify: [Refinement Element Structure Constraints](../../ModelStructure/ModelManagement.md#refinement-element-structure-constraints)
+  * verify: [Refinement Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
 ---
 
 ### Requirement Governance Metadata Verification
@@ -317,14 +317,14 @@ Expected checks:
 - Verify `owner` accepts a free-form string.
 - Verify inherited or default `status: approved` is not treated as explicit approval evidence.
 - Verify non-governance-bearing elements that declare `status`, `priority`, `risk`, or `owner` metadata are rejected with clear diagnostics.
-- Verify governance context for a refinement element is resolved from its owning requirement through `refine` / `refinedBy`, not from metadata authored on the refinement.
+- Verify governance context for a refinement element is resolved from its owning requirement through `define` / `definedBy`, not from metadata authored on the refinement.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../tests/test-requirement-governance-metadata/test.sh)
-  * verify: [Refinement Element Structure Constraints](../../ModelStructure/ModelManagement.md#refinement-element-structure-constraints)
+  * verify: [Refinement Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
   * verify: [Requirement Governance Metadata](../../ModelStructure/ModelManagement.md#requirement-governance-metadata)
 ---
 

@@ -25,10 +25,10 @@ The system shall provide formatting capability to ensure consistent formatting i
   * type: requirement
 
 #### Relations
+  * definedBy: [Format Consistency Specification](Specifications.md#format-consistency-specification)
   * derive: [Document Structure Normalization](#document-structure-normalization)
   * derive: [Element Ordering Normalization](#element-ordering-normalization)
   * derive: [Relation Ordering Normalization](#relation-ordering-normalization)
-  * refinedBy: [Format Consistency Specification](Specifications.md#format-consistency-specification)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
   * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
@@ -57,8 +57,8 @@ When generating formatted output, the system shall:
   * type: requirement
 
 #### Relations
+  * definedBy: [Document Structure Specification](Specifications.md#document-structure-specification)
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * refinedBy: [Document Structure Specification](Specifications.md#document-structure-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
@@ -72,8 +72,8 @@ When formatting or persisting specification files, the system shall reorder elem
   * type: requirement
 
 #### Relations
+  * definedBy: [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * refinedBy: [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
   * verifiedBy: [Element Ordering Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#element-ordering-verification)
 ---
 
@@ -90,8 +90,8 @@ This operation only removes within-section duplicates (entries repeated in the s
   * type: requirement
 
 #### Relations
+  * definedBy: [Format Duplicate Removal Behavior](Behaviors.md#format-duplicate-removal-behavior)
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * refinedBy: [Format Duplicate Removal Behavior](Behaviors.md#format-duplicate-removal-behavior)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * verifiedBy: [Format Duplicate Removal Test](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-duplicate-removal-test)
 ---
@@ -114,8 +114,8 @@ This ensures:
   * type: requirement
 
 #### Relations
+  * definedBy: [Relation Ordering Specification](Specifications.md#relation-ordering-specification)
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * refinedBy: [Relation Ordering Specification](Specifications.md#relation-ordering-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Relation Ordering Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#relation-ordering-verification)
 ---
@@ -160,7 +160,7 @@ Implementation details shall follow the associated refinement specifications.
   * [RelationTypes](../../ModelStructure/RelationTypes.md#relationtypes)
 
 #### Relations
-  * refinedBy: [Full Relations Insertion Refinement Specification](Specifications.md#full-relations-insertion-refinement-specification)
+  * definedBy: [Full Relations Insertion Refinement Specification](Specifications.md#full-relations-insertion-refinement-specification)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)

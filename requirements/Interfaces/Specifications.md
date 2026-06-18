@@ -17,7 +17,7 @@ Boundary rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Interface](InterfacesRequirements.md#mcp-interface)
+  * define: [MCP Interface](InterfacesRequirements.md#mcp-interface)
 ---
 
 ### Web Interface Refinement Specification

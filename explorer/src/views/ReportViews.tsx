@@ -727,7 +727,7 @@ export function CoverageView({
                   label="Orphaned verifications"
                   value={summary.orphaned_verifications_percentage}
                   detail={`${formatNumber(summary.orphaned_verifications)} / ${formatNumber(summary.total_verifications)} orphaned`}
-                  token="--refinement"
+                  token="--contract"
                   inverted
                 />
               </CoverageKpiGrid>

@@ -18,6 +18,8 @@ This objective groups verification that Reqvire MCP servers, tools, resources, p
   * derive: [MCP Protocol Standard Conformance Verification](#mcp-protocol-standard-conformance-verification)
   * derive: [MCP Quality Traceability Tools Verification](#mcp-quality-traceability-tools-verification)
   * derive: [MCP Resource Interface Verification](#mcp-resource-interface-verification)
+  * derive: [MCP Semantic Prefix Registry Tools Verification](#mcp-semantic-prefix-registry-tools-verification)
+  * derive: [MCP Semantic Query Tools Verification](#mcp-semantic-query-tools-verification)
   * derive: [MCP Server Command Verification](#mcp-server-command-verification)
   * derive: [MCP Server End-to-End Verification](#mcp-server-end-to-end-verification)
   * derive: [MCP Server State and Cache Verification](#mcp-server-state-and-cache-verification)
@@ -108,6 +110,9 @@ This verification shall prove that model evidence tools return authoritative Req
 Expected checks:
 - Search, read element, model, containment, collect, and submodels tools return data matching Reqvire core reports.
 - Search supports `filter_type=ontology` and returns parsed ontology ADT content.
+- Verify `tools/list` advertises `reqvire.semantic.ontologies` as a read-only semantic model evidence tool.
+- Verify `reqvire.semantic.ontologies` returns both RDF ontology and SHACL shape content by default.
+- Verify `reqvire.semantic.ontologies` filters to RDF-only or SHACL-only content when the `content` argument is set.
 - Read element returns `concept_references` for elements that author `#### Concept References`.
 - Collect returns authored concept references for capability and requirement elements and semantic-contract ontology-use context where the underlying operation returns semantic-contract evidence.
 - Results include evidence references for relevant files, elements, relations, and attachments.
@@ -230,6 +235,48 @@ Expected checks:
 
 #### Relations
   * verify: [MCP Resource Interface](../../../Interfaces/MCP/Tools.md#mcp-resource-interface)
+---
+
+### MCP Semantic Query Tools Verification
+
+This verification shall prove that MCP SPARQL queries execute over Reqvire semantic RDF evidence without mutating workspace state.
+
+#### Details
+Expected checks:
+- Verify `tools/list` advertises `reqvire.semantic.sparql` as a read-only tool.
+- Verify `reqvire.semantic.sparql` executes a SELECT query over authored ontology and SHACL RDF.
+- Verify `reqvire.semantic.sparql` uses full semantic graph context by default, including generated model-context triples.
+- Verify SELECT results include ordered variables, bindings, RDF term metadata, row count, semantic index summary, diagnostics, and model fingerprint.
+- Verify invalid SPARQL returns an MCP tool error rather than mutating files.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * verify: [MCP Semantic Query Tools](../../../Interfaces/MCP/Tools.md#mcp-semantic-query-tools)
+---
+
+### MCP Semantic Prefix Registry Tools Verification
+
+This verification shall prove that MCP prefix discovery exposes ontology element-defined prefixes with source prose content and without mutating workspace state.
+
+#### Details
+Expected checks:
+- Verify `tools/list` advertises `reqvire.semantic.prefixes` as a read-only tool.
+- Verify `reqvire.semantic.prefixes` returns the ontology element-defined `testonto` prefix and namespace from the parsed semantic model index.
+- Verify prefix source context includes element identifier, name, file path, line number, and ontology element prose content.
+- Verify source content excludes authored Turtle prefix blocks.
+- Verify the response includes a SPARQL prefix block suitable for query construction.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * verify: [MCP Semantic Prefix Registry Tools](../../../Interfaces/MCP/Tools.md#mcp-semantic-prefix-registry-tools)
 ---
 
 ### MCP Server Command Verification

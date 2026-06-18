@@ -27,7 +27,7 @@ normalize_error_output() {
   echo "$raw" \
     | sed 's/\x1b\[[0-9;]*m//g' \
     | sed -E 's/^\[[^]]+\][[:space:]]*//' \
-    | grep -E "[Ii]ncompatible element types for relation: Relation 'refinedBy'|refinedBy target '.*' is invalid\\." \
+    | grep -E "[Ii]ncompatible element types for relation: Relation 'definedBy'|definedBy target '.*' is invalid\\." \
     | sed -E 's/^[[:space:]]*[0-9]+\.[[:space:]]+//' \
     | head -n 1
 }
@@ -43,7 +43,7 @@ assert_validate_failure_matches() {
   normalized="$(normalize_error_output "$out")"
   [ -n "$normalized" ] || {
     echo "$out"
-    auto_fail "Could not extract expected refinedBy validation error line"
+    auto_fail "Could not extract expected definedBy validation error line"
   }
   printf "%s\n" "$normalized" > "$actual_file"
   if ! diff -u "$expected_file" "$actual_file"; then
@@ -55,10 +55,10 @@ assert_validate_failure_matches() {
 REQ_FILE="$TEST_DIR/specifications/Requirements.md"
 DOC_FILE="$TEST_DIR/specifications/DesignDocuments/ChangePropagation.md"
 
-# 1) Valid refinedBy identifier target into # Element element passes
+# 1) Valid definedBy identifier target into # Element element passes
 OUT=$(run_validate) || {
   echo "$OUT"
-  auto_fail "Valid refinedBy element target in # Element should pass validation"
+  auto_fail "Valid definedBy element target in # Element should pass validation"
 }
 
 # 2) # Element file parsed as one element
@@ -68,7 +68,7 @@ DOC_COUNT=$(echo "$SEARCH_JSON" | jq '[.files["specifications/DesignDocuments/Ch
 DOC_TYPE=$(echo "$SEARCH_JSON" | jq -r '.files["specifications/DesignDocuments/ChangePropagation.md"].elements[0].type')
 [ "$DOC_TYPE" = "specification" ] || auto_fail "Single element type must come from metadata"
 
-# 3) refinedBy fails when targeted # Element file element type is non-refinement
+# 3) definedBy fails when targeted # Element file element type is non-refinement
 sed -i "s@  \\* type: specification@  * type: requirement@" "$DOC_FILE"
 set +e
 OUT=$(run_validate)
@@ -82,20 +82,20 @@ assert_validate_failure_matches \
 # restore valid doc type
 sed -i "s@  \\* type: requirement@  * type: specification@" "$DOC_FILE"
 
-# 4) refinedBy file target fails (must point to element identifier, not plain file path)
-sed -i "s@  \\* refinedBy: \\[ChangePropagation\\](DesignDocuments/ChangePropagation.md#changepropagation)@  * refinedBy: [ChangePropagation.md](DesignDocuments/ChangePropagation.md)@" "$REQ_FILE"
+# 4) definedBy file target fails (must point to element identifier, not plain file path)
+sed -i "s@  \\* definedBy: \\[ChangePropagation\\](DesignDocuments/ChangePropagation.md#changepropagation)@  * definedBy: [ChangePropagation.md](DesignDocuments/ChangePropagation.md)@" "$REQ_FILE"
 set +e
 OUT=$(run_validate)
 CODE=$?
 set -e
-[ $CODE -ne 0 ] || auto_fail "refinedBy plain file target should fail"
+[ $CODE -ne 0 ] || auto_fail "definedBy plain file target should fail"
 assert_validate_failure_matches \
   "$TEST_SCRIPT_DIR/expected/refinedby-file-target-error.txt" \
   "$TEST_DIR/output/refinedby-file-target-error.actual.txt" \
   "$OUT" "$CODE"
 
-# restore refinedBy identifier target
-sed -i "s@  \\* refinedBy: \\[ChangePropagation.md\\](DesignDocuments/ChangePropagation.md)@  * refinedBy: [ChangePropagation](DesignDocuments/ChangePropagation.md#changepropagation)@" "$REQ_FILE"
+# restore definedBy identifier target
+sed -i "s@  \\* definedBy: \\[ChangePropagation.md\\](DesignDocuments/ChangePropagation.md)@  * definedBy: [ChangePropagation](DesignDocuments/ChangePropagation.md#changepropagation)@" "$REQ_FILE"
 
 # 5) # Element body may contain nested markdown headings after element name
 cat > "$DOC_FILE" <<'DOC'
@@ -105,7 +105,7 @@ cat > "$DOC_FILE" <<'DOC'
   * type: specification
 
 ## Relations
-  * refine: [Requirement Using Single Element Refinement](../Requirements.md#requirement-using-single-element-refinement)
+  * define: [Requirement Using Single Element Refinement](../Requirements.md#requirement-using-single-element-refinement)
 
 ## ChangePropagation
 

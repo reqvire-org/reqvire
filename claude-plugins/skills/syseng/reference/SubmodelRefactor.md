@@ -26,8 +26,8 @@ Before applying refactor operations, confirm with the user:
 
 - Submodel ownership map (who owns which folders/elements)
 - Which cross-submodel dependencies are allowed as attachments
-- Which relation types are forbidden across submodels (`derive`, `derivedFrom`, `refinedBy`, `verifiedBy`)
-- Where shared contracts live (ontology elements for vocabulary, semantic-contract elements for reusable shape profiles, or compatible requirement-owned refinement elements)
+- Which relation types are forbidden across submodels (`derive`, `derivedFrom`, `definedBy`, `verifiedBy`)
+- Where shared contracts live (ontology elements for vocabulary, semantic-contract elements for reusable shape profiles, or compatible requirement-owned contract elements)
 
 Do not run bulk unlink/move operations before this confirmation.
 
@@ -36,7 +36,7 @@ Do not run bulk unlink/move operations before this confirmation.
 When a relation crosses intended submodel boundaries, either:
 
 1. Move/reparent to restore hierarchical ownership
-2. Replace cross-boundary hierarchy links with attachment-based refinement contracts
+2. Replace cross-boundary hierarchy links with attachment-based contract contracts
 
 When one capability root is too broad, first split it into real child capabilities, then move requirements to specify the child capability that owns their local capability. Keep the parent capability as a capability grouping only when its children still form one coherent root submodel.
 
@@ -61,13 +61,13 @@ A submodel may contain internal sub-boundaries (nested domains) with separate ow
    - `reqvire lint --json` — prioritize `needs_manual_review` entries with `type: cross_submodel_hierarchical_relation`
 
 2. **Define submodel boundaries**
-   - Keep derivation/refinement/verification relations inside each submodel
+   - Keep derivation/contract/verification relations inside each submodel
    - Define allowed cross-boundary artifacts as attachments
 
 3. **Migrate links**
    - For each cross-submodel relation, either move element into owning submodel or replace with attachment
-   - Ensure each receiving element authors required concept references, each receiving requirement attaches required reusable non-semantic-contract refinements, and semantic contracts are linked with `constrainedBy`/`constrain`
-   - Preserve dependency visibility: if a requirement relied on a moved concept, add concept references, a local refinement, or an attachment so `collect` still explains the dependency
+   - Ensure each receiving element authors required concept references, each receiving requirement attaches required reusable non-semantic-contract contracts, and semantic contracts are linked with `constrainedBy`/`constrain`
+   - Preserve dependency visibility: if a requirement relied on a moved concept, add concept references, a local contract, or an attachment so `collect` still explains the dependency
 
 4. **Validate semantic completeness**
    - `reqvire collect "<capability-or-requirement>" --json` must include authored concept references, attached/refining specs, and explicitly constraining semantic contracts
@@ -84,21 +84,21 @@ Before applying refactor edits, explicitly confirm:
 - Submodel ownership map (who owns which folders/elements)
 - Which cross-submodel dependencies are allowed as attachments
 - Which relation types are forbidden across submodels
-- Whether shared contracts live as refinement elements (and which requirement owns each one)
+- Whether shared contracts live as contract elements (and which requirement owns each one)
 
 Do not proceed with bulk unlink/move operations until this is confirmed.
 
 ## Correct vs Incorrect Patterns
 
 **Correct** (attachment boundary):
-- `Submodel A` requirement keeps internal `derive/refinedBy/verifiedBy` only within `Submodel A`
+- `Submodel A` requirement keeps internal `derive/definedBy/verifiedBy` only within `Submodel A`
 - `Submodel A` requirement attaches `Submodel B` contract/spec:
   - `reqvire link "A Requirement" attaching "requirements/Contracts/B/InterfaceSpec.md#api-contract"`
 - `collect` for `A Requirement` includes the attached external contract content
 
 **Incorrect** (cross-submodel relation leakage):
 - `Submodel A` requirement directly uses `derivedFrom` to `Submodel B` requirement
-- `Submodel A` requirement uses `refinedBy` to `Submodel B` specification
+- `Submodel A` requirement uses `definedBy` to `Submodel B` specification
 - This breaks independence and creates hidden coupling
 
 ## Report Expectations

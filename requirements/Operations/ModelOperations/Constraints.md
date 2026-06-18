@@ -17,7 +17,7 @@ Validation rules for atomic relation relink operations.
   * type: constraint
 
 #### Relations
-  * refine: [Atomic Relation Relink Operation](ElementManipulationRequirements.md#atomic-relation-relink-operation)
+  * define: [Atomic Relation Relink Operation](ElementManipulationRequirements.md#atomic-relation-relink-operation)
 ---
 
 ### Merge Type Compatibility Constraint

@@ -153,7 +153,7 @@ Owner requirement for design refinement specification.
 
 #### Relations
   * specify: [Design Capability](#design-capability)
-  * refinedBy: [Design Doc Specification](DesignDoc.md#design-doc-specification)
+  * definedBy: [Design Doc Specification](DesignDoc.md#design-doc-specification)
 ---
 
 ### Design Capability

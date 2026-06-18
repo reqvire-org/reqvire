@@ -8,7 +8,7 @@ Owner for the behavior element (separate hierarchy).
   * type: requirement
 
 #### Relations
-  * refinedBy: [My Test Behavior](#my-test-behavior)
+  * definedBy: [My Test Behavior](#my-test-behavior)
   * specify: [Test Capability Test Advanced Format Behaviors Md](#test-capability-test-advanced-format-behaviors-md)
 ---
 

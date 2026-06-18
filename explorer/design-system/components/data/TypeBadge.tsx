@@ -80,16 +80,16 @@ const roleSkinX = css`
     --ds-typebadge-ink: var(--requirement-ink);
   }
 
-  &[data-element-role="refinement"],
+  &[data-element-role="contract"],
   &[data-element-role="source"],
   &[data-element-role="constraint"],
   &[data-element-role="behavior"],
   &[data-element-role="state"],
   &[data-element-role="input-output"],
   &[data-element-role="specification"] {
-    --ds-typebadge-color: var(--refinement);
-    --ds-typebadge-tint: var(--refinement-tint);
-    --ds-typebadge-ink: var(--refinement-ink);
+    --ds-typebadge-color: var(--contract);
+    --ds-typebadge-tint: var(--contract-tint);
+    --ds-typebadge-ink: var(--contract-ink);
   }
 
   &[data-element-role="semantic-contract"] {

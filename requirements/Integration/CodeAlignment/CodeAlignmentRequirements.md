@@ -24,10 +24,10 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Traceability Format Refinement Specification](Specifications.md#traceability-format-refinement-specification)
   * derive: [Comment Style by File Extension](#comment-style-by-file-extension)
   * derive: [Validating Traceability Format](#validating-traceability-format)
   * derivedFrom: [Code Traceability](#code-traceability)
-  * refinedBy: [Traceability Format Refinement Specification](Specifications.md#traceability-format-refinement-specification)
 ---
 
 ### Comment Style by File Extension
@@ -41,6 +41,7 @@ Comment style kinds and traceability relation kinds are defined by the Reqvire c
   * type: requirement
 
 #### Relations
+  * definedBy: [Comment Style Specification](Specifications.md#comment-style-specification)
   * derive: [BAT style comment](#bat-style-comment)
   * derive: [CSS style comment](#css-style-comment)
   * derive: [Dash style comment](#dash-style-comment)
@@ -48,7 +49,6 @@ Comment style kinds and traceability relation kinds are defined by the Reqvire c
   * derive: [SQL style comment](#sql-style-comment)
   * derive: [XML style comment](#xml-style-comment)
   * derivedFrom: [Traceability Format](#traceability-format)
-  * refinedBy: [Comment Style Specification](Specifications.md#comment-style-specification)
 ---
 
 ### BAT style comment
@@ -83,8 +83,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [CSS Style Comment Refinement Specification](Specifications.md#css-style-comment-refinement-specification)
   * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
-  * refinedBy: [CSS Style Comment Refinement Specification](Specifications.md#css-style-comment-refinement-specification)
 ---
 
 ### Dash style comment
@@ -134,8 +134,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Slash Style Comment Refinement Specification](Specifications.md#slash-style-comment-refinement-specification)
   * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
-  * refinedBy: [Slash Style Comment Refinement Specification](Specifications.md#slash-style-comment-refinement-specification)
 ---
 
 ### XML style comment
@@ -149,8 +149,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [XML Style Comment Refinement Specification](Specifications.md#xml-style-comment-refinement-specification)
   * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
-  * refinedBy: [XML Style Comment Refinement Specification](Specifications.md#xml-style-comment-refinement-specification)
 ---
 
 ### Validating Traceability Format

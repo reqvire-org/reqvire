@@ -34,7 +34,7 @@ export default function ModelingLanguage() {
               "reusable SHACL profiles that use ontology vocabulary and constrain requirements.",
             ],
             [
-              "Refinements",
+              "Contracts",
               "requirement-owned source, specification, constraint, behavior, state, and input-output detail.",
             ],
             [
@@ -79,8 +79,8 @@ API authentication capability.
 #### Metadata
   * type: capability
 
-#### Attachments
-  * [Access Token Ontology](AuthOntology.md#access-token-ontology)
+#### Concept References
+  * Access Token: auth:AccessToken
 
 #### Relations
   * specifiedBy: [API Access Token Validation](Requirements.md#api-access-token-validation)`}</CodeBlock>
@@ -93,7 +93,7 @@ API authentication capability.
   * type: specification
 
 ## Relations
-  * refine: [API Access Token Validation](Requirements.md#api-access-token-validation)
+  * define: [API Access Token Validation](Requirements.md#api-access-token-validation)
 
 ## Access Token Validation Specification
 
@@ -116,7 +116,7 @@ and signature before the request reaches protected application logic.`}</CodeBlo
             items={[
               [
                 "<Area>/<CapabilityName>/",
-                "root-level capability subgraphs with child capabilities, specifying requirements, and requirement-owned refinements.",
+                "root-level capability subgraphs with child capabilities, specifying requirements, and requirement-owned contracts.",
               ],
               [
                 "Ontologies/",

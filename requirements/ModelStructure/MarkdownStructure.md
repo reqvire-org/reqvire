@@ -4,7 +4,7 @@
   * type: specification
 
 ## Relations
-  * refine: [Structure and Addressing in Markdown Documents](StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
+  * define: [Structure and Addressing in Markdown Documents](StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
 
 ## MarkdownStructure
 

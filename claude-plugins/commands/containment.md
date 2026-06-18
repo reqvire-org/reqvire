@@ -71,7 +71,7 @@ Analyze the physical structure of your Reqvire model to understand how elements 
 - Use for: Reorganizing, refactoring, improving maintainability
 
 **Traceability** (logical relationships):
-- How elements relate through derivedFrom, verify, satisfiedBy, refinedBy relations
+- How elements relate through derivedFrom, verify, satisfiedBy, definedBy relations
 - Requirement flow-down and verification chains
 - Use for: Understanding dependencies, impact analysis, coverage
 

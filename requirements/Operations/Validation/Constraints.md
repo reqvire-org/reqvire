@@ -37,5 +37,5 @@ This rule is a structural model invariant and shall be enforced as validation, n
   * type: constraint
 
 #### Relations
-  * refine: [Single Root Hierarchy Ownership](ValidationRequirements.md#single-root-hierarchy-ownership)
+  * define: [Single Root Hierarchy Ownership](ValidationRequirements.md#single-root-hierarchy-ownership)
 ---

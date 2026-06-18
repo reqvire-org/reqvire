@@ -15,7 +15,7 @@ Unsupported first H1 headings shall be ignored by element parsing.
   * type: requirement
 
 #### Relations
-  * refinedBy: [Specification File Identification Refinement Specification](Specifications.md#specification-file-identification-refinement-specification)
+  * definedBy: [Specification File Identification Refinement Specification](Specifications.md#specification-file-identification-refinement-specification)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
   * specify: [Defining Model Structure](ModelStructureFeature.md#defining-model-structure)
@@ -31,10 +31,10 @@ The system shall implement semi-structured markdown format specifications that d
   * type: requirement
 
 #### Relations
+  * definedBy: [MarkdownStructure](MarkdownStructure.md#markdownstructure)
+  * definedBy: [Structure and Addressing in Markdown Documents Refinement Specification](Specifications.md#structure-and-addressing-in-markdown-documents-refinement-specification)
   * derive: [Element Identity Model](#element-identity-model)
   * derive: [Reserved Subsections Support](#reserved-subsections-support)
-  * refinedBy: [MarkdownStructure](MarkdownStructure.md#markdownstructure)
-  * refinedBy: [Structure and Addressing in Markdown Documents Refinement Specification](Specifications.md#structure-and-addressing-in-markdown-documents-refinement-specification)
   * satisfiedBy: [element.rs](../../core/src/element.rs)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
@@ -53,9 +53,9 @@ The system shall distinguish between element identity (ID) and element addressin
   * type: requirement
 
 #### Relations
+  * definedBy: [ElementIdentity](ElementIdentity.md#elementidentity)
   * derive: [Identifiers and Relations](#identifiers-and-relations)
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
-  * refinedBy: [ElementIdentity](ElementIdentity.md#elementidentity)
   * satisfiedBy: [element.rs](../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
   * verifiedBy: [Fragment Normalization Test](../Verifications/ModelStructure/ParsingVerifications.md#fragment-normalization-test)
@@ -69,10 +69,10 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
   * type: requirement
 
 #### Relations
+  * definedBy: [IdentifiersAndRelations](IdentifiersAndRelations.md#identifiersandrelations)
+  * definedBy: [Identifiers and Relations Refinement Specification](Specifications.md#identifiers-and-relations-refinement-specification)
   * derive: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
   * derivedFrom: [Element Identity Model](#element-identity-model)
-  * refinedBy: [IdentifiersAndRelations](IdentifiersAndRelations.md#identifiersandrelations)
-  * refinedBy: [Identifiers and Relations Refinement Specification](Specifications.md#identifiers-and-relations-refinement-specification)
   * satisfiedBy: [relation.rs](../../core/src/relation.rs)
 ---
 
@@ -96,11 +96,11 @@ Each reserved subsection has specific parsing rules, validation requirements, an
   * type: requirement
 
 #### Relations
+  * definedBy: [ReservedSubsections](ReservedSubsections.md#reservedsubsections)
+  * definedBy: [Element Type Metadata Specification](Specifications.md#element-type-metadata-specification)
+  * definedBy: [Requirement Governance Metadata Specification](Specifications.md#requirement-governance-metadata-specification)
   * derive: [Verification Type Categories](ModelManagement.md#verification-type-categories)
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
-  * refinedBy: [ReservedSubsections](ReservedSubsections.md#reservedsubsections)
-  * refinedBy: [Element Type Metadata Specification](Specifications.md#element-type-metadata-specification)
-  * refinedBy: [Requirement Governance Metadata Specification](Specifications.md#requirement-governance-metadata-specification)
   * satisfiedBy: [element.rs](../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
   * verifiedBy: [Element Subsection Parsing Test](../Verifications/ModelStructure/ParsingVerifications.md#element-subsection-parsing-test)

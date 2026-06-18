@@ -67,8 +67,8 @@ A separate requirement that owns refinements (outside main hierarchy).
   * type: requirement
 #### Relations
   * specify: [Test Capability](#test-capability-test-assets-specifications-requirements-md)
-  * refinedBy: [Test Constraint Element](#test-constraint-element)
-  * refinedBy: [Test Behavior Element](#test-behavior-element)
+  * definedBy: [Test Constraint Element](#test-constraint-element)
+  * definedBy: [Test Behavior Element](#test-behavior-element)
 ---
 
 ### Test Constraint Element

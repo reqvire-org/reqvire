@@ -18,7 +18,7 @@ export default function Submodels() {
         <p className="text-zinc-600 mb-4">
           A submodel is a graph rooted at a capability with no capability
           parent. Reqvire resolves capability hierarchy, specified requirements,
-          requirement hierarchy, refinements, verifications, attachments, and
+          requirement hierarchy, contracts, verifications, attachments, and
           implementation evidence from that root.
         </p>
         <BulletList
@@ -82,7 +82,7 @@ reqvire lint --auditable --json`}</CodeBlock>
           items={[
             {
               name: "Submodels",
-              desc: "Capability-rooted entries with requirements, refinements, verification context, and summary counts.",
+              desc: "Capability-rooted entries with requirements, contracts, verification context, and summary counts.",
             },
             {
               name: "Cross-Submodel Couplings",

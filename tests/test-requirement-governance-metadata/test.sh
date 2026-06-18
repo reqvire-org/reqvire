@@ -263,7 +263,7 @@ This refinement illegally declares governance metadata.
   * owner: Platform Team
 
 #### Relations
-  * refine: [Root Requirement](Requirements.md#root-requirement)
+  * define: [Root Requirement](Requirements.md#root-requirement)
 ---' \
   'governance|owner|requirement' \
   "refinement governance metadata"

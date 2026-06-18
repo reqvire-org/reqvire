@@ -44,7 +44,7 @@ Parent requirement covered through a derived requirement implementation.
 #### Relations
   * derive: [Derived Intermediate](#derived-intermediate)
   * derivedFrom: [Root Requirement](#root-requirement)
-  * refinedBy: [Derived Parent Contract Specification](#derived-parent-contract-specification)
+  * definedBy: [Derived Parent Contract Specification](#derived-parent-contract-specification)
 ---
 
 ### Derived Intermediate
@@ -67,7 +67,7 @@ Refinement contract owned by Derived Parent.
   * type: specification
 
 #### Relations
-  * refine: [Derived Parent](#derived-parent)
+  * define: [Derived Parent](#derived-parent)
 ---
 
 ### Derived Child Implemented
@@ -91,7 +91,7 @@ Requirement that owns a refinement contract and has no direct implementation.
 
 #### Relations
   * derivedFrom: [Root Requirement](#root-requirement)
-  * refinedBy: [Contract Specification](#contract-specification)
+  * definedBy: [Contract Specification](#contract-specification)
 ---
 
 ### Contract Specification
@@ -102,7 +102,7 @@ Refinement contract owned by Contract Owner.
   * type: specification
 
 #### Relations
-  * refine: [Contract Owner](#contract-owner)
+  * define: [Contract Owner](#contract-owner)
 ---
 
 ### Contract Consumer Implemented

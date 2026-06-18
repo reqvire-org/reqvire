@@ -9,7 +9,7 @@ This workflow bridges the gap between Reqvire's semantic engineering graph and i
 ## When to Use This Workflow
 
 - Generating implementation plans from capability-scoped requirement changes
-- Understanding what capabilities, requirements, refinements, or verifications changed on a capability branch
+- Understanding what capabilities, requirements, contracts, or verifications changed on a capability branch
 - Creating task breakdowns for developers
 - Planning implementation work with full traceability
 - Analyzing change impact before implementing
@@ -36,8 +36,8 @@ reqvire change-impact --git-commit=HEAD~1
 ```
 
 The change-impact command identifies:
-- `added[]` - New capabilities/requirements/refinements/verifications
-- `changed[]` - Changed capabilities/requirements/refinements/verifications
+- `added[]` - New capabilities/requirements/contracts/verifications
+- `changed[]` - Changed capabilities/requirements/contracts/verifications
 - `removed[]` - Removed elements
 - `relocated[]` - Relocated elements (same name, different path)
 - `impact_scope[]` - Per-branch scope roots: common parent capabilities or requirements covering all impacted elements. Use this for a high-level summary of affected model areas
@@ -87,7 +87,7 @@ reqvire search --filter-risk="high,critical" --json
 **Why use `reqvire collect` for task generation:**
 - **Upstream (default)**: Gathers capability and requirement trace context — the "why" context
 - **Downstream**: Enumerates all children via `derive` — find everything under a scope root
-- Includes all refinements, specifications, and design documents
+- Includes all contracts, specifications, and design documents
 - Captures constraints and validation rules
 - Provides full implementation context in one command
 - Saves to `/tmp` for developer reference during implementation
@@ -96,7 +96,7 @@ reqvire search --filter-risk="high,critical" --json
 - **Upstream**: All ancestor requirement content (parent chain to root)
 - **Downstream**: All descendant requirement content (children to leaves)
 - Attached markdown files (read as content)
-- Attached refinement elements (specifications, constraints, behaviors)
+- Attached contract elements (specifications, constraints, behaviors)
 - Source citations for traceability
 
 **Governance metadata in task planning:**
@@ -227,7 +227,7 @@ Full trace context available in `/tmp/`:
 Each context document shows:
 - Complete capability and requirement trace chain
 - Capability purpose and parent requirement obligations
-- Refinements, specifications, and implementation details
+- Contracts, specifications, and implementation details
 - Attached design documents
 - Constraints and validation rules
 ```
@@ -240,7 +240,7 @@ When analyzing capability-scoped changes for task generation:
 
 | To Understand This | Use This Command |
 |--------------------|------------------|
-| What capabilities, requirements, refinements, or verifications changed | `reqvire change-impact --git-commit=<hash> --json` |
+| What capabilities, requirements, contracts, or verifications changed | `reqvire change-impact --git-commit=<hash> --json` |
 | **Full capability and requirement context (ancestors)** | `reqvire collect "<name>" --json --output /tmp/context_<id>.json` |
 | Element direct content | `reqvire search --filter-id="<id>" --json` |
 | Owner routing | `reqvire search --filter-owner="<owner-regex>" --json` |

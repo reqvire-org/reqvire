@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="680" viewBox="0 0 520 680" role="img" aria-labelledby="title desc">
+  <title id="title">Reqvire semantic engineering model flow</title>
+  <desc id="desc">Ontology, capabilities, requirements, contracts, verification, and implementation arranged as a vertical flow.</desc>
+  <defs>
+    <style>
+      .panel { fill: #f8f6f1; stroke: #d8d2c6; stroke-width: 2; }
+      .box { fill: #f3f1eb; stroke: #2f80b7; stroke-width: 4; }
+      .label { fill: #2874a6; font: 700 25px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .icon { fill: none; stroke: #2874a6; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+      .arrow { fill: #2874a6; }
+    </style>
+  </defs>
+  <rect class="panel" x="28" y="28" width="464" height="624" rx="18" />
+
+  <g transform="translate(114 58)">
+    <g>
+      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
+      <g class="icon" transform="translate(29 17)">
+        <circle cx="18" cy="18" r="17" />
+        <path d="M1 18h34M18 1c6 8 6 26 0 34M18 1c-6 8-6 26 0 34M5 8c8 4 18 4 26 0M5 28c8-4 18-4 26 0" />
+      </g>
+      <text class="label" x="82" y="45">Ontology</text>
+    </g>
+
+    <path class="arrow" d="M146 73l22 27h-14v18h-16v-18h-14z" />
+
+    <g transform="translate(0 102)">
+      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
+      <g class="icon" transform="translate(30 16)">
+        <circle cx="18" cy="18" r="14" />
+        <path d="M18 4v-9M18 41v-9M4 18h-9M41 18h-9M8 8l-7-7M35 35l-7-7M28 8l7-7M1 35l7-7" />
+        <path d="M18 18l9-6" />
+      </g>
+      <text class="label" x="82" y="45">Capabilities</text>
+    </g>
+
+    <path class="arrow" d="M146 175l22 27h-14v18h-16v-18h-14z" />
+
+    <g transform="translate(0 204)">
+      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
+      <g class="icon" transform="translate(31 16)">
+        <rect x="3" y="2" width="30" height="34" rx="4" />
+        <path d="M11 12h14M11 22h14M8 12l-2 2-2-2M8 22l-2 2-2-2" />
+      </g>
+      <text class="label" x="82" y="45">Requirements</text>
+    </g>
+
+    <path class="arrow" d="M146 277l22 27h-14v18h-16v-18h-14z" />
+
+    <g transform="translate(0 306)">
+      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
+      <g class="icon" transform="translate(31 16)">
+        <path d="M7 9h22M7 18h22M7 27h16" />
+        <path d="M2 9h.1M2 18h.1M2 27h.1" />
+      </g>
+      <text class="label" x="82" y="45">Contracts</text>
+    </g>
+
+    <path class="arrow" d="M146 379l22 27h-14v18h-16v-18h-14z" />
+
+    <g transform="translate(0 408)">
+      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
+      <g class="icon" transform="translate(31 16)">
+        <path d="M18 2l15 6v11c0 10-6 17-15 21C9 36 3 29 3 19V8z" />
+        <path d="M10 20l6 6 12-13" />
+      </g>
+      <text class="label" x="82" y="45">Verification</text>
+    </g>
+
+    <path class="arrow" d="M146 481l22 27h-14v18h-16v-18h-14z" />
+
+    <g transform="translate(0 510)">
+      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
+      <g class="icon" transform="translate(31 16)">
+        <path d="M14 7L5 20l9 13M22 7l9 13-9 13M20 3l-6 34" />
+      </g>
+      <text class="label" x="82" y="45">Implementation</text>
+    </g>
+  </g>
+</svg>

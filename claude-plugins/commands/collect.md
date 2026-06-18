@@ -7,7 +7,7 @@ model: claude-sonnet-4-5
 
 # Collect Element Trace Context
 
-Collect and present a comprehensive summary of capability, requirement, refinement, verification, and implementation context via the upstream trace chain by default or the downstream trace chain when requested.
+Collect and present a comprehensive summary of capability, requirement, contract, verification, and implementation context via the upstream trace chain by default or the downstream trace chain when requested.
 
 ## Model Context
 
@@ -35,7 +35,7 @@ This command collects:
 - Attached/refining specifications, constraints, behaviors, states, and input-output contracts, plus semantic contracts reached through explicit `constrain`/`constrainedBy` relations
 - Related documentation files
 - Source citations and file paths
-- Verification, satisfaction, and refinement relations
+- Verification, satisfaction, and contract relations
 
 **Error Handling:**
 - If the command fails, check that the element name is correct
@@ -56,16 +56,16 @@ The JSON structure includes:
 - **`attachments`**: Specifications, constraints, behaviors, states, and input-output contracts refining the context; semantic contracts are reached through explicit `constrain`/`constrainedBy` relations
 - **`documents`**: Related markdown documentation files with content
 - **`citations`**: Source file paths and anchors for traceability
-- **`relations`**: verifiedBy, satisfiedBy, and refinedBy links to other elements
+- **`relations`**: verifiedBy, satisfiedBy, and definedBy links to other elements
 
 Extract and organize:
 - **Target element details**: Name, type, full content
-- **Trace hierarchy**: Owning capability path and requirement refinement path
-- **Attached refinements**: All specifications, constraints, behaviors, states, input-output contracts, and semantic contracts
+- **Trace hierarchy**: Owning capability path and requirement contract path
+- **Attached contracts**: All specifications, constraints, behaviors, states, input-output contracts, and semantic contracts
 - **Documentation**: Content from attached markdown files
 - **Verification info**: verifiedBy relations and test criteria
 - **Implementation info**: satisfiedBy relations and code references
-- **Refinement info**: refinedBy relations to compatible refinement elements
+- **Contract info**: definedBy relations to compatible contract elements
 - **Source locations**: File paths and anchors for all elements
 
 ### 3. Generate Comprehensive Context Document
@@ -100,10 +100,10 @@ Create a complete, readable markdown document that synthesizes all collected inf
 
 ### Implementation Details
 
-[Describe how this requirement is implemented and refined. Extract information from satisfiedBy and refinedBy relations and attached specifications:]
+[Describe how this requirement is implemented and refined. Extract information from satisfiedBy and definedBy relations and attached specifications:]
 
 - **Code/Components**: [List and describe all satisfiedBy elements - what they are and how they satisfy the requirement]
-- **Refinements**: [List and describe all refinedBy elements - specifications, constraints, behaviors that refine the requirement]
+- **Contracts**: [List and describe all definedBy elements - specifications, constraints, behaviors that define the requirement]
 - **API Endpoints**: [If applicable, detail all API specifications including methods, paths, parameters, responses]
 - **Algorithms**: [If applicable, describe technical approaches and logic]
 - **Data Structures**: [If applicable, describe data models and schemas]
@@ -111,11 +111,11 @@ Create a complete, readable markdown document that synthesizes all collected inf
 
 ### Constraints and Validation
 
-[Detail all constraints, state rules, semantic contracts, and validation rules from attached refinements and explicit semantic-contract constraint/use relations. Explain what each rule means, why it exists, and what it prevents or ensures.]
+[Detail all constraints, state rules, semantic contracts, and validation rules from attached contracts and explicit semantic-contract constraint/use relations. Explain what each rule means, why it exists, and what it prevents or ensures.]
 
 ### Attached Specifications
 
-[Include content from all attached specifications, constraints, behaviors, states, input-output contracts, and explicitly constraining semantic contracts. Rephrase this content to flow naturally as part of the document narrative. Synthesize related refinements together rather than treating them as separate items.]
+[Include content from all attached specifications, constraints, behaviors, states, input-output contracts, and explicitly constraining semantic contracts. Rephrase this content to flow naturally as part of the document narrative. Synthesize related contracts together rather than treating them as separate items.]
 
 ## Verification
 
@@ -154,7 +154,7 @@ Create a complete, readable markdown document that synthesizes all collected inf
 - [Implementation 2](path/to/file.md#impl-2)
 
 **Refined By:**
-[List all refinement elements owned by this element]
+[List all contract elements owned by this element]
 - [Specification 1](path/to/file.md#spec-1)
 - [Constraint 1](path/to/file.md#constraint-1)
 

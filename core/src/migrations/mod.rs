@@ -3,7 +3,7 @@ use crate::element::{Element, ElementType};
 use crate::error::ReqvireError;
 use crate::filesystem;
 use crate::graph_registry::{ElementNode, GraphRegistry};
-use crate::relation::{LinkType, Relation};
+use crate::relation::{LinkType, Relation, RELATION_TYPES};
 use crate::utils;
 use globset::GlobSet;
 use serde::Serialize;
@@ -47,6 +47,7 @@ pub const VERIFICATION_OBJECTIVE_HOLDER_NAME: &str = "Verification Objective";
 pub const VERIFICATION_OBJECTIVE_HOLDER_ID: &str =
     "VerificationObjectiveMigration.md#verification-objective";
 pub const DOCUMENTS_HEADER_MIGRATION_ID: &str = "v0.15-documents-to-element-header";
+pub const CONTRACT_RELATION_MIGRATION_ID: &str = "v1.0-contract-relations";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct VerificationObjectiveMigrationSummary {
@@ -64,6 +65,14 @@ pub struct DocumentsHeaderMigrationSummary {
     pub affected_files: Vec<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ContractRelationMigrationSummary {
+    pub migration_id: &'static str,
+    pub relations_rewritten: usize,
+    pub affected_files: Vec<String>,
+    pub affected_elements: Vec<String>,
+}
+
 pub fn candidates_for_validation_errors(errors: &[ReqvireError]) -> MigrationPlan {
     let mut candidates = Vec::new();
 
@@ -78,6 +87,17 @@ pub fn candidates_for_validation_errors(errors: &[ReqvireError]) -> MigrationPla
         });
     }
 
+    if errors.iter().any(is_contract_relation_migration_error) {
+        candidates.push(MigrationCandidate {
+            id: CONTRACT_RELATION_MIGRATION_ID,
+            from_version: "0.x",
+            to_version: "1.0",
+            safety: MigrationSafety::Automatic,
+            summary: "Rewrite legacy refinement relation names to requirement-owned contract relation names: refinedBy -> definedBy and refine -> define.",
+            dry_run_hint: "A dry run should show every relation key rewrite before applying source edits.",
+        });
+    }
+
     MigrationPlan { candidates }
 }
 
@@ -86,6 +106,79 @@ fn is_verification_objective_migration_error(error: &ReqvireError) -> bool {
     message.contains("verification-objective")
         || (message.contains("verifiedBy") && message.contains("verification"))
         || (message.contains("verify") && message.contains("verification"))
+}
+
+fn is_contract_relation_migration_error(error: &ReqvireError) -> bool {
+    let message = error.to_string();
+    message.contains("legacy relation 'refinedBy'")
+        || message.contains("legacy relation 'refine'")
+        || message.contains("refinedBy -> definedBy")
+        || message.contains("refine -> define")
+}
+
+pub fn apply_contract_relation_migration(
+    registry: &mut GraphRegistry,
+) -> Result<ContractRelationMigrationSummary, ReqvireError> {
+    let defined_by = RELATION_TYPES
+        .get("definedBy")
+        .ok_or_else(|| ReqvireError::UnsupportedRelationType("definedBy".to_string()))?;
+    let define = RELATION_TYPES
+        .get("define")
+        .ok_or_else(|| ReqvireError::UnsupportedRelationType("define".to_string()))?;
+
+    let mut relations_rewritten = 0;
+    let mut affected_files = Vec::new();
+    let mut affected_elements = Vec::new();
+
+    let mut sorted_ids: Vec<_> = registry.nodes.keys().cloned().collect();
+    sorted_ids.sort();
+
+    for id in sorted_ids {
+        let Some(node) = registry.nodes.get_mut(&id) else {
+            continue;
+        };
+
+        let mut element_changed = false;
+        for relation in &mut node.element.relations {
+            if !relation.user_created {
+                continue;
+            }
+
+            let replacement = match relation.relation_type.name {
+                "refinedBy" => defined_by,
+                "refine" => define,
+                _ => continue,
+            };
+            relation.relation_type = replacement;
+            relations_rewritten += 1;
+            element_changed = true;
+        }
+
+        for relation_node in &mut node.relations {
+            relation_node.relation_trigger = match relation_node.relation_trigger.as_str() {
+                "refinedBy" => "definedBy".to_string(),
+                "refine" => "define".to_string(),
+                _ => relation_node.relation_trigger.clone(),
+            };
+        }
+
+        if element_changed {
+            affected_files.push(node.element.file_path.clone());
+            affected_elements.push(node.element.identifier.clone());
+        }
+    }
+
+    affected_files.sort();
+    affected_files.dedup();
+    affected_elements.sort();
+    affected_elements.dedup();
+
+    Ok(ContractRelationMigrationSummary {
+        migration_id: CONTRACT_RELATION_MIGRATION_ID,
+        relations_rewritten,
+        affected_files,
+        affected_elements,
+    })
 }
 
 pub fn apply_verification_objective_holders(
@@ -289,6 +382,20 @@ mod tests {
     }
 
     #[test]
+    fn migration_candidate_detects_legacy_contract_relation_errors() {
+        let errors = vec![ReqvireError::InvalidMarkdownStructure(
+            "File requirements/Example.md: Element 'Requirement' uses legacy relation 'refinedBy'. Use 'definedBy' for requirement-owned contract elements, or run `reqvire migrate`.".to_string(),
+        )];
+
+        let plan = candidates_for_validation_errors(&errors);
+
+        assert!(plan
+            .candidates
+            .iter()
+            .any(|candidate| candidate.id == CONTRACT_RELATION_MIGRATION_ID));
+    }
+
+    #[test]
     fn migration_candidate_ignores_unrelated_errors() {
         let errors = vec![ReqvireError::MissingElement(
             "Missing unrelated element".to_string(),
@@ -348,6 +455,83 @@ mod tests {
                     && relation.target.link.as_str() == verification_id
             }));
         }
+    }
+
+    #[test]
+    fn contract_relation_migration_rewrites_legacy_relation_names() {
+        let mut registry = GraphRegistry::new();
+
+        let mut requirement = Element::new(
+            "Invoice Requirement",
+            "requirements/Billing.md#invoice-requirement",
+            "requirements/Billing.md",
+            1,
+            Some(ElementType::from_metadata("requirement")),
+        );
+        requirement
+            .metadata
+            .insert("type".to_string(), "requirement".to_string());
+        requirement.relations.push(
+            Relation::new(
+                "refinedBy",
+                "Invoice Numbering Specification".to_string(),
+                "requirements/Billing.md#invoice-numbering-specification",
+                Some("invoice-numbering-specification".to_string()),
+            )
+            .unwrap(),
+        );
+        registry
+            .register_element(requirement, "requirements/Billing.md")
+            .unwrap();
+
+        let mut specification = Element::new(
+            "Invoice Numbering Specification",
+            "requirements/Billing.md#invoice-numbering-specification",
+            "requirements/Billing.md",
+            2,
+            Some(ElementType::from_metadata("specification")),
+        );
+        specification
+            .metadata
+            .insert("type".to_string(), "specification".to_string());
+        specification.relations.push(
+            Relation::new(
+                "refine",
+                "Invoice Requirement".to_string(),
+                "requirements/Billing.md#invoice-requirement",
+                Some("invoice-requirement".to_string()),
+            )
+            .unwrap(),
+        );
+        registry
+            .register_element(specification, "requirements/Billing.md")
+            .unwrap();
+
+        let summary = apply_contract_relation_migration(&mut registry).unwrap();
+
+        assert_eq!(summary.relations_rewritten, 2);
+        assert_eq!(summary.affected_files, vec!["requirements/Billing.md"]);
+
+        let requirement = &registry.nodes["requirements/Billing.md#invoice-requirement"].element;
+        assert!(requirement
+            .relations
+            .iter()
+            .any(|relation| relation.relation_type.name == "definedBy"));
+        assert!(!requirement
+            .relations
+            .iter()
+            .any(|relation| relation.relation_type.name == "refinedBy"));
+
+        let specification =
+            &registry.nodes["requirements/Billing.md#invoice-numbering-specification"].element;
+        assert!(specification
+            .relations
+            .iter()
+            .any(|relation| relation.relation_type.name == "define"));
+        assert!(!specification
+            .relations
+            .iter()
+            .any(|relation| relation.relation_type.name == "refine"));
     }
 
     #[test]

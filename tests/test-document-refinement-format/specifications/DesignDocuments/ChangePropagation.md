@@ -4,7 +4,7 @@
   * type: specification
 
 ## Relations
-  * refine: [Requirement Using Single Element Refinement](../Requirements.md#requirement-using-single-element-refinement)
+  * define: [Requirement Using Single Element Refinement](../Requirements.md#requirement-using-single-element-refinement)
 
 ## ChangePropagation
 

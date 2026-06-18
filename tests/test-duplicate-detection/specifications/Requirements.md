@@ -39,7 +39,7 @@ A separate requirement for refinement ownership.
   * type: requirement
 #### Relations
   * specify: [Test Capability](#test-capability-test-duplicate-detection-specifications-requirements-md)
-  * refinedBy: [Refinement Element](#refinement-element)
+  * definedBy: [Refinement Element](#refinement-element)
 ---
 
 ### Refinement Element

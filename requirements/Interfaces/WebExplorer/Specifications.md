@@ -15,7 +15,7 @@ This keeps served Explorer content complete with navigable refinement attachment
   * type: specification
 
 #### Relations
-  * refine: [Attachment Link Serving](Capabilities.md#attachment-link-serving)
+  * define: [Attachment Link Serving](Capabilities.md#attachment-link-serving)
 ---
 
 ### Component-Based Explorer Architecture Refinement Specification
@@ -58,7 +58,7 @@ Model containment-mode attachment rendering behavior:
   * type: specification
 
 #### Relations
-  * refine: [Containment View Attachment Links](Capabilities.md#containment-view-attachment-links)
+  * define: [Containment View Attachment Links](Capabilities.md#containment-view-attachment-links)
 ---
 
 ### Diagram Attachment Display Refinement Specification
@@ -82,7 +82,7 @@ elementId["Element Name<br/>📎 Deterministic Output Specification"]
   * type: specification
 
 #### Relations
-  * refine: [Diagram Attachment Display](Capabilities.md#diagram-attachment-display)
+  * define: [Diagram Attachment Display](Capabilities.md#diagram-attachment-display)
 ---
 
 ### Explorer Branding Specification
@@ -138,7 +138,7 @@ Raw hexadecimal values belong in design-system token files or generated assets, 
   * type: specification
 
 #### Relations
-  * refine: [Web Interface Color Scheme](Capabilities.md#web-interface-color-scheme)
+  * define: [Web Interface Color Scheme](Capabilities.md#web-interface-color-scheme)
 ---
 
 ### Explorer Design System Styling Refinement Specification
@@ -160,7 +160,7 @@ The design-system styling contract provides:
   * type: specification
 
 #### Relations
-  * refine: [Explorer Design System Styling](ExplorerRendering.md#explorer-design-system-styling)
+  * define: [Explorer Design System Styling](ExplorerRendering.md#explorer-design-system-styling)
 ---
 
 ### Explorer Mermaid Diagram Style Specification
@@ -181,7 +181,7 @@ Explorer Mermaid rendering behavior:
   * type: specification
 
 #### Relations
-  * refine: [Diagram Attachment Display](Capabilities.md#diagram-attachment-display)
+  * define: [Diagram Attachment Display](Capabilities.md#diagram-attachment-display)
 ---
 
 ### Explorer Navigation Chrome Specification
@@ -288,7 +288,7 @@ The seed may be embedded inline in `index.html` or loaded as a static asset, but
   * type: specification
 
 #### Relations
-  * refine: [SPA Explorer Shell and Project Store](Capabilities.md#spa-explorer-shell-and-project-store)
+  * define: [SPA Explorer Shell and Project Store](Capabilities.md#spa-explorer-shell-and-project-store)
 ---
 
 ### Explorer Verification Trace Rendering Specification
@@ -308,7 +308,7 @@ Trace rendering behavior:
   * type: specification
 
 #### Relations
-  * refine: [Traces View Generation](Capabilities.md#traces-view-generation)
+  * define: [Traces View Generation](Capabilities.md#traces-view-generation)
 ---
 
 ### Model Browser and Graph Specification
@@ -352,7 +352,7 @@ Model-view element navigation behavior:
   * type: specification
 
 #### Relations
-  * refine: [Model View Element Navigation](Capabilities.md#model-view-element-navigation)
+  * define: [Model View Element Navigation](Capabilities.md#model-view-element-navigation)
 ---
 
 ### Model-Centric View Generation Refinement Specification
@@ -375,7 +375,7 @@ Model-centric view generation behavior:
   * type: specification
 
 #### Relations
-  * refine: [Model-Centric View Generation](Capabilities.md#model-centric-view-generation)
+  * define: [Model-Centric View Generation](Capabilities.md#model-centric-view-generation)
 ---
 
 ### OWL Semantic Ontology Projection Refinement Specification
@@ -396,7 +396,7 @@ Semantic projection behavior:
   * type: specification
 
 #### Relations
-  * refine: [OWL Semantic Ontology Projection](Capabilities.md#owl-semantic-ontology-projection)
+  * define: [OWL Semantic Ontology Projection](Capabilities.md#owl-semantic-ontology-projection)
 ---
 
 ### Ontologies View Generation Refinement Specification
@@ -440,7 +440,7 @@ Ontologies view generation behavior:
 - Keeps SHACL references to ontology terms as source/construct evidence without recoloring the referenced ontology class or property metadata as a SHACL shape.
 - Treats built-in vocabulary references from XSD, RDF, RDFS, OWL, and SHACL namespaces as external references. External references remain available for datatype/range audit, but they are hidden by default to prevent built-in terms such as `xsd:string` from cluttering the primary ontology map.
 - Does not render literal values as primary graph nodes or as a visibility filter layer. Literal object values from datatype properties remain searchable and are shown in the modal as predicate/value evidence owned by the selected subject node.
-- Labels class-expression nodes with their property usage context when the expression is used as a property domain or range, for example a valid union-valued range from the ontology model, so OWL domain/range constraints do not look like authored Reqvire model relations. The `refine` relation specifically must not render as `Capability ∪ Requirement`; its range is `Requirement` only.
+- Labels class-expression nodes with their property usage context when the expression is used as a property domain or range, for example a valid union-valued range from the ontology model, so OWL domain/range constraints do not look like authored Reqvire model relations. The `define` relation specifically must not render as `Capability ∪ Requirement`; its range is `Requirement` only.
 - Derives class and property slot facets from SHACL node shapes by combining `sh:targetClass`, `sh:property`, `sh:path`, `sh:datatype`, `sh:class`, `sh:nodeKind`, `sh:minCount`, `sh:maxCount`, `sh:pattern`, and `sh:in`. The target class modal shall show those slots and facets directly, with source-shape evidence, without requiring users to inspect the shape node first.
 - Attaches SHACL-derived slot facets to the named property metadata as well when the `sh:path` value is a named property already present in the graph model. On a selected class or term, those records represent property usages as slots; they must be labeled as property usages rather than as duplicate property definitions.
 
@@ -474,7 +474,7 @@ Interaction behavior:
   * type: specification
 
 #### Relations
-  * refine: [Ontologies View Generation](Capabilities.md#ontologies-view-generation)
+  * define: [Ontologies View Generation](Capabilities.md#ontologies-view-generation)
 ---
 
 ### Ontology Construct Grouping Refinement Specification
@@ -495,7 +495,7 @@ OWL construct grouping behavior:
   * type: specification
 
 #### Relations
-  * refine: [Ontology Construct Grouping](Capabilities.md#ontology-construct-grouping)
+  * define: [Ontology Construct Grouping](Capabilities.md#ontology-construct-grouping)
 ---
 
 ### Ontology Property-Centric Visualization Refinement Specification
@@ -515,7 +515,7 @@ Property-centric visualization behavior:
   * type: specification
 
 #### Relations
-  * refine: [Ontology Property-Centric Visualization](Capabilities.md#ontology-property-centric-visualization)
+  * define: [Ontology Property-Centric Visualization](Capabilities.md#ontology-property-centric-visualization)
 ---
 
 ### Ontology Symbol and Badge Vocabulary Refinement Specification
@@ -558,7 +558,7 @@ Symbols shall:
   * type: specification
 
 #### Relations
-  * refine: [Ontology Symbol and Badge Vocabulary](Capabilities.md#ontology-symbol-and-badge-vocabulary)
+  * define: [Ontology Symbol and Badge Vocabulary](Capabilities.md#ontology-symbol-and-badge-vocabulary)
 ---
 
 ### Project Knowledge Graph View Refinement Specification
@@ -571,7 +571,7 @@ Project knowledge graph view generation behavior:
 - Builds graph edges from actual relation facts, attachment facts, and concept-reference facts. User-authored and generated opposite relation facts shall remain distinguishable as evidence in the graph data and detail modal.
 - Emits Reqvire root submodel metadata alongside graph nodes and edges so Knowledge Graph variants can align visual subgraphs with the same capability-rooted submodel boundaries reported by the `submodels` command.
 - Classifies element nodes into four primary system-model layers: ontology definitions, capabilities, requirements, and verification-family elements. `verification-objective` nodes are verification planning nodes, while concrete verification nodes carry `verify`/evidence facts. Requirement-owned refinements are subordinate requirement detail/contract nodes, not an additional system-model layer. Custom/other elements and resource targets are supporting project-fact nodes, not additional model layers.
-- Separates system-model layer membership from relation semantics. Layer membership controls node role color and filtering; relation semantics control whether an edge is structural (`derive`, `specify`, `refine`) or an overlay/evidence fact (`attach`, `satisfiedBy`, `verifiedBy`, `trace`, concept reference, file target, or external target).
+- Separates system-model layer membership from relation semantics. Layer membership controls node role color and filtering; relation semantics control whether an edge is structural (`derive`, `specify`, `define`) or an overlay/evidence fact (`attach`, `satisfiedBy`, `verifiedBy`, `trace`, concept reference, file target, or external target).
 - Shows file-path and external URL targets as resource nodes only when actual project facts reference them.
 - Treats ontology IRI concept-reference targets like attachment/resource targets in the main Knowledge Graph instead of exposing a separate concept-reference node category; detailed OWL/RDFS/SHACL vocabulary exploration remains the responsibility of the Ontologies view.
 - Provides search over element names, identifiers, file paths, relation facts, attachment facts, governance, metadata, and concept references.
@@ -594,7 +594,7 @@ Project knowledge graph view generation behavior:
 - Hides relation edges in the default full-graph view to avoid a hairball. On node hover or click selection, shows only relation edges directly incident to the focused node, keeps the focused node and directly connected neighbors visually prominent, and fades unconnected nodes to low visual strength without changing active filters or graph data. The dimmed color shall be computed as a 20% original-node-color blend over the graph canvas background rather than by passing WebGL-sensitive alpha color strings to Sigma. A clicked node remains the pinned focus after pointer rollout; clicking empty graph space clears the pinned focus and returns to the default edge-hidden view.
 - Supports additive focus exploration: when a node is clicked, its direct neighborhood remains pinned; hovering another visible node, including a neighbor selected by the clicked focus, temporarily adds that hovered node's direct neighborhood and incident edges to the visible focus set without clearing the clicked focus.
 - Does not use renderer glow/highlight effects for selection; selection is communicated through pinned focus, forced label visibility, direct incident edges, and alpha fading of unrelated nodes.
-- Draws relation facts in the same canonical directions used by Mermaid diagrams: `derive`, `specifiedBy`, `satisfiedBy`, `refinedBy`, `verifiedBy`, and `trace`. Opposite propagated facts such as `derivedFrom`, `specify`, `satisfy`, `refine`, and `verify` shall be reversed and deduplicated into the canonical visual edge rather than rendered as duplicate parallel relations.
+- Draws relation facts in the same canonical directions used by Mermaid diagrams: `derive`, `specifiedBy`, `satisfiedBy`, `definedBy`, `verifiedBy`, and `trace`. Opposite propagated facts such as `derivedFrom`, `specify`, `satisfy`, `define`, and `verify` shall be reversed and deduplicated into the canonical visual edge rather than rendered as duplicate parallel relations.
 - Owns its viewport sizing directly and uses shell-provided minimum viewport dimensions so the WebGL graph remains visible.
 - Emits graph data with source and target identifiers that all resolve to Project Store graph nodes so Graphology edge insertion cannot fail before drawing.
 - Uses one semantic role color contract across the Knowledge Graph legend, graph nodes, search swatches, and detail kind badges: capability, requirement/refinement, verification-objective, concrete verification, ontology, resource, and other/default all resolve through the Explorer design-system palette API.
@@ -604,7 +604,7 @@ Project knowledge graph view generation behavior:
   * type: specification
 
 #### Relations
-  * refine: [Project Knowledge Graph View](Capabilities.md#project-knowledge-graph-view)
+  * define: [Project Knowledge Graph View](Capabilities.md#project-knowledge-graph-view)
 ---
 
 ### Responsive Explorer Rendering Refinement Specification
@@ -626,7 +626,7 @@ Breakpoints:
   * type: specification
 
 #### Relations
-  * refine: [Responsive Explorer Rendering](ExplorerRendering.md#responsive-explorer-rendering)
+  * define: [Responsive Explorer Rendering](ExplorerRendering.md#responsive-explorer-rendering)
 ---
 
 ### SPA Explorer Store Contract Refinement Specification
@@ -736,7 +736,7 @@ Breakpoints:
   * type: specification
 
 #### Relations
-  * refine: [SPA Explorer Shell and Project Store](Capabilities.md#spa-explorer-shell-and-project-store)
+  * define: [SPA Explorer Shell and Project Store](Capabilities.md#spa-explorer-shell-and-project-store)
 ---
 
 ### Serve Command Refinement Specification
@@ -759,7 +759,7 @@ Serve command behavior:
   * type: specification
 
 #### Relations
-  * refine: [Serve Command](Capabilities.md#serve-command)
+  * define: [Serve Command](Capabilities.md#serve-command)
 ---
 
 ### Web Interface Style Specification

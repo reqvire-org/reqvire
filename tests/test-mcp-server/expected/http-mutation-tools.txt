@@ -7,7 +7,9 @@ reqvire.model
 reqvire.containment
 reqvire.collect
 reqvire.submodels
-reqvire.ontologies
+reqvire.semantic.ontologies
+reqvire.semantic.prefixes
+reqvire.semantic.sparql
 reqvire.lint
 reqvire.coverage
 reqvire.traces

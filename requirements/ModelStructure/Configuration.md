@@ -8,7 +8,7 @@ The system shall allow structured markdown and unstructured. (eg., markdown, PDF
   * type: requirement
 
 #### Attachments
-  * [Refinement Specification](Specifications.md#refinement-specification)
+  * [Refinement Specification](Specifications.md#contract-specification)
 
 #### Relations
   * derive: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
@@ -26,11 +26,11 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Ignoring Unstructured Documents Refinement Specification](Specifications.md#ignoring-unstructured-documents-refinement-specification)
   * derive: [Ignore Files Integration](#ignore-files-integration)
   * derive: [Requirements Processing](#requirements-processing)
   * derive: [File Pattern Exclusion for Format](../Operations/Formatting/FormattingRequirements.md#file-pattern-exclusion-for-format)
   * derivedFrom: [Coexistence of Structured and Unstructured Documents](#coexistence-of-structured-and-unstructured-documents)
-  * refinedBy: [Ignoring Unstructured Documents Refinement Specification](Specifications.md#ignoring-unstructured-documents-refinement-specification)
   * satisfiedBy: [config.rs](../../cli/src/config.rs)
 ---
 
@@ -48,8 +48,8 @@ The system shall integrate with Git workflows by reading exclusion patterns from
   * type: requirement
 
 #### Relations
+  * definedBy: [Ignore Files Specification](Specifications.md#ignore-files-specification)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
-  * refinedBy: [Ignore Files Specification](Specifications.md#ignore-files-specification)
   * satisfiedBy: [config.rs](../../cli/src/config.rs)
   * verifiedBy: [File Exclusion Test](../Verifications/Operations/Validation/ValidationVerifications.md#file-exclusion-test)
 ---
@@ -65,9 +65,9 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Requirements Processing Refinement Specification](Specifications.md#requirements-processing-refinement-specification)
   * derive: [Structured Markdown Files Search and Detection](#structured-markdown-files-search-and-detection)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
-  * refinedBy: [Requirements Processing Refinement Specification](Specifications.md#requirements-processing-refinement-specification)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../core/src/parser.rs)
   * verifiedBy: [Same-File Fragment Relations Test](../Verifications/Operations/Validation/ValidationVerifications.md#same-file-fragment-relations-test)
@@ -85,8 +85,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Structured Markdown Files Search and Detection Refinement Specification](Specifications.md#structured-markdown-files-search-and-detection-refinement-specification)
   * derivedFrom: [Requirements Processing](#requirements-processing)
-  * refinedBy: [Structured Markdown Files Search and Detection Refinement Specification](Specifications.md#structured-markdown-files-search-and-detection-refinement-specification)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * verifiedBy: [Requirements Files Search and Detection Test](../Verifications/Operations/Validation/ValidationVerifications.md#requirements-files-search-and-detection-test)
 ---

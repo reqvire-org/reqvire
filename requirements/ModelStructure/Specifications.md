@@ -31,7 +31,7 @@ The `specifiedBy`/`specify` bridge is therefore directional:
   * type: specification
 
 #### Relations
-  * refine: [Capability Collect Traversal](ModelManagement.md#capability-collect-traversal)
+  * define: [Capability Collect Traversal](ModelManagement.md#capability-collect-traversal)
 ---
 
 ### Capability Model Structure Specification
@@ -53,7 +53,7 @@ The validator shall enforce the structural rules derived from those contracts:
   * type: specification
 
 #### Relations
-  * refine: [Capability Model Structure](ModelManagement.md#capability-model-structure)
+  * define: [Capability Model Structure](ModelManagement.md#capability-model-structure)
 ---
 
 ### Containment Specification
@@ -80,7 +80,7 @@ Reqvire implements containment hierarchy through filesystem structure.
   * type: specification
 
 #### Relations
-  * refine: [Git Repository as Project Root](ModelManagement.md#git-repository-as-project-root)
+  * define: [Git Repository as Project Root](ModelManagement.md#git-repository-as-project-root)
 ---
 
 ### Default Requirement Type Assignment Refinement Specification
@@ -117,7 +117,7 @@ Element size estimates are expected to be optional model-build metadata.
   * type: specification
 
 #### Relations
-  * refine: [Opt-In Element Size Estimate Model Build](ModelManagement.md#opt-in-element-size-estimate-model-build)
+  * define: [Opt-In Element Size Estimate Model Build](ModelManagement.md#opt-in-element-size-estimate-model-build)
 ---
 
 ### Element Type Metadata Specification
@@ -229,7 +229,7 @@ examples/**
   * type: specification
 
 #### Relations
-  * refine: [Ignoring Unstructured Documents](Configuration.md#ignoring-unstructured-documents)
+  * define: [Ignoring Unstructured Documents](Configuration.md#ignoring-unstructured-documents)
 ---
 
 ### Ontology Annotation Convention Specification
@@ -248,7 +248,7 @@ Authored ontology vocabulary shall use standard RDF/RDFS annotation properties f
   * type: specification
 
 #### Relations
-  * refine: [Ontology and Semantic Contract Model](ModelManagement.md#ontology-and-semantic-contract-model)
+  * define: [Ontology and Semantic Contract Model](ModelManagement.md#ontology-and-semantic-contract-model)
 ---
 
 ### Operation Command Contract Specification
@@ -275,51 +275,51 @@ Concrete command names, flags, output fields, file paths, workflow steps, and pe
   * type: specification
 
 #### Relations
-  * refine: [Element Manipulation Operations](ModelManagement.md#element-manipulation-operations)
+  * define: [Element Manipulation Operations](ModelManagement.md#element-manipulation-operations)
 ---
 
-### Refinement Element Structure Constraints Refinement Specification
+### Contract Element Structure Constraints Specification
 
 #### Details
-Refinement elements serve as requirement-owned subordinate details or contracts that drive implementation. Their relation usage is restricted because:
+Contract elements serve as requirement-owned subordinate details that drive implementation. Their relation usage is restricted because:
 - They represent atomic pieces of information focused on documenting requirements
 - They are primarily referenced through the Attachments subsection of other elements
-- Their `refine` relation links back to the requirement they refine, establishing ownership
-- Each refinement can only be owned by one compatible requirement according to its subtype
-- They do not define requirement governance metadata; governance context for a refinement is obtained from its owning requirement
+- Their `define` relation links back to the requirement they define, establishing ownership
+- Each contract can only be owned by one compatible requirement according to its subtype
+- They do not define requirement governance metadata; governance context for a contract is obtained from its owning requirement
 
-When a Refinement element contains relations other than `refine`, the validator is expected to report an error indicating that only `refine` relations are allowed for refinement types.
+When a contract element contains relations other than `define`, the validator is expected to report an error indicating that only `define` relations are allowed for contract types.
 
-When a Refinement element declares requirement governance metadata keys (`status`, `priority`, `risk`, or `owner`), the validator is expected to report an error indicating that governance metadata is only valid on capability and requirement elements.
+When a contract element declares requirement governance metadata keys (`status`, `priority`, `risk`, or `owner`), the validator is expected to report an error indicating that governance metadata is only valid on capability and requirement elements.
 
 #### Metadata
   * type: specification
 ---
 
-### Refinement Specification
+### Contract Specification
 
-Reqvire implements requirement refinement through explicit refinement elements linked to requirements.
+Reqvire implements requirement contracts through explicit contract elements linked to requirements.
 
 #### Details
-**Refinement Ownership:**
-- Refinement content is captured in dedicated requirement-owned elements (`source`, `specification`, `constraint`, `behavior`, `state`, `input-output`)
-- Requirement owns refinement via `refinedBy`; refinement points back via `refine`
-- Refinement elements can be attached by external requirements when ownership constraints allow
-- Semantic contracts are first-class SHACL shape contracts outside refinement ownership; requirements are constrained by them through `constrainedBy`/`constrain`, and semantic contracts use ontology through `use`/`usedBy`.
+**Contract Ownership:**
+- Contract content is captured in dedicated requirement-owned elements (`source`, `specification`, `constraint`, `behavior`, `state`, `input-output`)
+- Requirement owns contract elements via `definedBy`; contract elements point back via `define`
+- Contract elements can be attached by external requirements when ownership constraints allow
+- Semantic contracts are first-class SHACL shape contracts outside contract ownership; requirements are constrained by them through `constrainedBy`/`constrain`, and semantic contracts use ontology through `use`/`usedBy`.
 
 **Usage:**
-- Acceptance criteria and technical details reside in refinement elements
+- Acceptance criteria and technical details reside in contract elements
 - Requirement text stays intent-focused (EARS-style), with concise detail pointers
-- Clarifying information and rationale are captured in linked refinements
-- Refinements provide attachment-ready specification contracts across submodels
-- `state` refinements capture lifecycle states, state machines, allowed transitions, terminal states, and state-dependent contract behavior.
-- `input-output` refinements capture payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries.
+- Clarifying information and rationale are captured in linked contracts
+- Contract elements provide attachment-ready specification contracts across submodels
+- `state` contract elements capture lifecycle states, state machines, allowed transitions, terminal states, and state-dependent contract behavior.
+- `input-output` contract elements capture payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * refine: [Refinement Element Structure Constraints](ModelManagement.md#refinement-element-structure-constraints)
+  * define: [Refinement Element Structure Constraints](ModelManagement.md#contract-element-structure-constraints)
 ---
 
 ### Relation Operations Specification
@@ -360,13 +360,13 @@ Reqvire implements relation semantics for ownership, hierarchy, verification, im
 - Relation names, inverse names, allowed source/target families, ownership semantics, and change-impact propagation are defined by the Reqvire relation ontology.
 - Implementation relation validators shall enforce the relation ontology together with element-type compatibility constraints.
 - Report and mutation code shall use the same relation direction and propagation semantics so validation, collect, submodels, coverage, and change impact remain consistent.
-- `trace` remains non-owning documentation traceability and must not be used as a substitute for hierarchy, refinement ownership, verification, satisfaction, or attachment dependencies.
+- `trace` remains non-owning documentation traceability and must not be used as a substitute for hierarchy, contract ownership, verification, satisfaction, or attachment dependencies.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * refine: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
+  * define: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
 ---
 
 ### Relation Types and behaviors Refinement Specification
@@ -419,7 +419,7 @@ Requirements-processing scope behavior:
   * type: specification
 
 #### Relations
-  * refine: [Requirements Processing](Configuration.md#requirements-processing)
+  * define: [Requirements Processing](Configuration.md#requirements-processing)
 ---
 
 ### Semantic Contract Structure Specification
@@ -429,9 +429,9 @@ Semantic vocabulary and shape profile meaning are defined by the Reqvire ontolog
 
 The implementation shall enforce the ontology and semantic-contract structure:
 - Ontology elements define reusable vocabulary and model meaning.
-- `semantic-contract` must not use `refine`/`refinedBy`; semantic contracts constrain requirements with `constrain`/`constrainedBy`.
+- `semantic-contract` must not use `define`/`definedBy`; semantic contracts constrain requirements with `constrain`/`constrainedBy`.
 - `semantic-contract` must use at least one ontology element through `use`/`usedBy`.
-- `source`, `constraint`, `behavior`, `specification`, `state`, and `input-output` must not refine a capability; they are requirement-owned subordinate details or contracts.
+- `source`, `constraint`, `behavior`, `specification`, `state`, and `input-output` must not define a capability; they are requirement-owned subordinate details or contracts.
 - Semantic contracts define closed-world SHACL profiles over terms reachable from the contract's explicit ontology-use context and must not define local ontology terms.
 - Ontology and semantic-contract elements use reserved type-specific subsections:
   - `ontology`: `#### Ontology` is required with exactly one fenced Turtle block; `#### Shapes` is forbidden.
@@ -475,7 +475,7 @@ The implementation shall enforce the ontology and semantic-contract structure:
   * type: specification
 
 #### Relations
-  * refine: [Ontology and Semantic Contract Model](ModelManagement.md#ontology-and-semantic-contract-model)
+  * define: [Ontology and Semantic Contract Model](ModelManagement.md#ontology-and-semantic-contract-model)
 ---
 
 ### Specification File Identification Refinement Specification
@@ -515,7 +515,7 @@ Structured markdown detection behavior:
   * type: specification
 
 #### Relations
-  * refine: [Structured Markdown Files Search and Detection](Configuration.md#structured-markdown-files-search-and-detection)
+  * define: [Structured Markdown Files Search and Detection](Configuration.md#structured-markdown-files-search-and-detection)
 ---
 
 ### Supported Element Types Specification
@@ -545,7 +545,7 @@ Parser-facing behavior remains:
   * type: specification
 
 #### Relations
-  * refine: [Element Type Relation Compatibility](ModelManagement.md#element-type-relation-compatibility)
+  * define: [Element Type Relation Compatibility](ModelManagement.md#element-type-relation-compatibility)
 ---
 
 ### Verification Type Selection Guidelines

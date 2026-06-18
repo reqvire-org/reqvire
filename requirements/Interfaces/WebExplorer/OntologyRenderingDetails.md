@@ -179,5 +179,5 @@ When changing ontology rendering:
   * type: specification
 
 #### Relations
-  * refine: [Ontologies View Generation](Capabilities.md#ontologies-view-generation)
+  * define: [Ontologies View Generation](Capabilities.md#ontologies-view-generation)
 ---

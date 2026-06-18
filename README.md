@@ -139,7 +139,7 @@ Capabilities
     ↓
 Requirements
     ↓
-Refinements
+Contracts
     ↓
 Verification
 ```
@@ -217,7 +217,7 @@ In Reqvire, requirements are not treated as isolated specification statements or
 Requirements are first-class semantic graph elements that:
 - derive from capabilities
 - connect to ontology concepts
-- refine into structured engineering contracts
+- are defined by structured engineering contracts
 - can be constrained by ontologically anchored `semantic-contract`s
 - stay verifiable as ontology-derived constraints are reapplied through SHACL profiles
 - trace to implementation artifacts
@@ -238,8 +238,8 @@ This enables:
 - specification-driven engineering
 - semantic consistency across the lifecycle
 
-Requirements can evolve from lightweight statements into progressively refined, machine-verifiable engineering semantics through:
-- behavioral refinements
+Requirements can evolve from lightweight statements into progressively precise, machine-verifiable engineering semantics through:
+- behavioral contracts
 - state models
 - I/O contracts
 - constraints
@@ -265,14 +265,15 @@ This transforms requirements from static documentation into living engineering i
 
 ---
 
-## Refinements
+## Contracts
 
-Requirements can be refined into structured engineering contracts such as:
+Requirements can be defined by structured engineering contracts such as:
+- source contracts
+- specifications
 - behavioral contracts
 - state models
 - input/output contracts
 - constraints
-- detailed specifications
 
 This allows requirements to evolve into precise, machine-readable engineering semantics while remaining Git-native and human-readable.
 
@@ -429,7 +430,7 @@ Maintain bidirectional links between:
 - ontologies
 - capabilities
 - requirements
-- refinements
+- contracts
 - code
 - tests
 - verification artifacts
@@ -573,7 +574,7 @@ See:
 # Next Steps
 
 - **[Documentation](https://www.reqvire.org)** — Learn how to use Reqvire
-- **[Browse Model](https://reqvire-org.github.io/reqvire/)** — Explore Reqvire's own specifications
+- **[Explore Model](https://reqvire-org.github.io/reqvire/)** — Explore Reqvire's own specifications
 
 ---
 
@@ -627,7 +628,7 @@ Reqvire follows a semantic MBSE workflow.
 Maintainer-authored changes should include:
 - capability updates
 - requirements
-- refinements
+- contracts
 - verifications
 - tests
 

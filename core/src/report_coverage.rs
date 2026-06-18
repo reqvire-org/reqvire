@@ -650,11 +650,11 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         children.dedup();
         children_by_requirement.insert(req.identifier.clone(), children);
 
-        // Owned refinement contracts
+        // Owned requirement contracts
         let mut refinements: Vec<String> = req
             .relations
             .iter()
-            .filter(|r| r.relation_type.name == "refinedBy")
+            .filter(|r| r.relation_type.name == "definedBy")
             .filter_map(|r| match &r.target.link {
                 relation::LinkType::Identifier(id) => Some(id.clone()),
                 _ => None,
@@ -800,7 +800,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
             let has_forward_relations = element.relations.iter().any(|relation| {
                 // Check if relation is a forward relation to another requirement
                 match relation.relation_type.name {
-                    "contain" | "derive" | "refinedBy" => {
+                    "contain" | "derive" | "definedBy" => {
                         // These are forward relations - check if target is a requirement
                         if let relation::LinkType::Identifier(_) = &relation.target.link {
                             // Assume it's a requirement if it's an identifier link

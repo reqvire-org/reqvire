@@ -29,8 +29,8 @@ Technical specification for content collection from capability, requirement, and
 
 **Content Collection:**
 - Collect element content field (main body text including Details section)
-- For each refinedBy target:
- - ElementIdentifier (refinement element): Include element's content
+- For each definedBy target:
+ - ElementIdentifier (contract element): Include element's content
  - FilePath pointing to .md file: Read and include file content
  - FilePath pointing to other file types: Include as markdown link
 - For each attachment:
@@ -55,7 +55,7 @@ Technical specification for content collection from capability, requirement, and
   * type: specification
 
 #### Relations
-  * refine: [Collect Capability and Requirement Context](ReportingRequirements.md#collect-capability-and-requirement-context)
+  * define: [Collect Capability and Requirement Context](ReportingRequirements.md#collect-capability-and-requirement-context)
 ---
 
 ### Collect Output Format Specification
@@ -78,8 +78,8 @@ Each collected content block followed by source citation and separator:
 | Source Type | Citation Format |
 |-------------|-----------------|
 | Element | `— Source: [Element Name](file.md#element-id)` |
-| Refinement Element (via refinedBy) | `— Source: [Refinement Name](file.md#refinement-id) refining [Element Name](file.md#element-id)` |
-| Attachment Element | `— Source: [Refinement Name](file.md#refinement-id) attached to [Element Name](file.md#element-id)` |
+| Contract Element (via definedBy) | `— Source: [Contract Name](file.md#contract-id) defining [Element Name](file.md#element-id)` |
+| Attachment Element | `— Source: [Contract Name](file.md#contract-id) attached to [Element Name](file.md#element-id)` |
 
 **JSON Format:**
 ```json
@@ -162,7 +162,7 @@ Filtering behavior:
   * type: specification
 
 #### Relations
-  * refine: [Comma-Separated Type Filter Parsing](ReportingRequirements.md#comma-separated-type-filter-parsing)
+  * define: [Comma-Separated Type Filter Parsing](ReportingRequirements.md#comma-separated-type-filter-parsing)
 ---
 
 ### Containment View Report Refinement Specification
@@ -272,7 +272,7 @@ Label format example:
   * type: specification
 
 #### Relations
-  * refine: [File Diagram Attachment Display](DiagramGeneration.md#file-diagram-attachment-display)
+  * define: [File Diagram Attachment Display](DiagramGeneration.md#file-diagram-attachment-display)
 ---
 
 ### Flexible Search Type Filtering Refinement Specification
@@ -318,7 +318,7 @@ Technical specification for implementation coverage report output structure.
   * type: specification
 
 #### Relations
-  * refine: [Requirement Implementation Coverage Report](ReportingRequirements.md#requirement-implementation-coverage-report)
+  * define: [Requirement Implementation Coverage Report](ReportingRequirements.md#requirement-implementation-coverage-report)
 ---
 
 ### Interactive Mermaid Diagram Node Behavior Refinement Specification
@@ -363,7 +363,7 @@ JSON report outputs are expected to preserve element size-estimate metadata when
   * type: specification
 
 #### Relations
-  * refine: [JSON Element Size Estimate Exposure](ReportingRequirements.md#json-element-size-estimate-exposure)
+  * define: [JSON Element Size Estimate Exposure](ReportingRequirements.md#json-element-size-estimate-exposure)
 ---
 
 ### JSON Output Structure
@@ -401,7 +401,7 @@ JSON output conventions:
   * type: specification
 
 #### Relations
-  * refine: [Model Reports](ReportingRequirements.md#model-reports)
+  * define: [Model Reports](ReportingRequirements.md#model-reports)
 ---
 
 ### Markdown Report Style Specification
@@ -514,7 +514,7 @@ Model output format rules:
   * type: specification
 
 #### Relations
-  * refine: [Model Diagram Output Formats](ReportingRequirements.md#model-diagram-output-formats)
+  * define: [Model Diagram Output Formats](ReportingRequirements.md#model-diagram-output-formats)
 ---
 
 ### Ontology Collection Output Specification
@@ -529,9 +529,9 @@ The output shall:
 - Emit JSON-LD when requested by the CLI `--jsonld` option.
 - Support full semantic model export when requested by the CLI `--full` option or MCP `full: true` argument.
 - In full semantic model export mode, append RDF triples for Reqvire model context:
-  - all parsed capability, requirement, ontology, semantic-contract, verification, and refinement elements
+  - all parsed capability, requirement, ontology, semantic-contract, verification, and contract elements
   - element id, identifier, name, type, file path, and source line
-  - internal model relations, including `derive`, `derivedFrom`, `specify`, `specifiedBy`, `refine`, `refinedBy`, `verify`, `verifiedBy`, `satisfy`, `satisfiedBy`, and `trace`
+  - internal model relations, including `derive`, `derivedFrom`, `specify`, `specifiedBy`, `define`, `definedBy`, `verify`, `verifiedBy`, `satisfy`, `satisfiedBy`, and `trace`
   - element attachments for reusable requirement-owned contracts
   - concept references from model elements to ontology terms
   - ontology term declaration edges from ontology elements to declared terms
@@ -549,7 +549,7 @@ The output shall:
   * type: specification
 
 #### Relations
-  * refine: [Ontology and Shapes Collection](ReportingRequirements.md#ontology-and-shapes-collection)
+  * define: [Ontology and Shapes Collection](ReportingRequirements.md#ontology-and-shapes-collection)
 ---
 
 ### Ontology Projection Subgraph Materialization Specification
@@ -591,7 +591,7 @@ Consumer behavior:
   * type: specification
 
 #### Relations
-  * refine: [Ontology Projection Subgraph Materialization](ReportingRequirements.md#ontology-projection-subgraph-materialization)
+  * define: [Ontology Projection Subgraph Materialization](ReportingRequirements.md#ontology-projection-subgraph-materialization)
 ---
 
 ### Report Command Catalog Specification
@@ -617,7 +617,7 @@ Report commands:
   * type: specification
 
 #### Relations
-  * refine: [Model Reports](ReportingRequirements.md#model-reports)
+  * define: [Model Reports](ReportingRequirements.md#model-reports)
 ---
 
 ### Requirement Governance Metadata JSON Output Specification
@@ -674,7 +674,7 @@ Example:
   * type: specification
 
 #### Relations
-  * refine: [Search Report Generator](ReportingRequirements.md#search-report-generator)
+  * define: [Search Report Generator](ReportingRequirements.md#search-report-generator)
 ---
 
 ### Requirement Implementation Coverage Logic Specification
@@ -686,13 +686,13 @@ Implementation coverage source vocabulary is defined by the Reqvire report ontol
 
 Implementation coverage scope includes only elements of type `requirement`. Elements of type `capability` are excluded from direct implementation coverage and receive implementation coverage through capability roll-up.
 
-The report shall classify each requirement using the semantic coverage source vocabulary and the available `satisfiedBy`, `refinedBy`, attachment, and child requirement evidence.
+The report shall classify each requirement using the semantic coverage source vocabulary and the available `satisfiedBy`, `definedBy`, attachment, and child requirement evidence.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * refine: [Requirement Implementation Coverage Report](ReportingRequirements.md#requirement-implementation-coverage-report)
+  * define: [Requirement Implementation Coverage Report](ReportingRequirements.md#requirement-implementation-coverage-report)
 ---
 
 ### Requirement Submodels Report Specification
@@ -950,7 +950,7 @@ Reqvire provides traceability reports over the Reqvire capability, requirement, 
   * type: specification
 
 #### Relations
-  * refine: [Model Reports](ReportingRequirements.md#model-reports)
+  * define: [Model Reports](ReportingRequirements.md#model-reports)
 ---
 
 ### Verification Coverage Specification
@@ -967,5 +967,5 @@ Reqvire supports verification coverage analysis for requirement verification and
   * type: specification
 
 #### Relations
-  * refine: [Verification Coverage Report](ReportingRequirements.md#verification-coverage-report)
+  * define: [Verification Coverage Report](ReportingRequirements.md#verification-coverage-report)
 ---

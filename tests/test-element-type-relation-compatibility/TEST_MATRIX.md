@@ -85,19 +85,19 @@ Based on the Element Type Relation Compatibility specification, the following te
 | refinement | requirement-owned refinement | ❌ FAIL | invalid-refinement-attachment |
 | test-verification | requirement-owned refinement | ❌ FAIL | invalid-verification-attachment |
 
-## Ordinary Refinement Type Tests (Only refine Allowed)
+## Ordinary Refinement Type Tests (Only define Allowed)
 
 ### Valid Refinement Relations
 
 | Element Type | Relation | Target Type | Expected | Test Case |
 |--------------|----------|-------------|----------|-----------|
-| source | refine | requirement | ✅ PASS | valid-refinement/source-refine-requirement |
+| source | define | requirement | ✅ PASS | valid-refinement/source-define-requirement |
 | ontology | derivedFrom | ontology | ✅ PASS | valid-hierarchy/ontology-derived-from-ontology |
-| constraint | refine | requirement | ✅ PASS | valid-refinement/constraint-refine-requirement |
-| behavior | refine | requirement | ✅ PASS | valid-refinement/behavior-refine-requirement |
-| specification | refine | requirement | ✅ PASS | valid-refinement/specification-refine-requirement |
-| state | refine | requirement | ✅ PASS | valid-refinement/state-refine-requirement |
-| input-output | refine | requirement | ✅ PASS | valid-refinement/input-output-refine-requirement |
+| constraint | define | requirement | ✅ PASS | valid-refinement/constraint-define-requirement |
+| behavior | define | requirement | ✅ PASS | valid-refinement/behavior-define-requirement |
+| specification | define | requirement | ✅ PASS | valid-refinement/specification-define-requirement |
+| state | define | requirement | ✅ PASS | valid-refinement/state-define-requirement |
+| input-output | define | requirement | ✅ PASS | valid-refinement/input-output-define-requirement |
 
 ## Semantic Contract Relation Tests
 
@@ -107,8 +107,8 @@ Based on the Element Type Relation Compatibility specification, the following te
 | semantic-contract | constrain | requirement | ✅ PASS | valid-cases/semantic-contract-constrain-requirement |
 | semantic-contract | use | ontology | ✅ PASS | valid-cases/semantic-contract-use-ontology |
 | ontology | usedBy | semantic-contract | ✅ PASS | valid-cases/ontology-usedby-semantic-contract |
-| semantic-contract | refine | requirement | ❌ FAIL | invalid-refinement/semantic-contract-refine-requirement |
-| requirement | refinedBy | semantic-contract | ❌ FAIL | invalid-refinement/requirement-refinedby-semantic-contract |
+| semantic-contract | define | requirement | ❌ FAIL | invalid-refinement/semantic-contract-define-requirement |
+| requirement | definedBy | semantic-contract | ❌ FAIL | invalid-refinement/requirement-refinedby-semantic-contract |
 
 ### Invalid Refinement Relations
 
@@ -120,13 +120,13 @@ Based on the Element Type Relation Compatibility specification, the following te
 | behavior | trace | ❌ FAIL | invalid-refinement/behavior-trace |
 | specification | derivedFrom | ❌ FAIL | invalid-refinement/specification-derivedfrom |
 | specification | trace | ❌ FAIL | invalid-refinement/specification-trace |
-| source | refine capability | ❌ FAIL | invalid-capability-refinements/source-refine-capability |
-| semantic-contract | refine requirement | ❌ FAIL | invalid-refinement/semantic-contract-refine-requirement |
-| constraint | refine capability | ❌ FAIL | invalid-capability-refinements/constraint-refine-capability |
-| behavior | refine capability | ❌ FAIL | invalid-capability-refinements/behavior-refine-capability |
-| specification | refine capability | ❌ FAIL | invalid-capability-refinements/specification-refine-capability |
-| state | refine capability | ❌ FAIL | invalid-capability-refinements/state-refine-capability |
-| input-output | refine capability | ❌ FAIL | invalid-capability-refinements/input-output-refine-capability |
+| source | define capability | ❌ FAIL | invalid-capability-refinements/source-define-capability |
+| semantic-contract | define requirement | ❌ FAIL | invalid-refinement/semantic-contract-define-requirement |
+| constraint | define capability | ❌ FAIL | invalid-capability-refinements/constraint-define-capability |
+| behavior | define capability | ❌ FAIL | invalid-capability-refinements/behavior-define-capability |
+| specification | define capability | ❌ FAIL | invalid-capability-refinements/specification-define-capability |
+| state | define capability | ❌ FAIL | invalid-capability-refinements/state-define-capability |
+| input-output | define capability | ❌ FAIL | invalid-capability-refinements/input-output-define-capability |
 
 ## Summary
 

@@ -54,5 +54,5 @@ Shared terms for capability, requirement, refinement, and verification prose com
   * type: specification
 
 #### Relations
-  * refine: [Ontology and Semantic Contract Model](ModelManagement.md#ontology-and-semantic-contract-model)
+  * define: [Ontology and Semantic Contract Model](ModelManagement.md#ontology-and-semantic-contract-model)
 ---

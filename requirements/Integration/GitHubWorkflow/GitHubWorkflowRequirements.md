@@ -8,7 +8,7 @@ The system shall automate validations of pull requests in the GitHub workflow to
   * type: requirement
 
 #### Relations
-  * refinedBy: [Pull Request Validation Workflow Specification](Specifications.md#pull-request-validation-workflow-specification)
+  * definedBy: [Pull Request Validation Workflow Specification](Specifications.md#pull-request-validation-workflow-specification)
   * specify: [GitHub Workflow Automation](../IntegrationFeature.md#github-workflow-automation)
 ---
 
@@ -20,7 +20,7 @@ The system shall generate detailed change logs for pull requests, summarizing mo
   * type: requirement
 
 #### Relations
-  * refinedBy: [Pull Request Change Log Workflow Specification](Specifications.md#pull-request-change-log-workflow-specification)
+  * definedBy: [Pull Request Change Log Workflow Specification](Specifications.md#pull-request-change-log-workflow-specification)
   * specify: [GitHub Workflow Automation](../IntegrationFeature.md#github-workflow-automation)
 ---
 

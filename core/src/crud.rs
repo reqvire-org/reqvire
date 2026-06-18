@@ -1533,7 +1533,7 @@ pub fn attach_element_identifier(
     {
         return Err(ReqvireError::InvalidAttachmentTarget(
             format!(
-                "'{}' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not refined by implementation-detail refinements.",
+                "'{}' has no define relation. Contracts must define a requirement before they can be attached; contracts are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not defined by implementation-detail contracts.",
                 attachment_element.name
             )
         ));
@@ -1549,7 +1549,7 @@ pub fn attach_element_identifier(
         {
             return Err(ReqvireError::InvalidAttachmentScope(
                 format!(
-                    "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from elements outside the refinedBy chain.",
+                    "'{}' cannot be attached to '{}' because it is within the contract's defining hierarchy. Attachments are only allowed from elements outside the definedBy chain.",
                     attachment_element.name, element_name
                 )
             ));

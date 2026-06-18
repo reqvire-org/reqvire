@@ -18,7 +18,7 @@ Access rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Access Control Baseline](Tools.md#mcp-access-control-baseline)
+  * define: [MCP Access Control Baseline](Tools.md#mcp-access-control-baseline)
 ---
 
 ### MCP Contract Layer Boundary Specification
@@ -39,7 +39,7 @@ Boundary rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Adapter Boundary](Tools.md#mcp-adapter-boundary)
+  * define: [MCP Adapter Boundary](Tools.md#mcp-adapter-boundary)
 ---
 
 ### MCP Contract Versioning Specification
@@ -67,7 +67,7 @@ Compatibility rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Compatibility Versioning](Tools.md#mcp-compatibility-versioning)
+  * define: [MCP Compatibility Versioning](Tools.md#mcp-compatibility-versioning)
 ---
 
 ### MCP Model Evidence Tools Specification
@@ -102,16 +102,19 @@ Semantic model evidence rules:
 - `reqvire.read_element` returns `concept_references` for non-ontology, non-semantic-contract elements that author `#### Concept References`.
 - `reqvire.collect` includes authored concept references for capability/requirement collection and semantic-contract ontology-use context for semantic-contract evidence where the underlying Reqvire operation returns it.
 - `reqvire.model` and `reqvire.submodels` preserve capability roots, requirement ownership through `specify`/`specifiedBy`, ontology hierarchy through `derive`/`derivedFrom`, and concept-reference facts needed for semantic dependency traceability.
-- `reqvire.ontologies` exposes the same semantic collection as the CLI `ontologies` command.
-- `reqvire.ontologies` accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`.
-- `reqvire.ontologies` accepts optional `full` boolean; omitted or false returns generated ontology document declarations plus authored ontology and SHACL artifacts, while true also includes generated Reqvire model context triples and ontology projection facts. Generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors.
-- `reqvire.ontologies` returns selected serialized semantic content, semantic index summary, collected block metadata, diagnostics, generated ontology document declarations, ontology term declarations, and SHACL shape references.
+- `reqvire.semantic.ontologies` exposes the same semantic collection as the CLI `ontologies` command under the semantic MCP namespace.
+- `reqvire.semantic.ontologies` accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`.
+- `reqvire.semantic.ontologies` accepts optional `content` with values `rdf`, `shacl`, or `both`; omitted content defaults to `both`.
+- `reqvire.semantic.ontologies` accepts optional `full` boolean; omitted or false returns generated ontology document declarations plus authored ontology and SHACL artifacts, while true also includes generated Reqvire model context triples and ontology projection facts. Generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors.
+- `reqvire.semantic.ontologies` returns selected serialized semantic content, effective content filter, semantic index summary, collected block metadata, diagnostics, generated ontology document declarations, ontology term declarations, and SHACL shape references.
+- `reqvire.semantic.prefixes` returns ontology element-defined prefixes, namespaces, source provenance, source prose content, and a reusable SPARQL prefix block.
+- `reqvire.semantic.sparql` executes SPARQL against the same semantic collection used by `reqvire.semantic.ontologies`.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * refine: [MCP Model Evidence Tools](Tools.md#mcp-model-evidence-tools)
+  * define: [MCP Model Evidence Tools](Tools.md#mcp-model-evidence-tools)
 ---
 
 ### MCP Mutation Concurrency Control Specification
@@ -143,7 +146,7 @@ Mutation critical section:
   * type: specification
 
 #### Relations
-  * refine: [MCP Mutation Concurrency Control](Tools.md#mcp-mutation-concurrency-control)
+  * define: [MCP Mutation Concurrency Control](Tools.md#mcp-mutation-concurrency-control)
 ---
 
 ### MCP Mutation Execution Flow Specification
@@ -181,7 +184,7 @@ Mutation flow constraints:
   * type: specification
 
 #### Relations
-  * refine: [MCP Mutation Execution Flow](Tools.md#mcp-mutation-execution-flow)
+  * define: [MCP Mutation Execution Flow](Tools.md#mcp-mutation-execution-flow)
 ---
 
 ### MCP Mutation Tool Safety Specification
@@ -204,7 +207,7 @@ Mutation exposure and safety rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Mutation Tool Safety](Tools.md#mcp-mutation-tool-safety)
+  * define: [MCP Mutation Tool Safety](Tools.md#mcp-mutation-tool-safety)
 ---
 
 ### MCP Protocol Standard Conformance Specification
@@ -231,7 +234,7 @@ Protocol conformance rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Protocol Standard Conformance](Tools.md#mcp-protocol-standard-conformance)
+  * define: [MCP Protocol Standard Conformance](Tools.md#mcp-protocol-standard-conformance)
 ---
 
 ### MCP Quality Traceability Tools Specification
@@ -245,7 +248,7 @@ Quality and traceability tool behavior is inherited from attached Reqvire lint, 
   * type: specification
 
 #### Relations
-  * refine: [MCP Quality Traceability Tools](Tools.md#mcp-quality-traceability-tools)
+  * define: [MCP Quality Traceability Tools](Tools.md#mcp-quality-traceability-tools)
 ---
 
 ### MCP Resource Interface Specification
@@ -270,7 +273,68 @@ Resources include revision metadata and must not mutate model files or cache sta
   * type: specification
 
 #### Relations
-  * refine: [MCP Resource Interface](Tools.md#mcp-resource-interface)
+  * define: [MCP Resource Interface](Tools.md#mcp-resource-interface)
+---
+
+### MCP Semantic Query Tools Specification
+
+The MCP interface is expected to expose read-only SPARQL query execution over Reqvire semantic RDF evidence.
+
+#### Details
+SPARQL tool request:
+- Tool name is `reqvire.semantic.sparql`.
+- Required `query` string contains a SPARQL 1.1 query.
+- Optional `full` boolean defaults to `true`. When true, the queried graph includes authored ontology and SHACL RDF plus generated Reqvire model-context triples and ontology projection facts. When false, the queried graph includes generated ontology document declarations plus authored ontology and SHACL RDF only.
+
+Execution behavior:
+- The validated Reqvire model owns an in-memory Oxigraph semantic store built after parsing and graph validation.
+- The tool executes against the selected model-owned semantic store without rebuilding or reloading RDF for each query call.
+- The tool executes the query with Oxigraph SPARQL evaluation.
+- The tool does not persist an RDF store and does not write generated triples back to Markdown source.
+- The tool does not expose SPARQL Update, arbitrary shell execution, arbitrary filesystem reads, or remote URL fetching.
+
+Result behavior:
+- SELECT results return ordered `variables`, `bindings`, `row_count`, and RDF term metadata for each bound value.
+- ASK results return a boolean.
+- CONSTRUCT and DESCRIBE results return graph triples with RDF term metadata and `triple_count`.
+- Result payloads include `format: "sparql"`, the effective `full` value, semantic index `summary`, semantic `diagnostics`, and `model_fingerprint`.
+- Invalid SPARQL or RDF load failures return MCP tool errors without mutating workspace state.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Semantic Query Tools](Tools.md#mcp-semantic-query-tools)
+---
+
+### MCP Semantic Prefix Registry Tools Specification
+
+The MCP interface is expected to expose read-only ontology-defined prefix discovery for semantic query construction.
+
+#### Details
+Prefix registry request:
+- Tool name is `reqvire.semantic.prefixes`.
+- The tool has no required arguments.
+- The tool reads prefix declarations from parsed ontology element metadata and the already-built semantic model index.
+
+Result behavior:
+- Result payloads include `prefixes`, `sparql_prefix_block`, `conflicts`, `summary`, semantic `diagnostics`, and `model_fingerprint`.
+- Each prefix entry includes `prefix`, `namespace`, `ontology_base`, `term_namespace`, `ontology_document_iri`, source element provenance, and contributors.
+- `source` includes `element_identifier`, `element_name`, `file_path`, `line_number`, and ontology element prose `content`.
+- Source `content` excludes authored Turtle and SHACL blocks, so clients receive the model element description rather than embedded RDF source text.
+- `sparql_prefix_block` contains namespace declarations formatted for direct inclusion before SPARQL queries.
+- Prefix conflicts are reported when the same prefix token resolves to more than one namespace.
+
+Execution behavior:
+- The tool does not scrape Turtle prefix declarations to infer Reqvire ontology prefixes.
+- The tool does not rebuild, reload, or mutate the semantic RDF store for prefix discovery.
+- The tool does not write generated prefix data back to Markdown source.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Semantic Prefix Registry Tools](Tools.md#mcp-semantic-prefix-registry-tools)
 ---
 
 ### MCP Server Command Specification
@@ -292,7 +356,7 @@ Command behavior:
   * type: specification
 
 #### Relations
-  * refine: [MCP Server Command](Tools.md#mcp-server-command)
+  * define: [MCP Server Command](Tools.md#mcp-server-command)
 ---
 
 ### MCP Server State and Cache Specification
@@ -323,7 +387,7 @@ Cache rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Server State and Cache](Tools.md#mcp-server-state-and-cache)
+  * define: [MCP Server State and Cache](Tools.md#mcp-server-state-and-cache)
 ---
 
 ### MCP Shared Operation Contracts Specification
@@ -350,7 +414,7 @@ Contract rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Shared Operation Interfaces](Tools.md#mcp-shared-operation-interfaces)
+  * define: [MCP Shared Operation Interfaces](Tools.md#mcp-shared-operation-interfaces)
 ---
 
 ### MCP Size Estimate Startup Specification
@@ -369,7 +433,7 @@ The MCP server is expected to expose element size estimates only when explicitly
   * type: specification
 
 #### Relations
-  * refine: [MCP Server Command](Tools.md#mcp-server-command)
+  * define: [MCP Server Command](Tools.md#mcp-server-command)
 ---
 
 ### MCP Streamable HTTP Transport Safety Specification
@@ -405,7 +469,7 @@ Session and streaming rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Streamable HTTP Transport Safety](Tools.md#mcp-streamable-http-transport-safety)
+  * define: [MCP Streamable HTTP Transport Safety](Tools.md#mcp-streamable-http-transport-safety)
 ---
 
 ### MCP Streamable HTTP Transport Specification
@@ -427,7 +491,7 @@ Transport rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Streamable HTTP Transport](Tools.md#mcp-streamable-http-transport)
+  * define: [MCP Streamable HTTP Transport](Tools.md#mcp-streamable-http-transport)
 ---
 
 ### MCP Structured Payload Contracts Specification
@@ -461,7 +525,7 @@ Versioning rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Structured Payload Interfaces](Tools.md#mcp-structured-payload-interfaces)
+  * define: [MCP Structured Payload Interfaces](Tools.md#mcp-structured-payload-interfaces)
 ---
 
 ### MCP Tool Call Contracts Specification
@@ -499,7 +563,9 @@ Model evidence tools:
 - `reqvire.containment`
 - `reqvire.collect`
 - `reqvire.submodels`
-- `reqvire.ontologies`
+- `reqvire.semantic.ontologies`
+- `reqvire.semantic.prefixes`
+- `reqvire.semantic.sparql`
 
 Quality and traceability tools:
 - `reqvire.lint`
@@ -526,7 +592,7 @@ Mutation and maintenance tools:
   * type: specification
 
 #### Relations
-  * refine: [MCP Shared Operation Interfaces](Tools.md#mcp-shared-operation-interfaces)
+  * define: [MCP Shared Operation Interfaces](Tools.md#mcp-shared-operation-interfaces)
 ---
 
 ### MCP Tool Exposure Scope Specification
@@ -548,7 +614,7 @@ Exposure rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Tool Exposure Scope](Tools.md#mcp-tool-exposure-scope)
+  * define: [MCP Tool Exposure Scope](Tools.md#mcp-tool-exposure-scope)
 ---
 
 ### MCP Tool Side Effect Classification Specification
@@ -576,7 +642,9 @@ Read-only tools:
 - `reqvire.containment`
 - `reqvire.collect`
 - `reqvire.submodels`
-- `reqvire.ontologies`
+- `reqvire.semantic.ontologies`
+- `reqvire.semantic.prefixes`
+- `reqvire.semantic.sparql`
 - `reqvire.lint`
 - `reqvire.coverage`
 - `reqvire.traces`
@@ -603,7 +671,7 @@ Mutation tools:
   * type: specification
 
 #### Relations
-  * refine: [MCP Tool Side Effect Classification](Tools.md#mcp-tool-side-effect-classification)
+  * define: [MCP Tool Side Effect Classification](Tools.md#mcp-tool-side-effect-classification)
 ---
 
 ### MCP Workspace Session Tools Specification
@@ -622,5 +690,5 @@ These tools are read-only and must not mutate the model.
   * type: specification
 
 #### Relations
-  * refine: [MCP Workspace Session Tools](Tools.md#mcp-workspace-session-tools)
+  * define: [MCP Workspace Session Tools](Tools.md#mcp-workspace-session-tools)
 ---

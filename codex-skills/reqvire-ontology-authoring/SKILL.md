@@ -42,12 +42,12 @@ Author Reqvire ontology content as reusable building blocks for system-of-intere
 
 ## Ontology From Existing Model Content
 
-Ontology work does not have to come first. If capabilities, requirements, specifications, behaviors, constraints, input/output refinements, or verifications already exist, derive ontology and semantic contracts from that authored model rather than forcing a greenfield ontology pass.
+Ontology work does not have to come first. If capabilities, requirements, specifications, behaviors, constraints, input/output contracts, or verifications already exist, derive ontology and semantic contracts from that authored model rather than forcing a greenfield ontology pass.
 
 Use this workflow when a project has partial or no ontology coverage:
 
 1. Read the existing capability and requirement subgraph first.
-2. Extract repeated domain nouns, states, relation words, artifact types, payload concepts, governed tokens, and validation conditions from requirements and refinements.
+2. Extract repeated domain nouns, states, relation words, artifact types, payload concepts, governed tokens, and validation conditions from requirements and contracts.
 3. Promote stable reusable vocabulary into ontology elements only where it improves shared meaning, queryability, impact analysis, or semantic validation.
 4. Promote repeated closed-world validation rules into semantic-contract SHACL shapes only when machine-checkable constraints add value.
 5. Leave requirements prose-only when ontology or SHACL formalization is not useful.

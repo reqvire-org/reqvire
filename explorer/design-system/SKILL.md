@@ -27,7 +27,7 @@ Generated bundles, generated CSS, generated browser icons, generated adherence
 config, and dist output are build/runtime artifacts, never tracked source.
 
 ## Non-negotiables
-- Keep the **element-type color code** meaningful: capability=blue, requirement=violet, refinement=orange, verification=green, ontology=gold, resource=amber, other=slate. Never reuse these hues decoratively.
+- Keep the **element-type color code** meaningful: capability=blue, requirement=violet, contract=orange, verification=green, ontology=gold, resource=amber, other=slate. Never reuse these hues decoratively. Use `--contract*` for source/specification/constraint/behavior/state/input-output contract elements.
 - Rose is the only chrome accent; primary buttons/active segments use dark slate ink. Dense 13px UI text. Geist. 4px grid. Soft, low shadows. No emoji, no decorative gradients, no hand-drawn SVG icons (use `Icon` / `ElementIcon`).
 - Primitive components own interaction state styling. Product patterns and showcase examples may use documented primitive props and documented context/density/composition `--ds-*` variables, but must not assign primitive state-policy variables like `--ds-*-sel-*`, `--ds-*-hover-*`, `--ds-*-active-*`, `--ds-*-focus-*`, or `--ds-*-off-*`; add a primitive prop/variant instead.
 - Product patterns must not use inline `style={...}`, `CSSProperties`, ad hoc CSS-variable objects, computed colors, or imperative `.style.*` mutations. If a dynamic visual value is legitimate, move it behind a reusable primitive API in `components/**` (for example `ElementIcon`, `TypeBadge`, `TokenSwatch`, `DonutMeter`, `BarMeterFill`) and compose that primitive from the product pattern.

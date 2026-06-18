@@ -20,7 +20,7 @@ TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # - Text search contains expected header, element count, and required fields
 # - Filters reduce element counts as expected
 # - Incorrect usage exits non-zero with proper error message
-# - Relations coverage: bidirectional relationships are shown (verifiedBy/verify, refine/refinedBy, derivedFrom/derive, etc.)
+# - Relations coverage: bidirectional relationships are shown (verifiedBy/verify, define/definedBy, derivedFrom/derive, etc.)
 # - Filtered relations coverage: relations to filtered-out elements are preserved in both directions
 
 # 1) No filters: base JSON search - Full output comparison

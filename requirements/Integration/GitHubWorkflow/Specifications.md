@@ -16,7 +16,7 @@ GitHub Pages deployment workflow behavior:
   * type: specification
 
 #### Relations
-  * refine: [GitHub Pages Deployment Workflow](GitHubWorkflowRequirements.md#github-pages-deployment-workflow)
+  * define: [GitHub Pages Deployment Workflow](GitHubWorkflowRequirements.md#github-pages-deployment-workflow)
 ---
 
 ### Pull Request Change Log Workflow Specification
@@ -31,7 +31,7 @@ Pull request change-log workflow behavior:
   * type: specification
 
 #### Relations
-  * refine: [Generate Change Logs for Pull Requests](GitHubWorkflowRequirements.md#generate-change-logs-for-pull-requests)
+  * define: [Generate Change Logs for Pull Requests](GitHubWorkflowRequirements.md#generate-change-logs-for-pull-requests)
 ---
 
 ### Pull Request Validation Workflow Specification
@@ -47,5 +47,5 @@ Pull request validation workflow behavior:
   * type: specification
 
 #### Relations
-  * refine: [Automate Pull Request Validations](GitHubWorkflowRequirements.md#automate-pull-request-validations)
+  * define: [Automate Pull Request Validations](GitHubWorkflowRequirements.md#automate-pull-request-validations)
 ---

@@ -16,9 +16,9 @@ This objective groups verification that attachment and asset operations parse, v
   * derive: [Attachments Change Impact Verification](#attachments-change-impact-verification)
   * derive: [Attachments Subsection Parsing Verification](#attachments-subsection-parsing-verification)
   * derive: [Attachments Validation Verification](#attachments-validation-verification)
+  * derive: [Contract Attachment Verification](#contract-attachment-verification)
   * derive: [Detach Command Verification](#detach-command-verification)
   * derive: [Move Asset Command Verification](#move-asset-command-verification)
-  * derive: [Contract Attachment Verification](#contract-attachment-verification)
   * derive: [Remove Asset Command Verification](#remove-asset-command-verification)
 ---
 
@@ -98,12 +98,12 @@ Test cases for identifier attachments:
 
 ### Attachment Scope Constraints Test
 
-Verify that attachment scope constraints (hierarchical independence, refine requirement, upstream propagation, and one-direction subgraph flow) are enforced for refinement-element identifier attachments.
+Verify that attachment scope constraints (hierarchical independence, define requirement, upstream propagation, and one-direction subgraph flow) are enforced for refinement-element identifier attachments.
 
 #### Details
 **Test cases for refinement hierarchical independence:**
 - Model with attachment to refinement from same hierarchy causes `validate` to fail
-- Error when attaching requirement has `refinedBy` to the refinement
+- Error when attaching requirement has `definedBy` to the refinement
 - Error when attaching requirement is parent of the defining requirement
 - Error when attaching requirement is child/grandchild of the defining requirement
 - Accept attachment when attaching requirement is in a separate branch
@@ -125,14 +125,14 @@ Verify that attachment scope constraints (hierarchical independence, refine requ
 - Descendant conflict: `'<attachment>' is already attached at '<descendant>' which is a descendant. Move attachment to '<element>' if you want it at higher level.`
 - Direction conflict: `'<attachment>' cannot be attached to '<element>' because subgraph '<root>' already receives attachment contracts from subgraph '<other-root>'`
 
-**Test cases for refine owner requirement:**
-- Model with attachment to orphan refinement (no refine relations) causes `validate` to fail
-- Error message indicates refinement must refine a capability or requirement
-- Accept attachment to refinement with refine relations
+**Test cases for define owner requirement:**
+- Model with attachment to orphan refinement (no define relations) causes `validate` to fail
+- Error message indicates refinement must define a capability or requirement
+- Accept attachment to refinement with define relations
 
 **Test cases for attach command:**
 - `link REQ attaching REFINEMENT` fails when REQ is in same hierarchy
-- `link REQ attaching ORPHAN-REFINEMENT` fails when refinement has no refine
+- `link REQ attaching ORPHAN-REFINEMENT` fails when refinement has no define
 - `link REQ attaching TARGET` fails when TARGET is not a valid refinement identifier
 - Error messages are consistent with validate error format
 
@@ -236,6 +236,29 @@ Test cases for element identifiers:
   * verify: [Attachment Target Validation](../../../Operations/Validation/ValidationRequirements.md#attachment-target-validation)
 ---
 
+### Contract Attachment Verification
+
+Verify attachment rules for requirement-owned refinement elements and rejection of ontology attachments.
+
+#### Details
+Test cases:
+- Capability attachment to any target fails; capabilities use `#### Concept References` for semantic vocabulary and relations for verification/specification.
+- Requirement attachment to an `ontology` element fails.
+- Requirement attachment to a `semantic-contract` fails; requirements use `constrainedBy` instead.
+- Requirement attachment to ontology is forbidden because ontology vocabulary dependencies use concept references or semantic-contract `use` relations.
+- Requirement attachment to ordinary refinements is limited to requirement-owned refinement elements.
+- Verification element attachment to any target fails; verification evidence must use `satisfiedBy`, and verified targets must use `verify`.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-capability-attachments/test.sh)
+  * verify: [Ontology and Semantic Contract Model](../../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
+  * verify: [Attachment Scope Validation](../../../Operations/Validation/ValidationRequirements.md#attachment-scope-validation)
+  * verify: [Attachment Target Validation](../../../Operations/Validation/ValidationRequirements.md#attachment-target-validation)
+---
+
 ### Detach Command Verification
 
 Verify detach command removes identifier links and cleans up empty subsections.
@@ -288,29 +311,6 @@ Test cases for filesystem and reporting:
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
   * verify: [CLI Move Asset Command](../../../Interfaces/CLI/Commands.md#cli-move-asset-command)
----
-
-### Contract Attachment Verification
-
-Verify attachment rules for requirement-owned refinement elements and rejection of ontology attachments.
-
-#### Details
-Test cases:
-- Capability attachment to any target fails; capabilities use `#### Concept References` for semantic vocabulary and relations for verification/specification.
-- Requirement attachment to an `ontology` element fails.
-- Requirement attachment to a `semantic-contract` fails; requirements use `constrainedBy` instead.
-- Requirement attachment to ontology is forbidden because ontology vocabulary dependencies use concept references or semantic-contract `use` relations.
-- Requirement attachment to ordinary refinements is limited to requirement-owned refinement elements.
-- Verification element attachment to any target fails; verification evidence must use `satisfiedBy`, and verified targets must use `verify`.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-capability-attachments/test.sh)
-  * verify: [Ontology and Semantic Contract Model](../../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
-  * verify: [Attachment Scope Validation](../../../Operations/Validation/ValidationRequirements.md#attachment-scope-validation)
-  * verify: [Attachment Target Validation](../../../Operations/Validation/ValidationRequirements.md#attachment-target-validation)
 ---
 
 ### Remove Asset Command Verification

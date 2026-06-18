@@ -20,7 +20,7 @@
   * type: specification
 
 #### Relations
-  * refine: [Cross-Submodel Hierarchical Relation Detection](LintingRequirements.md#cross-submodel-hierarchical-relation-detection)
+  * define: [Cross-Submodel Hierarchical Relation Detection](LintingRequirements.md#cross-submodel-hierarchical-relation-detection)
 ---
 
 ### Lint Auto-fix Capability Refinement Specification
@@ -38,7 +38,7 @@ Auto-fix behavior:
   * type: specification
 
 #### Relations
-  * refine: [Lint Auto-fix Capability](LintingRequirements.md#lint-auto-fix-capability)
+  * define: [Lint Auto-fix Capability](LintingRequirements.md#lint-auto-fix-capability)
 ---
 
 ### Lint Output Specification
@@ -199,5 +199,5 @@ Redundant verify relation detection behavior:
   * type: specification
 
 #### Relations
-  * refine: [Redundant Verify Relations Detection](LintingRequirements.md#redundant-verify-relations-detection)
+  * define: [Redundant Verify Relations Detection](LintingRequirements.md#redundant-verify-relations-detection)
 ---

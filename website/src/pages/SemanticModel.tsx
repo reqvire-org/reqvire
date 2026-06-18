@@ -24,7 +24,7 @@ export default function SemanticModel() {
         <ul className="space-y-3">
           {[
             ["Ontology layer", "reusable semantic definitions, relations, rules, and model vocabulary"],
-            ["Capability and requirement subgraphs", "one or more independent product or system intent structures with requirements and refinements"],
+            ["Capability and requirement subgraphs", "one or more independent product or system intent structures with requirements and contracts"],
             ["Verification layer", "tests, proofs, analysis, inspection, and demonstration evidence linked to the capabilities or requirements they verify"],
             ["Implementation evidence", "code, tests, reports, documents, and other artifacts that satisfy requirements or provide verification evidence"],
           ].map(([term, desc]) => (
@@ -55,8 +55,8 @@ export default function SemanticModel() {
               desc: "A requirement resolves to exactly one owning capability. Top-level requirements use specify; child requirements inherit ownership through requirement hierarchy.",
             },
             {
-              name: "Refinement ownership",
-              desc: "A non-semantic-contract refinement is owned by exactly one compatible requirement through refine or refinedBy. Semantic contracts constrain requirements through constrain and constrainedBy.",
+              name: "Contract ownership",
+              desc: "A non-semantic-contract contract is owned by exactly one compatible requirement through define or definedBy. Semantic contracts constrain requirements through constrain and constrainedBy.",
             },
             {
               name: "Cross-boundary reuse",
@@ -70,7 +70,7 @@ export default function SemanticModel() {
         <p className="text-zinc-600 mb-4">
           Capability-rooted submodels are intentionally independent. A capability
           can own its operational meaning, the requirements that specify it, and
-          the refinements and verifications that prove it without becoming part
+          the contracts and verifications that prove it without becoming part
           of one universal hierarchy.
         </p>
         <div className="space-y-4">
@@ -79,7 +79,7 @@ export default function SemanticModel() {
               Concept references
             </h4>
             <p className="text-sm text-zinc-600">
-              Capabilities, requirements, refinements, verification objectives,
+              Capabilities, requirements, contracts, verification objectives,
               and concrete verifications use concept references to bind
               readable labels to ontology terms.
             </p>
@@ -93,7 +93,7 @@ export default function SemanticModel() {
               specifications, constraints, behaviors, states, and input/output
               definitions. The attaching requirement declares that its subgraph
               must fulfill the attached contract across that requirement, its
-              child requirements, and the refinements that detail those
+              child requirements, and the contracts that detail those
               obligations. Semantic contracts are linked through constrainedBy.
             </p>
           </div>
@@ -106,7 +106,7 @@ export default function SemanticModel() {
               shown by satisfied requirements, child requirement coverage, and
               verifications linked to evidence. Trace and change-impact views
               keep that dependency visible so affected contracts, requirements,
-              refinements, verifications, and implementation artifacts can be
+              contracts, verifications, and implementation artifacts can be
               reviewed and hardened after changes.
             </p>
           </div>
@@ -141,8 +141,8 @@ export default function SemanticModel() {
               desc: "Defines implementable obligations, constraints, guarantees, and behavioral expectations that specify capabilities.",
             },
             {
-              name: "Refinement",
-              desc: "Adds source, specification, constraint, behavior, state, and input/output detail to obligations.",
+              name: "Contract",
+              desc: "Defines source, specification, constraint, behavior, state, and input/output detail for obligations.",
             },
             {
               name: "Verification",
@@ -183,7 +183,7 @@ export default function SemanticModel() {
             },
             {
               name: "Concept References",
-              desc: "Use concept references when readable capability, requirement, refinement, or verification prose should bind labels to ontology CURIEs or IRIs without crowding the text.",
+              desc: "Use concept references when readable capability, requirement, contract, or verification prose should bind labels to ontology CURIEs or IRIs without crowding the text.",
             },
             {
               name: "Semantic Contract",
@@ -210,7 +210,7 @@ export default function SemanticModel() {
               {[
                 ["derivedFrom / derive", "Hierarchy inside the same family: capability, requirement, ontology, or verification-family."],
                 ["specify / specifiedBy", "Requirement specifies a capability."],
-                ["refine / refinedBy", "Requirement owns a compatible refinement contract."],
+                ["define / definedBy", "Requirement owns a compatible contract element."],
                 ["constrain / constrainedBy", "Semantic contract constrains one or more requirements."],
                 ["use / usedBy", "Semantic contract uses ontology vocabulary."],
                 ["verify / verifiedBy", "Concrete verification records evidence scope for a capability or requirement; verification-objective is excluded."],

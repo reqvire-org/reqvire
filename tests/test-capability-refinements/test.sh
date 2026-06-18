@@ -31,7 +31,7 @@ External billing vocabulary source.
   * type: source
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * define: [Billing Requirement](#billing-requirement)
 ---
 
 ### Billing Ontology
@@ -64,7 +64,7 @@ The system shall produce billing invoices.
 
 #### Relations
   * specify: [Billing Capability](#billing-capability)
-  * refinedBy: [Billing Source](#billing-source)
+  * definedBy: [Billing Source](#billing-source)
   * constrainedBy: [Billing Invoice Shape Contract](#billing-invoice-shape-contract)
 ---
 
@@ -183,7 +183,7 @@ assert_invalid_model() {
 }
 
 assert_invalid_requirement_owned_only() {
-  assert_invalid_model "non-semantic-contract refinement element to a requirement"
+  assert_invalid_model "non-semantic-contract contract element to a requirement"
 }
 
 rm -rf "${TEST_DIR}/specifications"
@@ -374,7 +374,7 @@ Capability with invalid refinement ownership.
   * type: capability
 
 #### Relations
-  * refinedBy: [${element_name}](#${fragment})
+  * definedBy: [${element_name}](#${fragment})
 ---
 
 ### ${element_name}
@@ -385,7 +385,7 @@ Capability-owned ${refinement_type} is invalid.
   * type: ${refinement_type}
 
 #### Relations
-  * refine: [Billing Capability](#billing-capability)
+  * define: [Billing Capability](#billing-capability)
 ---
 EOF
   assert_invalid_requirement_owned_only

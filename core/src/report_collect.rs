@@ -32,9 +32,9 @@ impl std::fmt::Display for CollectDirection {
 pub enum SourceType {
     /// Content from a model element
     Element,
-    /// Content from a refinement element (via refinedBy relation)
+    /// Content from a contract element (via definedBy relation)
     RefinedByElement,
-    /// Content from a refinement file (via refinedBy relation)
+    /// Content from a contract file (via definedBy relation)
     RefinedByFile,
     /// Content from an attached file
     AttachmentFile,
@@ -155,9 +155,9 @@ pub fn generate_collect_report(
             });
             element_count += 1;
 
-            // Collect refinedBy targets (refinement elements and files)
+            // Collect definedBy targets (requirement-owned contract elements and files)
             for rel in &elem.relations {
-                if rel.relation_type.name == "refinedBy" {
+                if rel.relation_type.name == "definedBy" {
                     if let Some(item) = collect_refinement_content(
                         registry,
                         &rel.target,
@@ -683,7 +683,7 @@ fn collect_attachment_content(
     }
 }
 
-/// Collect content from a refinedBy relation target
+/// Collect content from a definedBy relation target
 fn collect_refinement_content(
     registry: &GraphRegistry,
     target: &relation::RelationTarget,

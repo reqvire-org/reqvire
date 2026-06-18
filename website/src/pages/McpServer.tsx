@@ -76,7 +76,9 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             "reqvire.containment",
             "reqvire.collect",
             "reqvire.submodels",
-            "reqvire.ontologies",
+            "reqvire.semantic.ontologies",
+            "reqvire.semantic.prefixes",
+            "reqvire.semantic.sparql",
             "reqvire.lint",
             "reqvire.coverage",
             "reqvire.traces",
@@ -111,7 +113,15 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             },
             {
               name: "Ontologies",
-              desc: "reqvire.ontologies returns authored ontology and SHACL content as Turtle or JSON-LD, with full mode for generated Reqvire model context triples.",
+              desc: "reqvire.semantic.ontologies returns authored RDF ontology, SHACL, or both as Turtle or JSON-LD, with full mode for generated Reqvire model context triples.",
+            },
+            {
+              name: "Semantic prefixes",
+              desc: "reqvire.semantic.prefixes returns ontology-defined prefixes, namespaces, source element prose content, and a SPARQL prefix block for query construction.",
+            },
+            {
+              name: "SPARQL",
+              desc: "reqvire.semantic.sparql runs read-only SPARQL queries against the model-owned Oxigraph semantic store and returns structured SELECT, ASK, CONSTRUCT, or DESCRIBE results.",
             },
           ]}
         />

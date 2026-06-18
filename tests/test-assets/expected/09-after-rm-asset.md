@@ -60,8 +60,8 @@ A separate requirement that owns refinements (outside main hierarchy).
   * type: capability
 
 #### Relations
-  * refinedBy: [Test Constraint Element](#test-constraint-element)
-  * refinedBy: [Test Behavior Element](#test-behavior-element)
+  * definedBy: [Test Constraint Element](#test-constraint-element)
+  * definedBy: [Test Behavior Element](#test-behavior-element)
 
 ---
 

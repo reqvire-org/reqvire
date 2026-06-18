@@ -30,8 +30,8 @@ The system shall implement a verification roll-up strategy where parent requirem
   * type: requirement
 
 #### Relations
+  * definedBy: [Verification Roll-up Specification](Specifications.md#verification-roll-up-specification)
   * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
-  * refinedBy: [Verification Roll-up Specification](Specifications.md#verification-roll-up-specification)
   * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
 ---
 
@@ -43,6 +43,6 @@ The system shall provide functionality to build upward trace trees from verifica
   * type: requirement
 
 #### Relations
+  * definedBy: [Verification Trace Tree Construction](Specifications.md#verification-trace-tree-construction)
   * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
-  * refinedBy: [Verification Trace Tree Construction](Specifications.md#verification-trace-tree-construction)
 ---

@@ -138,15 +138,41 @@ ontology_search_request() {
 }
 
 ontologies_request() {
-  jq -n -c '{jsonrpc:"2.0",id:14,method:"tools/call",params:{name:"reqvire.ontologies",arguments:{}}}'
+  jq -n -c '{jsonrpc:"2.0",id:14,method:"tools/call",params:{name:"reqvire.semantic.ontologies",arguments:{}}}'
 }
 
 ontologies_jsonld_request() {
-  jq -n -c '{jsonrpc:"2.0",id:15,method:"tools/call",params:{name:"reqvire.ontologies",arguments:{format:"jsonld"}}}'
+  jq -n -c '{jsonrpc:"2.0",id:15,method:"tools/call",params:{name:"reqvire.semantic.ontologies",arguments:{format:"jsonld"}}}'
 }
 
 ontologies_full_request() {
-  jq -n -c '{jsonrpc:"2.0",id:16,method:"tools/call",params:{name:"reqvire.ontologies",arguments:{full:true}}}'
+  jq -n -c '{jsonrpc:"2.0",id:16,method:"tools/call",params:{name:"reqvire.semantic.ontologies",arguments:{full:true}}}'
+}
+
+ontologies_rdf_request() {
+  jq -n -c '{jsonrpc:"2.0",id:20,method:"tools/call",params:{name:"reqvire.semantic.ontologies",arguments:{content:"rdf"}}}'
+}
+
+ontologies_shacl_request() {
+  jq -n -c '{jsonrpc:"2.0",id:21,method:"tools/call",params:{name:"reqvire.semantic.ontologies",arguments:{content:"shacl"}}}'
+}
+
+semantic_prefixes_request() {
+  jq -n -c '{jsonrpc:"2.0",id:19,method:"tools/call",params:{name:"reqvire.semantic.prefixes",arguments:{}}}'
+}
+
+sparql_request() {
+  jq -n -c --arg query 'PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+SELECT ?element ?term WHERE {
+  ?term a owl:Class .
+  ?ontology reqvire:declaresTerm ?term .
+  ?element reqvire:elementId "mcp-semantic-requirement" .
+}' '{jsonrpc:"2.0",id:17,method:"tools/call",params:{name:"reqvire.semantic.sparql",arguments:{query:$query}}}'
+}
+
+invalid_sparql_request() {
+  jq -n -c '{jsonrpc:"2.0",id:18,method:"tools/call",params:{name:"reqvire.semantic.sparql",arguments:{query:"SELECT WHERE"}}}'
 }
 
 model_request() {
@@ -284,7 +310,12 @@ run_http_mcp_sequence "$DEFAULT_PORT" "$DEFAULT_OUTPUT" \
   "$(ontology_search_request)" \
   "$(ontologies_request)" \
   "$(ontologies_jsonld_request)" \
-  "$(ontologies_full_request)" || fail "default MCP HTTP request sequence failed"
+  "$(ontologies_full_request)" \
+  "$(sparql_request)" \
+  "$(invalid_sparql_request)" \
+  "$(semantic_prefixes_request)" \
+  "$(ontologies_rdf_request)" \
+  "$(ontologies_shacl_request)" || fail "default MCP HTTP request sequence failed"
 stop_http_mcp
 trap - EXIT
 
@@ -295,6 +326,9 @@ assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.capabilities.prompts == null and .re
 assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.serverInfo.name == "reqvire"' "initialize reports serverInfo"
 
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.search") != null' "tools/list includes read tools"
+assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.semantic.ontologies") != null' "tools/list includes semantic ontology tool"
+assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.semantic.sparql") != null' "tools/list includes semantic query tool"
+assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.semantic.prefixes") != null' "tools/list includes semantic prefix registry tool"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.add_element") == null and index("reqvire.link") == null' "default tools/list omits mutation tools"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.mcp") == null and index("reqvire.serve") == null and index("reqvire.validate") == null' "tools/list omits server and validate commands"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.command") == null and index("reqvire.shell") == null and index("reqvire.sout") == null' "tools/list omits shell-style tools"
@@ -317,11 +351,22 @@ assert_jq_line "$DEFAULT_OUTPUT" 9 '.result.contents[0].uri == "reqvire://worksp
 assert_jq_line "$DEFAULT_OUTPUT" 10 '.error.code == -32602' "format fix is rejected by default schema"
 assert_jq_line "$DEFAULT_OUTPUT" 11 '.result.structuredContent.concept_references[0].label == "Access Token" and .result.structuredContent.concept_references[0].iri == "mcp:AccessToken"' "read_element returns concept references"
 assert_jq_line "$DEFAULT_OUTPUT" 12 '.result.structuredContent.files[]?.elements[] | select(.name=="MCP Access Token Ontology") | .ontology.ontology.content | contains("mcp:AccessToken")' "search returns ontology ADT content"
-assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.format == "turtle" and (.result.structuredContent.content | contains("mcp:AccessToken")) and (.result.structuredContent.content | contains("mcp:AccessTokenShape"))' "ontologies tool returns Turtle semantic content"
+assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.format == "turtle" and .result.structuredContent.content_filter == "both" and (.result.structuredContent.content | contains("mcp:AccessToken")) and (.result.structuredContent.content | contains("mcp:AccessTokenShape"))' "semantic ontologies tool returns Turtle semantic content"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.summary.ontology_blocks >= 1 and .result.structuredContent.summary.shape_blocks >= 1' "ontologies tool returns semantic index summary"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.blocks[] | select(.source_name=="MCP Access Token Ontology" and .kind=="ontology")' "ontologies tool returns ontology block metadata"
 assert_jq_line "$DEFAULT_OUTPUT" 14 '.result.structuredContent.format == "jsonld" and (.result.structuredContent.jsonld | type == "array") and (.result.structuredContent.jsonld | length) > 0' "ontologies tool returns JSON-LD semantic content"
 assert_jq_line "$DEFAULT_OUTPUT" 15 '.result.structuredContent.full == true and (.result.structuredContent.content | contains("reqvire:conceptReference")) and (.result.structuredContent.content | contains("urn:reqvire:element:mcp-semantic-requirement")) and (.result.structuredContent.content | contains("reqvire:OntologyProjectionGraph"))' "ontologies tool returns full model context triples and ontology projection facts"
+assert_jq_line "$DEFAULT_OUTPUT" 16 '.result.structuredContent.result_type == "select" and .result.structuredContent.full == true and .result.structuredContent.row_count == 1 and .result.structuredContent.variables == ["element","term"]' "sparql tool returns SELECT result metadata"
+assert_jq_line "$DEFAULT_OUTPUT" 16 '.result.structuredContent.bindings[0].term.iri == "urn:reqvire:test:mcp:AccessToken" and .result.structuredContent.bindings[0].element.iri == "urn:reqvire:element:mcp-semantic-requirement"' "sparql tool queries authored ontology and generated model context from built semantic store"
+assert_jq_line "$DEFAULT_OUTPUT" 16 '.result.structuredContent.summary.ontology_blocks >= 1 and (.result.structuredContent.model_fingerprint | type == "string")' "sparql tool returns semantic summary and model fingerprint"
+assert_jq_line "$DEFAULT_OUTPUT" 17 '.result.isError == true and (.result.structuredContent.error.message | contains("Invalid SPARQL query"))' "invalid sparql returns MCP tool error"
+assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.prefixes[] | select(.prefix=="testonto" and .namespace=="https://example.test/ontology#") | .source.content == "Access token ontology for MCP semantic evidence."' "semantic prefixes returns ontology-defined namespace with source prose content"
+assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.prefixes[] | select(.prefix=="testonto") | .ontology_base == "https://example.test/ontology" and .term_namespace == "https://example.test/ontology#" and .ontology_document_iri == "https://example.test/ontology"' "semantic prefixes returns ontology base and term namespace"
+assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.prefixes[] | select(.prefix=="testonto") | .source.element_identifier == "specifications/Requirements.md#mcp-access-token-ontology" and .source.element_name == "MCP Access Token Ontology" and (.source.file_path | endswith("specifications/Requirements.md")) and (.source.line_number | type == "number")' "semantic prefixes returns source element provenance"
+assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.sparql_prefix_block | contains("PREFIX testonto: <https://example.test/ontology#>")' "semantic prefixes returns SPARQL prefix block"
+assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.prefixes[] | select(.prefix=="testonto") | (.source.content | contains("@prefix") | not)' "semantic prefixes source content omits Turtle prefix block"
+assert_jq_line "$DEFAULT_OUTPUT" 19 '.result.structuredContent.content_filter == "rdf" and .result.structuredContent.summary.ontology_blocks >= 1 and .result.structuredContent.summary.shape_blocks == 0 and (.result.structuredContent.content | contains("mcp:AccessTokenShape") | not)' "semantic ontologies RDF filter excludes SHACL shapes"
+assert_jq_line "$DEFAULT_OUTPUT" 20 '.result.structuredContent.content_filter == "shacl" and .result.structuredContent.summary.ontology_blocks == 0 and .result.structuredContent.summary.shape_blocks >= 1 and (.result.structuredContent.content | contains("mcp:AccessTokenShape")) and (.result.structuredContent.content | contains("owl:Ontology") | not)' "semantic ontologies SHACL filter excludes ontology declarations"
 
 UNSUPPORTED_PORT="$(pick_port)"
 UNSUPPORTED_OUTPUT_PREFIX="$TEST_DIR/output/mcp-unsupported-protocol"

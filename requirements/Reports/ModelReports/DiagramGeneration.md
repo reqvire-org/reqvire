@@ -8,11 +8,11 @@ The system shall produce interactive visual representations of relationships wit
   * type: requirement
 
 #### Relations
+  * definedBy: [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
+  * definedBy: [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
+  * definedBy: [Mermaid Interactive Capabilities Specification](Specifications.md#mermaid-interactive-capabilities-specification)
   * derive: [Diagram Generation](#diagram-generation)
   * derivedFrom: [Model Reports](ReportingRequirements.md#model-reports)
-  * refinedBy: [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
-  * refinedBy: [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
-  * refinedBy: [Mermaid Interactive Capabilities Specification](Specifications.md#mermaid-interactive-capabilities-specification)
 ---
 
 ### Diagram Generation
@@ -42,8 +42,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [File Diagram Attachment Display Refinement Specification](Specifications.md#file-diagram-attachment-display-refinement-specification)
   * derivedFrom: [Diagram Generation](#diagram-generation)
-  * refinedBy: [File Diagram Attachment Display Refinement Specification](Specifications.md#file-diagram-attachment-display-refinement-specification)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 
@@ -58,9 +58,9 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Mermaid Diagram Link Behavior](Behaviors.md#mermaid-diagram-link-behavior)
+  * definedBy: [Interactive Mermaid Diagram Node Behavior Refinement Specification](Specifications.md#interactive-mermaid-diagram-node-behavior-refinement-specification)
   * derivedFrom: [Diagram Generation](#diagram-generation)
-  * refinedBy: [Mermaid Diagram Link Behavior](Behaviors.md#mermaid-diagram-link-behavior)
-  * refinedBy: [Interactive Mermaid Diagram Node Behavior Refinement Specification](Specifications.md#interactive-mermaid-diagram-node-behavior-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
@@ -82,8 +82,8 @@ Each relation type has specific visual properties and directional semantics defi
   * type: requirement
 
 #### Relations
+  * definedBy: [SysML Rendering Specification](Specifications.md#sysml-rendering-specification)
   * derivedFrom: [Diagram Generation](#diagram-generation)
-  * refinedBy: [SysML Rendering Specification](Specifications.md#sysml-rendering-specification)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
 
@@ -98,7 +98,7 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
-  * refinedBy: [Trace Relation Non-Directional Behavior Refinement Specification](Specifications.md#trace-relation-non-directional-behavior-refinement-specification)
+  * definedBy: [Trace Relation Non-Directional Behavior Refinement Specification](Specifications.md#trace-relation-non-directional-behavior-refinement-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)

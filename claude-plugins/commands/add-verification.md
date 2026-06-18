@@ -59,7 +59,7 @@ ${1:-The user will specify which capability or requirement needs verification.}
 
    Extract:
    - Capability or requirement content
-   - Ontology/refinement context reachable from the capability or requirement
+   - Ontology/contract context reachable from the capability or requirement
    - All requirements in derivedFrom chain up to capability context
    - Build complete understanding of what needs verification
 

@@ -10,7 +10,7 @@ export default function CodingAssistants() {
       <p className="text-base text-zinc-600 leading-relaxed mb-10">
         Reqvire integrates with coding assistants by exposing the engineering
         knowledge graph as structured, AI-ready context. Assistants can work
-        from ontology, capability, requirement, refinement, verification, and
+        from ontology, capability, requirement, contract, verification, and
         implementation evidence instead of scattered prose.
       </p>
 
@@ -82,9 +82,13 @@ reqvire mcp --enable-mutations`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
           Use{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
-            reqvire.ontologies
+            reqvire.semantic.ontologies
           </code>{" "}
-          when an assistant needs ontology and SHACL context. Pass{" "}
+          when an assistant needs ontology and SHACL context. Set{" "}
+          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
+            content
+          </code>{" "}
+          to rdf, shacl, or both, and pass{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             full: true
           </code>{" "}
@@ -100,7 +104,7 @@ reqvire mcp --enable-mutations`}</CodeBlock>
             "Capability first: understand or define the operational ability being changed.",
             "Ontology context: inspect or attach semantic vocabulary that gives the capability meaning.",
             "Requirements: define implementable obligations that specify the capability.",
-            "Refinements: add specifications, constraints, behaviors, states, or I/O contracts.",
+            "Contracts: add specifications, constraints, behaviors, states, or I/O contracts.",
             "Semantic contracts: add reusable SHACL shape profiles under the ontology plane and link them with constrainedBy/constrain and use/usedBy.",
             "Verifications: ensure capabilities or leaf requirements are verified.",
             "Implementation links: connect code, tests, proofs, and evidence with satisfiedBy.",

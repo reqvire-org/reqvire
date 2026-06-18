@@ -1,6 +1,6 @@
 # Capability and Semantic Contract Refactor
 
-Use this workflow when migrating an existing Reqvire model toward clear capability semantics, ontology elements, refinements, and requirement-owned obligations.
+Use this workflow when migrating an existing Reqvire model toward clear capability semantics, ontology elements, contracts, and requirement-owned obligations.
 
 ## Goal
 
@@ -11,7 +11,7 @@ Separate three concerns without losing traceability:
 - Requirements own implementable obligations: what the system shall do, what can satisfy it, and what verification proves it.
 - Reusable `semantic-contract` elements own SHACL shape profiles over ontology terms reached through explicit `use`/`usedBy` relations and constrain requirements through `constrain`/`constrainedBy`.
 - Ontology referenced by model elements should define nouns, relationships, allowed semantic categories, and stable model rules.
-- Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Shape-only `semantic-contract` elements capture reusable SHACL profiles through explicit ontology use.
+- Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` contracts. Shape-only `semantic-contract` elements capture reusable SHACL profiles through explicit ontology use.
 
 ## Capability Modeling Philosophy
 
@@ -45,7 +45,7 @@ Use this method when building or refactoring a system model, not only when clean
    - Reuse existing ontology terms when they already describe the concept.
    - Add ontology terms before adding `#### Concept References` or SHACL shapes that depend on those terms.
    - Keep exact command names, fields, URI patterns, workflow steps, output formats, persistence behavior, and reject/write/emit behavior out of ontology.
-   - If prose moved out of a requirement still matters to implementation, preserve it as a requirement-owned refinement instead of deleting it.
+   - If prose moved out of a requirement still matters to implementation, preserve it as a requirement-owned contract instead of deleting it.
 
 4. **Keep obligations in requirements**
    - Requirements state what the system shall do.
@@ -55,7 +55,7 @@ Use this method when building or refactoring a system model, not only when clean
 5. **Preserve boundaries through attachments**
    - Use hierarchy only inside a capability, requirement, or ontology family.
    - Use concept references for cross-root ontology term reuse.
-   - Use requirement attachments for cross-root reusable requirement-owned non-semantic-contract refinements.
+   - Use requirement attachments for cross-root reusable requirement-owned non-semantic-contract contracts.
    - Use `use` for semantic-contract ontology dependencies and `constrain` for semantic-contract requirement dependencies.
    - After changing attachments or hierarchy, check `submodels --json` for unintended cross-submodel couplings.
 
@@ -143,11 +143,11 @@ For each capability root:
 - Check whether it has requirements through `specifiedBy`/`specify`.
 - If it has zero requirements, confirm it is still a meaningful capability because it has child capabilities or direct verification; otherwise add a concrete obligation that specifies it or move pure vocabulary into `requirements/Ontologies` and reference it from consuming elements.
 - Confirm cross-root dependencies are attachments, not hierarchy relations.
-- If one root is too broad, split it into child capabilities first and move local requirements to the child capabilities before editing ontology or refinements.
+- If one root is too broad, split it into child capabilities first and move local requirements to the child capabilities before editing ontology or contracts.
 
 ### 2. Classify Candidate Text
 
-For each candidate requirement or refinement, split text into:
+For each candidate requirement or contract, split text into:
 
 - capability ability/context
 - reusable semantic meaning
@@ -209,7 +209,7 @@ Use:
 - `semantic-contract constrain requirement` or `requirement constrainedBy semantic-contract` for SHACL profile application.
 - `semantic-contract use ontology` or `ontology usedBy semantic-contract` for ontology vocabulary dependencies.
 - Capabilities do not author attachments; they use concept references for ontology terms.
-- Requirement attachments only for compatible requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements.
+- Requirement attachments only for compatible requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` contracts.
 
 Do not use `trace` as a substitute for ownership or dependency.
 Do not remove a cross-root dependency unless the consumer now has an explicit concept reference, semantic-contract relation, or requirement attachment that gives `collect` and change impact the same dependency path.

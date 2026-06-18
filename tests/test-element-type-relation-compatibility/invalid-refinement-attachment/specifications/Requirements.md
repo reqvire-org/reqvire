@@ -28,7 +28,7 @@ Owner requirement for Attachment Spec.
   * type: requirement
 #### Relations
   * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-invalid-refinement-attachment)
-  * refinedBy: [Attachment Spec](#attachment-spec)
+  * definedBy: [Attachment Spec](#attachment-spec)
 ---
 
 ### Attachment Spec

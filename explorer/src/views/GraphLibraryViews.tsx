@@ -23,7 +23,7 @@ type GraphEdge = NonNullable<KnowledgeGraphProjection["edges"]>[number] & {
 type RelationCategory =
   | "derive"
   | "specify"
-  | "refine"
+  | "define"
   | "verify"
   | "satisfy"
   | "attach"
@@ -35,7 +35,7 @@ type OverlayKey = "cross" | "verification" | "trace";
 const STRUCTURAL_RELATIONS = new Set<RelationCategory>([
   "derive",
   "specify",
-  "refine",
+  "define",
   "verify",
   "satisfy",
 ]);
@@ -58,7 +58,7 @@ function relationCategory(edge: Pick<GraphEdge, "label" | "kind">): RelationCate
   if (kind === "concept-reference" || label === "conceptref") return "concept-reference";
   if (label.includes("derive")) return "derive";
   if (label.includes("specif")) return "specify";
-  if (label.includes("refine")) return "refine";
+  if (label.includes("defin")) return "define";
   if (label.includes("verif")) return "verify";
   if (label.includes("satisf")) return "satisfy";
   if (label.includes("trace")) return "trace";
@@ -160,7 +160,7 @@ function assignInitialPositions(nodes: KnowledgeGraphNode[]) {
   const centers: Record<string, [number, number]> = {
     capability: [-8, -5],
     requirement: [-1, -2],
-    refinement: [3, 2],
+    contract: [3, 2],
     verification: [8, 5],
     ontology: [-5, -8],
     resource: [10, 8],

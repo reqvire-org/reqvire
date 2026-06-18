@@ -29,12 +29,12 @@ const documents: ProjectSearchDocument[] = [
     text: "Defines SHACL constraints for core ontology terms.",
   },
   {
-    id: "requirements/Functional/Output/Reporting.md#cli-json-file-output-option-refinement-specification",
+    id: "requirements/Functional/Output/Reporting.md#cli-json-file-output-option-contract-specification",
     kind: "element",
     displayKind: "element",
     elementType: "specification",
-    title: "CLI JSON File Output Option Refinement Specification",
-    route: "#/elements/requirements/Functional/Output/Reporting.md#cli-json-file-output-option-refinement-specification",
+    title: "CLI JSON File Output Option Contract Specification",
+    route: "#/elements/requirements/Functional/Output/Reporting.md#cli-json-file-output-option-contract-specification",
     text: "The --output option writes JSON content to the specified file path.",
   },
   {
@@ -90,7 +90,7 @@ describe("project search index", () => {
     const index = createProjectSearchIndex(documents);
     const results = searchProjectDocuments(index, "json output", allKinds);
 
-    expect(results[0]?.title).toBe("CLI JSON File Output Option Refinement Specification");
+    expect(results[0]?.title).toBe("CLI JSON File Output Option Contract Specification");
   });
 
   it("supports fuzzy and prefix matching", () => {

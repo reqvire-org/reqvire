@@ -8,13 +8,13 @@ Capability root for invalid capability-owned refinement cases.
   * type: capability
 
 #### Relations
-  * refinedBy: [Capability Source](#capability-source)
-  * refinedBy: [Capability Constraint](#capability-constraint)
-  * refinedBy: [Capability Behavior](#capability-behavior)
-  * refinedBy: [Capability Specification](#capability-specification)
-  * refinedBy: [Capability State](#capability-state)
-  * refinedBy: [Capability Input Output](#capability-input-output)
-  * refinedBy: [Capability Semantic Contract](#capability-semantic-contract)
+  * definedBy: [Capability Source](#capability-source)
+  * definedBy: [Capability Constraint](#capability-constraint)
+  * definedBy: [Capability Behavior](#capability-behavior)
+  * definedBy: [Capability Specification](#capability-specification)
+  * definedBy: [Capability State](#capability-state)
+  * definedBy: [Capability Input Output](#capability-input-output)
+  * definedBy: [Capability Semantic Contract](#capability-semantic-contract)
 ---
 
 ### Capability Source
@@ -25,7 +25,7 @@ INVALID: capability-owned source is not allowed.
   * type: source
 
 #### Relations
-  * refine: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
+  * define: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
 ---
 
 ### Capability Constraint
@@ -36,7 +36,7 @@ INVALID: capability-owned constraint is not allowed.
   * type: constraint
 
 #### Relations
-  * refine: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
+  * define: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
 ---
 
 ### Capability Behavior
@@ -47,7 +47,7 @@ INVALID: capability-owned behavior is not allowed.
   * type: behavior
 
 #### Relations
-  * refine: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
+  * define: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
 ---
 
 ### Capability Specification
@@ -58,7 +58,7 @@ INVALID: capability-owned specification is not allowed.
   * type: specification
 
 #### Relations
-  * refine: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
+  * define: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
 ---
 
 ### Capability State
@@ -69,7 +69,7 @@ INVALID: capability-owned state is not allowed.
   * type: state
 
 #### Relations
-  * refine: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
+  * define: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
 ---
 
 ### Capability Input Output
@@ -80,7 +80,7 @@ INVALID: capability-owned input-output is not allowed.
   * type: input-output
 
 #### Relations
-  * refine: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
+  * define: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
 ---
 
 ### Capability Semantic Contract
@@ -91,7 +91,7 @@ INVALID: capability-owned semantic-contract is not allowed.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
+  * define: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
 
 #### Shapes
 ```turtle

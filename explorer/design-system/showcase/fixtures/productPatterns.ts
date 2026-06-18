@@ -150,13 +150,13 @@ export const FILE_BROWSER_ITEMS = [
   },
   {
     kind: "file",
-    id: "requirements-refinements-md",
-    name: "Refinements.md",
-    path: "requirements/Refinements.md",
-    displayPath: "requirements/Refinements.md",
+    id: "requirements-contracts-md",
+    name: "Contracts.md",
+    path: "requirements/Contracts.md",
+    displayPath: "requirements/Contracts.md",
     elementCount: 6,
     childCount: 0,
-    contentHref: "#/content/requirements/Refinements.md",
+    contentHref: "#/content/requirements/Contracts.md",
   },
 ] as const satisfies readonly FileBrowserItem[];
 

@@ -26,6 +26,7 @@ pub mod report_resources;
 pub mod report_submodels;
 pub mod search;
 pub mod semantic_contract;
+pub mod semantic_store;
 pub mod subsection;
 pub mod tool_interface;
 pub mod trace_tree_builder;

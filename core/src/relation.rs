@@ -87,7 +87,30 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
             },
         );
 
-        // Refine relations (refinement ownership)
+        // Contract definition relations (requirement-owned contract ownership)
+        m.insert(
+            "definedBy",
+            RelationTypeInfo {
+                name: "definedBy",
+                opposite: Some("define"),
+                description: "A requirement being defined by a contract element.",
+                arrow: "-->",
+                label: "definedBy",
+            },
+        );
+        m.insert(
+            "define",
+            RelationTypeInfo {
+                name: "define",
+                opposite: Some("definedBy"),
+                description: "Contract element defines a requirement",
+                arrow: "-->",
+                label: "defines",
+            },
+        );
+
+        // Legacy refinement relations. Kept parseable so `reqvire migrate`
+        // can rewrite older workspaces to `define` / `definedBy`.
         m.insert(
             "refinedBy",
             RelationTypeInfo {
@@ -188,13 +211,15 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
         m
     });
 
+pub const LEGACY_CONTRACT_RELATIONS: &[&str] = &["refinedBy", "refine"];
+
 /// Relations to show in diagrams (one from each pair to avoid duplicates)
 /// These are typically the "forward" relations from the old direction system
 pub const DIAGRAM_RELATIONS: &[&str] = &[
     "derive",      // Not derivedFrom
     "specifiedBy", // Not specify
     "satisfiedBy", // Not satisfy
-    "refinedBy",   // Not refine
+    "definedBy",   // Not define
     "constrainedBy",
     "use",
     "verifiedBy", // Not verify
@@ -207,8 +232,8 @@ pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
     "derive",      // Source changes affect derived elements
     "specifiedBy", // Capability changes affect specifying requirements
     "satisfiedBy", // Requirement changes affect implementations
-    "refine",      // Refinement changes affect its owning requirement or capability
-    "refinedBy",   // Requirement changes affect refinements
+    "define",      // Contract changes affect its owning requirement
+    "definedBy",   // Requirement changes affect contracts
     "constrainedBy",
     "constrain",
     "use",
@@ -222,7 +247,7 @@ pub const BACKWARD_RELATIONS: &[&str] = &[
     "derivedFrom", // Opposite of derive
     "specify",     // Opposite of specifiedBy
     "satisfy",     // Opposite of satisfiedBy
-    "refine",      // Opposite of refinedBy
+    "define",      // Opposite of definedBy
     "constrain",   // Opposite of constrainedBy
     "usedBy",      // Opposite of use
     "verify",      // Opposite of verifiedBy
@@ -238,11 +263,11 @@ pub const SATISFACTION_RELATIONS: &[&str] = &[
     "satisfiedBy", // Requirement satisfied by implementation (forward from requirement)
 ];
 
-/// Relations for refinement ownership connections
-/// Used to determine if refinements are connected and find defining owners
+/// Relations for requirement-owned contract connections.
+/// Used to determine if contract elements are connected and find defining owners.
 pub const REFINEMENT_RELATIONS: &[&str] = &[
-    "refine",    // Refinement refines requirement (forward from refinement)
-    "refinedBy", // Requirement refined by refinement (forward from requirement)
+    "define",    // Contract defines requirement (forward from contract)
+    "definedBy", // Requirement defined by contract (forward from requirement)
 ];
 
 /// Relations that trace verification propagation in verification traces
@@ -411,6 +436,7 @@ impl Relation {
 /// Check if a relation type is supported according to the DSD
 pub fn is_supported_relation_type(relation_type: &str) -> bool {
     RELATION_TYPES.contains_key(relation_type)
+        && !LEGACY_CONTRACT_RELATIONS.contains(&relation_type)
 }
 
 /// Check if revalidation is needed
@@ -424,7 +450,7 @@ pub fn needs_revalidation(relation_type: &str) -> bool {
 /// Check if review is needed
 pub fn needs_review(relation_type: &str) -> bool {
     if RELATION_TYPES.contains_key(relation_type) {
-        relation_type == "satisfiedBy" || relation_type == "refinedBy"
+        relation_type == "satisfiedBy" || relation_type == "definedBy"
     } else {
         false
     }
@@ -432,12 +458,17 @@ pub fn needs_review(relation_type: &str) -> bool {
 
 /// Get the list of all supported relation types
 pub fn get_supported_relation_types() -> Vec<&'static str> {
-    RELATION_TYPES.keys().cloned().collect()
+    RELATION_TYPES
+        .keys()
+        .filter(|relation_type| !LEGACY_CONTRACT_RELATIONS.contains(relation_type))
+        .cloned()
+        .collect()
 }
 
 /// Get a formatted string of all supported relation types for error messages
 pub fn supported_relation_types_list() -> String {
     let mut types: Vec<&str> = RELATION_TYPES.keys().cloned().collect();
+    types.retain(|relation_type| !LEGACY_CONTRACT_RELATIONS.contains(relation_type));
     types.sort();
     types.join(", ")
 }
@@ -446,7 +477,7 @@ pub fn supported_relation_types_list() -> String {
 /// These are the "backward" pointing relations where an element refers to something it depends on.
 /// Includes hierarchical (derivedFrom), satisfaction (satisfy), and verification (verify) parents.
 pub fn get_parent_relation_types() -> Vec<&'static str> {
-    vec!["derivedFrom", "specify", "satisfy", "refine", "verify"]
+    vec!["derivedFrom", "specify", "satisfy", "define", "verify"]
 }
 
 /// Get the list of hierarchical relation types only.
@@ -468,7 +499,7 @@ pub fn is_satisfaction_relation(rtype: &RelationTypeInfo) -> bool {
 
 /// Returns whether the relation is a refinement-related type (refinement ownership)
 pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
-    matches!(rtype.name, "refinedBy" | "refine")
+    matches!(rtype.name, "definedBy" | "define" | "refinedBy" | "refine")
 }
 
 /// Validates if the element types are appropriate for a given relation type
@@ -480,14 +511,14 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
 /// - verify: Source must be concrete verification, target must be capability or requirement
 /// - satisfiedBy: Source must be system requirement (requirement) or test-verification, target must be file (implementation)
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
-/// - refinedBy: Source must be requirement, target must be compatible non-semantic-contract refinement element
-/// - refine: Source must be compatible non-semantic-contract refinement element, target must be requirement
+/// - definedBy: Source must be requirement, target must be compatible non-semantic-contract contract element
+/// - define: Source must be compatible non-semantic-contract contract element, target must be requirement
 /// - constrainedBy: Source must be requirement, target must be semantic-contract
 /// - constrain: Source must be semantic-contract, target must be requirement
 /// - use: Source must be semantic-contract, target must be ontology
 /// - usedBy: Source must be ontology, target must be semantic-contract
 /// - trace: Any non-refinement element type can use trace
-/// - Refinement types (constraint, behavior, specification): Can only have refine relations
+/// - Contract types (constraint, behavior, specification): Can only have define relations
 /// - Other type: Can only use trace relations
 pub fn validate_relation_element_types(
     relation_type: &str,
@@ -562,7 +593,7 @@ pub fn validate_relation_element_types(
         }
         "satisfiedBy" => {
             // Source must be system requirement or test-verification
-            // Target must be a file (implementation) - refinement types use refinedBy instead
+            // Target must be a file (implementation) - contract types use definedBy instead
             // Note: non-test-verification satisfiedBy is checked separately in graph_registry
             let source_valid = match source_type {
                 ElementType::Requirement(crate::element::RequirementType::System) => true,
@@ -582,7 +613,7 @@ pub fn validate_relation_element_types(
         }
         "satisfy" => {
             // Source should be a file/implementation, target should be a system requirement or test-verification
-            // Refinement elements use refine instead of satisfy
+            // Contract elements use define instead of satisfy
             let source_valid = matches!(source_type, ElementType::File | ElementType::Other(_));
             let target_valid = match target_type {
                 ElementType::Requirement(crate::element::RequirementType::System) => true,
@@ -598,7 +629,7 @@ pub fn validate_relation_element_types(
             };
             source_valid && target_valid
         }
-        "refinedBy" => match (source_type, target_type) {
+        "definedBy" | "refinedBy" => match (source_type, target_type) {
             (
                 ElementType::Requirement(_),
                 ElementType::Refinement(
@@ -612,7 +643,7 @@ pub fn validate_relation_element_types(
             ) => true,
             _ => false,
         },
-        "refine" => match (source_type, target_type) {
+        "define" | "refine" => match (source_type, target_type) {
             (
                 ElementType::Refinement(
                     RefinementType::Source
@@ -664,8 +695,10 @@ pub fn get_relation_element_type_description(relation_type: &str) -> Option<Stri
         "verify" => Some("'verify' should connect a concrete verification element to a capability or requirement; verification-objective is not allowed".to_string()),
         "satisfiedBy" => Some("'satisfiedBy' should connect a requirement, test-verification, or formal-proof-verification to an implementation/evidence file; capability is not allowed".to_string()),
         "satisfy" => Some("'satisfy' should connect an implementation/evidence file to a requirement, test-verification, or formal-proof-verification; capability is not allowed".to_string()),
-        "refinedBy" => Some("'refinedBy' should connect a requirement to a compatible non-semantic-contract refinement element. Semantic contracts use constrainedBy/constrain instead.".to_string()),
-        "refine" => Some("'refine' should connect a compatible non-semantic-contract refinement element to a requirement. Semantic contracts use constrain/constrainedBy instead.".to_string()),
+        "definedBy" => Some("'definedBy' should connect a requirement to a compatible non-semantic-contract contract element. Semantic contracts use constrainedBy/constrain instead.".to_string()),
+        "define" => Some("'define' should connect a compatible non-semantic-contract contract element to a requirement. Semantic contracts use constrain/constrainedBy instead.".to_string()),
+        "refinedBy" => Some("'refinedBy' is a legacy relation. Use 'definedBy' for requirement-owned contract elements, or run `reqvire migrate`.".to_string()),
+        "refine" => Some("'refine' is a legacy relation. Use 'define' for requirement-owned contract elements, or run `reqvire migrate`.".to_string()),
         "constrainedBy" => Some("'constrainedBy' should connect a requirement to a semantic-contract element".to_string()),
         "constrain" => Some("'constrain' should connect a semantic-contract element to a requirement".to_string()),
         "use" => Some("'use' should connect a semantic-contract element to an ontology element".to_string()),

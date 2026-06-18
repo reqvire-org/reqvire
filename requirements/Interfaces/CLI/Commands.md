@@ -11,6 +11,7 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [CLI Interface Structure Refinement Specification](Specifications.md#cli-interface-structure-refinement-specification)
   * derive: [Attachment Commands](#attachment-commands)
   * derive: [CLI Add Element Command](#cli-add-element-command)
   * derive: [CLI Change Impact Report Command](#cli-change-impact-report-command)
@@ -39,7 +40,6 @@ Implementation details shall follow the associated refinement specifications.
   * derive: [Format Command](#format-command)
   * derive: [Validate Command](#validate-command)
   * derivedFrom: [CLI interface](../InterfacesRequirements.md#cli-interface)
-  * refinedBy: [CLI Interface Structure Refinement Specification](Specifications.md#cli-interface-structure-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -78,11 +78,11 @@ Attachment management behavior:
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-refinement-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
 
 #### Relations
+  * definedBy: [Attachment Input Auto-Detection Behavior](Behaviors.md#attachment-input-auto-detection-behavior)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [Attachment Input Auto-Detection Behavior](Behaviors.md#attachment-input-auto-detection-behavior)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * verifiedBy: [Attach Command Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attach-command-verification)
@@ -109,11 +109,11 @@ Implementation details shall follow the associated refinement specifications. On
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Create Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#create-element-workflow-specification)
   * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-refinement-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
 
 #### Relations
+  * definedBy: [CLI Add Element Command Refinement Specification](Specifications.md#cli-add-element-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Add Element Command Refinement Specification](Specifications.md#cli-add-element-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Add Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-add-element-test)
 ---
@@ -153,8 +153,8 @@ Command invocation: `reqvire change-impact [OPTIONS]`
   * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
 
 #### Relations
+  * definedBy: [Change Propagation Behavior](Behaviors.md#change-propagation-behavior)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [Change Propagation Behavior](Behaviors.md#change-propagation-behavior)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Git Commit Hash Flag Test](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-git-commit-hash-flag-test)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
@@ -178,8 +178,8 @@ Implementation details shall follow the associated refinement specifications.
   * [Collect Output Format Specification](../../Reports/ModelReports/Specifications.md#collect-output-format-specification)
 
 #### Relations
+  * definedBy: [CLI Collect Command Refinement Specification](Specifications.md#cli-collect-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Collect Command Refinement Specification](Specifications.md#cli-collect-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Collect Command Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#cli-collect-command-test)
 ---
@@ -212,8 +212,8 @@ The markdown output shall include:
   * [Model Browser and Graph Specification](../WebExplorer/Specifications.md#model-browser-and-graph-specification)
 
 #### Relations
+  * definedBy: [Short Mode Behavior](Behaviors.md#short-mode-behavior)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [Short Mode Behavior](Behaviors.md#short-mode-behavior)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
@@ -236,8 +236,8 @@ Implementation details shall follow the associated refinement specifications.
   * [Text Output Formatting](../../Reports/ModelReports/Specifications.md#text-output-formatting)
 
 #### Relations
+  * definedBy: [CLI Coverage Command Refinement Specification](Specifications.md#cli-coverage-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Coverage Command Refinement Specification](Specifications.md#cli-coverage-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Verification Coverage Report Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#verification-coverage-report-test)
@@ -254,8 +254,8 @@ The diff output contract shall define a shared presentation format for command r
   * type: requirement
 
 #### Relations
+  * definedBy: [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
 ---
 
@@ -270,8 +270,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [CLI JSON File Output Option Refinement Specification](Specifications.md#cli-json-file-output-option-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI JSON File Output Option Refinement Specification](Specifications.md#cli-json-file-output-option-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI JSON File Output Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#cli-json-file-output-test)
 ---
@@ -295,8 +295,8 @@ Implementation details shall follow the associated refinement specifications.
   * [Multi-Branch Convergence Detection Specification](../../Operations/Linting/Specifications.md#multi-branch-convergence-detection-specification)
 
 #### Relations
+  * definedBy: [CLI Lint Command Refinement Specification](Specifications.md#cli-lint-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Lint Command Refinement Specification](Specifications.md#cli-lint-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -316,11 +316,11 @@ Implementation details shall follow the associated refinement specifications. On
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Merge Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#merge-element-workflow-specification)
   * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-refinement-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
 
 #### Relations
+  * definedBy: [CLI Merge Element Command Refinement Specification](Specifications.md#cli-merge-element-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Merge Element Command Refinement Specification](Specifications.md#cli-merge-element-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -341,8 +341,8 @@ Implementation details shall follow the associated refinement specifications. Th
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
 
 #### Relations
+  * definedBy: [CLI Migrate Command Refinement Specification](Specifications.md#cli-migrate-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Migrate Command Refinement Specification](Specifications.md#cli-migrate-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [mod.rs](../../../core/src/migrations/mod.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
@@ -367,8 +367,8 @@ Implementation details shall follow the associated refinement specifications. Th
   * [Type Validation Error Behavior](../../Operations/Validation/Behaviors.md#type-validation-error-behavior)
 
 #### Relations
+  * definedBy: [CLI Model Diagram Command Refinement Specification](Specifications.md#cli-model-diagram-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Model Diagram Command Refinement Specification](Specifications.md#cli-model-diagram-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
@@ -392,8 +392,8 @@ Implementation details shall follow the associated refinement specifications.
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
+  * definedBy: [CLI Move Asset Command Refinement Specification](Specifications.md#cli-move-asset-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Move Asset Command Refinement Specification](Specifications.md#cli-move-asset-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Move Asset Command Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#move-asset-command-verification)
 ---
@@ -418,8 +418,8 @@ The command shall reject moving an element into an existing `# Element` file whe
   * [Move Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#move-element-workflow-specification)
 
 #### Relations
+  * definedBy: [CLI Move Element Command Refinement Specification](Specifications.md#cli-move-element-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Move Element Command Refinement Specification](Specifications.md#cli-move-element-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Move Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-move-element-test)
   * verifiedBy: [Subdirectory Processing Verification](../../Verifications/Operations/Validation/ValidationVerifications.md#subdirectory-processing-verification)
@@ -443,8 +443,8 @@ The command shall reject `mv-file --squash` when the target file is an existing 
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
+  * definedBy: [CLI Move File Command Refinement Specification](Specifications.md#cli-move-file-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Move File Command Refinement Specification](Specifications.md#cli-move-file-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Move File Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-move-file-test)
   * verifiedBy: [Subdirectory Processing Verification](../../Verifications/Operations/Validation/ValidationVerifications.md#subdirectory-processing-verification)
@@ -470,8 +470,8 @@ The command shall:
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
 
 #### Relations
+  * definedBy: [CLI Ontologies Command Refinement Specification](Specifications.md#cli-ontologies-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Ontologies Command Refinement Specification](Specifications.md#cli-ontologies-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
@@ -495,9 +495,9 @@ Implementation details shall follow the associated refinement specifications.
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
+  * definedBy: [CLI Relink Command Refinement Specification](Specifications.md#cli-relink-command-refinement-specification)
+  * definedBy: [Mutating Command Hierarchy Safety Refinement Specification](Specifications.md#mutating-command-hierarchy-safety-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Relink Command Refinement Specification](Specifications.md#cli-relink-command-refinement-specification)
-  * refinedBy: [Mutating Command Hierarchy Safety Refinement Specification](Specifications.md#mutating-command-hierarchy-safety-refinement-specification)
   * verifiedBy: [Atomic Relation Relink Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#atomic-relation-relink-test)
 ---
 
@@ -518,8 +518,8 @@ Implementation details shall follow the associated refinement specifications.
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
+  * definedBy: [CLI Remove Asset Command Refinement Specification](Specifications.md#cli-remove-asset-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Remove Asset Command Refinement Specification](Specifications.md#cli-remove-asset-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Remove Asset Command Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#remove-asset-command-verification)
 ---
@@ -542,8 +542,8 @@ Implementation details shall follow the associated refinement specifications.
   * [Delete Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#delete-element-workflow-specification)
 
 #### Relations
+  * definedBy: [CLI Remove Element Command Refinement Specification](Specifications.md#cli-remove-element-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Remove Element Command Refinement Specification](Specifications.md#cli-remove-element-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Remove Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-remove-element-test)
 ---
@@ -565,8 +565,8 @@ Implementation details shall follow the associated refinement specifications.
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
+  * definedBy: [CLI Rename Element Command Refinement Specification](Specifications.md#cli-rename-element-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Rename Element Command Refinement Specification](Specifications.md#cli-rename-element-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Rename Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-rename-element-test)
 ---
@@ -582,8 +582,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [CLI Resources Command Refinement Specification](Specifications.md#cli-resources-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Resources Command Refinement Specification](Specifications.md#cli-resources-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Resources Report Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#resources-report-verification)
 ---
@@ -607,8 +607,8 @@ Implementation details shall follow the associated refinement specifications. Se
   * [Type Validation Error Behavior](../../Operations/Validation/Behaviors.md#type-validation-error-behavior)
 
 #### Relations
+  * definedBy: [CLI Search Command Refinement Specification](Specifications.md#cli-search-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Search Command Refinement Specification](Specifications.md#cli-search-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Attachment Search Filters Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachment-search-filters-verification)
@@ -630,8 +630,8 @@ The CLI shall provide an opt-in `--with-size-estimates` option for supported JSO
   * type: requirement
 
 #### Relations
+  * definedBy: [CLI Size Estimate JSON Option Specification](Specifications.md#cli-size-estimate-json-option-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Size Estimate JSON Option Specification](Specifications.md#cli-size-estimate-json-option-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Size Estimate JSON Option Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-size-estimate-json-option-verification)
 ---
@@ -656,8 +656,8 @@ Implementation details shall follow the associated refinement specifications.
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
 
 #### Relations
+  * definedBy: [CLI Submodels Command Refinement Specification](Specifications.md#cli-submodels-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Submodels Command Refinement Specification](Specifications.md#cli-submodels-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Submodels Report Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#submodels-report-verification)
@@ -680,9 +680,9 @@ Implementation details shall follow the associated refinement specifications.
   * [Type Validation Error Behavior](../../Operations/Validation/Behaviors.md#type-validation-error-behavior)
 
 #### Relations
+  * definedBy: [CLI Traces Command Refinement Specification](Specifications.md#cli-traces-command-refinement-specification)
   * derive: [Verification Traces Element Navigation](#verification-traces-element-navigation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Traces Command Refinement Specification](Specifications.md#cli-traces-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Verification Traces Filter Options Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#verification-traces-filter-options-test)
@@ -700,8 +700,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Verification Traces Element Navigation Refinement Specification](Specifications.md#verification-traces-element-navigation-refinement-specification)
   * derivedFrom: [CLI Traces Command](#cli-traces-command)
-  * refinedBy: [Verification Traces Element Navigation Refinement Specification](Specifications.md#verification-traces-element-navigation-refinement-specification)
   * satisfiedBy: [verification_trace.rs](../../../core/src/verification_trace.rs)
   * verifiedBy: [Verification Traces Element Navigation Test](../../Verifications/Interfaces/CLI/CLIVerifications.md#verification-traces-element-navigation-test)
 ---
@@ -720,8 +720,8 @@ Implementation details shall follow the associated refinement specifications.
   * [Validation Error Reporting Behavior](../../Operations/Validation/Behaviors.md#validation-error-reporting-behavior)
 
 #### Relations
+  * definedBy: [Detailed Error Handling and Logging Refinement Specification](Specifications.md#detailed-error-handling-and-logging-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [Detailed Error Handling and Logging Refinement Specification](Specifications.md#detailed-error-handling-and-logging-refinement-specification)
   * satisfiedBy: [error.rs](../../../core/src/error.rs)
 ---
 
@@ -743,8 +743,8 @@ The system shall allow command invocations to select the Reqvire workspace expli
   * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
 
 #### Relations
+  * definedBy: [Explicit Workspace Selection Specification](Specifications.md#explicit-workspace-selection-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [Explicit Workspace Selection Specification](Specifications.md#explicit-workspace-selection-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Explicit Workspace Selection Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#explicit-workspace-selection-verification)
 ---
@@ -765,8 +765,8 @@ Implementation details shall follow the associated refinement specifications.
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
+  * definedBy: [Format Command Refinement Specification](Specifications.md#format-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [Format Command Refinement Specification](Specifications.md#format-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Element Ordering Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#element-ordering-verification)
@@ -792,8 +792,8 @@ Implementation details shall follow the associated refinement specifications.
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
+  * definedBy: [Relation Commands Refinement Specification](Specifications.md#relation-commands-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [Relation Commands Refinement Specification](Specifications.md#relation-commands-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Link Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#unlink-command-verification)
@@ -815,11 +815,11 @@ Implementation details shall follow the associated refinement specifications.
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Error Message Format Specification](Specifications.md#error-message-format-specification)
   * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-refinement-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
 
 #### Relations
+  * definedBy: [Validate Command Refinement Specification](Specifications.md#validate-command-refinement-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [Validate Command Refinement Specification](Specifications.md#validate-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)

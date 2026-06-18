@@ -345,7 +345,7 @@ reqvire:RelationRuleShape
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "refinedBy" "refine" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "definedBy" "define" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
   ] ;
   sh:property [
     sh:path reqvire:allowedSourceType ;
@@ -434,7 +434,7 @@ reqvire:RelationUsageCategoryShape
     sh:path reqvire:usageCategoryRelationName ;
     sh:minCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "refinedBy" "refine" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "definedBy" "define" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
   ] ;
   sh:property [
     sh:path reqvire:usageCategoryMeaning ;
@@ -455,7 +455,7 @@ reqvire:RelationSemanticCategoryShape
     sh:path reqvire:semanticCategoryRelationName ;
     sh:minCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "refinedBy" "refine" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "definedBy" "define" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
   ] ;
   sh:property [
     sh:path reqvire:semanticCategoryMeaning ;
@@ -684,7 +684,7 @@ reqvire:ownerToRefinementImpactRule a reqvire:ChangePropagationRule ;
   rdfs:label "Owner to refinement impact" ;
   reqvire:changeRuleName "owner-to-refinement-impact" ;
   reqvire:changedThing "requirement-owner" ;
-  reqvire:impactRelation "refinedBy" ;
+  reqvire:impactRelation "definedBy" ;
   reqvire:impactDirection "downstream" ;
   reqvire:propagationTarget "owned-refinement" ;
   reqvire:propagationMode "review-required" ;
@@ -831,15 +831,15 @@ reqvire:specifiedBy a owl:ObjectProperty ;
   rdfs:range reqvire:Requirement ;
   owl:inverseOf reqvire:specify ;
   rdfs:comment "Forward relation from a capability to a requirement that specifies it." .
-reqvire:refine a owl:ObjectProperty ;
+reqvire:define a owl:ObjectProperty ;
   rdfs:domain reqvire:Refinement ;
   rdfs:range reqvire:Requirement ;
-  owl:inverseOf reqvire:refinedBy ;
+  owl:inverseOf reqvire:definedBy ;
   rdfs:comment "Inverse ownership relation from a refinement to its requirement owner." .
-reqvire:refinedBy a owl:ObjectProperty ;
+reqvire:definedBy a owl:ObjectProperty ;
   rdfs:domain reqvire:Requirement ;
   rdfs:range reqvire:Refinement ;
-  owl:inverseOf reqvire:refine ;
+  owl:inverseOf reqvire:define ;
   rdfs:comment "Forward ownership relation from a requirement to an owned refinement." .
 reqvire:constrain a owl:ObjectProperty ;
   rdfs:domain reqvire:SemanticContract ;
@@ -987,19 +987,19 @@ reqvire:diagramRenderingRelationUsageCategory a reqvire:RelationUsageCategory ;
   rdfs:comment "Forward relation names rendered in diagrams and root-to-leaf model views to avoid duplicate inverse arrows." ;
   reqvire:usageCategoryName "diagram-rendering-forward" ;
   reqvire:usageCategoryMeaning "Forward relation names rendered in diagrams and root-to-leaf model views to avoid duplicate inverse arrows." ;
-  reqvire:usageCategoryRelationName "derive", "specifiedBy", "satisfiedBy", "refinedBy", "constrainedBy", "use", "verifiedBy", "trace" .
+  reqvire:usageCategoryRelationName "derive", "specifiedBy", "satisfiedBy", "definedBy", "constrainedBy", "use", "verifiedBy", "trace" .
 reqvire:reverseTraversalRelationUsageCategory a reqvire:RelationUsageCategory ;
   rdfs:label "Reverse traversal relations" ;
   rdfs:comment "Inverse relation names used for leaf-to-root traversal and upward traceability." ;
   reqvire:usageCategoryName "reverse-traversal" ;
   reqvire:usageCategoryMeaning "Inverse relation names used for leaf-to-root traversal and upward traceability." ;
-  reqvire:usageCategoryRelationName "derivedFrom", "specify", "satisfy", "refine", "constrain", "usedBy", "verify" .
+  reqvire:usageCategoryRelationName "derivedFrom", "specify", "satisfy", "define", "constrain", "usedBy", "verify" .
 reqvire:changePropagationRelationUsageCategory a reqvire:RelationUsageCategory ;
   rdfs:label "Change propagation relations" ;
   rdfs:comment "Relation names through which changed upstream model meaning propagates to dependent downstream elements." ;
   reqvire:usageCategoryName "change-propagation" ;
   reqvire:usageCategoryMeaning "Relation names through which changed upstream model meaning propagates to dependent downstream elements." ;
-  reqvire:usageCategoryRelationName "derive", "specifiedBy", "satisfiedBy", "refinedBy", "constrainedBy", "constrain", "use", "usedBy", "verifiedBy", "attachment" .
+  reqvire:usageCategoryRelationName "derive", "specifiedBy", "satisfiedBy", "definedBy", "constrainedBy", "constrain", "use", "usedBy", "verifiedBy", "attachment" .
 reqvire:verificationRollupRelationUsageCategory a reqvire:RelationUsageCategory ;
   rdfs:label "Verification rollup relations" ;
   rdfs:comment "Relation names used to roll verification state from requirement leaves toward ancestors." ;
@@ -1030,7 +1030,7 @@ reqvire:refinementRelationCategory a reqvire:RelationSemanticCategory ;
   rdfs:comment "Ownership of requirement-owned refinements." ;
   reqvire:semanticCategoryName "refinement-ownership" ;
   reqvire:semanticCategoryMeaning "Ownership of requirement-owned refinements." ;
-  reqvire:semanticCategoryRelationName "refine", "refinedBy" .
+  reqvire:semanticCategoryRelationName "define", "definedBy" .
 reqvire:semanticContractConstraintRelationCategory a reqvire:RelationSemanticCategory ;
   rdfs:label "Semantic contract constraint relations" ;
   rdfs:comment "Application of reusable semantic contracts to constrained requirements." ;
@@ -1106,10 +1106,10 @@ reqvire:specifyRelationRule a reqvire:RelationRule ;
   reqvire:propagatesChangeImpact false ;
   reqvire:relationRuleDescription "Requirement points to the capability it specifies." .
 
-reqvire:refinedByRelationRule a reqvire:RelationRule ;
-  rdfs:label "refinedBy" ;
-  reqvire:relationName "refinedBy" ;
-  reqvire:inverseRelation reqvire:refine ;
+reqvire:definedByRelationRule a reqvire:RelationRule ;
+  rdfs:label "definedBy" ;
+  reqvire:relationName "definedBy" ;
+  reqvire:inverseRelation reqvire:define ;
   reqvire:allowedSourceType "requirement" ;
   reqvire:allowedTargetType "subtype-compatible-non-semantic-contract-refinement" ;
   reqvire:relationDirection "forward" ;
@@ -1118,9 +1118,9 @@ reqvire:refinedByRelationRule a reqvire:RelationRule ;
   reqvire:relationRuleDescription "Requirement owns a subtype-compatible non-semantic-contract refinement element." .
 
 reqvire:refineRelationRule a reqvire:RelationRule ;
-  rdfs:label "refine" ;
-  reqvire:relationName "refine" ;
-  reqvire:inverseRelation reqvire:refinedBy ;
+  rdfs:label "define" ;
+  reqvire:relationName "define" ;
+  reqvire:inverseRelation reqvire:definedBy ;
   reqvire:allowedSourceType "non-semantic-contract-refinement" ;
   reqvire:allowedTargetType "requirement-owner" ;
   reqvire:relationDirection "inverse" ;
@@ -1247,7 +1247,7 @@ reqvire:ownedRefinementAttachmentRule a reqvire:AttachmentCompatibilityRule ;
   rdfs:label "Owned refinement attachment compatibility" ;
   reqvire:attachmentSourceType "requirement" ;
   reqvire:attachmentTargetType "refinement" ;
-  reqvire:attachmentRuleDescription "A requirement attachment target must be a refinement already owned by exactly one compatible requirement through refine/refinedBy." .
+  reqvire:attachmentRuleDescription "A requirement attachment target must be a refinement already owned by exactly one compatible requirement through define/definedBy." .
 ```
 
 #### Metadata

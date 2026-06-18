@@ -11,9 +11,9 @@ For hierarchical relinks (`derivedFrom`/`derive`), the operation shall support s
   * type: requirement
 
 #### Relations
+  * definedBy: [Atomic Relink Validity Constraint](Constraints.md#atomic-relink-validity-constraint)
+  * definedBy: [Atomic Relation Relink Workflow Specification](Specifications.md#atomic-relation-relink-workflow-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * refinedBy: [Atomic Relink Validity Constraint](Constraints.md#atomic-relink-validity-constraint)
-  * refinedBy: [Atomic Relation Relink Workflow Specification](Specifications.md#atomic-relation-relink-workflow-specification)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Atomic Relation Relink Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#atomic-relation-relink-test)
@@ -31,8 +31,8 @@ When a CRUD mutation changes model elements or relations, the system shall rejec
   * type: requirement
 
 #### Relations
+  * definedBy: [CRUD Semantic Contract Validation Specification](Specifications.md#crud-semantic-contract-validation-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * refinedBy: [CRUD Semantic Contract Validation Specification](Specifications.md#crud-semantic-contract-validation-specification)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Delete Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#delete-element-test)
@@ -49,14 +49,14 @@ The system shall provide the capability to create new model elements by acceptin
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
   * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-refinement-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
   * [Element Type Metadata Specification](../../ModelStructure/Specifications.md#element-type-metadata-specification)
 
 #### Relations
+  * definedBy: [Create Element Override Behavior](Behaviors.md#create-element-override-behavior)
+  * definedBy: [Create Element Workflow Specification](Specifications.md#create-element-workflow-specification)
+  * definedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * refinedBy: [Create Element Override Behavior](Behaviors.md#create-element-override-behavior)
-  * refinedBy: [Create Element Workflow Specification](Specifications.md#create-element-workflow-specification)
-  * refinedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
@@ -74,9 +74,9 @@ The system shall provide the capability to delete existing model elements while 
   * type: requirement
 
 #### Relations
+  * definedBy: [Delete Element Workflow Specification](Specifications.md#delete-element-workflow-specification)
+  * definedBy: [Orphaned Children Error Message Specification](Specifications.md#orphaned-children-error-message-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * refinedBy: [Delete Element Workflow Specification](Specifications.md#delete-element-workflow-specification)
-  * refinedBy: [Orphaned Children Error Message Specification](Specifications.md#orphaned-children-error-message-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
@@ -95,8 +95,8 @@ The system shall persist all element manipulation operations to the source files
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
 
 #### Relations
+  * definedBy: [Element Manipulation File Persistence Refinement Specification](Specifications.md#element-manipulation-file-persistence-refinement-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * refinedBy: [Element Manipulation File Persistence Refinement Specification](Specifications.md#element-manipulation-file-persistence-refinement-specification)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [File Persistence Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#file-persistence-test)
@@ -116,13 +116,13 @@ When the target is an ontology element, the operation shall preserve the target 
 
 #### Attachments
   * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-refinement-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
 
 #### Relations
+  * definedBy: [Merge Content Transformation Behavior](Behaviors.md#merge-content-transformation-behavior)
+  * definedBy: [Merge Type Compatibility Constraint](Constraints.md#merge-type-compatibility-constraint)
+  * definedBy: [Merge Element Workflow Specification](Specifications.md#merge-element-workflow-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * refinedBy: [Merge Content Transformation Behavior](Behaviors.md#merge-content-transformation-behavior)
-  * refinedBy: [Merge Type Compatibility Constraint](Constraints.md#merge-type-compatibility-constraint)
-  * refinedBy: [Merge Element Workflow Specification](Specifications.md#merge-element-workflow-specification)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
@@ -145,8 +145,8 @@ The operation shall reject moves into an existing `# Element` file when that mov
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
 
 #### Relations
+  * definedBy: [Move Element Workflow Specification](Specifications.md#move-element-workflow-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * refinedBy: [Move Element Workflow Specification](Specifications.md#move-element-workflow-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
@@ -169,8 +169,8 @@ When `--squash` is requested, the operation shall reject squashing into an exist
   * [Target Location Constraint](Constraints.md#target-location-constraint)
 
 #### Relations
+  * definedBy: [Move File Operation Refinement Specification](Specifications.md#move-file-operation-refinement-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * refinedBy: [Move File Operation Refinement Specification](Specifications.md#move-file-operation-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
@@ -189,8 +189,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Relation Consistency Maintenance Refinement Specification](Specifications.md#relation-consistency-maintenance-refinement-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * refinedBy: [Relation Consistency Maintenance Refinement Specification](Specifications.md#relation-consistency-maintenance-refinement-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Relation Consistency Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#relation-consistency-test)
 ---
@@ -206,8 +206,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Rename Element Operation Refinement Specification](Specifications.md#rename-element-operation-refinement-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * refinedBy: [Rename Element Operation Refinement Specification](Specifications.md#rename-element-operation-refinement-specification)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
@@ -228,8 +228,8 @@ The system shall define target location validation constraints.
   * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
 
 #### Relations
+  * definedBy: [Target Location Constraint](Constraints.md#target-location-constraint)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * refinedBy: [Target Location Constraint](Constraints.md#target-location-constraint)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
   * verifiedBy: [Target Location Validation Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#target-location-validation-test)

@@ -4,7 +4,7 @@
   * type: specification
 
 ## Relations
-  * refine: [Traces View Generation](Capabilities.md#traces-view-generation)
+  * define: [Traces View Generation](Capabilities.md#traces-view-generation)
 
 ## TraceFlowView
 

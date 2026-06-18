@@ -74,7 +74,7 @@ The system shall support billing.
 
 #### Relations
   * specify: [Billing Capability](#billing-capability)
-  * refinedBy: [Billing Detail](#billing-detail)
+  * definedBy: [Billing Detail](#billing-detail)
 ---
 
 ### Billing Detail
@@ -85,5 +85,5 @@ Billing detail.
   * type: input-output
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * define: [Billing Requirement](#billing-requirement)
 ---

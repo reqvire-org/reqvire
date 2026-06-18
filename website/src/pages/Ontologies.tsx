@@ -39,9 +39,9 @@ export default function Ontologies() {
         <BulletList
           items={[
             "Author shared ontology elements under the ontology plane, commonly requirements/Ontologies.",
-            "Capabilities, requirements, refinements, verification objectives, and concrete verifications use Concept References for ontology term bindings.",
+            "Capabilities, requirements, contracts, verification objectives, and concrete verifications use Concept References for ontology term bindings.",
             "Semantic contracts do not author Concept References; they use ontology through explicit use relations.",
-            "Requirement attachments are for reusable requirement-owned non-semantic-contract refinements.",
+            "Requirement attachments are for reusable requirement-owned non-semantic-contract contracts.",
             "Ontology hierarchy uses derive or derivedFrom only with other ontology elements.",
             "Ontology elements do not author attachments.",
           ]}
@@ -193,6 +193,9 @@ auth:AccessTokenValidationShape
           items={[
             "Use reqvire ontologies when a tool needs the clean ontology and SHACL document.",
             "Use reqvire ontologies --full when a graph/database should also know which model elements reference ontology terms.",
+            "Use reqvire.semantic.ontologies through MCP with content set to rdf, shacl, or both when an assistant needs only part of the semantic document.",
+            "Use reqvire.semantic.prefixes through MCP when an assistant needs ontology-defined namespaces and source prose before writing SPARQL.",
+            "Use reqvire.semantic.sparql through MCP when an assistant needs to query the model-owned Oxigraph semantic store directly.",
             "Concept References appear in full export as model-context facts such as conceptReference and referencesTerm; they do not rewrite authored OWL/SHACL semantics.",
             "Concept References are model-context term-reference edges, not generated OntologyConstruct records. OntologyConstruct is reserved for projected OWL/RDFS/SHACL patterns such as subclass, membership, restriction, property-chain, inverse-property, and shape-overlay constructs.",
           ]}
@@ -203,7 +206,10 @@ reqvire ontologies --jsonld --output ontologies.jsonld
 reqvire ontologies --full
 
 # MCP tool
-reqvire.ontologies({ "format": "turtle", "full": true })`}</CodeBlock>
+reqvire.semantic.ontologies({ "format": "turtle", "content": "both", "full": true })
+reqvire.semantic.ontologies({ "content": "shacl" })
+reqvire.semantic.prefixes()
+reqvire.semantic.sparql({ "query": "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 20" })`}</CodeBlock>
       </Section>
 
       <Footer />

@@ -214,7 +214,7 @@ reqvire:attachmentPresenceSearchFilterKind a reqvire:SearchFilterKind ;
 
 reqvire:elementCollectSource a reqvire:CollectSourceType ;
   reqvire:sourceTypeName "element" .
-reqvire:refinedByCollectSource a reqvire:CollectSourceType ;
+reqvire:definedByCollectSource a reqvire:CollectSourceType ;
   reqvire:sourceTypeName "refined_by_element" .
 reqvire:attachmentCollectSource a reqvire:CollectSourceType ;
   reqvire:sourceTypeName "attachment_element" .

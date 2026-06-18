@@ -21,10 +21,10 @@ When generating a change impact report, the system shall compute and display the
   * type: requirement
 
 #### Relations
+  * definedBy: [Impact Scope Computation Specification](Specifications.md#impact-scope-computation-specification)
   * derive: [Requirements Change Propagation](#requirements-change-propagation)
   * derive: [Structural Change Analyzer](#structural-change-analyzer)
   * derivedFrom: [Tracing Structural Changes](../../Reports/ModelReports/ReportingRequirements.md#tracing-structural-changes)
-  * refinedBy: [Impact Scope Computation Specification](Specifications.md#impact-scope-computation-specification)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
   * verifiedBy: [Attachments Change Impact Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachments-change-impact-verification)
   * verifiedBy: [Impact Scope Summary Test](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#impact-scope-summary-test)
@@ -38,8 +38,8 @@ When a requirement is changed, the system shall propagate the change through rel
   * type: requirement
 
 #### Relations
+  * definedBy: [ChangePropagation](ChangePropagation.md#changepropagation)
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
-  * refinedBy: [ChangePropagation](ChangePropagation.md#changepropagation)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
   * verifiedBy: [Change Impact Detection Test](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#change-impact-detection-test)
   * verifiedBy: [Change Impact Relations Test](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#change-impact-relations-test)

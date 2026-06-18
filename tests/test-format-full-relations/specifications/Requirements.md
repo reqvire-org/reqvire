@@ -40,7 +40,7 @@ A requirement that is refined by a constraint.
 
 #### Relations
   * derivedFrom: [Parent Requirement](#parent-requirement)
-  * refinedBy: [Test Constraint](#test-constraint)
+  * definedBy: [Test Constraint](#test-constraint)
 ---
 
 ### Test Constraint

@@ -15,8 +15,8 @@ The system shall provide safe local-first MCP defaults that avoid arbitrary shel
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Access Control Baseline Specification](Specifications.md#mcp-access-control-baseline-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Access Control Baseline Specification](Specifications.md#mcp-access-control-baseline-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Access Control Baseline Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-access-control-baseline-verification)
 ---
@@ -35,8 +35,8 @@ The system shall keep Reqvire MCP tool interfaces protocol-neutral below the MCP
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Contract Layer Boundary Specification](Specifications.md#mcp-contract-layer-boundary-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Contract Layer Boundary Specification](Specifications.md#mcp-contract-layer-boundary-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * satisfiedBy: [tool_interface.rs](../../../core/src/tool_interface.rs)
   * verifiedBy: [MCP Contract Layer Boundary Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-contract-layer-boundary-verification)
@@ -55,8 +55,8 @@ The system shall expose MCP protocol compatibility and Reqvire tool interface co
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Contract Versioning Specification](Specifications.md#mcp-contract-versioning-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Contract Versioning Specification](Specifications.md#mcp-contract-versioning-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Contract Versioning Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-contract-versioning-verification)
 ---
@@ -68,6 +68,8 @@ The system shall expose MCP read tools that return model evidence needed by exte
 #### Details
 - The MCP interface shall expose read tools for authoritative Reqvire model evidence.
 - Model evidence tools shall support element lookup, model structure, containment, collection, submodel analysis, and ontology/SHACL semantic collection.
+- The ontology/SHACL semantic collection tool shall be named under the `reqvire.semantic` namespace and shall filter serialized content to RDF only, SHACL only, or both.
+- Model evidence tools shall support read-only semantic query execution over collected ontology, SHACL, model-context, and ontology projection RDF when requested by a typed MCP operation.
 - Model evidence tools shall expose the canonical capability/requirement/ontology model, including `ontology` elements, `#### Concept References`, reusable `semantic-contract` shape profiles, constrained requirements, and ontology-use relations where the underlying Reqvire operation returns them.
 - Model evidence tools shall include revision metadata when model state affects interpretation.
 - Model evidence tools shall not mutate the model or filesystem.
@@ -84,10 +86,65 @@ The system shall expose MCP read tools that return model evidence needed by exte
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
 
 #### Relations
+  * definedBy: [MCP Model Evidence Tools Specification](Specifications.md#mcp-model-evidence-tools-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Model Evidence Tools Specification](Specifications.md#mcp-model-evidence-tools-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Model Evidence Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
+---
+
+### MCP Semantic Query Tools
+
+The system shall expose an MCP read tool for SPARQL queries over Reqvire semantic RDF evidence.
+
+#### Details
+- The MCP interface shall execute SPARQL queries against Reqvire's collected semantic RDF graph.
+- The semantic query tool shall use the existing in-memory semantic export and Oxigraph query engine.
+- The semantic query tool shall support authored ontology and SHACL RDF, and shall include generated Reqvire model-context and ontology projection facts by default.
+- The semantic query tool shall return structured results for SELECT, ASK, CONSTRUCT, and DESCRIBE queries.
+- The semantic query interface shall provide ontology-defined prefix discovery so clients can construct namespace-correct SPARQL without rebuilding the RDF store.
+- The semantic query tool shall not mutate the model or filesystem.
+- The semantic query tool shall not expose arbitrary shell execution, arbitrary filesystem reads, or remote URL fetching.
+
+#### Concept References
+  * MCP semantic query contract: https://www.reqvire.org/ontology#McpSemanticQueryContract
+  * MCP SPARQL query tool contract: https://www.reqvire.org/ontology#McpSparqlQueryToolContract
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [MCP Semantic Query Tools Specification](Specifications.md#mcp-semantic-query-tools-specification)
+  * derivedFrom: [MCP Model Evidence Tools](#mcp-model-evidence-tools)
+  * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
+  * satisfiedBy: [tool_interface.rs](../../../core/src/tool_interface.rs)
+  * verifiedBy: [MCP Semantic Query Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-query-tools-verification)
+---
+
+### MCP Semantic Prefix Registry Tools
+
+The system shall expose an MCP read tool that lists ontology-defined prefixes and namespaces with source element context.
+
+#### Details
+- The MCP interface shall expose prefixes from ontology element metadata, not from ad hoc Turtle prefix scraping.
+- The prefix registry tool shall return prefix, namespace, ontology_base, term_namespace, ontology_document_iri, source element provenance, and source element prose content.
+- The source content shall describe the ontology element and shall not include the authored Turtle block.
+- The prefix registry tool shall return a SPARQL prefix block suitable for client query construction.
+- The prefix registry tool shall not mutate the model or filesystem.
+- The prefix registry tool shall not rebuild or reload the semantic store to answer prefix discovery.
+
+#### Concept References
+  * MCP semantic prefix registry contract: https://www.reqvire.org/ontology#McpSemanticPrefixRegistryContract
+  * MCP semantic prefix tool contract: https://www.reqvire.org/ontology#McpSemanticPrefixToolContract
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [MCP Semantic Prefix Registry Tools Specification](Specifications.md#mcp-semantic-prefix-registry-tools-specification)
+  * derivedFrom: [MCP Semantic Query Tools](#mcp-semantic-query-tools)
+  * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
+  * satisfiedBy: [tool_interface.rs](../../../core/src/tool_interface.rs)
+  * verifiedBy: [MCP Semantic Prefix Registry Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-prefix-registry-tools-verification)
 ---
 
 ### MCP Mutation Concurrency Control
@@ -104,8 +161,8 @@ The system shall serialize mutation execution per workspace when the MCP transpo
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP HTTP Transport End-to-End Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-http-transport-end-to-end-verification)
 ---
@@ -124,8 +181,8 @@ The system shall execute MCP mutations through deterministic operation-specific 
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Mutation Execution Flow Specification](Specifications.md#mcp-mutation-execution-flow-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Mutation Execution Flow Specification](Specifications.md#mcp-mutation-execution-flow-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
@@ -161,8 +218,8 @@ The system shall expose mutation tools only through typed Reqvire core operation
   * [Relation Consistency Maintenance Refinement Specification](../../Operations/ModelOperations/Specifications.md#relation-consistency-maintenance-refinement-specification)
 
 #### Relations
+  * definedBy: [MCP Mutation Tool Safety Specification](Specifications.md#mcp-mutation-tool-safety-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Mutation Tool Safety Specification](Specifications.md#mcp-mutation-tool-safety-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
@@ -184,8 +241,8 @@ The system shall implement the Model Context Protocol using standard MCP lifecyc
 
 #### Relations
   * constrainedBy: [MCP Tool Side-Effect Shape](../../Ontologies/Interfaces.md#mcp-tool-side-effect-shape)
+  * definedBy: [MCP Protocol Standard Conformance Specification](Specifications.md#mcp-protocol-standard-conformance-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Protocol Standard Conformance Specification](Specifications.md#mcp-protocol-standard-conformance-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Protocol Standard Conformance Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-protocol-standard-conformance-verification)
 ---
@@ -211,8 +268,8 @@ The system shall expose MCP read tools for linting, coverage, verification trace
   * [Impact Scope Computation Specification](../../Processing/ChangeImpact/Specifications.md#impact-scope-computation-specification)
 
 #### Relations
+  * definedBy: [MCP Quality Traceability Tools Specification](Specifications.md#mcp-quality-traceability-tools-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Quality Traceability Tools Specification](Specifications.md#mcp-quality-traceability-tools-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Quality Traceability Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-quality-traceability-tools-verification)
 ---
@@ -236,8 +293,8 @@ The system shall expose MCP resources only as read-only, revision-tagged views o
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
 
 #### Relations
+  * definedBy: [MCP Resource Interface Specification](Specifications.md#mcp-resource-interface-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Resource Interface Specification](Specifications.md#mcp-resource-interface-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Resource Interface Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-resource-interface-verification)
 ---
@@ -257,9 +314,9 @@ The system shall provide `reqvire mcp` as the command that starts the Reqvire MC
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Server Command Specification](Specifications.md#mcp-server-command-specification)
+  * definedBy: [MCP Size Estimate Startup Specification](Specifications.md#mcp-size-estimate-startup-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Server Command Specification](Specifications.md#mcp-server-command-specification)
-  * refinedBy: [MCP Size Estimate Startup Specification](Specifications.md#mcp-size-estimate-startup-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [main.rs](../../../cli/src/main.rs)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
@@ -282,8 +339,8 @@ The system shall keep MCP server cached model state subordinate to Reqvire sourc
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Server State and Cache Specification](Specifications.md#mcp-server-state-and-cache-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Server State and Cache Specification](Specifications.md#mcp-server-state-and-cache-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Server State and Cache Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-server-state-and-cache-verification)
 ---
@@ -306,9 +363,9 @@ The system shall expose MCP tools through shared typed request and result interf
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
+  * definedBy: [MCP Shared Operation Contracts Specification](Specifications.md#mcp-shared-operation-contracts-specification)
+  * definedBy: [MCP Tool Call Contracts Specification](Specifications.md#mcp-tool-call-contracts-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Shared Operation Contracts Specification](Specifications.md#mcp-shared-operation-contracts-specification)
-  * refinedBy: [MCP Tool Call Contracts Specification](Specifications.md#mcp-tool-call-contracts-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * satisfiedBy: [tool_interface.rs](../../../core/src/tool_interface.rs)
   * verifiedBy: [MCP Shared Operation Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-shared-operation-contracts-verification)
@@ -329,8 +386,8 @@ The system shall provide MCP service through RMCP Streamable HTTP transport.
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Streamable HTTP Transport Specification](Specifications.md#mcp-streamable-http-transport-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Streamable HTTP Transport Specification](Specifications.md#mcp-streamable-http-transport-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP HTTP Transport End-to-End Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-http-transport-end-to-end-verification)
@@ -350,8 +407,8 @@ The system shall implement Streamable HTTP transport with local-safe defaults an
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Streamable HTTP Transport Safety Specification](Specifications.md#mcp-streamable-http-transport-safety-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Streamable HTTP Transport Safety Specification](Specifications.md#mcp-streamable-http-transport-safety-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP HTTP Transport End-to-End Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-http-transport-end-to-end-verification)
 ---
@@ -370,8 +427,8 @@ The system shall provide MCP structured payload interfaces derived from shared R
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Structured Payload Contracts Specification](Specifications.md#mcp-structured-payload-contracts-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Structured Payload Contracts Specification](Specifications.md#mcp-structured-payload-contracts-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Structured Payload Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-structured-payload-contracts-verification)
 ---
@@ -390,8 +447,8 @@ The system shall expose only supported Reqvire model operations as MCP tools.
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Tool Exposure Scope Specification](Specifications.md#mcp-tool-exposure-scope-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Tool Exposure Scope Specification](Specifications.md#mcp-tool-exposure-scope-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Tool Exposure Scope Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-exposure-scope-verification)
 ---
@@ -410,8 +467,8 @@ The system shall classify every MCP tool by side-effect behavior so clients and 
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Tool Side Effect Classification Specification](Specifications.md#mcp-tool-side-effect-classification-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Tool Side Effect Classification Specification](Specifications.md#mcp-tool-side-effect-classification-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Tool Side Effect Classification Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-side-effect-classification-verification)
 ---
@@ -430,8 +487,8 @@ The system shall expose MCP-only workspace/session tools for workspace status, t
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Workspace Session Tools Specification](Specifications.md#mcp-workspace-session-tools-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * refinedBy: [MCP Workspace Session Tools Specification](Specifications.md#mcp-workspace-session-tools-specification)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Workspace Session Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-workspace-session-tools-verification)
 ---

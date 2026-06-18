@@ -27,7 +27,7 @@ The `coverage` command behavior is governed by the attached coverage report cont
   * type: specification
 
 #### Relations
-  * refine: [CLI Coverage Command](Commands.md#cli-coverage-command)
+  * define: [CLI Coverage Command](Commands.md#cli-coverage-command)
 ---
 
 ### CLI Interface Structure Refinement Specification
@@ -85,7 +85,7 @@ Each command has its own options displayed in a flattened section
   * type: specification
 
 #### Relations
-  * refine: [CLI Interface Structure](Commands.md#cli-interface-structure)
+  * define: [CLI Interface Structure](Commands.md#cli-interface-structure)
 ---
 
 ### CLI JSON File Output Option Refinement Specification
@@ -103,7 +103,7 @@ Each command has its own options displayed in a flattened section
   * type: specification
 
 #### Relations
-  * refine: [CLI JSON File Output Option](Commands.md#cli-json-file-output-option)
+  * define: [CLI JSON File Output Option](Commands.md#cli-json-file-output-option)
 ---
 
 ### CLI Lint Command Refinement Specification
@@ -129,7 +129,7 @@ Command output is written to stdout for easy redirection to files.
   * type: specification
 
 #### Relations
-  * refine: [CLI Lint Command](Commands.md#cli-lint-command)
+  * define: [CLI Lint Command](Commands.md#cli-lint-command)
 ---
 
 ### CLI Merge Element Command Refinement Specification
@@ -141,7 +141,7 @@ The `merge` command behavior is governed by the attached merge content, compatib
   * type: specification
 
 #### Relations
-  * refine: [CLI Merge Element Command](Commands.md#cli-merge-element-command)
+  * define: [CLI Merge Element Command](Commands.md#cli-merge-element-command)
 ---
 
 ### CLI Migrate Command Refinement Specification
@@ -164,7 +164,7 @@ Migrate command behavior:
   * type: specification
 
 #### Relations
-  * refine: [CLI Migrate Command](Commands.md#cli-migrate-command)
+  * define: [CLI Migrate Command](Commands.md#cli-migrate-command)
 ---
 
 ### CLI Model Diagram Command Refinement Specification
@@ -176,7 +176,7 @@ The `model` command behavior is governed by the attached model-diagram output co
   * type: specification
 
 #### Relations
-  * refine: [CLI Model Diagram Command](Commands.md#cli-model-diagram-command)
+  * define: [CLI Model Diagram Command](Commands.md#cli-model-diagram-command)
 ---
 
 ### CLI Move Asset Command Refinement Specification
@@ -188,7 +188,7 @@ The `mv-asset` command behavior is governed by the attached asset-move and refer
   * type: specification
 
 #### Relations
-  * refine: [CLI Move Asset Command](Commands.md#cli-move-asset-command)
+  * define: [CLI Move Asset Command](Commands.md#cli-move-asset-command)
 ---
 
 ### CLI Move Element Command Refinement Specification
@@ -218,7 +218,7 @@ The `ontologies` command behavior is governed by the attached ontology collectio
   * type: specification
 
 #### Relations
-  * refine: [CLI Ontologies Command](Commands.md#cli-ontologies-command)
+  * define: [CLI Ontologies Command](Commands.md#cli-ontologies-command)
 ---
 
 ### CLI Relink Command Refinement Specification
@@ -230,7 +230,7 @@ The `relink` command behavior is governed by the attached relink workflow and at
   * type: specification
 
 #### Relations
-  * refine: [CLI Relink Command](Commands.md#cli-relink-command)
+  * define: [CLI Relink Command](Commands.md#cli-relink-command)
 ---
 
 ### CLI Remove Asset Command Refinement Specification
@@ -242,7 +242,7 @@ The `rm-asset` command behavior is governed by the attached asset-move/remove an
   * type: specification
 
 #### Relations
-  * refine: [CLI Remove Asset Command](Commands.md#cli-remove-asset-command)
+  * define: [CLI Remove Asset Command](Commands.md#cli-remove-asset-command)
 ---
 
 ### CLI Remove Element Command Refinement Specification
@@ -254,7 +254,7 @@ The `rm` command behavior is governed by the attached delete workflow and relati
   * type: specification
 
 #### Relations
-  * refine: [CLI Remove Element Command](Commands.md#cli-remove-element-command)
+  * define: [CLI Remove Element Command](Commands.md#cli-remove-element-command)
 ---
 
 ### CLI Rename Element Command Refinement Specification
@@ -266,7 +266,7 @@ The `rename` command behavior is governed by the attached rename workflow and re
   * type: specification
 
 #### Relations
-  * refine: [CLI Rename Element Command](Commands.md#cli-rename-element-command)
+  * define: [CLI Rename Element Command](Commands.md#cli-rename-element-command)
 ---
 
 ### CLI Resources Command Refinement Specification
@@ -278,7 +278,7 @@ The `resources` command behavior is governed by the attached relation and attach
   * type: specification
 
 #### Relations
-  * refine: [CLI Resources Command](Commands.md#cli-resources-command)
+  * define: [CLI Resources Command](Commands.md#cli-resources-command)
 ---
 
 ### CLI Search Command Refinement Specification
@@ -301,7 +301,7 @@ The `--with-size-estimates` option behavior is governed by the attached report-e
   * type: specification
 
 #### Relations
-  * refine: [CLI Size Estimate JSON Option](Commands.md#cli-size-estimate-json-option)
+  * define: [CLI Size Estimate JSON Option](Commands.md#cli-size-estimate-json-option)
 ---
 
 ### CLI Submodels Command Refinement Specification
@@ -313,7 +313,7 @@ The `submodels` command behavior is governed by the attached submodel analysis a
   * type: specification
 
 #### Relations
-  * refine: [CLI Submodels Command](Commands.md#cli-submodels-command)
+  * define: [CLI Submodels Command](Commands.md#cli-submodels-command)
 ---
 
 ### CLI Traces Command Refinement Specification
@@ -338,7 +338,7 @@ CLI error handling and logging behavior:
   * type: specification
 
 #### Relations
-  * refine: [Detailed Error Handling and Logging](Commands.md#detailed-error-handling-and-logging)
+  * define: [Detailed Error Handling and Logging](Commands.md#detailed-error-handling-and-logging)
 ---
 
 ### Diff Output Format Specification
@@ -372,7 +372,7 @@ Git-style diff format for change previews.
   * type: specification
 
 #### Relations
-  * refine: [CLI Diff Output](Commands.md#cli-diff-output)
+  * define: [CLI Diff Output](Commands.md#cli-diff-output)
 ---
 
 ### Error Message Format Specification
@@ -403,7 +403,7 @@ Structure for error and warning messages.
   * type: specification
 
 #### Relations
-  * refine: [Detailed Error Handling and Logging](Commands.md#detailed-error-handling-and-logging)
+  * define: [Detailed Error Handling and Logging](Commands.md#detailed-error-handling-and-logging)
 ---
 
 ### Explicit Workspace Selection Specification
@@ -417,7 +417,7 @@ The `--workspace` behavior is governed by the attached workspace-selection and s
   * type: specification
 
 #### Relations
-  * refine: [Explicit Workspace Selection](Commands.md#explicit-workspace-selection)
+  * define: [Explicit Workspace Selection](Commands.md#explicit-workspace-selection)
 ---
 
 ### Format Command Refinement Specification
@@ -438,7 +438,7 @@ Mutating command hierarchy safety is governed by the attached validation and ato
   * type: specification
 
 #### Relations
-  * refine: [CLI Relink Command](Commands.md#cli-relink-command)
+  * define: [CLI Relink Command](Commands.md#cli-relink-command)
 ---
 
 ### Relation Commands Refinement Specification
@@ -450,7 +450,7 @@ Relation command behavior is governed by the attached relation, attachment, and 
   * type: specification
 
 #### Relations
-  * refine: [Relation Commands](Commands.md#relation-commands)
+  * define: [Relation Commands](Commands.md#relation-commands)
 ---
 
 ### Validate Command Refinement Specification
@@ -462,7 +462,7 @@ The `validate` command behavior is governed by the attached validation strategy 
   * type: specification
 
 #### Relations
-  * refine: [Validate Command](Commands.md#validate-command)
+  * define: [Validate Command](Commands.md#validate-command)
 ---
 
 ### Verification Traces Element Navigation Refinement Specification
@@ -474,5 +474,5 @@ Verification trace element navigation behavior is governed by the attached verif
   * type: specification
 
 #### Relations
-  * refine: [Verification Traces Element Navigation](Commands.md#verification-traces-element-navigation)
+  * define: [Verification Traces Element Navigation](Commands.md#verification-traces-element-navigation)
 ---

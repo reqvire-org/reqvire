@@ -26,6 +26,7 @@ The system shall provide a Model Context Protocol interface for external tools, 
   * type: requirement
 
 #### Relations
+  * definedBy: [MCP Interface Boundary Specification](Specifications.md#mcp-interface-boundary-specification)
   * derive: [MCP Access Control Baseline](MCP/Tools.md#mcp-access-control-baseline)
   * derive: [MCP Adapter Boundary](MCP/Tools.md#mcp-adapter-boundary)
   * derive: [MCP Compatibility Versioning](MCP/Tools.md#mcp-compatibility-versioning)
@@ -45,7 +46,6 @@ The system shall provide a Model Context Protocol interface for external tools, 
   * derive: [MCP Tool Exposure Scope](MCP/Tools.md#mcp-tool-exposure-scope)
   * derive: [MCP Tool Side Effect Classification](MCP/Tools.md#mcp-tool-side-effect-classification)
   * derive: [MCP Workspace Session Tools](MCP/Tools.md#mcp-workspace-session-tools)
-  * refinedBy: [MCP Interface Boundary Specification](Specifications.md#mcp-interface-boundary-specification)
   * specify: [MCP Tool Interface](InterfacesFeature.md#mcp-tool-interface)
 ---
 
@@ -60,8 +60,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Web Interface Refinement Specification](Specifications.md#web-interface-refinement-specification)
   * derive: [Serve Command](WebExplorer/Capabilities.md#serve-command)
   * derive: [Served Explorer Browser Interface](WebExplorer/Capabilities.md#served-explorer-browser-interface)
-  * refinedBy: [Web Interface Refinement Specification](Specifications.md#web-interface-refinement-specification)
   * specify: [Web Explorer Interface](InterfacesFeature.md#web-explorer-interface)
 ---

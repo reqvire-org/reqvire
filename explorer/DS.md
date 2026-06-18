@@ -326,7 +326,7 @@ Three primitive ramps plus semantic aliases:
 |-------|-------|---------|
 | `--capability` | blue `#bbdefb` | Capability nodes/chips |
 | `--requirement` | deep purple `#673ab7` | Requirement nodes/chips |
-| `--refinement` | orange `#ff9800` | All refinement sub-types |
+| `--contract` | orange `#ff9800` | All requirement-owned contract sub-types |
 | `--verification` | green `#4caf50` | All verification sub-types |
 | `--ontology` | gold `#b08a00` | Ontology nodes |
 | `--resource` | amber `#ffca28` | Files / resources |
@@ -518,7 +518,7 @@ hardcoding token strings.
 
 | Type | Values |
 |------|--------|
-| `ElementRole` | `"capability"`, `"requirement"`, `"refinement"`, `"source"`, `"constraint"`, `"behavior"`, `"state"`, `"input-output"`, `"verification"`, `"specification"`, `"semantic-contract"`, `"ontology"`, `"resource"`, `"other"` |
+| `ElementRole` | `"capability"`, `"requirement"`, `"contract"`, `"source"`, `"constraint"`, `"behavior"`, `"state"`, `"input-output"`, `"verification"`, `"specification"`, `"semantic-contract"`, `"ontology"`, `"resource"`, `"other"` |
 | `ElementType` | `ElementRole` minus `"other"` |
 | `PaletteChannel` | `"fill"` \| `"ink"` \| `"tint"` |
 | `DesignSystemColorToken` | Union of every valid color token string (`--capability`, `--text-body`, etc.) |
@@ -1046,7 +1046,7 @@ const role = elementRole(element.element_type, element.type_family);
 import { ElementIcon } from "@ds";
 
 <ElementIcon type="verification" size="md" />
-<ElementIcon type="refinement" size="sm" />
+<ElementIcon type="contract" size="sm" />
 ```
 
 ### Dark mode

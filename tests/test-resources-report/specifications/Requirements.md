@@ -82,8 +82,8 @@ Owner requirement for documentation refinement contracts.
   * type: requirement
 #### Relations
   * specify: [Test Capability](#test-capability-test-resources-report-specifications-requirements-md)
-  * refinedBy: [UI Mockup Spec](#ui-mockup-spec)
-  * refinedBy: [API Contract Spec](#api-contract-spec)
+  * definedBy: [UI Mockup Spec](#ui-mockup-spec)
+  * definedBy: [API Contract Spec](#api-contract-spec)
 ---
 
 ### UI Mockup Spec

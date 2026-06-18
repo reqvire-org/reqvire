@@ -14,7 +14,7 @@ Type assignment behavior shall follow the associated refinement specifications.
   * [Element Type Metadata Specification](Specifications.md#element-type-metadata-specification)
 
 #### Relations
-  * refinedBy: [Default Requirement Type Assignment Refinement Specification](Specifications.md#default-requirement-type-assignment-refinement-specification)
+  * definedBy: [Default Requirement Type Assignment Refinement Specification](Specifications.md#default-requirement-type-assignment-refinement-specification)
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
   * verifiedBy: [Element Subsection Parsing Test](../Verifications/ModelStructure/ParsingVerifications.md#element-subsection-parsing-test)
   * verifiedBy: [Default Element Type Assignment Test](../Verifications/Operations/Validation/ValidationVerifications.md#default-element-type-assignment-test)
@@ -47,8 +47,8 @@ The system shall support an opt-in model build mode that computes canonical size
   * type: requirement
 
 #### Relations
+  * definedBy: [Element Size Estimate Model Build Specification](Specifications.md#element-size-estimate-model-build-specification)
   * derivedFrom: [Efficient Processing](#efficient-processing)
-  * refinedBy: [Element Size Estimate Model Build Specification](Specifications.md#element-size-estimate-model-build-specification)
   * satisfiedBy: [element.rs](../../core/src/element.rs)
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
@@ -69,6 +69,9 @@ All manipulation operations shall:
   * type: requirement
 
 #### Relations
+  * definedBy: [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
+  * definedBy: [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
+  * definedBy: [Operation Command Contract Specification](Specifications.md#operation-command-contract-specification)
   * derive: [Attachment Identifier Updates](#attachment-identifier-updates)
   * derive: [Create Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
   * derive: [Delete Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#delete-element-operation)
@@ -78,9 +81,6 @@ All manipulation operations shall:
   * derive: [Relation Consistency Maintenance](../Operations/ModelOperations/ElementManipulationRequirements.md#relation-consistency-maintenance)
   * derive: [Rename Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#rename-element-operation)
   * derive: [Target Location Validation and Auto-Creation](../Operations/ModelOperations/ElementManipulationRequirements.md#target-location-validation-and-auto-creation)
-  * refinedBy: [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
-  * refinedBy: [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
-  * refinedBy: [Operation Command Contract Specification](Specifications.md#operation-command-contract-specification)
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
 ---
 
@@ -100,8 +100,8 @@ This requirement ensures consistency between relation updates and attachment ide
   * type: requirement
 
 #### Relations
+  * definedBy: [Attachment Identifier CRUD Update Behavior](Behaviors.md#attachment-identifier-crud-update-behavior)
   * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
-  * refinedBy: [Attachment Identifier CRUD Update Behavior](Behaviors.md#attachment-identifier-crud-update-behavior)
   * satisfiedBy: [crud.rs](../../core/src/crud.rs)
   * verifiedBy: [Attachment Identifier CRUD Verification](../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachment-identifier-crud-verification)
 ---
@@ -121,9 +121,9 @@ The system shall use the Git repository root as the project base for path resolu
   * type: requirement
 
 #### Relations
-  * refinedBy: [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
-  * refinedBy: [Containment Specification](Specifications.md#containment-specification)
-  * refinedBy: [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
+  * definedBy: [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
+  * definedBy: [Containment Specification](Specifications.md#containment-specification)
+  * definedBy: [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
   * specify: [Defining Model Structure](ModelStructureFeature.md#defining-model-structure)
   * verifiedBy: [Subdirectory Processing Verification](../Verifications/Operations/Validation/ValidationVerifications.md#subdirectory-processing-verification)
 ---
@@ -136,13 +136,13 @@ The system shall implement relations following clearly defined specifications fo
   * type: requirement
 
 #### Relations
+  * definedBy: [RelationTypes](RelationTypes.md#relationtypes)
+  * definedBy: [Relation Semantics Specification](Specifications.md#relation-semantics-specification)
+  * definedBy: [Relation Types and behaviors Refinement Specification](Specifications.md#relation-types-and-behaviors-refinement-specification)
   * derive: [Element Type Relation Compatibility](#element-type-relation-compatibility)
   * derive: [Relation Management Operations](#relation-management-operations)
   * derive: [Trace Relation Non-Directional Behavior](../Reports/ModelReports/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
-  * refinedBy: [RelationTypes](RelationTypes.md#relationtypes)
-  * refinedBy: [Relation Semantics Specification](Specifications.md#relation-semantics-specification)
-  * refinedBy: [Relation Types and behaviors Refinement Specification](Specifications.md#relation-types-and-behaviors-refinement-specification)
   * satisfiedBy: [relation.rs](../../core/src/relation.rs)
   * verifiedBy: [Element Subsection Parsing Test](../Verifications/ModelStructure/ParsingVerifications.md#element-subsection-parsing-test)
 ---
@@ -158,8 +158,8 @@ Capability model behavior shall follow the relation type and validation specific
   * type: requirement
 
 #### Relations
+  * definedBy: [Capability Model Structure Specification](Specifications.md#capability-model-structure-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * refinedBy: [Capability Model Structure Specification](Specifications.md#capability-model-structure-specification)
   * verifiedBy: [Capability Element Relation Compatibility Test](../Verifications/Operations/Validation/ValidationVerifications.md#capability-element-relation-compatibility-test)
 ---
 
@@ -174,8 +174,8 @@ Collect traversal behavior shall follow the associated output specification.
   * type: requirement
 
 #### Relations
+  * definedBy: [Capability Collect Traversal Specification](Specifications.md#capability-collect-traversal-specification)
   * derivedFrom: [Capability Model Structure](#capability-model-structure)
-  * refinedBy: [Capability Collect Traversal Specification](Specifications.md#capability-collect-traversal-specification)
   * verifiedBy: [Capability Collect Traversal Test](../Verifications/Reports/ModelReports/ReportingVerifications.md#capability-collect-traversal-test)
 ---
 
@@ -201,7 +201,7 @@ The system shall support first-class `ontology` elements for reusable semantic v
 #### Details
 Ontology elements shall define ontology vocabulary, model concepts, semantic categories, and reusable domain meaning. Authored Reqvire ontology elements shall be kept under the dedicated `requirements/Ontologies` folder rather than nested in capability files. The top parent ontology element in each ontology subgraph shall define non-empty `ontology_base` and `ontology_prefix` metadata; descendant ontology elements inherit both through `derivedFrom`/`derive` hierarchy. Authored OWL ontology blocks define classes, properties, individuals, hierarchy, and axioms in the corresponding hash term namespace. The root ontology block should explicitly declare `<ontology_base> a owl:Ontology` for authored OWL document identity. Reqvire uses the inherited `ontology_prefix` as the canonical CURIE label and `<ontology_base>#` as the canonical namespace; authored Turtle blocks that use the inherited prefix must explicitly declare that prefix to the canonical namespace, and validation fails when the declaration is missing or points to a different namespace. Reqvire emits one generated document-level `owl:Ontology` declaration per resolved `ontology_base`; ontology elements that inherit the same base contribute authored vocabulary to that same document, while `derivedFrom` across different resolved bases becomes `owl:imports`. Authored child ontology blocks do not need to repeat document-level `owl:Ontology` or `owl:imports` declarations. Ontology-controlled vocabulary records shall carry formal semantics through IRI identity, typed class membership, hierarchy, and axioms; standard annotation properties such as `rdfs:label` and `rdfs:comment` may be used for optional presentation metadata, but canonical authored tokens, parser fields, interface enum values, report kinds, controlled-vocabulary payloads, and queryable meanings shall remain declared domain properties. Deprecated presentation-only ontology properties shall not remain in authored Reqvire ontology source after refactoring. Semantic contracts shall define reusable SHACL shape profiles that explicitly use ontology through `use`/`usedBy`, may constrain zero or more requirements through `constrainedBy`/`constrain`, and must not define ontology vocabulary. The model structure capability must include ontology rebasing as part of the owned ontology context, so that changes to `ontology_base` or `ontology_prefix` are handled atomically and the dependent boundary chain is rewritten rather than edited piecemeal.
 
-Non-ontology, non-semantic-contract elements may bind readable prose to ontology vocabulary with `#### Concept References`. Requirement elements may be constrained by semantic contracts through `constrainedBy`/`constrain`. Semantic contracts use ontology vocabulary through `use`/`usedBy`; they are already part of the semantic graph and must not author concept references. Requirements may refine to source, behavior, state, specification, constraint, and input-output refinements when they need subordinate detail over ontology-backed terms. Capabilities must not own source, constraint, behavior, specification, state, input-output, or semantic-contract elements through `refinedBy`/`refine`.
+Non-ontology, non-semantic-contract elements may bind readable prose to ontology vocabulary with `#### Concept References`. Requirement elements may be constrained by semantic contracts through `constrainedBy`/`constrain`. Semantic contracts use ontology vocabulary through `use`/`usedBy`; they are already part of the semantic graph and must not author concept references. Requirements may be defined by source, behavior, state, specification, constraint, and input-output contracts when they need subordinate detail over ontology-backed terms. Capabilities must not own source, constraint, behavior, specification, state, input-output, or semantic-contract elements through `definedBy`/`define`.
 
 #### Metadata
   * type: requirement
@@ -214,10 +214,10 @@ Non-ontology, non-semantic-contract elements may bind readable prose to ontology
   * constrainedBy: [Element Identity and Metadata Shape](../Ontologies/Core.md#element-identity-and-metadata-shape)
   * constrainedBy: [Governance Metadata Scope Shape](../Ontologies/Governance.md#governance-metadata-scope-shape)
   * constrainedBy: [Relation Compatibility Shape](../Ontologies/RelationsAndImpact.md#relation-compatibility-shape)
+  * definedBy: [Defining Model Structure Source](ModelStructureFeature.md#defining-model-structure-source)
+  * definedBy: [Ontology Annotation Convention Specification](Specifications.md#ontology-annotation-convention-specification)
+  * definedBy: [Semantic Contract Structure Specification](Specifications.md#semantic-contract-structure-specification)
   * derivedFrom: [Capability Model Structure](#capability-model-structure)
-  * refinedBy: [Defining Model Structure Source](ModelStructureFeature.md#defining-model-structure-source)
-  * refinedBy: [Ontology Annotation Convention Specification](Specifications.md#ontology-annotation-convention-specification)
-  * refinedBy: [Semantic Contract Structure Specification](Specifications.md#semantic-contract-structure-specification)
   * verifiedBy: [Semantic Contract Ontology Declaration Validation Test](../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-ontology-declaration-validation-test)
   * verifiedBy: [Semantic Contract Relation Validation Test](../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-relation-validation-test)
   * verifiedBy: [Semantic Contract Section Validation Test](../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-section-validation-test)
@@ -236,21 +236,21 @@ Mutation commands that create or rewrite relations shall enforce the same compat
   * type: requirement
 
 #### Relations
+  * definedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
+  * definedBy: [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * refinedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
-  * refinedBy: [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * satisfiedBy: [relation.rs](../../core/src/relation.rs)
   * verifiedBy: [Verification Objective Mutation Test](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
   * verifiedBy: [Element Type Relation Compatibility Test](../Verifications/Operations/Validation/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
 
-### Refinement Element Structure Constraints
+### Contract Element Structure Constraints
 
-The system shall restrict ordinary Refinement elements (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`) to only allow `refine` relations, and shall restrict `semantic-contract` elements to `constrain` and `use` relations.
+The system shall restrict ordinary contract elements (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`) to only allow `define` relations, and shall restrict `semantic-contract` elements to `constrain` and `use` relations.
 
 #### Details
-Refinement relation validation shall enforce the subtype-compatible refinement vocabulary defined by the Reqvire capability, requirement, ontology, and semantic-contract model contracts.
+Contract relation validation shall enforce the subtype-compatible contract vocabulary defined by the Reqvire capability, requirement, ontology, and semantic-contract model contracts.
 
 #### Metadata
   * type: requirement
@@ -261,24 +261,24 @@ Refinement relation validation shall enforce the subtype-compatible refinement v
 #### Relations
   * constrainedBy: [Custom Element Trace Boundary Shape](../Ontologies/CapabilityRequirementModel.md#custom-element-trace-boundary-shape)
   * constrainedBy: [Refinement Ownership Shape](../Ontologies/CapabilityRequirementModel.md#refinement-ownership-shape)
+  * definedBy: [Refinement Element Structure Constraints Refinement Specification](Specifications.md#contract-element-structure-constraints-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * refinedBy: [Refinement Element Structure Constraints Refinement Specification](Specifications.md#refinement-element-structure-constraints-refinement-specification)
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * verifiedBy: [Refinement Relations Rejection Test](../Verifications/ModelStructure/ParsingVerifications.md#refinement-relations-rejection-test)
 ---
 
 ### Attachment Scope Constraints
 
-The system shall enforce scope constraints on refinement-element attachments to ensure proper cross-submodel traceability while preventing redundant or invalid attachment relationships.
+The system shall enforce scope constraints on contract-element attachments to ensure proper cross-submodel traceability while preventing redundant or invalid attachment relationships.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Refinement Element Structure Constraints](#refinement-element-structure-constraints)
-  * refinedBy: [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
-  * refinedBy: [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-refinement-constraint)
-  * refinedBy: [Attachment Subgraph Direction Constraint](Constraints.md#attachment-subgraph-direction-constraint)
+  * definedBy: [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
+  * definedBy: [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-contract-constraint)
+  * definedBy: [Attachment Subgraph Direction Constraint](Constraints.md#attachment-subgraph-direction-constraint)
+  * derivedFrom: [Refinement Element Structure Constraints](#contract-element-structure-constraints)
   * verifiedBy: [Attachment Scope Constraints Test](../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachment-scope-constraints-test)
 ---
 
@@ -302,11 +302,11 @@ When unlinking, the system shall:
 
 #### Attachments
   * [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
-  * [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-refinement-constraint)
+  * [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-contract-constraint)
 
 #### Relations
+  * definedBy: [Relation Operations Specification](Specifications.md#relation-operations-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * refinedBy: [Relation Operations Specification](Specifications.md#relation-operations-specification)
   * satisfiedBy: [crud.rs](../../core/src/crud.rs)
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * verifiedBy: [Link Command Verification](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
@@ -328,7 +328,7 @@ Governance metadata behavior shall follow the associated refinement specificatio
   * [Requirement Governance Metadata Specification](Specifications.md#requirement-governance-metadata-specification)
 
 #### Relations
-  * refinedBy: [Requirement Governance Metadata Inheritance Behavior](Behaviors.md#requirement-governance-metadata-inheritance-behavior)
+  * definedBy: [Requirement Governance Metadata Inheritance Behavior](Behaviors.md#requirement-governance-metadata-inheritance-behavior)
   * satisfiedBy: [element.rs](../../core/src/element.rs)
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * satisfiedBy: [search.rs](../../core/src/search.rs)
@@ -376,5 +376,5 @@ The system shall support defined verification categories following clearly defin
   * [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
 
 #### Relations
-  * refinedBy: [Verification Type Selection Guidelines](Specifications.md#verification-type-selection-guidelines)
+  * definedBy: [Verification Type Selection Guidelines](Specifications.md#verification-type-selection-guidelines)
 ---

@@ -150,7 +150,11 @@ impl GraphRegistry {
         // Validate attachments exist
         errors.extend(self.validate_attachments()?);
 
-        // Validate Refinement elements have only refine relations
+        // Validate legacy contract relation names before the stricter
+        // contract-element ownership checks.
+        errors.extend(self.validate_legacy_contract_relations()?);
+
+        // Validate contract elements have only define relations
         errors.extend(self.validate_refinement_elements()?);
 
         // Validate ontology elements and ontology graph shape
@@ -159,7 +163,7 @@ impl GraphRegistry {
         // Validate reserved requirement governance metadata
         errors.extend(self.validate_governance_metadata()?);
 
-        // Validate refinement ownership uniqueness (each refinement owned by at most one requirement)
+        // Validate contract ownership uniqueness (each contract owned by at most one requirement)
         errors.extend(self.validate_refinement_ownership_uniqueness()?);
 
         // Validate 'other' type elements only use trace relations
@@ -574,9 +578,9 @@ impl GraphRegistry {
                                 continue;
                             }
 
-                            if relation.relation_type.name == "refinedBy" {
+                            if relation.relation_type.name == "definedBy" {
                                 errors.push(ReqvireError::IncompatibleElementTypes(format!(
-                                    "refinedBy target '{}' is invalid. 'refinedBy' must point to a refinement element identifier, not a file path.",
+                                    "definedBy target '{}' is invalid. 'definedBy' must point to a contract element identifier, not a file path.",
                                     file_path.to_string_lossy()
                                 )));
                             }
@@ -1265,13 +1269,13 @@ impl GraphRegistry {
                                 continue;
                             }
 
-                            // Check 1: Refinement targets must have a refine relation. Ontology is not a refinement.
+                            // Check 1: Contract targets must have a define relation. Ontology is not a contract.
                             if target_node.element.element_type.is_refinement()
                                 && !self.refinement_has_refine_relation(identifier)
                             {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
-                                        "'{}' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not refined by implementation-detail refinements. (file: {}, element: {})",
+                                        "'{}' has no define relation. Contracts must define a requirement before they can be attached; contracts are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not defined by implementation-detail contracts. (file: {}, element: {})",
                                         target_node.element.name,
                                         element.file_path,
                                         element.name
@@ -1287,7 +1291,7 @@ impl GraphRegistry {
                                 if self.is_in_hierarchy(&element.identifier, &defining_req_id) {
                                     errors.push(ReqvireError::InvalidAttachmentScope(
                                         format!(
-                                            "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from elements outside the refinedBy chain. (file: {}, element: {})",
+                                            "'{}' cannot be attached to '{}' because it is within the contract's defining hierarchy. Attachments are only allowed from elements outside the definedBy chain. (file: {}, element: {})",
                                             target_node.element.name,
                                             element.name,
                                             element.file_path,
@@ -1376,7 +1380,7 @@ impl GraphRegistry {
         }
     }
 
-    /// Get the elements that own a refinement via `refinedBy`.
+    /// Get the elements that own a contract via `definedBy`.
     pub fn get_refinement_owners(&self, refinement_id: &str) -> Vec<String> {
         let mut owners = Vec::new();
 
@@ -1384,12 +1388,12 @@ impl GraphRegistry {
         sorted_nodes.sort_by(|(a_id, _), (b_id, _)| a_id.cmp(b_id));
 
         for (element_id, element_node) in sorted_nodes {
-            // Check if this element has a refinedBy relation pointing to the refinement
+            // Check if this element has a definedBy relation pointing to the contract
             for relation in &element_node.element.relations {
-                // Use REFINEMENT_RELATIONS - refinedBy is the forward refinement relation from requirement
+                // Use REFINEMENT_RELATIONS - definedBy is the forward contract relation from requirement
                 if relation::is_refinement_relation(relation.relation_type)
                     && relation.relation_type.name == REFINEMENT_RELATIONS[1]
-                // refinedBy
+                // definedBy
                 {
                     if let LinkType::Identifier(target_id) = &relation.target.link {
                         if target_id == refinement_id {
@@ -1553,18 +1557,18 @@ impl GraphRegistry {
         context.into_iter().collect()
     }
 
-    /// Check if a refinement element has at least one `refine` relation.
-    /// Returns true if the refinement has a refine relation, false otherwise.
+    /// Check if a contract element has at least one `define` relation.
+    /// Returns true if the contract has a define relation, false otherwise.
     pub fn refinement_has_refine_relation(&self, refinement_id: &str) -> bool {
         if let Some(node) = self.nodes.get(refinement_id) {
             node.element
                 .relations
                 .iter()
-                // Use REFINEMENT_RELATIONS - refine is the backward refinement relation from refinement
+                // Use REFINEMENT_RELATIONS - define is the backward contract relation from contract
                 .any(|r| {
                     relation::is_refinement_relation(r.relation_type)
                         && r.relation_type.name == REFINEMENT_RELATIONS[0]
-                }) // refine
+                }) // define
         } else {
             false
         }
@@ -1644,18 +1648,18 @@ impl GraphRegistry {
         self.is_ancestor_of(element_id, potential_descendant)
     }
 
-    /// Get the owner requirements for a file attachment (via satisfiedBy or refinedBy relation).
+    /// Get the owner requirements for a file attachment (via satisfiedBy or definedBy relation).
     pub fn get_file_owners(&self, file_path: &std::path::Path) -> Vec<String> {
         let mut owners = Vec::new();
         let file_path_str = file_path.to_string_lossy();
 
         for (element_id, node) in &self.nodes {
             for relation in &node.element.relations {
-                // File ownership can come from satisfiedBy (implementations) or refinedBy (refinements)
+                // File ownership can come from satisfiedBy (implementations) or definedBy (contracts)
                 let is_ownership_relation = (relation::is_satisfaction_relation(relation.relation_type)
                     && relation.relation_type.name == SATISFACTION_RELATIONS[1]) // satisfiedBy
                     || (relation::is_refinement_relation(relation.relation_type)
-                    && relation.relation_type.name == REFINEMENT_RELATIONS[1]); // refinedBy
+                    && relation.relation_type.name == REFINEMENT_RELATIONS[1]); // definedBy
                 if is_ownership_relation {
                     if let LinkType::InternalPath(ref target_path) = relation.target.link {
                         if target_path.to_string_lossy() == file_path_str {
@@ -1810,8 +1814,35 @@ impl GraphRegistry {
         }
     }
 
-    /// Validate Refinement element constraints
-    /// Refinement elements (constraint, behavior, specification) can only have refine relations
+    fn validate_legacy_contract_relations(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        let mut errors = Vec::new();
+
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+            for relation in &element.relations {
+                if !relation.user_created {
+                    continue;
+                }
+                let replacement = match relation.relation_type.name {
+                    "refinedBy" => "definedBy",
+                    "refine" => "define",
+                    _ => continue,
+                };
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "File {}: Element '{}' uses legacy relation '{}'. Use '{}' for requirement-owned contract elements, or run `reqvire migrate`.",
+                    element.file_path,
+                    element.name,
+                    relation.relation_type.name,
+                    replacement
+                )));
+            }
+        }
+
+        Ok(errors)
+    }
+
+    /// Validate contract element constraints
+    /// Contract elements (constraint, behavior, specification) can only have define relations
     /// and cannot have attachments.
     fn validate_refinement_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating Refinement element constraints...");
@@ -1851,12 +1882,12 @@ impl GraphRegistry {
 
             // Check if this is a non-semantic-contract Refinement element type
             if element.element_type.is_refinement() {
-                // Refinement elements can only have refine relations
+                // Contract elements can only have define relations
                 let invalid_relations: Vec<_> = element
                     .relations
                     .iter()
                     .filter(|r| r.user_created)
-                    .filter(|r| r.relation_type.name.to_lowercase() != "refine")
+                    .filter(|r| r.relation_type.name != "define")
                     .collect();
 
                 if !invalid_relations.is_empty() {
@@ -1866,7 +1897,7 @@ impl GraphRegistry {
                         .collect();
                     errors.push(ReqvireError::InvalidMarkdownStructure(
                         format!(
-                            "File {}: Refinement element '{}' (type: {}) can only have refine relations. Invalid relations: {:?}",
+                            "File {}: Contract element '{}' (type: {}) can only have define relations. Invalid relations: {:?}",
                             element.file_path,
                             element.name,
                             element.element_type.as_str(),
@@ -1879,7 +1910,7 @@ impl GraphRegistry {
                 if !element.attachments.is_empty() {
                     errors.push(ReqvireError::InvalidMarkdownStructure(
                         format!(
-                            "File {}: Refinement element '{}' (type: {}) cannot have attachments. Refinement elements are atomic documentation units meant to be attached to requirements.",
+                            "File {}: Contract element '{}' (type: {}) cannot have attachments. Contract elements are atomic documentation units meant to be attached to requirements.",
                             element.file_path,
                             element.name,
                             element.element_type.as_str(),
@@ -2567,8 +2598,8 @@ impl GraphRegistry {
         }
     }
 
-    /// Validates that each refinement is owned by at most one requirement via refinedBy.
-    /// A refinement element or file can only appear as a target of refinedBy from one owner.
+    /// Validates that each contract is owned by at most one requirement via definedBy.
+    /// A contract element or file can only appear as a target of definedBy from one owner.
     fn validate_refinement_ownership_uniqueness(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating refinement ownership uniqueness...");
         let mut errors = Vec::new();
@@ -2580,7 +2611,7 @@ impl GraphRegistry {
             for relation in &element_node.element.relations {
                 if relation::is_refinement_relation(relation.relation_type)
                     && relation.relation_type.name == REFINEMENT_RELATIONS[1]
-                // refinedBy
+                // definedBy
                 {
                     let target_key = relation.target.link.as_str().to_string();
                     if let Some(existing_owner) = ownership_map.get(&target_key) {
@@ -2598,7 +2629,7 @@ impl GraphRegistry {
                         };
                         errors.push(ReqvireError::InvalidMarkdownStructure(
                             format!(
-                                "Refinement '{}' is owned by multiple elements: '{}' and '{}'. Each refinement can only be owned by one requirement via refinedBy; refinements are requirement-owned only.",
+                                "Contract '{}' is owned by multiple elements: '{}' and '{}'. Each contract can only be owned by one requirement via definedBy; contracts are requirement-owned only.",
                                 target_name,
                                 first,
                                 second
@@ -3314,7 +3345,7 @@ impl GraphRegistry {
                 let has_parent_in_descendants = element.relations.iter().any(|rel| {
                     matches!(&rel.target.link, crate::relation::LinkType::Identifier(target_id)
                         if descendants.iter().any(|d| d.identifier == *target_id)
-                        && ["containedBy", "derivedFrom", "refine", "satisfy", "verify"].contains(&rel.relation_type.name))
+                        && ["containedBy", "derivedFrom", "define", "refine", "satisfy", "verify"].contains(&rel.relation_type.name))
                 });
 
                 if has_parent_in_descendants {
@@ -4864,7 +4895,7 @@ impl GraphRegistry {
     ) -> Result<String, ReqvireError> {
         use crate::relation::{
             get_relation_element_type_description, validate_relation_element_types, LinkType,
-            Relation, RelationTarget, RELATION_TYPES,
+            Relation, RelationTarget, LEGACY_CONTRACT_RELATIONS, RELATION_TYPES,
         };
         use std::path::PathBuf;
 
@@ -4877,6 +4908,18 @@ impl GraphRegistry {
         }
 
         // Validate relation type
+        if LEGACY_CONTRACT_RELATIONS.contains(&relation_type) {
+            let replacement = if relation_type == "refinedBy" {
+                "definedBy"
+            } else {
+                "define"
+            };
+            return Err(ReqvireError::UnsupportedRelationType(format!(
+                "Legacy relation type '{}'. Use '{}' for requirement-owned contract elements, or run `reqvire migrate` on existing sources.",
+                relation_type, replacement
+            )));
+        }
+
         if !RELATION_TYPES.contains_key(relation_type) {
             return Err(ReqvireError::UnsupportedRelationType(format!(
                 "Invalid relation type '{}'. Valid types: {}",
@@ -5709,7 +5752,7 @@ impl GraphRegistry {
                         .unwrap_or(att_id);
                     return Err(ReqvireError::InvalidAttachmentTarget(
                         format!(
-                            "'{}' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not refined by implementation-detail refinements.",
+                            "'{}' has no define relation. Contracts must define a requirement before they can be attached; contracts are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not defined by implementation-detail contracts.",
                             att_name
                         ),
                     ));
@@ -5726,7 +5769,7 @@ impl GraphRegistry {
                             .unwrap_or(att_id);
                         return Err(ReqvireError::InvalidAttachmentScope(
                             format!(
-                                "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from elements outside the refinedBy chain.",
+                                "'{}' cannot be attached to '{}' because it is within the contract's defining hierarchy. Attachments are only allowed from elements outside the definedBy chain.",
                                 att_name,
                                 target_name
                             ),

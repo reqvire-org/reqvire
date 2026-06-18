@@ -5,7 +5,7 @@
 A valid refinement that refines User Req A.
 
 #### Details
-This refinement is owned via refinedBy relation, so it can be attached to requirements outside its defining hierarchy.
+This refinement is owned via definedBy relation, so it can be attached to requirements outside its defining hierarchy.
 
 #### Metadata
   * type: specification
@@ -35,10 +35,10 @@ This refinement is used to verify reverse-direction attachment flow between User
 
 ### Orphan-Spec
 
-An orphan refinement without any refine relations.
+An orphan refinement without any define relations.
 
 #### Details
-This refinement has no refine relations, so it cannot be attached anywhere.
+This refinement has no define relations, so it cannot be attached anywhere.
 
 #### Metadata
   * type: specification

@@ -27,7 +27,7 @@ Output behavior:
   * type: specification
 
 #### Relations
-  * refine: [Atomic Relation Relink Operation](ElementManipulationRequirements.md#atomic-relation-relink-operation)
+  * define: [Atomic Relation Relink Operation](ElementManipulationRequirements.md#atomic-relation-relink-operation)
 ---
 
 ### CRUD Semantic Contract Validation Specification
@@ -70,7 +70,7 @@ When a mutation would leave a `Shapes` reference to an IRI that is declared by a
   * type: specification
 
 #### Relations
-  * refine: [CRUD Semantic Contract Mutation Validation](ElementManipulationRequirements.md#crud-semantic-contract-mutation-validation)
+  * define: [CRUD Semantic Contract Mutation Validation](ElementManipulationRequirements.md#crud-semantic-contract-mutation-validation)
 ---
 
 ### Create Element Workflow Specification
@@ -283,7 +283,7 @@ Validation behavior:
   * type: specification
 
 #### Relations
-  * refine: [Relation Consistency Maintenance](ElementManipulationRequirements.md#relation-consistency-maintenance)
+  * define: [Relation Consistency Maintenance](ElementManipulationRequirements.md#relation-consistency-maintenance)
 ---
 
 ### Relation Validation Specification

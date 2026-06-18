@@ -8,7 +8,7 @@ The system shall define a dedicated AI-assistant skills submodel that provides i
   * type: requirement
 
 #### Attachments
-  * [Refinement Specification](../../ModelStructure/Specifications.md#refinement-specification)
+  * [Refinement Specification](../../ModelStructure/Specifications.md#contract-specification)
   * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
   * [Traceability Reporting Specification](../../Reports/ModelReports/Specifications.md#traceability-reporting-specification)
@@ -30,8 +30,8 @@ Instruction contract details shall follow the associated refinement specificatio
   * type: requirement
 
 #### Relations
+  * definedBy: [AI Skills Instruction Contract Specification](#ai-skills-instruction-contract-specification)
   * derivedFrom: [AI Assistant Skill-Guided Reqvire Modeling](#ai-assistant-skill-guided-reqvire-modeling)
-  * refinedBy: [AI Skills Instruction Contract Specification](#ai-skills-instruction-contract-specification)
 ---
 
 ### AI Skills Markdown Implementation Artifacts
@@ -45,8 +45,8 @@ Artifact contract details shall follow the associated refinement specification.
   * type: requirement
 
 #### Relations
+  * definedBy: [AI Skills Markdown Artifact Specification](#ai-skills-markdown-artifact-specification)
   * derivedFrom: [AI Assistant Skill-Guided Reqvire Modeling](#ai-assistant-skill-guided-reqvire-modeling)
-  * refinedBy: [AI Skills Markdown Artifact Specification](#ai-skills-markdown-artifact-specification)
   * satisfiedBy: [analyze-coverage.md](../../../claude-plugins/commands/analyze-coverage.md)
   * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/ontology-authoring/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/syseng/SKILL.md)
@@ -72,7 +72,7 @@ Instruction contract rules:
   * type: specification
 
 #### Relations
-  * refine: [AI Skills Instruction Contracts](#ai-skills-instruction-contracts)
+  * define: [AI Skills Instruction Contracts](#ai-skills-instruction-contracts)
 ---
 
 ### AI Skills Markdown Artifact Specification
@@ -96,5 +96,5 @@ Artifact contract rules:
   * type: specification
 
 #### Relations
-  * refine: [AI Skills Markdown Implementation Artifacts](#ai-skills-markdown-implementation-artifacts)
+  * define: [AI Skills Markdown Implementation Artifacts](#ai-skills-markdown-implementation-artifacts)
 ---

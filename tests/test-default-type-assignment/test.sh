@@ -243,9 +243,9 @@ No type metadata - should default to requirement.
 
 #### Relations
   * specify: #root-capability
-  * refinedBy: [Source Refinement](#source-refinement)
-  * refinedBy: [State Refinement](#state-refinement)
-  * refinedBy: [Input Output Refinement](#input-output-refinement)
+  * definedBy: [Source Refinement](#source-refinement)
+  * definedBy: [State Refinement](#state-refinement)
+  * definedBy: [Input Output Refinement](#input-output-refinement)
   * constrainedBy: [Semantic Contract Refinement](#semantic-contract-refinement)
 
 ### Capability
@@ -259,7 +259,7 @@ No type metadata - should default to requirement.
   * type: source
 
 #### Relations
-  * refine: #explicit-requirement
+  * define: #explicit-requirement
 
 ### Semantic Contract Refinement
 
@@ -373,7 +373,7 @@ reqvire:DefaultTypeContract a owl:Class .
   * type: state
 
 #### Relations
-  * refine: #explicit-requirement
+  * define: #explicit-requirement
 
 ### Input Output Refinement
 
@@ -381,7 +381,7 @@ reqvire:DefaultTypeContract a owl:Class .
   * type: input-output
 
 #### Relations
-  * refine: #explicit-requirement
+  * define: #explicit-requirement
 
 ### Other Type
 

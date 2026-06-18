@@ -7,7 +7,7 @@ model: claude-sonnet-4-5
 
 # Add Capability
 
-Add a complete capability by orchestrating multiple commands to create a first-class capability graph node, requirements that specify it, optional ontology/refinement context, verifications, and proper traceability.
+Add a complete capability by orchestrating multiple commands to create a first-class capability graph node, requirements that specify it, optional ontology/contract context, verifications, and proper traceability.
 
 ## Current Model Context
 
@@ -59,7 +59,7 @@ This command orchestrates the complete workflow:
 3. **Add ontology context when needed:**
 
    Use `ontology` elements when the capability needs reusable vocabulary, ontology terms, source authority, or shared OWL contract language. Add ontology elements under `requirements/Ontologies`, then bind capability prose to declared terms with `#### Concept References` when needed.
-   Ontology referenced by model elements should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible refinements owned by the relevant requirement. Semantic contracts are reusable SHACL profiles that explicitly `use` ontology and `constrain` requirements.
+   Ontology referenced by model elements should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible contracts owned by the relevant requirement. Semantic contracts are reusable SHACL profiles that explicitly `use` ontology and `constrain` requirements.
 
    For broader semantic contract refactoring, use:
    ```bash
@@ -129,6 +129,6 @@ This command orchestrates the complete workflow:
 ## Notes
 
 - This is an orchestration command - it calls other commands
-- Follow MBSE methodology: capability → ontology/refinement context → requirements → verifications → tests
+- Follow MBSE methodology: capability → ontology/contract context → requirements → verifications → tests
 - Each step uses specialized commands for consistency
 - Run `reqvire coverage` at the end to confirm complete capability coverage

@@ -56,7 +56,7 @@ Generate implementation task plan from capability-scoped requirement changes on 
    This provides:
    - Complete upstream chain, including owning capabilities and parent requirements
    - Capability meaning, ontology references, and requirement obligations for context
-   - Refinement elements that refine the requirement
+   - Contract elements that define the requirement
    - Attached design documents
    - Full implementation context
 
@@ -88,7 +88,7 @@ Generate implementation task plan from capability-scoped requirement changes on 
    **Use collected context** from `/tmp/context_<element-id>.json` to create concise summaries:
    - Extract owning capability purpose (what the system is able to accomplish)
    - Extract parent requirement purpose for changed requirement obligations
-   - Identify key refinements and specifications
+   - Identify key contracts and specifications
    - Note important constraints and validation rules
    - Carry effective governance status, priority, risk, and owner routing
    - Summarize in ~2-3 sentences
@@ -140,7 +140,7 @@ Generate implementation task plan from capability-scoped requirement changes on 
    npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" collect "<element-name>" > /tmp/trace_context_<element-id>.md
    ```
 
-   This provides developers with full ontology, capability, requirement, refinement, verification, and implementation context documents they can reference during implementation.
+   This provides developers with full ontology, capability, requirement, contract, verification, and implementation context documents they can reference during implementation.
 
 9. **Present task plan:**
    - Phase 1: New requirements to implement (with context summaries)
@@ -177,7 +177,7 @@ Full trace context available in `/tmp/`:
 Each context document shows:
 - Complete capability and requirement trace chain
 - Capability purpose and parent requirement obligations
-- Refinements, specifications, and implementation details
+- Contracts, specifications, and implementation details
 - Attached design documents
 - Constraints and validation rules
 ```

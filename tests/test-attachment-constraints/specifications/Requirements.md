@@ -35,7 +35,7 @@ Capability root for Ancestor Req hierarchy.
 
 ### User Req A
 
-Top-level capability that defines Spec-1 via refinedBy.
+Top-level capability that defines Spec-1 via definedBy.
 
 #### Metadata
   * type: requirement
@@ -43,7 +43,7 @@ Top-level capability that defines Spec-1 via refinedBy.
   * specify: [User Req A Capability](#user-req-a-capability)
   * derive: [Req B](#req-b)
   * derive: [Req D](#req-d)
-  * refinedBy: [Spec-1](Refinements.md#spec-1)
+  * definedBy: [Spec-1](Refinements.md#spec-1)
 ---
 
 ### Req B
@@ -103,7 +103,7 @@ Separate branch requirement - can legitimately attach Spec-1 and defines Spec-X.
 
 #### Relations
   * specify: [User Req X Capability](#user-req-x-capability)
-  * refinedBy: [Spec-X](Refinements.md#spec-x)
+  * definedBy: [Spec-X](Refinements.md#spec-x)
 ---
 
 ### User Req Y
@@ -133,7 +133,7 @@ Child of User Req Y in a completely separate hierarchy - can attach Spec-1.
 
 ### Ancestor Req
 
-A requirement that has children with refinedBy to a refinement.
+A requirement that has children with definedBy to a refinement.
 
 #### Metadata
   * type: requirement
@@ -144,7 +144,7 @@ A requirement that has children with refinedBy to a refinement.
 
 ### Child With Refinement
 
-A child requirement that defines Spec-2 via refinedBy.
+A child requirement that defines Spec-2 via definedBy.
 
 #### Metadata
   * type: requirement
@@ -152,7 +152,7 @@ A child requirement that defines Spec-2 via refinedBy.
 #### Relations
   * derive: [Grandchild Req](#grandchild-req)
   * derivedFrom: [Ancestor Req](#ancestor-req)
-  * refinedBy: [Spec-2](Refinements.md#spec-2)
+  * definedBy: [Spec-2](Refinements.md#spec-2)
 ---
 
 ### Grandchild Req

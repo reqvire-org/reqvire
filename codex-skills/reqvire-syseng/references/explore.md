@@ -119,7 +119,7 @@ reqvire search --filter-type="test-verification" --not-have-relations="satisfied
 reqvire search --have-relations="verifiedBy,satisfiedBy" --short
 
 # Find specifications not linked to any requirement
-reqvire search --filter-type="specification" --not-have-relations="refine" --short
+reqvire search --filter-type="specification" --not-have-relations="define" --short
 ```
 
 ### By Attachments
@@ -183,7 +183,7 @@ reqvire collect "System Requirement" --json
 The collect command traverses `derivedFrom` relations upward and includes:
 - All ancestor requirement content
 - Attached markdown files (read as content)
-- Attached refinement elements (specifications, constraints, behaviors)
+- Attached contract elements (specifications, constraints, behaviors)
 - Source citations for traceability
 
 **When to use collect:**
@@ -221,7 +221,7 @@ reqvire coverage --json | jq '.summary'
 ### Find orphaned elements
 ```bash
 # Specifications not refining any requirement
-reqvire search --filter-type="specification" --not-have-relations="refine" --short --json
+reqvire search --filter-type="specification" --not-have-relations="define" --short --json
 
 # Verifications not verifying any requirement
 reqvire search --filter-type="verification" --not-have-relations="verify" --short

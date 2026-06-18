@@ -2,7 +2,7 @@ export type ElementIconShape = "square" | "diamond" | "hub";
 export type ElementRole =
   | "capability"
   | "requirement"
-  | "refinement"
+  | "contract"
   | "source"
   | "constraint"
   | "behavior"
@@ -27,12 +27,12 @@ type CssTokenName = `--${string}`;
 export const ELEMENT_ROLE_TOKENS = {
   capability: { fill: "--capability", ink: "--capability-ink", tint: "--capability-tint" },
   requirement: { fill: "--requirement", ink: "--requirement-ink", tint: "--requirement-tint" },
-  refinement: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
-  source: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
-  constraint: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
-  behavior: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
-  state: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
-  "input-output": { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  contract: { fill: "--contract", ink: "--contract-ink", tint: "--contract-tint" },
+  source: { fill: "--contract", ink: "--contract-ink", tint: "--contract-tint" },
+  constraint: { fill: "--contract", ink: "--contract-ink", tint: "--contract-tint" },
+  behavior: { fill: "--contract", ink: "--contract-ink", tint: "--contract-tint" },
+  state: { fill: "--contract", ink: "--contract-ink", tint: "--contract-tint" },
+  "input-output": { fill: "--contract", ink: "--contract-ink", tint: "--contract-tint" },
   "verification-objective": {
     fill: "--verification-objective",
     ink: "--verification-objective-ink",
@@ -44,7 +44,7 @@ export const ELEMENT_ROLE_TOKENS = {
   "inspection-verification": { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
   "demonstration-verification": { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
   verification: { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
-  specification: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  specification: { fill: "--contract", ink: "--contract-ink", tint: "--contract-tint" },
   "semantic-contract": { fill: "--semantic-contract", ink: "--semantic-contract-ink", tint: "--semantic-contract-tint" },
   ontology: { fill: "--ontology", ink: "--ontology-ink", tint: "--ontology-tint" },
   resource: { fill: "--resource", ink: "--resource-ink", tint: "--resource-tint" },
@@ -54,12 +54,12 @@ export const ELEMENT_ROLE_TOKENS = {
 export const ELEMENT_TYPES: Record<ElementType, { color: string; shape: ElementIconShape; role: ElementRole; glyph?: string }> = {
   capability: { color: "var(--capability)", shape: "square", role: "capability" },
   requirement: { color: "var(--requirement)", shape: "square", role: "requirement" },
-  refinement: { color: "var(--refinement)", shape: "diamond", role: "refinement", glyph: "R" },
-  source: { color: "var(--refinement)", shape: "diamond", role: "source", glyph: "↗" },
-  constraint: { color: "var(--refinement)", shape: "diamond", role: "constraint", glyph: "!" },
-  behavior: { color: "var(--refinement)", shape: "diamond", role: "behavior", glyph: "→" },
-  state: { color: "var(--refinement)", shape: "diamond", role: "state", glyph: "●" },
-  "input-output": { color: "var(--refinement)", shape: "diamond", role: "input-output", glyph: "↔" },
+  contract: { color: "var(--contract)", shape: "diamond", role: "contract", glyph: "C" },
+  source: { color: "var(--contract)", shape: "diamond", role: "source", glyph: "↗" },
+  constraint: { color: "var(--contract)", shape: "diamond", role: "constraint", glyph: "!" },
+  behavior: { color: "var(--contract)", shape: "diamond", role: "behavior", glyph: "→" },
+  state: { color: "var(--contract)", shape: "diamond", role: "state", glyph: "●" },
+  "input-output": { color: "var(--contract)", shape: "diamond", role: "input-output", glyph: "↔" },
   "verification-objective": {
     color: "var(--verification-objective)",
     shape: "square",
@@ -71,7 +71,7 @@ export const ELEMENT_TYPES: Record<ElementType, { color: string; shape: ElementI
   "inspection-verification": { color: "var(--verification)", shape: "square", role: "verification", glyph: "I" },
   "demonstration-verification": { color: "var(--verification)", shape: "square", role: "verification", glyph: "D" },
   verification: { color: "var(--verification)", shape: "square", role: "verification" },
-  specification: { color: "var(--refinement)", shape: "diamond", role: "specification", glyph: "≡" },
+  specification: { color: "var(--contract)", shape: "diamond", role: "specification", glyph: "≡" },
   "semantic-contract": { color: "var(--semantic-contract)", shape: "square", role: "semantic-contract" },
   ontology: { color: "var(--ontology)", shape: "square", role: "ontology" },
   resource: { color: "var(--resource)", shape: "square", role: "resource" },
@@ -150,9 +150,9 @@ const CSS_TOKEN_FALLBACKS: Partial<Record<DesignSystemColorToken, string>> = {
   "--requirement": "#673ab7",
   "--requirement-ink": "#512da8",
   "--requirement-tint": "#ede7f6",
-  "--refinement": "#ff9800",
-  "--refinement-ink": "#e65100",
-  "--refinement-tint": "#fff3e0",
+  "--contract": "#ff9800",
+  "--contract-ink": "#e65100",
+  "--contract-tint": "#fff3e0",
   "--semantic-contract": "#d32f2f",
   "--semantic-contract-ink": "#b71c1c",
   "--semantic-contract-tint": "#ffebee",
@@ -204,7 +204,7 @@ const CSS_TOKEN_FALLBACKS: Partial<Record<DesignSystemColorToken, string>> = {
   "--text-strong": "#161d27",
 };
 
-const REFINEMENT_TYPES = new Set([
+const CONTRACT_TYPES = new Set([
   "source",
   "specification",
   "constraint",
@@ -228,10 +228,10 @@ export function elementRole(type?: string | null, family?: string | null): Eleme
   if (normalizedType.includes("resource") || normalizedType === "file" || normalizedFamily === "resource") {
     return "resource";
   }
-  if (REFINEMENT_TYPES.has(normalizedType) && normalizedType in ELEMENT_TYPES) {
+  if (CONTRACT_TYPES.has(normalizedType) && normalizedType in ELEMENT_TYPES) {
     return ELEMENT_TYPES[normalizedType as ElementType].role;
   }
-  if (normalizedType.includes("refinement") || normalizedFamily === "refinement") return "refinement";
+  if (normalizedType === "contract" || normalizedFamily === "contract") return "contract";
   if (normalizedType.includes("requirement") || normalizedFamily === "requirement") return "requirement";
   if (normalizedType.includes("contract")) return "semantic-contract";
   if (normalizedType.includes("specification")) return "specification";
@@ -288,7 +288,7 @@ export function getMermaidClassDefs() {
     classDef("capability", "capability", "2.5px"),
     classDef("systemRequirement", "requirement", "2px"),
     classDef("requirement", "requirement", "2px"),
-    classDef("refinement", "refinement", "2px"),
+    classDef("contract", "contract", "2px"),
     classDef("source", "source", "2px"),
     classDef("constraint", "constraint", "2px"),
     classDef("behavior", "behavior", "2px"),

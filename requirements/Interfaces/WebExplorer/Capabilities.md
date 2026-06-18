@@ -33,8 +33,8 @@ Implementation details shall follow the associated refinement specifications.
   * [Explorer Serve Pipeline Specification](Specifications.md#explorer-serve-pipeline-specification)
 
 #### Relations
+  * definedBy: [Serve Command Refinement Specification](Specifications.md#serve-command-refinement-specification)
   * derivedFrom: [Web Interface](../InterfacesRequirements.md#web-interface)
-  * refinedBy: [Serve Command Refinement Specification](Specifications.md#serve-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [serve.rs](../../../cli/src/serve.rs)
   * verifiedBy: [Serve Command Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#serve-command-verification)
@@ -48,6 +48,12 @@ The system SHALL serve the embedded Reqvire Explorer SPA with all model artifact
   * type: requirement
 
 #### Relations
+  * definedBy: [Web Interface Navigation Behavior](Behaviors.md#web-interface-navigation-behavior)
+  * definedBy: [Explorer Branding Specification](Specifications.md#explorer-branding-specification)
+  * definedBy: [Explorer Navigation Chrome Specification](Specifications.md#explorer-navigation-chrome-specification)
+  * definedBy: [Explorer Serve Pipeline Specification](Specifications.md#explorer-serve-pipeline-specification)
+  * definedBy: [Model Browser and Graph Specification](Specifications.md#model-browser-and-graph-specification)
+  * definedBy: [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
   * derive: [Attachment Link Serving](#attachment-link-serving)
   * derive: [Containment View Attachment Links](#containment-view-attachment-links)
   * derive: [Diagram Attachment Display](#diagram-attachment-display)
@@ -58,12 +64,6 @@ The system SHALL serve the embedded Reqvire Explorer SPA with all model artifact
   * derive: [Traces View Generation](#traces-view-generation)
   * derive: [Web Interface Color Scheme](#web-interface-color-scheme)
   * derivedFrom: [Web Interface](../InterfacesRequirements.md#web-interface)
-  * refinedBy: [Web Interface Navigation Behavior](Behaviors.md#web-interface-navigation-behavior)
-  * refinedBy: [Explorer Branding Specification](Specifications.md#explorer-branding-specification)
-  * refinedBy: [Explorer Navigation Chrome Specification](Specifications.md#explorer-navigation-chrome-specification)
-  * refinedBy: [Explorer Serve Pipeline Specification](Specifications.md#explorer-serve-pipeline-specification)
-  * refinedBy: [Model Browser and Graph Specification](Specifications.md#model-browser-and-graph-specification)
-  * refinedBy: [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [explorer_runtime.rs](../../../core/src/explorer_runtime.rs)
   * satisfiedBy: [mod.rs](../../../core/src/html/mod.rs)
@@ -92,8 +92,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Attachment Link Serving Refinement Specification](Specifications.md#attachment-link-serving-refinement-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * refinedBy: [Attachment Link Serving Refinement Specification](Specifications.md#attachment-link-serving-refinement-specification)
   * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
   * verifiedBy: [Attachment Link Serving Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#attachment-link-serving-verification)
 ---
@@ -109,8 +109,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Containment View Attachment Links Refinement Specification](Specifications.md#containment-view-attachment-links-refinement-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * refinedBy: [Containment View Attachment Links Refinement Specification](Specifications.md#containment-view-attachment-links-refinement-specification)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
   * verifiedBy: [Model Containment Attachment Links Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-containment-attachment-links-verification)
 ---
@@ -126,9 +126,9 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Diagram Attachment Display Refinement Specification](Specifications.md#diagram-attachment-display-refinement-specification)
+  * definedBy: [Explorer Mermaid Diagram Style Specification](Specifications.md#explorer-mermaid-diagram-style-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * refinedBy: [Diagram Attachment Display Refinement Specification](Specifications.md#diagram-attachment-display-refinement-specification)
-  * refinedBy: [Explorer Mermaid Diagram Style Specification](Specifications.md#explorer-mermaid-diagram-style-specification)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Diagram Attachment Display Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#diagram-attachment-display-verification)
 ---
@@ -144,9 +144,9 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Model-Centric View Generation Refinement Specification](Specifications.md#model-centric-view-generation-refinement-specification)
   * derive: [Model View Element Navigation](#model-view-element-navigation)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * refinedBy: [Model-Centric View Generation Refinement Specification](Specifications.md#model-centric-view-generation-refinement-specification)
   * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
   * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
 ---
@@ -162,8 +162,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Model View Element Navigation Refinement Specification](Specifications.md#model-view-element-navigation-refinement-specification)
   * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
-  * refinedBy: [Model View Element Navigation Refinement Specification](Specifications.md#model-view-element-navigation-refinement-specification)
   * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
   * verifiedBy: [Model View Element Navigation Test](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-view-element-navigation-test)
 ---
@@ -194,13 +194,13 @@ The Ontologies view shall:
   * [Ontology Projection Subgraph Materialization Specification](../../Reports/ModelReports/Specifications.md#ontology-projection-subgraph-materialization-specification)
 
 #### Relations
+  * definedBy: [Ontology Rendering Details](OntologyRenderingDetails.md#ontology-rendering-details)
+  * definedBy: [Ontologies View Generation Refinement Specification](Specifications.md#ontologies-view-generation-refinement-specification)
   * derive: [Ontology Construct Grouping](#ontology-construct-grouping)
   * derive: [Ontology Property-Centric Visualization](#ontology-property-centric-visualization)
   * derive: [Ontology Symbol and Badge Vocabulary](#ontology-symbol-and-badge-vocabulary)
   * derive: [OWL Semantic Ontology Projection](#owl-semantic-ontology-projection)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * refinedBy: [Ontology Rendering Details](OntologyRenderingDetails.md#ontology-rendering-details)
-  * refinedBy: [Ontologies View Generation Refinement Specification](Specifications.md#ontologies-view-generation-refinement-specification)
 ---
 
 ### OWL Semantic Ontology Projection
@@ -214,8 +214,8 @@ The projection shall classify terms by semantic role, preserve source traceabili
   * type: requirement
 
 #### Relations
+  * definedBy: [OWL Semantic Ontology Projection Refinement Specification](Specifications.md#owl-semantic-ontology-projection-refinement-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
-  * refinedBy: [OWL Semantic Ontology Projection Refinement Specification](Specifications.md#owl-semantic-ontology-projection-refinement-specification)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
 
@@ -230,8 +230,8 @@ Construct grouping shall cover equivalence groups, inverse properties, property-
   * type: requirement
 
 #### Relations
+  * definedBy: [Ontology Construct Grouping Refinement Specification](Specifications.md#ontology-construct-grouping-refinement-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
-  * refinedBy: [Ontology Construct Grouping Refinement Specification](Specifications.md#ontology-construct-grouping-refinement-specification)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
 
@@ -246,8 +246,8 @@ The property visualization shall aggregate many domain and range classes without
   * type: requirement
 
 #### Relations
+  * definedBy: [Ontology Property-Centric Visualization Refinement Specification](Specifications.md#ontology-property-centric-visualization-refinement-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
-  * refinedBy: [Ontology Property-Centric Visualization Refinement Specification](Specifications.md#ontology-property-centric-visualization-refinement-specification)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
 
@@ -262,8 +262,8 @@ The symbol vocabulary shall define each symbol with its semantic meaning, raw Un
   * type: requirement
 
 #### Relations
+  * definedBy: [Ontology Symbol and Badge Vocabulary Refinement Specification](Specifications.md#ontology-symbol-and-badge-vocabulary-refinement-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
-  * refinedBy: [Ontology Symbol and Badge Vocabulary Refinement Specification](Specifications.md#ontology-symbol-and-badge-vocabulary-refinement-specification)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
 
@@ -278,7 +278,7 @@ The Knowledge Graph view shall:
 - Render the four system-model layers as first-class graph nodes: ontologies, capabilities, requirements, and verifications. Requirement-owned refinements may appear as subordinate requirement detail/contract nodes when actual project facts reference them, but they are not a separate system-model layer.
 - Render actual relation facts, attachment facts, concept-reference facts, file targets, and external targets as graph edges or resource nodes.
 - Use Reqvire capability-root submodels as the structural graph partitioning contract; attachments, concept references, verification/satisfaction, and trace facts are overlays rather than submodel boundaries.
-- Treat structural ownership/backbone relations separately from cross-layer evidence relations: `derive` and `specify` organize the capability/requirement submodel backbone, while requirement-owned `refine`, `attach`, `satisfiedBy`, `verifiedBy`, `trace`, and concept-reference facts connect subordinate details or layers as inspectable overlays.
+- Treat structural ownership/backbone relations separately from cross-layer evidence relations: `derive` and `specify` organize the capability/requirement submodel backbone, while requirement-owned `define`, `attach`, `satisfiedBy`, `verifiedBy`, `trace`, and concept-reference facts connect subordinate details or layers as inspectable overlays.
 - Reuse the dense Explorer graph and modal-detail interaction pattern used by the ontology viewer, while focusing on project instances rather than ontology vocabulary definitions.
 - Provide modal detail evidence for element type, identifier, source location, governance, metadata, incoming facts, outgoing facts, attachments, and concept references.
 - Keep ontology vocabulary exploration in the Ontologies view; the Knowledge Graph view may show ontology terms only when they are referenced by actual project elements.
@@ -287,8 +287,8 @@ The Knowledge Graph view shall:
   * type: requirement
 
 #### Relations
+  * definedBy: [Project Knowledge Graph View Refinement Specification](Specifications.md#project-knowledge-graph-view-refinement-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * refinedBy: [Project Knowledge Graph View Refinement Specification](Specifications.md#project-knowledge-graph-view-refinement-specification)
   * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
   * satisfiedBy: [GraphLibraryViews.tsx](../../../explorer/src/views/GraphLibraryViews.tsx)
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
@@ -325,9 +325,9 @@ The SPA Explorer shell shall:
   * type: requirement
 
 #### Relations
+  * definedBy: [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
+  * definedBy: [SPA Explorer Store Contract Refinement Specification](Specifications.md#spa-explorer-store-contract-refinement-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * refinedBy: [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
-  * refinedBy: [SPA Explorer Store Contract Refinement Specification](Specifications.md#spa-explorer-store-contract-refinement-specification)
   * satisfiedBy: [git_commands.rs](../../../core/src/git_commands.rs)
   * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
   * satisfiedBy: [DetailDialog.tsx](../../../explorer/design-system/product-patterns/detail/DetailDialog.tsx)
@@ -358,9 +358,9 @@ The Traces view shall:
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
+  * definedBy: [Explorer Verification Trace Rendering Specification](Specifications.md#explorer-verification-trace-rendering-specification)
+  * definedBy: [TraceFlowView](TraceFlowView.md#traceflowview)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * refinedBy: [Explorer Verification Trace Rendering Specification](Specifications.md#explorer-verification-trace-rendering-specification)
-  * refinedBy: [TraceFlowView](TraceFlowView.md#traceflowview)
   * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
   * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
@@ -389,8 +389,8 @@ The system shall ensure color consistency between:
   * type: requirement
 
 #### Relations
+  * definedBy: [Explorer Color and Type Palette Specification](Specifications.md#explorer-color-and-type-palette-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * refinedBy: [Explorer Color and Type Palette Specification](Specifications.md#explorer-color-and-type-palette-specification)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
   * satisfiedBy: [ElementIcon.tsx](../../../explorer/design-system/components/data/ElementIcon.tsx)
   * satisfiedBy: [palette.ts](../../../explorer/design-system/palette.ts)

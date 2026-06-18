@@ -109,7 +109,7 @@ Use unlink when:
 - Disconnecting deprecated verifications
 - Cleaning up obsolete trace relations
 - Detaching documents or files
-- Removing attached refinement elements
+- Removing attached contract elements
 
 ## Related Commands
 

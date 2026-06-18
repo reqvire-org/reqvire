@@ -6,7 +6,7 @@ model: claude-sonnet-4-5
 
 # Consolidate Requirements Model
 
-Consolidate child requirements that only refine their parents (without introducing new capabilities) into the parent requirement. This uses a two-phase workflow: automated merge followed by intelligent content cleanup.
+Consolidate child requirements that only define their parents (without introducing new capabilities) into the parent requirement. This uses a two-phase workflow: automated merge followed by intelligent content cleanup.
 
 ## Model Context
 
@@ -17,7 +17,7 @@ Consolidate child requirements that only refine their parents (without introduci
 ## When to Use
 
 Use this command when:
-- Model has grown with many small refinement requirements
+- Model has grown with many small contract requirements
 - Child requirements only elaborate on implementation details of parents
 - You want to reduce model clutter while preserving all information
 - Requirements are split via derivedFrom relations but don't add new capabilities
@@ -38,7 +38,7 @@ A child requirement is a candidate for consolidation if it meets **multiple** of
 4. **Implementation-level details** - Mentions specific technical details, file formats, parameters, or procedural steps
 5. **Leaf requirement** - No children of its own, derives from only one parent
 6. **Procedural/step-by-step details** - Contains "how-to" information that expands on parent
-7. **Refinement keywords** - Contains phrases like "shall support", "shall provide", "shall include", "formatting", "structure", "output", "options", "flags"
+7. **Contract keywords** - Contains phrases like "shall support", "shall provide", "shall include", "formatting", "structure", "output", "options", "flags"
 
 ## Process Overview
 
@@ -86,7 +86,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 **Example:**
 ```bash
-# Merge two child refinements into parent
+# Merge two child contracts into parent
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" merge "Format Consistency Enforcement" "Excess Whitespace Format" "Missing Separators Format"
 ```
 
@@ -299,7 +299,7 @@ Do NOT consolidate if:
 - Child has **many verifications** (3+) indicating significant independent functionality
 - Child is referenced by **many other elements** as a key concept
 - Child represents a **distinct abstraction level** (e.g., capability scope vs requirement obligation)
-- There's **uncertainty** about whether child is truly refinement-only
+- There's **uncertainty** about whether child is truly contract-only
 
 ## Expected Benefits
 

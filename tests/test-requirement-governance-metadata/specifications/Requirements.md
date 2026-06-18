@@ -78,5 +78,5 @@ This refinement augments the root requirement and must not author governance met
   * type: specification
 
 #### Relations
-  * refine: [Root Requirement](#root-requirement)
+  * define: [Root Requirement](#root-requirement)
 ---

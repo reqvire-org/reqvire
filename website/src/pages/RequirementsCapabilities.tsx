@@ -127,10 +127,10 @@ The system shall reject API requests whose access token is invalid.
         </div>
       </Section>
 
-      <Section title="Requirement-Owned Refinements and Semantic Contracts">
+      <Section title="Requirement-Owned Contracts and Semantic Contracts">
         <p className="text-zinc-600 mb-4">
-          Refinements carry detailed engineering contracts for a requirement.
-          Non-semantic-contract refinements are owned through refine or refinedBy
+          Contracts carry detailed engineering terms for a requirement.
+          Non-semantic-contract contract elements are owned through define or definedBy
           and should not author governance metadata. Semantic contracts are separate
           ontology-plane elements that constrain requirements through constrainedBy and constrain,
           and use ontology through use and usedBy.
@@ -138,7 +138,7 @@ The system shall reject API requests whose access token is invalid.
         <BulletList
           items={[
             "source captures stakeholder, regulatory, policy, contractual, or external source material.",
-            "specification, constraint, behavior, state, and input-output refinements carry detailed contract content.",
+            "specification, constraint, behavior, state, and input-output contract elements carry detailed contract content.",
             "semantic-contract is a reusable SHACL profile over explicitly used ontology and must include Shapes.",
           ]}
         />
@@ -149,7 +149,7 @@ The system shall reject API requests whose access token is invalid.
   * type: specification
 
 ## Relations
-  * refine: [API Access Token Validation](AuthRequirements.md#api-access-token-validation)
+  * define: [API Access Token Validation](AuthRequirements.md#api-access-token-validation)
 
 ## Access Token Validation Specification
 
@@ -163,7 +163,7 @@ and signature before the request reaches protected application logic.`}</CodeBlo
           Attachments make cross-boundary requirement contracts explicit.
           Ontology term usage is modeled with concept references. A requirement
           can import a one-way contract dependency from a compatible
-          requirement-owned non-semantic-contract refinement in another
+          requirement-owned non-semantic-contract element in another
           subgraph; semantic-contract dependencies use constrainedBy/constrain
           and use/usedBy instead.
         </p>
@@ -171,11 +171,11 @@ and signature before the request reaches protected application logic.`}</CodeBlo
           items={[
             {
               name: "Concept references",
-              desc: "Capabilities, requirements, refinements, and verifications bind prose to ontology terms with Concept References.",
+              desc: "Capabilities, requirements, contracts, and verifications bind prose to ontology terms with Concept References.",
             },
             {
               name: "Requirement attachments",
-              desc: "Requirements attach specifications, constraints, behaviors, states, and input-output refinements owned by requirement subgraphs. Semantic contracts are linked through constrainedBy/constrain.",
+              desc: "Requirements attach specifications, constraints, behaviors, states, and input-output contracts owned by requirement subgraphs. Semantic contracts are linked through constrainedBy/constrain.",
             },
             {
               name: "One-way flow",
@@ -183,7 +183,7 @@ and signature before the request reaches protected application logic.`}</CodeBlo
             },
             {
               name: "Review impact",
-              desc: "Verifications provide evidence, while traces and change-impact reports show which contracts, child requirements, refinements, and implementation artifacts need review after changes.",
+              desc: "Verifications provide evidence, while traces and change-impact reports show which contracts, child requirements, and implementation artifacts need review after changes.",
             },
           ]}
         />
@@ -245,7 +245,7 @@ The consumer service shall fulfill the shared access-token validation behavior.
             "Capabilities inherit missing governance fields from parent capabilities.",
             "Top-level requirements inherit missing governance fields from their owning capability.",
             "Child requirements inherit missing fields from the nearest parent requirement.",
-            "Refinements and verifications must not declare status, priority, risk, or owner directly.",
+            "Contracts and verifications must not declare status, priority, risk, or owner directly.",
           ]}
         />
         <div className="mt-5">
@@ -285,7 +285,7 @@ reqvire search --filter-owner "Identity Team"`}</CodeBlock>
         <div className="mt-5">
           <BulletList
             items={[
-              "Capabilities holds capability-rooted subgraphs with child capabilities, specifying requirements, and requirement-owned refinements.",
+              "Capabilities holds capability-rooted subgraphs with child capabilities, specifying requirements, and requirement-owned contracts.",
               "Ontologies holds reusable semantic vocabulary referenced by model elements instead of nested into unrelated capability files.",
               "Verifications holds verification elements grouped by domain and linked through verify or verifiedBy.",
               "Folder names are guidance, not schema. Reqvire validates element metadata and graph relations.",

@@ -20,12 +20,12 @@ When filtering lint results, the system shall allow focusing on specific categor
 
 #### Relations
   * constrainedBy: [Lint Rule Metadata Shape](../../Ontologies/BehaviorValidationOperations.md#lint-rule-metadata-shape)
+  * definedBy: [Lint Output Specification](Specifications.md#lint-output-specification)
   * derive: [Cross-Submodel Hierarchical Relation Detection](#cross-submodel-hierarchical-relation-detection)
   * derive: [Lint Auto-fix Capability](#lint-auto-fix-capability)
   * derive: [Multi-Branch Convergence Detection](#multi-branch-convergence-detection)
   * derive: [Redundant Hierarchical Relations Detection and Auto-Removal](#redundant-hierarchical-relations-detection-and-auto-removal)
   * derive: [Redundant Verify Relations Detection](#redundant-verify-relations-detection)
-  * refinedBy: [Lint Output Specification](Specifications.md#lint-output-specification)
   * specify: [Linting Model Quality](../BehaviorValidationOperationsFeature.md#linting-model-quality)
 ---
 
@@ -41,8 +41,8 @@ The system shall use this detection during lint analysis to identify and report 
   * type: requirement
 
 #### Relations
+  * definedBy: [Cross-Submodel Hierarchical Relation Detection Specification](Specifications.md#cross-submodel-hierarchical-relation-detection-specification)
   * derivedFrom: [Model Linting](#model-linting)
-  * refinedBy: [Cross-Submodel Hierarchical Relation Detection Specification](Specifications.md#cross-submodel-hierarchical-relation-detection-specification)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
 ---
@@ -58,8 +58,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Lint Auto-fix Capability Refinement Specification](Specifications.md#lint-auto-fix-capability-refinement-specification)
   * derivedFrom: [Model Linting](#model-linting)
-  * refinedBy: [Lint Auto-fix Capability Refinement Specification](Specifications.md#lint-auto-fix-capability-refinement-specification)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
 ---
@@ -75,8 +75,8 @@ The system shall detect when an element reaches a common ancestor through multip
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
+  * definedBy: [Multi-Branch Convergence Detection Specification](Specifications.md#multi-branch-convergence-detection-specification)
   * derivedFrom: [Model Linting](#model-linting)
-  * refinedBy: [Multi-Branch Convergence Detection Specification](Specifications.md#multi-branch-convergence-detection-specification)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
 ---
@@ -92,8 +92,8 @@ The system shall detect and auto-remove redundant derivedFrom relations where an
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
+  * definedBy: [Redundant Hierarchical Relations Specification](Specifications.md#redundant-hierarchical-relations-specification)
   * derivedFrom: [Model Linting](#model-linting)
-  * refinedBy: [Redundant Hierarchical Relations Specification](Specifications.md#redundant-hierarchical-relations-specification)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
 ---
@@ -112,8 +112,8 @@ Implementation details shall follow the associated refinement specifications.
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
+  * definedBy: [Redundant Verify Relations Detection Refinement Specification](Specifications.md#redundant-verify-relations-detection-refinement-specification)
   * derivedFrom: [Model Linting](#model-linting)
-  * refinedBy: [Redundant Verify Relations Detection Refinement Specification](Specifications.md#redundant-verify-relations-detection-refinement-specification)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * satisfiedBy: [trace_tree_builder.rs](../../../core/src/trace_tree_builder.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)

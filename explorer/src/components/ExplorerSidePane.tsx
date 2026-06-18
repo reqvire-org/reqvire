@@ -834,7 +834,7 @@ function humanize(value: string) {
 const ELEMENT_TYPE_ORDER = [
   "capability",
   "requirement",
-  "refinement",
+  "contract",
   "verification-objective",
   "verification",
   "test-verification",

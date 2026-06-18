@@ -695,6 +695,7 @@ fn quad_key(quad: &Quad) -> String {
 fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -> String {
     let mut output = String::new();
     let mut artifacts = BTreeSet::new();
+    let concept_reference_prefixes = full_context_ontology_prefixes(index);
     output.push_str(
         "# -----------------------------------------------------------------------------\n",
     );
@@ -803,15 +804,20 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
         }
 
         for reference in &element.concept_references {
+            let resolved_iri = resolve_full_context_concept_reference_iri(
+                &reference.iri,
+                &concept_reference_prefixes,
+            )
+            .unwrap_or_else(|_| reference.iri.clone());
             output.push_str(&format!(
                 "{} reqvire:conceptReference <{}> .\n",
                 subject,
-                escape_iri(&reference.iri)
+                escape_iri(&resolved_iri)
             ));
             output.push_str(&format!(
                 "{} reqvire:referencesTerm <{}> .\n",
                 subject,
-                escape_iri(&reference.iri)
+                escape_iri(&resolved_iri)
             ));
         }
 
@@ -862,6 +868,85 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
 
     output.push('\n');
     output
+}
+
+fn full_context_ontology_prefixes(index: &SemanticIndex) -> HashMap<String, String> {
+    let mut prefixes = HashMap::new();
+
+    for block in &index.blocks {
+        if !matches!(block.kind, SemanticBlockKind::Ontology) {
+            continue;
+        }
+        for (prefix, iri) in parse_turtle_prefix_declarations(&block.content) {
+            prefixes.entry(prefix).or_insert(iri);
+        }
+    }
+
+    for declaration in &index.ontology_documents {
+        prefixes
+            .entry(declaration.ontology_prefix.clone())
+            .or_insert(declaration.term_namespace.clone());
+    }
+
+    prefixes
+}
+
+fn parse_turtle_prefix_declarations(content: &str) -> Vec<(String, String)> {
+    let mut prefixes = Vec::new();
+    for line in content.lines() {
+        let trimmed = line.trim();
+        let Some(rest) = trimmed.strip_prefix("@prefix ") else {
+            continue;
+        };
+        let mut parts = rest.split_whitespace();
+        let Some(prefix_token) = parts.next() else {
+            continue;
+        };
+        let Some(iri_token) = parts.next() else {
+            continue;
+        };
+        let Some(prefix) = prefix_token.strip_suffix(':') else {
+            continue;
+        };
+        let Some(iri) = iri_token
+            .strip_prefix('<')
+            .and_then(|value| value.strip_suffix('>'))
+        else {
+            continue;
+        };
+        prefixes.push((prefix.to_string(), iri.to_string()));
+    }
+    prefixes
+}
+
+fn resolve_full_context_concept_reference_iri(
+    value: &str,
+    prefixes: &HashMap<String, String>,
+) -> Result<String, String> {
+    let trimmed = value.trim();
+    if let Some(iri) = trimmed
+        .strip_prefix('<')
+        .and_then(|value| value.strip_suffix('>'))
+    {
+        return Ok(iri.to_string());
+    }
+    if trimmed.starts_with("urn:")
+        || trimmed.starts_with("http://")
+        || trimmed.starts_with("https://")
+    {
+        return Ok(trimmed.to_string());
+    }
+
+    let Some((prefix, local)) = trimmed.split_once(':') else {
+        return Err("expected absolute IRI, <IRI>, or CURIE".to_string());
+    };
+    let Some(base) = prefixes.get(prefix) else {
+        return Err(format!("prefix '{}' is not declared", prefix));
+    };
+    if local.is_empty() {
+        return Err("CURIE local name is empty".to_string());
+    }
+    Ok(format!("{}{}", base, local))
 }
 
 fn build_ontology_projection_turtle(index: &SemanticIndex) -> String {

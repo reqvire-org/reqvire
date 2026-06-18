@@ -7,8 +7,8 @@ set -uo pipefail
 #   - requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attachment-scope-constraints-test
 #
 # Acceptance Criteria:
-# - Orphan refinement (no refine relations) attachment causes validation to fail
-# - Defining requirement (has refinedBy) cannot also attach the refinement
+# - Orphan refinement (no define relations) attachment causes validation to fail
+# - Defining requirement (has definedBy) cannot also attach the refinement
 # - Descendant of defining requirement cannot attach the refinement
 # - Ancestor of defining requirement cannot attach the refinement
 # - Cross-subgraph attachment flow is one-directional at capability-root hierarchy level
@@ -18,7 +18,7 @@ set -uo pipefail
 # Test Model Structure:
 #
 # Spec-1 refines User Req A:
-#   User Req A (defining requirement - has refinedBy: Spec-1)
+#   User Req A (defining requirement - has definedBy: Spec-1)
 #   ├── Req B (child - cannot attach Spec-1)
 #   │   └── Req C (grandchild - cannot attach Spec-1)
 #   │       └── Req C1 (great-grandchild - cannot attach Spec-1)
@@ -29,7 +29,7 @@ set -uo pipefail
 #
 # Spec-2 refines Child With Refinement:
 #   Ancestor Req (ANCESTOR - cannot attach Spec-2)
-#   └── Child With Refinement (defining - has refinedBy: Spec-2)
+#   └── Child With Refinement (defining - has definedBy: Spec-2)
 #       └── Grandchild Req (descendant - cannot attach Spec-2)
 #
 # Directionality case:
@@ -71,7 +71,7 @@ fi
 # ==================================
 # Test 2: Orphan Refinement Attachment Fails
 # ==================================
-# Add attachment to orphan refinement (no refine relations)
+# Add attachment to orphan refinement (no define relations)
 
 cat > "$TEST_DIR/specifications/TestOrphanAttachment.md" <<'EOF'
 # Elements
@@ -112,16 +112,16 @@ assert_output_matches "${TEST_SCRIPT_DIR}/expected/orphan-attachment-error.txt" 
 rm -f "$TEST_DIR/specifications/TestOrphanAttachment.md"
 
 # ==================================
-# Test 3: Defining Requirement Attachment Fails (same as refinedBy)
+# Test 3: Defining Requirement Attachment Fails (same as definedBy)
 # ==================================
-# User Req A has refinedBy: Spec-1, so it cannot ALSO attach Spec-1
+# User Req A has definedBy: Spec-1, so it cannot ALSO attach Spec-1
 
 cat > "$TEST_DIR/specifications/TestDefiningAttachment.md" <<'EOF'
 # Elements
 
 ### User Req A With Attachment
 
-User requirement that has refinedBy AND attachment to same refinement.
+User requirement that has definedBy AND attachment to same refinement.
 
 #### Metadata
   * type: requirement
@@ -131,7 +131,7 @@ User requirement that has refinedBy AND attachment to same refinement.
 
 #### Relations
   * specify: [User Req A Capability](Requirements.md#user-req-a-capability)
-  * refinedBy: [Spec-1](Refinements.md#spec-1)
+  * definedBy: [Spec-1](Refinements.md#spec-1)
 ---
 
 EOF

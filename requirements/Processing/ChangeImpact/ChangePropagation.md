@@ -4,7 +4,7 @@
   * type: specification
 
 ## Relations
-  * refine: [Requirements Change Propagation](ChangeImpactRequirements.md#requirements-change-propagation)
+  * define: [Requirements Change Propagation](ChangeImpactRequirements.md#requirements-change-propagation)
 
 ## ChangePropagation
 

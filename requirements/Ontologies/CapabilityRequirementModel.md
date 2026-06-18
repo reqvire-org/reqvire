@@ -22,7 +22,7 @@ reqvire:CapabilityShape
     sh:class reqvire:Capability ;
   ] ;
   sh:property [
-    sh:path reqvire:refinedBy ;
+    sh:path reqvire:definedBy ;
     sh:maxCount 0 ;
   ] ;
   sh:property [
@@ -42,7 +42,7 @@ reqvire:CapabilityShape
     sh:maxCount 0 ;
   ] ;
   sh:property [
-    sh:path reqvire:refine ;
+    sh:path reqvire:define ;
     sh:maxCount 0 ;
   ] ;
   sh:property [
@@ -97,11 +97,11 @@ reqvire:CustomElementShape
     sh:maxCount 0 ;
   ] ;
   sh:property [
-    sh:path reqvire:refine ;
+    sh:path reqvire:define ;
     sh:maxCount 0 ;
   ] ;
   sh:property [
-    sh:path reqvire:refinedBy ;
+    sh:path reqvire:definedBy ;
     sh:maxCount 0 ;
   ] ;
   sh:property [
@@ -130,7 +130,7 @@ reqvire:CustomElementShape
   * type: semantic-contract
 
 #### Relations
-  * constrain: [Refinement Element Structure Constraints](../ModelStructure/ModelManagement.md#refinement-element-structure-constraints)
+  * constrain: [Refinement Element Structure Constraints](../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
   * use: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
@@ -171,7 +171,7 @@ reqvire:OntologyElementShape
     sh:class reqvire:Ontology ;
   ] ;
   sh:property [
-    sh:path reqvire:refinedBy ;
+    sh:path reqvire:definedBy ;
     sh:maxCount 0 ;
   ] ;
   sh:property [
@@ -206,7 +206,7 @@ reqvire:RefinementShape
   a sh:NodeShape ;
   sh:targetClass reqvire:Refinement ;
   sh:property [
-    sh:path reqvire:refine ;
+    sh:path reqvire:define ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:class reqvire:Requirement ;
@@ -248,7 +248,7 @@ reqvire:SourceShape
   a sh:NodeShape ;
   sh:targetClass reqvire:Source ;
   sh:property [
-    sh:path reqvire:refine ;
+    sh:path reqvire:define ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:class reqvire:Requirement ;
@@ -258,7 +258,7 @@ reqvire:SpecificationShape
   a sh:NodeShape ;
   sh:targetClass reqvire:Specification ;
   sh:property [
-    sh:path reqvire:refine ;
+    sh:path reqvire:define ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:class reqvire:Requirement ;
@@ -268,7 +268,7 @@ reqvire:ConstraintShape
   a sh:NodeShape ;
   sh:targetClass reqvire:Constraint ;
   sh:property [
-    sh:path reqvire:refine ;
+    sh:path reqvire:define ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:class reqvire:Requirement ;
@@ -278,7 +278,7 @@ reqvire:BehaviorShape
   a sh:NodeShape ;
   sh:targetClass reqvire:Behavior ;
   sh:property [
-    sh:path reqvire:refine ;
+    sh:path reqvire:define ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:class reqvire:Requirement ;
@@ -288,7 +288,7 @@ reqvire:StateShape
   a sh:NodeShape ;
   sh:targetClass reqvire:State ;
   sh:property [
-    sh:path reqvire:refine ;
+    sh:path reqvire:define ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:class reqvire:Requirement ;
@@ -298,7 +298,7 @@ reqvire:InputOutputShape
   a sh:NodeShape ;
   sh:targetClass reqvire:InputOutput ;
   sh:property [
-    sh:path reqvire:refine ;
+    sh:path reqvire:define ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:class reqvire:Requirement ;
@@ -309,7 +309,7 @@ reqvire:InputOutputShape
   * type: semantic-contract
 
 #### Relations
-  * constrain: [Refinement Element Structure Constraints](../ModelStructure/ModelManagement.md#refinement-element-structure-constraints)
+  * constrain: [Refinement Element Structure Constraints](../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
   * use: [Reqvire Capability Ontology](#reqvire-capability-ontology)
   * use: [Reqvire Requirement Ontology](#reqvire-requirement-ontology)
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
@@ -357,7 +357,7 @@ reqvire:RequirementShape
     sh:class reqvire:Requirement ;
   ] ;
   sh:property [
-    sh:path reqvire:refinedBy ;
+    sh:path reqvire:definedBy ;
     sh:class reqvire:Refinement ;
   ] ;
   sh:property [
@@ -385,7 +385,7 @@ reqvire:RequirementOwnedRefinementShape
   a sh:NodeShape ;
   sh:targetClass reqvire:RequirementOwnedRefinement ;
   sh:property [
-    sh:path reqvire:refine ;
+    sh:path reqvire:define ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:class reqvire:Requirement ;
@@ -436,7 +436,7 @@ reqvire:sourceType a reqvire:RefinementElementType ;
 
 The Reqvire requirement ontology defines requirement obligations and requirement-owned refinement types.
 
-Requirements are implementation-facing obligations. They can own source context, specifications, constraints, behavior descriptions, state contracts, and input-output contracts. Requirements may also be constrained by reusable shapes-only semantic contracts. Capabilities bind ontology terms through concept references, derive child capabilities, are specified by requirements, and may be verified; capabilities must not own refinement elements through `refinedBy`/`refine`. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts.
+Requirements are implementation-facing obligations. They can own source context, specifications, constraints, behavior descriptions, state contracts, and input-output contracts. Requirements may also be constrained by reusable shapes-only semantic contracts. Capabilities bind ontology terms through concept references, derive child capabilities, are specified by requirements, and may be verified; capabilities must not own refinement elements through `definedBy`/`define`. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts.
 
 #### Ontology
 ```turtle
@@ -447,7 +447,7 @@ Requirements are implementation-facing obligations. They can own source context,
 
 reqvire:RequirementOwnedRefinement a owl:Class ;
   rdfs:subClassOf reqvire:Refinement ;
-  rdfs:comment "Refinement class whose instances are owned by requirement elements through refine/refinedBy." .
+  rdfs:comment "Refinement class whose instances are owned by requirement elements through define/definedBy." .
 reqvire:Specification a owl:Class ;
   rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
   rdfs:comment "Requirement-owned refinement for detailed specifications and technical descriptions." .

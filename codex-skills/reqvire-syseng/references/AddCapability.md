@@ -10,7 +10,7 @@
 1. Capability first       → Define the coherent operational/system ability
 2. Semantic context    → Add concept references when shared ontology terms matter
 3. Requirements        → Define what the system shall do (never skip implementable obligations)
-4. Refinements         → Add specifications, constraints, behaviors, state, and input-output refinements as needed
+4. Contracts         → Add specifications, constraints, behaviors, state, and input-output contracts as needed
    Semantic contracts  → Add reusable SHACL contracts with explicit ontology use when closed-world checks are needed
 5. Verifications       → Add verification elements for capabilities or leaf requirements
 6. Implementation      → Connect `requirement` elements and evidence-backed verifications to code/evidence via `satisfiedBy`
@@ -24,10 +24,10 @@ When constructing or refactoring a system model, work from model boundaries inwa
 2. Run `reqvire search --filter-type="ontology" --short` and identify the ontology terms already available.
 3. Decide whether the new content belongs under an existing capability root, a child capability, a new independent capability root, or the shared ontology hierarchy.
 4. Add subcapabilities only for meaningful capability slices; do not use capability hierarchy just to share ontology.
-5. Put shared vocabulary and stable semantic relationships in ontology; bind capability, requirement, refinement, and verification prose to ontology terms with `#### Concept References`.
+5. Put shared vocabulary and stable semantic relationships in ontology; bind capability, requirement, contract, and verification prose to ontology terms with `#### Concept References`.
 6. Put implementable obligations in requirements that `specify` the local capability.
-7. Put local details in compatible refinements owned by the relevant requirement.
-8. Use attachments, not hierarchy, when another requirement root needs reusable requirement-owned non-semantic-contract refinements. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
+7. Put local details in compatible contracts owned by the relevant requirement.
+8. Use attachments, not hierarchy, when another requirement root needs reusable requirement-owned non-semantic-contract contracts. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
 9. Validate `submodels`, `collect`, and change-impact paths after each boundary slice.
 
 ## Capability Design Rules
@@ -71,7 +71,7 @@ Capability (coherent operational/system ability)
     ├── derive → Subcapability
     ├── verifiedBy → Verification
     └── specifiedBy ← Requirement
-                     ├── refinedBy → source / specification / constraint / behavior / state / input-output
+                     ├── definedBy → source / specification / constraint / behavior / state / input-output
                      ├── constrainedBy → semantic-contract → use → ontology
                      └── derive → Child Requirement
 ```
@@ -80,8 +80,8 @@ Capability (coherent operational/system ability)
 - Start with `capability` for the coherent ability, not a UI screen, task, module, or implementation detail
 - Check existing capability roots before adding a new one; preserve independent submodels unless the new work truly belongs in the same capability root
 - Use child capabilities for real independently verifiable operational, product, interface, stakeholder, regulatory, or domain slices
-- Use `source` refinements on requirements for stakeholder, regulatory, contractual, or external context
-- Use `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements when requirement-level context needs additional operational detail
+- Use `source` contracts on requirements for stakeholder, regulatory, contractual, or external context
+- Use `specification`, `constraint`, `behavior`, `state`, and `input-output` contracts when requirement-level context needs additional operational detail
 - Use `ontology` elements for ontology/vocabulary contracts
 - Use `semantic-contract` elements for SHACL shape profiles over explicitly used ontology; link them to requirements with `constrain`/`constrainedBy`
 - Use `specify` / `specifiedBy` to connect requirements to capabilities
@@ -138,14 +138,14 @@ Good split:
 - Ontology: `Access Token Ontology`
 - Semantic contract: `Access Token Validation Contract`
 - Requirement: `The system shall reject API requests whose access token does not conform to the Access Token validation contract.`
-- Input-output refinement, when needed: local request/response examples or API-specific representation details
+- Input-output contract, when needed: local request/response examples or API-specific representation details
 
 Keep domain definitions and reusable vocabulary in ontology when they are stable and shared. Keep requirement-obligation-specific closed-world constraints in semantic contracts. Keep workflow behavior, implementation obligations, acceptance commitments, and verification scope in requirements.
 
 When splitting existing prose, do not lose meaning:
 - Capability prose keeps capability scope and why the area exists.
 - Ontology keeps reusable terms and relationships.
-- Capability and requirement refinements keep exact command behavior, payload fields, outputs, state behavior, validation messages, file paths, and workflow steps.
+- Capability and requirement contracts keep exact command behavior, payload fields, outputs, state behavior, validation messages, file paths, and workflow steps.
 - Verifications keep evidence expectations and test assertions.
 
 ### Adding Requirements
@@ -221,11 +221,11 @@ reqvire link "Capability Name" "specifiedBy" "System Capability Implementation"
 reqvire link "Child Requirement" "derivedFrom" "System Capability Implementation"
 ```
 
-**Relation types**: `derivedFrom` (child -> parent inside same family, including verification-family hierarchy), `derive` (parent -> child inside same family), `specify` (requirement -> capability), `specifiedBy` (capability -> requirement), `verifiedBy` (capability or requirement -> concrete verification), `verify` (concrete verification -> capability or requirement), `satisfiedBy` (requirement/test-verification/formal-proof-verification -> implementation or evidence), `satisfy` (implementation/evidence -> requirement/test-verification/formal-proof-verification), `refinedBy` (requirement -> refinement), `refine` (refinement -> requirement), `trace` (non-directional traceability)
+**Relation types**: `derivedFrom` (child -> parent inside same family, including verification-family hierarchy), `derive` (parent -> child inside same family), `specify` (requirement -> capability), `specifiedBy` (capability -> requirement), `verifiedBy` (capability or requirement -> concrete verification), `verify` (concrete verification -> capability or requirement), `satisfiedBy` (requirement/test-verification/formal-proof-verification -> implementation or evidence), `satisfy` (implementation/evidence -> requirement/test-verification/formal-proof-verification), `definedBy` (requirement -> contract), `define` (contract -> requirement), `trace` (non-directional traceability)
 
-## Step 3: Add Refinements (if needed)
+## Step 3: Add Contracts (if needed)
 
-Add refinements only when:
+Add contracts only when:
 - **Specifications** - Detailed definitions needed, referenced by multiple requirements
 - **Constraints** - Limits/boundaries exist (add to Constraints.md)
 - **Behaviors** - Complex state/flow logic needs documentation
@@ -234,9 +234,9 @@ Add refinements only when:
 - **Ontology** - Shared semantic meaning and vocabulary referenced by model elements
 - **Semantic contracts** - Reusable SHACL shape profiles over explicitly used ontology that constrain requirements
 
-Link requirement-owned non-semantic-contract refinements via `refinedBy` from the requirement that owns the refinement. Link semantic contracts to ontology with `use` and to requirements with `constrain`/`constrainedBy`. Use `#### Concept References` when capability, requirement, refinement, or verification prose needs explicit ontology term bindings.
+Link requirement-owned non-semantic-contract contracts via `definedBy` from the requirement that owns the contract. Link semantic contracts to ontology with `use` and to requirements with `constrain`/`constrainedBy`. Use `#### Concept References` when capability, requirement, contract, or verification prose needs explicit ontology term bindings.
 
-### Refinement Best Practices
+### Contract Best Practices
 
 - **Constraints** should always be in constraint element type
 - Group constraints in single file (e.g., `Constraints.md` in requirements root)
@@ -245,9 +245,9 @@ Link requirement-owned non-semantic-contract refinements via `refinedBy` from th
 - Define **semantic contracts** as reusable SHACL contracts when one or more requirement obligations need a shape profile over explicitly used ontology context
 - Otherwise define them under `#### Behaviors` or `#### Specifications` subsection of the requirement
 
-### Adding Refinement Elements
+### Adding Contract Elements
 
-Create refinement elements when they need to be referenced by multiple requirements:
+Create contract elements when they need to be referenced by multiple requirements:
 
 ```bash
 # Add specification element
@@ -281,14 +281,14 @@ When an error occurs, the system shall log the error, notify the user, and attem
 EOF
 ```
 
-Link refinements to requirements using relations or attachments:
+Link contracts to requirements using relations or attachments:
 
 ```bash
-# Link refinement to requirement using refinedBy relation (owner defines it)
-reqvire link "Data Processing Requirement" "refinedBy" "Data Format Specification"
+# Link contract to requirement using definedBy relation (owner defines it)
+reqvire link "Data Processing Requirement" "definedBy" "Data Format Specification"
 
-# Attach requirement refinement element across explicit requirement subgraph boundaries
-# The refinement must be owned by a requirement via refinedBy
+# Attach requirement contract element across explicit requirement subgraph boundaries
+# The contract must be owned by a requirement via definedBy
 reqvire link "Other Capability Requirement" attaching "Performance Constraint"
 
 # Link a reusable semantic contract to a requirement and ontology
@@ -305,9 +305,9 @@ reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
 ```
 
 **Attachment constraints:**
-- Refinements must have a `refine` relation before being attached
+- Contracts must have a `define` relation before being attached
 - Capabilities do not author attachments; use `#### Concept References` for ontology term bindings
-- Requirements may attach only requirement-owned `specification`, `constraint`, `behavior`, `state`, or `input-output` refinements
+- Requirements may attach only requirement-owned `specification`, `constraint`, `behavior`, `state`, or `input-output` contracts
 - Semantic contracts must not author `#### Concept References`; they depend on ontology through `use`
 
 ## Step 4: Add Verifications
@@ -477,7 +477,7 @@ The system shall create and manage user sessions after successful authentication
 
 #### Relations
   * specify: [User Authentication](Feature.md#user-authentication)
-  * refinedBy: [Session Timeout Constraint](Constraints.md#session-timeout)
+  * definedBy: [Session Timeout Constraint](Constraints.md#session-timeout)
 ```
 
 ### 5. Constraint
@@ -490,7 +490,7 @@ Session timeout limit used by session-management behavior.
   * type: constraint
 
 #### Relations
-  * refine: [Session Management](../System/Auth.md#session-management)
+  * define: [Session Management](../System/Auth.md#session-management)
 ```
 
 ### 6. Verification
@@ -520,7 +520,7 @@ requirements/
 │   └── CapabilityA/
 │       ├── Feature.md          # Capability roots and child capabilities
 │       ├── Requirements.md     # Requirements that specify this capability
-│       └── Specifications.md   # Requirement-owned refinements
+│       └── Specifications.md   # Requirement-owned contracts
 ├── Operations/
 │   └── CapabilityB/
 ├── Ontologies/                  # Canonical home for ontology and semantic-contract elements

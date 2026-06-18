@@ -4,7 +4,7 @@
   * type: specification
 
 ## Relations
-  * refine: [Element Identity Model](StructureAndParsing.md#element-identity-model)
+  * define: [Element Identity Model](StructureAndParsing.md#element-identity-model)
 
 ## ElementIdentity
 

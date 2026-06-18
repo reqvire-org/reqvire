@@ -4,7 +4,7 @@
   * type: specification
 
 ## Relations
-  * refine: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
+  * define: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
 
 ## ReservedSubsections
 
@@ -40,9 +40,9 @@ The Details subsection provides supporting requirement context and intent-level 
 **Parsing Rules:**
 - When parsing `#### Details` subsections, any markdown headers or elements within `<details>...</details>` tags are skipped
 - Content within the Details subsection is part of the requirement narrative context
-- Details subsection does **not** replace refinement relations
-- Technical specifications, constraints, and behaviors that define implementation contracts should be captured in explicit refinement elements linked via `refinedBy`
-- Any normative statements in the Details subsection are interpreted as requirement-level statements unless moved to dedicated refinement elements
+- Details subsection does **not** replace contract relations
+- Technical specifications, constraints, and behaviors that define implementation contracts should be captured in explicit contract elements linked via `definedBy`
+- Any normative statements in the Details subsection are interpreted as requirement-level statements unless moved to dedicated contract elements
 
 **Examples:**
 ```markdown
@@ -127,9 +127,9 @@ Element identifier attachments link to model elements that are attachable under 
 
 **Validation Rules:**
 - Target element must exist in the model
-- Requirement attachment targets must be reusable requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` elements. Semantic-contract dependencies use `constrainedBy`/`constrain` and ontology `use` relations.
-- Capability, verification, refinement, and requirement semantic vocabulary references use `#### Concept References`, not attachments.
-- Requirement-owned refinement targets must have exactly one compatible `refine` relation before they are attachable.
+- Requirement attachment targets must be reusable requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` contract elements. Semantic-contract dependencies use `constrainedBy`/`constrain` and ontology `use` relations.
+- Capability, verification, contract, and requirement semantic vocabulary references use `#### Concept References`, not attachments.
+- Requirement-owned contract targets must have exactly one compatible `define` relation before they are attachable.
 - Non-attachable element identifiers are rejected with a validation error.
 - Redundant same-hierarchy attachments and invalid cross-subgraph attachment flow are rejected by attachment validation.
 
@@ -147,4 +147,4 @@ The system shall expose an API contract.
 
 Must be defined with a level 4 header: `#### Concept References`.
 
-Concept references bind readable element prose to declared ontology terms. They may be authored on capability, requirement, refinement, verification-objective, and concrete verification elements. They must not be authored on ontology elements, because ontology elements declare terms in `#### Ontology`. They must not be authored on semantic-contract elements, because semantic contracts are semantic graph artifacts that use ontology through `use`/`usedBy` relations and SHACL `#### Shapes`.
+Concept references bind readable element prose to declared ontology terms. They may be authored on capability, requirement, contract, verification-objective, and concrete verification elements. They must not be authored on ontology elements, because ontology elements declare terms in `#### Ontology`. They must not be authored on semantic-contract elements, because semantic contracts are semantic graph artifacts that use ontology through `use`/`usedBy` relations and SHACL `#### Shapes`.

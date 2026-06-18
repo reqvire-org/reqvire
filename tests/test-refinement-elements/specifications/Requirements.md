@@ -20,11 +20,11 @@ This is a parent requirement for testing Refinement elements.
 
 #### Relations
   * specify: [Parent Capability](#parent-capability)
-  * refinedBy: [Test Constraint Element](#test-constraint-element)
-  * refinedBy: [Test Behavior Element](#test-behavior-element)
-  * refinedBy: [Test Specification Element](#test-specification-element)
-  * refinedBy: [Test State Element](#test-state-element)
-  * refinedBy: [Test Input Output Element](#test-input-output-element)
+  * definedBy: [Test Constraint Element](#test-constraint-element)
+  * definedBy: [Test Behavior Element](#test-behavior-element)
+  * definedBy: [Test Specification Element](#test-specification-element)
+  * definedBy: [Test State Element](#test-state-element)
+  * definedBy: [Test Input Output Element](#test-input-output-element)
 ---
 
 ### Test Constraint Element

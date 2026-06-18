@@ -913,7 +913,7 @@ fn is_smart_filter_child_relation(relation_type: &str) -> bool {
         "derive"
             | "specifiedBy"
             | "satisfiedBy"
-            | "refinedBy"
+            | "definedBy"
             | "constrainedBy"
             | "constrain"
             | "use"

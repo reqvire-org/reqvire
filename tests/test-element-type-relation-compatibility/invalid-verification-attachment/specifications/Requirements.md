@@ -26,7 +26,7 @@ Requirement owning a refinement that a verification must not attach.
 
 #### Relations
   * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-invalid-verification-attachment)
-  * refinedBy: [Reusable Verification Criteria](#reusable-verification-criteria)
+  * definedBy: [Reusable Verification Criteria](#reusable-verification-criteria)
   * verifiedBy: [Verification With Attachment](#verification-with-attachment)
 ---
 

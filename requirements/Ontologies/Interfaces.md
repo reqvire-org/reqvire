@@ -92,6 +92,18 @@ reqvire:McpCompatibilityVersionContract a owl:Class ;
 reqvire:McpResourceContract a owl:Class ;
   rdfs:subClassOf reqvire:McpInterfaceContract ;
   rdfs:comment "Contract vocabulary for MCP resource exposure." .
+reqvire:McpSemanticQueryContract a owl:Class ;
+  rdfs:subClassOf reqvire:McpInterfaceContract ;
+  rdfs:comment "Contract vocabulary for read-only semantic query execution over Reqvire RDF evidence through MCP." .
+reqvire:McpSparqlQueryToolContract a owl:Class ;
+  rdfs:subClassOf reqvire:McpSemanticQueryContract ;
+  rdfs:comment "MCP tool contract for SPARQL query execution over a model-owned Oxigraph semantic store." .
+reqvire:McpSemanticPrefixRegistryContract a owl:Class ;
+  rdfs:subClassOf reqvire:McpSemanticQueryContract ;
+  rdfs:comment "Contract vocabulary for ontology-defined prefix and namespace discovery through MCP." .
+reqvire:McpSemanticPrefixToolContract a owl:Class ;
+  rdfs:subClassOf reqvire:McpSemanticPrefixRegistryContract ;
+  rdfs:comment "MCP tool contract for listing ontology element prefix metadata, namespace IRIs, source provenance, and source prose content." .
 reqvire:McpToolSideEffectClass a owl:Class ;
   rdfs:subClassOf reqvire:McpToolSideEffectContract ;
   rdfs:comment "Controlled vocabulary class for MCP tool side-effect categories." .

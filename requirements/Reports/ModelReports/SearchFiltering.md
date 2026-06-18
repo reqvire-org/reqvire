@@ -4,7 +4,7 @@
   * type: specification
 
 ## Relations
-  * refine: [Search Report Generator](ReportingRequirements.md#search-report-generator)
+  * define: [Search Report Generator](ReportingRequirements.md#search-report-generator)
 
 ## SearchFiltering
 

@@ -26,7 +26,7 @@ function Section({ title, desc, children }: { title: string; desc?: string; chil
 const ELEMENT_TYPES = [
   { name: "capability", fill: "--capability", tint: "--capability-tint", ink: "--capability-ink" },
   { name: "requirement", fill: "--requirement", tint: "--requirement-tint", ink: "--requirement-ink" },
-  { name: "refinement", fill: "--refinement", tint: "--refinement-tint", ink: "--refinement-ink" },
+  { name: "contract", fill: "--contract", tint: "--contract-tint", ink: "--contract-ink" },
   { name: "verification", fill: "--verification", tint: "--verification-tint", ink: "--verification-ink" },
   { name: "ontology", fill: "--ontology", tint: "--ontology-tint", ink: "--ontology-ink" },
   { name: "resource", fill: "--resource", tint: "--resource-tint", ink: "--resource-ink" },

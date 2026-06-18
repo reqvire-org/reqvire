@@ -13,7 +13,7 @@ When filtering model output from a starting requirement:
   * type: behavior
 
 #### Relations
-  * refine: [Forward-Only Relation Traversal](ReportingRequirements.md#forward-only-relation-traversal)
+  * define: [Forward-Only Relation Traversal](ReportingRequirements.md#forward-only-relation-traversal)
 ---
 
 ### Implementation Coverage Behavior
@@ -24,8 +24,8 @@ Coverage behavior for requirement implementation reporting.
 Implementation coverage source vocabulary is defined by the Reqvire report ontology. Implementation coverage classification shall follow:
 
 - **Directly satisfied**: requirement has one or more `satisfiedBy` relations.
-- **Refinement-contract via attachment**: requirement owns refinement elements via `refinedBy`, and at least one owned refinement is attached by a requirement that is directly satisfied.
-- **Refinement-contract via child**: requirement owns refinement elements via `refinedBy`, and at least one derived descendant requirement has `satisfiedBy`.
+- **Contract via attachment**: requirement owns contract elements via `definedBy`, and at least one owned contract is attached by a requirement that is directly satisfied.
+- **Contract via child**: requirement owns contract elements via `definedBy`, and at least one derived descendant requirement has `satisfiedBy`.
 - **Uncovered**: requirement has no coverage evidence from the above sources.
 
 Rules:

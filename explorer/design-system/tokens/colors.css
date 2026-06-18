@@ -57,7 +57,7 @@
     --color-requirement: oklch(47.42% 0.1862 294.78);
     --color-verification:oklch(67.31% 0.1624 144.21);
     --color-verification-objective: oklch(43.2% 0.122 145.8);
-    --color-refinement:  oklch(77.03% 0.1741 64.05);
+    --color-contract:    oklch(77.03% 0.1741 64.05);
     --color-semantic-contract: oklch(63.68% 0.2078 25.33);
     --color-ontology:    oklch(65.1%  0.133  89.06);
     --color-resource:    oklch(86.22% 0.1681 88.31);
@@ -156,9 +156,9 @@
     --requirement-ink: #512da8;
     --requirement-tint: color-mix(in oklch, var(--requirement) 15%, var(--bg-surface));
 
-    --refinement:     var(--color-refinement);
-    --refinement-ink: #e65100;
-    --refinement-tint: color-mix(in oklch, var(--refinement) 15%, var(--bg-surface));
+    --contract:     var(--color-contract);
+    --contract-ink: #e65100;
+    --contract-tint: color-mix(in oklch, var(--contract) 15%, var(--bg-surface));
 
     --semantic-contract:     var(--color-semantic-contract);
     --semantic-contract-ink: #b71c1c;
@@ -288,7 +288,7 @@
     :root:not([data-theme="light"]) {
       --capability-ink:    #90caf9;
       --requirement-ink:   #b39ddb;
-      --refinement-ink:    #ffb74d;
+      --contract-ink:      #ffb74d;
       --semantic-contract-ink: #ef9a9a;
       --verification-ink:  #81c784;
       --verification-objective-ink: #9ccc65;
@@ -345,7 +345,7 @@
   [data-theme="dark"], .dark {
     --capability-ink:    #90caf9;
     --requirement-ink:   #b39ddb;
-    --refinement-ink:    #ffb74d;
+    --contract-ink:      #ffb74d;
     --semantic-contract-ink: #ef9a9a;
     --verification-ink:  #81c784;
     --verification-objective-ink: #9ccc65;

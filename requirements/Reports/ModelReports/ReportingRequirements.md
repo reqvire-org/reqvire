@@ -9,6 +9,12 @@ When requested the system shall provide human readable and machine readable Syst
 
 #### Relations
   * constrainedBy: [Report Output Vocabulary Shape](../../Ontologies/ReportsAndQuery.md#report-output-vocabulary-shape)
+  * definedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
+  * definedBy: [JSON Output Structure](Specifications.md#json-output-structure)
+  * definedBy: [Markdown Report Style Specification](Specifications.md#markdown-report-style-specification)
+  * definedBy: [Report Command Catalog Specification](Specifications.md#report-command-catalog-specification)
+  * definedBy: [Text Output Formatting](Specifications.md#text-output-formatting)
+  * definedBy: [Traceability Reporting Specification](Specifications.md#traceability-reporting-specification)
   * derive: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
   * derive: [Collect Capability and Requirement Context](#collect-capability-and-requirement-context)
   * derive: [JSON Element Size Estimate Exposure](#json-element-size-estimate-exposure)
@@ -17,22 +23,16 @@ When requested the system shall provide human readable and machine readable Syst
   * derive: [Requirement Implementation Coverage Report](#requirement-implementation-coverage-report)
   * derive: [Resources Report](#resources-report)
   * derive: [Verification Coverage Report](#verification-coverage-report)
-  * refinedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
-  * refinedBy: [JSON Output Structure](Specifications.md#json-output-structure)
-  * refinedBy: [Markdown Report Style Specification](Specifications.md#markdown-report-style-specification)
-  * refinedBy: [Report Command Catalog Specification](Specifications.md#report-command-catalog-specification)
-  * refinedBy: [Text Output Formatting](Specifications.md#text-output-formatting)
-  * refinedBy: [Traceability Reporting Specification](Specifications.md#traceability-reporting-specification)
   * specify: [Provide Reports](../ReportsAndQueryFeature.md#provide-reports)
 ---
 
 ### Collect Capability and Requirement Context
 
-The system shall collect and consolidate context from a capability or requirement element, including directional capability and requirement traversal, authored concept references, requirement-owned `refinedBy` targets, attached requirement contract contents, and source citations in text or JSON format.
+The system shall collect and consolidate context from a capability or requirement element, including directional capability and requirement traversal, authored concept references, requirement-owned `definedBy` targets, attached requirement contract contents, and source citations in text or JSON format.
 
 #### Details
 The system shall define:
-- Content collection rules for elements, refinedBy targets, and attachments
+- Content collection rules for elements, definedBy targets, and attachments
 - Output format specifications for text and JSON modes
 - Direction-based traversal over capability hierarchy, requirement hierarchy, and the `specify`/`specifiedBy` bridge where defined by the collect traversal specification
 
@@ -40,9 +40,9 @@ The system shall define:
   * type: requirement
 
 #### Relations
+  * definedBy: [Collect Content Specification](Specifications.md#collect-content-specification)
+  * definedBy: [Collect Output Format Specification](Specifications.md#collect-output-format-specification)
   * derivedFrom: [Model Reports](#model-reports)
-  * refinedBy: [Collect Content Specification](Specifications.md#collect-content-specification)
-  * refinedBy: [Collect Output Format Specification](Specifications.md#collect-output-format-specification)
   * satisfiedBy: [report_collect.rs](../../../core/src/report_collect.rs)
 ---
 
@@ -60,8 +60,8 @@ The system shall expose element-level `size_estimate` records in JSON model evid
   * type: requirement
 
 #### Relations
+  * definedBy: [JSON Element Size Estimate Output Specification](Specifications.md#json-element-size-estimate-output-specification)
   * derivedFrom: [Model Reports](#model-reports)
-  * refinedBy: [JSON Element Size Estimate Output Specification](Specifications.md#json-element-size-estimate-output-specification)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
   * verifiedBy: [JSON Element Size Estimate Output Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#json-element-size-estimate-output-verification)
@@ -98,8 +98,8 @@ Implementation details shall follow the associated refinement specifications.
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
 #### Relations
+  * definedBy: [Containment View Report Refinement Specification](Specifications.md#containment-view-report-refinement-specification)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * refinedBy: [Containment View Report Refinement Specification](Specifications.md#containment-view-report-refinement-specification)
   * verifiedBy: [Containment View Design Documents Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#containment-view-design-documents-test)
 ---
 
@@ -118,9 +118,9 @@ Implementation details shall follow the associated refinement specifications.
   * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
 
 #### Relations
+  * definedBy: [Model Diagram Output Formats Refinement Specification](Specifications.md#model-diagram-output-formats-refinement-specification)
   * derive: [Forward-Only Relation Traversal](#forward-only-relation-traversal)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * refinedBy: [Model Diagram Output Formats Refinement Specification](Specifications.md#model-diagram-output-formats-refinement-specification)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#model-command-verification)
 ---
@@ -136,8 +136,8 @@ Traversal behavior shall follow the associated behavior refinement.
   * type: requirement
 
 #### Relations
+  * definedBy: [Forward-Only Relation Traversal Behavior](Behaviors.md#forward-only-relation-traversal-behavior)
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
-  * refinedBy: [Forward-Only Relation Traversal Behavior](Behaviors.md#forward-only-relation-traversal-behavior)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#model-command-verification)
 ---
@@ -150,8 +150,8 @@ The system shall support reverse relation traversal for model views, following d
   * type: requirement
 
 #### Relations
+  * definedBy: [Reverse Relation Traversal Behavior](Behaviors.md#reverse-relation-traversal-behavior)
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
-  * refinedBy: [Reverse Relation Traversal Behavior](Behaviors.md#reverse-relation-traversal-behavior)
   * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
   * verifiedBy: [Reverse Model Traversal Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#reverse-model-traversal-test)
 ---
@@ -164,8 +164,8 @@ The system shall support filtering starting elements by type for model traversal
   * type: requirement
 
 #### Relations
+  * definedBy: [Start Element Type Filter Behavior](Behaviors.md#start-element-type-filter-behavior)
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
-  * refinedBy: [Start Element Type Filter Behavior](Behaviors.md#start-element-type-filter-behavior)
   * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
   * verifiedBy: [Start Type Filter Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#start-type-filter-test)
 ---
@@ -194,8 +194,8 @@ Implementation details shall follow the associated refinement specifications.
   * [RelationTypes](../../ModelStructure/RelationTypes.md#relationtypes)
 
 #### Relations
+  * definedBy: [Requirement Submodels Report Specification](Specifications.md#requirement-submodels-report-specification)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * refinedBy: [Requirement Submodels Report Specification](Specifications.md#requirement-submodels-report-specification)
   * satisfiedBy: [report_submodels.rs](../../../core/src/report_submodels.rs)
   * verifiedBy: [Submodels Report Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#submodels-report-verification)
 ---
@@ -236,9 +236,9 @@ Search report kinds, search filter kinds, collect source types, coverage source 
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
 #### Relations
+  * definedBy: [SearchFiltering](SearchFiltering.md#searchfiltering)
+  * definedBy: [Requirement Governance Metadata JSON Output Specification](Specifications.md#requirement-governance-metadata-json-output-specification)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * refinedBy: [SearchFiltering](SearchFiltering.md#searchfiltering)
-  * refinedBy: [Requirement Governance Metadata JSON Output Specification](Specifications.md#requirement-governance-metadata-json-output-specification)
   * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)
   * verifiedBy: [Search Command Tests](../../Verifications/Reports/ModelReports/ReportingVerifications.md#search-command-tests)
@@ -255,8 +255,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Flexible Search Type Filtering Refinement Specification](Specifications.md#flexible-search-type-filtering-refinement-specification)
   * derivedFrom: [Search Report Generator](#search-report-generator)
-  * refinedBy: [Flexible Search Type Filtering Refinement Specification](Specifications.md#flexible-search-type-filtering-refinement-specification)
 ---
 
 ### Comma-Separated Type Filter Parsing
@@ -270,8 +270,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Comma-Separated Type Filter Parsing Refinement Specification](Specifications.md#comma-separated-type-filter-parsing-refinement-specification)
   * derivedFrom: [Flexible Search Type Filtering](#flexible-search-type-filtering)
-  * refinedBy: [Comma-Separated Type Filter Parsing Refinement Specification](Specifications.md#comma-separated-type-filter-parsing-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)
 ---
@@ -324,10 +324,10 @@ The implementation coverage report shall provide:
   * type: requirement
 
 #### Relations
+  * definedBy: [Implementation Coverage Behavior](Behaviors.md#implementation-coverage-behavior)
+  * definedBy: [Implementation Coverage Output Structure Specification](Specifications.md#implementation-coverage-output-structure-specification)
+  * definedBy: [Requirement Implementation Coverage Logic Specification](Specifications.md#requirement-implementation-coverage-logic-specification)
   * derivedFrom: [Model Reports](#model-reports)
-  * refinedBy: [Implementation Coverage Behavior](Behaviors.md#implementation-coverage-behavior)
-  * refinedBy: [Implementation Coverage Output Structure Specification](Specifications.md#implementation-coverage-output-structure-specification)
-  * refinedBy: [Requirement Implementation Coverage Logic Specification](Specifications.md#requirement-implementation-coverage-logic-specification)
   * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
 ---
 
@@ -339,8 +339,8 @@ The system shall provide a resources report showing all files referenced by the 
   * type: requirement
 
 #### Relations
+  * definedBy: [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
   * derivedFrom: [Model Reports](#model-reports)
-  * refinedBy: [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
   * verifiedBy: [Resources Report Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#resources-report-verification)
 ---
 
@@ -370,9 +370,9 @@ The report helps track verification completeness and identify gaps in requiremen
   * [Verification Type Selection Guidelines](../../ModelStructure/Specifications.md#verification-type-selection-guidelines)
 
 #### Relations
+  * definedBy: [Verification Coverage Philosophy Behavior](Behaviors.md#verification-coverage-philosophy-behavior)
+  * definedBy: [Verification Coverage Specification](Specifications.md#verification-coverage-specification)
   * derivedFrom: [Model Reports](#model-reports)
-  * refinedBy: [Verification Coverage Philosophy Behavior](Behaviors.md#verification-coverage-philosophy-behavior)
-  * refinedBy: [Verification Coverage Specification](Specifications.md#verification-coverage-specification)
 ---
 
 ### TraceFlow View Report Generation
@@ -413,7 +413,7 @@ The ontology projection subgraph shall:
   * [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
 
 #### Relations
-  * refinedBy: [Ontology Projection Subgraph Materialization Specification](Specifications.md#ontology-projection-subgraph-materialization-specification)
+  * definedBy: [Ontology Projection Subgraph Materialization Specification](Specifications.md#ontology-projection-subgraph-materialization-specification)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
 ---
@@ -437,7 +437,7 @@ The collection shall preserve source element identifiers, source file paths, sec
 
 #### Relations
   * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/ReportsAndQuery.md#semantic-export-projection-shape)
-  * refinedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
+  * definedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
   * satisfiedBy: [explorer_runtime.rs](../../../core/src/explorer_runtime.rs)
   * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)

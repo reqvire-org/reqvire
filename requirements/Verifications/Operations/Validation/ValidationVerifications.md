@@ -156,14 +156,14 @@ This test verifies that the system correctly validates relation types based on e
 - System shall reject `verify` relations to non-capability and non-requirement elements
 
 **Refinement Type Validation:**
-- System shall allow `refine` relations on `constraint` type elements pointing to requirements
-- System shall allow `refine` relations on `behavior` type elements pointing to requirements
-- System shall allow `refine` relations on `specification` type elements pointing to requirements
-- System shall allow `refine` relations on `state` and `input-output` elements pointing to requirements
-- System shall allow `refine` relations on `source` elements pointing to capabilities
+- System shall allow `define` relations on `constraint` type elements pointing to requirements
+- System shall allow `define` relations on `behavior` type elements pointing to requirements
+- System shall allow `define` relations on `specification` type elements pointing to requirements
+- System shall allow `define` relations on `state` and `input-output` elements pointing to requirements
+- System shall allow `define` relations on `source` elements pointing to capabilities
 - System shall allow `constrain` relations on `semantic-contract` elements pointing to requirements
 - System shall reject all other relation types on refinement elements (derivedFrom, verifiedBy, trace, satisfiedBy)
-- System shall provide clear error message indicating non-semantic-contract refinement types can only have refine relations
+- System shall provide clear error message indicating non-semantic-contract refinement types can only have define relations
 
 **trace Relation Validation:**
 - System shall allow `trace` relations for any non-refinement element type
@@ -185,13 +185,13 @@ This test verifies that the system correctly validates relation types based on e
    - Verify error message indicates `capability` is not allowed for satisfiedBy
 
 3. **Refinement type relation tests:**
-   - Create constraint element with `refine` relation to requirement - PASS
-   - Create behavior element with `refine` relation to requirement - PASS
-   - Create specification element with `refine` relation to requirement - PASS
+   - Create constraint element with `define` relation to requirement - PASS
+   - Create behavior element with `define` relation to requirement - PASS
+   - Create specification element with `define` relation to requirement - PASS
    - Create constraint element with `trace` relation - FAIL with error
    - Create behavior element with `derivedFrom` relation - FAIL with error
    - Create specification element with `satisfiedBy` relation - FAIL with error
-   - Verify error messages indicate refinement types can only have refine relations
+   - Verify error messages indicate refinement types can only have define relations
    - Create constraint element with Attachments subsection - FAIL with error
    - Verify error message indicates refinement types cannot have attachments
 
@@ -450,7 +450,7 @@ Test cases:
 1. `source` refining `requirement` validates successfully.
 2. `ontology` validates as an independent ontology element when semantic sections are well formed.
 3. `semantic-contract` constraining `requirement` validates as a shape contract when it contains Shapes, uses ontology, and has no Ontology section.
-4. `semantic-contract` using `refinedBy`/`refine` fails validation.
+4. `semantic-contract` using `definedBy`/`define` fails validation.
 5. `source` refining `capability` fails.
 6. `constraint`, `behavior`, `specification`, `state`, or `input-output` refining `capability` fails.
 7. Capability attachment to `ontology` fails; capabilities use concept references for ontology terms.
@@ -526,7 +526,7 @@ Test cases:
 
 ### Single Element Refinement Validation Test
 
-This test verifies that `# Element` files are parsed as single-element model files and that `refinedBy` targets must resolve to refinement elements (including those defined in `# Element` files).
+This test verifies that `# Element` files are parsed as single-element model files and that `definedBy` targets must resolve to refinement elements (including those defined in `# Element` files).
 
 #### Details
 
@@ -534,18 +534,18 @@ This test verifies that `# Element` files are parsed as single-element model fil
 - System shall parse `# Element` files as model files with one element.
 - The single element shall use metadata type from `## Metadata`.
 - Content under `## <Actual Element Name>` shall allow arbitrary markdown headers, and the heading text shall define the element name.
-- `refinedBy` targets shall be identifier links that resolve to refinement elements.
-- `refinedBy` plain file-path targets shall be rejected.
-- `refinedBy` identifier targets into `# Element` files shall satisfy existing relation type compatibility rules based on target element type.
+- `definedBy` targets shall be identifier links that resolve to refinement elements.
+- `definedBy` plain file-path targets shall be rejected.
+- `definedBy` identifier targets into `# Element` files shall satisfy existing relation type compatibility rules based on target element type.
 
 ##### Test Criteria
 1. Create valid `# Element` refinement file with:
    - `## Metadata` type `specification`
-   - `## Relations` containing `refine` relation
+   - `## Relations` containing `define` relation
    - `## <Actual Element Name>` body containing nested markdown headers
-2. Create requirement with `refinedBy` pointing to the single-element identifier (`file.md#fragment`); run `reqvire validate`; assert success.
+2. Create requirement with `definedBy` pointing to the single-element identifier (`file.md#fragment`); run `reqvire validate`; assert success.
 3. Change single-element metadata type to `requirement`; run `reqvire validate`; assert failure with incompatible type message.
-4. Point `refinedBy` to plain file path (no fragment), including a `# Element` file path; run `reqvire validate`; assert failure.
+4. Point `definedBy` to plain file path (no fragment), including a `# Element` file path; run `reqvire validate`; assert failure.
 5. Create `# Element` file where `## <Actual Element Name>` body contains multiple markdown headers (including `###`); run `reqvire validate`; assert success.
 
 #### Metadata

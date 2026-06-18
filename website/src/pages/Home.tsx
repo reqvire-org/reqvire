@@ -63,7 +63,7 @@ const knowledgeItems = [
   { term: "Ontologies", desc: "define domain concepts, relationships, vocabulary, and semantic meaning." },
   { term: "Capabilities", desc: "describe coherent operational, product, business, regulatory, or system abilities." },
   { term: "Requirements", desc: "define implementable obligations, constraints, guarantees, and behavioral expectations." },
-  { term: "Refinements", desc: "turn requirements and capabilities into precise engineering contracts." },
+  { term: "Contracts", desc: "turn requirements and capabilities into precise engineering contracts." },
   { term: "Verifications", desc: "provide evidence that requirements and capabilities are satisfied." },
   { term: "Implementation artifacts", desc: "connect the model to code, tests, proofs, and generated evidence." },
 ];
@@ -73,7 +73,7 @@ const capabilities = [
   { icon: Target, title: "Capability-Driven Engineering", desc: "Develop systems around coherent operational capabilities instead of disconnected feature lists. Capabilities decompose hierarchically and remain stable across implementation changes." },
   { icon: Network, title: "Ontology-Driven Engineering", desc: "Bring semantic vocabulary and domain meaning directly into the engineering workflow. Ontologies make terminology explicit, reusable, and visible to humans and AI systems." },
   { icon: FileCode, title: "Specification-Driven Development", desc: "Develop from capabilities and requirements while keeping implementation, architecture, tests, and verification artifacts aligned with engineering intent." },
-  { icon: Link2, title: "Automated Traceability", desc: "Maintain links between ontologies, capabilities, requirements, refinements, code, tests, proofs, and verification artifacts." },
+  { icon: Link2, title: "Automated Traceability", desc: "Maintain links between ontologies, capabilities, requirements, contracts, code, tests, proofs, and verification artifacts." },
   { icon: CheckCircle, title: "Verification & Validation", desc: "Track verification coverage, behavioral correctness, implementation alignment, and validation evidence throughout the lifecycle." },
 ];
 
@@ -164,7 +164,7 @@ export default function Home() {
             ))}
           </div>
           <ScrollReveal delay={200} className="lg:w-[260px] flex-shrink-0">
-            <img src="/images/graph-hierarchy.jpg" alt="Semantic engineering model structure" className="w-full rounded-lg border border-zinc-200" />
+            <img src="/images/graph-hierarchy.svg" alt="Semantic engineering model structure" className="w-full rounded-lg border border-zinc-200" />
           </ScrollReveal>
         </div>
 

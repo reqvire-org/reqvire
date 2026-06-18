@@ -56,7 +56,7 @@ export default function Advanced() {
             },
             {
               name: "reqvire change-impact",
-              desc: "Shows elements that need review because requirements, refinements, attachments, verification links, or semantic dependencies changed.",
+              desc: "Shows elements that need review because requirements, contracts, attachments, verification links, or semantic dependencies changed.",
             },
             {
               name: "reqvire ontologies",

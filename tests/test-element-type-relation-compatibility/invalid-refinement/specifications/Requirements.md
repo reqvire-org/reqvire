@@ -43,13 +43,13 @@ invalidsc:payloadId a owl:DatatypeProperty .
 
 ### Semantic Contract with Refine
 
-INVALID: Semantic contract must use constrain/constrainedBy instead of refine/refinedBy.
+INVALID: Semantic contract must use constrain/constrainedBy instead of define/definedBy.
 
 #### Metadata
   * type: semantic-contract
 
 #### Relations
-  * refine: [Target Capability](#target-capability)
+  * define: [Target Capability](#target-capability)
   * use: [Semantic Contract Ontology](#semantic-contract-ontology)
 
 #### Shapes
@@ -71,20 +71,20 @@ invalidsc:PayloadShape
 
 ### Requirement Refined By Semantic Contract
 
-INVALID: Requirement must use constrainedBy instead of refinedBy for semantic contracts.
+INVALID: Requirement must use constrainedBy instead of definedBy for semantic contracts.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Target Capability](#target-capability)
-  * refinedBy: [Semantic Contract with Constraint Relation](#semantic-contract-with-constraint-relation)
+  * definedBy: [Semantic Contract with Constraint Relation](#semantic-contract-with-constraint-relation)
 
 ---
 
 ### Semantic Contract with Constraint Relation
 
-Semantic contract with valid semantic-contract relations, used as an invalid refinedBy target.
+Semantic contract with valid semantic-contract relations, used as an invalid definedBy target.
 
 #### Metadata
   * type: semantic-contract

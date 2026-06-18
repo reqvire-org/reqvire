@@ -163,8 +163,8 @@ MV FILE OPTIONS:
 
 LINK OPTIONS:
        <SOURCE>                 Source element name
-       <RELATION_TYPE>          Relation type OR 'attaching'. Relations: derivedFrom, derive, specify, specifiedBy, refine, refinedBy, constrain, constrainedBy, use, usedBy, satisfiedBy, satisfy, verifiedBy, verify, trace. Use 'attaching' to attach compatible requirement-owned refinement elements
-       <TARGET>                 Target: element name, internal path, or external URL (for relations); compatible refinement element identifier for requirement attachments
+       <RELATION_TYPE>          Relation type OR 'attaching'. Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, satisfiedBy, satisfy, verifiedBy, verify, trace. Use 'attaching' to attach compatible requirement-owned contract elements
+       <TARGET>                 Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement attachments
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)

@@ -33,8 +33,8 @@ A requirement that is refined by a constraint.
   * type: requirement
 
 #### Relations
+  * definedBy: [Test Constraint](#test-constraint)
   * derivedFrom: [Parent Requirement](#parent-requirement)
-  * refinedBy: [Test Constraint](#test-constraint)
 ---
 
 ### Test Capability Test Format Full Relations Specifications Requirements Md
@@ -56,5 +56,5 @@ A constraint that refines the target requirement.
   * type: constraint
 
 #### Relations
-  * refine: [Target Requirement](#target-requirement)
+  * define: [Target Requirement](#target-requirement)
 ---

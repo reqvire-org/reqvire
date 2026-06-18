@@ -16,6 +16,8 @@ use crate::semantic_contract::{self, SemanticExportFormat};
 use crate::verification_trace;
 use crate::{ModelBuildOptions, ModelManager};
 use globset::GlobSet;
+use oxigraph::model::{NamedOrBlankNode, Term, Triple};
+use oxigraph::sparql::{QueryResults, SparqlEvaluator};
 use serde_json::{json, Value};
 use std::collections::BTreeSet;
 use std::hash::{Hash, Hasher};
@@ -243,15 +245,35 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             object_schema(vec![("from", json!({ "type": "string" }))]),
         ),
         read_tool(
-            "reqvire.ontologies",
-            "Collect ontology elements and semantic-contract SHACL shapes.",
+            "reqvire.semantic.ontologies",
+            "Collect ontology RDF and semantic-contract SHACL shapes.",
             object_schema(vec![
                 (
                     "format",
                     json!({ "type": "string", "enum": ["turtle", "jsonld"], "default": "turtle" }),
                 ),
+                (
+                    "content",
+                    json!({ "type": "string", "enum": ["rdf", "shacl", "both"], "default": "both" }),
+                ),
                 ("full", json!({ "type": "boolean", "default": false })),
             ]),
+        ),
+        read_tool(
+            "reqvire.semantic.prefixes",
+            "List ontology-defined semantic prefixes and namespaces.",
+            object_schema(vec![]),
+        ),
+        read_tool(
+            "reqvire.semantic.sparql",
+            "Run a read-only SPARQL query over Reqvire semantic RDF evidence.",
+            required_object_schema(
+                vec![
+                    ("query", json!({ "type": "string" })),
+                    ("full", json!({ "type": "boolean", "default": true })),
+                ],
+                vec!["query"],
+            ),
         ),
         read_tool(
             "reqvire.lint",
@@ -536,7 +558,15 @@ fn dispatch_tool(
         "reqvire.containment" => containment_tool(args, excluded_filename_patterns),
         "reqvire.collect" => collect_tool(args, excluded_filename_patterns),
         "reqvire.submodels" => submodels_tool(args, excluded_filename_patterns),
-        "reqvire.ontologies" => ontologies_tool(args, excluded_filename_patterns),
+        "reqvire.semantic.ontologies" => {
+            ontologies_tool(args, excluded_filename_patterns, with_size_estimates)
+        }
+        "reqvire.semantic.prefixes" => {
+            semantic_prefixes_tool(excluded_filename_patterns, with_size_estimates)
+        }
+        "reqvire.semantic.sparql" => {
+            sparql_tool(args, excluded_filename_patterns, with_size_estimates)
+        }
         "reqvire.lint" => lint_tool(args, excluded_filename_patterns),
         "reqvire.coverage" => coverage_tool(excluded_filename_patterns),
         "reqvire.traces" => traces_tool(args, excluded_filename_patterns),
@@ -728,14 +758,20 @@ fn submodels_tool(
 fn ontologies_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
 ) -> Result<Value, ReqvireError> {
-    let model = load_model(excluded_filename_patterns)?;
-    let index = semantic_contract::build_semantic_index(&model.graph_registry);
+    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
+    let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
+        ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
+    })?;
     let format = string_arg(args, "format").unwrap_or_else(|| "turtle".to_string());
+    let content_filter = ontology_content_filter(args)?;
     let full = bool_arg(args, "full", false);
+    let index = filtered_semantic_index(&semantic_store.index, content_filter);
     match format.as_str() {
         "turtle" => Ok(json!({
             "format": "turtle",
+            "content_filter": content_filter.as_str(),
             "full": full,
             "content": if full {
                 index.serialize_full(SemanticExportFormat::Turtle, &model.graph_registry)?
@@ -759,6 +795,7 @@ fn ontologies_tool(
                 .map_err(|e| ReqvireError::SerializationError(e.to_string()))?;
             Ok(json!({
                 "format": "jsonld",
+                "content_filter": content_filter.as_str(),
                 "full": full,
                 "content": content,
                 "jsonld": jsonld,
@@ -774,6 +811,406 @@ fn ontologies_tool(
             "Invalid ontology format '{}'. Valid values: turtle, jsonld",
             other
         ))),
+    }
+}
+
+#[derive(Clone, Copy)]
+enum OntologyContentFilter {
+    Rdf,
+    Shacl,
+    Both,
+}
+
+impl OntologyContentFilter {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Rdf => "rdf",
+            Self::Shacl => "shacl",
+            Self::Both => "both",
+        }
+    }
+}
+
+fn ontology_content_filter(args: &Value) -> Result<OntologyContentFilter, ReqvireError> {
+    match string_arg(args, "content")
+        .unwrap_or_else(|| "both".to_string())
+        .as_str()
+    {
+        "rdf" => Ok(OntologyContentFilter::Rdf),
+        "shacl" => Ok(OntologyContentFilter::Shacl),
+        "both" => Ok(OntologyContentFilter::Both),
+        other => Err(ReqvireError::ProcessError(format!(
+            "Invalid ontology content filter '{}'. Valid values: rdf, shacl, both",
+            other
+        ))),
+    }
+}
+
+fn filtered_semantic_index(
+    source: &semantic_contract::SemanticIndex,
+    content_filter: OntologyContentFilter,
+) -> semantic_contract::SemanticIndex {
+    if matches!(content_filter, OntologyContentFilter::Both) {
+        return source.clone();
+    }
+
+    let mut index = source.clone();
+    index.blocks.retain(|block| match content_filter {
+        OntologyContentFilter::Rdf => {
+            matches!(block.kind, semantic_contract::SemanticBlockKind::Ontology)
+        }
+        OntologyContentFilter::Shacl => {
+            matches!(block.kind, semantic_contract::SemanticBlockKind::Shapes)
+        }
+        OntologyContentFilter::Both => true,
+    });
+
+    if matches!(content_filter, OntologyContentFilter::Shacl) {
+        index.ontology_documents.clear();
+        index.ontology_declarations.clear();
+        index.ontology_projection = semantic_contract::OntologyProjectionGraph {
+            id: "urn:reqvire:ontology-projection:empty".to_string(),
+            derivation_mode: semantic_contract::OntologyProjectionDerivationMode::DirectAuthored,
+            projections: Vec::new(),
+            constructs: Vec::new(),
+            symbols: Vec::new(),
+        };
+    } else {
+        index.shape_references.clear();
+    }
+
+    let ontology_blocks = index
+        .blocks
+        .iter()
+        .filter(|block| matches!(block.kind, semantic_contract::SemanticBlockKind::Ontology))
+        .count();
+    let shape_blocks = index
+        .blocks
+        .iter()
+        .filter(|block| matches!(block.kind, semantic_contract::SemanticBlockKind::Shapes))
+        .count();
+    let total_quads = index.blocks.iter().map(|block| block.quads.len()).sum();
+    index.summary = semantic_contract::SemanticIndexSummary {
+        ontology_blocks,
+        shape_blocks,
+        total_blocks: index.blocks.len(),
+        total_quads,
+    };
+
+    index
+}
+
+fn semantic_prefixes_tool(
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<Value, ReqvireError> {
+    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
+    let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
+        ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
+    })?;
+
+    let mut prefixes = Vec::new();
+    let mut prefix_namespaces: std::collections::BTreeMap<String, BTreeSet<String>> =
+        std::collections::BTreeMap::new();
+
+    for declaration in &semantic_store.index.ontology_documents {
+        prefix_namespaces
+            .entry(declaration.ontology_prefix.clone())
+            .or_default()
+            .insert(declaration.term_namespace.clone());
+
+        let source = ontology_prefix_source(&model, declaration);
+        prefixes.push(json!({
+            "prefix": declaration.ontology_prefix,
+            "namespace": declaration.term_namespace,
+            "ontology_base": declaration.ontology_base,
+            "term_namespace": declaration.term_namespace,
+            "ontology_document_iri": declaration.iri,
+            "source": source,
+            "contributors": declaration.element_identifiers.iter().zip(declaration.element_names.iter()).map(|(identifier, name)| {
+                json!({
+                    "element_identifier": identifier,
+                    "element_name": name
+                })
+            }).collect::<Vec<_>>()
+        }));
+    }
+
+    prefixes.sort_by(|left, right| {
+        let left_prefix = left
+            .get("prefix")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        let right_prefix = right
+            .get("prefix")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        left_prefix.cmp(right_prefix).then_with(|| {
+            left.get("namespace")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .cmp(
+                    right
+                        .get("namespace")
+                        .and_then(Value::as_str)
+                        .unwrap_or_default(),
+                )
+        })
+    });
+
+    let conflicts: Vec<Value> = prefix_namespaces
+        .iter()
+        .filter(|(_prefix, namespaces)| namespaces.len() > 1)
+        .map(|(prefix, namespaces)| {
+            json!({
+                "prefix": prefix,
+                "namespaces": namespaces.iter().cloned().collect::<Vec<_>>()
+            })
+        })
+        .collect();
+
+    let sparql_prefix_block = prefixes
+        .iter()
+        .filter_map(|entry| {
+            Some(format!(
+                "PREFIX {}: <{}>",
+                entry.get("prefix")?.as_str()?,
+                entry.get("namespace")?.as_str()?
+            ))
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    let sparql_prefix_block = if sparql_prefix_block.is_empty() {
+        String::new()
+    } else {
+        format!("{}\n", sparql_prefix_block)
+    };
+
+    let namespace_count: usize = prefix_namespaces
+        .values()
+        .flat_map(|namespaces| namespaces.iter())
+        .collect::<BTreeSet<_>>()
+        .len();
+
+    Ok(json!({
+        "prefixes": prefixes,
+        "sparql_prefix_block": sparql_prefix_block,
+        "conflicts": conflicts,
+        "summary": {
+            "prefix_count": prefix_namespaces.len(),
+            "namespace_count": namespace_count,
+            "ontology_document_count": semantic_store.index.ontology_documents.len(),
+            "conflict_count": conflicts.len()
+        },
+        "diagnostics": semantic_store.index.diagnostics,
+        "model_fingerprint": model_fingerprint(&model)
+    }))
+}
+
+fn ontology_prefix_source(
+    model: &ModelManager,
+    declaration: &semantic_contract::OntologyDocumentDeclaration,
+) -> Value {
+    let source_element = declaration
+        .element_identifiers
+        .iter()
+        .filter_map(|identifier| model.graph_registry.get_element(identifier))
+        .find(|element| {
+            element.metadata.get("ontology_base") == Some(&declaration.ontology_base)
+                && element.metadata.get("ontology_prefix") == Some(&declaration.ontology_prefix)
+        })
+        .or_else(|| {
+            declaration
+                .element_identifiers
+                .iter()
+                .filter_map(|identifier| model.graph_registry.get_element(identifier))
+                .find(|element| {
+                    element.metadata.contains_key("ontology_base")
+                        || element.metadata.contains_key("ontology_prefix")
+                })
+        })
+        .or_else(|| {
+            declaration
+                .element_identifiers
+                .iter()
+                .find_map(|identifier| model.graph_registry.get_element(identifier))
+        });
+
+    match source_element {
+        Some(element) => json!({
+            "element_identifier": element.identifier,
+            "element_name": element.name,
+            "file_path": element.file_path,
+            "line_number": element.line_number,
+            "content": semantic_prefix_source_content(&element.content)
+        }),
+        None => json!({
+            "element_identifier": null,
+            "element_name": null,
+            "file_path": null,
+            "line_number": null,
+            "content": ""
+        }),
+    }
+}
+
+fn semantic_prefix_source_content(content: &str) -> String {
+    let mut result = Vec::new();
+    let mut skip_semantic_section = false;
+
+    for line in content.lines() {
+        if let Some(section) = line.trim().strip_prefix("#### ") {
+            skip_semantic_section = matches!(section.trim(), "Ontology" | "Shapes");
+            if skip_semantic_section {
+                continue;
+            }
+        }
+        if !skip_semantic_section {
+            result.push(line);
+        }
+    }
+
+    result.join("\n").trim().to_string()
+}
+
+fn sparql_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<Value, ReqvireError> {
+    let query = required_string_arg(args, "query")?;
+    let full = bool_arg(args, "full", true);
+    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
+    let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
+        ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
+    })?;
+
+    let results = SparqlEvaluator::new()
+        .parse_query(&query)
+        .map_err(|error| ReqvireError::ProcessError(format!("Invalid SPARQL query: {}", error)))?
+        .on_store(semantic_store.store(full))
+        .execute()
+        .map_err(|error| ReqvireError::ProcessError(format!("SPARQL query failed: {}", error)))?;
+
+    let mut result = match results {
+        QueryResults::Solutions(mut solutions) => {
+            let variables: Vec<String> = solutions
+                .variables()
+                .iter()
+                .map(|variable| variable.as_str().to_string())
+                .collect();
+            let mut bindings = Vec::new();
+            for solution in &mut solutions {
+                let solution = solution.map_err(|error| {
+                    ReqvireError::ProcessError(format!(
+                        "SPARQL solution evaluation failed: {}",
+                        error
+                    ))
+                })?;
+                let mut binding = serde_json::Map::new();
+                for variable in &variables {
+                    if let Some(term) = solution.get(variable.as_str()) {
+                        binding.insert(variable.clone(), rdf_term_json(term));
+                    }
+                }
+                bindings.push(Value::Object(binding));
+            }
+            json!({
+                "result_type": "select",
+                "variables": variables,
+                "bindings": bindings,
+                "row_count": bindings.len()
+            })
+        }
+        QueryResults::Boolean(value) => json!({
+            "result_type": "ask",
+            "boolean": value
+        }),
+        QueryResults::Graph(triples) => {
+            let mut rows = Vec::new();
+            for triple in triples {
+                let triple = triple.map_err(|error| {
+                    ReqvireError::ProcessError(format!("SPARQL graph evaluation failed: {}", error))
+                })?;
+                rows.push(rdf_triple_json(&triple));
+            }
+            json!({
+                "result_type": "graph",
+                "triples": rows,
+                "triple_count": rows.len()
+            })
+        }
+    };
+
+    if let Value::Object(ref mut object) = result {
+        object.insert("format".to_string(), json!("sparql"));
+        object.insert("full".to_string(), json!(full));
+        object.insert("summary".to_string(), json!(semantic_store.index.summary));
+        object.insert(
+            "diagnostics".to_string(),
+            json!(semantic_store.index.diagnostics),
+        );
+        object.insert(
+            "model_fingerprint".to_string(),
+            json!(model_fingerprint(&model)),
+        );
+    }
+
+    Ok(result)
+}
+
+fn rdf_triple_json(triple: &Triple) -> Value {
+    json!({
+        "subject": rdf_subject_json(&triple.subject),
+        "predicate": {
+            "kind": "iri",
+            "value": triple.predicate.as_str(),
+            "iri": triple.predicate.as_str()
+        },
+        "object": rdf_term_json(&triple.object)
+    })
+}
+
+fn rdf_subject_json(subject: &NamedOrBlankNode) -> Value {
+    match subject {
+        NamedOrBlankNode::NamedNode(node) => json!({
+            "kind": "iri",
+            "value": node.as_str(),
+            "iri": node.as_str()
+        }),
+        NamedOrBlankNode::BlankNode(node) => json!({
+            "kind": "blank-node",
+            "value": node.as_str(),
+            "id": node.as_str()
+        }),
+    }
+}
+
+fn rdf_term_json(term: &Term) -> Value {
+    match term {
+        Term::NamedNode(node) => json!({
+            "kind": "iri",
+            "value": node.as_str(),
+            "iri": node.as_str()
+        }),
+        Term::BlankNode(node) => json!({
+            "kind": "blank-node",
+            "value": node.as_str(),
+            "id": node.as_str()
+        }),
+        Term::Literal(literal) => {
+            let mut value = json!({
+                "kind": "literal",
+                "value": literal.value(),
+                "datatype": literal.datatype().as_str()
+            });
+            if let Some(language) = literal.language() {
+                if let Value::Object(ref mut object) = value {
+                    object.insert("language".to_string(), json!(language));
+                }
+            }
+            value
+        }
     }
 }
 
@@ -1146,7 +1583,9 @@ fn read_tool_names() -> Vec<&'static str> {
         "reqvire.containment",
         "reqvire.collect",
         "reqvire.submodels",
-        "reqvire.ontologies",
+        "reqvire.semantic.ontologies",
+        "reqvire.semantic.prefixes",
+        "reqvire.semantic.sparql",
         "reqvire.lint",
         "reqvire.coverage",
         "reqvire.traces",

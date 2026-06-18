@@ -71,7 +71,7 @@ Owner requirement for specifications (separate from main hierarchy).
   * type: requirement
 #### Relations
   * specify: [Test Capability](#test-capability-test-change-impact-attachments-specifications-requirements-md)
-  * refinedBy: [Data Format Spec](#data-format-spec)
+  * definedBy: [Data Format Spec](#data-format-spec)
 ---
 
 ### Data Format Spec
@@ -111,7 +111,7 @@ Owner requirement for export format refinement.
   * type: requirement
 #### Relations
   * specify: [Test Capability](#test-capability-test-change-impact-attachments-specifications-requirements-md)
-  * refinedBy: [Export Format Spec](#export-format-spec)
+  * definedBy: [Export Format Spec](#export-format-spec)
 ---
 
 ### Export Format Spec

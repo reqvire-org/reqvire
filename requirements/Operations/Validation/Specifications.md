@@ -3,10 +3,10 @@
 ### Attachment Scope Validation Refinement Specification
 
 #### Details
-When validating attachments, the system is expected to enforce attachment scope constraints for refinement-element identifier targets and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.
+When validating attachments, the system is expected to enforce attachment scope constraints for contract-element identifier targets and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.
 
 Attachment scope validation is expected to enforce:
-- Hierarchical independence from the refinement's defining hierarchy
+- Hierarchical independence from the contract's defining hierarchy
 - Upstream propagation within a hierarchy branch
 - One-direction attachment flow between capability-root subgraphs
 
@@ -20,7 +20,7 @@ Attachment scope validation is expected to enforce:
 Attachment targets support model element identifier references with family-specific compatibility rules.
 
 **Identifier Targets:**
-- Requirement attachments must point to reusable requirement-owned non-semantic-contract refinement element types only (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
+- Requirement attachments must point to reusable requirement-owned non-semantic-contract element types only (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
 - Attachment to `ontology` is invalid; ontology vocabulary bindings use `#### Concept References` on non-ontology, non-semantic-contract elements or `use`/`usedBy` on semantic contracts
 - Normalized like relation targets (resolved to full identifier path)
 - Validation is expected to reject identifiers pointing to non-attachable element types
@@ -45,7 +45,7 @@ Excluded-file relation validation behavior:
   * type: specification
 
 #### Relations
-  * refine: [Excluded File Relation Validation](ValidationRequirements.md#excluded-file-relation-validation)
+  * define: [Excluded File Relation Validation](ValidationRequirements.md#excluded-file-relation-validation)
 ---
 
 ### Integrated Validation Refinement Specification
@@ -61,7 +61,7 @@ Integrated validation execution behavior:
   * type: specification
 
 #### Relations
-  * refine: [Integrated Validation](ValidationRequirements.md#integrated-validation)
+  * define: [Integrated Validation](ValidationRequirements.md#integrated-validation)
 ---
 
 ### Internal Consistency Validator Refinement Specification
@@ -89,11 +89,11 @@ The validator enforces the Reqvire relation ontology together with the canonical
 
 Validation shall check:
 - relation endpoint families and inverse relation compatibility from the relation ontology
-- ontology, capability, requirement, and refinement compatibility from the ontology, capability, requirement, and semantic-contract contracts
+- ontology, capability, requirement, and contract compatibility from the ontology, capability, requirement, and semantic-contract contracts
 - evidence-backed verification compatibility from the verification contracts
 - trace-only behavior for custom `other` and `other-TYPENAME` element types
-- refinement restrictions: refinement elements use only `refine` relations and cannot have Attachments subsections
-- `refinedBy` targets resolve to element identifiers, not plain file paths or `# Element` file links without element fragments
+- contract restrictions: contract elements use only `define` relations and cannot have Attachments subsections
+- `definedBy` targets resolve to element identifiers, not plain file paths or `# Element` file links without element fragments
 
 This validation occurs:
 - During model parsing and validation (model.rs, parser.rs)
@@ -154,5 +154,5 @@ The rule is intentionally strict:
   * type: specification
 
 #### Relations
-  * refine: [Semantic Contract Reference Context Validation](ValidationRequirements.md#semantic-contract-reference-context-validation)
+  * define: [Semantic Contract Reference Context Validation](ValidationRequirements.md#semantic-contract-reference-context-validation)
 ---

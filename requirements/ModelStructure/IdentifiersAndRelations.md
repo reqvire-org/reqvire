@@ -4,7 +4,7 @@
   * type: specification
 
 ## Relations
-  * refine: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
+  * define: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
 
 ## IdentifiersAndRelations
 

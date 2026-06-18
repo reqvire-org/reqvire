@@ -11,8 +11,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Excluded File Relation Validation Refinement Specification](Specifications.md#excluded-file-relation-validation-refinement-specification)
   * derivedFrom: [File Pattern Exclusion for Format](../Formatting/FormattingRequirements.md#file-pattern-exclusion-for-format)
-  * refinedBy: [Excluded File Relation Validation Refinement Specification](Specifications.md#excluded-file-relation-validation-refinement-specification)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Unstructured Documents Test](../../Verifications/Operations/Validation/ValidationVerifications.md#unstructured-documents-test)
 ---
@@ -30,8 +30,8 @@ The system shall reject references to terms declared outside the reachable ontol
   * type: requirement
 
 #### Relations
+  * definedBy: [Semantic Contract Reference Context Validation Specification](Specifications.md#semantic-contract-reference-context-validation-specification)
   * derivedFrom: [Ontology and Semantic Contract Model](../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
-  * refinedBy: [Semantic Contract Reference Context Validation Specification](Specifications.md#semantic-contract-reference-context-validation-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
 ---
@@ -99,8 +99,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Attachment Target Validation Refinement Specification](Specifications.md#attachment-target-validation-refinement-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * refinedBy: [Attachment Target Validation Refinement Specification](Specifications.md#attachment-target-validation-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Attachments Subsection Parsing Verification](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachments-subsection-parsing-verification)
@@ -120,11 +120,11 @@ Implementation details shall follow the associated refinement specifications.
 #### Attachments
   * [Attachment Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#attachment-hierarchical-independence-constraint)
   * [Attachment Subgraph Direction Constraint](../../ModelStructure/Constraints.md#attachment-subgraph-direction-constraint)
-  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-refinement-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../ModelStructure/Constraints.md#attachment-satisfied-contract-constraint)
 
 #### Relations
+  * definedBy: [Attachment Scope Validation Refinement Specification](Specifications.md#attachment-scope-validation-refinement-specification)
   * derivedFrom: [Attachment Target Validation](#attachment-target-validation)
-  * refinedBy: [Attachment Scope Validation Refinement Specification](Specifications.md#attachment-scope-validation-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * verifiedBy: [Attachment Scope Constraints Test](../../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachment-scope-constraints-test)
 ---
@@ -149,8 +149,8 @@ The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 com
   * type: requirement
 
 #### Relations
+  * definedBy: [Requirements Processing Specification](Specifications.md#requirements-processing-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * refinedBy: [Requirements Processing Specification](Specifications.md#requirements-processing-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * verifiedBy: [Requirements Files Search and Detection Test](../../Verifications/Operations/Validation/ValidationVerifications.md#requirements-files-search-and-detection-test)
@@ -170,8 +170,8 @@ Implementation details shall follow the associated refinement specifications.
   * [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
 
 #### Relations
+  * definedBy: [Integrated Validation Refinement Specification](Specifications.md#integrated-validation-refinement-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * refinedBy: [Integrated Validation Refinement Specification](Specifications.md#integrated-validation-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -186,8 +186,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Internal Consistency Validator Refinement Specification](Specifications.md#internal-consistency-validator-refinement-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * refinedBy: [Internal Consistency Validator Refinement Specification](Specifications.md#internal-consistency-validator-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
@@ -208,8 +208,8 @@ Within-section duplicates (same entry repeated within Relations OR within Attach
   * type: requirement
 
 #### Relations
+  * definedBy: [Cross-Section Duplicate Constraint](Constraints.md#cross-section-duplicate-constraint)
   * derivedFrom: [Internal Consistency Validator](#internal-consistency-validator)
-  * refinedBy: [Cross-Section Duplicate Constraint](Constraints.md#cross-section-duplicate-constraint)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * verifiedBy: [Cross-Section Duplicate Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#cross-section-duplicate-validation-test)
 ---
@@ -239,8 +239,8 @@ Validation details shall follow the associated hierarchy ownership constraint.
   * type: requirement
 
 #### Relations
+  * definedBy: [Single Root Hierarchy Ownership Constraint](Constraints.md#single-root-hierarchy-ownership-constraint)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * refinedBy: [Single Root Hierarchy Ownership Constraint](Constraints.md#single-root-hierarchy-ownership-constraint)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Single Root Hierarchy Ownership Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#single-root-hierarchy-ownership-validation-test)
 ---
@@ -256,8 +256,8 @@ The system shall define two-pass validation behavior.
   * type: requirement
 
 #### Relations
+  * definedBy: [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * refinedBy: [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 
@@ -275,8 +275,8 @@ The system shall display all valid type options when type validation fails.
   * type: requirement
 
 #### Relations
+  * definedBy: [Type Validation Error Behavior](Behaviors.md#type-validation-error-behavior)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * refinedBy: [Type Validation Error Behavior](Behaviors.md#type-validation-error-behavior)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
   * verifiedBy: [Type Validation Errors Test](../../Verifications/Operations/Validation/ValidationVerifications.md#type-validation-errors-test)
@@ -301,8 +301,8 @@ This ensures users see all relevant errors at once rather than fixing issues one
   * type: requirement
 
 #### Relations
+  * definedBy: [Validation Error Reporting Behavior](Behaviors.md#validation-error-reporting-behavior)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * refinedBy: [Validation Error Reporting Behavior](Behaviors.md#validation-error-reporting-behavior)
   * satisfiedBy: [error.rs](../../../core/src/error.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
@@ -358,8 +358,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * definedBy: [Relation Element Type Validator Refinement Specification](Specifications.md#relation-element-type-validator-refinement-specification)
   * derivedFrom: [Validate Relation Types](#validate-relation-types)
-  * refinedBy: [Relation Element Type Validator Refinement Specification](Specifications.md#relation-element-type-validator-refinement-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
