@@ -3149,10 +3149,10 @@ fn validate_property_shape(
         match term_iri(term) {
             Some(iri)
                 if owl_reserved::is_reserved_namespace_iri(iri)
-                    && !owl_reserved::is_builtin_datatype_iri(iri) =>
+                    && !owl_reserved::is_supported_datatype_iri(iri) =>
             {
                 errors.push(format!(
-                    "SHACL property shape {shape_name} sh:datatype uses reserved IRI <{iri}> that is not an OWL built-in datatype"
+                    "SHACL property shape {shape_name} sh:datatype uses reserved IRI <{iri}> that is not a supported datatype"
                 ));
             }
             Some(_) => {}
@@ -4208,7 +4208,7 @@ fn shape_iri_references_from_quads(element: &Element, quads: &[Quad]) -> Vec<Sha
         let Some(iri) = term_iri(&quad.object) else {
             continue;
         };
-        if kind == "sh:datatype" && owl_reserved::is_builtin_datatype_iri(iri) {
+        if kind == "sh:datatype" && owl_reserved::is_supported_datatype_iri(iri) {
             continue;
         }
         if kind == "sh:path" && is_builtin_annotation_path(iri) {

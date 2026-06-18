@@ -131,6 +131,22 @@ if echo "$STORE_CONTENT" | grep -q '"path": "notes/unrelated.md"'; then
     exit 1
 fi
 
+printf '\n' >> "$TEST_DIR/specifications/Requirements.md"
+cat "$TEST_DIR/fixtures/direct-filesystem-store-regeneration-sentinel.md.txt" >> "$TEST_DIR/specifications/Requirements.md"
+
+REFRESH_RESPONSE=$(curl -s -w "\n%{http_code}" "http://$TEST_HOST:$TEST_PORT/assets/project-store.js")
+REFRESH_CODE=$(echo "$REFRESH_RESPONSE" | tail -n1)
+REFRESH_CONTENT=$(echo "$REFRESH_RESPONSE" | sed '$d')
+if [ "$REFRESH_CODE" != "200" ]; then
+    echo "❌ FAILED: Project Store refresh request returned HTTP $REFRESH_CODE"
+    exit 1
+fi
+
+if echo "$REFRESH_CONTENT" | grep -q "Direct Filesystem Store Regeneration Sentinel"; then
+    echo "❌ FAILED: Project Store GET regenerated from disk instead of serving the cached runtime store"
+    exit 1
+fi
+
 # Test 3: Check Content-Type for HTML files
 CONTENT_TYPE=$(curl -s -I "http://$TEST_HOST:$TEST_PORT/" | grep -i "content-type" | cut -d: -f2 | tr -d ' \r')
 if [[ ! "$CONTENT_TYPE" =~ ^text/html ]]; then

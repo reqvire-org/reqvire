@@ -485,7 +485,7 @@ Reserved vocabulary recognition shall be fixed-list based over expanded IRIs, no
 
 Reqvire shall treat known reserved vocabulary IRIs as model-valid references in positions where their OWL role is valid without requiring `#### External Ontology` sections for those namespaces.
 
-Built-in datatype IRIs are one reserved vocabulary subset and shall be accepted in datatype positions such as ontology datatype property ranges and SHACL `sh:datatype` values.
+Built-in datatype IRIs are one reserved vocabulary subset and shall be accepted in datatype positions such as ontology datatype property ranges and SHACL `sh:datatype` values. SHACL `sh:datatype` positions shall also accept the Reqvire-supported XML Schema datatype-position subset, including date/time datatypes such as `xsd:date`, without requiring authored ontology declarations for those standard IRIs.
 
 Custom IRIs outside the reserved vocabulary registry remain subject to normal authored or external ontology resolution when term existence validation applies.
 

@@ -11,6 +11,7 @@ use crate::semantic_contract::build_semantic_index;
 
 include!(concat!(env!("OUT_DIR"), "/explorer_bundle_manifest.rs"));
 
+#[derive(Clone)]
 pub struct ExplorerRuntimeAssets {
     pub project_store_js: String,
     pub ontologies_ttl: String,

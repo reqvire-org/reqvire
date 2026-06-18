@@ -771,8 +771,9 @@ Serve command behavior:
 - Accept `--enable-mcp` to also expose the Reqvire MCP Streamable HTTP endpoint at `/mcp` on the same HTTP listener.
 - Accept `--enable-mutations` only when `--enable-mcp` is present, and use it to enable mutation tools for the embedded MCP endpoint.
 - Assemble the embedded Explorer shell, Project Store data, and ontology artifact in memory
-- Regenerate runtime Project Store data and ontology artifacts from the current workspace when `assets/project-store.js` or `ontologies.ttl` are requested, so served Explorer reloads can observe model changes made through embedded MCP mutation tools.
-- Serialize runtime data regeneration with embedded MCP mutation execution to avoid reading partial filesystem updates.
+- Serve `assets/project-store.js` and `ontologies.ttl` from the materialized in-memory runtime assets. Browser refreshes and direct HTTP GET/HEAD requests for those assets shall not parse, validate, or regenerate model data from disk.
+- Refresh the materialized runtime Project Store data and ontology artifact after successful embedded MCP write mutations, so subsequent Explorer reloads observe MCP-authored model changes without making ordinary browser refresh the regeneration trigger.
+- Serialize embedded MCP write mutation execution and runtime asset refresh so the served runtime store is refreshed only after the mutation has completed and never from a partial filesystem update.
 - Populate Project Store source-file records from modeled element source files and existing graph-referenced local implementation/evidence/resource files, without using generated Markdown files on disk as an intermediate runtime artifact
 - Keep relation-backed implementation/evidence/source targets as Project Store resources for relation semantics, and include only existing repository-relative local targets in the Model tree file hierarchy
 - Start an HTTP server serving embedded Explorer assets and generated runtime data

@@ -12,6 +12,7 @@ pub fn is_reserved_namespace_iri(iri: &str) -> bool {
 
 pub fn is_reserved_vocabulary_iri(iri: &str) -> bool {
     is_builtin_datatype_iri(iri)
+        || is_supported_shacl_datatype_iri(iri)
         || is_builtin_datatype_facet_iri(iri)
         || matches!(
             iri,
@@ -32,6 +33,10 @@ pub fn is_reserved_vocabulary_iri(iri: &str) -> bool {
                 | "http://www.w3.org/2000/01/rdf-schema#label"
                 | "http://www.w3.org/2000/01/rdf-schema#seeAlso"
         )
+}
+
+pub fn is_supported_datatype_iri(iri: &str) -> bool {
+    is_builtin_datatype_iri(iri) || is_supported_shacl_datatype_iri(iri)
 }
 
 pub fn is_builtin_datatype_iri(iri: &str) -> bool {
@@ -74,6 +79,22 @@ pub fn is_builtin_datatype_iri(iri: &str) -> bool {
     )
 }
 
+pub fn is_supported_shacl_datatype_iri(iri: &str) -> bool {
+    matches!(
+        iri,
+        "http://www.w3.org/2001/XMLSchema#date"
+            | "http://www.w3.org/2001/XMLSchema#time"
+            | "http://www.w3.org/2001/XMLSchema#duration"
+            | "http://www.w3.org/2001/XMLSchema#dayTimeDuration"
+            | "http://www.w3.org/2001/XMLSchema#yearMonthDuration"
+            | "http://www.w3.org/2001/XMLSchema#gDay"
+            | "http://www.w3.org/2001/XMLSchema#gMonth"
+            | "http://www.w3.org/2001/XMLSchema#gMonthDay"
+            | "http://www.w3.org/2001/XMLSchema#gYear"
+            | "http://www.w3.org/2001/XMLSchema#gYearMonth"
+    )
+}
+
 pub fn is_builtin_datatype_facet_iri(iri: &str) -> bool {
     matches!(
         iri,
@@ -104,10 +125,29 @@ mod tests {
             "http://www.w3.org/2002/07/owl#real"
         ));
         assert!(!is_builtin_datatype_iri(
+            "http://www.w3.org/2001/XMLSchema#date"
+        ));
+        assert!(!is_builtin_datatype_iri(
             "http://www.w3.org/2001/XMLSchema#pattern"
         ));
         assert!(!is_builtin_datatype_iri(
             "http://www.w3.org/2001/XMLSchema#notARealDatatype"
+        ));
+    }
+
+    #[test]
+    fn recognizes_supported_shacl_datatypes_separately_from_owl_builtins() {
+        assert!(is_supported_shacl_datatype_iri(
+            "http://www.w3.org/2001/XMLSchema#date"
+        ));
+        assert!(is_supported_datatype_iri(
+            "http://www.w3.org/2001/XMLSchema#date"
+        ));
+        assert!(is_supported_datatype_iri(
+            "http://www.w3.org/2001/XMLSchema#string"
+        ));
+        assert!(!is_supported_datatype_iri(
+            "http://www.w3.org/2001/XMLSchema#pattern"
         ));
     }
 

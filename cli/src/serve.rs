@@ -1,6 +1,7 @@
 use crate::mcp;
 use globset::GlobSet;
 use std::path::{Path, PathBuf};
+use std::pin::Pin;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -19,12 +20,13 @@ use reqvire::{ModelBuildOptions, ModelManager};
 #[derive(Clone)]
 pub(crate) struct ServeState {
     excluded_filename_patterns: Arc<GlobSet>,
-    refresh_lock: Arc<Mutex<()>>,
+    runtime_assets: Arc<Mutex<ExplorerRuntimeAssets>>,
+    write_lock: Arc<Mutex<()>>,
 }
 
 /// Starts an HTTP server for the embedded Explorer SPA and generated runtime data.
 pub async fn serve_explorer(
-    _assets: ExplorerRuntimeAssets,
+    assets: ExplorerRuntimeAssets,
     host: &str,
     port: u16,
     enable_mcp: bool,
@@ -38,19 +40,27 @@ pub async fn serve_explorer(
 
     let state = ServeState {
         excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
-        refresh_lock: Arc::new(Mutex::new(())),
+        runtime_assets: Arc::new(Mutex::new(assets)),
+        write_lock: Arc::new(Mutex::new(())),
     };
     let mut app = Router::new()
         .route("/", any(serve_static))
         .fallback(serve_static);
 
     if enable_mcp {
-        app = mcp::mount_service(
+        let refresh_state = state.clone();
+        let post_write_hook: mcp::PostWriteHook = Arc::new(move || {
+            let refresh_state = refresh_state.clone();
+            Box::pin(async move { refresh_runtime_assets(&refresh_state).await })
+                as Pin<Box<dyn std::future::Future<Output = Result<(), ReqvireError>> + Send>>
+        });
+        app = mcp::mount_service_with_post_write_hook(
             app,
             mcp_enable_mutations,
             false,
             excluded_filename_patterns,
-            state.refresh_lock.clone(),
+            state.write_lock.clone(),
+            Some(post_write_hook),
         );
     }
     let app = app.with_state(state);
@@ -155,34 +165,21 @@ async fn runtime_asset_response(
         });
     }
 
-    let assets = match refreshed_runtime_assets(&state).await {
-        Ok(assets) => assets,
-        Err(error) => {
-            return Response::builder()
-                .status(StatusCode::INTERNAL_SERVER_ERROR)
-                .body(Body::from(format!(
-                    "Failed to refresh Explorer runtime data: {error}"
-                )))
-                .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR));
-        }
-    };
+    let assets = state.runtime_assets.lock().await;
 
     match kind {
         RuntimeAssetKind::ProjectStore => runtime_bytes_response(
             "application/javascript",
-            assets.project_store_js.into_bytes(),
+            assets.project_store_js.clone().into_bytes(),
         ),
         RuntimeAssetKind::Ontologies => runtime_bytes_response(
             "text/turtle; charset=utf-8",
-            assets.ontologies_ttl.into_bytes(),
+            assets.ontologies_ttl.clone().into_bytes(),
         ),
     }
 }
 
-async fn refreshed_runtime_assets(
-    state: &ServeState,
-) -> Result<ExplorerRuntimeAssets, ReqvireError> {
-    let _guard = state.refresh_lock.lock().await;
+async fn refresh_runtime_assets(state: &ServeState) -> Result<(), ReqvireError> {
     let mut model = ModelManager::new();
     model.parse_and_validate_with_options(
         None,
@@ -192,7 +189,10 @@ async fn refreshed_runtime_assets(
             with_size_estimates: false,
         },
     )?;
-    build_runtime_assets(&model.graph_registry)
+    let assets = build_runtime_assets(&model.graph_registry)?;
+    let mut runtime_assets = state.runtime_assets.lock().await;
+    *runtime_assets = assets;
+    Ok(())
 }
 
 fn runtime_bytes_response(content_type: &'static str, content: Vec<u8>) -> Response<Body> {

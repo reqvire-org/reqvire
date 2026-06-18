@@ -1,0 +1,9 @@
+### Direct Filesystem Store Regeneration Sentinel
+
+This requirement must not appear in the served Project Store until a serve-owned mutation refreshes the runtime store.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Parent Requirement](#parent-requirement)

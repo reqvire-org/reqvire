@@ -23,8 +23,12 @@ use rmcp::{
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::future::Future;
+use std::pin::Pin;
 use std::sync::Arc;
 use tokio::sync::Mutex;
+
+pub(crate) type PostWriteHook =
+    Arc<dyn Fn() -> Pin<Box<dyn Future<Output = Result<(), ReqvireError>> + Send>> + Send + Sync>;
 
 #[derive(Debug, Deserialize)]
 struct RpcRequest {
@@ -47,6 +51,7 @@ struct ReqvireMcpServer {
     with_size_estimates: bool,
     excluded_filename_patterns: Arc<GlobSet>,
     write_lock: Arc<Mutex<()>>,
+    post_write_hook: Option<PostWriteHook>,
 }
 
 impl ReqvireMcpServer {
@@ -55,12 +60,14 @@ impl ReqvireMcpServer {
         with_size_estimates: bool,
         excluded_filename_patterns: &GlobSet,
         write_lock: Arc<Mutex<()>>,
+        post_write_hook: Option<PostWriteHook>,
     ) -> Self {
         Self {
             enable_mutations,
             with_size_estimates,
             excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
             write_lock,
+            post_write_hook,
         }
     }
 
@@ -72,7 +79,24 @@ impl ReqvireMcpServer {
     ) -> Result<Value, McpError> {
         if serialize {
             let _guard = self.write_lock.lock().await;
-            return self.call_handler_unlocked(method, params);
+            let should_refresh_runtime =
+                method == "tools/call" && request_refreshes_runtime_after_write(&params);
+            let result = self.call_handler_unlocked(method, params);
+            if result.is_ok() && should_refresh_runtime {
+                if let Some(post_write_hook) = &self.post_write_hook {
+                    post_write_hook()
+                        .await
+                        .map_err(|error| {
+                            McpError::internal_error(
+                                format!(
+                                    "MCP mutation succeeded but Explorer runtime refresh failed: {error}"
+                                ),
+                                None,
+                            )
+                        })?;
+                }
+            }
+            return result;
         }
         self.call_handler_unlocked(method, params)
     }
@@ -312,11 +336,33 @@ pub(crate) fn mount_service<S>(
 where
     S: Clone + Send + Sync + 'static,
 {
+    mount_service_with_post_write_hook(
+        router,
+        enable_mutations,
+        with_size_estimates,
+        excluded_filename_patterns,
+        write_lock,
+        None,
+    )
+}
+
+pub(crate) fn mount_service_with_post_write_hook<S>(
+    router: axum::Router<S>,
+    enable_mutations: bool,
+    with_size_estimates: bool,
+    excluded_filename_patterns: &GlobSet,
+    write_lock: Arc<Mutex<()>>,
+    post_write_hook: Option<PostWriteHook>,
+) -> axum::Router<S>
+where
+    S: Clone + Send + Sync + 'static,
+{
     let server = ReqvireMcpServer::new_with_write_lock(
         enable_mutations,
         with_size_estimates,
         excluded_filename_patterns,
         write_lock,
+        post_write_hook,
     );
     let service: StreamableHttpService<ReqvireMcpServer, LocalSessionManager> =
         StreamableHttpService::new(
@@ -328,6 +374,20 @@ where
                 .with_json_response(true),
         );
     router.nest_service("/mcp", service)
+}
+
+fn request_refreshes_runtime_after_write(params: &Value) -> bool {
+    let tool_name = match params.get("name").and_then(Value::as_str) {
+        Some(tool_name) => tool_name,
+        None => return false,
+    };
+    let arguments = params.get("arguments");
+
+    request_requires_write_tool(tool_name, arguments)
+        && !arguments
+            .and_then(|args| args.get("dry_run"))
+            .and_then(Value::as_bool)
+            .unwrap_or(false)
 }
 
 fn loopback_allowed_origins() -> [&'static str; 6] {

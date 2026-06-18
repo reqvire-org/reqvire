@@ -2004,7 +2004,7 @@ fn is_blank_node_id(id: &str) -> bool {
 }
 
 fn is_datatype_iri(iri: &str) -> bool {
-    owl_reserved::is_builtin_datatype_iri(iri) || iri == RDFS_DATATYPE
+    owl_reserved::is_supported_datatype_iri(iri) || iri == RDFS_DATATYPE
 }
 
 #[cfg(test)]

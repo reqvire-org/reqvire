@@ -99,7 +99,7 @@ export function loadStore(devFixture?: ExplorerProjectStore): StoreLoadResult {
         reason: "No Reqvire Project Store seed found.",
         detail:
           "Expected window.reqvireProjectStore from assets/project-store.js. " +
-          "This Explorer must be opened from reqvire serve or npm run dev.",
+          "Open this Explorer from reqvire serve, a reqvire export output directory, or npm run dev.",
       };
     }
   }

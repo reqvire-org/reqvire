@@ -99,6 +99,7 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 - Project Store file records include normalized source Markdown content derived from the registry for modeled files and raw source-preview content for existing registry-linked local resources
 - Relation-backed local resource targets are present as resources with source-preview content when the local file exists, and existing resource-only paths appear in the Project Store `files` and `folders` hierarchy under their full repository-relative path
 - Nonexistent local targets, unsupported parsed pages, unrelated repository files, and external URLs are absent from the Project Store file-tree hierarchy
+- A plain `assets/project-store.js` request after a direct filesystem edit returns the already-materialized runtime store and does not regenerate model data from disk
 - Hash routes for primary Model, file deep links, Ontologies, and Traces views plus supporting Coverage, Resources, Elements, and Search workflows are declared; the project Knowledge Graph is not a separate hash route
 - Retired Explorer page URLs are absent from generated output and canonical route mappings
 - Explorer content preserves the structure and information from the source files

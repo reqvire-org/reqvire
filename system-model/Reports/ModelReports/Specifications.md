@@ -567,6 +567,8 @@ The built-in datatype subset shall include:
 - `owl:rational`
 - standard XML Schema datatype IRIs with OWL special treatment: `xsd:anyURI`, `xsd:base64Binary`, `xsd:boolean`, `xsd:byte`, `xsd:dateTime`, `xsd:dateTimeStamp`, `xsd:decimal`, `xsd:double`, `xsd:float`, `xsd:hexBinary`, `xsd:int`, `xsd:integer`, `xsd:language`, `xsd:long`, `xsd:Name`, `xsd:NCName`, `xsd:negativeInteger`, `xsd:NMTOKEN`, `xsd:nonNegativeInteger`, `xsd:nonPositiveInteger`, `xsd:normalizedString`, `xsd:positiveInteger`, `xsd:short`, `xsd:string`, `xsd:token`, `xsd:unsignedByte`, `xsd:unsignedInt`, `xsd:unsignedLong`, and `xsd:unsignedShort`
 
+The supported SHACL datatype-position subset shall additionally include XML Schema datatypes commonly used by closed-world data validation but not classified as OWL built-in datatypes: `xsd:date`, `xsd:time`, `xsd:duration`, `xsd:dayTimeDuration`, `xsd:yearMonthDuration`, `xsd:gDay`, `xsd:gMonth`, `xsd:gMonthDay`, `xsd:gYear`, and `xsd:gYearMonth`.
+
 The datatype facet subset shall include supported XSD facet IRIs such as `xsd:length`, `xsd:minLength`, `xsd:maxLength`, `xsd:pattern`, `xsd:minInclusive`, `xsd:maxInclusive`, `xsd:minExclusive`, and `xsd:maxExclusive`. Facet IRIs are valid only in facet/constraint positions, not as datatypes.
 
 Reqvire shall not require local `#### External Ontology` source declarations for standard reserved prefixes or reserved vocabulary IRIs.

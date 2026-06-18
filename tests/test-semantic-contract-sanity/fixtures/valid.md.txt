@@ -31,6 +31,7 @@ test:CorrectiveInvoice a owl:Class .
 test:CorrectedInvoiceRef a owl:Class .
 test:correctedInvoiceRef a owl:ObjectProperty .
 test:status a owl:DatatypeProperty .
+test:invoiceDate a owl:DatatypeProperty .
 ```
 
 ---
@@ -88,6 +89,10 @@ test:CorrectiveInvoiceShape
     sh:path test:status ;
     sh:datatype xsd:string ;
     sh:in ("draft" "issued" "corrected") ;
+  ] ;
+  sh:property [
+    sh:path test:invoiceDate ;
+    sh:datatype xsd:date ;
   ] .
 ```
 ---

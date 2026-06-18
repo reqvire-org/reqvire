@@ -28,12 +28,45 @@ function loadProjectStoreSeed() {
       resolve();
       return;
     }
-    const script = document.createElement("script");
-    script.src = "assets/project-store.js";
-    script.onload = () => resolve();
-    script.onerror = () => resolve();
-    document.head.appendChild(script);
+
+    const candidates = projectStoreSeedCandidates();
+    let index = 0;
+
+    function tryNext() {
+      if (window.reqvireProjectStore !== undefined || index >= candidates.length) {
+        resolve();
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = candidates[index];
+      script.async = false;
+      script.onload = () => resolve();
+      script.onerror = () => {
+        script.remove();
+        index += 1;
+        tryNext();
+      };
+      document.head.appendChild(script);
+    }
+
+    tryNext();
   });
+}
+
+function projectStoreSeedCandidates() {
+  const candidates = new Set<string>();
+  const moduleUrl = new URL(import.meta.url);
+
+  if (moduleUrl.pathname.includes("/assets/")) {
+    candidates.add(new URL("project-store.js", moduleUrl).toString());
+  }
+
+  candidates.add(new URL("assets/project-store.js", document.baseURI).toString());
+  candidates.add(new URL("assets/project-store.js", window.location.href).toString());
+  candidates.add("assets/project-store.js");
+
+  return [...candidates];
 }
 
 loadProjectStoreSeed().then(() => {
