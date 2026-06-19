@@ -104,7 +104,7 @@ reqvire mcp --enable-mutations`}</CodeBlock>
             "Capability first: understand or define the operational ability being changed.",
             "Ontology context: inspect or reuse semantic vocabulary that gives the capability meaning.",
             "Requirements: define implementable obligations that specify the capability.",
-            "Contracts: add specifications, constraints, behaviors, states, or I/O contracts.",
+            "Contracts: define requirements in precise terms: source basis, specifications, constraints, behavior, state, interfaces, and input/output semantics.",
             "Semantic contracts: add reusable SHACL shape profiles under the ontology plane and link them with constrainedBy/constrain and use/usedBy.",
             "Verifications: ensure capabilities or leaf requirements are verified.",
             "Implementation links: connect code, tests, proofs, and evidence with satisfiedBy.",

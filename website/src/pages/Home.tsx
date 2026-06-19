@@ -63,7 +63,7 @@ const knowledgeItems = [
   { term: "Ontologies", desc: "define domain concepts, relationships, vocabulary, and semantic meaning." },
   { term: "Capabilities", desc: "describe coherent operational, product, business, regulatory, or system abilities." },
   { term: "Requirements", desc: "define implementable obligations, constraints, guarantees, and behavioral expectations." },
-  { term: "Contracts", desc: "turn requirements and capabilities into precise engineering contracts." },
+  { term: "Contracts", desc: "define requirements in precise terms: source basis, specifications, constraints, behavior, state, interfaces, and input/output semantics." },
   { term: "Verifications", desc: "provide evidence that requirements and capabilities are satisfied." },
   { term: "Implementation artifacts", desc: "connect the model to code, tests, proofs, and generated evidence." },
 ];

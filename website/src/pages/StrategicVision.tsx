@@ -40,7 +40,7 @@ export default function StrategicVision() {
             ["Ontologies", "define reusable domain meaning"],
             ["Capabilities", "define stable operational or system abilities"],
             ["Requirements", "define implementable obligations"],
-            ["Contracts", "capture behavioral, state, semantic, and constraint detail"],
+            ["Contracts", "define requirements through source basis, specifications, constraints, behavior, state, interfaces, and input/output semantics"],
             ["Verifications", "prove that obligations and capability expectations are met"],
             ["Implementation artifacts", "show where requirements and evidence are realized"],
           ].map(([term, desc]) => (
@@ -99,7 +99,7 @@ export default function StrategicVision() {
             ["Ontologies", "define reusable domain meaning"],
             ["Capabilities", "define stable operational or product abilities"],
             ["Requirements", "define implementable obligations"],
-            ["Contracts", "capture behavioral, semantic, state, I/O contract, constraint, and specification detail"],
+            ["Contracts", "define requirements through source basis, specifications, constraints, behavior, state, interfaces, and input/output semantics"],
             ["Verifications", "prove that obligations and capability expectations are met"],
             ["Implementation artifacts", "show where requirements and evidence are realized"],
           ].map(([term, desc]) => (
@@ -126,8 +126,10 @@ export default function StrategicVision() {
           engineering context, giving teams and AI agents implementation-facing
           contracts that can be checked during validation, automation, and review
           workflows. Capabilities describe what the product or system must be able
-          to do. Requirements define obligations. Contracts add behavioral and
-          semantic detail. Verifications prove expectations are met. Implementation
+          to do. Requirements define obligations. Contracts define requirements in
+          precise terms: source basis, specifications, constraints, behavior,
+          state, interfaces, and input/output semantics. Verifications prove
+          expectations are met. Implementation
           artifacts connect the model back to code, tests, and evidence.
         </p>
         <p className="text-zinc-600">

@@ -129,7 +129,9 @@ The system shall reject API requests whose access token is invalid.
 
       <Section title="Requirement-Owned Contracts and Semantic Contracts">
         <p className="text-zinc-600 mb-4">
-          Contracts carry detailed engineering terms for a requirement.
+          Contracts define requirements in precise terms: source basis,
+          specifications, constraints, behavior, state, interfaces, and
+          input/output semantics.
           Non-semantic-contract elements are owned through define or definedBy
           and should not author governance metadata. Semantic contracts are separate
           ontology-plane elements that constrain requirements through constrainedBy and constrain,
