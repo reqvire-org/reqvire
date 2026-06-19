@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="doc/social-card.png" alt="Reqvire - Build verifiable and traceable software" width="100%">
+<img src="doc/explorer-showcase.gif" alt="Reqvire Explorer semantic model showcase" width="100%">
 
 [![Latest Release](https://img.shields.io/github/v/release/Reqvire/reqvire?style=flat-square&logo=github&color=blue)](https://github.com/reqvire-org/reqvire/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
