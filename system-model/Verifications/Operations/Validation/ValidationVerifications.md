@@ -20,6 +20,7 @@ This objective groups verification that Reqvire validation enforces element typi
   * derive: [Semantic Contract Ontology Declaration Validation Test](#semantic-contract-ontology-declaration-validation-test)
   * derive: [Semantic Contract Relation Validation Test](#semantic-contract-relation-validation-test)
   * derive: [Semantic Contract Section Validation Test](#semantic-contract-section-validation-test)
+  * derive: [SHACL Recursive AST Regression Test](#shacl-recursive-ast-regression-test)
   * derive: [Semantic Contract SHACL Sanity Validation Test](#semantic-contract-shacl-sanity-validation-test)
   * derive: [Single Element Contract Validation Test](#single-element-contract-validation-test)
   * derive: [Single Root Hierarchy Ownership Validation Test](#single-root-hierarchy-ownership-validation-test)
@@ -491,6 +492,37 @@ Test cases:
   * verify: [Ontology and Semantic Contract Model](../../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
 ---
 
+### SHACL Recursive AST Regression Test
+
+This verification verifies recursive SHACL path parsing, raw constraint preservation, and ontology-context alignment through authored Reqvire fixtures.
+
+#### Details
+Test cases:
+1. A semantic contract with a reachable ontology through `use` validates when it contains a target-only shape using `sh:targetSubjectsOf`.
+2. A property shape with an RDF list `sh:path` sequence validates when the sequence contains declared predicates.
+3. Nested path variants inside the sequence validate, including `sh:inversePath`, `sh:alternativePath`, and a repetition operator.
+4. Typed constraints such as `sh:datatype`, `sh:minCount`, `sh:maxCount`, `sh:class`, and `sh:in` are accepted so the SHACL parser exercises both typed constraint extraction and raw Oxigraph-backed constraint preservation.
+5. The same fixture fails validation when one nested path predicate is changed to an undeclared ontology term.
+6. The invalid nested path case reports the semantic-contract identifier, SHACL reference kind, missing IRI, and guidance to update or remove the SHACL reference.
+7. A semantic contract using a child ontology validates when the child ontology has a different `ontology_base` from its parent and the SHACL shapes reference both child-base terms and inherited parent-base terms.
+8. A semantic contract using a child ontology fails when SHACL references a term from another ontology base that is declared in the model but outside the reachable ontology hierarchy.
+9. The outside-context multi-base case reports the semantic-contract identifier, SHACL reference kind, referenced IRI, declaring ontology identifier, and guidance to add a `use` relation when intentional.
+10. A semantic contract validates when its used ontology declares a local `#### External Ontology` Turtle source and SHACL references reachable external source terms through `sh:targetClass`, `sh:targetNode`, `sh:path`, `sh:class`, and `sh:datatype`.
+11. The external-source fixture preserves `sh:hasValue` and `sh:in` value constraints without requiring those value-list IRIs to be authored ontology terms.
+12. A semantic contract fails when `sh:targetNode` references an external source term declared by a connected sibling ontology that is outside the contract's reachable `use` context.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Validation and Semantic Integrity Verification Objective](#validation-and-semantic-integrity-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-shacl-recursive-ast/test.sh)
+  * verify: [Semantic Contract Shape Validation](../../../Operations/Validation/ValidationRequirements.md#semantic-contract-shape-validation)
+  * verify: [SHACL Structural Parser Registry](../../../Operations/Validation/ValidationRequirements.md#shacl-structural-parser-registry)
+  * verify: [SHACL Ontology Alignment](../../../Operations/Validation/ValidationRequirements.md#shacl-ontology-alignment)
+  * verify: [Reqvire SHACL Context Adapter](../../../Operations/Validation/ValidationRequirements.md#reqvire-shacl-context-adapter)
+---
+
 ### Semantic Contract Section Validation Test
 
 This test verifies built-in semantic-contract section validation.
@@ -681,4 +713,3 @@ This test verifies that the system correctly validates relations to excluded fil
   * satisfiedBy: [test.sh](../../../../tests/test-valid-relations/test.sh)
   * verify: [Excluded File Relation Validation](../../../Operations/Validation/ValidationRequirements.md#excluded-file-relation-validation)
 ---
-

@@ -110,9 +110,30 @@ if ! grep -q "<http://www.w3.org/ns/shacl#datatype> <https://example.test/extern
 fi
 
 for external_source_token in \
-  "ExternalResource" \
-  "externalCode" \
-  "External code datatype"; do
+  "<https://example.test/external> a <http://www.w3.org/2002/07/owl#Ontology>" \
+  "<https://example.test/external#ExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/external#externalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "External code datatype" \
+  "External code property" \
+  "External resource" \
+  "Unused external resource" \
+  "Unused external code property" \
+  "<https://example.test/jsonld-external> a <http://www.w3.org/2002/07/owl#Ontology>" \
+  "<https://example.test/jsonld-external#JsonExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/jsonld-external#jsonExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "JSON-LD external code datatype" \
+  "JSON-LD external code property" \
+  "JSON-LD external resource" \
+  "Unused JSON-LD external resource" \
+  "Unused JSON-LD external code property" \
+  "<https://example.test/rdf-external> a <http://www.w3.org/2002/07/owl#Ontology>" \
+  "<https://example.test/rdf-external#RdfExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/rdf-external#rdfExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "RDF/XML external code datatype" \
+  "RDF/XML external code property" \
+  "RDF/XML external resource" \
+  "Unused RDF/XML external resource" \
+  "Unused RDF/XML external code property"; do
   if grep -qF "$external_source_token" <<< "$TTL_OUTPUT"; then
     echo "FAILED: default Turtle output must not include external ontology source triples: $external_source_token"
     echo "$TTL_OUTPUT"
@@ -131,13 +152,50 @@ if [ $EXTERNAL_TTL_EXIT -ne 0 ]; then
   exit 1
 fi
 
-for external_source_token in \
-  "<https://example.test/external> a <http://www.w3.org/2002/07/owl#Ontology>" \
-  "<https://example.test/external#ExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+for used_external_subset_token in \
   "<https://example.test/external#ExternalCode> a <http://www.w3.org/2000/01/rdf-schema#Datatype>" \
-  "<https://example.test/external#externalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>"; do
-  if ! grep -qF "$external_source_token" <<< "$EXTERNAL_TTL_OUTPUT"; then
-    echo "FAILED: --include-external Turtle output missing external source triple: $external_source_token"
+  "<https://example.test/external#ExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/external#externalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "External code datatype" \
+  "External code property" \
+  "External resource" \
+  "<https://example.test/jsonld-external#JsonExternalCode> a <http://www.w3.org/2000/01/rdf-schema#Datatype>" \
+  "<https://example.test/jsonld-external#JsonExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/jsonld-external#jsonExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "JSON-LD external code datatype" \
+  "JSON-LD external code property" \
+  "JSON-LD external resource" \
+  "<https://example.test/rdf-external#RdfExternalCode> a <http://www.w3.org/2000/01/rdf-schema#Datatype>" \
+  "<https://example.test/rdf-external#RdfExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/rdf-external#rdfExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "RDF/XML external code datatype" \
+  "RDF/XML external code property" \
+  "RDF/XML external resource"; do
+  if ! grep -qF "$used_external_subset_token" <<< "$EXTERNAL_TTL_OUTPUT"; then
+    echo "FAILED: --include-external Turtle output missing used external subset triple: $used_external_subset_token"
+    echo "$EXTERNAL_TTL_OUTPUT"
+    exit 1
+  fi
+done
+
+for unused_external_source_token in \
+  "<https://example.test/external> a <http://www.w3.org/2002/07/owl#Ontology>" \
+  "<https://example.test/external#UnusedExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/external#unusedExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "Unused external resource" \
+  "Unused external code property" \
+  "<https://example.test/jsonld-external> a <http://www.w3.org/2002/07/owl#Ontology>" \
+  "<https://example.test/jsonld-external#UnusedJsonExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/jsonld-external#unusedJsonExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "Unused JSON-LD external resource" \
+  "Unused JSON-LD external code property" \
+  "<https://example.test/rdf-external> a <http://www.w3.org/2002/07/owl#Ontology>" \
+  "<https://example.test/rdf-external#UnusedRdfExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/rdf-external#unusedRdfExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "Unused RDF/XML external resource" \
+  "Unused RDF/XML external code property"; do
+  if grep -qF "$unused_external_source_token" <<< "$EXTERNAL_TTL_OUTPUT"; then
+    echo "FAILED: --include-external Turtle output must not include unused external source triple: $unused_external_source_token"
     echo "$EXTERNAL_TTL_OUTPUT"
     exit 1
   fi
@@ -154,11 +212,33 @@ if [ $FULL_EXTERNAL_TTL_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! grep -qF "<https://example.test/external#ExternalResource> a <http://www.w3.org/2002/07/owl#Class>" <<< "$FULL_EXTERNAL_TTL_OUTPUT"; then
-  echo "FAILED: full external Turtle output missing external source class"
-  echo "$FULL_EXTERNAL_TTL_OUTPUT"
-  exit 1
-fi
+for used_external_subset_token in \
+  "<https://example.test/external#ExternalCode> a <http://www.w3.org/2000/01/rdf-schema#Datatype>" \
+  "<https://example.test/external#externalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "<https://example.test/jsonld-external#JsonExternalCode> a <http://www.w3.org/2000/01/rdf-schema#Datatype>" \
+  "<https://example.test/jsonld-external#jsonExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "<https://example.test/rdf-external#RdfExternalCode> a <http://www.w3.org/2000/01/rdf-schema#Datatype>" \
+  "<https://example.test/rdf-external#rdfExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>"; do
+  if ! grep -qF "$used_external_subset_token" <<< "$FULL_EXTERNAL_TTL_OUTPUT"; then
+    echo "FAILED: full external Turtle output missing used external subset triple: $used_external_subset_token"
+    echo "$FULL_EXTERNAL_TTL_OUTPUT"
+    exit 1
+  fi
+done
+
+for unused_external_source_token in \
+  "<https://example.test/external#UnusedExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/external#unusedExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "<https://example.test/jsonld-external#UnusedJsonExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/jsonld-external#unusedJsonExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "<https://example.test/rdf-external#UnusedRdfExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/rdf-external#unusedRdfExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>"; do
+  if grep -qF "$unused_external_source_token" <<< "$FULL_EXTERNAL_TTL_OUTPUT"; then
+    echo "FAILED: full external Turtle output must not include unused external source term: $unused_external_source_token"
+    echo "$FULL_EXTERNAL_TTL_OUTPUT"
+    exit 1
+  fi
+done
 
 if ! grep -qF "reqvire:OntologyProjectionGraph" <<< "$FULL_EXTERNAL_TTL_OUTPUT"; then
   echo "FAILED: full external Turtle output missing ontology projection facts"
@@ -232,6 +312,62 @@ for forbidden in \
   if grep -qF "$forbidden" <<< "$JSONLD_OUTPUT"; then
     echo "FAILED: default JSON-LD output must not contain generated ontology projection marker: $forbidden"
     echo "$JSONLD_OUTPUT"
+    exit 1
+  fi
+done
+
+if grep -qF "External code property" <<< "$JSONLD_OUTPUT" || \
+   grep -qF "JSON-LD external code property" <<< "$JSONLD_OUTPUT" || \
+   grep -qF "RDF/XML external code property" <<< "$JSONLD_OUTPUT"; then
+  echo "FAILED: default JSON-LD output must not include external ontology source labels"
+  echo "$JSONLD_OUTPUT"
+  exit 1
+fi
+
+set +e
+EXTERNAL_JSONLD_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies --include-external --jsonld 2>&1)
+EXTERNAL_JSONLD_EXIT=$?
+set -e
+
+if [ $EXTERNAL_JSONLD_EXIT -ne 0 ]; then
+  echo "FAILED: ontologies --include-external --jsonld command failed"
+  echo "$EXTERNAL_JSONLD_OUTPUT"
+  exit 1
+fi
+
+if ! jq . >/dev/null 2>&1 <<< "$EXTERNAL_JSONLD_OUTPUT"; then
+  echo "FAILED: include-external JSON-LD output should be valid JSON"
+  echo "$EXTERNAL_JSONLD_OUTPUT"
+  exit 1
+fi
+
+for used_external_jsonld_token in \
+  "https://example.test/external#externalCode" \
+  "https://example.test/external#ExternalResource" \
+  "External code property" \
+  "https://example.test/jsonld-external#jsonExternalCode" \
+  "https://example.test/jsonld-external#JsonExternalResource" \
+  "JSON-LD external code property" \
+  "https://example.test/rdf-external#rdfExternalCode" \
+  "https://example.test/rdf-external#RdfExternalResource" \
+  "RDF/XML external code property"; do
+  if ! grep -qF "$used_external_jsonld_token" <<< "$EXTERNAL_JSONLD_OUTPUT"; then
+    echo "FAILED: include-external JSON-LD output missing used external subset token: $used_external_jsonld_token"
+    echo "$EXTERNAL_JSONLD_OUTPUT"
+    exit 1
+  fi
+done
+
+for unused_external_jsonld_token in \
+  "Unused external resource" \
+  "unusedExternalCode" \
+  "Unused JSON-LD external resource" \
+  "unusedJsonExternalCode" \
+  "Unused RDF/XML external resource" \
+  "unusedRdfExternalCode"; do
+  if grep -qF "$unused_external_jsonld_token" <<< "$EXTERNAL_JSONLD_OUTPUT"; then
+    echo "FAILED: include-external JSON-LD output must not include unused external source token: $unused_external_jsonld_token"
+    echo "$EXTERNAL_JSONLD_OUTPUT"
     exit 1
   fi
 done

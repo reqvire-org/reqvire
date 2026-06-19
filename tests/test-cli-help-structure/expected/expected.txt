@@ -212,7 +212,7 @@ RESOURCES OPTIONS:
 ONTOLOGIES OPTIONS:
       --jsonld                  Output JSON-LD format instead of RDF/Turtle (.ttl)
       --full                    Include Reqvire model context triples and ontology projection facts in the semantic export
-      --include-external        Include local external ontology source triples
+      --include-external        Include used local external ontology subset triples
       --output <FILE>           Save output to file
 
 SUBMODELS OPTIONS:

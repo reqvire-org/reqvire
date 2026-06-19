@@ -390,25 +390,31 @@ Rules:
 - Only ontology elements may define `#### External Ontology`.
 - The section is repeatable.
 - Each section requires `prefix`, `namespace`, `resource`, and `source`.
-- `format` is optional and defaults to Turtle. The only supported source format for this version is Turtle/.ttl.
+- `format` is optional and defaults to Turtle. Supported source formats are `turtle`, `ttl`, `rdf`, `rdfxml`, `rdf+xml`, and `jsonld`.
 - `source` must be a local path. `http://` and `https://` source paths are rejected; network ontology fetches are not part of validation or export.
 - Source paths are resolved as model paths using the repository root, with file-relative resolution as a fallback for local fixture and authoring ergonomics.
-- The source Turtle must explicitly declare the configured prefix/namespace pair.
-- The source Turtle must contain `<resource> a owl:Ontology`.
-- The source Turtle must declare or reference at least one term in the configured namespace.
+- Turtle/TTL sources must explicitly declare the configured prefix/namespace pair.
+- RDF/XML sources must use RDF/XML syntax; `format: rdf` is treated as RDF/XML for local `.rdf` ontology files.
+- JSON-LD sources must define equivalent local context mappings or expanded IRIs so the parsed RDF graph mentions the configured namespace.
+- The parsed source graph must contain `<resource> a owl:Ontology`.
+- The parsed source graph must declare or reference at least one term in the configured namespace.
 - The same prefix may not be bound to different namespaces.
 - The same namespace may not be bound to different prefixes; aliases are rejected in this version.
 - Imported terms are available for semantic-reference validation through the ontology element that declared the external source.
 - Imported terms remain marked as external declarations in semantic metadata.
 - Imported terms do not count as authored project-owned term declarations for duplicate authored-term validation.
+- Full external ontology files are internal dependency inputs for validation and term resolution.
+- Public semantic output surfaces must expose only the used external subset selected from those internal dependencies.
+- Unused external dependency facts are not Reqvire semantic output.
 
 Export modes:
 - `reqvire ontologies` emits generated ontology document declarations plus authored ontology and SHACL triples only.
-- `reqvire ontologies --include-external` additionally emits local external source triples.
+- `reqvire ontologies --include-external` additionally emits only the used external subset.
 - `reqvire ontologies --full` emits authored triples, Reqvire model context, and generated ontology projection facts.
-- `reqvire ontologies --full --include-external` emits authored triples, external source triples, Reqvire model context, and generated ontology projection facts.
-- MCP semantic ontology, vocabulary, prefix, and SPARQL tools keep external source declarations and triples hidden by default and expose them only when `include_external` is true.
+- `reqvire ontologies --full --include-external` emits authored triples, the used external subset, Reqvire model context, and generated ontology projection facts.
+- MCP semantic ontology, vocabulary, prefix, and SPARQL tools keep external source declarations and triples hidden by default and expose only the used external subset when `include_external` is true.
 - Vocabulary and source-map entries for imported terms must carry an explicit external marker and source metadata.
+- Export and MCP metadata for external materialization shall identify `external_materialization: "used_subset"` and include available counts for external sources, used external terms, and materialized external triples.
 
 External sections are source declarations, not hidden Turtle injection. Authored ontology and SHACL blocks must still be complete Turtle with their own explicit prefixes and semantic statements.
 
@@ -417,6 +423,185 @@ External sections are source declarations, not hidden Turtle injection. Authored
 
 #### Relations
   * define: [Local External Ontology Sources](ReportingRequirements.md#local-external-ontology-sources)
+---
+
+### Used External Ontology Subset Projection Specification
+
+The used external ontology subset projection contract defines the model-owned SPARQL query specifications for selecting external facts that may be exposed from local external ontology dependencies.
+
+#### Details
+Subset boundary:
+- Raw external ontology graphs are internal dependency inputs for validation and term resolution.
+- The exposed subset is derived from declared external namespaces and references found in authored semantic content, model context, and generated semantic projection facts.
+- The subset is the only external ontology materialization exposed by `include_external`.
+- No CLI, MCP, Explorer, website, or assistant-facing contract shall specify a public full third-party ontology dump mode.
+
+Seed query:
+```sparql
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+
+SELECT DISTINCT ?term
+WHERE {
+  ?source a reqvire:ExternalOntologySource ;
+    reqvire:externalOntologyNamespace ?namespace .
+
+  {
+    ?block reqvire:referencesTerm ?term .
+  }
+  UNION {
+    ?block reqvire:declaresTerm ?term .
+  }
+  UNION {
+    ?projection reqvire:conceptReference ?term .
+  }
+  UNION {
+    ?projection reqvire:constructSubject|reqvire:constructPredicate|reqvire:constructObject|reqvire:constructProperty ?term .
+  }
+
+  FILTER(isIRI(?term))
+  FILTER(STRSTARTS(STR(?term), STR(?namespace)))
+}
+```
+
+Direct description construct:
+```sparql
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+
+CONSTRUCT {
+  ?term ?p ?o .
+}
+WHERE {
+  ?subset a reqvire:UsedExternalOntologySubset ;
+    reqvire:externalUsedTerm ?term ;
+    reqvire:externalSubsetGraph ?rawExternalGraph .
+
+  GRAPH ?rawExternalGraph {
+    ?term ?p ?o .
+  }
+}
+```
+
+Support closure construct:
+```sparql
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+
+CONSTRUCT {
+  ?support ?p ?supportObject .
+}
+WHERE {
+  ?subset a reqvire:UsedExternalOntologySubset ;
+    reqvire:externalUsedTerm ?term ;
+    reqvire:externalSubsetGraph ?rawExternalGraph .
+
+  GRAPH ?rawExternalGraph {
+    ?term ?p ?support .
+    FILTER(?p IN (
+      rdf:type,
+      rdfs:subClassOf,
+      rdfs:subPropertyOf,
+      rdfs:domain,
+      rdfs:range,
+      owl:equivalentClass,
+      owl:equivalentProperty,
+      owl:inverseOf,
+      owl:onProperty,
+      owl:someValuesFrom,
+      owl:allValuesFrom,
+      owl:hasValue
+    ))
+    FILTER(isIRI(?support) || isBlank(?support))
+
+    OPTIONAL {
+      ?support ?p ?supportObject .
+      FILTER(?p IN (
+        rdf:type,
+        rdfs:subClassOf,
+        rdfs:subPropertyOf,
+        rdfs:domain,
+        rdfs:range,
+        owl:equivalentClass,
+        owl:equivalentProperty,
+        owl:inverseOf,
+        owl:onProperty,
+        owl:someValuesFrom,
+        owl:allValuesFrom,
+        owl:hasValue
+      ))
+    }
+  }
+}
+```
+
+Annotation construct:
+```sparql
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+CONSTRUCT {
+  ?describedTerm ?annotationProperty ?annotationValue .
+}
+WHERE {
+  ?subset a reqvire:UsedExternalOntologySubset ;
+    reqvire:externalSubsetGraph ?rawExternalGraph .
+
+  {
+    ?subset reqvire:externalUsedTerm ?describedTerm .
+  }
+  UNION {
+    ?subset reqvire:externalUsedTerm ?term .
+    GRAPH ?rawExternalGraph {
+      ?term ?supportProperty ?describedTerm .
+      FILTER(?supportProperty IN (
+        rdfs:subClassOf,
+        rdfs:subPropertyOf,
+        rdfs:domain,
+        rdfs:range,
+        owl:equivalentClass,
+        owl:equivalentProperty,
+        owl:inverseOf,
+        owl:onProperty,
+        owl:someValuesFrom,
+        owl:allValuesFrom,
+        owl:hasValue
+      ))
+    }
+  }
+
+  GRAPH ?rawExternalGraph {
+    ?describedTerm ?annotationProperty ?annotationValue .
+    FILTER(?annotationProperty IN (
+      rdfs:label,
+      rdfs:comment,
+      skos:prefLabel,
+      skos:definition,
+      dcterms:description
+    ))
+  }
+}
+```
+
+Implementation contract:
+- Current Rust code may implement equivalent selection directly; this specification defines the model contract it must match.
+- The seed query is a SELECT query because it identifies the used external term set.
+- The direct, support, and annotation queries are SPARQL CONSTRUCT contracts for materialized subset triples.
+- Constructed subset triples shall not be written back to authored Markdown ontology, semantic-contract, requirement, or contract blocks.
+
+#### Concept References
+  * Used external ontology subset: https://www.reqvire.org/ontology#UsedExternalOntologySubset
+  * External ontology subset construct query: https://www.reqvire.org/ontology#ExternalOntologySubsetConstructQuery
+  * Raw external ontology graph: https://www.reqvire.org/ontology#RawExternalOntologyGraph
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Used External Ontology Subset Projection](ReportingRequirements.md#used-external-ontology-subset-projection)
 ---
 
 ### Markdown Report Style Specification

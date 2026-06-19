@@ -69,9 +69,9 @@ The system shall expose MCP read tools that return model evidence needed by exte
 - The MCP interface shall expose read tools for authoritative Reqvire model evidence.
 - Model evidence tools shall support element lookup, model structure, containment, collection, submodel analysis, and ontology/SHACL semantic collection.
 - The ontology/SHACL semantic collection tool shall be named under the `reqvire.semantic` namespace and shall filter serialized content to RDF only, SHACL only, or both.
-- The ontology/SHACL semantic collection tool shall support optional external ontology source materialization through a typed `include_external` argument without changing the default authored-only export.
-- Semantic prefix and vocabulary tools shall keep imported external ontology declarations hidden by default and expose them only through a typed `include_external` argument with explicit external markers and source metadata.
-- Model evidence tools shall support read-only semantic query execution over collected ontology, SHACL, model-context, and ontology projection RDF when requested by a typed MCP operation, and shall support an explicit `include_external` argument for querying the external-inclusive semantic store.
+- The ontology/SHACL semantic collection tool shall support optional used external ontology subset materialization through a typed `include_external` argument without changing the default authored-only export.
+- Semantic prefix and vocabulary tools shall keep imported external ontology declarations hidden by default and expose only used external subset entries through a typed `include_external` argument with explicit external markers and source metadata.
+- Model evidence tools shall support read-only semantic query execution over collected ontology, SHACL, model-context, and ontology projection RDF when requested by a typed MCP operation, and shall support an explicit `include_external` argument for querying the graph that includes the used external subset.
 - Model evidence tools shall expose the canonical capability/requirement/ontology model, including `ontology` elements, `#### Concept References`, reusable `semantic-contract` shape profiles, constrained requirements, and ontology-use relations where the underlying Reqvire operation returns them.
 - Model evidence tools shall include revision metadata when model state affects interpretation.
 - Model evidence tools shall not mutate the model or filesystem.
@@ -135,7 +135,7 @@ The system shall expose MCP prompts that guide regular Reqvire workflows and sem
 - The MCP interface shall support `prompts/list` and `prompts/get` for Reqvire-authored prompt templates.
 - Prompt templates shall include regular Reqvire model exploration, change planning, and verification coverage review workflows.
 - Prompt templates shall include semantic query, semantic verification search, and semantic contract-context search workflows.
-- Semantic prompt templates shall direct clients to use `reqvire.semantic.vocabulary`, `reqvire.semantic.prefixes`, and `reqvire.semantic.sparql` for ontology-aware questions.
+- Semantic prompt templates shall direct clients to use `reqvire.semantic.vocabulary`, `reqvire.semantic.prefixes`, and `reqvire.semantic.sparql` for ontology-aware questions, and shall state that `include_external` exposes only the used external subset rather than raw external dependency files.
 - Prompt templates shall be imported into Rust at build time and shall not be read from workspace source files at runtime.
 - Prompt retrieval shall not mutate the model or filesystem.
 

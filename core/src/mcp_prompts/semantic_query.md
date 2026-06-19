@@ -8,6 +8,8 @@ Workflow:
 - If a namespace or prefix is unclear, call `reqvire.semantic.prefixes` and inspect source element content.
 - Prefer normalized semantic properties and relation-family query patterns over hard-coded markdown relation names.
 - Run the query with `reqvire.semantic.sparql`.
+- Use `include_external: true` only when the question needs imported ontology terms; it exposes the used external subset, not raw full external ontology dependencies.
+- When `include_external: true` is needed, query the materialized used external vocabulary terms and their supporting labels, domains, ranges, and source metadata. Do not enumerate unused terms from the raw dependency files.
 - Explain which semantic terms, properties, and graph facts the answer depends on.
 
 Useful starting calls:

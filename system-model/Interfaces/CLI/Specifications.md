@@ -71,7 +71,7 @@ help Print help for commands
 Ontologies options:
 --jsonld Output JSON-LD format instead of RDF/Turtle (.ttl)
 --full Include Reqvire model context triples and ontology projection facts in the semantic export
---include-external Include local external ontology source triples
+--include-external Include the used external ontology subset
 --output <FILE> Save output to file
 
 Options:

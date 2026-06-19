@@ -453,30 +453,6 @@ The implementation shall enforce the ontology and semantic-contract structure:
 - The graph registry indexes ontology elements by `element.id`, `element.identifier`, derived IRI, ontology hierarchy, reused_contract_context consumers, and parsed `Ontology` content.
 - The graph registry indexes semantic contracts by `element.id`, `element.identifier`, derived IRI, constrained requirements, used ontology context, and parsed `Shapes` content.
 - Reqvire builds a reusable semantic index from the graph registry for ontology validation, semantic-contract validation, ontology export, parsing each Turtle block once and reusing the parsed RDF quads for diagnostics, ontology term declarations, SHACL references, Turtle export, and JSON-LD export.
-- `reqvire validate` parses `Ontology` and `Shapes` Turtle content with Oxigraph and inspects the parsed RDF graph instead of using raw text matching.
-- `reqvire validate` treats ontology term declarations as globally owned by one ontology element:
-  - The same ontology term IRI must not be declared by multiple ontology elements.
-  - The same ontology term IRI must not be declared with conflicting roles, such as both `owl:Class` and `owl:DatatypeProperty`.
-  - This validation applies to declared ontology terms, not to derived ontology element IRIs.
-  - Duplicate and conflicting declaration issue kinds are defined by the Reqvire validation ontology.
-- When `Shapes` exists, validation performs lightweight SHACL sanity checks:
-  - The shapes graph contains at least one `sh:NodeShape` or `sh:PropertyShape`.
-  - Each `sh:NodeShape` has at least one IRI `sh:targetClass`.
-  - `sh:targetClass` values are declared by at least one ontology element in the Reqvire model.
-  - Referenced `sh:property` shapes define exactly one IRI `sh:path`.
-  - `sh:path` values are declared by at least one ontology element in the Reqvire model.
-  - `sh:class` values are declared by at least one ontology element in the Reqvire model.
-  - Missing declarations are validation errors because they create dangling semantic references.
-  - Built-in RDFS annotation paths `rdfs:label` and `rdfs:comment` are allowed as external annotation properties in `sh:path` and do not require local ontology term declarations.
-  - Validation errors for missing semantic declarations must include the referencing semantic-contract identifier, reference kind, referenced IRI, and guidance to define the term or update/remove the SHACL reference before deleting or editing the declaring contract.
-  - Declared references must also be reachable from the referencing semantic contract's ontology-use context.
-  - A semantic-contract ontology-use context contains ontology elements linked through `use`/`usedBy` plus ontology ancestors reachable through ontology hierarchy.
-  - A SHACL reference to a term declared outside reachable ontology context is a validation error, not a lint issue.
-  - Validation errors for outside-context semantic references must include the referencing semantic-contract identifier, reference kind, referenced IRI, declaring ontology identifier, and guidance to add a `use` relation to the declaring ontology or an ontology descendant with the declaring ontology in its hierarchy.
-  - Supported constraint terms are checked for basic shape validity: `sh:minCount`, `sh:maxCount`, `sh:datatype`, `sh:class`, `sh:nodeKind`, `sh:pattern`, and `sh:in`.
-  - `sh:maxCount` must be greater than or equal to `sh:minCount` when both are present.
-  - `sh:in` must point to a valid RDF list.
-- OWL reasoning and full SHACL conformance execution are not required for the initial semantic contract validator; they may be added later through optional adapters once the dependency footprint is acceptable.
 
 #### Metadata
   * type: specification
@@ -573,4 +549,3 @@ Usage guidelines for selecting appropriate verification types.
 #### Metadata
   * type: specification
 ---
-

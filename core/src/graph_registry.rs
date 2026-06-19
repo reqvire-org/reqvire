@@ -18,8 +18,10 @@ use crate::relation::{
     IMPACT_PROPAGATION_RELATIONS, SATISFACTION_RELATIONS,
 };
 use crate::semantic_contract;
+use crate::shacl;
 use crate::Relation;
 use globset::GlobSet;
+use oxigraph::model::NamedOrBlankNode;
 use regex::Regex;
 
 /// Cached regex for matching .md file references in relation targets
@@ -1508,7 +1510,7 @@ impl GraphRegistry {
 
         let semantic_index = semantic_contract::build_semantic_index(self);
         let context = self.build_concept_reference_context(element_id);
-        let prefixes = self.build_ontology_prefix_map(&context, &semantic_index);
+        let prefixes = semantic_index.ontology_prefix_map(&context);
         let mut ontology_ids = BTreeSet::new();
 
         for reference in references {
@@ -2205,57 +2207,10 @@ impl GraphRegistry {
             }
         }
 
-        for reference in &semantic_index.shape_references {
-            if semantic_index
-                .ontology_declarations
-                .contains_key(&reference.iri)
-            {
-                let context =
-                    self.semantic_contract_used_ontology_context(&reference.element_identifier);
-                if context.is_empty() {
-                    continue;
-                }
-                let context: BTreeSet<String> = context.into_iter().collect();
-                let declaration_sources: BTreeSet<String> = semantic_index
-                    .ontology_declarations
-                    .get(&reference.iri)
-                    .into_iter()
-                    .flat_map(|declarations| {
-                        declarations
-                            .iter()
-                            .map(|declaration| declaration.element_identifier.clone())
-                    })
-                    .collect();
-                if declaration_sources
-                    .iter()
-                    .any(|declaration_source| context.contains(declaration_source))
-                {
-                    continue;
-                }
-
-                let declaring_contract = declaration_sources
-                    .iter()
-                    .next()
-                    .cloned()
-                    .unwrap_or_else(|| "unknown semantic contract".to_string());
-                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Semantic reference outside context: semantic contract '{}' references {} <{}>, declared by ontology '{}', but that ontology is not reachable through the contract's use relations. Add a use relation to the declaring ontology or an ontology descendant with the declaring ontology in its hierarchy.",
-                        reference.element_identifier,
-                        reference.kind,
-                        reference.iri,
-                        declaring_contract
-                    )));
-                continue;
-            }
-
-            let removed_source = removed_declaration_source
-                .map(|source| format!(" Removed declaration source: {}.", source))
-                .unwrap_or_default();
-            errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "Semantic reference not found: semantic contract '{}' references {} <{}>, but no ontology element declares this IRI.{} Update or remove the SHACL reference before deleting or editing the declaring ontology.",
-                    reference.element_identifier, reference.kind, reference.iri, removed_source
-                )));
-        }
+        errors.extend(self.validate_semantic_contract_shape_alignment(
+            &semantic_index,
+            removed_declaration_source,
+        ));
 
         errors.extend(self.validate_semantic_contract_shape_prefixes(&semantic_index));
 
@@ -2306,6 +2261,74 @@ impl GraphRegistry {
         Ok(errors)
     }
 
+    fn validate_semantic_contract_shape_alignment(
+        &self,
+        semantic_index: &semantic_contract::SemanticIndex,
+        removed_declaration_source: Option<&str>,
+    ) -> Vec<ReqvireError> {
+        let mut errors = Vec::new();
+        let mut seen = BTreeSet::new();
+
+        for block in &semantic_index.blocks {
+            if !matches!(block.kind, semantic_contract::SemanticBlockKind::Shapes) {
+                continue;
+            }
+
+            let context = self.semantic_contract_used_ontology_context(&block.source);
+            if context.is_empty() {
+                continue;
+            }
+            let context: BTreeSet<String> = context.into_iter().collect();
+            let domain_index = semantic_index.shacl_domain_ontology_index(&context);
+            let registry = shacl::ShaclRegistry::parse(&block.quads);
+            let aligner = shacl::OntologyAligner::new(&domain_index);
+
+            for alignment_error in aligner.cross_check_shapes(&registry.compiled_shapes) {
+                let Some((iri, kind)) = shacl_alignment_reference(&alignment_error) else {
+                    continue;
+                };
+                let key = (block.source.clone(), kind.to_string(), iri.to_string());
+                if !seen.insert(key) {
+                    continue;
+                }
+
+                if let Some(declarations) = semantic_index.ontology_declarations.get(iri) {
+                    let declaration_sources: BTreeSet<String> = declarations
+                        .iter()
+                        .map(|declaration| declaration.element_identifier.clone())
+                        .collect();
+                    if declaration_sources
+                        .iter()
+                        .any(|declaration_source| context.contains(declaration_source))
+                    {
+                        continue;
+                    }
+
+                    let declaring_contract = declaration_sources
+                        .iter()
+                        .next()
+                        .cloned()
+                        .unwrap_or_else(|| "unknown semantic contract".to_string());
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "Semantic reference outside context: semantic contract '{}' references {} <{}>, declared by ontology '{}', but that ontology is not reachable through the contract's use relations. Add a use relation to the declaring ontology or an ontology descendant with the declaring ontology in its hierarchy.",
+                        block.source, kind, iri, declaring_contract
+                    )));
+                    continue;
+                }
+
+                let removed_source = removed_declaration_source
+                    .map(|source| format!(" Removed declaration source: {}.", source))
+                    .unwrap_or_default();
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "Semantic reference not found: semantic contract '{}' references {} <{}>, but no ontology element declares this IRI.{} Update or remove the SHACL reference before deleting or editing the declaring ontology.",
+                    block.source, kind, iri, removed_source
+                )));
+            }
+        }
+
+        errors
+    }
+
     fn validate_semantic_contract_shape_prefixes(
         &self,
         semantic_index: &semantic_contract::SemanticIndex,
@@ -2332,17 +2355,18 @@ impl GraphRegistry {
             }
 
             let context_set: BTreeSet<&str> = context.iter().map(String::as_str).collect();
-            let project_namespaces =
-                self.used_ontology_project_namespaces(&context_set, semantic_index);
+            let project_namespaces = semantic_index.used_ontology_project_namespaces(&context_set);
             if project_namespaces.is_empty() {
                 continue;
             }
 
-            let shape_prefixes = parse_turtle_prefixes(&block.content);
+            let shape_prefixes =
+                semantic_contract::parse_turtle_prefix_declarations(&block.content);
             let mut declared_namespaces = BTreeSet::new();
             for (prefix, namespace) in &shape_prefixes {
                 declared_namespaces.insert(namespace.clone());
-                if let Some(expected_namespaces) = project_namespaces.by_prefix.get(prefix) {
+                if let Some(expected_namespaces) = project_namespaces.namespaces_for_prefix(prefix)
+                {
                     if !expected_namespaces.contains(namespace) {
                         let expected = expected_namespaces
                             .iter()
@@ -2438,7 +2462,7 @@ impl GraphRegistry {
 
             let context = self.build_concept_reference_context(&element.identifier);
             let context_set: BTreeSet<String> = context.iter().cloned().collect();
-            let prefixes = self.build_ontology_prefix_map(&context, semantic_index);
+            let prefixes = semantic_index.ontology_prefix_map(&context);
 
             for reference in references {
                 let resolved_iri = match resolve_concept_reference_iri(&reference.iri, &prefixes) {
@@ -2511,49 +2535,6 @@ impl GraphRegistry {
             .collect()
     }
 
-    fn build_ontology_prefix_map(
-        &self,
-        ontology_context: &[String],
-        semantic_index: &semantic_contract::SemanticIndex,
-    ) -> HashMap<String, String> {
-        let context: BTreeSet<&str> = ontology_context.iter().map(String::as_str).collect();
-        let mut prefixes = HashMap::new();
-
-        for block in &semantic_index.blocks {
-            if !matches!(block.kind, semantic_contract::SemanticBlockKind::Ontology)
-                || !context.contains(block.source.as_str())
-            {
-                continue;
-            }
-
-            for (prefix, iri) in parse_turtle_prefixes(&block.content) {
-                prefixes.entry(prefix).or_insert(iri);
-            }
-        }
-
-        for declaration in &semantic_index.ontology_documents {
-            if declaration
-                .element_identifiers
-                .iter()
-                .any(|identifier| context.contains(identifier.as_str()))
-            {
-                prefixes
-                    .entry(declaration.ontology_prefix.clone())
-                    .or_insert(declaration.term_namespace.clone());
-            }
-        }
-
-        for source in &semantic_index.external_sources {
-            if context.contains(source.owner_identifier.as_str()) {
-                prefixes
-                    .entry(source.prefix.clone())
-                    .or_insert(source.namespace.clone());
-            }
-        }
-
-        prefixes
-    }
-
     fn semantic_contract_used_ontology_context(&self, contract_id: &str) -> Vec<String> {
         let Some(contract) = self.nodes.get(contract_id) else {
             return Vec::new();
@@ -2592,54 +2573,6 @@ impl GraphRegistry {
         }
 
         self.expand_ontology_context(context)
-    }
-
-    fn used_ontology_project_namespaces(
-        &self,
-        ontology_context: &BTreeSet<&str>,
-        semantic_index: &semantic_contract::SemanticIndex,
-    ) -> UsedOntologyProjectNamespaces {
-        let mut by_prefix: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
-        let mut prefix_by_namespace: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
-
-        for declaration in &semantic_index.ontology_documents {
-            if !declaration
-                .element_identifiers
-                .iter()
-                .any(|identifier| ontology_context.contains(identifier.as_str()))
-            {
-                continue;
-            }
-
-            by_prefix
-                .entry(declaration.ontology_prefix.clone())
-                .or_default()
-                .insert(declaration.term_namespace.clone());
-            prefix_by_namespace
-                .entry(declaration.term_namespace.clone())
-                .or_default()
-                .insert(declaration.ontology_prefix.clone());
-        }
-
-        for source in &semantic_index.external_sources {
-            if !ontology_context.contains(source.owner_identifier.as_str()) {
-                continue;
-            }
-
-            by_prefix
-                .entry(source.prefix.clone())
-                .or_default()
-                .insert(source.namespace.clone());
-            prefix_by_namespace
-                .entry(source.namespace.clone())
-                .or_default()
-                .insert(source.prefix.clone());
-        }
-
-        UsedOntologyProjectNamespaces {
-            by_prefix,
-            prefix_by_namespace,
-        }
     }
 
     /// Validates that each contract is owned by at most one requirement via definedBy.
@@ -6357,69 +6290,38 @@ fn replace_single_fenced_subsection(
     Ok(output.trim_end_matches('\n').to_string())
 }
 
-struct UsedOntologyProjectNamespaces {
-    by_prefix: BTreeMap<String, BTreeSet<String>>,
-    prefix_by_namespace: BTreeMap<String, BTreeSet<String>>,
-}
-
-impl UsedOntologyProjectNamespaces {
-    fn is_empty(&self) -> bool {
-        self.by_prefix.is_empty()
+fn shacl_alignment_reference(error: &shacl::AlignmentError) -> Option<(&str, String)> {
+    match error {
+        shacl::AlignmentError::UndeclaredClass {
+            class_node: NamedOrBlankNode::NamedNode(iri),
+            predicate,
+            ..
+        } => Some((iri.as_str(), shacl::predicate_label(predicate))),
+        shacl::AlignmentError::UndeclaredClass {
+            class_node: NamedOrBlankNode::BlankNode(_),
+            ..
+        } => None,
+        shacl::AlignmentError::UndeclaredProperty {
+            property_iri,
+            predicate,
+            ..
+        } => Some((property_iri.as_str(), shacl::predicate_label(predicate))),
+        shacl::AlignmentError::UndeclaredDatatype {
+            datatype_iri,
+            predicate,
+            ..
+        } => Some((datatype_iri.as_str(), shacl::predicate_label(predicate))),
+        shacl::AlignmentError::UndeclaredNode {
+            node_iri,
+            predicate,
+            ..
+        } => Some((node_iri.as_str(), shacl::predicate_label(predicate))),
+        shacl::AlignmentError::InvalidInversePath {
+            property_iri,
+            predicate,
+            ..
+        } => Some((property_iri.as_str(), shacl::predicate_label(predicate))),
     }
-
-    fn namespaces_for_iri(&self, iri: &str) -> Vec<&str> {
-        self.prefix_by_namespace
-            .keys()
-            .filter(|namespace| iri.starts_with(namespace.as_str()))
-            .map(String::as_str)
-            .collect()
-    }
-
-    fn prefix_for_namespace(&self, namespace: &str) -> Option<&str> {
-        self.prefix_by_namespace
-            .get(namespace)?
-            .iter()
-            .next()
-            .map(String::as_str)
-    }
-}
-
-fn parse_turtle_prefixes(content: &str) -> Vec<(String, String)> {
-    let mut prefixes = Vec::new();
-    for line in content.lines() {
-        let trimmed = line.trim();
-        let lower = trimmed.to_ascii_lowercase();
-        let Some(rest) = lower
-            .strip_prefix("@prefix ")
-            .map(|_| &trimmed["@prefix ".len()..])
-            .or_else(|| {
-                lower
-                    .strip_prefix("prefix ")
-                    .map(|_| &trimmed["prefix ".len()..])
-            })
-        else {
-            continue;
-        };
-
-        let mut parts = rest.split_whitespace();
-        let Some(prefix_token) = parts.next() else {
-            continue;
-        };
-        let Some(iri_token) = parts.next() else {
-            continue;
-        };
-        let Some(prefix) = prefix_token.strip_suffix(':') else {
-            continue;
-        };
-        let Some(iri) = iri_token
-            .strip_prefix('<')
-            .and_then(|value| value.strip_suffix('>'))
-        else {
-            continue;
-        };
-        prefixes.push((prefix.to_string(), iri.to_string()));
-    }
-    prefixes
 }
 
 fn resolve_concept_reference_iri(

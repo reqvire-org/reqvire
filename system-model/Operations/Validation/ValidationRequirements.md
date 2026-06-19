@@ -17,21 +17,75 @@ Implementation details shall follow the associated contract specifications.
   * verifiedBy: [Unstructured Documents Test](../../Verifications/Operations/Validation/ValidationVerifications.md#unstructured-documents-test)
 ---
 
-### Semantic Contract Reference Context Validation
+### Semantic Contract Shape Validation
 
-The system shall reject semantic-contract shape references that cannot be resolved within the contract's explicit ontology-use context.
+The system shall validate semantic-contract SHACL shape documents using the ontology context explicitly reachable from each semantic contract.
 
 #### Details
-When validating semantic contracts, the system shall require each SHACL reference to resolve to an ontology term declared by an ontology element reachable through the semantic contract's `use` relations, including ontology ancestors reached through `derivedFrom`/`derive`.
+When validating semantic contracts, the system shall parse each `#### Shapes` Turtle block, validate the SHACL document structure that Reqvire depends on, and resolve SHACL vocabulary references against built-in vocabulary, local external ontology sources, and ontology terms reachable through the semantic contract's explicit `use` relations.
 
-The system shall reject references to terms declared outside the reachable ontology-use context because such references bypass the explicit semantic-contract dependency path required for change-impact traceability.
+This validation shall allow valid SHACL target mechanisms while preserving Reqvire's traceability requirement that model-owned references are backed by the semantic contract's declared ontology-use context.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Semantic Contract Reference Context Validation Specification](Specifications.md#semantic-contract-reference-context-validation-specification)
+  * definedBy: [Semantic Contract Shape Validation Specification](Specifications.md#semantic-contract-shape-validation-specification)
   * derivedFrom: [Ontology and Semantic Contract Model](../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
+  * derive: [SHACL Structural Parser Registry](#shacl-structural-parser-registry)
+  * derive: [SHACL Ontology Alignment](#shacl-ontology-alignment)
+  * derive: [Reqvire SHACL Context Adapter](#reqvire-shacl-context-adapter)
+  * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
+---
+
+### SHACL Structural Parser Registry
+
+The system shall compile SHACL RDF graphs into a reusable structural registry that is independent of Reqvire model elements and relations.
+
+#### Details
+The parser registry shall consume Oxigraph RDF terms and quads, discover SHACL shape nodes, parse targets, recursive property paths, nested shape structure, and supported constraint syntax, then expose a typed AST, raw Oxigraph-backed constraint facts, and diagnostics that can be reused by Reqvire validation, ontology projection, export, and Explorer rendering.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [SHACL Structural Parser Registry Specification](Specifications.md#shacl-structural-parser-registry-specification)
+  * derivedFrom: [Semantic Contract Shape Validation](#semantic-contract-shape-validation)
+  * satisfiedBy: [shacl.rs](../../../core/src/shacl.rs)
+  * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
+---
+
+### SHACL Ontology Alignment
+
+The system shall align compiled SHACL shape registries against a supplied domain ontology index.
+
+#### Details
+The SHACL library shall accept a compiled shape registry and a domain ontology index derived from supplied RDF quads. The index shall expose declared classes, properties, datatypes, and available named terms from that supplied graph. The aligner shall cross-check SHACL targets, paths, class constraints, datatype constraints, target-node references, and relational property constraints against that supplied ontology index, then return generic alignment errors without depending on Reqvire elements or relations. Value constraints such as `sh:hasValue` and `sh:in` shall be preserved in the registry without requiring every value IRI to be a declared ontology term.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [SHACL Ontology Alignment Specification](Specifications.md#shacl-ontology-alignment-specification)
+  * derivedFrom: [Semantic Contract Shape Validation](#semantic-contract-shape-validation)
+  * satisfiedBy: [shacl.rs](../../../core/src/shacl.rs)
+  * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
+---
+
+### Reqvire SHACL Context Adapter
+
+The system shall adapt Reqvire semantic-contract ontology context into the generic SHACL ontology alignment input.
+
+#### Details
+The Reqvire adapter shall ask the semantic index for parsed RDF quads from the ontology subset reachable through semantic-contract `use` relations and ontology ancestry, including reachable local external ontology source quads. It shall derive the SHACL domain ontology index from that supplied RDF context, resolve built-in vocabulary policy, invoke the generic SHACL ontology aligner, and map generic parser/alignment diagnostics into Reqvire semantic diagnostics.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Reqvire SHACL Context Adapter Specification](Specifications.md#reqvire-shacl-context-adapter-specification)
+  * derivedFrom: [Semantic Contract Shape Validation](#semantic-contract-shape-validation)
+  * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
 ---
@@ -367,4 +421,3 @@ Implementation details shall follow the associated contract specifications.
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
   * verifiedBy: [Single Element Contract Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#single-element-contract-validation-test)
 ---
-

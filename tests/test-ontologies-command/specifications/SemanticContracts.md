@@ -30,6 +30,20 @@ API vocabulary.
   * source: references/external.ttl
   * format: turtle
 
+#### External Ontology
+  * prefix: jsonext
+  * namespace: https://example.test/jsonld-external#
+  * resource: https://example.test/jsonld-external
+  * source: references/external.jsonld
+  * format: jsonld
+
+#### External Ontology
+  * prefix: rdfext
+  * namespace: https://example.test/rdf-external#
+  * resource: https://example.test/rdf-external
+  * source: references/external.rdf
+  * format: rdf
+
 #### Ontology
 ```turtle
 @prefix testonto: <https://example.test/ontology#> .
@@ -159,6 +173,8 @@ API endpoint shape contract.
 ```turtle
 @prefix testonto: <https://example.test/ontology#> .
 @prefix ext: <https://example.test/external#> .
+@prefix jsonext: <https://example.test/jsonld-external#> .
+@prefix rdfext: <https://example.test/rdf-external#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xs: <http://www.w3.org/2001/XMLSchema#> .
 
@@ -185,6 +201,18 @@ testonto:ServiceEndpointShape
   sh:property [
     sh:path testonto:identifier ;
     sh:datatype ext:ExternalCode ;
+  ] ;
+  sh:property [
+    sh:path ext:externalCode ;
+    sh:datatype ext:ExternalCode ;
+  ] ;
+  sh:property [
+    sh:path jsonext:jsonExternalCode ;
+    sh:datatype jsonext:JsonExternalCode ;
+  ] ;
+  sh:property [
+    sh:path rdfext:rdfExternalCode ;
+    sh:datatype rdfext:RdfExternalCode ;
   ] .
 ```
 ---

@@ -1,0 +1,85 @@
+# Elements
+
+### Platform Capability
+
+Platform capability.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * specifiedBy: [External Source Requirement](#external-source-requirement)
+---
+
+### Platform Ontology
+
+Platform ontology with a reachable local external ontology source.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/platform
+  * ontology_prefix: platform
+
+#### External Ontology
+  * prefix: ext
+  * namespace: https://example.test/shacl-external#
+  * resource: https://example.test/shacl-external
+  * source: references/external-shacl.ttl
+  * format: turtle
+
+#### Ontology
+```turtle
+@prefix platform: <https://example.test/platform#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/platform> a owl:Ontology .
+platform:EventEnvelope a owl:Class .
+```
+---
+
+### External Source Requirement
+
+The system shall validate SHACL shapes that reference reachable external ontology source terms.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Platform Capability](#platform-capability)
+  * constrainedBy: [External Source Shape Contract](#external-source-shape-contract)
+---
+
+### External Source Shape Contract
+
+External source shape contract.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [External Source Requirement](#external-source-requirement)
+  * use: [Platform Ontology](#platform-ontology)
+
+#### Shapes
+```turtle
+@prefix ext: <https://example.test/shacl-external#> .
+@prefix platform: <https://example.test/platform#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+platform:ExternalEventShape
+  a sh:NodeShape ;
+  sh:targetClass ext:ExternalEvent ;
+  sh:targetNode ext:externalNode ;
+  sh:property [
+    sh:path ext:externalLink ;
+    sh:class ext:externalNode ;
+    sh:hasValue ext:externalNode ;
+    sh:in ( ext:externalNode )
+  ] ;
+  sh:property [
+    sh:path ext:externalCode ;
+    sh:datatype ext:ExternalCode ;
+    sh:minCount 1 ;
+  ] .
+```
+---

@@ -1,9 +1,10 @@
 use crate::element::{Element, GovernanceMetadataSource, ReusedContractContextTarget};
 use crate::git_commands;
 use crate::graph_registry::GraphRegistry;
-use crate::ontology_graph::build_graph_data;
+use crate::ontology_graph::{build_graph_data, OntologyGraphData};
 use crate::relation::{self, LinkType};
-use crate::semantic_contract::SemanticIndex;
+use crate::semantic_contract::{SemanticBlock, SemanticIndex};
+use oxigraph::model::NamedOrBlankNode;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
@@ -162,7 +163,6 @@ pub fn build_project_store(
     let concept_refs = build_concept_refs(registry, &mut resources);
     enrich_resource_sources(&mut resources);
     let (files, folders) = build_files_and_folders(registry, &resources);
-    let search = build_search_documents(&elements, &files, &resources);
     let submodels = crate::report_submodels::generate_submodels_report(registry, None)
         .ok()
         .and_then(|report| serde_json::to_value(report).ok())
@@ -175,14 +175,21 @@ pub fn build_project_store(
         &resources,
         &submodels,
     );
+    let (visible_semantic_index, external_metadata) =
+        explorer_visible_semantic_index(semantic_index);
+    let ontology_graph_data = build_graph_data(&visible_semantic_index);
+    let search = build_search_documents(&elements, &files, &resources, &ontology_graph_data);
     let ontology = json!({
         "summary": semantic_index.summary,
-        "blocks": semantic_index.blocks,
+        "blocks": visible_semantic_index.blocks,
         "diagnostics": semantic_index.diagnostics,
-        "declarations": semantic_index.ontology_declarations,
+        "declarations": visible_semantic_index.ontology_declarations,
         "shape_references": semantic_index.shape_references,
         "projection": semantic_index.ontology_projection,
-        "graph_data": build_graph_data(semantic_index),
+        "graph_data": ontology_graph_data,
+        "external_sources": semantic_index.external_sources,
+        "external_materialization": external_metadata["external_materialization"].clone(),
+        "external_counts": external_metadata["external_counts"].clone(),
         "ttl_href": "ontologies.ttl"
     });
     let trace_report =
@@ -265,6 +272,98 @@ fn repository_name_from_url(url: &str) -> Option<String> {
         .next()
         .map(|name| name.trim_end_matches(".git").to_string())
         .filter(|name| !name.is_empty())
+}
+
+fn explorer_visible_semantic_index(source: &SemanticIndex) -> (SemanticIndex, Value) {
+    let mut visible = source.clone();
+    let used_subset_block = visible.used_external_subset_block().ok().flatten();
+    let used_terms = used_subset_block
+        .as_ref()
+        .map(materialized_external_subjects)
+        .unwrap_or_default();
+
+    visible.external_blocks = used_subset_block.into_iter().collect();
+    visible.ontology_declarations.retain(|_iri, declarations| {
+        declarations.retain_mut(|declaration| {
+            if !declaration.external {
+                return true;
+            }
+            let materialized = used_terms.contains(&declaration.iri);
+            declaration.materialized_in_used_subset = materialized;
+            materialized
+        });
+        !declarations.is_empty()
+    });
+
+    let external_metadata = explorer_external_materialization_metadata(source, &visible);
+    (visible, external_metadata)
+}
+
+fn materialized_external_subjects(block: &SemanticBlock) -> BTreeSet<String> {
+    block
+        .quads
+        .iter()
+        .filter_map(|quad| match &quad.subject {
+            NamedOrBlankNode::NamedNode(node) => Some(node.as_str().to_string()),
+            NamedOrBlankNode::BlankNode(_) => None,
+        })
+        .collect()
+}
+
+fn explorer_external_materialization_metadata(
+    source: &SemanticIndex,
+    visible: &SemanticIndex,
+) -> Value {
+    let materialized_terms: BTreeSet<String> = visible
+        .external_blocks
+        .iter()
+        .flat_map(materialized_external_subjects)
+        .collect();
+    let available_external_declaration_count = source
+        .ontology_declarations
+        .values()
+        .flat_map(|declarations| declarations.iter())
+        .filter(|declaration| declaration.external)
+        .count();
+    let visible_external_declaration_count = visible
+        .ontology_declarations
+        .values()
+        .flat_map(|declarations| declarations.iter())
+        .filter(|declaration| declaration.external)
+        .count();
+    let used_external_source_count = source
+        .external_sources
+        .iter()
+        .filter(|source| {
+            materialized_terms
+                .iter()
+                .any(|term| term.starts_with(&source.namespace))
+        })
+        .count();
+    let raw_external_triple_count: usize = source
+        .external_blocks
+        .iter()
+        .map(|block| block.quads.len())
+        .sum();
+    let materialized_external_triple_count: usize = visible
+        .external_blocks
+        .iter()
+        .map(|block| block.quads.len())
+        .sum();
+
+    json!({
+        "external_materialization": if source.external_sources.is_empty() { "none" } else { "used_subset" },
+        "external_counts": {
+            "declared_external_source_count": source.external_sources.len(),
+            "visible_external_source_count": used_external_source_count,
+            "used_external_source_count": used_external_source_count,
+            "available_external_term_declaration_count": available_external_declaration_count,
+            "visible_external_term_declaration_count": visible_external_declaration_count,
+            "materialized_external_term_count": materialized_terms.len(),
+            "raw_external_triple_count": raw_external_triple_count,
+            "materialized_external_triple_count": materialized_external_triple_count
+        }
+    })
 }
 
 pub fn project_store_javascript(
@@ -858,6 +957,7 @@ fn build_search_documents(
     elements: &[ProjectStoreElement],
     files: &[ProjectStoreFile],
     resources: &BTreeMap<String, ProjectStoreResource>,
+    ontology_graph_data: &OntologyGraphData,
 ) -> Vec<ProjectStoreSearchDocument> {
     let mut docs = Vec::new();
     for element in elements {
@@ -898,6 +998,56 @@ fn build_search_documents(
             title: resource.display.clone(),
             route: format!("#/resources/{}", resource.id),
             text: format!("{} {}", resource.target, resource.relation_types.join(" ")),
+        });
+    }
+    for node in &ontology_graph_data.nodes {
+        let source_text = node
+            .sources
+            .iter()
+            .map(|source| {
+                format!(
+                    "{} {} {} {}",
+                    source.source_name, source.file_path, source.kind, source.source
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(" ");
+        let type_text = node
+            .rdf_types
+            .iter()
+            .chain(node.type_evidence.iter().map(|evidence| &evidence.label))
+            .cloned()
+            .collect::<Vec<_>>()
+            .join(" ");
+        let relation_text = node
+            .domain
+            .iter()
+            .chain(node.range.iter())
+            .map(|term| format!("{} {} {}", term.label, term.iri, term.kind))
+            .collect::<Vec<_>>()
+            .join(" ");
+        let text = [
+            node.id.as_str(),
+            node.full_uri.as_str(),
+            node.semantic_type.as_str(),
+            node.layer.as_str(),
+            node.source_kind.as_str(),
+            node.comment.as_str(),
+            type_text.as_str(),
+            source_text.as_str(),
+            relation_text.as_str(),
+        ]
+        .join(" ");
+        docs.push(ProjectStoreSearchDocument {
+            id: node.id.clone(),
+            kind: "ontology".to_string(),
+            title: if node.label.is_empty() {
+                node.id.clone()
+            } else {
+                node.label.clone()
+            },
+            route: "#/ontologies".to_string(),
+            text,
         });
     }
     docs.sort_by(|a, b| a.id.cmp(&b.id));
@@ -1084,6 +1234,243 @@ mod tests {
     use super::*;
     use crate::element::{Element, ElementType, RequirementType, VerificationType};
     use crate::relation::Relation;
+    use crate::semantic_contract::{
+        ExternalOntologySource, ModelContextGraph, OntologyConstruct, OntologyConstructFamily,
+        OntologyConstructKind, OntologyProjectionDerivationMode, OntologyProjectionGraph,
+        OntologyProjectionProvenance, OntologyProjectionSource, OntologyProjectionTerm,
+        OntologyProjectionTermKind, OntologyTermDeclaration, OntologyTermRole, SemanticBlock,
+        SemanticBlockKind, SemanticIndexSummary,
+    };
+    use oxigraph::io::{RdfFormat, RdfParser};
+    use std::collections::HashMap;
+
+    const TEST_RDFS_SUBCLASS_OF: &str = "http://www.w3.org/2000/01/rdf-schema#subClassOf";
+
+    fn parse_test_quads(turtle: &str) -> Vec<oxigraph::model::Quad> {
+        RdfParser::from_format(RdfFormat::Turtle)
+            .for_reader(turtle.as_bytes())
+            .map(|quad| quad.expect("test Turtle should parse"))
+            .collect()
+    }
+
+    fn external_block(content: &str) -> SemanticBlock {
+        SemanticBlock {
+            kind: SemanticBlockKind::ExternalOntology,
+            source: "test#external".to_string(),
+            source_name: "Test external ontology".to_string(),
+            file_path: "system-model/Ontologies/Test.md".to_string(),
+            line_number: 1,
+            language: "turtle".to_string(),
+            external_materialization: None,
+            content: content.to_string(),
+            quads: parse_test_quads(content),
+        }
+    }
+
+    fn test_projection_source() -> OntologyProjectionSource {
+        OntologyProjectionSource {
+            source_block: "test#ontology".to_string(),
+            source_element_identifier: "system-model/Ontologies/Test.md#test-ontology".to_string(),
+            source_name: "Test Ontology".to_string(),
+            file_path: "system-model/Ontologies/Test.md".to_string(),
+            line_number: 1,
+            block_kind: "ontology".to_string(),
+        }
+    }
+
+    fn iri_term(iri: &str) -> OntologyProjectionTerm {
+        OntologyProjectionTerm {
+            kind: OntologyProjectionTermKind::Iri,
+            value: iri.to_string(),
+            label: iri.to_string(),
+        }
+    }
+
+    fn projection_graph_with_external_object(iri: &str) -> OntologyProjectionGraph {
+        let source = test_projection_source();
+        OntologyProjectionGraph {
+            id: "urn:reqvire:ontology-projection:test".to_string(),
+            derivation_mode: OntologyProjectionDerivationMode::DirectAuthored,
+            projections: Vec::new(),
+            constructs: vec![OntologyConstruct {
+                id: "urn:reqvire:ontology-construct:test".to_string(),
+                family: OntologyConstructFamily::SubclassMembership,
+                kind: OntologyConstructKind::SubclassInclusion,
+                subject: iri_term("https://example.test/local#LocalTerm"),
+                predicate: Some(iri_term(TEST_RDFS_SUBCLASS_OF)),
+                object: Some(iri_term(iri)),
+                property: None,
+                members: Vec::new(),
+                property_characteristic: None,
+                restriction_kind: None,
+                class_expression_kind: None,
+                shape_overlay_kind: None,
+                symbol: None,
+                provenance: OntologyProjectionProvenance {
+                    derivation_mode: OntologyProjectionDerivationMode::DirectAuthored,
+                    source,
+                    evidence: Vec::new(),
+                },
+            }],
+            symbols: Vec::new(),
+        }
+    }
+
+    fn external_declaration(iri: &str) -> OntologyTermDeclaration {
+        OntologyTermDeclaration {
+            iri: iri.to_string(),
+            role: OntologyTermRole::Class,
+            element_identifier: "system-model/Ontologies/Test.md#test-ontology".to_string(),
+            external: true,
+            materialized_in_used_subset: false,
+        }
+    }
+
+    fn test_semantic_index_with_external_subset() -> SemanticIndex {
+        let raw_external = r#"
+@prefix ext: <https://example.test/external#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ext:ProjectedTerm a owl:Class ;
+  rdfs:label "Projected term" ;
+  rdfs:subClassOf ext:SupportClass .
+
+ext:SupportClass a owl:Class ;
+  rdfs:label "Support class" .
+
+ext:UnusedTerm a owl:Class ;
+  rdfs:label "Unused term" .
+"#;
+
+        SemanticIndex {
+            blocks: Vec::new(),
+            external_blocks: vec![external_block(raw_external)],
+            external_sources: vec![ExternalOntologySource {
+                owner_identifier: "system-model/Ontologies/Test.md#test-ontology".to_string(),
+                owner_name: "Test Ontology".to_string(),
+                prefix: "ext".to_string(),
+                namespace: "https://example.test/external#".to_string(),
+                resource: Some("https://example.test/external".to_string()),
+                source: "references/external.ttl".to_string(),
+                format: "turtle".to_string(),
+                line_number: 1,
+            }],
+            diagnostics: Vec::new(),
+            ontology_documents: Vec::new(),
+            ontology_declarations: HashMap::from([
+                (
+                    "https://example.test/external#ProjectedTerm".to_string(),
+                    vec![external_declaration(
+                        "https://example.test/external#ProjectedTerm",
+                    )],
+                ),
+                (
+                    "https://example.test/external#UnusedTerm".to_string(),
+                    vec![external_declaration(
+                        "https://example.test/external#UnusedTerm",
+                    )],
+                ),
+            ]),
+            shape_references: Vec::new(),
+            ontology_projection: projection_graph_with_external_object(
+                "https://example.test/external#ProjectedTerm",
+            ),
+            model_context: ModelContextGraph {
+                nodes: Vec::new(),
+                edges: Vec::new(),
+            },
+            model_context_turtle: r#"
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+
+<urn:reqvire:external-source:test> a reqvire:ExternalOntologySource ;
+  reqvire:externalOntologyNamespace "https://example.test/external#" .
+
+<urn:reqvire:concept:test> reqvire:referencesTerm <https://example.test/external#ProjectedTerm> .
+"#
+            .to_string(),
+            summary: SemanticIndexSummary {
+                ontology_blocks: 0,
+                shape_blocks: 0,
+                total_blocks: 0,
+                total_quads: 0,
+            },
+        }
+    }
+
+    #[test]
+    fn explorer_visible_semantic_index_materializes_used_external_subset_only() {
+        let source = test_semantic_index_with_external_subset();
+        let (visible, metadata) = explorer_visible_semantic_index(&source);
+        let graph_data = build_graph_data(&visible);
+        let graph_node_ids = graph_data
+            .nodes
+            .iter()
+            .map(|node| node.id.as_str())
+            .collect::<BTreeSet<_>>();
+
+        assert_eq!(visible.external_blocks.len(), 1);
+        assert_eq!(
+            visible.external_blocks[0].source,
+            "reqvire:external-used-subset"
+        );
+        assert!(graph_node_ids.contains("https://example.test/external#ProjectedTerm"));
+        assert!(graph_node_ids.contains("https://example.test/external#SupportClass"));
+        assert!(!graph_node_ids.contains("https://example.test/external#UnusedTerm"));
+        assert!(visible
+            .ontology_declarations
+            .contains_key("https://example.test/external#ProjectedTerm"));
+        assert!(!visible
+            .ontology_declarations
+            .contains_key("https://example.test/external#UnusedTerm"));
+        assert!(
+            visible.ontology_declarations["https://example.test/external#ProjectedTerm"][0]
+                .materialized_in_used_subset
+        );
+        assert_eq!(metadata["external_materialization"], "used_subset");
+        assert_eq!(
+            metadata["external_counts"]["declared_external_source_count"],
+            1
+        );
+        assert_eq!(metadata["external_counts"]["used_external_source_count"], 1);
+        assert_eq!(
+            metadata["external_counts"]["visible_external_term_declaration_count"],
+            1
+        );
+        assert_eq!(
+            metadata["external_counts"]["visible_external_source_count"],
+            1
+        );
+        let raw_external_triple_count = metadata["external_counts"]["raw_external_triple_count"]
+            .as_u64()
+            .expect("raw external triple count should be numeric");
+        let materialized_external_triple_count = metadata["external_counts"]
+            ["materialized_external_triple_count"]
+            .as_u64()
+            .expect("materialized external triple count should be numeric");
+        assert!(raw_external_triple_count > materialized_external_triple_count);
+    }
+
+    #[test]
+    fn explorer_search_indexes_visible_ontology_subset_only() {
+        let source = test_semantic_index_with_external_subset();
+        let (visible, _metadata) = explorer_visible_semantic_index(&source);
+        let graph_data = build_graph_data(&visible);
+        let docs = build_search_documents(&[], &[], &BTreeMap::new(), &graph_data);
+        let ontology_text = docs
+            .iter()
+            .filter(|doc| doc.kind == "ontology")
+            .map(|doc| format!("{} {}", doc.title, doc.text))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        assert!(ontology_text.contains("ProjectedTerm"));
+        assert!(ontology_text.contains("SupportClass"));
+        assert!(!ontology_text.contains("UnusedTerm"));
+        assert!(docs
+            .iter()
+            .all(|doc| doc.kind != "ontology" || doc.route == "#/ontologies"));
+    }
 
     #[test]
     fn explorer_files_include_only_model_files_and_registry_linked_resources() {
@@ -1132,7 +1519,15 @@ mod tests {
         let (_relations, mut resources) = build_relations(&registry);
         enrich_resource_sources(&mut resources);
         let (files, _folders) = build_files_and_folders(&registry, &resources);
-        let search = build_search_documents(&elements, &files, &resources);
+        let search = build_search_documents(
+            &elements,
+            &files,
+            &resources,
+            &OntologyGraphData {
+                nodes: Vec::new(),
+                edges: Vec::new(),
+            },
+        );
 
         let file_paths = files
             .iter()

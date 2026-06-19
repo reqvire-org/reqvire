@@ -7,9 +7,12 @@ use crate::graph_registry::GraphRegistry;
 use crate::owl_reserved;
 use crate::relation::{self, LinkType};
 use oxigraph::io::{JsonLdProfileSet, RdfFormat, RdfParser, RdfSerializer};
-use oxigraph::model::{NamedOrBlankNode, Quad, Term};
+use oxigraph::model::{NamedNode, NamedOrBlankNode, Quad, Term, Triple};
+use oxigraph::sparql::{QueryResults, SparqlEvaluator};
+use oxigraph::store::Store;
 use serde::Serialize;
-use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fmt;
 use std::path::{Path, PathBuf};
 
@@ -73,14 +76,158 @@ const SH_CLASS: &str = "http://www.w3.org/ns/shacl#class";
 const SH_NODE_KIND: &str = "http://www.w3.org/ns/shacl#nodeKind";
 const SH_PATTERN: &str = "http://www.w3.org/ns/shacl#pattern";
 const SH_IN: &str = "http://www.w3.org/ns/shacl#in";
-const SH_NODE_KINDS: &[&str] = &[
-    "http://www.w3.org/ns/shacl#IRI",
-    "http://www.w3.org/ns/shacl#BlankNode",
-    "http://www.w3.org/ns/shacl#Literal",
-    "http://www.w3.org/ns/shacl#BlankNodeOrIRI",
-    "http://www.w3.org/ns/shacl#BlankNodeOrLiteral",
-    "http://www.w3.org/ns/shacl#IRIOrLiteral",
-];
+const GRAPH_AUTHORED_ONTOLOGY: &str = "urn:reqvire:semantic-graph:authored-ontology";
+const GRAPH_SHACL: &str = "urn:reqvire:semantic-graph:shacl";
+const GRAPH_MODEL_CONTEXT: &str = "urn:reqvire:semantic-graph:model-context";
+const GRAPH_ONTOLOGY_PROJECTION: &str = "urn:reqvire:semantic-graph:ontology-projection";
+const GRAPH_RAW_EXTERNAL_SOURCE: &str = "urn:reqvire:semantic-graph:raw-external-source";
+const EXTERNAL_USED_SUBSET_IRI: &str = "urn:reqvire:semantic-graph:external-used-subset";
+
+const EXTERNAL_USED_TERM_SEED_QUERY_V1: &str = r#"
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+
+SELECT DISTINCT ?term
+WHERE {
+  ?source a reqvire:ExternalOntologySource ;
+    reqvire:externalOntologyNamespace ?namespace .
+
+  {
+    ?block reqvire:referencesTerm ?term .
+  }
+  UNION {
+    ?block reqvire:declaresTerm ?term .
+  }
+  UNION {
+    ?projection reqvire:conceptReference ?term .
+  }
+  UNION {
+    ?projection reqvire:constructSubject|reqvire:constructPredicate|reqvire:constructObject|reqvire:constructProperty ?term .
+  }
+
+  FILTER(isIRI(?term))
+  FILTER(STRSTARTS(STR(?term), STR(?namespace)))
+}
+"#;
+
+const EXTERNAL_USED_DIRECT_DESCRIPTION_CONSTRUCT_V1: &str = r#"
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+
+CONSTRUCT {
+  ?term ?p ?o .
+}
+WHERE {
+  ?subset a reqvire:UsedExternalOntologySubset ;
+    reqvire:externalUsedTerm ?term ;
+    reqvire:externalSubsetGraph ?rawExternalGraph .
+
+  GRAPH ?rawExternalGraph {
+    ?term ?p ?o .
+  }
+}
+"#;
+
+const EXTERNAL_USED_SUPPORT_CLOSURE_CONSTRUCT_V1: &str = r#"
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+
+CONSTRUCT {
+  ?support ?supportProperty ?supportObject .
+}
+WHERE {
+  ?subset a reqvire:UsedExternalOntologySubset ;
+    reqvire:externalUsedTerm ?term ;
+    reqvire:externalSubsetGraph ?rawExternalGraph .
+
+  GRAPH ?rawExternalGraph {
+    ?term ?p ?support .
+    FILTER(?p IN (
+      rdf:type,
+      rdfs:subClassOf,
+      rdfs:subPropertyOf,
+      rdfs:domain,
+      rdfs:range,
+      owl:equivalentClass,
+      owl:equivalentProperty,
+      owl:inverseOf,
+      owl:onProperty,
+      owl:someValuesFrom,
+      owl:allValuesFrom,
+      owl:hasValue
+    ))
+    FILTER(isIRI(?support) || isBlank(?support))
+
+    OPTIONAL {
+      ?support ?supportProperty ?supportObject .
+      FILTER(?supportProperty IN (
+        rdf:type,
+        rdfs:subClassOf,
+        rdfs:subPropertyOf,
+        rdfs:domain,
+        rdfs:range,
+        owl:equivalentClass,
+        owl:equivalentProperty,
+        owl:inverseOf,
+        owl:onProperty,
+        owl:someValuesFrom,
+        owl:allValuesFrom,
+        owl:hasValue
+      ))
+    }
+  }
+}
+"#;
+
+const EXTERNAL_USED_ANNOTATION_CONSTRUCT_V1: &str = r#"
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+CONSTRUCT {
+  ?describedTerm ?annotationProperty ?annotationValue .
+}
+WHERE {
+  ?subset a reqvire:UsedExternalOntologySubset ;
+    reqvire:externalSubsetGraph ?rawExternalGraph .
+
+  {
+    ?subset reqvire:externalUsedTerm ?describedTerm .
+  }
+  UNION {
+    ?subset reqvire:externalUsedTerm ?term .
+    GRAPH ?rawExternalGraph {
+      ?term ?supportProperty ?describedTerm .
+      FILTER(?supportProperty IN (
+        rdfs:subClassOf,
+        rdfs:subPropertyOf,
+        rdfs:domain,
+        rdfs:range,
+        owl:equivalentClass,
+        owl:equivalentProperty,
+        owl:inverseOf,
+        owl:onProperty,
+        owl:someValuesFrom,
+        owl:allValuesFrom,
+        owl:hasValue
+      ))
+    }
+  }
+
+  GRAPH ?rawExternalGraph {
+    ?describedTerm ?annotationProperty ?annotationValue .
+    FILTER(?annotationProperty IN (
+      rdfs:label,
+      rdfs:comment,
+      skos:prefLabel,
+      skos:definition,
+      dcterms:description
+    ))
+  }
+}
+"#;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 #[serde(rename_all = "kebab-case")]
@@ -126,6 +273,8 @@ pub struct OntologyTermDeclaration {
     pub role: OntologyTermRole,
     pub element_identifier: String,
     pub external: bool,
+    #[serde(skip_serializing_if = "is_false")]
+    pub materialized_in_used_subset: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -182,6 +331,8 @@ pub struct SemanticBlock {
     pub file_path: String,
     pub line_number: usize,
     pub language: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub external_materialization: Option<String>,
     pub content: String,
     #[serde(skip)]
     pub quads: Vec<Quad>,
@@ -205,6 +356,37 @@ pub struct ExternalOntologySource {
     pub source: String,
     pub format: String,
     pub line_number: usize,
+}
+
+pub struct UsedOntologyProjectNamespaces {
+    by_prefix: BTreeMap<String, BTreeSet<String>>,
+    prefix_by_namespace: BTreeMap<String, BTreeSet<String>>,
+}
+
+impl UsedOntologyProjectNamespaces {
+    pub fn is_empty(&self) -> bool {
+        self.by_prefix.is_empty()
+    }
+
+    pub fn namespaces_for_iri(&self, iri: &str) -> Vec<&str> {
+        self.prefix_by_namespace
+            .keys()
+            .filter(|namespace| iri.starts_with(namespace.as_str()))
+            .map(String::as_str)
+            .collect()
+    }
+
+    pub fn prefix_for_namespace(&self, namespace: &str) -> Option<&str> {
+        self.prefix_by_namespace
+            .get(namespace)?
+            .iter()
+            .next()
+            .map(String::as_str)
+    }
+
+    pub fn namespaces_for_prefix(&self, prefix: &str) -> Option<&BTreeSet<String>> {
+        self.by_prefix.get(prefix)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -561,7 +743,278 @@ pub enum SemanticExportFormat {
     JsonLd,
 }
 
+#[derive(Debug, Clone, Copy)]
+enum ExternalOntologyFormat {
+    Turtle,
+    RdfXml,
+    JsonLd,
+}
+
+impl ExternalOntologyFormat {
+    fn parse(value: &str) -> Option<Self> {
+        match value.trim().to_ascii_lowercase().as_str() {
+            "turtle" | "ttl" => Some(Self::Turtle),
+            "rdf" | "rdfxml" | "rdf-xml" | "rdf_xml" | "rdf+xml" => Some(Self::RdfXml),
+            "jsonld" | "json-ld" | "json_ld" => Some(Self::JsonLd),
+            _ => None,
+        }
+    }
+
+    fn display_name(self) -> &'static str {
+        match self {
+            Self::Turtle => "Turtle",
+            Self::RdfXml => "RDF/XML",
+            Self::JsonLd => "JSON-LD",
+        }
+    }
+
+    fn language(self) -> &'static str {
+        match self {
+            Self::Turtle => "turtle",
+            Self::RdfXml => "rdfxml",
+            Self::JsonLd => "jsonld",
+        }
+    }
+}
+
 impl SemanticIndex {
+    pub fn with_external_visibility(&self, include_external: bool) -> Result<Self, ReqvireError> {
+        let mut index = self.clone();
+        index.apply_external_visibility(include_external)?;
+        Ok(index)
+    }
+
+    pub fn apply_external_visibility(
+        &mut self,
+        include_external: bool,
+    ) -> Result<(), ReqvireError> {
+        if include_external {
+            let used_subset_block = self.used_external_subset_block()?;
+            let used_terms = used_subset_block
+                .as_ref()
+                .map(materialized_external_subjects)
+                .unwrap_or_default();
+            self.external_blocks = used_subset_block.into_iter().collect();
+            self.external_sources.retain(|source| {
+                used_terms
+                    .iter()
+                    .any(|term| term.starts_with(&source.namespace))
+            });
+            self.ontology_declarations.retain(|_iri, declarations| {
+                declarations.retain_mut(|declaration| {
+                    if !declaration.external {
+                        return true;
+                    }
+                    let materialized = used_terms.contains(&declaration.iri);
+                    declaration.materialized_in_used_subset = materialized;
+                    materialized
+                });
+                !declarations.is_empty()
+            });
+            return Ok(());
+        }
+
+        self.external_blocks.clear();
+        self.external_sources.clear();
+        self.ontology_declarations.retain(|_iri, declarations| {
+            declarations.retain(|declaration| !declaration.external);
+            !declarations.is_empty()
+        });
+        Ok(())
+    }
+
+    pub fn reachable_ontology_context_quads(
+        &self,
+        ontology_context: &BTreeSet<String>,
+    ) -> Vec<Quad> {
+        let external_block_sources: BTreeSet<String> = self
+            .external_sources
+            .iter()
+            .filter(|source| ontology_context.contains(&source.owner_identifier))
+            .map(|source| {
+                format!(
+                    "{}#external-ontology-{}",
+                    source.owner_identifier, source.prefix
+                )
+            })
+            .collect();
+
+        let mut quads = Vec::new();
+        for block in &self.blocks {
+            if matches!(block.kind, SemanticBlockKind::Ontology)
+                && ontology_context.contains(&block.source)
+            {
+                quads.extend(block.quads.iter().cloned());
+            }
+        }
+        for block in &self.external_blocks {
+            if external_block_sources.contains(&block.source) {
+                quads.extend(block.quads.iter().cloned());
+            }
+        }
+
+        quads
+    }
+
+    pub fn shacl_domain_ontology_index(
+        &self,
+        ontology_context: &BTreeSet<String>,
+    ) -> crate::shacl::DomainOntologyIndex {
+        let quads = self.reachable_ontology_context_quads(ontology_context);
+        crate::shacl::DomainOntologyIndex::from_quads(&quads)
+    }
+
+    pub fn ontology_prefix_map(&self, ontology_context: &[String]) -> HashMap<String, String> {
+        let context: BTreeSet<&str> = ontology_context.iter().map(String::as_str).collect();
+        let mut prefixes = HashMap::new();
+
+        for block in &self.blocks {
+            if !matches!(block.kind, SemanticBlockKind::Ontology)
+                || !context.contains(block.source.as_str())
+            {
+                continue;
+            }
+
+            for (prefix, iri) in parse_turtle_prefix_declarations(&block.content) {
+                prefixes.entry(prefix).or_insert(iri);
+            }
+        }
+
+        for declaration in &self.ontology_documents {
+            if declaration
+                .element_identifiers
+                .iter()
+                .any(|identifier| context.contains(identifier.as_str()))
+            {
+                prefixes
+                    .entry(declaration.ontology_prefix.clone())
+                    .or_insert(declaration.term_namespace.clone());
+            }
+        }
+
+        for source in &self.external_sources {
+            if context.contains(source.owner_identifier.as_str()) {
+                prefixes
+                    .entry(source.prefix.clone())
+                    .or_insert(source.namespace.clone());
+            }
+        }
+
+        prefixes
+    }
+
+    pub fn used_ontology_project_namespaces(
+        &self,
+        ontology_context: &BTreeSet<&str>,
+    ) -> UsedOntologyProjectNamespaces {
+        let mut by_prefix: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+        let mut prefix_by_namespace: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+
+        for declaration in &self.ontology_documents {
+            if !declaration
+                .element_identifiers
+                .iter()
+                .any(|identifier| ontology_context.contains(identifier.as_str()))
+            {
+                continue;
+            }
+
+            by_prefix
+                .entry(declaration.ontology_prefix.clone())
+                .or_default()
+                .insert(declaration.term_namespace.clone());
+            prefix_by_namespace
+                .entry(declaration.term_namespace.clone())
+                .or_default()
+                .insert(declaration.ontology_prefix.clone());
+        }
+
+        for source in &self.external_sources {
+            if !ontology_context.contains(source.owner_identifier.as_str()) {
+                continue;
+            }
+
+            by_prefix
+                .entry(source.prefix.clone())
+                .or_default()
+                .insert(source.namespace.clone());
+            prefix_by_namespace
+                .entry(source.namespace.clone())
+                .or_default()
+                .insert(source.prefix.clone());
+        }
+
+        UsedOntologyProjectNamespaces {
+            by_prefix,
+            prefix_by_namespace,
+        }
+    }
+
+    pub fn to_authored_ontology_turtle_string(&self) -> Result<String, ReqvireError> {
+        let mut output = String::new();
+        let ontology_documents_turtle =
+            build_ontology_document_declarations_turtle(&self.ontology_documents);
+        output.push_str(&ontology_documents_turtle);
+
+        let mut seen_quads = quad_keys_from_turtle(&ontology_documents_turtle)?;
+        append_blocks_turtle(
+            &mut output,
+            self.blocks
+                .iter()
+                .filter(|block| matches!(block.kind, SemanticBlockKind::Ontology)),
+            &mut seen_quads,
+        )?;
+        Ok(output)
+    }
+
+    pub fn to_shacl_turtle_string(&self) -> Result<String, ReqvireError> {
+        let mut output = String::new();
+        let mut seen_quads = BTreeSet::new();
+        append_blocks_turtle(
+            &mut output,
+            self.blocks
+                .iter()
+                .filter(|block| matches!(block.kind, SemanticBlockKind::Shapes)),
+            &mut seen_quads,
+        )?;
+        Ok(output)
+    }
+
+    pub fn to_raw_external_turtle_string(&self) -> Result<String, ReqvireError> {
+        let mut output = String::new();
+        let mut seen_quads = BTreeSet::new();
+        append_blocks_turtle(&mut output, self.external_blocks.iter(), &mut seen_quads)?;
+        Ok(output)
+    }
+
+    pub fn to_ontology_projection_turtle_string(&self) -> String {
+        build_ontology_projection_turtle(self)
+    }
+
+    pub fn to_used_external_subset_turtle_string(&self) -> Result<String, ReqvireError> {
+        materialize_used_external_subset_turtle(self)
+    }
+
+    pub fn used_external_subset_block(&self) -> Result<Option<SemanticBlock>, ReqvireError> {
+        let content = self.to_used_external_subset_turtle_string()?;
+        let quads = quads_from_turtle(&content, "used external ontology subset projection")?;
+        if quads.is_empty() {
+            return Ok(None);
+        }
+
+        Ok(Some(SemanticBlock {
+            kind: SemanticBlockKind::ExternalOntology,
+            source: "reqvire:external-used-subset".to_string(),
+            source_name: "Reqvire used external ontology subset".to_string(),
+            file_path: String::new(),
+            line_number: 0,
+            language: "turtle".to_string(),
+            external_materialization: Some("used_subset".to_string()),
+            content,
+            quads,
+        }))
+    }
+
     pub fn to_turtle_string(&self) -> Result<String, ReqvireError> {
         self.to_turtle_string_with_external(false)
     }
@@ -601,19 +1054,22 @@ impl SemanticIndex {
         }
 
         if include_external {
-            for (block, quads) in normalized_export_blocks(&self.external_blocks, &mut seen_quads) {
+            let used_external_subset_turtle = self.to_used_external_subset_turtle_string()?;
+            let used_external_subset_quads = quads_from_turtle(
+                &used_external_subset_turtle,
+                "used external ontology subset projection",
+            )?;
+            let used_external_subset_quads =
+                unique_quads(used_external_subset_quads.iter(), &mut seen_quads);
+            if !used_external_subset_quads.is_empty() {
                 output.push_str(
                     "# -----------------------------------------------------------------------------\n",
                 );
-                output.push_str(&format!("# Source: {}\n", block.source));
-                output.push_str(&format!("# Name: {}\n", block.source_name));
-                output.push_str(&format!("# Kind: {}\n", block.kind.as_str()));
-                output.push_str(&format!("# File: {}\n", block.file_path));
-                if block.line_number > 0 {
-                    output.push_str(&format!("# Line: {}\n", block.line_number));
-                }
+                output.push_str("# Source: reqvire:external-used-subset\n");
+                output.push_str("# Name: Reqvire used external ontology subset\n");
+                output.push_str("# Kind: external-used-subset\n\n");
                 output.push('\n');
-                let turtle = serialize_quads_turtle(&quads)?;
+                let turtle = serialize_quads_turtle(&used_external_subset_quads)?;
                 if !turtle.trim().is_empty() {
                     output.push_str(turtle.trim());
                     output.push_str("\n\n");
@@ -665,13 +1121,15 @@ impl SemanticIndex {
         }
 
         if include_external {
-            for (_block, quads) in normalized_export_blocks(&self.external_blocks, &mut seen_quads)
-            {
-                for quad in quads {
-                    serializer
-                        .serialize_quad((*quad).as_ref())
-                        .map_err(|e| ReqvireError::SerializationError(e.to_string()))?;
-                }
+            let used_external_subset_turtle = self.to_used_external_subset_turtle_string()?;
+            let used_external_subset_quads = quads_from_turtle(
+                &used_external_subset_turtle,
+                "used external ontology subset projection",
+            )?;
+            for quad in unique_quads(used_external_subset_quads.iter(), &mut seen_quads) {
+                serializer
+                    .serialize_quad(quad.as_ref())
+                    .map_err(|e| ReqvireError::SerializationError(e.to_string()))?;
             }
         }
 
@@ -764,6 +1222,108 @@ impl SemanticIndex {
     }
 }
 
+pub fn external_materialization_metadata(
+    source: &SemanticIndex,
+    visible: &SemanticIndex,
+    include_external: bool,
+) -> Value {
+    let materialized_terms: BTreeSet<String> = visible
+        .external_blocks
+        .iter()
+        .flat_map(materialized_external_subjects)
+        .collect();
+    let visible_external_declaration_count = visible
+        .ontology_declarations
+        .values()
+        .flat_map(|declarations| declarations.iter())
+        .filter(|declaration| declaration.external)
+        .count();
+    let available_external_declaration_count = source
+        .ontology_declarations
+        .values()
+        .flat_map(|declarations| declarations.iter())
+        .filter(|declaration| declaration.external)
+        .count();
+    let used_external_source_count = source
+        .external_sources
+        .iter()
+        .filter(|source| {
+            materialized_terms
+                .iter()
+                .any(|term| term.starts_with(&source.namespace))
+        })
+        .count();
+    let raw_external_triple_count: usize = source
+        .external_blocks
+        .iter()
+        .map(|block| block.quads.len())
+        .sum();
+    let materialized_external_triple_count: usize = visible
+        .external_blocks
+        .iter()
+        .map(|block| block.quads.len())
+        .sum();
+
+    json!({
+        "external_materialization": if include_external { "used_subset" } else { "none" },
+        "external_counts": {
+            "declared_external_source_count": source.external_sources.len(),
+            "visible_external_source_count": if include_external { used_external_source_count } else { 0 },
+            "used_external_source_count": if include_external { used_external_source_count } else { 0 },
+            "available_external_term_declaration_count": available_external_declaration_count,
+            "visible_external_term_declaration_count": if include_external { visible_external_declaration_count } else { 0 },
+            "materialized_external_term_count": if include_external { materialized_terms.len() } else { 0 },
+            "raw_external_triple_count": raw_external_triple_count,
+            "materialized_external_triple_count": if include_external { materialized_external_triple_count } else { 0 }
+        }
+    })
+}
+
+fn materialized_external_subjects(block: &SemanticBlock) -> BTreeSet<String> {
+    block
+        .quads
+        .iter()
+        .filter_map(|quad| subject_iri(&quad.subject).map(str::to_string))
+        .collect()
+}
+
+fn append_blocks_turtle<'a>(
+    output: &mut String,
+    blocks: impl IntoIterator<Item = &'a SemanticBlock>,
+    seen_quads: &mut BTreeSet<String>,
+) -> Result<(), ReqvireError> {
+    for block in blocks {
+        let mut quads = Vec::new();
+        for quad in &block.quads {
+            let key = quad_key(quad);
+            if seen_quads.insert(key) {
+                quads.push(quad);
+            }
+        }
+        if quads.is_empty() {
+            continue;
+        }
+
+        output.push_str(
+            "# -----------------------------------------------------------------------------\n",
+        );
+        output.push_str(&format!("# Source: {}\n", block.source));
+        output.push_str(&format!("# Name: {}\n", block.source_name));
+        output.push_str(&format!("# Kind: {}\n", block.kind.as_str()));
+        output.push_str(&format!("# File: {}\n", block.file_path));
+        if block.line_number > 0 {
+            output.push_str(&format!("# Line: {}\n", block.line_number));
+        }
+        output.push('\n');
+        let turtle = serialize_quads_turtle(&quads)?;
+        if !turtle.trim().is_empty() {
+            output.push_str(turtle.trim());
+            output.push_str("\n\n");
+        }
+    }
+    Ok(())
+}
+
 fn normalized_export_blocks<'a>(
     blocks: &'a [SemanticBlock],
     seen_quads: &mut BTreeSet<String>,
@@ -784,21 +1344,42 @@ fn normalized_export_blocks<'a>(
     normalized
 }
 
+fn unique_quads<'a>(
+    quads: impl IntoIterator<Item = &'a Quad>,
+    seen_quads: &mut BTreeSet<String>,
+) -> Vec<&'a Quad> {
+    quads
+        .into_iter()
+        .filter(|quad| seen_quads.insert(quad_key(quad)))
+        .collect()
+}
+
 fn quad_keys_from_turtle(turtle: &str) -> Result<BTreeSet<String>, ReqvireError> {
     let mut keys = BTreeSet::new();
     if turtle.trim().is_empty() {
         return Ok(keys);
     }
-    for parsed in RdfParser::from_format(RdfFormat::Turtle).for_reader(turtle.as_bytes()) {
-        let quad = parsed.map_err(|error| {
-            ReqvireError::SerializationError(format!(
-                "Generated ontology document declarations failed to parse: {}",
-                error
-            ))
-        })?;
+    for quad in quads_from_turtle(turtle, "Generated ontology document declarations")? {
         keys.insert(quad_key(&quad));
     }
     Ok(keys)
+}
+
+fn quads_from_turtle(turtle: &str, label: &str) -> Result<Vec<Quad>, ReqvireError> {
+    let mut quads = Vec::new();
+    if turtle.trim().is_empty() {
+        return Ok(quads);
+    }
+    for parsed in RdfParser::from_format(RdfFormat::Turtle).for_reader(turtle.as_bytes()) {
+        let quad = parsed.map_err(|error| {
+            ReqvireError::SerializationError(format!(
+                "{} failed to parse as Turtle: {}",
+                label, error
+            ))
+        })?;
+        quads.push(quad);
+    }
+    Ok(quads)
 }
 
 fn serialize_quads_turtle(quads: &[&Quad]) -> Result<String, ReqvireError> {
@@ -814,8 +1395,270 @@ fn serialize_quads_turtle(quads: &[&Quad]) -> Result<String, ReqvireError> {
     String::from_utf8(bytes).map_err(|e| ReqvireError::SerializationError(e.to_string()))
 }
 
+fn serialize_triples_turtle(triples: &[Triple]) -> Result<String, ReqvireError> {
+    let mut serializer = RdfSerializer::from_format(RdfFormat::Turtle).for_writer(Vec::new());
+    for triple in triples {
+        serializer
+            .serialize_triple(triple.as_ref())
+            .map_err(|e| ReqvireError::SerializationError(e.to_string()))?;
+    }
+    let bytes = serializer
+        .finish()
+        .map_err(|e| ReqvireError::SerializationError(e.to_string()))?;
+    String::from_utf8(bytes).map_err(|e| ReqvireError::SerializationError(e.to_string()))
+}
+
+fn materialize_used_external_subset_turtle(index: &SemanticIndex) -> Result<String, ReqvireError> {
+    if index.external_sources.is_empty() || index.external_blocks.is_empty() {
+        return Ok(String::new());
+    }
+
+    let store = build_external_subset_derivation_store(index)?;
+    let seed_terms = select_used_external_terms(&store)?;
+    if seed_terms.is_empty() {
+        return Ok(String::new());
+    }
+
+    let subset_context_turtle = build_external_used_subset_context_turtle(&seed_terms);
+    load_default_graph(
+        &store,
+        &subset_context_turtle,
+        "used external subset seed context",
+    )?;
+
+    let mut triples_by_key = BTreeMap::new();
+    for (label, query) in [
+        (
+            "used external direct description construct",
+            EXTERNAL_USED_DIRECT_DESCRIPTION_CONSTRUCT_V1,
+        ),
+        (
+            "used external support closure construct",
+            EXTERNAL_USED_SUPPORT_CLOSURE_CONSTRUCT_V1,
+        ),
+        (
+            "used external annotation construct",
+            EXTERNAL_USED_ANNOTATION_CONSTRUCT_V1,
+        ),
+    ] {
+        for triple in execute_construct_query(&store, query, label)? {
+            triples_by_key.insert(format!("{:?}", triple), triple);
+        }
+    }
+
+    let triples: Vec<_> = triples_by_key.into_values().collect();
+    serialize_triples_turtle(&triples)
+}
+
+fn build_external_subset_derivation_store(index: &SemanticIndex) -> Result<Store, ReqvireError> {
+    let store = Store::new().map_err(|error| {
+        ReqvireError::ProcessError(format!(
+            "Failed to create external subset derivation store: {}",
+            error
+        ))
+    })?;
+
+    let authored_ontology_turtle = index.to_authored_ontology_turtle_string()?;
+    load_default_graph(
+        &store,
+        &authored_ontology_turtle,
+        "authored ontology graph for external subset derivation",
+    )?;
+    load_named_graph(
+        &store,
+        &authored_ontology_turtle,
+        GRAPH_AUTHORED_ONTOLOGY,
+        "authored ontology graph for external subset derivation",
+    )?;
+
+    let shacl_turtle = index.to_shacl_turtle_string()?;
+    load_default_graph(
+        &store,
+        &shacl_turtle,
+        "SHACL graph for external subset derivation",
+    )?;
+    load_named_graph(
+        &store,
+        &shacl_turtle,
+        GRAPH_SHACL,
+        "SHACL graph for external subset derivation",
+    )?;
+
+    load_default_graph(
+        &store,
+        &index.model_context_turtle,
+        "model context graph for external subset derivation",
+    )?;
+    load_named_graph(
+        &store,
+        &index.model_context_turtle,
+        GRAPH_MODEL_CONTEXT,
+        "model context graph for external subset derivation",
+    )?;
+
+    let ontology_projection_turtle = index.to_ontology_projection_turtle_string();
+    load_default_graph(
+        &store,
+        &ontology_projection_turtle,
+        "ontology projection graph for external subset derivation",
+    )?;
+    load_named_graph(
+        &store,
+        &ontology_projection_turtle,
+        GRAPH_ONTOLOGY_PROJECTION,
+        "ontology projection graph for external subset derivation",
+    )?;
+
+    let raw_external_turtle = index.to_raw_external_turtle_string()?;
+    load_named_graph(
+        &store,
+        &raw_external_turtle,
+        GRAPH_RAW_EXTERNAL_SOURCE,
+        "raw external source graph for external subset derivation",
+    )?;
+
+    Ok(store)
+}
+
+fn load_default_graph(store: &Store, turtle: &str, label: &str) -> Result<(), ReqvireError> {
+    if turtle.trim().is_empty() {
+        return Ok(());
+    }
+    store
+        .load_from_reader(
+            RdfParser::from_format(RdfFormat::Turtle).without_named_graphs(),
+            turtle.as_bytes(),
+        )
+        .map_err(|error| {
+            ReqvireError::ProcessError(format!("Failed to load {} into Oxigraph: {}", label, error))
+        })
+}
+
+fn load_named_graph(
+    store: &Store,
+    turtle: &str,
+    graph_iri: &str,
+    label: &str,
+) -> Result<(), ReqvireError> {
+    if turtle.trim().is_empty() {
+        return Ok(());
+    }
+    let graph_name = NamedNode::new(graph_iri).map_err(|error| {
+        ReqvireError::ProcessError(format!(
+            "Invalid semantic named graph IRI '{}': {}",
+            graph_iri, error
+        ))
+    })?;
+    store
+        .load_from_reader(
+            RdfParser::from_format(RdfFormat::Turtle)
+                .without_named_graphs()
+                .with_default_graph(graph_name),
+            turtle.as_bytes(),
+        )
+        .map_err(|error| {
+            ReqvireError::ProcessError(format!("Failed to load {} into Oxigraph: {}", label, error))
+        })
+}
+
+fn select_used_external_terms(store: &Store) -> Result<Vec<String>, ReqvireError> {
+    let results = SparqlEvaluator::new()
+        .parse_query(EXTERNAL_USED_TERM_SEED_QUERY_V1)
+        .map_err(|error| {
+            ReqvireError::ProcessError(format!(
+                "Invalid used external term seed SPARQL query: {}",
+                error
+            ))
+        })?
+        .on_store(store)
+        .execute()
+        .map_err(|error| {
+            ReqvireError::ProcessError(format!(
+                "Used external term seed SPARQL query failed: {}",
+                error
+            ))
+        })?;
+
+    let QueryResults::Solutions(mut solutions) = results else {
+        return Err(ReqvireError::ProcessError(
+            "Used external term seed SPARQL query did not return SELECT results".to_string(),
+        ));
+    };
+
+    let mut terms = BTreeSet::new();
+    for solution in &mut solutions {
+        let solution = solution.map_err(|error| {
+            ReqvireError::ProcessError(format!(
+                "Used external term seed solution evaluation failed: {}",
+                error
+            ))
+        })?;
+        if let Some(Term::NamedNode(term)) = solution.get("term") {
+            terms.insert(term.as_str().to_string());
+        }
+    }
+    Ok(terms.into_iter().collect())
+}
+
+fn execute_construct_query(
+    store: &Store,
+    query: &str,
+    label: &str,
+) -> Result<Vec<Triple>, ReqvireError> {
+    let results = SparqlEvaluator::new()
+        .parse_query(query)
+        .map_err(|error| {
+            ReqvireError::ProcessError(format!("Invalid {} SPARQL query: {}", label, error))
+        })?
+        .on_store(store)
+        .execute()
+        .map_err(|error| {
+            ReqvireError::ProcessError(format!("{} SPARQL query failed: {}", label, error))
+        })?;
+
+    let QueryResults::Graph(triples) = results else {
+        return Err(ReqvireError::ProcessError(format!(
+            "{} SPARQL query did not return CONSTRUCT results",
+            label
+        )));
+    };
+
+    let mut output = Vec::new();
+    for triple in triples {
+        output.push(triple.map_err(|error| {
+            ReqvireError::ProcessError(format!("{} graph evaluation failed: {}", label, error))
+        })?);
+    }
+    Ok(output)
+}
+
+fn build_external_used_subset_context_turtle(seed_terms: &[String]) -> String {
+    let mut output = String::new();
+    output.push_str("@prefix reqvire: <https://www.reqvire.org/ontology#> .\n\n");
+    output.push_str(&format!(
+        "<{}> a reqvire:UsedExternalOntologySubset ;\n",
+        EXTERNAL_USED_SUBSET_IRI
+    ));
+    output.push_str(&format!(
+        "  reqvire:externalSubsetGraph <{}>",
+        GRAPH_RAW_EXTERNAL_SOURCE
+    ));
+    for term in seed_terms {
+        output.push_str(&format!(
+            " ;\n  reqvire:externalUsedTerm <{}>",
+            escape_iri(term)
+        ));
+    }
+    output.push_str(" .\n");
+    output
+}
+
 fn quad_key(quad: &Quad) -> String {
     format!("{:?}", quad)
+}
+
+fn is_false(value: &bool) -> bool {
+    !*value
 }
 
 fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -> String {
@@ -1003,6 +1846,9 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
             .then_with(|| a.role.cmp(&b.role))
     });
     for declaration in declarations {
+        if declaration.external {
+            continue;
+        }
         if let Some(node) = registry.nodes.get(&declaration.element_identifier) {
             output.push_str(&format!(
                 "{} reqvire:declaresTerm <{}> .\n",
@@ -1010,6 +1856,17 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
                 escape_iri(&declaration.iri)
             ));
         }
+    }
+
+    let mut external_sources = index.external_sources.clone();
+    external_sources.sort_by(|a, b| {
+        a.owner_identifier
+            .cmp(&b.owner_identifier)
+            .then_with(|| a.prefix.cmp(&b.prefix))
+            .then_with(|| a.namespace.cmp(&b.namespace))
+    });
+    for source in external_sources {
+        output.push_str(&external_ontology_source_turtle(&source));
     }
 
     let mut shape_references = index.shape_references.clone();
@@ -1026,6 +1883,53 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
 
     output.push('\n');
     output
+}
+
+fn external_ontology_source_turtle(source: &ExternalOntologySource) -> String {
+    let source_iri = external_ontology_source_iri(source);
+    let owner_iri = element_iri_from_identifier(&source.owner_identifier);
+    let mut output = String::new();
+    output.push_str(&format!(
+        "{} a reqvire:ExternalOntologySource ;\n",
+        source_iri
+    ));
+    output.push_str(&format!(
+        "  reqvire:externalOntologyOwner {} ;\n",
+        owner_iri
+    ));
+    if let Some(resource) = &source.resource {
+        output.push_str(&format!(
+            "  reqvire:externalOntologyResource <{}> ;\n",
+            escape_iri(resource)
+        ));
+    }
+    output.push_str(&format!(
+        "  reqvire:externalOntologyPrefix {} ;\n",
+        turtle_string(&source.prefix)
+    ));
+    output.push_str(&format!(
+        "  reqvire:externalOntologyNamespace {} ;\n",
+        turtle_string(&source.namespace)
+    ));
+    output.push_str(&format!(
+        "  reqvire:externalOntologySourcePath {} ;\n",
+        turtle_string(&source.source)
+    ));
+    output.push_str(&format!(
+        "  reqvire:externalOntologyFormat {} .\n\n",
+        turtle_string(&source.format)
+    ));
+    output
+}
+
+fn external_ontology_source_iri(source: &ExternalOntologySource) -> String {
+    projection_generated_iri(
+        "external-ontology-source",
+        &format!(
+            "{}\n{}\n{}\n{}",
+            source.owner_identifier, source.prefix, source.namespace, source.source
+        ),
+    )
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1185,7 +2089,7 @@ fn full_context_ontology_prefixes(index: &SemanticIndex) -> HashMap<String, Stri
     prefixes
 }
 
-fn parse_turtle_prefix_declarations(content: &str) -> Vec<(String, String)> {
+pub(crate) fn parse_turtle_prefix_declarations(content: &str) -> Vec<(String, String)> {
     let mut prefixes = Vec::new();
     for line in content.lines() {
         let trimmed = line.trim();
@@ -2008,19 +2912,21 @@ fn build_external_ontology_block(
     source: &ExternalOntologySource,
     diagnostics: &mut Vec<SemanticDiagnostic>,
 ) -> Option<SemanticBlock> {
-    let format = source.format.to_ascii_lowercase();
-    if !matches!(format.as_str(), "turtle" | "ttl") {
-        diagnostics.push(SemanticDiagnostic {
-            source: element.identifier.clone(),
-            file_path: element.file_path.clone(),
-            line_number: source.line_number,
-            message: format!(
-                "External Ontology '{}' uses unsupported format '{}'. Only Turtle/.ttl is supported.",
-                source.prefix, source.format
-            ),
-        });
-        return None;
-    }
+    let format = match ExternalOntologyFormat::parse(&source.format) {
+        Some(format) => format,
+        None => {
+            diagnostics.push(SemanticDiagnostic {
+                source: element.identifier.clone(),
+                file_path: element.file_path.clone(),
+                line_number: source.line_number,
+                message: format!(
+                    "External Ontology '{}' uses unsupported format '{}'. Supported formats: turtle, ttl, rdf, rdfxml, rdf+xml, jsonld.",
+                    source.prefix, source.format
+                ),
+            });
+            return None;
+        }
+    };
 
     let path = match resolve_external_source_path(element, &source.source) {
         Ok(path) => path,
@@ -2056,7 +2962,9 @@ fn build_external_ontology_block(
         }
     };
 
-    if turtle_prefix_binding(&content, &source.prefix) != Some(source.namespace.clone()) {
+    if matches!(format, ExternalOntologyFormat::Turtle)
+        && turtle_prefix_binding(&content, &source.prefix) != Some(source.namespace.clone())
+    {
         diagnostics.push(SemanticDiagnostic {
             source: element.identifier.clone(),
             file_path: element.file_path.clone(),
@@ -2068,7 +2976,7 @@ fn build_external_ontology_block(
         });
     }
 
-    let quads = match parse_turtle_block(&content) {
+    let quads = match parse_external_ontology_block(&content, format) {
         Ok(quads) => quads,
         Err(message) => {
             diagnostics.push(SemanticDiagnostic {
@@ -2076,8 +2984,11 @@ fn build_external_ontology_block(
                 file_path: element.file_path.clone(),
                 line_number: source.line_number,
                 message: format!(
-                    "External Ontology '{}' source '{}' failed to parse as Turtle: {}.",
-                    source.prefix, source.source, message
+                    "External Ontology '{}' source '{}' failed to parse as {}: {}.",
+                    source.prefix,
+                    source.source,
+                    format.display_name(),
+                    message
                 ),
             });
             return None;
@@ -2116,7 +3027,8 @@ fn build_external_ontology_block(
         source_name: format!("{} external ontology {}", element.name, source.prefix),
         file_path: path.to_string_lossy().to_string(),
         line_number: source.line_number,
-        language: "turtle".to_string(),
+        language: format.language().to_string(),
+        external_materialization: None,
         content,
         quads,
     })
@@ -2242,7 +3154,8 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
                 None,
                 &mut diagnostics,
             ) {
-                for message in validate_shacl_sanity(&block.quads) {
+                let shacl_registry = crate::shacl::ShaclRegistry::parse(&block.quads);
+                for message in shacl_registry.diagnostics_as_messages() {
                     diagnostics.push(SemanticDiagnostic {
                         source: element.identifier.clone(),
                         file_path: element.file_path.clone(),
@@ -2858,6 +3771,7 @@ fn build_block(
             file_path: element.file_path.clone(),
             line_number: block.line_number,
             language: block.language.clone(),
+            external_materialization: None,
             content: block.content.clone(),
             quads,
         }),
@@ -2999,6 +3913,34 @@ fn parse_turtle_block(content: &str) -> Result<Vec<Quad>, String> {
     Ok(graph)
 }
 
+fn parse_external_ontology_block(
+    content: &str,
+    format: ExternalOntologyFormat,
+) -> Result<Vec<Quad>, String> {
+    let mut graph = Vec::new();
+
+    let parser = match format {
+        ExternalOntologyFormat::Turtle => RdfParser::from_format(RdfFormat::Turtle),
+        ExternalOntologyFormat::RdfXml => RdfParser::from_format(RdfFormat::RdfXml),
+        ExternalOntologyFormat::JsonLd => RdfParser::from_format(RdfFormat::JsonLd {
+            profile: JsonLdProfileSet::empty(),
+        }),
+    };
+
+    for parsed in parser.for_reader(content.as_bytes()) {
+        graph.push(parsed.map_err(|error| error.to_string())?);
+    }
+
+    if graph.is_empty() {
+        return Err(format!(
+            "{} block has no RDF statements",
+            format.display_name()
+        ));
+    }
+
+    Ok(graph)
+}
+
 fn subject_iri(subject: &NamedOrBlankNode) -> Option<&str> {
     match subject {
         NamedOrBlankNode::NamedNode(node) => Some(node.as_str()),
@@ -3022,230 +3964,6 @@ fn ontology_term_role(type_iri: &str) -> Option<OntologyTermRole> {
         OWL_DATATYPE_PROPERTY => Some(OntologyTermRole::DatatypeProperty),
         _ => None,
     }
-}
-
-fn term_as_node(term: &Term) -> Option<NamedOrBlankNode> {
-    match term {
-        Term::NamedNode(node) => Some(NamedOrBlankNode::NamedNode(node.clone())),
-        Term::BlankNode(node) => Some(NamedOrBlankNode::BlankNode(node.clone())),
-        Term::Literal(_) => None,
-    }
-}
-
-fn objects_for<'a>(
-    graph: &'a [Quad],
-    subject: &NamedOrBlankNode,
-    predicate: &str,
-) -> Vec<&'a Term> {
-    graph
-        .iter()
-        .filter(|quad| &quad.subject == subject && quad.predicate.as_str() == predicate)
-        .map(|quad| &quad.object)
-        .collect()
-}
-
-fn subjects_with_type(graph: &[Quad], type_iri: &str) -> Vec<NamedOrBlankNode> {
-    graph
-        .iter()
-        .filter(|quad| {
-            quad.predicate.as_str() == RDF_TYPE && term_iri(&quad.object) == Some(type_iri)
-        })
-        .map(|quad| quad.subject.clone())
-        .collect()
-}
-
-fn parse_non_negative_count(term: &Term, name: &str) -> Result<u64, String> {
-    let Term::Literal(literal) = term else {
-        return Err(format!("{name} must be a non-negative integer literal"));
-    };
-
-    let value = literal
-        .value()
-        .parse::<i64>()
-        .map_err(|_| format!("{name} must be a non-negative integer literal"))?;
-    if value < 0 {
-        return Err(format!("{name} must be a non-negative integer literal"));
-    }
-    Ok(value as u64)
-}
-
-fn validate_rdf_list(
-    graph: &[Quad],
-    head: &Term,
-    seen: &mut HashSet<String>,
-) -> Result<(), String> {
-    if term_iri(head) == Some(RDF_NIL) {
-        return Ok(());
-    }
-
-    let Some(node) = term_as_node(head) else {
-        return Err("sh:in must point to an RDF list node or rdf:nil".to_string());
-    };
-
-    if matches!(node, NamedOrBlankNode::NamedNode(_)) {
-        return Err("sh:in RDF list nodes must be blank nodes or rdf:nil".to_string());
-    }
-
-    if !seen.insert(node.to_string()) {
-        return Err("sh:in RDF list contains a cycle".to_string());
-    }
-
-    let first = objects_for(graph, &node, RDF_FIRST);
-    let rest = objects_for(graph, &node, RDF_REST);
-    if first.len() != 1 || rest.len() != 1 {
-        return Err(
-            "sh:in RDF list nodes must have exactly one rdf:first and rdf:rest".to_string(),
-        );
-    }
-
-    validate_rdf_list(graph, rest[0], seen)
-}
-
-fn validate_property_shape(
-    property_shape: &NamedOrBlankNode,
-    _ontology: &[Quad],
-    shapes: &[Quad],
-) -> Vec<String> {
-    let mut errors = Vec::new();
-    let shape_name = property_shape.to_string();
-    let paths = objects_for(shapes, property_shape, SH_PATH);
-
-    if paths.len() != 1 {
-        errors.push(format!(
-            "SHACL property shape {shape_name} must define exactly one sh:path"
-        ));
-    } else if term_iri(paths[0]).is_some() {
-    } else {
-        errors.push(format!(
-            "SHACL property shape {shape_name} sh:path must be an IRI"
-        ));
-    }
-
-    let mut min_count = None;
-    for term in objects_for(shapes, property_shape, SH_MIN_COUNT) {
-        match parse_non_negative_count(term, "sh:minCount") {
-            Ok(value) => min_count = Some(value),
-            Err(message) => errors.push(format!("SHACL property shape {shape_name} {message}")),
-        }
-    }
-
-    let mut max_count = None;
-    for term in objects_for(shapes, property_shape, SH_MAX_COUNT) {
-        match parse_non_negative_count(term, "sh:maxCount") {
-            Ok(value) => max_count = Some(value),
-            Err(message) => errors.push(format!("SHACL property shape {shape_name} {message}")),
-        }
-    }
-
-    if let (Some(min), Some(max)) = (min_count, max_count) {
-        if max < min {
-            errors.push(format!(
-                "SHACL property shape {shape_name} sh:maxCount must be greater than or equal to sh:minCount"
-            ));
-        }
-    }
-
-    for term in objects_for(shapes, property_shape, SH_DATATYPE) {
-        match term_iri(term) {
-            Some(iri)
-                if owl_reserved::is_reserved_namespace_iri(iri)
-                    && !owl_reserved::is_supported_datatype_iri(iri) =>
-            {
-                errors.push(format!(
-                    "SHACL property shape {shape_name} sh:datatype uses reserved IRI <{iri}> that is not a supported datatype"
-                ));
-            }
-            Some(_) => {}
-            None => {
-                errors.push(format!(
-                    "SHACL property shape {shape_name} sh:datatype must be an IRI"
-                ));
-            }
-        }
-    }
-
-    for term in objects_for(shapes, property_shape, SH_CLASS) {
-        if term_iri(term).is_none() {
-            errors.push(format!(
-                "SHACL property shape {shape_name} sh:class must be an IRI"
-            ));
-        }
-    }
-
-    for term in objects_for(shapes, property_shape, SH_NODE_KIND) {
-        if !matches!(term_iri(term), Some(iri) if SH_NODE_KINDS.contains(&iri)) {
-            errors.push(format!(
-                "SHACL property shape {shape_name} sh:nodeKind must be a supported SHACL node kind IRI"
-            ));
-        }
-    }
-
-    for term in objects_for(shapes, property_shape, SH_PATTERN) {
-        if !matches!(term, Term::Literal(_)) {
-            errors.push(format!(
-                "SHACL property shape {shape_name} sh:pattern must be a string literal"
-            ));
-        }
-    }
-
-    for term in objects_for(shapes, property_shape, SH_IN) {
-        if let Err(message) = validate_rdf_list(shapes, term, &mut HashSet::new()) {
-            errors.push(format!("SHACL property shape {shape_name} {message}"));
-        }
-    }
-
-    errors
-}
-
-fn validate_shacl_sanity(shapes: &[Quad]) -> Vec<String> {
-    let mut errors = Vec::new();
-    let node_shapes = subjects_with_type(shapes, SH_NODE_SHAPE);
-    let property_shapes = subjects_with_type(shapes, SH_PROPERTY_SHAPE);
-
-    if node_shapes.is_empty() && property_shapes.is_empty() {
-        errors.push(
-            "Shapes graph must contain at least one sh:NodeShape or sh:PropertyShape".to_string(),
-        );
-        return errors;
-    }
-
-    let mut validated_property_shapes = HashSet::new();
-    for node_shape in &node_shapes {
-        let shape_name = node_shape.to_string();
-        let target_classes = objects_for(shapes, node_shape, SH_TARGET_CLASS);
-        if target_classes.is_empty() {
-            errors.push(format!(
-                "SHACL node shape {shape_name} must define at least one sh:targetClass"
-            ));
-        }
-
-        for target in target_classes {
-            if term_iri(target).is_none() {
-                errors.push(format!(
-                    "SHACL node shape {shape_name} sh:targetClass must be an IRI"
-                ));
-            }
-        }
-
-        for property in objects_for(shapes, node_shape, SH_PROPERTY) {
-            if let Some(property_shape) = term_as_node(property) {
-                validated_property_shapes.insert(property_shape.to_string());
-                errors.extend(validate_property_shape(&property_shape, &[], shapes));
-            } else {
-                errors.push(format!(
-                    "SHACL node shape {shape_name} sh:property must point to a property shape"
-                ));
-            }
-        }
-    }
-
-    for property_shape in &property_shapes {
-        if validated_property_shapes.insert(property_shape.to_string()) {
-            errors.extend(validate_property_shape(property_shape, &[], shapes));
-        }
-    }
-
-    errors
 }
 
 fn build_ontology_projection(
@@ -4190,6 +4908,7 @@ fn ontology_term_declarations_from_quads_with_source(
                 role,
                 element_identifier: element.identifier.clone(),
                 external,
+                materialized_in_used_subset: false,
             })
         })
         .collect()
@@ -4197,17 +4916,10 @@ fn ontology_term_declarations_from_quads_with_source(
 
 fn shape_iri_references_from_quads(element: &Element, quads: &[Quad]) -> Vec<ShapeIriReference> {
     let mut references = BTreeSet::new();
-    for quad in quads {
-        let kind = match quad.predicate.as_str() {
-            SH_TARGET_CLASS => "sh:targetClass",
-            SH_PATH => "sh:path",
-            SH_CLASS => "sh:class",
-            SH_DATATYPE => "sh:datatype",
-            _ => continue,
-        };
-        let Some(iri) = term_iri(&quad.object) else {
-            continue;
-        };
+    let shacl_registry = crate::shacl::ShaclRegistry::parse(quads);
+    for reference in shacl_registry.referenced_iris() {
+        let iri = reference.iri.as_str();
+        let kind = reference.predicate_label();
         if kind == "sh:datatype" && owl_reserved::is_supported_datatype_iri(iri) {
             continue;
         }
@@ -4216,7 +4928,7 @@ fn shape_iri_references_from_quads(element: &Element, quads: &[Quad]) -> Vec<Sha
         }
         references.insert(ShapeIriReference {
             iri: iri.to_string(),
-            kind: kind.to_string(),
+            kind,
             element_identifier: element.identifier.clone(),
         });
     }
@@ -4226,4 +4938,258 @@ fn shape_iri_references_from_quads(element: &Element, quads: &[Quad]) -> Vec<Sha
 
 fn is_builtin_annotation_path(iri: &str) -> bool {
     matches!(iri, RDFS_LABEL | RDFS_COMMENT)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn parse_test_quads(turtle: &str) -> Vec<Quad> {
+        RdfParser::from_format(RdfFormat::Turtle)
+            .for_reader(turtle.as_bytes())
+            .map(|quad| quad.expect("test Turtle should parse"))
+            .collect()
+    }
+
+    fn external_block(content: &str) -> SemanticBlock {
+        SemanticBlock {
+            kind: SemanticBlockKind::ExternalOntology,
+            source: "test#external".to_string(),
+            source_name: "Test external ontology".to_string(),
+            file_path: "system-model/Ontologies/Test.md".to_string(),
+            line_number: 1,
+            language: "turtle".to_string(),
+            external_materialization: None,
+            content: content.to_string(),
+            quads: parse_test_quads(content),
+        }
+    }
+
+    fn test_projection_source() -> OntologyProjectionSource {
+        OntologyProjectionSource {
+            source_block: "test#ontology".to_string(),
+            source_element_identifier: "system-model/Ontologies/Test.md#test-ontology".to_string(),
+            source_name: "Test Ontology".to_string(),
+            file_path: "system-model/Ontologies/Test.md".to_string(),
+            line_number: 1,
+            block_kind: "ontology".to_string(),
+        }
+    }
+
+    fn iri_term(iri: &str) -> OntologyProjectionTerm {
+        OntologyProjectionTerm {
+            kind: OntologyProjectionTermKind::Iri,
+            value: iri.to_string(),
+            label: iri.to_string(),
+        }
+    }
+
+    fn projection_graph_with_external_object(iri: &str) -> OntologyProjectionGraph {
+        let source = test_projection_source();
+        OntologyProjectionGraph {
+            id: "urn:reqvire:ontology-projection:test".to_string(),
+            derivation_mode: OntologyProjectionDerivationMode::DirectAuthored,
+            projections: Vec::new(),
+            constructs: vec![OntologyConstruct {
+                id: "urn:reqvire:ontology-construct:test".to_string(),
+                family: OntologyConstructFamily::SubclassMembership,
+                kind: OntologyConstructKind::SubclassInclusion,
+                subject: iri_term("https://example.test/local#LocalTerm"),
+                predicate: Some(iri_term(RDFS_SUBCLASS_OF)),
+                object: Some(iri_term(iri)),
+                property: None,
+                members: Vec::new(),
+                property_characteristic: None,
+                restriction_kind: None,
+                class_expression_kind: None,
+                shape_overlay_kind: None,
+                symbol: None,
+                provenance: OntologyProjectionProvenance {
+                    derivation_mode: OntologyProjectionDerivationMode::DirectAuthored,
+                    source,
+                    evidence: Vec::new(),
+                },
+            }],
+            symbols: Vec::new(),
+        }
+    }
+
+    fn test_index() -> SemanticIndex {
+        let raw_external = r#"
+@prefix ext: <https://example.test/external#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ext:PathTerm a owl:ObjectProperty ;
+  rdfs:label "Path term" ;
+  rdfs:domain ext:SupportClass .
+
+ext:DeclaredTerm a owl:Class ;
+  rdfs:label "Declared term" .
+
+ext:ConceptTerm a owl:Class ;
+  rdfs:label "Concept term" .
+
+ext:ProjectedTerm a owl:Class ;
+  rdfs:label "Projected term" ;
+  rdfs:subClassOf ext:SupportClass .
+
+ext:SupportClass a owl:Class ;
+  rdfs:label "Support class" ;
+  rdfs:subClassOf ext:ParentSupport .
+
+ext:ParentSupport a owl:Class ;
+  rdfs:label "Parent support" .
+
+ext:UnusedTerm a owl:Class ;
+  rdfs:label "Unused term" .
+"#;
+
+        SemanticIndex {
+            blocks: Vec::new(),
+            external_blocks: vec![external_block(raw_external)],
+            external_sources: vec![ExternalOntologySource {
+                owner_identifier: "system-model/Ontologies/Test.md#test-ontology".to_string(),
+                owner_name: "Test Ontology".to_string(),
+                prefix: "ext".to_string(),
+                namespace: "https://example.test/external#".to_string(),
+                resource: Some("https://example.test/external".to_string()),
+                source: "references/external.ttl".to_string(),
+                format: "turtle".to_string(),
+                line_number: 1,
+            }],
+            diagnostics: Vec::new(),
+            ontology_documents: Vec::new(),
+            ontology_declarations: HashMap::from([
+                (
+                    "https://example.test/external#ProjectedTerm".to_string(),
+                    vec![OntologyTermDeclaration {
+                        iri: "https://example.test/external#ProjectedTerm".to_string(),
+                        role: OntologyTermRole::Class,
+                        element_identifier: "system-model/Ontologies/Test.md#test-ontology"
+                            .to_string(),
+                        external: true,
+                        materialized_in_used_subset: false,
+                    }],
+                ),
+                (
+                    "https://example.test/external#UnusedTerm".to_string(),
+                    vec![OntologyTermDeclaration {
+                        iri: "https://example.test/external#UnusedTerm".to_string(),
+                        role: OntologyTermRole::Class,
+                        element_identifier: "system-model/Ontologies/Test.md#test-ontology"
+                            .to_string(),
+                        external: true,
+                        materialized_in_used_subset: false,
+                    }],
+                ),
+            ]),
+            shape_references: Vec::new(),
+            ontology_projection: projection_graph_with_external_object(
+                "https://example.test/external#ProjectedTerm",
+            ),
+            model_context: ModelContextGraph {
+                nodes: Vec::new(),
+                edges: Vec::new(),
+            },
+            model_context_turtle: r#"
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+
+<urn:reqvire:external-source:test> a reqvire:ExternalOntologySource ;
+  reqvire:externalOntologyNamespace "https://example.test/external#" .
+
+<urn:reqvire:shape:test> reqvire:referencesTerm <https://example.test/external#PathTerm> .
+<urn:reqvire:declaration:test> reqvire:declaresTerm <https://example.test/external#DeclaredTerm> .
+<urn:reqvire:concept:test> reqvire:conceptReference <https://example.test/external#ConceptTerm> .
+"#
+            .to_string(),
+            summary: SemanticIndexSummary {
+                ontology_blocks: 0,
+                shape_blocks: 0,
+                total_blocks: 0,
+                total_quads: 0,
+            },
+        }
+    }
+
+    fn materialized_triples(index: &SemanticIndex) -> BTreeSet<(String, String, String)> {
+        parse_test_quads(&index.to_used_external_subset_turtle_string().unwrap())
+            .into_iter()
+            .map(|quad| {
+                (
+                    quad.subject.to_string(),
+                    quad.predicate.to_string(),
+                    quad.object.to_string(),
+                )
+            })
+            .collect()
+    }
+
+    #[test]
+    fn used_external_subset_materializes_sparql_seed_sources_and_closure() {
+        let triples = materialized_triples(&test_index());
+
+        assert!(triples.contains(&(
+            "<https://example.test/external#PathTerm>".to_string(),
+            "<http://www.w3.org/2000/01/rdf-schema#label>".to_string(),
+            "\"Path term\"".to_string()
+        )));
+        assert!(triples.contains(&(
+            "<https://example.test/external#DeclaredTerm>".to_string(),
+            "<http://www.w3.org/2000/01/rdf-schema#label>".to_string(),
+            "\"Declared term\"".to_string()
+        )));
+        assert!(triples.contains(&(
+            "<https://example.test/external#ConceptTerm>".to_string(),
+            "<http://www.w3.org/2000/01/rdf-schema#label>".to_string(),
+            "\"Concept term\"".to_string()
+        )));
+        assert!(triples.contains(&(
+            "<https://example.test/external#ProjectedTerm>".to_string(),
+            "<http://www.w3.org/2000/01/rdf-schema#label>".to_string(),
+            "\"Projected term\"".to_string()
+        )));
+        assert!(triples.contains(&(
+            "<https://example.test/external#SupportClass>".to_string(),
+            "<http://www.w3.org/2000/01/rdf-schema#subClassOf>".to_string(),
+            "<https://example.test/external#ParentSupport>".to_string()
+        )));
+        assert!(triples.contains(&(
+            "<https://example.test/external#SupportClass>".to_string(),
+            "<http://www.w3.org/2000/01/rdf-schema#label>".to_string(),
+            "\"Support class\"".to_string()
+        )));
+    }
+
+    #[test]
+    fn used_external_subset_omits_unused_raw_external_terms() {
+        let output = test_index()
+            .to_turtle_string_with_external(true)
+            .expect("include_external Turtle should serialize");
+
+        assert!(output.contains("Projected term"));
+        assert!(output.contains("Support class"));
+        assert!(!output.contains("Unused term"));
+        assert!(!output.contains("UnusedTerm"));
+    }
+
+    #[test]
+    fn used_external_subset_block_marks_materialization_without_raw_terms() {
+        let block = test_index()
+            .used_external_subset_block()
+            .expect("used subset should materialize")
+            .expect("used subset block should be present");
+        let subjects = block
+            .quads
+            .iter()
+            .filter_map(|quad| subject_iri(&quad.subject).map(str::to_string))
+            .collect::<BTreeSet<_>>();
+
+        assert_eq!(
+            block.external_materialization.as_deref(),
+            Some("used_subset")
+        );
+        assert!(subjects.contains("https://example.test/external#ProjectedTerm"));
+        assert!(!subjects.contains("https://example.test/external#UnusedTerm"));
+    }
 }

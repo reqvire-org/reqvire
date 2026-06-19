@@ -444,18 +444,20 @@ The collection shall preserve source element identifiers, source file paths, sec
 
 ### Local External Ontology Sources
 
-The system shall allow ontology elements to declare local external ontology source files that provide imported vocabulary namespaces for validation and optional semantic export materialization.
+The system shall allow ontology elements to declare local external ontology source files that provide imported vocabulary namespaces for validation and optional used-subset semantic export materialization.
 
 #### Details
-External ontology sources shall be declared with repeatable `#### External Ontology` sections on ontology elements. Each section shall define `prefix`, `namespace`, `resource`, `source`, and an optional `format` value. The initial supported format is Turtle/.ttl only.
+External ontology sources shall be declared with repeatable `#### External Ontology` sections on ontology elements. Each section shall define `prefix`, `namespace`, `resource`, `source`, and an optional `format` value. Supported source formats shall include Turtle/TTL, RDF/XML, and JSON-LD.
 
 The `source` path shall be local and resolved like a model path; Reqvire shall not fetch network ontology sources during validation or export.
 
-External ontology source triples shall be parsed into the semantic index before validating ontology and semantic-contract references. Terms declared by the local source shall be available to the declaring ontology element, its ontology descendants, and semantic contracts that use that ontology context. Imported terms shall remain marked as external declarations and shall not be promoted to authored Reqvire ontology terms.
+External ontology source files shall be parsed as internal dependency inputs before validating ontology and semantic-contract references. Terms declared by the local source shall be available to the declaring ontology element, its ontology descendants, and semantic contracts that use that ontology context. Imported terms shall remain marked as external declarations and shall not be promoted to authored Reqvire ontology terms.
+
+Semantic output surfaces shall not expose raw full external ontology files. When `include_external` is requested, Reqvire shall expose only the used external subset: external terms referenced by authored ontology, SHACL, concept-reference, model-context, or generated semantic projection content, plus directly needed support and annotation facts selected by the external subset construct-query contract. Unused external dependency facts shall remain internal and shall not appear in CLI ontology output, MCP semantic ontology output, MCP vocabulary output, MCP SPARQL graphs, or Explorer ontology views.
 
 Turtle blocks remain explicit. External source sections do not inject prefixes, ontology declarations, imports, or semantic triples into authored ontology or SHACL blocks.
 
-Default semantic export and MCP semantic metadata shall include authored ontology and SHACL content only. `reqvire ontologies --include-external` and MCP `include_external: true` shall include parsed external source triples, external declarations, and external vocabulary metadata. `reqvire ontologies --full --include-external` and MCP full semantic query with `include_external: true` shall include authored triples, external source triples, Reqvire model context, and generated ontology projection facts.
+Default semantic export and MCP semantic metadata shall include authored ontology and SHACL content only. `reqvire ontologies --include-external` and MCP `include_external: true` shall include used external subset triples, used external declarations, and used external vocabulary metadata. `reqvire ontologies --full --include-external` and MCP full semantic query with `include_external: true` shall include authored triples, the used external subset, Reqvire model context, and generated ontology projection facts.
 
 Standard OWL reserved vocabulary and built-in datatype IRIs remain recognized by the fixed reserved vocabulary registry and do not require `#### External Ontology` declarations.
 
@@ -465,6 +467,7 @@ Standard OWL reserved vocabulary and built-in datatype IRIs remain recognized by
   * External ontology namespace: https://www.reqvire.org/ontology#externalOntologyNamespace
   * External ontology resource: https://www.reqvire.org/ontology#externalOntologyResource
   * External ontology source path: https://www.reqvire.org/ontology#externalOntologySourcePath
+  * External ontology format: https://www.reqvire.org/ontology#externalOntologyFormat
 
 #### Metadata
   * type: requirement
@@ -474,6 +477,34 @@ Standard OWL reserved vocabulary and built-in datatype IRIs remain recognized by
   * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+---
+
+### Used External Ontology Subset Projection
+
+The system shall derive a used external ontology subset from internal external ontology dependency inputs and expose only that subset through external-inclusive semantic output surfaces.
+
+#### Details
+- The projection shall seed used external terms from authored ontology, SHACL, concept-reference, model-context, and generated semantic projection facts that reference declared external namespaces.
+- The projection shall construct direct descriptions for seed terms from raw external source graphs.
+- The projection shall construct one-hop support facts for selected RDF, RDFS, and OWL relationships needed to understand the used terms.
+- The projection shall construct annotation facts for seed and support terms.
+- Raw full external source graphs shall remain internal dependency inputs and shall not be exposed as a public full third-party ontology dump mode.
+- `include_external` shall mean include the used external subset for CLI, MCP, Explorer, and vocabulary surfaces.
+
+#### Concept References
+  * Used external ontology subset: https://www.reqvire.org/ontology#UsedExternalOntologySubset
+  * External ontology subset construct query: https://www.reqvire.org/ontology#ExternalOntologySubsetConstructQuery
+  * Raw external ontology graph: https://www.reqvire.org/ontology#RawExternalOntologyGraph
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Used External Ontology Subset Projection Specification](Specifications.md#used-external-ontology-subset-projection-specification)
+  * derivedFrom: [Local External Ontology Sources](#local-external-ontology-sources)
+  * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
+  * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+  * verifiedBy: [MCP Model Evidence Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
 ---
 
 ### OWL Reserved Vocabulary Recognition

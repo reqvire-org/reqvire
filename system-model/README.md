@@ -161,7 +161,7 @@ Tool interfaces are **CLI** (Command Line Interface), **Web Explorer Interface**
 - Web Explorer Interface: Human browsing and visualization interface for served model content, diagrams, reports, and traces.
 - MCP Server: Typed external interface for AI agents, IDE integrations, CI adapters, and other tools.
 
-The MCP server exposes shared tool contracts, resources, and build-time prompt templates, including semantic model evidence through `reqvire.semantic.ontologies`, semantic vocabulary through `reqvire.semantic.vocabulary`, and semantic query guidance through standard MCP prompts. `reqvire.semantic.ontologies` supports `include_external: true` when clients need local External Ontology source triples. The MCP server does not expose arbitrary shell execution, does not own model state, and does not bypass Reqvire core semantics.
+The MCP server exposes shared tool contracts, resources, and build-time prompt templates, including semantic model evidence through `reqvire.semantic.ontologies`, semantic vocabulary through `reqvire.semantic.vocabulary`, and semantic query guidance through standard MCP prompts. `reqvire.semantic.ontologies` supports `include_external: true` when clients need the used subset of local External Ontology dependencies. The MCP server does not expose raw full third-party ontology dumps, arbitrary shell execution, model state ownership, or behavior that bypasses Reqvire core semantics.
 
 #### Core Capabilities
 

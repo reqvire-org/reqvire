@@ -407,14 +407,15 @@ The command shall reject `mv-file --squash` when the target file is an existing 
 
 ### CLI Ontologies Command
 
-The system shall provide an `ontologies` command that collects all ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry, emits generated ontology document declarations derived from root ontology metadata, supports optional local external ontology source inclusion, and supports an optional full semantic model projection. The command shall emit one `owl:Ontology` declaration per resolved `ontology_base`; ontology elements in the same base contribute vocabulary to that document, while cross-base ontology hierarchy may emit `owl:imports`.
+The system shall provide an `ontologies` command that collects all ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry, emits generated ontology document declarations derived from root ontology metadata, supports optional used external ontology subset inclusion, and supports an optional full semantic model projection. The command shall emit one `owl:Ontology` declaration per resolved `ontology_base`; ontology elements in the same base contribute vocabulary to that document, while cross-base ontology hierarchy may emit `owl:imports`.
 
 #### Details
 The command shall:
 - Emit RDF/Turtle by default.
 - Support `--jsonld` to emit JSON-LD instead of Turtle.
 - Support `--full` to include RDF triples for Reqvire model elements, relations, reused_contract_context, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts.
-- Support `--include-external` to include triples loaded from local ontology `#### External Ontology` source files.
+- Support `--include-external` to include only the used external subset derived from local ontology `#### External Ontology` source files.
+- Provide no CLI flag or mode that emits complete third-party ontology source dumps; users that need raw external source already have the local dependency file.
 - Support `--output <FILE>` to write the selected format to a file.
 - Reuse the semantic index built from the graph registry instead of reparsing Turtle separately from validation.
 

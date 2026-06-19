@@ -139,10 +139,11 @@ Expected checks:
 - Run `reqvire ontologies` and verify Turtle output contains generated ontology document declarations, ontology term declarations, and SHACL shape references without generated ontology projection facts.
 - Verify generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors instead of emitting one document per element.
 - Run `reqvire ontologies --jsonld` and verify the output is valid JSON-LD without generated ontology projection facts.
-- Run `reqvire ontologies --include-external` and verify local external ontology source triples are included while default `reqvire ontologies` keeps those source triples out.
+- Run `reqvire ontologies --include-external` and verify local Turtle/TTL, RDF/XML, and JSON-LD external ontology dependencies contribute only used external subset triples while default `reqvire ontologies` keeps external triples out.
+- Verify unused external ontology dependency terms do not appear in `reqvire ontologies --include-external` or `reqvire ontologies --full --include-external`.
 - Run `reqvire ontologies --full` and verify Turtle output contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements, plus generated ontology projection graph, projection, construct, symbol, source/provenance, member, and subject/object/predicate facts for direct-authored constructs.
 - Run `reqvire ontologies --full --jsonld` and verify JSON-LD output contains Reqvire model context triples and generated ontology projection facts.
-- Run `reqvire ontologies --full --include-external` through fixture coverage when external source materialization is enabled together with full semantic export.
+- Run `reqvire ontologies --full --include-external` through fixture coverage when used external subset materialization is enabled together with full semantic export.
 - Verify default Turtle output contains generated ontology document declarations and collected ontology content without generated ontology projection facts.
 - Verify the Ontologies Explorer uses the same collected ontology content and semantic projection model when served.
 - Verify the Reqvire authored ontology source tree does not contain stale `owl:deprecated true` presentation-only vocabulary declarations after ontology refactoring.

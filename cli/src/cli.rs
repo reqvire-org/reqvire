@@ -700,7 +700,7 @@ pub enum Commands {
 
     /// Collect ontology elements and semantic-contract SHACL shapes
     #[clap(
-        override_help = "Collect ontology elements and semantic-contract SHACL shapes\n\nONTOLOGIES OPTIONS:\n      --jsonld                Output JSON-LD format instead of RDF/Turtle (.ttl)\n      --full                  Include Reqvire model context triples and ontology projection facts in the semantic export\n      --include-external      Include local external ontology source triples\n      --output <FILE>         Save output to file"
+        override_help = "Collect ontology elements and semantic-contract SHACL shapes\n\nONTOLOGIES OPTIONS:\n      --jsonld                Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --full                  Include Reqvire model context triples and ontology projection facts in the semantic export\n      --include-external      Include used local external ontology subset triples\n      --output <FILE>         Save output to file"
     )]
     Ontologies {
         /// Output JSON-LD format instead of RDF/Turtle (.ttl)
@@ -711,7 +711,7 @@ pub enum Commands {
         #[clap(long, help_heading = "ONTOLOGIES OPTIONS")]
         full: bool,
 
-        /// Include local external ontology source triples
+        /// Include used local external ontology subset triples
         #[clap(long, help_heading = "ONTOLOGIES OPTIONS")]
         include_external: bool,
 

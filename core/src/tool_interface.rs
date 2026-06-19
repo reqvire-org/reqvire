@@ -262,7 +262,11 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 ("full", json!({ "type": "boolean", "default": false })),
                 (
                     "include_external",
-                    json!({ "type": "boolean", "default": false }),
+                    json!({
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Include the used external ontology subset only; raw full external dependency triples are not exposed."
+                    }),
                 ),
             ]),
         ),
@@ -271,7 +275,11 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             "List ontology-defined semantic prefixes and namespaces.",
             object_schema(vec![(
                 "include_external",
-                json!({ "type": "boolean", "default": false }),
+                json!({
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Include external prefix declarations for query construction with used-subset materialization metadata; this does not expose raw full external vocabulary."
+                }),
             )]),
         ),
         read_tool(
@@ -310,7 +318,11 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 ),
                 (
                     "include_external",
-                    json!({ "type": "boolean", "default": false }),
+                    json!({
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Include vocabulary terms from the used external ontology subset only; unused raw external dependency terms remain hidden."
+                    }),
                 ),
             ]),
         ),
@@ -323,7 +335,11 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                     ("full", json!({ "type": "boolean", "default": true })),
                     (
                         "include_external",
-                        json!({ "type": "boolean", "default": false }),
+                        json!({
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Query the graph with the used external ontology subset only; raw full external dependency triples are not queryable."
+                        }),
                     ),
                 ],
                 vec!["query"],
@@ -827,7 +843,7 @@ fn ontologies_tool(
     let include_external = bool_arg(args, "include_external", false);
 
     let mut serializable_index = filtered_semantic_index(&semantic_store.index, content_filter);
-    apply_external_visibility(&mut serializable_index, include_external);
+    serializable_index.apply_external_visibility(include_external)?;
 
     let (format_name, export_format) = match format.as_str() {
         "turtle" => ("turtle", SemanticExportFormat::Turtle),
@@ -841,16 +857,24 @@ fn ontologies_tool(
     };
     let content =
         serializable_index.serialize_with_options(export_format, full, include_external)?;
+    let external_metadata = semantic_contract::external_materialization_metadata(
+        &semantic_store.index,
+        &serializable_index,
+        include_external,
+    );
 
     match format_name {
         "turtle" => Ok(json!({
             "format": format_name,
             "content_filter": content_filter.as_str(),
             "include_external": include_external,
+            "external_materialization": external_metadata["external_materialization"].clone(),
+            "external_counts": external_metadata["external_counts"].clone(),
             "full": full,
             "content": content,
             "summary": serializable_index.summary,
             "blocks": serializable_index.blocks,
+            "external_blocks": serializable_index.external_blocks,
             "diagnostics": serializable_index.diagnostics,
             "ontology_documents": serializable_index.ontology_documents,
             "ontology_declarations": serializable_index.ontology_declarations,
@@ -863,11 +887,14 @@ fn ontologies_tool(
                 "format": format_name,
                 "content_filter": content_filter.as_str(),
                 "include_external": include_external,
+                "external_materialization": external_metadata["external_materialization"].clone(),
+                "external_counts": external_metadata["external_counts"].clone(),
                 "full": full,
                 "content": content,
                 "jsonld": jsonld,
                 "summary": serializable_index.summary,
                 "blocks": serializable_index.blocks,
+                "external_blocks": serializable_index.external_blocks,
                 "diagnostics": serializable_index.diagnostics,
                 "ontology_documents": serializable_index.ontology_documents,
                 "ontology_declarations": serializable_index.ontology_declarations,
@@ -969,23 +996,8 @@ fn filtered_semantic_index(
 fn semantic_index_with_external_visibility(
     source: &semantic_contract::SemanticIndex,
     include_external: bool,
-) -> semantic_contract::SemanticIndex {
-    let mut index = source.clone();
-    apply_external_visibility(&mut index, include_external);
-    index
-}
-
-fn apply_external_visibility(index: &mut semantic_contract::SemanticIndex, include_external: bool) {
-    if include_external {
-        return;
-    }
-
-    index.external_blocks.clear();
-    index.external_sources.clear();
-    index.ontology_declarations.retain(|_iri, declarations| {
-        declarations.retain(|declaration| !declaration.external);
-        !declarations.is_empty()
-    });
+) -> Result<semantic_contract::SemanticIndex, ReqvireError> {
+    source.with_external_visibility(include_external)
 }
 
 fn semantic_prefixes_tool(
@@ -998,6 +1010,13 @@ fn semantic_prefixes_tool(
     let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
+    let visible_index =
+        semantic_index_with_external_visibility(&semantic_store.index, include_external)?;
+    let external_metadata = semantic_contract::external_materialization_metadata(
+        &semantic_store.index,
+        &visible_index,
+        include_external,
+    );
 
     let mut prefixes = Vec::new();
     let mut prefix_namespaces: std::collections::BTreeMap<String, BTreeSet<String>> =
@@ -1028,7 +1047,7 @@ fn semantic_prefixes_tool(
     }
 
     if include_external {
-        for source in &semantic_store.index.external_sources {
+        for source in used_external_sources(&semantic_store.index, &visible_index) {
             prefix_namespaces
                 .entry(source.prefix.clone())
                 .or_default()
@@ -1041,6 +1060,8 @@ fn semantic_prefixes_tool(
                 "term_namespace": source.namespace,
                 "ontology_document_iri": source.resource,
                 "external": true,
+                "external_materialization": "used_subset",
+                "source_declaration": "declared",
                 "source": external_ontology_prefix_source(&model, source)
             }));
         }
@@ -1110,10 +1131,12 @@ fn semantic_prefixes_tool(
             "prefix_count": prefix_namespaces.len(),
             "namespace_count": namespace_count,
             "ontology_document_count": semantic_store.index.ontology_documents.len(),
-            "external_source_count": if include_external { semantic_store.index.external_sources.len() } else { 0 },
+            "external_source_count": if include_external { external_metadata["external_counts"]["used_external_source_count"].as_u64().unwrap_or(0) } else { 0 },
             "conflict_count": conflicts.len()
         },
         "include_external": include_external,
+        "external_materialization": external_metadata["external_materialization"].clone(),
+        "external_counts": external_metadata["external_counts"].clone(),
         "diagnostics": semantic_store.index.diagnostics,
         "model_fingerprint": model_fingerprint(&model)
     }))
@@ -1245,7 +1268,12 @@ fn semantic_vocabulary_tool(
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let semantic_index =
-        semantic_index_with_external_visibility(&semantic_store.index, include_external);
+        semantic_index_with_external_visibility(&semantic_store.index, include_external)?;
+    let external_metadata = semantic_contract::external_materialization_metadata(
+        &semantic_store.index,
+        &semantic_index,
+        include_external,
+    );
 
     let prefixes = vocabulary_prefixes(&model, &semantic_index);
     let compact_prefixes: Vec<VocabularyPrefix> = prefixes
@@ -1311,6 +1339,8 @@ fn semantic_vocabulary_tool(
             },
             "diagnostics": semantic_store.index.diagnostics,
             "include_external": include_external,
+            "external_materialization": external_metadata["external_materialization"].clone(),
+            "external_counts": external_metadata["external_counts"].clone(),
             "model_fingerprint": model_fingerprint(&model)
         }));
     }
@@ -1346,6 +1376,8 @@ fn semantic_vocabulary_tool(
         },
         "diagnostics": semantic_store.index.diagnostics,
         "include_external": include_external,
+        "external_materialization": external_metadata["external_materialization"].clone(),
+        "external_counts": external_metadata["external_counts"].clone(),
         "model_fingerprint": model_fingerprint(&model)
     }))
 }
@@ -1375,6 +1407,8 @@ fn vocabulary_prefixes(
             "term_namespace": source.namespace,
             "ontology_document_iri": source.resource,
             "external": true,
+            "external_materialization": "used_subset",
+            "source_declaration": "declared",
             "source": external_ontology_prefix_source(model, source)
         }));
     }
@@ -1390,6 +1424,34 @@ fn vocabulary_prefixes(
             )
     });
     prefixes
+}
+
+fn used_external_sources<'a>(
+    source: &'a semantic_contract::SemanticIndex,
+    visible: &semantic_contract::SemanticIndex,
+) -> Vec<&'a semantic_contract::ExternalOntologySource> {
+    let materialized_terms: BTreeSet<String> = visible
+        .external_blocks
+        .iter()
+        .flat_map(|block| {
+            block.quads.iter().filter_map(|quad| match &quad.subject {
+                oxigraph::model::NamedOrBlankNode::NamedNode(node) => {
+                    Some(node.as_str().to_string())
+                }
+                oxigraph::model::NamedOrBlankNode::BlankNode(_) => None,
+            })
+        })
+        .collect();
+
+    source
+        .external_sources
+        .iter()
+        .filter(|external_source| {
+            materialized_terms
+                .iter()
+                .any(|term| term.starts_with(&external_source.namespace))
+        })
+        .collect()
 }
 
 fn build_vocabulary_sections(
@@ -1565,6 +1627,13 @@ fn ontology_terms_section(
             );
             item.insert("role".to_string(), json!(role));
             item.insert("external".to_string(), json!(declaration.external));
+            if declaration.external {
+                item.insert("external_materialization".to_string(), json!("used_subset"));
+                item.insert(
+                    "materialized_in_used_subset".to_string(),
+                    json!(declaration.materialized_in_used_subset),
+                );
+            }
             item.insert(
                 "label".to_string(),
                 json!(info.and_then(|entry| entry.label.clone())),
@@ -1802,6 +1871,8 @@ fn source_map_section(
                 "iri": declaration.iri,
                 "role": declaration.role.to_string(),
                 "external": declaration.external,
+                "external_materialization": if declaration.external { Value::String("used_subset".to_string()) } else { Value::Null },
+                "materialized_in_used_subset": declaration.external && declaration.materialized_in_used_subset,
                 "source": source
             })
         })
@@ -1886,12 +1957,22 @@ fn source_for_term(index: &semantic_contract::SemanticIndex, info: &TermInfo) ->
             }
         })
         .map(|block| {
+            let external = matches!(
+                block.kind,
+                semantic_contract::SemanticBlockKind::ExternalOntology
+            );
+            let external_materialization = block
+                .external_materialization
+                .as_ref()
+                .map(|materialization| Value::String(materialization.clone()))
+                .unwrap_or(Value::Null);
             json!({
                 "element_identifier": block.source,
                 "element_name": block.source_name,
                 "file_path": block.file_path,
                 "line_number": block.line_number,
-                "external": matches!(block.kind, semantic_contract::SemanticBlockKind::ExternalOntology)
+                "external": external,
+                "external_materialization": external_materialization
             })
         })
         .unwrap_or(Value::Null)
@@ -1984,6 +2065,13 @@ fn sparql_tool(
     let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
+    let visible_index =
+        semantic_index_with_external_visibility(&semantic_store.index, include_external)?;
+    let external_metadata = semantic_contract::external_materialization_metadata(
+        &semantic_store.index,
+        &visible_index,
+        include_external,
+    );
 
     let results = SparqlEvaluator::new()
         .parse_query(&query)
@@ -2046,6 +2134,14 @@ fn sparql_tool(
         object.insert("format".to_string(), json!("sparql"));
         object.insert("full".to_string(), json!(full));
         object.insert("include_external".to_string(), json!(include_external));
+        object.insert(
+            "external_materialization".to_string(),
+            external_metadata["external_materialization"].clone(),
+        );
+        object.insert(
+            "external_counts".to_string(),
+            external_metadata["external_counts"].clone(),
+        );
         object.insert("summary".to_string(), json!(semantic_store.index.summary));
         object.insert(
             "diagnostics".to_string(),

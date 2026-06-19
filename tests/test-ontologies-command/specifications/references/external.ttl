@@ -13,5 +13,14 @@ ext:ExternalCode a rdfs:Datatype ;
   rdfs:label "External code datatype" .
 
 ext:externalCode a owl:DatatypeProperty ;
+  rdfs:label "External code property" ;
   rdfs:domain ext:ExternalResource ;
+  rdfs:range ext:ExternalCode .
+
+ext:UnusedExternalResource a owl:Class ;
+  rdfs:label "Unused external resource" .
+
+ext:unusedExternalCode a owl:DatatypeProperty ;
+  rdfs:label "Unused external code property" ;
+  rdfs:domain ext:UnusedExternalResource ;
   rdfs:range ext:ExternalCode .

@@ -306,28 +306,51 @@ function ExplorerViewControls({
 
   if (activeView === "ontologies") {
     const summary = store.ontology.summary ?? {};
+    const externalCounts = store.ontology.external_counts ?? {};
+    const declaredExternalSources = readNumber(externalCounts.declared_external_source_count);
+    const usedExternalSources = readNumber(externalCounts.used_external_source_count);
+    const materializedExternalTerms = readNumber(externalCounts.materialized_external_term_count);
+    const materializedExternalTriples = readNumber(externalCounts.materialized_external_triple_count);
+    const ontologySummaryItems = [
+      { label: "Ontologies", value: formatSummaryValue(summary.ontology_blocks ?? 0) },
+      { label: "Shapes", value: formatSummaryValue(summary.shape_blocks ?? 0) },
+      {
+        label: "Quads",
+        value: formatSummaryValue(summary.total_quads ?? 0),
+        title: "RDF statements (subject-predicate-object, with graph context)",
+      },
+      {
+        label: "Blocks",
+        value: formatSummaryValue(summary.total_blocks ?? 0),
+        title: "Ontology and shape source blocks discovered in the model",
+      },
+    ];
+    if (declaredExternalSources > 0) {
+      ontologySummaryItems.push(
+        {
+          label: "Ext Sources",
+          value: formatSummaryValue(usedExternalSources),
+          title: `${formatSummaryValue(declaredExternalSources)} declared external source(s); ${formatSummaryValue(usedExternalSources)} contribute to the used subset`,
+        },
+        {
+          label: "Ext Terms",
+          value: formatSummaryValue(materializedExternalTerms),
+          title: "External terms materialized into the Explorer used subset",
+        },
+        {
+          label: "Ext Triples",
+          value: formatSummaryValue(materializedExternalTriples),
+          title: "External triples materialized into the Explorer used subset",
+        },
+      );
+    }
     const ontologyLayerCounts = new Map<string, number>();
     for (const node of store.ontology.graph_data?.nodes ?? []) {
       ontologyLayerCounts.set(node.layer, (ontologyLayerCounts.get(node.layer) ?? 0) + 1);
     }
     return (
       <PaneFilterSection aria-label="Ontology controls">
-        <PaneSummary
-          items={[
-            { label: "Ontologies", value: formatSummaryValue(summary.ontology_blocks ?? 0) },
-            { label: "Shapes", value: formatSummaryValue(summary.shape_blocks ?? 0) },
-            {
-              label: "Quads",
-              value: formatSummaryValue(summary.total_quads ?? 0),
-              title: "RDF statements (subject-predicate-object, with graph context)",
-            },
-            {
-              label: "Blocks",
-              value: formatSummaryValue(summary.total_blocks ?? 0),
-              title: "Ontology and shape source blocks discovered in the model",
-            },
-          ]}
-        />
+        <PaneSummary items={ontologySummaryItems} />
         <OntologySelectedNodeLink
           selectedNodeId={ui.ontologySelectionId}
           nodes={store.ontology.graph_data?.nodes ?? []}
@@ -1074,7 +1097,7 @@ function ontologyLayerColorToken(value: string): DesignSystemColorToken {
 function ontologyLayerDescription(value: string): string {
   const descriptions: Record<string, string> = {
     "layer-reqvire-context": "Semantic context: model elements that declare or reference ontology terms.",
-    "layer-external-source": "External ontology source triples, when external vocabulary sources are present.",
+    "layer-external-source": "Used external ontology subset triples derived from declared external sources.",
   };
   return descriptions[value] ?? "";
 }

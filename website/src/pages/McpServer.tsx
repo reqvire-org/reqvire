@@ -114,19 +114,19 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             },
             {
               name: "Ontologies",
-              desc: "reqvire.semantic.ontologies returns authored RDF ontology, SHACL, or both as Turtle or JSON-LD, with full mode for generated model context and include_external for local external ontology source triples and declarations.",
+              desc: "reqvire.semantic.ontologies returns authored RDF ontology, SHACL, or both as Turtle or JSON-LD, with full mode for generated model context and include_external for used external subset triples and declarations.",
             },
             {
               name: "Semantic prefixes",
-              desc: "reqvire.semantic.prefixes returns ontology-defined prefixes, namespaces, source element prose content, and a SPARQL prefix block; include_external adds imported external prefixes with source metadata.",
+              desc: "reqvire.semantic.prefixes returns ontology-defined prefixes, namespaces, source element prose content, and a SPARQL prefix block; include_external adds imported external prefixes with used-subset source metadata.",
             },
             {
               name: "Semantic vocabulary",
-              desc: "reqvire.semantic.vocabulary returns paged classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source maps, diagnostics, and prefixes; include_external adds imported vocabulary entries marked as external.",
+              desc: "reqvire.semantic.vocabulary returns paged classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source maps, diagnostics, and prefixes; include_external adds used external vocabulary entries marked as external.",
             },
             {
               name: "SPARQL",
-              desc: "reqvire.semantic.sparql runs read-only SPARQL queries against the model-owned Oxigraph semantic store; include_external queries the external-inclusive store.",
+              desc: "reqvire.semantic.sparql runs read-only SPARQL queries against the model-owned Oxigraph semantic store; include_external queries the store with the used external subset.",
             },
             {
               name: "Prompts",

@@ -25,9 +25,9 @@ The generated `ontologyGraphData` is the contract between Rust projection logic 
 Ontology graph data uses explicit layers:
 - `authored` contains authored ontology and SHACL semantics plus projection facts derived from that authored content.
 - `reqvire-context` contains generated semantic context for model-to-term provenance only: model elements that `declaresTerm` or `referencesTerm` ontology terms.
-- `external-source` is reserved for imported external ontology vocabulary triples.
+- `external-source` is reserved for imported external ontology vocabulary triples in the used external subset.
 
-The Ontologies view treats `authored` as the implicit base graph, not as an optional layer control. The left pane must not render an Authored row because disabling or selecting authored ontology content would remove the point of the ontology view itself. Semantic Context and External Sources are the only visible overlay filters, letting users inspect model-to-term provenance or external vocabulary without changing the primary authored ontology view.
+The Ontologies view treats `authored` as the implicit base graph, not as an optional layer control. The left pane must not render an Authored row because disabling or selecting authored ontology content would remove the point of the ontology view itself. Semantic Context and External Sources are the only visible overlay filters, letting users inspect model-to-term provenance or used external subset vocabulary without changing the primary authored ontology view.
 
 #### Semantic Projection
 The graph projection applies these rules before Sigma sees the graph:

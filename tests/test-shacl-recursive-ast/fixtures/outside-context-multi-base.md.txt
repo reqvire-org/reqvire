@@ -1,0 +1,136 @@
+# Elements
+
+### Platform Capability
+
+Platform capability.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * specifiedBy: [Billing Platform Requirement](#billing-platform-requirement)
+---
+
+### Platform Ontology
+
+Platform ontology.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/platform
+  * ontology_prefix: platform
+
+#### Ontology
+```turtle
+@prefix platform: <https://example.test/platform#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/platform> a owl:Ontology .
+platform:TenantScopedEvent a owl:Class .
+platform:tenant a owl:ObjectProperty .
+platform:eventSubject a owl:ObjectProperty .
+```
+---
+
+### Billing Ontology
+
+Billing ontology derived from the platform ontology while declaring its own ontology base.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/billing
+  * ontology_prefix: billing
+
+#### Relations
+  * derivedFrom: [Platform Ontology](#platform-ontology)
+
+#### Ontology
+```turtle
+@prefix billing: <https://example.test/billing#> .
+@prefix platform: <https://example.test/platform#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/billing>
+  a owl:Ontology ;
+  owl:imports <https://example.test/platform> .
+
+billing:InvoiceEvent a owl:Class .
+billing:invoice a owl:ObjectProperty .
+billing:lineItem a owl:ObjectProperty .
+billing:status a owl:DatatypeProperty .
+```
+---
+
+### External Ontology
+
+External ontology that is declared in the model but not reachable through the billing shape contract.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/external
+  * ontology_prefix: ext
+
+#### Relations
+  * derivedFrom: [Platform Ontology](#platform-ontology)
+
+#### Ontology
+```turtle
+@prefix ext: <https://example.test/external#> .
+@prefix platform: <https://example.test/platform#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/external>
+  a owl:Ontology ;
+  owl:imports <https://example.test/platform> .
+
+ext:externalEvent a owl:ObjectProperty .
+```
+---
+
+### Billing Platform Requirement
+
+The system shall validate billing event shapes against billing and inherited platform ontology terms.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Platform Capability](#platform-capability)
+  * constrainedBy: [Billing Shape Contract](#billing-shape-contract)
+---
+
+### Billing Shape Contract
+
+Billing shape contract.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Billing Platform Requirement](#billing-platform-requirement)
+  * use: [Billing Ontology](#billing-ontology)
+
+#### Shapes
+```turtle
+@prefix billing: <https://example.test/billing#> .
+@prefix ext: <https://example.test/external#> .
+@prefix platform: <https://example.test/platform#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+billing:InvoiceEventShape
+  a sh:NodeShape ;
+  sh:targetClass billing:InvoiceEvent ;
+  sh:targetSubjectsOf platform:eventSubject ;
+  sh:targetObjectsOf ext:externalEvent ;
+  sh:property [
+    sh:path (
+      platform:tenant
+      billing:invoice
+      [ sh:zeroOrOnePath billing:lineItem ]
+    ) ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+```
+---

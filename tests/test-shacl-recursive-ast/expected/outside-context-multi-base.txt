@@ -1,0 +1,6 @@
+
+❌ 1 validation failed with error(s):
+
+  1. Invalid markdown structure: Semantic reference outside context: semantic contract 'specifications/RecursiveShacl.md#billing-shape-contract' references sh:targetObjectsOf <https://example.test/external#externalEvent>, declared by ontology 'specifications/RecursiveShacl.md#external-ontology', but that ontology is not reachable through the contract's use relations. Add a use relation to the declaring ontology or an ontology descendant with the declaring ontology in its hierarchy.
+
+

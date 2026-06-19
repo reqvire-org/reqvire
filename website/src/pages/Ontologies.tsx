@@ -118,7 +118,7 @@ The system shall reject API requests whose access token is invalid.
 
       <Section title="External Ontology Sources">
         <p className="text-zinc-600 mb-4">
-          Ontology elements can declare local Turtle files for external
+          Ontology elements can declare local Turtle/TTL, RDF/XML, or JSON-LD files for external
           vocabularies that are not authored by the Reqvire model. These files
           are loaded for validation and can be included in semantic exports on
           demand.
@@ -126,7 +126,7 @@ The system shall reject API requests whose access token is invalid.
         <BulletList
           items={[
             "Use External Ontology sections only on ontology elements.",
-            "The source must be a local .ttl/Turtle file; Reqvire does not fetch remote ontology URLs during validation.",
+            "The source must be a local Turtle/TTL, RDF/XML, or JSON-LD file; Reqvire does not fetch remote ontology URLs during validation.",
             "Authored Turtle and SHACL blocks still declare their own prefixes explicitly. External source sections do not inject hidden Turtle.",
             "OWL/RDF/RDFS/XSD reserved vocabulary and core SHACL shape syntax are recognized by Reqvire without local External Ontology declarations.",
           ]}
@@ -217,13 +217,14 @@ auth:AccessTokenValidationShape
         <BulletList
           items={[
             "Use reqvire ontologies when a tool needs the clean ontology and SHACL document.",
-            "Use reqvire ontologies --include-external when the exported graph should include local external ontology source triples.",
+            "Use reqvire ontologies --include-external when the exported graph should include the used subset of local external ontology dependencies.",
             "Use reqvire ontologies --full when a graph/database should also know which model elements reference ontology terms.",
-            "Use reqvire ontologies --full --include-external when a graph/database should receive authored triples, external source triples, model context, and generated ontology projection facts.",
-            "Use reqvire.semantic.ontologies through MCP with content set to rdf, shacl, or both when an assistant needs only part of the semantic document; set include_external to include local external ontology source triples and declarations.",
+            "Use reqvire ontologies --full --include-external when a graph/database should receive authored triples, the used external subset, model context, and generated ontology projection facts.",
+            "Use reqvire.semantic.ontologies through MCP with content set to rdf, shacl, or both when an assistant needs only part of the semantic document; set include_external to include used external subset triples and declarations.",
             "Use reqvire.semantic.prefixes through MCP when an assistant needs ontology-defined namespaces and source prose before writing SPARQL; set include_external when imported external prefixes are needed.",
-            "Use reqvire.semantic.vocabulary through MCP when an assistant needs paged classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source maps, diagnostics, and prefixes before writing SPARQL; set include_external when imported vocabulary should be listed.",
-            "Use reqvire.semantic.sparql through MCP when an assistant needs to query the model-owned Oxigraph semantic store directly; set include_external to query imported external ontology triples.",
+            "Use reqvire.semantic.vocabulary through MCP when an assistant needs paged classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source maps, diagnostics, and prefixes before writing SPARQL; set include_external when used external vocabulary should be listed.",
+            "Use reqvire.semantic.sparql through MCP when an assistant needs to query the model-owned Oxigraph semantic store directly; set include_external to query the used external subset.",
+            "Reqvire parses complete external ontology files internally for validation and term resolution, but it does not expose unused third-party ontology facts as a public dump mode.",
             "Use MCP prompts such as reqvire.semantic.query when an assistant needs query-construction guidance before calling vocabulary, prefix, or SPARQL tools.",
             "Concept References appear in full export as model-context facts such as conceptReference and referencesTerm; they do not rewrite authored OWL/SHACL semantics.",
             "Concept References are model-context term-reference edges, not generated OntologyConstruct records. OntologyConstruct is reserved for projected OWL/RDFS/SHACL patterns such as subclass, membership, restriction, property-chain, inverse-property, and shape-overlay constructs.",

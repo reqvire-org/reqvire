@@ -199,6 +199,9 @@ export interface OntologyProjection {
   diagnostics?: unknown[];
   projection?: OntologyConstructProjectionGraph;
   graph_data?: OntologyGraphData;
+  external_sources?: ExternalOntologySource[];
+  external_materialization?: "none" | "used_subset" | string;
+  external_counts?: OntologyExternalCounts;
   ttl_href?: string;
 }
 
@@ -206,6 +209,30 @@ export interface OntologyTermDeclaration {
   iri: string;
   role: string;
   element_identifier: string;
+  external?: boolean;
+  materialized_in_used_subset?: boolean;
+}
+
+export interface ExternalOntologySource {
+  owner_identifier: string;
+  owner_name: string;
+  prefix: string;
+  namespace: string;
+  resource?: string | null;
+  source: string;
+  format: string;
+  line_number: number;
+}
+
+export interface OntologyExternalCounts {
+  declared_external_source_count?: number;
+  visible_external_source_count?: number;
+  used_external_source_count?: number;
+  available_external_term_declaration_count?: number;
+  visible_external_term_declaration_count?: number;
+  materialized_external_term_count?: number;
+  raw_external_triple_count?: number;
+  materialized_external_triple_count?: number;
 }
 
 export interface OntologyProjectionTerm {

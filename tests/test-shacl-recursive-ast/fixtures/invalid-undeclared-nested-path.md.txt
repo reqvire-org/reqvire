@@ -1,0 +1,91 @@
+# Elements
+
+### Recursive SHACL Capability
+
+Recursive SHACL validation capability.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * specifiedBy: [Recursive SHACL Requirement](#recursive-shacl-requirement)
+---
+
+### Recursive SHACL Ontology
+
+Recursive SHACL ontology.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/recursive
+  * ontology_prefix: rec
+
+#### Ontology
+```turtle
+@prefix rec: <https://example.test/recursive#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/recursive> a owl:Ontology .
+rec:Invoice a owl:Class .
+rec:InvoiceLine a owl:Class .
+rec:LineStatus a owl:Class .
+rec:eventSubject a owl:ObjectProperty .
+rec:customer a owl:ObjectProperty .
+rec:parentInvoice a owl:ObjectProperty .
+rec:lineItems a owl:ObjectProperty .
+rec:primaryLine a owl:ObjectProperty .
+rec:tag a owl:DatatypeProperty .
+rec:status a owl:ObjectProperty .
+rec:code a owl:DatatypeProperty .
+```
+---
+
+### Recursive SHACL Requirement
+
+The system shall validate recursive SHACL shape structure against reachable ontology terms.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Recursive SHACL Capability](#recursive-shacl-capability)
+  * constrainedBy: [Recursive SHACL Shape Contract](#recursive-shacl-shape-contract)
+---
+
+### Recursive SHACL Shape Contract
+
+Recursive SHACL shape contract.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Recursive SHACL Requirement](#recursive-shacl-requirement)
+  * use: [Recursive SHACL Ontology](#recursive-shacl-ontology)
+
+#### Shapes
+```turtle
+@prefix rec: <https://example.test/recursive#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+rec:InvoiceEventShape
+  a sh:NodeShape ;
+  sh:targetSubjectsOf rec:eventSubject ;
+  sh:property rec:RecursivePathShape .
+
+rec:RecursivePathShape
+  a sh:PropertyShape ;
+  sh:path (
+    rec:customer
+    [ sh:inversePath rec:parentInvoice ]
+    [ sh:alternativePath ( rec:primaryLine rec:undeclaredNestedPath ) ]
+    [ sh:zeroOrMorePath rec:tag ]
+  ) ;
+  sh:minCount 1 ;
+  sh:maxCount 3 ;
+  sh:class rec:InvoiceLine ;
+  sh:datatype xsd:string ;
+  sh:in ( rec:active rec:archived ) .
+```
+---

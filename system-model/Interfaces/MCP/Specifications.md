@@ -106,11 +106,11 @@ Semantic model evidence rules:
 - `reqvire.semantic.ontologies` accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`.
 - `reqvire.semantic.ontologies` accepts optional `content` with values `rdf`, `shacl`, or `both`; omitted content defaults to `both`.
 - `reqvire.semantic.ontologies` accepts optional `full` boolean; omitted or false returns generated ontology document declarations plus authored ontology and SHACL artifacts, while true also includes generated Reqvire model context triples and ontology projection facts. Generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors.
-- `reqvire.semantic.ontologies` accepts optional `include_external` boolean; omitted or false excludes local `#### External Ontology` source triples and external term declarations from serialized content and metadata, while true includes parsed local external ontology source triples and external declarations.
-- `reqvire.semantic.ontologies` returns selected serialized semantic content, effective content filter, effective `include_external` state, semantic index summary, collected block metadata, diagnostics, generated ontology document declarations, visible ontology term declarations, and SHACL shape references.
-- `reqvire.semantic.prefixes` returns ontology element-defined prefixes, namespaces, source provenance, source prose content, and a reusable SPARQL prefix block. It accepts optional `include_external`; omitted or false returns authored ontology prefixes only, while true also returns local external ontology source prefixes marked as external.
-- `reqvire.semantic.vocabulary` returns compact paged semantic vocabulary with prefixes included in every response for SPARQL query construction. It accepts optional `include_external`; omitted or false returns authored vocabulary only, while true also returns external vocabulary terms marked as external with external source metadata.
-- `reqvire.semantic.sparql` executes SPARQL against the same semantic collection used by `reqvire.semantic.ontologies`. It accepts optional `include_external`; omitted or false queries the authored semantic store only, while true queries the external-inclusive semantic store.
+- `reqvire.semantic.ontologies` accepts optional `include_external` boolean; omitted or false excludes local `#### External Ontology` dependency triples and external term declarations from serialized content and metadata, while true includes only used external subset triples and declarations.
+- `reqvire.semantic.ontologies` returns selected serialized semantic content, effective content filter, effective `include_external` state, effective external materialization mode, semantic index summary, collected block metadata, diagnostics, generated ontology document declarations, visible ontology term declarations, and SHACL shape references.
+- `reqvire.semantic.prefixes` returns ontology element-defined prefixes, namespaces, source provenance, source prose content, and a reusable SPARQL prefix block. It accepts optional `include_external`; omitted or false returns authored ontology prefixes only, while true also returns local external ontology source prefixes marked as external and used-subset materialization metadata.
+- `reqvire.semantic.vocabulary` returns compact paged semantic vocabulary with prefixes included in every response for SPARQL query construction. It accepts optional `include_external`; omitted or false returns authored vocabulary only, while true also returns used external subset vocabulary terms marked as external with external source metadata.
+- `reqvire.semantic.sparql` executes SPARQL against the same semantic collection used by `reqvire.semantic.ontologies`. It accepts optional `include_external`; omitted or false queries the authored semantic store only, while true queries a store that includes only the used external subset.
 
 #### Metadata
   * type: specification
@@ -236,6 +236,7 @@ Prompt set:
 Prompt content rules:
 - Semantic prompts direct clients to discover prefixes and vocabulary before writing SPARQL.
 - Semantic prompts reference `reqvire.semantic.vocabulary`, `reqvire.semantic.prefixes`, and `reqvire.semantic.sparql`.
+- Semantic prompts state that `include_external` exposes only the used external subset and is not a way to browse or dump raw full external ontology dependencies.
 - Regular workflow prompts reference non-semantic tools such as workspace status, search, read element, model, collect, lint, coverage, and traces.
 - Prompt content warns clients not to rebuild semantic stores or infer prefixes from raw Turtle when MCP vocabulary/prefix tools are available.
 - Prompt content distinguishes capability, requirement, contract, ontology, semantic-contract, verification, and reused contract context semantics where relevant.
@@ -338,7 +339,7 @@ Prefix registry request:
 Result behavior:
 - Result payloads include `prefixes`, `sparql_prefix_block`, `conflicts`, `summary`, semantic `diagnostics`, and `model_fingerprint`.
 - Each prefix entry includes `prefix`, `namespace`, `ontology_base`, `term_namespace`, `ontology_document_iri`, source element provenance, and contributors.
-- Authored prefix entries are marked `external: false`; imported external ontology prefix entries are returned only when `include_external` is true and are marked `external: true`.
+- Authored prefix entries are marked `external: false`; imported external ontology prefix entries are returned only when `include_external` is true, are marked `external: true`, and identify `external_materialization: "used_subset"`.
 - `source` includes `element_identifier`, `element_name`, `file_path`, `line_number`, and ontology element prose `content`.
 - Source `content` excludes authored Turtle and SHACL blocks, so clients receive the model element description rather than embedded RDF source text.
 - `sparql_prefix_block` contains namespace declarations formatted for direct inclusion before SPARQL queries.
@@ -365,7 +366,7 @@ SPARQL tool request:
 - Tool name is `reqvire.semantic.sparql`.
 - Required `query` string contains a SPARQL 1.1 query.
 - Optional `full` boolean defaults to `true`. When true, the queried graph includes authored ontology and SHACL RDF plus generated Reqvire model-context triples, semantic-export relation-family projection facts, and ontology projection facts. When false, the queried graph includes generated ontology document declarations plus authored ontology and SHACL RDF only.
-- Optional `include_external` boolean defaults to false. When true, the selected graph also includes parsed local external ontology source triples.
+- Optional `include_external` boolean defaults to false. When true, the selected graph also includes only the used external ontology subset derived from parsed local external dependency files.
 
 Execution behavior:
 - The validated Reqvire model owns an in-memory Oxigraph semantic store built after parsing and graph validation.
@@ -419,7 +420,7 @@ Vocabulary tool request:
 - Optional `filter` performs a text match over compact item content.
 - Optional `include_source` defaults to true and controls source provenance where supported.
 - Optional `include_examples` defaults to false and controls whether query pattern entries include SPARQL examples.
-- Optional `include_external` defaults to false and controls whether imported external ontology vocabulary appears in prefixes and item sections.
+- Optional `include_external` defaults to false and controls whether used external ontology subset vocabulary appears in prefixes and item sections.
 
 Result behavior:
 - Every response includes `prefixes` and `sparql_prefix_block`.
@@ -427,7 +428,7 @@ Result behavior:
 - Item section responses return `items`, `paging`, prefixes, diagnostics, and model fingerprint.
 - `relation_families` items include family name, IRI/CURIE, meaning, normalized forward property, normalized inverse property, raw relation rules, and transitive flag.
 - `classes` and `properties` items include IRI/CURIE, role, external marker, label/comment where available, source when requested, and domain/range when available.
-- Imported external vocabulary items are omitted by default; when included, they are marked `external: true` and use external source metadata.
+- Imported external vocabulary items are omitted by default; when included, only used external subset items are returned, marked `external: true`, and use external source metadata.
 - `semantic_contracts` items include shape source and referenced SHACL target/path/class IRIs.
 
 Execution behavior:

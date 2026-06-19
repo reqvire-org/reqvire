@@ -231,12 +231,16 @@ Ontologies define:
 Reqvire supports ontology modeling directly inside the engineering workflow.
 Ontology boundary metadata and Turtle are explicit: a top ontology element declares `ontology_base` and `ontology_prefix`, and its Turtle must agree with the generated ontology IRI and term namespace.
 
-Ontology elements can reference local external `.ttl` vocabularies through
-`External Ontology` source sections when model validation needs terms from a
+Ontology elements can reference local external Turtle/TTL, RDF/XML, or JSON-LD
+vocabularies through `External Ontology` source sections when model validation needs terms from a
 third-party or shared vocabulary. These sources support reference resolution and
 optional export materialization with `reqvire ontologies --include-external` or
-MCP `include_external: true`; imported terms are marked as external and do not
-replace authored Reqvire ontology elements as the canonical system model.
+MCP `include_external: true`, but exposed external content is limited to the
+used external subset. Full external ontology files remain local dependency
+inputs for validation and term resolution; Reqvire does not provide a public
+mode for dumping complete third-party ontology files. Imported terms are marked
+as external and do not replace authored Reqvire ontology elements as the
+canonical system model.
 
 RDF, RDFS, OWL, XSD reserved vocabulary and core SHACL shape syntax are built into Reqvire, so standard vocabulary does not need vendored source files.
 

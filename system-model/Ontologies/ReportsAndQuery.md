@@ -291,6 +291,15 @@ reqvire:ShapeBlock a owl:Class ;
 reqvire:ExternalOntologySource a owl:Class ;
   rdfs:subClassOf reqvire:SemanticBlock ;
   rdfs:comment "Local external ontology source declared by an ontology element through a repeatable External Ontology section." .
+reqvire:RawExternalOntologyGraph a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Internal raw graph parsed from a local external ontology dependency input; this graph is available for validation and subset construction but is not a public semantic output mode." .
+reqvire:UsedExternalOntologySubset a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Only external ontology materialization that Reqvire exposes when include_external is requested; it contains used external terms plus selected support and annotation facts." .
+reqvire:UsedExternalOntologyTerm a owl:Class ;
+  rdfs:subClassOf reqvire:OntologyTerm ;
+  rdfs:comment "External ontology term selected for exposure because authored Reqvire semantic content references it directly or through required support closure." .
 reqvire:ModelContextProjection a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection .
 reqvire:OntologyProjectionGraph a owl:Class ;
@@ -311,6 +320,9 @@ reqvire:SemanticConstructQuery a owl:Class ;
 reqvire:RelationFamilyConstructQuery a owl:Class ;
   rdfs:subClassOf reqvire:SemanticConstructQuery ;
   rdfs:comment "SPARQL CONSTRUCT query specification for materializing canonical forward and inverse relation-family facts from authored Reqvire model relations." .
+reqvire:ExternalOntologySubsetConstructQuery a owl:Class ;
+  rdfs:subClassOf reqvire:SemanticConstructQuery ;
+  rdfs:comment "SPARQL query specification for selecting the used external ontology subset from internal raw external dependency graphs." .
 reqvire:OntologyProjectionProvenance a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection ;
   rdfs:comment "Generated provenance record describing how an ontology construct projection fact was derived." .
@@ -343,6 +355,18 @@ reqvire:externalOntologyResource a owl:ObjectProperty ;
   rdfs:domain reqvire:ExternalOntologySource ;
   rdfs:range owl:Ontology ;
   rdfs:comment "Ontology document IRI declared by a local external ontology source." .
+reqvire:externalUsedTerm a owl:ObjectProperty ;
+  rdfs:domain reqvire:UsedExternalOntologySubset ;
+  rdfs:range reqvire:UsedExternalOntologyTerm ;
+  rdfs:comment "External term selected for public used-subset materialization." .
+reqvire:externalSubsetSource a owl:ObjectProperty ;
+  rdfs:domain reqvire:UsedExternalOntologySubset ;
+  rdfs:range reqvire:ExternalOntologySource ;
+  rdfs:comment "External ontology source declaration from which a used-subset materialization was derived." .
+reqvire:externalSubsetGraph a owl:ObjectProperty ;
+  rdfs:domain reqvire:UsedExternalOntologySubset ;
+  rdfs:range reqvire:RawExternalOntologyGraph ;
+  rdfs:comment "Internal raw external graph used as input to used-subset construction." .
 reqvire:recognizesReservedVocabularyTerm a owl:ObjectProperty ;
   rdfs:domain reqvire:OwlReservedVocabularyRegistry ;
   rdfs:range reqvire:OwlReservedVocabularyTerm ;
@@ -482,7 +506,15 @@ reqvire:externalOntologySourcePath a owl:DatatypeProperty ;
 reqvire:externalOntologyFormat a owl:DatatypeProperty ;
   rdfs:domain reqvire:ExternalOntologySource ;
   rdfs:range xsd:string ;
-  rdfs:comment "Serialization format of a local external ontology source. Turtle is the initial supported value." .
+  rdfs:comment "Serialization format of a local external ontology source, such as Turtle/TTL, RDF/XML, or JSON-LD." .
+reqvire:externalMaterializationMode a owl:DatatypeProperty ;
+  rdfs:domain reqvire:UsedExternalOntologySubset ;
+  rdfs:range xsd:string ;
+  rdfs:comment "External ontology materialization mode token; public Reqvire outputs use the used_subset mode and do not expose full raw external graphs." .
+reqvire:externalMaterializedTripleCount a owl:DatatypeProperty ;
+  rdfs:domain reqvire:UsedExternalOntologySubset ;
+  rdfs:range xsd:integer ;
+  rdfs:comment "Count of triples emitted in the used external ontology subset." .
 reqvire:constructFamily a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
@@ -555,6 +587,121 @@ reqvire:fullSemanticModelExportMode a reqvire:FullSemanticModelExport ;
 reqvire:directAuthoredProjectionMode a reqvire:OntologyConstructProjection ;
   reqvire:projectionDerivationMode "direct-authored" ;
   rdfs:comment "Projection mode for constructs materialized from authored triples without OWL reasoning." .
+reqvire:externalUsedTermSeedQuery a reqvire:ExternalOntologySubsetConstructQuery ;
+  reqvire:constructQueryName "external-used-term-seed-query" ;
+  reqvire:constructFamily "external-used-subset" ;
+  reqvire:constructKind "seed-query" ;
+  reqvire:projectionDerivationMode "construct-query-specified" ;
+  reqvire:constructQueryPurpose "Select external ontology terms referenced by authored ontology, SHACL, concept-reference, model-context, or generated semantic projection facts whose IRIs fall under declared external namespaces." ;
+  reqvire:constructQueryText """
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+
+SELECT DISTINCT ?term
+WHERE {
+  ?source a reqvire:ExternalOntologySource ;
+    reqvire:externalOntologyNamespace ?namespace .
+  {
+    ?block reqvire:referencesTerm ?term .
+  }
+  UNION {
+    ?block reqvire:declaresTerm ?term .
+  }
+  UNION {
+    ?projection reqvire:conceptReference ?term .
+  }
+  UNION {
+    ?projection reqvire:constructSubject|reqvire:constructPredicate|reqvire:constructObject|reqvire:constructProperty ?term .
+  }
+  FILTER(isIRI(?term))
+  FILTER(STRSTARTS(STR(?term), STR(?namespace)))
+}
+""" .
+reqvire:externalUsedTermDirectDescriptionConstructQuery a reqvire:ExternalOntologySubsetConstructQuery ;
+  reqvire:constructQueryName "external-used-term-direct-description-construct" ;
+  reqvire:constructFamily "external-used-subset" ;
+  reqvire:constructKind "direct-description-construct" ;
+  reqvire:projectionDerivationMode "construct-query-specified" ;
+  reqvire:constructQueryPurpose "Construct direct raw-external-graph description triples for seed external ontology terms only." ;
+  reqvire:constructQueryText """
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+
+CONSTRUCT {
+  ?term ?p ?o .
+}
+WHERE {
+  ?subset a reqvire:UsedExternalOntologySubset ;
+    reqvire:externalUsedTerm ?term ;
+    reqvire:externalSubsetGraph ?rawExternalGraph .
+  GRAPH ?rawExternalGraph {
+    ?term ?p ?o .
+  }
+}
+""" .
+reqvire:externalUsedTermSupportClosureConstructQuery a reqvire:ExternalOntologySubsetConstructQuery ;
+  reqvire:constructQueryName "external-used-term-support-closure-construct" ;
+  reqvire:constructFamily "external-used-subset" ;
+  reqvire:constructKind "support-closure-construct" ;
+  reqvire:projectionDerivationMode "construct-query-specified" ;
+  reqvire:constructQueryPurpose "Construct one-hop support facts for used external terms across selected RDF, RDFS, and OWL support predicates." ;
+  reqvire:constructQueryText """
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+
+CONSTRUCT {
+  ?support ?p ?supportObject .
+}
+WHERE {
+  ?subset a reqvire:UsedExternalOntologySubset ;
+    reqvire:externalUsedTerm ?term ;
+    reqvire:externalSubsetGraph ?rawExternalGraph .
+  GRAPH ?rawExternalGraph {
+    ?term ?p ?support .
+    FILTER(?p IN (rdf:type, rdfs:subClassOf, rdfs:subPropertyOf, rdfs:domain, rdfs:range, owl:equivalentClass, owl:equivalentProperty, owl:inverseOf, owl:onProperty, owl:someValuesFrom, owl:allValuesFrom, owl:hasValue))
+    FILTER(isIRI(?support) || isBlank(?support))
+    OPTIONAL {
+      ?support ?p ?supportObject .
+      FILTER(?p IN (rdf:type, rdfs:subClassOf, rdfs:subPropertyOf, rdfs:domain, rdfs:range, owl:equivalentClass, owl:equivalentProperty, owl:inverseOf, owl:onProperty, owl:someValuesFrom, owl:allValuesFrom, owl:hasValue))
+    }
+  }
+}
+""" .
+reqvire:externalUsedTermAnnotationConstructQuery a reqvire:ExternalOntologySubsetConstructQuery ;
+  reqvire:constructQueryName "external-used-term-annotation-construct" ;
+  reqvire:constructFamily "external-used-subset" ;
+  reqvire:constructKind "annotation-construct" ;
+  reqvire:projectionDerivationMode "construct-query-specified" ;
+  reqvire:constructQueryPurpose "Construct label, comment, preferred-label, definition, and description annotation triples for used external terms and support terms." ;
+  reqvire:constructQueryText """
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+CONSTRUCT {
+  ?describedTerm ?annotationProperty ?annotationValue .
+}
+WHERE {
+  ?subset a reqvire:UsedExternalOntologySubset ;
+    reqvire:externalSubsetGraph ?rawExternalGraph .
+  {
+    ?subset reqvire:externalUsedTerm ?describedTerm .
+  }
+  UNION {
+    ?subset reqvire:externalUsedTerm ?term .
+    GRAPH ?rawExternalGraph {
+      ?term ?supportProperty ?describedTerm .
+      FILTER(?supportProperty IN (rdfs:subClassOf, rdfs:subPropertyOf, rdfs:domain, rdfs:range, owl:equivalentClass, owl:equivalentProperty, owl:inverseOf, owl:onProperty, owl:someValuesFrom, owl:allValuesFrom, owl:hasValue))
+    }
+  }
+  GRAPH ?rawExternalGraph {
+    ?describedTerm ?annotationProperty ?annotationValue .
+    FILTER(?annotationProperty IN (rdfs:label, rdfs:comment, skos:prefLabel, skos:definition, dcterms:description))
+  }
+}
+""" .
 reqvire:relationFamilyNormalizedConstructQuery a reqvire:RelationFamilyConstructQuery ;
   reqvire:constructQueryName "relation-family-normalized-projection" ;
   reqvire:constructFamily "semantic-search" ;

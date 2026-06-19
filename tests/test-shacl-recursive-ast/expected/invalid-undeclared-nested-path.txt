@@ -1,0 +1,6 @@
+
+❌ 1 validation failed with error(s):
+
+  1. Invalid markdown structure: Semantic reference not found: semantic contract 'specifications/RecursiveShacl.md#recursive-shacl-shape-contract' references sh:path <https://example.test/recursive#undeclaredNestedPath>, but no ontology element declares this IRI. Update or remove the SHACL reference before deleting or editing the declaring ontology.
+
+
