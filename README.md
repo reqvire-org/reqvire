@@ -12,12 +12,17 @@
 
 # What is Reqvire?
 
-Build verifiable and traceable software.
+A semantic engineering framework for building verifiable and traceable software.
 
 Reqvire is a Git-native semantic engineering model for ontologies, capabilities,
 requirements, contracts, verification plans, evidence, and implementation links.
-It keeps engineering intent close to the codebase while making the model
-queryable through the CLI, Explorer UI, and MCP tools for AI assistants.
+It keeps engineering intent close to the codebase, computes typed change impact
+across the model, and gives engineers and AI assistants scoped implementation
+context constrained by requirements, contracts, and verification evidence.
+
+Use the CLI, Explorer UI, and MCP tools to navigate from intent to code,
+understand what changes affect, and keep implementation work aligned with the
+verified system model.
 
 Use Reqvire to:
 - define shared ontology vocabulary and semantic contracts
