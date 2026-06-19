@@ -79,10 +79,10 @@ development and must build the Explorer bundle before compiling Rust.
 
 ---
 
-# AI Assistants and MCP
+# Skills and MCP
 
-Reqvire provides assistant integrations for MCP clients, Claude Code, and Codex.
-Full assistant setup details live in the documentation:
+Reqvire exposes model context through an MCP server and ships setup assets for
+Claude Code and Codex. Full setup details live in the documentation:
 [https://www.reqvire.org/coding_assistants.html](https://www.reqvire.org/coding_assistants.html)
 
 ## MCP Server
