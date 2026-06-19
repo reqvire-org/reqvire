@@ -19,6 +19,7 @@ Interface requirements define the concrete commands, generated views, transports
 #### Relations
   * derive: [Command-Line Interface](#command-line-interface)
   * derive: [MCP Tool Interface](#mcp-tool-interface)
+  * derive: [Public Documentation Website Interface](#public-documentation-website-interface)
   * derive: [Web Explorer Interface](#web-explorer-interface)
 ---
 
@@ -113,3 +114,19 @@ Web requirements define concrete Explorer views, local server behavior, browser 
   * specifiedBy: [Web Interface](InterfacesRequirements.md#web-interface)
 ---
 
+### Public Documentation Website Interface
+
+As a **Reqvire Evaluator**, I want Reqvire to publish a public documentation website, so that project concepts, workflows, interface capabilities, and AI-assistant integration guidance can be understood without running the CLI first.
+
+#### Details
+Public documentation website is the capability for the externally published `www.reqvire.org` documentation surface. It explains the same system model vocabulary, relation semantics, ontology workflow, verification model, implementation coverage, and assistant-facing workflows that Reqvire validates in the repository model.
+
+Website requirements define page-level documentation context and link each source page to the model concepts it presents so change impact can route wording and documentation updates to concrete website implementation files.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [System Model Interfaces](#system-model-interfaces)
+  * specifiedBy: [Public Documentation Website](Website/WebsiteRequirements.md#public-documentation-website)
+---
