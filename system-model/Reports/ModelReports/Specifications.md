@@ -390,12 +390,14 @@ Rules:
 - Only ontology elements may define `#### External Ontology`.
 - The section is repeatable.
 - Each section requires `prefix`, `namespace`, `resource`, and `source`.
-- `format` is optional and defaults to Turtle. The only supported source format for this version is Turtle/.ttl.
+- `format` is optional and defaults to Turtle. Supported source formats are `turtle`, `ttl`, `rdf`, `rdfxml`, `rdf+xml`, and `jsonld`.
 - `source` must be a local path. `http://` and `https://` source paths are rejected; network ontology fetches are not part of validation or export.
 - Source paths are resolved as model paths using the repository root, with file-relative resolution as a fallback for local fixture and authoring ergonomics.
-- The source Turtle must explicitly declare the configured prefix/namespace pair.
-- The source Turtle must contain `<resource> a owl:Ontology`.
-- The source Turtle must declare or reference at least one term in the configured namespace.
+- Turtle/TTL sources must explicitly declare the configured prefix/namespace pair.
+- RDF/XML sources must use RDF/XML syntax; `format: rdf` is treated as RDF/XML for local `.rdf` ontology files.
+- JSON-LD sources must define equivalent local context mappings or expanded IRIs so the parsed RDF graph mentions the configured namespace.
+- The parsed source graph must contain `<resource> a owl:Ontology`.
+- The parsed source graph must declare or reference at least one term in the configured namespace.
 - The same prefix may not be bound to different namespaces.
 - The same namespace may not be bound to different prefixes; aliases are rejected in this version.
 - Imported terms are available for semantic-reference validation through the ontology element that declared the external source.

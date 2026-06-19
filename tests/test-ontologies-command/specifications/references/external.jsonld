@@ -1,0 +1,24 @@
+{
+  "@context": {
+    "jsonext": "https://example.test/jsonld-external#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://example.test/jsonld-external",
+      "@type": "owl:Ontology",
+      "rdfs:label": "JSON-LD external ontology"
+    },
+    {
+      "@id": "jsonext:JsonExternalResource",
+      "@type": "owl:Class",
+      "rdfs:label": "JSON-LD external resource"
+    },
+    {
+      "@id": "jsonext:jsonExternalCode",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:label": "JSON-LD external code property"
+    }
+  ]
+}

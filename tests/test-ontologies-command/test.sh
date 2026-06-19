@@ -112,7 +112,13 @@ fi
 for external_source_token in \
   "ExternalResource" \
   "externalCode" \
-  "External code datatype"; do
+  "External code datatype" \
+  "JsonExternalResource" \
+  "jsonExternalCode" \
+  "JSON-LD external resource" \
+  "RdfExternalResource" \
+  "rdfExternalCode" \
+  "RDF/XML external resource"; do
   if grep -qF "$external_source_token" <<< "$TTL_OUTPUT"; then
     echo "FAILED: default Turtle output must not include external ontology source triples: $external_source_token"
     echo "$TTL_OUTPUT"
@@ -135,7 +141,13 @@ for external_source_token in \
   "<https://example.test/external> a <http://www.w3.org/2002/07/owl#Ontology>" \
   "<https://example.test/external#ExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
   "<https://example.test/external#ExternalCode> a <http://www.w3.org/2000/01/rdf-schema#Datatype>" \
-  "<https://example.test/external#externalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>"; do
+  "<https://example.test/external#externalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "<https://example.test/jsonld-external> a <http://www.w3.org/2002/07/owl#Ontology>" \
+  "<https://example.test/jsonld-external#JsonExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/jsonld-external#jsonExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
+  "<https://example.test/rdf-external> a <http://www.w3.org/2002/07/owl#Ontology>" \
+  "<https://example.test/rdf-external#RdfExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<https://example.test/rdf-external#rdfExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>"; do
   if ! grep -qF "$external_source_token" <<< "$EXTERNAL_TTL_OUTPUT"; then
     echo "FAILED: --include-external Turtle output missing external source triple: $external_source_token"
     echo "$EXTERNAL_TTL_OUTPUT"
@@ -156,6 +168,18 @@ fi
 
 if ! grep -qF "<https://example.test/external#ExternalResource> a <http://www.w3.org/2002/07/owl#Class>" <<< "$FULL_EXTERNAL_TTL_OUTPUT"; then
   echo "FAILED: full external Turtle output missing external source class"
+  echo "$FULL_EXTERNAL_TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -qF "<https://example.test/jsonld-external#JsonExternalResource> a <http://www.w3.org/2002/07/owl#Class>" <<< "$FULL_EXTERNAL_TTL_OUTPUT"; then
+  echo "FAILED: full external Turtle output missing JSON-LD external source class"
+  echo "$FULL_EXTERNAL_TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -qF "<https://example.test/rdf-external#RdfExternalResource> a <http://www.w3.org/2002/07/owl#Class>" <<< "$FULL_EXTERNAL_TTL_OUTPUT"; then
+  echo "FAILED: full external Turtle output missing RDF/XML external source class"
   echo "$FULL_EXTERNAL_TTL_OUTPUT"
   exit 1
 fi

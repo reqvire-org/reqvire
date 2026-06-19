@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:owl="http://www.w3.org/2002/07/owl#">
+  <owl:Ontology rdf:about="https://example.test/rdf-external">
+    <rdfs:label>RDF/XML external ontology</rdfs:label>
+  </owl:Ontology>
+
+  <owl:Class rdf:about="https://example.test/rdf-external#RdfExternalResource">
+    <rdfs:label>RDF/XML external resource</rdfs:label>
+  </owl:Class>
+
+  <owl:DatatypeProperty rdf:about="https://example.test/rdf-external#rdfExternalCode">
+    <rdfs:label>RDF/XML external code property</rdfs:label>
+  </owl:DatatypeProperty>
+</rdf:RDF>

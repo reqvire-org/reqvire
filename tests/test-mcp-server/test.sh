@@ -284,6 +284,44 @@ ext:ExternalCode a rdfs:Datatype ;
   rdfs:label "MCP external code datatype" .
 EOF
 
+cat > "$TEST_DIR/specifications/references/mcp-external.jsonld" <<'EOF'
+{
+  "@context": {
+    "jsonext": "https://example.test/mcp-jsonld-external#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://example.test/mcp-jsonld-external",
+      "@type": "owl:Ontology",
+      "rdfs:label": "MCP JSON-LD external vocabulary"
+    },
+    {
+      "@id": "jsonext:JsonExternalResource",
+      "@type": "owl:Class",
+      "rdfs:label": "MCP JSON-LD external resource"
+    }
+  ]
+}
+EOF
+
+cat > "$TEST_DIR/specifications/references/mcp-external.rdf" <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:owl="http://www.w3.org/2002/07/owl#">
+  <owl:Ontology rdf:about="https://example.test/mcp-rdf-external">
+    <rdfs:label>MCP RDF/XML external vocabulary</rdfs:label>
+  </owl:Ontology>
+
+  <owl:Class rdf:about="https://example.test/mcp-rdf-external#RdfExternalResource">
+    <rdfs:label>MCP RDF/XML external resource</rdfs:label>
+  </owl:Class>
+</rdf:RDF>
+EOF
+
 cat >> "$TEST_DIR/specifications/Requirements.md" <<'EOF'
 
 ### MCP Semantic Capability
@@ -312,6 +350,20 @@ Access token ontology for MCP semantic evidence.
   * resource: https://example.test/mcp-external
   * source: references/mcp-external.ttl
   * format: turtle
+
+#### External Ontology
+  * prefix: jsonext
+  * namespace: https://example.test/mcp-jsonld-external#
+  * resource: https://example.test/mcp-jsonld-external
+  * source: references/mcp-external.jsonld
+  * format: jsonld
+
+#### External Ontology
+  * prefix: rdfext
+  * namespace: https://example.test/mcp-rdf-external#
+  * resource: https://example.test/mcp-rdf-external
+  * source: references/mcp-external.rdf
+  * format: rdf
 
 #### Ontology
 ```turtle
@@ -517,7 +569,7 @@ assert_jq_line "$DEFAULT_OUTPUT" 12 '.result.structuredContent.files[]?.elements
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.format == "turtle" and .result.structuredContent.content_filter == "both" and (.result.structuredContent.content | contains("mcp:AccessToken")) and (.result.structuredContent.content | contains("mcp:AccessTokenShape"))' "semantic ontologies tool returns Turtle semantic content"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.summary.ontology_blocks >= 1 and .result.structuredContent.summary.shape_blocks >= 1' "ontologies tool returns semantic index summary"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.blocks[] | select(.source_name=="MCP Access Token Ontology" and .kind=="ontology")' "ontologies tool returns ontology block metadata"
-assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.include_external == false and (.result.structuredContent.content | contains("MCP external resource") | not) and (.result.structuredContent.content | contains("MCP external code datatype") | not)' "semantic ontologies default excludes external source triples"
+assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.include_external == false and (.result.structuredContent.content | contains("MCP external resource") | not) and (.result.structuredContent.content | contains("MCP external code datatype") | not) and (.result.structuredContent.content | contains("MCP JSON-LD external resource") | not) and (.result.structuredContent.content | contains("MCP RDF/XML external resource") | not)' "semantic ontologies default excludes external source triples"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.include_external == false and (.result.structuredContent.ontology_declarations | tostring | contains("mcp-external") | not)' "semantic ontologies default excludes external declarations"
 assert_jq_line "$DEFAULT_OUTPUT" 14 '.result.structuredContent.format == "jsonld" and (.result.structuredContent.jsonld | type == "array") and (.result.structuredContent.jsonld | length) > 0' "ontologies tool returns JSON-LD semantic content"
 assert_jq_line "$DEFAULT_OUTPUT" 15 '.result.structuredContent.full == true and (.result.structuredContent.content | contains("reqvire:conceptReference")) and (.result.structuredContent.content | contains("urn:reqvire:element:mcp-semantic-requirement")) and (.result.structuredContent.content | contains("reqvire:OntologyProjectionGraph"))' "ontologies tool returns full model context triples and ontology projection facts"
@@ -542,9 +594,9 @@ assert_jq_line "$DEFAULT_OUTPUT" 24 '.result.prompts[] | select(.name=="reqvire.
 assert_jq_line "$DEFAULT_OUTPUT" 25 '.result.messages[0].role == "user" and (.result.messages[0].content.text | contains("reqvire.semantic.vocabulary") and contains("reqvire.semantic.prefixes") and contains("reqvire.semantic.sparql") and contains("Client arguments"))' "prompts/get returns semantic query guidance"
 assert_jq_line "$DEFAULT_OUTPUT" 26 '.result.messages[0].role == "user" and (.result.messages[0].content.text | contains("reqvire.workspace_status") and contains("reqvire.search") and contains("reqvire.read_element"))' "prompts/get returns regular Reqvire workflow guidance"
 assert_jq_line "$DEFAULT_OUTPUT" 27 '.error.code == -32602 and (.error.data.message | contains("Unknown MCP prompt"))' "unknown prompt returns protocol error"
-assert_jq_line "$DEFAULT_OUTPUT" 28 '.result.structuredContent.include_external == true and (.result.structuredContent.content | contains("MCP external resource")) and (.result.structuredContent.content | contains("MCP external code datatype")) and (.result.structuredContent.content | contains("<https://example.test/mcp-external#ExternalResource>"))' "semantic ontologies include_external includes external source triples"
-assert_jq_line "$DEFAULT_OUTPUT" 28 '.result.structuredContent.include_external == true and (.result.structuredContent.ontology_declarations["https://example.test/mcp-external#ExternalResource"][] | select(.external == true))' "semantic ontologies include_external includes external declarations"
-assert_jq_line "$DEFAULT_OUTPUT" 29 '.result.structuredContent.include_external == true and (.result.structuredContent.prefixes[] | select(.prefix=="ext" and .external == true and .namespace=="https://example.test/mcp-external#")) and (.result.structuredContent.sparql_prefix_block | contains("PREFIX ext: <https://example.test/mcp-external#>"))' "semantic prefixes include_external includes external prefix"
+assert_jq_line "$DEFAULT_OUTPUT" 28 '.result.structuredContent.include_external == true and (.result.structuredContent.content | contains("MCP external resource")) and (.result.structuredContent.content | contains("MCP external code datatype")) and (.result.structuredContent.content | contains("MCP JSON-LD external resource")) and (.result.structuredContent.content | contains("MCP RDF/XML external resource")) and (.result.structuredContent.content | contains("<https://example.test/mcp-external#ExternalResource>")) and (.result.structuredContent.content | contains("<https://example.test/mcp-jsonld-external#JsonExternalResource>")) and (.result.structuredContent.content | contains("<https://example.test/mcp-rdf-external#RdfExternalResource>"))' "semantic ontologies include_external includes Turtle, JSON-LD, and RDF/XML external source triples"
+assert_jq_line "$DEFAULT_OUTPUT" 28 '.result.structuredContent.include_external == true and (.result.structuredContent.ontology_declarations["https://example.test/mcp-external#ExternalResource"][] | select(.external == true)) and (.result.structuredContent.ontology_declarations["https://example.test/mcp-jsonld-external#JsonExternalResource"][] | select(.external == true)) and (.result.structuredContent.ontology_declarations["https://example.test/mcp-rdf-external#RdfExternalResource"][] | select(.external == true))' "semantic ontologies include_external includes external declarations"
+assert_jq_line "$DEFAULT_OUTPUT" 29 '.result.structuredContent.include_external == true and (.result.structuredContent.prefixes[] | select(.prefix=="ext" and .external == true and .namespace=="https://example.test/mcp-external#")) and (.result.structuredContent.prefixes[] | select(.prefix=="jsonext" and .external == true and .namespace=="https://example.test/mcp-jsonld-external#")) and (.result.structuredContent.prefixes[] | select(.prefix=="rdfext" and .external == true and .namespace=="https://example.test/mcp-rdf-external#")) and (.result.structuredContent.sparql_prefix_block | contains("PREFIX ext: <https://example.test/mcp-external#>")) and (.result.structuredContent.sparql_prefix_block | contains("PREFIX jsonext: <https://example.test/mcp-jsonld-external#>")) and (.result.structuredContent.sparql_prefix_block | contains("PREFIX rdfext: <https://example.test/mcp-rdf-external#>"))' "semantic prefixes include_external includes external prefixes"
 assert_jq_line "$DEFAULT_OUTPUT" 30 '.result.structuredContent.include_external == true and .result.structuredContent.section == "classes" and (.result.structuredContent.items[] | select(.curie=="ext:ExternalResource" and .external == true and .label=="MCP external resource" and (.source.external == true)))' "semantic vocabulary include_external includes marked external class"
 assert_jq_line "$DEFAULT_OUTPUT" 31 '.result.structuredContent.include_external == false and .result.structuredContent.row_count == 0' "semantic sparql default excludes external source triples"
 assert_jq_line "$DEFAULT_OUTPUT" 32 '.result.structuredContent.include_external == true and .result.structuredContent.row_count == 1 and .result.structuredContent.bindings[0].class.iri == "https://example.test/mcp-external#ExternalResource"' "semantic sparql include_external queries external source triples"

@@ -118,7 +118,7 @@ The system shall reject API requests whose access token is invalid.
 
       <Section title="External Ontology Sources">
         <p className="text-zinc-600 mb-4">
-          Ontology elements can declare local Turtle files for external
+          Ontology elements can declare local Turtle/TTL, RDF/XML, or JSON-LD files for external
           vocabularies that are not authored by the Reqvire model. These files
           are loaded for validation and can be included in semantic exports on
           demand.
@@ -126,7 +126,7 @@ The system shall reject API requests whose access token is invalid.
         <BulletList
           items={[
             "Use External Ontology sections only on ontology elements.",
-            "The source must be a local .ttl/Turtle file; Reqvire does not fetch remote ontology URLs during validation.",
+            "The source must be a local Turtle/TTL, RDF/XML, or JSON-LD file; Reqvire does not fetch remote ontology URLs during validation.",
             "Authored Turtle and SHACL blocks still declare their own prefixes explicitly. External source sections do not inject hidden Turtle.",
             "OWL/RDF/RDFS/XSD reserved vocabulary and core SHACL shape syntax are recognized by Reqvire without local External Ontology declarations.",
           ]}

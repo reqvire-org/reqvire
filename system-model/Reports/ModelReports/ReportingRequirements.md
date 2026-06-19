@@ -447,7 +447,7 @@ The collection shall preserve source element identifiers, source file paths, sec
 The system shall allow ontology elements to declare local external ontology source files that provide imported vocabulary namespaces for validation and optional semantic export materialization.
 
 #### Details
-External ontology sources shall be declared with repeatable `#### External Ontology` sections on ontology elements. Each section shall define `prefix`, `namespace`, `resource`, `source`, and an optional `format` value. The initial supported format is Turtle/.ttl only.
+External ontology sources shall be declared with repeatable `#### External Ontology` sections on ontology elements. Each section shall define `prefix`, `namespace`, `resource`, `source`, and an optional `format` value. Supported source formats shall include Turtle/TTL, RDF/XML, and JSON-LD.
 
 The `source` path shall be local and resolved like a model path; Reqvire shall not fetch network ontology sources during validation or export.
 
@@ -465,6 +465,7 @@ Standard OWL reserved vocabulary and built-in datatype IRIs remain recognized by
   * External ontology namespace: https://www.reqvire.org/ontology#externalOntologyNamespace
   * External ontology resource: https://www.reqvire.org/ontology#externalOntologyResource
   * External ontology source path: https://www.reqvire.org/ontology#externalOntologySourcePath
+  * External ontology format: https://www.reqvire.org/ontology#externalOntologyFormat
 
 #### Metadata
   * type: requirement

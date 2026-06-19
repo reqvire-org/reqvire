@@ -561,6 +561,40 @@ pub enum SemanticExportFormat {
     JsonLd,
 }
 
+#[derive(Debug, Clone, Copy)]
+enum ExternalOntologyFormat {
+    Turtle,
+    RdfXml,
+    JsonLd,
+}
+
+impl ExternalOntologyFormat {
+    fn parse(value: &str) -> Option<Self> {
+        match value.trim().to_ascii_lowercase().as_str() {
+            "turtle" | "ttl" => Some(Self::Turtle),
+            "rdf" | "rdfxml" | "rdf-xml" | "rdf_xml" | "rdf+xml" => Some(Self::RdfXml),
+            "jsonld" | "json-ld" | "json_ld" => Some(Self::JsonLd),
+            _ => None,
+        }
+    }
+
+    fn display_name(self) -> &'static str {
+        match self {
+            Self::Turtle => "Turtle",
+            Self::RdfXml => "RDF/XML",
+            Self::JsonLd => "JSON-LD",
+        }
+    }
+
+    fn language(self) -> &'static str {
+        match self {
+            Self::Turtle => "turtle",
+            Self::RdfXml => "rdfxml",
+            Self::JsonLd => "jsonld",
+        }
+    }
+}
+
 impl SemanticIndex {
     pub fn to_turtle_string(&self) -> Result<String, ReqvireError> {
         self.to_turtle_string_with_external(false)
@@ -2008,19 +2042,21 @@ fn build_external_ontology_block(
     source: &ExternalOntologySource,
     diagnostics: &mut Vec<SemanticDiagnostic>,
 ) -> Option<SemanticBlock> {
-    let format = source.format.to_ascii_lowercase();
-    if !matches!(format.as_str(), "turtle" | "ttl") {
-        diagnostics.push(SemanticDiagnostic {
-            source: element.identifier.clone(),
-            file_path: element.file_path.clone(),
-            line_number: source.line_number,
-            message: format!(
-                "External Ontology '{}' uses unsupported format '{}'. Only Turtle/.ttl is supported.",
-                source.prefix, source.format
-            ),
-        });
-        return None;
-    }
+    let format = match ExternalOntologyFormat::parse(&source.format) {
+        Some(format) => format,
+        None => {
+            diagnostics.push(SemanticDiagnostic {
+                source: element.identifier.clone(),
+                file_path: element.file_path.clone(),
+                line_number: source.line_number,
+                message: format!(
+                    "External Ontology '{}' uses unsupported format '{}'. Supported formats: turtle, ttl, rdf, rdfxml, rdf+xml, jsonld.",
+                    source.prefix, source.format
+                ),
+            });
+            return None;
+        }
+    };
 
     let path = match resolve_external_source_path(element, &source.source) {
         Ok(path) => path,
@@ -2056,7 +2092,9 @@ fn build_external_ontology_block(
         }
     };
 
-    if turtle_prefix_binding(&content, &source.prefix) != Some(source.namespace.clone()) {
+    if matches!(format, ExternalOntologyFormat::Turtle)
+        && turtle_prefix_binding(&content, &source.prefix) != Some(source.namespace.clone())
+    {
         diagnostics.push(SemanticDiagnostic {
             source: element.identifier.clone(),
             file_path: element.file_path.clone(),
@@ -2068,7 +2106,7 @@ fn build_external_ontology_block(
         });
     }
 
-    let quads = match parse_turtle_block(&content) {
+    let quads = match parse_external_ontology_block(&content, format) {
         Ok(quads) => quads,
         Err(message) => {
             diagnostics.push(SemanticDiagnostic {
@@ -2076,8 +2114,11 @@ fn build_external_ontology_block(
                 file_path: element.file_path.clone(),
                 line_number: source.line_number,
                 message: format!(
-                    "External Ontology '{}' source '{}' failed to parse as Turtle: {}.",
-                    source.prefix, source.source, message
+                    "External Ontology '{}' source '{}' failed to parse as {}: {}.",
+                    source.prefix,
+                    source.source,
+                    format.display_name(),
+                    message
                 ),
             });
             return None;
@@ -2116,7 +2157,7 @@ fn build_external_ontology_block(
         source_name: format!("{} external ontology {}", element.name, source.prefix),
         file_path: path.to_string_lossy().to_string(),
         line_number: source.line_number,
-        language: "turtle".to_string(),
+        language: format.language().to_string(),
         content,
         quads,
     })
@@ -2994,6 +3035,34 @@ fn parse_turtle_block(content: &str) -> Result<Vec<Quad>, String> {
 
     if graph.is_empty() {
         return Err("Turtle block has no RDF statements".to_string());
+    }
+
+    Ok(graph)
+}
+
+fn parse_external_ontology_block(
+    content: &str,
+    format: ExternalOntologyFormat,
+) -> Result<Vec<Quad>, String> {
+    let mut graph = Vec::new();
+
+    let parser = match format {
+        ExternalOntologyFormat::Turtle => RdfParser::from_format(RdfFormat::Turtle),
+        ExternalOntologyFormat::RdfXml => RdfParser::from_format(RdfFormat::RdfXml),
+        ExternalOntologyFormat::JsonLd => RdfParser::from_format(RdfFormat::JsonLd {
+            profile: JsonLdProfileSet::empty(),
+        }),
+    };
+
+    for parsed in parser.for_reader(content.as_bytes()) {
+        graph.push(parsed.map_err(|error| error.to_string())?);
+    }
+
+    if graph.is_empty() {
+        return Err(format!(
+            "{} block has no RDF statements",
+            format.display_name()
+        ));
     }
 
     Ok(graph)

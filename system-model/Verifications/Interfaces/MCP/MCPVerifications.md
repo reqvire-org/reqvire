@@ -118,7 +118,7 @@ Expected checks:
 - Verify `tools/list` advertises the `include_external` argument on `reqvire.semantic.prefixes`, `reqvire.semantic.vocabulary`, and `reqvire.semantic.sparql`.
 - Verify `reqvire.semantic.ontologies` returns both RDF ontology and SHACL shape content by default.
 - Verify `reqvire.semantic.ontologies` filters to RDF-only or SHACL-only content when the `content` argument is set.
-- Verify `reqvire.semantic.ontologies` excludes local External Ontology source triples and external term declarations by default and includes them when `include_external` is true.
+- Verify `reqvire.semantic.ontologies` excludes local External Ontology source triples and external term declarations by default and includes parsed Turtle/TTL, RDF/XML, and JSON-LD sources when `include_external` is true.
 - Verify semantic prefix and vocabulary tools exclude imported external ontology vocabulary by default, include it when `include_external` is true, and mark included imported entries as external with source metadata.
 - Verify `reqvire.semantic.sparql` queries the authored semantic store by default and can query local external ontology source triples when `include_external` is true.
 - Read element returns `concept_references` for elements that author `#### Concept References`.

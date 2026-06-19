@@ -30,6 +30,20 @@ API vocabulary.
   * source: references/external.ttl
   * format: turtle
 
+#### External Ontology
+  * prefix: jsonext
+  * namespace: https://example.test/jsonld-external#
+  * resource: https://example.test/jsonld-external
+  * source: references/external.jsonld
+  * format: jsonld
+
+#### External Ontology
+  * prefix: rdfext
+  * namespace: https://example.test/rdf-external#
+  * resource: https://example.test/rdf-external
+  * source: references/external.rdf
+  * format: rdf
+
 #### Ontology
 ```turtle
 @prefix testonto: <https://example.test/ontology#> .

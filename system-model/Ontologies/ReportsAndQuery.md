@@ -482,7 +482,7 @@ reqvire:externalOntologySourcePath a owl:DatatypeProperty ;
 reqvire:externalOntologyFormat a owl:DatatypeProperty ;
   rdfs:domain reqvire:ExternalOntologySource ;
   rdfs:range xsd:string ;
-  rdfs:comment "Serialization format of a local external ontology source. Turtle is the initial supported value." .
+  rdfs:comment "Serialization format of a local external ontology source, such as Turtle/TTL, RDF/XML, or JSON-LD." .
 reqvire:constructFamily a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
