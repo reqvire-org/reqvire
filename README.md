@@ -79,12 +79,13 @@ development and must build the Explorer bundle before compiling Rust.
 
 ---
 
-## Use with AI Coding Assistants
+# AI Assistants and MCP
 
-Reqvire ships with:
-- Claude Code integrations
-- Codex skills
-- MCP server support
+Reqvire provides assistant integrations for MCP clients, Claude Code, and Codex.
+Full assistant setup details live in the documentation:
+[https://www.reqvire.org/coding_assistants.html](https://www.reqvire.org/coding_assistants.html)
+
+## MCP Server
 
 Start the MCP server with the Reqvire CLI:
 
@@ -132,6 +133,70 @@ reqvire --workspace /absolute/path/to/workspace mcp --enable-mutations
 
 ---
 
+## Claude Code
+
+The Reqvire Claude Code plugin is distributed through the reqvire-org plugin
+marketplace. See the assistant documentation for current installation commands
+and client setup.
+
+---
+
+## Codex Skills
+
+This repository includes installable Codex skill packages for Reqvire model work:
+
+```text
+codex-skills/reqvire-syseng
+codex-skills/reqvire-ontology-authoring
+```
+
+Use `reqvire-syseng` for semantic engineering, capability, requirement,
+verification, traceability, migration, and general Reqvire CLI workflows.
+
+Use `reqvire-ontology-authoring` for ontology scoping, OWL/Turtle vocabulary,
+semantic contracts, concept references, namespace decisions, and ontology
+refactoring.
+
+The skills use the npm package directly:
+
+```bash
+npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace validate
+```
+
+To pin workflows to a specific Reqvire version:
+
+```bash
+export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2
+```
+
+Install globally:
+
+```bash
+git clone https://github.com/reqvire-org/reqvire.git
+cd reqvire
+./scripts/install-codex-skill.sh
+```
+
+The installer uses `CODEX_HOME` if set, otherwise defaults to:
+
+```text
+~/.codex
+```
+
+Installed locations:
+
+```text
+$CODEX_HOME/skills/reqvire-syseng
+$CODEX_HOME/skills/reqvire-ontology-authoring
+```
+
+Restart Codex after installing or updating the skill.
+
+See:
+[doc/CODEX_SKILLS.md](./doc/CODEX_SKILLS.md)
+
+---
+
 # Reqvire Conceptual Model
 
 Reqvire organizes engineering knowledge into a semantic graph:
@@ -160,13 +225,10 @@ Ontologies define:
 
 Reqvire supports ontology modeling directly inside the engineering workflow.
 Ontology boundary metadata and Turtle are explicit: a top ontology element declares `ontology_base` and `ontology_prefix`, and its Turtle must agree with the generated ontology IRI and term namespace.
-Ontology elements may also declare local `External Ontology` source sections for pinned `.ttl` vocabularies that should be used for validation and optional `reqvire ontologies --include-external` or MCP `include_external: true` export materialization. RDF, RDFS, OWL, XSD reserved vocabulary and core SHACL shape syntax are built into Reqvire and do not need vendored source files.
 
-This enables:
-- semantic consistency
-- AI-readable engineering context
-- shared system understanding
-- traceable domain semantics
+Ontology elements can also declare local `External Ontology` source sections for pinned `.ttl` vocabularies. Reqvire uses those sources for validation and can materialize them in ontology exports with `reqvire ontologies --include-external` or MCP `include_external: true`.
+
+RDF, RDFS, OWL, XSD reserved vocabulary and core SHACL shape syntax are built into Reqvire, so standard vocabulary does not need vendored source files.
 
 Ontology itself defines the shared meaning; reusable constraints are authored separately as `semantic-contract` elements.
 
@@ -294,90 +356,6 @@ This enables:
 
 ---
 
-# Assistant Integrations
-
-## Claude Code Plugin
-
-Before installing the plugin, ensure you have:
-1. **Claude Code** installed (available at [claude.com/claude-code](https://claude.com/claude-code))
-
-The Reqvire plugin is available through the reqvire-org marketplace for Claude Code.
-
-### Add the marketplace
-
-```text
-/plugin marketplace add https://github.com/reqvire-org/reqvire
-```
-
-### Install the plugin
-
-```text
-/plugin install reqvire@reqvire-org
-```
-
-Restart Claude Code after installation.
-
-Read more in:
-[https://www.reqvire.org/coding_assistants.html](https://www.reqvire.org/coding_assistants.html)
-
----
-
-## Codex Skills
-
-This repository includes installable Codex skill packages for Reqvire model work:
-
-```text
-codex-skills/reqvire-syseng
-codex-skills/reqvire-ontology-authoring
-```
-
-Use `reqvire-syseng` for semantic engineering, capability, requirement,
-verification, traceability, migration, and general Reqvire CLI workflows.
-
-Use `reqvire-ontology-authoring` for ontology scoping, OWL/Turtle vocabulary,
-semantic contracts, concept references, namespace decisions, and ontology
-refactoring.
-
-The skills use the npm package directly:
-
-```bash
-npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace validate
-```
-
-To pin workflows to a specific Reqvire version:
-
-```bash
-export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2
-```
-
-Install globally:
-
-```bash
-git clone https://github.com/reqvire-org/reqvire.git
-cd reqvire
-./scripts/install-codex-skill.sh
-```
-
-The installer uses `CODEX_HOME` if set, otherwise defaults to:
-
-```text
-~/.codex
-```
-
-Installed locations:
-
-```text
-$CODEX_HOME/skills/reqvire-syseng
-$CODEX_HOME/skills/reqvire-ontology-authoring
-```
-
-Restart Codex after installing or updating the skill.
-
-See:
-[doc/CODEX_SKILLS.md](./doc/CODEX_SKILLS.md)
-
----
-
 # Next Steps
 
 - **[Documentation](https://www.reqvire.org)** — Learn how to use Reqvire
@@ -428,24 +406,6 @@ repository access is considered.
 
 ---
 
-## Engineering Workflow
-
-Reqvire follows a semantic MBSE workflow.
-
-Maintainer-authored changes should include:
-- capability updates
-- requirements
-- contracts
-- verifications
-- tests
-
-when applicable.
-
-See:
-[Contributor Documentation](./doc/README.md)
-
----
-
 ## Quick Links
 
 - **[Report a Bug](https://github.com/reqvire-org/reqvire/issues/new?template=bug_report.yml)**
@@ -454,16 +414,6 @@ See:
 - **[Express Collaborator Interest](https://github.com/reqvire-org/reqvire/discussions)**
 - **[Ask a Question](https://github.com/reqvire-org/reqvire/discussions)**
 - **[Contributor Guide](./doc/README.md)**
-
----
-
-## Contributor License Agreement
-
-If external code or model contributions are reopened in the future, merged
-contributions will require acceptance of the
-[Contributor License Agreement](./doc/CLA.md).
-
-The CLA process is automated through GitHub PR comments.
 
 ---
 

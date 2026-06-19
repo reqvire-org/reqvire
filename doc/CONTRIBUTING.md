@@ -70,6 +70,15 @@ well-scoped model-improvement discussion in GitHub Discussions.
 This workflow applies to maintainer-authored changes while external code and
 model contributions are closed.
 
+Reqvire follows a semantic MBSE workflow. Maintainer-authored changes should
+update the relevant model layer when applicable:
+
+- capabilities
+- requirements
+- requirement-owned contracts or semantic contracts
+- verifications
+- tests
+
 1. Start with an issue and align on the approach before writing code.
 2. Apply MBSE principles first: begin with requirements/specifications/verifications updates in the system model.
 3. Create a focused topic branch from `main`.
