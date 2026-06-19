@@ -14,19 +14,18 @@
 
 Build verifiable and traceable software.
 
-Model ontologies, capabilities, requirements, and verifications in Git, with traceability and engineering context built in for humans, AI agents, and modern engineering workflows.
+Reqvire is a Git-native semantic engineering model for ontologies, capabilities,
+requirements, contracts, verification plans, evidence, and implementation links.
+It keeps engineering intent close to the codebase while making the model
+queryable through the CLI, Explorer UI, and MCP tools for AI assistants.
 
-It unifies:
-- system modeling
-- requirements engineering
-- verification & validation
-- semantic traceability
-- context engineering
-- AI-assisted development
-
-into a single workflow that stays aligned with your codebase.
-
-Unlike traditional requirements systems, Reqvire treats engineering knowledge as a connected, versioned model rather than disconnected documents, tickets, or spreadsheets.
+Use Reqvire to:
+- define shared ontology vocabulary and semantic contracts
+- connect capabilities to implementable requirements
+- attach requirement-owned contracts for behavior, state, I/O, sources, and constraints
+- plan verification and link concrete evidence
+- inspect traceability, coverage, and change impact
+- expose structured engineering context to AI workflows without exporting a separate model
 
 ## Latest Changes
 
@@ -176,7 +175,9 @@ Ontology itself defines the shared meaning; reusable constraints are authored se
 - bind to ontology terms through `use` / `usedBy`
 - constrain requirements through `constrain` / `constrainedBy`
 
-This keeps constraints explicit and reusable at the ontological level, while requirements remain implementation-facing obligations and remain machine-verifiable through ontology-derived checks.
+Requirements may exist without ontology or semantic-contract links. When they do
+use semantic contracts, the SHACL profile stays in the ontology plane while the
+requirement remains an implementation-facing obligation.
 
 ---
 
@@ -218,32 +219,14 @@ Requirements define:
 - operational expectations
 - behavioral contracts
 
-In Reqvire, requirements are not treated as isolated specification statements or static documentation.
-
-Requirements are first-class semantic graph elements that:
+Requirements are graph elements that:
 - derive from capabilities
 - connect to ontology concepts
 - are defined by structured engineering contracts
 - reuse compatible cross-subgraph contract context through `#### Reused Contract Context`
 - can be constrained by ontologically anchored `semantic-contract`s
-- stay verifiable as ontology-derived constraints are reapplied through SHACL profiles
 - trace to implementation artifacts
 - link directly to verification evidence
-- propagate change impact throughout the engineering graph
-
-Reqvire requirements act as durable engineering context for:
-- humans
-- AI systems
-- coding assistants
-- architecture workflows
-- verification pipelines
-
-This enables:
-- intelligent traceability
-- automated impact analysis
-- architecture-aware development
-- specification-driven engineering
-- semantic consistency across the lifecycle
 
 Requirements can evolve from lightweight statements into progressively precise, machine-verifiable engineering semantics through:
 - behavioral contracts
@@ -261,15 +244,6 @@ Examples:
 - auditability obligations
 - semantic consistency requirements
 
-Unlike traditional requirements systems, Reqvire requirements remain:
-- version-controlled
-- AI-readable
-- semantically connected
-- continuously traceable
-- tightly integrated with implementation and verification workflows
-
-This transforms requirements from static documentation into living engineering intelligence embedded directly inside Git workflows.
-
 ---
 
 ## Contracts
@@ -284,7 +258,7 @@ Requirements can be defined by structured engineering contracts such as:
 
 This allows requirements to evolve into precise, machine-readable engineering semantics while remaining Git-native and human-readable.
 
-Semantic contracts are separate reusable SHACL profiles. They are linked to ontology terms using `use`/`usedBy`, and they constrain requirements via `constrain`/`constrainedBy`; requirements may still exist without ontology or semantic-contract links.
+Semantic contracts are ontology-plane SHACL profiles covered in the Ontologies section; requirement-owned contracts are the implementation-facing detail layer.
 
 Requirements can also reuse compatible requirement-owned contracts from another subgraph through the `#### Reused Contract Context` section. This is a dependency/context mechanism, not ownership: the reused contract remains owned by its defining requirement, while the consuming requirement makes the cross-subgraph obligation explicit.
 
@@ -308,7 +282,7 @@ Verification planning in Reqvire follows this flow:
 
 3) Connect each concrete verification element with `verify` relations to target capabilities or requirements.
 
-4) Add evidence evidence in implementation-facing layers using `satisfiedBy` on concrete verifications once execution is complete.
+4) Add execution evidence in implementation-facing layers using `satisfiedBy` on concrete verifications once execution is complete.
 
 5) Track quality using Reqvire coverage and traceability outputs. Coverage reflects leaf requirements; requirements roll up through existing requirement relations.
 
@@ -317,182 +291,6 @@ This enables:
 - impact-aware updates when requirements or context changes
 - traceability from obligations to evidence
 - repeatable, AI-readable validation workflows
-
----
-
-# Why Reqvire?
-
-Traditional engineering knowledge is fragmented across:
-- documents
-- tickets
-- architecture diagrams
-- code
-- spreadsheets
-- wikis
-- test systems
-
-This creates:
-- stale specifications
-- broken traceability
-- inconsistent semantics
-- disconnected verification
-- poor AI context
-- difficult change propagation
-
-Reqvire turns engineering knowledge into a living semantic graph directly inside Git.
-
----
-
-# AI-Native Engineering
-
-Reqvire models are designed for both humans and AI systems.
-
-The semi-structured modeling language enables:
-- LLM reasoning
-- intelligent traceability
-- semantic search
-- automated impact analysis
-- context-aware code generation
-- AI-assisted verification
-- intelligent change propagation
-- architecture-aware engineering workflows
-
-Reqvire acts as a structured, canonical context layer that AI systems can reliably reason over.
-
----
-
-# Key Features
-
-## Semantic Engineering in Git
-
-Reqvire keeps engineering knowledge:
-- versioned
-- traceable
-- reviewable
-- AI-readable
-- semantically connected
-
-directly alongside implementation artifacts.
-
-No more:
-- lost specifications
-- outdated documents
-- disconnected architecture
-- isolated requirements
-- untraceable changes
-
----
-
-## Capability-Driven Engineering
-
-Develop systems around coherent operational capabilities instead of disconnected feature lists or isolated requirements.
-
-Capabilities:
-- decompose hierarchically
-- generate requirements
-- support verification
-- connect naturally to ontology concepts
-- remain stable across implementation changes
-
----
-
-## Ontology-Driven Modeling
-
-Bring semantic engineering directly into your Git workflow.
-
-Reqvire supports:
-- ontology modeling
-- semantic relationships
-- engineering vocabularies
-- domain concepts
-- AI-readable system meaning
-
-This enables:
-- consistent terminology
-- shared system understanding
-- semantic traceability
-- better AI reasoning
-
----
-
-## Intelligent Engineering
-
-Bring modern Model-Based Systems Engineering (MBSE) directly into Git-native workflows.
-
-### Specification-Driven Development
-
-Develop from capabilities and requirements.
-
-Keep:
-- implementation
-- architecture
-- tests
-- verification artifacts
-
-aligned with engineering intent.
-
----
-
-### Automated Traceability
-
-Maintain bidirectional links between:
-- ontologies
-- capabilities
-- requirements
-- contracts
-- code
-- tests
-- verification artifacts
-
----
-
-### Verification & Validation
-
-Track:
-- verification coverage
-- behavioral correctness
-- implementation alignment
-- validation evidence
-
-throughout the engineering lifecycle.
-
----
-
-### Smart Change Propagation
-
-Identify impacted:
-- requirements
-- capabilities
-- verifications
-- implementation artifacts
-- semantic dependencies
-
-and propagate changes consistently across the engineering graph.
-
----
-
-### AI-Assisted Engineering
-
-Provide coding assistants and AI systems with structured engineering context that stays aligned with:
-- architecture
-- requirements
-- capabilities
-- verification
-- semantic meaning
-
----
-
-### Seamless Integration
-
-Works naturally with:
-- Git
-- branches
-- pull requests
-- reviews
-- CI/CD
-- coding assistants
-
-No workflow disruption — just structured engineering intelligence.
 
 ---
 
