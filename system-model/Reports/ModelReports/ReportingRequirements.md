@@ -451,11 +451,11 @@ External ontology sources shall be declared with repeatable `#### External Ontol
 
 The `source` path shall be local and resolved like a model path; Reqvire shall not fetch network ontology sources during validation or export.
 
-External ontology source triples shall be parsed into the semantic index before validating ontology and semantic-contract references. Terms declared by the local source shall be available to the declaring ontology element, its ontology descendants, and semantic contracts that use that ontology context.
+External ontology source triples shall be parsed into the semantic index before validating ontology and semantic-contract references. Terms declared by the local source shall be available to the declaring ontology element, its ontology descendants, and semantic contracts that use that ontology context. Imported terms shall remain marked as external declarations and shall not be promoted to authored Reqvire ontology terms.
 
 Turtle blocks remain explicit. External source sections do not inject prefixes, ontology declarations, imports, or semantic triples into authored ontology or SHACL blocks.
 
-Default semantic export shall include authored ontology and SHACL triples only. `reqvire ontologies --include-external` shall include parsed external source triples. `reqvire ontologies --full --include-external` shall include authored triples, external source triples, Reqvire model context, and generated ontology projection facts.
+Default semantic export and MCP semantic metadata shall include authored ontology and SHACL content only. `reqvire ontologies --include-external` and MCP `include_external: true` shall include parsed external source triples, external declarations, and external vocabulary metadata. `reqvire ontologies --full --include-external` and MCP full semantic query with `include_external: true` shall include authored triples, external source triples, Reqvire model context, and generated ontology projection facts.
 
 Standard OWL reserved vocabulary and built-in datatype IRIs remain recognized by the fixed reserved vocabulary registry and do not require `#### External Ontology` declarations.
 

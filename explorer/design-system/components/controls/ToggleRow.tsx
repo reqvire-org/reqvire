@@ -175,6 +175,19 @@ const skinStaticX = css`
   }
 `;
 
+const skinFilterX = css`
+  --ds-togglerow-on-bg: transparent;
+  --ds-togglerow-hover-bg: var(--bg-hover);
+
+  &.is-on:not(.ds-togglerow--static):hover {
+    --ds-togglerow-on-bg: var(--bg-hover);
+  }
+
+  &.is-off:hover {
+    --ds-togglerow-off-bg: var(--bg-hover);
+  }
+`;
+
 export type ToggleRowProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onToggle" | "style"> & {
   label: ReactNode;
   colorToken?: DesignSystemColorToken;
@@ -183,6 +196,7 @@ export type ToggleRowProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onTo
   on?: boolean;
   line?: boolean;
   static?: boolean;
+  variant?: "default" | "filter";
   onToggle?: () => void;
 };
 
@@ -194,6 +208,7 @@ export function ToggleRow({
   on = true,
   line = false,
   static: isStatic = false,
+  variant = "default",
   className = "",
   onToggle,
   onClick,
@@ -213,6 +228,7 @@ export function ToggleRow({
         skinX,
         line && "ds-togglerow--line",
         line && skinLineX,
+        variant === "filter" && skinFilterX,
         (isStatic || hasStaticClass) && "ds-togglerow--static",
         (isStatic || hasStaticClass) && skinStaticX,
         on && "is-on",

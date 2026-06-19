@@ -336,6 +336,31 @@ export function KnowledgeGraphView({
           hidden: !visibleEdge(edge),
         });
       });
+      const computeFocusNeighborhoodIds = (focusIds: readonly string[]) => {
+        const neighborhood = new Set<string>();
+        focusIds.forEach((focusId) => {
+          neighborhood.add(focusId);
+          edges.forEach((edge) => {
+            if (!visibleEdge(edge)) return;
+            if (edge.source === focusId) neighborhood.add(edge.target);
+            if (edge.target === focusId) neighborhood.add(edge.source);
+          });
+        });
+        return neighborhood;
+      };
+      const edgeInFocusNeighborhood = (
+        attributes: { source?: unknown; target?: unknown },
+        focusIds: readonly string[],
+        neighborhoodIds: ReadonlySet<string>,
+      ) => {
+        const source = String(attributes.source ?? "");
+        const target = String(attributes.target ?? "");
+        return (
+          neighborhoodIds.has(source) &&
+          neighborhoodIds.has(target) &&
+          focusIds.some((focusId) => source === focusId || target === focusId)
+        );
+      };
 
       renderer = new Sigma(graph, container, {
         allowInvalidContainer: true,
@@ -348,26 +373,61 @@ export function KnowledgeGraphView({
         labelRenderedSizeThreshold: 9,
         nodeReducer: (node, attributes) => {
           const result = { ...attributes };
-          const selectionIds = [selectedRef.current].filter(
-            (id): id is string => Boolean(id),
-          );
-          const hoverIds = [hoveredRef.current].filter(
-            (id): id is string => Boolean(id),
-          );
-          const dragIds = [draggedNodeId].filter((id): id is string => Boolean(id));
-          const focusIds = [...selectionIds, ...hoverIds, ...dragIds];
-          const hasFocus = focusIds.length > 0;
-          const inFocusNeighborhood = focusIds.some(
-            (focusId) =>
-              node === focusId ||
-              edges.some(
-                (edge) =>
-                  visibleEdge(edge) &&
-                  ((edge.source === focusId && edge.target === node) ||
-                    (edge.target === focusId && edge.source === node)),
-              ),
-          );
+          if (attributes.hidden) {
+            result.label = "";
+            result.highlighted = false;
+            result.forceLabel = false;
+            return result;
+          }
+          const selectedId = selectedRef.current;
+          const hoveredId = hoveredRef.current;
           const dragged = draggedNodeId === node;
+          const selectionNeighborhoodIds = selectedId
+            ? computeFocusNeighborhoodIds([selectedId])
+            : new Set<string>();
+          const hoverRefinesSelection = Boolean(
+            selectedId && hoveredId && selectionNeighborhoodIds.has(hoveredId),
+          );
+          const hoverNeighborhoodIds = hoveredId
+            ? computeFocusNeighborhoodIds([hoveredId])
+            : new Set<string>();
+
+          if (selectedId) {
+            const inSelectionTree = selectionNeighborhoodIds.has(node);
+            const inHoverTree = hoverRefinesSelection && hoverNeighborhoodIds.has(node);
+            const visibleByFocus = inSelectionTree || inHoverTree || dragged;
+            if (!visibleByFocus) {
+              result.hidden = true;
+              result.label = "";
+              result.highlighted = false;
+              result.forceLabel = false;
+              result.zIndex = 0;
+              return result;
+            }
+            result.hidden = false;
+            if (hoverRefinesSelection && inSelectionTree && !inHoverTree && !dragged) {
+              result.color = dimNodeColor(String(attributes.color ?? cssVar("--text-faint")), 0.2);
+              result.label = "";
+              result.highlighted = false;
+              result.forceLabel = false;
+              result.zIndex = 0;
+              return result;
+            }
+            result.label = attributes.fullLabel ?? attributes.label ?? "";
+            result.highlighted = true;
+            result.forceLabel = true;
+            result.zIndex = dragged || node === selectedId || node === hoveredId ? 20 : 10;
+            return result;
+          }
+
+          const dragIds = [draggedNodeId].filter((id): id is string => Boolean(id));
+          const focusIds = [
+            ...(hoveredId ? [hoveredId] : []),
+            ...dragIds,
+          ];
+          const hasFocus = focusIds.length > 0;
+          const focusNeighborhoodIds = computeFocusNeighborhoodIds(focusIds);
+          const inFocusNeighborhood = focusNeighborhoodIds.has(node);
           if (!hasFocus) {
             result.label = "";
             result.highlighted = false;
@@ -388,17 +448,36 @@ export function KnowledgeGraphView({
         },
         edgeReducer: (_edge, attributes) => {
           const result = { ...attributes };
-          const focusIds = [selectedRef.current, hoveredRef.current, draggedNodeId].filter(
-            (id): id is string => Boolean(id),
-          );
-          if (focusIds.length === 0 || attributes.hidden) {
+          const selectedId = selectedRef.current;
+          const hoveredId = hoveredRef.current;
+          if (attributes.hidden) {
             result.hidden = true;
             return result;
           }
+          if (selectedId) {
+            const selectionNeighborhoodIds = computeFocusNeighborhoodIds([selectedId]);
+            const hoverRefinesSelection = Boolean(
+              hoveredId && selectionNeighborhoodIds.has(hoveredId),
+            );
+            const focusIds = hoverRefinesSelection && hoveredId ? [hoveredId] : [selectedId];
+            const focusNeighborhoodIds = hoverRefinesSelection && hoveredId
+              ? computeFocusNeighborhoodIds([hoveredId])
+              : selectionNeighborhoodIds;
+            if (!edgeInFocusNeighborhood(attributes, focusIds, focusNeighborhoodIds)) {
+              result.hidden = true;
+              result.label = "";
+              return result;
+            }
+            result.hidden = false;
+            result.color = cssVar("--edge-default");
+            result.size = Math.max(1.1, Number(attributes.size ?? 1) * 1.15);
+            result.forceLabel = true;
+            return result;
+          }
+          const focusIds = [hoveredId, draggedNodeId].filter((id): id is string => Boolean(id));
           if (
-            !focusIds.some(
-              (focusId) => attributes.source === focusId || attributes.target === focusId,
-            )
+            focusIds.length === 0 ||
+            !edgeInFocusNeighborhood(attributes, focusIds, computeFocusNeighborhoodIds(focusIds))
           ) {
             result.hidden = true;
             result.label = "";

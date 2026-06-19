@@ -290,7 +290,7 @@ reqvire:ShapeBlock a owl:Class ;
   rdfs:subClassOf reqvire:SemanticBlock .
 reqvire:ExternalOntologySource a owl:Class ;
   rdfs:subClassOf reqvire:SemanticBlock ;
-  rdfs:comment "Local pinned external ontology source declared by an ontology element through a repeatable External Ontology section." .
+  rdfs:comment "Local external ontology source declared by an ontology element through a repeatable External Ontology section." .
 reqvire:ModelContextProjection a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection .
 reqvire:OntologyProjectionGraph a owl:Class ;
@@ -478,7 +478,7 @@ reqvire:externalOntologyNamespace a owl:DatatypeProperty ;
 reqvire:externalOntologySourcePath a owl:DatatypeProperty ;
   rdfs:domain reqvire:ExternalOntologySource ;
   rdfs:range xsd:string ;
-  rdfs:comment "Local repository path to the pinned external ontology source file." .
+  rdfs:comment "Local repository path to the external ontology source file." .
 reqvire:externalOntologyFormat a owl:DatatypeProperty ;
   rdfs:domain reqvire:ExternalOntologySource ;
   rdfs:range xsd:string ;
@@ -953,4 +953,3 @@ reqvire:SemanticBlockShape
   * constrain: [Ontology and Shapes Collection](../Reports/ModelReports/ReportingRequirements.md#ontology-and-shapes-collection)
   * use: [Reqvire Semantic Export Ontology](#reqvire-semantic-export-ontology)
 ---
-

@@ -115,9 +115,12 @@ Expected checks:
 - Search supports `filter_type=ontology` and returns parsed ontology ADT content.
 - Verify `tools/list` advertises `reqvire.semantic.ontologies` as a read-only semantic model evidence tool.
 - Verify `tools/list` advertises the `include_external` argument on `reqvire.semantic.ontologies`.
+- Verify `tools/list` advertises the `include_external` argument on `reqvire.semantic.prefixes`, `reqvire.semantic.vocabulary`, and `reqvire.semantic.sparql`.
 - Verify `reqvire.semantic.ontologies` returns both RDF ontology and SHACL shape content by default.
 - Verify `reqvire.semantic.ontologies` filters to RDF-only or SHACL-only content when the `content` argument is set.
-- Verify `reqvire.semantic.ontologies` excludes local External Ontology source triples by default and includes them when `include_external` is true.
+- Verify `reqvire.semantic.ontologies` excludes local External Ontology source triples and external term declarations by default and includes them when `include_external` is true.
+- Verify semantic prefix and vocabulary tools exclude imported external ontology vocabulary by default, include it when `include_external` is true, and mark included imported entries as external with source metadata.
+- Verify `reqvire.semantic.sparql` queries the authored semantic store by default and can query local external ontology source triples when `include_external` is true.
 - Read element returns `concept_references` for elements that author `#### Concept References`.
 - Collect returns authored concept references for capability and requirement elements and semantic-contract ontology-use context where the underlying operation returns semantic-contract evidence.
 - Results include evidence references for relevant files, elements, relations, and reused_contract_context.
@@ -271,6 +274,7 @@ This verification shall prove that MCP prefix discovery exposes ontology element
 Expected checks:
 - Verify `tools/list` advertises `reqvire.semantic.prefixes` as a read-only tool.
 - Verify `reqvire.semantic.prefixes` returns the ontology element-defined `testonto` prefix and namespace from the parsed semantic model index.
+- Verify imported external ontology prefixes are omitted by default and included with `external: true` plus external source metadata when `include_external` is true.
 - Verify prefix source context includes element identifier, name, file path, line number, and ontology element prose content.
 - Verify source content excludes authored Turtle prefix blocks.
 - Verify the response includes a SPARQL prefix block suitable for query construction.
@@ -293,6 +297,7 @@ Expected checks:
 - Verify `tools/list` advertises `reqvire.semantic.sparql` as a read-only tool.
 - Verify `reqvire.semantic.sparql` executes a SELECT query over authored ontology and SHACL RDF.
 - Verify `reqvire.semantic.sparql` uses full semantic graph context by default, including generated model-context triples.
+- Verify local external ontology source triples are outside the default queried graph and become queryable when `include_external` is true.
 - Verify the full semantic graph materializes relation-family normalized predicates equivalent to the relation-family CONSTRUCT query specification.
 - Verify SELECT results include ordered variables, bindings, RDF term metadata, row count, semantic index summary, diagnostics, and model fingerprint.
 - Verify invalid SPARQL returns an MCP tool error rather than mutating files.
@@ -314,6 +319,7 @@ This verification shall prove that MCP vocabulary discovery exposes compact page
 Expected checks:
 - Verify `tools/list` advertises `reqvire.semantic.vocabulary` as a read-only tool.
 - Verify `reqvire.semantic.vocabulary` with `section: "all"` returns section counts, prefixes, a SPARQL prefix block, diagnostics, and model fingerprint.
+- Verify imported external vocabulary is omitted by default and included with `external: true` plus external source metadata when `include_external` is true.
 - Verify `section: "relation_families"` returns relation family entries with normalized forward and inverse properties.
 - Verify paging returns `next_cursor` when a section has more items than the requested limit.
 - Verify query patterns include SPARQL examples when `include_examples` is true.

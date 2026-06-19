@@ -81,7 +81,7 @@ Rendered edge categories are derived from construct evidence:
 - Restriction links: separate Sigma-native construct connectors from restriction glyph nodes to their `on property` and filler/target evidence; they are not rendered as normal domain/range property edges.
 - Class-expression links: dedicated Sigma/WebGL dashed membership connectors with an open diamond marker at the anonymous construct/source side.
 
-Graph relationship edges are hidden in the default full-graph view. Edges become visible for the hovered or selected focus neighborhood, subject to role and relation visibility controls.
+Graph relationship edges are hidden in the default full-graph view. Edges become visible for the hovered focus tree, selected focus tree, or active rollover tree, subject to role and relation visibility controls.
 
 #### WebVOWL-Aligned Constructs
 The renderer follows the WebVOWL visual grammar where it improves ontology readability:
@@ -138,7 +138,7 @@ The `Overlays` controls expose only optional non-authored graph additions. Autho
 
 The single `SHACL shapes` role filter controls both SHACL shape nodes and their SHACL overlay relations. The renderer must not expose a second SHACL slot-overlay checkbox that can hide overlay relations while leaving SHACL shape nodes visible, or vice versa.
 
-When a node is selected or hovered, the focused neighborhood is computed from currently visible relations. Disabling a relation filter removes neighbors that were reachable only through that relation from the selected/hovered focus highlight, while ontology terms remain available as the graph backbone.
+When no node is pinned, hovering a node computes its focused neighborhood from currently visible relations and fades unrelated visible nodes. When a node is selected, the selected node and its focused neighborhood become the pinned selection tree; nodes outside that tree are hidden from the canvas. Rolling over a visible node inside the pinned selection tree opens that node's own focused neighborhood as a temporary rollover tree. Nodes from the pinned selection tree that are outside the rollover tree stay visible but use the low-strength dimmed treatment; nodes outside both trees remain hidden. Disabling a relation filter removes neighbors that were reachable only through that relation from the selected or rollover focus tree, while ontology terms remain available as the graph backbone.
 
 If the focused neighborhood reaches a visible construct-only node, the renderer expands through that construct node to include its currently visible member/filler links. This keeps OWL unions, intersections, complements, and restrictions readable from the selected class or property context without expanding through ordinary neighbor nodes.
 
@@ -161,7 +161,7 @@ The viewer distinguishes view operations:
 - Dragging a node updates its in-memory Graphology coordinates and refreshes the renderer, letting users uncover relation lines or labels hidden behind nodes or labels.
 - Hover sets a temporary focus node and reveals its incident eligible edges.
 - Click selection persists focus, centers the selected node, and opens a selected-node link in the left pane that launches the ontology node modal.
-- Hover and selection can coexist; the active focus neighborhood is the union of selected and hovered nodes.
+- Hover and selection can coexist through rollover refinement: selection pins the selected focus tree, and hovering a visible node inside that tree temporarily makes the hovered node's focus tree active while dimming selected-tree context outside the rollover tree.
 
 Focused graph items use Sigma z-index, highlighted-node rendering, and native edge reducers rather than separate focus overlay canvases.
 
@@ -191,4 +191,3 @@ When changing ontology rendering:
 #### Relations
   * define: [Ontologies View Generation](Capabilities.md#ontologies-view-generation)
 ---
-

@@ -586,13 +586,36 @@ function createSubclassTriangleEdgeProgram(options = {}) {
                 const focusNeighborhoodIds = activeOntologyFocusNeighborhoodIds();
                 const hoverIds = activeOntologyHoverIds();
                 const hoverNeighborhoodIds = activeOntologyHoverNeighborhoodIds();
-                const hasAnyFocus = focusIds.length > 0 || hoverIds.length > 0;
+                const hasSelection = focusIds.length > 0;
+                const hoverRefinesSelection = hasSelection
+                    && hoverIds.some(hoverId => focusNeighborhoodIds.has(hoverId));
+                const hasAnyFocus = hasSelection || hoverIds.length > 0;
                 const constructGlyph = isConstructGlyphNode(attributes);
                 const hovered = hoveredNodeId === nodeId;
-                result.focused = focusIds.includes(nodeId) || hoverIds.includes(nodeId);
-                result.inFocusNeighborhood = focusNeighborhoodIds.has(nodeId) || hoverNeighborhoodIds.has(nodeId);
                 const dragged = draggedNodeId === nodeId;
-                const muted = hasAnyFocus && !result.inFocusNeighborhood && !dragged;
+                if (hasSelection) {
+                    const inSelectionTree = focusNeighborhoodIds.has(nodeId);
+                    const inHoverTree = hoverRefinesSelection && hoverNeighborhoodIds.has(nodeId);
+                    if (!inSelectionTree && !inHoverTree && !dragged) {
+                        result.hidden = true;
+                        result.label = '';
+                        result.forceLabel = false;
+                        result.highlighted = false;
+                        result.zIndex = ontologyZIndex.base;
+                        return result;
+                    }
+                    result.hidden = false;
+                    result.focused = hoverRefinesSelection
+                        ? hoverIds.includes(nodeId)
+                        : focusIds.includes(nodeId);
+                    result.inFocusNeighborhood = hoverRefinesSelection ? inHoverTree : inSelectionTree;
+                } else {
+                    result.focused = hoverIds.includes(nodeId);
+                    result.inFocusNeighborhood = hoverNeighborhoodIds.has(nodeId);
+                }
+                const muted = hasSelection && hoverRefinesSelection
+                    ? focusNeighborhoodIds.has(nodeId) && !hoverNeighborhoodIds.has(nodeId) && !dragged
+                    : hasAnyFocus && !result.inFocusNeighborhood && !dragged;
                 result.highlighted = hasAnyFocus && (result.inFocusNeighborhood || dragged || hovered);
                 result.zIndex = result.focused || dragged
                     ? ontologyZIndex.focusedNode
@@ -634,13 +657,19 @@ function createSubclassTriangleEdgeProgram(options = {}) {
                 const focusNeighborhoodIds = activeOntologyFocusNeighborhoodIds();
                 const hoverIds = activeOntologyHoverIds();
                 const hoverNeighborhoodIds = activeOntologyHoverNeighborhoodIds();
-                const hasAnyFocus = focusIds.length > 0 || hoverIds.length > 0;
+                const hasSelection = focusIds.length > 0;
+                const hoverRefinesSelection = hasSelection
+                    && hoverIds.some(hoverId => focusNeighborhoodIds.has(hoverId));
+                const hasAnyFocus = hasSelection || hoverIds.length > 0;
+                const activeFocusIds = hoverRefinesSelection ? hoverIds : focusIds;
+                const activeNeighborhoodIds = hoverRefinesSelection
+                    ? hoverNeighborhoodIds
+                    : focusNeighborhoodIds;
                 result.hidden = !isEdgeVisible(attributes)
                     || !hasAnyFocus
-                    || (
-                        !isEdgeInFocusNeighborhood(attributes, focusIds, focusNeighborhoodIds)
-                        && !isEdgeInFocusNeighborhood(attributes, hoverIds, hoverNeighborhoodIds)
-                    );
+                    || (hasSelection
+                        ? !isEdgeInFocusNeighborhood(attributes, activeFocusIds, activeNeighborhoodIds)
+                        : !isEdgeInFocusNeighborhood(attributes, hoverIds, hoverNeighborhoodIds));
                 result.zIndex = result.hidden ? ontologyZIndex.base : ontologyZIndex.focusedEdge;
                 if (result.hidden) {
                     result.label = '';

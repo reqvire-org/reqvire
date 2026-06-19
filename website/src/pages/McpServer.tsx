@@ -114,19 +114,19 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             },
             {
               name: "Ontologies",
-              desc: "reqvire.semantic.ontologies returns authored RDF ontology, SHACL, or both as Turtle or JSON-LD, with full mode for generated model context and include_external for local external ontology source triples.",
+              desc: "reqvire.semantic.ontologies returns authored RDF ontology, SHACL, or both as Turtle or JSON-LD, with full mode for generated model context and include_external for local external ontology source triples and declarations.",
             },
             {
               name: "Semantic prefixes",
-              desc: "reqvire.semantic.prefixes returns ontology-defined prefixes, namespaces, source element prose content, and a SPARQL prefix block for query construction.",
+              desc: "reqvire.semantic.prefixes returns ontology-defined prefixes, namespaces, source element prose content, and a SPARQL prefix block; include_external adds imported external prefixes with source metadata.",
             },
             {
               name: "Semantic vocabulary",
-              desc: "reqvire.semantic.vocabulary returns paged classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source maps, diagnostics, and prefixes for query construction.",
+              desc: "reqvire.semantic.vocabulary returns paged classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source maps, diagnostics, and prefixes; include_external adds imported vocabulary entries marked as external.",
             },
             {
               name: "SPARQL",
-              desc: "reqvire.semantic.sparql runs read-only SPARQL queries against the model-owned Oxigraph semantic store and returns structured SELECT, ASK, CONSTRUCT, or DESCRIBE results.",
+              desc: "reqvire.semantic.sparql runs read-only SPARQL queries against the model-owned Oxigraph semantic store; include_external queries the external-inclusive store.",
             },
             {
               name: "Prompts",

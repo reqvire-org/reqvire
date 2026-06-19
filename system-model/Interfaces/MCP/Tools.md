@@ -70,7 +70,8 @@ The system shall expose MCP read tools that return model evidence needed by exte
 - Model evidence tools shall support element lookup, model structure, containment, collection, submodel analysis, and ontology/SHACL semantic collection.
 - The ontology/SHACL semantic collection tool shall be named under the `reqvire.semantic` namespace and shall filter serialized content to RDF only, SHACL only, or both.
 - The ontology/SHACL semantic collection tool shall support optional external ontology source materialization through a typed `include_external` argument without changing the default authored-only export.
-- Model evidence tools shall support read-only semantic query execution over collected ontology, SHACL, model-context, and ontology projection RDF when requested by a typed MCP operation.
+- Semantic prefix and vocabulary tools shall keep imported external ontology declarations hidden by default and expose them only through a typed `include_external` argument with explicit external markers and source metadata.
+- Model evidence tools shall support read-only semantic query execution over collected ontology, SHACL, model-context, and ontology projection RDF when requested by a typed MCP operation, and shall support an explicit `include_external` argument for querying the external-inclusive semantic store.
 - Model evidence tools shall expose the canonical capability/requirement/ontology model, including `ontology` elements, `#### Concept References`, reusable `semantic-contract` shape profiles, constrained requirements, and ontology-use relations where the underlying Reqvire operation returns them.
 - Model evidence tools shall include revision metadata when model state affects interpretation.
 - Model evidence tools shall not mutate the model or filesystem.

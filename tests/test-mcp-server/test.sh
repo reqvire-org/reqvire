@@ -177,12 +177,24 @@ ontologies_shacl_request() {
   jq -n -c '{jsonrpc:"2.0",id:21,method:"tools/call",params:{name:"reqvire.semantic.ontologies",arguments:{content:"shacl"}}}'
 }
 
+ontologies_shacl_include_external_request() {
+  jq -n -c '{jsonrpc:"2.0",id:34,method:"tools/call",params:{name:"reqvire.semantic.ontologies",arguments:{content:"shacl",include_external:true}}}'
+}
+
 semantic_prefixes_request() {
   jq -n -c '{jsonrpc:"2.0",id:19,method:"tools/call",params:{name:"reqvire.semantic.prefixes",arguments:{}}}'
 }
 
+semantic_prefixes_include_external_request() {
+  jq -n -c '{jsonrpc:"2.0",id:30,method:"tools/call",params:{name:"reqvire.semantic.prefixes",arguments:{include_external:true}}}'
+}
+
 semantic_vocabulary_all_request() {
   jq -n -c '{jsonrpc:"2.0",id:22,method:"tools/call",params:{name:"reqvire.semantic.vocabulary",arguments:{section:"all"}}}'
+}
+
+semantic_vocabulary_external_classes_request() {
+  jq -n -c '{jsonrpc:"2.0",id:31,method:"tools/call",params:{name:"reqvire.semantic.vocabulary",arguments:{section:"classes",include_external:true,filter:"ExternalResource"}}}'
 }
 
 semantic_vocabulary_relation_families_request() {
@@ -210,6 +222,24 @@ SELECT ?requirement ?verification ?relation WHERE {
 
 invalid_sparql_request() {
   jq -n -c '{jsonrpc:"2.0",id:18,method:"tools/call",params:{name:"reqvire.semantic.sparql",arguments:{query:"SELECT WHERE"}}}'
+}
+
+sparql_external_default_request() {
+  jq -n -c --arg query 'PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX ext: <https://example.test/mcp-external#>
+SELECT ?class WHERE {
+  ?class a owl:Class .
+  FILTER(?class = ext:ExternalResource)
+}' '{jsonrpc:"2.0",id:32,method:"tools/call",params:{name:"reqvire.semantic.sparql",arguments:{query:$query}}}'
+}
+
+sparql_external_include_request() {
+  jq -n -c --arg query 'PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX ext: <https://example.test/mcp-external#>
+SELECT ?class WHERE {
+  ?class a owl:Class .
+  FILTER(?class = ext:ExternalResource)
+}' '{jsonrpc:"2.0",id:33,method:"tools/call",params:{name:"reqvire.semantic.sparql",arguments:{query:$query,include_external:true}}}'
 }
 
 model_request() {
@@ -437,7 +467,12 @@ run_http_mcp_sequence "$DEFAULT_PORT" "$DEFAULT_OUTPUT" \
   "$(semantic_query_prompt_request)" \
   "$(workflow_explore_prompt_request)" \
   "$(unknown_prompt_request)" \
-  "$(ontologies_include_external_request)" || fail "default MCP HTTP request sequence failed"
+  "$(ontologies_include_external_request)" \
+  "$(semantic_prefixes_include_external_request)" \
+  "$(semantic_vocabulary_external_classes_request)" \
+  "$(sparql_external_default_request)" \
+  "$(sparql_external_include_request)" \
+  "$(ontologies_shacl_include_external_request)" || fail "default MCP HTTP request sequence failed"
 stop_http_mcp
 trap - EXIT
 
@@ -460,6 +495,9 @@ assert_jq_line "$DEFAULT_OUTPUT" 2 'all(.result.tools[]; (.name|type=="string") 
 assert_jq_line "$DEFAULT_OUTPUT" 2 'all(.result.tools[]; ((.inputSchema.properties // {}) | has("json") | not) and ((.inputSchema.properties // {}) | has("output") | not))' "tool schemas omit CLI transport options"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.search") | .inputSchema.properties | has("filter_status") and has("filter_priority") and has("filter_risk") and has("filter_owner")' "search tool schema advertises governance metadata filters"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.semantic.ontologies") | .inputSchema.properties.include_external.default == false' "semantic ontologies schema advertises include_external flag"
+assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.semantic.prefixes") | .inputSchema.properties.include_external.default == false' "semantic prefixes schema advertises include_external flag"
+assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.semantic.vocabulary") | .inputSchema.properties.include_external.default == false' "semantic vocabulary schema advertises include_external flag"
+assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.semantic.sparql") | .inputSchema.properties.include_external.default == false' "semantic sparql schema advertises include_external flag"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.format") | .annotations.readOnlyHint == true and .inputSchema.properties.fix.enum == [false]' "format is preview-only in default mode"
 
 assert_jq_line "$DEFAULT_OUTPUT" 3 '[.result.resources[].uri] | index("reqvire://workspace/status") != null' "resources/list exposes workspace status"
@@ -480,6 +518,7 @@ assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.format == "turtle
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.summary.ontology_blocks >= 1 and .result.structuredContent.summary.shape_blocks >= 1' "ontologies tool returns semantic index summary"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.blocks[] | select(.source_name=="MCP Access Token Ontology" and .kind=="ontology")' "ontologies tool returns ontology block metadata"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.include_external == false and (.result.structuredContent.content | contains("MCP external resource") | not) and (.result.structuredContent.content | contains("MCP external code datatype") | not)' "semantic ontologies default excludes external source triples"
+assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.include_external == false and (.result.structuredContent.ontology_declarations | tostring | contains("mcp-external") | not)' "semantic ontologies default excludes external declarations"
 assert_jq_line "$DEFAULT_OUTPUT" 14 '.result.structuredContent.format == "jsonld" and (.result.structuredContent.jsonld | type == "array") and (.result.structuredContent.jsonld | length) > 0' "ontologies tool returns JSON-LD semantic content"
 assert_jq_line "$DEFAULT_OUTPUT" 15 '.result.structuredContent.full == true and (.result.structuredContent.content | contains("reqvire:conceptReference")) and (.result.structuredContent.content | contains("urn:reqvire:element:mcp-semantic-requirement")) and (.result.structuredContent.content | contains("reqvire:OntologyProjectionGraph"))' "ontologies tool returns full model context triples and ontology projection facts"
 assert_jq_line "$DEFAULT_OUTPUT" 16 '.result.structuredContent.result_type == "select" and .result.structuredContent.full == true and .result.structuredContent.row_count == 1 and .result.structuredContent.variables == ["requirement","verification","relation"]' "sparql tool returns SELECT result metadata"
@@ -491,9 +530,11 @@ assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.prefixes[] | sele
 assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.prefixes[] | select(.prefix=="testonto") | .source.element_identifier == "specifications/Requirements.md#mcp-access-token-ontology" and .source.element_name == "MCP Access Token Ontology" and (.source.file_path | endswith("specifications/Requirements.md")) and (.source.line_number | type == "number")' "semantic prefixes returns source element provenance"
 assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.sparql_prefix_block | contains("PREFIX testonto: <https://example.test/ontology#>")' "semantic prefixes returns SPARQL prefix block"
 assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.prefixes[] | select(.prefix=="testonto") | (.source.content | contains("@prefix") | not)' "semantic prefixes source content omits Turtle prefix block"
+assert_jq_line "$DEFAULT_OUTPUT" 18 '.result.structuredContent.include_external == false and ([.result.structuredContent.prefixes[].prefix] | index("ext") == null)' "semantic prefixes default excludes external prefixes"
 assert_jq_line "$DEFAULT_OUTPUT" 19 '.result.structuredContent.content_filter == "rdf" and .result.structuredContent.summary.ontology_blocks >= 1 and .result.structuredContent.summary.shape_blocks == 0 and (.result.structuredContent.content | contains("mcp:AccessTokenShape") | not)' "semantic ontologies RDF filter excludes SHACL shapes"
 assert_jq_line "$DEFAULT_OUTPUT" 20 '.result.structuredContent.content_filter == "shacl" and .result.structuredContent.summary.ontology_blocks == 0 and .result.structuredContent.summary.shape_blocks >= 1 and (.result.structuredContent.content | contains("mcp:AccessTokenShape")) and (.result.structuredContent.content | contains("owl:Ontology") | not)' "semantic ontologies SHACL filter excludes ontology declarations"
 assert_jq_line "$DEFAULT_OUTPUT" 21 '.result.structuredContent.section == "all" and .result.structuredContent.summary.relation_families >= 1 and (.result.structuredContent.prefixes[] | select(.prefix=="testonto")) and (.result.structuredContent.sparql_prefix_block | contains("PREFIX testonto: <https://example.test/ontology#>"))' "semantic vocabulary all section returns counts and prefixes"
+assert_jq_line "$DEFAULT_OUTPUT" 21 '.result.structuredContent.include_external == false and ([.result.structuredContent.prefixes[].prefix] | index("ext") == null)' "semantic vocabulary default excludes external prefixes"
 assert_jq_line "$DEFAULT_OUTPUT" 22 '.result.structuredContent.section == "relation_families" and .result.structuredContent.items[0].raw_relations and (.result.structuredContent.items[0] | has("forward_property")) and .result.structuredContent.paging.has_more == true and (.result.structuredContent.paging.next_cursor | type == "string")' "semantic vocabulary relation families are paged with normalized properties"
 assert_jq_line "$DEFAULT_OUTPUT" 23 '.result.structuredContent.section == "query_patterns" and (.result.structuredContent.items[] | select(.id=="verified_requirements" and (.sparql | contains("elementVerifiedByVerification")))) and (.result.structuredContent.prefixes[] | select(.prefix=="testonto"))' "semantic vocabulary query patterns include SPARQL examples and prefixes"
 assert_jq_line "$DEFAULT_OUTPUT" 24 '[.result.prompts[].name] | index("reqvire.semantic.query") != null and index("reqvire.semantic.verification_search") != null and index("reqvire.workflow.explore_model") != null and index("reqvire.workflow.verify_coverage") != null' "prompts/list includes semantic and regular Reqvire prompts"
@@ -502,6 +543,12 @@ assert_jq_line "$DEFAULT_OUTPUT" 25 '.result.messages[0].role == "user" and (.re
 assert_jq_line "$DEFAULT_OUTPUT" 26 '.result.messages[0].role == "user" and (.result.messages[0].content.text | contains("reqvire.workspace_status") and contains("reqvire.search") and contains("reqvire.read_element"))' "prompts/get returns regular Reqvire workflow guidance"
 assert_jq_line "$DEFAULT_OUTPUT" 27 '.error.code == -32602 and (.error.data.message | contains("Unknown MCP prompt"))' "unknown prompt returns protocol error"
 assert_jq_line "$DEFAULT_OUTPUT" 28 '.result.structuredContent.include_external == true and (.result.structuredContent.content | contains("MCP external resource")) and (.result.structuredContent.content | contains("MCP external code datatype")) and (.result.structuredContent.content | contains("<https://example.test/mcp-external#ExternalResource>"))' "semantic ontologies include_external includes external source triples"
+assert_jq_line "$DEFAULT_OUTPUT" 28 '.result.structuredContent.include_external == true and (.result.structuredContent.ontology_declarations["https://example.test/mcp-external#ExternalResource"][] | select(.external == true))' "semantic ontologies include_external includes external declarations"
+assert_jq_line "$DEFAULT_OUTPUT" 29 '.result.structuredContent.include_external == true and (.result.structuredContent.prefixes[] | select(.prefix=="ext" and .external == true and .namespace=="https://example.test/mcp-external#")) and (.result.structuredContent.sparql_prefix_block | contains("PREFIX ext: <https://example.test/mcp-external#>"))' "semantic prefixes include_external includes external prefix"
+assert_jq_line "$DEFAULT_OUTPUT" 30 '.result.structuredContent.include_external == true and .result.structuredContent.section == "classes" and (.result.structuredContent.items[] | select(.curie=="ext:ExternalResource" and .external == true and .label=="MCP external resource" and (.source.external == true)))' "semantic vocabulary include_external includes marked external class"
+assert_jq_line "$DEFAULT_OUTPUT" 31 '.result.structuredContent.include_external == false and .result.structuredContent.row_count == 0' "semantic sparql default excludes external source triples"
+assert_jq_line "$DEFAULT_OUTPUT" 32 '.result.structuredContent.include_external == true and .result.structuredContent.row_count == 1 and .result.structuredContent.bindings[0].class.iri == "https://example.test/mcp-external#ExternalResource"' "semantic sparql include_external queries external source triples"
+assert_jq_line "$DEFAULT_OUTPUT" 33 '.result.structuredContent.include_external == true and .result.structuredContent.content_filter == "shacl" and (.result.structuredContent.content | contains("MCP external resource") | not) and (.result.structuredContent.content | contains("mcp:AccessTokenShape"))' "semantic ontologies SHACL filter excludes external ontology RDF even when include_external is true"
 
 UNSUPPORTED_PORT="$(pick_port)"
 UNSUPPORTED_OUTPUT_PREFIX="$TEST_DIR/output/mcp-unsupported-protocol"

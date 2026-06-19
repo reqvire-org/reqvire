@@ -269,7 +269,10 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         read_tool(
             "reqvire.semantic.prefixes",
             "List ontology-defined semantic prefixes and namespaces.",
-            object_schema(vec![]),
+            object_schema(vec![(
+                "include_external",
+                json!({ "type": "boolean", "default": false }),
+            )]),
         ),
         read_tool(
             "reqvire.semantic.vocabulary",
@@ -305,6 +308,10 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                     "include_examples",
                     json!({ "type": "boolean", "default": false }),
                 ),
+                (
+                    "include_external",
+                    json!({ "type": "boolean", "default": false }),
+                ),
             ]),
         ),
         read_tool(
@@ -314,6 +321,10 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 vec![
                     ("query", json!({ "type": "string" })),
                     ("full", json!({ "type": "boolean", "default": true })),
+                    (
+                        "include_external",
+                        json!({ "type": "boolean", "default": false }),
+                    ),
                 ],
                 vec!["query"],
             ),
@@ -605,7 +616,7 @@ fn dispatch_tool(
             ontologies_tool(args, excluded_filename_patterns, with_size_estimates)
         }
         "reqvire.semantic.prefixes" => {
-            semantic_prefixes_tool(excluded_filename_patterns, with_size_estimates)
+            semantic_prefixes_tool(args, excluded_filename_patterns, with_size_estimates)
         }
         "reqvire.semantic.vocabulary" => {
             semantic_vocabulary_tool(args, excluded_filename_patterns, with_size_estimates)
@@ -816,9 +827,7 @@ fn ontologies_tool(
     let include_external = bool_arg(args, "include_external", false);
 
     let mut serializable_index = filtered_semantic_index(&semantic_store.index, content_filter);
-    if !include_external {
-        serializable_index.external_blocks.clear();
-    }
+    apply_external_visibility(&mut serializable_index, include_external);
 
     let (format_name, export_format) = match format.as_str() {
         "turtle" => ("turtle", SemanticExportFormat::Turtle),
@@ -923,6 +932,8 @@ fn filtered_semantic_index(
     if matches!(content_filter, OntologyContentFilter::Shacl) {
         index.ontology_documents.clear();
         index.ontology_declarations.clear();
+        index.external_blocks.clear();
+        index.external_sources.clear();
         index.ontology_projection = semantic_contract::OntologyProjectionGraph {
             id: "urn:reqvire:ontology-projection:empty".to_string(),
             derivation_mode: semantic_contract::OntologyProjectionDerivationMode::DirectAuthored,
@@ -955,10 +966,34 @@ fn filtered_semantic_index(
     index
 }
 
+fn semantic_index_with_external_visibility(
+    source: &semantic_contract::SemanticIndex,
+    include_external: bool,
+) -> semantic_contract::SemanticIndex {
+    let mut index = source.clone();
+    apply_external_visibility(&mut index, include_external);
+    index
+}
+
+fn apply_external_visibility(index: &mut semantic_contract::SemanticIndex, include_external: bool) {
+    if include_external {
+        return;
+    }
+
+    index.external_blocks.clear();
+    index.external_sources.clear();
+    index.ontology_declarations.retain(|_iri, declarations| {
+        declarations.retain(|declaration| !declaration.external);
+        !declarations.is_empty()
+    });
+}
+
 fn semantic_prefixes_tool(
+    args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
 ) -> Result<Value, ReqvireError> {
+    let include_external = bool_arg(args, "include_external", false);
     let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
     let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
@@ -981,6 +1016,7 @@ fn semantic_prefixes_tool(
             "ontology_base": declaration.ontology_base,
             "term_namespace": declaration.term_namespace,
             "ontology_document_iri": declaration.iri,
+            "external": false,
             "source": source,
             "contributors": declaration.element_identifiers.iter().zip(declaration.element_names.iter()).map(|(identifier, name)| {
                 json!({
@@ -989,6 +1025,25 @@ fn semantic_prefixes_tool(
                 })
             }).collect::<Vec<_>>()
         }));
+    }
+
+    if include_external {
+        for source in &semantic_store.index.external_sources {
+            prefix_namespaces
+                .entry(source.prefix.clone())
+                .or_default()
+                .insert(source.namespace.clone());
+
+            prefixes.push(json!({
+                "prefix": source.prefix,
+                "namespace": source.namespace,
+                "ontology_base": source.resource,
+                "term_namespace": source.namespace,
+                "ontology_document_iri": source.resource,
+                "external": true,
+                "source": external_ontology_prefix_source(&model, source)
+            }));
+        }
     }
 
     prefixes.sort_by(|left, right| {
@@ -1055,8 +1110,10 @@ fn semantic_prefixes_tool(
             "prefix_count": prefix_namespaces.len(),
             "namespace_count": namespace_count,
             "ontology_document_count": semantic_store.index.ontology_documents.len(),
+            "external_source_count": if include_external { semantic_store.index.external_sources.len() } else { 0 },
             "conflict_count": conflicts.len()
         },
+        "include_external": include_external,
         "diagnostics": semantic_store.index.diagnostics,
         "model_fingerprint": model_fingerprint(&model)
     }))
@@ -1109,6 +1166,39 @@ fn ontology_prefix_source(
     }
 }
 
+fn external_ontology_prefix_source(
+    model: &ModelManager,
+    source: &semantic_contract::ExternalOntologySource,
+) -> Value {
+    let owner = model.graph_registry.get_element(&source.owner_identifier);
+    match owner {
+        Some(element) => json!({
+            "element_identifier": element.identifier,
+            "element_name": element.name,
+            "file_path": element.file_path,
+            "line_number": source.line_number,
+            "content": semantic_prefix_source_content(&element.content),
+            "external_source": {
+                "resource": source.resource,
+                "source": source.source,
+                "format": source.format
+            }
+        }),
+        None => json!({
+            "element_identifier": source.owner_identifier,
+            "element_name": source.owner_name,
+            "file_path": null,
+            "line_number": source.line_number,
+            "content": "",
+            "external_source": {
+                "resource": source.resource,
+                "source": source.source,
+                "format": source.format
+            }
+        }),
+    }
+}
+
 fn semantic_prefix_source_content(content: &str) -> String {
     let mut result = Vec::new();
     let mut skip_semantic_section = false;
@@ -1148,13 +1238,16 @@ fn semantic_vocabulary_tool(
     let filter = string_arg(args, "filter").map(|value| value.to_lowercase());
     let include_source = bool_arg(args, "include_source", true);
     let include_examples = bool_arg(args, "include_examples", false);
+    let include_external = bool_arg(args, "include_external", false);
 
     let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
     let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
+    let semantic_index =
+        semantic_index_with_external_visibility(&semantic_store.index, include_external);
 
-    let prefixes = vocabulary_prefixes(&model, &semantic_store.index);
+    let prefixes = vocabulary_prefixes(&model, &semantic_index);
     let compact_prefixes: Vec<VocabularyPrefix> = prefixes
         .iter()
         .filter_map(|entry| {
@@ -1183,7 +1276,7 @@ fn semantic_vocabulary_tool(
 
     let vocabulary = build_vocabulary_sections(
         &model,
-        &semantic_store.index,
+        &semantic_index,
         &compact_prefixes,
         include_source,
         include_examples,
@@ -1217,6 +1310,7 @@ fn semantic_vocabulary_tool(
                 "has_more": false
             },
             "diagnostics": semantic_store.index.diagnostics,
+            "include_external": include_external,
             "model_fingerprint": model_fingerprint(&model)
         }));
     }
@@ -1251,6 +1345,7 @@ fn semantic_vocabulary_tool(
             "total": total
         },
         "diagnostics": semantic_store.index.diagnostics,
+        "include_external": include_external,
         "model_fingerprint": model_fingerprint(&model)
     }))
 }
@@ -1268,7 +1363,19 @@ fn vocabulary_prefixes(
             "ontology_base": declaration.ontology_base,
             "term_namespace": declaration.term_namespace,
             "ontology_document_iri": declaration.iri,
+            "external": false,
             "source": source
+        }));
+    }
+    for source in &index.external_sources {
+        prefixes.push(json!({
+            "prefix": source.prefix,
+            "namespace": source.namespace,
+            "ontology_base": source.resource,
+            "term_namespace": source.namespace,
+            "ontology_document_iri": source.resource,
+            "external": true,
+            "source": external_ontology_prefix_source(model, source)
         }));
     }
     prefixes.sort_by(|left, right| {
@@ -1362,12 +1469,30 @@ struct TermInfo {
     types: BTreeSet<String>,
     string_properties: BTreeMap<String, Vec<String>>,
     iri_properties: BTreeMap<String, Vec<String>>,
-    source_block: Option<usize>,
+    source_block: Option<TermSourceRef>,
+}
+
+#[derive(Clone, Copy)]
+struct TermSourceRef {
+    external: bool,
+    block_index: usize,
 }
 
 fn collect_term_index(index: &semantic_contract::SemanticIndex) -> BTreeMap<String, TermInfo> {
     let mut terms = BTreeMap::new();
-    for (block_index, block) in index.blocks.iter().enumerate() {
+    let blocks = index
+        .blocks
+        .iter()
+        .enumerate()
+        .map(|(block_index, block)| (false, block_index, block))
+        .chain(
+            index
+                .external_blocks
+                .iter()
+                .enumerate()
+                .map(|(block_index, block)| (true, block_index, block)),
+        );
+    for (external, block_index, block) in blocks {
         for quad in &block.quads {
             let Some(subject) = subject_iri(&quad.subject) else {
                 continue;
@@ -1375,7 +1500,10 @@ fn collect_term_index(index: &semantic_contract::SemanticIndex) -> BTreeMap<Stri
             let entry = terms
                 .entry(subject.to_string())
                 .or_insert_with(TermInfo::default);
-            entry.source_block.get_or_insert(block_index);
+            entry.source_block.get_or_insert(TermSourceRef {
+                external,
+                block_index,
+            });
             match quad.predicate.as_str() {
                 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" => {
                     if let Some(iri) = term_iri(&quad.object) {
@@ -1436,6 +1564,7 @@ fn ontology_terms_section(
                 json!(curie(&declaration.iri, prefixes)),
             );
             item.insert("role".to_string(), json!(role));
+            item.insert("external".to_string(), json!(declaration.external));
             item.insert(
                 "label".to_string(),
                 json!(info.and_then(|entry| entry.label.clone())),
@@ -1459,10 +1588,13 @@ fn ontology_terms_section(
                 }
             }
             if include_source {
-                item.insert(
-                    "source".to_string(),
-                    source_for_element_identifier(model, &declaration.element_identifier),
-                );
+                let source = if declaration.external {
+                    info.map(|entry| source_for_term(index, entry))
+                        .unwrap_or(Value::Null)
+                } else {
+                    source_for_element_identifier(model, &declaration.element_identifier)
+                };
+                item.insert("source".to_string(), source);
             }
             items.push(Value::Object(item));
         }
@@ -1495,7 +1627,8 @@ fn relation_families_section(
             "allowed_source_type": strings(info, "https://www.reqvire.org/ontology#allowedSourceType"),
             "allowed_target_type": strings(info, "https://www.reqvire.org/ontology#allowedTargetType"),
             "iri": iri,
-            "curie": curie(iri, prefixes)
+            "curie": curie(iri, prefixes),
+            "external": term_info_external(info)
         });
         rule_items_by_family
             .entry(family.to_string())
@@ -1520,6 +1653,7 @@ fn relation_families_section(
         );
         item.insert("iri".to_string(), json!(iri));
         item.insert("curie".to_string(), json!(curie(iri, prefixes)));
+        item.insert("external".to_string(), json!(term_info_external(info)));
         item.insert(
             "meaning".to_string(),
             json!(first_string(
@@ -1591,6 +1725,7 @@ fn controlled_vocabularies_section(
         let mut item = serde_json::Map::new();
         item.insert("iri".to_string(), json!(iri));
         item.insert("curie".to_string(), json!(curie(iri, prefixes)));
+        item.insert("external".to_string(), json!(term_info_external(info)));
         item.insert("types".to_string(), json!(semantic_types));
         item.insert("label".to_string(), json!(info.label));
         item.insert("comment".to_string(), json!(info.comment));
@@ -1648,16 +1783,26 @@ fn source_map_section(
     index: &semantic_contract::SemanticIndex,
     prefixes: &[VocabularyPrefix],
 ) -> Vec<Value> {
+    let term_index = collect_term_index(index);
     index
         .ontology_declarations
         .values()
         .flat_map(|declarations| declarations.iter())
         .map(|declaration| {
+            let source = if declaration.external {
+                term_index
+                    .get(&declaration.iri)
+                    .map(|info| source_for_term(index, info))
+                    .unwrap_or(Value::Null)
+            } else {
+                source_for_element_identifier(model, &declaration.element_identifier)
+            };
             json!({
                 "term": curie(&declaration.iri, prefixes),
                 "iri": declaration.iri,
                 "role": declaration.role.to_string(),
-                "source": source_for_element_identifier(model, &declaration.element_identifier)
+                "external": declaration.external,
+                "source": source
             })
         })
         .collect()
@@ -1733,16 +1878,27 @@ fn source_for_element_identifier(model: &ModelManager, identifier: &str) -> Valu
 
 fn source_for_term(index: &semantic_contract::SemanticIndex, info: &TermInfo) -> Value {
     info.source_block
-        .and_then(|block_index| index.blocks.get(block_index))
+        .and_then(|source| {
+            if source.external {
+                index.external_blocks.get(source.block_index)
+            } else {
+                index.blocks.get(source.block_index)
+            }
+        })
         .map(|block| {
             json!({
                 "element_identifier": block.source,
                 "element_name": block.source_name,
                 "file_path": block.file_path,
-                "line_number": block.line_number
+                "line_number": block.line_number,
+                "external": matches!(block.kind, semantic_contract::SemanticBlockKind::ExternalOntology)
             })
         })
         .unwrap_or(Value::Null)
+}
+
+fn term_info_external(info: &TermInfo) -> bool {
+    matches!(info.source_block, Some(source) if source.external)
 }
 
 fn first_string(info: &TermInfo, predicate: &str) -> Option<String> {
@@ -1823,6 +1979,7 @@ fn sparql_tool(
 ) -> Result<Value, ReqvireError> {
     let query = required_string_arg(args, "query")?;
     let full = bool_arg(args, "full", true);
+    let include_external = bool_arg(args, "include_external", false);
     let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
     let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
@@ -1831,7 +1988,7 @@ fn sparql_tool(
     let results = SparqlEvaluator::new()
         .parse_query(&query)
         .map_err(|error| ReqvireError::ProcessError(format!("Invalid SPARQL query: {}", error)))?
-        .on_store(semantic_store.store(full))
+        .on_store(semantic_store.store(full, include_external))
         .execute()
         .map_err(|error| ReqvireError::ProcessError(format!("SPARQL query failed: {}", error)))?;
 
@@ -1888,6 +2045,7 @@ fn sparql_tool(
     if let Value::Object(ref mut object) = result {
         object.insert("format".to_string(), json!("sparql"));
         object.insert("full".to_string(), json!(full));
+        object.insert("include_external".to_string(), json!(include_external));
         object.insert("summary".to_string(), json!(semantic_store.index.summary));
         object.insert(
             "diagnostics".to_string(),

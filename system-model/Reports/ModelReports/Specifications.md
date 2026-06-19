@@ -371,7 +371,7 @@ JSON output conventions:
 
 ### Local External Ontology Source Specification
 
-The local external ontology source contract defines how ontology elements declare pinned external vocabulary graphs.
+The local external ontology source contract defines how ontology elements declare local external vocabulary graphs.
 
 #### Details
 An ontology element may define one or more repeatable `#### External Ontology` sections:
@@ -399,6 +399,7 @@ Rules:
 - The same prefix may not be bound to different namespaces.
 - The same namespace may not be bound to different prefixes; aliases are rejected in this version.
 - Imported terms are available for semantic-reference validation through the ontology element that declared the external source.
+- Imported terms remain marked as external declarations in semantic metadata.
 - Imported terms do not count as authored project-owned term declarations for duplicate authored-term validation.
 
 Export modes:
@@ -406,6 +407,8 @@ Export modes:
 - `reqvire ontologies --include-external` additionally emits local external source triples.
 - `reqvire ontologies --full` emits authored triples, Reqvire model context, and generated ontology projection facts.
 - `reqvire ontologies --full --include-external` emits authored triples, external source triples, Reqvire model context, and generated ontology projection facts.
+- MCP semantic ontology, vocabulary, prefix, and SPARQL tools keep external source declarations and triples hidden by default and expose them only when `include_external` is true.
+- Vocabulary and source-map entries for imported terms must carry an explicit external marker and source metadata.
 
 External sections are source declarations, not hidden Turtle injection. Authored ontology and SHACL blocks must still be complete Turtle with their own explicit prefixes and semantic statements.
 
@@ -577,7 +580,7 @@ Reqvire shall not treat arbitrary custom IRIs as reserved vocabulary simply beca
 
 OWL reserved vocabulary recognition is a semantic validation rule. It does not make standard namespaces authored ontology namespaces, does not synthesize external source triples, and does not require standard reserved prefixes to appear as External Sources in Explorer.
 
-Core SHACL vocabulary used to parse and validate `#### Shapes` blocks is handled by Reqvire's semantic-contract parser and SHACL sanity checks. It is not modeled as a local `#### External Ontology` source. External ontology sources are reserved for additional pinned vocabularies authored outside the Reqvire model, such as project-specific exported ontologies or SHACL extension vocabularies.
+Core SHACL vocabulary used to parse and validate `#### Shapes` blocks is handled by Reqvire's semantic-contract parser and SHACL sanity checks. It is not modeled as a local `#### External Ontology` source. External ontology sources are reserved for additional local vocabularies authored outside the Reqvire model, such as project-specific exported ontologies or SHACL extension vocabularies.
 
 #### Metadata
   * type: specification

@@ -232,6 +232,7 @@ function ExplorerViewControls({
               key={option.type}
               label={humanize(option.type)}
               on={ui.modelTypes.has(option.type)}
+              variant="filter"
               icon={<ElementIcon type={option.type} family={option.family} size="sm" />}
               meta={formatCompactCount(option.count)}
               onToggle={() => ui.toggleModelType(option.type)}
@@ -277,6 +278,7 @@ function ExplorerViewControls({
               key={kind}
               label={searchKindLabel(kind)}
               on={ui.searchKinds.has(kind)}
+              variant="filter"
               colorToken={searchKindColorToken(kind)}
               meta={formatCompactCount(searchKindCounts[kind] ?? 0)}
               onToggle={() => ui.toggleSearchKind(kind)}
@@ -290,6 +292,7 @@ function ExplorerViewControls({
                 key={option.type}
                 label={humanize(option.type)}
                 on={ui.searchElementTypes.has(option.type)}
+                variant="filter"
                 icon={<ElementIcon type={option.type} family={option.family} size="sm" />}
                 meta={formatCompactCount(option.count)}
                 onToggle={() => ui.toggleSearchElementType(option.type)}
@@ -368,6 +371,7 @@ function ExplorerViewControls({
                 label={label}
                 colorToken={ontologyLayerColorToken(value)}
                 on={ui.ontologyFilters.has(value)}
+                variant="filter"
                 meta={count}
                 title={ontologyLayerDescription(value)}
                 onToggle={() => ui.toggleOntologyFilter(value)}
