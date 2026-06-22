@@ -1,0 +1,20 @@
+[package]
+name = "o-kernel"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+[lib]
+name = "o_kernel"
+path = "src/lib.rs"
+
+[package.metadata.dist]
+dist = false
+
+[dependencies]
+oxigraph = { workspace = true }
+thiserror = { workspace = true }

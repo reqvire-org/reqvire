@@ -25,7 +25,7 @@ Validation rules for atomic relation relink operations.
 Type compatibility rules for merging elements.
 
 #### Details
-Canonical merge compatibility categories are defined by the Reqvire operation ontology and core element type vocabulary.
+Canonical merge compatibility categories are defined by the merge operation requirements, this constraint, and core element type rules.
 
 **Compatibility Rules:**
 - Source and target must be in the same semantic merge compatibility category.
@@ -60,4 +60,3 @@ Validation rules for target paths in element operations.
 #### Metadata
   * type: constraint
 ---
-

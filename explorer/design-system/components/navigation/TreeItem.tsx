@@ -7,7 +7,7 @@ const baseUX = css`
   display: flex;
   width: var(--ds-treeitem-w, 100%);
   min-width: 0;
-  height: var(--ds-treeitem-h, var(--row-h));
+  height: var(--ds-treeitem-h, var(--row-height-compact));
   align-items: center;
   gap: var(--ds-treeitem-gap, var(--space-4));
   padding-block: 0;
@@ -152,7 +152,6 @@ const fileSkinX = css`
 `;
 
 const elementSkinX = css`
-  --ds-treeitem-twist-w: var(--space-5);
   --ds-treeitem-hover-bg: var(--bg-hover);
   --ds-treeitem-sel-bg: var(--bg-selected);
 

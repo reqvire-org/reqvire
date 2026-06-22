@@ -29,7 +29,7 @@ Improve:
 1. Inventory the existing ontology plane before editing.
    - Run `reqvire search --filter-type=ontology --short`.
    - Read the affected `system-model/Ontologies/*.md` files and nearby semantic-contract shape profiles.
-   - Check which elements author concept references to ontology terms and which semantic contracts use the ontology.
+   - Check which elements author concept references to SKOS concepts and which semantic contracts use the ontology.
 2. Identify the refactoring driver.
    - unclear class hierarchy
    - duplicate or synonym classes
@@ -116,25 +116,25 @@ Formal meaning comes from:
 - axioms
 - domain properties validated by SHACL
 
-Use `rdfs:label` and `rdfs:comment` for optional presentation metadata. Keep custom `*Name`, `*Meaning`, or similar properties only when the value is a canonical token, payload field, validation target, report value, or queryable model contract. If SHACL validates a presentation-only custom name/meaning field, refactor the SHACL `sh:path` to `rdfs:label` or `rdfs:comment` instead of keeping the custom property.
+Use `rdfs:label` and `rdfs:comment` for optional presentation metadata. Keep custom `*Name`, `*Meaning`, or similar properties only when the value is a canonical domain token, payload field, validation target, operation value, or queryable model contract. If SHACL validates a presentation-only custom name/meaning field, refactor the SHACL `sh:path` to `rdfs:label` or `rdfs:comment` instead of keeping the custom property.
 
 Refactor this:
 
 ```turtle
-ex:collectReportKind a ex:ReportKind ;
-  ex:reportKindName "collect" ;
-  rdfs:comment "Report kind that gathers element context." .
+ex:criticalLifecycleState a ex:LifecycleState ;
+  ex:stateName "critical" ;
+  rdfs:comment "Critical lifecycle state." .
 ```
 
 Into this:
 
 ```turtle
-ex:collectReportKind a owl:NamedIndividual, ex:ReportKind ;
-  ex:reportKindName "collect" ;
-  rdfs:comment "Report kind that gathers element context." .
+ex:criticalLifecycleState a owl:NamedIndividual, ex:LifecycleState ;
+  ex:stateName "critical" ;
+  ex:stateMeaning "State category indicating that resource behavior may block a critical capability." .
 ```
 
-Do not replace `ex:reportKindName "collect"` with only `rdfs:label "collect"` when `collect` is a CLI/report/API/validation/query token.
+Do not replace `ex:stateName "critical"` with only `rdfs:label "critical"` when that literal is a canonical domain token validated by SHACL or queried by semantic tooling. Delivery-surface tokens such as command names, UI route names, and report-output kind names belong in specifications or contracts unless the domain itself needs to reason over them.
 
 ### Ontology Dependencies
 
@@ -208,8 +208,8 @@ Use labels/comments only if the literal is purely presentation metadata.
 After refactoring, run focused checks before broad validation:
 
 ```bash
-cargo run -q -p cli -- validate
-cargo run -q -p cli -- ontologies
+cargo run -q -p reqvire-cli -- validate
+cargo run -q -p reqvire-cli -- ontologies
 ```
 
 If shapes or output fixtures changed, also run the affected test slice, usually:

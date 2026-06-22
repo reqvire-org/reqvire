@@ -17,6 +17,7 @@ graph TD
   classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
+  classDef concept fill:#D7CCC8,stroke:#6D4C41,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 

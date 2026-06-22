@@ -13,8 +13,8 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Export Command Contract Specification](Specifications.md#export-command-contract-specification)
   * derivedFrom: [Web Interface](../InterfacesRequirements.md#web-interface)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [explorer_runtime.rs](../../../core/src/explorer_runtime.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [explorer_runtime.rs](../../../crates/reqvire-core/src/explorer_runtime.rs)
   * verifiedBy: [Export Command Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#export-command-verification)
 ---
 
@@ -37,8 +37,8 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Serve Command Contract Specification](Specifications.md#serve-command-contract-specification)
   * derive: [Serve Command Embedded MCP Endpoint](#serve-command-embedded-mcp-endpoint)
   * derivedFrom: [Web Interface](../InterfacesRequirements.md#web-interface)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [serve.rs](../../../cli/src/serve.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
   * verifiedBy: [Serve Command Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#serve-command-verification)
 ---
 
@@ -55,9 +55,9 @@ When enabled, the embedded MCP endpoint shall reuse the normal Reqvire MCP tool 
 #### Relations
   * definedBy: [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
   * derivedFrom: [Serve Command](#serve-command)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
-  * satisfiedBy: [serve.rs](../../../cli/src/serve.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
   * verifiedBy: [Embedded MCP Serve Endpoint Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#embedded-mcp-serve-endpoint-verification)
   * verifiedBy: [Serve Command Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#serve-command-verification)
 ---
@@ -83,13 +83,14 @@ The system SHALL serve the embedded Reqvire Explorer SPA with all model artifact
   * derive: [Project Knowledge Graph View](#project-knowledge-graph-view)
   * derive: [Reused Contract Context Link Serving](#reused-contract-context-link-serving)
   * derive: [SPA Explorer Shell and Project Store](#spa-explorer-shell-and-project-store)
+  * derive: [Thesaurus View Generation](#thesaurus-view-generation)
   * derive: [Traces View Generation](#traces-view-generation)
   * derive: [Web Interface Color Scheme](#web-interface-color-scheme)
   * derivedFrom: [Web Interface](../InterfacesRequirements.md#web-interface)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [explorer_runtime.rs](../../../core/src/explorer_runtime.rs)
-  * satisfiedBy: [mod.rs](../../../core/src/html/mod.rs)
-  * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [explorer_runtime.rs](../../../crates/reqvire-core/src/explorer_runtime.rs)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/html/mod.rs)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
   * satisfiedBy: [ContentView.tsx](../../../explorer/src/components/ContentView.tsx)
   * satisfiedBy: [MarkdownContent.tsx](../../../explorer/src/components/MarkdownContent.tsx)
@@ -116,7 +117,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Containment View Reused Contract Context Links Contract Specification](Specifications.md#containment-view-reused-contract-context-links-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
+  * satisfiedBy: [containment.rs](../../../crates/reqvire-core/src/containment.rs)
   * verifiedBy: [Model Containment Reused Contract Context Links Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-containment-reused-contract-context-links-verification)
 ---
 
@@ -134,8 +135,8 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Diagram Reused Contract Context Display Contract Specification](Specifications.md#diagram-reused-contract-context-display-contract-specification)
   * definedBy: [Explorer Mermaid Diagram Style Specification](Specifications.md#explorer-mermaid-diagram-style-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
-  * satisfiedBy: [verification_trace.rs](../../../core/src/verification_trace.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [verification_trace.rs](../../../crates/reqvire-core/src/verification_trace.rs)
   * verifiedBy: [Diagram Reused Contract Context Display Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#diagram-reused-contract-context-display-verification)
 ---
 
@@ -153,8 +154,8 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Model-Centric View Generation Contract Specification](Specifications.md#model-centric-view-generation-contract-specification)
   * derive: [Model View Element Navigation](#model-view-element-navigation)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
-  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
 ---
 
 ### Model View Element Navigation
@@ -170,8 +171,37 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Model View Element Navigation Contract Specification](Specifications.md#model-view-element-navigation-contract-specification)
   * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
-  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
   * verifiedBy: [Model View Element Navigation Test](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-view-element-navigation-test)
+---
+
+### Thesaurus View Generation
+
+The system shall expose a Thesaurus Explorer view during serve workflows that presents standalone native concept schemes and concepts as curated SKOS terminology instead of as ontology children or filesystem folders.
+
+#### Details
+The Thesaurus view shall:
+- Render concept-scheme roots and broader/narrower concept hierarchy from Project Store semantic concept data, using canonical SKOS `scheme_iri` / `scheme_label` membership rather than source-name, namespace, ontology-document, filesystem, or element-hierarchy fallback grouping.
+- Use a concept-scheme navigator in the left Explorer pane rather than the Model project tree.
+- Show selected concept details, definitions, alternative labels, scope notes, examples, taxonomy, related concepts, exact/close mappings, concept references, mapped ontology terms, and authored relation evidence from generated native concept data.
+- Provide a single Map workspace that shows the selected concept scheme as an interactive concept map; Thesaurus must not expose a Browse/Map segmented mode control.
+- Render Thesaurus Map through the shared design-system product pattern using React Flow for node interaction and a deterministic concept-scheme mind-map layout, with boxed label-first concept nodes and no role labels beside concept names.
+- Open the shared element-detail modal for native `concept-scheme` and `concept` elements when map nodes are activated and source element metadata is available, using a concept-optimized modal body for SKOS properties, concept relations, exact/close mappings, ontology mappings, model usage, and remaining authored relations.
+- Preserve source navigation to the Markdown `concept-scheme` or `concept` element that generated the selected SKOS resource.
+- Keep structural ontology exploration in the Ontologies route, while allowing ontology bridge context such as `reqvire:mapsToConcept` to appear as concept usage evidence.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Thesaurus View Generation Contract Specification](Specifications.md#thesaurus-view-generation-contract-specification)
+  * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
+  * satisfiedBy: [ExplorerSidePane.tsx](../../../explorer/src/components/ExplorerSidePane.tsx)
+  * satisfiedBy: [types.ts](../../../explorer/src/store/types.ts)
+  * satisfiedBy: [ThesaurusView.tsx](../../../explorer/src/views/ThesaurusView.tsx)
+  * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
+  * verifiedBy: [Thesaurus Project Store Projection Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#thesaurus-project-store-projection-verification)
 ---
 
 ### Ontologies View Generation
@@ -186,11 +216,12 @@ The Ontologies view shall:
 - Derive class slots and slot facets from SHACL target-class/property-shape constraints so users can inspect datatype or object range, cardinality, pattern, node-kind, and allowed-value constraints without navigating raw SHACL blank nodes.
 - Show named properties as reusable slots in the selected class or term modal, including each target class and source shape that uses that property as a `sh:path`, so repeated property usages are understandable rather than presented as duplicate property definitions.
 - Use a defined ontology symbol and badge vocabulary so rendered symbols are stable, documented, and accessible.
-- Consume generated ontology projection facts from the semantic export context so the Ontologies Explorer and `reqvire ontologies --full` describe the same ontology constructs.
-- Expose ontology graph layers so users can inspect authored semantic content by default, optionally overlay semantic context for model-to-term declaration/reference provenance, and separately enable only the used external source vocabulary subset when external ontology dependencies are present.
+- Consume generated ontology projection facts from the semantic export context so the Ontologies Explorer and `reqvire semantic graph --full` describe the same ontology constructs.
+- Use ontology-document ownership metadata from generated `rdfs:isDefinedBy`/ontology term declarations for term grouping, search, and modal evidence, while not rendering ontology document IRIs as graph nodes or definition links as canvas edges.
+- Expose ontology graph layers so users can inspect authored structural semantic content by default, optionally show curated SKOS Concepts and their structural bridges, optionally overlay semantic context for model-to-term declaration/reference provenance, and separately enable only the used external source vocabulary subset when external ontology dependencies are present.
 - Prioritize graph canvas space by using a dense full-height viewer layout, left-pane ontology controls, and modal detail for selected ontology nodes.
 - Separate normalized ontology constructs and SHACL-derived slots/facets from optional raw SHACL evidence; empty raw-evidence sections shall not be shown.
-- Apply viewer filters as explicit canvas visibility contracts: authored ontology semantics are enabled by default, semantic context and external source layers are opt-in, ontology terms and class-membership context stay available, role controls govern optional SHACL, resource, and external-reference visibility, and construct notation remains available as passive legend and modal evidence.
+- Apply viewer filters as explicit canvas visibility contracts: authored structural ontology semantics are enabled by default, Concepts, semantic context, and external source layers are independently controlled overlays, ontology terms and class-membership context stay available, role controls govern optional SHACL, resource, and external-reference visibility, and construct notation remains available as passive legend and modal evidence.
 - Keep linked source citations in the viewer and the served `ontologies.ttl` artifact available for traceability and downstream tooling without rendering raw Turtle blocks as the primary page content.
 
 #### Metadata
@@ -212,13 +243,16 @@ The Ontologies view shall:
 
 ### OWL Semantic Ontology Projection
 
-The system shall transform semantic-index RDF quads into generated ontology projection facts that suppress RDF serialization mechanics and expose stable ontology concepts for both full semantic export and Explorer visualization.
+The system shall consume o-kernel construct classifications and Reqvire semantic-index context to produce generated ontology projection facts that suppress RDF serialization mechanics and expose stable ontology concepts for both full semantic export and Explorer visualization.
 
 #### Details
-The projection shall classify terms by semantic role, preserve source traceability, reuse generated direct-authored OWL/RDFS/SHACL construct data to `SemanticIndex`, expose that data as a reusable ontology projection subgraph inside the existing in-memory RDF projection, derive normalized slot/facet records from SHACL property shapes, and omit primary rendering of `rdf:type` edges, RDF list plumbing, metaclass resources, and anonymous blank-node implementation details unless those nodes represent a meaningful ontology construct.
+The projection shall preserve source traceability, reuse o-kernel direct-authored OWL/RDFS/SHACL construct classification data through `SemanticIndex`, expose that data as a reusable ontology projection subgraph inside the existing in-memory RDF projection, derive Reqvire viewer slot/facet records from SHACL property shapes, and omit primary rendering of `rdf:type` edges, RDF list plumbing, metaclass resources, and anonymous blank-node implementation details unless those nodes represent a meaningful ontology construct.
 
 #### Metadata
   * type: requirement
+
+#### Reused Contract Context
+  * [Ontology Construct Classification Specification](../../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
 
 #### Relations
   * definedBy: [OWL Semantic Ontology Projection Contract Specification](Specifications.md#owl-semantic-ontology-projection-contract-specification)
@@ -283,7 +317,7 @@ The Knowledge Graph view shall:
 - Answer what actual project elements and facts exist right now.
 - Be reached through the canonical `index.html#/model` Explorer route by selecting Graph mode; a separate Knowledge Graph route or document entry point shall not be generated.
 - Render the four system-model layers as first-class graph nodes: ontologies, capabilities, requirements, and verifications. Requirement-owned contracts may appear as subordinate requirement detail/contract nodes when actual project facts reference them, but they are not a separate system-model layer.
-- Render actual relation facts, reused_contract_context facts, concept-reference facts, file targets, and external targets as graph edges or resource nodes.
+- Render actual relation facts, reused_contract_context facts, concept-reference facts, file targets, and external targets as graph edges or resource nodes. Concept-reference facts target SKOS concept nodes and must not create a separate concept-reference node type.
 - Use Reqvire capability-root submodels as the structural graph partitioning contract; reused_contract_context, concept references, verification/satisfaction, and trace facts are overlays rather than submodel boundaries.
 - Treat structural ownership/backbone relations separately from cross-layer evidence relations: `derive` and `specify` organize the capability/requirement submodel backbone, while requirement-owned `define`, `reuse`, `satisfiedBy`, `verifiedBy`, and concept-reference facts connect subordinate details or layers as inspectable overlays.
 - Reuse the dense Explorer graph and modal-detail interaction pattern used by the ontology viewer, while focusing on project instances rather than ontology vocabulary definitions.
@@ -296,7 +330,7 @@ The Knowledge Graph view shall:
 #### Relations
   * definedBy: [Project Knowledge Graph View Contract Specification](Specifications.md#project-knowledge-graph-view-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [GraphLibraryViews.tsx](../../../explorer/src/views/GraphLibraryViews.tsx)
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
 ---
@@ -314,7 +348,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Reused Contract Context Link Serving Contract Specification](Specifications.md#reused-contract-context-link-serving-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * verifiedBy: [Reused Contract Context Link Serving Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#reused-contract-context-link-serving-verification)
 ---
 
@@ -337,13 +371,7 @@ The SPA Explorer shell shall:
 - Do not generate separate Explorer/report document entry points.
 - Seed a normalized project snapshot that distinguishes modeled source-file containers from modeled resource and evidence-file targets. The Model tree shall contain modeled element files plus existing repository-relative local implementation/evidence/resource files referenced by graph-registry facts, while unrelated repository files remain absent.
 - Keep containment, model, knowledge graph, verification traces, coverage, resources, ontology, search, summaries, and route state as view-neutral store projections rather than separate page-local data models.
-- Preserve the current relation model: capabilities may author concept references and are specified/verified; requirements own contracts, satisfaction evidence, verification evidence, reusable contract reused_contract_context, and concept references.
-
-#### Concept References
-  * Project Store: reqvire:BrowserLocalProjectStore
-  * Explorer Route: reqvire:ExplorerRoute
-  * File Container: reqvire:FileContainer
-  * Resource Reference: reqvire:ModeledResource
+- Preserve the current relation model: capabilities may author concept references and are specified by requirements; requirements own contracts, satisfaction evidence, verification evidence, reusable contract reused_contract_context, and concept references. Capability coverage is computed from verified requirements.
 
 #### Metadata
   * type: requirement
@@ -352,8 +380,8 @@ The SPA Explorer shell shall:
   * definedBy: [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
   * definedBy: [SPA Explorer Store Contract Specification](Specifications.md#spa-explorer-store-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [git_commands.rs](../../../core/src/git_commands.rs)
-  * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
+  * satisfiedBy: [git_commands.rs](../../../crates/reqvire-core/src/git_commands.rs)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [DetailDialog.tsx](../../../explorer/design-system/product-patterns/detail/DetailDialog.tsx)
   * satisfiedBy: [FileBrowser.tsx](../../../explorer/design-system/product-patterns/files/FileBrowser.tsx)
   * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
@@ -383,9 +411,9 @@ The Traces view shall:
 
 #### Relations
   * definedBy: [Explorer Verification Trace Rendering Specification](Specifications.md#explorer-verification-trace-rendering-specification)
-  * definedBy: [TraceFlowView](TraceFlowView.md#traceflowview)
+  * definedBy: [Traces View](TracesView.md#traces-view)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
 ---
@@ -400,7 +428,7 @@ The color scheme shall provide:
 - Element role tokens and glyphs for visual differentiation across files, model elements, resources, relation pills, graph nodes, badges, tiles, and modals
 - Status tokens for verification, warning, error, and success states
 - Interactive state tokens for hover, focus, selected, disabled, and active controls
-- Programmatic palette tokens for browser-rendered graph, Mermaid, D3/Sankey, and badge renderers
+- Programmatic palette tokens for browser-rendered graph, Mermaid, and badge renderers
 
 The system shall ensure color consistency between:
 - Explorer route styling
@@ -415,7 +443,7 @@ The system shall ensure color consistency between:
 #### Relations
   * definedBy: [Explorer Color and Type Palette Specification](Specifications.md#explorer-color-and-type-palette-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
+  * satisfiedBy: [containment.rs](../../../crates/reqvire-core/src/containment.rs)
   * satisfiedBy: [ElementIcon.tsx](../../../explorer/design-system/components/data/ElementIcon.tsx)
   * satisfiedBy: [palette.ts](../../../explorer/design-system/palette.ts)
   * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)

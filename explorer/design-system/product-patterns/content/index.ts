@@ -14,7 +14,7 @@ export type {
 } from "./GraphCanvasFrame";
 export { MarkdownFrame, MARKDOWN_TABLE_WRAP_CLASS } from "./MarkdownFrame";
 export type { MarkdownFrameProps, MarkdownFrameVariant } from "./MarkdownFrame";
-export { ModelGraphShell } from "./ModelGraphShell";
-export type { ModelGraphShellProps } from "./ModelGraphShell";
+export { WorkspaceShell } from "./WorkspaceShell";
+export type { WorkspaceShellProps } from "./WorkspaceShell";
 export { RendererNotice } from "./RendererNotice";
 export type { RendererNoticeProps, RendererNoticeTone } from "./RendererNotice";

@@ -63,6 +63,9 @@ export interface OntologyDetailNode {
   node_type?: string;
   semantic_type?: string;
   full_uri?: string;
+  ontology_document?: string;
+  layer?: "authored" | "concepts" | "reqvire-context" | "external-source";
+  source_kind?: "ontology" | "shape" | "concepts" | "model-context" | "external-ontology";
   comment?: string;
   rdf_types?: string[];
   sources?: OntologyDetailSource[];
@@ -133,7 +136,6 @@ const detailDialogBaseUX = css`
   --ux-ontology-detail-dialog-chrome-h: 176px;
   --ux-ontology-meta-key-col: minmax(92px, 160px);
   --ux-ontology-meta-key-col-narrow: minmax(72px, 0.32fr);
-  --ux-ontology-modal-rail-col: minmax(260px, 320px);
   width: min(var(--ux-ontology-detail-dialog-w), calc(100vw - var(--space-24)));
   max-width: min(var(--ux-ontology-detail-dialog-w), calc(100vw - var(--space-24)));
   max-height: min(92vh, var(--ux-ontology-detail-dialog-max-h));
@@ -320,11 +322,6 @@ const metadataRowSkinX = css`
   }
 `;
 
-const metadataRailRowUX = css`
-  grid-template-columns: 1fr;
-  gap: var(--space-1);
-`;
-
 const metadataKeySkinX = css`
   color: var(--text-muted);
   font-weight: var(--weight-medium);
@@ -401,13 +398,9 @@ const ontologyUriCopySkinX = css`
 
 const ontologyLayoutUX = css`
   display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--ux-ontology-modal-rail-col);
-  gap: var(--space-16);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-12);
   align-items: start;
-
-  @media (max-width: 980px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const ontologyColumnUX = css`
@@ -418,13 +411,7 @@ const ontologyColumnUX = css`
 `;
 
 const ontologyRailUX = css`
-  position: sticky;
-  top: 0;
-
-  @media (max-width: 980px) {
-    position: static;
-    order: -1;
-  }
+  width: 100%;
 `;
 
 const ontologyRailParagraphUX = css`
@@ -548,7 +535,7 @@ const ontologyConstructTitleUX = css`
 
 const ontologyConstructGlyphBaseUX = css`
   display: inline-flex;
-  min-width: var(--row-h);
+  min-width: var(--row-height-compact);
   height: var(--space-12);
   align-items: center;
   justify-content: center;
@@ -567,7 +554,7 @@ const ontologyConstructGlyphSkinX = css`
 
 const ontologyMetaRowsUX = css`
   display: grid;
-  gap: var(--gap-list-stack);
+  gap: var(--stack-gap-compact);
   margin: 0;
 `;
 
@@ -787,6 +774,26 @@ export function OntologyNodeDetailContent({
 }: OntologyNodeDetailContentProps) {
   return (
     <div className={cx(ontologyLayoutUX)}>
+      <section className={cx(ontologyColumnUX, ontologyRailUX)} aria-label="Ontology node summary">
+        <OntologyMetadata node={node} copiedUri={copiedUri} onCopyUri={onCopyUri} />
+        {node.comment ? (
+          <Section title="Description">
+            <p className={cx(ontologyRailParagraphUX)}>{node.comment}</p>
+          </Section>
+        ) : null}
+        {node.badges?.length ? (
+          <Section title="Notation">
+            <div className={cx(ontologyInlineListUX)}>
+              {node.badges.map((badge) => (
+                <span className={cx(ontologySymbolBaseUX, ontologySymbolSkinX)} key={`${badge.kind}-${badge.symbol}`}>
+                  <span aria-hidden="true">{badge.symbol}</span>
+                  {badge.label}
+                </span>
+              ))}
+            </div>
+          </Section>
+        ) : null}
+      </section>
       <main className={cx(ontologyColumnUX)}>
         <OntologyPropertyUsages node={node} nodes={nodes} />
         {isPropertyNode(node) && ((node.domain?.length ?? 0) > 0 || (node.range?.length ?? 0) > 0) ? (
@@ -851,26 +858,6 @@ export function OntologyNodeDetailContent({
           </Section>
         ) : null}
       </main>
-      <aside className={cx(ontologyColumnUX, ontologyRailUX)}>
-        <OntologyMetadata node={node} copiedUri={copiedUri} onCopyUri={onCopyUri} />
-        {node.comment ? (
-          <Section title="Description">
-            <p className={cx(ontologyRailParagraphUX)}>{node.comment}</p>
-          </Section>
-        ) : null}
-        {node.badges?.length ? (
-          <Section title="Notation">
-            <div className={cx(ontologyInlineListUX)}>
-              {node.badges.map((badge) => (
-                <span className={cx(ontologySymbolBaseUX, ontologySymbolSkinX)} key={`${badge.kind}-${badge.symbol}`}>
-                  <span aria-hidden="true">{badge.symbol}</span>
-                  {badge.label}
-                </span>
-              ))}
-            </div>
-          </Section>
-        ) : null}
-      </aside>
     </div>
   );
 }
@@ -889,9 +876,14 @@ export function OntologyMetadata({
       .filter(Boolean)
       .map((type) => String(type).toLowerCase()),
   ));
+  const provenance = ontologyNodeProvenance(node);
   return (
     <div className={cx(metadataBaseUX, metadataSkinX)}>
-      <div className={cx(metadataRowBaseUX, metadataRowSkinX, metadataRailRowUX)}>
+      <div className={cx(metadataRowBaseUX, metadataRowSkinX)}>
+        <span className={cx(metadataKeySkinX)}>Origin</span>
+        <span className={cx(metadataValueBaseUX, metadataValueSkinX)}>{provenance}</span>
+      </div>
+      <div className={cx(metadataRowBaseUX, metadataRowSkinX)}>
         <span className={cx(metadataKeySkinX)}>RDF type</span>
         <span className={cx(metadataValueBaseUX, metadataValueSkinX, metadataBadgeRowUX)}>
           {rdfTypes.map((type) => (
@@ -901,7 +893,7 @@ export function OntologyMetadata({
           ))}
         </span>
       </div>
-      <div className={cx(metadataRowBaseUX, metadataRowSkinX, metadataRailRowUX)}>
+      <div className={cx(metadataRowBaseUX, metadataRowSkinX)}>
         <span className={cx(metadataKeySkinX)}>Full URI</span>
         <span className={cx(metadataValueBaseUX, metadataValueSkinX)}>
           <button
@@ -915,6 +907,14 @@ export function OntologyMetadata({
           </button>
         </span>
       </div>
+      {node.ontology_document ? (
+        <div className={cx(metadataRowBaseUX, metadataRowSkinX)}>
+          <span className={cx(metadataKeySkinX)}>OWL document</span>
+          <span className={cx(metadataValueBaseUX, metadataValueSkinX)}>
+            <CodeRef>{node.ontology_document}</CodeRef>
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -1202,6 +1202,22 @@ function SourceRow({
 
 function ontologyNodeKind(node: OntologyDetailNode) {
   return node.semantic_type || node.node_type || node.type || "resource";
+}
+
+function ontologyNodeProvenance(node: OntologyDetailNode) {
+  if (node.layer === "external-source" || node.source_kind === "external-ontology") {
+    return "External used subset";
+  }
+  if (node.layer === "reqvire-context" || node.source_kind === "model-context") {
+    return "Generated semantic context";
+  }
+  if (node.layer === "concepts") {
+    return "Concept layer";
+  }
+  if (node.source_kind === "shape") {
+    return "Generated construct";
+  }
+  return "Authored ontology";
 }
 
 function isPropertyNode(node: OntologyDetailNode) {

@@ -49,7 +49,7 @@ Based on the Element Type Relation Compatibility specification, the following te
 |-------------|-------------|----------|-----------|
 | requirement | test-verification | ✅ PASS | valid-cases/verifiedby-req-to-test-verif |
 | requirement | analysis-verification | ✅ PASS | valid-cases/verifiedby-req-to-analysis |
-| capability | verification | ✅ PASS | valid-cases/verifiedby-capability-to-verif |
+| capability | verification | ❌ FAIL | invalid-verifiedby/capability-to-verif |
 | test-verification | test-verification | ❌ FAIL | invalid-verifiedby/verif-to-verif |
 | test-verification | requirement | ❌ FAIL | invalid-verifiedby/verif-to-req |
 | other | test-verification | ❌ FAIL | invalid-verifiedby/other-to-verif |
@@ -60,7 +60,7 @@ Based on the Element Type Relation Compatibility specification, the following te
 |-------------|-------------|----------|-----------|
 | test-verification | requirement | ✅ PASS | valid-cases/verify-test-verif-to-req |
 | analysis-verification | requirement | ✅ PASS | valid-cases/verify-analysis-to-req |
-| analysis-verification | capability | ✅ PASS | valid-cases/verify-analysis-to-capability |
+| analysis-verification | capability | ❌ FAIL | invalid-verifiedby/verify-analysis-to-capability |
 | test-verification | test-verification | ❌ FAIL | (covered by verifiedBy inverse) |
 | requirement | requirement | ❌ FAIL | invalid-verifiedby/req-using-verify |
 
@@ -117,8 +117,8 @@ Based on the Element Type Relation Compatibility specification, the following te
 |----------|-------------|--------------|----------------|
 | derivedFrom | 12 | 4 | 8 |
 | satisfiedBy | 12 | 5 | 7 |
-| verifiedBy | 6 | 3 | 3 |
+| verifiedBy | 6 | 2 | 4 |
 | verify | 4 | 2 | 2 |
 | reused_contract_context | 2 | 0 | 2 |
 | Contract | 9 | 3 | 6 |
-| **TOTAL** | **45** | **17** | **28** |
+| **TOTAL** | **45** | **16** | **29** |

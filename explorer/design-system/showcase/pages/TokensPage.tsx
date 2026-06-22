@@ -29,6 +29,9 @@ const ELEMENT_TYPES = [
   { name: "contract", fill: "--contract", tint: "--contract-tint", ink: "--contract-ink" },
   { name: "verification", fill: "--verification", tint: "--verification-tint", ink: "--verification-ink" },
   { name: "ontology", fill: "--ontology", tint: "--ontology-tint", ink: "--ontology-ink" },
+  { name: "concept", fill: "--concept", tint: "--concept-tint", ink: "--concept-ink" },
+  { name: "concept-scheme", fill: "--concept-scheme", tint: "--concept-scheme-tint", ink: "--concept-scheme-ink" },
+  { name: "concept-reference", fill: "--concept-reference", tint: "--concept-reference-tint", ink: "--concept-reference-ink" },
   { name: "resource", fill: "--resource", tint: "--resource-tint", ink: "--resource-ink" },
   { name: "other", fill: "--other", tint: "--other-tint", ink: "--other-ink" },
 ] as const;
@@ -55,11 +58,11 @@ const STATUS_TOKENS = [
 ] as const satisfies readonly { token: DesignSystemColorToken; label: string }[];
 
 const EDGE_TOKENS = [
-  "--edge-default", "--edge-derive", "--edge-satisfy", "--edge-trace", "--edge-reuse",
+  "--edge-default", "--edge-derive", "--edge-satisfy", "--edge-trace", "--edge-reuse", "--concept-reference",
 ] as const satisfies readonly DesignSystemColorToken[];
 
 const RDF_TOKENS = [
-  "--rdf-class", "--rdf-objprop", "--rdf-dtprop", "--rdf-rdfprop",
+  "--rdf-class", "--rdf-concept", "--rdf-concept-scheme", "--rdf-objprop", "--rdf-dtprop", "--rdf-rdfprop",
   "--rdf-individual", "--rdf-datatype", "--rdf-restriction", "--rdf-classexpr",
   "--rdf-nodeshape", "--rdf-propshape", "--rdf-resource",
 ] as const satisfies readonly DesignSystemColorToken[];
@@ -96,7 +99,7 @@ const SHADOWS = [
 export function TokensPage() {
   return (
     <div className="showcase-page">
-      <Section title="Element-type colors" desc="Six semantic hues encode the model vocabulary. Never repurpose for decoration.">
+      <Section title="Element-type colors" desc="Semantic hues encode the model vocabulary. Never repurpose for decoration.">
         {ELEMENT_TYPES.map((t) => (
           <div key={t.name}>
             <div className="showcase-label showcase-label--spaced">{t.name}</div>

@@ -12,6 +12,226 @@ if [ $TTL_EXIT -ne 0 ]; then
   exit 1
 fi
 
+set +e
+SEMANTIC_ONTOLOGIES_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic ontologies 2>&1)
+SEMANTIC_ONTOLOGIES_EXIT=$?
+SEMANTIC_SHAPES_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic shapes 2>&1)
+SEMANTIC_SHAPES_EXIT=$?
+SEMANTIC_CONCEPTS_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic concepts --include-mappings 2>&1)
+SEMANTIC_CONCEPTS_EXIT=$?
+CONCEPTS_EXPORT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" concepts export --include-mappings 2>&1)
+CONCEPTS_EXPORT_EXIT=$?
+CONCEPTS_VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" concepts validate 2>&1)
+CONCEPTS_VALIDATE_EXIT=$?
+SEMANTIC_GRAPH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic graph --full 2>&1)
+SEMANTIC_GRAPH_EXIT=$?
+NATIVE_CONCEPT_SEARCH_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type concept --json 2>&1)
+NATIVE_CONCEPT_SEARCH_EXIT=$?
+NATIVE_SCHEME_SEARCH_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type concept-scheme --json 2>&1)
+NATIVE_SCHEME_SEARCH_EXIT=$?
+NATIVE_CONCEPT_MODEL_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --filter-type concept-scheme --json 2>&1)
+NATIVE_CONCEPT_MODEL_EXIT=$?
+NATIVE_CONCEPT_COLLECT_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" collect "API Endpoint Requirement" --json 2>&1)
+NATIVE_CONCEPT_COLLECT_EXIT=$?
+set -e
+
+if [ $SEMANTIC_ONTOLOGIES_EXIT -ne 0 ]; then
+  echo "FAILED: semantic ontologies command failed"
+  echo "$SEMANTIC_ONTOLOGIES_OUTPUT"
+  exit 1
+fi
+
+if [ $SEMANTIC_SHAPES_EXIT -ne 0 ]; then
+  echo "FAILED: semantic shapes command failed"
+  echo "$SEMANTIC_SHAPES_OUTPUT"
+  exit 1
+fi
+
+if [ $SEMANTIC_CONCEPTS_EXIT -ne 0 ]; then
+  echo "FAILED: semantic concepts command failed"
+  echo "$SEMANTIC_CONCEPTS_OUTPUT"
+  exit 1
+fi
+
+if [ $CONCEPTS_EXPORT_EXIT -ne 0 ]; then
+  echo "FAILED: concepts export command failed"
+  echo "$CONCEPTS_EXPORT_OUTPUT"
+  exit 1
+fi
+
+if [ $CONCEPTS_VALIDATE_EXIT -ne 0 ]; then
+  echo "FAILED: concepts validate command failed"
+  echo "$CONCEPTS_VALIDATE_OUTPUT"
+  exit 1
+fi
+
+if [ $SEMANTIC_GRAPH_EXIT -ne 0 ]; then
+  echo "FAILED: semantic graph command failed"
+  echo "$SEMANTIC_GRAPH_OUTPUT"
+  exit 1
+fi
+
+if [ $NATIVE_CONCEPT_SEARCH_EXIT -ne 0 ]; then
+  echo "FAILED: search --filter-type concept command failed"
+  echo "$NATIVE_CONCEPT_SEARCH_JSON"
+  exit 1
+fi
+
+if [ $NATIVE_SCHEME_SEARCH_EXIT -ne 0 ]; then
+  echo "FAILED: search --filter-type concept-scheme command failed"
+  echo "$NATIVE_SCHEME_SEARCH_JSON"
+  exit 1
+fi
+
+if [ $NATIVE_CONCEPT_MODEL_EXIT -ne 0 ]; then
+  echo "FAILED: model --filter-type concept-scheme command failed"
+  echo "$NATIVE_CONCEPT_MODEL_JSON"
+  exit 1
+fi
+
+if [ $NATIVE_CONCEPT_COLLECT_EXIT -ne 0 ]; then
+  echo "FAILED: collect with native concept reference command failed"
+  echo "$NATIVE_CONCEPT_COLLECT_JSON"
+  exit 1
+fi
+
+if ! grep -q "<https://example.test/ontology#ServiceEndpoint> a <http://www.w3.org/2002/07/owl#Class>" <<< "$SEMANTIC_ONTOLOGIES_OUTPUT"; then
+  echo "FAILED: semantic ontologies output missing ontology class"
+  echo "$SEMANTIC_ONTOLOGIES_OUTPUT"
+  exit 1
+fi
+
+if grep -q "<https://example.test/ontology#ServiceEndpointShape>" <<< "$SEMANTIC_ONTOLOGIES_OUTPUT"; then
+  echo "FAILED: semantic ontologies output must not include semantic-contract SHACL shapes"
+  echo "$SEMANTIC_ONTOLOGIES_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "<https://example.test/ontology#ServiceEndpointShape>" <<< "$SEMANTIC_SHAPES_OUTPUT"; then
+  echo "FAILED: semantic shapes output missing SHACL shape"
+  echo "$SEMANTIC_SHAPES_OUTPUT"
+  exit 1
+fi
+
+if grep -q "<https://example.test/ontology#ServiceEndpoint> a <http://www.w3.org/2002/07/owl#Class>" <<< "$SEMANTIC_SHAPES_OUTPUT"; then
+  echo "FAILED: semantic shapes output must not include authored ontology classes"
+  echo "$SEMANTIC_SHAPES_OUTPUT"
+  exit 1
+fi
+
+if grep -q "<https://example.test/concepts#TraceabilityConcept>" <<< "$SEMANTIC_CONCEPTS_OUTPUT"; then
+  echo "FAILED: semantic concepts output must not include legacy Turtle-authored SKOS concepts"
+  echo "$SEMANTIC_CONCEPTS_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "https://www.reqvire.org/ontology#mapsToConcept" <<< "$SEMANTIC_CONCEPTS_OUTPUT"; then
+  echo "FAILED: semantic concepts --include-mappings output missing concept bridge"
+  echo "$SEMANTIC_CONCEPTS_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "https://www.reqvire.org/ontology#mapsToConcept" <<< "$CONCEPTS_EXPORT_OUTPUT"; then
+  echo "FAILED: concepts export --include-mappings output missing concept bridge"
+  echo "$CONCEPTS_EXPORT_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "<https://example.test/concepts#NativeTraceability> a <http://www.w3.org/2004/02/skos/core#Concept>" <<< "$CONCEPTS_EXPORT_OUTPUT"; then
+  echo "FAILED: concepts export output missing Markdown-generated native concept RDF"
+  echo "$CONCEPTS_EXPORT_OUTPUT"
+  exit 1
+fi
+
+for native_concept_token in \
+  "<https://example.test/concepts#NativeConcepts>" \
+  "<http://www.w3.org/2004/02/skos/core#ConceptScheme>" \
+  "Native concept scheme authored as Reqvire Markdown." \
+  "<http://www.w3.org/2004/02/skos/core#hasTopConcept>" \
+  "<https://example.test/concepts#EngineeringKnowledge>" \
+  "<https://example.test/concepts#NativeTraceability>" \
+  "<https://example.test/concepts#ServiceEndpoint>" \
+  "<http://www.w3.org/2004/02/skos/core#Concept>" \
+  "<http://www.w3.org/2004/02/skos/core#inScheme>" \
+  "\"Native Traceability\"" \
+  "<http://www.w3.org/2004/02/skos/core#altLabel>" \
+  "\"Trace link analysis\"" \
+  "<http://www.w3.org/2004/02/skos/core#broader>" \
+  "<http://www.w3.org/2004/02/skos/core#related>" \
+  "<https://example.test/concepts#VerificationEvidence>"; do
+  if ! grep -qF "$native_concept_token" <<< "$SEMANTIC_CONCEPTS_OUTPUT"; then
+    echo "FAILED: semantic concepts output missing native Markdown concept token: $native_concept_token"
+    echo "$SEMANTIC_CONCEPTS_OUTPUT"
+    exit 1
+  fi
+done
+
+if grep -q "<https://example.test/concepts#NativeTraceability> a <http://www.w3.org/2004/02/skos/core#Concept>" <<< "$SEMANTIC_ONTOLOGIES_OUTPUT"; then
+  echo "FAILED: semantic ontologies output must not include Markdown-generated native concept RDF"
+  echo "$SEMANTIC_ONTOLOGIES_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "<https://example.test/concepts#NativeTraceability> a <http://www.w3.org/2004/02/skos/core#Concept>" <<< "$SEMANTIC_GRAPH_OUTPUT"; then
+  echo "FAILED: semantic graph output missing Markdown-generated native concept RDF"
+  echo "$SEMANTIC_GRAPH_OUTPUT"
+  exit 1
+fi
+
+if ! jq -e '
+  any(.files[].elements[];
+    .name == "Native Traceability"
+    and .concept.pref_label == "Native Traceability"
+    and (.concept.definition | contains("engineering intent"))
+    and any(.relations[]; .relation_type == "broader" and (.target.target | endswith("SemanticContracts.md#engineering-knowledge")))
+    and any(.relations[]; .relation_type == "related" and (.target.target | endswith("SemanticContracts.md#verification-evidence"))))
+  and any(.files[].elements[]; .name == "Engineering Knowledge")
+  and any(.files[].elements[]; .name == "Verification Evidence")
+' >/dev/null 2>&1 <<< "$NATIVE_CONCEPT_SEARCH_JSON"; then
+  echo "FAILED: search --filter-type concept JSON missing native concept payloads or concept relations"
+  echo "$NATIVE_CONCEPT_SEARCH_JSON"
+  exit 1
+fi
+
+if ! jq -e '
+  any(.files[].elements[];
+    .name == "Native Concepts"
+    and .concept_scheme.pref_label == "Native Concepts"
+    and (.concept_scheme.definition | contains("Native concept scheme"))
+    and (.concept_scheme.top_concepts | length == 3))
+' >/dev/null 2>&1 <<< "$NATIVE_SCHEME_SEARCH_JSON"; then
+  echo "FAILED: search --filter-type concept-scheme JSON missing native concept scheme payload"
+  echo "$NATIVE_SCHEME_SEARCH_JSON"
+  exit 1
+fi
+
+if ! jq -e '
+  any(.elements[];
+    .name == "Native Concepts"
+    and .element_type == "concept-scheme"
+    and any(.relations[]; .relation_type == "derive" and .element.name == "Engineering Knowledge"))
+' >/dev/null 2>&1 <<< "$NATIVE_CONCEPT_MODEL_JSON"; then
+  echo "FAILED: model --filter-type concept-scheme JSON missing native concept root hierarchy"
+  echo "$NATIVE_CONCEPT_MODEL_JSON"
+  exit 1
+fi
+
+if ! jq -e '
+  .metadata.concept_context_count >= 1
+  and any(.items[]; .name == "Native Traceability" and .source_type == "concept_context")
+  and any(.items[]; .name == "Engineering Knowledge" and .source_type == "concept_context")
+' >/dev/null 2>&1 <<< "$NATIVE_CONCEPT_COLLECT_JSON"; then
+  echo "FAILED: collect JSON missing Markdown-native concept context for concept references"
+  echo "$NATIVE_CONCEPT_COLLECT_JSON"
+  exit 1
+fi
+
+if ! grep -q "reqvire:OntologyProjectionGraph" <<< "$SEMANTIC_GRAPH_OUTPUT"; then
+  echo "FAILED: semantic graph --full output missing generated ontology projection facts"
+  echo "$SEMANTIC_GRAPH_OUTPUT"
+  exit 1
+fi
+
 count_occurrences() {
   { grep -oF "$1" <<< "$2" || true; } | wc -l | tr -d ' '
 }
@@ -46,6 +266,91 @@ if ! grep -q "reqvire:ontologyPrefix \"testonto\"" <<< "$TTL_OUTPUT"; then
   exit 1
 fi
 
+if ! grep -q "<https://example.test/ontology#ServiceEndpoint> rdfs:isDefinedBy <https://example.test/ontology>" <<< "$TTL_OUTPUT"; then
+  echo "FAILED: Turtle output missing generated rdfs:isDefinedBy edge from authored ontology term to ontology document"
+  echo "$TTL_OUTPUT"
+  exit 1
+fi
+
+set +e
+FILTERED_CONCEPT_TTL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies --namespace-base https://example.test/ontology/conceptual 2>&1)
+FILTERED_CONCEPT_EXIT=$?
+set -e
+
+if [ $FILTERED_CONCEPT_EXIT -ne 0 ]; then
+  echo "FAILED: ontologies --namespace-base command failed"
+  echo "$FILTERED_CONCEPT_TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "<https://example.test/ontology/conceptual> a owl:Ontology" <<< "$FILTERED_CONCEPT_TTL_OUTPUT"; then
+  echo "FAILED: namespace-filtered Turtle output missing selected ontology document declaration"
+  echo "$FILTERED_CONCEPT_TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "<https://example.test/ontology/conceptual#TraceabilityConstruct> a <http://www.w3.org/2002/07/owl#Class>" <<< "$FILTERED_CONCEPT_TTL_OUTPUT"; then
+  echo "FAILED: namespace-filtered Turtle output missing selected namespace term"
+  echo "$FILTERED_CONCEPT_TTL_OUTPUT"
+  exit 1
+fi
+
+if grep -q "<https://example.test/ontology#ServiceEndpoint> a <http://www.w3.org/2002/07/owl#Class>" <<< "$FILTERED_CONCEPT_TTL_OUTPUT"; then
+  echo "FAILED: namespace-filtered Turtle output included non-selected ontology term"
+  echo "$FILTERED_CONCEPT_TTL_OUTPUT"
+  exit 1
+fi
+
+set +e
+FILTERED_API_TTL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies --namespace-base https://example.test/ontology# 2>&1)
+FILTERED_API_EXIT=$?
+set -e
+
+if [ $FILTERED_API_EXIT -ne 0 ]; then
+  echo "FAILED: ontologies --namespace-base term namespace command failed"
+  echo "$FILTERED_API_TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "<https://example.test/ontology#ServiceEndpoint> a <http://www.w3.org/2002/07/owl#Class>" <<< "$FILTERED_API_TTL_OUTPUT"; then
+  echo "FAILED: term-namespace-filtered Turtle output missing selected ontology term"
+  echo "$FILTERED_API_TTL_OUTPUT"
+  exit 1
+fi
+
+if grep -q "<https://example.test/concepts#TraceabilityConcept> a <http://www.w3.org/2004/02/skos/core#Concept>" <<< "$FILTERED_API_TTL_OUTPUT"; then
+  echo "FAILED: term-namespace-filtered Turtle output included non-selected ontology term"
+  echo "$FILTERED_API_TTL_OUTPUT"
+  exit 1
+fi
+
+set +e
+FILTERED_FULL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies --full --namespace-base https://example.test/ontology# 2>&1)
+FILTERED_FULL_EXIT=$?
+set -e
+
+if [ $FILTERED_FULL_EXIT -eq 0 ]; then
+  echo "FAILED: ontologies --full --namespace-base should be rejected until full-context filtering is specified"
+  echo "$FILTERED_FULL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q -- "--namespace-base filters clean authored semantic exports" <<< "$FILTERED_FULL_OUTPUT"; then
+  echo "FAILED: ontologies --full --namespace-base rejection did not explain clean export boundary"
+  echo "$FILTERED_FULL_OUTPUT"
+  exit 1
+fi
+
+for authored_term in \
+  "ProductionEndpoint" \
+  "SecondaryEndpoint"; do
+  if ! grep -q "<https://example.test/ontology#$authored_term> rdfs:isDefinedBy <https://example.test/ontology>" <<< "$TTL_OUTPUT"; then
+    echo "FAILED: Turtle output missing generated rdfs:isDefinedBy edge for authored ontology named subject: $authored_term"
+    echo "$TTL_OUTPUT"
+    exit 1
+  fi
+done
+
 for prefix in \
   "@prefix owl:" \
   "@prefix rdf:" \
@@ -74,19 +379,9 @@ if [ "$ONTOLOGY_DECL_COUNT" -ne 1 ]; then
   exit 1
 fi
 
-IMPORT_COUNT=$(( \
-  $(count_occurrences "owl:imports <https://example.test/imported>" "$TTL_OUTPUT") + \
-  $(count_occurrences "<http://www.w3.org/2002/07/owl#imports> <https://example.test/imported>" "$TTL_OUTPUT") \
-))
+IMPORT_COUNT=$(count_occurrences "<https://example.test/imported>" "$TTL_OUTPUT")
 if [ "$IMPORT_COUNT" -ne 1 ]; then
   echo "FAILED: Turtle output should contain the duplicated authored owl:imports statement exactly once"
-  echo "$TTL_OUTPUT"
-  exit 1
-fi
-
-if grep -q "owl:imports <https://example.test/ontology>" <<< "$TTL_OUTPUT" || \
-   grep -q "<http://www.w3.org/2002/07/owl#imports> <https://example.test/ontology>" <<< "$TTL_OUTPUT"; then
-  echo "FAILED: Turtle output must not synthesize ontology imports"
   echo "$TTL_OUTPUT"
   exit 1
 fi
@@ -133,7 +428,10 @@ for external_source_token in \
   "RDF/XML external code property" \
   "RDF/XML external resource" \
   "Unused RDF/XML external resource" \
-  "Unused RDF/XML external code property"; do
+  "Unused RDF/XML external code property" \
+  "An idea or notion; a unit of thought." \
+  "A set of concepts, optionally including statements about semantic relationships between those concepts." \
+  "The preferred lexical label for a resource, in a given language."; do
   if grep -qF "$external_source_token" <<< "$TTL_OUTPUT"; then
     echo "FAILED: default Turtle output must not include external ontology source triples: $external_source_token"
     echo "$TTL_OUTPUT"
@@ -170,7 +468,11 @@ for used_external_subset_token in \
   "<https://example.test/rdf-external#rdfExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
   "RDF/XML external code datatype" \
   "RDF/XML external code property" \
-  "RDF/XML external resource"; do
+  "RDF/XML external resource" \
+  "<http://www.w3.org/2004/02/skos/core#Concept> a <http://www.w3.org/2002/07/owl#Class>" \
+  "<http://www.w3.org/2004/02/skos/core#ConceptScheme> a <http://www.w3.org/2002/07/owl#Class>" \
+  "An idea or notion; a unit of thought." \
+  "A set of concepts, optionally including statements about semantic relationships between those concepts."; do
   if ! grep -qF "$used_external_subset_token" <<< "$EXTERNAL_TTL_OUTPUT"; then
     echo "FAILED: --include-external Turtle output missing used external subset triple: $used_external_subset_token"
     echo "$EXTERNAL_TTL_OUTPUT"
@@ -193,13 +495,42 @@ for unused_external_source_token in \
   "<https://example.test/rdf-external#UnusedRdfExternalResource> a <http://www.w3.org/2002/07/owl#Class>" \
   "<https://example.test/rdf-external#unusedRdfExternalCode> a <http://www.w3.org/2002/07/owl#DatatypeProperty>" \
   "Unused RDF/XML external resource" \
-  "Unused RDF/XML external code property"; do
+  "Unused RDF/XML external code property" \
+  "<http://www.w3.org/2004/02/skos/core#OrderedCollection> a <http://www.w3.org/2002/07/owl#Class>" \
+  "An ordered collection of concepts, where both the grouping and the ordering are meaningful."; do
   if grep -qF "$unused_external_source_token" <<< "$EXTERNAL_TTL_OUTPUT"; then
     echo "FAILED: --include-external Turtle output must not include unused external source triple: $unused_external_source_token"
     echo "$EXTERNAL_TTL_OUTPUT"
     exit 1
   fi
 done
+
+for external_definition_token in \
+  "<https://example.test/external#ExternalCode> rdfs:isDefinedBy" \
+  "<https://example.test/external#ExternalCode> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy>" \
+  "<https://example.test/jsonld-external#JsonExternalCode> rdfs:isDefinedBy" \
+  "<https://example.test/jsonld-external#JsonExternalCode> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy>" \
+  "<https://example.test/rdf-external#RdfExternalCode> rdfs:isDefinedBy" \
+  "<https://example.test/rdf-external#RdfExternalCode> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy>"; do
+  if grep -qF "$external_definition_token" <<< "$EXTERNAL_TTL_OUTPUT"; then
+    echo "FAILED: --include-external Turtle output must not generate rdfs:isDefinedBy for external source terms: $external_definition_token"
+    echo "$EXTERNAL_TTL_OUTPUT"
+    exit 1
+  fi
+done
+
+if ! grep -qF "# Source: reqvire:external-used-subset" <<< "$EXTERNAL_TTL_OUTPUT"; then
+  echo "FAILED: --include-external Turtle output should include the external-used-subset source section"
+  echo "$EXTERNAL_TTL_OUTPUT"
+  exit 1
+fi
+
+if grep -qF "reqvire:ExternalOntologySource" <<< "$EXTERNAL_TTL_OUTPUT" || \
+   grep -qF "reqvire:externalOntologyResource" <<< "$EXTERNAL_TTL_OUTPUT"; then
+  echo "FAILED: --include-external Turtle output must not dump raw external ontology source graph triples"
+  echo "$EXTERNAL_TTL_OUTPUT"
+  exit 1
+fi
 
 set +e
 FULL_EXTERNAL_TTL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies --full --include-external 2>&1)
@@ -295,6 +626,22 @@ if ! grep -qF '"@value":"testonto"' <<< "$JSONLD_OUTPUT"; then
   exit 1
 fi
 
+if ! jq -e 'any(.[]; .["@id"] == "https://example.test/ontology#ServiceEndpoint" and ((.["http://www.w3.org/2000/01/rdf-schema#isDefinedBy"] // []) | map(.["@id"]) | index("https://example.test/ontology")))' >/dev/null 2>&1 <<< "$JSONLD_OUTPUT"; then
+  echo "FAILED: JSON-LD output missing generated rdfs:isDefinedBy edge from authored ontology term to ontology document"
+  echo "$JSONLD_OUTPUT"
+  exit 1
+fi
+
+for authored_term in \
+  "ProductionEndpoint" \
+  "SecondaryEndpoint"; do
+  if ! jq -e --arg iri "https://example.test/ontology#$authored_term" 'any(.[]; .["@id"] == $iri and ((.["http://www.w3.org/2000/01/rdf-schema#isDefinedBy"] // []) | map(.["@id"]) | index("https://example.test/ontology")))' >/dev/null 2>&1 <<< "$JSONLD_OUTPUT"; then
+    echo "FAILED: JSON-LD output missing generated rdfs:isDefinedBy edge for authored ontology named subject: $authored_term"
+    echo "$JSONLD_OUTPUT"
+    exit 1
+  fi
+done
+
 JSONLD_IMPORT_COUNT=$(jq '[.[] | select(.["@id"] == "https://example.test/ontology") | .["http://www.w3.org/2002/07/owl#imports"][]? | select(.["@id"] == "https://example.test/imported")] | length' <<< "$JSONLD_OUTPUT")
 if [ "$JSONLD_IMPORT_COUNT" -ne 1 ]; then
   echo "FAILED: JSON-LD output should contain the duplicated authored owl:imports statement exactly once"
@@ -307,7 +654,6 @@ for forbidden in \
   "OntologyConstruct" \
   "urn:reqvire:ontology-construct" \
   "urn:reqvire:ontology-member" \
-  "urn:reqvire:ontology-symbol" \
   "projectionDerivationMode"; do
   if grep -qF "$forbidden" <<< "$JSONLD_OUTPUT"; then
     echo "FAILED: default JSON-LD output must not contain generated ontology projection marker: $forbidden"
@@ -350,7 +696,10 @@ for used_external_jsonld_token in \
   "JSON-LD external code property" \
   "https://example.test/rdf-external#rdfExternalCode" \
   "https://example.test/rdf-external#RdfExternalResource" \
-  "RDF/XML external code property"; do
+  "RDF/XML external code property" \
+  "http://www.w3.org/2004/02/skos/core#Concept" \
+  "http://www.w3.org/2004/02/skos/core#ConceptScheme" \
+  "An idea or notion; a unit of thought."; do
   if ! grep -qF "$used_external_jsonld_token" <<< "$EXTERNAL_JSONLD_OUTPUT"; then
     echo "FAILED: include-external JSON-LD output missing used external subset token: $used_external_jsonld_token"
     echo "$EXTERNAL_JSONLD_OUTPUT"
@@ -364,13 +713,22 @@ for unused_external_jsonld_token in \
   "Unused JSON-LD external resource" \
   "unusedJsonExternalCode" \
   "Unused RDF/XML external resource" \
-  "unusedRdfExternalCode"; do
+  "unusedRdfExternalCode" \
+  "http://www.w3.org/2004/02/skos/core#OrderedCollection" \
+  "An ordered collection of concepts, where both the grouping and the ordering are meaningful."; do
   if grep -qF "$unused_external_jsonld_token" <<< "$EXTERNAL_JSONLD_OUTPUT"; then
     echo "FAILED: include-external JSON-LD output must not include unused external source token: $unused_external_jsonld_token"
     echo "$EXTERNAL_JSONLD_OUTPUT"
     exit 1
   fi
 done
+
+if grep -qF '"externalOntologySource"' <<< "$EXTERNAL_JSONLD_OUTPUT" || \
+   grep -qF '"externalOntologyResource"' <<< "$EXTERNAL_JSONLD_OUTPUT"; then
+  echo "FAILED: include-external JSON-LD output must not dump raw external ontology source graph triples"
+  echo "$EXTERNAL_JSONLD_OUTPUT"
+  exit 1
+fi
 
 set +e
 FULL_TTL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies --full 2>&1)
@@ -389,7 +747,7 @@ if ! grep -q "urn:reqvire:element:api-capability" <<< "$FULL_TTL_OUTPUT"; then
   exit 1
 fi
 
-if ! grep -q "reqvire:conceptReference <https://example.test/ontology#ServiceEndpoint>" <<< "$FULL_TTL_OUTPUT"; then
+if ! grep -q "reqvire:conceptReference <https://example.test/concepts#ServiceEndpoint>" <<< "$FULL_TTL_OUTPUT"; then
   echo "FAILED: full Turtle output missing concept-reference term edge"
   echo "$FULL_TTL_OUTPUT"
   exit 1
@@ -435,10 +793,8 @@ for token in \
   "reqvire:OntologyProjectionGraph" \
   "reqvire:OntologyConstructProjection" \
   "reqvire:OntologyConstruct" \
-  "reqvire:OntologySymbol" \
   "urn:reqvire:ontology-construct" \
   "urn:reqvire:ontology-member" \
-  "urn:reqvire:ontology-symbol" \
   "reqvire:projectionDerivationMode \"direct-authored\"" \
   "reqvire:constructFamily \"property-domain-range\"" \
   "reqvire:constructKind \"property-chain\"" \
@@ -486,7 +842,6 @@ for token in \
   "OntologyConstruct" \
   "urn:reqvire:ontology-construct" \
   "urn:reqvire:ontology-member" \
-  "urn:reqvire:ontology-symbol" \
   "projectionDerivationMode"; do
   if ! grep -qF "$token" <<< "$FULL_JSONLD_OUTPUT"; then
     echo "FAILED: full JSON-LD output missing generated ontology projection marker: $token"
@@ -572,7 +927,7 @@ for construct in \
   fi
 done
 
-# Representative OWL reserved vocabulary IRIs must survive serialization without requiring local External Ontology sources.
+# Representative standards reserved vocabulary IRIs must survive serialization without requiring local External Ontology sources.
 for reserved_iri in \
   "http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral" \
   "http://www.w3.org/2000/01/rdf-schema#label" \
@@ -584,16 +939,82 @@ for reserved_iri in \
   "http://www.w3.org/2001/XMLSchema#anyURI" \
   "http://www.w3.org/2001/XMLSchema#string" \
   "http://www.w3.org/2001/XMLSchema#boolean" \
-  "http://www.w3.org/2001/XMLSchema#integer"; do
+  "http://www.w3.org/2001/XMLSchema#integer" \
+  "http://www.w3.org/ns/shacl#NodeShape" \
+  "http://www.w3.org/ns/shacl#targetClass" \
+  "http://www.w3.org/ns/shacl#datatype"; do
   if ! grep -qF "$reserved_iri" <<< "$TTL_OUTPUT"; then
-    echo "FAILED: default Turtle output missing OWL reserved vocabulary IRI: $reserved_iri"
+    echo "FAILED: default Turtle output missing standards reserved vocabulary IRI: $reserved_iri"
     echo "$TTL_OUTPUT"
     exit 1
   fi
 done
 
-if grep -A4 "#### External Ontology" specifications/SemanticContracts.md | grep -Eq "prefix: (rdf|rdfs|owl|xs|xsd)"; then
-  echo "FAILED: OWL reserved vocabulary fixture must not use External Ontology declarations"
+if grep -A4 "#### External Ontology" "$TEST_DIR/specifications/SemanticContracts.md" | grep -Eq "prefix: (rdf|rdfs|owl|xs|xsd)$"; then
+  echo "FAILED: standards reserved vocabulary fixture must not use External Ontology declarations"
+  exit 1
+fi
+
+if grep -A4 "#### External Ontology" "$TEST_DIR/specifications/SemanticContracts.md" | grep -Eq "prefix: skos$"; then
+  echo "FAILED: built-in SKOS fixture must not use a local External Ontology declaration"
+  exit 1
+fi
+
+cp "$TEST_DIR/specifications/SemanticContracts.md" "$TEST_DIR/specifications/SemanticContracts.md.bak"
+perl -0pi -e 's/testonto:SecondaryEndpoint a testonto:ServiceEndpoint ;/testonto:SecondaryEndpoint a testonto:ServiceEndpoint ;\n  rdfs:isDefinedBy <https:\/\/example.test\/wrong-ontology> ;/g' "$TEST_DIR/specifications/SemanticContracts.md"
+set +e
+INVALID_DEFINED_BY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+INVALID_DEFINED_BY_EXIT=$?
+set -e
+mv "$TEST_DIR/specifications/SemanticContracts.md.bak" "$TEST_DIR/specifications/SemanticContracts.md"
+
+if [ $INVALID_DEFINED_BY_EXIT -eq 0 ]; then
+  echo "FAILED: validate should reject conflicting authored rdfs:isDefinedBy target"
+  echo "$INVALID_DEFINED_BY_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "conflicting rdfs:isDefinedBy target" <<< "$INVALID_DEFINED_BY_OUTPUT"; then
+  echo "FAILED: conflicting rdfs:isDefinedBy validation error missing expected guidance"
+  echo "$INVALID_DEFINED_BY_OUTPUT"
+  exit 1
+fi
+
+cp "$TEST_DIR/specifications/fixtures/builtin-skos-invalid.txt" "$TEST_DIR/specifications/BuiltinSkosInvalid.md"
+set +e
+INVALID_SKOS_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+INVALID_SKOS_EXIT=$?
+set -e
+rm -f "$TEST_DIR/specifications/BuiltinSkosInvalid.md"
+
+if [ $INVALID_SKOS_EXIT -eq 0 ]; then
+  echo "FAILED: validate should reject references to missing built-in SKOS terms"
+  echo "$INVALID_SKOS_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "NotARealSkosClass" <<< "$INVALID_SKOS_OUTPUT"; then
+  echo "FAILED: missing built-in SKOS term validation error should name the missing term"
+  echo "$INVALID_SKOS_OUTPUT"
+  exit 1
+fi
+
+cp "$TEST_DIR/specifications/fixtures/invalid-reserved-vocabulary.txt" "$TEST_DIR/specifications/InvalidReservedVocabulary.md"
+set +e
+INVALID_RESERVED_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+INVALID_RESERVED_EXIT=$?
+set -e
+rm -f "$TEST_DIR/specifications/InvalidReservedVocabulary.md"
+
+if [ $INVALID_RESERVED_EXIT -eq 0 ]; then
+  echo "FAILED: validate should reject fake terms in standards reserved vocabulary namespaces"
+  echo "$INVALID_RESERVED_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "NotARealShapeClass" <<< "$INVALID_RESERVED_OUTPUT"; then
+  echo "FAILED: missing standards reserved vocabulary term validation error should name the missing term"
+  echo "$INVALID_RESERVED_OUTPUT"
   exit 1
 fi
 

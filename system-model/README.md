@@ -24,6 +24,7 @@ flowchart LR
             manageModel((Manage System Model))
             generateDiagrams((Visualize Model))
             analyzeRelations((Analyze Relations))
+            semanticModelCore((Semantic Model Core))
             provideReports[Provide Reports]
             validateStructure((Validate Structure))
             filesStructure[Filesystem Structure]
@@ -105,6 +106,8 @@ flowchart LR
     manageModel -. provide .-> traceability
     manageModel -. provide .-> analyzeRelations
     analyzeRelations -. include .-> provideReports
+    semanticModelCore -. provide .-> provideReports
+    semanticModelCore -. provide .-> validateStructure
     manageModel -. provide .-> generateDiagrams
     manageModel -. provide .-> handleDiffs
     manageModel -. provide .-> browseModel
@@ -161,7 +164,7 @@ Tool interfaces are **CLI** (Command Line Interface), **Web Explorer Interface**
 - Web Explorer Interface: Human browsing and visualization interface for served model content, diagrams, reports, and traces.
 - MCP Server: Typed external interface for AI agents, IDE integrations, CI adapters, and other tools.
 
-The MCP server exposes shared tool contracts, resources, and build-time prompt templates, including semantic model evidence through `reqvire.semantic.ontologies`, semantic vocabulary through `reqvire.semantic.vocabulary`, and semantic query guidance through standard MCP prompts. `reqvire.semantic.ontologies` supports `include_external: true` when clients need the used subset of local External Ontology dependencies. The MCP server does not expose raw full third-party ontology dumps, arbitrary shell execution, model state ownership, or behavior that bypasses Reqvire core semantics.
+The MCP server exposes shared tool contracts, resources, and build-time prompt templates, including split semantic model evidence through `reqvire.semantic.ontologies`, `reqvire.semantic.shapes`, `reqvire.semantic.concepts`, and `reqvire.semantic.graph`, semantic vocabulary through `reqvire.semantic.vocabulary`, and semantic query guidance through standard MCP prompts. `reqvire.semantic.ontologies` and `reqvire.semantic.graph` support `include_external: true` when clients need the used subset of local or built-in External Ontology dependencies. The MCP server does not expose raw full third-party ontology dumps, arbitrary shell execution, model state ownership, or behavior that bypasses Reqvire core semantics.
 
 #### Core Capabilities
 
@@ -169,6 +172,7 @@ The MCP server exposes shared tool contracts, resources, and build-time prompt t
 - Visualize Model: Allows users to generate visual representations of the system model.
  - Diagrams can be generated for different viewpoints.
 - Analyze Relations: Provides tools to analyze relationships and dependencies within the model.
+- Semantic Model Core: Owns ontology, semantic-contract, external ontology source resolution, built-in external source context, and used-subset construction before reports or interfaces consume those facts.
 - Provide Reports: Generates structured reports based on the model and analysis.
 - Validate Structure: Ensures the model adheres to defined structure and guidelines:
   - Markdown Structure: Verifies the correctness of the Markdown-based requirements and documentation.

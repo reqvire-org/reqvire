@@ -2,12 +2,12 @@
 
 ### Verification Traceability
 
-As a **V&V Engineer**, I want Reqvire to trace verification evidence through capabilities, requirements, and capability roots, so that I can see which abilities and obligations are verified, which are blocked, and which capabilities still have coverage gaps.
+As a **V&V Engineer**, I want Reqvire to trace verification evidence through requirements and capability roots, so that I can see which obligations are verified, which are blocked, and which capabilities still have coverage gaps.
 
 #### Details
-Verification traceability is the capability for verification objectives, concrete verification elements, verification evidence, direct capability verification, and requirement verification rollup.
+Verification traceability is the capability for verification objectives, concrete verification elements, verification evidence, requirement verification, and capability coverage rollup.
 
-Verification objectives organize mandatory verification planning hierarchy. Every concrete verification element must derive from a verification objective parent. Concrete verification elements verify capabilities or requirements. Capabilities may be directly verified; capability coverage status also rolls up from requirements that specify the capability.
+Verification objectives organize mandatory verification planning hierarchy. Every concrete verification element must derive from a verification objective parent. Concrete verification elements verify requirements. Capability coverage status rolls up from requirements that specify the capability.
 
 #### Metadata
   * type: capability
@@ -19,4 +19,3 @@ Verification objectives organize mandatory verification planning hierarchy. Ever
 #### Relations
   * specifiedBy: [Verification Upward Traceability](Traceability/VerificationTracesRequirements.md#verification-upward-traceability)
 ---
-

@@ -1,0 +1,137 @@
+# Elements
+
+### Invalid Concept Scheme
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/invalid-native-concepts
+  * concept_prefix: invalidconcept
+  * concept_id: InvalidConceptScheme
+  * language: en
+
+#### Top Concepts
+  * [Invalid Concept](#invalid-concept)
+---
+
+### Invalid Concept
+
+#### Metadata
+  * type: concept
+  * concept_kind: concept
+  * pref_label: Invalid Concept Label
+
+#### Relations
+  * derivedFrom: [Invalid Concept Scheme](#invalid-concept-scheme)
+
+#### Definition
+Concepts must use the main body, not Definition.
+
+#### Details
+Concepts must use the main body, not Details.
+---
+
+### Missing Concept Base Scheme
+
+#### Metadata
+  * type: concept-scheme
+  * concept_prefix: missingbase
+---
+
+### Missing Concept Prefix Scheme
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/missing-prefix-concepts
+---
+
+### Duplicate Prefix Scheme A
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/duplicate-prefix-a
+  * concept_prefix: duplicateconcept
+---
+
+### Duplicate Prefix Scheme B
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/duplicate-prefix-b
+  * concept_prefix: duplicateconcept
+---
+
+### Duplicate Namespace Scheme A
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/duplicate-namespace
+  * concept_prefix: dupnamespacea
+---
+
+### Duplicate Namespace Scheme B
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/duplicate-namespace
+  * concept_prefix: dupnamespaceb
+---
+
+### Orphan Concept
+
+#### Metadata
+  * type: concept
+---
+
+### Invalid Structural Ontology
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/invalid-structural
+  * ontology_prefix: invalidstructural
+
+#### Ontology
+```turtle
+@prefix invalidstructural: <https://example.test/invalid-structural#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+invalidstructural:Thing a owl:Class .
+```
+---
+
+### Concept Scheme Under Ontology
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/scheme-under-ontology
+  * concept_prefix: schemeunderontology
+
+#### Relations
+  * derivedFrom: [Invalid Structural Ontology](#invalid-structural-ontology)
+---
+
+### Concept Under Ontology
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Invalid Structural Ontology](#invalid-structural-ontology)
+---
+
+### Ontology Under Concept
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/ontology-under-concept
+  * ontology_prefix: ontologyunderconcept
+
+#### Relations
+  * derivedFrom: [Invalid Concept](#invalid-concept)
+
+#### Ontology
+```turtle
+@prefix ontologyunderconcept: <https://example.test/ontology-under-concept#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+ontologyunderconcept:Thing a owl:Class .
+```

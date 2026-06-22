@@ -89,7 +89,7 @@ The page shall distinguish authored ontology/SHACL output, full semantic model c
 ### Website Verification Documentation Specification
 
 #### Details
-The verification page shall explain verification objectives, concrete verification types, evidence-backed verification satisfaction, requirement/capability verification links, and coverage philosophy.
+The verification page shall explain verification objectives, concrete verification types, evidence-backed verification satisfaction, requirement verification links, and capability coverage rollup philosophy.
 
 The page shall keep the verification-objective model current: objectives organize verification work and concrete verification elements provide verification evidence through `verify`/`verifiedBy`; evidence-backed concrete verifications use `satisfiedBy` for test or proof artifacts.
 

@@ -8,7 +8,7 @@ The system shall parse the files in all folders and subfolders from the root of 
 
 #### Relations
   * derivedFrom: ../UserStories.md#managing-mbse-models
-  * satisfiedBy: ../core/src/model.rs
+  * satisfiedBy: ../crates/reqvire-core/src/model.rs
 
 ### Validation Framework
 
@@ -19,7 +19,7 @@ The system shall implement a two-pass validation architecture for comprehensive 
 
 #### Relations
   * derivedFrom: #requirements-processing
-  * satisfiedBy: ../core/src/graph_registry.rs
+  * satisfiedBy: ../crates/reqvire-core/src/graph_registry.rs
 
 ---
 
@@ -33,4 +33,4 @@ This requirement tests various absolute path conversions from a subfolder.
 #### Relations
   * derivedFrom: [../UserStories.md#managing-mbse-models](/UserStories.md#managing-mbse-models)
   * verifiedBy: [../Verifications/Tests.md#format-test](/Verifications/Tests.md#format-test)
-  * satisfiedBy: /core/src/parser.rs
+  * satisfiedBy: /crates/reqvire-core/src/parser.rs

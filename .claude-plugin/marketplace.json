@@ -9,7 +9,7 @@
     },
     "plugins": [
         {
-            "version": "1.10.1",
+            "version": "1.10.2",
             "name": "reqvire",
             "description": "Expert MBSE engineer for system models, specifications, architectures, ontology authoring, semantic contracts and semantic query contracts. Use when exploring, updating and refactoring requirements, specifications and system model, adding features, managing verifications and creating tasks from introduced changes in requirements and system model.",
             "author": {
@@ -31,31 +31,11 @@
                 "semantic-web",
                 "rust"
             ],
-            "commands": [
-                "./commands/setup.md",
-                "./commands/add-feature.md",
-                "./commands/analyze-model.md",
-                "./commands/lint-model.md",
-                "./commands/add-requirement.md",
-                "./commands/consolidate.md",
-                "./commands/semantic-refactor.md",
-                "./commands/mv-file.md",
-                "./commands/add-verification.md",
-                "./commands/containment.md",
-                "./commands/mv.md",
-                "./commands/analyze-coverage.md",
-                "./commands/find-redundant-verifications.md",
-                "./commands/rename-element.md",
-                "./commands/analyze-impact.md",
-                "./commands/collect.md",
-                "./commands/generate-tasks.md",
-                "./commands/rm.md",
-                "./commands/link.md",
-                "./commands/unlink.md"
-            ],
             "skills": [
                 "./skills/syseng/",
-                "./skills/ontology-authoring/"
+                "./skills/ontology-authoring/",
+                "./skills/concept-authoring/",
+                "./skills/audit/"
             ],
             "source": "./claude-plugins",
             "strict": false

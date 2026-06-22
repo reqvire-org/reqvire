@@ -42,7 +42,7 @@ const helpLegendGridUX = css`
 const helpLegendListUX = css`
   display: flex;
   flex-direction: column;
-  gap: var(--gap-list-stack);
+  gap: var(--stack-gap-compact);
   margin-top: var(--space-5);
 `;
 
@@ -95,6 +95,8 @@ const ELEMENT_LEGEND = [
   ["specification", "Specification"],
   ["semantic-contract", "Semantic Contract"],
   ["ontology", "Ontology"],
+  ["concept-scheme", "Concept Scheme"],
+  ["concept", "Concept"],
   ["concept-reference", "Concept Reference"],
   ["evidence-file", "Evidence File"],
 ] as const;
@@ -108,6 +110,8 @@ const RESULT_LEGEND = [
 
 const ONTOLOGY_TYPE_LEGEND = [
   ["--rdf-class", "Class"],
+  ["--rdf-concept", "SKOS concept"],
+  ["--rdf-concept-scheme", "SKOS concept scheme"],
   ["--rdf-objprop", "Object property"],
   ["--rdf-dtprop", "Datatype property"],
   ["--rdf-individual", "Individual"],
@@ -218,13 +222,11 @@ function LegendRow({
 }
 
 function iconTypeForLegend(type: (typeof ELEMENT_LEGEND)[number][0]) {
-  if (type === "concept-reference") return "resource";
   if (type === "evidence-file") return "other";
   return type;
 }
 
 function badgeTypeForLegend(type: (typeof ELEMENT_LEGEND)[number][0]) {
-  if (type === "concept-reference") return "resource";
   if (type === "evidence-file") return "other";
   return type;
 }

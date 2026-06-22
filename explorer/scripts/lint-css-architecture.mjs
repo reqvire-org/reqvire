@@ -118,6 +118,7 @@ const allowedProductPatternDsVariables = new Set([
   "--ds-treeitem-icon-color",
   "--ds-treeitem-label-flex",
   "--ds-treeitem-lh",
+  "--ds-treeitem-pl-base",
   "--ds-treeitem-pr",
   "--ds-treeitem-twist-color",
   "--ds-treeitem-twist-w",

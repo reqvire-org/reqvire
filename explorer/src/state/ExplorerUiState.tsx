@@ -5,6 +5,13 @@ import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
 export type ModelMode = "list" | "grid" | "graph";
 export type ModelSelectionId = "__root__" | `folder:${string}` | `file:${string}` | string;
 export type GraphOverlayKey = "cross" | "verification" | "trace";
+export type CoverageSectionId =
+  | "overview"
+  | "capability-coverage"
+  | "unverified-requirements"
+  | "unimplemented-requirements"
+  | "unsatisfied-verifications"
+  | "orphaned-verifications";
 
 export const MODEL_DEFAULT_OVERLAYS = ["cross", "verification", "trace"] as const;
 
@@ -45,12 +52,15 @@ export const ONTOLOGY_ORIGIN_FILTERS = [
 ] as const;
 
 export const ONTOLOGY_LAYER_FILTERS = [
+  ["layer-authored", "Ontologies", "authored"],
+  ["layer-concepts", "Concepts", "concepts"],
   ["layer-reqvire-context", "Semantic Context", "semantic"],
   ["layer-external-source", "External Sources", "external"],
 ] as const;
 
 export const ONTOLOGY_DEFAULT_FILTERS = [
   "layer-authored",
+  "layer-concepts",
   "ontology-term",
   "shacl-shape",
   "resource",
@@ -78,6 +88,8 @@ interface ExplorerUiState {
   setModelMode: (mode: ModelMode) => void;
   modelSelectionId: ModelSelectionId;
   setModelSelectionId: (id: ModelSelectionId) => void;
+  modelTreeQuery: string;
+  setModelTreeQuery: (query: string) => void;
   modelTypes: Set<string>;
   toggleModelType: (type: string) => void;
   resetModelTypes: () => void;
@@ -100,10 +112,18 @@ interface ExplorerUiState {
   setKnowledgeGraphSelectionId: (id: string | null) => void;
   ontologySelectionId: string | null;
   setOntologySelectionId: (id: string | null) => void;
+  thesaurusSelectionId: string | null;
+  setThesaurusSelectionId: (id: string | null) => void;
+  thesaurusQuery: string;
+  setThesaurusQuery: (query: string) => void;
+  coverageSectionId: CoverageSectionId;
+  setCoverageSectionId: (id: CoverageSectionId) => void;
   traceFilePath: string | null;
   setTraceFilePath: (path: string | null) => void;
   traceSelectionId: string | null;
   setTraceSelectionId: (id: string | null) => void;
+  traceTreeQuery: string;
+  setTraceTreeQuery: (query: string) => void;
 }
 
 const ExplorerUiStateContext = createContext<ExplorerUiState | null>(null);
@@ -127,6 +147,7 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
   );
   const [modelMode, setModelMode] = useState<ModelMode>("grid");
   const [modelSelectionId, setModelSelectionId] = useState<ModelSelectionId>("__root__");
+  const [modelTreeQuery, setModelTreeQuery] = useState("");
   const [modelTypes, setModelTypes] = useState(() => new Set<string>(modelTypeKeys));
   const [modelOverlays, setModelOverlays] = useState<Set<GraphOverlayKey>>(
     () => new Set(MODEL_DEFAULT_OVERLAYS),
@@ -140,8 +161,12 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
   const [searchElementTypes, setSearchElementTypes] = useState(() => new Set<string>(searchElementTypeKeys));
   const [knowledgeGraphSelectionId, setKnowledgeGraphSelectionId] = useState<string | null>(null);
   const [ontologySelectionId, setOntologySelectionId] = useState<string | null>(null);
+  const [thesaurusSelectionId, setThesaurusSelectionId] = useState<string | null>(null);
+  const [thesaurusQuery, setThesaurusQuery] = useState("");
+  const [coverageSectionId, setCoverageSectionId] = useState<CoverageSectionId>("overview");
   const [traceFilePath, setTraceFilePath] = useState<string | null>(null);
   const [traceSelectionId, setTraceSelectionId] = useState<string | null>(null);
+  const [traceTreeQuery, setTraceTreeQuery] = useState("");
 
   const value = useMemo<ExplorerUiState>(
     () => ({
@@ -149,6 +174,8 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
       setModelMode,
       modelSelectionId,
       setModelSelectionId,
+      modelTreeQuery,
+      setModelTreeQuery,
       modelTypes,
       toggleModelType: (type) =>
         setModelTypes((current) => toggleSetValue(current, type)),
@@ -180,18 +207,31 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
       setKnowledgeGraphSelectionId,
       ontologySelectionId,
       setOntologySelectionId,
+      thesaurusSelectionId,
+      setThesaurusSelectionId,
+      thesaurusQuery,
+      setThesaurusQuery,
+      coverageSectionId,
+      setCoverageSectionId,
       traceFilePath,
       setTraceFilePath,
       traceSelectionId,
       setTraceSelectionId,
+      traceTreeQuery,
+      setTraceTreeQuery,
     }),
     [
       knowledgeGraphSelectionId,
       ontologySelectionId,
+      thesaurusSelectionId,
+      thesaurusQuery,
+      coverageSectionId,
       traceFilePath,
       traceSelectionId,
+      traceTreeQuery,
       modelMode,
       modelSelectionId,
+      modelTreeQuery,
       modelOverlays,
       modelTypeKeys,
       modelTypes,

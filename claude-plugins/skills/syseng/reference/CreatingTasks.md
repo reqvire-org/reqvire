@@ -45,7 +45,7 @@ The change-impact command identifies:
 
 **Change Propagation Rules:**
 - **Parent → Child**: Parent capability or requirement changes propagate to derived children
-- **Capability → Requirement**: Capability changes may require review of specifying requirements and direct capability verification
+- **Capability → Requirement**: Capability changes may require review of specifying requirements and requirement verification coverage
 - **Requirement → Verification**: Requirement changes invalidate verifications
 - **Requirement → Implementation**: May need implementation updates
 - **Verification changes**: Generally don't propagate upward
@@ -344,21 +344,8 @@ After creating the task plan:
 - **For refactoring requirements**: See [Consolidate Requirements](ConsolidateRequirements.md)
 - **For verification**: Run tests and validate model after each implementation
 
-## Using Slash Commands
+## Related References
 
-The syseng skill provides slash commands that automate this workflow:
-
-- `/reqvire:analyze-impact [commit-hash]` - Analyze capability and requirement changes and their impact
-- `/reqvire:generate-tasks [base-commit]` - Generate complete task plan from changes
-
-These commands follow the workflow described above and automatically:
-1. Detect base branch
-2. Run change-impact analysis
-3. Collect capability and requirement context
-4. Generate TodoWrite task plan
-5. Save reference documents to `/tmp`
-6. Create git blob links
-
-**When to use slash commands vs manual workflow:**
-- **Use slash commands**: Quick task generation for capability branches
-- **Use manual workflow**: Custom analysis, learning the process, non-standard cases
+- For model analysis and impact overview, use the `reqvire:audit` skill ([ChangeImpact](../../audit/reference/ChangeImpact.md))
+- For adding new requirements discovered during planning, see [AddRequirement](AddRequirement.md)
+- For adding verifications, see [AddVerification](AddVerification.md)

@@ -36,7 +36,7 @@ Reference target kind vocabulary is defined by the Reqvire core element ontology
 - **InternalPath**
   - An internal filesystem file path without fragment, pointing to implementation files.
   - Used for implementation and evidence satisfaction relations (e.g., `satisfiedBy`, `satisfy`)
-  - **Example**: `"../../core/src/diagrams.rs"`
+  - **Example**: `"../../crates/reqvire-core/src/diagrams.rs"`
 
 
 ### Identifier Path Resolution Rules

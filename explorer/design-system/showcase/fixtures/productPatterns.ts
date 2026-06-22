@@ -14,7 +14,7 @@ import type {
   ShellNavigationItem,
 } from "@ds";
 
-export type ShowcaseMockViewId = "model" | "traces" | "ontologies" | "search" | "coverage";
+export type ShowcaseMockViewId = "thesaurus" | "model" | "traces" | "ontologies" | "coverage";
 
 export interface ShowcaseMockView {
   id: ShowcaseMockViewId;
@@ -38,6 +38,13 @@ export interface ShowcaseTreeRow {
 
 export const FULL_APP_MOCKS: readonly ShowcaseMockView[] = [
   {
+    id: "thesaurus",
+    hash: "#/thesaurus",
+    label: "Thesaurus View",
+    desc: "Concept hierarchy, local neighborhood, and model usage.",
+    icon: "tags",
+  },
+  {
     id: "model",
     hash: "#/model",
     label: "Model View",
@@ -48,7 +55,7 @@ export const FULL_APP_MOCKS: readonly ShowcaseMockView[] = [
     id: "traces",
     hash: "#/traces",
     label: "Traces View",
-    desc: "Coverage Sankey for requirements to verifications.",
+    desc: "Trace rows and requirement roll-up diagrams.",
     icon: "activity",
   },
   {
@@ -57,13 +64,6 @@ export const FULL_APP_MOCKS: readonly ShowcaseMockView[] = [
     label: "Ontologies View",
     desc: "RDF and SHACL class hierarchy with node inspector.",
     icon: "globe",
-  },
-  {
-    id: "search",
-    hash: "#/search",
-    label: "Search View",
-    desc: "Full-text element search with live filtering.",
-    icon: "search",
   },
   {
     id: "coverage",
@@ -75,10 +75,11 @@ export const FULL_APP_MOCKS: readonly ShowcaseMockView[] = [
 ];
 
 export const SHELL_NAVIGATION: ShellNavigationItem[] = [
+  { value: "thesaurus", label: "Thesaurus", icon: "tags" },
   { value: "model", label: "Model", icon: "folder", badge: "640" },
-  { value: "traces", label: "Traces", icon: "activity" },
   { value: "ontologies", label: "Ontologies", icon: "globe", badge: "14" },
-  { value: "search", label: "Search", icon: "search" },
+  { value: "traces", label: "Traces", icon: "activity" },
+  { value: "coverage", label: "Coverage", icon: "pie-chart" },
 ];
 
 export const SHELL_ACTIONS = [

@@ -47,10 +47,11 @@ Artifact contract details shall follow the associated contract specification.
 #### Relations
   * definedBy: [AI Skills Markdown Artifact Specification](#ai-skills-markdown-artifact-specification)
   * derivedFrom: [AI Assistant Skill-Guided Reqvire Modeling](#ai-assistant-skill-guided-reqvire-modeling)
-  * satisfiedBy: [analyze-coverage.md](../../../claude-plugins/commands/analyze-coverage.md)
   * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/ontology-authoring/SKILL.md)
+  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/concept-authoring/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/syseng/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-ontology-authoring/SKILL.md)
+  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-concept-authoring/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-syseng/SKILL.md)
 ---
 
@@ -85,6 +86,8 @@ Artifact contract rules:
 - Claude skill artifacts live under `claude-plugins/skills/syseng`.
 - Codex ontology-authoring skill artifacts live under `codex-skills/reqvire-ontology-authoring`.
 - Claude ontology-authoring skill artifacts live under `claude-plugins/skills/ontology-authoring`.
+- Codex concept-authoring skill artifacts live under `codex-skills/reqvire-concept-authoring`.
+- Claude concept-authoring skill artifacts live under `claude-plugins/skills/concept-authoring`.
 - Equivalent guidance should stay synchronized between Codex and Claude skill artifacts.
 - Assistant artifact changes should preserve MBSE workflow guidance and verification-aligned change sequencing.
 - Ontology-authoring guidance should distinguish generic labels/descriptions from ontology slots: `rdfs:label` and `rdfs:comment` are appropriate for optional presentation metadata, while true domain concepts, canonical authored tokens, parser fields, interface enum values, report kinds, controlled-vocabulary payloads, and queryable domain meanings remain declared ontology properties even when their local names end with `Name` or `Meaning`.
@@ -98,4 +101,3 @@ Artifact contract rules:
 #### Relations
   * define: [AI Skills Markdown Implementation Artifacts](#ai-skills-markdown-implementation-artifacts)
 ---
-

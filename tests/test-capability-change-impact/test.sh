@@ -13,6 +13,7 @@ create_workspace() {
       git init >/dev/null 2>&1 &&
       git config user.email test@example.com &&
       git config user.name "Test User" &&
+      git remote remove origin >/dev/null 2>&1 || true &&
       git remote add origin https://dummy.example.com/dummy-repo.git &&
       git add . &&
       git commit -m init >/dev/null 2>&1

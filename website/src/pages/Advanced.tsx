@@ -59,8 +59,8 @@ export default function Advanced() {
               desc: "Shows elements that need review because requirements, contracts, reused contract context, verification links, or semantic dependencies changed.",
             },
             {
-              name: "reqvire ontologies",
-              desc: "Exports authored ontology and SHACL content, with full mode for generated Reqvire model context triples.",
+              name: "reqvire semantic",
+              desc: "Exports ontology vocabulary, SHACL shapes, SKOS concepts, or the combined semantic graph as explicit RDF layers.",
             },
             {
               name: "reqvire resources",

@@ -1,0 +1,55 @@
+# Elements
+
+### Broken SKOS Ontology
+
+Ontology that intentionally references an unknown SKOS class through SHACL.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/broken-skos
+  * ontology_prefix: broken
+
+#### Ontology
+```turtle
+@prefix broken: <https://example.test/broken-skos#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/broken-skos> a owl:Ontology .
+
+broken:Thing a owl:Class .
+```
+---
+
+### Broken SKOS Requirement
+
+The system shall reject SHACL references to SKOS terms that are not present in the built-in SKOS external source.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * constrainedBy: [Broken SKOS Shape](#broken-skos-shape)
+---
+
+### Broken SKOS Shape
+
+This semantic contract intentionally references a missing SKOS class.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Broken SKOS Requirement](#broken-skos-requirement)
+  * use: [Broken SKOS Ontology](#broken-skos-ontology)
+
+#### Shapes
+```turtle
+@prefix broken: <https://example.test/broken-skos#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+broken:BrokenShape
+  a sh:NodeShape ;
+  sh:targetClass skos:NotARealSkosClass .
+```
+---

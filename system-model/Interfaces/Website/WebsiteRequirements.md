@@ -101,10 +101,10 @@ The system shall document capability, requirement, contract, semantic-contract, 
 The system shall document ontology authoring, external ontology sources, built-in reserved vocabulary behavior, semantic contracts, validation, and ontology export modes.
 
 #### Reused Contract Context
-  * [Local External Ontology Source Specification](../../Reports/ModelReports/Specifications.md#local-external-ontology-source-specification)
+  * [Local External Ontology Source Specification](../../Semantics/SemanticModelSpecifications.md#local-external-ontology-source-specification)
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
   * [Ontology Projection Subgraph Materialization Specification](../../Reports/ModelReports/Specifications.md#ontology-projection-subgraph-materialization-specification)
-  * [OWL Reserved Vocabulary Recognition Specification](../../Reports/ModelReports/Specifications.md#owl-reserved-vocabulary-recognition-specification)
+  * [OWL Reserved Vocabulary Recognition Specification](../../Semantics/SemanticModelSpecifications.md#owl-reserved-vocabulary-recognition-specification)
   * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
 
 #### Metadata

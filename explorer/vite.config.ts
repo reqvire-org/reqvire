@@ -8,7 +8,7 @@ const __dirname = import.meta.dirname;
 
 // The served Explorer must run from local files and simple static servers, so
 // assets are emitted with relative paths and no CDN-loaded framework or
-// stylesheet. core/build.rs embeds the whole dist/ tree, which means lazy
+// stylesheet. crates/reqvire-core/build.rs embeds the whole dist/ tree, which means lazy
 // chunks are safe and heavy renderers can stay off the initial route path.
 //
 // Test configuration lives in vitest.config.ts so this file uses the plain

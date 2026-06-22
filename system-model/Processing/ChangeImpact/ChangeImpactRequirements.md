@@ -25,7 +25,7 @@ When generating a change impact report, the system shall compute and display the
   * derive: [Requirements Change Propagation](#requirements-change-propagation)
   * derive: [Structural Change Analyzer](#structural-change-analyzer)
   * derivedFrom: [Tracing Structural Changes](../../Reports/ModelReports/ReportingRequirements.md#tracing-structural-changes)
-  * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
+  * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
   * verifiedBy: [Reused Contract Context Change Impact Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-change-impact-verification)
   * verifiedBy: [Impact Scope Summary Test](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#impact-scope-summary-test)
 ---
@@ -40,7 +40,7 @@ When a requirement is changed, the system shall propagate the change through rel
 #### Relations
   * definedBy: [ChangePropagation](ChangePropagation.md#changepropagation)
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
-  * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
+  * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
   * verifiedBy: [Change Impact Detection Test](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#change-impact-detection-test)
   * verifiedBy: [Change Impact Relations Test](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#change-impact-relations-test)
   * verifiedBy: [Change Impact Smart Filtering Test](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#change-impact-smart-filtering-test)
@@ -56,6 +56,6 @@ The system shall implement a model change analyzer that identifies structural mo
 
 #### Relations
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
-  * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
+  * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
 ---
 

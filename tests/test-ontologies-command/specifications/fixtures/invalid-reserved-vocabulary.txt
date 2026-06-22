@@ -1,0 +1,54 @@
+# Elements
+
+### Invalid Reserved Vocabulary Ontology
+
+Ontology that intentionally provides a small local class for a SHACL shape that references an invalid reserved vocabulary term.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/invalid-reserved
+  * ontology_prefix: invalidreserved
+
+#### Ontology
+```turtle
+@prefix invalidreserved: <https://example.test/invalid-reserved#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/invalid-reserved> a owl:Ontology .
+
+invalidreserved:Thing a owl:Class .
+```
+---
+
+### Invalid Reserved Vocabulary Requirement
+
+The system shall reject references to fake terms in reserved RDF, RDFS, OWL, XSD, or SHACL namespaces.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * constrainedBy: [Invalid Reserved Vocabulary Shape](#invalid-reserved-vocabulary-shape)
+---
+
+### Invalid Reserved Vocabulary Shape
+
+This semantic contract intentionally references a missing SHACL reserved vocabulary term as a target class.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Invalid Reserved Vocabulary Requirement](#invalid-reserved-vocabulary-requirement)
+  * use: [Invalid Reserved Vocabulary Ontology](#invalid-reserved-vocabulary-ontology)
+
+#### Shapes
+```turtle
+@prefix invalidreserved: <https://example.test/invalid-reserved#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+invalidreserved:BrokenReservedShape
+  a sh:NodeShape ;
+  sh:targetClass sh:NotARealShapeClass .
+```
+---

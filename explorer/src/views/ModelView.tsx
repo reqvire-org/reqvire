@@ -1,6 +1,5 @@
 import { useExplorerUiState, type ModelMode } from "../state/ExplorerUiState";
-import { Icon, ModelGraphShell, RouteLayout, SegmentedControl } from "@ds";
-import { useStore } from "../store/StoreContext";
+import { Icon, RouteLayout, SegmentedControl, WorkspaceShell } from "@ds";
 import { FilesView } from "./FilesView";
 import { KnowledgeGraphView } from "./GraphLibraryViews";
 import { ViewFrame } from "./ViewFrame";
@@ -23,22 +22,19 @@ export function ModelView({ onOpenElement }: { onOpenElement: (id: string) => vo
 
 function ModelGraphView({ onOpenElement }: { onOpenElement: (id: string) => void }) {
   const ui = useExplorerUiState();
-  const { store } = useStore();
-  const summary = store.knowledge_graph.summary;
-  const elementCount = summary?.elements ?? store.elements.length;
 
   return (
     <ViewFrame testId="model">
       <RouteLayout>
-        <ModelGraphShell
+        <WorkspaceShell
           rootLabel="Model"
           currentLabel="Graph"
-          countLabel={`${elementCount} elements`}
           controls={<ModelModeSelector value={ui.modelMode} onChange={ui.setModelMode} />}
+          breadcrumbLabel="Model graph breadcrumbs"
           onRootClick={() => ui.setModelMode("grid")}
         >
           <KnowledgeGraphView embedded frameTestId="model" onOpenElement={onOpenElement} />
-        </ModelGraphShell>
+        </WorkspaceShell>
       </RouteLayout>
     </ViewFrame>
   );

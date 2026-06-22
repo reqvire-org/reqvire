@@ -442,6 +442,10 @@
     "total_ontology_types": {
       "ontology": 0
     },
+    "total_concept_types": {
+      "concept": 0,
+      "concept-scheme": 0
+    },
     "total_requirements_types": {
       "capability": 1,
       "system-requirement": 6

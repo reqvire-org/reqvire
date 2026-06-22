@@ -209,6 +209,7 @@ export function FilesView({
           }
           layout={layout}
           resultCount={items.length}
+          showResultCount={!stateDriven}
           onOpenFolder={openFolder}
           onLayoutChange={changeLayout}
         />

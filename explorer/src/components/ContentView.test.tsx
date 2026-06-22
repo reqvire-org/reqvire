@@ -29,10 +29,10 @@ describe("ContentView", () => {
   });
 
   it("renders local resource source files in the middle pane", () => {
-    renderContent("core/src/lib.rs");
+    renderContent("crates/reqvire-core/src/lib.rs");
 
     expect(screen.getByText("Source file")).toBeTruthy();
-    expect(screen.getByText("core/src/lib.rs")).toBeTruthy();
+    expect(screen.getByText("crates/reqvire-core/src/lib.rs")).toBeTruthy();
     expect(screen.getByText(/fixture_source/)).toBeTruthy();
   });
 });

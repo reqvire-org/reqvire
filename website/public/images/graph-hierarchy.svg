@@ -1,80 +1,123 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="520" height="680" viewBox="0 0 520 680" role="img" aria-labelledby="title desc">
-  <title id="title">Reqvire semantic engineering model flow</title>
-  <desc id="desc">Ontology, capabilities, requirements, contracts, verification, and implementation arranged as a vertical flow.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="560" viewBox="0 0 620 560" role="img" aria-labelledby="title desc">
+  <title id="title">Reqvire MBSE semantic V model</title>
+  <desc id="desc">Concepts and structural ontology provide shared semantic context above a V model connecting capabilities, requirements, contracts, implementation, verification, evidence, and coverage.</desc>
   <defs>
     <style>
       .panel { fill: #f8f6f1; stroke: #d8d2c6; stroke-width: 2; }
-      .box { fill: #f3f1eb; stroke: #2f80b7; stroke-width: 4; }
-      .label { fill: #2874a6; font: 700 25px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-      .icon { fill: none; stroke: #2874a6; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
-      .arrow { fill: #2874a6; }
+      .context { fill: #fff7d6; stroke: #b98718; stroke-width: 3; }
+      .left { fill: #eef6fb; stroke: #2f80b7; stroke-width: 3; }
+      .bottom { fill: #f3f1eb; stroke: #4b5563; stroke-width: 3; }
+      .right { fill: #edf7ee; stroke: #2d7d46; stroke-width: 3; }
+      .label { fill: #1f2937; font: 700 20px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .small { fill: #4b5563; font: 600 13px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; letter-spacing: .02em; }
+      .icon { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .blue { color: #2f80b7; }
+      .green { color: #2d7d46; }
+      .gold { color: #b98718; }
+      .gray { color: #4b5563; }
+      .line { fill: none; stroke: #8b949e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .dash { fill: none; stroke: #b98718; stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 6 7; }
+      .arrow { fill: #8b949e; }
+      .gold-arrow { fill: #b98718; }
+      .impact-pill { fill: #fff7d6; stroke: #d7b454; stroke-width: 1.5; opacity: .82; }
+      .impact-text { fill: #8a6411; font: 800 13px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; letter-spacing: .1em; text-transform: uppercase; }
     </style>
   </defs>
-  <rect class="panel" x="28" y="28" width="464" height="624" rx="18" />
 
-  <g transform="translate(114 58)">
-    <g>
-      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
-      <g class="icon" transform="translate(29 17)">
-        <circle cx="18" cy="18" r="17" />
-        <path d="M1 18h34M18 1c6 8 6 26 0 34M18 1c-6 8-6 26 0 34M5 8c8 4 18 4 26 0M5 28c8-4 18-4 26 0" />
-      </g>
-      <text class="label" x="82" y="45">Ontology</text>
+  <rect class="panel" x="24" y="24" width="572" height="512" rx="22" />
+
+  <g transform="translate(122 48)">
+    <rect class="context" x="0" y="0" width="376" height="78" rx="14" />
+    <g class="icon gold" transform="translate(24 18)">
+      <rect x="4" y="4" width="34" height="34" rx="7" />
+      <path d="M12 17h18M12 27h13M21 38v10M10 48h22" />
     </g>
+    <text class="label" x="188" y="32" text-anchor="middle">Concepts + Ontology</text>
+    <text class="small" x="188" y="55" text-anchor="middle">semantic model</text>
+  </g>
 
-    <path class="arrow" d="M146 73l22 27h-14v18h-16v-18h-14z" />
 
-    <g transform="translate(0 102)">
-      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
-      <g class="icon" transform="translate(30 16)">
-        <circle cx="18" cy="18" r="14" />
-        <path d="M18 4v-9M18 41v-9M4 18h-9M41 18h-9M8 8l-7-7M35 35l-7-7M28 8l7-7M1 35l7-7" />
-        <path d="M18 18l9-6" />
-      </g>
-      <text class="label" x="82" y="45">Capabilities</text>
+  <path class="dash" d="M310 126v55" />
+  <path class="gold-arrow" d="M310 187l-9-14h18z" />
+
+  <path class="line" d="M222 178L182 254L248 346L310 420" />
+  <path class="line" d="M398 178L438 254L372 346L310 420" />
+  <path class="arrow" d="M247 346l-16-4 9 14z" />
+  <path class="arrow" d="M373 346l16-4-9 14z" />
+
+  <g transform="translate(62 146)">
+    <rect class="left" x="0" y="0" width="214" height="66" rx="12" />
+    <g class="icon blue" transform="translate(18 16)">
+      <circle cx="17" cy="17" r="13" />
+      <path d="M17 4v-8M17 42v-8M4 17h-8M42 17h-8M17 17l8-5" />
     </g>
+    <text class="label" x="62" y="29">Capabilities</text>
+    <text class="small" x="62" y="49">system intent</text>
+  </g>
 
-    <path class="arrow" d="M146 175l22 27h-14v18h-16v-18h-14z" />
-
-    <g transform="translate(0 204)">
-      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
-      <g class="icon" transform="translate(31 16)">
-        <rect x="3" y="2" width="30" height="34" rx="4" />
-        <path d="M11 12h14M11 22h14M8 12l-2 2-2-2M8 22l-2 2-2-2" />
-      </g>
-      <text class="label" x="82" y="45">Requirements</text>
+  <g transform="translate(40 242)">
+    <rect class="left" x="0" y="0" width="214" height="66" rx="12" />
+    <g class="icon blue" transform="translate(19 15)">
+      <rect x="3" y="2" width="30" height="34" rx="4" />
+      <path d="M11 12h14M11 22h14M8 12l-2 2-2-2M8 22l-2 2-2-2" />
     </g>
+    <text class="label" x="62" y="29">Requirements</text>
+    <text class="small" x="62" y="49">system obligations</text>
+  </g>
 
-    <path class="arrow" d="M146 277l22 27h-14v18h-16v-18h-14z" />
-
-    <g transform="translate(0 306)">
-      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
-      <g class="icon" transform="translate(31 16)">
-        <path d="M7 9h22M7 18h22M7 27h16" />
-        <path d="M2 9h.1M2 18h.1M2 27h.1" />
-      </g>
-      <text class="label" x="82" y="45">Contracts</text>
+  <g transform="translate(96 338)">
+    <rect class="left" x="0" y="0" width="214" height="66" rx="12" />
+    <g class="icon blue" transform="translate(20 17)">
+      <path d="M7 8h24M7 17h24M7 26h17" />
+      <path d="M2 8h.1M2 17h.1M2 26h.1" />
     </g>
+    <text class="label" x="62" y="29">Contracts</text>
+    <text class="small" x="62" y="49">system design</text>
+  </g>
 
-    <path class="arrow" d="M146 379l22 27h-14v18h-16v-18h-14z" />
-
-    <g transform="translate(0 408)">
-      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
-      <g class="icon" transform="translate(31 16)">
-        <path d="M18 2l15 6v11c0 10-6 17-15 21C9 36 3 29 3 19V8z" />
-        <path d="M10 20l6 6 12-13" />
-      </g>
-      <text class="label" x="82" y="45">Verification</text>
+  <g transform="translate(168 418)">
+    <rect class="bottom" x="0" y="0" width="284" height="66" rx="12" />
+    <g class="icon gray" transform="translate(21 15)">
+      <path d="M14 7L5 20l9 13M24 7l9 13-9 13M22 3l-7 34" />
     </g>
+    <text class="label" x="142" y="29" text-anchor="middle">Implementation</text>
+    <text class="small" x="142" y="49" text-anchor="middle">system realization</text>
+  </g>
 
-    <path class="arrow" d="M146 481l22 27h-14v18h-16v-18h-14z" />
-
-    <g transform="translate(0 510)">
-      <rect class="box" x="0" y="0" width="292" height="70" rx="8" />
-      <g class="icon" transform="translate(31 16)">
-        <path d="M14 7L5 20l9 13M22 7l9 13-9 13M20 3l-6 34" />
-      </g>
-      <text class="label" x="82" y="45">Implementation</text>
+  <g transform="translate(344 146)">
+    <rect class="right" x="0" y="0" width="214" height="66" rx="12" />
+    <g class="icon green" transform="translate(20 13)">
+      <path d="M18 2l15 6v11c0 10-6 17-15 21C9 36 3 29 3 19V8z" />
+      <path d="M10 20l6 6 12-13" />
     </g>
+    <text class="label" x="62" y="29">Verification</text>
+    <text class="small" x="62" y="49">system validation</text>
+  </g>
+
+  <g transform="translate(366 242)">
+    <rect class="right" x="0" y="0" width="214" height="66" rx="12" />
+    <g class="icon green" transform="translate(20 15)">
+      <path d="M5 30h30" />
+      <path d="M8 30V18M19 30V9M30 30V14" />
+      <path d="M6 9l9 6 8-9 10 5" />
+    </g>
+    <text class="label" x="62" y="29">Coverage</text>
+    <text class="small" x="62" y="49">traceability closure</text>
+  </g>
+
+  <g transform="translate(344 338)">
+    <rect class="right" x="0" y="0" width="214" height="66" rx="12" />
+    <g class="icon green" transform="translate(20 15)">
+      <rect x="5" y="4" width="28" height="34" rx="4" />
+      <path d="M12 14h14M12 23h14M12 32h9" />
+    </g>
+    <text class="label" x="62" y="29">Evidence</text>
+    <text class="small" x="62" y="49">tests, proofs, reports</text>
+  </g>
+
+
+  <g transform="translate(218 492)">
+    <rect class="impact-pill" x="0" y="0" width="184" height="30" rx="15" />
+    <text class="impact-text" x="92" y="20" text-anchor="middle">Change Impact</text>
   </g>
 </svg>

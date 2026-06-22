@@ -45,7 +45,7 @@ The change-impact command identifies:
 
 **Change Propagation Rules:**
 - **Parent → Child**: Parent capability or requirement changes propagate to derived children
-- **Capability → Requirement**: Capability changes may require review of specifying requirements and direct capability verification
+- **Capability → Requirement**: Capability changes may require review of specifying requirements and requirement verification coverage
 - **Requirement → Verification**: Requirement changes invalidate verifications
 - **Requirement → Implementation**: May need implementation updates
 - **Verification changes**: Generally don't propagate upward

@@ -23,7 +23,7 @@ export default function CodingAssistants() {
             },
             {
               name: "Codex skill package",
-              desc: "Installable Reqvire skills for Codex workflows, including semantic engineering and ontology authoring guidance.",
+              desc: "Installable Reqvire skills for Codex workflows, including semantic engineering, ontology authoring, and concept/thesaurus authoring guidance.",
             },
             {
               name: "MCP server",
@@ -43,9 +43,9 @@ export default function CodingAssistants() {
         <div className="mt-4">
           <BulletList
             items={[
-              "Skills: syseng and ontology-authoring.",
+              "Skills: syseng, ontology-authoring, and concept-authoring.",
               "Commands include analyze-model, add-requirement, add-verification, add-capability, analyze-coverage, analyze-impact, collect, lint-model, consolidate, generate-tasks, rename-element, mv, mv-file, and rm.",
-              "Plugin content comes from claude-plugins/skills/syseng and claude-plugins/skills/ontology-authoring.",
+              "Plugin content comes from claude-plugins/skills/syseng, claude-plugins/skills/ontology-authoring, and claude-plugins/skills/concept-authoring.",
             ]}
           />
         </div>
@@ -64,7 +64,8 @@ export default function CodingAssistants() {
 
 # Installed skill directories
 $CODEX_HOME/skills/reqvire-syseng
-$CODEX_HOME/skills/reqvire-ontology-authoring`}</CodeBlock>
+$CODEX_HOME/skills/reqvire-ontology-authoring
+$CODEX_HOME/skills/reqvire-concept-authoring`}</CodeBlock>
       </Section>
 
       <Section title="MCP Server">
@@ -84,11 +85,19 @@ reqvire mcp --enable-mutations`}</CodeBlock>
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             reqvire.semantic.ontologies
           </code>{" "}
-          when an assistant needs ontology and SHACL context. Set{" "}
+          when an assistant needs ontology vocabulary. Use{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
-            content
+            reqvire.semantic.shapes
           </code>{" "}
-          to rdf, shacl, or both, and pass{" "}
+          for SHACL,{" "}
+          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
+            reqvire.semantic.concepts
+          </code>{" "}
+          for SKOS concepts, and{" "}
+          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
+            reqvire.semantic.graph
+          </code>{" "}
+          for the combined graph. Pass{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             full: true
           </code>{" "}
@@ -102,11 +111,11 @@ reqvire mcp --enable-mutations`}</CodeBlock>
         <div className="bg-zinc-50 rounded-lg p-5 space-y-3">
           {[
             "Capability first: understand or define the operational ability being changed.",
-            "Ontology context: inspect or reuse semantic vocabulary that gives the capability meaning.",
+            "Concept and ontology context: inspect or reuse curated terminology and structural semantic vocabulary that give the capability meaning.",
             "Requirements: define implementable obligations that specify the capability.",
             "Contracts: define requirements in precise terms: source basis, specifications, constraints, behavior, state, interfaces, and input/output semantics.",
             "Semantic contracts: add reusable SHACL shape profiles under the ontology plane and link them with constrainedBy/constrain and use/usedBy.",
-            "Verifications: ensure capabilities or leaf requirements are verified.",
+            "Verifications: ensure leaf requirements are verified so capability coverage rolls up correctly.",
             "Implementation links: connect code, tests, proofs, and evidence with satisfiedBy.",
             "Validation: run validate, lint, coverage, traces, and change impact before review.",
           ].map((step, i) => (
@@ -124,7 +133,7 @@ reqvire mcp --enable-mutations`}</CodeBlock>
         <BulletList
           items={[
             "Show unverified leaf requirements and propose verifications.",
-            "Explain the capability, ontology context, requirements, and verification evidence for this change.",
+            "Explain the capability, concept and ontology context, requirements, and verification evidence for this change.",
             "Analyze change impact against main and summarize invalidated verifications.",
             "Create implementation tasks for the impacted requirements with traceability.",
             "Refactor this requirement to extract technical detail into specification elements.",
@@ -140,7 +149,7 @@ reqvire mcp --enable-mutations`}</CodeBlock>
             "Change impact assessment",
             "Capability planning",
             "Implementation task generation",
-            "Ontology-driven context collection",
+            "Concept and ontology context collection",
             "Requirement refactoring",
             "Verification hardening",
           ].map((use) => (

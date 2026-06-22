@@ -32,7 +32,7 @@ const baseUX = css`
     display: flex;
     min-width: 0;
     flex-direction: column;
-    gap: var(--ds-section-body-gap, var(--gap-list-stack));
+    gap: var(--ds-section-body-gap, var(--stack-gap-compact));
   }
 
   svg {

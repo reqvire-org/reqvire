@@ -54,7 +54,7 @@ Rationale: Element names serve as stable IDs for element identity, independent o
 #### Details
 The validator enforces the Reqvire relation ontology together with the canonical element type vocabulary.
 
-Validation shall check:
+Validation must check:
 - relation endpoint families and inverse relation compatibility from the relation ontology
 - ontology, capability, requirement, and contract compatibility from the ontology, capability, requirement, and semantic-contracts
 - evidence-backed verification compatibility from the verification contracts
@@ -109,7 +109,7 @@ Reused Contract Context targets support model element identifier references with
 
 **Identifier Targets:**
 - Requirement reused_contract_context must point to reusable requirement-owned non-semantic-contract element types only (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
-- Reused Contract Context to `ontology` is invalid; ontology vocabulary bindings use `#### Concept References` on non-ontology, non-semantic-contract elements or `use`/`usedBy` on semantic contracts
+- Reused Contract Context to `ontology` is invalid; SKOS concept bindings use `#### Concept References` on non-ontology, non-semantic-contract elements, while semantic-contract ontology dependencies use `use`/`usedBy`
 - Normalized like relation targets (resolved to full identifier path)
 - Validation is expected to reject identifiers pointing to non-reusable element types
 - Validation is expected to reject unresolved identifiers
@@ -127,17 +127,17 @@ Technical specification for validating semantic-contract `#### Shapes` documents
 
 #### Details
 Semantic-contract shape validation behavior:
-- Parse each semantic-contract `#### Shapes` fenced Turtle block with Oxigraph and pass the resulting SHACL RDF subgraph into the reusable SHACL parser.
-- The reusable SHACL parser must be independent of Reqvire element types, semantic-contract relations, filenames, source identifiers, and validation error wording. It consumes Oxigraph RDF terms/quads and produces a compiled Oxigraph-backed `ShaclRegistry`/AST plus parser diagnostics.
+- Parse each semantic-contract `#### Shapes` fenced Turtle block and pass the resulting SHACL RDF subgraph into the o-kernel SHACL parser.
+- The o-kernel SHACL parser must be independent of Reqvire element types, semantic-contract relations, filenames, source identifiers, and validation error wording. It consumes RDF terms/quads and produces a compiled SHACL registry/AST plus parser diagnostics.
 - The compiled SHACL registry must identify `sh:NodeShape`, `sh:PropertyShape`, `sh:Shape`, targeted shape nodes, property-shape nodes, target definitions, property paths, nested property shapes, syntax constraints, logical constraints, qualified value shapes, enumerations, and SPARQL constraints.
 - Reject invalid Turtle syntax, duplicate or missing `#### Shapes` sections, and shape documents that do not contain any discoverable SHACL shape node.
 - Allow SHACL target mechanisms supported by the SHACL RDF vocabulary, including `sh:targetClass`, `sh:targetNode`, `sh:targetSubjectsOf`, `sh:targetObjectsOf`, and `sh:target`, instead of requiring every node shape to be class-targeted.
 - Check supported SHACL constraint structure needed by Reqvire, including property paths, class constraints, datatype constraints, target-node references, node kind, cardinality, value ranges, string constraints, relational property constraints, logical constraints, qualified value shapes, allowed-value lists, constants, and SPARQL query constraints.
 - Build a Reqvire-specific ontology alignment input outside the SHACL parser by taking the ontology subset reachable from the semantic contract's explicit `use` relations and ontology ancestors.
-- Resolve model-owned SHACL references by running the generic SHACL registry against a domain ontology index derived from the semantic index's reachable parsed RDF context for the contract. Standard RDF, RDFS, OWL, XSD, and SHACL vocabulary shall be resolved through Reqvire's built-in reserved vocabulary handling only at the Reqvire adapter/alignment layer.
+- Resolve model-owned SHACL references by running the generic SHACL registry against a domain ontology index derived from the semantic index's reachable parsed RDF context for the contract. Standard RDF, RDFS, OWL, XSD, and SHACL vocabulary must be resolved through the o-kernel reserved vocabulary registry only at the Reqvire adapter/alignment layer.
 - Keep full SHACL data validation/execution out of scope unless a separate verification requirement introduces a SHACL execution engine.
 
-The SHACL structural parser and ontology aligner shall operate as a compile-time design/schema alignment phase:
+The SHACL structural parser and ontology aligner must operate as a validation-time design/schema alignment phase:
 
 1. Shape node discovery:
    - Identify structural graph nodes containing explicit shape indicators: `sh:NodeShape`, `sh:PropertyShape`, and `sh:Shape`.
@@ -154,7 +154,7 @@ The SHACL structural parser and ontology aligner shall operate as a compile-time
    - Map structural logic references: `sh:and`, `sh:or`, `sh:not`, `sh:xone`, `sh:node`, `sh:in`, `sh:hasValue`, and `sh:qualifiedValueShape`.
    - Map relational path mapping properties: `sh:class`, `sh:equals`, `sh:disjoint`, `sh:lessThan`, and `sh:lessThanOrEquals`.
    - Map extension rules referencing raw custom string scripts through `sh:sparql`.
-   - Preserve raw Oxigraph predicate/object pairs for SHACL constraints beside typed constraints so later validation phases can inspect unsupported or not-yet-specialized SHACL predicates without reparsing Turtle.
+   - Preserve raw RDF predicate/object pairs for SHACL constraints beside typed constraints so later validation phases can inspect unsupported or not-yet-specialized SHACL predicates without reparsing Turtle.
 4. Static ontology alignment verification:
    - Cross-reference extracted target identifiers to verify class, predicate, and target-node references exist inside the domain ontology subset supplied by Reqvire.
    - Cross-reference parsed recursive property paths to verify every referenced schema predicate exists in the supplied domain ontology subset.
@@ -169,69 +169,18 @@ The SHACL structural parser and ontology aligner shall operate as a compile-time
   * define: [Semantic Contract Shape Validation](ValidationRequirements.md#semantic-contract-shape-validation)
 ---
 
-### SHACL Structural Parser Registry Specification
-
-Technical specification for the reusable SHACL structural parser and registry.
-
-#### Details
-The SHACL parser registry shall:
-- Accept Oxigraph RDF terms and quads as input.
-- Avoid dependencies on Reqvire element types, semantic-contract relations, graph registry internals, filenames, source identifiers, or Reqvire validation wording.
-- Discover shape node candidates from explicit shape indicators (`sh:NodeShape`, `sh:PropertyShape`, `sh:Shape`), target predicates (`sh:targetClass`, `sh:targetNode`, `sh:targetSubjectsOf`, `sh:targetObjectsOf`, `sh:target`), property shape references, and `sh:path`.
-- Deduplicate shape node candidates before structural parsing.
-- Classify each shape as a node shape or property shape based on SHACL type and path structure.
-- Extract target identifiers as typed SHACL target variants.
-- Deconstruct property paths into recursive AST path nodes for IRI paths, inverse paths, sequence paths, alternative paths, and repetition modifiers while preserving Oxigraph `NamedNode`, `NamedOrBlankNode`, and `Term` values directly.
-- Preserve nested property-shape parent-child relationships.
-- Map supported constraint syntax into typed AST constraints for datatype, class, node kind, cardinality, value range, string, language, relational property, logical, qualified value, enumeration, constant, and SPARQL constraints.
-- Preserve raw SHACL constraint facts as Oxigraph predicate/object pairs alongside typed constraints.
-- Return parser diagnostics for malformed SHACL structures without converting those diagnostics into Reqvire-specific errors.
-- Store compiled shapes in a reusable registry keyed by Oxigraph shape identifiers.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [SHACL Structural Parser Registry](ValidationRequirements.md#shacl-structural-parser-registry)
----
-
-### SHACL Ontology Alignment Specification
-
-Technical specification for aligning a compiled SHACL registry with a supplied domain ontology index.
-
-#### Details
-The generic SHACL ontology aligner shall:
-- Accept a compiled SHACL registry and a domain ontology index as input.
-- Provide a domain-index constructor from supplied Oxigraph RDF quads so callers can pass a reachable authored/external ontology context without hand-populating class/property/datatype buckets.
-- Avoid dependencies on Reqvire element types, semantic-contract relations, graph registry internals, source identifiers, and Reqvire validation wording.
-- Cross-reference SHACL target classes against declared ontology classes.
-- Cross-reference named `sh:targetNode` references against resolvable named nodes from the supplied ontology index.
-- Cross-reference `sh:targetSubjectsOf`, `sh:targetObjectsOf`, parsed property paths, inverse paths, and relational property constraints against declared ontology properties.
-- Cross-reference `sh:class` constraints against declared ontology classes.
-- Cross-reference `sh:datatype` constraints against declared ontology datatypes or accepted built-in datatype vocabulary.
-- Preserve `sh:hasValue` and `sh:in` values as parsed constraint facts without treating every listed IRI as an ontology term-existence requirement.
-- Return generic alignment errors such as undeclared class, undeclared property, undeclared datatype, undeclared target node, and invalid inverse path, preserving the SHACL predicate that caused the reference.
-- Keep full SHACL data validation/execution out of scope unless a separate validation engine is introduced.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [SHACL Ontology Alignment](ValidationRequirements.md#shacl-ontology-alignment)
----
-
 ### Reqvire SHACL Context Adapter Specification
 
 Technical specification for adapting Reqvire semantic-contract context to generic SHACL ontology alignment.
 
 #### Details
-The Reqvire SHACL context adapter shall:
+The Reqvire SHACL context adapter must:
 - Ask the semantic index for parsed RDF quads from the ontology subset reachable through the semantic contract's explicit `use` relations and ontology ancestors.
 - Include parsed local external ontology source quads reachable through that ontology subset.
 - Derive the generic SHACL domain ontology index from those supplied RDF quads rather than manually rebuilding declaration buckets in the validation adapter.
-- Treat built-in RDF, RDFS, OWL, XSD, and SHACL vocabulary through Reqvire's reserved vocabulary registry where supported positions allow it.
+- Treat built-in RDF, RDFS, OWL, XSD, and SHACL vocabulary through the o-kernel reserved vocabulary registry where supported positions allow it.
 - Pass the compiled SHACL registry and the reachable domain ontology index into the generic SHACL ontology aligner.
-- Reject hidden ontology dependencies by passing only the explicit reachable ontology subset to the generic aligner; a model-owned SHACL reference outside that subset shall fail as an undeclared alignment reference from the perspective of the semantic contract.
+- Reject hidden ontology dependencies by passing only the explicit reachable ontology subset to the generic aligner; a model-owned SHACL reference outside that subset must fail as an undeclared alignment reference from the perspective of the semantic contract.
 - Convert generic SHACL parser and alignment diagnostics into Reqvire validation errors that include semantic-contract identifiers, reference kind, referenced IRI, declaring ontology context when available, and fix guidance.
 - Keep full SHACL data validation/execution out of scope unless a separate verification requirement introduces a SHACL execution engine.
 

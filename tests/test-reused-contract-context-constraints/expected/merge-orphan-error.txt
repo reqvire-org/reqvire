@@ -1,4 +1,4 @@
 
 ❌ 1 validation failed with error(s):
 
-  1. Invalid reused_contract_context target: 'Orphan-Spec' has no define relation. Contracts must define a requirement before they can be reused; contracts are requirement-owned only. Capabilities use concept references for ontology terms and are specified/verified, not defined by implementation-detail contracts. (file: specifications/TestMergeOrphan.md, element: Merge Orphan Source)
+  1. Invalid reused_contract_context target: 'Orphan-Spec' has no define relation. Contracts must define a requirement before they can be reused; contracts are requirement-owned only. Capabilities use concept references for SKOS concepts and are specified by requirements; verification coverage rolls up from verified requirements. (file: specifications/TestMergeOrphan.md, element: Merge Orphan Source)

@@ -48,13 +48,13 @@ A capability represents a coherent operational, product, business, regulatory, o
 
 `Ontologies/` contains first-class `ontology` elements.
 
-Ontologies define reusable semantic vocabulary: domain concepts, relationships, categories, and stable model meaning. Capabilities, requirements, contracts, and verifications use concept references to bind prose to ontology terms.
+Ontologies define reusable semantic vocabulary: domain concepts, relationships, categories, and stable model meaning. Capabilities, requirements, contracts, and verifications use concept references to bind prose to SKOS concepts.
 
 ### Verifications
 
 `Verifications/` contains verification elements grouped by verification domain.
 
-Verification elements prove capabilities or requirements through `verify` / `verifiedBy`. Evidence-backed verification types may use `satisfiedBy` to point at test results, proof reports, fixtures, or other evidence artifacts.
+Verification elements prove requirements through `verify` / `verifiedBy`. Capability coverage rolls up from verified requirements. Evidence-backed verification types may use `satisfiedBy` to point at test results, proof reports, fixtures, or other evidence artifacts.
 
 ## Capability Folder Pattern
 
@@ -129,7 +129,7 @@ Keep content in capabilities, requirements, or contracts when it says:
 - This workflow step or exact output must occur.
 - This code, service, or architecture component must exist.
 
-Ontology hierarchy uses `derivedFrom` / `derive` between ontology elements. Non-ontology, non-semantic-contract elements consume ontology terms through `#### Concept References`; semantic contracts consume ontology through `use` / `usedBy`.
+Ontology hierarchy uses `derivedFrom` / `derive` between ontology elements. Non-ontology, non-semantic-contract elements consume SKOS concepts through `#### Concept References`; semantic contracts consume ontology through `use` / `usedBy`.
 
 ## Requirement and Contract Files
 
@@ -179,7 +179,7 @@ Verifications/
   UI/
 ```
 
-Capabilities may be directly verified. Requirements remain the primary implementation coverage anchors.
+Capabilities are covered through verified requirements. Requirements remain the verification and implementation coverage anchors.
 
 ## Relation Expectations
 
@@ -193,8 +193,8 @@ requirement --specify--> capability
 capability --specifiedBy--> requirement
 capability/requirement --definedBy--> contract
 contract --define--> capability/requirement
-capability/requirement --verifiedBy--> verification
-verification --verify--> capability/requirement
+requirement --verifiedBy--> verification
+verification --verify--> requirement
 requirement --satisfiedBy--> implementation/evidence
 test-verification/formal-proof-verification --satisfiedBy--> evidence
 ```
@@ -220,19 +220,19 @@ Hierarchy should stay inside one logical subgraph:
 
 Cross-subgraph reuse should use reused_contract_context, not hierarchy.
 
-Avoid cross-submodel requirement hierarchy. If a requirement in one capability needs context from another capability, use concept references for ontology terms or reuse a compatible requirement-owned contract instead of creating a parent/child requirement relation across subgraphs.
+Avoid cross-submodel requirement hierarchy. If a requirement in one capability needs context from another capability, use concept references for SKOS concepts or reuse a compatible requirement-owned contract instead of creating a parent/child requirement relation across subgraphs.
 
 ## File Placement Heuristics
 
 When adding or moving model content:
 
-1. If it defines reusable meaning, put it in `Ontologies/`.
+1. If it defines reusable structural meaning, put it in `Ontologies/`; if it defines curated terminology, put it in `Thesaurus/`.
 2. If it defines a system ability, put it as a `capability` under `<Area>/<CapabilityName>/` at the model root.
 3. If it states an obligation, put it as a `requirement` in the owning capability folder.
 4. If it elaborates an obligation or capability, put it as a contract in the same capability folder.
 5. If it is service or architecture detail for one capability, put it under that capability's `Architecture/` folder.
 6. If it proves behavior, put it under `Verifications/<Domain>/`.
-7. If another subgraph needs vocabulary, add concept references to terms declared under `Ontologies/`.
+7. If another subgraph needs curated vocabulary, add concept references to generated SKOS concepts declared under `Thesaurus/`.
 8. If another subgraph needs a reusable requirement-owned contract, reuse that contract explicitly.
 
 ## Refactor Workflow

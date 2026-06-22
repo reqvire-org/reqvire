@@ -78,8 +78,8 @@ npx -y @reqvire-org/reqvire@latest --workspace /path/to/repository mcp`}</CodeBl
 reqvire search --json --output search-results.json
 reqvire lint --json --output lint-report.json
 reqvire change-impact --json --output impact.json
-reqvire ontologies --output ontologies.ttl
-reqvire ontologies --jsonld --output ontologies.jsonld`}</CodeBlock>
+reqvire semantic ontologies --output ontologies.ttl
+reqvire semantic graph --full --jsonld --output semantic-graph.jsonld`}</CodeBlock>
       </Section>
 
       <Section title="Working with Elements">

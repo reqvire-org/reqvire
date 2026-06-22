@@ -10,7 +10,7 @@ The system shall respect configured excluded filename patterns when performing f
 #### Relations
   * derive: [Excluded File Relation Validation](../Validation/ValidationRequirements.md#excluded-file-relation-validation)
   * derivedFrom: [Ignoring Unstructured Documents](../../ModelStructure/Configuration.md#ignoring-unstructured-documents)
-  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
+  * satisfiedBy: [utils.rs](../../../crates/reqvire-core/src/utils.rs)
 ---
 
 ### Format Consistency Enforcement
@@ -29,7 +29,7 @@ The system shall provide formatting capability to ensure consistent formatting i
   * derive: [Document Structure Normalization](#document-structure-normalization)
   * derive: [Element Ordering Normalization](#element-ordering-normalization)
   * derive: [Relation Ordering Normalization](#relation-ordering-normalization)
-  * satisfiedBy: [format.rs](../../../core/src/format.rs)
+  * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
   * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
 ---
@@ -59,8 +59,8 @@ When generating formatted output, the system shall:
 #### Relations
   * definedBy: [Document Structure Specification](Specifications.md#document-structure-specification)
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
@@ -92,7 +92,7 @@ This operation only removes within-section duplicates (entries repeated in the s
 #### Relations
   * definedBy: [Format Duplicate Removal Behavior](Behaviors.md#format-duplicate-removal-behavior)
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * satisfiedBy: [format.rs](../../../core/src/format.rs)
+  * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
   * verifiedBy: [Format Duplicate Removal Test](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-duplicate-removal-test)
 ---
 
@@ -116,7 +116,7 @@ This ensures:
 #### Relations
   * definedBy: [Relation Ordering Specification](Specifications.md#relation-ordering-specification)
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
   * verifiedBy: [Relation Ordering Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#relation-ordering-verification)
 ---
 
@@ -129,8 +129,8 @@ The system shall display formatting changes suggestion in similar manner as git 
 
 #### Relations
   * derive: [Git-Style Diff Output for Format](#git-style-diff-output-for-format)
-  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
-  * satisfiedBy: [format.rs](../../../core/src/format.rs)
+  * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
+  * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
 ---
 
@@ -158,8 +158,8 @@ Implementation details shall follow the associated contract specifications.
 
 #### Relations
   * definedBy: [Full Relations Insertion Contract Specification](Specifications.md#full-relations-insertion-contract-specification)
-  * satisfiedBy: [format.rs](../../../core/src/format.rs)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
   * verifiedBy: [Full Relations Insertion Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#full-relations-insertion-verification)
 ---
@@ -172,8 +172,8 @@ The system shall replace absolute links with relative links, where applicable an
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [utils.rs](../../../crates/reqvire-core/src/utils.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
   * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
 ---

@@ -31,7 +31,7 @@ Implementation details shall follow the associated contract specifications.
   * derive: [Requirements Processing](#requirements-processing)
   * derive: [File Pattern Exclusion for Format](../Operations/Formatting/FormattingRequirements.md#file-pattern-exclusion-for-format)
   * derivedFrom: [Coexistence of Structured and Unstructured Documents](#coexistence-of-structured-and-unstructured-documents)
-  * satisfiedBy: [config.rs](../../cli/src/config.rs)
+  * satisfiedBy: [config.rs](../../crates/reqvire-cli/src/config.rs)
 ---
 
 ### Ignore Files Integration
@@ -50,7 +50,7 @@ The system shall integrate with Git workflows by reading exclusion patterns from
 #### Relations
   * definedBy: [Ignore Files Specification](Specifications.md#ignore-files-specification)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
-  * satisfiedBy: [config.rs](../../cli/src/config.rs)
+  * satisfiedBy: [config.rs](../../crates/reqvire-cli/src/config.rs)
   * verifiedBy: [File Exclusion Test](../Verifications/Operations/Validation/ValidationVerifications.md#file-exclusion-test)
 ---
 
@@ -68,8 +68,8 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Requirements Processing Contract Specification](Specifications.md#requirements-processing-contract-specification)
   * derive: [Structured Markdown Files Search and Detection](#structured-markdown-files-search-and-detection)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
-  * satisfiedBy: [parser.rs](../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../crates/reqvire-core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Same-File Fragment Relations Test](../Verifications/Operations/Validation/ValidationVerifications.md#same-file-fragment-relations-test)
   * verifiedBy: [Element Content Extraction Test](../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#element-content-extraction-test)
 ---
@@ -87,7 +87,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Structured Markdown Files Search and Detection Contract Specification](Specifications.md#structured-markdown-files-search-and-detection-contract-specification)
   * derivedFrom: [Requirements Processing](#requirements-processing)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
+  * satisfiedBy: [model.rs](../../crates/reqvire-core/src/model.rs)
   * verifiedBy: [Requirements Files Search and Detection Test](../Verifications/Operations/Validation/ValidationVerifications.md#requirements-files-search-and-detection-test)
 ---
 

@@ -1,19 +1,21 @@
 export { PaneActionRow, PaneGhostLink } from "./PaneActionRow";
 export type { PaneActionRowProps, PaneGhostLinkProps } from "./PaneActionRow";
 export {
+  PaneControlSection,
   PaneFilterGroup,
+  PaneFilterGrid,
   PaneFilterNavList,
   PaneFilterNavRow,
-  PaneFilterSection,
   PaneSearchForm,
-} from "./PaneFilterSection";
+} from "./PaneControls";
 export type {
+  PaneControlSectionProps,
   PaneFilterGroupProps,
+  PaneFilterGridProps,
   PaneFilterNavListProps,
   PaneFilterNavRowProps,
-  PaneFilterSectionProps,
   PaneSearchFormProps,
-} from "./PaneFilterSection";
+} from "./PaneControls";
 export { PaneLegend } from "./PaneLegend";
 export type { PaneLegendProps, PaneLegendRow } from "./PaneLegend";
 export { PaneNotationLegend } from "./PaneNotationLegend";

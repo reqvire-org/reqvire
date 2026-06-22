@@ -112,7 +112,7 @@ Some details.
 
 Must be defined with a level 4 header: `#### Reused Contract Context`.
 
-The Reused Contract Context subsection links a requirement to explicit reusable contract context from another subgraph. Reused contract context does not provide ontology context. Semantic vocabulary bindings belong in `#### Concept References`; semantic-contract ontology dependencies belong in `use`/`usedBy` relations.
+The Reused Contract Context subsection links a requirement to explicit reusable contract context from another subgraph. Reused contract context does not provide ontology context. SKOS concept bindings belong in `#### Concept References`; semantic-contract ontology dependencies belong in `use`/`usedBy` relations.
 
 ### Element Identifier Reused Contract Context
 
@@ -147,4 +147,69 @@ The system shall expose an API contract.
 
 Must be defined with a level 4 header: `#### Concept References`.
 
-Concept references bind readable element prose to declared ontology terms. They may be authored on capability, requirement, contract, verification-objective, and concrete verification elements. They must not be authored on ontology elements, because ontology elements declare terms in `#### Ontology`. They must not be authored on semantic-contract elements, because semantic contracts are semantic graph artifacts that use ontology through `use`/`usedBy` relations and SHACL `#### Shapes`.
+Concept references bind readable element prose to generated native SKOS concepts. They may be authored on capability, requirement, contract, verification-objective, and concrete verification elements. They must not target arbitrary OWL classes, properties, individuals, or SKOS resources authored directly in ontology Turtle; structural ontology terms should point back to curated native concepts with `reqvire:mapsToConcept` when that bridge is useful. They must not be authored on ontology elements, because ontology elements declare structural terms in `#### Ontology`. They must not be authored on semantic-contract elements, because semantic contracts are semantic graph artifacts that use ontology through `use`/`usedBy` relations and SHACL `#### Shapes`.
+
+**Parsing Rules:**
+- Entries are bullet points starting with `*`.
+- Format: `* Label: IRI_OR_CURIE`.
+- The parser records label, referenced IRI/CURIE text, and source line number.
+- Semantic validation resolves the referenced term against the element's ontology context; semantic validation does not reparse this markdown grammar.
+
+## Ontology Subsection
+
+Must be defined with a level 4 header: `#### Ontology`.
+
+Ontology subsections contain fenced RDF/Turtle content owned by ontology elements.
+
+**Parsing Rules:**
+- The parser extracts fenced code blocks under `#### Ontology`.
+- Ontology elements must contain exactly one valid ontology block.
+- The parser preserves fenced block language, content, and source line number.
+- RDF parsing and ontology validation are semantic responsibilities over the extracted block, not markdown grammar parsing responsibilities.
+
+## External Ontology Subsection
+
+Must be defined with a level 4 header: `#### External Ontology`.
+
+External ontology subsections declare local external vocabulary source files for ontology elements.
+
+**Parsing Rules:**
+- The subsection is repeatable.
+- Entries are bullet points starting with `*` or `-`.
+- Format: `* key: value`.
+- Required keys: `prefix`, `namespace`, `resource`, and `source`.
+- Optional key: `format`; defaults to `turtle`.
+- The parser records the parsed source declaration and subsection line number.
+- Semantic model construction consumes parsed declarations and must not reparse this markdown grammar from raw element content.
+
+**Example:**
+```markdown
+  * prefix: skos
+  * namespace: http://www.w3.org/2004/02/skos/core#
+  * resource: http://www.w3.org/2004/02/skos/core
+  * source: references/ontologies/skos.rdf
+  * format: rdfxml
+```
+
+## Shapes Subsection
+
+Must be defined with a level 4 header: `#### Shapes`.
+
+Shapes subsections contain fenced SHACL/RDF content owned by semantic-contract elements.
+
+**Parsing Rules:**
+- The parser extracts fenced code blocks under `#### Shapes`.
+- Semantic-contract elements must contain exactly one valid shapes block.
+- The parser preserves fenced block language, content, and source line number.
+- SHACL parsing and ontology alignment run over the extracted RDF block; they must not parse the markdown subsection grammar directly.
+
+## Query Subsection
+
+Must be defined with a level 4 header: `#### Query`.
+
+Query subsections contain fenced SPARQL or query content when a semantic contract owns query text.
+
+**Parsing Rules:**
+- The parser extracts fenced code blocks under `#### Query`.
+- The parser preserves fenced block language, content, and source line number.
+- Query validation or execution behavior is owned by semantic model requirements over the parsed block.

@@ -6,7 +6,7 @@ Use this workflow when migrating an existing Reqvire model toward clear capabili
 
 Separate three concerns without losing traceability:
 
-- Capabilities own coherent operational/system ability, authored concept-reference context, and direct verification context.
+- Capabilities own coherent operational/system ability and authored concept-reference context; verification coverage comes from requirements that specify them.
 - `ontology` elements own stable model/domain meaning: `X is`, `X has`, `X relates to Y`, allowed semantic structure, and shared OWL/Turtle vocabulary.
 - Requirements own implementable obligations: what the system shall do, what can satisfy it, and what verification proves it.
 - Reusable `semantic-contract` elements own SHACL shape profiles over ontology terms reached through explicit `use`/`usedBy` relations and constrain requirements through `constrain`/`constrainedBy`.
@@ -31,7 +31,7 @@ Use this method when building or refactoring a system model, not only when clean
    - Run `reqvire submodels --json`.
    - Run `reqvire search --filter-type="ontology" --short`.
    - Treat each capability root as an independent coherent operational/system ability.
-   - Keep ontology and semantic-contract elements under `system-model/Ontologies`; model elements consume ontology terms through concept references, and requirements consume semantic contracts through `constrainedBy`.
+   - Keep ontology and semantic-contract elements under `system-model/Ontologies`; model elements consume SKOS concepts through concept references, and requirements consume semantic contracts through `constrainedBy`.
    - Treat ontology as a first-class semantic plane: it defines reusable terms and relationships that non-ontology elements reference explicitly.
    - Do not create one universal top capability just to reuse vocabulary. Shared meaning crosses roots through explicit concept references.
 
@@ -43,24 +43,24 @@ Use this method when building or refactoring a system model, not only when clean
 3. **Shape the ontology hierarchy before writing local profiles**
    - Put nouns, classes, properties, semantic categories, and stable relationship rules in `ontology`.
    - Reuse existing ontology terms when they already describe the concept.
-   - Add ontology terms before adding `#### Concept References` or SHACL shapes that depend on those terms.
+   - Add SKOS concepts before adding `#### Concept References`, and add ontology terms before SHACL shapes depend on those terms.
    - Keep exact command names, fields, URI patterns, workflow steps, output formats, persistence behavior, and reject/write/emit behavior out of ontology.
    - If prose moved out of a requirement still matters to implementation, preserve it as a requirement-owned contract instead of deleting it.
 
 4. **Keep obligations in requirements**
    - Requirements state what the system shall do.
-   - Requirements may use `#### Concept References` to bind readable text to ontology terms.
+   - Requirements may use `#### Concept References` to bind readable text to SKOS concepts.
    - `semantic-contract` elements contain `#### Shapes` only, never `#### Ontology`, use ontology through `use`/`usedBy`, and constrain requirements through `constrain`/`constrainedBy`.
 
 5. **Preserve boundaries through reused_contract_context**
    - Use hierarchy only inside a capability, requirement, or ontology family.
-   - Use concept references for cross-root ontology term reuse.
+   - Use concept references for cross-root SKOS concept reuse.
    - Use requirement reused_contract_context for cross-root reusable requirement-owned contracts.
    - Use `use` for semantic-contract ontology dependencies and `constrain` for semantic-contract requirement dependencies.
    - After changing reused_contract_context or hierarchy, check `submodels --json` for unintended cross-submodel couplings.
 
 6. **Update verification and tests in the same slice**
-   - Verifications may verify capabilities or requirements directly.
+   - Verifications verify requirements directly; capabilities are covered through requirement rollup.
    - Capability coverage is rollup from specifying requirements and child capabilities.
    - If names, hierarchy, report shape, or fixtures change, update verifications and e2e expected files before finishing.
 
@@ -86,7 +86,7 @@ Put content in a capability when it answers:
 - What stakeholder need, feature context, operational context, regulatory driver, mission objective, service context, AI context, source context, or ontology defines its meaning?
 - What source context or ontology defines this capability's language?
 - Which requirements belong under this capability?
-- Which verification evidence directly verifies it when capability-level evidence is appropriate?
+- Which requirements specify it, and which verified requirements provide its coverage?
 
 Put content in an ontology element when it says:
 
@@ -141,7 +141,7 @@ For each capability root:
 
 - Confirm it is a real independent capability root.
 - Check whether it has requirements through `specifiedBy`/`specify`.
-- If it has zero requirements, confirm it is still a meaningful capability because it has child capabilities or direct verification; otherwise add a concrete obligation that specifies it or move pure vocabulary into `system-model/Ontologies` and reference it from consuming elements.
+- If it has zero requirements, confirm it is still a meaningful capability because it has child capabilities; otherwise add a concrete obligation that specifies it or move pure vocabulary into `system-model/Ontologies` and reference it from consuming elements.
 - Confirm cross-root dependencies are reused_contract_context, not hierarchy relations.
 - If one root is too broad, split it into child capabilities first and move local requirements to the child capabilities before editing ontology or contracts.
 
@@ -205,10 +205,10 @@ When an obligation needs specific closed-world validation:
 Use:
 
 - `capability specifiedBy requirement` or `requirement specify capability` for ownership.
-- concept references from model elements to ontology terms.
+- concept references from model elements to SKOS concepts.
 - `semantic-contract constrain requirement` or `requirement constrainedBy semantic-contract` for SHACL profile application.
 - `semantic-contract use ontology` or `ontology usedBy semantic-contract` for ontology vocabulary dependencies.
-- Capabilities do not author reused_contract_context; they use concept references for ontology terms.
+- Capabilities do not author reused_contract_context; they use concept references for SKOS concepts.
 - Requirement reused_contract_context only for compatible requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` contracts.
 
 Use semantic relation families or concept references instead of a generic relation to preserve ownership or dependency meaning.
@@ -218,7 +218,7 @@ Do not remove a cross-root dependency unless the consumer now has an explicit co
 
 When requirements move or split:
 
-- Use `verifiedBy`/`verify` links when verification intentionally targets capabilities or requirements.
+- Use `verifiedBy`/`verify` links only when concrete verification targets requirements; capabilities are covered through requirement rollup.
 - Add verification coverage for new obligations.
 - Update e2e fixtures and expected output when submodel counts, coverage, search output, or ontology export output changes.
 - Keep verifications evidence-backed when they require files through `satisfiedBy`.
@@ -239,7 +239,7 @@ Run focused e2e tests for touched behavior, then full e2e before finishing.
 ## Completion Criteria
 
 - Every requirement resolves to exactly one owning capability root.
-- Capability roots have specifying requirements, child capabilities, or intentional direct verification. Pure vocabulary belongs in ontology and is referenced by consuming elements.
+- Capability roots have specifying requirements or child capabilities. Pure vocabulary belongs in ontology and is referenced by consuming elements.
 - Semantic meaning is not duplicated in requirements and ontology elements.
 - Semantic contracts contain `Shapes` only and no `Ontology`.
 - Semantic-contract references resolve through explicit ontology `use` context and ontology hierarchy.
@@ -251,4 +251,4 @@ Run focused e2e tests for touched behavior, then full e2e before finishing.
 - Do not move workflow behavior or implementation commitments into ontology just because the text is structured.
 - Do not let SHACL profiles introduce new ontology terms.
 - Do not remove cross-subgraph relations without replacing intentional dependencies with reused_contract_context.
-- Do not leave capability roots with zero requirements unless they have child capabilities or direct verification; move pure vocabulary to ontology.
+- Do not leave capability roots with zero requirements unless they have child capabilities; move pure vocabulary to ontology.

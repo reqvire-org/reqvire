@@ -16,8 +16,8 @@ Product capability.
   * type: capability
 
 #### Concept References
-  * Product Payload: urn:reqvire:test:product:ProductPayload
-  * Shared Property: urn:reqvire:test:shared:SharedProperty
+  * Product Payload: urn:reqvire:test:concept#ProductPayload
+  * Shared Property: urn:reqvire:test:concept#SharedProperty
 
 #### Relations
   * specifiedBy: [Payload Requirement](#payload-requirement)
@@ -34,16 +34,55 @@ Product semantic vocabulary.
 
 #### Ontology
 ```turtle
+@prefix concept: <urn:reqvire:test:concept#> .
 @prefix testonto: <https://example.test/ontology#> .
 @prefix product: <urn:reqvire:test:product:> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 <https://example.test/ontology> a owl:Ontology .
 product:ProductPayload a owl:Class ;
+  reqvire:mapsToConcept concept:ProductPayload ;
   product:state product:Initial .
 ```
 ---
 
+### Product Concepts
+
+Native product concept scheme.
+
+Concept scheme for product payload terms.
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: urn:reqvire:test:concept
+  * concept_prefix: concept
+---
+### Product Payload
+
+Native product payload concept.
+
+A product payload concept.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Product Concepts](#product-concepts)
+---
+### Shared Property
+
+Native shared property concept.
+
+A shared property concept.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Product Payload](#product-payload)
+  * broader: [Product Payload](#product-payload)
+---
 ### Shared Ontology
 
 Shared semantic vocabulary.
@@ -58,12 +97,15 @@ Shared semantic vocabulary.
 
 #### Ontology
 ```turtle
+@prefix concept: <urn:reqvire:test:concept#> .
 @prefix testonto: <https://example.test/ontology#> .
 @prefix shared: <urn:reqvire:test:shared:> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 <https://example.test/ontology> a owl:Ontology .
 shared:SharedProperty a owl:DatatypeProperty ;
+  reqvire:mapsToConcept concept:SharedProperty ;
   shared:state shared:Initial .
 ```
 ---

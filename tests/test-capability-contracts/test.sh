@@ -16,8 +16,8 @@ Billing capability.
   * type: capability
 
 #### Concept References
-  * Invoice: urn:reqvire:test:billing:Invoice
-  * Tax Invoice: urn:reqvire:test:tax:TaxInvoice
+  * Invoice: urn:reqvire:test:concept#Invoice
+  * Tax Invoice: urn:reqvire:test:concept#TaxInvoice
 
 #### Relations
   * specifiedBy: [Billing Requirement](#billing-requirement)
@@ -45,16 +45,55 @@ Billing vocabulary.
 
 #### Ontology
 ```turtle
+@prefix concept: <urn:reqvire:test:concept#> .
 @prefix testonto: <https://example.test/ontology#> .
 @prefix billing: <urn:reqvire:test:billing:> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 <https://example.test/ontology> a owl:Ontology .
 billing:CorrectiveInvoice a owl:Class .
-billing:Invoice a owl:Class .
+billing:Invoice a owl:Class ;
+  reqvire:mapsToConcept concept:Invoice .
 ```
 ---
 
+### Billing Concepts
+
+Native billing concept scheme.
+
+Concept scheme for billing terms.
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: urn:reqvire:test:concept
+  * concept_prefix: concept
+---
+### Invoice
+
+Native invoice concept.
+
+A billing invoice.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Billing Concepts](#billing-concepts)
+---
+### Tax Invoice
+
+Native tax invoice concept.
+
+A tax-specific billing invoice.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Invoice](#invoice)
+  * broader: [Invoice](#invoice)
+---
 ### Billing Requirement
 
 The system shall produce billing invoices.
@@ -104,12 +143,15 @@ Shared tax vocabulary.
 
 #### Ontology
 ```turtle
+@prefix concept: <urn:reqvire:test:concept#> .
 @prefix testonto: <https://example.test/ontology#> .
 @prefix tax: <urn:reqvire:test:tax:> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 <https://example.test/ontology> a owl:Ontology .
-tax:TaxInvoice a owl:Class .
+tax:TaxInvoice a owl:Class ;
+  reqvire:mapsToConcept concept:TaxInvoice .
 ```
 ---
 EOF

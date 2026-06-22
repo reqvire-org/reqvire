@@ -102,15 +102,19 @@ Semantic model evidence rules:
 - `reqvire.read_element` returns `concept_references` for non-ontology, non-semantic-contract elements that author `#### Concept References`.
 - `reqvire.collect` includes authored concept references for capability/requirement collection and semantic-contract ontology-use context for semantic-contract evidence where the underlying Reqvire operation returns it.
 - `reqvire.model` and `reqvire.submodels` preserve capability roots, requirement ownership through `specify`/`specifiedBy`, ontology hierarchy through `derive`/`derivedFrom`, and concept-reference facts needed for semantic dependency traceability.
-- `reqvire.semantic.ontologies` exposes the same semantic collection as the CLI `ontologies` command under the semantic MCP namespace.
-- `reqvire.semantic.ontologies` accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`.
-- `reqvire.semantic.ontologies` accepts optional `content` with values `rdf`, `shacl`, or `both`; omitted content defaults to `both`.
-- `reqvire.semantic.ontologies` accepts optional `full` boolean; omitted or false returns generated ontology document declarations plus authored ontology and SHACL artifacts, while true also includes generated Reqvire model context triples and ontology projection facts. Generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors.
-- `reqvire.semantic.ontologies` accepts optional `include_external` boolean; omitted or false excludes local `#### External Ontology` dependency triples and external term declarations from serialized content and metadata, while true includes only used external subset triples and declarations.
-- `reqvire.semantic.ontologies` returns selected serialized semantic content, effective content filter, effective `include_external` state, effective external materialization mode, semantic index summary, collected block metadata, diagnostics, generated ontology document declarations, visible ontology term declarations, and SHACL shape references.
+- `reqvire.semantic.ontologies` exposes authored OWL/RDF ontology vocabulary only. It accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`. It accepts optional `include_external`; omitted or false excludes local and built-in External Ontology dependency triples and external term declarations, while true includes only used external subset triples and declarations sourced from `reqvire:external-used-subset` (o-kernel-managed named graph).
+- `reqvire.semantic.shapes` exposes semantic-contract SHACL shapes only. It accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`.
+- `reqvire.semantic.concepts` exposes SKOS concept scheme/thesaurus triples only. It accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`, and optional `include_mappings` controls whether `reqvire:mapsToConcept` bridge triples are included.
+- `reqvire.concept_schemes.list` exposes standalone native concept schemes and their `concept_base`/`concept_prefix` namespace context.
+- `reqvire.concepts.list` exposes standalone native SKOS concepts generated from Reqvire `concept` elements, with optional filtering by text or scheme IRI.
+- `reqvire.concepts.get` reads one generated native concept or concept scheme by generated IRI, source element identifier, or source element name.
+- `reqvire.concept_mappings.list` lists validated `reqvire:mapsToConcept` bridge triples from structural ontology terms to generated native SKOS concepts; target validation is enforced by canonical model startup and validation.
+- `reqvire.semantic.graph` exposes the combined semantic graph. It accepts optional `format`, optional `full`, and optional `include_external`; full mode adds Reqvire model context triples and generated ontology projection facts, while `include_external` adds only the used external subset.
+- Semantic export responses return selected serialized content, effective semantic layer, effective external materialization state where relevant, semantic index summary, collected block metadata, graph layer metadata, diagnostics, generated ontology document declarations, visible ontology term declarations, and SHACL shape references.
 - `reqvire.semantic.prefixes` returns ontology element-defined prefixes, namespaces, source provenance, source prose content, and a reusable SPARQL prefix block. It accepts optional `include_external`; omitted or false returns authored ontology prefixes only, while true also returns local external ontology source prefixes marked as external and used-subset materialization metadata.
 - `reqvire.semantic.vocabulary` returns compact paged semantic vocabulary with prefixes included in every response for SPARQL query construction. It accepts optional `include_external`; omitted or false returns authored vocabulary only, while true also returns used external subset vocabulary terms marked as external with external source metadata.
-- `reqvire.semantic.sparql` executes SPARQL against the same semantic collection used by `reqvire.semantic.ontologies`. It accepts optional `include_external`; omitted or false queries the authored semantic store only, while true queries a store that includes only the used external subset.
+- `reqvire.semantic.sparql` executes SPARQL against the semantic store used by the combined semantic graph. It accepts optional `include_external`; omitted or false queries the authored semantic store only, while true queries a store that includes only the used external subset.
+- Semantic tool responses expose `graph_layers` metadata with `default`, `authored-ontology`, `authored-model`, `generated`, `external-used-subset`, and `raw-external-source` role flags so clients can target named-graph scopes explicitly while raw external source graphs remain hidden.
 
 #### Metadata
   * type: specification
@@ -245,11 +249,6 @@ Safety behavior:
 - Prompt listing and retrieval do not parse arbitrary files, execute shell commands, fetch remote URLs, or mutate workspace state.
 - Prompt retrieval may append client-supplied prompt arguments as context but shall not treat them as executable instructions.
 
-#### Concept References
-  * MCP prompt contract: https://www.reqvire.org/ontology#McpPromptContract
-  * MCP semantic query prompt contract: https://www.reqvire.org/ontology#McpSemanticQueryPromptContract
-  * MCP regular workflow prompt contract: https://www.reqvire.org/ontology#McpWorkflowPromptContract
-
 #### Metadata
   * type: specification
 
@@ -365,7 +364,7 @@ The MCP interface is expected to expose read-only SPARQL query execution over Re
 SPARQL tool request:
 - Tool name is `reqvire.semantic.sparql`.
 - Required `query` string contains a SPARQL 1.1 query.
-- Optional `full` boolean defaults to `true`. When true, the queried graph includes authored ontology and SHACL RDF plus generated Reqvire model-context triples, semantic-export relation-family projection facts, and ontology projection facts. When false, the queried graph includes generated ontology document declarations plus authored ontology and SHACL RDF only.
+- Optional `full` boolean defaults to `true`. When true, the queried graph includes authored ontology and SHACL RDF, authored model facts, semantic-export relation-family projection facts, and generated ontology projection facts. When false, the queried graph includes authored ontology and SHACL RDF only.
 - Optional `include_external` boolean defaults to false. When true, the selected graph also includes only the used external ontology subset derived from parsed local external dependency files.
 
 Execution behavior:
@@ -418,6 +417,8 @@ Vocabulary tool request:
 - Optional `limit` defaults to 50 and is capped at 200.
 - Optional `cursor` continues a previous section page.
 - Optional `filter` performs a text match over compact item content.
+- Optional `ontology_document` filters vocabulary items to terms defined by an exact OWL ontology document IRI.
+- Optional `ontology_base` is an alias for `ontology_document` because the resolved Reqvire `ontology_base` is the generated OWL ontology document IRI.
 - Optional `include_source` defaults to true and controls source provenance where supported.
 - Optional `include_examples` defaults to false and controls whether query pattern entries include SPARQL examples.
 - Optional `include_external` defaults to false and controls whether used external ontology subset vocabulary appears in prefixes and item sections.
@@ -428,7 +429,8 @@ Result behavior:
 - Item section responses return `items`, `paging`, prefixes, diagnostics, and model fingerprint.
 - `relation_families` items include family name, IRI/CURIE, meaning, normalized forward property, normalized inverse property, raw relation rules, and transitive flag.
 - `classes` and `properties` items include IRI/CURIE, role, external marker, label/comment where available, source when requested, and domain/range when available.
-- Imported external vocabulary items are omitted by default; when included, only used external subset items are returned, marked `external: true`, and use external source metadata.
+- Authored `classes` and `properties` items include `ontology_document` when Reqvire can resolve the owning OWL document.
+- Imported external vocabulary items are omitted by default; when included, only used external subset items are returned, marked `external: true`, carry `ontology_document` from the declared external ontology source resource or namespace fallback, and use external source metadata.
 - `semantic_contracts` items include shape source and referenced SHACL target/path/class IRIs.
 
 Execution behavior:
@@ -437,9 +439,7 @@ Execution behavior:
 - The tool does not write generated vocabulary data back to Markdown source.
 
 #### Concept References
-  * MCP semantic vocabulary contract: https://www.reqvire.org/ontology#McpSemanticVocabularyContract
-  * MCP semantic vocabulary tool contract: https://www.reqvire.org/ontology#McpSemanticVocabularyToolContract
-  * Relation Family: https://www.reqvire.org/ontology#RelationFamily
+  * Relation Family: https://www.reqvire.org/concepts#RelationFamily
 
 #### Metadata
   * type: specification
@@ -701,6 +701,9 @@ Model evidence tools:
 - `reqvire.collect`
 - `reqvire.submodels`
 - `reqvire.semantic.ontologies`
+- `reqvire.semantic.shapes`
+- `reqvire.semantic.concepts`
+- `reqvire.semantic.graph`
 - `reqvire.semantic.prefixes`
 - `reqvire.semantic.vocabulary`
 - `reqvire.semantic.sparql`
@@ -760,7 +763,7 @@ Exposure rules:
 Every MCP tool is expected to declare its side-effect class and availability.
 
 #### Details
-Canonical MCP side-effect classes are defined by the Reqvire interface ontology.
+Canonical MCP side-effect classes are defined by the MCP tool contract requirements and their operation specifications.
 
 Classification rules:
 - `read_only` tools are advertised in default `tools/list`.
@@ -781,6 +784,9 @@ Read-only tools:
 - `reqvire.collect`
 - `reqvire.submodels`
 - `reqvire.semantic.ontologies`
+- `reqvire.semantic.shapes`
+- `reqvire.semantic.concepts`
+- `reqvire.semantic.graph`
 - `reqvire.semantic.prefixes`
 - `reqvire.semantic.vocabulary`
 - `reqvire.semantic.sparql`

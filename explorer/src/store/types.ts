@@ -1,6 +1,6 @@
 /*
  * Project Store schema — TypeScript mirror of the Rust `ExplorerProjectStore`
- * defined in core/src/html/store.rs (owned by Task-50).
+ * defined in crates/reqvire-core/src/html/store.rs (owned by Task-50).
  *
  * This file is the authoritative frontend view of the seed contract. Keep it
  * in sync with store.rs. The schema version string below must match
@@ -13,8 +13,8 @@
  * Store consumers must tolerate unknown future fields (forward-compatible).
  */
 
-/** Must match `SCHEMA_VERSION` in core/src/html/store.rs. */
-export const EXPECTED_SCHEMA_VERSION = "2026-06-07.project-store.v1";
+/** Must match `SCHEMA_VERSION` in crates/reqvire-core/src/html/store.rs. */
+export const EXPECTED_SCHEMA_VERSION = "2026-06-23.project-store.v2";
 
 export interface ProjectStoreProject {
   name: string;
@@ -91,6 +91,50 @@ export interface ProjectStoreConceptReference {
   label: string;
   iri: string;
   line_number: number;
+}
+
+export interface ProjectStoreThesaurusUsage {
+  id: string;
+  label: string;
+  type: string;
+}
+
+export interface ProjectStoreThesaurusScheme {
+  id: string;
+  element_id: string;
+  label: string;
+  definition: string;
+  source_href: string;
+  source_label: string;
+  concept_base: string;
+  concept_prefix: string;
+  top_concept_ids: string[];
+}
+
+export interface ProjectStoreThesaurusConcept {
+  id: string;
+  element_id: string;
+  label: string;
+  scheme_id: string;
+  scheme_element_id: string;
+  scheme_label: string;
+  parent_id: string | null;
+  definition: string;
+  alt_labels: string[];
+  scope_note: string;
+  example_values: string[];
+  related_ids: string[];
+  exact_match_ids: string[];
+  close_match_ids: string[];
+  used_by: ProjectStoreThesaurusUsage[];
+  maps_to: ProjectStoreThesaurusUsage[];
+  source_href: string;
+  source_label: string;
+}
+
+export interface ProjectStoreThesaurus {
+  schemes: ProjectStoreThesaurusScheme[];
+  concepts: ProjectStoreThesaurusConcept[];
 }
 
 export interface ProjectStoreSearchDocument {
@@ -193,6 +237,7 @@ export interface OntologyProjection {
     total_blocks?: number;
     total_quads?: number;
   };
+  graph_layers?: OntologyGraphLayer[];
   declarations?: Record<string, OntologyTermDeclaration[]>;
   shape_references?: { element_identifier: string; iri: string; kind: string }[];
   blocks?: { file_path: string; kind: string; line_number: number }[];
@@ -203,6 +248,13 @@ export interface OntologyProjection {
   external_materialization?: "none" | "used_subset" | string;
   external_counts?: OntologyExternalCounts;
   ttl_href?: string;
+}
+
+export interface OntologyGraphLayer {
+  role: string;
+  graph_iri: string;
+  included: boolean;
+  source: string;
 }
 
 export interface OntologyTermDeclaration {
@@ -322,9 +374,12 @@ export interface OntologyGraphNode {
   type?: string;
   node_type?: string;
   semantic_type: string;
-  layer: "authored" | "reqvire-context" | "external-source";
-  source_kind: "ontology" | "shape" | "model-context" | "external-ontology";
+  layer: "authored" | "concepts" | "reqvire-context" | "external-source";
+  source_kind: "ontology" | "shape" | "concepts" | "model-context" | "external-ontology";
   full_uri: string;
+  ontology_document?: string;
+  scheme_iri?: string;
+  scheme_label?: string;
   comment: string;
   rdf_types: string[];
   type_evidence: OntologyGraphTypeEvidence[];
@@ -345,8 +400,8 @@ export interface OntologyGraphEdge {
   source: string;
   target: string;
   label: string;
-  layer: "authored" | "reqvire-context" | "external-source";
-  source_kind: "ontology" | "shape" | "model-context" | "external-ontology";
+  layer: "authored" | "concepts" | "reqvire-context" | "external-source";
+  source_kind: "ontology" | "shape" | "concepts" | "model-context" | "external-ontology";
 }
 
 export interface OntologyGraphSource {
@@ -447,6 +502,7 @@ export interface ExplorerProjectStore {
   relations: ProjectStoreRelation[];
   reused_contract_context: ProjectStoreReusedContractContextEntry[];
   concept_refs: ProjectStoreConceptReference[];
+  thesaurus: ProjectStoreThesaurus;
   /** Opaque: capability-rooted submodel report projection. */
   submodels: unknown;
   /** Verification trace report projection. */

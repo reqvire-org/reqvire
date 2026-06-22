@@ -84,7 +84,7 @@ const panelTitleSkinX = css`
 const resourcesListBaseUX = css`
   display: flex;
   flex-direction: column;
-  gap: var(--gap-list-stack);
+  gap: var(--stack-gap-compact);
 
   .ux-resource-list-card-row {
     display: flex;

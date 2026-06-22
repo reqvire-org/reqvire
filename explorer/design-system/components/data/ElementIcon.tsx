@@ -101,6 +101,9 @@ const roleSkinX = css`
   &[data-element-role="verification-objective"] { --ds-elemicon-color: var(--verification-objective); }
   &[data-element-role="verification"] { --ds-elemicon-color: var(--verification); }
   &[data-element-role="ontology"] { --ds-elemicon-color: var(--ontology); }
+  &[data-element-role="concept"] { --ds-elemicon-color: var(--concept); }
+  &[data-element-role="concept-scheme"] { --ds-elemicon-color: var(--concept-scheme); }
+  &[data-element-role="concept-reference"] { --ds-elemicon-color: var(--concept-reference); }
   &[data-element-role="resource"] { --ds-elemicon-color: var(--resource); }
   &[data-element-role="other"] { --ds-elemicon-color: var(--other); }
 `;

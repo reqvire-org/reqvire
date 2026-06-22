@@ -214,7 +214,7 @@ The `mv-file` command behavior is governed by the reused file-move workflow and 
 ### CLI Ontologies Command Contract Specification
 
 #### Details
-The `ontologies` command behavior is governed by the reused ontology collection and semantic export contracts.
+The semantic export command family is governed by the reused ontology collection and semantic export contracts. Canonical users should select the narrowest command that matches the requested layer: `semantic ontologies`, `semantic shapes`, `semantic concepts`, or `semantic graph`. Canonical native thesaurus workflows may use the root `concepts export` and `concepts validate` commands when the user intent is standalone concept-scheme work rather than generic semantic-layer export. The legacy `ontologies` command remains a compatibility alias for combined graph export.
 
 #### Metadata
   * type: specification

@@ -37,17 +37,57 @@ Defines billing payload vocabulary.
 
 #### Ontology
 ```turtle
+@prefix concept: <https://example.test/concepts#> .
 @prefix oldbilling: <https://example.test/old-billing#> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 <https://example.test/old-billing> a owl:Ontology ;
   owl:imports <https://example.test/old-foundation> .
-oldbilling:BillingPayload a owl:Class .
-oldbilling:billingId a owl:DatatypeProperty .
+oldbilling:BillingPayload a owl:Class ;
+  reqvire:mapsToConcept concept:BillingPayload .
+oldbilling:billingId a owl:DatatypeProperty ;
+  reqvire:mapsToConcept concept:BillingId .
 ```
 
 ---
 
+### Billing Concepts
+
+Native billing concept scheme.
+
+Concept scheme for billing terms.
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/concepts
+  * concept_prefix: concept
+---
+### Billing Payload
+
+Native billing payload concept.
+
+Billing payload concept.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Billing Concepts](#billing-concepts)
+---
+### Billing Id
+
+Native billing identifier concept.
+
+Billing identifier concept.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Billing Payload](#billing-payload)
+  * broader: [Billing Payload](#billing-payload)
+---
 ### Billing Capability
 
 Billing capability.
@@ -69,8 +109,8 @@ The system shall validate billing payloads.
   * constrainedBy: [Billing Shape Contract](#billing-shape-contract)
 
 #### Concept References
-  * Billing payload class: oldbilling:BillingPayload
-  * Billing payload IRI: <https://example.test/old-billing#billingId>
+  * Billing payload class: https://example.test/concepts#BillingPayload
+  * Billing payload IRI: https://example.test/concepts#BillingId
 
 ---
 
@@ -194,12 +234,16 @@ Defines billing payload vocabulary after a base change.
 #### Ontology
 ```turtle
 @prefix newbilling: <https://example.test/new-billing#> .
+@prefix concept: <https://example.test/concepts#> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 <https://example.test/new-billing> a owl:Ontology ;
   owl:imports <https://example.test/old-foundation> .
-newbilling:BillingPayload a owl:Class .
-newbilling:billingId a owl:DatatypeProperty .
+newbilling:BillingPayload a owl:Class ;
+  reqvire:mapsToConcept concept:BillingPayload .
+newbilling:billingId a owl:DatatypeProperty ;
+  reqvire:mapsToConcept concept:BillingId .
 ```'
 
 set +e
@@ -224,12 +268,12 @@ if ! grep -Fq "sh:path newbilling:billingId" "$TEST_DIR/specifications.md"; then
   echo "FAILED: SHACL path CURIE was not rewritten"
   exit 1
 fi
-if ! grep -Fq "Billing payload class: newbilling:BillingPayload" "$TEST_DIR/specifications.md"; then
-  echo "FAILED: concept reference CURIE was not rewritten"
+if ! grep -Fq "Billing payload class: https://example.test/concepts#BillingPayload" "$TEST_DIR/specifications.md"; then
+  echo "FAILED: concept reference class anchor was not preserved"
   exit 1
 fi
-if ! grep -Fq "Billing payload IRI: <https://example.test/new-billing#billingId>" "$TEST_DIR/specifications.md"; then
-  echo "FAILED: concept reference IRI was not rewritten"
+if ! grep -Fq "Billing payload IRI: https://example.test/concepts#BillingId" "$TEST_DIR/specifications.md"; then
+  echo "FAILED: concept reference property anchor was not preserved"
   exit 1
 fi
 if grep -Fq "oldbilling:BillingPayload" "$TEST_DIR/specifications.md"; then

@@ -115,12 +115,14 @@ Governance metadata is part of the Reqvire semantic model because it changes pla
 #### Ontology
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix concept: <https://www.reqvire.org/concepts#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:GovernedElement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
+  reqvire:mapsToConcept concept:Governance ;
   rdfs:comment "Element type that may author explicit governance metadata." .
 reqvire:Capability rdfs:subClassOf reqvire:GovernedElement .
 reqvire:Requirement rdfs:subClassOf reqvire:GovernedElement .
@@ -128,8 +130,10 @@ reqvire:GovernanceRule a owl:Class ;
   rdfs:subClassOf reqvire:ContractRule ;
   rdfs:comment "Contract rule describing governance authoring, inheritance, effective value, or persistence semantics." .
 reqvire:GovernanceMetadata a owl:Class ;
+  reqvire:mapsToConcept concept:Governance ;
   rdfs:comment "Governance metadata concept covering status, priority, risk, and owner fields." .
 reqvire:GovernanceValue a owl:Class ;
+  reqvire:mapsToConcept concept:Governance ;
   rdfs:comment "Controlled vocabulary value for a governance metadata field." .
 reqvire:StatusValue a owl:Class ;
   rdfs:subClassOf reqvire:GovernanceValue ;
@@ -164,11 +168,11 @@ reqvire:governanceDefaultValue a owl:DatatypeProperty ;
 reqvire:governanceValueName a owl:DatatypeProperty ;
   rdfs:domain reqvire:GovernanceValue ;
   rdfs:range xsd:string ;
-  rdfs:comment "Canonical governance metadata value token used by Markdown metadata, filters, output, and queries." .
+  rdfs:comment "Canonical governance metadata value token used by Markdown metadata, model filters, and queries." .
 reqvire:governanceRuleName a owl:DatatypeProperty ;
   rdfs:domain reqvire:GovernanceRule ;
   rdfs:range xsd:string ;
-  rdfs:comment "Canonical governance rule token used for rule lookup, reporting, and queries." .
+  rdfs:comment "Canonical governance rule token used for rule lookup and model queries." .
 reqvire:governanceAppliesTo a owl:DatatypeProperty ;
   rdfs:domain reqvire:GovernanceRule ;
   rdfs:range xsd:string ;
@@ -255,4 +259,3 @@ reqvire:governancePersistenceRule a reqvire:GovernanceRule ;
 #### Relations
   * derivedFrom: [Reqvire Behavior Rule Ontology](BehaviorValidationOperations.md#reqvire-behavior-rule-ontology)
 ---
-

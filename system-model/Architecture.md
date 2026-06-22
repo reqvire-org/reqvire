@@ -259,8 +259,8 @@ crud.unlink() → graph_registry.remove_element_relation_full()
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [crud.rs](core/src/crud.rs)
-  * satisfiedBy: [graph_registry.rs](core/src/graph_registry.rs)
+  * satisfiedBy: [crud.rs](crates/reqvire-core/src/crud.rs)
+  * satisfiedBy: [graph_registry.rs](crates/reqvire-core/src/graph_registry.rs)
 ---
 
 ### Shared Utility Functions
@@ -291,7 +291,7 @@ pub fn get_parent_dir(file_path: &str) -> PathBuf {
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [utils.rs](core/src/utils.rs)
-  * satisfiedBy: [crud.rs](core/src/crud.rs)
-  * satisfiedBy: [graph_registry.rs](core/src/graph_registry.rs)
+  * satisfiedBy: [utils.rs](crates/reqvire-core/src/utils.rs)
+  * satisfiedBy: [crud.rs](crates/reqvire-core/src/crud.rs)
+  * satisfiedBy: [graph_registry.rs](crates/reqvire-core/src/graph_registry.rs)
 ---

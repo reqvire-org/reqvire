@@ -50,11 +50,17 @@
   --type-icon-lg: 26px;
 
   /* Layout */
-  --rail-w:         52px;   /* right icon rail */
-  --header-h:       52px;   /* explorer top header */
+  --navigation-rail-width: 52px;   /* primary navigation rail */
+  --app-header-height:     52px;   /* application header bar */
   --content-max:    1180px; /* main column max readable width */
-  --row-h:          30px;   /* tree row / list row height */
-  --gap-list-stack: var(--space-0); /* default vertical gap for contiguous menu/list/filter rows */
+  --row-height-compact: 30px;   /* compact tree/list row height */
+  --compact-column-min: 112px; /* minimum readable compact metadata/filter column width */
+  --stack-gap-compact: var(--space-0); /* contiguous compact stack gap */
+  --side-pane-content-inset-inline: var(--space-12); /* shared Explorer side-pane content inset */
+  --side-pane-search-content-gap: var(--space-4); /* compact gap from pane quick filter to next pane block */
+  --side-pane-summary-columns: repeat(2, minmax(0, 1fr)); /* compact key/value summary grid */
+  --thesaurus-map-scheme-node-min-width: calc(var(--space-32) * 4 + var(--space-4)); /* concept-scheme map node width */
+  --thesaurus-map-concept-node-min-width: calc(var(--space-32) * 3 - var(--space-2)); /* concept map node width */
 
   /* Borders */
   --border-w:       1px;

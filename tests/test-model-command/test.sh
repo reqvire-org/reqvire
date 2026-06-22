@@ -11,11 +11,11 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # Satisfies: specifications/Verifications/ReportsTests.md#model-command-verification
 #
 # Acceptance Criteria:
-# - `reqvire model` generates model-centric output showing ontology roots and capability roots with nested relations
+# - `reqvire model` generates model-centric output showing ontology roots, concept roots, and capability roots with nested relations
 # - `reqvire model --from=<name>` generates nested structure from specified element
 # - `reqvire model --json` generates valid JSON with nested element structure
 # - `reqvire model --from=<name> --json` generates filtered JSON from specified starting point
-# - Default mode filters to ontology roots and capability roots
+# - Default mode filters to ontology roots, concept roots, and capability roots
 # - Relations contain full target element details recursively
 #
 # Test Criteria:

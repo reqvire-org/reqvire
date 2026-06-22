@@ -8,7 +8,8 @@ API capability.
   * type: capability
 
 #### Concept References
-  * Service Endpoint: https://example.test/ontology#ServiceEndpoint
+  * Service Endpoint: https://example.test/concepts#ServiceEndpoint
+  * Native Traceability: https://example.test/concepts#NativeTraceability
 
 #### Relations
   * specifiedBy: [API Endpoint Requirement](#api-endpoint-requirement)
@@ -22,6 +23,9 @@ API vocabulary.
   * type: ontology
   * ontology_base: https://example.test/ontology
   * ontology_prefix: testonto
+
+#### Relations
+  * derivedFrom: [Conceptual Layer Ontology](#conceptual-layer-ontology)
 
 #### External Ontology
   * prefix: ext
@@ -46,19 +50,25 @@ API vocabulary.
 
 #### Ontology
 ```turtle
+@prefix conceptual: <https://example.test/ontology/conceptual#> .
+@prefix concept: <https://example.test/concepts#> .
 @prefix testonto: <https://example.test/ontology#> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <https://example.test/ontology> a owl:Ontology ;
+  owl:imports <https://example.test/ontology/conceptual> ;
   owl:imports <https://example.test/imported> ;
   owl:imports <https://example.test/imported> ;
   rdfs:label "Test ontology" .
 
 # Classes
-testonto:ServiceEndpoint a owl:Class .
+testonto:ServiceEndpoint a owl:Class ;
+  reqvire:mapsToConcept concept:ServiceEndpoint .
 testonto:Request a owl:Class .
 testonto:Response a owl:Class .
 testonto:ServiceEndpointAlias a owl:Class ;
@@ -151,7 +161,7 @@ The system shall expose service endpoint contracts.
   * type: requirement
 
 #### Concept References
-  * Service Endpoint: https://example.test/ontology#ServiceEndpoint
+  * Service Endpoint: https://example.test/concepts#ServiceEndpoint
 
 #### Relations
   * specify: [API Capability](#api-capability)
@@ -215,4 +225,104 @@ testonto:ServiceEndpointShape
     sh:datatype rdfext:RdfExternalCode ;
   ] .
 ```
+---
+
+### Conceptual Layer Ontology
+
+Concept vocabulary that uses the built-in SKOS external ontology source without declaring a local External Ontology section.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/ontology/conceptual
+  * ontology_prefix: conceptual
+
+#### Ontology
+```turtle
+@prefix conceptual: <https://example.test/ontology/conceptual#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://example.test/ontology/conceptual> a owl:Ontology ;
+  rdfs:label "Conceptual layer ontology" .
+
+conceptual:TraceabilityConstruct a owl:Class ;
+  rdfs:label "Traceability construct" .
+
+conceptual:anchorsConcept a owl:ObjectProperty ;
+  rdfs:domain conceptual:TraceabilityConstruct ;
+  rdfs:range skos:Concept .
+```
+---
+
+### Native Concepts
+
+Native Markdown concept scheme for Reqvire concept element export tests.
+
+Native concept scheme authored as Reqvire Markdown.
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/concepts
+  * concept_prefix: concept
+---
+### Engineering Knowledge
+
+Native top concept for engineering knowledge.
+
+Knowledge used to describe, constrain, verify, and evolve engineered systems.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Native Concepts](#native-concepts)
+---
+### Native Traceability
+
+Native concept for traceability.
+
+The ability to follow engineering intent from source need through requirements, implementation, verification, and evidence.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Engineering Knowledge](#engineering-knowledge)
+  * broader: [Engineering Knowledge](#engineering-knowledge)
+  * related: [Verification Evidence](#verification-evidence)
+#### Labels
+  * altLabel: Trace link analysis
+
+#### Scope Note
+Use this concept for engineering artifact traceability, not runtime distributed tracing.
+
+#### Examples
+  * A requirement traces to implementation and verification evidence.
+---
+### Verification Evidence
+
+Native concept for verification evidence.
+
+Evidence that supports a verification result.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Native Concepts](#native-concepts)
+  * related: [Native Traceability](#native-traceability)
+---
+### Service Endpoint
+
+Native concept for service endpoint vocabulary.
+
+An externally visible service interaction point that accepts requests or produces responses.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Native Concepts](#native-concepts)
+  * related: [Native Traceability](#native-traceability)
 ---

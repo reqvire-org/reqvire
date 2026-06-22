@@ -41,6 +41,19 @@ const frameBaseUX = css`
     width: 100%;
     margin-right: 0;
   }
+
+  &[data-view="thesaurus"] [data-route-frame],
+  &[data-view="thesaurus"] .ux-route-panel,
+  &[data-view="thesaurus"] .ux-workspace-shell,
+  &[data-view="thesaurus"] .ux-thesaurus {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  &[data-view="thesaurus"] .ux-route-panel {
+    padding: 0;
+  }
 `;
 
 const frameSkinX = css`

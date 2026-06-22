@@ -18,7 +18,7 @@ Test verifies system performance requirements.
 #### Relations
   * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [System Performance](../Requirements.md#system-performance)
-  * satisfiedBy: [test_perf.rs](../../core/src/test_perf.rs)
+  * satisfiedBy: [test_perf.rs](../../crates/reqvire-core/src/test_perf.rs)
 ---
 
 ### Data Test

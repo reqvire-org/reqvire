@@ -27,7 +27,7 @@ The child product capability that specifies the root requirement.
   * type: capability
 
 #### Concept References
-  * Collect Contract: urn:reqvire:test:collect:CollectContract
+  * Collect Contract: urn:reqvire:test:concept#CollectContract
 
 #### Relations
   * derivedFrom: [Product Capability](#product-capability)
@@ -49,15 +49,41 @@ Ontology content for collect traversal.
 
 #### Ontology
 ```turtle
+@prefix concept: <urn:reqvire:test:concept#> .
 @prefix testonto: <https://example.test/ontology#> .
 @prefix ex: <urn:reqvire:test:collect:> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 <https://example.test/ontology> a owl:Ontology .
-ex:CollectContract a owl:Class .
+ex:CollectContract a owl:Class ;
+  reqvire:mapsToConcept concept:CollectContract .
 ```
 ---
 
+### Collect Concepts
+
+Native collect concept scheme.
+
+Concept scheme for collect traversal.
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: urn:reqvire:test:concept
+  * concept_prefix: concept
+---
+### Collect Contract
+
+Native collect contract concept.
+
+Concept used to ground collect contract context.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Collect Concepts](#collect-concepts)
+---
 ### Collect Child Ontology
 
 Child ontology content for ontology-start collect traversal.

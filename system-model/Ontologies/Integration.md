@@ -1,36 +1,5 @@
 # Elements
 
-### Reqvire AI Assistance Ontology
-
-The Reqvire AI assistance ontology defines the vocabulary for assistant-facing modeling guidance.
-
-#### Ontology
-```turtle
-@prefix reqvire: <https://www.reqvire.org/ontology#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-
-reqvire:AiAssistanceContract a owl:Class .
-reqvire:SkillInstructionContract a owl:Class ;
-  rdfs:subClassOf reqvire:AiAssistanceContract .
-reqvire:AssistantArtifactContract a owl:Class ;
-  rdfs:subClassOf reqvire:AiAssistanceContract .
-reqvire:SkillWorkflowContract a owl:Class ;
-  rdfs:subClassOf reqvire:SkillInstructionContract .
-reqvire:SkillBoundaryContract a owl:Class ;
-  rdfs:subClassOf reqvire:SkillInstructionContract .
-reqvire:SkillVerificationContract a owl:Class ;
-  rdfs:subClassOf reqvire:SkillInstructionContract .
-
-```
-
-#### Metadata
-  * type: ontology
-
-#### Relations
-  * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
----
-
 ### Reqvire Code Traceability Ontology
 
 The Reqvire code traceability ontology defines the vocabulary for implementation evidence markers in source files.
@@ -38,17 +7,21 @@ The Reqvire code traceability ontology defines the vocabulary for implementation
 #### Ontology
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix concept: <https://www.reqvire.org/concepts#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:CodeTraceabilityContract a owl:Class ;
+  reqvire:mapsToConcept concept:Traceability ;
   rdfs:comment "Contract vocabulary for source-level implementation evidence markers and supported marker parsing categories." .
 reqvire:TraceabilityMarkerContract a owl:Class ;
   rdfs:subClassOf reqvire:CodeTraceabilityContract ;
+  reqvire:mapsToConcept concept:Traceability ;
   rdfs:comment "Contract vocabulary for markers that connect source content to model requirements or trace evidence." .
 reqvire:CommentStyleContract a owl:Class ;
   rdfs:subClassOf reqvire:CodeTraceabilityContract ;
+  reqvire:mapsToConcept concept:Integration ;
   rdfs:comment "Contract vocabulary for source comment styles that can carry traceability markers." .
 reqvire:TraceabilityRelationKind a owl:Class ;
   rdfs:subClassOf reqvire:TraceabilityMarkerContract ;
@@ -60,7 +33,7 @@ reqvire:CommentStyleKind a owl:Class ;
 reqvire:traceabilityRelationKindName a owl:DatatypeProperty ;
   rdfs:domain reqvire:TraceabilityRelationKind ;
   rdfs:range xsd:string ;
-  rdfs:comment "Canonical code marker relation token consumed by source marker parsing and reporting contracts." .
+  rdfs:comment "Canonical code marker relation token consumed by source marker parsing and traceability contracts." .
 reqvire:commentStyleName a owl:DatatypeProperty ;
   rdfs:domain reqvire:CommentStyleKind ;
   rdfs:range xsd:string ;
@@ -88,33 +61,6 @@ reqvire:blockCssCommentStyle a reqvire:CommentStyleKind ;
 reqvire:blockXmlCommentStyle a reqvire:CommentStyleKind ;
   reqvire:commentStyleName "xml-block" ;
   rdfs:comment "XML/HTML-style block comment wrapper for traceability markers." .
-
-```
-
-#### Metadata
-  * type: ontology
-
-#### Relations
-  * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
----
-
-### Reqvire GitHub Workflow Ontology
-
-The Reqvire GitHub workflow ontology defines the vocabulary for hosted repository automation behavior.
-
-#### Ontology
-```turtle
-@prefix reqvire: <https://www.reqvire.org/ontology#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-
-reqvire:RepositoryWorkflowContract a owl:Class .
-reqvire:ExplorerServeContract a owl:Class ;
-  rdfs:subClassOf reqvire:RepositoryWorkflowContract .
-reqvire:PullRequestValidationContract a owl:Class ;
-  rdfs:subClassOf reqvire:RepositoryWorkflowContract .
-reqvire:ChangeLogContract a owl:Class ;
-  rdfs:subClassOf reqvire:RepositoryWorkflowContract .
 
 ```
 
@@ -167,4 +113,3 @@ reqvire:CommentStyleKindShape
   * constrain: [Code Traceability](../Integration/CodeAlignment/CodeAlignmentRequirements.md#code-traceability)
   * use: [Reqvire Code Traceability Ontology](#reqvire-code-traceability-ontology)
 ---
-

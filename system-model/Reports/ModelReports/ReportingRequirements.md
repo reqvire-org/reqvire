@@ -8,7 +8,6 @@ When requested the system shall provide human readable and machine readable Syst
   * type: requirement
 
 #### Relations
-  * constrainedBy: [Report Output Vocabulary Shape](../../Ontologies/ReportsAndQuery.md#report-output-vocabulary-shape)
   * definedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
   * definedBy: [JSON Output Structure](Specifications.md#json-output-structure)
   * definedBy: [Markdown Report Style Specification](Specifications.md#markdown-report-style-specification)
@@ -43,7 +42,7 @@ The system shall define:
   * definedBy: [Collect Content Specification](Specifications.md#collect-content-specification)
   * definedBy: [Collect Output Format Specification](Specifications.md#collect-output-format-specification)
   * derivedFrom: [Model Reports](#model-reports)
-  * satisfiedBy: [report_collect.rs](../../../core/src/report_collect.rs)
+  * satisfiedBy: [report_collect.rs](../../../crates/reqvire-core/src/report_collect.rs)
 ---
 
 ### JSON Element Size Estimate Exposure
@@ -62,8 +61,8 @@ The system shall expose element-level `size_estimate` records in JSON model evid
 #### Relations
   * definedBy: [JSON Element Size Estimate Output Specification](Specifications.md#json-element-size-estimate-output-specification)
   * derivedFrom: [Model Reports](#model-reports)
-  * satisfiedBy: [element.rs](../../../core/src/element.rs)
-  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
+  * satisfiedBy: [element.rs](../../../crates/reqvire-core/src/element.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
   * verifiedBy: [JSON Element Size Estimate Output Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#json-element-size-estimate-output-verification)
 ---
 
@@ -121,7 +120,7 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Model Diagram Output Formats Contract Specification](Specifications.md#model-diagram-output-formats-contract-specification)
   * derive: [Forward-Only Relation Traversal](#forward-only-relation-traversal)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
   * verifiedBy: [Model Command Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#model-command-verification)
 ---
 
@@ -138,7 +137,7 @@ Traversal behavior shall follow the associated behavior contract.
 #### Relations
   * definedBy: [Forward-Only Relation Traversal Behavior](Behaviors.md#forward-only-relation-traversal-behavior)
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
-  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#model-command-verification)
 ---
 
@@ -152,7 +151,7 @@ The system shall support reverse relation traversal for model views, following d
 #### Relations
   * definedBy: [Reverse Relation Traversal Behavior](Behaviors.md#reverse-relation-traversal-behavior)
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
-  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
   * verifiedBy: [Reverse Model Traversal Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#reverse-model-traversal-test)
 ---
 
@@ -166,7 +165,7 @@ The system shall support filtering starting elements by type for model traversal
 #### Relations
   * definedBy: [Start Element Type Filter Behavior](Behaviors.md#start-element-type-filter-behavior)
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
-  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
   * verifiedBy: [Start Type Filter Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#start-type-filter-test)
 ---
 
@@ -193,7 +192,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Requirement Submodels Report Specification](Specifications.md#requirement-submodels-report-specification)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * satisfiedBy: [report_submodels.rs](../../../core/src/report_submodels.rs)
+  * satisfiedBy: [report_submodels.rs](../../../crates/reqvire-core/src/report_submodels.rs)
   * verifiedBy: [Submodels Report Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#submodels-report-verification)
 ---
 
@@ -222,7 +221,7 @@ The system shall define custom element type tracking:
 - Identify types not in standard categories
 - Report custom types with counts
 
-Search report kinds, search filter kinds, collect source types, coverage source types, and submodel concepts are defined by the Reqvire report ontology.
+Search filter tokens, collect source tokens, coverage source tokens, submodel report concepts, and report-command kind tokens are defined by the reporting, search, coverage, and interface contracts that emit or consume them.
 
 #### Metadata
   * type: requirement
@@ -236,8 +235,8 @@ Search report kinds, search filter kinds, collect source types, coverage source 
   * definedBy: [SearchFiltering](SearchFiltering.md#searchfiltering)
   * definedBy: [Requirement Governance Metadata JSON Output Specification](Specifications.md#requirement-governance-metadata-json-output-specification)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
-  * satisfiedBy: [search.rs](../../../core/src/search.rs)
+  * satisfiedBy: [filters.rs](../../../crates/reqvire-core/src/filters.rs)
+  * satisfiedBy: [search.rs](../../../crates/reqvire-core/src/search.rs)
   * verifiedBy: [Search Command Tests](../../Verifications/Reports/ModelReports/ReportingVerifications.md#search-command-tests)
 ---
 
@@ -269,8 +268,8 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Comma-Separated Type Filter Parsing Contract Specification](Specifications.md#comma-separated-type-filter-parsing-contract-specification)
   * derivedFrom: [Flexible Search Type Filtering](#flexible-search-type-filtering)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [search.rs](../../../core/src/search.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [search.rs](../../../crates/reqvire-core/src/search.rs)
 ---
 
 ### Provide Validation Reports
@@ -297,7 +296,7 @@ The system shall implement a validation report generator that compiles and forma
 
 #### Relations
   * derivedFrom: [Provide Validation Reports](#provide-validation-reports)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
 ---
 
 ### Requirement Implementation Coverage Report
@@ -325,7 +324,7 @@ The implementation coverage report shall provide:
   * definedBy: [Implementation Coverage Output Structure Specification](Specifications.md#implementation-coverage-output-structure-specification)
   * definedBy: [Requirement Implementation Coverage Logic Specification](Specifications.md#requirement-implementation-coverage-logic-specification)
   * derivedFrom: [Model Reports](#model-reports)
-  * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
+  * satisfiedBy: [report_coverage.rs](../../../crates/reqvire-core/src/report_coverage.rs)
 ---
 
 ### Resources Report
@@ -372,9 +371,9 @@ The report helps track verification completeness and identify gaps in requiremen
   * derivedFrom: [Model Reports](#model-reports)
 ---
 
-### TraceFlow View Report Generation
+### Traces View Report Generation
 
-The system shall seed TraceFlow/Traces SPA route data showing verification traceability flow for an interactive D3.js Sankey diagram visualization. The routed view displays how capabilities are specified by requirements, how requirements flow to verifications, and how capabilities may be directly verified through served Explorer state.
+The system shall seed Explorer Traces SPA route data showing verification traceability from concrete verifications through verified requirements and owning capability context. The routed view displays grouped trace rows and per-verification Mermaid roll-up diagrams from served Project Store state.
 
 #### Metadata
   * type: requirement
@@ -384,7 +383,7 @@ The system shall seed TraceFlow/Traces SPA route data showing verification trace
 
 #### Relations
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
-  * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
 ---
 
 ### Ontology Projection Subgraph Materialization
@@ -396,18 +395,18 @@ The ontology projection subgraph shall:
 - Extend the existing in-memory RDF projection used by full semantic export; it is not a separate database, persistent store, or route-local model.
 - Be reused to the reusable `SemanticIndex` as structured generated projection data so semantic export, JSON-LD export, and Explorer rendering share one authoritative projection source.
 - Be generated from authored ontology and semantic-contract RDF quads during semantic index processing or immediately after parsing.
-- Materialize direct-authored OWL/RDFS/SHACL constructs into Reqvire ontology projection facts without changing authored Markdown ontology or semantic-contract blocks.
+- Materialize o-kernel construct classifications into Reqvire ontology projection facts without changing authored Markdown ontology or semantic-contract blocks.
 - Preserve source element identifier, source name, source file, source line, source block kind, construct subject, construct object, construct members, construct property, ordered sequence index when relevant, symbol code point, rendered symbol, and derivation mode.
 - Derive normalized SHACL slot/facet projection records from node-shape target classes and property-shape paths so WebInterface ontology views and semantic exports can share the same source-backed semantic evidence.
-- Include constructs for property domain/range, subclass or inclusion, class membership, disjointness, equivalence, inverse properties, property chains, property characteristics, restrictions, intersections, unions, complement or difference-style expressions when authored, and SHACL shape overlays when present.
 - Distinguish direct-authored projection from inferred projection. Direct-authored projection is in scope; OWL reasoning, SHACL-AF rule execution, and inferred materialization require separate inference requirements before they can contribute generated facts.
-- Feed generated facts into `reqvire ontologies --full`, `reqvire ontologies --full --jsonld`, and the Ontologies Explorer through the same in-memory projection context. The default `reqvire ontologies` and served `ontologies.ttl` artifact include generated ontology document declarations plus authored ontology/SHACL collection output, but do not include generated ontology projection facts unless full semantic output is requested.
+- Feed generated facts into `reqvire semantic graph --full`, `reqvire semantic graph --full --jsonld`, and the Ontologies Explorer through the same in-memory projection context. The served `ontologies.ttl` artifact includes generated ontology document declarations plus authored ontology/SHACL collection output, but does not include generated ontology projection facts unless full semantic output is requested.
 
 #### Metadata
   * type: requirement
 
 #### Reused Contract Context
   * [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
+  * [Ontology Construct Classification Specification](../../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
 
 #### Relations
   * definedBy: [Ontology Projection Subgraph Materialization Specification](Specifications.md#ontology-projection-subgraph-materialization-specification)
@@ -415,124 +414,49 @@ The ontology projection subgraph shall:
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
 ---
 
-### Ontology and Shapes Collection
+### Ontology Collection Output
 
-The system shall collect ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry into a reusable semantic export context, and shall optionally project Reqvire model context and generated ontology construct facts into the same RDF export.
+The system shall expose the semantic model core context as CLI, MCP, serve-time, and Explorer ontology output without making reporting the owner of ontology or semantic-contract source semantics.
 
 #### Details
-The default collection shall expose authored ontology RDF content and semantic-contract SHACL RDF content without changing the Markdown model as the source of truth.
+Ontology collection output consumes the semantic context from [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection), including generated ontology document declarations, generated term definition links, authored ontology RDF, semantic-contract SHACL RDF, optional full model context, generated projection facts, and optional used external vocabulary subset content.
 
-When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, relation-family projection facts, requirement-to-capability specification relations, requirement-to-semantic-contract constraint relations, semantic-contract-to-ontology use relations, ontology hierarchy relations, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts materialized from direct-authored OWL/RDFS/SHACL constructs.
-
-The collection shall preserve source element identifiers, source file paths, section kind, and line numbers so CLI, Explorer rendering, and downstream semantic tooling can cite the model source of each RDF block.
+The output contract owns serialization choices, command/API flags, Project Store payload shape, and Explorer artifact inclusion. It does not own source resolution, semantic-contract reachability, reserved vocabulary recognition, or built-in external source policy.
 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
-  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
-
 #### Relations
-  * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/ReportsAndQuery.md#semantic-export-projection-shape)
   * definedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
-  * derive: [OWL Reserved Vocabulary Recognition](#owl-reserved-vocabulary-recognition)
-  * satisfiedBy: [explorer_runtime.rs](../../../core/src/explorer_runtime.rs)
-  * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
-  * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
-  * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
----
-
-### Local External Ontology Sources
-
-The system shall allow ontology elements to declare local external ontology source files that provide imported vocabulary namespaces for validation and optional used-subset semantic export materialization.
-
-#### Details
-External ontology sources shall be declared with repeatable `#### External Ontology` sections on ontology elements. Each section shall define `prefix`, `namespace`, `resource`, `source`, and an optional `format` value. Supported source formats shall include Turtle/TTL, RDF/XML, and JSON-LD.
-
-The `source` path shall be local and resolved like a model path; Reqvire shall not fetch network ontology sources during validation or export.
-
-External ontology source files shall be parsed as internal dependency inputs before validating ontology and semantic-contract references. Terms declared by the local source shall be available to the declaring ontology element, its ontology descendants, and semantic contracts that use that ontology context. Imported terms shall remain marked as external declarations and shall not be promoted to authored Reqvire ontology terms.
-
-Semantic output surfaces shall not expose raw full external ontology files. When `include_external` is requested, Reqvire shall expose only the used external subset: external terms referenced by authored ontology, SHACL, concept-reference, model-context, or generated semantic projection content, plus directly needed support and annotation facts selected by the external subset construct-query contract. Unused external dependency facts shall remain internal and shall not appear in CLI ontology output, MCP semantic ontology output, MCP vocabulary output, MCP SPARQL graphs, or Explorer ontology views.
-
-Turtle blocks remain explicit. External source sections do not inject prefixes, ontology declarations, imports, or semantic triples into authored ontology or SHACL blocks.
-
-Default semantic export and MCP semantic metadata shall include authored ontology and SHACL content only. `reqvire ontologies --include-external` and MCP `include_external: true` shall include used external subset triples, used external declarations, and used external vocabulary metadata. `reqvire ontologies --full --include-external` and MCP full semantic query with `include_external: true` shall include authored triples, the used external subset, Reqvire model context, and generated ontology projection facts.
-
-Standard OWL reserved vocabulary and built-in datatype IRIs remain recognized by the fixed reserved vocabulary registry and do not require `#### External Ontology` declarations.
-
-#### Concept References
-  * External ontology source: https://www.reqvire.org/ontology#ExternalOntologySource
-  * External ontology prefix: https://www.reqvire.org/ontology#externalOntologyPrefix
-  * External ontology namespace: https://www.reqvire.org/ontology#externalOntologyNamespace
-  * External ontology resource: https://www.reqvire.org/ontology#externalOntologyResource
-  * External ontology source path: https://www.reqvire.org/ontology#externalOntologySourcePath
-  * External ontology format: https://www.reqvire.org/ontology#externalOntologyFormat
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Local External Ontology Source Specification](Specifications.md#local-external-ontology-source-specification)
-  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
-  * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
-  * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
----
-
-### Used External Ontology Subset Projection
-
-The system shall derive a used external ontology subset from internal external ontology dependency inputs and expose only that subset through external-inclusive semantic output surfaces.
-
-#### Details
-- The projection shall seed used external terms from authored ontology, SHACL, concept-reference, model-context, and generated semantic projection facts that reference declared external namespaces.
-- The projection shall construct direct descriptions for seed terms from raw external source graphs.
-- The projection shall construct one-hop support facts for selected RDF, RDFS, and OWL relationships needed to understand the used terms.
-- The projection shall construct annotation facts for seed and support terms.
-- Raw full external source graphs shall remain internal dependency inputs and shall not be exposed as a public full third-party ontology dump mode.
-- `include_external` shall mean include the used external subset for CLI, MCP, Explorer, and vocabulary surfaces.
-
-#### Concept References
-  * Used external ontology subset: https://www.reqvire.org/ontology#UsedExternalOntologySubset
-  * External ontology subset construct query: https://www.reqvire.org/ontology#ExternalOntologySubsetConstructQuery
-  * Raw external ontology graph: https://www.reqvire.org/ontology#RawExternalOntologyGraph
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Used External Ontology Subset Projection Specification](Specifications.md#used-external-ontology-subset-projection-specification)
-  * derivedFrom: [Local External Ontology Sources](#local-external-ontology-sources)
+  * derivedFrom: [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
   * verifiedBy: [MCP Model Evidence Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
 ---
 
-### OWL Reserved Vocabulary Recognition
+### External Vocabulary Exposure Policy
 
-The system shall recognize fixed OWL reserved vocabulary IRIs in ontology and semantic-contract RDF positions without requiring local external ontology source declarations for those IRIs.
+The system shall expose only constructed used external vocabulary content through external-inclusive semantic output surfaces.
 
 #### Details
-Reserved vocabulary recognition shall be fixed-list based over expanded IRIs, not prefix-name or namespace-prefix matching. Turtle prefix names are aliases: `xsd:string` and `xs:string` are equivalent when both expand to `http://www.w3.org/2001/XMLSchema#string`.
+Semantic output surfaces shall not expose raw full external ontology files. When `include_external` is requested, Reqvire shall expose only the used external vocabulary content selected and constructed from internal external dependency inputs. Unused external dependency facts shall remain internal and shall not appear in CLI ontology output, MCP semantic ontology output, MCP vocabulary output, MCP SPARQL graphs, or Explorer ontology views.
 
-Reqvire shall treat known reserved vocabulary IRIs as model-valid references in positions where their OWL role is valid without requiring `#### External Ontology` sections for those namespaces.
+Default semantic export and MCP semantic metadata shall keep authored ontology, SHACL shape, SKOS concept, and combined graph concerns as separate surfaces. `reqvire semantic ontologies --include-external`, `reqvire semantic graph --include-external`, and MCP `include_external: true` shall include used external subset triples, used external declarations, and used external vocabulary metadata where that layer supports external materialization. `reqvire semantic graph --full --include-external` and MCP full semantic query with `include_external: true` shall include authored triples, the used external subset, Reqvire model context, and generated ontology projection facts.
 
-Built-in datatype IRIs are one reserved vocabulary subset and shall be accepted in datatype positions such as ontology datatype property ranges and SHACL `sh:datatype` values. SHACL `sh:datatype` positions shall also accept the Reqvire-supported XML Schema datatype-position subset, including date/time datatypes such as `xsd:date`, without requiring authored ontology declarations for those standard IRIs.
-
-Custom IRIs outside the reserved vocabulary registry remain subject to normal authored or external ontology resolution when term existence validation applies.
+No CLI, MCP, Explorer, website, or assistant-facing contract shall specify a public full third-party ontology dump mode.
 
 #### Concept References
-  * OWL reserved vocabulary registry: https://www.reqvire.org/ontology#OwlReservedVocabularyRegistry
-  * OWL reserved vocabulary term: https://www.reqvire.org/ontology#OwlReservedVocabularyTerm
-  * OWL built-in datatype: https://www.reqvire.org/ontology#OwlBuiltInDatatype
+  * Used external ontology subset: https://www.reqvire.org/concepts#UsedExternalOntologySubset
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [OWL Reserved Vocabulary Recognition Specification](Specifications.md#owl-reserved-vocabulary-recognition-specification)
-  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
+  * definedBy: [External Vocabulary Exposure Policy Specification](Specifications.md#external-vocabulary-exposure-policy-specification)
+  * derivedFrom: [External Vocabulary Description Construction](../../Semantics/SemanticModelRequirements.md#external-vocabulary-description-construction)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+  * verifiedBy: [MCP Model Evidence Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
 ---
 
 ### Semantic Relation Family Projection
@@ -547,16 +471,16 @@ The system shall materialize ontology-defined relation-family projection facts a
 - The projection shall follow the ontology-authored `reqvire:RelationRule` semantics and the relation-family construct-query contract.
 
 #### Concept References
-  * Relation family construct query: https://www.reqvire.org/ontology#RelationFamilyConstructQuery
-  * Model relation: https://www.reqvire.org/ontology#ModelRelation
+  * Relation family construct query: https://www.reqvire.org/concepts#RelationFamilyConstructQuery
+  * Model relation: https://www.reqvire.org/concepts#ModelRelation
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/ReportsAndQuery.md#semantic-export-projection-shape)
+  * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/SemanticExport.md#semantic-export-projection-shape)
   * definedBy: [Semantic Relation Family Projection Specification](Specifications.md#semantic-relation-family-projection-specification)
-  * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
+  * satisfiedBy: [semantic_contract.rs](../../../crates/reqvire-core/src/semantic_contract.rs)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
   * verifiedBy: [MCP Semantic Query Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-query-tools-verification)

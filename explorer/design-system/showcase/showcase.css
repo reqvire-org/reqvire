@@ -41,7 +41,7 @@
 
 .showcase-topbar {
   flex: none;
-  height: var(--header-h);
+  height: var(--app-header-height);
   display: flex;
   align-items: stretch;
   background: var(--bg-surface);
@@ -163,7 +163,7 @@
   display: flex;
   width: min(100%, var(--showcase-control-list-w));
   flex-direction: column;
-  gap: var(--gap-list-stack);
+  gap: var(--stack-gap-compact);
 }
 
 .showcase-input-demo--md {
@@ -464,7 +464,7 @@
   display: flex;
   width: var(--showcase-pane-demo-w);
   flex-direction: column;
-  gap: var(--gap-list-stack);
+  gap: var(--stack-gap-compact);
   padding: var(--space-8);
   border: var(--border-w) solid var(--border-subtle);
   border-radius: var(--radius-lg);

@@ -21,7 +21,7 @@ When filtering model output from a starting requirement:
 Coverage behavior for requirement implementation reporting.
 
 #### Details
-Implementation coverage source vocabulary is defined by the Reqvire report ontology. Implementation coverage classification shall follow:
+Implementation coverage source values are defined by the implementation coverage contracts. Implementation coverage classification shall follow:
 
 - **Directly satisfied**: requirement has one or more `satisfiedBy` relations.
 - **Contract via reused_contract_context**: requirement owns contract elements via `definedBy`, and at least one owned contract is reused by a requirement that is directly satisfied.
@@ -110,4 +110,3 @@ Coverage evaluation philosophy for verification reporting.
 #### Metadata
   * type: behavior
 ---
-

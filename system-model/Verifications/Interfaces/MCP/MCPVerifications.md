@@ -114,11 +114,16 @@ Expected checks:
 - Search, read element, model, containment, collect, and submodels tools return data matching Reqvire core reports.
 - Search supports `filter_type=ontology` and returns parsed ontology ADT content.
 - Verify `tools/list` advertises `reqvire.semantic.ontologies` as a read-only semantic model evidence tool.
+- Verify `tools/list` advertises `reqvire.semantic.shapes`, `reqvire.semantic.concepts`, and `reqvire.semantic.graph` as read-only semantic export tools.
 - Verify `tools/list` advertises the `include_external` argument on `reqvire.semantic.ontologies`.
 - Verify `tools/list` advertises the `include_external` argument on `reqvire.semantic.prefixes`, `reqvire.semantic.vocabulary`, and `reqvire.semantic.sparql`.
-- Verify `reqvire.semantic.ontologies` returns both RDF ontology and SHACL shape content by default.
-- Verify `reqvire.semantic.ontologies` filters to RDF-only or SHACL-only content when the `content` argument is set.
+- Verify `reqvire.semantic.ontologies` returns authored OWL/RDF ontology vocabulary and excludes SHACL shapes.
+- Verify `reqvire.semantic.shapes` returns SHACL shape content and excludes authored ontology classes.
+- Verify `reqvire.semantic.concepts` returns SKOS concept content and optional `reqvire:mapsToConcept` mappings.
+- Verify `reqvire.semantic.ontologies` returns generated `rdfs:isDefinedBy` links from authored named ontology resources to the generated ontology document IRI.
 - Verify `reqvire.semantic.ontologies` excludes local External Ontology dependency triples and external term declarations by default and includes only the used external subset from parsed Turtle/TTL, RDF/XML, and JSON-LD sources when `include_external` is true.
+- Verify `reqvire.semantic.ontologies` with `include_external` does not generate `rdfs:isDefinedBy` ownership links for imported external ontology terms.
+- Verify `reqvire.semantic.graph` supports full mode and returns Reqvire model context triples plus generated ontology projection facts alongside authored semantic content.
 - Verify semantic prefix and vocabulary tools exclude imported external ontology vocabulary by default, include only used external subset vocabulary when `include_external` is true, and mark included imported entries as external with source metadata and used-subset materialization metadata.
 - Verify `reqvire.semantic.sparql` queries the authored semantic store by default and can query only the used external subset when `include_external` is true.
 - Verify unused external ontology dependency terms remain unavailable through MCP semantic ontology, vocabulary, and SPARQL outputs.
@@ -133,6 +138,7 @@ Expected checks:
 
 #### Relations
   * verify: [MCP Model Evidence Tools](../../../Interfaces/MCP/Tools.md#mcp-model-evidence-tools)
+  * verify: [Ontology Term Definition Link Materialization](../../../Semantics/SemanticModelRequirements.md#ontology-term-definition-link-materialization)
 ---
 
 ### MCP Mutation Execution Flow Verification
@@ -188,7 +194,7 @@ This verification shall prove that MCP prompt templates are discoverable, retrie
 Expected checks:
 - Verify initialization advertises a standard MCP prompts capability.
 - Verify `prompts/list` returns regular workflow prompts and semantic query prompts.
-- Verify `prompts/get` for `reqvire.semantic.query` returns text that references semantic vocabulary, prefix, and SPARQL tools and states that `include_external` exposes only the used external subset.
+- Verify `prompts/get` for `reqvire.semantic.query` returns text that references semantic vocabulary, prefix, SPARQL tools, ontology-document vocabulary filtering, and states that `include_external` exposes only the used external subset.
 - Verify `prompts/get` for a regular workflow prompt returns text that references standard Reqvire model exploration tools.
 - Verify unknown prompt names return a protocol error.
 - Verify prompt retrieval does not mutate model source files.
@@ -234,7 +240,7 @@ Expected checks:
 - Lint, coverage, traces, resources, ontologies, and change-impact tools match shared Reqvire operation contracts.
 - Ontologies tool returns collected ontology `Ontology` blocks and semantic-contract `Shapes` blocks in Turtle by default.
 - Ontologies tool supports JSON-LD output through a typed MCP argument.
-- Ontologies tool supports `full: true` and returns Reqvire model context triples and ontology projection facts alongside ontology and SHACL content.
+- Semantic graph tool supports `full: true` and returns Reqvire model context triples and ontology projection facts alongside authored semantic content.
 - Startup validation failures are returned before the MCP server starts.
 - Git comparison tools include compared commit and current `HEAD` metadata.
 - Diagnostics are structured and machine-actionable.
@@ -297,7 +303,7 @@ This verification shall prove that MCP SPARQL queries execute over Reqvire seman
 Expected checks:
 - Verify `tools/list` advertises `reqvire.semantic.sparql` as a read-only tool.
 - Verify `reqvire.semantic.sparql` executes a SELECT query over authored ontology and SHACL RDF.
-- Verify `reqvire.semantic.sparql` uses full semantic graph context by default, including generated model-context triples.
+- Verify `reqvire.semantic.sparql` uses full semantic graph context by default, including authored model facts and generated helper/projection facts.
 - Verify local external ontology dependency triples are outside the default queried graph and only used external subset triples become queryable when `include_external` is true.
 - Verify the full semantic graph materializes relation-family normalized predicates equivalent to the relation-family CONSTRUCT query specification.
 - Verify SELECT results include ordered variables, bindings, RDF term metadata, row count, semantic index summary, diagnostics, and model fingerprint.
@@ -321,6 +327,8 @@ Expected checks:
 - Verify `tools/list` advertises `reqvire.semantic.vocabulary` as a read-only tool.
 - Verify `reqvire.semantic.vocabulary` with `section: "all"` returns section counts, prefixes, a SPARQL prefix block, diagnostics, and model fingerprint.
 - Verify imported external vocabulary is omitted by default and only used external subset vocabulary is included with `external: true` plus external source metadata when `include_external` is true.
+- Verify authored vocabulary items expose `ontology_document` and can be filtered by exact `ontology_document` or `ontology_base`.
+- Verify used external subset vocabulary items expose `ontology_document` from the declared external source resource or namespace fallback and can be filtered by exact document only when `include_external` is true.
 - Verify `section: "relation_families"` returns relation family entries with normalized forward and inverse properties.
 - Verify paging returns `next_cursor` when a section has more items than the requested limit.
 - Verify query patterns include SPARQL examples when `include_examples` is true.

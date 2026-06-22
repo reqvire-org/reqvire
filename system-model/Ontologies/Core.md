@@ -143,8 +143,10 @@ This is the foundation ontology used by the rest of the Reqvire ontology set. Ot
 #### Ontology
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix concept: <https://www.reqvire.org/concepts#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <https://www.reqvire.org/ontology> a owl:Ontology ;
@@ -152,21 +154,48 @@ This is the foundation ontology used by the rest of the Reqvire ontology set. Ot
   rdfs:comment "Canonical ontology document for same-base Reqvire ontology elements; derived ontology elements contribute vocabulary to this document." .
 
 reqvire:Element a owl:Class ;
+  reqvire:mapsToConcept concept:Element ;
   rdfs:comment "Base class for addressable Reqvire model elements and related model artifacts." .
 reqvire:Capability a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
+  reqvire:mapsToConcept concept:Capability ;
   rdfs:comment "Coherent operational, product, business, regulatory, or system ability that bridges ontology, requirements, and verification." .
 reqvire:Requirement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
+  reqvire:mapsToConcept concept:Requirement ;
   rdfs:comment "Implementation-facing obligation that can be verified and satisfied by implementation or evidence." .
 reqvire:Contract a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
+  reqvire:mapsToConcept concept:RequirementContract ;
   rdfs:comment "Requirement-owned detail element that defines a requirement with source, behavioral, structural, query, or contract information." .
+reqvire:ConceptScheme a owl:Class ;
+  rdfs:subClassOf reqvire:Element ;
+  rdfs:comment "Markdown-native Reqvire element that authors a SKOS concept scheme or thesaurus boundary." .
+reqvire:Concept a owl:Class ;
+  rdfs:subClassOf reqvire:Element ;
+  rdfs:comment "Markdown-native Reqvire element that authors one curated SKOS concept." .
 reqvire:Verification a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
-  rdfs:comment "Evidence or method used to verify a capability or requirement." .
+  reqvire:mapsToConcept concept:ConcreteVerification ;
+  rdfs:comment "Evidence or method used to verify a requirement." .
 reqvire:Artifact a owl:Class ;
   rdfs:comment "Referenced implementation, evidence, document, or external resource artifact." .
+reqvire:RuntimeOntologyArtifact a owl:Class ;
+  rdfs:subClassOf reqvire:Artifact ;
+  reqvire:mapsToConcept concept:RuntimeOntologyArtifact ;
+  rdfs:comment "Generated runtime ontology snapshot embedded by Reqvire core and derived from authored ontology source." .
+reqvire:RuntimeOntologyNamespace a owl:Class ;
+  reqvire:mapsToConcept concept:RuntimeOntologyNamespace ;
+  rdfs:comment "Term namespace selected as the Reqvire runtime vocabulary boundary for generated runtime ontology artifacts." .
+reqvire:NamespaceScopedOntologyExport a owl:Class ;
+  reqvire:mapsToConcept concept:NamespaceScopedOntologyExport ;
+  rdfs:comment "Clean authored semantic export filtered to one ontology base or term namespace." .
+reqvire:OntologySourceOfTruth a owl:Class ;
+  reqvire:mapsToConcept concept:OntologySourceOfTruth ;
+  rdfs:comment "Authored ontology source model that governs generated runtime ontology artifacts." .
+reqvire:OntologyDocument a owl:Class ;
+  reqvire:mapsToConcept concept:OntologyDocument ;
+  rdfs:comment "Generated or authored ontology document identified by ontology base IRI and containing contributed ontology terms." .
 reqvire:File a owl:Class ;
   rdfs:subClassOf reqvire:Artifact ;
   rdfs:comment "Repository-internal file artifact referenced by Reqvire relations, reused_contract_context, or evidence links." .
@@ -174,6 +203,7 @@ reqvire:CustomElement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   rdfs:comment "Custom model extension element whose authored metadata type follows other-TYPENAME and cannot author canonical semantic relations." .
 reqvire:ElementType a owl:Class ;
+  reqvire:mapsToConcept concept:Element ;
   rdfs:comment "Canonical metadata type value used to classify Reqvire elements." .
 reqvire:CapabilityElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
@@ -184,6 +214,9 @@ reqvire:RequirementElementType a owl:Class ;
 reqvire:ContractElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
   rdfs:comment "Element type category for requirement-owned contracts." .
+reqvire:ConceptElementType a owl:Class ;
+  rdfs:subClassOf reqvire:ElementType ;
+  rdfs:comment "Element type category for Markdown-native SKOS concept schemes and concepts." .
 reqvire:SemanticContractElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
   rdfs:comment "Element type category for reusable semantic-contract SHACL profile elements." .
@@ -216,6 +249,11 @@ reqvire:ExternalUrlTarget a owl:Class ;
   rdfs:comment "Reference target category that resolves to an external URL." .
 reqvire:ReservedSubsection a owl:Class ;
   rdfs:comment "Reserved level-four subsection name with parser-recognized model meaning." .
+
+reqvire:mapsToConcept a owl:AnnotationProperty ;
+  rdfs:range skos:Concept ;
+  rdfs:label "maps to concept" ;
+  rdfs:comment "Links a structural ontology term or model resource to a curated SKOS concept entity without implying OWL equivalence, SKOS mapping semantics, or subject membership in skos:Concept." .
 
 reqvire:id a owl:DatatypeProperty ;
   rdfs:domain reqvire:Element ;
@@ -284,7 +322,7 @@ reqvire:identityStability a owl:DatatypeProperty ;
 reqvire:referenceTargetKindName a owl:DatatypeProperty ;
   rdfs:domain reqvire:ReferenceTargetKind ;
   rdfs:range xsd:string ;
-  rdfs:comment "Stable reference target category token used by parsers, reports, and queries." .
+  rdfs:comment "Stable reference target category token used by parsers and model queries." .
 reqvire:capabilityType a reqvire:CapabilityElementType ;
   reqvire:elementTypeName "capability" ;
   reqvire:elementTypeCategory "capability" ;
@@ -296,6 +334,18 @@ reqvire:requirementType a reqvire:RequirementElementType ;
   reqvire:elementTypeCategory "requirement" ;
   rdfs:comment "Implementation-facing system obligation verified by verification elements and satisfied by implementation or evidence." ;
   reqvire:defaultElementType true .
+
+reqvire:conceptSchemeType a reqvire:ConceptElementType ;
+  reqvire:elementTypeName "concept-scheme" ;
+  reqvire:elementTypeCategory "concept" ;
+  rdfs:comment "Markdown-native SKOS concept scheme or thesaurus boundary." ;
+  reqvire:defaultElementType false .
+
+reqvire:conceptType a reqvire:ConceptElementType ;
+  reqvire:elementTypeName "concept" ;
+  reqvire:elementTypeCategory "concept" ;
+  rdfs:comment "Markdown-native SKOS concept authored from Reqvire sections and relations." ;
+  reqvire:defaultElementType false .
 
 reqvire:otherType a reqvire:CustomElementType ;
   reqvire:elementTypeName "other" ;
@@ -335,7 +385,8 @@ reqvire:reusedContractContextSubsection a reqvire:ReservedSubsection ;
   rdfs:comment "Explicit cross-subgraph reuse of requirement-owned contract context." .
 reqvire:conceptReferencesSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Concept References" ;
-  rdfs:comment "Human-readable bindings from non-ontology, non-semantic-contract element prose to declared ontology terms." .
+  reqvire:mapsToConcept concept:ConceptReference ;
+  rdfs:comment "Human-readable bindings from non-ontology, non-semantic-contract element prose to generated native SKOS concepts." .
 reqvire:ontologySubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Ontology" ;
   rdfs:comment "Inline Turtle ontology content for ontology elements." .
@@ -349,4 +400,3 @@ reqvire:shapesSubsection a reqvire:ReservedSubsection ;
   * ontology_base: https://www.reqvire.org/ontology
   * ontology_prefix: reqvire
 ---
-

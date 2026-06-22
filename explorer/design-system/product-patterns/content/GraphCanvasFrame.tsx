@@ -79,6 +79,9 @@ const noticeUX = css`
   position: absolute;
   top: 50%;
   left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
   font-size: var(--text-base);
   font-style: italic;
   transform: translate(-50%, -50%);

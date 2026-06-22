@@ -49,9 +49,9 @@ The system shall support an opt-in model build mode that computes canonical size
 #### Relations
   * definedBy: [Element Size Estimate Model Build Specification](Specifications.md#element-size-estimate-model-build-specification)
   * derivedFrom: [Efficient Processing](#efficient-processing)
-  * satisfiedBy: [element.rs](../../core/src/element.rs)
-  * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
+  * satisfiedBy: [element.rs](../../crates/reqvire-core/src/element.rs)
+  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [model.rs](../../crates/reqvire-core/src/model.rs)
   * verifiedBy: [Element Size Estimate Model Build Verification](../Verifications/ModelStructure/ParsingVerifications.md#element-size-estimate-model-build-verification)
 ---
 
@@ -102,7 +102,7 @@ This requirement ensures consistency between relation updates and reused_contrac
 #### Relations
   * definedBy: [Reused Contract Context Identifier CRUD Update Behavior](Behaviors.md#reused-contract-context-identifier-crud-update-behavior)
   * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
-  * satisfiedBy: [crud.rs](../../core/src/crud.rs)
+  * satisfiedBy: [crud.rs](../../crates/reqvire-core/src/crud.rs)
   * verifiedBy: [Reused Contract Context Identifier CRUD Verification](../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-identifier-crud-verification)
 ---
 
@@ -141,7 +141,7 @@ The system shall implement relations following clearly defined specifications fo
   * derive: [Element Type Relation Compatibility](#element-type-relation-compatibility)
   * derive: [Relation Management Operations](#relation-management-operations)
   * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
-  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
+  * satisfiedBy: [relation.rs](../../crates/reqvire-core/src/relation.rs)
   * verifiedBy: [Element Subsection Parsing Test](../Verifications/ModelStructure/ParsingVerifications.md#element-subsection-parsing-test)
 ---
 
@@ -182,7 +182,7 @@ Collect traversal behavior shall follow the associated output specification.
 The system shall report capability verification and implementation coverage by rolling up coverage from requirements that specify each capability.
 
 #### Details
-Capability coverage shall remain separate from capability validation. Capability elements may be directly verified but are not directly satisfied.
+Capability coverage shall remain separate from capability validation. Capability elements are not directly verified or directly satisfied; verification coverage rolls up from requirements that specify each capability.
 
 #### Metadata
   * type: requirement
@@ -199,7 +199,7 @@ The system shall support first-class `ontology` elements for reusable semantic v
 #### Details
 Ontology elements shall define ontology vocabulary, model concepts, semantic categories, and reusable domain meaning. Authored Reqvire ontology elements shall be kept under the dedicated `system-model/Ontologies` folder rather than nested in capability files. The top parent ontology element in each ontology subgraph shall define non-empty `ontology_base` and `ontology_prefix` metadata; descendant ontology elements inherit both through `derivedFrom`/`derive` hierarchy. Authored OWL ontology blocks define classes, properties, individuals, hierarchy, and axioms in the corresponding hash term namespace. The root ontology block should explicitly declare `<ontology_base> a owl:Ontology` for authored OWL document identity. Reqvire uses the inherited `ontology_prefix` as the canonical CURIE label and `<ontology_base>#` as the canonical namespace; authored Turtle blocks that use the inherited prefix must explicitly declare that prefix to the canonical namespace, and validation fails when the declaration is missing or points to a different namespace. Reqvire emits one generated document-level `owl:Ontology` declaration per resolved `ontology_base`; ontology elements that inherit the same base contribute authored vocabulary to that same document, while `derivedFrom` across different resolved bases becomes `owl:imports`. Authored child ontology blocks do not need to repeat document-level `owl:Ontology` or `owl:imports` declarations. Ontology-controlled vocabulary records shall carry formal semantics through IRI identity, typed class membership, hierarchy, and axioms; standard annotation properties such as `rdfs:label` and `rdfs:comment` may be used for optional presentation metadata, but canonical authored tokens, parser fields, interface enum values, report kinds, controlled-vocabulary payloads, and queryable meanings shall remain declared domain properties. Deprecated presentation-only ontology properties shall not remain in authored Reqvire ontology source after refactoring. Semantic contracts shall define reusable SHACL shape profiles that explicitly use ontology through `use`/`usedBy`, may constrain zero or more requirements through `constrainedBy`/`constrain`, and must not define ontology vocabulary. The model structure capability must include ontology rebasing as part of the owned ontology context, so that changes to `ontology_base` or `ontology_prefix` are handled atomically and the dependent boundary chain is rewritten rather than edited piecemeal.
 
-Non-ontology, non-semantic-contract elements may bind readable prose to ontology vocabulary with `#### Concept References`. Requirement elements may be constrained by semantic contracts through `constrainedBy`/`constrain`. Semantic contracts use ontology vocabulary through `use`/`usedBy`; they are already part of the semantic graph and must not author concept references. Requirements may be defined by source, behavior, state, specification, constraint, and input-output contracts when they need subordinate detail over ontology-backed terms. Capabilities must not own source, constraint, behavior, specification, state, input-output, or semantic-contract elements through `definedBy`/`define`.
+Non-ontology, non-semantic-contract elements may bind readable prose to SKOS concepts with `#### Concept References`. Requirement elements may be constrained by semantic contracts through `constrainedBy`/`constrain`. Semantic contracts use ontology vocabulary through `use`/`usedBy`; they are already part of the semantic graph and must not author concept references. Requirements may be defined by source, behavior, state, specification, constraint, and input-output contracts when they need subordinate detail over ontology-backed terms. Capabilities must not own source, constraint, behavior, specification, state, input-output, or semantic-contract elements through `definedBy`/`define`.
 
 #### Metadata
   * type: requirement
@@ -240,7 +240,7 @@ Contract relation validation shall enforce the subtype-compatible contract vocab
   * constrainedBy: [Custom Element Semantic Boundary Shape](../Ontologies/CapabilityRequirementModel.md#custom-element-semantic-boundary-shape)
   * definedBy: [Contract Element Structure Constraints Specification](Specifications.md#contract-element-structure-constraints-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * satisfiedBy: [model.rs](../../core/src/model.rs)
+  * satisfiedBy: [model.rs](../../crates/reqvire-core/src/model.rs)
   * verifiedBy: [Contract Relations Rejection Test](../Verifications/ModelStructure/ParsingVerifications.md#contract-relations-rejection-test)
 ---
 
@@ -274,8 +274,8 @@ Mutation commands that create or rewrite relations shall enforce the same compat
   * definedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
   * definedBy: [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
-  * satisfiedBy: [relation.rs](../../core/src/relation.rs)
+  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [relation.rs](../../crates/reqvire-core/src/relation.rs)
   * verifiedBy: [Verification Objective Mutation Test](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
   * verifiedBy: [Element Type Relation Compatibility Test](../Verifications/Operations/Validation/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
@@ -305,8 +305,8 @@ When unlinking, the system shall:
 #### Relations
   * definedBy: [Relation Operations Specification](Specifications.md#relation-operations-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * satisfiedBy: [crud.rs](../../core/src/crud.rs)
-  * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
+  * satisfiedBy: [crud.rs](../../crates/reqvire-core/src/crud.rs)
+  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
   * verifiedBy: [Link Command Verification](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#unlink-command-verification)
   * verifiedBy: [Verification Objective Mutation Test](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
@@ -327,9 +327,9 @@ Governance metadata behavior shall follow the associated contract specifications
 
 #### Relations
   * definedBy: [Requirement Governance Metadata Inheritance Behavior](Behaviors.md#requirement-governance-metadata-inheritance-behavior)
-  * satisfiedBy: [element.rs](../../core/src/element.rs)
-  * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
-  * satisfiedBy: [search.rs](../../core/src/search.rs)
+  * satisfiedBy: [element.rs](../../crates/reqvire-core/src/element.rs)
+  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [search.rs](../../crates/reqvire-core/src/search.rs)
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
   * verifiedBy: [Requirement Governance Metadata Verification](../Verifications/ModelStructure/ParsingVerifications.md#requirement-governance-metadata-verification)
   * verifiedBy: [Requirement Governance Metadata Formatting Verification](../Verifications/Operations/Formatting/FormattingVerifications.md#requirement-governance-metadata-formatting-verification)
@@ -376,4 +376,3 @@ The system shall support defined verification categories following clearly defin
 #### Relations
   * definedBy: [Verification Type Selection Guidelines](Specifications.md#verification-type-selection-guidelines)
 ---
-

@@ -153,14 +153,19 @@ This repository includes installable Codex skill packages for Reqvire model work
 ```text
 codex-skills/reqvire-syseng
 codex-skills/reqvire-ontology-authoring
+codex-skills/reqvire-concept-authoring
 ```
 
 Use `reqvire-syseng` for semantic engineering, capability, requirement,
 verification, traceability, migration, and general Reqvire CLI workflows.
 
 Use `reqvire-ontology-authoring` for ontology scoping, OWL/Turtle vocabulary,
-semantic contracts, concept references, namespace decisions, and ontology
+semantic contracts, structural-to-concept bridges, namespace decisions, and ontology
 refactoring.
+
+Use `reqvire-concept-authoring` for native concept-scheme and concept
+thesaurus authoring, SKOS terminology, concept taxonomies, labels, definitions,
+scope notes, examples, mappings, and concept references.
 
 The skills use the npm package directly:
 
@@ -193,6 +198,7 @@ Installed locations:
 ```text
 $CODEX_HOME/skills/reqvire-syseng
 $CODEX_HOME/skills/reqvire-ontology-authoring
+$CODEX_HOME/skills/reqvire-concept-authoring
 ```
 
 Restart Codex after installing or updating the skill.
@@ -223,7 +229,7 @@ Verification
 ## Ontologies
 
 Ontologies define:
-- concepts
+- structural classes and properties
 - relationships
 - domain vocabulary
 - semantic meaning
@@ -231,14 +237,36 @@ Ontologies define:
 Reqvire supports ontology modeling directly inside the engineering workflow.
 Ontology boundary metadata and Turtle are explicit: a top ontology element declares `ontology_base` and `ontology_prefix`, and its Turtle must agree with the generated ontology IRI and term namespace.
 
+Concept schemes and concepts are modeled as first-class Reqvire elements, not as
+ontology Turtle. A concept scheme owns `concept_base` and `concept_prefix`
+directly and forms a standalone Thesaurus root. Concepts own curated human
+terms, labels, synonyms, definitions, and broader/narrower taxonomy.
+Structural ontologies own classes, properties, individuals, axioms, and SHACL
+targets. Use `reqvire:mapsToConcept` only where a structural term needs an
+explicit link back to a curated native concept; do not collapse the concept
+layer and the structural layer just because they share labels.
+
+```text
+Thesaurus
+  └─ concept-scheme root
+      └─ concept
+
+Ontologies
+  └─ structural ontology
+      may map structural terms to curated native concepts
+```
+
 Ontology elements can reference local external Turtle/TTL, RDF/XML, or JSON-LD
 vocabularies through `External Ontology` source sections when model validation needs terms from a
 third-party or shared vocabulary. These sources support reference resolution and
-optional export materialization with `reqvire ontologies --include-external` or
+optional export materialization with `reqvire semantic ontologies --include-external`, `reqvire semantic graph --include-external`, or
 MCP `include_external: true`, but exposed external content is limited to the
 used external subset. Full external ontology files remain local dependency
-inputs for validation and term resolution; Reqvire does not provide a public
-mode for dumping complete third-party ontology files. Imported terms are marked
+inputs for validation and term resolution; they are not part of public
+`include_external` output. Even `semantic graph --full --include-external` emits authored
+semantic content, authored model facts, generated facts, and the used external
+subset only.
+Imported terms are marked
 as external and do not replace authored Reqvire ontology elements as the
 canonical system model.
 
@@ -356,7 +384,7 @@ Verification planning in Reqvire follows this flow:
 - `inspection-verification`
 - `demonstration-verification`
 
-3) Connect each concrete verification element with `verify` relations to target capabilities or requirements.
+3) Connect each concrete verification element with `verify` relations to target requirements.
 
 4) Add execution evidence in implementation-facing layers using `satisfiedBy` on concrete verifications once execution is complete.
 

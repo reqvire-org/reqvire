@@ -44,4 +44,4 @@ This verification uses absolute paths to rs files.
 #### Relations
   * derivedFrom: [Format Verification Objective](#format-verification-objective)
   * verify: [../SystemRequirements/Requirements.md#path-resolution-testing](/SystemRequirements/Requirements.md#path-resolution-testing)
-  * satisfiedBy: /core/src/element.rs
+  * satisfiedBy: /crates/reqvire-core/src/element.rs

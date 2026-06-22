@@ -1,0 +1,52 @@
+[package]
+name = "reqvire-cli"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+[[bin]]
+name = "reqvire"
+path = "src/main.rs"
+
+[package.metadata.dist]
+dist = true
+npm-scope = "@reqvire-org"
+npm-package = "reqvire"
+
+[dependencies]
+reqvire = { workspace = true }
+
+# CLI
+clap = { workspace = true }
+
+# Logging
+log = { workspace = true }
+env_logger = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# File handling
+globset = { workspace = true }
+ignore = "0.4"
+
+# HTTP server
+tokio = { workspace = true }
+axum = { workspace = true }
+tower-http = { workspace = true }
+percent-encoding = { workspace = true }
+rmcp = { version = "1.6.0", features = ["server", "macros", "schemars", "transport-streamable-http-server"] }
+
+[dev-dependencies]
+assert_fs = { workspace = true }
+predicates = { workspace = true }
+tempfile = { workspace = true }

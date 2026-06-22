@@ -44,9 +44,9 @@ System shall traverse only forward relations when filtering from a root element.
 
 ### Default Model Roots
 
-System shall filter to ontology roots and capability roots when no --from filter is specified.
+System shall filter to ontology roots, concept roots, and capability roots when no --from filter is specified.
 
-Ontology roots and capability roots are ontology and capability elements without hierarchical parent relations.
+Ontology roots, concept roots, and capability roots are ontology, concept-scheme, and capability elements without rendered hierarchical parent relations.
 
 #### Metadata
   * type: requirement

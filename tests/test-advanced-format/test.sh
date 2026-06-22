@@ -60,9 +60,9 @@ EXPECTED_SUBFOLDER_TO_ROOT="\[Managing MBSE Models\](../UserStories.md#managing-
 # Test absolute path conversion from subfolder to another subfolder
 EXPECTED_SUBFOLDER_TO_SUBFOLDER="\[Format Test\](../Verifications/Tests.md#format-test)"
 # Test absolute path conversion to internal file (from SystemRequirements subfolder)
-EXPECTED_ABSOLUTE_INTERNAL_PATH="../core/src/parser.rs"
+EXPECTED_ABSOLUTE_INTERNAL_PATH="../crates/reqvire-core/src/parser.rs"
 # Test absolute path from verification in subfolder to rs file (from Verifications subfolder)
-EXPECTED_VERIFICATION_ABSOLUTE_PATH="../core/src/element.rs"
+EXPECTED_VERIFICATION_ABSOLUTE_PATH="../crates/reqvire-core/src/element.rs"
 
 if ! grep -q "$EXPECTED_SIMPLE_ID_CONVERSION" dry_run_clean.txt; then
     echo "FAIL: Dry run does not show simple identifier conversion to markdown link"
@@ -156,14 +156,14 @@ if ! grep -q "$EXPECTED_SUBFOLDER_TO_SUBFOLDER_APPLIED" SystemRequirements/Requi
 fi
 
 # Test 3.3c: Check absolute internal path conversions
-EXPECTED_ABSOLUTE_INTERNAL_PATH_APPLIED="../core/src/parser.rs"
+EXPECTED_ABSOLUTE_INTERNAL_PATH_APPLIED="../crates/reqvire-core/src/parser.rs"
 if ! grep -q "$EXPECTED_ABSOLUTE_INTERNAL_PATH_APPLIED" SystemRequirements/Requirements.md; then
     echo "FAIL: Absolute internal path not converted correctly"
     exit 1
 fi
 
 # Test 3.3d: Check verification absolute path conversions
-EXPECTED_VERIFICATION_ABSOLUTE_PATH_APPLIED="../core/src/element.rs"
+EXPECTED_VERIFICATION_ABSOLUTE_PATH_APPLIED="../crates/reqvire-core/src/element.rs"
 if ! grep -q "$EXPECTED_VERIFICATION_ABSOLUTE_PATH_APPLIED" Verifications/Tests.md; then
     echo "FAIL: Verification absolute path not converted correctly"
     exit 1

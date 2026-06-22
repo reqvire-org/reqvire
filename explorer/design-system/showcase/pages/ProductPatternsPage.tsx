@@ -22,7 +22,6 @@ import {
   OntologyNodeDetailContent,
   OntologyNodeDetailDialog,
   PaneChromeHeader,
-  PaneFilterSection,
   PaneTree,
   PaneTreeNode,
   RelationList,
@@ -339,24 +338,22 @@ export function ProductPatternsPage() {
             </div>
           </div>
           <div className="showcase-pattern-card">
-            <PaneFilterSection title="File tree">
-              <PaneTree>
-                {MODEL_TREE_ROWS.map((row) => (
-                  <PaneTreeNode key={row.id}>
-                    <TreeItem
-                      label={row.label}
-                      icon={<Icon name={row.icon} size={14} />}
-                      count={row.count}
-                      depth={row.depth}
-                      kind={row.kind}
-                      expandable={row.expandable}
-                      open={row.open}
-                      selected={row.selected}
-                    />
-                  </PaneTreeNode>
-                ))}
-              </PaneTree>
-            </PaneFilterSection>
+            <PaneTree aria-label="Example file tree">
+              {MODEL_TREE_ROWS.map((row) => (
+                <PaneTreeNode key={row.id}>
+                  <TreeItem
+                    label={row.label}
+                    icon={<Icon name={row.icon} size={14} />}
+                    count={row.count}
+                    depth={row.depth}
+                    kind={row.kind}
+                    expandable={row.expandable}
+                    open={row.open}
+                    selected={row.selected}
+                  />
+                </PaneTreeNode>
+              ))}
+            </PaneTree>
           </div>
         </div>
       </Section>

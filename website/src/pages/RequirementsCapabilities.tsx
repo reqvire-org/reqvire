@@ -54,7 +54,7 @@ export default function RequirementsCapabilities() {
         <BulletList
           items={[
             "Use capability hierarchy only between capability elements with derive or derivedFrom.",
-            "Use Concept References when capability prose should bind readable labels to ontology terms.",
+            "Use Concept References when capability prose should bind readable labels to SKOS concepts.",
             "Create child capabilities when ownership, lifecycle, verification, stakeholder scope, architecture impact, or requirement clusters differ.",
             "Do not create one universal top capability that hides all submodel boundaries.",
           ]}
@@ -163,17 +163,17 @@ and signature before the request reaches protected application logic.`}</CodeBlo
       <Section title="Reused Contract Context">
         <p className="text-zinc-600 mb-4">
           Reused Contract Context makes cross-boundary requirement contracts
-          explicit. Ontology term usage is modeled with concept references. A
-          requirement can reuse a one-way contract dependency from a compatible
-          requirement-owned non-semantic-contract element in another subgraph;
-          semantic-contract dependencies use constrainedBy/constrain and
-          use/usedBy instead.
+          explicit. Concept references bind prose to curated SKOS concepts;
+          semantic-contract dependencies use structural ontology through
+          constrainedBy/constrain and use/usedBy. A requirement can reuse a
+          one-way contract dependency from a compatible requirement-owned
+          non-semantic-contract element in another subgraph.
         </p>
         <DetailGrid
           items={[
             {
               name: "Concept references",
-              desc: "Capabilities, requirements, contracts, and verifications bind prose to ontology terms with Concept References.",
+              desc: "Capabilities, requirements, contracts, and verifications bind prose to SKOS concepts with Concept References.",
             },
             {
               name: "Reused contract context",
@@ -288,7 +288,7 @@ reqvire search --filter-owner "Identity Team"`}</CodeBlock>
           <BulletList
             items={[
               "Capabilities holds capability-rooted subgraphs with child capabilities, specifying requirements, and requirement-owned contracts.",
-              "Ontologies holds reusable semantic vocabulary referenced by model elements instead of nested into unrelated capability files.",
+              "Ontologies holds structural ontology and semantic contracts; Thesaurus holds curated concept schemes instead of nesting reusable semantic material into unrelated capability files.",
               "Verifications holds verification elements grouped by domain and linked through verify or verifiedBy.",
               "Folder names are guidance, not schema. Reqvire validates element metadata and graph relations.",
             ]}

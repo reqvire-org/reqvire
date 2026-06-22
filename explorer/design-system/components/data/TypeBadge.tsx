@@ -116,6 +116,24 @@ const roleSkinX = css`
     --ds-typebadge-ink: var(--ontology-ink);
   }
 
+  &[data-element-role="concept"] {
+    --ds-typebadge-color: var(--concept);
+    --ds-typebadge-tint: var(--concept-tint);
+    --ds-typebadge-ink: var(--concept-ink);
+  }
+
+  &[data-element-role="concept-scheme"] {
+    --ds-typebadge-color: var(--concept-scheme);
+    --ds-typebadge-tint: var(--concept-scheme-tint);
+    --ds-typebadge-ink: var(--concept-scheme-ink);
+  }
+
+  &[data-element-role="concept-reference"] {
+    --ds-typebadge-color: var(--concept-reference);
+    --ds-typebadge-tint: var(--concept-reference-tint);
+    --ds-typebadge-ink: var(--concept-reference-ink);
+  }
+
   &[data-element-role="resource"] {
     --ds-typebadge-color: var(--resource);
     --ds-typebadge-tint: var(--resource-tint);

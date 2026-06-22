@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ExplorerUiStateProvider } from "../state/ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
@@ -81,7 +81,7 @@ describe("OntologiesView", () => {
     expect(container.querySelector("#ontology-graph-search")).toBeNull();
   });
 
-  it("does not pass exported ontology node type values to Sigma renderer programs", () => {
+  it("does not pass exported ontology node type values to Sigma renderer programs", async () => {
     const graphData = devFixture.ontology.graph_data;
     expect(graphData).toBeTruthy();
     const store: ExplorerProjectStore = {
@@ -99,12 +99,29 @@ describe("OntologiesView", () => {
 
     renderWithStore(store);
 
+    await waitFor(() => expect(sigmaState.graphs[0]).toBeTruthy());
+
     const rendererTypes: unknown[] = [];
     sigmaState.graphs[0].forEachNode((_node, attributes) => {
       rendererTypes.push(attributes.type);
     });
     expect(rendererTypes).not.toContain("owl");
     expect(rendererTypes.every((type) => type === "circle" || type === "constructGlyph")).toBe(true);
+  });
+
+  it("keeps Explorer external-source graph data limited to used external subset terms", () => {
+    const graphNodes = devFixture.ontology.graph_data?.nodes ?? [];
+    const externalNodes = graphNodes.filter((node) => node.layer === "external-source");
+
+    expect(externalNodes.length).toBeGreaterThan(0);
+    expect(externalNodes.every((node) => node.source_kind === "external-ontology")).toBe(true);
+    expect(externalNodes.every((node) => node.sources.some((source) => source.kind === "external-used-subset"))).toBe(true);
+    expect(externalNodes.every((node) =>
+      node.constraints.some(
+        (constraint) => constraint.property === "external_materialization" && constraint.value === "used_subset",
+      ),
+    )).toBe(true);
+    expect(graphNodes.some((node) => node.id.includes("UnusedExternal"))).toBe(false);
   });
 
 });

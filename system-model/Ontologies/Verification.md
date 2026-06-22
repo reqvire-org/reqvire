@@ -2,13 +2,14 @@
 
 ### Reqvire Verification Ontology
 
-The Reqvire verification ontology defines verification objective and concrete verification element categories and their relationship to capabilities and requirements.
+The Reqvire verification ontology defines verification objective and concrete verification element categories and their relationship to requirements and capability coverage rollups.
 
-Verification objective elements organize verification intent and planning hierarchy. Concrete verification elements derive from a verification objective and verify capabilities or requirements. Evidence-backed verification types can also be satisfied by evidence artifacts such as test runs, proof reports, generated fixtures, or theorem/model-checking artifacts.
+Verification objective elements organize verification intent and planning hierarchy. Concrete verification elements derive from a verification objective and verify requirements. Capability verification is a computed rollup from verified requirements that specify each capability. Evidence-backed verification types can also be satisfied by evidence artifacts such as test runs, proof reports, generated fixtures, or theorem/model-checking artifacts.
 
 #### Ontology
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix concept: <https://www.reqvire.org/concepts#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
@@ -16,8 +17,9 @@ Verification objective elements organize verification intent and planning hierar
 reqvire:ConcreteVerification a owl:Class ;
   rdfs:label "Concrete verification" ;
   rdfs:subClassOf reqvire:Verification ;
+  reqvire:mapsToConcept concept:ConcreteVerification ;
   owl:disjointWith reqvire:VerificationObjective ;
-  rdfs:comment "Executable or reviewable verification element that derives from a verification objective and verifies a capability or requirement." .
+  rdfs:comment "Executable or reviewable verification element that derives from a verification objective and verifies requirements." .
 reqvire:EvidenceBackedVerification a owl:Class ;
   rdfs:label "Evidence-backed verification" ;
   rdfs:subClassOf reqvire:ConcreteVerification,
@@ -53,6 +55,7 @@ reqvire:DemonstrationVerification a owl:Class ;
 reqvire:VerificationObjective a owl:Class ;
   rdfs:label "Verification objective" ;
   rdfs:subClassOf reqvire:Verification ;
+  reqvire:mapsToConcept concept:VerificationObjective ;
   rdfs:comment "Planning and grouping element for verification objectives. It may participate in verification hierarchy but does not directly verify requirements or carry evidence artifacts." .
 
 reqvire:VerificationType a owl:Class ;
@@ -137,20 +140,24 @@ Rollup is calculated through capability and requirement graph structure. This on
 #### Ontology
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix concept: <https://www.reqvire.org/concepts#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:VerificationRollup a owl:Class ;
   rdfs:label "Verification rollup" ;
-  rdfs:comment "Computed verification coverage record for a capability or requirement." .
+  reqvire:mapsToConcept concept:VerificationCoverage ;
+  rdfs:comment "Computed verification coverage record for a requirement or capability rollup." .
 reqvire:CapabilityCoverage a owl:Class ;
   rdfs:subClassOf reqvire:VerificationRollup ;
   rdfs:label "Capability coverage" ;
+  reqvire:mapsToConcept concept:VerificationCoverage ;
   rdfs:comment "Computed verification coverage state for a capability." .
 reqvire:RequirementCoverage a owl:Class ;
   rdfs:subClassOf reqvire:VerificationRollup ;
   rdfs:label "Requirement coverage" ;
+  reqvire:mapsToConcept concept:VerificationCoverage ;
   rdfs:comment "Computed verification coverage state for a requirement." .
 reqvire:CoverageState a owl:Class ;
   rdfs:label "Coverage state" ;
@@ -174,7 +181,7 @@ reqvire:coveredByVerification a owl:ObjectProperty ;
 reqvire:blockedByRequirement a owl:ObjectProperty ;
   rdfs:domain reqvire:VerificationRollup ;
   rdfs:range reqvire:Requirement ;
-  rdfs:comment "Requirement that blocks a capability or requirement coverage rollup." .
+  rdfs:comment "Requirement that blocks a requirement or capability coverage rollup." .
 reqvire:coverageState a owl:DatatypeProperty ;
   rdfs:domain reqvire:VerificationRollup ;
   rdfs:range xsd:string ;
@@ -186,7 +193,7 @@ reqvire:coverageReason a owl:DatatypeProperty ;
 reqvire:rollupRuleName a owl:DatatypeProperty ;
   rdfs:domain reqvire:VerificationRollupRule ;
   rdfs:range xsd:string ;
-  rdfs:comment "Canonical verification rollup rule token used by reports and semantic validation." .
+  rdfs:comment "Canonical verification rollup rule token used by coverage analysis and semantic validation." .
 reqvire:rollupCondition a owl:DatatypeProperty ;
   rdfs:domain reqvire:VerificationRollupRule ;
   rdfs:range xsd:string ;
@@ -217,12 +224,6 @@ reqvire:capabilityCoverageRollupRule a reqvire:VerificationRollupRule ;
   reqvire:rollupRuleName "capability-coverage-rollup" ;
   reqvire:rollupCondition "A capability has requirements through specifiedBy or descendant capabilities through derive." ;
   reqvire:rollupOutcome "The capability coverage state is derived from requirements that specify the capability, child requirements, and child capability coverage." .
-
-reqvire:directCapabilityVerificationRule a reqvire:VerificationRollupRule ;
-  rdfs:label "Direct capability verification" ;
-  reqvire:rollupRuleName "direct-capability-verification" ;
-  reqvire:rollupCondition "A capability has a direct verifiedBy relation to a verification element." ;
-  reqvire:rollupOutcome "The capability may be directly verified; requirement-derived capability coverage remains a separate rollup state." .
 
 reqvire:evidenceBackedVerificationRule a reqvire:VerificationRollupRule ;
   rdfs:label "Evidence-backed verification satisfaction" ;
@@ -314,7 +315,6 @@ reqvire:VerificationRollupRuleShape
       "leaf-requirement-verification"
       "parent-requirement-rollup"
       "capability-coverage-rollup"
-      "direct-capability-verification"
       "evidence-backed-verification-satisfaction"
       "non-evidence-backed-verification-satisfaction"
     ) ;
@@ -346,7 +346,7 @@ reqvire:VerificationRollupRuleShape
 
 ### Verification Target and Evidence Shape
 
-Defines SHACL constraints for verification elements and the capabilities or requirements they verify.
+Defines SHACL constraints for verification elements and the requirements they verify.
 
 #### Shapes
 ```turtle
@@ -450,4 +450,3 @@ reqvire:VerificationTypeShape
   * constrain: [Verification Upward Traceability](../Verification/Traceability/VerificationTracesRequirements.md#verification-upward-traceability)
   * use: [Reqvire Verification Ontology](#reqvire-verification-ontology)
 ---
-

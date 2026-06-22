@@ -96,7 +96,7 @@ const searchToolbarSkinX = css`
 const searchResultsBaseUX = css`
   display: flex;
   flex-direction: column;
-  gap: var(--gap-list-stack);
+  gap: var(--stack-gap-compact);
   margin-top: var(--space-8);
 
   .ux-search-result-card {
@@ -126,7 +126,7 @@ const searchResultsBaseUX = css`
     display: flex;
     align-items: center;
     min-width: 0;
-    min-height: var(--row-h);
+    min-height: var(--row-height-compact);
     gap: var(--space-4);
   }
 

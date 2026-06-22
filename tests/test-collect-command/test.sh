@@ -90,13 +90,18 @@ if ! jq . /tmp/collect-capability-downstream.json >/dev/null 2>&1; then
   cat /tmp/collect-capability-downstream.json
   exit 1
 fi
-for name in "Product Capability" "Child Capability" "Root Requirement" "Leaf Requirement" "Collect Ontology"; do
+for name in "Product Capability" "Child Capability" "Root Requirement" "Leaf Requirement"; do
   if ! jq -e --arg name "$name" '.items[] | select(.name == $name)' /tmp/collect-capability-downstream.json >/dev/null; then
     echo "FAILED: capability downstream JSON missing ${name}"
     cat /tmp/collect-capability-downstream.json
     exit 1
   fi
 done
+if ! jq -e '.items[] | select(.name == "Collect Contract" and .element_type == "concept" and .source_type == "concept_context" and .reused_by == "specifications/Requirements.md#child-capability")' /tmp/collect-capability-downstream.json >/dev/null; then
+  echo "FAILED: capability downstream JSON should include generated concept reference context"
+  cat /tmp/collect-capability-downstream.json
+  exit 1
+fi
 
 # Ontology upstream follows ontology hierarchy.
 cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Collect Child Ontology" --direction UPSTREAM --json > /tmp/collect-ontology-upstream.json 2>&1
@@ -135,6 +140,30 @@ if ! jq -e '.items[] | select(.name == "Collect Shape Contract" and .element_typ
   exit 1
 fi
 
+# Concept scheme downstream returns thesaurus context through concept hierarchy.
+cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Collect Concepts" --direction DOWNSTREAM --json > /tmp/collect-concepts-downstream.json 2>&1
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "FAILED: collect concept scheme downstream returned error: $EXIT_CODE"
+  cat /tmp/collect-concepts-downstream.json
+  exit 1
+fi
+for name in "Collect Concepts" "Collect Contract"; do
+  if ! jq -e --arg name "$name" '.items[] | select(.name == $name)' /tmp/collect-concepts-downstream.json >/dev/null; then
+    echo "FAILED: concept scheme downstream JSON missing ${name}"
+    cat /tmp/collect-concepts-downstream.json
+    exit 1
+  fi
+done
+if ! jq -e '
+  any(.items[]; .name == "Collect Concepts" and .element_type == "concept-scheme" and .source_type == "element")
+  and any(.items[]; .name == "Collect Contract" and .element_type == "concept" and .source_type == "element")
+' /tmp/collect-concepts-downstream.json >/dev/null; then
+  echo "FAILED: concept scheme downstream JSON should include concept scheme and child concept as elements"
+  cat /tmp/collect-concepts-downstream.json
+  exit 1
+fi
+
 # Error handling - element not found.
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Non Existent Element" 2>&1)
 EXIT_CODE=$?
@@ -147,7 +176,7 @@ fi
 # Error handling - non capability/requirement type.
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Test Verification" 2>&1)
 EXIT_CODE=$?
-if [ $EXIT_CODE -eq 0 ] || ! echo "$OUTPUT" | grep -q "not a capability, requirement, or ontology type"; then
+if [ $EXIT_CODE -eq 0 ] || ! echo "$OUTPUT" | grep -q "not a capability, requirement, ontology, concept-scheme, or concept type"; then
   echo "FAILED: verification collect should return type error"
   echo "$OUTPUT"
   exit 1

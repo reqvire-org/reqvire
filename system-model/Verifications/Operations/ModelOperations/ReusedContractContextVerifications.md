@@ -28,7 +28,7 @@ Verify reused_contract_context rules for requirement-owned contract elements and
 
 #### Details
 Test cases:
-- Capability reused_contract_context to any target fails; capabilities use `#### Concept References` for semantic vocabulary and relations for verification/specification.
+- Capability reused_contract_context to any target fails; capabilities use `#### Concept References` for semantic vocabulary and `specifiedBy` requirements for coverage and specification.
 - Requirement reused_contract_context to an `ontology` element fails.
 - Requirement reused_contract_context to a `semantic-contract` fails; requirements use `constrainedBy` instead.
 - Requirement reused_contract_context to ontology is forbidden because ontology vocabulary dependencies use concept references or semantic-contract `use` relations.
@@ -344,4 +344,3 @@ Test cases for element identifiers:
   * verify: [Reserved Subsections Support](../../../ModelStructure/StructureAndParsing.md#reserved-subsections-support)
   * verify: [Reused Contract Context Target Validation](../../../Operations/Validation/ValidationRequirements.md#reused-contract-context-target-validation)
 ---
-

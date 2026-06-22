@@ -8,7 +8,7 @@
 
 ```
 1. Capability first       → Define the coherent operational/system ability
-2. Semantic context    → Add concept references when shared ontology terms matter
+2. Semantic context    → Add concept references when shared SKOS concepts matter
 3. Requirements        → Define what the system shall do (never skip implementable obligations)
 4. Contracts         → Add specifications, constraints, behaviors, state, and input-output contracts as needed
    Semantic contracts  → Add reusable SHACL contracts with explicit ontology use when closed-world checks are needed
@@ -24,7 +24,7 @@ When constructing or refactoring a system model, work from model boundaries inwa
 2. Run `reqvire search --filter-type="ontology" --short` and identify the ontology terms already available.
 3. Decide whether the new content belongs under an existing capability root, a child capability, a new independent capability root, or the shared ontology hierarchy.
 4. Add subcapabilities only for meaningful capability slices; do not use capability hierarchy just to share ontology.
-5. Put shared vocabulary and stable semantic relationships in ontology; bind capability, requirement, contract, and verification prose to ontology terms with `#### Concept References`.
+5. Put shared vocabulary and stable semantic relationships in ontology; bind capability, requirement, contract, and verification prose to SKOS concepts with `#### Concept References`.
 6. Put implementable obligations in requirements that `specify` the local capability.
 7. Put local details in compatible contracts owned by the relevant requirement.
 8. Use reused_contract_context, not hierarchy, when another requirement root needs reusable requirement-owned contracts. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
@@ -67,9 +67,8 @@ Before creating requirements, answer:
 
 ```
 Capability (coherent operational/system ability)
-    ├── Concept References → ontology terms
+    ├── Concept References → SKOS concepts
     ├── derive → Subcapability
-    ├── verifiedBy → Verification
     └── specifiedBy ← Requirement
                      ├── definedBy → source / specification / constraint / behavior / state / input-output
                      ├── constrainedBy → semantic-contract → use → ontology
@@ -96,9 +95,9 @@ A `capability` answers:
 - What coherent operational/system concern this represents.
 - What stakeholder need, feature context, operational context, regulatory driver, mission objective, service context, AI context, source context, or ontology defines its meaning.
 - Which requirements specify this capability.
-- Which verification evidence directly verifies it when capability-level evidence is appropriate.
+- Which verified requirements provide coverage for this capability.
 
-A capability is not a weaker requirement. Use a `capability` when the statement is about stable operational ability, product scope, stakeholder value, regulatory domain, ownership, planning, or capability grouping. Capabilities may be directly verified but are not directly satisfied; implementation coverage rolls up from the requirements that specify them.
+A capability is not a weaker requirement. Use a `capability` when the statement is about stable operational ability, product scope, stakeholder value, regulatory domain, ownership, planning, or capability grouping. Capabilities are not directly verified or directly satisfied; implementation and verification coverage roll up from the requirements that specify them.
 
 A `requirement` answers:
 - What must the system do?
@@ -221,7 +220,7 @@ reqvire link "Capability Name" "specifiedBy" "System Capability Implementation"
 reqvire link "Child Requirement" "derivedFrom" "System Capability Implementation"
 ```
 
-**Relation types**: `derivedFrom` (child -> parent inside same family, including verification-family hierarchy), `derive` (parent -> child inside same family), `specify` (requirement -> capability), `specifiedBy` (capability -> requirement), `verifiedBy` (capability or requirement -> concrete verification), `verify` (concrete verification -> capability or requirement), `satisfiedBy` (requirement/test-verification/formal-proof-verification -> implementation or evidence), `satisfy` (implementation/evidence -> requirement/test-verification/formal-proof-verification), `definedBy` (requirement -> contract), `define` (contract -> requirement)
+**Relation types**: `derivedFrom` (child -> parent inside same family, including verification-family hierarchy), `derive` (parent -> child inside same family), `specify` (requirement -> capability), `specifiedBy` (capability -> requirement), `verifiedBy` (requirement -> concrete verification), `verify` (concrete verification -> requirement), `satisfiedBy` (requirement/test-verification/formal-proof-verification -> implementation or evidence), `satisfy` (implementation/evidence -> requirement/test-verification/formal-proof-verification), `definedBy` (requirement -> contract), `define` (contract -> requirement)
 
 ## Step 3: Add Contracts (if needed)
 
@@ -234,7 +233,7 @@ Add contracts only when:
 - **Ontology** - Shared semantic meaning and vocabulary referenced by model elements
 - **Semantic contracts** - Reusable SHACL shape profiles over explicitly used ontology that constrain requirements
 
-Link requirement-owned contracts via `definedBy` from the requirement that owns the contract. Link semantic contracts to ontology with `use` and to requirements with `constrain`/`constrainedBy`. Use `#### Concept References` when capability, requirement, contract, or verification prose needs explicit ontology term bindings.
+Link requirement-owned contracts via `definedBy` from the requirement that owns the contract. Link semantic contracts to ontology with `use` and to requirements with `constrain`/`constrainedBy`. Use `#### Concept References` when capability, requirement, contract, or verification prose needs explicit SKOS concept bindings.
 
 ### Contract Best Practices
 
@@ -306,7 +305,7 @@ reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
 
 **Reused Contract Context constraints:**
 - Contracts must have a `define` relation before being reused
-- Capabilities do not author reused_contract_context; use `#### Concept References` for ontology term bindings
+- Capabilities do not author reused_contract_context; use `#### Concept References` for SKOS concept bindings
 - Requirements may reuse only requirement-owned `specification`, `constraint`, `behavior`, `state`, or `input-output` contracts
 - Semantic contracts must not author `#### Concept References`; they depend on ontology through `use`
 

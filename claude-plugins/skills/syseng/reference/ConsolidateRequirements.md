@@ -173,7 +173,7 @@ When merge is acceptable:
 - They share owner, lifecycle, and acceptance criteria.
 - Separate compliance/audit evidence is unnecessary because the concerns are inseparable in practice.
 
-**Post-merge cleanup**: If the merged result needs content restructuring (removing "Merged Details" artifacts), use `/reqvire:consolidate` to read, fix, and override with clean content.
+**Post-merge cleanup**: If the merged result needs content restructuring (removing "Merged Details" artifacts), follow the two-phase consolidate workflow below.
 
 ## When to Split Requirements (using derivedFrom)
 
@@ -251,6 +251,105 @@ The format command ensures:
 - Proper element separator lines (`---`)
 - Correct subsection ordering (Metadata, Relations, Details, Reused Contract Context)
 - Clean whitespace and indentation
+
+## Two-Phase Consolidate Workflow
+
+Use this when content needs intelligent restructuring after merging — the AI reads the merged element, fixes the body, and overrides with a clean version.
+
+**When to use consolidate vs direct merge:**
+- **Direct merge** (`reqvire merge`): Quick merge when raw output is acceptable, or when merging duplicates
+- **Consolidate** (this workflow): When content needs intelligent restructuring
+
+### Consolidation Heuristics
+
+A child requirement is a candidate for consolidation if it meets **multiple** of these criteria:
+
+1. **Very similar names to parent** - e.g., parent: "Explorer Serve", child: "Explorer Serve Verification"
+2. **Short content** - Less than 200 words of requirement text (excluding relations)
+3. **No verifications** - Has no verifiedBy relations of its own
+4. **Implementation-level details** - Mentions specific technical details, file formats, parameters, or procedural steps
+5. **Leaf requirement** - No children of its own, derives from only one parent
+6. **Procedural/step-by-step details** - Contains "how-to" information that expands on parent
+7. **Contract keywords** - Contains phrases like "shall support", "shall provide", "shall include", "formatting", "structure", "output", "options", "flags"
+
+### Step 1: Analyze Model for Candidates
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --short --json --output /tmp/search.json
+```
+
+Review derivedFrom relationships, requirement naming patterns, content length, and presence of verifications.
+
+### Step 2: Execute Merge
+
+```bash
+# Preview first
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" merge "<target-element>" "<source1>" "<source2>" --dry-run
+
+# Execute
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" merge "<target-element>" "<source1>" "<source2>"
+```
+
+### Step 3: Read Merged Element
+
+After merge, read the merged element to see the raw output:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-name="<target-name>" --json
+```
+
+The merged element will have **artifacts that need cleanup**:
+- `#### Merged Details (Source Name)` subsections for each merged source
+- Potentially duplicated content
+- Awkward structure from concatenation
+
+### Step 4: Prepare Fixed Element Body
+
+Analyze the merged content and create a **clean, restructured version**:
+
+1. **Remove all `#### Merged Details (X)` subsection headers** - These are merge artifacts
+2. **Integrate all content logically into a single `#### Details` section**
+3. **Remove duplicate information**
+4. **Ensure proper EARS statement structure**
+5. **Maintain all Relations** - These are already correctly merged
+6. **Keep Metadata and Reused Contract Context** - Preserve unchanged
+
+### Step 5: Override with Fixed Content
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "<file-path>" --override <<'EOF'
+### <Element Name>
+
+<Clean main content - EARS statement>
+
+#### Details
+
+<Consolidated details - all merged content properly integrated>
+
+#### Metadata
+  * type: <type>
+
+#### Relations
+  * <all merged relations - copy exactly from merged element>
+---
+EOF
+```
+
+### Step 6: Validate
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
+```
+
+### Anti-Patterns (When NOT to Consolidate)
+
+Do NOT consolidate if:
+- Child introduces **new functional capability** beyond parent
+- Child has **extensive content** (>300 words) that would overwhelm parent Details
+- Child has **many verifications** (3+) indicating significant independent functionality
+- Child is referenced by **many other elements** as a key concept
+- Child represents a **distinct abstraction level**
+- There's **uncertainty** about whether child is truly contract-only
 
 ## Git Philosophy
 

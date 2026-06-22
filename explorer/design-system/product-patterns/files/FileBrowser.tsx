@@ -54,6 +54,7 @@ export interface FileBrowserToolbarProps {
   };
   layout: FileBrowserLayout;
   resultCount: number;
+  showResultCount?: boolean;
   onOpenFolder: (path: string) => void;
   onLayoutChange: (layout: FileBrowserMode) => void;
 }
@@ -456,7 +457,7 @@ const elementsUX = css`
   .ux-file-browser__elements-list {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-list-stack);
+    gap: var(--stack-gap-compact);
     margin-top: var(--space-6);
   }
 
@@ -604,6 +605,7 @@ export function FileBrowserToolbar({
   selectedFile,
   layout,
   resultCount,
+  showResultCount = true,
   onOpenFolder,
   onLayoutChange,
 }: FileBrowserToolbarProps) {
@@ -626,7 +628,7 @@ export function FileBrowserToolbar({
         ) : null}
       </div>
       <div className="ux-file-browser__toolbar-actions">
-        <span className="ux-file-browser__count">{resultCount} items</span>
+        {showResultCount ? <span className="ux-file-browser__count">{resultCount} items</span> : null}
         <SegmentedControl<FileBrowserMode>
           ariaLabel="Model layout"
           value={layout}

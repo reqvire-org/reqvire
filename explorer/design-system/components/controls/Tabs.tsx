@@ -19,7 +19,7 @@ const tabBaseUX = css`
   position: relative;
   align-items: center;
   gap: var(--space-5);
-  height: var(--ds-tab-h, var(--header-h));
+  height: var(--ds-tab-h, var(--app-header-height));
   padding: 0 var(--space-7);
   border: 0;
   font-size: var(--text-sm);

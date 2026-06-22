@@ -108,6 +108,7 @@ design-system/
 │   ├── side-pane/             # Explorer side-pane frames, filters, trees, legends
 │   ├── detail/                # Detail dialog bodies and relation/detail lists
 │   ├── content/               # Document, markdown, diagram, and code preview frames
+│   ├── thesaurus/             # Standalone SKOS concept browser and concept detail map
 │   └── feedback/              # Product notices and help content
 │
 ├── assets/
@@ -320,7 +321,7 @@ Three primitive ramps plus semantic aliases:
 | `--warm-0` … `--warm-300` | Product surfaces (canvas, panels, hovers) |
 | `--rose-50` … `--rose-800` | Brand accent (interactive chrome only) |
 
-**Six element-type semantic hues** — never repurpose for decoration:
+**Element-type semantic hues** — never repurpose for decoration:
 
 | Token | Color | Used for |
 |-------|-------|---------|
@@ -329,6 +330,8 @@ Three primitive ramps plus semantic aliases:
 | `--contract` | orange `#ff9800` | All requirement-owned contract sub-types |
 | `--verification` | green `#4caf50` | All verification sub-types |
 | `--ontology` | gold `#b08a00` | Ontology nodes |
+| `--concept` | yellow `#e7c94a` | Native SKOS concept elements |
+| `--concept-scheme` | darker yellow `#cda83a` | Native SKOS concept-scheme roots |
 | `--resource` | amber `#ffca28` | Files / resources |
 
 Each type ships three channels: `--<type>` (fill), `--<type>-ink` (text on
@@ -344,7 +347,7 @@ dark-mode tint; dark theme activates it automatically via the overrides in
 - Accent: `--accent`, `--accent-hover`, `--accent-active`, `--accent-fg`, `--accent-subtle`, `--accent-ring`
 - Selection: `--bg-selected`, `--border-selected`
 - Graph edges: `--edge-default`, `--edge-derive`, `--edge-satisfy`, `--edge-trace`, `--edge-attach`
-- Extended RDF palette: `--rdf-class`, `--rdf-objprop`, `--rdf-dtprop`, `--rdf-nodeshape`, `--rdf-propshape`, etc.
+- Extended RDF palette: `--rdf-class`, `--rdf-concept`, `--rdf-objprop`, `--rdf-dtprop`, `--rdf-nodeshape`, `--rdf-propshape`, etc. `--rdf-concept` is the canonical yellow SKOS graph-node token. Native Reqvire `concept` and `concept-scheme` elements use the semantic aliases `--concept` and `--concept-scheme` so element badges stay distinct from passive RDF notation. `--concept-reference` is the darker yellow token for concept-reference facts and graph edges from model elements to concept nodes.
 
 **Dark theme** — activated by `data-theme="dark"` or `.dark` on any ancestor
 element. All semantic aliases re-resolve to navy-slate surfaces (`#0e141d` →
@@ -383,8 +386,8 @@ Two utility classes are defined here:
 - **Radii**: `--radius-xs` (4px) → `--radius-xl` (14px) → `--radius-pill` (999px)
 - **Control heights**: `--control-xs` (22px), `--control-sm` (28px), `--control-md` (34px), `--control-lg` (40px)
 - **Icon sizes**: `--icon-xs` (13px) → `--icon-lg` (20px)
-- **Layout**: `--rail-w` (52px), `--header-h` (52px), `--content-max` (1180px), `--row-h` (30px)
-- **List rhythm**: `--gap-list-stack` (`0`) — default vertical gap for contiguous menu, table, filter, legend, and relation rows
+- **Layout**: `--navigation-rail-width` (52px), `--app-header-height` (52px), `--content-max` (1180px), `--row-height-compact` (30px), `--compact-column-min` (112px)
+- **Stack rhythm**: `--stack-gap-compact` (`0`) — default vertical gap for contiguous menu, table, filter, legend, and relation rows
 - **Borders**: `--border-w` (1px), `--border-w-thick` (2px), `--border-w-heavy` (3px), `--focus-w` (2px)
 
 List-like UI is contiguous by default: menu items, table/list rows, filter
@@ -471,6 +474,11 @@ context/density/composition `--ds-*` variables. They must not redefine primitive
 state policy variables; state variants belong in primitive props and primitive
 CSS.
 
+Shared route chrome must be consumed through the canonical exported product
+pattern directly. Do not keep view-specific aliases or compatibility wrapper
+components for shared patterns such as `WorkspaceShell`; update callers to the
+canonical name.
+
 They must not use inline `style={...}`, `CSSProperties`, ad hoc CSS-variable
 objects, computed colors, or imperative `.style.*` mutations. Dynamic visual
 values belong behind reusable primitive APIs in `design-system/components/**`;
@@ -482,7 +490,8 @@ product patterns compose those primitives through typed semantic/token props.
 | `chrome/` | `WorkspaceToolbar`, `PaneChromeHeader`, `ReqvireRailMark` |
 | `side-pane/` | `SidePaneFrame`, pane filters, summaries, selections, trees, legends, and action rows |
 | `detail/` | `DetailDialog`, element detail content, relation and Reused Contract Context lists, concept references, and ontology detail bodies |
-| `content/` | `DocumentPanel`, `MarkdownFrame`, `DiagramBlockFrame`, `CodePreviewFrame`, `CodeToolbar`, `CodeBody`, `RendererNotice` |
+| `content/` | `WorkspaceShell`, `DocumentPanel`, `MarkdownFrame`, `DiagramBlockFrame`, `CodePreviewFrame`, `CodeToolbar`, `CodeBody`, `RendererNotice` |
+| `thesaurus/` | `ThesaurusExplorer` for standalone SKOS concept schemes, concept taxonomy, concept references, and ontology `mapsToConcept` bridges |
 | `feedback/` | `StoreNotice`, `HelpContent`, `HelpDialog` |
 
 Product-pattern names should be general inside their folder context. Do not
@@ -518,7 +527,7 @@ hardcoding token strings.
 
 | Type | Values |
 |------|--------|
-| `ElementRole` | `"capability"`, `"requirement"`, `"contract"`, `"source"`, `"constraint"`, `"behavior"`, `"state"`, `"input-output"`, `"verification"`, `"specification"`, `"semantic-contract"`, `"ontology"`, `"resource"`, `"other"` |
+| `ElementRole` | `"capability"`, `"requirement"`, `"contract"`, `"source"`, `"constraint"`, `"behavior"`, `"state"`, `"input-output"`, `"verification"`, `"specification"`, `"semantic-contract"`, `"ontology"`, `"concept"`, `"concept-scheme"`, `"concept-reference"`, `"resource"`, `"other"` |
 | `ElementType` | `ElementRole` minus `"other"` |
 | `PaletteChannel` | `"fill"` \| `"ink"` \| `"tint"` |
 | `DesignSystemColorToken` | Union of every valid color token string (`--capability`, `--text-body`, etc.) |

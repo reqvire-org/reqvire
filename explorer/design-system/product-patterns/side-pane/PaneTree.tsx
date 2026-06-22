@@ -5,7 +5,7 @@ import { treeClass, treeNodeClass } from "./classes";
 export type PaneTreeProps = Omit<HTMLAttributes<HTMLDivElement>, "style">;
 
 export function PaneTree({ className = "", ...props }: PaneTreeProps) {
-  return <div className={cx("ux-tree", treeClass, className)} {...props} />;
+  return <div role="tree" className={cx("ux-tree", treeClass, className)} {...props} />;
 }
 
 export type PaneTreeNodeProps = Omit<HTMLAttributes<HTMLDivElement>, "style">;

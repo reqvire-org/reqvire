@@ -111,6 +111,8 @@ reqvire:ChangePropagationRuleShape
       "ontology-to-semantic-contract-impact"
       "semantic-contract-to-requirement-impact"
       "semantic-contract-ontology-use-dependency"
+      "concept-reference-dependency"
+      "maps-to-concept-impact"
       "requirement-to-semantic-contract-review"
       "reused-contract-context-content-impact"
       "semantic-reference-reachability"
@@ -341,6 +343,34 @@ reqvire:NonReusedContractContextElementShape
     sh:maxCount 0 ;
   ] .
 
+reqvire:RelationPredicateLayerAssignmentShape
+  a sh:NodeShape ;
+  sh:targetSubjectsOf reqvire:relationPredicateLayer ;
+  sh:property [
+    sh:path reqvire:relationPredicateLayer ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:RelationPredicateLayer ;
+  ] .
+
+reqvire:AuthoredRelationPredicateNodeShape
+  a sh:NodeShape ;
+  sh:property [
+    sh:path reqvire:relationPredicateLayer ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:hasValue reqvire:authoredRelationLayer ;
+  ] .
+
+reqvire:NormalizedRelationPredicateNodeShape
+  a sh:NodeShape ;
+  sh:property [
+    sh:path reqvire:relationPredicateLayer ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:hasValue reqvire:normalizedRelationLayer ;
+  ] .
+
 reqvire:RelationRuleShape
   a sh:NodeShape ;
   sh:targetClass reqvire:RelationRule ;
@@ -373,6 +403,7 @@ reqvire:RelationRuleShape
     sh:path reqvire:inverseRelation ;
     sh:maxCount 1 ;
     sh:nodeKind sh:IRI ;
+    sh:node reqvire:AuthoredRelationPredicateNodeShape ;
   ] ;
   sh:property [
     sh:path reqvire:relationPattern ;
@@ -390,21 +421,25 @@ reqvire:RelationRuleShape
     sh:path reqvire:normalizedForwardProperty ;
     sh:maxCount 1 ;
     sh:nodeKind sh:IRI ;
+    sh:node reqvire:NormalizedRelationPredicateNodeShape ;
   ] ;
   sh:property [
     sh:path reqvire:normalizedInverseProperty ;
     sh:maxCount 1 ;
     sh:nodeKind sh:IRI ;
+    sh:node reqvire:NormalizedRelationPredicateNodeShape ;
   ] ;
   sh:property [
     sh:path reqvire:transitiveClosureForwardProperty ;
     sh:maxCount 1 ;
     sh:nodeKind sh:IRI ;
+    sh:node reqvire:NormalizedRelationPredicateNodeShape ;
   ] ;
   sh:property [
     sh:path reqvire:transitiveClosureInverseProperty ;
     sh:maxCount 1 ;
     sh:nodeKind sh:IRI ;
+    sh:node reqvire:NormalizedRelationPredicateNodeShape ;
   ] ;
   sh:property [
     sh:path reqvire:relationConstraint ;
@@ -472,7 +507,7 @@ reqvire:RelationUsageCategoryShape
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("diagram-rendering-forward" "reverse-traversal" "change-propagation" "verification-rollup") ;
+    sh:in ("forward-model-traversal" "reverse-traversal" "change-propagation" "verification-rollup") ;
   ] ;
   sh:property [
     sh:path reqvire:usageCategoryRelationName ;
@@ -542,11 +577,13 @@ reqvire:RelationFamilyShape
     sh:path reqvire:relationFamilyForwardProperty ;
     sh:maxCount 1 ;
     sh:nodeKind sh:IRI ;
+    sh:node reqvire:NormalizedRelationPredicateNodeShape ;
   ] ;
   sh:property [
     sh:path reqvire:relationFamilyInverseProperty ;
     sh:maxCount 1 ;
     sh:nodeKind sh:IRI ;
+    sh:node reqvire:NormalizedRelationPredicateNodeShape ;
   ] .
 ```
 
@@ -570,18 +607,23 @@ Change impact is based on auditable graph paths. Native relations, concept refer
 #### Ontology
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix concept: <https://www.reqvire.org/concepts#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:ChangeImpactAnalysis a owl:Class ;
   rdfs:label "Change impact analysis" ;
+  reqvire:mapsToConcept concept:ChangeImpact ;
   rdfs:comment "Analysis record for a changed element, impacted elements, propagation paths, and review status." .
 reqvire:ChangeImpactPath a owl:Class ;
   rdfs:label "Change impact path" ;
+  reqvire:mapsToConcept concept:ChangeImpact ;
   rdfs:comment "Auditable path that explains how impact propagates through model relations, reused_contract_context, or semantic dependencies." .
 reqvire:ChangeImpactEdge a owl:Class ;
   rdfs:label "Change impact edge" ;
+  reqvire:mapsToConcept concept:ChangeImpact ;
   rdfs:comment "Single propagation step in a change-impact path." .
 reqvire:SemanticDependency a owl:Class ;
   rdfs:label "Semantic dependency" ;
@@ -655,7 +697,7 @@ reqvire:dependencyResolution a owl:DatatypeProperty ;
 reqvire:changeRuleName a owl:DatatypeProperty ;
   rdfs:domain reqvire:ChangePropagationRule ;
   rdfs:range xsd:string ;
-  rdfs:comment "Canonical change-propagation rule token used by reports and semantic validation." .
+  rdfs:comment "Canonical change-propagation rule token used by impact analysis and semantic validation." .
 reqvire:changedThing a owl:DatatypeProperty ;
   rdfs:domain reqvire:ChangePropagationRule ;
   rdfs:range xsd:string ;
@@ -667,7 +709,7 @@ reqvire:propagationTarget a owl:DatatypeProperty ;
 reqvire:propagationMode a owl:DatatypeProperty ;
   rdfs:domain reqvire:ChangePropagationRule ;
   rdfs:range xsd:string ;
-  rdfs:comment "Review, validation, or reporting mode for a propagation rule." .
+  rdfs:comment "Review or validation mode for a propagation rule." .
 reqvire:changeKindName a owl:DatatypeProperty ;
   rdfs:domain reqvire:ChangeKind ;
   rdfs:range xsd:string ;
@@ -815,7 +857,17 @@ reqvire:conceptReferenceDependencyRule a reqvire:ChangePropagationRule ;
   reqvire:impactDirection "dependency" ;
   reqvire:propagationTarget "referenced-ontology-term" ;
   reqvire:propagationMode "dependency-record" ;
-  reqvire:impactReason "Non-ontology, non-semantic-contract elements record ontology term dependencies through explicit concept references." .
+  reqvire:impactReason "Non-ontology, non-semantic-contract elements record SKOS concept dependencies through explicit concept references." .
+
+reqvire:mappedByOntologyImpactRule a reqvire:ChangePropagationRule ;
+  rdfs:label "mappedByOntology impact" ;
+  reqvire:changeRuleName "maps-to-concept-impact" ;
+  reqvire:changedThing "native-concept-or-concept-scheme" ;
+  reqvire:impactRelation "mappedByOntology" ;
+  reqvire:impactDirection "downstream" ;
+  reqvire:propagationTarget "mapped-ontology-term-and-semantic-dependents" ;
+  reqvire:propagationMode "review-required" ;
+  reqvire:impactReason "Native concept or concept-scheme changes propagate forward to ontology terms that map to the changed concept through the authored reqvire:mapsToConcept predicate; change-impact reports this concept-to-ontology edge as mappedByOntology, then mapped ontology terms propagate through semantic-contract and requirement dependencies." .
 
 reqvire:requirementToSemanticContractReviewRule a reqvire:ChangePropagationRule ;
   rdfs:label "Requirement to semantic contract review" ;
@@ -845,7 +897,7 @@ reqvire:semanticReferenceReachabilityRule a reqvire:ChangePropagationRule ;
   reqvire:impactDirection "downstream" ;
   reqvire:propagationTarget "referencing-element-or-semantic-contract" ;
   reqvire:propagationMode "validation-error-when-unreachable" ;
-  reqvire:impactReason "Concept references must resolve to declared ontology terms, and semantic-contract SHACL references must resolve through explicit use relations." .
+  reqvire:impactReason "Concept references must resolve to generated native SKOS concepts, and semantic-contract SHACL references must resolve through explicit use relations." .
 
 reqvire:relocationNoPropagationRule a reqvire:ChangePropagationRule ;
   rdfs:label "Relocation without content change" ;
@@ -894,7 +946,7 @@ Relation endpoint compatibility is semantic:
 - Requirements specify capabilities through `specify`; capabilities point to specifying requirements through `specifiedBy`.
 - Requirements own non-semantic contract context through `definedBy`; ordinary contract elements point back to their owner through `define`.
 - Semantic contracts constrain requirements through `constrain` and `constrainedBy`, and use ontology vocabulary through `use` and `usedBy`.
-- Capabilities and requirements are verified by concrete verification elements through `verifiedBy` and `verify`; verification objectives organize verification hierarchy but are not concrete verification evidence.
+- Requirements are verified by concrete verification elements through `verifiedBy` and `verify`; capability verification coverage is computed from verified requirements that specify each capability. Verification objectives organize verification hierarchy but are not concrete verification evidence.
 - Requirements and evidence-backed verifications are satisfied by implementation or evidence artifacts through `satisfiedBy` and `satisfy`.
 - Reused Contract Context expresses a requirement dependency on compatible requirement-owned contract context from another subgraph without transferring ownership.
 - Explicit `other` elements cannot author semantic relations; model meaning should be expressed with a specific supported element type or ontology concept references.
@@ -902,18 +954,23 @@ Relation endpoint compatibility is semantic:
 #### Ontology
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix concept: <https://www.reqvire.org/concepts#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:RelationRule a owl:Class ;
   rdfs:label "Relation rule" ;
+  reqvire:mapsToConcept concept:RelationRule ;
   rdfs:comment "Controlled rule for an authored Reqvire relation name, allowed endpoint types, direction, ownership, and impact behavior." .
 reqvire:RelationConstraint a owl:Class ;
   rdfs:label "Relation constraint" ;
+  reqvire:mapsToConcept concept:RelationModel ;
   rdfs:comment "Constraint concept that further qualifies a relation rule." .
 reqvire:TraversalRule a owl:Class ;
   rdfs:label "Traversal rule" ;
+  reqvire:mapsToConcept concept:RelationModel ;
   rdfs:comment "Rule describing how a relation category may be traversed for model navigation." .
 reqvire:ReusedContractContextCompatibilityRule a owl:Class ;
   rdfs:subClassOf reqvire:RelationConstraint ;
@@ -921,18 +978,25 @@ reqvire:ReusedContractContextCompatibilityRule a owl:Class ;
   rdfs:comment "Constraint defining valid reused_contract_context source, target, and owner compatibility." .
 reqvire:RelationUsageCategory a owl:Class ;
   rdfs:label "Relation usage category" ;
-  rdfs:comment "Controlled category grouping relation names by operational usage such as rendering, traversal, change propagation, or rollup." .
+  rdfs:comment "Controlled category grouping relation names by operational usage such as model traversal, change propagation, or rollup." .
 reqvire:RelationSemanticCategory a owl:Class ;
   rdfs:label "Relation semantic category" ;
   rdfs:comment "Controlled category grouping relation names by their model semantics." .
 reqvire:RelationSemanticPattern a owl:Class ;
   rdfs:label "Relation semantic pattern" ;
+  reqvire:mapsToConcept concept:RelationSemanticPattern ;
   rdfs:comment "Controlled semantic pattern that describes whether a relation family is hierarchy, bridge, ownership, constraint, dependency, verification, satisfaction, or cross-subgraph contract dependency." .
 reqvire:RelationFamily a owl:Class ;
   rdfs:label "Relation family" ;
-  rdfs:comment "Controlled family that groups authored relation names and inverse pairs by stable model meaning for semantic search." .
+  reqvire:mapsToConcept concept:RelationFamily ;
+  rdfs:comment "Controlled family that groups authored relation names and inverse pairs by stable model meaning and exposes normalized query predicates for semantic traversal." .
+reqvire:RelationPredicateLayer a owl:Class ;
+  rdfs:label "Relation predicate layer" ;
+  reqvire:mapsToConcept concept:RelationPredicateLayer ;
+  rdfs:comment "Controlled layer classifying a relation predicate as source-authored vocabulary or normalized semantic query vocabulary." .
 reqvire:ModelRelation a owl:Class ;
   rdfs:label "Model relation" ;
+  reqvire:mapsToConcept concept:ModelRelation ;
   rdfs:comment "First-class projection record for one authored Reqvire relation edge, used by construct-query specifications to preserve source, target, and relation-token pairing." .
 reqvire:HierarchyRelationPattern a owl:Class ;
   rdfs:subClassOf reqvire:RelationSemanticPattern ;
@@ -957,7 +1021,7 @@ reqvire:DependencyRelationPattern a owl:Class ;
 reqvire:VerificationRelationPattern a owl:Class ;
   rdfs:subClassOf reqvire:RelationSemanticPattern ;
   rdfs:label "Verification relation pattern" ;
-  rdfs:comment "Relation pattern connecting capabilities or requirements to verification elements." .
+  rdfs:comment "Relation pattern connecting requirements to verification elements." .
 reqvire:SatisfactionRelationPattern a owl:Class ;
   rdfs:subClassOf reqvire:RelationSemanticPattern ;
   rdfs:label "Satisfaction relation pattern" ;
@@ -966,6 +1030,15 @@ reqvire:CrossSubgraphContractDependencyPattern a owl:Class ;
   rdfs:subClassOf reqvire:RelationSemanticPattern ;
   rdfs:label "Cross-subgraph contract dependency pattern" ;
   rdfs:comment "Relation pattern for a requirement using reusable requirement-owned contract context from another subgraph without transferring ownership." .
+
+reqvire:authoredRelationLayer a owl:NamedIndividual, reqvire:RelationPredicateLayer ;
+  rdfs:label "Authored relation layer" ;
+  reqvire:mapsToConcept concept:AuthoredRelationPredicate ;
+  rdfs:comment "Layer for relation predicates that preserve authored Markdown relation names and source-model fidelity." .
+reqvire:normalizedRelationLayer a owl:NamedIndividual, reqvire:RelationPredicateLayer ;
+  rdfs:label "Normalized relation layer" ;
+  reqvire:mapsToConcept concept:NormalizedRelationPredicate ;
+  rdfs:comment "Layer for generated relation-family predicates used by semantic traversal, graph projection, reports, rollups, and query APIs." .
 
 reqvire:hierarchyRelationPattern a owl:NamedIndividual, reqvire:RelationSemanticPattern, reqvire:HierarchyRelationPattern ;
   reqvire:semanticPatternName "hierarchy" ;
@@ -1007,9 +1080,9 @@ reqvire:capabilitySpecificationRelationFamily a owl:NamedIndividual, reqvire:Rel
 reqvire:contractOwnershipRelationFamily a owl:NamedIndividual, reqvire:RelationFamily ;
   rdfs:label "Contract ownership relation family" ;
   reqvire:relationFamilyName "contract-ownership" ;
-  reqvire:relationFamilyMeaning "Ownership from a requirement to local non-semantic contract context that defines it." ;
-  reqvire:relationFamilyForwardProperty reqvire:requirementDefinesContract ;
-  reqvire:relationFamilyInverseProperty reqvire:contractDefinedByRequirement .
+  reqvire:relationFamilyMeaning "Definition relationship between a requirement and the local non-semantic contract context that defines it." ;
+  reqvire:relationFamilyForwardProperty reqvire:requirementDefinedByContract ;
+  reqvire:relationFamilyInverseProperty reqvire:contractDefinesRequirement .
 reqvire:semanticContractConstraintRelationFamily a owl:NamedIndividual, reqvire:RelationFamily ;
   rdfs:label "Semantic contract constraint relation family" ;
   reqvire:relationFamilyName "semantic-contract-constraint" ;
@@ -1025,9 +1098,9 @@ reqvire:semanticContractOntologyUseRelationFamily a owl:NamedIndividual, reqvire
 reqvire:verificationRelationFamily a owl:NamedIndividual, reqvire:RelationFamily ;
   rdfs:label "Verification relation family" ;
   reqvire:relationFamilyName "verification" ;
-  reqvire:relationFamilyMeaning "Verification relationship between capabilities or requirements and concrete verification elements." ;
-  reqvire:relationFamilyForwardProperty reqvire:elementVerifiedByVerification ;
-  reqvire:relationFamilyInverseProperty reqvire:verificationVerifiesElement .
+  reqvire:relationFamilyMeaning "Verification relationship between requirements and concrete verification elements." ;
+  reqvire:relationFamilyForwardProperty reqvire:requirementVerifiedByVerification ;
+  reqvire:relationFamilyInverseProperty reqvire:verificationVerifiesRequirement .
 reqvire:satisfactionRelationFamily a owl:NamedIndividual, reqvire:RelationFamily ;
   rdfs:label "Satisfaction relation family" ;
   reqvire:relationFamilyName "satisfaction" ;
@@ -1191,22 +1264,22 @@ reqvire:define a owl:ObjectProperty ;
   rdfs:domain reqvire:Contract ;
   rdfs:range reqvire:Requirement ;
   owl:inverseOf reqvire:definedBy ;
-  rdfs:comment "Inverse ownership relation from a contract to its requirement owner." .
+  rdfs:comment "Inverse definition relation from a contract to the requirement it defines." .
 reqvire:definedBy a owl:ObjectProperty ;
   rdfs:domain reqvire:Requirement ;
   rdfs:range reqvire:Contract ;
   owl:inverseOf reqvire:define ;
-  rdfs:comment "Forward ownership relation from a requirement to an owned contract." .
-reqvire:requirementDefinesContract a owl:ObjectProperty ;
+  rdfs:comment "Forward definition relation from a requirement to a contract that defines it." .
+reqvire:requirementDefinedByContract a owl:ObjectProperty ;
   rdfs:domain reqvire:Requirement ;
   rdfs:range reqvire:Contract ;
-  owl:inverseOf reqvire:contractDefinedByRequirement ;
-  rdfs:comment "Normalized direct ownership relation from a requirement to its owned contract context." .
-reqvire:contractDefinedByRequirement a owl:ObjectProperty ;
+  owl:inverseOf reqvire:contractDefinesRequirement ;
+  rdfs:comment "Normalized direct definition relation from a requirement to a contract that defines it." .
+reqvire:contractDefinesRequirement a owl:ObjectProperty ;
   rdfs:domain reqvire:Contract ;
   rdfs:range reqvire:Requirement ;
-  owl:inverseOf reqvire:requirementDefinesContract ;
-  rdfs:comment "Normalized direct ownership relation from a contract to its requirement owner." .
+  owl:inverseOf reqvire:requirementDefinedByContract ;
+  rdfs:comment "Normalized direct definition relation from a contract to the requirement it defines." .
 reqvire:constrain a owl:ObjectProperty ;
   rdfs:domain reqvire:SemanticContract ;
   rdfs:range reqvire:Requirement ;
@@ -1249,24 +1322,24 @@ reqvire:ontologyUsedBySemanticContract a owl:ObjectProperty ;
   rdfs:comment "Normalized direct dependency from ontology vocabulary to semantic contracts that use it." .
 reqvire:verify a owl:ObjectProperty ;
   rdfs:domain reqvire:Verification ;
-  rdfs:range [ a owl:Class ; owl:unionOf (reqvire:Capability reqvire:Requirement) ] ;
+  rdfs:range reqvire:Requirement ;
   owl:inverseOf reqvire:verifiedBy ;
-  rdfs:comment "Inverse relation from a verification element to the capability or requirement it verifies." .
+  rdfs:comment "Inverse relation from a verification element to the requirement it verifies." .
 reqvire:verifiedBy a owl:ObjectProperty ;
-  rdfs:domain [ a owl:Class ; owl:unionOf (reqvire:Capability reqvire:Requirement) ] ;
+  rdfs:domain reqvire:Requirement ;
   rdfs:range reqvire:Verification ;
   owl:inverseOf reqvire:verify ;
-  rdfs:comment "Forward relation from a capability or requirement to a verification element that verifies it." .
-reqvire:elementVerifiedByVerification a owl:ObjectProperty ;
-  rdfs:domain [ a owl:Class ; owl:unionOf (reqvire:Capability reqvire:Requirement) ] ;
+  rdfs:comment "Forward relation from a requirement to a verification element that verifies it." .
+reqvire:requirementVerifiedByVerification a owl:ObjectProperty ;
+  rdfs:domain reqvire:Requirement ;
   rdfs:range reqvire:Verification ;
-  owl:inverseOf reqvire:verificationVerifiesElement ;
-  rdfs:comment "Normalized direct verification relation from a capability or requirement to a verification element." .
-reqvire:verificationVerifiesElement a owl:ObjectProperty ;
+  owl:inverseOf reqvire:verificationVerifiesRequirement ;
+  rdfs:comment "Normalized direct verification relation from a requirement to a verification element." .
+reqvire:verificationVerifiesRequirement a owl:ObjectProperty ;
   rdfs:domain reqvire:Verification ;
-  rdfs:range [ a owl:Class ; owl:unionOf (reqvire:Capability reqvire:Requirement) ] ;
-  owl:inverseOf reqvire:elementVerifiedByVerification ;
-  rdfs:comment "Normalized direct verification relation from a verification element to the capability or requirement it verifies." .
+  rdfs:range reqvire:Requirement ;
+  owl:inverseOf reqvire:requirementVerifiedByVerification ;
+  rdfs:comment "Normalized direct verification relation from a verification element to the requirement it verifies." .
 reqvire:satisfy a owl:ObjectProperty ;
   rdfs:domain reqvire:Artifact ;
   rdfs:range reqvire:Element ;
@@ -1313,6 +1386,59 @@ reqvire:implementedByArtifact a owl:ObjectProperty ;
   owl:propertyChainAxiom (reqvire:specifiedBy reqvire:satisfiedBy) ;
   rdfs:comment "Inferred capability-to-artifact trace when a capability is specified by a requirement satisfied by an artifact." .
 
+reqvire:derive reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:derivedFrom reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:specify reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:specifiedBy reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:define reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:definedBy reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:constrain reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:constrainedBy reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:use reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:usedBy reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:verify reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:verifiedBy reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:satisfy reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:satisfiedBy reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:reuse reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:reusesContract reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+
+reqvire:parentElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:childElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:ancestorElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:descendantElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:parentCapability reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:childCapability reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:ancestorCapability reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:descendantCapability reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:parentRequirement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:childRequirement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:ancestorRequirement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:descendantRequirement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:parentOntology reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:childOntology reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:ancestorOntology reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:descendantOntology reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:parentVerificationElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:childVerificationElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:ancestorVerificationElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:descendantVerificationElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:capabilitySpecifiedByRequirement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:requirementSpecifiesCapability reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:requirementDefinedByContract reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:contractDefinesRequirement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:requirementConstrainedBySemanticContract reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:semanticContractConstrainsRequirement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:semanticContractUsesOntology reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:ontologyUsedBySemanticContract reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:requirementVerifiedByVerification reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:verificationVerifiesRequirement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:elementSatisfiedByArtifact reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:artifactSatisfiesElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:requirementUsesCrossSubgraphContract reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:crossSubgraphContractUsedByRequirement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:implementedByArtifact reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+
 reqvire:inverseRelation a owl:ObjectProperty ;
   rdfs:domain reqvire:RelationRule ;
   rdfs:range owl:ObjectProperty ;
@@ -1329,22 +1455,26 @@ reqvire:relationSource a owl:ObjectProperty ;
   rdfs:domain reqvire:ModelRelation ;
   rdfs:range reqvire:Element ;
   rdfs:comment "Source element for one authored model relation edge." .
+reqvire:relationPredicateLayer a owl:AnnotationProperty ;
+  rdfs:domain rdf:Property ;
+  rdfs:range reqvire:RelationPredicateLayer ;
+  rdfs:comment "Classifies a relation predicate as an authored source predicate or a normalized semantic query predicate." .
 reqvire:normalizedForwardProperty a owl:ObjectProperty ;
   rdfs:domain reqvire:RelationRule ;
   rdfs:range owl:ObjectProperty ;
-  rdfs:comment "Canonical forward normalized property materialized for query-oriented model graph search." .
+  rdfs:comment "Canonical forward normalized property materialized for query-oriented model graph search. Consumers should use normalized predicates for semantic traversal instead of combining them with authored source predicates." .
 reqvire:normalizedInverseProperty a owl:ObjectProperty ;
   rdfs:domain reqvire:RelationRule ;
   rdfs:range owl:ObjectProperty ;
-  rdfs:comment "Canonical inverse normalized property materialized for query-oriented model graph search." .
+  rdfs:comment "Canonical inverse normalized property materialized for query-oriented model graph search. Consumers should use normalized predicates for semantic traversal instead of combining them with authored source predicates." .
 reqvire:transitiveClosureForwardProperty a owl:ObjectProperty ;
   rdfs:domain reqvire:RelationRule ;
   rdfs:range owl:ObjectProperty ;
-  rdfs:comment "Canonical forward transitive closure property materialized only for relation patterns with closure semantics." .
+  rdfs:comment "Canonical forward transitive closure property materialized only for relation patterns with closure semantics. Consumers should use normalized closure predicates without adding authored source predicates to the same property path." .
 reqvire:transitiveClosureInverseProperty a owl:ObjectProperty ;
   rdfs:domain reqvire:RelationRule ;
   rdfs:range owl:ObjectProperty ;
-  rdfs:comment "Canonical inverse transitive closure property materialized only for relation patterns with closure semantics." .
+  rdfs:comment "Canonical inverse transitive closure property materialized only for relation patterns with closure semantics. Consumers should use normalized closure predicates without adding authored source predicates to the same property path." .
 reqvire:relationConstraint a owl:ObjectProperty ;
   rdfs:domain reqvire:RelationRule ;
   rdfs:range reqvire:RelationConstraint ;
@@ -1352,7 +1482,7 @@ reqvire:relationConstraint a owl:ObjectProperty ;
 reqvire:relationName a owl:DatatypeProperty ;
   rdfs:domain reqvire:RelationRule ;
   rdfs:range xsd:string ;
-  rdfs:comment "Canonical authored relation name token used in Markdown metadata, CLI output, reports, validation, and queries." .
+  rdfs:comment "Canonical authored relation name token used in Markdown metadata, validation, and model queries." .
 reqvire:semanticPatternName a owl:DatatypeProperty ;
   rdfs:domain reqvire:RelationSemanticPattern ;
   rdfs:range xsd:string ;
@@ -1368,7 +1498,7 @@ reqvire:allowedTargetType a owl:DatatypeProperty ;
 reqvire:relationDirection a owl:DatatypeProperty ;
   rdfs:domain reqvire:RelationRule ;
   rdfs:range xsd:string ;
-  rdfs:comment "Canonical direction token for authored relation presentation and traversal." .
+  rdfs:comment "Canonical direction token for authored relation traversal." .
 reqvire:traversalDirection a owl:DatatypeProperty ;
   rdfs:domain reqvire:TraversalRule ;
   rdfs:range xsd:string ;
@@ -1436,17 +1566,17 @@ reqvire:relationFamilyMeaning a owl:DatatypeProperty ;
 reqvire:relationFamilyForwardProperty a owl:ObjectProperty ;
   rdfs:domain reqvire:RelationFamily ;
   rdfs:range owl:ObjectProperty ;
-  rdfs:comment "Normalized forward query property for a relation family." .
+  rdfs:comment "Normalized forward query property for a relation family. This is the preferred predicate for semantic traversal and reporting." .
 reqvire:relationFamilyInverseProperty a owl:ObjectProperty ;
   rdfs:domain reqvire:RelationFamily ;
   rdfs:range owl:ObjectProperty ;
-  rdfs:comment "Normalized inverse query property for a relation family." .
+  rdfs:comment "Normalized inverse query property for a relation family. This is the preferred predicate for semantic traversal and reporting." .
 
-reqvire:diagramRenderingRelationUsageCategory a reqvire:RelationUsageCategory ;
-  rdfs:label "Diagram rendering forward relations" ;
-  rdfs:comment "Forward relation names rendered in diagrams and root-to-leaf model views to avoid duplicate inverse arrows." ;
-  reqvire:usageCategoryName "diagram-rendering-forward" ;
-  reqvire:usageCategoryMeaning "Forward relation names rendered in diagrams and root-to-leaf model views to avoid duplicate inverse arrows." ;
+reqvire:forwardModelTraversalRelationUsageCategory a reqvire:RelationUsageCategory ;
+  rdfs:label "Forward model traversal relations" ;
+  rdfs:comment "Forward relation names used for root-to-leaf model traversal and canonical downstream graph walks." ;
+  reqvire:usageCategoryName "forward-model-traversal" ;
+  reqvire:usageCategoryMeaning "Forward relation names used for root-to-leaf model traversal and canonical downstream graph walks." ;
   reqvire:usageCategoryRelationName "derive", "specifiedBy", "satisfiedBy", "definedBy", "constrainedBy", "use", "verifiedBy" .
 reqvire:reverseTraversalRelationUsageCategory a reqvire:RelationUsageCategory ;
   rdfs:label "Reverse traversal relations" ;
@@ -1505,9 +1635,9 @@ reqvire:semanticContractOntologyUseRelationCategory a reqvire:RelationSemanticCa
   reqvire:semanticCategoryRelationName "use", "usedBy" .
 reqvire:verificationRelationCategory a reqvire:RelationSemanticCategory ;
   rdfs:label "Verification relations" ;
-  rdfs:comment "Links between capabilities or requirements and verification elements that verify them." ;
+  rdfs:comment "Links between requirements and verification elements that verify them." ;
   reqvire:semanticCategoryName "verification" ;
-  reqvire:semanticCategoryMeaning "Links between capabilities or requirements and verification elements that verify them." ;
+  reqvire:semanticCategoryMeaning "Links between requirements and verification elements that verify them." ;
   reqvire:semanticCategoryRelationName "verify", "verifiedBy" .
 reqvire:crossSubgraphContractDependencyRelationCategory a reqvire:RelationSemanticCategory ;
   rdfs:label "Cross-subgraph contract dependency relation" ;
@@ -1586,14 +1716,14 @@ reqvire:definedByRelationRule a reqvire:RelationRule ;
   reqvire:inverseRelation reqvire:define ;
   reqvire:relationPattern reqvire:ownershipRelationPattern ;
   reqvire:relationFamily reqvire:contractOwnershipRelationFamily ;
-  reqvire:normalizedForwardProperty reqvire:requirementDefinesContract ;
-  reqvire:normalizedInverseProperty reqvire:contractDefinedByRequirement ;
+  reqvire:normalizedForwardProperty reqvire:requirementDefinedByContract ;
+  reqvire:normalizedInverseProperty reqvire:contractDefinesRequirement ;
   reqvire:allowedSourceType "requirement" ;
   reqvire:allowedTargetType "subtype-compatible-non-semantic-contract" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Requirement owns a subtype-compatible non-semantic contract element." .
+  reqvire:relationRuleDescription "Requirement points to a subtype-compatible non-semantic contract element that defines it." .
 
 reqvire:defineRelationRule a reqvire:RelationRule ;
   rdfs:label "define" ;
@@ -1601,14 +1731,14 @@ reqvire:defineRelationRule a reqvire:RelationRule ;
   reqvire:inverseRelation reqvire:definedBy ;
   reqvire:relationPattern reqvire:ownershipRelationPattern ;
   reqvire:relationFamily reqvire:contractOwnershipRelationFamily ;
-  reqvire:normalizedForwardProperty reqvire:requirementDefinesContract ;
-  reqvire:normalizedInverseProperty reqvire:contractDefinedByRequirement ;
+  reqvire:normalizedForwardProperty reqvire:requirementDefinedByContract ;
+  reqvire:normalizedInverseProperty reqvire:contractDefinesRequirement ;
   reqvire:allowedSourceType "non-semantic-contract" ;
   reqvire:allowedTargetType "requirement-owner" ;
   reqvire:relationDirection "inverse" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact false ;
-  reqvire:relationRuleDescription "Non-semantic-contract element points to its single valid owner." .
+  reqvire:relationRuleDescription "Non-semantic-contract element points to the requirement it defines." .
 
 reqvire:constrainedByRelationRule a reqvire:RelationRule ;
   rdfs:label "constrainedBy" ;
@@ -1676,14 +1806,14 @@ reqvire:verifiedByRelationRule a reqvire:RelationRule ;
   reqvire:inverseRelation reqvire:verify ;
   reqvire:relationPattern reqvire:verificationRelationPattern ;
   reqvire:relationFamily reqvire:verificationRelationFamily ;
-  reqvire:normalizedForwardProperty reqvire:elementVerifiedByVerification ;
-  reqvire:normalizedInverseProperty reqvire:verificationVerifiesElement ;
-  reqvire:allowedSourceType "capability", "requirement" ;
+  reqvire:normalizedForwardProperty reqvire:requirementVerifiedByVerification ;
+  reqvire:normalizedInverseProperty reqvire:verificationVerifiesRequirement ;
+  reqvire:allowedSourceType "requirement" ;
   reqvire:allowedTargetType "concrete-verification" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Capability or requirement points to concrete verification evidence that verifies it. Verification objectives are excluded." .
+  reqvire:relationRuleDescription "Requirement points to concrete verification evidence that verifies it. Capabilities are verified through requirement coverage rollup; verification objectives are excluded." .
 
 reqvire:verifyRelationRule a reqvire:RelationRule ;
   rdfs:label "verify" ;
@@ -1691,14 +1821,14 @@ reqvire:verifyRelationRule a reqvire:RelationRule ;
   reqvire:inverseRelation reqvire:verifiedBy ;
   reqvire:relationPattern reqvire:verificationRelationPattern ;
   reqvire:relationFamily reqvire:verificationRelationFamily ;
-  reqvire:normalizedForwardProperty reqvire:elementVerifiedByVerification ;
-  reqvire:normalizedInverseProperty reqvire:verificationVerifiesElement ;
+  reqvire:normalizedForwardProperty reqvire:requirementVerifiedByVerification ;
+  reqvire:normalizedInverseProperty reqvire:verificationVerifiesRequirement ;
   reqvire:allowedSourceType "concrete-verification" ;
-  reqvire:allowedTargetType "capability", "requirement" ;
+  reqvire:allowedTargetType "requirement" ;
   reqvire:relationDirection "inverse" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact false ;
-  reqvire:relationRuleDescription "Concrete verification element points to the capability or requirement it verifies. Verification objectives are excluded." .
+  reqvire:relationRuleDescription "Concrete verification element points to the requirement it verifies. Capabilities are verified through requirement coverage rollup; verification objectives are excluded." .
 
 reqvire:satisfiedByRelationRule a reqvire:RelationRule ;
   rdfs:label "satisfiedBy" ;
@@ -1764,4 +1894,3 @@ reqvire:ownedContractReusedContractContextRule a reqvire:ReusedContractContextCo
 #### Relations
   * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
 ---
-

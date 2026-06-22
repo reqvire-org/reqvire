@@ -5,10 +5,11 @@ import {
   Icon,
   PaneActionRow,
   PaneChromeHeader,
+  PaneControlSection,
   PaneFilterGroup,
+  PaneFilterGrid,
   PaneFilterNavList,
   PaneFilterNavRow,
-  PaneFilterSection,
   PaneGhostLink,
   PaneLegend,
   PaneNotationLegend,
@@ -19,6 +20,7 @@ import {
   PaneTreeNode,
   ReqvireRailMark,
   SidePaneFrame,
+  TokenSwatch,
   ToggleRow,
   TreeItem,
   type DesignSystemColorToken,
@@ -32,7 +34,7 @@ import type {
   ProjectStoreElement,
   ProjectStoreFile,
 } from "../store/types";
-import { ONTOLOGY_LAYER_FILTERS, useExplorerUiState } from "../state/ExplorerUiState";
+import { ONTOLOGY_LAYER_FILTERS, useExplorerUiState, type CoverageSectionId } from "../state/ExplorerUiState";
 import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
 import { buildTraceFiles, type TraceFileNode } from "../lib/traces";
 
@@ -74,14 +76,6 @@ interface TracePaneFolder {
   files: TracePaneFile[];
 }
 
-type CoverageSectionId =
-  | "overview"
-  | "capability-coverage"
-  | "unverified-requirements"
-  | "unimplemented-requirements"
-  | "unsatisfied-verifications"
-  | "orphaned-verifications";
-
 export function ExplorerSidePane({
   activeView,
   open,
@@ -95,7 +89,16 @@ export function ExplorerSidePane({
   const ui = useExplorerUiState();
   const projectRootLabel = projectTreeRootLabel(store);
   const tree = useMemo(() => buildFileTree(store.files, projectRootLabel), [projectRootLabel, store.files]);
-  const traceTree = useMemo(() => buildTraceFileTree(buildTraceFiles(store), projectRootLabel), [projectRootLabel, store]);
+  const filteredTree = useMemo(
+    () => filterFileTree(tree, ui.modelTreeQuery, elementById),
+    [elementById, tree, ui.modelTreeQuery],
+  );
+  const traceFiles = useMemo(() => buildTraceFiles(store), [store]);
+  const traceTree = useMemo(() => buildTraceFileTree(traceFiles, projectRootLabel), [projectRootLabel, traceFiles]);
+  const filteredTraceTree = useMemo(
+    () => filterTraceFileTree(traceTree, ui.traceTreeQuery),
+    [traceTree, ui.traceTreeQuery],
+  );
   const graphModelActive = activeView === "model" && ui.modelMode === "graph";
   const showProjectTree = (activeView === "model" || activeView === "files") && !graphModelActive;
   const title = graphModelActive ? "Graph Explorer" : `${VIEW_TITLES[activeView]} Explorer`;
@@ -110,30 +113,77 @@ export function ExplorerSidePane({
       aria-label="Explorer navigation"
     >
       {activeView === "ontologies" && <OntologyGraphSearch />}
+      {activeView === "thesaurus" && <ThesaurusSearch />}
+      {showProjectTree && <ProjectTreeSearch />}
+      {activeView === "traces" && <TraceTreeSearch />}
       <ExplorerViewControls
         activeView={activeView}
         onOpenElement={onOpenElement}
         onOpenOntologyNode={onOpenOntologyNode}
       />
       {activeView === "traces" && (
-        <PaneTree aria-label="Verification trace tree">
-          <TraceTreeFolderNode folder={traceTree} depth={0} />
+        <PaneTree aria-label="Verification trace tree" id="trace-tree">
+          <TraceTreeFolderNode folder={filteredTraceTree} depth={0} query={ui.traceTreeQuery} />
         </PaneTree>
       )}
+      {activeView === "traces" ? <TraceTreeSummary files={traceFiles} /> : null}
       {showProjectTree && (
         <PaneTree aria-label="Project tree">
           <TreeFolderNode
-            folder={tree}
+            folder={filteredTree}
             activeView={activeView}
             elementById={elementById}
             onNavigate={onNavigate}
             onOpenElement={onOpenElement}
             depth={0}
+            query={ui.modelTreeQuery}
           />
         </PaneTree>
       )}
+      {showProjectTree && activeView === "model" ? <ModelTreeSummary /> : null}
     </SidePaneFrame>
   );
+}
+
+function ModelTreeSummary() {
+  const { store } = useStore();
+  const summary = store.knowledge_graph.summary;
+  const items = [
+    { label: "Elements", value: formatSummaryValue(summary?.elements ?? store.elements.length) },
+    { label: "Relations", value: formatSummaryValue(summary?.relations ?? store.relations.length) },
+    { label: "Files", value: formatSummaryValue(store.files.length) },
+    { label: "Resources", value: formatSummaryValue(store.resources.length) },
+  ];
+
+  return <PaneSummary items={items} placement="footer" />;
+}
+
+function TraceTreeSummary({ files }: { files: TraceFileNode[] }) {
+  const totals = files.reduce(
+    (current, file) => {
+      current.files += 1;
+      current.verifications += file.verifications.length;
+      for (const verification of file.verifications) {
+        current.directRequirements += verification.directCount;
+        current.rollupRequirements += verification.totalCount;
+      }
+      return current;
+    },
+    {
+      files: 0,
+      verifications: 0,
+      directRequirements: 0,
+      rollupRequirements: 0,
+    },
+  );
+  const items = [
+    { label: "Files", value: formatSummaryValue(totals.files) },
+    { label: "Verifications", value: formatSummaryValue(totals.verifications) },
+    { label: "Direct reqs", value: formatSummaryValue(totals.directRequirements) },
+    { label: "Rollup reqs", value: formatSummaryValue(totals.rollupRequirements) },
+  ];
+
+  return <PaneSummary items={items} placement="footer" />;
 }
 
 function OntologyGraphSearch() {
@@ -157,6 +207,54 @@ function OntologyGraphSearch() {
       resultsId="ontology-graph-results"
       onQueryChange={setQuery}
       onSubmit={submitSearch}
+    />
+  );
+}
+
+function ThesaurusSearch() {
+  const ui = useExplorerUiState();
+
+  return (
+    <PaneSearchForm
+      searchInputId="thesaurus-search"
+      inputLabel="Filter concepts"
+      placeholder="Filter concepts..."
+      value={ui.thesaurusQuery}
+      resultsId="thesaurus-tree"
+      onQueryChange={ui.setThesaurusQuery}
+      onSubmit={(event) => event.preventDefault()}
+    />
+  );
+}
+
+function ProjectTreeSearch() {
+  const ui = useExplorerUiState();
+
+  return (
+    <PaneSearchForm
+      searchInputId="project-tree-search"
+      inputLabel="Filter project tree"
+      placeholder="Filter model tree..."
+      value={ui.modelTreeQuery}
+      resultsId="project-tree"
+      onQueryChange={ui.setModelTreeQuery}
+      onSubmit={(event) => event.preventDefault()}
+    />
+  );
+}
+
+function TraceTreeSearch() {
+  const ui = useExplorerUiState();
+
+  return (
+    <PaneSearchForm
+      searchInputId="trace-tree-search"
+      inputLabel="Filter trace tree"
+      placeholder="Filter trace tree..."
+      value={ui.traceTreeQuery}
+      resultsId="trace-tree"
+      onQueryChange={ui.setTraceTreeQuery}
+      onSubmit={(event) => event.preventDefault()}
     />
   );
 }
@@ -192,83 +290,125 @@ function ExplorerViewControls({
   }
 
   if (graphControlsActive) {
+    const graphSummaryItems = [
+      {
+        label: "Submodels",
+        value: formatSummaryValue(
+          store.knowledge_graph.summary?.submodels ?? store.knowledge_graph.submodels?.length ?? 0,
+        ),
+      },
+      {
+        label: "Elements",
+        value: formatSummaryValue(store.knowledge_graph.summary?.elements ?? store.elements.length),
+      },
+      {
+        label: "Relations",
+        value: formatSummaryValue(store.knowledge_graph.summary?.relations ?? store.relations.length),
+      },
+      {
+        label: "Reused Context",
+        value: formatSummaryValue(store.knowledge_graph.summary?.reused_contract_context ?? store.reused_contract_context.length),
+      },
+    ];
+
     return (
-      <PaneFilterSection aria-label="Graph controls">
-        <PaneSummary
-          items={[
-            {
-              label: "Submodels",
-              value: formatSummaryValue(
-                store.knowledge_graph.summary?.submodels ?? store.knowledge_graph.submodels?.length ?? 0,
-              ),
-            },
-            {
-              label: "Elements",
-              value: formatSummaryValue(store.knowledge_graph.summary?.elements ?? store.elements.length),
-            },
-            {
-              label: "Relations",
-              value: formatSummaryValue(store.knowledge_graph.summary?.relations ?? store.relations.length),
-            },
-            {
-              label: "Reused Context",
-              value: formatSummaryValue(store.knowledge_graph.summary?.reused_contract_context ?? store.reused_contract_context.length),
-            },
-          ]}
-        />
-        <KnowledgeGraphSelectedElementLink
-          selectedNodeId={ui.knowledgeGraphSelectionId}
-          nodes={store.knowledge_graph.nodes ?? []}
-          elementById={elementById}
-          onOpenElement={onOpenElement}
-          onClear={() => ui.setKnowledgeGraphSelectionId(null)}
-        />
-        <PaneFilterGroup label="Show">
-          <Button size="sm" onClick={ui.resetModelTypes}>
-            Reset filters
-          </Button>
-          {graphTypeOptions.map((option) => (
-            <ToggleRow
-              key={option.type}
-              label={humanize(option.type)}
-              on={ui.modelTypes.has(option.type)}
-              variant="filter"
-              icon={<ElementIcon type={option.type} family={option.family} size="sm" />}
-              meta={formatCompactCount(option.count)}
-              onToggle={() => ui.toggleModelType(option.type)}
-            />
-          ))}
-        </PaneFilterGroup>
-      </PaneFilterSection>
+      <>
+        <PaneControlSection aria-label="Graph controls">
+          <KnowledgeGraphSelectedElementLink
+            selectedNodeId={ui.knowledgeGraphSelectionId}
+            nodes={store.knowledge_graph.nodes ?? []}
+            elementById={elementById}
+            onOpenElement={onOpenElement}
+            onClear={() => ui.setKnowledgeGraphSelectionId(null)}
+          />
+          <PaneFilterGroup label="Show">
+            <Button size="sm" onClick={ui.resetModelTypes}>
+              Reset filters
+            </Button>
+            {graphTypeOptions.map((option) => (
+              <ToggleRow
+                key={option.type}
+                label={humanize(option.type)}
+                on={ui.modelTypes.has(option.type)}
+                variant="filter"
+                icon={<ElementIcon type={option.type} family={option.family} size="sm" />}
+                meta={formatCompactCount(option.count)}
+                onToggle={() => ui.toggleModelType(option.type)}
+              />
+            ))}
+          </PaneFilterGroup>
+        </PaneControlSection>
+        <PaneSummary items={graphSummaryItems} placement="footer" />
+      </>
     );
   }
 
   if (activeView === "traces") return null;
 
+  if (activeView === "thesaurus") {
+    const thesaurusTree = buildThesaurusPaneTree(store);
+    const filteredTree = filterThesaurusPaneTree(thesaurusTree, ui.thesaurusQuery);
+    const conceptCount = thesaurusTree.reduce((total, scheme) => total + scheme.concepts.length, 0);
+    const summaryItems = [
+      { label: "Schemes", value: formatSummaryValue(thesaurusTree.length) },
+      { label: "Concepts", value: formatSummaryValue(conceptCount) },
+    ];
+    return (
+      <>
+        <PaneTree aria-label="Concept hierarchy" id="thesaurus-tree">
+          {filteredTree.map((scheme) => (
+            <ThesaurusSchemeTreeNode
+              key={scheme.id}
+              scheme={scheme}
+              selectedId={ui.thesaurusSelectionId}
+              query={ui.thesaurusQuery}
+              onSelectConcept={ui.setThesaurusSelectionId}
+            />
+          ))}
+        </PaneTree>
+        <PaneSummary items={summaryItems} placement="footer" />
+      </>
+    );
+  }
+
   if (activeView === "coverage") {
     const coverageItems = buildCoveragePaneItems(store);
+    const coverage = isPlainRecord(store.coverage) ? store.coverage : {};
+    const summary = isPlainRecord(coverage.summary) ? coverage.summary : {};
+    const coverageSummaryItems = [
+      { label: "Requirements", value: formatSummaryValue(readNumber(summary.total_requirements_in_scope)) },
+      { label: "Leaf reqs", value: formatSummaryValue(readNumber(summary.total_leaf_requirements)) },
+      { label: "Verifications", value: formatSummaryValue(readNumber(summary.total_verifications)) },
+    ];
     return (
-      <PaneFilterSection aria-label="Coverage explorer">
-        <PaneFilterGroup label="Coverage">
-          <PaneFilterNavList>
-            {coverageItems.map((item) => (
-              <PaneFilterNavRow
-                key={item.id}
-                icon={item.icon}
-                label={item.label}
-                count={formatCompactCount(item.count)}
-                onClick={() => navigateCoverageSection(item.id)}
-              />
-            ))}
-          </PaneFilterNavList>
-        </PaneFilterGroup>
-      </PaneFilterSection>
+      <>
+        <PaneControlSection aria-label="Coverage explorer">
+          <PaneFilterGroup label="Coverage">
+            <PaneFilterNavList>
+              {coverageItems.map((item) => (
+                <PaneFilterNavRow
+                  key={item.id}
+                  icon={item.icon}
+                  label={item.label}
+                  count={formatCompactCount(item.count)}
+                  selected={ui.coverageSectionId === item.id}
+                  onClick={() => {
+                    ui.setCoverageSectionId(item.id);
+                    navigateCoverageSection(item.id);
+                  }}
+                />
+              ))}
+            </PaneFilterNavList>
+          </PaneFilterGroup>
+        </PaneControlSection>
+        <PaneSummary items={coverageSummaryItems} placement="footer" />
+      </>
     );
   }
 
   if (activeView === "search") {
     return (
-      <PaneFilterSection aria-label="Search controls" title="Filter by">
+      <PaneControlSection aria-label="Search controls" title="Filter by">
         <Button size="sm" onClick={ui.resetSearchKinds}>
           Reset filters
         </Button>
@@ -300,7 +440,7 @@ function ExplorerViewControls({
             ))}
           </PaneFilterGroup>
         ) : null}
-      </PaneFilterSection>
+      </PaneControlSection>
     );
   }
 
@@ -349,89 +489,99 @@ function ExplorerViewControls({
       ontologyLayerCounts.set(node.layer, (ontologyLayerCounts.get(node.layer) ?? 0) + 1);
     }
     return (
-      <PaneFilterSection aria-label="Ontology controls">
-        <PaneSummary items={ontologySummaryItems} />
-        <OntologySelectedNodeLink
-          selectedNodeId={ui.ontologySelectionId}
-          nodes={store.ontology.graph_data?.nodes ?? []}
-          onOpenOntologyNode={onOpenOntologyNode}
-          onClear={() => {
-            ui.setOntologySelectionId(null);
-            window.clearOntologySelection?.();
-          }}
-        />
-        <PaneFilterGroup label="Graph">
-          <PaneActionRow>
-            {store.ontology.ttl_href ? (
-              <PaneGhostLink
-                href={store.ontology.ttl_href}
-                title="Download the exported ontology as Turtle (ontologies.ttl)"
+      <>
+        <PaneControlSection aria-label="Ontology controls">
+          <OntologySelectedNodeLink
+            selectedNodeId={ui.ontologySelectionId}
+            nodes={store.ontology.graph_data?.nodes ?? []}
+            onOpenOntologyNode={onOpenOntologyNode}
+            onClear={() => {
+              ui.setOntologySelectionId(null);
+              window.clearOntologySelection?.();
+            }}
+          />
+          <PaneFilterGroup label="Graph">
+            <PaneActionRow>
+              {store.ontology.ttl_href ? (
+                <PaneGhostLink
+                  href={store.ontology.ttl_href}
+                  title="Download the exported ontology as Turtle (ontologies.ttl)"
+                >
+                  <Icon name="download" />
+                  Download .ttl
+                </PaneGhostLink>
+              ) : null}
+              <Button
+                tone="ghost"
+                size="sm"
+                iconLeft={<Icon name="rotate-ccw" />}
+                onClick={() =>
+                  (window as typeof window & { resetOntologyGraphLayout?: () => void })
+                    .resetOntologyGraphLayout?.()
+                }
               >
-                <Icon name="download" />
-                Download .ttl
-              </PaneGhostLink>
-            ) : null}
-            <Button
-              tone="ghost"
-              size="sm"
-              iconLeft={<Icon name="rotate-ccw" />}
-              onClick={() =>
-                (window as typeof window & { resetOntologyGraphLayout?: () => void })
-                  .resetOntologyGraphLayout?.()
-              }
-            >
-              Reset layout
-            </Button>
-          </PaneActionRow>
-        </PaneFilterGroup>
-        <PaneFilterGroup label="Overlays">
-          {ONTOLOGY_LAYER_FILTERS.map(([value, label]) => {
-            const layer = value.replace("layer-", "");
-            const count = formatCompactCount(ontologyLayerCounts.get(layer) ?? 0);
-            return (
-              <ToggleRow
-                key={value}
-                label={label}
-                colorToken={ontologyLayerColorToken(value)}
-                on={ui.ontologyFilters.has(value)}
-                variant="filter"
-                meta={count}
-                title={ontologyLayerDescription(value)}
-                onToggle={() => ui.toggleOntologyFilter(value)}
-              />
-            );
-          })}
-        </PaneFilterGroup>
-        <PaneFilterGroup label="Types">
-          <PaneLegend
-            rows={[
-              { id: "class", label: "Class", colorToken: ontologyColorToken("class") },
-              { id: "named-individual", label: "Individual", colorToken: ontologyColorToken("named-individual") },
-              { id: "datatype", label: "Datatype", colorToken: ontologyColorToken("datatype") },
-              { id: "class-expression", label: "Class expr.", colorToken: ontologyColorToken("class-expression") },
-              { id: "node-shape", label: "Node shape", colorToken: ontologyColorToken("node-shape") },
-              { id: "property-shape", label: "Property shape", colorToken: ontologyColorToken("property-shape") },
-              { id: "resource", label: "Resource", colorToken: ontologyColorToken("resource") },
-            ]}
-          />
-          <PaneLegend rows={[{ id: "relation", label: "Relation", colorToken: "--text-muted", line: true }]} />
-        </PaneFilterGroup>
-        <PaneFilterGroup label="Notation">
-          <PaneNotationLegend
-            rows={[
-              { symbol: "D/R", label: "Domain/range" },
-              { symbol: "⊆", label: "Subclass" },
-              { symbol: "∈", label: "Membership" },
-              { symbol: "⟂", label: "Disjoint" },
-              { symbol: "⇔", label: "Equivalence" },
-              { symbol: "⟲", label: "Inverse" },
-              { symbol: "∘", label: "Property chain" },
-              { symbol: "∩", label: "Class expr." },
-              { symbol: "SH", label: "SHACL overlay" },
-            ]}
-          />
-        </PaneFilterGroup>
-      </PaneFilterSection>
+                Reset layout
+              </Button>
+            </PaneActionRow>
+          </PaneFilterGroup>
+          <PaneFilterGroup label="Overlays">
+            {ONTOLOGY_LAYER_FILTERS.map(([value, label]) => {
+              const layer = value.replace("layer-", "");
+              const count = formatCompactCount(ontologyLayerCounts.get(layer) ?? 0);
+              return (
+                <ToggleRow
+                  key={value}
+                  label={label}
+                  colorToken={ontologyLayerColorToken(value)}
+                  on={ui.ontologyFilters.has(value)}
+                  variant="filter"
+                  meta={count}
+                  title={ontologyLayerDescription(value)}
+                  onToggle={() => ui.toggleOntologyFilter(value)}
+                />
+              );
+            })}
+          </PaneFilterGroup>
+          <PaneFilterGrid columns="two">
+            <div>
+              <PaneFilterGroup label="Types">
+                <PaneLegend
+                  rows={[
+                    { id: "class", label: "Class", colorToken: ontologyColorToken("class") },
+                    { id: "skos-concept", label: "Concept", colorToken: ontologyColorToken("skos-concept") },
+                    { id: "skos-concept-scheme", label: "Concept Scheme", colorToken: ontologyColorToken("skos-concept-scheme") },
+                    { id: "named-individual", label: "Individual", colorToken: ontologyColorToken("named-individual") },
+                    { id: "datatype", label: "Datatype", colorToken: ontologyColorToken("datatype") },
+                    { id: "class-expression", label: "Class expr.", colorToken: ontologyColorToken("class-expression") },
+                    { id: "node-shape", label: "Node shape", colorToken: ontologyColorToken("node-shape") },
+                    { id: "property-shape", label: "Property shape", colorToken: ontologyColorToken("property-shape") },
+                    { id: "resource", label: "Resource", colorToken: ontologyColorToken("resource") },
+                  ]}
+                />
+                <PaneLegend rows={[{ id: "relation", label: "Relation", colorToken: "--text-muted", line: true }]} />
+              </PaneFilterGroup>
+            </div>
+            <div>
+              <PaneFilterGroup label="Notation">
+                <PaneNotationLegend
+                  rows={[
+                    { symbol: "D/R", label: "Domain/range" },
+                    { symbol: "⊆", label: "Subclass" },
+                    { symbol: "∈", label: "Membership" },
+                    { symbol: "⟂", label: "Disjoint" },
+                    { symbol: "⇔", label: "Equivalence" },
+                    { symbol: "⟲", label: "Inverse" },
+                    { symbol: "∘", label: "Property chain" },
+                    { symbol: "∩", label: "Class expr." },
+                    { symbol: "SH", label: "SHACL overlay" },
+                  ]}
+                />
+              </PaneFilterGroup>
+            </div>
+          </PaneFilterGrid>
+        </PaneControlSection>
+        <PaneSummary items={ontologySummaryItems} placement="footer" />
+      </>
     );
   }
 
@@ -507,7 +657,7 @@ function OntologySelectedNodeLink({
       selection={
         node
           ? {
-              icon: <ElementIcon type={kind} size="sm" />,
+              icon: <TokenSwatch colorToken={ontologyColorToken(kind)} title={kind} />,
               name: node.label || node.id,
               kind,
             }
@@ -527,6 +677,7 @@ function TreeFolderNode({
   onNavigate,
   onOpenElement,
   depth,
+  query,
 }: {
   folder: TreeFolder;
   activeView: ViewId;
@@ -534,10 +685,12 @@ function TreeFolderNode({
   onNavigate: (view: ViewId) => void;
   onOpenElement: (id: string) => void;
   depth: number;
+  query: string;
 }) {
   const [open, setOpen] = useState(depth === 0);
   const ui = useExplorerUiState();
   const selectionId = folder.path === ROOT_PATH ? "__root__" : `folder:${folder.path}`;
+  const expanded = Boolean(query.trim()) || open;
 
   function selectFolder() {
     ui.setModelSelectionId(selectionId);
@@ -549,16 +702,16 @@ function TreeFolderNode({
       <TreeItem
         kind="folder"
         label={folder.name}
-        icon={open ? <Icon name="folder-open" className="file-kind-folder" /> : <Icon name="folder" className="file-kind-folder" />}
+        icon={expanded ? <Icon name="folder-open" className="file-kind-folder" /> : <Icon name="folder" className="file-kind-folder" />}
         count={folder.files.length + folder.folders.length}
         depth={depth}
-        open={open}
+        open={expanded}
         expandable={folder.files.length + folder.folders.length > 0}
         selected={ui.modelSelectionId === selectionId}
         onToggle={() => setOpen((value) => !value)}
         onSelect={selectFolder}
       />
-      {open && (
+      {expanded && (
         <>
           {folder.folders.map((child) => (
             <TreeFolderNode
@@ -569,6 +722,7 @@ function TreeFolderNode({
               onNavigate={onNavigate}
               onOpenElement={onOpenElement}
               depth={depth + 1}
+              query={query}
             />
           ))}
           {folder.files.map((file) => (
@@ -580,6 +734,7 @@ function TreeFolderNode({
               onNavigate={onNavigate}
               onOpenElement={onOpenElement}
               depth={depth + 1}
+              query={query}
             />
           ))}
         </>
@@ -591,9 +746,11 @@ function TreeFolderNode({
 function TraceTreeFolderNode({
   folder,
   depth,
+  query,
 }: {
   folder: TracePaneFolder;
   depth: number;
+  query: string;
 }) {
   const ui = useExplorerUiState();
   const selectedPath = ui.traceFilePath;
@@ -601,6 +758,7 @@ function TraceTreeFolderNode({
     ? traceFolderContainsPath(folder, selectedPath)
     : false;
   const [open, setOpen] = useState(depth < 2 || hasSelectedDescendant);
+  const expanded = Boolean(query.trim()) || open;
 
   useEffect(() => {
     if (hasSelectedDescendant) setOpen(true);
@@ -611,10 +769,10 @@ function TraceTreeFolderNode({
       <TreeItem
         kind="folder"
         label={folder.name}
-        icon={open ? <Icon name="folder-open" className="file-kind-folder" /> : <Icon name="folder" className="file-kind-folder" />}
+        icon={expanded ? <Icon name="folder-open" className="file-kind-folder" /> : <Icon name="folder" className="file-kind-folder" />}
         count={traceFolderVerificationCount(folder)}
         depth={depth}
-        open={open}
+        open={expanded}
         expandable={folder.files.length + folder.folders.length > 0}
         selected={folder.path === ROOT_PATH && !selectedPath}
         onToggle={() => setOpen((value) => !value)}
@@ -623,13 +781,13 @@ function TraceTreeFolderNode({
           ui.setTraceSelectionId(null);
         }}
       />
-      {open && (
+      {expanded && (
         <>
           {folder.folders.map((child) => (
-            <TraceTreeFolderNode key={child.path} folder={child} depth={depth + 1} />
+            <TraceTreeFolderNode key={child.path} folder={child} depth={depth + 1} query={query} />
           ))}
           {folder.files.map((file) => (
-            <TraceTreeFileNode key={file.path} file={file} depth={depth + 1} />
+            <TraceTreeFileNode key={file.path} file={file} depth={depth + 1} query={query} />
           ))}
         </>
       )}
@@ -640,14 +798,17 @@ function TraceTreeFolderNode({
 function TraceTreeFileNode({
   file,
   depth,
+  query,
 }: {
   file: TracePaneFile;
   depth: number;
+  query: string;
 }) {
   const ui = useExplorerUiState();
   const selectedFile = ui.traceFilePath === file.path;
   const selectedVerification = selectedFile ? ui.traceSelectionId : null;
   const [open, setOpen] = useState(true);
+  const expanded = Boolean(query.trim()) || open;
 
   function selectFile() {
     ui.setTraceFilePath(file.path);
@@ -667,13 +828,13 @@ function TraceTreeFileNode({
         icon={<Icon name="file" className="file-kind-file" />}
         count={file.verifications.length}
         depth={depth}
-        open={open}
+        open={expanded}
         expandable={file.verifications.length > 0}
         selected={selectedFile && !selectedVerification}
         onToggle={() => setOpen((value) => !value)}
         onSelect={selectFile}
       />
-      {open && file.verifications.map((verification) => (
+      {expanded && file.verifications.map((verification) => (
         <TreeItem
           key={verification.id}
           kind="element"
@@ -695,6 +856,7 @@ function TreeFileNode({
   onNavigate,
   onOpenElement,
   depth,
+  query,
 }: {
   file: ProjectStoreFile;
   activeView: ViewId;
@@ -702,11 +864,13 @@ function TreeFileNode({
   onNavigate: (view: ViewId) => void;
   onOpenElement: (id: string) => void;
   depth: number;
+  query: string;
 }) {
   const ui = useExplorerUiState();
   const elements = file.element_ids.map(elementById).filter(Boolean) as ProjectStoreElement[];
   const showElementChildren = elements.length > 0;
   const [open, setOpen] = useState(showElementChildren);
+  const expanded = Boolean(query.trim()) || open;
   const selectionId = `file:${file.path}`;
 
   function selectFile() {
@@ -728,13 +892,13 @@ function TreeFileNode({
         icon={<Icon name="file" className="file-kind-file" />}
         count={elements.length > 0 ? elements.length : undefined}
         depth={depth}
-        open={open}
+        open={expanded}
         expandable={showElementChildren}
         selected={ui.modelSelectionId === selectionId}
         onToggle={() => setOpen((value) => !value)}
         onSelect={selectFile}
       />
-      {open && showElementChildren && elements.map((element) => (
+      {expanded && showElementChildren && elements.map((element) => (
         <TreeItem
           key={element.id}
           kind="element"
@@ -750,6 +914,127 @@ function TreeFileNode({
           depth={depth + 1}
           selected={ui.modelSelectionId === element.id}
           onSelect={() => selectElement(element.id)}
+        />
+      ))}
+    </PaneTreeNode>
+  );
+}
+
+interface ThesaurusPaneConcept {
+  id: string;
+  label: string;
+  parentId: string | null;
+  schemeId: string;
+  description: string;
+}
+
+interface ThesaurusPaneScheme {
+  id: string;
+  label: string;
+  concepts: ThesaurusPaneConcept[];
+}
+
+function ThesaurusSchemeTreeNode({
+  scheme,
+  selectedId,
+  query,
+  onSelectConcept,
+}: {
+  scheme: ThesaurusPaneScheme;
+  selectedId: string | null;
+  query: string;
+  onSelectConcept: (id: string | null) => void;
+}) {
+  const hasSelectedDescendant = selectedId ? scheme.concepts.some((concept) => concept.id === selectedId) : false;
+  const [open, setOpen] = useState(hasSelectedDescendant || scheme.concepts.length <= 8);
+
+  useEffect(() => {
+    if (hasSelectedDescendant) setOpen(true);
+  }, [hasSelectedDescendant]);
+
+  const children = thesaurusTopLevelConcepts(scheme.concepts);
+  const expanded = Boolean(query.trim()) || open;
+
+  return (
+    <PaneTreeNode>
+      <TreeItem
+        kind="element"
+        label={scheme.label}
+        icon={<ElementIcon type="concept-scheme" size="sm" />}
+        count={scheme.concepts.length}
+        depth={0}
+        open={expanded}
+        expandable={children.length > 0}
+        selected={false}
+        onToggle={() => setOpen((value) => !value)}
+        onSelect={() => {
+          const first = children[0] ?? scheme.concepts[0];
+          if (first) onSelectConcept(first.id);
+        }}
+      />
+      {expanded && children.map((concept) => (
+        <ThesaurusConceptTreeNode
+          key={concept.id}
+          concept={concept}
+          concepts={scheme.concepts}
+          selectedId={selectedId}
+          query={query}
+          onSelectConcept={onSelectConcept}
+          depth={1}
+        />
+      ))}
+    </PaneTreeNode>
+  );
+}
+
+function ThesaurusConceptTreeNode({
+  concept,
+  concepts,
+  selectedId,
+  query,
+  onSelectConcept,
+  depth,
+}: {
+  concept: ThesaurusPaneConcept;
+  concepts: readonly ThesaurusPaneConcept[];
+  selectedId: string | null;
+  query: string;
+  onSelectConcept: (id: string | null) => void;
+  depth: number;
+}) {
+  const children = concepts.filter((candidate) => candidate.parentId === concept.id);
+  const hasSelectedDescendant = selectedId ? conceptTreeContains(concepts, concept.id, selectedId) : false;
+  const [open, setOpen] = useState(depth < 2 || hasSelectedDescendant);
+  const expanded = Boolean(query.trim()) || open;
+
+  useEffect(() => {
+    if (hasSelectedDescendant) setOpen(true);
+  }, [hasSelectedDescendant]);
+
+  return (
+    <PaneTreeNode>
+      <TreeItem
+        kind="element"
+        label={concept.label}
+        icon={<ElementIcon type="concept" size="sm" />}
+        count={children.length > 0 ? children.length : undefined}
+        depth={depth}
+        open={expanded}
+        expandable={children.length > 0}
+        selected={selectedId === concept.id}
+        onToggle={() => setOpen((value) => !value)}
+        onSelect={() => onSelectConcept(concept.id)}
+        title={concept.description || concept.label}
+      />
+      {expanded && children.map((child) => (
+        <ThesaurusConceptTreeNode
+          key={child.id}
+          concept={child}
+          concepts={concepts}
+          selectedId={selectedId}
+          query={query}
+          onSelectConcept={onSelectConcept}
+          depth={depth + 1}
         />
       ))}
     </PaneTreeNode>
@@ -778,6 +1063,92 @@ function buildFileTree(files: ProjectStoreFile[], rootLabel: string): TreeFolder
   }
 
   return root;
+}
+
+function filterFileTree(
+  folder: TreeFolder,
+  query: string,
+  elementById: (id: string) => ProjectStoreElement | undefined,
+): TreeFolder {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return folder;
+
+  const filtered = filterFileTreeNode(folder, normalized, elementById, true);
+  return filtered ?? { ...folder, folders: [], files: [] };
+}
+
+function filterFileTreeNode(
+  folder: TreeFolder,
+  query: string,
+  elementById: (id: string) => ProjectStoreElement | undefined,
+  isRoot = false,
+): TreeFolder | null {
+  const folderMatches = !isRoot && textMatches(query, folder.name, folder.path);
+  if (folderMatches) return folder;
+
+  const folders = folder.folders
+    .map((child) => filterFileTreeNode(child, query, elementById))
+    .filter(Boolean) as TreeFolder[];
+  const files = folder.files
+    .map((file) => filterProjectFile(file, query, elementById))
+    .filter(Boolean) as ProjectStoreFile[];
+
+  if (folders.length === 0 && files.length === 0 && !isRoot) return null;
+  return { ...folder, folders, files };
+}
+
+function filterProjectFile(
+  file: ProjectStoreFile,
+  query: string,
+  elementById: (id: string) => ProjectStoreElement | undefined,
+): ProjectStoreFile | null {
+  if (textMatches(query, file.display_path, file.path, file.markdown_content)) return file;
+
+  const elementIds = file.element_ids.filter((id) => {
+    const element = elementById(id);
+    return element
+      ? textMatches(query, element.name, element.element_type, element.type_family, element.content)
+      : id.toLowerCase().includes(query);
+  });
+
+  return elementIds.length > 0 ? { ...file, element_ids: elementIds } : null;
+}
+
+function filterTraceFileTree(folder: TracePaneFolder, query: string): TracePaneFolder {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return folder;
+
+  const filtered = filterTraceFileTreeNode(folder, normalized, true);
+  return filtered ?? { ...folder, folders: [], files: [] };
+}
+
+function filterTraceFileTreeNode(
+  folder: TracePaneFolder,
+  query: string,
+  isRoot = false,
+): TracePaneFolder | null {
+  const folderMatches = !isRoot && textMatches(query, folder.name, folder.path);
+  if (folderMatches) return folder;
+
+  const folders = folder.folders
+    .map((child) => filterTraceFileTreeNode(child, query))
+    .filter(Boolean) as TracePaneFolder[];
+  const files = folder.files
+    .map((file) => filterTraceFile(file, query))
+    .filter(Boolean) as TracePaneFile[];
+
+  if (folders.length === 0 && files.length === 0 && !isRoot) return null;
+  return { ...folder, folders, files };
+}
+
+function filterTraceFile(file: TracePaneFile, query: string): TracePaneFile | null {
+  if (textMatches(query, file.name, file.path)) return file;
+
+  const verifications = file.verifications.filter((verification) =>
+    textMatches(query, verification.name, verification.type, verification.id),
+  );
+
+  return verifications.length > 0 ? { ...file, verifications } : null;
 }
 
 function buildTraceFileTree(files: TraceFileNode[], rootLabel: string): TracePaneFolder {
@@ -867,6 +1238,10 @@ function ensureFolder(path: string, byPath: Map<string, TreeFolder>, root: TreeF
 function displayName(path: string) {
   const normalized = path.replace(/\\/g, "/").replace(/\/$/, "");
   return normalized.split("/").pop() || normalized || "Project";
+}
+
+function textMatches(query: string, ...values: Array<string | null | undefined>) {
+  return values.some((value) => value?.toLowerCase().includes(query));
 }
 
 function dirname(path: string) {
@@ -1029,6 +1404,141 @@ function buildSearchElementTypeOptions(elements: readonly ProjectStoreElement[])
   });
 }
 
+function buildThesaurusPaneTree(store: ExplorerProjectStore): ThesaurusPaneScheme[] {
+  const graphNodes = store.ontology.graph_data?.nodes ?? [];
+  const graphEdges = store.ontology.graph_data?.edges ?? [];
+  const conceptNodes = graphNodes
+    .filter(isConceptGraphNode)
+    .sort((left, right) => conceptGraphLabel(left).localeCompare(conceptGraphLabel(right)));
+  const schemeIds = new Set(graphNodes.filter(isConceptSchemeGraphNode).map((node) => node.id));
+
+  const conceptIds = new Set(conceptNodes.map((node) => node.id));
+  const parentByConcept = new Map<string, string>();
+  for (const edge of graphEdges) {
+    if (edge.label === "broader" && conceptIds.has(edge.source) && conceptIds.has(edge.target)) {
+      parentByConcept.set(edge.source, edge.target);
+    }
+  }
+
+  const schemeById = new Map<string, ThesaurusPaneScheme>();
+  for (const node of conceptNodes) {
+    const schemeId = node.scheme_iri;
+    const schemeLabel = node.scheme_label;
+    if (!schemeId || !schemeLabel || !schemeIds.has(schemeId)) continue;
+    const scheme = ensureThesaurusPaneScheme(schemeById, schemeId, schemeLabel);
+    scheme.concepts.push({
+      id: node.id,
+      label: conceptGraphLabel(node),
+      parentId: parentByConcept.get(node.id) ?? null,
+      schemeId,
+      description: conceptGraphDescription(node),
+    });
+  }
+
+  return sortThesaurusPaneSchemes(Array.from(schemeById.values()).filter((scheme) => scheme.concepts.length > 0));
+}
+
+function filterThesaurusPaneTree(
+  schemes: readonly ThesaurusPaneScheme[],
+  query: string,
+): ThesaurusPaneScheme[] {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return [...schemes];
+
+  return schemes
+    .map((scheme) => {
+      const included = new Set<string>();
+      const byId = new Map(scheme.concepts.map((concept) => [concept.id, concept]));
+      for (const concept of scheme.concepts) {
+        if (!thesaurusConceptMatches(concept, normalized)) continue;
+        included.add(concept.id);
+        let parentId = concept.parentId;
+        while (parentId) {
+          included.add(parentId);
+          parentId = byId.get(parentId)?.parentId ?? null;
+        }
+      }
+      return {
+        ...scheme,
+        concepts: scheme.concepts.filter((concept) => included.has(concept.id)),
+      };
+    })
+    .filter((scheme) => scheme.concepts.length > 0);
+}
+
+function ensureThesaurusPaneScheme(
+  schemeById: Map<string, ThesaurusPaneScheme>,
+  id: string,
+  label: string,
+): ThesaurusPaneScheme {
+  const existing = schemeById.get(id);
+  if (existing) return existing;
+  const scheme = { id, label, concepts: [] };
+  schemeById.set(id, scheme);
+  return scheme;
+}
+
+function sortThesaurusPaneSchemes(schemes: ThesaurusPaneScheme[]) {
+  return schemes
+    .map((scheme) => ({
+      ...scheme,
+      concepts: [...scheme.concepts].sort((left, right) => {
+        const leftDepth = thesaurusConceptDepth(scheme.concepts, left.id);
+        const rightDepth = thesaurusConceptDepth(scheme.concepts, right.id);
+        return leftDepth - rightDepth || left.label.localeCompare(right.label);
+      }),
+    }))
+    .sort((left, right) => left.label.localeCompare(right.label));
+}
+
+function isConceptGraphNode(node: OntologyGraphNode) {
+  return node.semantic_type === "skos-concept";
+}
+
+function isConceptSchemeGraphNode(node: OntologyGraphNode) {
+  return node.semantic_type === "skos-concept-scheme";
+}
+
+function conceptGraphLabel(node: OntologyGraphNode) {
+  return firstConceptLiteralValue(node, "prefLabel") || node.label;
+}
+
+function conceptGraphDescription(node: OntologyGraphNode) {
+  return firstConceptLiteralValue(node, "definition") || firstConceptLiteralValue(node, "scopeNote") || node.comment;
+}
+
+function firstConceptLiteralValue(node: OntologyGraphNode, predicateSuffix: string) {
+  return (node.literal_values ?? []).find((value) => value.predicate.endsWith(predicateSuffix))?.value ?? "";
+}
+
+function thesaurusConceptDepth(concepts: readonly ThesaurusPaneConcept[], id: string) {
+  const parentById = new Map(concepts.map((concept) => [concept.id, concept.parentId]));
+  let depth = 0;
+  let current = parentById.get(id);
+  const seen = new Set<string>([id]);
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    depth += 1;
+    current = parentById.get(current) ?? null;
+  }
+  return depth;
+}
+
+function conceptTreeContains(concepts: readonly ThesaurusPaneConcept[], rootId: string, targetId: string): boolean {
+  if (rootId === targetId) return true;
+  const children = concepts.filter((concept) => concept.parentId === rootId);
+  return children.some((child) => conceptTreeContains(concepts, child.id, targetId));
+}
+
+function thesaurusConceptMatches(concept: ThesaurusPaneConcept, query: string) {
+  return concept.label.toLowerCase().includes(query) || concept.description.toLowerCase().includes(query);
+}
+
+function thesaurusTopLevelConcepts(concepts: readonly ThesaurusPaneConcept[]) {
+  const ids = new Set(concepts.map((concept) => concept.id));
+  return concepts.filter((concept) => concept.parentId === null || !ids.has(concept.parentId));
+}
+
 function elementTypeRank(type: string, family: string) {
   const direct = ELEMENT_TYPE_ORDER.indexOf(type);
   if (direct >= 0) return direct;
@@ -1074,6 +1584,8 @@ function ontologyColorToken(value: string): DesignSystemColorToken {
     "rdf-property": "--rdf-rdfprop",
     property: "--rdf-objprop",
     "named-individual": "--rdf-individual",
+    "skos-concept": "--rdf-concept",
+    "skos-concept-scheme": "--rdf-concept-scheme",
     datatype: "--rdf-datatype",
     restriction: "--rdf-restriction",
     "class-expression": "--rdf-classexpr",
@@ -1088,6 +1600,7 @@ function ontologyColorToken(value: string): DesignSystemColorToken {
 function ontologyLayerColorToken(value: string): DesignSystemColorToken {
   const colors: Record<string, DesignSystemColorToken> = {
     "layer-authored": "--ontology",
+    "layer-concepts": "--rdf-concept",
     "layer-reqvire-context": "--info",
     "layer-external-source": "--other",
   };
@@ -1096,6 +1609,8 @@ function ontologyLayerColorToken(value: string): DesignSystemColorToken {
 
 function ontologyLayerDescription(value: string): string {
   const descriptions: Record<string, string> = {
+    "layer-authored": "Authored OWL/RDFS/SHACL structural ontology nodes and projection edges.",
+    "layer-concepts": "Curated SKOS concept nodes, concept taxonomy edges, and mapsToConcept bridge edges.",
     "layer-reqvire-context": "Semantic context: model elements that declare or reference ontology terms.",
     "layer-external-source": "Used external ontology subset triples derived from declared external sources.",
   };

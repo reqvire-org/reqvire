@@ -13,7 +13,7 @@ endef
 .PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major explorer build
 
 # Build the React/Vite Explorer SPA bundle. The served index.html is
-# this bundle; core/build.rs embeds explorer/dist at compile time, so this must
+# this bundle; crates/reqvire-core/build.rs embeds explorer/dist at compile time, so this must
 # run before `cargo build` for the real bundle to be embedded.
 explorer:
 	@echo "Building Explorer SPA bundle..."

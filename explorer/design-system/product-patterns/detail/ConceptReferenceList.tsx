@@ -14,7 +14,7 @@ import type { DetailConceptReferenceItem, OpenConceptReferenceHandler } from "./
 
 export interface ConceptReferenceListProps {
   title?: string;
-  references: DetailConceptReferenceItem[];
+  references: readonly DetailConceptReferenceItem[];
   onOpenConceptReference?: OpenConceptReferenceHandler;
 }
 
@@ -28,28 +28,36 @@ export function ConceptReferenceList({
   return (
     <DetailSection title={title}>
       <div className={cx(relationStackUX)}>
-        {references.map((reference) => (
-          <div key={reference.id} className={cx(conceptReferenceRowBaseUX, conceptReferenceRowSkinX)}>
-            {reference.ontologyNodeId && onOpenConceptReference ? (
-              <button
-                type="button"
-                className={cx(relationEndpointBaseUX, relationEndpointSkinX)}
-                title={reference.iri}
-                onClick={() => onOpenConceptReference(reference)}
-              >
-                <ElementIcon type="ontology" family="ontology" title="ontology" size="sm" />
-                <span className={cx(relationEndpointLabelUX)}>{reference.ontologyLabel ?? reference.label}</span>
-              </button>
-            ) : (
-              <span className={cx(relationEndpointBaseUX, relationEndpointSkinX)} title={reference.iri}>
-                <ElementIcon type="resource" family="resource" title="concept reference" size="sm" />
-                <span className={cx(relationEndpointLabelUX)}>{reference.ontologyLabel ?? reference.label}</span>
-              </span>
-            )}
-            <span className={cx(conceptReferenceQualifierSkinX)}>({reference.label})</span>
-          </div>
-        ))}
+        {references.map((reference) => {
+          const displayLabel = reference.ontologyLabel ?? reference.label;
+          const showQualifier = normalizedConceptLabel(displayLabel) !== normalizedConceptLabel(reference.label);
+          return (
+            <div key={reference.id} className={cx(conceptReferenceRowBaseUX, conceptReferenceRowSkinX)}>
+              {reference.ontologyNodeId && onOpenConceptReference ? (
+                <button
+                  type="button"
+                  className={cx(relationEndpointBaseUX, relationEndpointSkinX)}
+                  title={reference.iri}
+                  onClick={() => onOpenConceptReference(reference)}
+                >
+                  <ElementIcon type="concept" family="ontology" title="concept" size="sm" />
+                  <span className={cx(relationEndpointLabelUX)}>{displayLabel}</span>
+                </button>
+              ) : (
+                <span className={cx(relationEndpointBaseUX, relationEndpointSkinX)} title={reference.iri}>
+                  <ElementIcon type="concept-reference" family="resource" title="concept reference" size="sm" />
+                  <span className={cx(relationEndpointLabelUX)}>{displayLabel}</span>
+                </span>
+              )}
+              {showQualifier ? <span className={cx(conceptReferenceQualifierSkinX)}>({reference.label})</span> : null}
+            </div>
+          );
+        })}
       </div>
     </DetailSection>
   );
+}
+
+function normalizedConceptLabel(value: string | null | undefined) {
+  return String(value ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }

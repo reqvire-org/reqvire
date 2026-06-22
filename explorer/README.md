@@ -4,7 +4,7 @@ Native static single-page Explorer for the Reqvire Project Store. Built with
 Vite + TypeScript + React and an in-tree design system; no Tailwind, no Radix
 Themes, no CDN dependencies.
 
-The served `index.html` **is** this bundle: `core/build.rs` embeds the built
+The served `index.html` **is** this bundle: `crates/reqvire-core/build.rs` embeds the built
 `dist/`, and `reqvire serve` supplies the generated Project Store as
 `assets/project-store.js`. Explorer views are SPA routes.
 
@@ -38,7 +38,7 @@ npm run lint && npm run generate:icons && tsc --noEmit && npm run build:ds-bundl
 `assets/explorer.css`). The asset contract validates `design-system/assets/`,
 generated browser assets, and optional `public/assets/` raw URL inputs, then
 assembles the build output under `dist/assets/`; matching asset filenames fail
-the build. `core/build.rs` copies `dist/` into `OUT_DIR` so `cargo build`
+the build. `crates/reqvire-core/build.rs` copies `dist/` into `OUT_DIR` so `cargo build`
 embeds it. **Build the Explorer before `cargo build`** — the compiled bundle is
 a required build input.
 
@@ -60,7 +60,7 @@ npm run build      # lint + typecheck + generated DS artifacts + vite build -> d
 ## Interface expected from `reqvire serve`
 
 The SPA reads an immutable browser-local **Project Store** seed produced from
-`core/src/html/store.rs`. The frontend resolves the seed in this order (see
+`crates/reqvire-core/src/html/store.rs`. The frontend resolves the seed in this order (see
 `src/store/loadStore.ts`):
 
 1. `window.reqvireProjectStore` — a global set by `assets/project-store.js`

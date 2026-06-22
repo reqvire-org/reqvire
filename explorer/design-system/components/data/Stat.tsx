@@ -10,7 +10,7 @@ const baseUX = css`
 
   &.ds-stat--stacked {
     flex-direction: column;
-    gap: var(--gap-list-stack);
+    gap: var(--stack-gap-compact);
   }
 `;
 
@@ -35,10 +35,12 @@ const skinX = css`
 `;
 
 const baseUXRow = css`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--space-3) var(--space-8);
+  display: var(--ds-statrow-display, flex);
+  width: var(--ds-statrow-width, auto);
+  grid-template-columns: var(--ds-statrow-grid-template-columns, none);
+  flex-wrap: var(--ds-statrow-flex-wrap, wrap);
+  align-items: var(--ds-statrow-align-items, baseline);
+  gap: var(--ds-statrow-gap, var(--space-3) var(--space-8));
 `;
 
 export type StatProps = Omit<HTMLAttributes<HTMLSpanElement>, "style"> & {

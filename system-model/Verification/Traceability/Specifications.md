@@ -32,12 +32,11 @@ Build a tree structure showing how verifications trace upward through the requir
 1. **Start from verification element**
  - Input: verification element with `verify` relations
 
-2. **Get directly verified elements**
- - Follow `verify` relations to get target capabilities or requirements
+2. **Get directly verified requirements**
+ - Follow `verify` relations to get target requirements
  - Mark these as "directly verified" in the tree
 
 3. **Traverse upward through specify and derivedFrom**
- - For each directly verified capability, follow capability `derivedFrom` until reaching a capability root
  - For each requirement, follow `derivedFrom` relations to parent requirements
  - Follow `specify` to the owning capability when the requirement root is reached
  - Continue recursively through capability `derivedFrom` until reaching a capability root
@@ -62,4 +61,3 @@ For hierarchical relation analysis (not verification-specific), create a virtual
 #### Metadata
   * type: specification
 ---
-

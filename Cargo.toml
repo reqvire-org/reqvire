@@ -1,12 +1,13 @@
 [workspace]
 members = [
-    "core",
-    "cli",
+    "crates/reqvire-core",
+    "crates/reqvire-cli",
+    "crates/o-kernel",
 ]
 resolver = "2"
 
 [workspace.package]
-version = "1.0.0"
+version = "1.1.0"
 edition = "2021"
 rust-version = "1.86"
 license = "Apache-2.0"
@@ -36,7 +37,8 @@ globset = "0.4.16"
 rustc-hash = "2.1"
 difference = "2.0"
 oxigraph = { version = "0.5.8", default-features = false }
-reqvire = { path = "core" }
+o-kernel = { path = "crates/o-kernel" }
+reqvire = { path = "crates/reqvire-core" }
 tiny_http = "0.12"
 tokio = { version = "1.48", features = ["macros", "rt-multi-thread", "signal", "net", "fs", "sync"] }
 axum = "0.8.4"

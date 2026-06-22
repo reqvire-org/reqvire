@@ -148,7 +148,7 @@ Capability.
 ---
 EOF
 
-cat > "${TEST_DIR}/valid-capability-verification.fixture" << 'EOF'
+cat > "${TEST_DIR}/invalid-capability-verification.fixture" << 'EOF'
 # Elements
 
 ### Verification Objective
@@ -186,14 +186,6 @@ EOF
 assert_invalid "invalid-legacy-type.fixture" "Invalid element type"
 assert_invalid "invalid-derive-bridge.fixture" "incompatible"
 assert_invalid "invalid-capability-satisfaction.fixture" "incompatible"
-
-rm -rf "${TEST_DIR}/specifications"
-mkdir -p "${TEST_DIR}/specifications"
-cp "${TEST_DIR}/valid-capability-verification.fixture" "${TEST_DIR}/specifications/Requirements.md"
-if ! (cd "$TEST_DIR" && "$REQVIRE_BIN" validate > /tmp/capability-verification-valid.out 2>&1); then
-  echo "FAILED: valid capability verification should validate"
-  cat /tmp/capability-verification-valid.out
-  exit 1
-fi
+assert_invalid "invalid-capability-verification.fixture" "incompatible"
 
 exit 0

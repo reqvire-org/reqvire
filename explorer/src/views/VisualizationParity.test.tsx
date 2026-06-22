@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { ExplorerSidePane } from "../components/ExplorerSidePane";
@@ -10,6 +10,7 @@ import {
   TracesView,
 } from "./ReportViews";
 import { KnowledgeGraphView } from "./GraphLibraryViews";
+import { ThesaurusView } from "./ThesaurusView";
 
 vi.mock("graphology-layout-forceatlas2", () => ({
   default: {
@@ -51,16 +52,40 @@ function renderWithStore(view: React.ReactElement) {
 }
 
 describe("native visualization parity views", () => {
-  it("renders Graph as the native Sigma/Graphology project graph", () => {
+  it("renders Graph as the native Sigma/Graphology project graph", async () => {
     const { container } = renderWithStore(
       <KnowledgeGraphView frameTestId="model-graph" onOpenElement={vi.fn()} />,
     );
 
     expect(container.querySelector('[data-view="model-graph"]')).toBeTruthy();
     expect(screen.getByTestId("kg-sigma-canvas")).toBeTruthy();
-    expect(screen.getByTestId("mock-sigma-renderer")).toBeTruthy();
+    await waitFor(() => expect(screen.getByTestId("mock-sigma-renderer")).toBeTruthy());
     expect(screen.getByRole("img", { name: "Actual project elements and facts graph" })).toBeTruthy();
     expect(container.querySelector("iframe")).toBeNull();
+  });
+
+  it("renders thesaurus concepts in the native Explorer shell route", () => {
+    renderWithStore(<ThesaurusView onOpenElement={vi.fn()} />);
+
+    expect(screen.getAllByText("Service Endpoint").length).toBeGreaterThan(0);
+    expect(screen.getByText("Used by model")).toBeTruthy();
+  });
+
+  it("uses the Explorer pane as the thesaurus concept tree", () => {
+    renderWithStore(
+      <ExplorerSidePane
+        activeView="thesaurus"
+        open
+        onToggle={vi.fn()}
+        onNavigate={vi.fn()}
+        onOpenElement={vi.fn()}
+        onOpenOntologyNode={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("tree", { name: "Concept hierarchy" })).toBeTruthy();
+    expect(screen.getByText("Example Thesaurus")).toBeTruthy();
+    expect(screen.getByText("Service Endpoint")).toBeTruthy();
   });
 
   it("renders traces as native verification rows", () => {

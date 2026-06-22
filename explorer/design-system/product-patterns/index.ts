@@ -8,6 +8,7 @@ export * from "./reports";
 export * from "./resources";
 export * from "./search";
 export * from "./side-pane";
+export * from "./thesaurus";
 export { AppShell, PaneResizer, RouteFrame, RouteLayout, RoutePanel, ShellMain, ShellPane } from "./shell";
 export type {
   AppShellProps,

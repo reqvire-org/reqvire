@@ -7,9 +7,6 @@ Test capability root for migrated requirement fixtures.
 
 #### Metadata
   * type: capability
-
-#### Relations
-  * verifiedBy: [Capability Level Verification](#capability-level-verification)
 ---
 
 ### Capability Parent
@@ -156,7 +153,7 @@ Analysis verification verifying a requirement.
 
 #### Relations
   * derivedFrom: [Verification Objective](#verification-objective)
-  * verify: [Capability Parent](#capability-parent)
+  * verify: [Requirement with Analysis Verification](#requirement-with-analysis-verification)
 
 ---
 
@@ -169,7 +166,7 @@ Inspection verification verifying a requirement.
 
 #### Relations
   * derivedFrom: [Verification Objective](#verification-objective)
-  * verify: [Capability Parent](#capability-parent)
+  * verify: [Requirement with Analysis Verification](#requirement-with-analysis-verification)
 
 ---
 
@@ -182,20 +179,7 @@ Demonstration verification verifying a requirement.
 
 #### Relations
   * derivedFrom: [Verification Objective](#verification-objective)
-  * verify: [Capability Parent](#capability-parent)
-
----
-
-### Capability Level Verification
-
-Analysis verification directly verifying a capability.
-
-#### Metadata
-  * type: analysis-verification
-
-#### Relations
-  * derivedFrom: [Verification Objective](#verification-objective)
-  * verify: [Test Capability](#test-capability-test-element-type-relation-compatibility-valid-cases-specifications)
+  * verify: [Requirement with Analysis Verification](#requirement-with-analysis-verification)
 
 ---
 

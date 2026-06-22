@@ -5,9 +5,9 @@
 ~~~markdown
 # Elements
 
-### Managed Platform Domain Ontology
+### Managed Platform Structural Ontology
 
-The Managed Platform Domain ontology defines the first domain-level vocabulary for a Reqvire-managed system of interest. It starts with reusable classes that can later be specialized into product, engineering, operations, interface, governance, support, billing, or verification concepts.
+The Managed Platform Structural ontology defines formal schema terms for a Reqvire-managed system of interest. It starts with reusable OWL classes that can later be specialized into product, engineering, operations, interface, governance, support, billing, or verification structures.
 
 #### Metadata
   * type: ontology
@@ -51,23 +51,56 @@ ex:LifecycleState a owl:Class ;
 
 ## Ontology Building Blocks
 
-A useful ontology deliberately defines five kinds of content. Check all five before treating an ontology as complete enough for the domain being modeled.
+A useful ontology deliberately separates conceptual vocabulary from structural schema. Check all six building blocks before treating an ontology as complete enough for the domain being modeled.
 
 | Building block | Purpose | General examples | System-of-interest examples |
 |----------------|---------|------------------|-----------------------------|
-| Classes / concepts | General categories or types of things in the domain. | `Person`, `Organization`, `Project`, `Document`, `Asset` | `SystemOfInterest`, `Actor`, `CapabilityArea`, `ManagedResource`, `InterfaceSurface`, `LifecycleState` |
+| SKOS concepts | Curated human/domain terms, labels, definitions, synonyms, search/navigation anchors, and taxonomy. | `person`, `organization`, `project`, `document`, `asset` | `traceability`, `verification evidence`, `change impact`, `managed resource`, `interface surface` |
+| OWL classes | Structural categories or types of things in the formal schema. | `Person`, `Organization`, `Project`, `Document`, `Asset` | `SystemOfInterest`, `Actor`, `CapabilityArea`, `ManagedResource`, `InterfaceSurface`, `LifecycleState` |
 | Instances / individuals | Specific named examples or controlled vocabulary records that belong to a class. | `AcmeCorp`, `ProjectApollo`, `HighPriority` | `theSystem`, `productionEnvironment`, `activeDeploymentState`, `criticalRiskLevel` |
 | Properties / slots | Literal-valued attributes or characteristics of a class or individual. | `name`, `identifier`, `status`, `createdDate` | `resourceIdentifier`, `environmentRegion`, `stateName`, `criticality`, `protocol` |
-| Relationships | Object-valued links showing how concepts or individuals connect. | `ownsAsset`, `approvesDocument`, `assignedToProject` | `ownedByActor`, `deployedToEnvironment`, `exposedThroughInterface`, `hasLifecycleState`, `dependsOnResource` |
+| Relationships | Object-valued links showing how classes or individuals connect. | `ownsAsset`, `approvesDocument`, `assignedToProject` | `ownedByActor`, `deployedToEnvironment`, `exposedThroughInterface`, `hasLifecycleState`, `dependsOnResource` |
 | Axioms / rules | Logical statements that constrain or enrich domain meaning. | subclass rules, domain/range rules, disjointness, equivalence, inverse properties, cardinality restrictions | `Deployment` is a `ManagedResource`; `Environment` hosts `Deployment`; `Snapshot` is of one or more `Deployment` resources; `PublicInterface` and `PrivateInterface` may be disjoint |
 
-Classes and properties should be developed together. A class without relationships or slots is often too vague; a property without a clear domain, range, or usage intent is often too broad. Individuals should be used for stable named records or controlled vocabularies, not for arbitrary runtime data. Axioms should express true domain semantics, not just labels or visualization preferences.
+Concepts and structural terms are different layers. SKOS concepts are the curated vocabulary people can agree on first; OWL classes and properties are the stricter structural schema used for formal modeling, SHACL targets, SPARQL queries, and reasoning. Classes and properties should be developed together. A class without relationships or slots is often too vague; a property without a clear domain, range, or usage intent is often too broad. Individuals should be used for stable named records or controlled vocabularies, not for arbitrary runtime data. Axioms should express true domain semantics, not just labels or visualization preferences.
 
-## Domain Concepts First
+## Conceptual Layer Handoff
 
-For new ontology work, start top-down. Define the domain-level concepts before adding concrete leaves such as a specific payment provider, support tool, API endpoint, cloud service, product screen, or workflow.
+For new terminology or thesaurus work, use `reqvire-concept-authoring` instead of this ontology reference. Humans can often agree on concept labels, synonyms, definitions, broader/narrower terms, and related terms earlier than they can agree on structural classes, cardinality constraints, inverse relationships, and SHACL rules. Model that conceptual layer with native `concept-scheme` and `concept` elements.
 
-Good first-stage classes for IT engineering and MBSE Reqvire projects often include:
+This ontology reference resumes when selected concepts need formal structural schema: OWL classes, object/datatype properties, individuals, axioms, SHACL target vocabulary, or explicit structural-to-concept bridges.
+
+Use `reqvire:mapsToConcept` only when a structural term needs an explicit concept anchor:
+
+```turtle
+@prefix ex: <https://example.org/ontology/managed-platform#> .
+@prefix concept: <https://example.org/concepts#> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:TraceLink a owl:Class ;
+  rdfs:comment "Structural relationship record connecting model elements for impact and coverage analysis." ;
+  reqvire:mapsToConcept concept:Traceability .
+```
+
+`reqvire:mapsToConcept` is an annotation bridge. It does not make the structural class itself a SKOS concept, does not imply OWL equivalence, and does not use SKOS mapping semantics.
+
+### Structure And Concept Check
+
+Apply this check before expanding an OWL class hierarchy:
+
+- If the change is about labels, aliases, spelling variants, definitions, stakeholder terminology, search categories, or broader/narrower editorial grouping, switch to `reqvire-concept-authoring`.
+- If the change is about formal type membership, properties, domain/range, SHACL targets, reasoning, or graph operation semantics, put it in the OWL structural ontology.
+- If a class needs many `rdfs:comment` paragraphs, alternate names, hidden labels, and search facets, keep the class small and move the curation to native concept elements.
+- If a hierarchy says "every A is a B", use `rdfs:subClassOf`. If it says "A is a narrower topic than B", use native concept relations.
+- If both layers are useful, keep both and bridge from structural term to concept with `reqvire:mapsToConcept`.
+
+## Structural Terms
+
+For structural ontology work, start top-down. Define the domain-level structural terms before adding concrete leaves such as a specific payment provider, support tool, API endpoint, cloud service, product screen, or workflow.
+
+Good first-stage OWL classes for IT engineering and MBSE Reqvire projects often include:
 
 - `SystemOfInterest`: the engineered system managed by the Reqvire project.
 - `Actor`: human, organization, team, machine client, external system, AI agent, operator, or stakeholder.
@@ -160,6 +193,8 @@ The top parent ontology element defines `ontology_base` metadata, normally as an
 
 The root ontology block should declare the document IRI itself, for example `<https://example.org/ontology/managed-platform> a owl:Ontology`. Do not use `ex:ManagedPlatformOntology a owl:Ontology` as the default pattern. That makes the ontology itself look like a named term inside the vocabulary namespace.
 
+Reqvire generates `rdfs:isDefinedBy <ontology_base>` facts for authored ontology terms so semantic tools can group and filter vocabulary by OWL document. Authors should not repeat this on every term. If an authored term explicitly declares `rdfs:isDefinedBy`, it must match the generated ontology document IRI; a conflicting target is a validation error. Explorer uses the generated ownership as metadata and does not render the OWL document as a primary graph node or `rdfs:isDefinedBy` as a canvas edge.
+
 When one ontology element depends on another, model the hierarchy with `derivedFrom`. Reqvire emits one generated `owl:Ontology` document declaration per resolved `ontology_base`; ontology elements that inherit the same base contribute vocabulary to that same document. A hierarchy edge becomes `owl:imports` only when the source and target ontology elements resolve to different ontology bases.
 
 ## Class Hierarchy And Slots
@@ -168,8 +203,8 @@ Develop classes and properties together. A class candidate is incomplete until i
 
 For new ontology work, use a top-down pass:
 
-- Define the top-level domain concepts.
-- Specialize them into middle-level concepts that match the system of interest.
+- Define the top-level structural classes. If the vocabulary is still being negotiated, create SKOS concepts first and bridge later only when useful.
+- Specialize structural classes into middle-level classes that match the system of interest.
 - Add concrete leaves only when they are needed by competency questions or by reusable system modeling.
 - For each class, define the object properties and datatype properties needed to answer the questions.
 
@@ -503,7 +538,7 @@ In Reqvire, keep the split at the element boundary:
 
 - `ontology` elements under `system-model/Ontologies` own `#### Ontology` Turtle blocks with OWL class declarations plus `owl:DatatypeProperty`/`owl:ObjectProperty` declarations and stable `rdfs:domain`/`rdfs:range`.
 - `semantic-contract` elements own `#### Shapes` Turtle blocks.
-- The SHACL block declares `sh:NodeShape` resources that use `sh:targetClass` and `sh:path` over OWL classes and properties declared by ontology elements reached through explicit `use` relations.
+- The SHACL block declares `sh:NodeShape` or `sh:PropertyShape` resources that use valid SHACL targets, such as `sh:targetClass`, `sh:targetNode`, `sh:targetSubjectsOf`, or `sh:targetObjectsOf`, and `sh:path` over OWL classes and properties declared by ontology elements reached through explicit `use` relations.
 - Do not redeclare `ex:Employee a owl:Class` or another OWL class inside the SHACL block just to make a shape parse.
 
 OWL ontology example:
@@ -863,9 +898,9 @@ ex:criticalLifecycleState a owl:NamedIndividual, ex:LifecycleState ;
   ex:stateName "critical" ;
   ex:stateMeaning "State category indicating that resource behavior may block a critical capability." .
 
-ex:collectReportKind a owl:NamedIndividual, ex:ReportKind ;
-  ex:reportKindName "collect" ;
-  rdfs:comment "Report kind that gathers element context, contracts, reused_contract_context, and reachable semantic context." .
+ex:criticalLifecycleState a owl:NamedIndividual, ex:LifecycleState ;
+  ex:stateName "critical" ;
+  ex:stateMeaning "State category indicating that resource behavior may block a critical capability." .
 ```
 
 ### Axioms
@@ -898,17 +933,17 @@ ex:BusinessArtifact owl:disjointWith ex:LifecycleState .
 - Put ontology elements in `system-model/Ontologies`.
 - Use one `#### Ontology` fenced Turtle block per ontology element.
 - Use `derivedFrom` only to relate ontology elements to ontology parents.
-- Keep shared ontology roots independent from capability roots; non-ontology, non-semantic-contract elements consume ontology terms through `#### Concept References`.
+- Keep shared ontology roots independent from capability roots; non-ontology, non-semantic-contract elements consume curated SKOS concepts through `#### Concept References`.
 - Do not put `#### Shapes` in ontology elements.
 
 Concept reference example:
 
 ```markdown
 #### Concept References
-  * Managed Resource: https://example.org/ontology#ManagedResource
+  * Managed Resource: https://example.org/concepts#ManagedResource
 ```
 
-Capability, requirement, contract, verification-objective, and concrete verification prose can bind readable terms with `#### Concept References` when useful. The referenced IRI or CURIE must be declared by an ontology element in the model. Semantic contracts must not author concept references; their semantic dependencies are declared with `use`/`usedBy`.
+Capability, requirement, contract, verification-objective, and concrete verification prose can bind readable terms with `#### Concept References` when useful. The referenced IRI or CURIE must resolve to a generated native concept resource typed as `skos:Concept` in the model. Do not point concept references directly at OWL classes, properties, or structural individuals; bridge structural terms to concepts with `reqvire:mapsToConcept` in authored ontology when useful. Semantic contracts must not author concept references; their semantic dependencies are declared with `use`/`usedBy`.
 
 ## Semantic Contract Boundary
 
@@ -956,7 +991,7 @@ ex:SystemInterfaceShape
 - Domain/range axioms are stable and useful.
 - Vocabulary individuals are typed by ontology classes.
 - SHACL shape references point to declared, reachable ontology terms.
-- Non-ontology, non-semantic-contract elements use concept references for ontology term bindings.
+- Non-ontology, non-semantic-contract elements use concept references for SKOS concept bindings.
 - Semantic contracts use ontology through `use`/`usedBy` and do not author concept references.
 - `reqvire validate` passes.
-- `reqvire ontologies` emits the expected terms.
+- `reqvire semantic ontologies` emits the expected ontology terms.

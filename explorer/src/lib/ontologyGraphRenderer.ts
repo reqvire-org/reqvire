@@ -358,6 +358,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         'object-property': { fill: cssVar('--rdf-objprop'), stroke: textBody, text: textStrong },
         'datatype-property': { fill: cssVar('--rdf-dtprop'), stroke: textBody, text: textInverse },
         'rdf-property': { fill: cssVar('--rdf-rdfprop'), stroke: textBody, text: textInverse },
+        'skos-concept': { fill: cssVar('--rdf-concept'), stroke: cssVar('--ontology-ink'), text: textStrong },
         'named-individual': { fill: cssVar('--rdf-individual'), stroke: cssVar('--requirement-ink'), text: textInverse },
         datatype: { fill: cssVar('--rdf-datatype'), stroke: cssVar('--ontology-ink'), text: textStrong },
         restriction: { fill: cssVar('--rdf-restriction'), stroke: textStrong, text: textStrong },
@@ -367,6 +368,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         resource: { fill: reqvireSurfaceHover, stroke: cssVar('--other-ink'), text: textStrong }
     };
     const colorByLayer = {
+        concepts: { fill: cssVar('--rdf-concept'), stroke: cssVar('--ontology-ink'), text: textStrong },
         'reqvire-context': { fill: cssVar('--info'), stroke: cssVar('--info-border'), text: textInverse },
         'external-source': { fill: cssVar('--other'), stroke: cssVar('--other-ink'), text: textStrong }
     };
@@ -415,11 +417,14 @@ function createSubclassTriangleEdgeProgram(options = {}) {
     const nodeById = new Map(nodes.map(node => [node.id, node]));
     const connectionCounts = computeRenderedNodeConnections(nodes, links);
     const adjacency = new Map(nodes.map(node => [node.id, new Set([node.id])]));
+    const linkAdjacency = new Map(nodes.map(node => [node.id, []]));
     links.forEach(link => {
         const source = typeof link.source === 'string' ? link.source : link.source.id;
         const target = typeof link.target === 'string' ? link.target : link.target.id;
         if (adjacency.has(source)) adjacency.get(source).add(target);
         if (adjacency.has(target)) adjacency.get(target).add(source);
+        if (linkAdjacency.has(source)) linkAdjacency.get(source).push(link);
+        if (target !== source && linkAdjacency.has(target)) linkAdjacency.get(target).push(link);
     });
     const filterState = {
         role: new Set([
@@ -434,7 +439,8 @@ function createSubclassTriangleEdgeProgram(options = {}) {
             'construct'
         ]),
         layer: new Set([
-            'layer-authored'
+            'layer-authored',
+            'layer-concepts'
         ]),
         construct: new Set([
             'domain-range',
@@ -823,7 +829,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         try {
             const settings = forceAtlas2.inferSettings(graph);
             forceAtlas2.assign(graph, {
-                iterations: graph.order > 650 ? 280 : 190,
+                iterations: graph.order > 650 ? 90 : graph.order > 350 ? 130 : 190,
                 settings: {
                     ...settings,
                     adjustSizes: true,
@@ -1450,6 +1456,8 @@ ${body}
         'restriction': 'OWL restriction',
         'class-expression': 'Class expression',
         'datatype': 'Datatype',
+        'skos-concept': 'SKOS concept',
+        'skos-concept-scheme': 'SKOS concept scheme',
         'literal': 'Literal',
         'resource': 'Resource'
     };
@@ -1781,6 +1789,7 @@ ${body}
             graphNodeDisplayLabel(node),
             node.label,
             node.full_uri,
+            node.ontology_document || '',
             node.type || '',
             node.semantic_type || '',
             (node.rdf_types || []).join(' '),
@@ -1859,6 +1868,12 @@ ${body}
         const classExpressionSummary = renderClassExpressionSummary(nodeData);
         const literalValues = renderLiteralValues(nodeData.literal_values);
         const identifier = renderIdentifierSection(nodeData, identifierTitle);
+        const ontologyDocument = nodeData.ontology_document
+            ? `<div class="ontology-meta-section">
+                <div class="ontology-meta-title">OWL Document</div>
+                <div class="ontology-uri-block">${escapeHtml(nodeData.ontology_document)}</div>
+            </div>`
+            : '';
         const properties = renderPropertyUsages(nodeData);
 
         const isProperty = String(nodeData.semantic_type || '').endsWith('property')
@@ -1898,6 +1913,7 @@ ${body}
                 <div>${types}</div>
             </div>
             ${identifier}
+            ${ontologyDocument}
             <div class="ontology-meta-section">
                 <div class="ontology-meta-title">Description</div>
                 <p class="m-0">${escapeHtml(nodeData.comment || 'None specified.')}</p>
@@ -1960,6 +1976,7 @@ ${body}
     }
 
     function layerFilterValue(layer) {
+        if (layer === 'concepts') return 'layer-concepts';
         if (layer === 'reqvire-context') return 'layer-reqvire-context';
         if (layer === 'external-source') return 'layer-external-source';
         return 'layer-authored';
@@ -2225,6 +2242,8 @@ ${body}
             results.replaceChildren();
             return;
         }
+        results.style.listStyle = 'none';
+        results.style.overflowY = 'auto';
         const matches = nodes
             .filter(node => visibleNodeIds.has(node.id) && ontologyNodeHaystack(node).includes(normalized))
             .slice(0, 40);
@@ -2232,6 +2251,7 @@ ${body}
         if (!matches.length) {
             const empty = document.createElement('li');
             empty.className = 'ontology-graph-result text-gray-400';
+            empty.style.listStyle = 'none';
             empty.textContent = 'No matching nodes found';
             results.replaceChildren(empty);
             results.style.display = 'block';
@@ -2240,21 +2260,37 @@ ${body}
 
         results.replaceChildren(...matches.map(node => {
             const item = document.createElement('li');
-            item.className = 'ontology-graph-result';
-            item.addEventListener('click', () => window.focusOntologyNode(node.id));
+            item.style.listStyle = 'none';
+            item.setAttribute('role', 'presentation');
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'ontology-graph-result';
+            item.style.listStyle = 'none';
+            button.setAttribute('aria-label', `Focus ${graphNodeDisplayLabel(node)} (${humanizeSemanticType(node.semantic_type)})`);
+            button.addEventListener('click', () => window.focusOntologyNode(node.id));
 
             const label = document.createElement('span');
+            label.className = 'ontology-graph-result-label';
             label.textContent = graphNodeDisplayLabel(node);
+            label.title = graphNodeDisplayLabel(node);
 
-            const badge = document.createElement('span');
-            const palette = nodePalette(node);
-            badge.className = 'ontology-graph-badge';
-            badge.style.background = palette.fill;
-            badge.style.color = palette.text;
-            badge.style.border = `${cssVar('--border-w')} solid ${palette.stroke}`;
-            badge.textContent = humanizeSemanticType(node.semantic_type);
+            const glyph = document.createElement('span');
+            glyph.className = 'ontology-graph-result-glyph';
+            glyph.setAttribute('data-semantic-type', String(node.semantic_type || node.node_type || 'resource'));
+            glyph.title = humanizeSemanticType(node.semantic_type);
 
-            item.append(label, badge);
+            const notation = visibleBadgeSymbols(node);
+            if (notation) {
+                const badge = document.createElement('span');
+                badge.className = 'ontology-graph-badge';
+                badge.textContent = notation;
+                badge.title = notation;
+                button.append(glyph, label, badge);
+            } else {
+                button.append(glyph, label);
+            }
+            item.append(button);
             return item;
         }));
         results.style.display = 'block';
@@ -2371,7 +2407,7 @@ ${body}
             }
             expandedFrom.add(currentId);
 
-            links.forEach(linkData => {
+            (linkAdjacency.get(currentId) || []).forEach(linkData => {
                 if (!isEdgeVisible(linkData)) {
                     return;
                 }
@@ -2471,7 +2507,7 @@ ${body}
         ['authored', 'registry', 'construct'].forEach(value => {
             if (activeSet.has(value)) filterState.origin.add(value);
         });
-        ['layer-authored', 'layer-reqvire-context', 'layer-external-source'].forEach(value => {
+        ['layer-authored', 'layer-concepts', 'layer-reqvire-context', 'layer-external-source'].forEach(value => {
             if (activeSet.has(value)) filterState.layer.add(value);
         });
         [

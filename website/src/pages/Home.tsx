@@ -60,7 +60,8 @@ const revealStyle = `
 `;
 
 const knowledgeItems = [
-  { term: "Ontologies", desc: "define domain concepts, relationships, vocabulary, and semantic meaning." },
+  { term: "Ontologies", desc: "define structural domain vocabulary, relationships, axioms, and semantic meaning." },
+  { term: "Concepts", desc: "define curated SKOS thesaurus terms, definitions, synonyms, taxonomy, and concept mappings." },
   { term: "Capabilities", desc: "describe coherent operational, product, business, regulatory, or system abilities." },
   { term: "Requirements", desc: "define implementable obligations, constraints, guarantees, and behavioral expectations." },
   { term: "Contracts", desc: "define requirements in precise terms: source basis, specifications, constraints, behavior, state, interfaces, and input/output semantics." },
@@ -71,7 +72,7 @@ const knowledgeItems = [
 const capabilities = [
   { icon: GitBranch, title: "Semantic Engineering in Git", desc: "Keep engineering knowledge versioned, traceable, reviewable, AI-readable, and semantically connected alongside implementation artifacts." },
   { icon: Target, title: "Capability-Driven Engineering", desc: "Develop systems around coherent operational capabilities instead of disconnected feature lists. Capabilities decompose hierarchically and remain stable across implementation changes." },
-  { icon: Network, title: "Ontology-Driven Engineering", desc: "Bring semantic vocabulary and domain meaning directly into the engineering workflow. Ontologies make terminology explicit, reusable, and visible to humans and AI systems." },
+  { icon: Network, title: "Ontology-Driven Engineering", desc: "Bring structural ontology and curated concept vocabulary directly into the engineering workflow. Reqvire keeps terminology explicit, reusable, and visible to humans and AI systems." },
   { icon: FileCode, title: "Specification-Driven Development", desc: "Develop from capabilities and requirements while keeping implementation, architecture, tests, and verification artifacts aligned with engineering intent." },
   { icon: Link2, title: "Automated Traceability", desc: "Maintain links between ontologies, capabilities, requirements, contracts, code, tests, proofs, and verification artifacts." },
   { icon: CheckCircle, title: "Verification & Validation", desc: "Track verification coverage, behavioral correctness, implementation alignment, and validation evidence throughout the lifecycle." },

@@ -22,6 +22,7 @@ This objective groups verification that Reqvire reporting commands expose collec
   * derive: [Model Command Verification](#model-command-verification)
   * derive: [Model Containment Report Integration Test](#model-containment-report-integration-test)
   * derive: [Multi-Type Search Filter Test](#multi-type-search-filter-test)
+  * derive: [Ontology Semantic Export Verification](#ontology-semantic-export-verification)
   * derive: [Resources Report Verification](#resources-report-verification)
   * derive: [Reverse Model Traversal Test](#reverse-model-traversal-test)
   * derive: [Search Command Tests](#search-command-tests)
@@ -31,6 +32,42 @@ This objective groups verification that Reqvire reporting commands expose collec
   * derive: [Verification Coverage Report Test](#verification-coverage-report-test)
   * derive: [Verification Traces Filter Options Test](#verification-traces-filter-options-test)
   * derive: [Verification Traces From-Folder Test](#verification-traces-from-folder-test)
+---
+
+### Ontology Semantic Export Verification
+
+This verification shall prove that semantic ontology export materializes authored ontology, SHACL, generated document ownership, external-subset, reserved-vocabulary, and full projection semantics according to the reporting requirements.
+
+#### Details
+Expected checks:
+- Verify default Turtle semantic export contains generated ontology document declarations, ontology term declarations, and SHACL shape references without generated ontology projection facts.
+- Verify generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors instead of emitting one document per element.
+- Verify authored ontology classes, explicit named individuals, and class-typed named individuals receive generated `rdfs:isDefinedBy` links to the generated ontology document IRI in Turtle and JSON-LD semantic export.
+- Verify local Turtle/TTL, RDF/XML, and JSON-LD external ontology dependencies contribute only used external subset triples when external-inclusive export is requested.
+- Verify built-in external ontology sources, including SKOS, are available without local `#### External Ontology` declarations and can support authored conceptual-layer ontology content.
+- Verify built-in external ontology sources follow the same used-subset export rule as local external sources: referenced built-in terms are materialized when external-inclusive export is requested, and unused built-in terms are omitted.
+- Verify validation rejects SHACL or ontology references to built-in external ontology terms that are not present in the registered built-in source.
+- Verify unused external ontology dependency terms do not appear in external-inclusive semantic export.
+- Verify imported external ontology terms do not receive Reqvire-generated `rdfs:isDefinedBy` ownership links.
+- Verify full semantic export contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements, plus generated ontology projection graph, projection, construct, symbol, source/provenance, member, and subject/object/predicate facts for direct-authored constructs.
+- Verify representative reserved vocabulary IRIs from the RDF, RDFS, OWL, XSD, and SHACL registry survive ontology serialization and do not require local External Ontology source declarations.
+- Verify validation rejects fake terms in standards reserved vocabulary namespaces when those terms are not present in the o-kernel bundled standards graphs or explicit XSD policy.
+- Verify validation rejects an authored named ontology resource whose explicit `rdfs:isDefinedBy` target conflicts with the generated ontology document IRI.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-ontologies-command/test.sh)
+  * verify: [External Vocabulary Description Construction](../../../Semantics/SemanticModelRequirements.md#external-vocabulary-description-construction)
+  * verify: [External Vocabulary Exposure Policy](../../../Reports/ModelReports/ReportingRequirements.md#external-vocabulary-exposure-policy)
+  * verify: [Built-In External Ontology Source Resolution](../../../Semantics/SemanticModelRequirements.md#built-in-external-ontology-source-resolution)
+  * verify: [Used External Vocabulary Selection](../../../Semantics/SemanticModelRequirements.md#used-external-vocabulary-selection)
+  * verify: [Ontology and Shapes Collection](../../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
+  * verify: [Ontology Collection Output](../../../Reports/ModelReports/ReportingRequirements.md#ontology-collection-output)
+  * verify: [Ontology Projection Subgraph Materialization](../../../Reports/ModelReports/ReportingRequirements.md#ontology-projection-subgraph-materialization)
+  * verify: [Ontology Term Definition Link Materialization](../../../Semantics/SemanticModelRequirements.md#ontology-term-definition-link-materialization)
+  * verify: [OWL Reserved Vocabulary Recognition](../../../Semantics/SemanticModelRequirements.md#owl-reserved-vocabulary-recognition)
 ---
 
 ### CLI Collect Command Test
@@ -220,7 +257,7 @@ This test verifies that capability coverage is reported by rolling up the requir
 
 #### Details
 Expected checks:
-- Capability elements may be directly verified through `verifiedBy`; rollup coverage remains requirement-derived.
+- Capability elements cannot be directly verified through `verifiedBy`; coverage remains requirement-derived.
 - Requirements that specify a capability contribute verification coverage to that capability.
 - Child requirements contribute through the requirement `derive` hierarchy.
 - Child capabilities contribute through the capability `derive` hierarchy.
@@ -1214,7 +1251,7 @@ This test verifies that the verification-traces command filter options work corr
 - System shall support `--filter-name=<regex>` for filtering by verification name pattern
 - System shall support `--filter-type=<type>` for filtering by verification type
 - Multiple filters shall be combinable using AND logic
-- JSON output shall include verification ID, directly verified capabilities or requirements, and complete trace tree structure
+- JSON output shall include verification ID, directly verified requirements, and complete trace tree structure
 
 ##### Test Criteria
 1. **Basic Markdown Output**
@@ -1224,7 +1261,7 @@ This test verifies that the verification-traces command filter options work corr
    - output contains Mermaid diagram blocks with `graph BT`
    - diagrams include verification element nodes and requirement nodes
    - diagrams include click handlers for all nodes (format: `click NODE_ID "url"`)
-   - directly verified capabilities or requirements have `:::verified` CSS class in diagram
+   - directly verified requirements have `:::verified` CSS class in diagram
 
 2. **JSON Output**
    Command: `reqvire verification-traces --json`

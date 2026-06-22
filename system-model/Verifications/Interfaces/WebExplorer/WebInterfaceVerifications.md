@@ -20,6 +20,7 @@ This objective groups verification that the served Web Explorer renders model da
   * derive: [Reused Contract Context Link Serving Verification](#reused-contract-context-link-serving-verification)
   * derive: [Serve Command Verification](#serve-command-verification)
   * derive: [SPA Explorer Store Contract Verification](#spa-explorer-store-contract-verification)
+  * derive: [Thesaurus Project Store Projection Verification](#thesaurus-project-store-projection-verification)
 ---
 
 ### Component Reuse Verification
@@ -220,13 +221,13 @@ This analysis verifies that the Ontologies page behaves as an ontology model vie
 #### Details
 Expected analysis checks:
 - Confirm the primary Ontologies visualization, search data, and ontology node modal construct metadata are built from `SemanticIndex.ontology_projection`, the same generated ontology construct projection used by full semantic export.
-- Confirm ontology graph data includes explicit `authored`, `reqvire-context`, and `external-source` layer semantics; authored ontology/projection facts are enabled by default, generated semantic context is hidden until its layer is enabled and is limited to model-to-term `declaresTerm` and `referencesTerm` provenance, and external-source vocabulary is a separate opt-in layer.
+- Confirm ontology graph data includes explicit `authored`, `concepts`, `reqvire-context`, and `external-source` layer semantics; authored structural ontology/projection facts are controlled by the Core layer, SKOS concept nodes, SKOS concept taxonomy edges, plus one-way `mapsToConcept` bridge edges are controlled by the Concepts layer, generated semantic context is hidden until its layer is enabled and is limited to model-to-term `declaresTerm` and `referencesTerm` provenance, and external-source vocabulary is a separate opt-in layer.
 - Confirm the primary viewer does not render `rdf:type` edges, OWL/RDFS metaclass nodes, RDF list plumbing, anonymous SHACL property-shape blank nodes, or generic literal plumbing as the main user-facing graph.
 - Confirm classes, object properties, datatype properties, RDF properties, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources are classified into distinct semantic kinds when present, while property terms are projected as graph relationship semantics rather than standalone graph nodes.
 - Confirm datatype-property literal values are not graph nodes or visibility filter layers, but remain searchable and appear in the selected subject node modal as predicate/value evidence.
 - Confirm a named IRI typed only by a declared ontology class, without explicit `owl:NamedIndividual`, is shown in graph data and the ontology node modal as a named individual while retaining its `∈` membership construct evidence.
 - Confirm visual coloring is driven by semantic kind, not by source provenance, so a class referenced by SHACL remains class-colored, property metadata remains property-typed in links/modal/search, and actual SHACL node shapes and property shapes use SHACL-specific colors.
-- Confirm RDF, RDFS, XSD, OWL reserved vocabulary and core SHACL shape syntax do not require local External Ontology source files and are not presented as imported external-source vocabulary. The external-source layer is reserved for used external subset triples derived from actual `#### External Ontology` dependencies.
+- Confirm RDF, RDFS, XSD, OWL reserved vocabulary and core SHACL shape syntax do not require local External Ontology source files and are not presented as imported external-source vocabulary. The external-source layer is reserved for used external subset triples derived from actual `#### External Ontology` dependencies, unused raw external terms are absent from graph data and search, and external-source metadata identifies `used_subset` materialization.
 - Confirm object and datatype properties are first-class relationship semantics with aggregated domain and range information rendered as labeled links and modal property usage evidence, not as standalone graph nodes.
 - Confirm SHACL node-shape target classes and property usage rows receive derived slot/facet modal sections from property-shape paths, datatype/class range constraints, node kind, cardinality, pattern, allowed values, and source-shape evidence.
 - Confirm target-class slot/facet sections are labeled as class slots, property usage sections are labeled as usages of the selected property by target classes, and repeated usages with different target classes or source shapes are not presented as duplicate property definitions.
@@ -236,9 +237,12 @@ Expected analysis checks:
 - Confirm class-expression nodes used as property domain/range expressions display contextual labels for actual union-valued ontology constraints while preserving expression members and property usage evidence in the ontology node modal, and confirm `define` does not render as a `Capability ∪ Requirement` range expression because contract ownership is requirement-only.
 - Confirm ontology viewer symbols are defined with semantic meaning, raw Unicode code point, rendered Unicode character, allowed viewer usage, tooltip text, and accessible labels.
 - Confirm ontology modal badges render the symbol and semantic label without rendering the raw Unicode code point as visible badge text, and that visible badge labels prefer domain wording such as `Subclass`.
+- Confirm the ontology node modal uses a single-column content flow with RDF type, full URI, OWL document, description, and notation at the top before projection constructs, literal values, raw evidence, and sources.
 - Confirm subclass and membership badges are directional and are not mirrored onto superclass or class-object nodes solely because those nodes are construct targets.
 - Confirm source citations remain available as modal/search evidence, link to served source route fragments, and the served `ontologies.ttl` artifact remains available for raw RDF/Turtle auditability and downstream tooling.
+- Confirm OWL ontology document IRIs typed as `owl:Ontology` do not render as ontology graph nodes, `rdfs:isDefinedBy` does not render as a canvas edge, and selected authored ontology terms expose their OWL document IRI in modal/search metadata.
 - Confirm the Ontologies SPA route opens directly on the headerless Explorer shell, fills the available viewport between the persistent left Explorer pane/strip and the right tool rail, places the `.ttl` download action in the Ontologies left pane with the summary controls, and does not render a retired route-local action bar, raw Turtle/source-block list, page header preamble, shared content-card footer, or route-local right sidebar.
+- Confirm the Ontologies SPA route paints the shell, graph canvas, and design-system spinner loading notice before deferred Sigma/ForceAtlas renderer construction starts, and clears the loading notice after the ontology renderer is mounted.
 - Confirm the ontology graph uses the Sigma.js, Graphology, and ForceAtlas2 rendering engine already used by the project knowledge graph while preserving ontology-specific projection and filter semantics, and uses Sigma curved-arrow edge programs to separate parallel edges and labels between the same nodes.
 - Confirm ontology graph property and construct edge labels are anchored on the same curved connector geometry as the rendered Sigma edge rather than at unrelated straight-line chord positions.
 - Confirm normal ontology property relationships render as solid labeled Sigma arrows, while OWL set-operator/class-expression member links use a dedicated Sigma/WebGL edge program, render as unlabeled dashed structural connectors with an open diamond marker at the anonymous construct/source side and an arrowhead at the member target side, retain expression kind/member evidence in node labels and the ontology node modal, and do not draw connector strokes or markers from the edge-label canvas hook.
@@ -255,14 +259,14 @@ Expected analysis checks:
 - Confirm generic SHACL overlay edges render as unlabeled overlay lines while retaining modal/projection evidence, unless an edge carries a more specific ontology/SHACL relation label.
 - Confirm relation connectors and arrowheads remain visible but subtle enough not to overflow or dominate labels.
 - Confirm circular class-anchor size is bounded and grows from graph connection degree rather than label length, so highly connected concepts are visually emphasized while low-degree concepts remain compact.
-- Confirm graph nodes, property link labels, modal badges, and legend swatches resolve through the ontology semantic role palette consistently, including separate role tokens for class anchors, property semantics, datatypes, named individuals, SHACL shapes, resources, restrictions, class expressions, external references, and the shared graph canvas surface.
+- Confirm graph nodes, property link labels, modal badges, and legend swatches resolve through the ontology semantic role palette consistently, including separate role tokens for class anchors, SKOS concepts, property semantics, datatypes, named individuals, SHACL shapes, resources, restrictions, class expressions, external references, and the shared graph canvas surface.
 - Confirm search, focus, modal detail, filters, and the compact legend operate over semantic ontology roles and OWL constructs rather than generic RDF predicate edges.
 - Confirm ontology graph nodes can be dragged through Sigma pointer events, updating in-memory Graphology coordinates so users can uncover overlapped relation lines or labels, and confirm the visible view controls expose `Reset` without a separate `Fit` button.
 - Confirm the Ontologies and Model/project graph left legend/filter panels use the shared graph control width and selected-control treatment: active controls use selected-control background/foreground tokens and inactive/hover controls use shared warm-neutral surface tokens.
 - Confirm selected Model Graph nodes expose a selected-element link in the left Explorer pane that opens the shared element-detail modal, and selected Ontologies graph nodes expose a selected ontology-node link in the left Explorer pane that opens the ontology element modal.
 - Confirm the detailed semantic type color key and construct notation key are passive, while the `Show` group contains the active role and relation visibility controls.
-- Confirm Ontologies left-pane overlay controls expose only Semantic Context and External Sources as active overlay filters with node counts, do not expose Authored as a layer row or toggle, and that toggling overlay controls changes graph visibility without changing ontology node modal evidence for selected authored nodes.
-- Confirm the passive type legend exposes separate color swatches only for semantic kinds that can render as nodes, including classes, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources; property kinds remain visible through property links, modal badges, search metadata, and relation visibility controls.
+- Confirm Ontologies left-pane overlay controls expose Core, Concepts, Semantic Context, and External Sources as active layer filters with node counts, and that toggling layer controls changes graph visibility without changing ontology node modal evidence for selected nodes. Confirm Core and Concepts are shown by default, Concepts can be hidden for structural-only inspection, Core can be hidden for thesaurus-only inspection, Concepts uses the `--rdf-concept` role token for SKOS concept nodes, and no generated inverse `mappedFrom` bridge edge is rendered.
+- Confirm the passive type legend exposes separate color swatches only for semantic kinds that can render as nodes, including classes, SKOS concepts, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources; property kinds remain visible through property links, modal badges, search metadata, and relation visibility controls.
 - Confirm the `Show` visibility group exposes one shared button design for datatype property links, object property links, class disjointness, restrictions, class expressions, SHACL shapes, resources, and external references without replacing Reqvire's richer passive type and notation legends, and that active means shown on the canvas.
 - Confirm ontology terms and class-membership context are not exposed as hideable toggles, property links are controlled through datatype-property and object-property visibility controls, and the single SHACL shapes role filter controls both SHACL shape nodes and SHACL overlay relations.
 - Confirm selected and hovered focus trees are computed from currently visible relation filters, so disabling object-property, datatype-property, restriction, class-expression, disjointness, or SHACL relation categories removes neighbors connected only by those hidden relations from the focused subgraph without filtering evidence from the ontology element modal; visible construct-only nodes expand the focus through their enabled construct links so union/intersection/complement members and restriction fillers are visible from the selected context.
@@ -339,13 +343,13 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - The served shell shall reference local compiled bundle, stylesheet, design-system, and font assets with no CDN-loaded framework, no CDN-loaded styling runtime, and no runtime CSS compiler.
 - The Project Store seed shall be present before view rendering and shall include a schema/version marker.
 - The Project Store `project` section shall include repository and branch metadata when Git metadata is available, and the Model tree root shall render that identity instead of a generic `Project` label.
-- The store shall expose normalized top-level sections for project, folders, files, resources, elements, relations, reused_contract_context, concept references, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes.
+- The store shall expose normalized top-level sections for project, folders, files, resources, elements, relations, reused_contract_context, concept references, thesaurus, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes.
 - File containers and modeled resources shall be represented as separate record families with explicit cross-references when the same path appears in both roles.
 - Route definitions shall include canonical hash routes for current views and element/file/search detail workflows.
 - Element-detail routes shall open a Project Store-backed scrollable modal/dialog in the Explorer shell instead of using the source content route as the primary element navigation target.
 - Element-detail modal headers shall show only the actual element type as a text badge and shall not show an additional type-family/kind badge, marker dot, shape, or glyph when the element type is more specific.
 - Opening a related element from within the element-detail modal shall show a compact back control whose accessible label names the previous element and shall not render a duplicate visible `From:` context line.
-- Resolved concept references in the element-detail modal shall show the ontology term name first, show the authored concept-reference label as bracketed secondary context, expose the IRI as tooltip/location metadata, and open the ontology-node modal when activated.
+- Resolved concept references in the element-detail modal shall show the SKOS concept name first, show the authored concept-reference label as bracketed secondary context only when it differs meaningfully from the resolved concept name, expose the IRI as tooltip/location metadata, and open the ontology-node modal when activated.
 - Element-detail modals shall expose source navigation as a secondary action using the source anchor.
 - The Coverage route shall render a left-pane coverage explorer with section counts for Overview, Capability coverage, Unverified requirements, Unimplemented requirements, Unsatisfied verifications, and Orphaned verifications, while keeping summary cards, charts, and legends out of the left pane.
 - Separate Explorer/report document entry points shall not be generated.
@@ -364,7 +368,8 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - Assert at least one Explorer element link or search result targets `#/elements/<identifier>` and that the element-detail UI contains a modal/dialog marker plus a secondary source link.
 - Assert element-detail modal headers render the actual element type as the only visible type badge and do not render a marker dot, shape, or glyph inside that badge; for example a `behavior` element shall not also show a separate `contract` badge.
 - Assert the Model view List/Grid modes render from Project Store `folders` and `files` without an iframe or third-party file-manager widget, expose breadcrumb navigation, sortable file rows, grid cards, central workspace search, icon/color legends, source-page secondary actions, and modeled-element rows that open the shared element-detail modal. Assert clicking anywhere on a Grid mode folder/file card opens or selects that card's item, while the source-page secondary action remains a separate control. Assert `#/files` and `#/files/<path>` deep-link into that behavior without creating a separate primary Filesystem view.
-- Assert the Model tree, grid cards, modeled-element lists, relation/reused_contract_context endpoints, and element legends use the shared Explorer `ElementIcon` type glyphs, that capability, semantic-contract, and verification-objective elements use their own role colors as plain squares with no glyph, that verification-objective uses the darker verification-objective token distinct from concrete verification, that concept-reference targets use the resource/amber treatment, that evidence-file artifacts use the neutral/default treatment, and that contract-family subtypes keep the shared contract color while rendering distinct glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
+- Assert the Model Graph mode paints the shell, graph canvas, and design-system spinner loading notice before deferred Sigma/ForceAtlas graph construction starts, clears the loading notice after renderer startup, and keeps full-graph ForceAtlas layout quality while using cached adjacency/focus lookup for interaction.
+- Assert the Model tree, grid cards, modeled-element lists, relation/reused_contract_context endpoints, and element legends use the shared Explorer `ElementIcon` type glyphs, that capability, semantic-contract, and verification-objective elements use their own role colors as plain squares with no glyph, that verification-objective uses the darker verification-objective token distinct from concrete verification, that resolved concept-reference endpoints use SKOS concept treatment, that unresolved concept-reference facts use the darker concept-reference treatment, that evidence-file artifacts use the neutral/default treatment, and that contract-family subtypes keep the shared contract color while rendering distinct glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
 - Assert selecting a folder, file, or modeled element in the left Model project tree updates the active Model workspace mode: List/Grid browse the selected folder or file, Graph focuses the matching graph node when one exists, and modeled-element rows open the shared element-detail modal without leaving the Model workspace.
 - Assert the Search route's left-pane result-type controls do not render a duplicate passive legend for the same result-type colors and labels.
 - Assert the Coverage route's left Explorer pane renders the coverage explorer section rows with counts, that selecting a row scrolls or selects the matching central Coverage section, and that the left pane does not duplicate the Coverage dashboard summaries or legend content.
@@ -378,6 +383,38 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 
 #### Relations
   * verify: [SPA Explorer Shell and Project Store](../../../Interfaces/WebExplorer/Capabilities.md#spa-explorer-shell-and-project-store)
+---
+
+### Thesaurus Project Store Projection Verification
+
+This test verifies that the Thesaurus Explorer route is backed by a native Project Store thesaurus projection instead of ontology graph provenance.
+
+#### Details
+
+##### Acceptance Criteria:
+- The exported Project Store shall include a top-level `thesaurus` projection with `schemes` and `concepts`.
+- Each concept-scheme row shall preserve distinct SKOS identity and native Reqvire `concept-scheme` element identity.
+- Each concept row shall preserve distinct SKOS identity and native Reqvire `concept` element identity.
+- Concept rows shall expose scheme membership, taxonomy parent identity, related concept identity, SKOS authoring fields, source navigation, model usage, and ontology mapping usage needed by the Thesaurus route.
+- Thesaurus map activation shall use native concept or concept-scheme element IDs from the `thesaurus` projection, not ontology graph node source/provenance data.
+- Ontology bridge evidence from `reqvire:mapsToConcept` shall appear as mapping usage without making the mapped ontology term the concept's navigation target.
+
+##### Test Criteria:
+- Export a model containing a native concept scheme, native concepts, concept taxonomy, related concepts, and an ontology term mapped to one concept through `reqvire:mapsToConcept`.
+- Parse `assets/project-store.js` and assert the top-level `thesaurus` projection exists.
+- Assert concept-scheme `element_id` resolves to a Project Store element with type `concept-scheme`.
+- Assert each concept `element_id` resolves to a Project Store element with type `concept`.
+- Assert the narrower concept's `parent_id` references the broader concept SKOS id.
+- Assert related concept ids, labels, scope note, source href, and ontology `maps_to` evidence are preserved.
+- Assert the concept `element_id` differs from ontology graph provenance for the same SKOS concept node, preventing Thesaurus map clicks from opening ontology elements.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-thesaurus-project-store/test.sh)
+  * verify: [Thesaurus View Generation](../../../Interfaces/WebExplorer/Capabilities.md#thesaurus-view-generation)
 ---
 
 ### Serve Command Verification

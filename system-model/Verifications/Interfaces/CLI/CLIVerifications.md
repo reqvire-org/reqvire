@@ -132,22 +132,19 @@ Expected checks:
 
 ### CLI Ontologies Command Verification
 
-This verification shall prove that the ontologies command collects ontology `Ontology` content and semantic-contract `Shapes` content.
+This verification shall prove that semantic export commands expose ontology, shapes, concepts, and combined graph layers through stable CLI options and output formats.
 
 #### Details
 Expected checks:
-- Run `reqvire ontologies` and verify Turtle output contains generated ontology document declarations, ontology term declarations, and SHACL shape references without generated ontology projection facts.
-- Verify generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors instead of emitting one document per element.
-- Run `reqvire ontologies --jsonld` and verify the output is valid JSON-LD without generated ontology projection facts.
-- Run `reqvire ontologies --include-external` and verify local Turtle/TTL, RDF/XML, and JSON-LD external ontology dependencies contribute only used external subset triples while default `reqvire ontologies` keeps external triples out.
-- Verify unused external ontology dependency terms do not appear in `reqvire ontologies --include-external` or `reqvire ontologies --full --include-external`.
-- Run `reqvire ontologies --full` and verify Turtle output contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements, plus generated ontology projection graph, projection, construct, symbol, source/provenance, member, and subject/object/predicate facts for direct-authored constructs.
-- Run `reqvire ontologies --full --jsonld` and verify JSON-LD output contains Reqvire model context triples and generated ontology projection facts.
-- Run `reqvire ontologies --full --include-external` through fixture coverage when used external subset materialization is enabled together with full semantic export.
-- Verify default Turtle output contains generated ontology document declarations and collected ontology content without generated ontology projection facts.
-- Verify the Ontologies Explorer uses the same collected ontology content and semantic projection model when served.
-- Verify the Reqvire authored ontology source tree does not contain stale `owl:deprecated true` presentation-only vocabulary declarations after ontology refactoring.
-- Verify representative reserved vocabulary IRIs from the RDF, RDFS, OWL, and XSD registry survive ontology serialization and do not require local External Ontology source declarations. The full executable fixed-list coverage is owned by the reserved-vocabulary implementation tests.
+- Run `reqvire semantic ontologies` and verify the command succeeds and emits authored ontology vocabulary without semantic-contract SHACL shapes.
+- Run `reqvire semantic shapes` and verify the command succeeds and emits semantic-contract SHACL shapes without authored ontology classes.
+- Run `reqvire semantic concepts --include-mappings` and verify the command succeeds and emits SKOS concepts plus optional `reqvire:mapsToConcept` bridge triples.
+- Run `reqvire concepts export --include-mappings` and verify the root Concepts command emits the same standalone Thesaurus SKOS layer plus optional valid bridge triples.
+- Run `reqvire concepts validate` and verify standalone concept-scheme namespace ownership, concept references, and `reqvire:mapsToConcept` targets validate through the canonical model validation path.
+- Run `reqvire semantic graph --full` and verify the command selects the full semantic graph export mode with model context and generated ontology projection facts.
+- Run JSON-LD variants and verify emitted JSON-LD is valid for supported layers.
+- Run external-inclusive ontology/graph exports and verify only the used external subset is exposed.
+- Verify the legacy `reqvire ontologies` command remains a compatibility alias for combined semantic graph export.
 
 #### Metadata
   * type: test-verification
@@ -155,10 +152,6 @@ Expected checks:
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-ontologies-command/test.sh)
   * verify: [CLI Ontologies Command](../../../Interfaces/CLI/Commands.md#cli-ontologies-command)
-  * verify: [Local External Ontology Sources](../../../Reports/ModelReports/ReportingRequirements.md#local-external-ontology-sources)
-  * verify: [Ontology and Shapes Collection](../../../Reports/ModelReports/ReportingRequirements.md#ontology-and-shapes-collection)
-  * verify: [Ontology Projection Subgraph Materialization](../../../Reports/ModelReports/ReportingRequirements.md#ontology-projection-subgraph-materialization)
-  * verify: [OWL Reserved Vocabulary Recognition](../../../Reports/ModelReports/ReportingRequirements.md#owl-reserved-vocabulary-recognition)
 ---
 
 ### CLI Size Estimate JSON Option Verification

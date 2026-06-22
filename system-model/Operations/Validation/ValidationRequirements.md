@@ -13,7 +13,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Excluded File Relation Validation Contract Specification](Specifications.md#excluded-file-relation-validation-contract-specification)
   * derivedFrom: [File Pattern Exclusion for Format](../Formatting/FormattingRequirements.md#file-pattern-exclusion-for-format)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Unstructured Documents Test](../../Verifications/Operations/Validation/ValidationVerifications.md#unstructured-documents-test)
 ---
 
@@ -32,43 +32,7 @@ This validation shall allow valid SHACL target mechanisms while preserving Reqvi
 #### Relations
   * definedBy: [Semantic Contract Shape Validation Specification](Specifications.md#semantic-contract-shape-validation-specification)
   * derivedFrom: [Ontology and Semantic Contract Model](../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
-  * derive: [SHACL Structural Parser Registry](#shacl-structural-parser-registry)
-  * derive: [SHACL Ontology Alignment](#shacl-ontology-alignment)
   * derive: [Reqvire SHACL Context Adapter](#reqvire-shacl-context-adapter)
-  * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
----
-
-### SHACL Structural Parser Registry
-
-The system shall compile SHACL RDF graphs into a reusable structural registry that is independent of Reqvire model elements and relations.
-
-#### Details
-The parser registry shall consume Oxigraph RDF terms and quads, discover SHACL shape nodes, parse targets, recursive property paths, nested shape structure, and supported constraint syntax, then expose a typed AST, raw Oxigraph-backed constraint facts, and diagnostics that can be reused by Reqvire validation, ontology projection, export, and Explorer rendering.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [SHACL Structural Parser Registry Specification](Specifications.md#shacl-structural-parser-registry-specification)
-  * derivedFrom: [Semantic Contract Shape Validation](#semantic-contract-shape-validation)
-  * satisfiedBy: [shacl.rs](../../../core/src/shacl.rs)
-  * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
----
-
-### SHACL Ontology Alignment
-
-The system shall align compiled SHACL shape registries against a supplied domain ontology index.
-
-#### Details
-The SHACL library shall accept a compiled shape registry and a domain ontology index derived from supplied RDF quads. The index shall expose declared classes, properties, datatypes, and available named terms from that supplied graph. The aligner shall cross-check SHACL targets, paths, class constraints, datatype constraints, target-node references, and relational property constraints against that supplied ontology index, then return generic alignment errors without depending on Reqvire elements or relations. Value constraints such as `sh:hasValue` and `sh:in` shall be preserved in the registry without requiring every value IRI to be a declared ontology term.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [SHACL Ontology Alignment Specification](Specifications.md#shacl-ontology-alignment-specification)
-  * derivedFrom: [Semantic Contract Shape Validation](#semantic-contract-shape-validation)
-  * satisfiedBy: [shacl.rs](../../../core/src/shacl.rs)
   * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
 ---
 
@@ -82,11 +46,16 @@ The Reqvire adapter shall ask the semantic index for parsed RDF quads from the o
 #### Metadata
   * type: requirement
 
+#### Reused Contract Context
+  * [SHACL Ontology Alignment Specification](../../Architecture/OntologyKernelSpecifications.md#shacl-ontology-alignment-specification)
+  * [SHACL Structural Parser Registry Specification](../../Architecture/OntologyKernelSpecifications.md#shacl-structural-parser-registry-specification)
+  * [Standards Reserved Vocabulary Recognition Specification](../../Architecture/OntologyKernelSpecifications.md#standards-reserved-vocabulary-recognition-specification)
+
 #### Relations
   * definedBy: [Reqvire SHACL Context Adapter Specification](Specifications.md#reqvire-shacl-context-adapter-specification)
   * derivedFrom: [Semantic Contract Shape Validation](#semantic-contract-shape-validation)
-  * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [semantic_contract.rs](../../../crates/reqvire-core/src/semantic_contract.rs)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
   * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
 ---
 
@@ -113,8 +82,8 @@ The system shall implement a specialized validator that analyzes dependencies ac
 
 #### Relations
   * derivedFrom: [Validate Cross-Component Dependencies](#validate-cross-component-dependencies)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
 ---
 
@@ -164,8 +133,8 @@ The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 com
 #### Relations
   * definedBy: [Requirements Processing Specification](Specifications.md#requirements-processing-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
   * verifiedBy: [Requirements Files Search and Detection Test](../../Verifications/Operations/Validation/ValidationVerifications.md#requirements-files-search-and-detection-test)
 ---
 
@@ -185,7 +154,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Integrated Validation Contract Specification](Specifications.md#integrated-validation-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
 ---
 
 ### Internal Consistency Validator
@@ -201,8 +170,8 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Internal Consistency Validator Contract Specification](Specifications.md#internal-consistency-validator-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
 ---
 
@@ -223,7 +192,7 @@ Within-section duplicates (same entry repeated within Relations OR within Reused
 #### Relations
   * definedBy: [Cross-Section Duplicate Constraint](Constraints.md#cross-section-duplicate-constraint)
   * derivedFrom: [Internal Consistency Validator](#internal-consistency-validator)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
   * verifiedBy: [Cross-Section Duplicate Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#cross-section-duplicate-validation-test)
 ---
 
@@ -236,7 +205,7 @@ The system shall validate relation types against a defined vocabulary and provid
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+  * satisfiedBy: [relation.rs](../../../crates/reqvire-core/src/relation.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
   * verifiedBy: [Same-File Fragment Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#same-file-fragment-relations-test)
 ---
@@ -254,8 +223,8 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Reused Contract Context Target Validation Contract Specification](Specifications.md#reused-contract-context-target-validation-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Reused Contract Context Subsection Parsing Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-subsection-parsing-verification)
   * verifiedBy: [Reused Contract Context Validation Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-validation-verification)
 ---
@@ -278,7 +247,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Reused Contract Context Scope Validation Contract Specification](Specifications.md#reused-contract-context-scope-validation-contract-specification)
   * derivedFrom: [Reused Contract Context Target Validation](#reused-contract-context-target-validation)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
   * verifiedBy: [Reused Contract Context Scope Constraints Test](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-scope-constraints-test)
 ---
 
@@ -295,7 +264,7 @@ Validation details shall follow the associated hierarchy ownership constraint.
 #### Relations
   * definedBy: [Single Root Hierarchy Ownership Constraint](Constraints.md#single-root-hierarchy-ownership-constraint)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
   * verifiedBy: [Single Root Hierarchy Ownership Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#single-root-hierarchy-ownership-validation-test)
 ---
 
@@ -312,7 +281,7 @@ The system shall define two-pass validation behavior.
 #### Relations
   * definedBy: [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
 ---
 
 ### Type Validation Error Requirement
@@ -331,8 +300,8 @@ The system shall display all valid type options when type validation fails.
 #### Relations
   * definedBy: [Type Validation Error Behavior](Behaviors.md#type-validation-error-behavior)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [element.rs](../../../core/src/element.rs)
-  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+  * satisfiedBy: [element.rs](../../../crates/reqvire-core/src/element.rs)
+  * satisfiedBy: [relation.rs](../../../crates/reqvire-core/src/relation.rs)
   * verifiedBy: [Type Validation Errors Test](../../Verifications/Operations/Validation/ValidationVerifications.md#type-validation-errors-test)
 ---
 
@@ -357,8 +326,8 @@ This ensures users see all relevant errors at once rather than fixing issues one
 #### Relations
   * definedBy: [Validation Error Reporting Behavior](Behaviors.md#validation-error-reporting-behavior)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [error.rs](../../../core/src/error.rs)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
 ---
 
@@ -383,8 +352,8 @@ The system shall implement a markdown structure validator that enforces Reqvire'
 
 #### Relations
   * derivedFrom: [Validate Markdown Structure](#validate-markdown-structure)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Invalid Header Structure Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-header-structure-test)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
 ---
@@ -414,9 +383,9 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Relation Element Type Validator Contract Specification](Specifications.md#relation-element-type-validator-contract-specification)
   * derivedFrom: [Validate Relation Types](#validate-relation-types)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Element Type Relation Compatibility Test](../../Verifications/Operations/Validation/ValidationVerifications.md#element-type-relation-compatibility-test)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
   * verifiedBy: [Single Element Contract Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#single-element-contract-validation-test)

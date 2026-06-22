@@ -91,7 +91,7 @@ The Graph view renders the project knowledge graph inside the Model workspace.
 
 **Structure:**
 - Nodes represent modeled elements and opt-in resource/evidence targets
-- Edges represent relation facts, reused_contract_context facts, concept-reference facts, verification/satisfaction facts, and trace overlays
+- Edges represent relation facts, reused_contract_context facts, concept-reference facts, verification/satisfaction facts, and trace overlays; concept references target SKOS concept nodes and do not create concept-reference nodes
 - Left-pane controls expose graph filters, overlays, layout reset, and selected element actions
 
 **Interactive Capabilities:**

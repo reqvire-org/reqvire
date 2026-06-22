@@ -1090,7 +1090,7 @@ This test verifies ontology-aware mutation rewrites when a CRUD change crosses o
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-ontology-aware-mutations/test.sh)
   * verify: [CRUD Semantic Contract Mutation Validation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#crud-semantic-contract-mutation-validation)
-  * verify: [Ontology and Shapes Collection](../../../Reports/ModelReports/ReportingRequirements.md#ontology-and-shapes-collection)
+  * verify: [Ontology and Shapes Collection](../../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
 ---
 
 ### Relation Consistency Test
@@ -1297,4 +1297,3 @@ Test cases:
   * verify: [Merge Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#merge-element-operation)
   * verify: [Move Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-element-operation)
 ---
-

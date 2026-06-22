@@ -178,7 +178,7 @@ export const governanceProvenanceSkinX = css`
 export const relationStackUX = css`
   display: flex;
   flex-direction: column;
-  gap: var(--gap-list-stack);
+  gap: var(--stack-gap-compact);
 `;
 
 export const relationListUX = css`
@@ -186,7 +186,7 @@ export const relationListUX = css`
   grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
   column-gap: var(--space-5);
-  gap: var(--gap-list-stack);
+  gap: var(--stack-gap-compact);
 `;
 
 export const relationRowBaseUX = css`

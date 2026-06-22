@@ -11,13 +11,47 @@ Test capability root for migrated requirement fixtures.
 
 ### Target Capability
 
-A capability for testing.
+A requirement for testing verification relations.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-invalid-verifiedby-specifications)
+---
+
+### Actual Capability Target
+
+An actual capability. Direct verification of this capability is invalid; verifications must target requirements and capability coverage rolls up from requirements.
+
+#### Metadata
+  * type: capability
+
+---
+
+### Capability Direct VerifiedBy
+
+INVALID: Capabilities cannot author verifiedBy. They are covered through verified requirements.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * verifiedBy: [Target Test Verification](#target-test-verification)
+
+---
+
+### Verification Directly Verifies Capability
+
+INVALID: Concrete verifications must verify requirements, not capabilities.
+
+#### Metadata
+  * type: analysis-verification
+
+#### Relations
+  * derivedFrom: [Verification Objective Using Verify](#verification-objective-using-verify)
+  * verify: [Actual Capability Target](#actual-capability-target)
+
 ---
 
 ### Target Test Verification

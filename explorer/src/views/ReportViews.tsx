@@ -691,11 +691,6 @@ export function CoverageView({
             id={coverageSectionDomId("overview")}
             eyebrow="Coverage"
             title="Verification Coverage"
-            stats={[
-              { label: "Requirements", value: formatNumber(summary.total_requirements_in_scope) },
-              { label: "Leaf reqs", value: formatNumber(summary.total_leaf_requirements) },
-              { label: "Verifications", value: formatNumber(summary.total_verifications) },
-            ]}
           />
 
           {!hasCoverageData ? (

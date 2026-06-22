@@ -1,13 +1,15 @@
 # Codex Skills for Reqvire
 
-This repository includes Codex skill packages for Reqvire MBSE workflows.
+This repository includes Codex skill packages for Reqvire MBSE workflows. Matching Claude plugin skills live under `claude-plugins/skills`.
 
 ## Included Skills
 
 - `codex-skills/reqvire-syseng`
   - Use for requirements and specifications work, verification modeling and coverage checks, model exploration and impact analysis, and MBSE-first change workflows in Reqvire.
 - `codex-skills/reqvire-ontology-authoring`
-  - Use for competency-question-driven creation, extension, and validation of Reqvire ontology elements for IT engineering, systems engineering, MBSE, and system-of-interest models with OWL/Turtle vocabulary, capability reused_contract_context context, semantic-contract boundaries, ontology hierarchy, domain/range/property modeling, individuals, axioms, and semantic export readiness.
+  - Use for competency-question-driven creation, extension, and validation of structural Reqvire OWL/Turtle ontology elements, semantic-contract boundaries, ontology hierarchy, domain/range/property modeling, individuals, axioms, structural-to-concept bridges, and semantic export readiness.
+- `codex-skills/reqvire-concept-authoring`
+  - Use for native `concept-scheme` and `concept` thesaurus authoring, SKOS terminology, concept taxonomies, labels, scope notes, examples, mappings, concept-scheme namespace ownership, and concept references.
 
 The skills use the Reqvire npm package by default:
 
@@ -47,6 +49,8 @@ rm -rf "$CODEX_HOME/skills/reqvire-syseng"
 cp -R codex-skills/reqvire-syseng "$CODEX_HOME/skills/reqvire-syseng"
 rm -rf "$CODEX_HOME/skills/reqvire-ontology-authoring"
 cp -R codex-skills/reqvire-ontology-authoring "$CODEX_HOME/skills/reqvire-ontology-authoring"
+rm -rf "$CODEX_HOME/skills/reqvire-concept-authoring"
+cp -R codex-skills/reqvire-concept-authoring "$CODEX_HOME/skills/reqvire-concept-authoring"
 ```
 
 ## Update After Repo Changes

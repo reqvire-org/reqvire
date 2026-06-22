@@ -29,7 +29,7 @@ The system shall meet performance requirements.
 
 #### Relations
   * derivedFrom: [Root Capability](#root-capability)
-  * satisfiedBy: [impl.rs](../core/src/impl.rs)
+  * satisfiedBy: [impl.rs](../crates/reqvire-core/src/impl.rs)
 ---
 
 ### Data Integrity
@@ -41,7 +41,7 @@ The system shall ensure data integrity across all operations.
 
 #### Relations
   * derivedFrom: [Root Capability](#root-capability)
-  * satisfiedBy: [impl.rs](../core/src/impl.rs)
+  * satisfiedBy: [impl.rs](../crates/reqvire-core/src/impl.rs)
   * satisfiedBy: [design.md](../docs/design.md)
 ---
 
@@ -71,7 +71,7 @@ The system shall provide a RESTful API.
 
 #### Relations
   * derivedFrom: [Root Capability](#root-capability)
-  * satisfiedBy: [api.rs](../core/src/api.rs)
+  * satisfiedBy: [api.rs](../crates/reqvire-core/src/api.rs)
 ---
 
 ### Documentation Contract Owner

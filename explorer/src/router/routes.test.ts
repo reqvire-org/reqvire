@@ -37,9 +37,9 @@ describe("parseHash", () => {
   });
 
   it("parses resource routes with their id param", () => {
-    const r = parseHash("#/resources/resource:core/src/lib.rs", "model");
+    const r = parseHash("#/resources/resource:crates/reqvire-core/src/lib.rs", "model");
     expect(r.view).toBe("resources");
-    expect(r.param).toBe("resource:core/src/lib.rs");
+    expect(r.param).toBe("resource:crates/reqvire-core/src/lib.rs");
   });
 
   it("parses search routes with query", () => {

@@ -41,7 +41,7 @@ Test cases:
 4. Capability `derivedFrom` capability validates successfully.
 5. Requirement `derivedFrom` capability fails.
 6. Capability `specifiedBy` capability fails.
-7. Capability `satisfiedBy` fails, while capability `verifiedBy` is valid.
+7. Capability `satisfiedBy` and capability `verifiedBy` both fail; capability coverage must roll up from verified requirements.
 8. Unsupported stakeholder requirement type metadata fails as an invalid type.
 
 #### Metadata
@@ -148,13 +148,15 @@ This test verifies that the system correctly validates relation types based on e
 - System shall provide clear error message for invalid element types using satisfiedBy
 
 **verifiedBy/verify Validation:**
-- System shall allow `verifiedBy` relations from `capability` and `requirement` elements to any concrete verification type
-- System shall allow `verify` relations from any concrete verification type to `capability` or `requirement` elements
+- System shall allow `verifiedBy` relations from `requirement` elements to any concrete verification type
+- System shall allow `verify` relations from any concrete verification type to `requirement` elements
+- System shall reject `verifiedBy` relations from `capability` elements
+- System shall reject `verify` relations from concrete verification elements to `capability` elements
 - System shall reject `verifiedBy` targets that are `verification-objective`
 - System shall reject `verify` relations authored by `verification-objective`
-- System shall reject `verifiedBy` relations from non-capability and non-requirement elements
+- System shall reject `verifiedBy` relations from non-requirement elements
 - System shall reject `verifiedBy` relations from verification elements
-- System shall reject `verify` relations to non-capability and non-requirement elements
+- System shall reject `verify` relations to non-requirement elements
 
 **Contract Type Validation:**
 - System shall allow `define` relations on `constraint` type elements pointing to requirements
@@ -451,7 +453,7 @@ Test cases:
 4. `semantic-contract` using `definedBy`/`define` fails validation.
 5. `source` refining `capability` fails.
 6. `constraint`, `behavior`, `specification`, `state`, or `input-output` refining `capability` fails.
-7. Capability reused_contract_context to `ontology` fails; capabilities use concept references for ontology terms.
+7. Capability reused_contract_context to `ontology` fails; capabilities use concept references for SKOS concepts.
 8. Requirement `constrainedBy` to `semantic-contract` validates.
 9. Requirement reused_contract_context to `ontology` fails because ontology terms use concept references and semantic-contract ontology use is explicit through `use`.
 10. Capability reused_contract_context to `semantic-contract` fails.
@@ -501,7 +503,7 @@ Test cases:
 1. A semantic contract with a reachable ontology through `use` validates when it contains a target-only shape using `sh:targetSubjectsOf`.
 2. A property shape with an RDF list `sh:path` sequence validates when the sequence contains declared predicates.
 3. Nested path variants inside the sequence validate, including `sh:inversePath`, `sh:alternativePath`, and a repetition operator.
-4. Typed constraints such as `sh:datatype`, `sh:minCount`, `sh:maxCount`, `sh:class`, and `sh:in` are accepted so the SHACL parser exercises both typed constraint extraction and raw Oxigraph-backed constraint preservation.
+4. Typed constraints such as `sh:datatype`, `sh:minCount`, `sh:maxCount`, `sh:class`, and `sh:in` are accepted so the SHACL parser exercises both typed constraint extraction and raw RDF-backed constraint preservation.
 5. The same fixture fails validation when one nested path predicate is changed to an undeclared ontology term.
 6. The invalid nested path case reports the semantic-contract identifier, SHACL reference kind, missing IRI, and guidance to update or remove the SHACL reference.
 7. A semantic contract using a child ontology validates when the child ontology has a different `ontology_base` from its parent and the SHACL shapes reference both child-base terms and inherited parent-base terms.
@@ -518,8 +520,8 @@ Test cases:
   * derivedFrom: [Validation and Semantic Integrity Verification Objective](#validation-and-semantic-integrity-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-shacl-recursive-ast/test.sh)
   * verify: [Semantic Contract Shape Validation](../../../Operations/Validation/ValidationRequirements.md#semantic-contract-shape-validation)
-  * verify: [SHACL Structural Parser Registry](../../../Operations/Validation/ValidationRequirements.md#shacl-structural-parser-registry)
-  * verify: [SHACL Ontology Alignment](../../../Operations/Validation/ValidationRequirements.md#shacl-ontology-alignment)
+  * verify: [SHACL Ontology Alignment](../../../Architecture/OntologyKernelRequirements.md#shacl-ontology-alignment)
+  * verify: [SHACL Structural Parser Registry](../../../Architecture/OntologyKernelRequirements.md#shacl-structural-parser-registry)
   * verify: [Reqvire SHACL Context Adapter](../../../Operations/Validation/ValidationRequirements.md#reqvire-shacl-context-adapter)
 ---
 

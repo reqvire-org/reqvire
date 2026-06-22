@@ -1,19 +1,20 @@
 ---
 name: reqvire-ontology-authoring
-description: Expert workflow for creating, extending, and validating Reqvire ontology elements for IT engineering, systems engineering, MBSE, and system-of-interest modeling. Use for competency-question-driven ontology scoping, OWL/Turtle vocabulary, concept-reference context, semantic-contract boundaries, ontology hierarchy, domain/range/property modeling, individuals, axioms, and Reqvire validation; trigger when Codex needs to add or revise files under system-model/Ontologies, author #### Ontology Turtle blocks, decide whether meaning belongs in ontology vs requirement/specification/semantic-contract, or prepare ontology terms for Reqvire HTML visualization and semantic export.
+description: Expert workflow for creating, extending, and validating Reqvire structural ontology elements for IT engineering, systems engineering, MBSE, and system-of-interest modeling. Use for competency-question-driven OWL/Turtle vocabulary, semantic-contract boundaries, ontology hierarchy, domain/range/property modeling, individuals, axioms, SHACL target vocabulary, structural-to-concept bridges, and Reqvire validation; trigger when the assistant needs to add or revise ontology elements, author #### Ontology Turtle blocks, decide whether structural meaning belongs in ontology vs requirement/specification/semantic-contract, or prepare ontology terms for semantic export. Do not use for native concept-scheme/concept thesaurus authoring; use reqvire-concept-authoring instead.
 ---
 
 # Reqvire Ontology Authoring
 
-Author Reqvire ontology content as reusable building blocks for system-of-interest models, not implementation detail. Reqvire managed-project ontologies are primarily for IT engineering, systems engineering, MBSE, architecture, interfaces, verification, operations, and other system model concerns. Use ontology elements for stable nouns, relationships, categories, and model meaning; use requirements for obligations; use semantic-contract elements for reusable SHACL profiles that explicitly `use` ontology and `constrain` requirements.
+Author Reqvire structural ontology content as reusable OWL/RDFS building blocks for system-of-interest models, not implementation detail. Reqvire managed-project ontologies are primarily for IT engineering, systems engineering, MBSE, architecture, interfaces, verification, operations, and other system model concerns. Keep curated conceptual vocabulary in native `concept-scheme` and `concept` elements using `reqvire-concept-authoring`; keep this skill focused on OWL classes, properties, individuals, axioms, SHACL target vocabulary, and structural-to-concept bridges. Use requirements for obligations; use semantic-contract elements for reusable SHACL profiles that explicitly `use` ontology and `constrain` requirements.
 
 ## Workflow
 
 1. Establish the domain-concept frame before project-specific examples.
    - Identify the system of interest and the domain viewpoints the ontology must support: product/domain, engineering/MBSE, operations, governance, interfaces, verification, assurance, or business process.
-   - Name the most reusable top-level concepts before leaves such as concrete providers or specific workflows.
-   - Typical first-pass concepts for IT/MBSE projects include `SystemOfInterest`, `Actor`, `CapabilityArea`, `ManagedResource`, `BusinessArtifact`, `OperationalArtifact`, `InterfaceSurface`, `ExternalSystem` or `EnablingSystem`, `LifecycleState`, `Operation`, `Policy`, `Risk`, and `VerificationEvidence`.
-   - Check the five ontology building blocks: classes/concepts, instances/individuals, properties/slots, relationships, and axioms/rules.
+   - If terminology is still being negotiated, use `reqvire-concept-authoring` first to create native `concept-scheme` and `concept` elements.
+   - Add OWL structural classes, properties, individuals, and axioms when the model needs formal schema, validation targets, reasoning semantics, or stable structural relationships.
+   - Typical first-pass structural terms for IT/MBSE projects include `SystemOfInterest`, `Actor`, `CapabilityArea`, `ManagedResource`, `BusinessArtifact`, `OperationalArtifact`, `InterfaceSurface`, `ExternalSystem` or `EnablingSystem`, `LifecycleState`, `Operation`, `Policy`, `Risk`, and `VerificationEvidence`.
+   - Check the six ontology building blocks: SKOS concepts, OWL classes, instances/individuals, properties/slots, relationships, and axioms/rules.
 2. Define the system-of-interest scope and 5-10 competency questions.
    - Ask what an ontology-backed model must answer about the system, subsystems, capabilities, functions, interfaces, requirements, verification, deployment, operations, risks, or evidence.
    - Treat these questions as the litmus test for scope. The ontology should contain enough vocabulary and relationships to answer them at the required level of detail.
@@ -25,19 +26,19 @@ Author Reqvire ontology content as reusable building blocks for system-of-intere
    - For each class candidate, immediately ask what object properties and datatype properties are needed: ownership, state, allocation, interface exposure, verification evidence, operational effect, constraints, and identifiers.
 4. Inspect the ontology plane:
    - `reqvire search --filter-type=ontology --short`
-   - `reqvire ontologies`
+   - `reqvire semantic ontologies`
    - Read the existing `system-model/Ontologies/*.md` file that owns nearby vocabulary.
 5. Decide whether to extend an existing ontology or create a new ontology element.
    - Extend when the new terms belong to an existing vocabulary root.
    - Create a new ontology when the terms form a coherent reusable vocabulary with separate ownership, lifecycle, or concept-reference scope.
-6. Derive candidate classes, properties, individuals, and axioms from the domain frame and competency questions.
+6. Derive candidate OWL classes, properties, individuals, and axioms from the domain frame and competency questions. If the candidate is mainly terminology, synonymy, definition, taxonomy, or stakeholder vocabulary, switch to `reqvire-concept-authoring`. Structural terms can point back to native concepts through `reqvire:mapsToConcept` when an explicit bridge is useful.
 7. For a top parent ontology element, define `ontology_base` and `ontology_prefix` metadata before authoring Turtle. Descendant ontology elements inherit both through `derivedFrom` hierarchy. Use the corresponding hash namespace for terms, normally `<ontology_base>#`, with the inherited prefix as the canonical CURIE label. When rebasing an existing ontology element, use `add --override` as the command path and require it to rewrite the dependent ontology boundary chain atomically, including `ontology_base`, `ontology_prefix`, inherited prefix bindings, imports, and any reachable SHACL references.
 8. Place ontology elements under `system-model/Ontologies`.
 9. Author exactly one `#### Ontology` fenced Turtle block per ontology element.
 10. Link ontology hierarchy with `derivedFrom` only between ontology elements.
-11. Use `#### Concept References` on non-ontology, non-semantic-contract elements when their prose needs explicit bindings to ontology terms.
+11. Use `#### Concept References` on non-ontology, non-semantic-contract elements when their prose needs explicit bindings to SKOS concepts. Do not point concept references directly at OWL classes or properties; bridge structural terms to concepts with `reqvire:mapsToConcept` in authored ontology when useful.
 12. Add or update semantic contracts only when a closed-world SHACL profile is needed; link each contract to ontology with `use`/`usedBy` and to governed requirements with `constrain`/`constrainedBy`. Do not add `#### Concept References` to semantic contracts.
-13. Use `reqvire ontologies` for the clean authored ontology/SHACL document. Use `reqvire ontologies --include-external` or MCP `reqvire.semantic.ontologies` with `include_external: true` when the used subset of local External Ontology dependencies must be materialized. Use MCP `reqvire.semantic.prefixes`, `reqvire.semantic.vocabulary`, or `reqvire.semantic.sparql` with `include_external: true` only when imported external prefixes, used vocabulary terms, or used subset triples are needed. Use `reqvire ontologies --full` when downstream graph/database tooling also needs model-context facts for element relations, reused_contract_context, concept references, term declarations, shape references, and ontology projection facts. Use `reqvire ontologies --full --include-external` when both the used external subset and full model context are needed. Concept references are term-reference edges, not generated `OntologyConstruct` records. Reqvire parses complete external ontology files internally for validation and term resolution, but assistants should not expect a public full third-party ontology dump mode.
+13. Use `reqvire semantic ontologies` for authored OWL/RDF ontology vocabulary, `reqvire semantic shapes` for semantic-contract SHACL shapes, `reqvire semantic concepts` for SKOS concepts, and `reqvire semantic graph` for the combined semantic graph. Reqvire generates `rdfs:isDefinedBy <ontology_base>` facts only for authored named ontology resources whose IRIs are inside the resolved ontology term namespace; authors do not need to repeat them, and conflicting authored `rdfs:isDefinedBy` targets fail validation. Reqvire does not generate `rdfs:isDefinedBy` ownership facts for imported External Ontology terms. Use `reqvire semantic ontologies --include-external`, `reqvire semantic graph --include-external`, or MCP `include_external: true` when the used subset of local External Ontology dependencies must be materialized. Use MCP `reqvire.semantic.prefixes`, `reqvire.semantic.vocabulary`, or `reqvire.semantic.sparql` with `include_external: true` only when imported external prefixes, used vocabulary terms, or used subset triples are needed. Use MCP `reqvire.semantic.vocabulary` with `ontology_document` or `ontology_base` to filter authored terms to one OWL document, or with `include_external: true` plus `ontology_document` to filter used external subset terms to one external source. Use `reqvire semantic graph --full` when downstream graph/database tooling also needs model-context facts for element relations, reused_contract_context, concept references, term declarations, shape references, and ontology projection facts. Use `reqvire semantic graph --full --include-external` when both the used external subset and full model context are needed. Concept references are term-reference edges, not generated `OntologyConstruct` records. Reqvire parses complete external ontology files internally for validation and term resolution, and `include_external` should be used only for used-subset materialization; raw full external dependency triples remain available only in explicit full-external workflows.
 14. Validate before finishing.
 
 ## Ontology From Existing Model Content
@@ -55,23 +56,65 @@ Use this workflow when a project has partial or no ontology coverage:
 
 ## Modeling Split
 
+### Structural Ontology Scope
+
+Use this skill for the structural OWL/RDFS layer:
+
+- Formal classes, object/datatype/annotation properties, named individuals, domain/range, subclass hierarchy, restrictions, property chains, equivalence, disjointness, and other axioms.
+- Terms that SHACL shapes, SPARQL queries, semantic exports, or model operations must treat as formal schema.
+- Stable domain semantics such as `X is a Y`, `X has property Z`, and `X relates to Y`.
+
+Use `reqvire-concept-authoring` for the conceptual SKOS layer:
+
+- Native `concept-scheme` and `concept` elements.
+- Curated human/domain terms, labels, synonyms, definitions, taxonomy, search/navigation anchors, scope notes, examples, and concept mappings.
+- Concept references from capabilities, requirements, contracts, and verifications to generated native SKOS concepts.
+
+Bridge the layers only when useful:
+
+- Use `reqvire:mapsToConcept` from a structural term or model resource to a generated native SKOS concept.
+- `reqvire:mapsToConcept` is an `owl:AnnotationProperty`; it does not imply OWL equivalence, SKOS mapping semantics, or that the structural subject is itself a `skos:Concept`.
+- Do not use `skos:exactMatch`, `skos:broadMatch`, or other SKOS mapping properties for structural-to-concept anchoring by default. Reserve SKOS mapping properties for concept-to-concept mappings in `reqvire-concept-authoring`.
+
+Preferred mixed structure:
+
+```text
+Concept scheme root
+  type: concept-scheme
+  concept_base: https://example.org/concepts
+  concept_prefix: concept
+  authored with reqvire-concept-authoring
+
+Structural ontology root
+  ontology_base: https://example.org/ontology/managed-platform
+  ontology_prefix: ex
+  owns: owl:Class, owl:ObjectProperty, owl:DatatypeProperty,
+        individuals, axioms, SHACL targets
+  optional bridge: ex:StructuralTerm reqvire:mapsToConcept concept:CuratedConcept
+```
+
+Before adding or changing OWL classes, run the structure/concept check:
+
+- If the work is mainly labels, synonyms, definitions, spelling variants, audience terms, broader/narrower editorial categories, or search/navigation vocabulary, use `reqvire-concept-authoring`.
+- If the work is formal type membership, valid properties, domain/range, SHACL targets, reasoning, or graph operation semantics, create or extend OWL structural terms here.
+- If an OWL class is accumulating glossary prose, aliases, search facets, and stakeholder wording, split that curation into native concepts and keep the class structural.
+- If a hierarchy means "is a formal subtype of", use `rdfs:subClassOf`. If it means "is a broader/narrower topic than", use native concept relations through `reqvire-concept-authoring`.
+
 Use `ontology` for:
-- Reusable ontology vocabulary under root `ontology_base` and `ontology_prefix` metadata values. Authored Turtle normally declares terms in the hash namespace such as `@prefix ex: <https://example.org/ontology/managed-platform#>`; Reqvire emits one generated `owl:Ontology` document declaration per resolved `ontology_base`, with same-base child ontology elements contributing vocabulary to that document. Cross-base ontology hierarchy can become `owl:imports`. If authored Turtle uses the inherited prefix, it must explicitly declare that prefix to `<ontology_base>#`; missing or conflicting declarations fail validation.
-- Classes/concepts, such as `reqvire:RequirementCoverage a owl:Class`.
-- Object properties and datatype properties declared in `#### Ontology` blocks with stable `rdfs:domain` and `rdfs:range` when those semantics are true.
-- Stable vocabulary individuals, such as element type records, rule records, report kinds, governance values, and enum-like categories. For new controlled vocabulary records, explicitly type the record as both `owl:NamedIndividual` and its domain class, for example `ex:collectReportKind a owl:NamedIndividual, ex:ReportKind`.
-- Stable hierarchy and axioms, such as `rdfs:subClassOf`, `rdfs:domain`, `rdfs:range`, `owl:inverseOf`, equivalence, disjointness, and property chains when semantically true.
-- MBSE/system-of-interest concepts, such as system, subsystem, function, interface, port, deployment environment, operational mode, verification evidence, risk, hazard, dependency, allocation, and traceability category.
+
+- Reusable structural ontology vocabulary under root `ontology_base` and `ontology_prefix` metadata values.
+- OWL structural classes, object properties, datatype properties, annotation properties, named individuals, stable hierarchy, and axioms.
+- MBSE/system-of-interest structural terms such as system, subsystem, function, interface, port, deployment environment, operational mode, verification evidence, risk, hazard, dependency, allocation, and traceability category when those terms are formal schema.
 
 Use `requirement` for implementable obligations, especially statements that naturally read as "The system shall...".
 
 Use `specification`, `behavior`, `constraint`, `state`, or `input-output` for exact commands, file paths, outputs, workflows, schemas, UI behavior, and implementation-specific details.
 
-Use `semantic-contract` for reusable SHACL `sh:NodeShape` profiles. A semantic contract is a first-class ontology-plane element and should be authored under `system-model/Ontologies` near the ontology it uses. It must have `#### Shapes`, use `sh:targetClass` and `sh:path` over ontology terms reachable through explicit `use` relations, constrain requirements through `constrain`/`constrainedBy`, and must not contain `#### Ontology`.
+Use `semantic-contract` for reusable SHACL shape profiles. A semantic contract is a first-class ontology-plane element and should be authored under `system-model/Ontologies` near the ontology it uses. It must have `#### Shapes`, use valid SHACL targets and paths over ontology terms reachable through explicit `use` relations, constrain requirements through `constrain`/`constrainedBy`, and must not contain `#### Ontology`.
 
-For greenfield ontology creation templates and examples, read `references/OntologyAuthoring.md`.
+For greenfield ontology creation templates and examples, read `reference/OntologyAuthoring.md`.
 
-For refactoring or improving existing ontology files, read `references/OntologyRefactoring.md`. Do not load the refactoring reference for new ontology creation unless the user explicitly asks to refactor or improve existing ontology content.
+For refactoring or improving existing ontology files, read `reference/OntologyRefactoring.md`. Do not load the refactoring reference for new ontology creation unless the user explicitly asks to refactor or improve existing ontology content.
 
 ## OWL 2 Authoring Mental Model
 
@@ -96,6 +139,7 @@ Reqvire rule of thumb:
 - Use `rdfs:label` and `rdfs:comment` for human-readable explanation, not as substitutes for formal terms.
 - If queries, SHACL, exports, report payloads, or model behavior depend on a value, model it as a real class, property, individual, or axiom rather than only as annotation text.
 - Do not encode required fields, cardinality checks, enum validation, parser behavior, command behavior, or report formatting as OWL axioms unless they are true domain semantics intended for reasoning.
+- Do not collapse conceptual and structural layers just because they share a label. A SKOS concept named "Electric vehicle" can remain separate from an OWL class `ex:ElectricVehicle`; use `reqvire:mapsToConcept` only if an explicit bridge is useful.
 
 ### Common OWL Axioms
 
@@ -120,11 +164,11 @@ Use `rdfs:label` and `rdfs:comment` for labels and descriptions unless the value
 - `rdfs:label` is optional presentation label text when no more specific domain property is needed.
 - `rdfs:comment` is optional explanatory description text for a class, property, individual, or axiom.
 - Create a domain class or property when a label/description value is itself system meaning that requirements, SHACL, queries, reports, or payloads depend on.
-- Keep custom datatype properties only when the literal is part of the system contract: authored metadata tokens, parser fields, export fields, interface enum values, report kinds, rule conditions, queryable attributes, or controlled-vocabulary payloads.
+- Keep custom datatype properties only when the literal is part of the domain or model contract: authored metadata tokens, rule conditions, queryable attributes, or controlled-vocabulary payloads.
 - If a SHACL shape validates a presentation-only `*Name`, `*Label`, `*Meaning`, or description field, refactor the SHACL `sh:path` to `rdfs:label` or `rdfs:comment` instead of preserving a custom property.
 - Do not infer that a property is only a label because it ends with `Name` or only a comment because it ends with `Meaning`.
 - Controlled-vocabulary individuals get formal semantics from their IRI, explicit `owl:NamedIndividual` typing, typed class membership, hierarchy, and axioms. Domain token and definition properties may still be required for validation and queries.
-- Do not replace canonical token properties with `rdfs:label` when project files, CLI output, API payloads, semantic contracts, reports, or queries depend on the literal. For example, keep `ex:reportKindName "collect"` for a report command token; `rdfs:label` may be added for presentation but is not the contract token.
+- Do not replace canonical domain-token properties with `rdfs:label` when semantic contracts, model operations, or queries depend on the literal. Delivery-surface tokens such as command names, UI route names, and report-output kind names belong in specifications or contracts unless the domain itself needs to reason over them.
 
 ## OWL / SHACL Block Split
 
@@ -133,7 +177,7 @@ Use OWL datatype/object properties for slots and relationships with stable domai
 - In `#### Ontology`, define classes, `owl:DatatypeProperty` and `owl:ObjectProperty` declarations, stable `rdfs:domain`/`rdfs:range`, hierarchy, metadata annotations, and stable OWL axioms.
 - For datatype properties, set `rdfs:range` to an XSD datatype such as `xsd:string`, `xsd:boolean`, `xsd:integer`, `xsd:decimal`, `xsd:float`, `xsd:double`, `xsd:dateTime`, or `xsd:date`.
 - For object properties, set `rdfs:domain` to the subject class and `rdfs:range` to the object class when both are stable.
-- In `#### Shapes`, declare `sh:NodeShape` resources, target existing OWL classes with `sh:targetClass`, and validate existing properties with `sh:path`.
+- In `#### Shapes`, declare `sh:NodeShape` or `sh:PropertyShape` resources, use valid SHACL targets such as `sh:targetClass`, `sh:targetNode`, `sh:targetSubjectsOf`, or `sh:targetObjectsOf`, and validate existing properties with `sh:path`.
 - Do not redefine `ex:Class a owl:Class` inside a SHACL shape block. The shape consumes the ontology; it does not own the class declaration.
 - Put closed-world cardinality, patterns, enumerations, numeric bounds, messages, and data-quality rules in SHACL, not in the ontology block. Use OWL cardinality restrictions only when they are true domain axioms and reasoner semantics are intended.
 - Keep OWL and SHACL separable so ontology exports remain useful to OWL/RDFS tools while semantic contracts remain useful to SHACL validators.
@@ -148,8 +192,87 @@ Use canonical Reqvire ontology identity boundaries:
 - The term namespace identifies classes, properties, and individuals and normally uses the inherited ontology base plus `#`, for example `@prefix ex: <https://example.org/ontology/managed-platform#>`. The prefix label comes from inherited `ontology_prefix`; the namespace comes from inherited `ontology_base`.
 - Authored Turtle that uses the inherited prefix must explicitly declare it to `<ontology_base>#`; missing or conflicting declarations fail validation.
 - The root ontology Turtle block should declare `<ontology_base> a owl:Ontology` for authored OWL document identity. Child ontology blocks normally define vocabulary terms only. Do not manually model the ontology itself as a vocabulary term inside the term namespace, such as `ex:ManagedPlatformOntology a owl:Ontology`.
+- Reqvire generates `rdfs:isDefinedBy <ontology_base>` ownership facts only for authored named ontology resources whose IRIs are inside the resolved term namespace. Do not hand-author these on every term; if present on an authored in-namespace resource, they must match the generated ontology document IRI or validation fails. Imported External Ontology terms do not receive Reqvire-generated `rdfs:isDefinedBy`.
 - Link ontology hierarchy with `derivedFrom` between ontology elements. Reqvire derives one ontology document declaration per resolved `ontology_base`; same-base `derivedFrom` contributes to the same document, while cross-base hierarchy can become `owl:imports`.
-- Use repeatable `#### External Ontology` sections on ontology elements for local external Turtle/TTL, RDF/XML, or JSON-LD vocabularies that are not authored by the Reqvire model. Each section requires `prefix`, `namespace`, `resource`, and `source`; `format` defaults to Turtle and supports `turtle`, `ttl`, `rdf`, `rdfxml`, `rdf+xml`, and `jsonld`. `format: rdf` is RDF/XML for local `.rdf` ontology files. Sources must be local files, not network fetches. These sections make imported terms available to that ontology context and to semantic contracts that `use` it, but they do not inject prefixes or triples into authored Turtle and do not promote imported terms to authored Reqvire ontology terms. Full source files are internal dependency inputs; `include_external` exposes only the used external subset. Do not add external sections for standard OWL/RDF/RDFS/XSD built-in vocabulary or core SHACL shape syntax; Reqvire recognizes those language vocabularies internally. Use External Ontology only for additional local vocabularies, such as project-specific exported ontologies or SHACL extension vocabularies.
+- Use repeatable `#### External Ontology` sections on ontology elements for local external Turtle/TTL, RDF/XML, or JSON-LD vocabularies that are not authored by the Reqvire model. Each section requires `prefix`, `namespace`, `resource`, and `source`; `format` defaults to Turtle and supports `turtle`, `ttl`, `rdf`, `rdfxml`, `rdf+xml`, and `jsonld`. `format: rdf` is RDF/XML for local `.rdf` ontology files. Sources must be local files, not network fetches. These sections make imported terms available to that ontology context and to semantic contracts that `use` it, but they do not inject prefixes or triples into authored Turtle and do not promote imported terms to authored Reqvire ontology terms. Full source files are internal dependency inputs; `include_external` exposes only the used external subset unless you specifically request explicit full-external mode. Do not add external sections for standard OWL/RDF/RDFS/XSD built-in vocabulary or core SHACL shape syntax; Reqvire recognizes those language vocabularies internally. Use External Ontology only for additional local vocabularies, such as project-specific exported ontologies or SHACL extension vocabularies.
+- SKOS is available as a Reqvire built-in external ontology source for structural annotations or deliberate bridge vocabulary. Authors may use `@prefix skos: <http://www.w3.org/2004/02/skos/core#> .` in ontology Turtle without adding a local `#### External Ontology` section for SKOS, but Turtle must still explicitly declare the prefix it uses. Do not use ontology Turtle as the normal authoring path for Reqvire-native concept schemes or concepts.
+
+Native conceptual layer example:
+
+````markdown
+### Engineering Concepts
+
+Curated engineering terminology for system-model authoring.
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.org/concepts
+  * concept_prefix: concept
+---
+
+### Traceability
+
+The conceptual practice of connecting intent, implementation, verification, and evidence.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Engineering Concepts](Thesaurus.md#engineering-concepts)
+
+#### Labels
+  * altLabel: Trace link analysis
+````
+
+Structural layer with optional concept bridge:
+
+```turtle
+@prefix ex: <https://example.org/ontology/managed-platform#> .
+@prefix concept: <https://example.org/concepts#> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:TraceLink a owl:Class ;
+  rdfs:comment "Structural relationship record connecting model elements for impact and coverage analysis." ;
+  reqvire:mapsToConcept concept:Traceability .
+```
+
+Connected concept-root pattern:
+
+````markdown
+### Engineering Concepts
+
+Curated concept scheme for engineering system-model terms.
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.org/concepts
+  * concept_prefix: concept
+````
+
+````markdown
+### Managed Platform Structural Ontology
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.org/ontology/managed-platform
+  * ontology_prefix: ex
+
+#### Ontology
+```turtle
+@prefix concept: <https://example.org/concepts#> .
+@prefix ex: <https://example.org/ontology/managed-platform#> .
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.org/ontology/managed-platform>
+  a owl:Ontology .
+
+ex:TraceLink a owl:Class ;
+  reqvire:mapsToConcept concept:Traceability .
+```
+````
 
 ```turtle
 @prefix ex: <https://example.org/ontology/managed-platform#> .
@@ -207,7 +330,7 @@ ex:resourceImpactedByPolicy a owl:ObjectProperty ;
 ex:PublicApiSurface owl:disjointWith ex:PrivateApiSurface .
 ```
 
-Use `owl:Class` for concepts, explicit `owl:NamedIndividual` plus domain-class typing for stable vocabulary records, `owl:DatatypeProperty` for literal slots, `owl:ObjectProperty` for relationship slots, `rdfs:subClassOf` for is-a hierarchy, `rdfs:domain`/`rdfs:range` for stable slot semantics and allowed values, and OWL axioms such as `owl:Restriction`, `owl:inverseOf`, `owl:equivalentClass`, `owl:equivalentProperty`, `owl:disjointWith`, and `owl:propertyChainAxiom` only when the semantics are true. Use SHACL shapes for closed-world validation such as required fields, cardinality, enumerations, or datatype checks.
+Use `skos:Concept` for curated conceptual vocabulary, `owl:Class` for structural classes, explicit `owl:NamedIndividual` plus domain-class typing for stable vocabulary records, `owl:DatatypeProperty` for literal slots, `owl:ObjectProperty` for relationship slots, `rdfs:subClassOf` for is-a hierarchy, `rdfs:domain`/`rdfs:range` for stable slot semantics and allowed values, and OWL axioms such as `owl:Restriction`, `owl:inverseOf`, `owl:equivalentClass`, `owl:equivalentProperty`, `owl:disjointWith`, and `owl:propertyChainAxiom` only when the semantics are true. Use `reqvire:mapsToConcept` as an optional annotation bridge from structural terms to SKOS concepts. Use SHACL shapes for closed-world validation such as required fields, cardinality, enumerations, or datatype checks.
 
 ## Validation
 
@@ -215,13 +338,13 @@ Run focused validation after ontology edits:
 
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" ontologies
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" semantic ontologies
 ```
 
 When working in the Reqvire source repository, the local Rust CLI is also acceptable:
 
 ```bash
-cargo run -q -p cli -- --workspace "$PWD" validate
+cargo run -q -p reqvire-cli -- --workspace "$PWD" validate
 ```
 
 ## Guardrails

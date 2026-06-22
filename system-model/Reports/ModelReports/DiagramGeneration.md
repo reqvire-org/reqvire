@@ -26,8 +26,8 @@ When requested through reporting commands, the system shall generate Mermaid dia
   * derive: [Interactive Mermaid Diagram Node Behavior](#interactive-mermaid-diagram-node-behavior)
   * derive: [Reqvire Relationship Rendering](#reqvire-relationship-rendering)
   * derivedFrom: [Interactive Mermaid Diagrams](#interactive-mermaid-diagrams)
-  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
-  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
 ---
 
 ### Interactive Mermaid Diagram Node Behavior
@@ -44,9 +44,9 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Mermaid Diagram Link Behavior](Behaviors.md#mermaid-diagram-link-behavior)
   * definedBy: [Interactive Mermaid Diagram Node Behavior Contract Specification](Specifications.md#interactive-mermaid-diagram-node-behavior-contract-specification)
   * derivedFrom: [Diagram Generation](#diagram-generation)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
-  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
 ---
 
 ### Reqvire Relationship Rendering
@@ -68,5 +68,5 @@ Each relation type has specific visual properties and directional semantics defi
 #### Relations
   * definedBy: [Reqvire Relation Rendering Specification](Specifications.md#reqvire-relation-rendering-specification)
   * derivedFrom: [Diagram Generation](#diagram-generation)
-  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
 ---

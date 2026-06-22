@@ -1,11 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useExplorerUiState } from "../state/ExplorerUiState";
 import type { ExplorerViewProps } from "./types/ExplorerViewProps";
 import { mountOntologyGraph, type OntologyGraphRendererHandle } from "../lib/ontologyGraphRenderer";
 import { useStore } from "../store/StoreContext";
 import type { OntologyGraphData, OntologyGraphNode } from "../store/types";
 import { ViewFrame } from "./ViewFrame";
-import { GraphCanvasFrame, GraphCanvasNotice, GraphCanvasSurface, GraphRoute } from "@ds";
+import { GraphCanvasFrame, GraphCanvasNotice, GraphCanvasSurface, GraphRoute, Spinner } from "@ds";
 
 declare global {
   interface Window {
@@ -57,17 +57,41 @@ function OntologyGraphRenderer({
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rendererRef = useRef<OntologyGraphRendererHandle | null>(null);
+  const activeFiltersRef = useRef(activeFilters);
   const { setOntologySelectionId } = useExplorerUiState();
+  const [notice, setNotice] = useState<string | null>("Loading ontology graph...");
+
+  useEffect(() => {
+    activeFiltersRef.current = activeFilters;
+  }, [activeFilters]);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return undefined;
-    const renderer = mountOntologyGraph(container, graphData, {
-      onSelect: (node: OntologyGraphNode | null) => setOntologySelectionId(node?.id ?? null),
+    setNotice("Loading ontology graph...");
+    let buildTimer: number | null = null;
+    const frameId = window.requestAnimationFrame(() => {
+      buildTimer = window.setTimeout(() => {
+      try {
+        const renderer = mountOntologyGraph(container, graphData, {
+          onSelect: (node: OntologyGraphNode | null) => setOntologySelectionId(node?.id ?? null),
+        });
+        rendererRef.current = renderer;
+        window.syncOntologyGraphFilters?.(activeFiltersRef.current);
+        setNotice(null);
+      } catch (error) {
+        console.error("[Reqvire Ontologies] Sigma/Graphology renderer failed", error);
+        setNotice("Ontology graph renderer failed. Check the browser console for details.");
+      }
+      }, 0);
     });
-    rendererRef.current = renderer;
     return () => {
-      renderer.destroy();
+      window.cancelAnimationFrame(frameId);
+      if (buildTimer !== null) {
+        window.clearTimeout(buildTimer);
+        buildTimer = null;
+      }
+      rendererRef.current?.destroy();
       rendererRef.current = null;
     };
   }, [graphData, setOntologySelectionId]);
@@ -87,6 +111,12 @@ function OntologyGraphRenderer({
             role="img"
             aria-label="Ontology and SHACL relationship graph"
           />
+          {notice ? (
+            <GraphCanvasNotice>
+              {notice === "Loading ontology graph..." ? <Spinner label={notice} /> : null}
+              <span>{notice}</span>
+            </GraphCanvasNotice>
+          ) : null}
         </GraphCanvasFrame>
       </GraphRoute>
     </ViewFrame>

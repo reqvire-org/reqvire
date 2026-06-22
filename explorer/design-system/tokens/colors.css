@@ -69,6 +69,9 @@
     --color-rdf-objprop:     oklch(55.44% 0.0407 257.42);
     --color-rdf-dtprop:      oklch(51.09% 0.0861 186.39);
     --color-rdf-rdfprop:     oklch(43.7%  0.0705 188.22);
+    --color-rdf-concept:     oklch(84.2%  0.145  91.5);
+    --color-rdf-concept-scheme: oklch(74.5% 0.145 88.5);
+    --color-concept-reference: oklch(63.5% 0.134 88.5);
     --color-rdf-individual:  oklch(54.13% 0.2466 293.01);
     --color-rdf-datatype:    oklch(74.73% 0.1295 81.69);
     --color-rdf-restriction: oklch(86.9%  0.0198 252.89);
@@ -175,6 +178,14 @@
     --ontology-ink: #6f5600;
     --ontology-tint: color-mix(in oklch, var(--ontology) 15%, var(--bg-surface));
 
+    --concept:     var(--color-rdf-concept);
+    --concept-ink: var(--ontology-ink);
+    --concept-tint: color-mix(in oklch, var(--concept) 18%, var(--bg-surface));
+    --concept-scheme:     var(--color-rdf-concept-scheme);
+    --concept-scheme-ink: var(--ontology-ink);
+    --concept-scheme-tint: color-mix(in oklch, var(--concept-scheme) 18%, var(--bg-surface));
+    --thesaurus-map-scheme-node-bg: color-mix(in oklch, var(--concept-scheme) 12%, var(--bg-surface));
+
     --resource:     var(--color-resource);
     --resource-ink: #8d6e00;
     --resource-tint: color-mix(in oklch, var(--resource) 15%, var(--bg-surface));
@@ -190,6 +201,11 @@
     --rdf-objprop:     var(--color-rdf-objprop);
     --rdf-dtprop:      var(--color-rdf-dtprop);
     --rdf-rdfprop:     var(--color-rdf-rdfprop);
+    --rdf-concept:     var(--color-rdf-concept);
+    --rdf-concept-scheme: var(--color-rdf-concept-scheme);
+    --concept-reference: var(--color-concept-reference);
+    --concept-reference-ink: color-mix(in oklch, var(--concept-reference) 58%, var(--slate-950));
+    --concept-reference-tint: color-mix(in oklch, var(--concept-reference) 18%, var(--bg-surface));
     --rdf-individual:  var(--color-rdf-individual);
     --rdf-datatype:    var(--color-rdf-datatype);
     --rdf-restriction: var(--color-rdf-restriction);

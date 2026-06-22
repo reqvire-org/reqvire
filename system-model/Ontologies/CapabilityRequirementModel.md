@@ -405,17 +405,19 @@ reqvire:RequirementOwnedContractShape
 
 The Reqvire capability ontology defines capability elements as first-class operational, product, business, regulatory, or system abilities.
 
-Capabilities decompose into child capabilities, bind vocabulary through concept references, derive implementation-facing requirements through `specifiedBy`/`specify`, and may be directly verified. Requirements specify capabilities and own subordinate contract details/contracts; they do not replace capability ownership of operational meaning, concept-reference context, or direct verification context.
+Capabilities decompose into child capabilities, bind curated SKOS vocabulary through concept references, and derive implementation-facing requirements through `specifiedBy`/`specify`. Requirements specify capabilities and own subordinate contract details/contracts; they do not replace capability ownership of operational meaning or concept-reference context. Verification coverage for capabilities is computed from verified requirements that specify them.
 
 #### Ontology
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix concept: <https://www.reqvire.org/concepts#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:Source a owl:Class ;
   rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  reqvire:mapsToConcept concept:RequirementContract ;
   rdfs:comment "Requirement-owned source contract for stakeholder, regulatory, contractual, policy, or other source context that explains why a requirement exists." .
 
 reqvire:sourceType a reqvire:ContractElementType ;
@@ -436,32 +438,39 @@ reqvire:sourceType a reqvire:ContractElementType ;
 
 The Reqvire requirement ontology defines requirement obligations and requirement-owned contract types.
 
-Requirements are implementation-facing obligations. They can own source context, specifications, constraints, behavior descriptions, state contracts, and input-output contracts. Requirements may also be constrained by reusable shapes-only semantic contracts. Capabilities bind ontology terms through concept references, derive child capabilities, are specified by requirements, and may be verified; capabilities must not own contract elements through `definedBy`/`define`. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts.
+Requirements are implementation-facing obligations. They can own source context, specifications, constraints, behavior descriptions, state contracts, and input-output contracts. Requirements may also be constrained by reusable shapes-only semantic contracts. Capabilities bind SKOS concepts through concept references, derive child capabilities, and are specified by requirements; capabilities must not own contract elements through `definedBy`/`define`. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts. Capability verification coverage is computed from verified requirements that specify each capability.
 
 #### Ontology
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix concept: <https://www.reqvire.org/concepts#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:RequirementOwnedContract a owl:Class ;
   rdfs:subClassOf reqvire:Contract ;
+  reqvire:mapsToConcept concept:RequirementContract ;
   rdfs:comment "Contract class whose instances are owned by requirement elements through define/definedBy." .
 reqvire:Specification a owl:Class ;
   rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  reqvire:mapsToConcept concept:RequirementContract ;
   rdfs:comment "Requirement-owned contract for detailed specifications and technical descriptions." .
 reqvire:Constraint a owl:Class ;
   rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  reqvire:mapsToConcept concept:RequirementContract ;
   rdfs:comment "Requirement-owned contract that limits or bounds valid system behavior." .
 reqvire:Behavior a owl:Class ;
   rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  reqvire:mapsToConcept concept:RequirementContract ;
   rdfs:comment "Requirement-owned contract that describes behavior details, operational rules, or scenario-specific behavior." .
 reqvire:State a owl:Class ;
   rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  reqvire:mapsToConcept concept:RequirementContract ;
   rdfs:comment "Requirement-owned contract for lifecycle states, state machines, transitions, terminal states, and state-dependent contract behavior." .
 reqvire:InputOutput a owl:Class ;
   rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  reqvire:mapsToConcept concept:RequirementContract ;
   rdfs:comment "Requirement-owned contract for payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries." .
 
 reqvire:ownedByRequirement a owl:ObjectProperty ;
@@ -524,18 +533,22 @@ Ontology elements define reusable vocabulary and contain `#### Ontology`. Semant
 #### Ontology
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix concept: <https://www.reqvire.org/concepts#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:SemanticContract a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
+  reqvire:mapsToConcept concept:SemanticContract ;
   rdfs:comment "Reusable semantic contract that defines SHACL profiles over ontology terms reached through explicit use relations." .
 reqvire:Ontology a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
+  reqvire:mapsToConcept concept:OntologyElement ;
   rdfs:comment "First-class ontology element that defines reusable RDF/OWL vocabulary." .
 reqvire:ShapeContract a owl:Class ;
   rdfs:subClassOf reqvire:SemanticContract ;
+  reqvire:mapsToConcept concept:SemanticContract ;
   rdfs:comment "Semantic contract that defines SHACL shapes over ontology terms reached through explicit use relations." .
 reqvire:semanticContractIri a owl:DatatypeProperty ;
   rdfs:domain reqvire:SemanticContract ;
@@ -640,4 +653,3 @@ reqvire:SemanticContractShape
   * use: [Reqvire Semantic Contract Ontology](#reqvire-semantic-contract-ontology)
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
-

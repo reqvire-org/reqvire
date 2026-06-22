@@ -43,7 +43,7 @@ The system shall use this detection during lint analysis to identify and report 
 #### Relations
   * definedBy: [Cross-Submodel Hierarchical Relation Detection Specification](Specifications.md#cross-submodel-hierarchical-relation-detection-specification)
   * derivedFrom: [Model Linting](#model-linting)
-  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
+  * satisfiedBy: [lint.rs](../../../crates/reqvire-core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
 ---
 
@@ -60,7 +60,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Lint Auto-fix Capability Contract Specification](Specifications.md#lint-auto-fix-capability-contract-specification)
   * derivedFrom: [Model Linting](#model-linting)
-  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
+  * satisfiedBy: [lint.rs](../../../crates/reqvire-core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
 ---
 
@@ -77,7 +77,7 @@ The system shall detect when an element reaches a common ancestor through multip
 #### Relations
   * definedBy: [Multi-Branch Convergence Detection Specification](Specifications.md#multi-branch-convergence-detection-specification)
   * derivedFrom: [Model Linting](#model-linting)
-  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
+  * satisfiedBy: [lint.rs](../../../crates/reqvire-core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
 ---
 
@@ -94,13 +94,13 @@ The system shall detect and auto-remove redundant derivedFrom relations where an
 #### Relations
   * definedBy: [Redundant Hierarchical Relations Specification](Specifications.md#redundant-hierarchical-relations-specification)
   * derivedFrom: [Model Linting](#model-linting)
-  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
+  * satisfiedBy: [lint.rs](../../../crates/reqvire-core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
 ---
 
 ### Redundant Verify Relations Detection
 
-The system shall detect redundant verify relations where a verification directly verifies both a child element and its ancestor in the capability or requirement hierarchy, leveraging the existing verification trace tree logic from the Verification Trace Builder.
+The system shall detect redundant verify relations where a verification directly verifies both a child requirement and its ancestor in the requirement hierarchy, leveraging the existing verification trace tree logic from the Verification Trace Builder.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -114,8 +114,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Redundant Verify Relations Detection Contract Specification](Specifications.md#redundant-verify-relations-detection-contract-specification)
   * derivedFrom: [Model Linting](#model-linting)
-  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
-  * satisfiedBy: [trace_tree_builder.rs](../../../core/src/trace_tree_builder.rs)
+  * satisfiedBy: [lint.rs](../../../crates/reqvire-core/src/lint.rs)
+  * satisfiedBy: [trace_tree_builder.rs](../../../crates/reqvire-core/src/trace_tree_builder.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
 ---
-

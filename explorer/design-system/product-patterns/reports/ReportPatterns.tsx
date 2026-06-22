@@ -4,7 +4,6 @@ import { css, cx } from "@linaria/atomic";
 import { Icon } from "../../components/core/Icon";
 import { BarMeterFill, ConicSwatch, DonutMeter } from "../../components/data/TokenVisual";
 import { ElementIcon } from "../../components/data/ElementIcon";
-import { Stat, StatRow } from "../../components/data/Stat";
 import { TypeBadge } from "../../components/data/TypeBadge";
 import type { DesignSystemColorToken } from "../../palette";
 import { RouteLayout, RoutePanel, type RouteLayoutProps, type RoutePanelProps } from "../shell";
@@ -93,7 +92,7 @@ const tracePanelBaseUX = css`
   .trace-verification-list {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-list-stack);
+    gap: var(--stack-gap-compact);
   }
 
   .trace-verification-card {
@@ -322,10 +321,6 @@ const coverageDashboardBaseUX = css`
     text-transform: uppercase;
   }
 
-  .coverage-header-stats {
-    flex: none;
-  }
-
   .coverage-kpi-grid,
   .coverage-grid,
   .coverage-gap-grid {
@@ -488,7 +483,7 @@ const coverageDashboardBaseUX = css`
   .coverage-bar-list,
   .coverage-capability-list,
   .coverage-gap-list__rows {
-    gap: var(--gap-list-stack);
+    gap: var(--stack-gap-compact);
   }
 
   .coverage-legend-row,
@@ -661,7 +656,6 @@ const coverageDashboardSkinX = css`
     color: var(--text-strong);
   }
 
-  .coverage-header-stats,
   .coverage-bar,
   .coverage-mark,
   .coverage-gap-list__head span,
@@ -931,12 +925,10 @@ export function CoverageHeader({
   id,
   title,
   eyebrow,
-  stats,
 }: {
   id?: string;
   title: ReactNode;
   eyebrow: ReactNode;
-  stats: readonly { label: ReactNode; value: ReactNode }[];
 }) {
   return (
     <header id={id} className="coverage-header">
@@ -944,11 +936,6 @@ export function CoverageHeader({
         <span className="coverage-eyebrow">{eyebrow}</span>
         <h1>{title}</h1>
       </div>
-      <StatRow className="coverage-header-stats">
-        {stats.map((stat, index) => (
-          <Stat key={index} label={stat.label} value={stat.value} />
-        ))}
-      </StatRow>
     </header>
   );
 }

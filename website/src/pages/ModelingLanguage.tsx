@@ -22,6 +22,10 @@ export default function ModelingLanguage() {
               "first-class OWL/Turtle vocabulary and reusable semantic model terms.",
             ],
             [
+              "Concepts",
+              "native concept-scheme and concept elements that generate SKOS thesaurus RDF from main body definitions, labels, taxonomy, and mappings.",
+            ],
+            [
               "Capabilities",
               "coherent operational, product, business, regulatory, or system abilities.",
             ],

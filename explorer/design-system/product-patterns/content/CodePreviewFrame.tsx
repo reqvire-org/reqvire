@@ -106,7 +106,7 @@ const baseUX = css`
 
   .ux-source-code-preview__button {
     display: inline-flex;
-    height: var(--row-h);
+    height: var(--row-height-compact);
     align-items: center;
     gap: var(--space-3);
     border-radius: var(--radius-md);

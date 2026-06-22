@@ -2,16 +2,16 @@
 
 Files referenced via relations such as satisfiedBy:
 
-### core/src/api.rs
+### crates/reqvire-core/src/api.rs
   * [API Requirements](specifications/Requirements.md#api-requirements) (via satisfiedBy)
 ---
 
-### core/src/impl.rs
+### crates/reqvire-core/src/impl.rs
   * [Data Integrity](specifications/Requirements.md#data-integrity) (via satisfiedBy)
   * [System Performance](specifications/Requirements.md#system-performance) (via satisfiedBy)
 ---
 
-### core/src/test_perf.rs
+### crates/reqvire-core/src/test_perf.rs
   * [Performance Test](specifications/Verifications/Tests.md#performance-test) (via satisfiedBy)
 ---
 

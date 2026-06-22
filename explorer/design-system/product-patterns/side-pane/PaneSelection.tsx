@@ -13,7 +13,7 @@ import {
   paneSelectionOpenClass,
   paneSelectionRowClass,
 } from "./classes";
-import { PaneFilterGroup } from "./PaneFilterSection";
+import { PaneFilterGroup } from "./PaneControls";
 
 export interface PaneSelectionValue {
   icon?: ReactNode;

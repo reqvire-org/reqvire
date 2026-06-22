@@ -9,6 +9,7 @@
 
 export type ViewId =
   | "model"
+  | "thesaurus"
   | "traces"
   | "ontologies"
   | "coverage"
@@ -21,13 +22,14 @@ export const DEFAULT_VIEW: ViewId = "model";
 
 /** Primary Explorer workspace view. */
 export const PRIMARY_VIEWS: { id: ViewId; label: string }[] = [
+  { id: "thesaurus", label: "Thesaurus" },
   { id: "model", label: "Model" },
 ];
 
 /** Specialist views reached from the right vertical tool rail. */
 export const TOOL_RAIL_VIEWS: { id: ViewId; label: string }[] = [
-  { id: "traces", label: "Traces" },
   { id: "ontologies", label: "Ontologies" },
+  { id: "traces", label: "Traces" },
   { id: "coverage", label: "Coverage" },
 ];
 
@@ -42,6 +44,7 @@ const ALL_VIEW_IDS = new Set<ViewId>([
 
 export const VIEW_TITLES: Record<ViewId, string> = {
   model: "Model",
+  thesaurus: "Thesaurus",
   traces: "Traces",
   ontologies: "Ontologies",
   coverage: "Coverage",

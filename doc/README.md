@@ -72,11 +72,13 @@ This will install the binary to `~/.cargo/bin/reqvire`
 
 ```
 reqvire/
-├── core/              # Core library (parsing, model, analysis)
-├── cli/               # Command-line interface
-├── system-model/    # Reqvire's own requirements and model
+├── crates/
+│   ├── reqvire-core/  # Core library package `reqvire` (parsing, model, analysis)
+│   ├── reqvire-cli/   # Command-line package; builds the `reqvire` binary
+│   └── o-kernel/      # Reusable RDF/OWL/SHACL kernel
+├── system-model/      # Reqvire's own requirements and model
 ├── tests/             # End-to-end tests
-└── doc/              # Contributor documentation (this folder)
+└── doc/               # Contributor documentation (this folder)
 ```
 
 ## Key Resources

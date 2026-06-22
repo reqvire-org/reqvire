@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reqvire Concept Authoring"
+  short_description: "Author Reqvire SKOS concept thesauri"
+  default_prompt: "Use $reqvire-concept-authoring to create or refine a Reqvire concept scheme and concept taxonomy."

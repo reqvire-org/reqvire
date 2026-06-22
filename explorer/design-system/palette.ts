@@ -18,6 +18,9 @@ export type ElementRole =
   | "specification"
   | "semantic-contract"
   | "ontology"
+  | "concept"
+  | "concept-scheme"
+  | "concept-reference"
   | "resource"
   | "other";
 export type ElementType = Exclude<ElementRole, "other">;
@@ -47,6 +50,9 @@ export const ELEMENT_ROLE_TOKENS = {
   specification: { fill: "--contract", ink: "--contract-ink", tint: "--contract-tint" },
   "semantic-contract": { fill: "--semantic-contract", ink: "--semantic-contract-ink", tint: "--semantic-contract-tint" },
   ontology: { fill: "--ontology", ink: "--ontology-ink", tint: "--ontology-tint" },
+  concept: { fill: "--concept", ink: "--concept-ink", tint: "--concept-tint" },
+  "concept-scheme": { fill: "--concept-scheme", ink: "--concept-scheme-ink", tint: "--concept-scheme-tint" },
+  "concept-reference": { fill: "--concept-reference", ink: "--concept-reference-ink", tint: "--concept-reference-tint" },
   resource: { fill: "--resource", ink: "--resource-ink", tint: "--resource-tint" },
   other: { fill: "--other", ink: "--other-ink", tint: "--other-tint" },
 } as const;
@@ -74,6 +80,9 @@ export const ELEMENT_TYPES: Record<ElementType, { color: string; shape: ElementI
   specification: { color: "var(--contract)", shape: "diamond", role: "specification", glyph: "≡" },
   "semantic-contract": { color: "var(--semantic-contract)", shape: "square", role: "semantic-contract" },
   ontology: { color: "var(--ontology)", shape: "square", role: "ontology" },
+  concept: { color: "var(--concept)", shape: "square", role: "concept" },
+  "concept-scheme": { color: "var(--concept-scheme)", shape: "square", role: "concept-scheme" },
+  "concept-reference": { color: "var(--concept-reference)", shape: "square", role: "concept-reference" },
   resource: { color: "var(--resource)", shape: "square", role: "resource" },
 };
 
@@ -101,10 +110,21 @@ export const DESIGN_SYSTEM_COLOR_TOKENS = [
   "--edge-derive",
   "--edge-satisfy",
   "--edge-trace",
+  "--concept-reference",
+  "--concept-reference-ink",
+  "--concept-reference-tint",
+  "--concept",
+  "--concept-ink",
+  "--concept-tint",
+  "--concept-scheme",
+  "--concept-scheme-ink",
+  "--concept-scheme-tint",
   "--node-generic-fill",
   "--ontology-ink",
   "--rdf-class",
   "--rdf-classexpr",
+  "--rdf-concept",
+  "--rdf-concept-scheme",
   "--rdf-datatype",
   "--rdf-dtprop",
   "--rdf-individual",
@@ -165,6 +185,12 @@ const CSS_TOKEN_FALLBACKS: Partial<Record<DesignSystemColorToken, string>> = {
   "--ontology": "#b08a00",
   "--ontology-ink": "#6f5600",
   "--ontology-tint": "#f4e3a1",
+  "--concept": "#e7c94a",
+  "--concept-ink": "#6f5600",
+  "--concept-tint": "#fbf1cf",
+  "--concept-scheme": "#cda83a",
+  "--concept-scheme-ink": "#6f5600",
+  "--concept-scheme-tint": "#f7e7b4",
   "--resource": "#ffca28",
   "--resource-ink": "#8d6e00",
   "--resource-tint": "#fff3cf",
@@ -184,6 +210,11 @@ const CSS_TOKEN_FALLBACKS: Partial<Record<DesignSystemColorToken, string>> = {
   "--accent": "#e11d48",
   "--accent-ring": "rgba(225,29,72,0.32)",
   "--rdf-class": "#94a3b8",
+  "--rdf-concept": "#e7c94a",
+  "--rdf-concept-scheme": "#cda83a",
+  "--concept-reference": "#a77718",
+  "--concept-reference-ink": "#4a3608",
+  "--concept-reference-tint": "#fbf1cf",
   "--rdf-objprop": "#64748b",
   "--rdf-dtprop": "#0f766e",
   "--rdf-rdfprop": "#115e59",
@@ -224,7 +255,9 @@ export function elementRole(type?: string | null, family?: string | null): Eleme
   if (normalizedType.includes("verification") || normalizedFamily === "verification") return "verification";
   if (normalizedType.includes("ontology") || normalizedFamily === "ontology") return "ontology";
   if (normalizedType === "evidence-file" || normalizedType.includes("evidence")) return "other";
-  if (normalizedType === "concept-reference" || normalizedType.includes("concept-reference")) return "resource";
+  if (normalizedType === "concept") return "concept";
+  if (normalizedType === "concept-scheme") return "concept-scheme";
+  if (normalizedType === "concept-reference" || normalizedType.includes("concept-reference")) return "concept-reference";
   if (normalizedType.includes("resource") || normalizedType === "file" || normalizedFamily === "resource") {
     return "resource";
   }

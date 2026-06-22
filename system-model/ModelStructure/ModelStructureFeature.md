@@ -33,7 +33,7 @@ Capability elements answer:
 - Why does this area exist in the product model?
 - What stakeholder need, feature context, operational context, regulatory driver, mission objective, service context, AI context, source context, and ontology define its meaning?
 - Which requirements specify this capability?
-- Which verification evidence directly verifies this capability when capability-level evidence is appropriate?
+- Which verified requirements provide coverage for this capability?
 
 Requirement elements answer:
 - What must the system do?
@@ -41,14 +41,14 @@ Requirement elements answer:
 - What implementation or evidence can satisfy it?
 - What verification proves it?
 
-Ontology elements hold stable domain and model-language meaning. They live in the dedicated `system-model/Ontologies` folder so the ontology plane stays orthogonal to capability-root subgraphs. The top ontology element defines the ontology document base and canonical prefix; child ontology elements in the same base contribute terms to that same generated `owl:Ontology` document. Non-ontology elements bind their prose and model intent to ontology terms through `#### Concept References`. Semantic contracts define reusable SHACL shape profiles, explicitly `use` ontology vocabulary, and `constrain` zero or more requirements when formal closed-world rules are needed.
-Ontology elements are first-class model-language content: they define concepts, relations, and rules for the modeling language, and their base or prefix rebasing must preserve the full dependency chain so the model stays valid.
+Ontology elements hold stable domain and model-language meaning. They live in the dedicated `system-model/Ontologies` folder so the ontology plane stays orthogonal to capability-root subgraphs. The top ontology element defines the ontology document base and canonical prefix; child ontology elements in the same base contribute terms to that same generated `owl:Ontology` document. Non-ontology elements bind their prose and model intent to SKOS concepts through `#### Concept References`. Semantic contracts define reusable SHACL shape profiles, explicitly `use` ontology vocabulary, and `constrain` zero or more requirements when formal closed-world rules are needed.
+Ontology and thesaurus elements are first-class model-language content: native `concept-scheme` and `concept` elements define SKOS thesaurus concepts, structural ontology elements define OWL/RDFS relations and rules, and base or prefix rebasing must preserve the full dependency chain so the model stays valid.
 
-Requirements should not duplicate ontology content and should not reuse ontology directly. A requirement that needs shared meaning should declare `#### Concept References` to the ontology terms it uses. Capabilities, contracts, verification objectives, and concrete verifications may do the same when their prose needs ontology-backed terms. If a requirement needs closed-world constraints, it should be linked to a semantic contract with `constrainedBy`/`constrain`; the semantic contract must use the ontology terms it references through explicit `use`/`usedBy` relations and must not author concept references.
+Requirements should not duplicate ontology content and should not reuse ontology directly. A requirement that needs shared conceptual meaning should declare `#### Concept References` to SKOS concepts. Capabilities, contracts, verification objectives, and concrete verifications may do the same when their prose needs thesaurus-backed terminology. If a requirement needs closed-world constraints, it should be linked to a semantic contract with `constrainedBy`/`constrain`; the semantic contract must use the ontology terms it references through explicit `use`/`usedBy` relations and must not author concept references.
 
-The Reqvire model is intentionally split into separate capability-root subgraphs. A top capability should be used when requirements truly specify the same capability. Child capabilities should be used only when the capability has independently verifiable operational, product, interface, stakeholder, regulatory, or domain slices that need separate ownership, lifecycle, architecture impact, or collection. Shared ontology lives in `system-model/Ontologies`; elements reference ontology terms directly through concept references instead of becoming children of another capability just to reuse vocabulary. Requirements specify their local capability unless they are actually implementing the shared capability.
+The Reqvire model is intentionally split into separate capability-root subgraphs. A top capability should be used when requirements truly specify the same capability. Child capabilities should be used only when the capability has independently verifiable operational, product, interface, stakeholder, regulatory, or domain slices that need separate ownership, lifecycle, architecture impact, or collection. Shared ontology lives in `system-model/Ontologies`; elements reference SKOS concepts through concept references instead of becoming children of another capability just to reuse vocabulary. Requirements specify their local capability unless they are actually implementing the shared capability.
 
-Shared terms for capability, requirement, contract, and verification prose come from explicit `#### Concept References`, not from one universal capability hierarchy and not from ontology reused_contract_context. Semantic-contract SHACL terms come from explicit semantic-contract `use` relations to ontology elements. This keeps each model concern independently collectible, reviewable, and impact-analyzable while preserving auditable semantic dependencies.
+Shared SKOS concepts for capability, requirement, contract, and verification prose come from explicit `#### Concept References`, not from one universal capability hierarchy and not from ontology reused_contract_context. Semantic-contract SHACL terms come from explicit semantic-contract `use` relations to ontology elements. This keeps each model concern independently collectible, reviewable, and impact-analyzable while preserving auditable semantic dependencies.
 
 #### Metadata
   * type: specification
@@ -56,4 +56,3 @@ Shared terms for capability, requirement, contract, and verification prose come 
 #### Relations
   * define: [Ontology and Semantic Contract Model](ModelManagement.md#ontology-and-semantic-contract-model)
 ---
-

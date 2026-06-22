@@ -23,9 +23,10 @@ export default function SemanticModel() {
         </p>
         <ul className="space-y-3">
           {[
-            ["Ontology layer", "reusable semantic definitions, relations, rules, and model vocabulary"],
+            ["Ontology layer", "reusable structural semantic definitions, relations, rules, and model vocabulary"],
+            ["Conceptual layer", "native concept-scheme and concept elements that generate SKOS thesaurus resources for terminology, taxonomy, and search"],
             ["Capability and requirement subgraphs", "one or more independent product or system intent structures with requirements and contracts"],
-            ["Verification layer", "tests, proofs, analysis, inspection, and demonstration evidence linked to the capabilities or requirements they verify"],
+            ["Verification layer", "tests, proofs, analysis, inspection, and demonstration evidence linked to the requirements they verify"],
             ["Implementation evidence", "code, tests, reports, documents, and other artifacts that satisfy requirements or provide verification evidence"],
           ].map(([term, desc]) => (
             <li key={term} className="flex items-start gap-2.5">
@@ -37,7 +38,7 @@ export default function SemanticModel() {
           ))}
         </ul>
         <p className="text-zinc-600 mt-4">
-          Concept references bind prose to ontology terms. Reused Contract
+          Concept references bind prose to SKOS concepts. Reused Contract
           Context brings reusable requirement-owned contracts into scope without
           forcing unrelated concerns into the same hierarchy.
         </p>
@@ -81,7 +82,7 @@ export default function SemanticModel() {
             <p className="text-sm text-zinc-600">
               Capabilities, requirements, contracts, verification objectives,
               and concrete verifications use concept references to bind
-              readable labels to ontology terms.
+              readable labels to SKOS concepts.
             </p>
           </div>
           <div className="border border-zinc-200 rounded-lg p-4">
@@ -130,7 +131,11 @@ export default function SemanticModel() {
           {[
             {
               name: "Ontology",
-              desc: "Defines domain semantics, relations, rules, reusable concepts, and ontology vocabulary as first-class OWL/Turtle content.",
+              desc: "Defines structural domain semantics, relations, rules, and ontology vocabulary as first-class OWL/Turtle content.",
+            },
+            {
+              name: "Concept Scheme and Concept",
+              desc: "Defines curated SKOS thesaurus terminology as native Markdown elements. Concept schemes and concepts generate skos:ConceptScheme, skos:Concept, labels, definitions, taxonomy, and mappings.",
             },
             {
               name: "Capability",
@@ -146,7 +151,7 @@ export default function SemanticModel() {
             },
             {
               name: "Verification",
-              desc: "Evidence that capabilities or requirements are verified by tests, proofs, analysis, inspection, or demonstration.",
+              desc: "Evidence that requirements are verified by tests, proofs, analysis, inspection, or demonstration.",
             },
           ].map((el) => (
             <div
@@ -163,9 +168,10 @@ export default function SemanticModel() {
       <Section title="Ontology Contracts">
         <p className="text-zinc-600 mb-4">
           Ontology and semantic contracts are separate layers of meaning.
-          Ontology defines reusable vocabulary. Semantic contracts explicitly
-          use ontology and constrain requirements to make obligations precise
-          and machine-checkable.
+          Ontology defines reusable structural vocabulary. Native concept
+          elements define curated SKOS terminology. Semantic contracts
+          explicitly use ontology and constrain requirements to make obligations
+          precise and machine-checkable.
         </p>
         <p className="text-zinc-600 mb-4">
           For ontology authoring rules, examples, validation, and export
@@ -179,11 +185,11 @@ export default function SemanticModel() {
           items={[
             {
               name: "Ontology",
-              desc: "Use ontology elements for reusable meaning: classes, properties, ranges, restrictions, labels, comments, and stable domain vocabulary. Ontology elements require one Ontology Turtle block.",
+              desc: "Use ontology elements for reusable structural meaning: classes, properties, ranges, restrictions, labels, comments, and stable domain vocabulary. Ontology elements require one Ontology Turtle block.",
             },
             {
               name: "Concept References",
-              desc: "Use concept references when readable capability, requirement, contract, or verification prose should bind labels to ontology CURIEs or IRIs without crowding the text.",
+              desc: "Use concept references when readable capability, requirement, contract, or verification prose should bind labels to SKOS concept IRIs without crowding the text.",
             },
             {
               name: "Semantic Contract",
@@ -208,12 +214,15 @@ export default function SemanticModel() {
             </thead>
             <tbody className="divide-y divide-zinc-200">
               {[
-                ["derivedFrom / derive", "Hierarchy inside the same family: capability, requirement, ontology, or verification-family."],
+                ["derivedFrom / derive", "Hierarchy inside compatible families: capability, requirement, ontology, concept-scheme/concept context, or verification-family."],
                 ["specify / specifiedBy", "Requirement specifies a capability."],
                 ["define / definedBy", "Requirement owns a compatible contract element."],
                 ["constrain / constrainedBy", "Semantic contract constrains one or more requirements."],
                 ["use / usedBy", "Semantic contract uses ontology vocabulary."],
-                ["verify / verifiedBy", "Concrete verification records evidence scope for a capability or requirement; verification-objective is excluded."],
+                ["broader / narrower", "SKOS taxonomy between native concept elements."],
+                ["related", "Associative SKOS relation between native concept elements."],
+                ["exactMatch / closeMatch", "SKOS mapping relation from a native concept to another concept or external concept IRI."],
+                ["verify / verifiedBy", "Concrete verification records evidence scope for a requirement; capability coverage is computed from verified requirements."],
                 ["satisfiedBy / satisfy", "Requirement or evidence-backed verification links to implementation or proof/test evidence."],
                 ["reuse", "Requirement imports a one-way non-semantic requirement-owned contract dependency."],
                 ["trace", "Soft traceability without ownership semantics."],

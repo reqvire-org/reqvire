@@ -1,7 +1,5 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import * as d3 from "d3";
-import * as d3Sankey from "d3-sankey";
 import { App } from "./App";
 import "../design-system/styles.css";
 
@@ -9,13 +7,9 @@ type MermaidApi = typeof import("mermaid").default;
 
 declare global {
   interface Window {
-    d3?: typeof d3 & typeof d3Sankey;
     mermaid?: MermaidApi;
   }
 }
-
-const bundledD3 = { ...d3, ...d3Sankey };
-window.d3 = bundledD3;
 
 const container = document.getElementById("root");
 if (!container) {

@@ -40,7 +40,7 @@ Implementation details shall follow the associated contract specifications.
   * derive: [Reused Contract Context Commands](#reused-contract-context-commands)
   * derive: [Validate Command](#validate-command)
   * derivedFrom: [CLI interface](../InterfacesRequirements.md#cli-interface)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
 ---
 
 ### CLI Add Element Command
@@ -68,7 +68,7 @@ Implementation details shall follow the associated contract specifications. Onto
 #### Relations
   * definedBy: [CLI Add Element Command Contract Specification](Specifications.md#cli-add-element-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Add Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-add-element-test)
 ---
 
@@ -109,7 +109,7 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 #### Relations
   * definedBy: [Change Propagation Behavior](Behaviors.md#change-propagation-behavior)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Git Commit Hash Flag Test](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-git-commit-hash-flag-test)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Change Impact Analysis Verification](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#change-impact-analysis-verification)
@@ -134,7 +134,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [CLI Collect Command Contract Specification](Specifications.md#cli-collect-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Collect Command Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#cli-collect-command-test)
 ---
 
@@ -168,9 +168,9 @@ The markdown output shall include:
 #### Relations
   * definedBy: [Short Mode Behavior](Behaviors.md#short-mode-behavior)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
-  * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [containment.rs](../../../crates/reqvire-core/src/containment.rs)
+  * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
 ---
 
 ### CLI Coverage Command
@@ -192,7 +192,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [CLI Coverage Command Contract Specification](Specifications.md#cli-coverage-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Verification Coverage Report Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#verification-coverage-report-test)
 ---
@@ -210,7 +210,7 @@ The diff output contract shall define a shared presentation format for command r
 #### Relations
   * definedBy: [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+  * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
 ---
 
 ### CLI JSON File Output Option
@@ -226,7 +226,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [CLI JSON File Output Option Contract Specification](Specifications.md#cli-json-file-output-option-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI JSON File Output Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#cli-json-file-output-test)
 ---
 
@@ -251,7 +251,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [CLI Lint Command Contract Specification](Specifications.md#cli-lint-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
 ---
 
 ### CLI Merge Element Command
@@ -275,7 +275,7 @@ Implementation details shall follow the associated contract specifications. Onto
 #### Relations
   * definedBy: [CLI Merge Element Command Contract Specification](Specifications.md#cli-merge-element-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
 ---
 
 ### CLI Migrate Command
@@ -297,8 +297,8 @@ Implementation details shall follow the associated contract specifications. The 
 #### Relations
   * definedBy: [CLI Migrate Command Contract Specification](Specifications.md#cli-migrate-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [mod.rs](../../../core/src/migrations/mod.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/migrations/mod.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [CLI Migrate Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-migrate-command-verification)
 ---
@@ -324,8 +324,8 @@ Implementation details shall follow the associated contract specifications. The 
 #### Relations
   * definedBy: [CLI Model Diagram Command Contract Specification](Specifications.md#cli-model-diagram-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Model Command Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#model-command-verification)
 ---
@@ -349,7 +349,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [CLI Move Asset Command Contract Specification](Specifications.md#cli-move-asset-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [Move Asset Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#move-asset-command-verification)
 ---
 
@@ -375,7 +375,7 @@ The command shall reject moving an element into an existing `# Element` file whe
 #### Relations
   * definedBy: [CLI Move Element Command Contract Specification](Specifications.md#cli-move-element-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Move Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-move-element-test)
   * verifiedBy: [Subdirectory Processing Verification](../../Verifications/Operations/Validation/ValidationVerifications.md#subdirectory-processing-verification)
 ---
@@ -400,21 +400,26 @@ The command shall reject `mv-file --squash` when the target file is an existing 
 #### Relations
   * definedBy: [CLI Move File Command Contract Specification](Specifications.md#cli-move-file-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Move File Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-move-file-test)
   * verifiedBy: [Subdirectory Processing Verification](../../Verifications/Operations/Validation/ValidationVerifications.md#subdirectory-processing-verification)
 ---
 
 ### CLI Ontologies Command
 
-The system shall provide an `ontologies` command that collects all ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry, emits generated ontology document declarations derived from root ontology metadata, supports optional used external ontology subset inclusion, and supports an optional full semantic model projection. The command shall emit one `owl:Ontology` declaration per resolved `ontology_base`; ontology elements in the same base contribute vocabulary to that document, while cross-base ontology hierarchy may emit `owl:imports`.
+The system shall provide semantic export commands that expose ontology vocabulary, SHACL shapes, SKOS concepts, and the combined semantic graph as separate CLI surfaces. The system shall also provide a root `concepts` command family for standalone Thesaurus concept-scheme work. The legacy `ontologies` command remains a compatibility alias for the combined semantic graph export, while canonical semantic workflows use `semantic ontologies`, `semantic shapes`, `semantic concepts`, and `semantic graph`.
 
 #### Details
-The command shall:
-- Emit RDF/Turtle by default.
-- Support `--jsonld` to emit JSON-LD instead of Turtle.
-- Support `--full` to include RDF triples for Reqvire model elements, relations, reused_contract_context, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts.
-- Support `--include-external` to include only the used external subset derived from local ontology `#### External Ontology` source files.
+The semantic export commands shall:
+- Emit RDF/Turtle by default and support `--jsonld` where the selected layer can be serialized as JSON-LD.
+- `semantic ontologies`: emit generated ontology document declarations plus authored OWL/RDF ontology vocabulary, with optional used external ontology subset inclusion.
+- `semantic shapes`: emit semantic-contract SHACL shapes only.
+- `semantic concepts`: emit SKOS concept scheme/thesaurus triples only, with optional `--include-mappings` for `reqvire:mapsToConcept` bridge triples.
+- `semantic graph`: emit the combined semantic graph; `--full` includes RDF triples for Reqvire model elements, relations, reused_contract_context, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts.
+- `concepts export`: emit generated SKOS concept scheme/thesaurus triples from standalone `concept-scheme` roots, with optional `--include-mappings` for valid `reqvire:mapsToConcept` bridge triples.
+- `concepts validate`: validate standalone concept schemes, concept references, and `reqvire:mapsToConcept` bridge targets through the same model validation path.
+- Support `--include-external` on ontology and graph exports to include only the used external subset derived from local or built-in ontology dependency sources.
+- Support `--namespace-base <IRI>` on ontology and graph exports to filter the clean authored layer to one ontology base or term namespace.
 - Provide no CLI flag or mode that emits complete third-party ontology source dumps; users that need raw external source already have the local dependency file.
 - Support `--output <FILE>` to write the selected format to a file.
 - Reuse the semantic index built from the graph registry instead of reparsing Turtle separately from validation.
@@ -429,8 +434,8 @@ The command shall:
 #### Relations
   * definedBy: [CLI Ontologies Command Contract Specification](Specifications.md#cli-ontologies-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [semantic_contract.rs](../../../crates/reqvire-core/src/semantic_contract.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
 ---
@@ -477,7 +482,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [CLI Remove Asset Command Contract Specification](Specifications.md#cli-remove-asset-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [Remove Asset Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#remove-asset-command-verification)
 ---
 
@@ -501,7 +506,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [CLI Remove Element Command Contract Specification](Specifications.md#cli-remove-element-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Remove Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-remove-element-test)
 ---
 
@@ -524,7 +529,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [CLI Rename Element Command Contract Specification](Specifications.md#cli-rename-element-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Rename Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-rename-element-test)
 ---
 
@@ -541,7 +546,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [CLI Resources Command Contract Specification](Specifications.md#cli-resources-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [Resources Report Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#resources-report-verification)
 ---
 
@@ -566,7 +571,7 @@ Implementation details shall follow the associated contract specifications. Sear
 #### Relations
   * definedBy: [CLI Search Command Contract Specification](Specifications.md#cli-search-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Reused Contract Context Search Filters Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-search-filters-verification)
   * verifiedBy: [Search Command Tests](../../Verifications/Reports/ModelReports/ReportingVerifications.md#search-command-tests)
@@ -589,7 +594,7 @@ The CLI shall provide an opt-in `--with-size-estimates` option for supported JSO
 #### Relations
   * definedBy: [CLI Size Estimate JSON Option Specification](Specifications.md#cli-size-estimate-json-option-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Size Estimate JSON Option Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-size-estimate-json-option-verification)
 ---
 
@@ -615,7 +620,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [CLI Submodels Command Contract Specification](Specifications.md#cli-submodels-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Submodels Report Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#submodels-report-verification)
 ---
@@ -640,7 +645,7 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [CLI Traces Command Contract Specification](Specifications.md#cli-traces-command-contract-specification)
   * derive: [Verification Traces Element Navigation](#verification-traces-element-navigation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Verification Traces Filter Options Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#verification-traces-filter-options-test)
   * verifiedBy: [Verification Traces From-Folder Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#verification-traces-from-folder-test)
@@ -659,7 +664,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Verification Traces Element Navigation Contract Specification](Specifications.md#verification-traces-element-navigation-contract-specification)
   * derivedFrom: [CLI Traces Command](#cli-traces-command)
-  * satisfiedBy: [verification_trace.rs](../../../core/src/verification_trace.rs)
+  * satisfiedBy: [verification_trace.rs](../../../crates/reqvire-core/src/verification_trace.rs)
   * verifiedBy: [Verification Traces Element Navigation Test](../../Verifications/Interfaces/CLI/CLIVerifications.md#verification-traces-element-navigation-test)
 ---
 
@@ -679,7 +684,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Detailed Error Handling and Logging Contract Specification](Specifications.md#detailed-error-handling-and-logging-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [error.rs](../../../core/src/error.rs)
+  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
 ---
 
 ### Explicit Workspace Selection
@@ -702,7 +707,7 @@ The system shall allow command invocations to select the Reqvire workspace expli
 #### Relations
   * definedBy: [Explicit Workspace Selection Specification](Specifications.md#explicit-workspace-selection-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [Explicit Workspace Selection Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#explicit-workspace-selection-verification)
 ---
 
@@ -724,7 +729,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Format Command Contract Specification](Specifications.md#format-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Element Ordering Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#element-ordering-verification)
   * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
@@ -750,7 +755,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Relation Commands Contract Specification](Specifications.md#relation-commands-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [Link Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#unlink-command-verification)
 ---
@@ -795,8 +800,8 @@ Reused Contract Context management behavior:
 #### Relations
   * definedBy: [Reused Contract Context Input Auto-Detection Behavior](Behaviors.md#reused-contract-context-input-auto-detection-behavior)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * verifiedBy: [Remove Reused Context Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#remove-reused-context-command-verification)
   * verifiedBy: [Reuse Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reuse-command-verification)
 ---
@@ -822,7 +827,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Validate Command Contract Specification](Specifications.md#validate-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
 ---

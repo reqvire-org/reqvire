@@ -32,7 +32,7 @@ jobs:
         run: cd explorer && npm run lint
 
       - name: Build Explorer SPA bundle
-        # core/build.rs embeds explorer/dist into the binary at compile time,
+        # crates/reqvire-core/build.rs embeds explorer/dist into the binary at compile time,
         # so the bundle must be built before cargo build/test.
         run: cd explorer && npm run build
 

@@ -14,10 +14,19 @@ import {
   GraphCanvasSurface,
   GraphRoute,
   roleColorValue,
+  Spinner,
 } from "@ds";
 
 type GraphEdge = NonNullable<KnowledgeGraphProjection["edges"]>[number] & {
   relCategory?: RelationCategory;
+};
+
+type GraphData = {
+  nodes: KnowledgeGraphNode[];
+  nodeById: Map<string, KnowledgeGraphNode>;
+  edges: GraphEdge[];
+  degreeByNode: Map<string, number>;
+  edgeAdjacency: Map<string, GraphEdge[]>;
 };
 
 type RelationCategory =
@@ -32,14 +41,6 @@ type RelationCategory =
 
 type OverlayKey = "cross" | "verification" | "trace";
 
-const STRUCTURAL_RELATIONS = new Set<RelationCategory>([
-  "derive",
-  "specify",
-  "define",
-  "verify",
-  "satisfy",
-]);
-
 function nodeKind(node: KnowledgeGraphNode): string {
   return node.element_type || node.node_type || node.type || "other";
 }
@@ -51,7 +52,7 @@ function roleColor(kind: string) {
   };
 }
 
-function relationCategory(edge: Pick<GraphEdge, "label" | "kind">): RelationCategory {
+function relationCategory(edge: { label?: unknown; kind?: unknown }): RelationCategory {
   const label = String(edge.label || "").toLowerCase();
   const kind = String(edge.kind || "").toLowerCase();
   if (kind === "reused_contract_context" || label === "reuses contract") return "reuse";
@@ -85,10 +86,6 @@ function overlayVisible(category: RelationCategory, activeOverlays: Set<OverlayK
   return true;
 }
 
-function edgeParticipatesInLayout(edge: GraphEdge) {
-  return STRUCTURAL_RELATIONS.has(edge.relCategory ?? relationCategory(edge));
-}
-
 function truncate(value: string | undefined, max: number) {
   const text = value ?? "";
   return text.length > max ? `${text.slice(0, Math.max(1, max - 1))}...` : text;
@@ -98,8 +95,8 @@ function nodeLabelLimit(node: KnowledgeGraphNode) {
   return ["capability", "requirement", "ontology"].includes(nodeKind(node)) ? 26 : 34;
 }
 
-function nodeSize(node: KnowledgeGraphNode, edges: GraphEdge[]) {
-  const degree = edges.filter((edge) => edge.source === node.id || edge.target === node.id).length;
+function nodeSize(node: KnowledgeGraphNode, degreeByNode: Map<string, number>) {
+  const degree = degreeByNode.get(node.id) ?? 0;
   return Math.min(16, 4 + Math.sqrt(degree + 1) * 1.6);
 }
 
@@ -138,14 +135,22 @@ function sigmaLabelSettings() {
   } as const;
 }
 
-function mutedHexColor() {
-  return cssVar("--text-muted");
+function edgeColor(edge: { label?: unknown; kind?: unknown; relCategory?: unknown }) {
+  const category = typeof edge.relCategory === "string"
+    ? edge.relCategory as RelationCategory
+    : relationCategory(edge);
+  if (category === "concept-reference") return cssVar("--concept-reference");
+  if (category === "reuse") return cssVar("--edge-reuse");
+  if (category === "derive") return cssVar("--edge-derive");
+  if (category === "satisfy" || category === "verify") return cssVar("--edge-satisfy");
+  if (category === "trace") return cssVar("--edge-trace");
+  return cssVar("--edge-default");
 }
 
 function isOpenableGraphNode(node: KnowledgeGraphNode | null | undefined): node is KnowledgeGraphNode {
   if (!node?.identifier) return false;
   const kind = nodeKind(node);
-  return kind !== "resource" && kind !== "concept";
+  return kind !== "resource";
 }
 
 function buildGraphData(projection: KnowledgeGraphProjection | undefined) {
@@ -157,7 +162,17 @@ function buildGraphData(projection: KnowledgeGraphProjection | undefined) {
   const edges = (projection?.edges ?? [])
     .filter((edge) => nodeById.has(edge.source) && nodeById.has(edge.target))
     .map((edge) => ({ ...edge, relCategory: relationCategory(edge) }));
-  return { nodes, nodeById, edges };
+  const degreeByNode = new Map<string, number>();
+  const edgeAdjacency = new Map<string, GraphEdge[]>();
+  const addEdgeForNode = (nodeId: string, edge: GraphEdge) => {
+    degreeByNode.set(nodeId, (degreeByNode.get(nodeId) ?? 0) + 1);
+    edgeAdjacency.set(nodeId, [...(edgeAdjacency.get(nodeId) ?? []), edge]);
+  };
+  edges.forEach((edge) => {
+    addEdgeForNode(edge.source, edge);
+    if (edge.target !== edge.source) addEdgeForNode(edge.target, edge);
+  });
+  return { nodes, nodeById, edges, degreeByNode, edgeAdjacency } satisfies GraphData;
 }
 
 function assignInitialPositions(nodes: KnowledgeGraphNode[]) {
@@ -204,7 +219,7 @@ export function KnowledgeGraphView({
     knowledgeGraphSelectionId: selectedId,
     setKnowledgeGraphSelectionId: setSelectedId,
   } = useExplorerUiState();
-  const { nodes, nodeById, edges } = useMemo(
+  const { nodes, nodeById, edges, degreeByNode, edgeAdjacency } = useMemo(
     () => buildGraphData(store.knowledge_graph),
     [store.knowledge_graph],
   );
@@ -213,10 +228,15 @@ export function KnowledgeGraphView({
   const rendererRef = useRef<Sigma | null>(null);
   const selectedRef = useRef<string | null>(null);
   const hoveredRef = useRef<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const activeTypesRef = useRef(activeTypes);
+  const activeOverlaysRef = useRef(activeOverlays);
+  const graphFilterRevisionRef = useRef(0);
+  const [notice, setNotice] = useState<string | null>(() => (
+    nodes.length > 0 ? "Loading graph..." : null
+  ));
 
   const visibleNode = (node: KnowledgeGraphNode) =>
-    activeTypes.has(nodeKind(node));
+    activeTypesRef.current.has(nodeKind(node));
   const visibleEdge = (edge: GraphEdge) => {
     const source = nodeById.get(edge.source);
     const target = nodeById.get(edge.target);
@@ -224,9 +244,15 @@ export function KnowledgeGraphView({
       Boolean(source && target) &&
       Boolean(source && visibleNode(source)) &&
       Boolean(target && visibleNode(target)) &&
-      overlayVisible(edge.relCategory ?? relationCategory(edge), activeOverlays)
+      overlayVisible(edge.relCategory ?? relationCategory(edge), activeOverlaysRef.current)
     );
   };
+  useEffect(() => {
+    activeTypesRef.current = activeTypes;
+    activeOverlaysRef.current = activeOverlays;
+    graphFilterRevisionRef.current += 1;
+  }, [activeTypes, activeOverlays]);
+
   useEffect(() => {
     selectedRef.current = selectedId;
     rendererRef.current?.refresh();
@@ -261,6 +287,7 @@ export function KnowledgeGraphView({
     let draggedNodeId: string | null = null;
     let isDraggingNode = false;
     let dragMovedNode = false;
+    const neighborhoodCache = new Map<string, Set<string>>();
     const setGraphCursor = (cursor: "" | "pointer" | "grabbing") => {
       container.style.cursor = cursor;
       container.querySelectorAll("canvas").forEach((canvas) => {
@@ -277,6 +304,10 @@ export function KnowledgeGraphView({
         suppressStageClearTimer = null;
       }, 0);
     };
+    setNotice("Loading graph...");
+    let buildTimer: number | null = null;
+    const frameId = window.requestAnimationFrame(() => {
+    buildTimer = window.setTimeout(() => {
     try {
       const positionedNodes = nodes.map((node) => ({ ...node }));
       assignInitialPositions(positionedNodes);
@@ -292,26 +323,25 @@ export function KnowledgeGraphView({
           fullLabel: node.label,
           x: positioned.x,
           y: positioned.y,
-          size: nodeSize(node, edges),
+          size: nodeSize(node, degreeByNode),
           color: roleColor(kind).fill,
           hidden: !visibleNode(node),
         });
       });
       edges.forEach((edge, index) => {
-        if (!edgeParticipatesInLayout(edge)) return;
         graph?.addDirectedEdgeWithKey(`e${index}`, edge.source, edge.target, {
           ...edge,
           type: "arrow",
           label: displayEdgeLabel(edge),
           size: edge.kind === "reused_contract_context" || edge.kind === "concept-reference" ? 0.8 : 1.1,
-          color: mutedHexColor(),
+          color: edgeColor(edge),
           hidden: !visibleEdge(edge),
         });
       });
       try {
         const settings = forceAtlas2.inferSettings(graph);
         forceAtlas2.assign(graph, {
-          iterations: graph.order > 650 ? 260 : 180,
+          iterations: graph.order > 650 ? 120 : graph.order > 350 ? 150 : 180,
           settings: {
             ...settings,
             adjustSizes: true,
@@ -324,28 +354,20 @@ export function KnowledgeGraphView({
       } catch (error) {
         console.warn("[Reqvire KG] ForceAtlas2 layout failed", error);
       }
-      edges.forEach((edge, index) => {
-        const key = `e${index}`;
-        if (graph?.hasEdge(key)) return;
-        graph?.addDirectedEdgeWithKey(key, edge.source, edge.target, {
-          ...edge,
-          type: "arrow",
-          label: displayEdgeLabel(edge),
-          size: edge.kind === "reused_contract_context" || edge.kind === "concept-reference" ? 0.8 : 1.1,
-          color: mutedHexColor(),
-          hidden: !visibleEdge(edge),
-        });
-      });
       const computeFocusNeighborhoodIds = (focusIds: readonly string[]) => {
+        const cacheKey = `${graphFilterRevisionRef.current}|${[...focusIds].sort().join("\u001f")}`;
+        const cached = neighborhoodCache.get(cacheKey);
+        if (cached) return cached;
         const neighborhood = new Set<string>();
         focusIds.forEach((focusId) => {
           neighborhood.add(focusId);
-          edges.forEach((edge) => {
+          (edgeAdjacency.get(focusId) ?? []).forEach((edge) => {
             if (!visibleEdge(edge)) return;
             if (edge.source === focusId) neighborhood.add(edge.target);
             if (edge.target === focusId) neighborhood.add(edge.source);
           });
         });
+        neighborhoodCache.set(cacheKey, neighborhood);
         return neighborhood;
       };
       const edgeInFocusNeighborhood = (
@@ -469,7 +491,7 @@ export function KnowledgeGraphView({
               return result;
             }
             result.hidden = false;
-            result.color = cssVar("--edge-default");
+            result.color = edgeColor(attributes);
             result.size = Math.max(1.1, Number(attributes.size ?? 1) * 1.15);
             result.forceLabel = true;
             return result;
@@ -483,7 +505,7 @@ export function KnowledgeGraphView({
             result.label = "";
           } else {
             result.hidden = false;
-            result.color = cssVar("--edge-default");
+            result.color = edgeColor(attributes);
             result.size = Math.max(1.1, Number(attributes.size ?? 1) * 1.15);
             result.forceLabel = true;
           }
@@ -521,11 +543,13 @@ export function KnowledgeGraphView({
       });
       renderer.on("enterNode", (event) => {
         hoveredRef.current = event.node;
+        neighborhoodCache.clear();
         setGraphCursor("pointer");
         renderer?.refresh();
       });
       renderer.on("leaveNode", (event) => {
         if (hoveredRef.current === event.node) hoveredRef.current = null;
+        neighborhoodCache.clear();
         setGraphCursor("");
         renderer?.refresh();
       });
@@ -585,8 +609,15 @@ export function KnowledgeGraphView({
       console.error("[Reqvire KG] Sigma/Graphology renderer failed", error);
       setNotice("Graph renderer failed. Check the browser console for details.");
     }
+    }, 0);
+    });
 
     return () => {
+      window.cancelAnimationFrame(frameId);
+      if (buildTimer !== null) {
+        window.clearTimeout(buildTimer);
+        buildTimer = null;
+      }
       // Lose all WebGL contexts before removal so the GPU compositor immediately
       // drops the cached texture — prevents stale-frame bleed onto the next view.
       containerRef.current?.querySelectorAll("canvas").forEach((canvas) => {
@@ -606,7 +637,7 @@ export function KnowledgeGraphView({
       graph = null;
       renderer = null;
     };
-  }, [edges, nodeById, nodes, onOpenElement, setSelectedId]);
+  }, [degreeByNode, edgeAdjacency, edges, nodeById, nodes, onOpenElement, setSelectedId]);
 
   const graph = (
     <GraphRoute embedded={embedded}>
@@ -617,7 +648,12 @@ export function KnowledgeGraphView({
           role="img"
           aria-label="Actual project elements and facts graph"
         />
-        {notice ? <GraphCanvasNotice>{notice}</GraphCanvasNotice> : null}
+        {notice ? (
+          <GraphCanvasNotice>
+            {notice === "Loading graph..." ? <Spinner label={notice} /> : null}
+            <span>{notice}</span>
+          </GraphCanvasNotice>
+        ) : null}
       </GraphCanvasFrame>
     </GraphRoute>
   );

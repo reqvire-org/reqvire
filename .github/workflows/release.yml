@@ -35,7 +35,7 @@ jobs:
           node-version: "24"
 
       - name: Install Explorer dependencies
-        # core/build.rs embeds explorer/dist and only builds it when
+        # crates/reqvire-core/build.rs embeds explorer/dist and only builds it when
         # REQVIRE_BUILD_EXPLORER=1 is set for the cargo invocation.
         run: cd explorer && npm ci
 

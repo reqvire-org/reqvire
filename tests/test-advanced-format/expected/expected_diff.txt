@@ -122,9 +122,9 @@ Found 9 file(s) with formatting changes:
   08
   09     #### Relations
   10 -     * derivedFrom: ../UserStories.md#managing-mbse-models
-  10 -     * satisfiedBy: ../core/src/model.rs
+  10 -     * satisfiedBy: ../crates/reqvire-core/src/model.rs
   10 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
-  11 +     * satisfiedBy: [parser.rs](../core/src/parser.rs)
+  11 +     * satisfiedBy: [parser.rs](../crates/reqvire-core/src/parser.rs)
   12 +     * verifiedBy: [Format Test](../Verifications/Tests.md#format-test)
   13 +   ---
   14
@@ -139,10 +139,10 @@ Found 9 file(s) with formatting changes:
   21
   22     #### Relations
   23 -     * derivedFrom: #requirements-processing
-  23 -     * satisfiedBy: ../core/src/graph_registry.rs
+  23 -     * satisfiedBy: ../crates/reqvire-core/src/graph_registry.rs
   23 -   ␤
   23 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
-  24 +     * satisfiedBy: [model.rs](../core/src/model.rs)
+  24 +     * satisfiedBy: [model.rs](../crates/reqvire-core/src/model.rs)
   25     ---
   26 -   ### Path Resolution Testing
   26 +   ### Validation Framework
@@ -156,9 +156,9 @@ Found 9 file(s) with formatting changes:
   33     #### Relations
   34 -     * derivedFrom: [../UserStories.md#managing-mbse-models](/UserStories.md#managing-mbse-models)
   34 -     * verifiedBy: [../Verifications/Tests.md#format-test](/Verifications/Tests.md#format-test)
-  34 -     * satisfiedBy: /core/src/parser.rs
+  34 -     * satisfiedBy: /crates/reqvire-core/src/parser.rs
   34 +     * derivedFrom: [Requirements Processing](#requirements-processing)
-  35 +     * satisfiedBy: [graph_registry.rs](../core/src/graph_registry.rs)
+  35 +     * satisfiedBy: [graph_registry.rs](../crates/reqvire-core/src/graph_registry.rs)
   36 +   ---
   37
 
@@ -523,7 +523,7 @@ Found 9 file(s) with formatting changes:
   19       * derivedFrom: [Format Verification Objective](#format-verification-objective)
   20 -     * verify: ../SystemRequirements/Requirements.md#requirements-processing
   20 -     * satisfiedBy: ../tests/test-format/test.sh
-  20 +     * satisfiedBy: [element.rs](../core/src/element.rs)
+  20 +     * satisfiedBy: [element.rs](../crates/reqvire-core/src/element.rs)
   21 +     * verify: [Path Resolution Testing](../SystemRequirements/Requirements.md#path-resolution-testing)
   22 +   ---
   23
@@ -557,7 +557,7 @@ Found 9 file(s) with formatting changes:
   43     #### Relations
   44       * derivedFrom: [Format Verification Objective](#format-verification-objective)
   45 -     * verify: [../SystemRequirements/Requirements.md#path-resolution-testing](/SystemRequirements/Requirements.md#path-resolution-testing)
-  45 -     * satisfiedBy: /core/src/element.rs
+  45 -     * satisfiedBy: /crates/reqvire-core/src/element.rs
   45 +     * verify: [Validation Framework](../SystemRequirements/Requirements.md#validation-framework)
   46 +   ---
   47

@@ -23,6 +23,7 @@ import { ResourcesView } from "./views/ResourcesView";
 import { SearchView } from "./views/SearchView";
 import { FilesView } from "./views/FilesView";
 import { ModelView } from "./views/ModelView";
+import { ThesaurusView } from "./views/ThesaurusView";
 import {
   CoverageView,
   TracesView,
@@ -37,6 +38,7 @@ const LEFT_PANE_WIDTH_MAX = 720;
 const LEFT_PANE_WIDTH_STORAGE_KEY = "reqvire:explorer:left-pane-width";
 
 const SHELL_NAVIGATION_ITEMS: ShellNavigationItem[] = [
+  { value: "thesaurus", label: "Thesaurus", icon: "tags" },
   { value: "model", label: "Model", icon: "folder" },
   { value: "ontologies", label: "Ontologies", icon: "globe" },
   { value: "traces", label: "Traces", icon: "activity" },
@@ -292,6 +294,8 @@ function ActiveView({
   switch (view) {
     case "model":
       return <ModelView onOpenElement={onOpenElement} />;
+    case "thesaurus":
+      return <ThesaurusView onOpenElement={onOpenElement} />;
     case "traces":
       return <TracesView activeView={view} onNavigate={onNavigate} onOpenElement={onOpenElement} />;
     case "ontologies":

@@ -1,0 +1,172 @@
+# Collect Element Trace Context
+
+Collect and present a comprehensive summary of capability, requirement, contract, verification, and implementation context via the upstream trace chain by default or the downstream trace chain when requested.
+
+## Steps
+
+### 1. Collect Raw Content
+
+Run the `reqvire collect` command to gather the complete trace context:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" collect "<element-name>" --json --output /tmp/collect_output.json
+```
+
+This command collects:
+- The target element's content and metadata
+- Full upstream trace chain, including owning capabilities and ancestor requirements
+- Reused/refining specifications, constraints, behaviors, states, and input-output contracts, plus semantic contracts reached through explicit `constrain`/`constrainedBy` relations
+- Related documentation files
+- Source citations and file paths
+- Verification, satisfaction, and contract relations
+
+**Error Handling:**
+- If the command fails, check that the element name is correct
+- Element names are case-sensitive and must match exactly
+- Use `reqvire search --short` to find the exact element name if needed
+
+### 2. Read and Analyze JSON Output
+
+```bash
+# The file /tmp/collect_output.json contains structured data
+```
+
+The JSON structure includes:
+- **`element`**: The target element's content, metadata, and type
+- **`ancestors`**: Array of upstream trace elements from root to target
+- **`reused_contract_context`**: Specifications, constraints, behaviors, states, and input-output contracts refining the context; semantic contracts are reached through explicit `constrain`/`constrainedBy` relations
+- **`documents`**: Related markdown documentation files with content
+- **`citations`**: Source file paths and anchors for traceability
+- **`relations`**: verifiedBy, satisfiedBy, and definedBy links to other elements
+
+Extract and organize:
+- **Target element details**: Name, type, full content
+- **Trace hierarchy**: Owning capability path and requirement contract path
+- **Reused contracts**: All specifications, constraints, behaviors, states, input-output contracts, and semantic contracts
+- **Documentation**: Content from reused markdown files
+- **Verification info**: verifiedBy relations and test criteria
+- **Implementation info**: satisfiedBy relations and code references
+- **Contract info**: definedBy relations to compatible contract elements
+- **Source locations**: File paths and anchors for all elements
+
+### 3. Generate Comprehensive Context Document
+
+Create a complete, readable markdown document that synthesizes all collected information into a coherent narrative.
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+- **NO page limits** - include complete details regardless of length
+- **Rephrase all content** into coherent, readable narrative (don't copy-paste raw data)
+- **Synthesize and explain** - make it flow as documentation someone would want to read
+- **Organize by topic** - not by source or element type
+- **All references at end** - citations and traceability links in References section
+
+#### Document Structure
+
+```markdown
+# Trace Context: [Element Name]
+
+## Overview
+
+[Write a comprehensive description of what this element represents, its purpose, and its engineering value.]
+
+## Background
+
+[Explain the ontology, capability, requirement, and verification context around the target element.]
+
+## Detailed Specifications
+
+### Core Requirements
+
+[Include all relevant capability and requirement content, rephrased as a coherent narrative.]
+
+### Implementation Details
+
+- **Code/Components**: [List and describe all satisfiedBy elements]
+- **Contracts**: [List and describe all definedBy elements]
+- **API Endpoints**: [If applicable]
+- **Algorithms**: [If applicable]
+- **Data Structures**: [If applicable]
+
+### Constraints and Validation
+
+[Detail all constraints, state rules, semantic contracts, and validation rules.]
+
+### Reused Specifications
+
+[Include content from all reused specifications, constraints, behaviors, states, and input-output contracts.]
+
+## Verification
+
+- **Verification Methods**: [List and describe verifiedBy elements]
+- **Test Criteria**: [Explain what the tests validate]
+- **Acceptance Criteria**: [Detail what constitutes successful verification]
+
+## Related Documentation
+
+[Describe reused documentation files and their relevance.]
+
+## References
+
+**Source:**
+- File: [path/to/file.md#element-anchor]
+- Type: [requirement/specification/etc.]
+
+**Trace Chain:**
+- [Parent Capability 1](path/to/file.md#parent-1)
+- [Parent Requirement 1](path/to/file.md#parent-2)
+
+**Verified By:**
+- [Verification 1](path/to/file.md#verification-1)
+
+**Satisfied By:**
+- [Implementation 1](path/to/file.md#impl-1)
+
+**Refined By:**
+- [Specification 1](path/to/file.md#spec-1)
+
+**Reused Elements:**
+- [Specification 1](path/to/file.md#spec-1)
+
+**Related Documents:**
+- [Document 1](path/to/doc.md)
+
+---
+*Generated by `reqvire collect "[Element Name]"`*
+*For raw JSON data, see `/tmp/collect_output.json`*
+```
+
+## Output Guidelines
+
+### Writing Style
+
+- **Narrative, not lists**: Write flowing prose that explains concepts
+- **Synthesis**: Combine related information from multiple sources
+- **Context**: Explain the "why" behind decisions and requirements
+- **Clarity**: Use clear language that new team members can understand
+- **Completeness**: Include ALL details - nothing should be omitted
+- **Length**: As long as needed - simple capabilities might be 1-2 pages, complex ones 5-10 pages
+
+### Content Treatment
+
+- **Rephrase everything**: Don't copy-paste requirement text verbatim
+- **Explain implications**: What does this requirement mean in practice?
+- **Connect the dots**: How do different pieces relate to each other?
+- **Preserve precision**: Keep technical accuracy while improving readability
+
+## Downstream Collection
+
+To collect all descendants under a capability or requirement:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" collect "<element-name>" --direction DOWNSTREAM --json --output /tmp/collect_downstream.json
+```
+
+This returns the element and all its descendants, useful for enumerating all elements under a scope root.
+
+## Notes
+
+- The collect command gathers complete context, but your job is to make it readable
+- Larger requirements will naturally produce longer documents - that's expected
+- Focus on creating documentation that developers would want to read
+- All traceability is preserved in the References section
+- Use the JSON data to inform the narrative, but don't dump JSON into the output

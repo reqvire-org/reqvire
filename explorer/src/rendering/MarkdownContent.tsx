@@ -290,9 +290,6 @@ function markdownComponents({ variant }: { variant: MarkdownContentVariant }): C
         />
       );
     }
-    if (block && variant === "detail" && block.language === "d3-sankey") {
-      return <D3JsonNotice code={block.code} label="D3 sankey" />;
-    }
     return <pre {...props}>{children}</pre>;
   },
   code({ className, children, node: _node, ...props }) {

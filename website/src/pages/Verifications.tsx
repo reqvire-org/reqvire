@@ -90,7 +90,7 @@ The system shall process data within 500ms.
             "Verification objectives are mandatory parents for concrete verifications and are excluded from concrete verification coverage counts.",
             "Leaf requirements are the preferred verification targets because they represent concrete testable obligations.",
             "Parent requirement coverage rolls up through the requirement hierarchy when leaf requirements are verified.",
-            "Capabilities may be directly verified, and capability coverage can also roll up from the requirements that specify them.",
+            "Capability coverage rolls up from the verified requirements that specify each capability.",
             "One verification may verify multiple leaf requirements when a single test or proof covers a coherent behavior.",
           ]}
         />

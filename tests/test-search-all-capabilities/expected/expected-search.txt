@@ -111,6 +111,10 @@ Total elements: 10
 📋 Ontology Types:
   ontology: 0
 
+📋 Concept Types:
+  concept: 0
+  concept-scheme: 0
+
 📋 Requirement Governance Metadata:
   Status:
     approved: 7

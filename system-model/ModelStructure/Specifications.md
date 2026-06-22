@@ -46,7 +46,7 @@ The validator shall enforce the structural rules derived from those contracts:
 - A top-level requirement must have `specify` pointing to exactly one capability.
 - A child requirement may omit `specify` when it has `derivedFrom` pointing to another requirement; the owning capability is inherited through the requirement hierarchy.
 - If a requirement has both `derivedFrom` and `specify`, the explicit `specify` capability must match the inherited capability.
-- Capabilities may be directly verified but are not directly satisfied; implementation coverage rolls up from requirements that specify them.
+- Capabilities are not directly verified or directly satisfied; implementation and verification coverage roll up from requirements that specify them.
 - Governance metadata is valid on capability and requirement elements only and inherits through the nearest parent in the same family or through the owning capability when a top-level requirement specifies a capability.
 
 #### Metadata
@@ -300,7 +300,7 @@ Authored ontology vocabulary shall use standard RDF/RDFS annotation properties f
 Common contract fields for graph-backed model operations.
 
 #### Details
-Operation family vocabulary is defined by the Reqvire operation ontology. Operation specifications define command-facing behavior, not ontology vocabulary.
+Operation family vocabulary is defined by operation requirements and specifications. Operation specifications define command-facing behavior and API behavior as contracts.
 
 Each graph-backed operation specification is expected to define:
 - command name or API entry point
@@ -365,9 +365,9 @@ Reqvire implements relation semantics for ownership, hierarchy, capability speci
 - Authored relation tokens must map to a declared semantic relation family. Generic semantic escape-hatch relations are not part of the canonical model; authors should use a semantically specific relation family or ontology concept references.
 
 #### Concept References
-  * Relation Family: https://www.reqvire.org/ontology#RelationFamily
-  * Relation Rule: https://www.reqvire.org/ontology#RelationRule
-  * Relation Semantic Pattern: https://www.reqvire.org/ontology#RelationSemanticPattern
+  * Relation Family: https://www.reqvire.org/concepts#RelationFamily
+  * Relation Rule: https://www.reqvire.org/concepts#RelationRule
+  * Relation Semantic Pattern: https://www.reqvire.org/concepts#RelationSemanticPattern
 
 #### Metadata
   * type: specification

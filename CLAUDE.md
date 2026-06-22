@@ -70,7 +70,7 @@ For comprehensive command reference, see the Reqvire skills.
 
 ### Project Structure
 ```
-core/src/
+crates/reqvire-core/src/
 ├── lib.rs                 # Library entry point
 ├── element.rs             # Element representation and logic
 ├── relation.rs            # Relation types and behaviors
@@ -90,7 +90,7 @@ core/src/
 ├── error.rs               # Error handling
 └── tests/                 # Unit tests
 
-cli/src/
+crates/reqvire-cli/src/
 ├── main.rs                # CLI entry point
 ├── cli.rs                 # Command-line interface logic
 └── config.rs              # Configuration management

@@ -23,11 +23,14 @@ The generated `ontologyGraphData` is the contract between Rust projection logic 
 
 #### Graph Layers
 Ontology graph data uses explicit layers:
-- `authored` contains authored ontology and SHACL semantics plus projection facts derived from that authored content.
+- `authored` contains authored structural ontology and SHACL semantics plus projection facts derived from that authored content.
+- `concepts` contains exported SKOS concept nodes, SKOS taxonomy edges, and concept bridge edges from the semantic store contract.
 - `reqvire-context` contains generated semantic context for model-to-term provenance only: model elements that `declaresTerm` or `referencesTerm` ontology terms.
 - `external-source` is reserved for imported external ontology vocabulary triples in the used external subset.
 
-The Ontologies view treats `authored` as the implicit base graph, not as an optional layer control. The left pane must not render an Authored row because disabling or selecting authored ontology content would remove the point of the ontology view itself. Semantic Context and External Sources are the only visible overlay filters, letting users inspect model-to-term provenance or used external subset vocabulary without changing the primary authored ontology view.
+The Ontologies view exposes `authored` as the Core layer because curated concepts can be inspected independently from structural ontology content. The left pane renders Core, Concepts, Semantic Context, and External Sources as layer controls. Core and Concepts are enabled by default so the route opens with both structural ontology and conceptual taxonomy visible, while Semantic Context and External Sources remain opt-in overlays.
+
+The Concepts layer is a conceptual overlay from the exported store, but it is still separated from the Core structural layer. Nodes typed as `skos:Concept` must use semantic type `skos-concept`, layer `concepts`, and the `--rdf-concept` color token. Nodes typed as `skos:ConceptScheme` must use semantic type `skos-concept-scheme`, layer `concepts`, and the `--rdf-concept-scheme` color token. Concept nodes must carry canonical `scheme_iri` and `scheme_label` fields derived from generated SKOS scheme facts such as `skos:inScheme`, `skos:topConceptOf`, or scheme-owned `skos:hasTopConcept`; consumers must not infer concept scheme grouping from source element names, ontology document IRIs, namespaces, filesystem paths, or fallback element hierarchy. SKOS concept relationship predicates such as `skos:inScheme`, `skos:hasTopConcept`, `skos:broader`, `skos:narrower`, `skos:related`, and SKOS mapping predicates must render as Concepts-layer edges so selected concept nodes reveal their concept neighborhood. Directional SKOS predicates remain directional in `ontology.graph_data.edges[]`; symmetric concept associations such as `skos:related`, `skos:exactMatch`, `skos:closeMatch`, and `skos:relatedMatch` must be canonicalized to one conceptual graph edge even when the RDF contains reciprocal triples. A `reqvire:mapsToConcept` annotation from a structural resource to a SKOS concept must render as one `mapsToConcept` edge in the Concepts layer. The viewer must not add a generated inverse `mappedFrom` edge because it duplicates the same bridge visually.
 
 #### Semantic Projection
 The graph projection applies these rules before Sigma sees the graph:
@@ -36,6 +39,8 @@ The graph projection applies these rules before Sigma sees the graph:
 - Duplicate rendered links are deduplicated by source, target, label, rendered kind, and property identity.
 - Literal nodes are suppressed.
 - Datatype IRIs such as `http://www.w3.org/2001/XMLSchema#string` are suppressed as primary nodes.
+- OWL ontology document IRIs typed as `owl:Ontology` are document metadata, not primary graph nodes.
+- `rdfs:isDefinedBy` links are ontology-document ownership metadata for grouping, filtering, search, and modal detail; they must not render as canvas relationship edges.
 - Anonymous blank nodes render only when they represent meaningful constructs, currently SHACL shapes, OWL restrictions, or OWL class expressions.
 - RDF list plumbing is suppressed as graph nodes and raw `rdf:first`/`rdf:rest` edges; list members are preserved as readable construct evidence, such as class-expression members in the ontology node modal and property-chain member rows.
 - Property details remain available in the ontology node modal for selected classes, individuals, and terms.
@@ -61,6 +66,8 @@ The renderer must not use separate ad hoc tests for the same concept. If a new c
 #### Rendered Node Kinds
 Rendered node roles are:
 - `class`: normal OWL/RDFS class-like ontology terms.
+- `skos-concept`: exported SKOS concept taxonomy nodes.
+- `skos-concept-scheme`: exported SKOS concept-scheme root nodes.
 - `named-individual`: authored or inferred named instances.
 - `datatype`: authored datatype terms when meaningful, not built-in datatype evidence.
 - `restriction`: OWL anonymous restriction constructs.
@@ -134,7 +141,7 @@ The `Show` controls expose canvas visibility toggles in one button group:
 
 Ontology terms and class-membership context are always available because hiding them removes the meaningful ontology graph backbone. Checked means shown. The default state shows the remaining visibility controls so the ontology map opens as a complete authored graph; relationship density is managed through hover/selection focus rather than by hiding the core graph by default.
 
-The `Overlays` controls expose only optional non-authored graph additions. Authored ontology content is implicit and is not shown as a layer row. Semantic Context and External Sources are the only checkable overlay rows. Semantic Context must not appear in the `Types` legend because it is provenance for model-to-term declaration/reference facts, not an ontology semantic node kind.
+The `Overlays` controls expose graph layers. Core is the authored structural ontology layer. Concepts is the exported SKOS taxonomy and concept-bridge layer. Semantic Context and External Sources are optional overlays. Core and Concepts are shown by default; users may hide Core when they want to inspect the thesaurus independently, or hide Concepts when they need a structural-only ontology view. Semantic Context must not appear in the `Types` legend because it is provenance for model-to-term declaration/reference facts, not an ontology semantic node kind.
 
 The single `SHACL shapes` role filter controls both SHACL shape nodes and their SHACL overlay relations. The renderer must not expose a second SHACL slot-overlay checkbox that can hide overlay relations while leaving SHACL shape nodes visible, or vice versa.
 
@@ -148,7 +155,9 @@ Changing any filter must not reset the camera. This keeps before/after visual co
 
 #### Modal Detail Semantics
 The ontology node modal is evidence-oriented and intentionally independent from canvas filters:
-- It shows the selected node's kind, RDF type evidence, URI or blank-node identifier, description, properties, domain/range, slots/facets, inverse/equivalence/chain evidence, projection constructs, source links, and raw SHACL evidence when directly present.
+ - It shows the selected node's kind, RDF type evidence, URI or blank-node identifier, provenance origin (authored term, generated construct, semantic context, external used subset), description, properties, domain/range, slots/facets, inverse/equivalence/chain evidence, projection constructs, source links, and raw SHACL evidence when directly present.
+- It shows the OWL ontology document IRI for authored terms when ontology-document ownership metadata is available.
+- It uses a single-column scroll flow: RDF type, full URI, OWL document, description, and notation appear at the top of the modal content before property usages, constructs, literal values, constraints, and sources.
 - Property usage rows are deduplicated by the underlying semantic facts rather than by repeated visual edges.
 - SHACL slot/facet rows are normalized from target-class and property-shape evidence.
 - Filtered-out badges, constructs, or SHACL evidence must remain available in the modal when they belong to the selected node.
@@ -174,6 +183,7 @@ The ontology command e2e test validates both projection and rendering contracts:
 - Source tokens assert the unified construct-class helpers and Sigma image-node construct glyph path exist.
 - Source tokens assert construct image nodes use Sigma's native circular image-node background with inline SVG pictogram data URIs.
 - Graph JSON assertions ensure literals and built-in datatype nodes do not render as primary graph nodes.
+- Graph JSON assertions ensure OWL ontology document IRIs and `rdfs:isDefinedBy` facts remain metadata rather than primary graph nodes or rendered canvas edges, while selected ontology terms retain their OWL document value for modal/search use.
 - Fixture ontology includes an existential `owl:someValuesFrom` restriction so restriction construct nodes are proven to survive graph projection and retain construct evidence for glyph rendering.
 
 #### Change Guidance

@@ -2,6 +2,8 @@ export { ReusedContractContextList } from "./ReusedContractContextList";
 export type { ReusedContractContextListProps } from "./ReusedContractContextList";
 export { ConceptReferenceList } from "./ConceptReferenceList";
 export type { ConceptReferenceListProps } from "./ConceptReferenceList";
+export { ConceptElementDetailContent } from "./ConceptElementDetailContent";
+export type { ConceptElementDetailContentProps } from "./ConceptElementDetailContent";
 export { DetailDialog } from "./DetailDialog";
 export type { DetailDialogProps } from "./DetailDialog";
 export { DetailSection } from "./DetailSection";
