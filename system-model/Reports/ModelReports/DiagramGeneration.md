@@ -26,8 +26,8 @@ When requested through reporting commands, the system shall generate Mermaid dia
   * derive: [Interactive Mermaid Diagram Node Behavior](#interactive-mermaid-diagram-node-behavior)
   * derive: [Reqvire Relationship Rendering](#reqvire-relationship-rendering)
   * derivedFrom: [Interactive Mermaid Diagrams](#interactive-mermaid-diagrams)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
   * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
 ---
 
 ### Interactive Mermaid Diagram Node Behavior
@@ -45,8 +45,8 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Interactive Mermaid Diagram Node Behavior Contract Specification](Specifications.md#interactive-mermaid-diagram-node-behavior-contract-specification)
   * derivedFrom: [Diagram Generation](#diagram-generation)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
   * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
+  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
 ---
 
 ### Reqvire Relationship Rendering

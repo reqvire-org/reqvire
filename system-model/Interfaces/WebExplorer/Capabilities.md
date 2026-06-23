@@ -175,35 +175,6 @@ Implementation details shall follow the associated contract specifications.
   * verifiedBy: [Model View Element Navigation Test](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-view-element-navigation-test)
 ---
 
-### Thesaurus View Generation
-
-The system shall expose a Thesaurus Explorer view during serve workflows that presents standalone native concept schemes and concepts as curated SKOS terminology instead of as ontology children or filesystem folders.
-
-#### Details
-The Thesaurus view shall:
-- Render concept-scheme roots and broader/narrower concept hierarchy from Project Store semantic concept data, using canonical SKOS `scheme_iri` / `scheme_label` membership rather than source-name, namespace, ontology-document, filesystem, or element-hierarchy fallback grouping.
-- Use a concept-scheme navigator in the left Explorer pane rather than the Model project tree.
-- Show selected concept details, definitions, alternative labels, scope notes, examples, taxonomy, related concepts, exact/close mappings, concept references, mapped ontology terms, and authored relation evidence from generated native concept data.
-- Provide a single Map workspace that shows the selected concept scheme as an interactive concept map; Thesaurus must not expose a Browse/Map segmented mode control.
-- Render Thesaurus Map through the shared design-system product pattern using React Flow for node interaction and a deterministic concept-scheme mind-map layout, with boxed label-first concept nodes and no role labels beside concept names.
-- Open the shared element-detail modal for native `concept-scheme` and `concept` elements when map nodes are activated and source element metadata is available, using a concept-optimized modal body for SKOS properties, concept relations, exact/close mappings, ontology mappings, model usage, and remaining authored relations.
-- Preserve source navigation to the Markdown `concept-scheme` or `concept` element that generated the selected SKOS resource.
-- Keep structural ontology exploration in the Ontologies route, while allowing ontology bridge context such as `reqvire:mapsToConcept` to appear as concept usage evidence.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Thesaurus View Generation Contract Specification](Specifications.md#thesaurus-view-generation-contract-specification)
-  * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
-  * satisfiedBy: [ExplorerSidePane.tsx](../../../explorer/src/components/ExplorerSidePane.tsx)
-  * satisfiedBy: [types.ts](../../../explorer/src/store/types.ts)
-  * satisfiedBy: [ThesaurusView.tsx](../../../explorer/src/views/ThesaurusView.tsx)
-  * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
-  * verifiedBy: [Thesaurus Project Store Projection Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#thesaurus-project-store-projection-verification)
----
-
 ### Ontologies View Generation
 
 The system shall expose an Ontologies Explorer view during serve workflows that presents ontology and SHACL semantics through an OWL-aware model viewer instead of a raw RDF triple graph.
@@ -390,6 +361,35 @@ The SPA Explorer shell shall:
   * satisfiedBy: [types.ts](../../../explorer/src/store/types.ts)
   * satisfiedBy: [FilesView.tsx](../../../explorer/src/views/FilesView.tsx)
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
+---
+
+### Thesaurus View Generation
+
+The system shall expose a Thesaurus Explorer view during serve workflows that presents standalone native concept schemes and concepts as curated SKOS terminology instead of as ontology children or filesystem folders.
+
+#### Details
+The Thesaurus view shall:
+- Render concept-scheme roots and broader/narrower concept hierarchy from Project Store semantic concept data, using canonical SKOS `scheme_iri` / `scheme_label` membership rather than source-name, namespace, ontology-document, filesystem, or element-hierarchy fallback grouping.
+- Use a concept-scheme navigator in the left Explorer pane rather than the Model project tree.
+- Show selected concept details, definitions, alternative labels, scope notes, examples, taxonomy, related concepts, exact/close mappings, concept references, mapped ontology terms, and authored relation evidence from generated native concept data.
+- Provide a single Map workspace that shows the selected concept scheme as an interactive concept map; Thesaurus must not expose a Browse/Map segmented mode control.
+- Render Thesaurus Map through the shared design-system product pattern using React Flow for node interaction and a deterministic concept-scheme mind-map layout, with boxed label-first concept nodes and no role labels beside concept names.
+- Open the shared element-detail modal for native `concept-scheme` and `concept` elements when map nodes are activated and source element metadata is available, using a concept-optimized modal body for SKOS properties, concept relations, exact/close mappings, ontology mappings, model usage, and remaining authored relations.
+- Preserve source navigation to the Markdown `concept-scheme` or `concept` element that generated the selected SKOS resource.
+- Keep structural ontology exploration in the Ontologies route, while allowing ontology bridge context such as `reqvire:mapsToConcept` to appear as concept usage evidence.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Thesaurus View Generation Contract Specification](Specifications.md#thesaurus-view-generation-contract-specification)
+  * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
+  * satisfiedBy: [ExplorerSidePane.tsx](../../../explorer/src/components/ExplorerSidePane.tsx)
+  * satisfiedBy: [types.ts](../../../explorer/src/store/types.ts)
+  * satisfiedBy: [ThesaurusView.tsx](../../../explorer/src/views/ThesaurusView.tsx)
+  * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
+  * verifiedBy: [Thesaurus Project Store Projection Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#thesaurus-project-store-projection-verification)
 ---
 
 ### Traces View Generation

@@ -234,4 +234,3 @@ The system shall define target location validation constraints.
   * satisfiedBy: [utils.rs](../../../crates/reqvire-core/src/utils.rs)
   * verifiedBy: [Target Location Validation Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#target-location-validation-test)
 ---
-

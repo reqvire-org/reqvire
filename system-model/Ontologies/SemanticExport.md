@@ -2,7 +2,6 @@
 
 ### Reqvire Semantic Export Ontology
 
-
 The Reqvire semantic export ontology defines RDF export concepts for collected ontology vocabulary, SHACL shapes, SKOS concepts, and combined semantic graph content.
 
 Semantic exports preserve Markdown as the source of truth while exposing parsed ontology and shape content for downstream semantic tooling.
@@ -13,6 +12,7 @@ Semantic exports preserve Markdown as the source of truth while exposing parsed 
 @prefix concept: <https://www.reqvire.org/concepts#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:GraphRegistry a owl:Class .
@@ -72,10 +72,16 @@ reqvire:SemanticConstructQuery a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection ;
   reqvire:mapsToConcept concept:OntologyProjection ;
   rdfs:comment "Versioned SPARQL CONSTRUCT query specification that defines generated semantic projection facts independently of the current Rust materialization path." .
-reqvire:RelationFamilyConstructQuery a owl:Class ;
+reqvire:NormalizedRelationConstructQuery a owl:Class ;
   rdfs:subClassOf reqvire:SemanticConstructQuery ;
+  rdfs:comment "Construct query that materializes normalized relation facts from authored relation evidence while preserving authored source records separately." .
+reqvire:RelationFamilyConstructQuery a owl:Class ;
+  rdfs:subClassOf reqvire:NormalizedRelationConstructQuery ;
   reqvire:mapsToConcept concept:RelationFamilyConstructQuery ;
   rdfs:comment "SPARQL CONSTRUCT query specification for materializing canonical forward and inverse relation-family facts from authored Reqvire model relations." .
+reqvire:ConceptRelationConstructQuery a owl:Class ;
+  rdfs:subClassOf reqvire:NormalizedRelationConstructQuery ;
+  rdfs:comment "SPARQL CONSTRUCT query specification for materializing normalized SKOS taxonomy, association, and mapping facts from native concept Markdown relations." .
 reqvire:ExternalOntologySubsetConstructQuery a owl:Class ;
   rdfs:subClassOf reqvire:SemanticConstructQuery ;
   reqvire:mapsToConcept concept:ExternalOntologySubsetConstructQuery ;
@@ -83,6 +89,12 @@ reqvire:ExternalOntologySubsetConstructQuery a owl:Class ;
 reqvire:OntologyProjectionGraph a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection ;
   rdfs:comment "Generated graph-level projection record for ontology construct facts emitted in full semantic exports." .
+reqvire:ConceptRelationProjection a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Generated normalized conceptual projection for native SKOS concept taxonomy, association, and mapping relations." .
+reqvire:ConceptRelationProjectionEvidence a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Generated evidence record linking a normalized SKOS concept relation projection to authored concept relation source data." .
 reqvire:OntologyConstructProjection a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection ;
   rdfs:comment "Generated projection pass record grouping ontology constructs by construct family." .
@@ -159,6 +171,26 @@ reqvire:ontologyConstructProjection a owl:ObjectProperty ;
   rdfs:domain reqvire:OntologyProjectionGraph ;
   rdfs:range reqvire:OntologyConstructProjection ;
   rdfs:comment "Links the generated ontology projection graph to a construct-family projection pass." .
+reqvire:conceptRelationProjectionEvidence a owl:ObjectProperty ;
+  rdfs:domain reqvire:ConceptRelationProjection ;
+  rdfs:range reqvire:ConceptRelationProjectionEvidence ;
+  rdfs:comment "Source evidence record that explains how a normalized concept relation projection was derived." .
+reqvire:canonicalConceptRelationSource a owl:ObjectProperty ;
+  rdfs:domain reqvire:ConceptRelationProjection ;
+  rdfs:range reqvire:OntologyTerm ;
+  rdfs:comment "Canonical source SKOS concept for a normalized concept relation edge." .
+reqvire:canonicalConceptRelationTarget a owl:ObjectProperty ;
+  rdfs:domain reqvire:ConceptRelationProjection ;
+  rdfs:range reqvire:OntologyTerm ;
+  rdfs:comment "Canonical target SKOS concept for a normalized concept relation edge." .
+reqvire:normalizedConceptRelationForwardProperty a owl:ObjectProperty ;
+  rdfs:domain reqvire:ConceptRelationProjection ;
+  rdfs:range owl:ObjectProperty ;
+  rdfs:comment "Forward SKOS property emitted by a normalized concept relation projection." .
+reqvire:normalizedConceptRelationInverseProperty a owl:ObjectProperty ;
+  rdfs:domain reqvire:ConceptRelationProjection ;
+  rdfs:range owl:ObjectProperty ;
+  rdfs:comment "Inverse or reciprocal SKOS property emitted by a normalized concept relation projection." .
 reqvire:constructSourceBlock a owl:ObjectProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range reqvire:SemanticBlock ;
@@ -339,6 +371,10 @@ reqvire:constructQueryPurpose a owl:DatatypeProperty ;
   rdfs:domain reqvire:SemanticConstructQuery ;
   rdfs:range xsd:string ;
   rdfs:comment "Human-readable purpose and intended consumer behavior for a construct-query specification." .
+reqvire:sourceRelationType a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ConceptRelationProjectionEvidence ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Authored native concept relation token that contributed to a normalized concept relation projection." .
 
 reqvire:semanticArtifactExportMode a reqvire:SemanticArtifactExport ;
   rdfs:comment "Semantic ontology export mode that emits generated ontology document declarations plus authored ontology vocabulary with source comments." .
@@ -459,7 +495,8 @@ WHERE {
   }
 }
 """ .
-reqvire:relationFamilyNormalizedConstructQuery a reqvire:RelationFamilyConstructQuery ;
+reqvire:relationFamilyNormalizedConstructQuery a reqvire:RelationFamilyConstructQuery,
+    reqvire:NormalizedRelationConstructQuery ;
   reqvire:constructQueryName "relation-family-normalized-projection" ;
   reqvire:constructFamily "semantic-search" ;
   reqvire:constructKind "relation-family-normalized-projection" ;
@@ -488,6 +525,40 @@ WHERE {
   BIND(IF(?direction = "inverse", ?source, ?target) AS ?canonicalTarget)
 }
 """ .
+reqvire:conceptRelationNormalizedConstructQuery a reqvire:ConceptRelationConstructQuery,
+    reqvire:NormalizedRelationConstructQuery ;
+  reqvire:constructQueryName "concept-relation-normalized-projection" ;
+  reqvire:constructFamily "concept-relation" ;
+  reqvire:constructKind "concept-relation-normalized-projection" ;
+  reqvire:projectionDerivationMode "construct-query-specified" ;
+  reqvire:constructQueryMaterializesProperty skos:broader, skos:narrower, skos:related, skos:exactMatch, skos:closeMatch ;
+  reqvire:constructQueryPurpose "Materialize canonical SKOS concept relation facts from authored native concept relations so child broader, parent narrower, symmetric association, and mapping neighborhoods are queryable without client-side inverse inference." ;
+  reqvire:constructQueryText """
+PREFIX reqvire: <https://www.reqvire.org/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+CONSTRUCT {
+  ?canonicalSource ?forwardProperty ?canonicalTarget .
+  ?canonicalTarget ?inverseProperty ?canonicalSource .
+}
+WHERE {
+  ?relation a reqvire:ModelRelation ;
+    reqvire:relationSource ?source ;
+    reqvire:relationTarget ?target ;
+    reqvire:relationType ?relationName .
+
+  VALUES (?relationName ?direction ?forwardProperty ?inverseProperty) {
+    ("broader" "forward" skos:broader skos:narrower)
+    ("narrower" "inverse" skos:broader skos:narrower)
+    ("related" "forward" skos:related skos:related)
+    ("exactMatch" "forward" skos:exactMatch skos:exactMatch)
+    ("closeMatch" "forward" skos:closeMatch skos:closeMatch)
+  }
+
+  BIND(IF(?direction = "inverse", ?target, ?source) AS ?canonicalSource)
+  BIND(IF(?direction = "inverse", ?source, ?target) AS ?canonicalTarget)
+}
+""" .
 ```
 
 #### Metadata
@@ -499,13 +570,15 @@ WHERE {
 
 ### Semantic Export Projection Shape
 
-Defines SHACL constraints for semantic export records, RDF projections, semantic blocks, and ontology-term references.
+Defines shared SHACL constraints and projection invariants for semantic export records, RDF projections, semantic blocks, ontology-term references, normalized relation-family facts, normalized concept-relation facts, and ontology construct projection facts.
 
 #### Shapes
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:GraphRegistryShape
@@ -594,6 +667,73 @@ reqvire:OntologyProjectionGraphShape
   sh:property [
     sh:path reqvire:projectionDerivationMode ;
     sh:datatype xsd:string ;
+  ] .
+
+reqvire:ConceptRelationProjectionShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ConceptRelationProjection ;
+  sh:property [
+    sh:path reqvire:projectionDerivationMode ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constructSourceBlock ;
+    sh:class reqvire:SemanticBlock ;
+  ] ;
+  sh:property [
+    sh:path reqvire:canonicalConceptRelationSource ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:OntologyTerm ;
+  ] ;
+  sh:property [
+    sh:path reqvire:canonicalConceptRelationTarget ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:OntologyTerm ;
+  ] ;
+  sh:property [
+    sh:path reqvire:normalizedConceptRelationForwardProperty ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in (skos:broader skos:narrower skos:related skos:exactMatch skos:closeMatch) ;
+  ] ;
+  sh:property [
+    sh:path reqvire:normalizedConceptRelationInverseProperty ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in (skos:broader skos:narrower skos:related skos:exactMatch skos:closeMatch) ;
+  ] ;
+  sh:property [
+    sh:path reqvire:conceptRelationProjectionEvidence ;
+    sh:class reqvire:ConceptRelationProjectionEvidence ;
+  ] .
+
+reqvire:ConceptRelationProjectionEvidenceShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ConceptRelationProjectionEvidence ;
+  sh:property [
+    sh:path reqvire:constructSourceBlock ;
+    sh:minCount 1 ;
+    sh:class reqvire:SemanticBlock ;
+  ] ;
+  sh:property [
+    sh:path reqvire:sourceRelationType ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in ("broader" "narrower" "related" "exactMatch" "closeMatch") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constructSubject ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:OntologyTerm ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constructObject ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:OntologyTerm ;
   ] .
 
 reqvire:OntologyConstructProjectionShape
@@ -691,6 +831,82 @@ reqvire:SemanticConstructQueryShape
   sh:property [
     sh:path reqvire:constructQueryMaterializesProperty ;
     sh:nodeKind sh:IRI ;
+  ] .
+
+reqvire:NormalizedRelationConstructQueryShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:NormalizedRelationConstructQuery ;
+  sh:property [
+    sh:path reqvire:projectionDerivationMode ;
+    sh:hasValue "construct-query-specified" ;
+  ] ;
+  sh:xone (
+    [
+      sh:property [
+        sh:path rdf:type ;
+        sh:hasValue reqvire:RelationFamilyConstructQuery ;
+      ]
+    ]
+    [
+      sh:property [
+        sh:path rdf:type ;
+        sh:hasValue reqvire:ConceptRelationConstructQuery ;
+      ]
+    ]
+  ) ;
+  sh:property [
+    sh:path reqvire:constructQueryMaterializesProperty ;
+    sh:minCount 1 ;
+    sh:nodeKind sh:IRI ;
+  ] .
+
+reqvire:ConceptRelationConstructQueryShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ConceptRelationConstructQuery ;
+  sh:property [
+    sh:path reqvire:constructFamily ;
+    sh:hasValue "concept-relation" ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constructKind ;
+    sh:hasValue "concept-relation-normalized-projection" ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constructQueryMaterializesProperty ;
+    sh:hasValue skos:broader ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constructQueryMaterializesProperty ;
+    sh:hasValue skos:narrower ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constructQueryMaterializesProperty ;
+    sh:hasValue skos:related ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constructQueryMaterializesProperty ;
+    sh:hasValue skos:exactMatch ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constructQueryMaterializesProperty ;
+    sh:hasValue skos:closeMatch ;
+  ] .
+
+reqvire:RelationFamilyConstructQueryShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:RelationFamilyConstructQuery ;
+  sh:property [
+    sh:path reqvire:constructFamily ;
+    sh:hasValue "semantic-search" ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constructKind ;
+    sh:hasValue "relation-family-normalized-projection" ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constructQueryMaterializesFamily ;
+    sh:minCount 1 ;
+    sh:class reqvire:RelationFamily ;
   ] .
 
 reqvire:OntologyConstructMemberShape
@@ -827,9 +1043,14 @@ reqvire:SemanticBlockShape
   * type: semantic-contract
 
 #### Relations
-  * constrain: [Ontology and Shapes Collection](../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
+  * constrain: [Concept Relation Projection Materialization](../Reports/ModelReports/ReportingRequirements.md#concept-relation-projection-materialization)
+  * constrain: [Ontology Projection Subgraph Materialization](../Reports/ModelReports/ReportingRequirements.md#ontology-projection-subgraph-materialization)
   * constrain: [Namespace-Scoped Ontology Export](../Semantics/SemanticModelRequirements.md#namespace-scoped-ontology-export)
+  * constrain: [Ontology and Shapes Collection](../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
   * constrain: [Runtime Reqvire Ontology Artifact](../Semantics/SemanticModelRequirements.md#runtime-reqvire-ontology-artifact)
+  * constrain: [Runtime Reqvire SHACL Artifact](../Semantics/SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)
   * constrain: [Runtime Reqvire Ontology Synchronization](../Semantics/SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
+  * constrain: [Semantic Relation Family Projection](../Reports/ModelReports/ReportingRequirements.md#semantic-relation-family-projection)
+  * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
   * use: [Reqvire Semantic Export Ontology](#reqvire-semantic-export-ontology)
 ---

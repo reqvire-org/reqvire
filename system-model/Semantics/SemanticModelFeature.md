@@ -17,40 +17,17 @@ Reports, Explorer views, MCP tools, website docs, and assistant skills consume t
   * status: approved
 
 #### Relations
+  * specifiedBy: [Built-In External Ontology Source Resolution](SemanticModelRequirements.md#built-in-external-ontology-source-resolution)
+  * specifiedBy: [External Vocabulary Description Construction](SemanticModelRequirements.md#external-vocabulary-description-construction)
+  * specifiedBy: [External Vocabulary Reference Resolution](SemanticModelRequirements.md#external-vocabulary-reference-resolution)
+  * specifiedBy: [Local External Ontology Sources](SemanticModelRequirements.md#local-external-ontology-sources)
+  * specifiedBy: [Namespace-Scoped Ontology Export](SemanticModelRequirements.md#namespace-scoped-ontology-export)
   * specifiedBy: [Ontology and Shapes Collection](SemanticModelRequirements.md#ontology-and-shapes-collection)
   * specifiedBy: [Ontology Term Definition Link Materialization](SemanticModelRequirements.md#ontology-term-definition-link-materialization)
   * specifiedBy: [OWL Reserved Vocabulary Recognition](SemanticModelRequirements.md#owl-reserved-vocabulary-recognition)
-  * specifiedBy: [Local External Ontology Sources](SemanticModelRequirements.md#local-external-ontology-sources)
-  * specifiedBy: [Built-In External Ontology Source Resolution](SemanticModelRequirements.md#built-in-external-ontology-source-resolution)
-  * specifiedBy: [External Vocabulary Reference Resolution](SemanticModelRequirements.md#external-vocabulary-reference-resolution)
+  * specifiedBy: [Runtime Reqvire Ontology Artifact](SemanticModelRequirements.md#runtime-reqvire-ontology-artifact)
+  * specifiedBy: [Runtime Reqvire Ontology Synchronization](SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
   * specifiedBy: [Used External Vocabulary Selection](SemanticModelRequirements.md#used-external-vocabulary-selection)
-  * specifiedBy: [External Vocabulary Description Construction](SemanticModelRequirements.md#external-vocabulary-description-construction)
-  * specifiedBy: [Namespace-Scoped Ontology Export](SemanticModelRequirements.md#namespace-scoped-ontology-export)
-  * specifiedBy: [Runtime Reqvire Ontology Artifact](SemanticModelRequirements.md#runtime-reqvire-ontology-artifact)
-  * specifiedBy: [Runtime Reqvire Ontology Synchronization](SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
----
-
-### Runtime Reqvire Ontology Vocabulary
-
-As a **Reqvire runtime maintainer**, I want Reqvire to ship a generated runtime ontology artifact derived from its authored ontology model, so that bootstrap and runtime semantic services can consume the Reqvire vocabulary without making the authored system model a hidden runtime dependency.
-
-#### Details
-Runtime Reqvire Ontology Vocabulary covers the chicken-and-egg boundary between Reqvire's authored ontology model and the runtime code that needs the Reqvire vocabulary to parse, validate, export, or expose semantic facts.
-
-The authored source of truth remains `system-model/Ontologies`. The generated `reqvire.ttl` artifact is implementation evidence derived from that authored source and checked for reproducibility.
-
-#### Metadata
-  * type: capability
-  * owner: syseng
-  * priority: high
-  * risk: high
-  * status: approved
-
-#### Relations
-  * derivedFrom: [Semantic Model Core](#semantic-model-core)
-  * specifiedBy: [Namespace-Scoped Ontology Export](SemanticModelRequirements.md#namespace-scoped-ontology-export)
-  * specifiedBy: [Runtime Reqvire Ontology Artifact](SemanticModelRequirements.md#runtime-reqvire-ontology-artifact)
-  * specifiedBy: [Runtime Reqvire Ontology Synchronization](SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
 ---
 
 ### External Ontology Source Management
@@ -69,10 +46,10 @@ External ontology source management covers source declaration, parsing, prefix/n
 
 #### Relations
   * derivedFrom: [Semantic Model Core](#semantic-model-core)
-  * specifiedBy: [Local External Ontology Sources](SemanticModelRequirements.md#local-external-ontology-sources)
-  * specifiedBy: [External Vocabulary Reference Resolution](SemanticModelRequirements.md#external-vocabulary-reference-resolution)
-  * specifiedBy: [Used External Vocabulary Selection](SemanticModelRequirements.md#used-external-vocabulary-selection)
   * specifiedBy: [External Vocabulary Description Construction](SemanticModelRequirements.md#external-vocabulary-description-construction)
+  * specifiedBy: [External Vocabulary Reference Resolution](SemanticModelRequirements.md#external-vocabulary-reference-resolution)
+  * specifiedBy: [Local External Ontology Sources](SemanticModelRequirements.md#local-external-ontology-sources)
+  * specifiedBy: [Used External Vocabulary Selection](SemanticModelRequirements.md#used-external-vocabulary-selection)
 ---
 
 ### Built-In External Ontology Sources
@@ -94,4 +71,28 @@ This capability is still external-source behavior. Built-in sources are parsed R
 #### Relations
   * derivedFrom: [External Ontology Source Management](#external-ontology-source-management)
   * specifiedBy: [Built-In External Ontology Source Resolution](SemanticModelRequirements.md#built-in-external-ontology-source-resolution)
+---
+
+### Runtime Reqvire Ontology Vocabulary
+
+As a **Reqvire runtime maintainer**, I want Reqvire to ship generated runtime semantic artifacts derived from its authored ontology model, so that bootstrap and runtime semantic services can consume the Reqvire vocabulary and SHACL rules without making the authored system model a hidden runtime dependency.
+
+#### Details
+Runtime Reqvire Ontology Vocabulary covers the chicken-and-egg boundary between Reqvire's authored ontology model and the runtime code that needs the Reqvire vocabulary and SHACL rules to parse, validate, export, or expose semantic facts.
+
+The authored source of truth remains `system-model/Ontologies`. The generated `reqvire.ttl` and `reqvire-shacl.ttl` artifacts are implementation evidence derived from that authored source and checked for reproducibility.
+
+#### Metadata
+  * type: capability
+  * owner: syseng
+  * priority: high
+  * risk: high
+  * status: approved
+
+#### Relations
+  * derivedFrom: [Semantic Model Core](#semantic-model-core)
+  * specifiedBy: [Namespace-Scoped Ontology Export](SemanticModelRequirements.md#namespace-scoped-ontology-export)
+  * specifiedBy: [Runtime Reqvire Ontology Artifact](SemanticModelRequirements.md#runtime-reqvire-ontology-artifact)
+  * specifiedBy: [Runtime Reqvire SHACL Artifact](SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)
+  * specifiedBy: [Runtime Reqvire Ontology Synchronization](SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
 ---

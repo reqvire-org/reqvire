@@ -350,6 +350,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - Element-detail modal headers shall show only the actual element type as a text badge and shall not show an additional type-family/kind badge, marker dot, shape, or glyph when the element type is more specific.
 - Opening a related element from within the element-detail modal shall show a compact back control whose accessible label names the previous element and shall not render a duplicate visible `From:` context line.
 - Resolved concept references in the element-detail modal shall show the SKOS concept name first, show the authored concept-reference label as bracketed secondary context only when it differs meaningfully from the resolved concept name, expose the IRI as tooltip/location metadata, and open the ontology-node modal when activated.
+- Concept relation lists in the element-detail modal shall exclude the selected concept itself, and reciprocal ontology edges for the same concept pair shall be deduplicated before rendering.
 - Element-detail modals shall expose source navigation as a secondary action using the source anchor.
 - The Coverage route shall render a left-pane coverage explorer with section counts for Overview, Capability coverage, Unverified requirements, Unimplemented requirements, Unsatisfied verifications, and Orphaned verifications, while keeping summary cards, charts, and legends out of the left pane.
 - Separate Explorer/report document entry points shall not be generated.
@@ -357,7 +358,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 
 ##### Test Criteria:
 - Run `reqvire serve` on a minimal model with at least one capability, requirement, verification relation, satisfiedBy evidence file, reused_contract_context or concept-reference fact, and ontology term when available.
-- Run the Explorer component/unit tests that cover element-detail modal back context rendering and resolved concept-reference ontology modal routing.
+- Run the Explorer component/unit tests that cover element-detail modal back context rendering, resolved concept-reference ontology modal routing, and exclusion of self-referential concept relation rows from the modal.
 - Parse the generated store seed from `index.html` or its referenced static asset.
 - Assert all required top-level store sections exist.
 - Assert the `project` section exposes repository and branch metadata when running from a Git repository, and that Explorer tree roots render the combined repository/branch label.
@@ -383,38 +384,6 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 
 #### Relations
   * verify: [SPA Explorer Shell and Project Store](../../../Interfaces/WebExplorer/Capabilities.md#spa-explorer-shell-and-project-store)
----
-
-### Thesaurus Project Store Projection Verification
-
-This test verifies that the Thesaurus Explorer route is backed by a native Project Store thesaurus projection instead of ontology graph provenance.
-
-#### Details
-
-##### Acceptance Criteria:
-- The exported Project Store shall include a top-level `thesaurus` projection with `schemes` and `concepts`.
-- Each concept-scheme row shall preserve distinct SKOS identity and native Reqvire `concept-scheme` element identity.
-- Each concept row shall preserve distinct SKOS identity and native Reqvire `concept` element identity.
-- Concept rows shall expose scheme membership, taxonomy parent identity, related concept identity, SKOS authoring fields, source navigation, model usage, and ontology mapping usage needed by the Thesaurus route.
-- Thesaurus map activation shall use native concept or concept-scheme element IDs from the `thesaurus` projection, not ontology graph node source/provenance data.
-- Ontology bridge evidence from `reqvire:mapsToConcept` shall appear as mapping usage without making the mapped ontology term the concept's navigation target.
-
-##### Test Criteria:
-- Export a model containing a native concept scheme, native concepts, concept taxonomy, related concepts, and an ontology term mapped to one concept through `reqvire:mapsToConcept`.
-- Parse `assets/project-store.js` and assert the top-level `thesaurus` projection exists.
-- Assert concept-scheme `element_id` resolves to a Project Store element with type `concept-scheme`.
-- Assert each concept `element_id` resolves to a Project Store element with type `concept`.
-- Assert the narrower concept's `parent_id` references the broader concept SKOS id.
-- Assert related concept ids, labels, scope note, source href, and ontology `maps_to` evidence are preserved.
-- Assert the concept `element_id` differs from ontology graph provenance for the same SKOS concept node, preventing Thesaurus map clicks from opening ontology elements.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * satisfiedBy: [test.sh](../../../../tests/test-thesaurus-project-store/test.sh)
-  * verify: [Thesaurus View Generation](../../../Interfaces/WebExplorer/Capabilities.md#thesaurus-view-generation)
 ---
 
 ### Serve Command Verification
@@ -462,4 +431,36 @@ This test verifies that the serve command starts an HTTP server for the embedded
   * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
   * verify: [Serve Command](../../../Interfaces/WebExplorer/Capabilities.md#serve-command)
   * verify: [Serve Command Embedded MCP Endpoint](../../../Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
+---
+
+### Thesaurus Project Store Projection Verification
+
+This test verifies that the Thesaurus Explorer route is backed by a native Project Store thesaurus projection instead of ontology graph provenance.
+
+#### Details
+
+##### Acceptance Criteria:
+- The exported Project Store shall include a top-level `thesaurus` projection with `schemes` and `concepts`.
+- Each concept-scheme row shall preserve distinct SKOS identity and native Reqvire `concept-scheme` element identity.
+- Each concept row shall preserve distinct SKOS identity and native Reqvire `concept` element identity.
+- Concept rows shall expose scheme membership, taxonomy parent identity, related concept identity, SKOS authoring fields, source navigation, model usage, and ontology mapping usage needed by the Thesaurus route.
+- Thesaurus map activation shall use native concept or concept-scheme element IDs from the `thesaurus` projection, not ontology graph node source/provenance data.
+- Ontology bridge evidence from `reqvire:mapsToConcept` shall appear as mapping usage without making the mapped ontology term the concept's navigation target.
+
+##### Test Criteria:
+- Export a model containing a native concept scheme, native concepts, concept taxonomy, related concepts, and an ontology term mapped to one concept through `reqvire:mapsToConcept`.
+- Parse `assets/project-store.js` and assert the top-level `thesaurus` projection exists.
+- Assert concept-scheme `element_id` resolves to a Project Store element with type `concept-scheme`.
+- Assert each concept `element_id` resolves to a Project Store element with type `concept`.
+- Assert the narrower concept's `parent_id` references the broader concept SKOS id.
+- Assert related concept ids, labels, scope note, source href, and ontology `maps_to` evidence are preserved.
+- Assert the concept `element_id` differs from ontology graph provenance for the same SKOS concept node, preventing Thesaurus map clicks from opening ontology elements.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-thesaurus-project-store/test.sh)
+  * verify: [Thesaurus View Generation](../../../Interfaces/WebExplorer/Capabilities.md#thesaurus-view-generation)
 ---

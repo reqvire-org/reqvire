@@ -125,4 +125,3 @@ This test verifies that the lint command analyzes model quality, detects issues 
   * verify: [Redundant Hierarchical Relations Detection and Auto-Removal](../../../Operations/Linting/LintingRequirements.md#redundant-hierarchical-relations-detection-and-auto-removal)
   * verify: [Redundant Verify Relations Detection](../../../Operations/Linting/LintingRequirements.md#redundant-verify-relations-detection)
 ---
-

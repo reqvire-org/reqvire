@@ -126,12 +126,12 @@ export function ConceptElementDetailContent({
           onOpenElement={onOpenElement}
           onOpenResource={onOpenResource}
         />
-        <ConceptEndpointList title="Top concepts" relationLabel="top concept" endpoints={topConcepts} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <ConceptEndpointList title="Broader concepts" relationLabel="broader" endpoints={broader} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <ConceptEndpointList title="Narrower concepts" relationLabel="narrower" endpoints={narrower} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <ConceptEndpointList title="Related concepts" relationLabel="related" endpoints={related} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <ConceptEndpointList title="Exact matches" relationLabel="exactMatch" endpoints={exactMatches} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <ConceptEndpointList title="Close matches" relationLabel="closeMatch" endpoints={closeMatches} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Top concepts" relationLabel="top concept of" endpoints={topConcepts} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Broader concepts" relationLabel="broader of" endpoints={broader} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Narrower concepts" relationLabel="narrower of" endpoints={narrower} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Related concepts" relationLabel="related to" endpoints={related} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Exact matches" relationLabel="exact match of" endpoints={exactMatches} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Close matches" relationLabel="close match of" endpoints={closeMatches} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
         <ConceptReferenceList
           title="Mapped ontology terms"
           references={mappedOntologyTerms}

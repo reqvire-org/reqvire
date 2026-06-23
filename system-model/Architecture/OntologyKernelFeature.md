@@ -18,9 +18,9 @@ The kernel is intentionally independent from consumer model structures, source-d
 
 #### Relations
   * derive: [Standards Vocabulary Support](#standards-vocabulary-support)
-  * specifiedBy: [Ontology Kernel Public Contract](OntologyKernelRequirements.md#ontology-kernel-public-contract)
   * specifiedBy: [Application Boundary Isolation](OntologyKernelRequirements.md#application-boundary-isolation)
   * specifiedBy: [O-Kernel Physical Module Architecture](OntologyKernelRequirements.md#o-kernel-physical-module-architecture)
+  * specifiedBy: [Ontology Kernel Public Contract](OntologyKernelRequirements.md#ontology-kernel-public-contract)
   * specifiedBy: [Ontology Kernel RDF Native Boundary](OntologyKernelRequirements.md#ontology-kernel-rdf-native-boundary)
   * specifiedBy: [Referenced Graph Subset Construction](OntologyKernelRequirements.md#referenced-graph-subset-construction)
   * specifiedBy: [SHACL and Ontology Algorithm Services](OntologyKernelRequirements.md#shacl-and-ontology-algorithm-services)

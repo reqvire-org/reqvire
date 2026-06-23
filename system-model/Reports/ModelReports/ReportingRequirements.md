@@ -1,5 +1,30 @@
 # Elements
 
+### External Vocabulary Exposure Policy
+
+The system shall expose only constructed used external vocabulary content through external-inclusive semantic output surfaces.
+
+#### Details
+Semantic output surfaces shall not expose raw full external ontology files. When `include_external` is requested, Reqvire shall expose only the used external vocabulary content selected and constructed from internal external dependency inputs. Unused external dependency facts shall remain internal and shall not appear in CLI ontology output, MCP semantic ontology output, MCP vocabulary output, MCP SPARQL graphs, or Explorer ontology views.
+
+Default semantic export and MCP semantic metadata shall keep authored ontology, SHACL shape, SKOS concept, and combined graph concerns as separate surfaces. `reqvire semantic ontologies --include-external`, `reqvire semantic graph --include-external`, and MCP `include_external: true` shall include used external subset triples, used external declarations, and used external vocabulary metadata where that layer supports external materialization. `reqvire semantic graph --full --include-external` and MCP full semantic query with `include_external: true` shall include authored triples, the used external subset, Reqvire model context, and generated ontology projection facts.
+
+No CLI, MCP, Explorer, website, or assistant-facing contract shall specify a public full third-party ontology dump mode.
+
+#### Concept References
+  * Used external ontology subset: https://www.reqvire.org/concepts#UsedExternalOntologySubset
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [External Vocabulary Exposure Policy Specification](Specifications.md#external-vocabulary-exposure-policy-specification)
+  * derivedFrom: [External Vocabulary Description Construction](../../Semantics/SemanticModelRequirements.md#external-vocabulary-description-construction)
+  * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
+  * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+  * verifiedBy: [MCP Model Evidence Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
+---
+
 ### Model Reports
 
 When requested the system shall provide human readable and machine readable System model reports with deterministic output and consistent ordering.
@@ -386,6 +411,26 @@ The system shall seed Explorer Traces SPA route data showing verification tracea
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
 ---
 
+### Ontology Collection Output
+
+The system shall expose the semantic model core context as CLI, MCP, serve-time, and Explorer ontology output without making reporting the owner of ontology or semantic-contract source semantics.
+
+#### Details
+Ontology collection output consumes the semantic context from [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection), including generated ontology document declarations, generated term definition links, authored ontology RDF, semantic-contract SHACL RDF, optional full model context, generated projection facts, and optional used external vocabulary subset content.
+
+The output contract owns serialization choices, command/API flags, Project Store payload shape, and Explorer artifact inclusion. It does not own source resolution, semantic-contract reachability, reserved vocabulary recognition, or built-in external source policy.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
+  * derivedFrom: [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
+  * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
+  * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+  * verifiedBy: [MCP Model Evidence Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
+---
+
 ### Ontology Projection Subgraph Materialization
 
 The system shall materialize generated ontology construct facts as a subgraph of the existing in-memory RDF projection so semantic exports and the Ontologies Explorer consume the same ontology construct facts.
@@ -409,54 +454,10 @@ The ontology projection subgraph shall:
   * [Ontology Construct Classification Specification](../../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
 
 #### Relations
+  * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/SemanticExport.md#semantic-export-projection-shape)
   * definedBy: [Ontology Projection Subgraph Materialization Specification](Specifications.md#ontology-projection-subgraph-materialization-specification)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
----
-
-### Ontology Collection Output
-
-The system shall expose the semantic model core context as CLI, MCP, serve-time, and Explorer ontology output without making reporting the owner of ontology or semantic-contract source semantics.
-
-#### Details
-Ontology collection output consumes the semantic context from [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection), including generated ontology document declarations, generated term definition links, authored ontology RDF, semantic-contract SHACL RDF, optional full model context, generated projection facts, and optional used external vocabulary subset content.
-
-The output contract owns serialization choices, command/API flags, Project Store payload shape, and Explorer artifact inclusion. It does not own source resolution, semantic-contract reachability, reserved vocabulary recognition, or built-in external source policy.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
-  * derivedFrom: [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
-  * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
-  * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
-  * verifiedBy: [MCP Model Evidence Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
----
-
-### External Vocabulary Exposure Policy
-
-The system shall expose only constructed used external vocabulary content through external-inclusive semantic output surfaces.
-
-#### Details
-Semantic output surfaces shall not expose raw full external ontology files. When `include_external` is requested, Reqvire shall expose only the used external vocabulary content selected and constructed from internal external dependency inputs. Unused external dependency facts shall remain internal and shall not appear in CLI ontology output, MCP semantic ontology output, MCP vocabulary output, MCP SPARQL graphs, or Explorer ontology views.
-
-Default semantic export and MCP semantic metadata shall keep authored ontology, SHACL shape, SKOS concept, and combined graph concerns as separate surfaces. `reqvire semantic ontologies --include-external`, `reqvire semantic graph --include-external`, and MCP `include_external: true` shall include used external subset triples, used external declarations, and used external vocabulary metadata where that layer supports external materialization. `reqvire semantic graph --full --include-external` and MCP full semantic query with `include_external: true` shall include authored triples, the used external subset, Reqvire model context, and generated ontology projection facts.
-
-No CLI, MCP, Explorer, website, or assistant-facing contract shall specify a public full third-party ontology dump mode.
-
-#### Concept References
-  * Used external ontology subset: https://www.reqvire.org/concepts#UsedExternalOntologySubset
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [External Vocabulary Exposure Policy Specification](Specifications.md#external-vocabulary-exposure-policy-specification)
-  * derivedFrom: [External Vocabulary Description Construction](../../Semantics/SemanticModelRequirements.md#external-vocabulary-description-construction)
-  * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
-  * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
-  * verifiedBy: [MCP Model Evidence Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
 ---
 
 ### Semantic Relation Family Projection
@@ -484,6 +485,31 @@ The system shall materialize ontology-defined relation-family projection facts a
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
   * verifiedBy: [MCP Semantic Query Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-query-tools-verification)
+---
+
+### Concept Relation Projection Materialization
+
+The system shall materialize normalized SKOS concept-relation facts from native concept Markdown relations so concept exports, full semantic graph output, Project Store thesaurus data, Ontologies Concepts-layer rendering, and MCP concept tools consume the same concept-relation projection.
+
+#### Details
+The concept relation projection shall:
+- Treat authored `broader` and `narrower` concept relations as inverse aliases for one taxonomy edge.
+- Treat authored `related`, `exactMatch`, and `closeMatch` concept relations as symmetric concept association or mapping edges.
+- Accept either direction in Markdown authoring, and accept consistent reciprocal authoring without reporting a duplicate relation error.
+- Materialize both explicit SKOS directions for taxonomy: `skos:broader` from narrower concept to broader concept and `skos:narrower` from broader concept to narrower concept.
+- Materialize reciprocal SKOS concept association or mapping facts where the SKOS predicate is symmetric, while consumers may canonicalize those reciprocal facts to one visual edge.
+- Keep raw authored Markdown relation evidence separate from generated normalized concept-relation projection facts.
+- Not write generated inverse or reciprocal SKOS facts back to authored Markdown.
+- Feed generated concept-relation facts into `reqvire semantic concepts`, `reqvire semantic graph --full`, full JSON-LD output, served Project Store `thesaurus` projection, Ontologies Concepts-layer graph data, and MCP concept/thesaurus tools.
+- Remain separate from ontology construct projection because SKOS concept taxonomy and mappings are conceptual thesaurus facts, not OWL/RDFS/SHACL construct classifications.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/SemanticExport.md#semantic-export-projection-shape)
+  * definedBy: [Concept Relation Projection Specification](Specifications.md#concept-relation-projection-specification)
+  * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
 ---
 
 ### Tracing Structural Changes

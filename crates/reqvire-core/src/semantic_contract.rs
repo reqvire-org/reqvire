@@ -1917,6 +1917,8 @@ fn build_generated_model_turtle(
         "# -----------------------------------------------------------------------------\n",
     );
     output.push_str("# Reqvire generated ontology and model context\n\n");
+    output.push_str("@prefix owl: <http://www.w3.org/2002/07/owl#> .\n");
+    output.push_str("@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n");
     output.push_str("@prefix reqvire: <https://www.reqvire.org/ontology#> .\n");
     output.push_str("\n");
     output.push_str(&build_ontology_document_declarations_turtle(
@@ -3852,30 +3854,13 @@ fn generated_concept_turtle(
                 turtle_literal(&example.value)
             ));
         }
-        append_concept_links(registry, &prefix, &mut turtle, "broader", &concept.broader);
-        append_concept_links(
-            registry,
-            &prefix,
-            &mut turtle,
-            "narrower",
-            &concept.narrower,
-        );
-        append_concept_links(registry, &prefix, &mut turtle, "related", &concept.related);
-        append_concept_links(
-            registry,
-            &prefix,
-            &mut turtle,
-            "exactMatch",
-            &concept.exact_match,
-        );
-        append_concept_links(
-            registry,
-            &prefix,
-            &mut turtle,
-            "closeMatch",
-            &concept.close_match,
-        );
+        for (predicate, object) in normalized_concept_relation_objects(registry, element, &prefix) {
+            turtle.push_str(&format!(" ;\n  skos:{} {}", predicate, object));
+        }
         turtle.push_str(" .\n");
+        for (subject, predicate, object) in external_symmetric_concept_relation_triples(element, &prefix) {
+            turtle.push_str(&format!("{} skos:{} {} .\n", subject, predicate, object));
+        }
         return Ok(Some(turtle));
     }
 
@@ -3950,20 +3935,146 @@ fn concept_scheme_context_recursive<'a>(
     None
 }
 
-fn append_concept_links(
+fn normalized_concept_relation_objects(
     registry: &GraphRegistry,
+    element: &Element,
     prefix: &str,
-    turtle: &mut String,
+) -> BTreeSet<(String, String)> {
+    let mut output = BTreeSet::new();
+    let current_id = element.identifier.as_str();
+
+    for candidate in registry.get_all_elements() {
+        let Some(concept) = candidate.concept.as_ref() else {
+            continue;
+        };
+        let candidate_id = candidate.identifier.as_str();
+
+        for link in &concept.broader {
+            if candidate_id == current_id {
+                output.insert((
+                    "broader".to_string(),
+                    concept_link_object(registry, prefix, &link.target, &link.label),
+                ));
+            }
+            if concept_link_target_element(registry, &link.target)
+                .is_some_and(|target| target.identifier.as_str() == current_id)
+            {
+                output.insert(("narrower".to_string(), concept_curie(prefix, candidate)));
+            }
+        }
+
+        for link in &concept.narrower {
+            if candidate_id == current_id {
+                output.insert((
+                    "narrower".to_string(),
+                    concept_link_object(registry, prefix, &link.target, &link.label),
+                ));
+            }
+            if concept_link_target_element(registry, &link.target)
+                .is_some_and(|target| target.identifier.as_str() == current_id)
+            {
+                output.insert(("broader".to_string(), concept_curie(prefix, candidate)));
+            }
+        }
+
+        append_symmetric_concept_relation_objects(
+            registry,
+            &mut output,
+            current_id,
+            candidate,
+            "related",
+            &concept.related,
+            prefix,
+        );
+        append_symmetric_concept_relation_objects(
+            registry,
+            &mut output,
+            current_id,
+            candidate,
+            "exactMatch",
+            &concept.exact_match,
+            prefix,
+        );
+        append_symmetric_concept_relation_objects(
+            registry,
+            &mut output,
+            current_id,
+            candidate,
+            "closeMatch",
+            &concept.close_match,
+            prefix,
+        );
+    }
+
+    output
+}
+
+fn append_symmetric_concept_relation_objects(
+    registry: &GraphRegistry,
+    output: &mut BTreeSet<(String, String)>,
+    current_id: &str,
+    candidate: &Element,
     predicate: &str,
     links: &[crate::element::ConceptLink],
+    prefix: &str,
 ) {
+    let candidate_id = candidate.identifier.as_str();
     for link in links {
-        turtle.push_str(&format!(
-            " ;\n  skos:{} {}",
-            predicate,
-            concept_link_object(registry, prefix, &link.target, &link.label)
-        ));
+        if candidate_id == current_id {
+            output.insert((
+                predicate.to_string(),
+                concept_link_object(registry, prefix, &link.target, &link.label),
+            ));
+        }
+        if concept_link_target_element(registry, &link.target)
+            .is_some_and(|target| target.identifier.as_str() == current_id)
+        {
+            output.insert((predicate.to_string(), concept_curie(prefix, candidate)));
+        }
     }
+}
+
+fn external_symmetric_concept_relation_triples(
+    element: &Element,
+    prefix: &str,
+) -> BTreeSet<(String, String, String)> {
+    let mut triples = BTreeSet::new();
+    let Some(concept) = element.concept.as_ref() else {
+        return triples;
+    };
+    let object = concept_curie(prefix, element);
+    for (predicate, links) in [
+        ("exactMatch", &concept.exact_match),
+        ("closeMatch", &concept.close_match),
+    ] {
+        for link in links {
+            if link.target.starts_with("http://") || link.target.starts_with("https://") {
+                triples.insert((
+                    format!("<{}>", link.target),
+                    predicate.to_string(),
+                    object.clone(),
+                ));
+            }
+        }
+    }
+    triples
+}
+
+fn concept_link_target_element<'a>(
+    registry: &'a GraphRegistry,
+    target: &str,
+) -> Option<&'a Element> {
+    registry
+        .nodes
+        .get(target)
+        .map(|node| &node.element)
+        .or_else(|| {
+            registry
+                .nodes
+                .values()
+                .find(|node| node.element.identifier.ends_with(target))
+                .map(|node| &node.element)
+        })
 }
 
 fn concept_link_object(
@@ -3975,18 +4086,7 @@ fn concept_link_object(
     if target.starts_with("http://") || target.starts_with("https://") {
         return format!("<{}>", target);
     }
-    if let Some(element) = registry
-        .nodes
-        .get(target)
-        .map(|node| &node.element)
-        .or_else(|| {
-            registry
-                .nodes
-                .values()
-                .find(|node| node.element.identifier.ends_with(target))
-                .map(|node| &node.element)
-        })
-    {
+    if let Some(element) = concept_link_target_element(registry, target) {
         return concept_curie(prefix, element);
     }
     format!("{}:{}", prefix, concept_local_name(label))
@@ -5595,6 +5695,64 @@ ext:UnusedTerm a owl:Class ;
             "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>".to_string(),
             "<http://www.w3.org/1999/02/22-rdf-syntax-ns#Property>".to_string()
         )));
+    }
+
+    #[test]
+    fn generated_model_turtle_declares_builtin_prefixes_when_it_uses_them() {
+        let registry = GraphRegistry::new();
+        let index = SemanticIndex {
+            blocks: Vec::new(),
+            external_blocks: Vec::new(),
+            external_sources: Vec::new(),
+            diagnostics: Vec::new(),
+            ontology_documents: vec![OntologyDocumentDeclaration {
+                iri: "https://example.test/ontology".to_string(),
+                ontology_base: "https://example.test/ontology".to_string(),
+                ontology_prefix: "ex".to_string(),
+                term_namespace: "https://example.test/ontology#".to_string(),
+                element_identifiers: vec!["system-model/Ontologies/Test.md#test-ontology".to_string()],
+                element_names: vec!["Test ontology".to_string()],
+                imports: Vec::new(),
+            }],
+            ontology_declarations: HashMap::from([(
+                "https://example.test/ontology#TestTerm".to_string(),
+                vec![OntologyTermDeclaration {
+                    iri: "https://example.test/ontology#TestTerm".to_string(),
+                    role: OntologyTermRole::Class,
+                    element_identifier: "system-model/Ontologies/Test.md#test-ontology".to_string(),
+                    external: false,
+                    materialized_in_used_subset: false,
+                }],
+            )]),
+            shape_references: Vec::new(),
+            ontology_projection: OntologyProjectionGraph {
+                id: "urn:reqvire:ontology-projection:test".to_string(),
+                derivation_mode: OntologyProjectionDerivationMode::DirectAuthored,
+                projections: Vec::new(),
+                constructs: Vec::new(),
+                symbols: Vec::new(),
+            },
+            model_context: ModelContextGraph {
+                nodes: Vec::new(),
+                edges: Vec::new(),
+            },
+            model_context_turtle: String::new(),
+            summary: SemanticIndexSummary {
+                ontology_blocks: 0,
+                shape_blocks: 0,
+                total_blocks: 0,
+                total_quads: 0,
+            },
+        };
+
+        let turtle = index
+            .to_generated_layer_turtle_string(&registry)
+            .expect("generated layer Turtle should serialize");
+
+        assert!(turtle.contains("@prefix owl: <http://www.w3.org/2002/07/owl#> ."));
+        assert!(turtle.contains("@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ."));
+        assert!(turtle.contains("@prefix reqvire: <https://www.reqvire.org/ontology#> ."));
+        assert!(turtle.contains("rdfs:isDefinedBy"));
     }
 
     #[test]

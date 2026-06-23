@@ -11,6 +11,33 @@ Use this skill for thesaurus work: stakeholder terminology, controlled vocabular
 
 Use `reqvire-ontology-authoring` instead when the work is structural OWL/RDFS vocabulary, classes, properties, individuals, axioms, SHACL targets, or semantic contracts.
 
+Use `reqvire-syseng` instead when the main change is to capabilities,
+requirements, specifications, verification elements, evidence, coverage,
+change-impact workflows, or broader model refactoring. This skill may update
+concept references on those elements only as part of concept-authoring work.
+
+## Reqvire Operations for Concept Authoring
+
+Use Reqvire as the source-of-truth runtime when authoring or changing native
+concept schemes and concepts.
+
+- Work from the repository root unless the user gives a different workspace.
+- Default CLI form: `npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" <command>`.
+- Inside the Reqvire source repository, `cargo run -- <command>` is also acceptable when the local binary is the intended target.
+- Inspect authored concepts with `search --filter-type concept-scheme --json`, `search --filter-type concept --json`, `model --filter-type concept-scheme --json`, `semantic concepts`, `concepts export`, and `concepts validate`.
+- Use `concepts export --include-mappings` or `semantic graph --full` only when checking structural `reqvire:mapsToConcept` bridge triples or downstream graph-store behavior.
+- Prefer Reqvire CLI mutation commands for broad structural edits when available, such as `add`, `link`, `relink`, `mv`, `rm`, and `rename-element`.
+- Manual Markdown edits are valid for focused authoring. Preserve `# Elements`, `### Element Name`, `#### Metadata`, and Reqvire relation list syntax.
+- Place concept-scheme and concept elements under `system-model/Thesaurus` unless the existing project uses a different `system-model/` content structure.
+- Author concept-scheme elements with `type: concept-scheme`, `concept_base`, and `concept_prefix`; this element is the namespace and SKOS `ConceptScheme` holder.
+- Author concept elements with `type: concept`; the main body is the SKOS definition-like human explanation. Do not add `#### Details`, `#### Ontology`, `#### Shapes`, `#### Definition`, or `#### Top Concepts` to concept elements.
+- Use `#### Labels`, `#### Scope Note`, `#### Examples`, and `#### Mappings` for SKOS-specific concept authoring fields when needed.
+- Use `#### Relations` for Reqvire-authored links: `derivedFrom` for scheme/parent containment, `broader` / `narrower` for taxonomy, `related` for associative links, and `exactMatch` / `closeMatch` for intentional concept-to-concept mappings.
+- Relation syntax is `  * relationName: [Target Element](path.md#target-element)`.
+- Keep ontology-to-concept bridges in ontology Turtle with `reqvire:mapsToConcept`; do not model those bridges as concept Markdown fallback data.
+- When changing concept identity, check dependent ontology bridges, concept references, Explorer thesaurus data, MCP concept tools, and any tests that assert generated SKOS IRIs.
+- When validation is part of the task, run focused checks such as `validate`, `semantic concepts`, `concepts validate`, and any affected fixture tests before finishing.
+
 ## Native Concept Model
 
 | Reqvire element | Generated SKOS | Purpose |
@@ -23,7 +50,7 @@ Do not add `concept_id`, `concept_kind`, `pref_label`, or `language` metadata. R
 ## Authoring Workflow
 
 1. Create one `concept-scheme` root with `concept_base` and `concept_prefix`.
-2. Keep concept schemes as standalone thesaurus roots, not ontology children.
+2. Keep concept schemes as standalone thesaurus roots under `system-model/Thesaurus`, not ontology children.
 3. Add child `concept` elements under the scheme or under broader concept groupings.
 4. Put the definition in the main body before reserved subsections.
 5. Add synonyms and stakeholder wording in `#### Labels`.

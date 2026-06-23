@@ -113,10 +113,10 @@ When constructing or refactoring a Reqvire system model:
 
 1. Inspect capability-root subgraphs with `submodels` and inspect the ontology plane with `search --filter-type=ontology`.
 2. Decide whether work belongs to an existing capability root, a child capability, a new independent capability root, or the shared ontology hierarchy.
-3. Keep ontology and semantic-contract elements in `system-model/Ontologies`; capabilities, requirements, contracts, and verifications bind prose to SKOS concepts with `#### Concept References`, and requirements link to semantic contracts there through `constrainedBy`.
+3. Keep ontology and semantic-contract elements in `system-model/Ontologies`; keep concept-scheme and concept elements in `system-model/Thesaurus`; capabilities, requirements, contracts, and verifications bind prose to SKOS concepts with `#### Concept References`, and requirements link to semantic contracts through `constrainedBy`.
 4. Treat ontology as first-class and orthogonal to capability/requirement structure: ontology defines reusable terms and relationships, non-ontology model elements reference those terms explicitly, and semantic contracts depend on ontology through `use`.
-5. Keep hierarchy inside capability, requirement, or ontology families; cross-root contract reuse must be explicit requirement-owned reused_contract_context.
-6. Move stable reusable meaning to ontology; keep obligations in requirements and exact implementation/interface behavior in requirement-owned contracts.
+5. Keep hierarchy inside capability, requirement, ontology, concept, or verification families; cross-root contract reuse must be explicit requirement-owned reused_contract_context.
+6. Move stable reusable structural meaning to ontology, curated terminology to native concepts, obligations to requirements, and exact implementation/interface behavior to requirement-owned contracts.
 7. Use concept references for non-ontology prose-to-SKOS-concept bindings, use `use`/`usedBy` for semantic-contract ontology dependencies, constrain requirements with `constrain`/`constrainedBy`, or reference reusable requirement-owned contracts from consuming requirements instead of using hierarchy to cross submodel boundaries.
 8. Update verifications and e2e fixtures in the same slice when requirements, report shape, names, or output expectations change.
 9. Validate in slices with `validate`, `lint`, `submodels`, and focused tests before broadening the refactor.

@@ -55,4 +55,3 @@ Content transformation rules for the merge elements operation.
 #### Metadata
   * type: behavior
 ---
-

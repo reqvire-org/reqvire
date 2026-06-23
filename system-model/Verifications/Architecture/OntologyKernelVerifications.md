@@ -8,36 +8,34 @@ This objective groups verification that the o-kernel crate boundary remains inde
   * type: verification-objective
 
 #### Relations
-  * derive: [Ontology Kernel Boundary Analysis](#ontology-kernel-boundary-analysis)
   * derive: [O-Kernel Ontology Classification Unit Test Verification](#o-kernel-ontology-classification-unit-test-verification)
   * derive: [O-Kernel Physical Module Unit Test Verification](#o-kernel-physical-module-unit-test-verification)
   * derive: [O-Kernel RDF Term Description Unit Test Verification](#o-kernel-rdf-term-description-unit-test-verification)
   * derive: [O-Kernel Referenced Graph Subset Unit Test Verification](#o-kernel-referenced-graph-subset-unit-test-verification)
   * derive: [O-Kernel Reserved Vocabulary Unit Test Verification](#o-kernel-reserved-vocabulary-unit-test-verification)
   * derive: [O-Kernel SHACL Services Unit Test Verification](#o-kernel-shacl-services-unit-test-verification)
+  * derive: [Ontology Kernel Boundary Analysis](#ontology-kernel-boundary-analysis)
 ---
 
-### Ontology Kernel Boundary Analysis
+### O-Kernel Ontology Classification Unit Test Verification
 
-This analysis verifies the planned o-kernel crate boundary before implementation.
+This unit-test verification defines the Rust test evidence required for ontology construct classification after the o-kernel code refactor.
 
 #### Details
-Expected checks:
+Required Rust test coverage:
 
-- Confirm `o-kernel` has no dependency on consumer application crates.
-- Confirm consumers depend on `o-kernel`, not the reverse.
-- Confirm SHACL parsing, ontology construct classification, RDF term description construction, and generic reserved vocabulary recognition are owned by `o-kernel`.
-- Confirm consumer-specific parsing, element registries, semantic indexes, source maps, diagnostics, graph-layer visibility policy, runtime store assembly policy, and response DTOs remain outside `o-kernel`.
-- Confirm the implementation does not introduce a custom RDF store, triple/quad model, or graph-layer abstraction that duplicates the selected RDF implementation.
-- Confirm kernel diagnostics are generic and do not require source-document assumptions.
+- Verify direct-authored RDF/RDFS/OWL/SHACL quads classify property domain/range, subclass inclusion, class membership, disjointness, equivalence, inverse properties, property chains, property characteristics, restrictions, class expressions, and SHACL shape overlays.
+- Verify RDF list member order is preserved for property chains and class expressions.
+- Verify classification does not perform OWL reasoning, SHACL-AF rule execution, or inferred materialization.
+- Verify returned construct records are generic and require consumers to add source provenance and runtime graph placement outside o-kernel.
+
+This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
 
 #### Metadata
-  * type: analysis-verification
+  * type: test-verification
 
 #### Relations
-  * verify: [Application Boundary Isolation](../../Architecture/OntologyKernelRequirements.md#application-boundary-isolation)
-  * verify: [Ontology Kernel RDF Native Boundary](../../Architecture/OntologyKernelRequirements.md#ontology-kernel-rdf-native-boundary)
-  * verify: [Ontology Kernel Public Contract](../../Architecture/OntologyKernelRequirements.md#ontology-kernel-public-contract)
+  * verify: [Ontology Construct Classification](../../Architecture/OntologyKernelRequirements.md#ontology-construct-classification)
 ---
 
 ### O-Kernel Physical Module Unit Test Verification
@@ -109,28 +107,6 @@ This verification remains unsatisfied until the code refactor creates and links 
   * verify: [Referenced Graph Subset Construction](../../Architecture/OntologyKernelRequirements.md#referenced-graph-subset-construction)
 ---
 
-### O-Kernel SHACL Services Unit Test Verification
-
-This unit-test verification defines the Rust test evidence required for SHACL parsing and ontology alignment after the o-kernel code refactor.
-
-#### Details
-Required Rust test coverage:
-
-- Verify SHACL parser discovery of node shapes, property shapes, target-only shapes, nested property shapes, recursive paths, raw constraints, and typed constraints from RDF quads.
-- Verify SHACL ontology alignment accepts declared classes, properties, datatypes, and target nodes from a supplied ontology index.
-- Verify SHACL ontology alignment reports generic undeclared class, property, datatype, target-node, and invalid inverse-path diagnostics without application source-document assumptions.
-- Verify `sh:hasValue` and `sh:in` values are preserved without requiring every listed value IRI to be declared as an ontology term.
-
-This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [SHACL Ontology Alignment](../../Architecture/OntologyKernelRequirements.md#shacl-ontology-alignment)
-  * verify: [SHACL Structural Parser Registry](../../Architecture/OntologyKernelRequirements.md#shacl-structural-parser-registry)
----
-
 ### O-Kernel Reserved Vocabulary Unit Test Verification
 
 This unit-test verification defines the Rust test evidence required for standards reserved vocabulary recognition after the o-kernel code refactor.
@@ -155,17 +131,17 @@ The o-kernel reserved vocabulary unit tests in `crates/o-kernel/src/vocab/reserv
   * verify: [Standards Reserved Vocabulary Recognition](../../Architecture/OntologyKernelRequirements.md#standards-reserved-vocabulary-recognition)
 ---
 
-### O-Kernel Ontology Classification Unit Test Verification
+### O-Kernel SHACL Services Unit Test Verification
 
-This unit-test verification defines the Rust test evidence required for ontology construct classification after the o-kernel code refactor.
+This unit-test verification defines the Rust test evidence required for SHACL parsing and ontology alignment after the o-kernel code refactor.
 
 #### Details
 Required Rust test coverage:
 
-- Verify direct-authored RDF/RDFS/OWL/SHACL quads classify property domain/range, subclass inclusion, class membership, disjointness, equivalence, inverse properties, property chains, property characteristics, restrictions, class expressions, and SHACL shape overlays.
-- Verify RDF list member order is preserved for property chains and class expressions.
-- Verify classification does not perform OWL reasoning, SHACL-AF rule execution, or inferred materialization.
-- Verify returned construct records are generic and require consumers to add source provenance and runtime graph placement outside o-kernel.
+- Verify SHACL parser discovery of node shapes, property shapes, target-only shapes, nested property shapes, recursive paths, raw constraints, and typed constraints from RDF quads.
+- Verify SHACL ontology alignment accepts declared classes, properties, datatypes, and target nodes from a supplied ontology index.
+- Verify SHACL ontology alignment reports generic undeclared class, property, datatype, target-node, and invalid inverse-path diagnostics without application source-document assumptions.
+- Verify `sh:hasValue` and `sh:in` values are preserved without requiring every listed value IRI to be declared as an ontology term.
 
 This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
 
@@ -173,5 +149,29 @@ This verification remains unsatisfied until the code refactor creates and links 
   * type: test-verification
 
 #### Relations
-  * verify: [Ontology Construct Classification](../../Architecture/OntologyKernelRequirements.md#ontology-construct-classification)
+  * verify: [SHACL Ontology Alignment](../../Architecture/OntologyKernelRequirements.md#shacl-ontology-alignment)
+  * verify: [SHACL Structural Parser Registry](../../Architecture/OntologyKernelRequirements.md#shacl-structural-parser-registry)
+---
+
+### Ontology Kernel Boundary Analysis
+
+This analysis verifies the planned o-kernel crate boundary before implementation.
+
+#### Details
+Expected checks:
+
+- Confirm `o-kernel` has no dependency on consumer application crates.
+- Confirm consumers depend on `o-kernel`, not the reverse.
+- Confirm SHACL parsing, ontology construct classification, RDF term description construction, and generic reserved vocabulary recognition are owned by `o-kernel`.
+- Confirm consumer-specific parsing, element registries, semantic indexes, source maps, diagnostics, graph-layer visibility policy, runtime store assembly policy, and response DTOs remain outside `o-kernel`.
+- Confirm the implementation does not introduce a custom RDF store, triple/quad model, or graph-layer abstraction that duplicates the selected RDF implementation.
+- Confirm kernel diagnostics are generic and do not require source-document assumptions.
+
+#### Metadata
+  * type: analysis-verification
+
+#### Relations
+  * verify: [Application Boundary Isolation](../../Architecture/OntologyKernelRequirements.md#application-boundary-isolation)
+  * verify: [Ontology Kernel Public Contract](../../Architecture/OntologyKernelRequirements.md#ontology-kernel-public-contract)
+  * verify: [Ontology Kernel RDF Native Boundary](../../Architecture/OntologyKernelRequirements.md#ontology-kernel-rdf-native-boundary)
 ---

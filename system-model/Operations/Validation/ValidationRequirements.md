@@ -31,8 +31,8 @@ This validation shall allow valid SHACL target mechanisms while preserving Reqvi
 
 #### Relations
   * definedBy: [Semantic Contract Shape Validation Specification](Specifications.md#semantic-contract-shape-validation-specification)
-  * derivedFrom: [Ontology and Semantic Contract Model](../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
   * derive: [Reqvire SHACL Context Adapter](#reqvire-shacl-context-adapter)
+  * derivedFrom: [Ontology and Semantic Contract Model](../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
   * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
 ---
 
@@ -54,8 +54,8 @@ The Reqvire adapter shall ask the semantic index for parsed RDF quads from the o
 #### Relations
   * definedBy: [Reqvire SHACL Context Adapter Specification](Specifications.md#reqvire-shacl-context-adapter-specification)
   * derivedFrom: [Semantic Contract Shape Validation](#semantic-contract-shape-validation)
-  * satisfiedBy: [semantic_contract.rs](../../../crates/reqvire-core/src/semantic_contract.rs)
   * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [semantic_contract.rs](../../../crates/reqvire-core/src/semantic_contract.rs)
   * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
 ---
 

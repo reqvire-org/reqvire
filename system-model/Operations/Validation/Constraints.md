@@ -39,4 +39,3 @@ This rule is a structural model invariant and shall be enforced as validation, n
 #### Relations
   * define: [Single Root Hierarchy Ownership](ValidationRequirements.md#single-root-hierarchy-ownership)
 ---
-

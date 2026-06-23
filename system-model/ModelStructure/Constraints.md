@@ -79,4 +79,3 @@ For cross-subgraph contract reused_contract_context, flow is defined from the re
 #### Metadata
   * type: constraint
 ---
-

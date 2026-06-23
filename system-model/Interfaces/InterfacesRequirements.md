@@ -66,4 +66,3 @@ Implementation details shall follow the associated contract specifications.
   * derive: [Served Explorer Browser Interface](WebExplorer/Capabilities.md#served-explorer-browser-interface)
   * specify: [Web Explorer Interface](InterfacesFeature.md#web-explorer-interface)
 ---
-

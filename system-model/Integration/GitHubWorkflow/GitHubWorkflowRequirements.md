@@ -35,4 +35,3 @@ The system SHALL provide a GitHub Actions workflow that builds the Reqvire binar
   * satisfiedBy: [pages.yml](../../../.github/workflows/pages.yml)
   * specify: [GitHub Workflow Automation](../IntegrationFeature.md#github-workflow-automation)
 ---
-

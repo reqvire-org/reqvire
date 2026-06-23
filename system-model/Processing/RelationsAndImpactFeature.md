@@ -19,4 +19,3 @@ Change impact uses native Reqvire relations, requirement-owned contract reused_c
 #### Relations
   * specifiedBy: [Tracing Structural Changes](../Reports/ModelReports/ReportingRequirements.md#tracing-structural-changes)
 ---
-

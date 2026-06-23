@@ -367,28 +367,48 @@ function buildConceptElementDetail({
 
   for (const edge of ontologyEdges) {
     if (edge.label === "broader") {
-      if (edge.source === conceptNode.id) pushEndpoint(broader, conceptEndpoint(nodeById.get(edge.target), elements));
-      if (edge.target === conceptNode.id) pushEndpoint(narrower, conceptEndpoint(nodeById.get(edge.source), elements));
+      if (edge.source === conceptNode.id && edge.target !== conceptNode.id) {
+        pushEndpoint(broader, conceptEndpoint(nodeById.get(edge.target), elements));
+      }
+      if (edge.target === conceptNode.id && edge.source !== conceptNode.id) {
+        pushEndpoint(narrower, conceptEndpoint(nodeById.get(edge.source), elements));
+      }
       continue;
     }
     if (edge.label === "narrower") {
-      if (edge.source === conceptNode.id) pushEndpoint(narrower, conceptEndpoint(nodeById.get(edge.target), elements));
-      if (edge.target === conceptNode.id) pushEndpoint(broader, conceptEndpoint(nodeById.get(edge.source), elements));
+      if (edge.source === conceptNode.id && edge.target !== conceptNode.id) {
+        pushEndpoint(narrower, conceptEndpoint(nodeById.get(edge.target), elements));
+      }
+      if (edge.target === conceptNode.id && edge.source !== conceptNode.id) {
+        pushEndpoint(broader, conceptEndpoint(nodeById.get(edge.source), elements));
+      }
       continue;
     }
     if (edge.label === "related") {
-      if (edge.source === conceptNode.id) pushEndpoint(related, conceptEndpoint(nodeById.get(edge.target), elements));
-      if (edge.target === conceptNode.id) pushEndpoint(related, conceptEndpoint(nodeById.get(edge.source), elements));
+      if (edge.source === conceptNode.id && edge.target !== conceptNode.id) {
+        pushEndpoint(related, conceptEndpoint(nodeById.get(edge.target), elements));
+      }
+      if (edge.target === conceptNode.id && edge.source !== conceptNode.id) {
+        pushEndpoint(related, conceptEndpoint(nodeById.get(edge.source), elements));
+      }
       continue;
     }
     if (edge.label === "exactMatch") {
-      if (edge.source === conceptNode.id) pushEndpoint(exactMatches, conceptEndpoint(nodeById.get(edge.target), elements));
-      if (edge.target === conceptNode.id) pushEndpoint(exactMatches, conceptEndpoint(nodeById.get(edge.source), elements));
+      if (edge.source === conceptNode.id && edge.target !== conceptNode.id) {
+        pushEndpoint(exactMatches, conceptEndpoint(nodeById.get(edge.target), elements));
+      }
+      if (edge.target === conceptNode.id && edge.source !== conceptNode.id) {
+        pushEndpoint(exactMatches, conceptEndpoint(nodeById.get(edge.source), elements));
+      }
       continue;
     }
     if (edge.label === "closeMatch") {
-      if (edge.source === conceptNode.id) pushEndpoint(closeMatches, conceptEndpoint(nodeById.get(edge.target), elements));
-      if (edge.target === conceptNode.id) pushEndpoint(closeMatches, conceptEndpoint(nodeById.get(edge.source), elements));
+      if (edge.source === conceptNode.id && edge.target !== conceptNode.id) {
+        pushEndpoint(closeMatches, conceptEndpoint(nodeById.get(edge.target), elements));
+      }
+      if (edge.target === conceptNode.id && edge.source !== conceptNode.id) {
+        pushEndpoint(closeMatches, conceptEndpoint(nodeById.get(edge.source), elements));
+      }
       continue;
     }
     if (edge.label === "mapsToConcept" || edge.label === "mappedFrom") {
@@ -396,7 +416,7 @@ function buildConceptElementDetail({
       const targetIsConcept = edge.target === conceptNode.id;
       if (!sourceIsConcept && !targetIsConcept) continue;
       const mappedNode = nodeById.get(sourceIsConcept ? edge.target : edge.source);
-      if (mappedNode && !conceptIds.has(mappedNode.id)) {
+      if (mappedNode && mappedNode.id !== conceptNode.id && !conceptIds.has(mappedNode.id)) {
         mappedOntologyTerms.push({
           id: `mapped-${conceptNode.id}-${mappedNode.id}`,
           label: mappedNode.label,

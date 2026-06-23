@@ -7,6 +7,33 @@ description: Expert workflow for creating, extending, and validating Reqvire str
 
 Author Reqvire structural ontology content as reusable OWL/RDFS building blocks for system-of-interest models, not implementation detail. Reqvire managed-project ontologies are primarily for IT engineering, systems engineering, MBSE, architecture, interfaces, verification, operations, and other system model concerns. Keep curated conceptual vocabulary in native `concept-scheme` and `concept` elements using `reqvire-concept-authoring`; keep this skill focused on OWL classes, properties, individuals, axioms, SHACL target vocabulary, and structural-to-concept bridges. Use requirements for obligations; use semantic-contract elements for reusable SHACL profiles that explicitly `use` ontology and `constrain` requirements.
 
+Use `reqvire-syseng` instead when the main change is to capabilities,
+requirements, specifications, verification elements, evidence, coverage,
+change-impact workflows, or broader model refactoring. This skill may update
+semantic contracts and ontology links that constrain those elements, but should
+not replace the system-engineering workflow for changing their behavior.
+
+## Reqvire Operations for Ontology Authoring
+
+Use Reqvire as the source-of-truth runtime when authoring or changing OWL/RDFS
+ontology elements and SHACL semantic contracts.
+
+- Work from the repository root unless the user gives a different workspace.
+- Default CLI form: `npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" <command>`.
+- Inside the Reqvire source repository, `cargo run -- <command>` is also acceptable when the local binary is the intended target.
+- Inspect authored ontology content with `search --filter-type ontology --json`, `search --filter-type semantic-contract --json`, `model --filter-type ontology --json`, `semantic ontologies`, `semantic shapes`, and `semantic graph --full`.
+- Use `semantic ontologies --include-external` or `semantic graph --full --include-external` only when the used subset of local external ontology dependencies must be materialized.
+- Prefer Reqvire CLI mutation commands for broad structural edits when available, such as `add`, `link`, `relink`, `mv`, `rm`, and `rename-element`.
+- Manual Markdown edits are valid for focused authoring. Preserve `# Elements`, `### Element Name`, `#### Metadata`, and Reqvire relation list syntax.
+- Author ontology elements with `type: ontology`, `ontology_base`, `ontology_prefix`, and `#### Ontology`; authored Turtle must declare the prefixes it uses.
+- Author semantic contracts with `type: semantic-contract` and `#### Shapes`; link contracts to ontology elements with `use` / `usedBy` and to governed model elements with `constrain` / `constrainedBy`.
+- Do not add `#### Concept References` to semantic contracts. Use SHACL shapes for closed-world validation and ontology Turtle for structural terms.
+- Relation syntax is `  * relationName: [Target Element](path.md#target-element)`.
+- Use ontology `derivedFrom` / `derive` for ontology hierarchy and document composition. Use `reqvire:mapsToConcept` in Turtle only when a structural term intentionally maps to a generated native SKOS concept.
+- Do not edit generated exports as the source of truth; edit authored Markdown elements and regenerate/export through Reqvire.
+- When changing ontology identity, check dependent semantic contracts, requirements constrained by shapes, concept bridges, Explorer ontology/thesaurus data, MCP semantic tools, and tests that assert exported Turtle.
+- When validation is part of the task, run focused checks such as `validate`, `semantic ontologies`, `semantic shapes`, `semantic graph --full`, and any affected fixture tests before finishing.
+
 ## Workflow
 
 1. Establish the domain-concept frame before project-specific examples.

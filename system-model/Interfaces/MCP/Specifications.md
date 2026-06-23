@@ -470,32 +470,6 @@ Command behavior:
   * define: [MCP Server Command](Tools.md#mcp-server-command)
 ---
 
-### Serve Command Embedded MCP Endpoint Specification
-
-The Explorer serve command is expected to optionally mount the same Reqvire MCP Streamable HTTP service on the Explorer HTTP listener.
-
-#### Details
-Embedded MCP behavior:
-- `reqvire serve` starts the Explorer HTTP server only and does not expose MCP by default.
-- `reqvire serve --enable-mcp` mounts the Reqvire MCP Streamable HTTP service at `/mcp` on the same host and port as the Explorer server.
-- `reqvire serve --enable-mcp --enable-mutations` enables MCP mutation tools for the embedded `/mcp` endpoint.
-- `--enable-mutations` requires `--enable-mcp`; mutation tools are not advertised or executable for embedded MCP unless both capabilities are present.
-- The embedded `/mcp` endpoint reuses the same MCP adapter, shared Reqvire tool registry, RMCP Streamable HTTP transport configuration, allowed-origin policy, stateless JSON response mode, and mutation serialization behavior as `reqvire mcp`.
-- The embedded MCP endpoint uses the current serve workspace and excluded-file-pattern configuration.
-- After embedded MCP mutations, the served Explorer runtime data endpoints rebuild `assets/project-store.js` and `ontologies.ttl` from the current workspace on subsequent requests so browser reloads observe the updated model datastore.
-- Explorer runtime data rebuilds and embedded MCP mutation execution share a workspace lock so runtime data generation does not read partially written model files.
-- Runtime data responses for `assets/project-store.js` and `ontologies.ttl` use no-store cache control so clients do not reuse stale generated datastores after mutation.
-- The Explorer SPA fallback must not handle `/mcp` requests when embedded MCP is enabled.
-- Embedded MCP startup is a server startup concern; it must not expose `reqvire.serve` or `reqvire.mcp` as MCP tools.
-- Non-local exposure of an embedded `/mcp` endpoint requires an explicit deployment-layer authentication and authorization decision; enabling embedded MCP only starts the in-process endpoint.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Serve Command Embedded MCP Endpoint](../WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
----
-
 ### MCP Server State and Cache Specification
 
 The MCP server is expected to cache parsed model state only as a performance optimization.
@@ -836,4 +810,30 @@ These tools are read-only and must not mutate the model.
 
 #### Relations
   * define: [MCP Workspace Session Tools](Tools.md#mcp-workspace-session-tools)
+---
+
+### Serve Command Embedded MCP Endpoint Specification
+
+The Explorer serve command is expected to optionally mount the same Reqvire MCP Streamable HTTP service on the Explorer HTTP listener.
+
+#### Details
+Embedded MCP behavior:
+- `reqvire serve` starts the Explorer HTTP server only and does not expose MCP by default.
+- `reqvire serve --enable-mcp` mounts the Reqvire MCP Streamable HTTP service at `/mcp` on the same host and port as the Explorer server.
+- `reqvire serve --enable-mcp --enable-mutations` enables MCP mutation tools for the embedded `/mcp` endpoint.
+- `--enable-mutations` requires `--enable-mcp`; mutation tools are not advertised or executable for embedded MCP unless both capabilities are present.
+- The embedded `/mcp` endpoint reuses the same MCP adapter, shared Reqvire tool registry, RMCP Streamable HTTP transport configuration, allowed-origin policy, stateless JSON response mode, and mutation serialization behavior as `reqvire mcp`.
+- The embedded MCP endpoint uses the current serve workspace and excluded-file-pattern configuration.
+- After embedded MCP mutations, the served Explorer runtime data endpoints rebuild `assets/project-store.js` and `ontologies.ttl` from the current workspace on subsequent requests so browser reloads observe the updated model datastore.
+- Explorer runtime data rebuilds and embedded MCP mutation execution share a workspace lock so runtime data generation does not read partially written model files.
+- Runtime data responses for `assets/project-store.js` and `ontologies.ttl` use no-store cache control so clients do not reuse stale generated datastores after mutation.
+- The Explorer SPA fallback must not handle `/mcp` requests when embedded MCP is enabled.
+- Embedded MCP startup is a server startup concern; it must not expose `reqvire.serve` or `reqvire.mcp` as MCP tools.
+- Non-local exposure of an embedded `/mcp` endpoint requires an explicit deployment-layer authentication and authorization decision; enabling embedded MCP only starts the in-process endpoint.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Serve Command Embedded MCP Endpoint](../WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
 ---

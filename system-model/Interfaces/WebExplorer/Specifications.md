@@ -395,32 +395,6 @@ Model-centric view generation behavior:
   * define: [Model-Centric View Generation](Capabilities.md#model-centric-view-generation)
 ---
 
-### Thesaurus View Generation Contract Specification
-
-#### Details
-Thesaurus view generation behavior:
-- Renders the canonical `#/thesaurus` route from the Project Store `thesaurus` projection, not from ontology graph canvas state or ontology graph provenance.
-- Treats native `concept-scheme` elements as standalone roots and native `concept` elements as SKOS resources generated from Markdown source.
-- Uses the left Explorer pane for concept-scheme navigation, concept filtering, and compact summary counts instead of the Model filesystem tree.
-- Shows concept-scheme and concept glyphs from the design system, with distinct native concept and concept-scheme color roles.
-- Builds the concept-scheme navigator and Map workspace only from the Project Store `thesaurus.schemes[]` and `thesaurus.concepts[]` projection. Concept scheme and concept rows must carry separate SKOS identity (`id`) and native Reqvire element identity (`element_id`), and concept rows must carry canonical `scheme_id`, `scheme_element_id`, `scheme_label`, `parent_id`, related concept ids, mapping ids, model usage, ontology mapping usage, and source navigation metadata.
-- Must not group Thesaurus concepts by source element name, ontology document IRI, namespace, filesystem path, ontology graph node source/provenance, or element-hierarchy fallback when canonical `thesaurus` projection data is absent. Missing required projection data is a store contract problem, not a UI fallback opportunity.
-- Populates concept scheme membership from generated native concept data equivalent to `skos:inScheme`, `skos:topConceptOf`, or scheme-owned `skos:hasTopConcept`; broader/narrower hierarchy remains separate taxonomy evidence and must not redefine scheme ownership.
-- Presents selected concept details using generated SKOS fields: the modal title carries the preferred label derived from the element name; the body promotes definition from main body content, alternative labels, scope notes, examples, broader/narrower hierarchy, related concepts, exact/close mapping relations, and ontology bridge mappings.
-- Shows ontology bridge context as usage evidence: ontology terms that author `reqvire:mapsToConcept` to the selected native concept appear as mapped ontology terms without making the concept an ontology child.
-- Provides a single scheme-scoped Map workspace for the selected concept's scheme; Thesaurus must not expose a Browse/Map segmented mode control.
-- Renders Thesaurus Map through the shared design-system product pattern using React Flow for node interaction and deterministic concept-scheme mind-map layout. The map canvas must be transparent, full-bleed, and full-height over the available workspace surface; concept-scheme nodes render as compact boxed anchors, concept nodes render as boxed label-first mind-map entries without role labels, and taxonomy edges render as colored curved branches.
-- Selecting a concept from the left Thesaurus navigator must keep the active scheme Map view open and center the matching map node in the workspace without changing the user's current map zoom level.
-- Opens the shared element-detail modal using `thesaurus.schemes[].element_id` for concept-scheme map nodes and `thesaurus.concepts[].element_id` for concept map nodes. Activating a Thesaurus map node must never open an ontology graph node merely because ontology graph provenance or mapping data names the same SKOS IRI. Concept elements must use a SKOS-optimized modal body that keeps the standard element modal frame but promotes definition, scheme, alternative labels, scope note, examples, top concepts, broader/narrower/related concepts, exact/close matches, mapped ontology terms, and model usage before `Authored relations`, which contains remaining Reqvire Markdown relation evidence. The Thesaurus route must not create a separate concept-specific modal frame for this.
-- Keeps source navigation anchored to the Markdown `concept-scheme` or `concept` element.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Thesaurus View Generation](Capabilities.md#thesaurus-view-generation)
----
-
 ### OWL Semantic Ontology Projection Contract Specification
 
 #### Details
@@ -831,6 +805,32 @@ Serve command behavior:
 
 #### Relations
   * define: [Serve Command](Capabilities.md#serve-command)
+---
+
+### Thesaurus View Generation Contract Specification
+
+#### Details
+Thesaurus view generation behavior:
+- Renders the canonical `#/thesaurus` route from the Project Store `thesaurus` projection, not from ontology graph canvas state or ontology graph provenance.
+- Treats native `concept-scheme` elements as standalone roots and native `concept` elements as SKOS resources generated from Markdown source.
+- Uses the left Explorer pane for concept-scheme navigation, concept filtering, and compact summary counts instead of the Model filesystem tree.
+- Shows concept-scheme and concept glyphs from the design system, with distinct native concept and concept-scheme color roles.
+- Builds the concept-scheme navigator and Map workspace only from the Project Store `thesaurus.schemes[]` and `thesaurus.concepts[]` projection. Concept scheme and concept rows must carry separate SKOS identity (`id`) and native Reqvire element identity (`element_id`), and concept rows must carry canonical `scheme_id`, `scheme_element_id`, `scheme_label`, `parent_id`, normalized child/narrower concept ids, normalized related concept ids, normalized mapping ids, model usage, ontology mapping usage, and source navigation metadata.
+- Must not group Thesaurus concepts by source element name, ontology document IRI, namespace, filesystem path, ontology graph node source/provenance, or element-hierarchy fallback when canonical `thesaurus` projection data is absent. Missing required projection data is a store contract problem, not a UI fallback opportunity.
+- Populates concept scheme membership from generated native concept data equivalent to `skos:inScheme`, `skos:topConceptOf`, or scheme-owned `skos:hasTopConcept`; broader/narrower hierarchy remains separate normalized taxonomy evidence and must not redefine scheme ownership.
+- Presents selected concept details using generated SKOS fields from the normalized concept projection: the modal title carries the preferred label derived from the element name; the body promotes definition from main body content, alternative labels, scope notes, examples, broader/narrower hierarchy, related concepts, exact/close mapping relations, and ontology bridge mappings. These relation lists must exclude the selected concept itself and deduplicate reciprocal graph edges before rendering.
+- Shows ontology bridge context as usage evidence: ontology terms that author `reqvire:mapsToConcept` to the selected native concept appear as mapped ontology terms without making the concept an ontology child.
+- Provides a single scheme-scoped Map workspace for the selected concept's scheme; Thesaurus must not expose a Browse/Map segmented mode control.
+- Renders Thesaurus Map through the shared design-system product pattern using React Flow for node interaction and deterministic concept-scheme mind-map layout. The map canvas must be transparent, full-bleed, and full-height over the available workspace surface; concept-scheme nodes render as compact boxed anchors, concept nodes render as boxed label-first mind-map entries without role labels, and taxonomy edges render as colored curved branches.
+- Selecting a concept from the left Thesaurus navigator must keep the active scheme Map view open and center the matching map node in the workspace without changing the user's current map zoom level.
+- Opens the shared element-detail modal using `thesaurus.schemes[].element_id` for concept-scheme map nodes and `thesaurus.concepts[].element_id` for concept map nodes. Activating a Thesaurus map node must never open an ontology graph node merely because ontology graph provenance or mapping data names the same SKOS IRI. Concept elements must use a SKOS-optimized modal body that keeps the standard element modal frame but promotes definition, scheme, alternative labels, scope note, examples, top concepts, broader/narrower/related concepts, exact/close matches, mapped ontology terms, and model usage before `Authored relations`, which contains remaining Reqvire Markdown relation evidence. The relation lists shown in this modal must not contain the selected concept itself or circular duplicate endpoints. The Thesaurus route must not create a separate concept-specific modal frame for this.
+- Keeps source navigation anchored to the Markdown `concept-scheme` or `concept` element.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Thesaurus View Generation](Capabilities.md#thesaurus-view-generation)
 ---
 
 ### Web Interface Style Specification

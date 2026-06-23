@@ -20,6 +20,7 @@ use crate::semantic_contract;
 use crate::Relation;
 use globset::GlobSet;
 use o_kernel::rdf::{subject_iri, term_iri};
+use o_kernel::vocab::reserved as owl_reserved;
 use o_kernel::{ontology, shacl};
 use regex::Regex;
 
@@ -2807,6 +2808,9 @@ impl GraphRegistry {
                 };
                 let key = (block.source.clone(), kind.to_string(), iri.to_string());
                 if !seen.insert(key) {
+                    continue;
+                }
+                if owl_reserved::is_reserved_vocabulary_iri(iri) {
                     continue;
                 }
                 let kind_label = shacl::predicate_label(kind);

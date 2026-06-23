@@ -242,6 +242,36 @@ The filtering ensures that:
   * type: specification
 ---
 
+### External Vocabulary Exposure Policy Specification
+
+The external vocabulary exposure policy contract defines what Reqvire public semantic surfaces expose when external ontology inclusion is requested.
+
+#### Details
+Exposure rules:
+- Public semantic output surfaces must expose only the used external subset selected and constructed from internal dependencies.
+- Unused external dependency facts are not Reqvire semantic output.
+- CLI, MCP, Explorer, website, and assistant-facing contracts must not specify a public full third-party ontology dump mode.
+
+Export modes:
+- `reqvire semantic ontologies` emits generated ontology document declarations plus authored ontology vocabulary only.
+- `reqvire semantic shapes` emits semantic-contract SHACL shapes only.
+- `reqvire semantic concepts` emits SKOS concept scheme/thesaurus triples only, with optional mapping triples.
+- `reqvire semantic graph --full` emits authored triples, Reqvire model context, and generated ontology projection facts.
+- `reqvire semantic ontologies --include-external` and `reqvire semantic graph --include-external` additionally emit only the used external subset.
+- MCP semantic ontology, vocabulary, prefix, and SPARQL tools keep external source declarations and triples hidden by default and expose only the used external subset when `include_external` is true.
+- Vocabulary and source-map entries for imported terms must carry an explicit external marker and source metadata.
+- Export and MCP metadata for external materialization must identify `external_materialization: "used_subset"` and include available counts for external sources, used external terms, and materialized external triples.
+
+#### Concept References
+  * Used external ontology subset: https://www.reqvire.org/concepts#UsedExternalOntologySubset
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [External Vocabulary Exposure Policy](ReportingRequirements.md#external-vocabulary-exposure-policy)
+---
+
 ### Flexible Search Type Filtering Contract Specification
 
 #### Details
@@ -367,36 +397,6 @@ JSON output conventions:
 
 #### Relations
   * define: [Model Reports](ReportingRequirements.md#model-reports)
----
-
-### External Vocabulary Exposure Policy Specification
-
-The external vocabulary exposure policy contract defines what Reqvire public semantic surfaces expose when external ontology inclusion is requested.
-
-#### Details
-Exposure rules:
-- Public semantic output surfaces must expose only the used external subset selected and constructed from internal dependencies.
-- Unused external dependency facts are not Reqvire semantic output.
-- CLI, MCP, Explorer, website, and assistant-facing contracts must not specify a public full third-party ontology dump mode.
-
-Export modes:
-- `reqvire semantic ontologies` emits generated ontology document declarations plus authored ontology vocabulary only.
-- `reqvire semantic shapes` emits semantic-contract SHACL shapes only.
-- `reqvire semantic concepts` emits SKOS concept scheme/thesaurus triples only, with optional mapping triples.
-- `reqvire semantic graph --full` emits authored triples, Reqvire model context, and generated ontology projection facts.
-- `reqvire semantic ontologies --include-external` and `reqvire semantic graph --include-external` additionally emit only the used external subset.
-- MCP semantic ontology, vocabulary, prefix, and SPARQL tools keep external source declarations and triples hidden by default and expose only the used external subset when `include_external` is true.
-- Vocabulary and source-map entries for imported terms must carry an explicit external marker and source metadata.
-- Export and MCP metadata for external materialization must identify `external_materialization: "used_subset"` and include available counts for external sources, used external terms, and materialized external triples.
-
-#### Concept References
-  * Used external ontology subset: https://www.reqvire.org/concepts#UsedExternalOntologySubset
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [External Vocabulary Exposure Policy](ReportingRequirements.md#external-vocabulary-exposure-policy)
 ---
 
 ### Markdown Report Style Specification
@@ -772,6 +772,38 @@ Cross-internal-boundary dependencies should be modeled as explicit reused_contra
   * type: specification
 ---
 
+### Reqvire Relation Rendering Specification
+
+Reqvire relation-label standards for relationship rendering in diagrams.
+
+#### Details
+Each relationship type is represented using its canonical Reqvire relation label with specific arrow direction.
+
+**Derive Relations:**
+| Relation | Label | Line Style | Arrow Direction |
+|----------|-------|------------|-----------------|
+| derive | `derive` | dashed | Parent → Child (derived) |
+| derivedFrom | `derivedFrom` | dashed | Child → Parent (source) |
+
+**Verify Relations:**
+| Relation | Label | Line Style | Arrow Direction |
+|----------|-------|------------|-----------------|
+| verify | `verify` | dashed | Verification → Requirement |
+| verifiedBy | `verifiedBy` | dashed | Requirement → Verification |
+
+**Satisfy Relations:**
+| Relation | Label | Line Style | Arrow Direction |
+|----------|-------|------------|-----------------|
+| satisfy | `satisfy` | solid | Implementation → Requirement |
+| satisfiedBy | `satisfiedBy` | solid | Requirement → Implementation |
+
+**Arrowhead Style:**
+All relation types use open (hollow) arrowheads for consistent diagram readability.
+
+#### Metadata
+  * type: specification
+---
+
 ### Resources Report Format Specification
 
 Technical specification for resources report structure and output formats.
@@ -873,36 +905,37 @@ Implementation contract:
   * define: [Semantic Relation Family Projection](ReportingRequirements.md#semantic-relation-family-projection)
 ---
 
-### Reqvire Relation Rendering Specification
+### Concept Relation Projection Specification
 
-Reqvire relation-label standards for relationship rendering in diagrams.
+The semantic model export shall materialize normalized SKOS concept-relation facts from native concept Markdown relations as a separate conceptual projection.
 
 #### Details
-Each relationship type is represented using its canonical Reqvire relation label with specific arrow direction.
+Normative concept projection contract:
+- Each authored concept relation is preserved as source evidence on the native concept element.
+- `broader` and `narrower` are inverse taxonomy aliases. Authored `A broader B` and authored `B narrower A` describe the same canonical taxonomy edge.
+- `related`, `exactMatch`, and `closeMatch` are symmetric concept association or mapping relations for projection purposes.
+- Consistent reciprocal authored pairs are valid and are deduplicated into one canonical concept edge before generated facts are emitted.
+- Conflicting taxonomy cycles, invalid targets, or non-concept targets remain validation errors.
 
-**Derive Relations:**
-| Relation | Label | Line Style | Arrow Direction |
-|----------|-------|------------|-----------------|
-| derive | `derive` | dashed | Parent → Child (derived) |
-| derivedFrom | `derivedFrom` | dashed | Child → Parent (source) |
+Generated SKOS facts:
+- For each canonical taxonomy edge where `child` is narrower than `parent`, emit `child skos:broader parent` and `parent skos:narrower child`.
+- For each canonical symmetric association or mapping edge, emit reciprocal SKOS facts when serializing a normalized concept projection, while graph renderers may collapse the reciprocal pair to one displayed edge.
+- Generated inverse and reciprocal facts are additional semantic-search/export facts and must not mutate authored Markdown.
 
-**Verify Relations:**
-| Relation | Label | Line Style | Arrow Direction |
-|----------|-------|------------|-----------------|
-| verify | `verify` | dashed | Verification → Requirement |
-| verifiedBy | `verifiedBy` | dashed | Requirement → Verification |
-
-**Satisfy Relations:**
-| Relation | Label | Line Style | Arrow Direction |
-|----------|-------|------------|-----------------|
-| satisfy | `satisfy` | solid | Implementation → Requirement |
-| satisfiedBy | `satisfiedBy` | solid | Requirement → Implementation |
-
-**Arrowhead Style:**
-All relation types use open (hollow) arrowheads for consistent diagram readability.
+Projection surface contract:
+- `reqvire semantic concepts` and `reqvire semantic graph --full` consume the normalized concept-relation projection, not only direct-authored concept relation fields.
+- Full JSON-LD output must be equivalent to the normalized Turtle output.
+- Project Store `thesaurus` rows must derive `parent_id`, child/narrower lists, `related_ids`, `exact_match_ids`, and `close_match_ids` from the same normalized concept-relation projection.
+- Ontologies Concepts-layer graph data may keep directional SKOS taxonomy edges visible, but must canonicalize symmetric reciprocal concept edges to one visual edge.
+- MCP concept/thesaurus tools must expose normalized concept neighborhoods rather than requiring clients to infer inverse or symmetric links.
+- The normalized concept-relation projection is independent from ontology construct projection. It is not an o-kernel OWL/RDFS/SHACL construct classification.
+- Semantic projection SHACL may use reserved RDF/RDFS/OWL/XSD/SHACL vocabulary such as `rdf:type` in shape paths; runtime validation resolves those terms through the o-kernel reserved vocabulary registry, not through authored Reqvire ontology declarations.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * define: [Concept Relation Projection Materialization](ReportingRequirements.md#concept-relation-projection-materialization)
 ---
 
 ### Text Output Formatting

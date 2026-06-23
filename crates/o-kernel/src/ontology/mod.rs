@@ -2,7 +2,7 @@
 
 use crate::shacl;
 use crate::vocab::reserved as owl_reserved;
-use crate::vocab::{RDFS_COMMENT, RDFS_LABEL, SH_DATATYPE, SH_PATH};
+use crate::vocab::{SH_DATATYPE, SH_PATH};
 use oxigraph::model::{NamedOrBlankNode, Quad};
 
 pub const MODULE: &str = "ontology";
@@ -50,16 +50,12 @@ pub fn extract_shape_references(quads: &[Quad]) -> Vec<shacl::ReferencedIri> {
         if reference.predicate == SH_DATATYPE && owl_reserved::is_supported_datatype_iri(iri) {
             continue;
         }
-        if reference.predicate == SH_PATH && is_builtin_annotation_path(iri) {
+        if reference.predicate == SH_PATH && owl_reserved::is_reserved_vocabulary_iri(iri) {
             continue;
         }
         references.push(reference);
     }
     references
-}
-
-fn is_builtin_annotation_path(iri: &str) -> bool {
-    matches!(iri, RDFS_LABEL | RDFS_COMMENT)
 }
 
 #[cfg(test)]
@@ -90,12 +86,16 @@ mod tests {
         let quads = parse_turtle(
             r#"
 @prefix ex: <https://example.org/model#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 ex:Shape
   a sh:NodeShape ;
+  sh:property [
+    sh:path rdf:type
+  ] ;
   sh:property [
     sh:path rdfs:label
   ] ;
@@ -118,6 +118,14 @@ ex:Shape
         assert_eq!(
             values.contains(&("http://www.w3.org/2001/XMLSchema#string", SH_DATATYPE)),
             false
+        );
+        assert_eq!(
+            values.contains(&(
+                "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                SH_PATH
+            )),
+            false,
+            "standard RDF path should be filtered"
         );
         assert_eq!(
             values.contains(&(RDFS_LABEL, SH_PATH)),

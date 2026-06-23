@@ -89,23 +89,6 @@ MCP semantic prefix registry interface is the capability for exposing ontology e
   * specifiedBy: [MCP Semantic Prefix Registry Tools](MCP/Tools.md#mcp-semantic-prefix-registry-tools)
 ---
 
-### Web Explorer Interface
-
-As a **System Engineer**, I want Reqvire to expose a browsable Explorer interface, so that model structure, reports, diagrams, traces, resources, and ontology artifacts can be inspected in a web interface.
-
-#### Details
-Web Explorer interface is the capability for the local Explorer server, navigation, visual styling, embedded browser assets, and browser-oriented model exploration.
-
-Web requirements define concrete Explorer views, local server behavior, browser assets, and visual rendering contracts.
-
-#### Metadata
-  * type: capability
-
-#### Relations
-  * derivedFrom: [System Model Interfaces](#system-model-interfaces)
-  * specifiedBy: [Web Interface](InterfacesRequirements.md#web-interface)
----
-
 ### Public Documentation Website Interface
 
 As a **Reqvire Evaluator**, I want Reqvire to publish a public documentation website, so that project concepts, workflows, interface capabilities, and AI-assistant integration guidance can be understood without running the CLI first.
@@ -121,4 +104,21 @@ Website requirements define page-level documentation context and link each sourc
 #### Relations
   * derivedFrom: [System Model Interfaces](#system-model-interfaces)
   * specifiedBy: [Public Documentation Website](Website/WebsiteRequirements.md#public-documentation-website)
+---
+
+### Web Explorer Interface
+
+As a **System Engineer**, I want Reqvire to expose a browsable Explorer interface, so that model structure, reports, diagrams, traces, resources, and ontology artifacts can be inspected in a web interface.
+
+#### Details
+Web Explorer interface is the capability for the local Explorer server, navigation, visual styling, embedded browser assets, and browser-oriented model exploration.
+
+Web requirements define concrete Explorer views, local server behavior, browser assets, and visual rendering contracts.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [System Model Interfaces](#system-model-interfaces)
+  * specifiedBy: [Web Interface](InterfacesRequirements.md#web-interface)
 ---

@@ -33,4 +33,3 @@ Provide reviewers with a high-level scope summary by finding the per-branch lowe
 #### Metadata
   * type: specification
 ---
-

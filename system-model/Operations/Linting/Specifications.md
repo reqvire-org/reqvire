@@ -201,4 +201,3 @@ Redundant verify relation detection behavior:
 #### Relations
   * define: [Redundant Verify Relations Detection](LintingRequirements.md#redundant-verify-relations-detection)
 ---
-

@@ -392,4 +392,3 @@ This test verifies that the system only parses markdown files where the first H1
   * satisfiedBy: [test.sh](../../../tests/test-gitignore-integration/test.sh)
   * verify: [Specification File Identification](../../ModelStructure/StructureAndParsing.md#specification-file-identification)
 ---
-

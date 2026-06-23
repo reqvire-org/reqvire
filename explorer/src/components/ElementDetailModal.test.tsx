@@ -23,6 +23,60 @@ describe("ElementDetailModal", () => {
     expect(screen.queryByText(/From:/)).toBeNull();
   });
 
+  it("filters the selected concept out of its own broader and mapped concept lists", () => {
+    const apiSurfaceNode = devFixture.ontology.graph_data?.nodes?.find(
+      (node) => node.label === "API Surface" && node.semantic_type === "skos-concept",
+    );
+    if (!apiSurfaceNode) {
+      throw new Error("API Surface concept node is missing from the test fixture");
+    }
+
+    const selfConceptIri = apiSurfaceNode.full_uri || apiSurfaceNode.id;
+    const baseGraphData = devFixture.ontology.graph_data ?? { nodes: [], edges: [] };
+
+    render(
+      <StoreProvider
+        store={{
+          ...devFixture,
+          ontology: {
+            ...devFixture.ontology,
+            graph_data: {
+              ...baseGraphData,
+              edges: [
+                ...(baseGraphData.edges ?? []),
+                {
+                  source: apiSurfaceNode.id,
+                  target: apiSurfaceNode.id,
+                  label: "broader",
+                  layer: "concepts",
+                  source_kind: "concepts",
+                },
+                {
+                  source: apiSurfaceNode.id,
+                  target: apiSurfaceNode.id,
+                  label: "mapsToConcept",
+                  layer: "concepts",
+                  source_kind: "concepts",
+                },
+              ],
+            },
+          },
+        }}
+        schemaMismatch={null}
+      >
+        <ElementDetailModal
+          identifier="system-model/Thesaurus/Thesaurus.md#api-surface"
+          onClose={vi.fn()}
+          onOpenElement={vi.fn()}
+          onOpenOntologyNode={vi.fn()}
+        />
+      </StoreProvider>,
+    );
+
+    expect(screen.getByText("Traceability")).toBeTruthy();
+    expect(screen.queryByTitle(selfConceptIri)).toBeNull();
+  });
+
   it("renders resolved concept references as ontology term links instead of raw IRI text", () => {
     const onOpenOntologyNode = vi.fn();
     render(

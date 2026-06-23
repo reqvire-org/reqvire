@@ -1,5 +1,173 @@
 # Elements
 
+### Application Boundary Isolation Specification
+
+Consumer-specific concerns must remain outside `o-kernel`.
+
+#### Details
+Out-of-kernel concerns include:
+
+- source-document parsing
+- consumer element models and registries
+- source maps and source-location diagnostics
+- durable runtime graph layer names and visibility policy
+- runtime store assembly policy
+- default graph mirroring policy
+- export visibility rules
+- presentation and protocol response DTOs
+- on-demand analysis orchestration
+
+When a consuming application uses kernel algorithms to build or validate semantic data, the consuming application must own how inputs are selected, how results are exposed, and how results map back to source documents.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Application Boundary Isolation](OntologyKernelRequirements.md#application-boundary-isolation)
+---
+
+### O-Kernel Physical Module Architecture Specification
+
+The o-kernel crate must use a focused physical module layout for standards-based ontology computation.
+
+#### Details
+Module layout:
+
+- `vocab`: RDF, RDFS, OWL, XSD, and SHACL namespace constants, named-node constructors, compile-time bundled standards vocabulary graphs, and reserved vocabulary classification helpers.
+- `rdf`: RDF dataset helpers over selected RDF implementation types, including standards-generic parser helpers, serializer helpers, list traversal, and query helpers.
+- `shacl`: SHACL shape discovery, target parsing, path parsing, constraint parsing, structural registry construction, and SHACL syntax diagnostics.
+- `ontology`: ontology declaration indexing, declared class/property/datatype lookup, named-term lookup, and SHACL-to-ontology alignment inputs.
+- `constructs`: direct RDF/RDFS/OWL/SHACL pattern classification into generic construct records, including subclass, membership, domain/range, equivalence, disjointness, inverse property, property chain, restriction, class expression, property characteristic, and shape-overlay records.
+- `describe`: bounded RDF term description construction for selected RDF terms, support predicates, annotation predicates, and support-depth policy.
+- `subset`: referenced graph subset construction for ontology graphs of interest and dependency RDF graphs.
+- `diagnostics`: generic diagnostic types, severities, and codes used by kernel services without application source-location assumptions.
+- `prelude`: stable re-exports for commonly used public kernel types and service functions.
+
+Module dependency diagram:
+
+```mermaid
+flowchart TD
+    vocab[vocab]
+    rdf[rdf]
+    diagnostics[diagnostics]
+    shacl[shacl]
+    ontology[ontology]
+    constructs[constructs]
+    describe[describe]
+    subset[subset]
+    prelude[prelude]
+
+    rdf --> vocab
+    rdf --> diagnostics
+    shacl --> vocab
+    shacl --> rdf
+    shacl --> diagnostics
+    ontology --> vocab
+    ontology --> rdf
+    ontology --> diagnostics
+    constructs --> vocab
+    constructs --> rdf
+    constructs --> diagnostics
+    constructs --> ontology
+    constructs --> shacl
+    describe --> vocab
+    describe --> rdf
+    describe --> diagnostics
+    subset --> vocab
+    subset --> rdf
+    subset --> diagnostics
+    subset --> describe
+    prelude --> vocab
+    prelude --> rdf
+    prelude --> shacl
+    prelude --> ontology
+    prelude --> constructs
+    prelude --> describe
+    prelude --> subset
+    prelude --> diagnostics
+```
+
+Consumer boundary diagram:
+
+```mermaid
+flowchart LR
+    consumer[Consumer application]
+    adapter[Consumer adapter]
+    kernel[o-kernel]
+    rdfdata[RDF-native data]
+    results[Generic kernel results]
+    policy[Consumer policy and presentation]
+
+    consumer --> adapter
+    adapter --> rdfdata
+    rdfdata --> kernel
+    kernel --> results
+    results --> adapter
+    adapter --> policy
+```
+
+Physical dependency rules:
+
+- Public APIs that carry RDF data must use RDF-native input and output types.
+- `vocab` must be dependency-light and usable by every other module.
+- `diagnostics` must depend only on standard library dependencies and stable diagnostic value types.
+- `rdf` must depend on `vocab` and `diagnostics`.
+- `shacl` must depend on `vocab`, `rdf`, and `diagnostics`.
+- `ontology` must depend on `vocab`, `rdf`, and `diagnostics`.
+- `constructs` must depend on `vocab`, `rdf`, `diagnostics`, `ontology`, and `shacl`.
+- `describe` must depend on `vocab`, `rdf`, and `diagnostics`.
+- `subset` must depend on `vocab`, `rdf`, `diagnostics`, and `describe`.
+- `shacl` and `ontology` must share cross-module data through public types, not through private cross-file coupling.
+- `constructs` must use ontology and SHACL public types for ontology declaration and shape-overlay classification.
+- `subset` must use description construction public types for direct, support, annotation, and depth-boundary metadata.
+- `diagnostics` must stay independent of application source maps, file paths, element identifiers, graph-layer names, and protocol payloads.
+- `prelude` must re-export stable public types only; feature internals remain in their owning modules.
+
+File-size and ownership rules:
+
+- A module with multiple independent responsibilities must be split into submodules.
+- SHACL implementation must be split into `shacl::target`, `shacl::path`, `shacl::constraint`, `shacl::registry`, and `shacl::align` submodules.
+- Construct classification implementation must be split into `constructs::rdf_rdfs`, `constructs::owl_expression`, `constructs::owl_property`, `constructs::restriction`, and `constructs::shacl_overlay` submodules.
+- Construct classification orchestration must live in `constructs::classify`.
+- Referenced graph subset implementation must be split into `subset::seed`, `subset::reference`, `subset::closure`, and `subset::construct` submodules.
+- Public modules must include focused Rust unit tests for their own service behavior.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [O-Kernel Physical Module Architecture](OntologyKernelRequirements.md#o-kernel-physical-module-architecture)
+---
+
+### Ontology Construct Classification Specification
+
+The ontology construct classifier must classify direct-authored RDF, RDFS, OWL, and SHACL constructs from RDF quads.
+
+#### Details
+Classification behavior:
+
+- `rdfs:domain` and `rdfs:range` become property-domain and property-range constructs.
+- `rdfs:subClassOf` becomes subclass-inclusion constructs.
+- `rdf:type` assertions for named subjects become membership constructs when the assertion is not solely a declaration of an RDF, RDFS, OWL, or SHACL metamodel construct.
+- `owl:disjointWith` becomes disjointness constructs.
+- `owl:equivalentClass`, `owl:equivalentProperty`, and `owl:sameAs` become equivalence-group constructs using stable connected components.
+- `owl:inverseOf` becomes inverse-property constructs.
+- `owl:propertyChainAxiom` RDF lists become ordered property-chain constructs preserving list member order.
+- `rdf:type` declarations of OWL property characteristics become property-characteristic constructs for functional, inverse-functional, symmetric, asymmetric, reflexive, irreflexive, and transitive properties.
+- `owl:Restriction` with `owl:onProperty`, `owl:allValuesFrom`, `owl:someValuesFrom`, cardinality predicates, `owl:hasValue`, or similar authored restriction predicates becomes restriction constructs.
+- `owl:intersectionOf`, `owl:unionOf`, and `owl:complementOf` RDF list or expression structures become class-expression constructs.
+- SHACL node shapes and property shapes become shape-overlay constructs over their target classes, paths, datatypes, class constraints, node kinds, cardinality constraints, and allowed-value lists.
+- SHACL node-shape target classes plus property-shape paths and facets become normalized slot/facet records reusable by consumers.
+- Class-expression projection records must preserve list members in RDF list order and expose usage evidence so consumers can distinguish the expression itself from the property, subclass, or restriction construct that references it.
+- Direct-authored classification must not perform OWL reasoning, SHACL-AF rule execution, or inferred materialization.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Ontology Construct Classification](OntologyKernelRequirements.md#ontology-construct-classification)
+---
+
 ### Ontology Kernel Public Contract Specification
 
 The o-kernel public contract defines a foundational library boundary for standards-based ontology computation.
@@ -18,6 +186,26 @@ Contract rules:
 
 #### Relations
   * define: [Ontology Kernel Public Contract](OntologyKernelRequirements.md#ontology-kernel-public-contract)
+---
+
+### Ontology Kernel RDF Native Boundary Specification
+
+The o-kernel crate must use the selected RDF implementation as its low-level data boundary. The initial Rust implementation uses Oxigraph.
+
+#### Details
+Implementation rules:
+
+- Public kernel APIs that carry RDF data must accept and return Oxigraph types, including `Quad`, `Triple`, `Term`, `NamedNode`, `NamedOrBlankNode`, `Store`, and `QueryResults`.
+- The kernel must not define a replacement RDF graph store.
+- The kernel must not define replacement triple, quad, term, or query result models when Oxigraph types are sufficient.
+- The kernel must not define a consumer source-block or graph-layer abstraction.
+- Thin helper functions around Oxigraph must be limited to parser, serializer, list traversal, or query boilerplate. Helper functions must preserve Oxigraph terms, graph names, error boundaries, and query-result semantics.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Ontology Kernel RDF Native Boundary](OntologyKernelRequirements.md#ontology-kernel-rdf-native-boundary)
 ---
 
 ### RDF Term Description Construction Specification
@@ -188,159 +376,30 @@ The Rust implementation must express this contract as RDF-native graph operation
   * define: [Referenced Graph Subset Construction](OntologyKernelRequirements.md#referenced-graph-subset-construction)
 ---
 
-### Ontology Kernel RDF Native Boundary Specification
+### SHACL Ontology Alignment Specification
 
-The o-kernel crate must use the selected RDF implementation as its low-level data boundary. The initial Rust implementation uses Oxigraph.
+The SHACL ontology aligner must align a compiled SHACL registry with a supplied domain ontology index.
 
 #### Details
-Implementation rules:
+The generic SHACL ontology aligner must:
 
-- Public kernel APIs that carry RDF data must accept and return Oxigraph types, including `Quad`, `Triple`, `Term`, `NamedNode`, `NamedOrBlankNode`, `Store`, and `QueryResults`.
-- The kernel must not define a replacement RDF graph store.
-- The kernel must not define replacement triple, quad, term, or query result models when Oxigraph types are sufficient.
-- The kernel must not define a consumer source-block or graph-layer abstraction.
-- Thin helper functions around Oxigraph must be limited to parser, serializer, list traversal, or query boilerplate. Helper functions must preserve Oxigraph terms, graph names, error boundaries, and query-result semantics.
+- Accept a compiled SHACL registry and a domain ontology index as input.
+- Provide a domain-index constructor from supplied RDF quads so callers can pass an ontology context without hand-populating class/property/datatype buckets.
+- Avoid dependencies on consumer element types, graph registry internals, source identifiers, and consumer validation wording.
+- Cross-reference SHACL target classes against declared ontology classes.
+- Cross-reference named `sh:targetNode` references against resolvable named nodes from the supplied ontology index.
+- Cross-reference `sh:targetSubjectsOf`, `sh:targetObjectsOf`, parsed property paths, inverse paths, and relational property constraints against declared ontology properties.
+- Cross-reference `sh:class` constraints against declared ontology classes.
+- Cross-reference `sh:datatype` constraints against declared ontology datatypes or accepted built-in datatype vocabulary.
+- Preserve `sh:hasValue` and `sh:in` values as parsed constraint facts without treating every listed IRI as an ontology term-existence requirement.
+- Return generic alignment errors such as undeclared class, undeclared property, undeclared datatype, undeclared target node, and invalid inverse path, preserving the SHACL predicate that caused the reference.
+- Keep full SHACL data validation/execution out of scope unless a separate validation engine is introduced.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * define: [Ontology Kernel RDF Native Boundary](OntologyKernelRequirements.md#ontology-kernel-rdf-native-boundary)
----
-
-### O-Kernel Physical Module Architecture Specification
-
-The o-kernel crate must use a focused physical module layout for standards-based ontology computation.
-
-#### Details
-Module layout:
-
-- `vocab`: RDF, RDFS, OWL, XSD, and SHACL namespace constants, named-node constructors, compile-time bundled standards vocabulary graphs, and reserved vocabulary classification helpers.
-- `rdf`: RDF dataset helpers over selected RDF implementation types, including standards-generic parser helpers, serializer helpers, list traversal, and query helpers.
-- `shacl`: SHACL shape discovery, target parsing, path parsing, constraint parsing, structural registry construction, and SHACL syntax diagnostics.
-- `ontology`: ontology declaration indexing, declared class/property/datatype lookup, named-term lookup, and SHACL-to-ontology alignment inputs.
-- `constructs`: direct RDF/RDFS/OWL/SHACL pattern classification into generic construct records, including subclass, membership, domain/range, equivalence, disjointness, inverse property, property chain, restriction, class expression, property characteristic, and shape-overlay records.
-- `describe`: bounded RDF term description construction for selected RDF terms, support predicates, annotation predicates, and support-depth policy.
-- `subset`: referenced graph subset construction for ontology graphs of interest and dependency RDF graphs.
-- `diagnostics`: generic diagnostic types, severities, and codes used by kernel services without application source-location assumptions.
-- `prelude`: stable re-exports for commonly used public kernel types and service functions.
-
-Module dependency diagram:
-
-```mermaid
-flowchart TD
-    vocab[vocab]
-    rdf[rdf]
-    diagnostics[diagnostics]
-    shacl[shacl]
-    ontology[ontology]
-    constructs[constructs]
-    describe[describe]
-    subset[subset]
-    prelude[prelude]
-
-    rdf --> vocab
-    rdf --> diagnostics
-    shacl --> vocab
-    shacl --> rdf
-    shacl --> diagnostics
-    ontology --> vocab
-    ontology --> rdf
-    ontology --> diagnostics
-    constructs --> vocab
-    constructs --> rdf
-    constructs --> diagnostics
-    constructs --> ontology
-    constructs --> shacl
-    describe --> vocab
-    describe --> rdf
-    describe --> diagnostics
-    subset --> vocab
-    subset --> rdf
-    subset --> diagnostics
-    subset --> describe
-    prelude --> vocab
-    prelude --> rdf
-    prelude --> shacl
-    prelude --> ontology
-    prelude --> constructs
-    prelude --> describe
-    prelude --> subset
-    prelude --> diagnostics
-```
-
-Consumer boundary diagram:
-
-```mermaid
-flowchart LR
-    consumer[Consumer application]
-    adapter[Consumer adapter]
-    kernel[o-kernel]
-    rdfdata[RDF-native data]
-    results[Generic kernel results]
-    policy[Consumer policy and presentation]
-
-    consumer --> adapter
-    adapter --> rdfdata
-    rdfdata --> kernel
-    kernel --> results
-    results --> adapter
-    adapter --> policy
-```
-
-Physical dependency rules:
-
-- Public APIs that carry RDF data must use RDF-native input and output types.
-- `vocab` must be dependency-light and usable by every other module.
-- `diagnostics` must depend only on standard library dependencies and stable diagnostic value types.
-- `rdf` must depend on `vocab` and `diagnostics`.
-- `shacl` must depend on `vocab`, `rdf`, and `diagnostics`.
-- `ontology` must depend on `vocab`, `rdf`, and `diagnostics`.
-- `constructs` must depend on `vocab`, `rdf`, `diagnostics`, `ontology`, and `shacl`.
-- `describe` must depend on `vocab`, `rdf`, and `diagnostics`.
-- `subset` must depend on `vocab`, `rdf`, `diagnostics`, and `describe`.
-- `shacl` and `ontology` must share cross-module data through public types, not through private cross-file coupling.
-- `constructs` must use ontology and SHACL public types for ontology declaration and shape-overlay classification.
-- `subset` must use description construction public types for direct, support, annotation, and depth-boundary metadata.
-- `diagnostics` must stay independent of application source maps, file paths, element identifiers, graph-layer names, and protocol payloads.
-- `prelude` must re-export stable public types only; feature internals remain in their owning modules.
-
-File-size and ownership rules:
-
-- A module with multiple independent responsibilities must be split into submodules.
-- SHACL implementation must be split into `shacl::target`, `shacl::path`, `shacl::constraint`, `shacl::registry`, and `shacl::align` submodules.
-- Construct classification implementation must be split into `constructs::rdf_rdfs`, `constructs::owl_expression`, `constructs::owl_property`, `constructs::restriction`, and `constructs::shacl_overlay` submodules.
-- Construct classification orchestration must live in `constructs::classify`.
-- Referenced graph subset implementation must be split into `subset::seed`, `subset::reference`, `subset::closure`, and `subset::construct` submodules.
-- Public modules must include focused Rust unit tests for their own service behavior.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [O-Kernel Physical Module Architecture](OntologyKernelRequirements.md#o-kernel-physical-module-architecture)
----
-
-### SHACL and Ontology Algorithm Services Specification
-
-The o-kernel crate must provide standards-based SHACL and ontology algorithms.
-
-#### Details
-Service rules:
-
-- Provide RDF/RDFS/OWL/XSD/SHACL vocabulary constants.
-- Recognize standards-reserved RDF/RDFS/OWL/XSD vocabulary.
-- Parse SHACL node shapes and property shapes from RDF quads.
-- Parse SHACL targets, property paths, and syntax constraints from RDF quads.
-- Report generic SHACL syntax sanity diagnostics without source-document assumptions.
-- Provide generic ontology construct classification over RDF quads for OWL/RDFS constructs such as subclass inclusion, membership, domain/range, restrictions, class expressions, inverse properties, equivalence, disjointness, property chains, and shape overlays.
-- Keep source provenance, layer placement, and consumer-specific diagnostic mapping outside the kernel.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [SHACL and Ontology Algorithm Services](OntologyKernelRequirements.md#shacl-and-ontology-algorithm-services)
+  * define: [SHACL Ontology Alignment](OntologyKernelRequirements.md#shacl-ontology-alignment)
 ---
 
 ### SHACL Structural Parser Registry Specification
@@ -370,30 +429,26 @@ The SHACL parser registry must:
   * define: [SHACL Structural Parser Registry](OntologyKernelRequirements.md#shacl-structural-parser-registry)
 ---
 
-### SHACL Ontology Alignment Specification
+### SHACL and Ontology Algorithm Services Specification
 
-The SHACL ontology aligner must align a compiled SHACL registry with a supplied domain ontology index.
+The o-kernel crate must provide standards-based SHACL and ontology algorithms.
 
 #### Details
-The generic SHACL ontology aligner must:
+Service rules:
 
-- Accept a compiled SHACL registry and a domain ontology index as input.
-- Provide a domain-index constructor from supplied RDF quads so callers can pass an ontology context without hand-populating class/property/datatype buckets.
-- Avoid dependencies on consumer element types, graph registry internals, source identifiers, and consumer validation wording.
-- Cross-reference SHACL target classes against declared ontology classes.
-- Cross-reference named `sh:targetNode` references against resolvable named nodes from the supplied ontology index.
-- Cross-reference `sh:targetSubjectsOf`, `sh:targetObjectsOf`, parsed property paths, inverse paths, and relational property constraints against declared ontology properties.
-- Cross-reference `sh:class` constraints against declared ontology classes.
-- Cross-reference `sh:datatype` constraints against declared ontology datatypes or accepted built-in datatype vocabulary.
-- Preserve `sh:hasValue` and `sh:in` values as parsed constraint facts without treating every listed IRI as an ontology term-existence requirement.
-- Return generic alignment errors such as undeclared class, undeclared property, undeclared datatype, undeclared target node, and invalid inverse path, preserving the SHACL predicate that caused the reference.
-- Keep full SHACL data validation/execution out of scope unless a separate validation engine is introduced.
+- Provide RDF/RDFS/OWL/XSD/SHACL vocabulary constants.
+- Recognize standards-reserved RDF/RDFS/OWL/XSD vocabulary.
+- Parse SHACL node shapes and property shapes from RDF quads.
+- Parse SHACL targets, property paths, and syntax constraints from RDF quads.
+- Report generic SHACL syntax sanity diagnostics without source-document assumptions.
+- Provide generic ontology construct classification over RDF quads for OWL/RDFS constructs such as subclass inclusion, membership, domain/range, restrictions, class expressions, inverse properties, equivalence, disjointness, property chains, and shape overlays.
+- Keep source provenance, layer placement, and consumer-specific diagnostic mapping outside the kernel.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * define: [SHACL Ontology Alignment](OntologyKernelRequirements.md#shacl-ontology-alignment)
+  * define: [SHACL and Ontology Algorithm Services](OntologyKernelRequirements.md#shacl-and-ontology-algorithm-services)
 ---
 
 ### Standards Reserved Vocabulary Recognition Specification
@@ -460,59 +515,4 @@ The registry must not treat arbitrary custom IRIs as reserved vocabulary simply 
 
 #### Relations
   * define: [Standards Reserved Vocabulary Recognition](OntologyKernelRequirements.md#standards-reserved-vocabulary-recognition)
----
-
-### Ontology Construct Classification Specification
-
-The ontology construct classifier must classify direct-authored RDF, RDFS, OWL, and SHACL constructs from RDF quads.
-
-#### Details
-Classification behavior:
-
-- `rdfs:domain` and `rdfs:range` become property-domain and property-range constructs.
-- `rdfs:subClassOf` becomes subclass-inclusion constructs.
-- `rdf:type` assertions for named subjects become membership constructs when the assertion is not solely a declaration of an RDF, RDFS, OWL, or SHACL metamodel construct.
-- `owl:disjointWith` becomes disjointness constructs.
-- `owl:equivalentClass`, `owl:equivalentProperty`, and `owl:sameAs` become equivalence-group constructs using stable connected components.
-- `owl:inverseOf` becomes inverse-property constructs.
-- `owl:propertyChainAxiom` RDF lists become ordered property-chain constructs preserving list member order.
-- `rdf:type` declarations of OWL property characteristics become property-characteristic constructs for functional, inverse-functional, symmetric, asymmetric, reflexive, irreflexive, and transitive properties.
-- `owl:Restriction` with `owl:onProperty`, `owl:allValuesFrom`, `owl:someValuesFrom`, cardinality predicates, `owl:hasValue`, or similar authored restriction predicates becomes restriction constructs.
-- `owl:intersectionOf`, `owl:unionOf`, and `owl:complementOf` RDF list or expression structures become class-expression constructs.
-- SHACL node shapes and property shapes become shape-overlay constructs over their target classes, paths, datatypes, class constraints, node kinds, cardinality constraints, and allowed-value lists.
-- SHACL node-shape target classes plus property-shape paths and facets become normalized slot/facet records reusable by consumers.
-- Class-expression projection records must preserve list members in RDF list order and expose usage evidence so consumers can distinguish the expression itself from the property, subclass, or restriction construct that references it.
-- Direct-authored classification must not perform OWL reasoning, SHACL-AF rule execution, or inferred materialization.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Ontology Construct Classification](OntologyKernelRequirements.md#ontology-construct-classification)
----
-
-### Application Boundary Isolation Specification
-
-Consumer-specific concerns must remain outside `o-kernel`.
-
-#### Details
-Out-of-kernel concerns include:
-
-- source-document parsing
-- consumer element models and registries
-- source maps and source-location diagnostics
-- durable runtime graph layer names and visibility policy
-- runtime store assembly policy
-- default graph mirroring policy
-- export visibility rules
-- presentation and protocol response DTOs
-- on-demand analysis orchestration
-
-When a consuming application uses kernel algorithms to build or validate semantic data, the consuming application must own how inputs are selected, how results are exposed, and how results map back to source documents.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Application Boundary Isolation](OntologyKernelRequirements.md#application-boundary-isolation)
 ---

@@ -28,6 +28,45 @@ The website is the public-facing documentation surface for `www.reqvire.org`. Pa
   * specify: [Public Documentation Website Interface](../InterfacesFeature.md#public-documentation-website-interface)
 ---
 
+### Website Assistant Integration Documentation
+
+The system shall document MCP, coding-assistant integrations, prompt workflows, and assistant-scoped Reqvire context using current protocol and model-tool terminology.
+
+#### Metadata
+  * type: requirement
+
+#### Reused Contract Context
+  * [MCP Prompt Guidance Specification](../MCP/Specifications.md#mcp-prompt-guidance-specification)
+  * [MCP Protocol Standard Conformance Specification](../MCP/Specifications.md#mcp-protocol-standard-conformance-specification)
+  * [MCP Semantic Query Tools Specification](../MCP/Specifications.md#mcp-semantic-query-tools-specification)
+
+#### Relations
+  * definedBy: [Website Assistant Integration Documentation Specification](WebsiteSpecifications.md#website-assistant-integration-documentation-specification)
+  * derivedFrom: [Public Documentation Website](#public-documentation-website)
+  * satisfiedBy: [CodingAssistants.tsx](../../../website/src/pages/CodingAssistants.tsx)
+  * satisfiedBy: [Integrations.tsx](../../../website/src/pages/Integrations.tsx)
+  * satisfiedBy: [McpServer.tsx](../../../website/src/pages/McpServer.tsx)
+---
+
+### Website Command and Workflow Documentation
+
+The system shall document everyday CLI workflows, model commands, report commands, mutation commands, change impact, and advanced workflow patterns.
+
+#### Metadata
+  * type: requirement
+
+#### Reused Contract Context
+  * [CLI Interface Structure Contract Specification](../CLI/Specifications.md#cli-interface-structure-contract-specification)
+  * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
+  * [Report Command Catalog Specification](../../Reports/ModelReports/Specifications.md#report-command-catalog-specification)
+
+#### Relations
+  * definedBy: [Website Command and Workflow Documentation Specification](WebsiteSpecifications.md#website-command-and-workflow-documentation-specification)
+  * derivedFrom: [Public Documentation Website](#public-documentation-website)
+  * satisfiedBy: [Advanced.tsx](../../../website/src/pages/Advanced.tsx)
+  * satisfiedBy: [UserGuide.tsx](../../../website/src/pages/UserGuide.tsx)
+---
+
 ### Website Home Messaging
 
 The system shall present Reqvire's public homepage as a concise semantic-engineering overview with links to major conceptual and workflow pages.
@@ -38,67 +77,50 @@ The system shall present Reqvire's public homepage as a concise semantic-enginee
 #### Relations
   * definedBy: [Website Home Messaging Specification](WebsiteSpecifications.md#website-home-messaging-specification)
   * derivedFrom: [Public Documentation Website](#public-documentation-website)
-  * satisfiedBy: [Home.tsx](../../../website/src/pages/Home.tsx)
   * satisfiedBy: [graph-hierarchy.svg](../../../website/public/images/graph-hierarchy.svg)
+  * satisfiedBy: [Home.tsx](../../../website/src/pages/Home.tsx)
 ---
 
-### Website Strategic Positioning Documentation
+### Website Implementation Coverage Documentation
 
-The system shall explain Reqvire as a semantic engineering framework for AI-assisted, traceable, verifiable software engineering.
-
-#### Reused Contract Context
-  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
-  * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
+The system shall document requirement implementation coverage, verification coverage, traceability, and how implementation/evidence artifacts relate to model elements.
 
 #### Metadata
   * type: requirement
 
+#### Reused Contract Context
+  * [Requirement Implementation Coverage Logic Specification](../../Reports/ModelReports/Specifications.md#requirement-implementation-coverage-logic-specification)
+  * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
+
 #### Relations
-  * definedBy: [Website Strategic Positioning Documentation Specification](WebsiteSpecifications.md#website-strategic-positioning-documentation-specification)
+  * definedBy: [Website Implementation Coverage Documentation Specification](WebsiteSpecifications.md#website-implementation-coverage-documentation-specification)
   * derivedFrom: [Public Documentation Website](#public-documentation-website)
-  * satisfiedBy: [StrategicVision.tsx](../../../website/src/pages/StrategicVision.tsx)
+  * satisfiedBy: [ImplementationCoverage.tsx](../../../website/src/pages/ImplementationCoverage.tsx)
 ---
 
-### Website Semantic Model Documentation
+### Website Modeling Language Documentation
 
-The system shall document the Reqvire semantic model, including element types, relation semantics, ownership, reused contract context, concept references, verification links, and implementation evidence.
-
-#### Reused Contract Context
-  * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
-  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
-  * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
+The system shall document Reqvire Markdown element syntax, relation syntax, model file structure, and user-facing modeling-language examples.
 
 #### Metadata
   * type: requirement
 
-#### Relations
-  * definedBy: [Website Semantic Model Documentation Specification](WebsiteSpecifications.md#website-semantic-model-documentation-specification)
-  * derivedFrom: [Public Documentation Website](#public-documentation-website)
-  * satisfiedBy: [SemanticModel.tsx](../../../website/src/pages/SemanticModel.tsx)
-  * satisfiedBy: [Submodels.tsx](../../../website/src/pages/Submodels.tsx)
----
-
-### Website Requirements and Contracts Documentation
-
-The system shall document capability, requirement, contract, semantic-contract, concept-reference, reused-contract-context, and governance rules using current Reqvire terminology.
-
 #### Reused Contract Context
-  * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
-  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
-  * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
-
-#### Metadata
-  * type: requirement
+  * [Specification File Identification Contract Specification](../../ModelStructure/Specifications.md#specification-file-identification-contract-specification)
+  * [Structure and Addressing in Markdown Documents Contract Specification](../../ModelStructure/Specifications.md#structure-and-addressing-in-markdown-documents-contract-specification)
 
 #### Relations
-  * definedBy: [Website Requirements and Contracts Documentation Specification](WebsiteSpecifications.md#website-requirements-and-contracts-documentation-specification)
+  * definedBy: [Website Modeling Language Documentation Specification](WebsiteSpecifications.md#website-modeling-language-documentation-specification)
   * derivedFrom: [Public Documentation Website](#public-documentation-website)
-  * satisfiedBy: [RequirementsCapabilities.tsx](../../../website/src/pages/RequirementsCapabilities.tsx)
+  * satisfiedBy: [ModelingLanguage.tsx](../../../website/src/pages/ModelingLanguage.tsx)
 ---
 
 ### Website Ontology Documentation
 
 The system shall document ontology authoring, external ontology sources, built-in reserved vocabulary behavior, semantic contracts, validation, and ontology export modes.
+
+#### Metadata
+  * type: requirement
 
 #### Reused Contract Context
   * [Local External Ontology Source Specification](../../Semantics/SemanticModelSpecifications.md#local-external-ontology-source-specification)
@@ -107,102 +129,80 @@ The system shall document ontology authoring, external ontology sources, built-i
   * [OWL Reserved Vocabulary Recognition Specification](../../Semantics/SemanticModelSpecifications.md#owl-reserved-vocabulary-recognition-specification)
   * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
 
-#### Metadata
-  * type: requirement
-
 #### Relations
   * definedBy: [Website Ontology Documentation Specification](WebsiteSpecifications.md#website-ontology-documentation-specification)
   * derivedFrom: [Public Documentation Website](#public-documentation-website)
   * satisfiedBy: [Ontologies.tsx](../../../website/src/pages/Ontologies.tsx)
 ---
 
+### Website Requirements and Contracts Documentation
+
+The system shall document capability, requirement, contract, semantic-contract, concept-reference, reused-contract-context, and governance rules using current Reqvire terminology.
+
+#### Metadata
+  * type: requirement
+
+#### Reused Contract Context
+  * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
+  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
+  * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
+
+#### Relations
+  * definedBy: [Website Requirements and Contracts Documentation Specification](WebsiteSpecifications.md#website-requirements-and-contracts-documentation-specification)
+  * derivedFrom: [Public Documentation Website](#public-documentation-website)
+  * satisfiedBy: [RequirementsCapabilities.tsx](../../../website/src/pages/RequirementsCapabilities.tsx)
+---
+
+### Website Semantic Model Documentation
+
+The system shall document the Reqvire semantic model, including element types, relation semantics, ownership, reused contract context, concept references, verification links, and implementation evidence.
+
+#### Metadata
+  * type: requirement
+
+#### Reused Contract Context
+  * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
+  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
+  * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
+
+#### Relations
+  * definedBy: [Website Semantic Model Documentation Specification](WebsiteSpecifications.md#website-semantic-model-documentation-specification)
+  * derivedFrom: [Public Documentation Website](#public-documentation-website)
+  * satisfiedBy: [SemanticModel.tsx](../../../website/src/pages/SemanticModel.tsx)
+  * satisfiedBy: [Submodels.tsx](../../../website/src/pages/Submodels.tsx)
+---
+
+### Website Strategic Positioning Documentation
+
+The system shall explain Reqvire as a semantic engineering framework for AI-assisted, traceable, verifiable software engineering.
+
+#### Metadata
+  * type: requirement
+
+#### Reused Contract Context
+  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
+  * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
+
+#### Relations
+  * definedBy: [Website Strategic Positioning Documentation Specification](WebsiteSpecifications.md#website-strategic-positioning-documentation-specification)
+  * derivedFrom: [Public Documentation Website](#public-documentation-website)
+  * satisfiedBy: [StrategicVision.tsx](../../../website/src/pages/StrategicVision.tsx)
+---
+
 ### Website Verification Documentation
 
 The system shall document verification objectives, concrete verification types, evidence-backed verification behavior, coverage, traces, and verification roll-up semantics.
+
+#### Metadata
+  * type: requirement
 
 #### Reused Contract Context
   * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
   * [Verification Roll-up Specification](../../Verification/Traceability/Specifications.md#verification-roll-up-specification)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
-#### Metadata
-  * type: requirement
-
 #### Relations
   * definedBy: [Website Verification Documentation Specification](WebsiteSpecifications.md#website-verification-documentation-specification)
   * derivedFrom: [Public Documentation Website](#public-documentation-website)
   * satisfiedBy: [Verifications.tsx](../../../website/src/pages/Verifications.tsx)
----
-
-### Website Implementation Coverage Documentation
-
-The system shall document requirement implementation coverage, verification coverage, traceability, and how implementation/evidence artifacts relate to model elements.
-
-#### Reused Contract Context
-  * [Requirement Implementation Coverage Logic Specification](../../Reports/ModelReports/Specifications.md#requirement-implementation-coverage-logic-specification)
-  * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Website Implementation Coverage Documentation Specification](WebsiteSpecifications.md#website-implementation-coverage-documentation-specification)
-  * derivedFrom: [Public Documentation Website](#public-documentation-website)
-  * satisfiedBy: [ImplementationCoverage.tsx](../../../website/src/pages/ImplementationCoverage.tsx)
----
-
-### Website Command and Workflow Documentation
-
-The system shall document everyday CLI workflows, model commands, report commands, mutation commands, change impact, and advanced workflow patterns.
-
-#### Reused Contract Context
-  * [CLI Interface Structure Contract Specification](../CLI/Specifications.md#cli-interface-structure-contract-specification)
-  * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
-  * [Report Command Catalog Specification](../../Reports/ModelReports/Specifications.md#report-command-catalog-specification)
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Website Command and Workflow Documentation Specification](WebsiteSpecifications.md#website-command-and-workflow-documentation-specification)
-  * derivedFrom: [Public Documentation Website](#public-documentation-website)
-  * satisfiedBy: [Advanced.tsx](../../../website/src/pages/Advanced.tsx)
-  * satisfiedBy: [UserGuide.tsx](../../../website/src/pages/UserGuide.tsx)
----
-
-### Website Assistant Integration Documentation
-
-The system shall document MCP, coding-assistant integrations, prompt workflows, and assistant-scoped Reqvire context using current protocol and model-tool terminology.
-
-#### Reused Contract Context
-  * [MCP Prompt Guidance Specification](../MCP/Specifications.md#mcp-prompt-guidance-specification)
-  * [MCP Protocol Standard Conformance Specification](../MCP/Specifications.md#mcp-protocol-standard-conformance-specification)
-  * [MCP Semantic Query Tools Specification](../MCP/Specifications.md#mcp-semantic-query-tools-specification)
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Website Assistant Integration Documentation Specification](WebsiteSpecifications.md#website-assistant-integration-documentation-specification)
-  * derivedFrom: [Public Documentation Website](#public-documentation-website)
-  * satisfiedBy: [CodingAssistants.tsx](../../../website/src/pages/CodingAssistants.tsx)
-  * satisfiedBy: [Integrations.tsx](../../../website/src/pages/Integrations.tsx)
-  * satisfiedBy: [McpServer.tsx](../../../website/src/pages/McpServer.tsx)
----
-
-### Website Modeling Language Documentation
-
-The system shall document Reqvire Markdown element syntax, relation syntax, model file structure, and user-facing modeling-language examples.
-
-#### Reused Contract Context
-  * [Specification File Identification Contract Specification](../../ModelStructure/Specifications.md#specification-file-identification-contract-specification)
-  * [Structure and Addressing in Markdown Documents Contract Specification](../../ModelStructure/Specifications.md#structure-and-addressing-in-markdown-documents-contract-specification)
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Website Modeling Language Documentation Specification](WebsiteSpecifications.md#website-modeling-language-documentation-specification)
-  * derivedFrom: [Public Documentation Website](#public-documentation-website)
-  * satisfiedBy: [ModelingLanguage.tsx](../../../website/src/pages/ModelingLanguage.tsx)
 ---

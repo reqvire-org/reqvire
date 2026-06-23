@@ -346,4 +346,3 @@ Expected checks:
   * verify: [Requirement Governance Metadata](../../../ModelStructure/ModelManagement.md#requirement-governance-metadata)
   * verify: [Format Consistency Enforcement](../../../Operations/Formatting/FormattingRequirements.md#format-consistency-enforcement)
 ---
-

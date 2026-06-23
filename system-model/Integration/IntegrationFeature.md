@@ -60,4 +60,3 @@ Requirements under this capability define concrete workflow behavior and reposit
   * specifiedBy: [Automate Pull Request Validations](GitHubWorkflow/GitHubWorkflowRequirements.md#automate-pull-request-validations)
   * specifiedBy: [Generate Change Logs for Pull Requests](GitHubWorkflow/GitHubWorkflowRequirements.md#generate-change-logs-for-pull-requests)
 ---
-

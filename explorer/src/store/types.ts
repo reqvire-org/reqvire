@@ -14,7 +14,7 @@
  */
 
 /** Must match `SCHEMA_VERSION` in crates/reqvire-core/src/html/store.rs. */
-export const EXPECTED_SCHEMA_VERSION = "2026-06-23.project-store.v2";
+export const EXPECTED_SCHEMA_VERSION = "2026-06-23.project-store.v3";
 
 export interface ProjectStoreProject {
   name: string;
@@ -119,6 +119,7 @@ export interface ProjectStoreThesaurusConcept {
   scheme_element_id: string;
   scheme_label: string;
   parent_id: string | null;
+  child_ids: string[];
   definition: string;
   alt_labels: string[];
   scope_note: string;

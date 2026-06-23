@@ -148,7 +148,7 @@ Ontology elements are first-class mutation targets and need boundary-safe rewrit
 
 ## Model Commands
 
-Use the model command when a shell workflow needs a structural model view. Without `--from` or `--filter-type`, `model` starts from ontology roots and capability roots. Use `--mmd` when a downstream tool expects pure Mermaid text instead of Markdown.
+Use the model command when a shell workflow needs a structural model view. Without `--from` or `--filter-type`, `model` starts from ontology roots, concept roots, and capability roots. Use `--mmd` when a downstream tool expects pure Mermaid text instead of Markdown.
 
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" model

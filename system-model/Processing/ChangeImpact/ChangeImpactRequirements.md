@@ -58,4 +58,3 @@ The system shall implement a model change analyzer that identifies structural mo
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
   * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
 ---
-

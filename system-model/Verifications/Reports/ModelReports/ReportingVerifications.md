@@ -34,42 +34,6 @@ This objective groups verification that Reqvire reporting commands expose collec
   * derive: [Verification Traces From-Folder Test](#verification-traces-from-folder-test)
 ---
 
-### Ontology Semantic Export Verification
-
-This verification shall prove that semantic ontology export materializes authored ontology, SHACL, generated document ownership, external-subset, reserved-vocabulary, and full projection semantics according to the reporting requirements.
-
-#### Details
-Expected checks:
-- Verify default Turtle semantic export contains generated ontology document declarations, ontology term declarations, and SHACL shape references without generated ontology projection facts.
-- Verify generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors instead of emitting one document per element.
-- Verify authored ontology classes, explicit named individuals, and class-typed named individuals receive generated `rdfs:isDefinedBy` links to the generated ontology document IRI in Turtle and JSON-LD semantic export.
-- Verify local Turtle/TTL, RDF/XML, and JSON-LD external ontology dependencies contribute only used external subset triples when external-inclusive export is requested.
-- Verify built-in external ontology sources, including SKOS, are available without local `#### External Ontology` declarations and can support authored conceptual-layer ontology content.
-- Verify built-in external ontology sources follow the same used-subset export rule as local external sources: referenced built-in terms are materialized when external-inclusive export is requested, and unused built-in terms are omitted.
-- Verify validation rejects SHACL or ontology references to built-in external ontology terms that are not present in the registered built-in source.
-- Verify unused external ontology dependency terms do not appear in external-inclusive semantic export.
-- Verify imported external ontology terms do not receive Reqvire-generated `rdfs:isDefinedBy` ownership links.
-- Verify full semantic export contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements, plus generated ontology projection graph, projection, construct, symbol, source/provenance, member, and subject/object/predicate facts for direct-authored constructs.
-- Verify representative reserved vocabulary IRIs from the RDF, RDFS, OWL, XSD, and SHACL registry survive ontology serialization and do not require local External Ontology source declarations.
-- Verify validation rejects fake terms in standards reserved vocabulary namespaces when those terms are not present in the o-kernel bundled standards graphs or explicit XSD policy.
-- Verify validation rejects an authored named ontology resource whose explicit `rdfs:isDefinedBy` target conflicts with the generated ontology document IRI.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-ontologies-command/test.sh)
-  * verify: [External Vocabulary Description Construction](../../../Semantics/SemanticModelRequirements.md#external-vocabulary-description-construction)
-  * verify: [External Vocabulary Exposure Policy](../../../Reports/ModelReports/ReportingRequirements.md#external-vocabulary-exposure-policy)
-  * verify: [Built-In External Ontology Source Resolution](../../../Semantics/SemanticModelRequirements.md#built-in-external-ontology-source-resolution)
-  * verify: [Used External Vocabulary Selection](../../../Semantics/SemanticModelRequirements.md#used-external-vocabulary-selection)
-  * verify: [Ontology and Shapes Collection](../../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
-  * verify: [Ontology Collection Output](../../../Reports/ModelReports/ReportingRequirements.md#ontology-collection-output)
-  * verify: [Ontology Projection Subgraph Materialization](../../../Reports/ModelReports/ReportingRequirements.md#ontology-projection-subgraph-materialization)
-  * verify: [Ontology Term Definition Link Materialization](../../../Semantics/SemanticModelRequirements.md#ontology-term-definition-link-materialization)
-  * verify: [OWL Reserved Vocabulary Recognition](../../../Semantics/SemanticModelRequirements.md#owl-reserved-vocabulary-recognition)
----
-
 ### CLI Collect Command Test
 
 This test verifies that the collect command aggregates capability, requirement, and ontology context with proper source citations.
@@ -786,6 +750,43 @@ This test verifies that the search command correctly filters by multiple element
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-multi-type-search/test.sh)
   * verify: [Comma-Separated Type Filter Parsing](../../../Reports/ModelReports/ReportingRequirements.md#comma-separated-type-filter-parsing)
+---
+
+### Ontology Semantic Export Verification
+
+This verification shall prove that semantic ontology export materializes authored ontology, SHACL, generated document ownership, external-subset, reserved-vocabulary, and full projection semantics according to the reporting requirements.
+
+#### Details
+Expected checks:
+- Verify default Turtle semantic export contains generated ontology document declarations, ontology term declarations, and SHACL shape references without generated ontology projection facts.
+- Verify each generated Turtle section is parseable on its own and declares the prefixes it uses, including `owl:` and `rdfs:` in generated ontology-document and definition-link sections.
+- Verify generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors instead of emitting one document per element.
+- Verify authored ontology classes, explicit named individuals, and class-typed named individuals receive generated `rdfs:isDefinedBy` links to the generated ontology document IRI in Turtle and JSON-LD semantic export.
+- Verify local Turtle/TTL, RDF/XML, and JSON-LD external ontology dependencies contribute only used external subset triples when external-inclusive export is requested.
+- Verify built-in external ontology sources, including SKOS, are available without local `#### External Ontology` declarations and can support authored conceptual-layer ontology content.
+- Verify built-in external ontology sources follow the same used-subset export rule as local external sources: referenced built-in terms are materialized when external-inclusive export is requested, and unused built-in terms are omitted.
+- Verify validation rejects SHACL or ontology references to built-in external ontology terms that are not present in the registered built-in source.
+- Verify unused external ontology dependency terms do not appear in external-inclusive semantic export.
+- Verify imported external ontology terms do not receive Reqvire-generated `rdfs:isDefinedBy` ownership links.
+- Verify full semantic export contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements, plus generated ontology projection graph, projection, construct, symbol, source/provenance, member, and subject/object/predicate facts for direct-authored constructs.
+- Verify representative reserved vocabulary IRIs from the RDF, RDFS, OWL, XSD, and SHACL registry survive ontology serialization and do not require local External Ontology source declarations.
+- Verify validation rejects fake terms in standards reserved vocabulary namespaces when those terms are not present in the o-kernel bundled standards graphs or explicit XSD policy.
+- Verify validation rejects an authored named ontology resource whose explicit `rdfs:isDefinedBy` target conflicts with the generated ontology document IRI.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-ontologies-command/test.sh)
+  * verify: [External Vocabulary Exposure Policy](../../../Reports/ModelReports/ReportingRequirements.md#external-vocabulary-exposure-policy)
+  * verify: [Ontology Collection Output](../../../Reports/ModelReports/ReportingRequirements.md#ontology-collection-output)
+  * verify: [Ontology Projection Subgraph Materialization](../../../Reports/ModelReports/ReportingRequirements.md#ontology-projection-subgraph-materialization)
+  * verify: [Built-In External Ontology Source Resolution](../../../Semantics/SemanticModelRequirements.md#built-in-external-ontology-source-resolution)
+  * verify: [External Vocabulary Description Construction](../../../Semantics/SemanticModelRequirements.md#external-vocabulary-description-construction)
+  * verify: [Ontology and Shapes Collection](../../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
+  * verify: [Ontology Term Definition Link Materialization](../../../Semantics/SemanticModelRequirements.md#ontology-term-definition-link-materialization)
+  * verify: [OWL Reserved Vocabulary Recognition](../../../Semantics/SemanticModelRequirements.md#owl-reserved-vocabulary-recognition)
+  * verify: [Used External Vocabulary Selection](../../../Semantics/SemanticModelRequirements.md#used-external-vocabulary-selection)
 ---
 
 ### Resources Report Verification

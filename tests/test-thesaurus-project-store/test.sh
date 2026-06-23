@@ -84,6 +84,10 @@ assert(
 );
 assert(endpoint.parent_id === apiSurface.id, "Service Endpoint parent_id does not use the broader API Surface concept id");
 assert(
+  apiSurface.child_ids.includes(endpoint.id),
+  "API Surface child_ids does not use the normalized narrower Service Endpoint concept id",
+);
+assert(
   apiSurface.related_ids.includes(traceability.id) && traceability.related_ids.includes(apiSurface.id),
   "related concept ids are not preserved bidirectionally in the thesaurus projection",
 );

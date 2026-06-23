@@ -40,6 +40,6 @@ Semantic export contracts may define the intended graph patterns for generated p
 
 #### Relations
   * derivedFrom: [Semantic Model Core](../Semantics/SemanticModelFeature.md#semantic-model-core)
-  * specifiedBy: [Ontology Collection Output](ModelReports/ReportingRequirements.md#ontology-collection-output)
   * specifiedBy: [External Vocabulary Exposure Policy](ModelReports/ReportingRequirements.md#external-vocabulary-exposure-policy)
+  * specifiedBy: [Ontology Collection Output](ModelReports/ReportingRequirements.md#ontology-collection-output)
 ---

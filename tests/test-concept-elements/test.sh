@@ -41,6 +41,7 @@ for token in \
   "<http://www.w3.org/2004/02/skos/core#scopeNote>" \
   "<http://www.w3.org/2004/02/skos/core#example>" \
   "<http://www.w3.org/2004/02/skos/core#broader>" \
+  "<http://www.w3.org/2004/02/skos/core#narrower>" \
   "<http://www.w3.org/2004/02/skos/core#related>" \
   "<http://www.w3.org/2004/02/skos/core#exactMatch>" \
   "<http://www.w3.org/2004/02/skos/core#closeMatch>" \

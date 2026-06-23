@@ -106,4 +106,3 @@ Example:
 #### Relations
   * define: [XML style comment](CodeAlignmentRequirements.md#xml-style-comment)
 ---
-

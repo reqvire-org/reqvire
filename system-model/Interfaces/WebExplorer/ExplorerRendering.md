@@ -68,4 +68,3 @@ Implementation details shall follow the associated contract specifications.
   * satisfiedBy: [styles.css](../../../explorer/design-system/styles.css)
   * verifiedBy: [Responsive Design Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#responsive-design-verification)
 ---
-

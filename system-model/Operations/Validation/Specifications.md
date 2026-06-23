@@ -88,6 +88,28 @@ Specification for how requirements files are discovered and processed.
   * type: specification
 ---
 
+### Reqvire SHACL Context Adapter Specification
+
+Technical specification for adapting Reqvire semantic-contract context to generic SHACL ontology alignment.
+
+#### Details
+The Reqvire SHACL context adapter must:
+- Ask the semantic index for parsed RDF quads from the ontology subset reachable through the semantic contract's explicit `use` relations and ontology ancestors.
+- Include parsed local external ontology source quads reachable through that ontology subset.
+- Derive the generic SHACL domain ontology index from those supplied RDF quads rather than manually rebuilding declaration buckets in the validation adapter.
+- Treat built-in RDF, RDFS, OWL, XSD, and SHACL vocabulary through the o-kernel reserved vocabulary registry where supported positions allow it.
+- Pass the compiled SHACL registry and the reachable domain ontology index into the generic SHACL ontology aligner.
+- Reject hidden ontology dependencies by passing only the explicit reachable ontology subset to the generic aligner; a model-owned SHACL reference outside that subset must fail as an undeclared alignment reference from the perspective of the semantic contract.
+- Convert generic SHACL parser and alignment diagnostics into Reqvire validation errors that include semantic-contract identifiers, reference kind, referenced IRI, declaring ontology context when available, and fix guidance.
+- Keep full SHACL data validation/execution out of scope unless a separate verification requirement introduces a SHACL execution engine.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Reqvire SHACL Context Adapter](ValidationRequirements.md#reqvire-shacl-context-adapter)
+---
+
 ### Reused Contract Context Scope Validation Contract Specification
 
 #### Details
@@ -167,26 +189,4 @@ The SHACL structural parser and ontology aligner must operate as a validation-ti
 
 #### Relations
   * define: [Semantic Contract Shape Validation](ValidationRequirements.md#semantic-contract-shape-validation)
----
-
-### Reqvire SHACL Context Adapter Specification
-
-Technical specification for adapting Reqvire semantic-contract context to generic SHACL ontology alignment.
-
-#### Details
-The Reqvire SHACL context adapter must:
-- Ask the semantic index for parsed RDF quads from the ontology subset reachable through the semantic contract's explicit `use` relations and ontology ancestors.
-- Include parsed local external ontology source quads reachable through that ontology subset.
-- Derive the generic SHACL domain ontology index from those supplied RDF quads rather than manually rebuilding declaration buckets in the validation adapter.
-- Treat built-in RDF, RDFS, OWL, XSD, and SHACL vocabulary through the o-kernel reserved vocabulary registry where supported positions allow it.
-- Pass the compiled SHACL registry and the reachable domain ontology index into the generic SHACL ontology aligner.
-- Reject hidden ontology dependencies by passing only the explicit reachable ontology subset to the generic aligner; a model-owned SHACL reference outside that subset must fail as an undeclared alignment reference from the perspective of the semantic contract.
-- Convert generic SHACL parser and alignment diagnostics into Reqvire validation errors that include semantic-contract identifiers, reference kind, referenced IRI, declaring ontology context when available, and fix guidance.
-- Keep full SHACL data validation/execution out of scope unless a separate verification requirement introduces a SHACL execution engine.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Reqvire SHACL Context Adapter](ValidationRequirements.md#reqvire-shacl-context-adapter)
 ---

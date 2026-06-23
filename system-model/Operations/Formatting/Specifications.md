@@ -86,4 +86,3 @@ Rules for sorting relations within elements for deterministic output.
 #### Metadata
   * type: specification
 ---
-

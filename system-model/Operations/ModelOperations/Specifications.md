@@ -331,4 +331,3 @@ The system is expected to reject the operation with a clear error message if:
 #### Metadata
   * type: specification
 ---
-

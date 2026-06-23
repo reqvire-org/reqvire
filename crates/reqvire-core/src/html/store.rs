@@ -11,7 +11,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 
-const SCHEMA_VERSION: &str = "2026-06-23.project-store.v2";
+const SCHEMA_VERSION: &str = "2026-06-23.project-store.v3";
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ExplorerProjectStore {
@@ -148,6 +148,7 @@ pub struct ProjectStoreThesaurusConcept {
     pub scheme_element_id: String,
     pub scheme_label: String,
     pub parent_id: Option<String>,
+    pub child_ids: Vec<String>,
     pub definition: String,
     pub alt_labels: Vec<String>,
     pub scope_note: String,
@@ -659,6 +660,9 @@ fn build_thesaurus_projection(
         }
     }
 
+    let normalized_concept_relations =
+        normalized_thesaurus_relations(&all_elements, &concept_iri_by_element_id);
+
     let schemes = all_elements
         .iter()
         .filter_map(|element| {
@@ -699,10 +703,15 @@ fn build_thesaurus_projection(
                 scheme_label: scheme_payload
                     .map(|scheme| scheme.pref_label.clone())
                     .unwrap_or_default(),
-                parent_id: concept
-                    .broader
-                    .iter()
-                    .find_map(|link| concept_link_iri(&link.target, &concept_iri_by_element_id)),
+                parent_id: normalized_concept_relations
+                    .parent_by_concept
+                    .get(&concept.iri)
+                    .cloned(),
+                child_ids: normalized_concept_relations
+                    .children_by_concept
+                    .get(&concept.iri)
+                    .cloned()
+                    .unwrap_or_default(),
                 definition: concept.definition.clone().unwrap_or_default(),
                 alt_labels: concept
                     .labels
@@ -716,21 +725,21 @@ fn build_thesaurus_projection(
                     .iter()
                     .map(|example| example.value.clone())
                     .collect(),
-                related_ids: concept
-                    .related
-                    .iter()
-                    .filter_map(|link| concept_link_iri(&link.target, &concept_iri_by_element_id))
-                    .collect(),
-                exact_match_ids: concept
-                    .exact_match
-                    .iter()
-                    .filter_map(|link| concept_link_iri(&link.target, &concept_iri_by_element_id))
-                    .collect(),
-                close_match_ids: concept
-                    .close_match
-                    .iter()
-                    .filter_map(|link| concept_link_iri(&link.target, &concept_iri_by_element_id))
-                    .collect(),
+                related_ids: normalized_concept_relations
+                    .related_by_concept
+                    .get(&concept.iri)
+                    .cloned()
+                    .unwrap_or_default(),
+                exact_match_ids: normalized_concept_relations
+                    .exact_match_by_concept
+                    .get(&concept.iri)
+                    .cloned()
+                    .unwrap_or_default(),
+                close_match_ids: normalized_concept_relations
+                    .close_match_by_concept
+                    .get(&concept.iri)
+                    .cloned()
+                    .unwrap_or_default(),
                 used_by: used_by_by_concept
                     .get(&concept.iri)
                     .cloned()
@@ -761,6 +770,122 @@ fn concept_link_iri(
         .get(target)
         .cloned()
         .or_else(|| target.starts_with("http").then(|| target.to_string()))
+}
+
+#[derive(Debug, Default)]
+struct NormalizedThesaurusRelations {
+    parent_by_concept: BTreeMap<String, String>,
+    children_by_concept: BTreeMap<String, Vec<String>>,
+    related_by_concept: BTreeMap<String, Vec<String>>,
+    exact_match_by_concept: BTreeMap<String, Vec<String>>,
+    close_match_by_concept: BTreeMap<String, Vec<String>>,
+}
+
+fn normalized_thesaurus_relations(
+    elements: &[&Element],
+    concept_iri_by_element_id: &BTreeMap<String, String>,
+) -> NormalizedThesaurusRelations {
+    let mut relations = NormalizedThesaurusRelations::default();
+
+    for element in elements {
+        let element = *element;
+        let Some(concept) = element.concept.as_ref() else {
+            continue;
+        };
+        let Some(source_iri) = concept_iri_by_element_id.get(&element.identifier) else {
+            continue;
+        };
+
+        for link in &concept.broader {
+            if let Some(parent_iri) = concept_link_iri(&link.target, concept_iri_by_element_id) {
+                relations
+                    .parent_by_concept
+                    .entry(source_iri.clone())
+                    .or_insert_with(|| parent_iri.clone());
+                push_unique(
+                    relations
+                        .children_by_concept
+                        .entry(parent_iri)
+                        .or_default(),
+                    source_iri.clone(),
+                );
+            }
+        }
+
+        for link in &concept.narrower {
+            if let Some(child_iri) = concept_link_iri(&link.target, concept_iri_by_element_id) {
+                relations
+                    .parent_by_concept
+                    .entry(child_iri.clone())
+                    .or_insert_with(|| source_iri.clone());
+                push_unique(
+                    relations
+                        .children_by_concept
+                        .entry(source_iri.clone())
+                        .or_default(),
+                    child_iri,
+                );
+            }
+        }
+
+        for link in &concept.related {
+            if let Some(target_iri) = concept_link_iri(&link.target, concept_iri_by_element_id) {
+                add_symmetric_thesaurus_relation(
+                    &mut relations.related_by_concept,
+                    source_iri,
+                    &target_iri,
+                );
+            }
+        }
+
+        for link in &concept.exact_match {
+            if let Some(target_iri) = concept_link_iri(&link.target, concept_iri_by_element_id) {
+                add_symmetric_thesaurus_relation(
+                    &mut relations.exact_match_by_concept,
+                    source_iri,
+                    &target_iri,
+                );
+            }
+        }
+
+        for link in &concept.close_match {
+            if let Some(target_iri) = concept_link_iri(&link.target, concept_iri_by_element_id) {
+                add_symmetric_thesaurus_relation(
+                    &mut relations.close_match_by_concept,
+                    source_iri,
+                    &target_iri,
+                );
+            }
+        }
+    }
+
+    sort_thesaurus_relation_map(&mut relations.children_by_concept);
+    sort_thesaurus_relation_map(&mut relations.related_by_concept);
+    sort_thesaurus_relation_map(&mut relations.exact_match_by_concept);
+    sort_thesaurus_relation_map(&mut relations.close_match_by_concept);
+    relations
+}
+
+fn add_symmetric_thesaurus_relation(
+    relation_map: &mut BTreeMap<String, Vec<String>>,
+    source_iri: &str,
+    target_iri: &str,
+) {
+    push_unique(
+        relation_map.entry(source_iri.to_string()).or_default(),
+        target_iri.to_string(),
+    );
+    push_unique(
+        relation_map.entry(target_iri.to_string()).or_default(),
+        source_iri.to_string(),
+    );
+}
+
+fn sort_thesaurus_relation_map(relation_map: &mut BTreeMap<String, Vec<String>>) {
+    for values in relation_map.values_mut() {
+        values.sort();
+        values.dedup();
+    }
 }
 
 fn source_label(element: &Element) -> String {

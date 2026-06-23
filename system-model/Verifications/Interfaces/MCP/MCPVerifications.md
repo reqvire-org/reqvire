@@ -8,10 +8,10 @@ This objective groups verification that Reqvire MCP servers, tools, resources, p
   * type: verification-objective
 
 #### Relations
+  * derive: [Embedded MCP Serve Endpoint Verification](#embedded-mcp-serve-endpoint-verification)
   * derive: [MCP Access Control Baseline Verification](#mcp-access-control-baseline-verification)
   * derive: [MCP Contract Layer Boundary Verification](#mcp-contract-layer-boundary-verification)
   * derive: [MCP Contract Versioning Verification](#mcp-contract-versioning-verification)
-  * derive: [Embedded MCP Serve Endpoint Verification](#embedded-mcp-serve-endpoint-verification)
   * derive: [MCP HTTP Transport End-to-End Verification](#mcp-http-transport-end-to-end-verification)
   * derive: [MCP Model Evidence Tools Verification](#mcp-model-evidence-tools-verification)
   * derive: [MCP Mutation Execution Flow Verification](#mcp-mutation-execution-flow-verification)
@@ -33,6 +33,30 @@ This objective groups verification that Reqvire MCP servers, tools, resources, p
   * derive: [MCP Tool Exposure Scope Verification](#mcp-tool-exposure-scope-verification)
   * derive: [MCP Tool Side Effect Classification Verification](#mcp-tool-side-effect-classification-verification)
   * derive: [MCP Workspace Session Tools Verification](#mcp-workspace-session-tools-verification)
+---
+
+### Embedded MCP Serve Endpoint Verification
+
+This verification shall prove that `reqvire serve --enable-mcp` exposes the Reqvire MCP Streamable HTTP endpoint on the same listener as the Explorer without enabling mutations by default.
+
+#### Details
+Expected checks:
+- Start `reqvire serve --enable-mcp --host 127.0.0.1 --port <PORT>` in a fixture workspace.
+- Verify the Explorer root URL still returns the SPA shell.
+- Verify standard MCP Streamable HTTP requests are accepted at `http://127.0.0.1:<PORT>/mcp`.
+- Verify MCP `tools/list` does not include mutation tools when only `--enable-mcp` is present.
+- Start `reqvire serve --enable-mcp --enable-mutations --host 127.0.0.1 --port <PORT>` and verify MCP `tools/list` includes mutation tools.
+- Execute an embedded MCP mutation and verify the mutation refreshes the materialized Explorer runtime store, so a subsequent `assets/project-store.js` request contains the updated model datastore after browser/client reload.
+- Verify ordinary `assets/project-store.js` requests do not regenerate the runtime store from disk without an embedded MCP write mutation or an explicit serve-owned refresh path.
+- Verify `assets/project-store.js` and `ontologies.ttl` responses include no-store cache control.
+- Verify `--enable-mutations` is rejected unless `--enable-mcp` is also provided for `reqvire serve`.
+- Verify `/mcp` is handled by RMCP transport and is not served by the Explorer SPA fallback.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Serve Command Embedded MCP Endpoint](../../../Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
 ---
 
 ### MCP Access Control Baseline Verification
@@ -389,30 +413,6 @@ The e2e test starts `reqvire mcp` in a fixture workspace and verifies MCP initia
   * verify: [MCP Tool Exposure Scope](../../../Interfaces/MCP/Tools.md#mcp-tool-exposure-scope)
   * verify: [MCP Tool Side Effect Classification](../../../Interfaces/MCP/Tools.md#mcp-tool-side-effect-classification)
   * verify: [MCP Workspace Session Tools](../../../Interfaces/MCP/Tools.md#mcp-workspace-session-tools)
----
-
-### Embedded MCP Serve Endpoint Verification
-
-This verification shall prove that `reqvire serve --enable-mcp` exposes the Reqvire MCP Streamable HTTP endpoint on the same listener as the Explorer without enabling mutations by default.
-
-#### Details
-Expected checks:
-- Start `reqvire serve --enable-mcp --host 127.0.0.1 --port <PORT>` in a fixture workspace.
-- Verify the Explorer root URL still returns the SPA shell.
-- Verify standard MCP Streamable HTTP requests are accepted at `http://127.0.0.1:<PORT>/mcp`.
-- Verify MCP `tools/list` does not include mutation tools when only `--enable-mcp` is present.
-- Start `reqvire serve --enable-mcp --enable-mutations --host 127.0.0.1 --port <PORT>` and verify MCP `tools/list` includes mutation tools.
-- Execute an embedded MCP mutation and verify the mutation refreshes the materialized Explorer runtime store, so a subsequent `assets/project-store.js` request contains the updated model datastore after browser/client reload.
-- Verify ordinary `assets/project-store.js` requests do not regenerate the runtime store from disk without an embedded MCP write mutation or an explicit serve-owned refresh path.
-- Verify `assets/project-store.js` and `ontologies.ttl` responses include no-store cache control.
-- Verify `--enable-mutations` is rejected unless `--enable-mcp` is also provided for `reqvire serve`.
-- Verify `/mcp` is handled by RMCP transport and is not served by the Explorer SPA fallback.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Serve Command Embedded MCP Endpoint](../../../Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
 ---
 
 ### MCP Server State and Cache Verification
