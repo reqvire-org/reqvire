@@ -1,5 +1,5 @@
 import type {
-  DetailReusedContractContextItem,
+  DetailContractBindingItem,
   DetailConceptReferenceItem,
   DetailMetaBadge,
   DetailRelationItem,
@@ -260,7 +260,7 @@ export const DETAIL_RELATIONS: DetailRelationItem[] = [
   },
 ];
 
-export const DETAIL_ATTACHMENTS: DetailReusedContractContextItem[] = [
+export const DETAIL_ATTACHMENTS: DetailContractBindingItem[] = [
   {
     id: "att-report",
     targetId: "reports/coverage-summary.md",

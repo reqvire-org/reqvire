@@ -7,7 +7,7 @@ How changes propagate through model based on relation types.
 #### Details
 Propagation categories and relation impact rules are defined by the Reqvire relation and change-impact ontologies.
 
-**Reused Contract Context Impact:**
+**Contract Bindings Impact:**
 - Content changes → propagate impact
 - Path renames → track but no impact
 
@@ -15,9 +15,9 @@ Propagation categories and relation impact rules are defined by the Reqvire rela
   * type: behavior
 ---
 
-### Reused Contract Context Input Auto-Detection Behavior
+### Contract Bindings Input Auto-Detection Behavior
 
-When reusesContract or removing reused context via CLI commands, the system shall resolve reused_contract_context targets as contract-element identifiers.
+When bindContract or removing contract binding via CLI commands, the system shall resolve contract_bindings targets as contract-element identifiers.
 
 #### Details
 The resolution follows this order:
@@ -44,7 +44,7 @@ Short mode reduces output verbosity for quick scanning:
 - Suitable for piping to other tools
 
 **JSON Output (--short with --json):**
-- Omit verbose fields: `content`, `page_content`, `reused_contract_context`
+- Omit verbose fields: `content`, `page_content`, `contract_bindings`
 - Omit computed fields: `element_count`, `total_elements`, `global_counters`
 - Retain: `identifier`, `name`, `type`, `file_path`
 - Retain: `relations` (for traceability)

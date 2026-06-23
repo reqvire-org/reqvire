@@ -1,0 +1,1 @@
+error: Invalid contract_bindings scope: 'Spec-X' cannot be bound to 'Req D' because subgraph 'User Req X Capability' already binds contracts owned by subgraph 'User Req A Capability'. Contract Binding flow between subgraphs must remain one-directional.

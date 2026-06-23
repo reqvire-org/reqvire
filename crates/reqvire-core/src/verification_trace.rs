@@ -54,7 +54,7 @@ struct RequirementNodeWithRelation {
     pub name: String,
     pub element_type: String, // CSS class name based on element type
     pub children: Vec<(String, RequirementNodeWithRelation)>, // (relation_type, node)
-    pub reused_contract_context_labels: Vec<String>,
+    pub contract_bindings_labels: Vec<String>,
 }
 
 pub struct VerificationTraceGenerator<'a> {
@@ -276,7 +276,7 @@ impl<'a> VerificationTraceGenerator<'a> {
         }
 
         // Collect all elements that will be in the diagram
-        // (id, name, element_type, reused_contract_context_labels) - element_type is used for CSS class
+        // (id, name, element_type, contract_bindings_labels) - element_type is used for CSS class
         let mut all_elements: Vec<(String, String, String, Vec<String>)> = Vec::new();
         let mut collected_ids: HashSet<String> = HashSet::new();
 
@@ -303,7 +303,7 @@ impl<'a> VerificationTraceGenerator<'a> {
             HashMap<String, Vec<(String, String, String, Vec<String>)>>,
         > = HashMap::new();
 
-        for (elem_id, elem_name, elem_type, reused_contract_context) in all_elements {
+        for (elem_id, elem_name, elem_type, contract_bindings) in all_elements {
             // Extract folder and file from identifier (format: path/to/File.md#element-name)
             let id_without_fragment = elem_id.split('#').next().unwrap_or(&elem_id);
             let path = PathBuf::from(id_without_fragment);
@@ -328,7 +328,7 @@ impl<'a> VerificationTraceGenerator<'a> {
                 .or_default()
                 .entry(file_name)
                 .or_default()
-                .push((elem_id, elem_name, elem_type, reused_contract_context));
+                .push((elem_id, elem_name, elem_type, contract_bindings));
         }
 
         // Header with CSS classes (MBSE color scheme - matching other diagrams)
@@ -381,17 +381,17 @@ impl<'a> VerificationTraceGenerator<'a> {
                     file_elements.iter().collect();
                 sorted_elements.sort_by(|a, b| a.0.cmp(&b.0));
 
-                for (elem_id, elem_name, elem_type, reused_contract_context_labels) in
+                for (elem_id, elem_name, elem_type, contract_bindings_labels) in
                     sorted_elements
                 {
                     let node_id = utils::hash_identifier(elem_id);
 
-                    // Build label with reused_contract_context
+                    // Build label with contract_bindings
                     let mut node_label = escape_mermaid_label(elem_name);
-                    for reused_contract_context in reused_contract_context_labels {
+                    for contract_bindings in contract_bindings_labels {
                         node_label.push_str(&format!(
                             "<br/>📎 {}",
-                            escape_mermaid_label(reused_contract_context)
+                            escape_mermaid_label(contract_bindings)
                         ));
                     }
 
@@ -465,7 +465,7 @@ impl<'a> VerificationTraceGenerator<'a> {
                     node.id.clone(),
                     node.name.clone(),
                     node.element_type.clone(),
-                    node.reused_contract_context_labels.clone(),
+                    node.contract_bindings_labels.clone(),
                 ));
             }
             // Recursively collect children
@@ -584,19 +584,19 @@ impl<'a> VerificationTraceGenerator<'a> {
             name: requirement.name.clone(),
             element_type: element_type.to_string(),
             children,
-            reused_contract_context_labels: requirement
-                .reused_contract_context
+            contract_bindings_labels: requirement
+                .contract_bindings
                 .iter()
                 .map(|a| match &a.target {
-                    crate::element::ReusedContractContextTarget::FilePath(path) => path
+                    crate::element::ContractBindingTarget::FilePath(path) => path
                         .file_name()
                         .map(|n| n.to_string_lossy().into_owned())
                         .unwrap_or_else(|| path.to_string_lossy().into_owned()),
-                    crate::element::ReusedContractContextTarget::ElementIdentifier(id) => self
+                    crate::element::ContractBindingTarget::ElementIdentifier(id) => self
                         .registry
                         .get_element(id)
                         .map(|target| target.name.clone())
-                        .unwrap_or_else(|| reused_contract_context_target_label(id)),
+                        .unwrap_or_else(|| contract_bindings_target_label(id)),
                 })
                 .collect(),
         })
@@ -642,7 +642,7 @@ impl<'a> VerificationTraceGenerator<'a> {
     }
 }
 
-fn reused_contract_context_target_label(target: &str) -> String {
+fn contract_bindings_target_label(target: &str) -> String {
     let fragment_or_path = target.rsplit('#').next().unwrap_or(target);
     let basename = fragment_or_path
         .rsplit('/')

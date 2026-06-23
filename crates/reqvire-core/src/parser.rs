@@ -1,7 +1,7 @@
 use crate::element::{
     ConceptReference, Element, ElementType, FencedBlock, RequirementType,
-    ReusedContractContextEntry, ReusedContractContextTarget, SubSection,
-    REUSED_CONTRACT_CONTEXT_SECTION,
+    ContractBindingEntry, ContractBindingTarget, SubSection,
+    CONTRACT_BINDINGS_SECTION,
 };
 use crate::error::ReqvireError;
 use crate::relation::{self, Relation};
@@ -312,7 +312,7 @@ You can use **markdown formatting**.
   * derivedFrom: [Parent Element](../ParentFile.md#parent-element)
   * satisfiedBy: [Implementation](../code/impl.rs)
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Reused Specification](Specifications.md#specification-name)
 ---
 "#
@@ -497,16 +497,16 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                 }
             }
 
-        // Parse reused_contract_context
-        } else if current_subsection == SubSection::ReusedContractContext {
+        // Parse contract_bindings
+        } else if current_subsection == SubSection::ContractBinding {
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                    match utils::parse_reused_contract_context_line(trimmed) {
+                    match utils::parse_contract_bindings_line(trimmed) {
                         Ok(href) => {
                             if !href.contains('#') {
-                                return Err(ReqvireError::InvalidReusedContractContextFormat(
+                                return Err(ReqvireError::InvalidContractBindingFormat(
                                     format!(
-                                        "Invalid reused contract context target '{}'. Reused Contract Context entries must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
+                                        "Invalid contract bindings target '{}'. Contract Bindings entries must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
                                         href
                                     )
                                 ));
@@ -529,29 +529,29 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                                 let base_path = git_root.join(file_parent);
                                 utils::normalize_identifier(&href, &base_path)?
                             };
-                            let target = ReusedContractContextTarget::ElementIdentifier(normalized);
+                            let target = ContractBindingTarget::ElementIdentifier(normalized);
 
-                            // Check for duplicate reused_contract_context
+                            // Check for duplicate contract_bindings
                             if element
-                                .reused_contract_context
+                                .contract_bindings
                                 .iter()
                                 .any(|a| a.target == target)
                             {
-                                return Err(ReqvireError::DuplicateReusedContractContext(format!(
-                                    "Duplicate reused_contract_context '{}'",
+                                return Err(ReqvireError::DuplicateContractBinding(format!(
+                                    "Duplicate contract_bindings '{}'",
                                     href
                                 )));
                             }
                             element
-                                .reused_contract_context
-                                .push(ReusedContractContextEntry {
+                                .contract_bindings
+                                .push(ContractBindingEntry {
                                     target,
                                     content_hash: None,
                                 });
                         }
                         Err(e) => {
-                            return Err(ReqvireError::InvalidReusedContractContextFormat(format!(
-                                "Invalid reused_contract_context format '{}': {}.\n{}",
+                            return Err(ReqvireError::InvalidContractBindingFormat(format!(
+                                "Invalid contract_bindings format '{}': {}.\n{}",
                                 trimmed,
                                 e,
                                 get_element_example()
@@ -559,8 +559,8 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                         }
                     }
                 } else if !trimmed.is_empty() {
-                    return Err(ReqvireError::InvalidReusedContractContextFormat(format!(
-                        "Invalid reused_contract_context format: '{}'. Expected format: '  * [Text](link)'\n{}",
+                    return Err(ReqvireError::InvalidContractBindingFormat(format!(
+                        "Invalid contract_bindings format: '{}'. Expected format: '  * [Text](link)'\n{}",
                         trimmed,
                         get_element_example()
                     )));
@@ -653,7 +653,7 @@ pub fn parse_single_element_contract(
                 seen_metadata = true;
             } else if section.eq_ignore_ascii_case("Relations") {
                 seen_relations = true;
-            } else if !section.eq_ignore_ascii_case(REUSED_CONTRACT_CONTEXT_SECTION) {
+            } else if !section.eq_ignore_ascii_case(CONTRACT_BINDINGS_SECTION) {
                 // Dynamic element name section header: `## <Element Name>`
                 seen_element_name = true;
             }
@@ -761,14 +761,14 @@ fn parse_single_element_file(
     let mut errors = Vec::new();
     let mut element_content = String::new();
     let mut element_relations: Vec<Relation> = Vec::new();
-    let mut element_reused_contract_context: Vec<ReusedContractContextEntry> = Vec::new();
+    let mut element_contract_bindings: Vec<ContractBindingEntry> = Vec::new();
     let mut metadata: std::collections::HashMap<String, String> = std::collections::HashMap::new();
 
     enum DocSection {
         None,
         Metadata,
         Relations,
-        ReusedContractContext,
+        ContractBinding,
         Document,
     }
     let mut section = DocSection::None;
@@ -800,7 +800,7 @@ fn parse_single_element_file(
                     DocSection::Metadata
                 }
                 "Relations" => DocSection::Relations,
-                REUSED_CONTRACT_CONTEXT_SECTION => DocSection::ReusedContractContext,
+                CONTRACT_BINDINGS_SECTION => DocSection::ContractBinding,
                 _ => {
                     // Dynamic element name section header (e.g., `## Change Propagation`)
                     seen_element_name = true;
@@ -888,16 +888,16 @@ fn parse_single_element_file(
                     )));
                 }
             }
-            DocSection::ReusedContractContext => {
+            DocSection::ContractBinding => {
                 if trimmed.is_empty() {
                     continue;
                 }
                 if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                    match utils::parse_reused_contract_context_line(trimmed) {
+                    match utils::parse_contract_bindings_line(trimmed) {
                         Ok(href) => {
                             if !href.contains('#') {
-                                errors.push(ReqvireError::InvalidReusedContractContextFormat(format!(
-                                    "Invalid reused contract context identifier in single-element file '{}', line {}: '{}'. Reused Contract Context entries must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
+                                errors.push(ReqvireError::InvalidContractBindingFormat(format!(
+                                    "Invalid contract bindings identifier in single-element file '{}', line {}: '{}'. Contract Bindings entries must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
                                     file,
                                     line_num + 1,
                                     href
@@ -918,10 +918,10 @@ fn parse_single_element_file(
                                 &href_to_normalize,
                                 &file_dir,
                             ) {
-                                Ok(normalized) => ReusedContractContextTarget::ElementIdentifier(normalized),
+                                Ok(normalized) => ContractBindingTarget::ElementIdentifier(normalized),
                                 Err(e) => {
-                                    errors.push(ReqvireError::InvalidReusedContractContextFormat(format!(
-                                        "Invalid reused_contract_context identifier in single-element file '{}', line {}: {}",
+                                    errors.push(ReqvireError::InvalidContractBindingFormat(format!(
+                                        "Invalid contract_bindings identifier in single-element file '{}', line {}: {}",
                                         file,
                                         line_num + 1,
                                         e
@@ -931,30 +931,30 @@ fn parse_single_element_file(
                             };
                             let content_hash = None;
 
-                            if !element_reused_contract_context.iter().any(|a| a.target == target) {
-                                element_reused_contract_context.push(ReusedContractContextEntry {
+                            if !element_contract_bindings.iter().any(|a| a.target == target) {
+                                element_contract_bindings.push(ContractBindingEntry {
                                     target,
                                     content_hash,
                                 });
                             } else {
-                                errors.push(ReqvireError::DuplicateReusedContractContext(format!(
-                                    "Duplicate reused_contract_context '{}' in single-element file '{}' (line {})",
+                                errors.push(ReqvireError::DuplicateContractBinding(format!(
+                                    "Duplicate contract_bindings '{}' in single-element file '{}' (line {})",
                                     href,
                                     file,
                                     line_num + 1
                                 )));
                             }
                         }
-                        Err(e) => errors.push(ReqvireError::InvalidReusedContractContextFormat(format!(
-                            "Invalid reused_contract_context in single-element file '{}', line {}: {}",
+                        Err(e) => errors.push(ReqvireError::InvalidContractBindingFormat(format!(
+                            "Invalid contract_bindings in single-element file '{}', line {}: {}",
                             file,
                             line_num + 1,
                             e
                         ))),
                     }
                 } else {
-                    errors.push(ReqvireError::InvalidReusedContractContextFormat(format!(
-                        "Invalid reused_contract_context entry in single-element file '{}', line {}: '{}'",
+                    errors.push(ReqvireError::InvalidContractBindingFormat(format!(
+                        "Invalid contract_bindings entry in single-element file '{}', line {}: '{}'",
                         file,
                         line_num + 1,
                         trimmed
@@ -1004,7 +1004,7 @@ fn parse_single_element_file(
     element.metadata = metadata;
     element.set_type_from_metadata();
     element.relations = element_relations;
-    element.reused_contract_context = element_reused_contract_context;
+    element.contract_bindings = element_contract_bindings;
     element.freeze_content();
     element.file_order_index = 0;
 
@@ -1014,7 +1014,7 @@ fn parse_single_element_file(
 /// Parses a markdown document and extracts elements with metadata and relations.
 /// Returns: (elements, errors, page_content)
 /// Only parses files where the first H1 heading is "# Elements" or "# Element".
-/// If git_commit is Some, file reused_contract_context hashes are computed from the git commit, not working directory.
+/// If git_commit is Some, file contract_bindings hashes are computed from the git commit, not working directory.
 pub fn parse_elements(
     file: &str,
     content: &str,
@@ -1358,21 +1358,21 @@ pub fn parse_elements(
                     current_subsection = SubSection::Other("".to_string());
                 }
             }
-        } else if current_subsection == SubSection::ReusedContractContext && !skip_current_element {
-            // Parse Reused Contract Context subsection
+        } else if current_subsection == SubSection::ContractBinding && !skip_current_element {
+            // Parse Contract Bindings subsection
             // Format: * [text](identifier) where identifier is:
             // - Same-file identifier (#fragment)
             // - Cross-file identifier (file.md#fragment)
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                    match utils::parse_reused_contract_context_line(trimmed) {
+                    match utils::parse_contract_bindings_line(trimmed) {
                         Ok(href) => {
                             if !href.contains('#') {
                                 let msg = format!(
-                                    "Invalid reused contract context identifier in element '{}': '{}' (file: {}, line {}). Reused Contract Context entries must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
+                                    "Invalid contract bindings identifier in element '{}': '{}' (file: {}, line {}). Contract Bindings entries must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
                                     element.name, href, file, line_num + 1
                                 );
-                                errors.push(ReqvireError::InvalidReusedContractContextFormat(
+                                errors.push(ReqvireError::InvalidContractBindingFormat(
                                     msg.clone(),
                                 ));
                                 debug!("Error: {}", msg);
@@ -1391,19 +1391,19 @@ pub fn parse_elements(
                                 .unwrap_or_else(|| Path::new("."))
                                 .to_path_buf();
                             let (target, content_hash): (
-                                ReusedContractContextTarget,
+                                ContractBindingTarget,
                                 Option<String>,
                             ) = match utils::normalize_identifier(&href_to_normalize, &file_dir) {
                                 Ok(normalized) => (
-                                    ReusedContractContextTarget::ElementIdentifier(normalized),
+                                    ContractBindingTarget::ElementIdentifier(normalized),
                                     None,
                                 ),
                                 Err(e) => {
                                     let msg = format!(
-                                            "Invalid reused_contract_context identifier in element '{}': {} (file: {}, line {})",
+                                            "Invalid contract_bindings identifier in element '{}': {} (file: {}, line {})",
                                             element.name, e, file, line_num + 1
                                         );
-                                    errors.push(ReqvireError::InvalidReusedContractContextFormat(
+                                    errors.push(ReqvireError::InvalidContractBindingFormat(
                                         msg.clone(),
                                     ));
                                     debug!("Error: {}", msg);
@@ -1413,23 +1413,23 @@ pub fn parse_elements(
 
                             // Check for duplicates
                             if !element
-                                .reused_contract_context
+                                .contract_bindings
                                 .iter()
                                 .any(|a| a.target == target)
                             {
                                 element
-                                    .reused_contract_context
-                                    .push(ReusedContractContextEntry {
+                                    .contract_bindings
+                                    .push(ContractBindingEntry {
                                         target,
                                         content_hash,
                                     });
                             } else {
                                 let msg =
                                     format!(
-                                    "Duplicate reused_contract_context '{}' in element '{}' (file: {}, line {})",
+                                    "Duplicate contract_bindings '{}' in element '{}' (file: {}, line {})",
                                     href, element.name, file, line_num + 1
                                 );
-                                errors.push(ReqvireError::DuplicateReusedContractContext(
+                                errors.push(ReqvireError::DuplicateContractBinding(
                                     msg.clone(),
                                 ));
                                 debug!("Warning: {}", msg);
@@ -1437,23 +1437,23 @@ pub fn parse_elements(
                         }
                         Err(e) => {
                             let msg = format!(
-                                "Invalid reused_contract_context in element '{}': {} (file: {}, line {})",
+                                "Invalid contract_bindings in element '{}': {} (file: {}, line {})",
                                 element.name,
                                 e,
                                 file,
                                 line_num + 1
                             );
-                            errors.push(ReqvireError::InvalidReusedContractContextFormat(
+                            errors.push(ReqvireError::InvalidContractBindingFormat(
                                 msg.clone(),
                             ));
                             debug!("Error: {}", msg);
                         }
                     }
                 } else if !trimmed.is_empty() {
-                    // Non-empty line that's not a bullet point - end of Reused Contract Context subsection
+                    // Non-empty line that's not a bullet point - end of Contract Bindings subsection
                     current_subsection = SubSection::Other("".to_string());
                 }
-                // Empty lines are ignored within Reused Contract Context subsection
+                // Empty lines are ignored within Contract Bindings subsection
             }
         } else if matches!(current_subsection, SubSection::Other(_)) {
             // Accumulate page content: everything outside of elements, but skip the # Elements title

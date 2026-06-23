@@ -43,7 +43,7 @@ reqvire migrate
 reqvire migrate --fix
 ```
 
-`reqvire migrate` is dry-run by default; `--fix` applies deterministic migrations such as legacy document header cleanup, verification-objective holder creation, contract relation cleanup, and legacy `Reused Contract Context` heading migration to `Reused Contract Context`.
+`reqvire migrate` is dry-run by default; `--fix` applies deterministic migrations such as legacy document header cleanup, verification-objective holder creation, contract relation cleanup, and legacy `Contract Bindings` heading migration to `Contract Bindings`.
 
 ---
 
@@ -327,7 +327,7 @@ Requirements are graph elements that:
 - derive from capabilities
 - connect to ontology concepts
 - are defined by structured engineering contracts
-- reuse compatible cross-subgraph contract context through `#### Reused Contract Context`
+- reuse compatible cross-subgraph contract context through `#### Contract Bindings`
 - can be constrained by ontologically anchored `semantic-contract`s
 - trace to implementation artifacts
 - link directly to verification evidence
@@ -364,7 +364,7 @@ This allows requirements to evolve into precise, machine-readable engineering se
 
 Semantic contracts are ontology-plane SHACL profiles covered in the Ontologies section; requirement-owned contracts are the implementation-facing detail layer.
 
-Requirements can also reuse compatible requirement-owned contracts from another subgraph through the `#### Reused Contract Context` section. This is a dependency/context mechanism, not ownership: the reused contract remains owned by its defining requirement, while the consuming requirement makes the cross-subgraph obligation explicit.
+Requirements can also reuse compatible requirement-owned contracts from another subgraph through the `#### Contract Bindings` section. This is a dependency/context mechanism, not ownership: the reused contract remains owned by its defining requirement, while the consuming requirement makes the cross-subgraph obligation explicit.
 
 ---
 

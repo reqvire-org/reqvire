@@ -7,7 +7,7 @@
 #### Coverage Sources
 
 - direct_satisfied: 3
-- contract_satisfied_via_reused_contract_context: 1
+- contract_satisfied_via_contract_bindings: 1
 - contract_satisfied_via_child: 1
 
 ## Covered Requirements
@@ -17,7 +17,7 @@
 - ✅ **[Contract Consumer Implemented](specifications/Requirements.md#contract-consumer-implemented)** (direct_satisfied)
   - Evidence:
     - [specifications/src/contract_consumer.rs](specifications/src/contract_consumer.rs)
-- ✅ **[Contract Owner](specifications/Requirements.md#contract-owner)** (contract_satisfied_via_reused_contract_context)
+- ✅ **[Contract Owner](specifications/Requirements.md#contract-owner)** (contract_satisfied_via_contract_bindings)
   - Evidence:
     - [specifications/Requirements.md#contract-consumer-implemented](specifications/Requirements.md#contract-consumer-implemented)
 - ✅ **[Derived Child Implemented](specifications/Requirements.md#derived-child-implemented)** (direct_satisfied)

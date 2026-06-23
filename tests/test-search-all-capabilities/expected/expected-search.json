@@ -42,7 +42,7 @@
               }
             }
           ],
-          "reused_contract_context": []
+          "contract_bindings": []
         },
         {
           "identifier": "specifications/Requirements.md#requirement-with-designspecifications-reference",
@@ -84,7 +84,7 @@
               }
             }
           ],
-          "reused_contract_context": []
+          "contract_bindings": []
         },
         {
           "identifier": "specifications/Requirements.md#requirement-with-many-subsections",
@@ -119,7 +119,7 @@
               }
             }
           ],
-          "reused_contract_context": []
+          "contract_bindings": []
         },
         {
           "identifier": "specifications/Requirements.md#requirement-with-valid-markdown-relations",
@@ -182,7 +182,7 @@
               }
             }
           ],
-          "reused_contract_context": []
+          "contract_bindings": []
         },
         {
           "identifier": "specifications/Requirements.md#requirement-with-valid-standard-relations",
@@ -252,7 +252,7 @@
               }
             }
           ],
-          "reused_contract_context": []
+          "contract_bindings": []
         },
         {
           "identifier": "specifications/Requirements.md#root-capability",
@@ -294,7 +294,7 @@
               }
             }
           ],
-          "reused_contract_context": []
+          "contract_bindings": []
         },
         {
           "identifier": "specifications/Requirements.md#search-command-verification",
@@ -325,7 +325,7 @@
               }
             }
           ],
-          "reused_contract_context": []
+          "contract_bindings": []
         },
         {
           "identifier": "specifications/Requirements.md#test-capability-test-search-all-capabilities-specifications-requirements-md",
@@ -374,7 +374,7 @@
               }
             }
           ],
-          "reused_contract_context": []
+          "contract_bindings": []
         },
         {
           "identifier": "specifications/Requirements.md#verification-objective",
@@ -398,7 +398,7 @@
               }
             }
           ],
-          "reused_contract_context": []
+          "contract_bindings": []
         },
         {
           "identifier": "specifications/Requirements.md#verification-of-standard-relations",
@@ -429,7 +429,7 @@
               }
             }
           ],
-          "reused_contract_context": []
+          "contract_bindings": []
         }
       ],
       "page_content": "",

@@ -98,8 +98,8 @@ if ! grep -q 'Model Command Ontology' <<< "$MMD_OUTPUT"; then
     exit 1
 fi
 
-if grep -q -- '-->|reuses contract|' <<< "$MMD_OUTPUT"; then
-    echo "❌ FAILED: model --mmd output should not include capability ontology reused_contract_context edges"
+if grep -q -- '-->|binds contract|' <<< "$MMD_OUTPUT"; then
+    echo "❌ FAILED: model --mmd output should not include capability ontology contract_bindings edges"
     echo "$MMD_OUTPUT"
     exit 1
 fi

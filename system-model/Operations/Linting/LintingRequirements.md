@@ -71,7 +71,7 @@ The system shall detect when an element reaches a common ancestor through multip
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
@@ -88,7 +88,7 @@ The system shall detect and auto-remove redundant derivedFrom relations where an
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
@@ -108,7 +108,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations

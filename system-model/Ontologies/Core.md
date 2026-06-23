@@ -198,7 +198,7 @@ reqvire:OntologyDocument a owl:Class ;
   rdfs:comment "Generated or authored ontology document identified by ontology base IRI and containing contributed ontology terms." .
 reqvire:File a owl:Class ;
   rdfs:subClassOf reqvire:Artifact ;
-  rdfs:comment "Repository-internal file artifact referenced by Reqvire relations, reused_contract_context, or evidence links." .
+  rdfs:comment "Repository-internal file artifact referenced by Reqvire relations, contract_bindings, or evidence links." .
 reqvire:CustomElement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   rdfs:comment "Custom model extension element whose authored metadata type follows other-TYPENAME and cannot author canonical semantic relations." .
@@ -237,7 +237,7 @@ reqvire:ElementIdentifier a owl:Class ;
 reqvire:ElementLocation a owl:Class ;
   rdfs:comment "File and section location context for an element, separate from stable identity." .
 reqvire:ReferenceTargetKind a owl:Class ;
-  rdfs:comment "Stable semantic category for relation or reused_contract_context target resolution." .
+  rdfs:comment "Stable semantic category for relation or contract_bindings target resolution." .
 reqvire:ElementIdentifierTarget a owl:Class ;
   rdfs:subClassOf reqvire:ReferenceTargetKind ;
   rdfs:comment "Reference target category that resolves to a specific model element." .
@@ -326,7 +326,7 @@ reqvire:referenceTargetKindName a owl:DatatypeProperty ;
 reqvire:capabilityType a reqvire:CapabilityElementType ;
   reqvire:elementTypeName "capability" ;
   reqvire:elementTypeCategory "capability" ;
-  rdfs:comment "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, connected to ontology through reused_contract_context, and verified by evidence." ;
+  rdfs:comment "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, connected to ontology through contract_bindings, and verified by evidence." ;
   reqvire:defaultElementType false .
 
 reqvire:requirementType a reqvire:RequirementElementType ;
@@ -380,8 +380,8 @@ reqvire:relationsSubsection a reqvire:ReservedSubsection ;
 reqvire:detailsSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Details" ;
   rdfs:comment "Narrative requirement context and clarification that remains part of the owning element." .
-reqvire:reusedContractContextSubsection a reqvire:ReservedSubsection ;
-  reqvire:subsectionName "Reused Contract Context" ;
+reqvire:contractBindingsSubsection a reqvire:ReservedSubsection ;
+  reqvire:subsectionName "Contract Bindings" ;
   rdfs:comment "Explicit cross-subgraph reuse of requirement-owned contract context." .
 reqvire:conceptReferencesSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Concept References" ;

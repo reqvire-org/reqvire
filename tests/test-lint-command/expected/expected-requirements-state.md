@@ -47,7 +47,7 @@ This is a parent requirement derived from root.
 
 ### Cross-Submodel Linked Requirement
 
-This requirement should only be modeled via reused_contract_context, not by hierarchical relation.
+This requirement should only be modeled via contract_bindings, not by hierarchical relation.
 
 #### Metadata
   * type: requirement

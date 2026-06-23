@@ -257,7 +257,7 @@ This test verifies that the system correctly normalizes element name fragments a
 
 ### Non-Reserved Subsections Content Test
 
-This test verifies that non-reserved subsections (subsections other than Relations, Details, Metadata, Reused Contract Context) are correctly included in the element's content field.
+This test verifies that non-reserved subsections (subsections other than Relations, Details, Metadata, Contract Bindings) are correctly included in the element's content field.
 
 #### Details
 
@@ -269,7 +269,7 @@ This test verifies that non-reserved subsections (subsections other than Relatio
 - Non-reserved subsections shall behave like `#### Details` (content goes into element's content field)
 
 **Reserved Subsection Behavior:**
-- Reserved subsections (Relations, Metadata, Reused Contract Context) shall NOT be included in element content
+- Reserved subsections (Relations, Metadata, Contract Bindings) shall NOT be included in element content
 - `#### Details` subsection header and its content shall be included in element content
 
 **Format Command:**

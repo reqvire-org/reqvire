@@ -33,9 +33,9 @@ pub struct ModelCentricElement {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size_estimate: Option<SizeEstimate>,
     pub relations: Vec<ModelCentricRelation>,
-    pub reused_contract_context: Vec<String>,
+    pub contract_bindings: Vec<String>,
     #[serde(skip)]
-    pub reused_contract_context_labels: Vec<String>,
+    pub contract_bindings_labels: Vec<String>,
 }
 
 /// Relation in model-centric view with target details
@@ -341,21 +341,21 @@ fn build_element_recursive(
 
     // Relations are already sorted from sorted_relations above
 
-    // Build reused_contract_context list
-    let reused_contract_context: Vec<String> = element
-        .reused_contract_context
+    // Build contract_bindings list
+    let contract_bindings: Vec<String> = element
+        .contract_bindings
         .iter()
         .map(|a| a.target.as_str())
         .collect();
-    let reused_contract_context_labels: Vec<String> = element
-        .reused_contract_context
+    let contract_bindings_labels: Vec<String> = element
+        .contract_bindings
         .iter()
         .map(|a| {
             let target_id = a.target.as_str();
             registry
                 .get_element(&target_id)
                 .map(|target| target.name.clone())
-                .unwrap_or_else(|| reused_contract_context_target_label(&target_id))
+                .unwrap_or_else(|| contract_bindings_target_label(&target_id))
         })
         .collect();
 
@@ -367,12 +367,12 @@ fn build_element_recursive(
         file_order_index: element.file_order_index,
         size_estimate: element.size_estimate.clone(),
         relations,
-        reused_contract_context,
-        reused_contract_context_labels,
+        contract_bindings,
+        contract_bindings_labels,
     })
 }
 
-fn reused_contract_context_target_label(target: &str) -> String {
+fn contract_bindings_target_label(target: &str) -> String {
     let fragment_or_path = target.rsplit('#').next().unwrap_or(target);
     let basename = fragment_or_path
         .rsplit('/')
@@ -492,7 +492,7 @@ struct MmdNode {
     identifier: String,
     name: String,
     element_type: String,
-    reused_contract_context: Vec<String>,
+    contract_bindings: Vec<String>,
 }
 
 fn generate_model_mmd_text(
@@ -510,8 +510,8 @@ fn generate_model_mmd_text(
 
     let discovered_nodes: Vec<MmdNode> = nodes.values().cloned().collect();
     for node in discovered_nodes {
-        for reused_context_id in &node.reused_contract_context {
-            if let Some(target) = registry.get_element(reused_context_id) {
+        for bound_context_id in &node.contract_bindings {
+            if let Some(target) = registry.get_element(bound_context_id) {
                 insert_mmd_node(
                     &mut nodes,
                     &mut node_order,
@@ -519,16 +519,16 @@ fn generate_model_mmd_text(
                         identifier: target.identifier.clone(),
                         name: target.name.clone(),
                         element_type: target.element_type.as_str().to_string(),
-                        reused_contract_context: target
-                            .reused_contract_context
+                        contract_bindings: target
+                            .contract_bindings
                             .iter()
-                            .map(|reused_contract_context| reused_contract_context.target.as_str())
+                            .map(|contract_bindings| contract_bindings.target.as_str())
                             .collect(),
                     },
                 );
                 edges.insert((
                     node.identifier.clone(),
-                    "reuses contract".to_string(),
+                    "binds contract".to_string(),
                     target.identifier.clone(),
                 ));
             }
@@ -596,7 +596,7 @@ fn collect_mmd_nodes_and_edges(
             identifier: element.identifier.clone(),
             name: element.name.clone(),
             element_type: element.element_type.clone(),
-            reused_contract_context: element.reused_contract_context.clone(),
+            contract_bindings: element.contract_bindings.clone(),
         },
     );
 
@@ -619,7 +619,7 @@ fn collect_mmd_nodes_and_edges(
                         identifier: target_id.clone(),
                         name: path.clone(),
                         element_type: "file".to_string(),
-                        reused_contract_context: Vec::new(),
+                        contract_bindings: Vec::new(),
                     },
                 );
                 edges.insert((
@@ -637,7 +637,7 @@ fn collect_mmd_nodes_and_edges(
                         identifier: target_id.clone(),
                         name: url.clone(),
                         element_type: "external".to_string(),
-                        reused_contract_context: Vec::new(),
+                        contract_bindings: Vec::new(),
                     },
                 );
                 edges.insert((
@@ -816,12 +816,12 @@ fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> 
                 let elem_id = hash_identifier(&elem.identifier);
                 let elem_class = get_element_class(&elem.element_type);
 
-                // Build label with reused_contract_context
+                // Build label with contract_bindings
                 let mut elem_label = escape_label(&elem.name);
-                for reused_contract_context in &elem.reused_contract_context_labels {
+                for contract_bindings in &elem.contract_bindings_labels {
                     elem_label.push_str(&format!(
                         "<br/>📎 {}",
-                        escape_label(reused_contract_context)
+                        escape_label(contract_bindings)
                     ));
                 }
 

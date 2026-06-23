@@ -318,9 +318,9 @@ assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_TestNoSectionHeader.md
 # Test 8.3: File with section header but no page header
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_TestNoPageHeader.md" TestNoPageHeader.md "TestNoPageHeader.md does not match expected output (page header not added)"
 
-# Test 9: ReusedContractContextEntry Display Name Preservation
-# Test 9.1: Verify reused_contract_context with human-readable display name is preserved
-assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_ReusedContractContextTest.md" ReusedContractContextTest.md "ReusedContractContextTest.md does not match expected output (reused contract context display name not preserved)"
+# Test 9: ContractBindingEntry Display Name Preservation
+# Test 9.1: Verify contract_bindings with human-readable display name is preserved
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_ContractBindingTest.md" ContractBindingTest.md "ContractBindingTest.md does not match expected output (contract bindings display name not preserved)"
 
 # No cleanup needed - temporary directory will be deleted
 exit 0

@@ -308,25 +308,25 @@ assert_invalid_contract_relations_rejected "state" "Invalid State With Relations
 assert_invalid_contract_relations_rejected "input-output" "Invalid Input Output With Relations"
 
 # ==================================
-# Test 12: ReusedContractContextEntry Identifier to Contract Element
+# Test 12: ContractBindingEntry Identifier to Contract Element
 # ==================================
-echo "Test 12: ReusedContractContextEntry identifier to Contract element..."
+echo "Test 12: ContractBindingEntry identifier to Contract element..."
 
 # Remove invalid file for this test
 rm -f "$TEST_DIR/specifications/InvalidContract.md"
 
-# Create a second cross-file reused_contract_context reference to validate multi-file CRUD update behavior
+# Create a second cross-file contract_bindings reference to validate multi-file CRUD update behavior
 cat > "$TEST_DIR/specifications/AdditionalRequirements.md" <<'EOF'
 # Elements
 
-### Additional Requirement With Contract ReusedContractContextEntry
+### Additional Requirement With Contract ContractBindingEntry
 
 This additional requirement references the same contract from a separate file.
 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Test Constraint Element](Requirements.md#test-constraint-element)
 
 #### Relations
@@ -334,7 +334,7 @@ This additional requirement references the same contract from a separate file.
 ---
 EOF
 
-# Verify reused_contract_context parsing
+# Verify contract_bindings parsing
 set +e
 FULL_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
 JSON_EXIT=$?
@@ -346,17 +346,17 @@ if [ $JSON_EXIT -ne 0 ]; then
   exit 1
 fi
 
-# Check reused_contract_context exists on "Requirement With Contract ReusedContractContextEntry"
-ATTACHMENTS=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "Requirement With Contract ReusedContractContextEntry") | .reused_contract_context')
+# Check contract_bindings exists on "Requirement With Contract ContractBindingEntry"
+ATTACHMENTS=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "Requirement With Contract ContractBindingEntry") | .contract_bindings')
 if [ "$ATTACHMENTS" == "null" ] || [ "$ATTACHMENTS" == "[]" ]; then
-  echo "FAILED: ReusedContractContextEntry not found on Requirement With Contract ReusedContractContextEntry"
+  echo "FAILED: ContractBindingEntry not found on Requirement With Contract ContractBindingEntry"
   exit 1
 fi
 
 # ==================================
-# Test 13: Rename Contract Element Updates ReusedContractContextEntry Identifiers
+# Test 13: Rename Contract Element Updates ContractBindingEntry Identifiers
 # ==================================
-echo "Test 13: Rename Contract element updates reused_contract_context identifiers..."
+echo "Test 13: Rename Contract element updates contract_bindings identifiers..."
 
 # Rename the constraint element
 set +e
@@ -370,19 +370,19 @@ if [ $RENAME_EXIT -ne 0 ]; then
   exit 1
 fi
 
-# Verify the reused_contract_context identifier was updated
+# Verify the contract_bindings identifier was updated
 FILE_CONTENT=$(cat "$TEST_DIR/specifications/Requirements.md")
 if ! echo "$FILE_CONTENT" | grep -q "#renamed-constraint"; then
-  echo "FAILED: ReusedContractContextEntry identifier not updated after rename"
+  echo "FAILED: ContractBindingEntry identifier not updated after rename"
   echo "File content:"
   echo "$FILE_CONTENT"
   exit 1
 fi
 
-# Verify all referencing files were updated (cross-file reused_contract_context target update)
+# Verify all referencing files were updated (cross-file contract_bindings target update)
 ADDITIONAL_FILE_CONTENT=$(cat "$TEST_DIR/specifications/AdditionalRequirements.md")
 if ! echo "$ADDITIONAL_FILE_CONTENT" | grep -q "Requirements.md#renamed-constraint"; then
-  echo "FAILED: Cross-file reused_contract_context identifier not updated after rename"
+  echo "FAILED: Cross-file contract_bindings identifier not updated after rename"
   echo "AdditionalRequirements.md content:"
   echo "$ADDITIONAL_FILE_CONTENT"
   exit 1
@@ -413,9 +413,9 @@ if [ $RENAME_EXIT -ne 0 ]; then
 fi
 
 # ==================================
-# Test 14: Move Contract Element Updates ReusedContractContextEntry Identifiers
+# Test 14: Move Contract Element Updates ContractBindingEntry Identifiers
 # ==================================
-echo "Test 14: Move Contract element updates reused_contract_context identifiers..."
+echo "Test 14: Move Contract element updates contract_bindings identifiers..."
 
 # Create a new file to move to
 cat > "$TEST_DIR/specifications/Contracts.md" <<'EOF'
@@ -434,11 +434,11 @@ if [ $MOVE_EXIT -ne 0 ]; then
   exit 1
 fi
 
-# Verify the reused_contract_context identifier was updated with the new file path
+# Verify the contract_bindings identifier was updated with the new file path
 # Note: The markdown output uses relative paths, so we check for Contracts.md (not specifications/Contracts.md)
 FILE_CONTENT=$(cat "$TEST_DIR/specifications/Requirements.md")
 if ! echo "$FILE_CONTENT" | grep -q "Contracts.md#test-constraint-element"; then
-  echo "FAILED: ReusedContractContextEntry identifier not updated after move"
+  echo "FAILED: ContractBindingEntry identifier not updated after move"
   echo "File content:"
   echo "$FILE_CONTENT"
   exit 1
@@ -446,7 +446,7 @@ fi
 
 ADDITIONAL_FILE_CONTENT=$(cat "$TEST_DIR/specifications/AdditionalRequirements.md")
 if ! echo "$ADDITIONAL_FILE_CONTENT" | grep -q "Contracts.md#test-constraint-element"; then
-  echo "FAILED: Cross-file reused_contract_context identifier not updated after move"
+  echo "FAILED: Cross-file contract_bindings identifier not updated after move"
   echo "AdditionalRequirements.md content:"
   echo "$ADDITIONAL_FILE_CONTENT"
   exit 1

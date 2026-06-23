@@ -84,7 +84,7 @@ The system shall remove duplicate entries within the same subsection during form
 #### Details
 A behavior defines the detailed deduplication rules.
 
-This operation only removes within-section duplicates (entries repeated in the same Relations or Reused Contract Context subsection). Cross-section duplicates are semantic errors that require user resolution.
+This operation only removes within-section duplicates (entries repeated in the same Relations or Contract Bindings subsection). Cross-section duplicates are semantic errors that require user resolution.
 
 #### Metadata
   * type: requirement

@@ -108,15 +108,15 @@ Some details.
   * verify: [Some Requirement](#some-requirement)
 ```
 
-## Reused Contract Context Subsection
+## Contract Bindings Subsection
 
-Must be defined with a level 4 header: `#### Reused Contract Context`.
+Must be defined with a level 4 header: `#### Contract Bindings`.
 
-The Reused Contract Context subsection links a requirement to explicit reusable contract context from another subgraph. Reused contract context does not provide ontology context. SKOS concept bindings belong in `#### Concept References`; semantic-contract ontology dependencies belong in `use`/`usedBy` relations.
+The Contract Bindings subsection links a requirement to explicit reusable contract context from another subgraph. Reused contract context does not provide ontology context. SKOS concept bindings belong in `#### Concept References`; semantic-contract ontology dependencies belong in `use`/`usedBy` relations.
 
-### Element Identifier Reused Contract Context
+### Element Identifier Contract Bindings
 
-Element identifier reused_contract_context link to model elements that are reusable under the Reqvire relation and reused_contract_context compatibility model.
+Element identifier contract_bindings link to model elements that are reusable under the Reqvire relation and contract_bindings compatibility model.
 
 **Parsing Rules:**
 - Support markdown link syntax with fragment identifiers: `* [Element Name](path#element-id)`
@@ -127,11 +127,11 @@ Element identifier reused_contract_context link to model elements that are reusa
 
 **Validation Rules:**
 - Target element must exist in the model
-- Requirement reused_contract_context targets must be reusable requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` contract elements. Semantic-contract dependencies use `constrainedBy`/`constrain` and ontology `use` relations.
-- Capability, verification, contract, and requirement semantic vocabulary references use `#### Concept References`, not reused_contract_context.
+- Requirement contract_bindings targets must be reusable requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` contract elements. Semantic-contract dependencies use `constrainedBy`/`constrain` and ontology `use` relations.
+- Capability, verification, contract, and requirement semantic vocabulary references use `#### Concept References`, not contract_bindings.
 - Requirement-owned contract targets must have exactly one compatible `define` relation before they are reusable.
 - Non-reusable element identifiers are rejected with a validation error.
-- Redundant same-hierarchy reused_contract_context and invalid cross-subgraph reused_contract_context flow are rejected by reused_contract_context validation.
+- Redundant same-hierarchy contract_bindings and invalid cross-subgraph contract_bindings flow are rejected by contract_bindings validation.
 
 **Examples:**
 ```markdown
@@ -139,7 +139,7 @@ Element identifier reused_contract_context link to model elements that are reusa
 
 The system shall expose an API contract.
 
-#### Reused Contract Context
+#### Contract Bindings
 * [Reusable Payload Shape](Contracts.md#reusable-payload-shape)
 ```
 

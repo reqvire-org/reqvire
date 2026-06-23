@@ -1,0 +1,8 @@
+
+❌ 3 validation failed with error(s):
+
+  1. Invalid contract_bindings scope: 'Spec-1' cannot be bound to 'User Req A With ContractBindingEntry' because it is within the contract's defining hierarchy. Contract Bindings are only allowed from elements outside the definedBy chain. (file: specifications/TestDefiningContractBinding.md, element: User Req A With ContractBindingEntry)
+
+  2. Invalid markdown structure: Contract 'Spec-1' is owned by multiple elements: 'User Req A' and 'User Req A With ContractBindingEntry'. Each contract can only be owned by one requirement via definedBy; contracts are requirement-owned only.
+
+  3. Cross-section duplicate: Cross-section duplicate in element 'User Req A With ContractBindingEntry': target 'specifications/Contracts.md#spec-1' appears in both Relations and Contract Bindings (file: specifications/TestDefiningContractBinding.md)

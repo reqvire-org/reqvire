@@ -89,7 +89,7 @@ This is an input-output contract that describes payload structure and data contr
 
 ### Separate Branch Capability
 
-A separate capability hierarchy for testing reused_contract_context.
+A separate capability hierarchy for testing contract_bindings.
 
 #### Metadata
   * type: capability
@@ -100,7 +100,7 @@ A separate capability hierarchy for testing reused_contract_context.
 
 ### Separate Branch Requirement
 
-A separate requirement hierarchy for testing reused_contract_context.
+A separate requirement hierarchy for testing contract_bindings.
 
 #### Metadata
   * type: requirement
@@ -109,14 +109,14 @@ A separate requirement hierarchy for testing reused_contract_context.
   * specify: [Separate Branch Capability](#separate-branch-capability)
 ---
 
-### Requirement With Contract ReusedContractContextEntry
+### Requirement With Contract ContractBindingEntry
 
-This requirement has a Contract element reused to it.
+This requirement has a Contract element bound to it.
 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Test Constraint Element](#test-constraint-element)
 
 #### Relations

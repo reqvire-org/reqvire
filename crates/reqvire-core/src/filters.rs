@@ -11,8 +11,8 @@ pub struct Filters {
     content_re: Option<Regex>,
     not_verified: bool,
     not_satisfied: bool,
-    has_reused_contract_context: bool,
-    reused_contract_context_glob: Option<GlobMatcher>,
+    has_contract_bindings: bool,
+    contract_bindings_glob: Option<GlobMatcher>,
 }
 
 impl Filters {
@@ -25,8 +25,8 @@ impl Filters {
         content: Option<&str>,
         is_not_verified: bool,
         is_not_satisfied: bool,
-        has_reused_contract_context: bool,
-        reused_contract_context: Option<&str>,
+        has_contract_bindings: bool,
+        contract_bindings: Option<&str>,
     ) -> Result<Self, ReqvireError> {
         fn compile_glob(pat: &str) -> Result<GlobMatcher, ReqvireError> {
             let glob = Glob::new(pat)
@@ -58,7 +58,7 @@ impl Filters {
             Some(r) => Some(Regex::new(r).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))?),
             None => None,
         };
-        let reused_contract_context_glob = reused_contract_context.map(compile_glob).transpose()?;
+        let contract_bindings_glob = contract_bindings.map(compile_glob).transpose()?;
 
         Ok(Filters {
             file_glob,
@@ -67,8 +67,8 @@ impl Filters {
             content_re,
             not_verified: is_not_verified,
             not_satisfied: is_not_satisfied,
-            has_reused_contract_context,
-            reused_contract_context_glob,
+            has_contract_bindings,
+            contract_bindings_glob,
         })
     }
 
@@ -134,17 +134,17 @@ impl Filters {
         if self.not_satisfied && satisfied_count > 0 {
             return false;
         }
-        // 8) has_reused_contract_context: only include elements that have at least one reused_contract_context
-        if self.has_reused_contract_context && e.reused_contract_context.is_empty() {
+        // 8) has_contract_bindings: only include elements that have at least one contract_bindings
+        if self.has_contract_bindings && e.contract_bindings.is_empty() {
             return false;
         }
-        // 9) reused_contract_context_glob: only include elements with reused_contract_context matching the glob
-        if let Some(g) = &self.reused_contract_context_glob {
-            let has_matching_reused_context = e
-                .reused_contract_context
+        // 9) contract_bindings_glob: only include elements with contract_bindings matching the glob
+        if let Some(g) = &self.contract_bindings_glob {
+            let has_matching_contract_binding = e
+                .contract_bindings
                 .iter()
                 .any(|a| g.is_match(a.target.as_str().as_str()));
-            if !has_matching_reused_context {
+            if !has_matching_contract_binding {
                 return false;
             }
         }

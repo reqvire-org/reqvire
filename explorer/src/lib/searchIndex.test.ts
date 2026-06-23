@@ -38,13 +38,13 @@ const documents: ProjectSearchDocument[] = [
     text: "The --output option writes JSON content to the specified file path.",
   },
   {
-    id: "system-model/Functional/Core/Verifications/ReusedContractContextVerifications.md#reuse-command-verification",
+    id: "system-model/Functional/Core/Verifications/ContractBindingVerifications.md#reuse-command-verification",
     kind: "element",
     displayKind: "element",
     elementType: "test-verification",
     title: "Reuse Command Verification",
-    route: "#/elements/system-model/Functional/Core/Verifications/ReusedContractContextVerifications.md#reuse-command-verification",
-    text: "test-verification for reused_contract_context behavior.",
+    route: "#/elements/system-model/Functional/Core/Verifications/ContractBindingVerifications.md#reuse-command-verification",
+    text: "test-verification for contract_bindings behavior.",
   },
   {
     id: "system-model/Ontologies/Core.md",

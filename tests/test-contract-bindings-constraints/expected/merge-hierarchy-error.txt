@@ -1,0 +1,1 @@
+error: Invalid contract_bindings scope: 'Spec-1' cannot be bound to 'Req B' because it is within the contract's defining hierarchy. Contract Bindings are only allowed from elements outside the definedBy chain.

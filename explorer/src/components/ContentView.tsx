@@ -1,8 +1,28 @@
-import { DocumentPanel, RendererNotice, type DetailConceptReferenceItem } from "@ds";
+import { useEffect, useMemo } from "react";
+import {
+  ConceptElementDetailContent,
+  DocumentPanel,
+  ElementDetailContent,
+  RendererNotice,
+  SourcePageElement,
+  SourcePageElements,
+  type DetailConceptReferenceItem,
+  type DetailContractBindingItem,
+} from "@ds";
 import { useStore } from "../store/StoreContext";
+import type { ProjectStoreElement } from "../store/types";
 import { MarkdownContent, stripConceptReferencesSection } from "./MarkdownContent";
-import { routeForElement, routeForView } from "../router/routes";
+import { routeForView } from "../router/routes";
 import { SourceCodePreview } from "./SourceCodePreview";
+import {
+  buildConceptElementDetail,
+  buildMetaBadges,
+  contractBindingsDisplayTarget,
+  isDetailRelationItem,
+  isPromotedConceptRelation,
+  relationFlowFromSelectedElement,
+  sourceAnchorRoute,
+} from "./ElementDetailModal";
 
 interface ContentViewProps {
   path: string;
@@ -16,6 +36,13 @@ export function ContentView({ path }: ContentViewProps) {
     (resource) => resource.file_path === filePath || resource.target === filePath,
   );
   const sourcePath = sourceResource?.file_path ?? sourceResource?.target ?? filePath;
+
+  useEffect(() => {
+    if (!fragmentId) return;
+    window.requestAnimationFrame(() => {
+      document.getElementById(fragmentId)?.scrollIntoView({ block: "start" });
+    });
+  }, [fragmentId, filePath]);
 
   if (!file) {
     if (sourceResource?.source_text) {
@@ -55,54 +82,178 @@ export function ContentView({ path }: ContentViewProps) {
     );
   }
 
-  const conceptReferences = conceptReferencesForFile(file.element_ids, store, elementById);
+  const elements = file.element_ids.map((id) => elementById(id)).filter(isProjectStoreElement);
 
   return (
     <DocumentPanel toolbar={contentToolbar(file.path)}>
-      <MarkdownContent
-        markdown={stripConceptReferencesSection(file.markdown_content)}
-        sourceFilePath={file.path}
-        sourceAnchor={fragmentId ? `#/content/${file.path}#${fragmentId}` : `#/content/${file.path}`}
-        scrollToAnchor={fragmentId}
-        conceptReferences={conceptReferences}
-        onOpenConceptReference={(reference) => {
-          if (reference.elementId) {
-            window.location.hash = routeForElement(reference.elementId);
-          }
-        }}
-      />
+      <SourcePageElements>
+        {elements.map((element) => (
+          <SourceElementView key={element.id} element={element} />
+        ))}
+      </SourcePageElements>
     </DocumentPanel>
   );
 }
 
-function conceptReferencesForFile(
-  elementIds: readonly string[],
-  store: ReturnType<typeof useStore>["store"],
-  elementById: ReturnType<typeof useStore>["elementById"],
-): DetailConceptReferenceItem[] {
-  const sourceIds = new Set(elementIds);
-  return store.concept_refs
-    .filter((conceptRef) => sourceIds.has(conceptRef.source_id))
-    .map((conceptRef): DetailConceptReferenceItem => {
-      const nativeConcept = store.thesaurus.concepts.find(
-        (concept) => concept.element_id === conceptRef.target_element_id,
-      );
-      const sourceElement = elementById(conceptRef.source_id);
-      return {
-        id: `${sourceElement?.id ?? conceptRef.source_id}:${conceptRef.id}`,
-        label: conceptRef.label,
-        iri: conceptRef.iri,
-        elementId: conceptRef.target_element_id,
-        matchLabels: nativeConcept
-          ? [nativeConcept.label, ...nativeConcept.alt_labels, conceptRef.label].filter(isString)
-          : [conceptRef.label].filter(isString),
-        ontologyLabel: nativeConcept?.label,
-      };
+function SourceElementView({ element }: { element: ProjectStoreElement }) {
+  const { store, elementById } = useStore();
+  const resourceById = useMemo(
+    () => new Map(store.resources.map((resource) => [resource.id, resource])),
+    [store.resources],
+  );
+  const relations = useMemo(
+    () => store.relations.filter((relation) => relation.source_id === element.id || relation.target_id === element.id),
+    [element.id, store.relations],
+  );
+  const contractBindings = useMemo(
+    () => store.contract_bindings.filter((contractBinding) => contractBinding.source_id === element.id),
+    [element.id, store.contract_bindings],
+  );
+  const conceptRefs = useMemo(
+    () => store.concept_refs.filter((conceptRef) => conceptRef.source_id === element.id),
+    [element.id, store.concept_refs],
+  );
+  const relationItems = useMemo(
+    () =>
+      relations
+        .filter((relation) => !isPromotedConceptRelation(element, relation))
+        .map((relation) => relationFlowFromSelectedElement(relation, element.id, elementById, resourceById))
+        .filter(isDetailRelationItem),
+    [element, elementById, relations, resourceById],
+  );
+  const contractBindingItems = useMemo(
+    () =>
+      contractBindings.map((contractBinding): DetailContractBindingItem => {
+        const target = contractBindingsDisplayTarget(contractBinding, elementById, resourceById);
+        return {
+          id: contractBinding.id,
+          targetId: contractBinding.target,
+          kind: contractBinding.target_kind,
+          resourceKind: target.resourceKind,
+          label: target.label,
+          elementType: target.elementType,
+          typeFamily: target.typeFamily,
+          href: target.href,
+          external: target.external,
+        };
+      }),
+    [contractBindings, elementById, resourceById],
+  );
+  const conceptReferenceItems = useMemo(
+    () =>
+      conceptRefs.map((conceptRef): DetailConceptReferenceItem => {
+        const nativeConcept = store.thesaurus.concepts.find(
+          (concept) => concept.element_id === conceptRef.target_element_id,
+        );
+        return {
+          id: conceptRef.id,
+          label: conceptRef.label,
+          iri: conceptRef.iri,
+          elementId: conceptRef.target_element_id,
+          matchLabels: nativeConcept
+            ? [nativeConcept.label, ...nativeConcept.alt_labels, conceptRef.label]
+            : [conceptRef.label].filter(isString),
+          ontologyLabel: nativeConcept?.label,
+        };
+      }),
+    [conceptRefs, store.thesaurus.concepts],
+  );
+  const conceptDetail = useMemo(() => {
+    if (element.element_type !== "concept" && element.element_type !== "concept-scheme") return null;
+    return buildConceptElementDetail({
+      element,
+      elements: store.elements,
+      ontologyNodes: store.ontology.graph_data?.nodes ?? [],
+      ontologyEdges: store.ontology.graph_data?.edges ?? [],
+      conceptRefs: store.concept_refs,
+      elementById,
     });
+  }, [element, elementById, store.concept_refs, store.elements, store.ontology.graph_data?.edges, store.ontology.graph_data?.nodes]);
+
+  const openElement = (id: string) => {
+    const target = elementById(id);
+    if (!target) return;
+    window.location.hash = sourceAnchorRoute(target.source_anchor, target.file_path);
+  };
+  const openResource = (href: string) => {
+    window.location.hash = href;
+  };
+
+  return (
+    <SourcePageElement
+      id={elementAnchorId(element)}
+      title={element.name}
+      elementType={element.element_type}
+      typeFamily={element.type_family}
+    >
+      {conceptDetail ? (
+        <ConceptElementDetailContent
+          metaBadges={buildMetaBadges(element)}
+          definition={
+            <MarkdownContent
+              markdown={conceptDetail.definition || element.content}
+              sourceFilePath={element.file_path}
+              sourceAnchor={sourceAnchorRoute(element.source_anchor, element.file_path)}
+            />
+          }
+          scheme={conceptDetail.scheme}
+          altLabels={conceptDetail.altLabels}
+          scopeNote={conceptDetail.scopeNote}
+          examples={conceptDetail.examples}
+          topConcepts={conceptDetail.topConcepts}
+          broader={conceptDetail.broader}
+          narrower={conceptDetail.narrower}
+          related={conceptDetail.related}
+          exactMatches={conceptDetail.exactMatches}
+          closeMatches={conceptDetail.closeMatches}
+          mappedOntologyTerms={conceptDetail.mappedOntologyTerms}
+          usedByModel={conceptDetail.usedByModel}
+          relations={relationItems}
+          contract_bindings={contractBindingItems}
+          conceptReferences={conceptReferenceItems}
+          detailListsDefaultExpanded={false}
+          onOpenElement={openElement}
+          onOpenConceptReference={(reference) => {
+            if (reference.elementId) openElement(reference.elementId);
+          }}
+          onOpenResource={openResource}
+        />
+      ) : (
+        <ElementDetailContent
+          metaBadges={buildMetaBadges(element)}
+          content={
+            <MarkdownContent
+              markdown={stripConceptReferencesSection(element.content)}
+              sourceFilePath={element.file_path}
+              sourceAnchor={sourceAnchorRoute(element.source_anchor, element.file_path)}
+              conceptReferences={conceptReferenceItems}
+              onOpenConceptReference={(reference) => {
+                if (reference.elementId) openElement(reference.elementId);
+              }}
+            />
+          }
+          relations={relationItems}
+          contract_bindings={contractBindingItems}
+          detailListsDefaultExpanded={false}
+          onOpenElement={openElement}
+          onOpenResource={openResource}
+        />
+      )}
+    </SourcePageElement>
+  );
 }
 
 function isString(value: string | undefined): value is string {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function isProjectStoreElement(value: ProjectStoreElement | undefined): value is ProjectStoreElement {
+  return Boolean(value);
+}
+
+function elementAnchorId(element: ProjectStoreElement) {
+  const hashIndex = element.id.indexOf("#");
+  return hashIndex === -1 ? element.id : element.id.slice(hashIndex + 1);
 }
 
 function contentToolbar(filePath: string, label = "Source page") {

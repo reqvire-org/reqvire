@@ -37,7 +37,7 @@ Implementation details shall follow the associated contract specifications.
   * derive: [CLI Traces Command](#cli-traces-command)
   * derive: [Explicit Workspace Selection](#explicit-workspace-selection)
   * derive: [Format Command](#format-command)
-  * derive: [Reused Contract Context Commands](#reused-contract-context-commands)
+  * derive: [Contract Bindings Commands](#contract-bindings-commands)
   * derive: [Validate Command](#validate-command)
   * derivedFrom: [CLI interface](../InterfacesRequirements.md#cli-interface)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
@@ -53,7 +53,7 @@ Implementation details shall follow the associated contract specifications. Onto
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
@@ -62,8 +62,8 @@ Implementation details shall follow the associated contract specifications. Onto
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Create Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#create-element-workflow-specification)
-  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
-  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
 
 #### Relations
   * definedBy: [CLI Add Element Command Contract Specification](Specifications.md#cli-add-element-command-contract-specification)
@@ -101,7 +101,7 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Text Output Formatting](../../Reports/ModelReports/Specifications.md#text-output-formatting)
   * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
@@ -127,7 +127,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
   * [Collect Output Format Specification](../../Reports/ModelReports/Specifications.md#collect-output-format-specification)
 
@@ -159,7 +159,7 @@ The markdown output shall include:
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
   * [ContainmentView](../WebExplorer/ContainmentView.md#containmentview)
@@ -183,7 +183,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Verification Type Selection Guidelines](../../ModelStructure/Specifications.md#verification-type-selection-guidelines)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Implementation Coverage Output Structure Specification](../../Reports/ModelReports/Specifications.md#implementation-coverage-output-structure-specification)
@@ -240,7 +240,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
@@ -264,13 +264,13 @@ Implementation details shall follow the associated contract specifications. Onto
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Merge Content Transformation Behavior](../../Operations/ModelOperations/Behaviors.md#merge-content-transformation-behavior)
   * [Merge Type Compatibility Constraint](../../Operations/ModelOperations/Constraints.md#merge-type-compatibility-constraint)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Merge Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#merge-element-workflow-specification)
-  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
-  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
 
 #### Relations
   * definedBy: [CLI Merge Element Command Contract Specification](Specifications.md#cli-merge-element-command-contract-specification)
@@ -288,7 +288,7 @@ Implementation details shall follow the associated contract specifications. The 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
@@ -313,7 +313,7 @@ Implementation details shall follow the associated contract specifications. The 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
   * [Model Diagram Output Formats Contract Specification](../../Reports/ModelReports/Specifications.md#model-diagram-output-formats-contract-specification)
@@ -340,7 +340,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -350,7 +350,7 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [CLI Move Asset Command Contract Specification](Specifications.md#cli-move-asset-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [Move Asset Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#move-asset-command-verification)
+  * verifiedBy: [Move Asset Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#move-asset-command-verification)
 ---
 
 ### CLI Move Element Command
@@ -363,7 +363,7 @@ The command shall reject moving an element into an existing `# Element` file whe
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
@@ -390,7 +390,7 @@ The command shall reject `mv-file --squash` when the target file is an existing 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
@@ -415,7 +415,7 @@ The semantic export commands shall:
 - `semantic ontologies`: emit generated ontology document declarations plus authored OWL/RDF ontology vocabulary, with optional used external ontology subset inclusion.
 - `semantic shapes`: emit semantic-contract SHACL shapes only.
 - `semantic concepts`: emit SKOS concept scheme/thesaurus triples only, with optional `--include-mappings` for `reqvire:mapsToConcept` bridge triples.
-- `semantic graph`: emit the combined semantic graph; `--full` includes RDF triples for Reqvire model elements, relations, reused_contract_context, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts.
+- `semantic graph`: emit the combined semantic graph; `--full` includes RDF triples for Reqvire model elements, relations, contract_bindings, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts.
 - `concepts export`: emit generated SKOS concept scheme/thesaurus triples from standalone `concept-scheme` roots, with optional `--include-mappings` for valid `reqvire:mapsToConcept` bridge triples.
 - `concepts validate`: validate standalone concept schemes, concept references, and `reqvire:mapsToConcept` bridge targets through the same model validation path.
 - Support `--include-external` on ontology and graph exports to include only the used external subset derived from local or built-in ontology dependency sources.
@@ -427,7 +427,7 @@ The semantic export commands shall:
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
 
@@ -450,7 +450,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Atomic Relation Relink Workflow Specification](../../Operations/ModelOperations/Specifications.md#atomic-relation-relink-workflow-specification)
   * [Atomic Relink Validity Constraint](../../Operations/ModelOperations/Constraints.md#atomic-relink-validity-constraint)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -473,7 +473,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -483,7 +483,7 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [CLI Remove Asset Command Contract Specification](Specifications.md#cli-remove-asset-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [Remove Asset Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#remove-asset-command-verification)
+  * verifiedBy: [Remove Asset Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#remove-asset-command-verification)
 ---
 
 ### CLI Remove Element Command
@@ -496,7 +496,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -520,7 +520,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -535,7 +535,7 @@ Implementation details shall follow the associated contract specifications.
 
 ### CLI Resources Command
 
-The system shall provide a `resources` command that generates a report showing all files referenced by the model through relations and reused_contract_context.
+The system shall provide a `resources` command that generates a report showing all files referenced by the model through relations and contract_bindings.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -560,7 +560,7 @@ Implementation details shall follow the associated contract specifications. Sear
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
@@ -573,7 +573,7 @@ Implementation details shall follow the associated contract specifications. Sear
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
-  * verifiedBy: [Reused Contract Context Search Filters Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-search-filters-verification)
+  * verifiedBy: [Contract Bindings Search Filters Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-search-filters-verification)
   * verifiedBy: [Search Command Tests](../../Verifications/Reports/ModelReports/ReportingVerifications.md#search-command-tests)
 ---
 
@@ -613,7 +613,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
 
@@ -635,7 +635,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
   * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
@@ -678,7 +678,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Validation Error Reporting Behavior](../../Operations/Validation/Behaviors.md#validation-error-reporting-behavior)
 
 #### Relations
@@ -701,7 +701,7 @@ The system shall allow command invocations to select the Reqvire workspace expli
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
 
 #### Relations
@@ -721,7 +721,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
@@ -738,7 +738,7 @@ Implementation details shall follow the associated contract specifications.
 
 ### Relation Commands
 
-The system shall provide unified CLI commands for relation and reused_contract_context management: link and unlink.
+The system shall provide unified CLI commands for relation and contract_bindings management: link and unlink.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -746,7 +746,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Relation Operations Specification](../../ModelStructure/Specifications.md#relation-operations-specification)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -760,28 +760,28 @@ Implementation details shall follow the associated contract specifications.
   * verifiedBy: [Unlink Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#unlink-command-verification)
 ---
 
-### Reused Contract Context Commands
+### Contract Bindings Commands
 
-The system shall provide reused_contract_context management through the unified link/unlink commands using the 'reusesContract' keyword.
+The system shall provide contract_bindings management through the unified link/unlink commands using the 'bindContract' keyword.
 
 #### Details
-Reused Contract Context management behavior:
+Contract Bindings management behavior:
 
-**Reuse (via link):**
-- Syntax: `reqvire link <element-name> reusesContract <target> [--dry-run] [--json] [--output <FILE>]`
+**Bind contract (via link):**
+- Syntax: `reqvire link <element-name> bindContract <target> [--dry-run] [--json] [--output <FILE>]`
 - Target: Contract element identifier
-- Create Reused Contract Context subsection if doesn't exist
+- Create Contract Bindings subsection if doesn't exist
 - Add link to subsection with format `* [display-name](file.md#contract-id)`
-- Skip if already reused (idempotent)
-- Support many-to-many (same reused_contract_context to multiple elements)
+- Skip if already bound (idempotent)
+- Support many-to-many (same contract to multiple elements)
 - Support dry-run mode for preview
 - Support structured JSON output and JSON file output
 
-**Remove Reused Context (via unlink):**
+**Remove Contract Binding (via unlink):**
 - Syntax: `reqvire unlink <element-name> <target> [--dry-run] [--json] [--output <FILE>]`
-- Auto-detects whether target is relation or reused_contract_context
-- Remove link from Reused Contract Context subsection
-- Remove subsection if no reused_contract_context remain
+- Auto-detects whether target is relation or contract_bindings
+- Remove link from Contract Bindings subsection
+- Remove subsection if no contract_bindings remain
 - Trigger change impact on element
 - Support dry-run mode for preview
 - Support structured JSON output and JSON file output
@@ -789,21 +789,21 @@ Reused Contract Context management behavior:
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
-  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
 
 #### Relations
-  * definedBy: [Reused Contract Context Input Auto-Detection Behavior](Behaviors.md#reused-contract-context-input-auto-detection-behavior)
+  * definedBy: [Contract Bindings Input Auto-Detection Behavior](Behaviors.md#contract-bindings-input-auto-detection-behavior)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
-  * verifiedBy: [Remove Reused Context Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#remove-reused-context-command-verification)
-  * verifiedBy: [Reuse Command Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reuse-command-verification)
+  * verifiedBy: [Remove Contract Binding Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#remove-contract-binding-command-verification)
+  * verifiedBy: [Bind Contract Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#bind-contract-command-verification)
 ---
 
 ### Validate Command
@@ -816,13 +816,13 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Two-Pass Validation Behavior](../../Operations/Validation/Behaviors.md#two-pass-validation-behavior)
   * [Validation Error Reporting Behavior](../../Operations/Validation/Behaviors.md#validation-error-reporting-behavior)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Error Message Format Specification](Specifications.md#error-message-format-specification)
-  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
-  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
 
 #### Relations
   * definedBy: [Validate Command Contract Specification](Specifications.md#validate-command-contract-specification)

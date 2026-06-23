@@ -2,10 +2,10 @@
 
 # Test: Duplicate Detection and Removal
 # -------------------------------------------------------------------
-# This test validates duplicate detection in Relations and Reused Contract Context:
+# This test validates duplicate detection in Relations and Contract Bindings:
 # - Duplicate relations detection during parsing (add command rejects)
-# - Duplicate reused_contract_context detection during parsing (add command rejects)
-# - Cross-section duplicate detection (same target in Relations AND Reused Contract Context)
+# - Duplicate contract_bindings detection during parsing (add command rejects)
+# - Cross-section duplicate detection (same target in Relations AND Contract Bindings)
 # - Format removes within-section duplicates
 # - Format does NOT remove cross-section duplicates (validation error)
 # - Validate fails for cross-section duplicates
@@ -51,22 +51,22 @@ if ! echo "$OUTPUT" | grep -qi "duplicate.*relation"; then
 fi
 
 # =============================================================================
-# Test 2: Add command rejects duplicate reused_contract_context
+# Test 2: Add command rejects duplicate contract_bindings
 # =============================================================================
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" add "specifications/Requirements.md" < "${TEST_SCRIPT_DIR}/duplicate-reused-contract-context-input.md" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" add "specifications/Requirements.md" < "${TEST_SCRIPT_DIR}/duplicate-contract-bindings-input.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
 if [ $EXIT_CODE -eq 0 ]; then
-  echo "❌ FAILED: Add command should reject duplicate reused_contract_context"
+  echo "❌ FAILED: Add command should reject duplicate contract_bindings"
   echo "OUTPUT: $OUTPUT"
   exit 1
 fi
 
-if ! echo "$OUTPUT" | grep -qi "duplicate.*reused_contract_context"; then
-  echo "❌ FAILED: Expected 'duplicate reused_contract_context' error message"
+if ! echo "$OUTPUT" | grep -qi "duplicate.*contract_bindings"; then
+  echo "❌ FAILED: Expected 'duplicate contract_bindings' error message"
   echo "OUTPUT: $OUTPUT"
   exit 1
 fi
@@ -77,7 +77,7 @@ fi
 
 # First remove files with within-section duplicates so we can test cross-section
 rm -f "$TEST_DIR/specifications/FormatTestDuplicateRelations.md"
-rm -f "$TEST_DIR/specifications/FormatTestDuplicateReusedContractContext.md"
+rm -f "$TEST_DIR/specifications/FormatTestDuplicateContractBinding.md"
 
 set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
@@ -105,7 +105,7 @@ rm -f "$TEST_DIR/specifications/CrossSectionDuplicate.md"
 
 # Restore the files with within-section duplicates
 cp "${TEST_SCRIPT_DIR}/specifications/FormatTestDuplicateRelations.md" "$TEST_DIR/specifications/"
-cp "${TEST_SCRIPT_DIR}/specifications/FormatTestDuplicateReusedContractContext.md" "$TEST_DIR/specifications/"
+cp "${TEST_SCRIPT_DIR}/specifications/FormatTestDuplicateContractBinding.md" "$TEST_DIR/specifications/"
 
 # First ensure validate fails due to duplicate parsing errors
 set +e
@@ -162,12 +162,12 @@ This element has a single relation.
 
 EOF
 
-cat > "$TEST_DIR/specifications/FormatTestDuplicateReusedContractContext.md" << 'EOF'
+cat > "$TEST_DIR/specifications/FormatTestDuplicateContractBinding.md" << 'EOF'
 # Elements
 
-### Format Test With Duplicate Reused Contract Context
+### Format Test With Duplicate Contract Bindings
 
-This element has a single reused_contract_context.
+This element has a single contract_bindings.
 
 #### Metadata
   * type: requirement
@@ -175,7 +175,7 @@ This element has a single reused_contract_context.
 #### Relations
   * specify: [Test Capability Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-capability-test-duplicate-detection-specifications-requirements-md)
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Contract Element](Requirements.md#contract-element)
 ---
 
@@ -194,17 +194,17 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 # =============================================================================
-# Test 6: Link command rejects when target already in Reused Contract Context
+# Test 6: Link command rejects when target already in Contract Bindings
 # =============================================================================
 
-# Add an reused_contract_context to Base Requirement
+# Add a contract binding to Base Requirement
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" reusesContract "#contract-element" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" bindContract "#contract-element" 2>&1)
 EXIT_CODE=$?
 set -e
 
 if [ $EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: Link reusesContract should succeed initially"
+  echo "❌ FAILED: Link bindContract should succeed initially"
   echo "OUTPUT: $OUTPUT"
   exit 1
 fi
@@ -216,13 +216,13 @@ EXIT_CODE=$?
 set -e
 
 if [ $EXIT_CODE -eq 0 ]; then
-  echo "❌ FAILED: Link should reject when target already in Reused Contract Context"
+  echo "❌ FAILED: Link should reject when target already in Contract Bindings"
   echo "OUTPUT: $OUTPUT"
   exit 1
 fi
 
-if ! echo "$OUTPUT" | grep -qi "already.*exists.*reused_contract_context\|cross.*section"; then
-  echo "❌ FAILED: Expected error about target already in Reused Contract Context"
+if ! echo "$OUTPUT" | grep -qi "already.*exists.*contract_bindings\|cross.*section"; then
+  echo "❌ FAILED: Expected error about target already in Contract Bindings"
   echo "OUTPUT: $OUTPUT"
   exit 1
 fi

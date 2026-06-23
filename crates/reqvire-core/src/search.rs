@@ -23,8 +23,8 @@ pub struct SearchFilters {
     page_content_re: Option<Regex>,
     have_relations: Vec<String>,
     not_have_relations: Vec<String>,
-    has_reused_contract_context: bool,
-    reused_contract_context_glob: Option<GlobMatcher>,
+    has_contract_bindings: bool,
+    contract_bindings_glob: Option<GlobMatcher>,
 }
 
 impl SearchFilters {
@@ -42,8 +42,8 @@ impl SearchFilters {
         page_content: Option<&str>,
         have_relations: Option<&str>,
         not_have_relations: Option<&str>,
-        has_reused_contract_context: bool,
-        reused_contract_context: Option<&str>,
+        has_contract_bindings: bool,
+        contract_bindings: Option<&str>,
     ) -> Result<Self, ReqvireError> {
         fn compile_glob(pat: &str) -> Result<GlobMatcher, ReqvireError> {
             let glob = Glob::new(pat)
@@ -115,7 +115,7 @@ impl SearchFilters {
         let owner_re = owner_regex.map(compile_regex).transpose()?;
         let content_re = content.map(compile_regex).transpose()?;
         let page_content_re = page_content.map(compile_regex).transpose()?;
-        let reused_contract_context_glob = reused_contract_context.map(compile_glob).transpose()?;
+        let contract_bindings_glob = contract_bindings.map(compile_glob).transpose()?;
 
         // Parse and validate comma-separated relation lists
         let have_relations = if let Some(s) = have_relations {
@@ -166,8 +166,8 @@ impl SearchFilters {
             page_content_re,
             have_relations,
             not_have_relations,
-            has_reused_contract_context,
-            reused_contract_context_glob,
+            has_contract_bindings,
+            contract_bindings_glob,
         })
     }
 
@@ -297,18 +297,18 @@ impl SearchFilters {
             }
         }
 
-        // Has reused_contract_context filter - must have at least one reused_contract_context
-        if self.has_reused_contract_context && elem.reused_contract_context.is_empty() {
+        // Has contract_bindings filter - must have at least one contract_bindings
+        if self.has_contract_bindings && elem.contract_bindings.is_empty() {
             return false;
         }
 
-        // ReusedContractContextEntry glob filter - must have an reused_contract_context matching the glob
-        if let Some(g) = &self.reused_contract_context_glob {
-            let has_matching_reused_context = elem
-                .reused_contract_context
+        // ContractBindingEntry glob filter - must have a contract binding matching the glob
+        if let Some(g) = &self.contract_bindings_glob {
+            let has_matching_contract_binding = elem
+                .contract_bindings
                 .iter()
                 .any(|a| g.is_match(a.target.as_str().as_str()));
-            if !has_matching_reused_context {
+            if !has_matching_contract_binding {
                 return false;
             }
         }
@@ -357,7 +357,7 @@ struct ElementSearchResult {
     concept_references: Vec<element::ConceptReference>,
     relations: Vec<RelationSearchResult>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    reused_contract_context: Option<Vec<String>>,
+    contract_bindings: Option<Vec<String>>,
 }
 
 #[derive(Serialize)]
@@ -653,12 +653,12 @@ fn build_search_result(
                 .then_with(|| a.target.target.cmp(&b.target.target))
         });
 
-        // Build reused_contract_context list (omit in short mode)
-        let reused_contract_context = if short_mode {
+        // Build contract_bindings list (omit in short mode)
+        let contract_bindings = if short_mode {
             None
         } else {
             Some(
-                elem.reused_contract_context
+                elem.contract_bindings
                     .iter()
                     .map(|a| a.target.as_str())
                     .collect(),
@@ -707,7 +707,7 @@ fn build_search_result(
                 elem.concept_references.clone()
             },
             relations: rels,
-            reused_contract_context,
+            contract_bindings,
         };
 
         // Insert into flat file→elements map

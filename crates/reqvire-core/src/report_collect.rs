@@ -1,4 +1,4 @@
-use crate::element::{ElementType, ReusedContractContextTarget};
+use crate::element::{ElementType, ContractBindingTarget};
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::relation;
@@ -37,9 +37,9 @@ pub enum SourceType {
     /// Content from a contract file (via definedBy relation)
     RefinedByFile,
     /// Content from an reused file
-    ReusedContractContextFile,
-    /// Content from an reused contract element
-    ReusedContractContextElement,
+    ContractBindingFile,
+    /// Content from an bound contract element
+    ContractBindingElement,
     /// Authored concept references and reachable semantic context
     OntologyContext,
     /// Markdown-native generated concept context
@@ -65,7 +65,7 @@ pub struct CollectedItem {
 pub struct CollectMetadata {
     pub element_count: usize,
     pub contract_count: usize,
-    pub reused_contract_context_count: usize,
+    pub contract_bindings_count: usize,
     pub ontology_count: usize,
     pub concept_context_count: usize,
     pub total_items: usize,
@@ -136,7 +136,7 @@ pub fn generate_collect_report(
     let mut items: Vec<CollectedItem> = Vec::new();
     let mut element_count = 0;
     let mut contract_count = 0;
-    let mut reused_contract_context_count = 0;
+    let mut contract_bindings_count = 0;
     let mut ontology_count = 0;
     let mut concept_context_count = 0;
     let mut collected_ontology_context: HashSet<String> = HashSet::new();
@@ -180,11 +180,11 @@ pub fn generate_collect_report(
                 }
             }
 
-            // Collect reused_contract_context contents
-            for reused_contract_context in &elem.reused_contract_context {
-                if let Some(item) = collect_reused_contract_context_content(
+            // Collect contract_bindings contents
+            for contract_bindings in &elem.contract_bindings {
+                if let Some(item) = collect_contract_bindings_content(
                     registry,
-                    reused_contract_context,
+                    contract_bindings,
                     &elem.identifier,
                     depth,
                     git_root,
@@ -195,7 +195,7 @@ pub fn generate_collect_report(
                         }
                         ontology_count += 1;
                     } else {
-                        reused_contract_context_count += 1;
+                        contract_bindings_count += 1;
                     }
                     items.push(item);
                 }
@@ -254,12 +254,12 @@ pub fn generate_collect_report(
         metadata: CollectMetadata {
             element_count,
             contract_count,
-            reused_contract_context_count,
+            contract_bindings_count,
             ontology_count,
             concept_context_count,
             total_items: element_count
                 + contract_count
-                + reused_contract_context_count
+                + contract_bindings_count
                 + ontology_count
                 + concept_context_count,
         },
@@ -689,16 +689,16 @@ fn find_owning_capability(registry: &GraphRegistry, requirement_id: &str) -> Opt
     None
 }
 
-/// Collect content from an reused_contract_context
-fn collect_reused_contract_context_content(
+/// Collect content from a contract binding
+fn collect_contract_bindings_content(
     registry: &GraphRegistry,
-    reused_contract_context: &crate::element::ReusedContractContextEntry,
+    contract_bindings: &crate::element::ContractBindingEntry,
     parent_identifier: &str,
     depth: usize,
     git_root: &Path,
 ) -> Option<CollectedItem> {
-    match &reused_contract_context.target {
-        ReusedContractContextTarget::FilePath(path) => {
+    match &contract_bindings.target {
+        ContractBindingTarget::FilePath(path) => {
             let full_path = git_root.join(path);
             let path_str = path.to_string_lossy().to_string();
 
@@ -713,10 +713,10 @@ fn collect_reused_contract_context_content(
                             .unwrap_or_else(|| path_str.clone()),
                         identifier: path_str,
                         file_path: path.to_string_lossy().to_string(),
-                        element_type: "reused_contract_context".to_string(),
+                        element_type: "contract_bindings".to_string(),
                         content,
                         depth,
-                        source_type: SourceType::ReusedContractContextFile,
+                        source_type: SourceType::ContractBindingFile,
                         reused_by: Some(parent_identifier.to_string()),
                     }),
                     Err(_) => {
@@ -728,10 +728,10 @@ fn collect_reused_contract_context_content(
                                 .unwrap_or_else(|| path_str.clone()),
                             identifier: path_str.clone(),
                             file_path: path.to_string_lossy().to_string(),
-                            element_type: "reused_contract_context".to_string(),
+                            element_type: "contract_bindings".to_string(),
                             content: format!("[{}]({})", path_str, path_str),
                             depth,
-                            source_type: SourceType::ReusedContractContextFile,
+                            source_type: SourceType::ContractBindingFile,
                             reused_by: Some(parent_identifier.to_string()),
                         })
                     }
@@ -745,21 +745,21 @@ fn collect_reused_contract_context_content(
                         .unwrap_or_else(|| path_str.clone()),
                     identifier: path_str.clone(),
                     file_path: path.to_string_lossy().to_string(),
-                    element_type: "reused_contract_context".to_string(),
+                    element_type: "contract_bindings".to_string(),
                     content: format!("[{}]({})", path_str, path_str),
                     depth,
-                    source_type: SourceType::ReusedContractContextFile,
+                    source_type: SourceType::ContractBindingFile,
                     reused_by: Some(parent_identifier.to_string()),
                 })
             }
         }
-        ReusedContractContextTarget::ElementIdentifier(elem_id) => {
+        ContractBindingTarget::ElementIdentifier(elem_id) => {
             // Look up element content from registry
             registry.get_element(elem_id).map(|elem| {
                 let source_type = if elem.element_type.is_ontology() {
                     SourceType::OntologyContext
                 } else {
-                    SourceType::ReusedContractContextElement
+                    SourceType::ContractBindingElement
                 };
                 CollectedItem {
                     name: elem.name.clone(),
@@ -799,7 +799,7 @@ fn collect_contract_content(
             })
         }
         relation::LinkType::InternalPath(path) => {
-            // File path - read file content (same logic as reused_contract_context file handling)
+            // File path - read file content (same logic as contract_bindings file handling)
             let full_path = git_root.join(path);
             let path_str = path.to_string_lossy().to_string();
 
@@ -896,10 +896,10 @@ fn generate_text_output(report: &CollectReport) -> String {
                     output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
                 }
             }
-            SourceType::ReusedContractContextFile => {
+            SourceType::ContractBindingFile => {
                 if let Some(ref parent) = item.reused_by {
                     output.push_str(&format!(
-                        "— Source: [{}]({}) reused to [{}]({})\n",
+                        "— Source: [{}]({}) bound to [{}]({})\n",
                         item.name,
                         item.identifier,
                         extract_element_name(parent),
@@ -909,10 +909,10 @@ fn generate_text_output(report: &CollectReport) -> String {
                     output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
                 }
             }
-            SourceType::ReusedContractContextElement => {
+            SourceType::ContractBindingElement => {
                 if let Some(ref parent) = item.reused_by {
                     output.push_str(&format!(
-                        "— Source: [{}]({}) reused to [{}]({})\n",
+                        "— Source: [{}]({}) bound to [{}]({})\n",
                         item.name,
                         item.identifier,
                         extract_element_name(parent),

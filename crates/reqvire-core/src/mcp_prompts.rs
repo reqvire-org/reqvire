@@ -60,7 +60,7 @@ pub const MCP_PROMPTS: &[McpPromptDefinition] = &[
     McpPromptDefinition {
         name: "reqvire.semantic.contract_context_search",
         title: "Reqvire Semantic Contract Context Search",
-        description: "Find cross-subgraph reused contract context and semantic-contract constraints.",
+        description: "Find cross-subgraph contract bindings and semantic-contract constraints.",
         arguments: QUESTION_SCOPE_ARGUMENTS,
         content: include_str!("mcp_prompts/semantic_contract_context_search.md"),
     },

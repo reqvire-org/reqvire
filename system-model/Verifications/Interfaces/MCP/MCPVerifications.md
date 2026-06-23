@@ -153,7 +153,7 @@ Expected checks:
 - Verify unused external ontology dependency terms remain unavailable through MCP semantic ontology, vocabulary, and SPARQL outputs.
 - Read element returns `concept_references` for elements that author `#### Concept References`.
 - Collect returns authored concept references for capability and requirement elements and semantic-contract ontology-use context where the underlying operation returns semantic-contract evidence.
-- Results include evidence references for relevant files, elements, relations, and reused_contract_context.
+- Results include evidence references for relevant files, elements, relations, and contract_bindings.
 - Read tools are allowed on dirty worktrees only when the result marks dirty state.
 - Read tools do not mutate the filesystem.
 
@@ -199,7 +199,7 @@ Expected checks:
 - Mutation tools are present in MCP `tools/list` and accept execution requests only when the server was started with `--enable-mutations`.
 - Operation-specific preview mutation requests, such as `dry_run: true`, return changed files and diffs or equivalent change descriptions without filesystem changes.
 - Non-dry-run requests use Reqvire core mutation logic and flush filesystem changes before reporting success.
-- Non-dry-run mutation requests that would break requirement reused_contract_context compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, or single ontology-root validation are rejected before persistence.
+- Non-dry-run mutation requests that would break requirement contract_bindings compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, or single ontology-root validation are rejected before persistence.
 - After successful mutation, subsequent MCP reads observe the refreshed internal graph state.
 - Post-mutation results include validation summary, refreshed model revision, and affected element/submodel metadata.
 
@@ -486,7 +486,7 @@ Expected checks:
 - Verify each MCP `outputSchema` is generated from or explicitly checked against its shared Reqvire operation result contract.
 - Verify successful tool calls return `structuredContent` conforming to the declared `outputSchema`.
 - Verify structured results identify relevant workspace/model revision and dirty state when model state affects interpretation.
-- Verify structured results expose evidence references when the underlying Reqvire operation produces file, element, relation, reused_contract_context, report, or diff evidence.
+- Verify structured results expose evidence references when the underlying Reqvire operation produces file, element, relation, contract_bindings, report, or diff evidence.
 - Verify element-shaped results preserve semantic model ADT fields when present, including `ontology`, `semantic_contract`, and `concept_references`.
 - Verify element/model/mutation/error-shaped results preserve the semantic obligations of the corresponding shared Reqvire result contract without requiring terminal-output parsing.
 - Verify removing or renaming stable structured fields requires a Reqvire tool contract version change.

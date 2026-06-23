@@ -83,7 +83,7 @@
 #### Coverage Sources
 
 - direct_satisfied: 0
-- contract_satisfied_via_reused_contract_context: 0
+- contract_satisfied_via_contract_bindings: 0
 - contract_satisfied_via_child: 0
 
 ## Uncovered Requirements

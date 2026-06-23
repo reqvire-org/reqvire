@@ -93,7 +93,7 @@ export default function SemanticModel() {
               Requirements reuse requirement-owned contracts such as
               specifications, constraints, behaviors, states, and input/output
               definitions. The consuming requirement declares that its subgraph
-              must fulfill the reused contract across that requirement, its
+              must fulfill the bound contract across that requirement, its
               child requirements, and the contracts that detail those
               obligations. Semantic contracts are linked through constrainedBy.
             </p>
@@ -103,7 +103,7 @@ export default function SemanticModel() {
               Fulfillment evidence
             </h4>
             <p className="text-sm text-zinc-600">
-              The reused context creates the contract dependency; fulfillment is
+              The contract binding creates the contract dependency; fulfillment is
               shown by satisfied requirements, child requirement coverage, and
               verifications linked to evidence. Trace and change-impact views
               keep that dependency visible so affected contracts, requirements,

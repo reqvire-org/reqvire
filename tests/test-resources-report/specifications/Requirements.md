@@ -52,7 +52,7 @@ The system shall provide a user-friendly interface.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [UI Mockup Spec](#ui-mockup-spec)
 
 #### Relations
@@ -66,7 +66,7 @@ The system shall provide a RESTful API.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [API Contract Spec](#api-contract-spec)
 
 #### Relations

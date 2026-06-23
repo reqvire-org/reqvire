@@ -199,14 +199,13 @@ requirement --satisfiedBy--> implementation/evidence
 test-verification/formal-proof-verification --satisfiedBy--> evidence
 ```
 
-Reused Contract Context are separate from normal relations:
+Contract Bindings are separate from normal relations:
 
 ```text
-capability --Reused Contract Context--> ontology
-requirement --Reused Contract Context--> compatible requirement-owned contract
+requirement --Contract Bindings--> compatible requirement-owned contract
 ```
 
-Reused Contract Context are the approved way to reuse ontology or contracts across otherwise independent subgraphs.
+Contract Bindings are the approved way for requirements to bind compatible requirement-owned contracts across otherwise independent subgraphs.
 
 ## Submodel Boundary Rule
 
@@ -218,7 +217,7 @@ Hierarchy should stay inside one logical subgraph:
 - requirement-to-requirement hierarchy stays inside the owning capability subgraph
 - ontology-to-ontology hierarchy stays inside the ontology plane
 
-Cross-subgraph reuse should use reused_contract_context, not hierarchy.
+Cross-subgraph reuse should use contract_bindings, not hierarchy.
 
 Avoid cross-submodel requirement hierarchy. If a requirement in one capability needs context from another capability, use concept references for SKOS concepts or reuse a compatible requirement-owned contract instead of creating a parent/child requirement relation across subgraphs.
 
@@ -248,7 +247,7 @@ When adding or moving model content:
 4. Produce a move plan before editing:
    - element/file moves
    - relation rewrites
-   - reused_contract_context substitutions
+   - contract_bindings substitutions
    - validation risks
 5. Confirm high-risk boundary decisions with the user before bulk moves.
 6. Apply changes in slices with `mv`, `mv-file`, `link`, `unlink`, or `relink`.
@@ -264,7 +263,7 @@ When adding or moving model content:
 - Do not force every repo into the example area names.
 - Do not move content only to satisfy a folder pattern when the current graph is valid and understandable.
 - Do not replace graph relations with path naming conventions.
-- Do not remove cross-subgraph relations without preserving required context through reused_contract_context.
+- Do not remove cross-subgraph relations without preserving required context through contract_bindings.
 - Do not create a broad capability root only to share ontology.
 
 The goal is clearer navigation and maintainability with graph semantics preserved.

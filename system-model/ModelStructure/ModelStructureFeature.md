@@ -48,7 +48,7 @@ Requirements should not duplicate ontology content and should not reuse ontology
 
 The Reqvire model is intentionally split into separate capability-root subgraphs. A top capability should be used when requirements truly specify the same capability. Child capabilities should be used only when the capability has independently verifiable operational, product, interface, stakeholder, regulatory, or domain slices that need separate ownership, lifecycle, architecture impact, or collection. Shared ontology lives in `system-model/Ontologies`; elements reference SKOS concepts through concept references instead of becoming children of another capability just to reuse vocabulary. Requirements specify their local capability unless they are actually implementing the shared capability.
 
-Shared SKOS concepts for capability, requirement, contract, and verification prose come from explicit `#### Concept References`, not from one universal capability hierarchy and not from ontology reused_contract_context. Semantic-contract SHACL terms come from explicit semantic-contract `use` relations to ontology elements. This keeps each model concern independently collectible, reviewable, and impact-analyzable while preserving auditable semantic dependencies.
+Shared SKOS concepts for capability, requirement, contract, and verification prose come from explicit `#### Concept References`, not from one universal capability hierarchy and not from ontology contract_bindings. Semantic-contract SHACL terms come from explicit semantic-contract `use` relations to ontology elements. This keeps each model concern independently collectible, reviewable, and impact-analyzable while preserving auditable semantic dependencies.
 
 #### Metadata
   * type: specification

@@ -11,7 +11,7 @@
           "name": "Contract Consumer Implemented"
         },
         {
-          "coverage_source": "contract_satisfied_via_reused_contract_context",
+          "coverage_source": "contract_satisfied_via_contract_bindings",
           "evidence": [
             "specifications/Requirements.md#contract-consumer-implemented"
           ],
@@ -48,7 +48,7 @@
   "summary": {
     "coverage_sources": {
       "contract_satisfied_via_child": 1,
-      "contract_satisfied_via_reused_contract_context": 1,
+      "contract_satisfied_via_contract_bindings": 1,
       "direct_satisfied": 3
     },
     "covered_requirements": 5,

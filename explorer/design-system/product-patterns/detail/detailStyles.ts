@@ -189,6 +189,62 @@ export const relationListUX = css`
   gap: var(--stack-gap-compact);
 `;
 
+export const relationDisclosureBaseUX = css`
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  svg {
+    width: var(--icon-xs);
+    height: var(--icon-xs);
+  }
+`;
+
+export const relationDisclosureSkinX = css`
+  background: transparent;
+  color: var(--text-strong);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--text-link);
+  }
+
+  &:focus-visible {
+    outline: var(--border-w) solid var(--text-link);
+    outline-offset: var(--space-1);
+    border-radius: var(--radius-sm);
+  }
+`;
+
+export const relationDisclosureTitleUX = css`
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0;
+  line-height: var(--leading-tight);
+`;
+
+export const relationDisclosureCountUX = css`
+  min-width: var(--space-8);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  text-align: center;
+`;
+
+export const relationDisclosureCountSkinX = css`
+  background: var(--bg-sunken);
+  color: var(--text-muted);
+`;
+
 export const relationRowBaseUX = css`
   display: contents;
 `;

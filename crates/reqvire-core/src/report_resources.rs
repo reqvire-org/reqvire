@@ -1,7 +1,7 @@
 // Resources Report Module
-// Generates reports showing all files referenced by the model through relations and reused_contract_context
+// Generates reports showing all files referenced by the model through relations and contract_bindings
 
-use crate::element::{ReusedContractContextTarget, REUSED_CONTRACT_CONTEXT_SECTION};
+use crate::element::{ContractBindingTarget, CONTRACT_BINDINGS_SECTION};
 use crate::graph_registry::GraphRegistry;
 use crate::relation::LinkType;
 use serde::Serialize;
@@ -11,7 +11,7 @@ use std::path::PathBuf;
 #[derive(Serialize)]
 pub struct ResourcesReport {
     pub relations: Vec<FileReferences>,
-    pub reused_contract_context: Vec<FileReferences>,
+    pub contract_bindings: Vec<FileReferences>,
     pub summary: ResourcesSummary,
 }
 
@@ -32,9 +32,9 @@ pub struct Reference {
 #[derive(Serialize)]
 pub struct ResourcesSummary {
     pub total_relation_files: usize,
-    pub total_reused_contract_context_files: usize,
+    pub total_contract_bindings_files: usize,
     pub total_relation_references: usize,
-    pub total_reused_contract_context_references: usize,
+    pub total_contract_bindings_references: usize,
 }
 
 /// Helper function to format an identifier as a markdown link
@@ -86,16 +86,16 @@ impl ResourcesReport {
             }
         }
 
-        // Reused Contract Context Section
+        // Contract Bindings Section
         output.push_str("## ");
-        output.push_str(REUSED_CONTRACT_CONTEXT_SECTION);
+        output.push_str(CONTRACT_BINDINGS_SECTION);
         output.push_str("\n\n");
-        output.push_str("Files referenced via reused_contract_context:\n\n");
+        output.push_str("Files referenced via contract_bindings:\n\n");
 
-        if self.reused_contract_context.is_empty() {
-            output.push_str("*No files referenced via reused_contract_context.*\n\n");
+        if self.contract_bindings.is_empty() {
+            output.push_str("*No files referenced via contract_bindings.*\n\n");
         } else {
-            for file_ref in &self.reused_contract_context {
+            for file_ref in &self.contract_bindings {
                 output.push_str(&format!("### {}\n", file_ref.file_path));
                 for reference in &file_ref.references {
                     let link =
@@ -113,9 +113,9 @@ impl ResourcesReport {
             self.summary.total_relation_files, self.summary.total_relation_references
         ));
         output.push_str(&format!(
-            "- **ReusedContractContextEntry Files:** {} ({} references)\n",
-            self.summary.total_reused_contract_context_files,
-            self.summary.total_reused_contract_context_references
+            "- **ContractBindingEntry Files:** {} ({} references)\n",
+            self.summary.total_contract_bindings_files,
+            self.summary.total_contract_bindings_references
         ));
 
         output
@@ -127,8 +127,8 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
     // Collect InternalPath relations: file_path -> Vec<(relation_type, element_id, element_name)>
     let mut relation_map: HashMap<PathBuf, Vec<(String, String, String)>> = HashMap::new();
 
-    // Collect FilePath reused_contract_context: file_path -> Vec<(element_id, element_name)>
-    let mut reused_context_map: HashMap<PathBuf, Vec<(String, String)>> = HashMap::new();
+    // Collect FilePath contract_bindings: file_path -> Vec<(element_id, element_name)>
+    let mut contract_bindings_map: HashMap<PathBuf, Vec<(String, String)>> = HashMap::new();
 
     // Iterate all elements
     for element in registry.get_all_elements() {
@@ -147,15 +147,15 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
             }
         }
 
-        // Process reused_contract_context with FilePath targets
-        for reused_contract_context in &element.reused_contract_context {
-            if let ReusedContractContextTarget::FilePath(path) = &reused_contract_context.target {
-                reused_context_map
+        // Process contract_bindings with FilePath targets
+        for contract_bindings in &element.contract_bindings {
+            if let ContractBindingTarget::FilePath(path) = &contract_bindings.target {
+                contract_bindings_map
                     .entry(path.clone())
                     .or_default()
                     .push((element_id.clone(), element_name.clone()));
             }
-            // Skip ElementIdentifier reused_contract_context - they reference model elements, not files
+            // Skip ElementIdentifier contract_bindings - they reference model elements, not files
         }
     }
 
@@ -185,8 +185,8 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
     // Sort by file path
     relations.sort_by(|a, b| a.file_path.cmp(&b.file_path));
 
-    // Build sorted reused_contract_context list
-    let mut reused_contract_context: Vec<FileReferences> = reused_context_map
+    // Build sorted contract_bindings list
+    let mut contract_bindings: Vec<FileReferences> = contract_bindings_map
         .into_iter()
         .map(|(path, mut refs)| {
             // Sort references by element_id
@@ -209,11 +209,11 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
         .collect();
 
     // Sort by file path
-    reused_contract_context.sort_by(|a, b| a.file_path.cmp(&b.file_path));
+    contract_bindings.sort_by(|a, b| a.file_path.cmp(&b.file_path));
 
     // Calculate totals
     let total_relation_references: usize = relations.iter().map(|f| f.references.len()).sum();
-    let total_reused_contract_context_references: usize = reused_contract_context
+    let total_contract_bindings_references: usize = contract_bindings
         .iter()
         .map(|f| f.references.len())
         .sum();
@@ -221,11 +221,11 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
     ResourcesReport {
         summary: ResourcesSummary {
             total_relation_files: relations.len(),
-            total_reused_contract_context_files: reused_contract_context.len(),
+            total_contract_bindings_files: contract_bindings.len(),
             total_relation_references,
-            total_reused_contract_context_references,
+            total_contract_bindings_references,
         },
         relations,
-        reused_contract_context,
+        contract_bindings,
     }
 }

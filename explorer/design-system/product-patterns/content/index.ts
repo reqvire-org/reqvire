@@ -18,3 +18,5 @@ export { WorkspaceShell } from "./WorkspaceShell";
 export type { WorkspaceShellProps } from "./WorkspaceShell";
 export { RendererNotice } from "./RendererNotice";
 export type { RendererNoticeProps, RendererNoticeTone } from "./RendererNotice";
+export { SourcePageElement, SourcePageElements } from "./SourcePageElements";
+export type { SourcePageElementProps, SourcePageElementsProps } from "./SourcePageElements";

@@ -115,7 +115,7 @@ OUTSIDE_ADD_EXIT=$?
 set -e
 
 if [ $OUTSIDE_ADD_EXIT -eq 0 ]; then
-  echo "FAILED: adding Outside Context Shape Contract should fail because it bypasses semantic reused_contract_context context"
+  echo "FAILED: adding Outside Context Shape Contract should fail because it bypasses semantic contract_bindings context"
   echo "$OUTSIDE_ADD_OUTPUT"
   exit 1
 fi

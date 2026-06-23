@@ -634,7 +634,7 @@ System-of-interest examples:
 | Slot | Good domain | Good range | Why |
 |------|-------------|------------|-----|
 | `ownedByActor` | `PlatformResource` | `Actor` | Any managed platform resource can have an owning or accountable actor. |
-| `deploymentBelongsToEnvironment` | `Deployment` | `Environment` | Deployments are hosted inside environments; the slot should not be reused to every managed resource. |
+| `deploymentBelongsToEnvironment` | `Deployment` | `Environment` | Deployments are hosted inside environments; the slot should not be bound to every managed resource. |
 | `deploymentHasReplica` | `Deployment` | `Replica` | Replicas are parts of deployments, not of every platform resource. |
 | `interfaceExposesResource` | `InterfaceSurface` | `PlatformResource` | Web, API, MCP, and BFF surfaces can expose platform resources. |
 | `environmentHasNetworkAccess` | `Environment` | `NetworkAccess` | Network access belongs to the environment boundary. |
@@ -751,7 +751,7 @@ Avoid:
 - Class and slot names that differ only by case, such as `Environment` and `environment`, when a clearer relation name exists.
 - Product/UI labels as canonical class names when a stable domain concept exists.
 
-Use comments or annotation properties for presentation labels, aliases, translations, old names, and product terms. For example, keep `MissionControlInterface` as the canonical class only if it is a stable domain concept; otherwise model it as a label or individual reused to `WebInterface`.
+Use comments or annotation properties for presentation labels, aliases, translations, old names, and product terms. For example, keep `MissionControlInterface` as the canonical class only if it is a stable domain concept; otherwise model it as a label or individual bound to `WebInterface`.
 
 ### Singular Or Plural
 

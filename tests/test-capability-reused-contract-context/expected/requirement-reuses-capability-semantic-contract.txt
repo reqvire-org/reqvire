@@ -1,1 +1,0 @@
-Semantic-contract reused_contract_context is rejected

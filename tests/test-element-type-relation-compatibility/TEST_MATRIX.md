@@ -64,12 +64,12 @@ Based on the Element Type Relation Compatibility specification, the following te
 | test-verification | test-verification | ❌ FAIL | (covered by verifiedBy inverse) |
 | requirement | requirement | ❌ FAIL | invalid-verifiedby/req-using-verify |
 
-## ReusedContractContextEntry Author Tests
+## ContractBindingEntry Author Tests
 
 | Source Type | Target Type | Expected | Test Case |
 |-------------|-------------|----------|-----------|
-| contract | requirement-owned contract | ❌ FAIL | invalid-contract-reused-context |
-| test-verification | requirement-owned contract | ❌ FAIL | invalid-verification-reused-context |
+| contract | requirement-owned contract | ❌ FAIL | invalid-contract-contract-binding |
+| test-verification | requirement-owned contract | ❌ FAIL | invalid-verification-contract-binding |
 
 ## Ordinary Contract Type Tests (Only define Allowed)
 
@@ -119,6 +119,6 @@ Based on the Element Type Relation Compatibility specification, the following te
 | satisfiedBy | 12 | 5 | 7 |
 | verifiedBy | 6 | 2 | 4 |
 | verify | 4 | 2 | 2 |
-| reused_contract_context | 2 | 0 | 2 |
+| contract_bindings | 2 | 0 | 2 |
 | Contract | 9 | 3 | 6 |
 | **TOTAL** | **45** | **16** | **29** |

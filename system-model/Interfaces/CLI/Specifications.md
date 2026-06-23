@@ -56,8 +56,8 @@ mv Move element to different location
 rename Rename element
 merge Merge multiple elements into target element
 mv-file Move entire specification file
-link Add relation or reused_contract_context between elements
-unlink Remove relation or reused_contract_context (auto-detects)
+link Add relation or contract_bindings between elements
+unlink Remove relation or contract_bindings (auto-detects)
 relink Replace an existing relation target with a new target in one operation
 mv-asset Move/rename asset file and update references
 rm-asset Remove asset file and remove references
@@ -277,7 +277,7 @@ The `rename` command behavior is governed by the reused rename workflow and rela
 ### CLI Resources Command Contract Specification
 
 #### Details
-The `resources` command behavior is governed by the reused relation and reused_contract_context inventory contracts.
+The `resources` command behavior is governed by the reused relation and contract_bindings inventory contracts.
 
 #### Metadata
   * type: specification
@@ -449,7 +449,7 @@ Mutating command hierarchy safety is governed by the reused validation and atomi
 ### Relation Commands Contract Specification
 
 #### Details
-Relation command behavior is governed by the reused relation, reused_contract_context, and atomicity contracts.
+Relation command behavior is governed by the reused relation, contract_bindings, and atomicity contracts.
 
 #### Metadata
   * type: specification

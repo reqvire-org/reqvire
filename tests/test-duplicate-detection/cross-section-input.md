@@ -1,8 +1,8 @@
 ### Test Element With Cross-Section Duplicate
 
-This element has the same target in both Relations and Reused Contract Context.
+This element has the same target in both Relations and Contract Bindings.
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Contract Element](specifications/Requirements.md#contract-element)
 
 #### Relations

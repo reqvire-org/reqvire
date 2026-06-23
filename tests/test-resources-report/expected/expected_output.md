@@ -19,13 +19,13 @@ Files referenced via relations such as satisfiedBy:
   * [Data Integrity](specifications/Requirements.md#data-integrity) (via satisfiedBy)
 ---
 
-## Reused Contract Context
+## Contract Bindings
 
-Files referenced via reused_contract_context:
+Files referenced via contract_bindings:
 
-*No files referenced via reused_contract_context.*
+*No files referenced via contract_bindings.*
 
 ## Summary
 
 - **Relation Files:** 4 (5 references)
-- **ReusedContractContextEntry Files:** 0 (0 references)
+- **ContractBindingEntry Files:** 0 (0 references)

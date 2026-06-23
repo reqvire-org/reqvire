@@ -10,12 +10,12 @@ Default collection excludes implementation/evidence relations (`satisfiedBy`, `s
 When starting from a `requirement`:
 - UPSTREAM traverses requirement parents through `derivedFrom`, then crosses to the owning capability through `specify` or inherited capability ownership, then traverses parent capabilities through `derivedFrom`.
 - DOWNSTREAM traverses child requirements through `derive` only and does not cross to capabilities.
-- The collected content includes authored concept references, plus each traversed requirement's requirement-detail contracts and requirement-owned contract reused_contract_context.
+- The collected content includes authored concept references, plus each traversed requirement's requirement-detail contracts and requirement-owned contract contract_bindings.
 
 When starting from a `capability`:
 - UPSTREAM traverses parent capabilities through `derivedFrom` only and does not include requirements that specify those capabilities.
 - DOWNSTREAM traverses child capabilities through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`.
-- The collected content includes authored concept references for capability, descendant capability, and requirement elements, requirement-detail contracts, and reused_contract_context for requirement elements.
+- The collected content includes authored concept references for capability, descendant capability, and requirement elements, requirement-detail contracts, and contract_bindings for requirement elements.
 
 When starting from an `ontology`:
 - UPSTREAM traverses parent ontology elements through `derivedFrom`.
@@ -88,7 +88,7 @@ Reqvire implements containment hierarchy through filesystem structure.
 #### Details
 Contract elements serve as requirement-owned subordinate details that drive implementation. Their relation usage is restricted because:
 - They represent atomic pieces of information focused on documenting requirements
-- They are primarily referenced through the Reused Contract Context subsection of other elements
+- They are primarily referenced through the Contract Bindings subsection of other elements
 - Their `define` relation links back to the requirement they define, establishing ownership
 - Each contract can only be owned by one compatible requirement according to its subtype
 - They do not define requirement governance metadata; governance context for a contract is obtained from its owning requirement
@@ -116,7 +116,7 @@ Reqvire implements requirement contracts through explicit contract elements link
 - Acceptance criteria and technical details reside in contract elements
 - Requirement text stays intent-focused (EARS-style), with concise detail pointers
 - Clarifying information and rationale are captured in linked contracts
-- Contract elements provide reused-contract-context-ready specification contracts across submodels
+- Contract elements provide contract-bindings-ready specification contracts across submodels
 - `state` contract elements capture lifecycle states, state machines, allowed transitions, terminal states, and state-dependent contract behavior.
 - `input-output` contract elements capture payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries.
 
@@ -202,7 +202,7 @@ Git repository scope defines source-file discovery and path normalization. It do
 - When run from git root: all files in the repository are processed
 - When run from a subdirectory: processing is limited to files within that subdirectory scope
 - Markdown files parsed as model documents become source file containers in the Explorer Project Store when the served Explorer runtime data is generated
-- Relation and reused_contract_context targets outside parsed model documents remain modeled resources or evidence targets, not source file containers
+- Relation and contract_bindings targets outside parsed model documents remain modeled resources or evidence targets, not source file containers
 
 **Scope Boundary Validation:**
 - Relations referencing elements outside the subdirectory scope report missing relation target errors
@@ -311,7 +311,7 @@ Each graph-backed operation specification is expected to define:
 - whether the operation can persist source-file changes
 - validation gates that must pass before persistence
 - rollback behavior and error reporting when a candidate mutation is rejected
-- relation, reused_contract_context, and semantic-contract consistency guarantees preserved by the operation
+- relation, contract_bindings, and semantic-contract consistency guarantees preserved by the operation
 
 Concrete command names, flags, output fields, file paths, workflow steps, and persistence behavior belong in these operation specifications or behavior contracts.
 
@@ -354,7 +354,7 @@ Technical specification for relation link and unlink operations.
 
 ### Relation Semantics Specification
 
-Reqvire implements relation semantics for ownership, hierarchy, capability specification, semantic-contract constraint, semantic-contract ontology use, verification, implementation satisfaction, and reused_contract_context.
+Reqvire implements relation semantics for ownership, hierarchy, capability specification, semantic-contract constraint, semantic-contract ontology use, verification, implementation satisfaction, and contract_bindings.
 
 #### Details
 - Relation names, inverse names, allowed source/target families, ownership semantics, and change-impact propagation are defined by the Reqvire relation ontology.
@@ -450,7 +450,7 @@ The implementation shall enforce the ontology and semantic-contract structure:
 - Ontology elements that inherit the same `ontology_base` contribute vocabulary to the same generated `owl:Ontology` document declaration. A `derivedFrom` relation between ontology elements becomes `owl:imports` only when the source and target resolve to different ontology bases.
 - Reqvire uses inherited `ontology_prefix` as the canonical CURIE label for the derived term namespace. Authored Turtle that uses the inherited prefix must explicitly declare it to `<ontology_base>#`; missing or conflicting declarations fail validation.
 - Reqvire derives the semantic contract IRI as `urn:reqvire:semantic-contract:<element.id>`.
-- The graph registry indexes ontology elements by `element.id`, `element.identifier`, derived IRI, ontology hierarchy, reused_contract_context consumers, and parsed `Ontology` content.
+- The graph registry indexes ontology elements by `element.id`, `element.identifier`, derived IRI, ontology hierarchy, contract_bindings consumers, and parsed `Ontology` content.
 - The graph registry indexes semantic contracts by `element.id`, `element.identifier`, derived IRI, constrained requirements, used ontology context, and parsed `Shapes` content.
 - Reqvire builds a reusable semantic index from the graph registry for ontology validation, semantic-contract validation, ontology export, parsing each Turtle block once and reusing the parsed RDF quads for diagnostics, ontology term declarations, SHACL references, Turtle export, and JSON-LD export.
 

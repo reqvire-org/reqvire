@@ -85,7 +85,7 @@ Reserved subsection vocabulary is defined by the Reqvire core element ontology. 
  * **Relations**: authored relation edges
  * **Details**: narrative element context
  * **Metadata**: element metadata, element type, and governance metadata where valid
- * **Reused Contract Context**: explicit reusable requirement-owned contract dependencies
+ * **Contract Bindings**: explicit reusable requirement-owned contract dependencies
  * **Concept References**: readable bindings from non-ontology, non-semantic-contract elements to native concept elements with derived generated SKOS IRIs
  * **Ontology**: ontology-element Turtle content
  * **External Ontology**: ontology-element local external vocabulary source declarations
@@ -107,7 +107,7 @@ Each reserved subsection has specific parsing rules, validation requirements, an
   * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Element Subsection Parsing Test](../Verifications/ModelStructure/ParsingVerifications.md#element-subsection-parsing-test)
   * verifiedBy: [Non-Reserved Subsections Content Test](../Verifications/ModelStructure/ParsingVerifications.md#non-reserved-subsections-content-test)
-  * verifiedBy: [Reused Contract Context Output Rendering Verification](../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-output-rendering-verification)
-  * verifiedBy: [Reused Contract Context Subsection Parsing Verification](../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-subsection-parsing-verification)
-  * verifiedBy: [Reused Contract Context Validation Verification](../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-validation-verification)
+  * verifiedBy: [Contract Bindings Output Rendering Verification](../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-output-rendering-verification)
+  * verifiedBy: [Contract Bindings Subsection Parsing Verification](../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-subsection-parsing-verification)
+  * verifiedBy: [Contract Bindings Validation Verification](../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-validation-verification)
 ---

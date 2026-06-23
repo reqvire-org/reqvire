@@ -7,7 +7,7 @@
       "file_path": "specifications/Ontologies.md",
       "file_order_index": 0,
       "relations": [],
-      "reused_contract_context": []
+      "contract_bindings": []
     },
     {
       "identifier": "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md",
@@ -43,11 +43,11 @@
                         "file_path": "specifications/Verifications/Tests.md",
                         "file_order_index": 4,
                         "relations": [],
-                        "reused_contract_context": []
+                        "contract_bindings": []
                       }
                     }
                   ],
-                  "reused_contract_context": []
+                  "contract_bindings": []
                 }
               },
               {
@@ -68,7 +68,7 @@
                         "file_path": "specifications/SystemRequirements.md",
                         "file_order_index": 6,
                         "relations": [],
-                        "reused_contract_context": []
+                        "contract_bindings": []
                       }
                     },
                     {
@@ -98,11 +98,11 @@
                                     "file_path": "specifications/Verifications/Tests.md",
                                     "file_order_index": 3,
                                     "relations": [],
-                                    "reused_contract_context": []
+                                    "contract_bindings": []
                                   }
                                 }
                               ],
-                              "reused_contract_context": []
+                              "contract_bindings": []
                             }
                           },
                           {
@@ -123,7 +123,7 @@
                                     "file_path": "specifications/Verifications/Tests.md",
                                     "file_order_index": 2,
                                     "relations": [],
-                                    "reused_contract_context": []
+                                    "contract_bindings": []
                                   }
                                 },
                                 {
@@ -135,11 +135,11 @@
                                     "file_path": "specifications/Verifications/Tests.md",
                                     "file_order_index": 5,
                                     "relations": [],
-                                    "reused_contract_context": []
+                                    "contract_bindings": []
                                   }
                                 }
                               ],
-                              "reused_contract_context": []
+                              "contract_bindings": []
                             }
                           },
                           {
@@ -151,11 +151,11 @@
                               "file_path": "specifications/Verifications/Tests.md",
                               "file_order_index": 6,
                               "relations": [],
-                              "reused_contract_context": []
+                              "contract_bindings": []
                             }
                           }
                         ],
-                        "reused_contract_context": []
+                        "contract_bindings": []
                       }
                     },
                     {
@@ -167,11 +167,11 @@
                         "file_path": "specifications/Verifications/Tests.md",
                         "file_order_index": 1,
                         "relations": [],
-                        "reused_contract_context": []
+                        "contract_bindings": []
                       }
                     }
                   ],
-                  "reused_contract_context": []
+                  "contract_bindings": []
                 }
               },
               {
@@ -183,15 +183,15 @@
                   "file_path": "specifications/SystemRequirements.md",
                   "file_order_index": 5,
                   "relations": [],
-                  "reused_contract_context": []
+                  "contract_bindings": []
                 }
               }
             ],
-            "reused_contract_context": []
+            "contract_bindings": []
           }
         }
       ],
-      "reused_contract_context": []
+      "contract_bindings": []
     }
   ],
   "metadata": {

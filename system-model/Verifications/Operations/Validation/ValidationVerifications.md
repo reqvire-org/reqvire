@@ -60,7 +60,7 @@ Test verifies that validation detects and reports cross-section duplicates.
 
 #### Details
 Test cases:
-1. Element with same target in both Relations (as satisfiedBy) and Reused Contract Context
+1. Element with same target in both Relations (as satisfiedBy) and Contract Bindings
 2. Run `reqvire validate`
 3. Verify validation fails with error mentioning "cross-section duplicate" or similar
 4. Verify error identifies the element and the duplicate target
@@ -196,8 +196,8 @@ This test verifies that the system correctly validates relation types based on e
    - Create behavior element with `derivedFrom` relation - FAIL with error
    - Create specification element with `satisfiedBy` relation - FAIL with error
    - Verify error messages indicate contract types can only have define relations
-   - Create constraint element with Reused Contract Context subsection - FAIL with error
-   - Verify error message indicates contract types cannot have reused_contract_context
+   - Create constraint element with Contract Bindings subsection - FAIL with error
+   - Verify error message indicates contract types cannot have contract_bindings
 
 4. **Unsupported generic relation tests:**
    - Create requirement with unsupported generic relation - FAIL with unsupported relation error
@@ -506,10 +506,10 @@ Test cases:
 4. `semantic-contract` using `definedBy`/`define` fails validation.
 5. `source` refining `capability` fails.
 6. `constraint`, `behavior`, `specification`, `state`, or `input-output` refining `capability` fails.
-7. Capability reused_contract_context to `ontology` fails; capabilities use concept references for SKOS concepts.
+7. Capability contract_bindings to `ontology` fails; capabilities use concept references for SKOS concepts.
 8. Requirement `constrainedBy` to `semantic-contract` validates.
-9. Requirement reused_contract_context to `ontology` fails because ontology terms use concept references and semantic-contract ontology use is explicit through `use`.
-10. Capability reused_contract_context to `semantic-contract` fails.
+9. Requirement contract_bindings to `ontology` fails because ontology terms use concept references and semantic-contract ontology use is explicit through `use`.
+10. Capability contract_bindings to `semantic-contract` fails.
 
 #### Metadata
   * type: test-verification

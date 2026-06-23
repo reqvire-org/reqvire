@@ -136,9 +136,9 @@ This test verifies the format command requirements, focusing on normalizing and 
 - System shall convert implementation file paths to clean filename references
 - System shall preserve external URLs without modification
 
-**Reused Contract Context Formatting:**
-- System shall format element identifier reused_contract_context with human-readable element names
-- System shall look up actual element name from registry for reused contract context display names
+**Contract Bindings Formatting:**
+- System shall format element identifier contract_bindings with human-readable element names
+- System shall look up actual element name from registry for contract bindings display names
 - System shall NOT use identifier fragment as display name (e.g., NOT `[my-behavior]` but `[My Behavior]`)
 
 ##### Test Criteria
@@ -184,8 +184,8 @@ This test verifies the format command requirements, focusing on normalizing and 
    - Added lines show correct position in final file
    - Line numbering reflects final file structure accurately
 
-7. **Reused Contract Context display name preservation**
-   - Element identifier reused_contract_context use actual element name as display text
+7. **Contract Bindings display name preservation**
+   - Element identifier contract_bindings use actual element name as display text
    - Format does NOT replace human-readable names with identifier fragments
 
 #### Metadata
@@ -208,7 +208,7 @@ Test verifies that format removes within-section duplicates but not cross-sectio
 #### Details
 Test cases:
 1. File with duplicate relations -> `format --fix` -> Duplicates removed
-2. File with duplicate reused_contract_context -> `format --fix` -> Duplicates removed
+2. File with duplicate contract_bindings -> `format --fix` -> Duplicates removed
 3. File with cross-section duplicate -> `format --fix` -> No change (validation error, not format issue)
 
 #### Metadata

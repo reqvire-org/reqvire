@@ -764,8 +764,8 @@ if ! grep -q "reqvire:conceptReference <https://example.test/concepts#ServiceEnd
   exit 1
 fi
 
-if grep -q "reqvire:reusesContract <urn:reqvire:element:api-ontology>" <<< "$FULL_TTL_OUTPUT"; then
-  echo "FAILED: full Turtle output must not contain capability ontology reused_contract_context edge"
+if grep -q "reqvire:bindsContract <urn:reqvire:element:api-ontology>" <<< "$FULL_TTL_OUTPUT"; then
+  echo "FAILED: full Turtle output must not contain capability ontology contract_bindings edge"
   echo "$FULL_TTL_OUTPUT"
   exit 1
 fi

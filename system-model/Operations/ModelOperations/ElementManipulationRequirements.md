@@ -45,11 +45,11 @@ The system shall provide the capability to create new model elements by acceptin
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
-  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
-  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
   * [Element Type Metadata Specification](../../ModelStructure/Specifications.md#element-type-metadata-specification)
 
 #### Relations
@@ -91,7 +91,7 @@ The system shall persist all element manipulation operations to the source files
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
 
 #### Relations
@@ -104,7 +104,7 @@ The system shall persist all element manipulation operations to the source files
 
 ### Merge Element Operation
 
-The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and reused_contract_context while enforcing type compatibility and removing source elements after successful merge.
+The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and contract_bindings while enforcing type compatibility and removing source elements after successful merge.
 
 #### Details
 When the merge target is a `# Element` model file element, the operation shall preserve the `# Element` file format and keep the result as a single-element file.
@@ -114,9 +114,9 @@ When the target is an ontology element, the operation shall preserve the target 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
-  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
-  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
+#### Contract Bindings
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
 
 #### Relations
   * definedBy: [Merge Content Transformation Behavior](Behaviors.md#merge-content-transformation-behavior)
@@ -140,7 +140,7 @@ The operation shall reject moves into an existing `# Element` file when that mov
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
 
@@ -165,7 +165,7 @@ When `--squash` is requested, the operation shall reject squashing into an exist
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Target Location Constraint](Constraints.md#target-location-constraint)
 
 #### Relations
@@ -223,7 +223,7 @@ The system shall define target location validation constraints.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Ignore Files Specification](../../ModelStructure/Specifications.md#ignore-files-specification)
   * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
 

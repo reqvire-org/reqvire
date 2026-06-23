@@ -243,7 +243,7 @@ reqvire:CustomElementShape
     sh:maxCount 0 ;
   ] ;
   sh:property [
-    sh:path reqvire:reusesContract ;
+    sh:path reqvire:bindsContract ;
     sh:maxCount 0 ;
   ] .
 ```
@@ -281,7 +281,7 @@ reqvire:OntologyElementShape
     sh:maxCount 0 ;
   ] ;
   sh:property [
-    sh:path reqvire:reusesContract ;
+    sh:path reqvire:bindsContract ;
     sh:maxCount 0 ;
   ] ;
   sh:property [

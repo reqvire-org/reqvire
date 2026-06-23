@@ -1,1 +1,0 @@
-Capability reused_contract_context to requirement-detail contract is rejected

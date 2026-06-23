@@ -3,18 +3,18 @@ set -uo pipefail
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-reused_contract_context_count() {
+contract_bindings_count() {
   local element_name="$1"
   (cd "$TEST_DIR" && "$REQVIRE_BIN" search --json) | jq -r --arg name "$element_name" '
-    [.. | objects | select(.name? == $name and has("reused_contract_context")) | .reused_contract_context[]?] | length
+    [.. | objects | select(.name? == $name and has("contract_bindings")) | .contract_bindings[]?] | length
   '
 }
 
-has_reused_contract_context() {
+has_contract_bindings() {
   local element_name="$1"
   local expected_target="$2"
   (cd "$TEST_DIR" && "$REQVIRE_BIN" search --json) | jq -r --arg name "$element_name" '
-    .. | objects | select(.name? == $name and has("reused_contract_context")) | .reused_contract_context[]?
+    .. | objects | select(.name? == $name and has("contract_bindings")) | .contract_bindings[]?
   ' | grep -Fxq "$expected_target"
 }
 
@@ -32,7 +32,7 @@ assert_file_matches() {
 }
 
 echo "===================================="
-echo "Identifier Reused Contract Context Capability Tests"
+echo "Identifier Contract Bindings Capability Tests"
 echo "===================================="
 echo ""
 
@@ -40,15 +40,15 @@ echo ""
 # Test 1: Reuse contract identifier
 # ==================================
 echo "Test 1: Reuse contract identifier..."
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#test-constraint-element" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#test-constraint-element" > /dev/null 2>&1
 
-if [ "$(reused_contract_context_count "Performance Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: Performance Requirement should have 1 reused_contract_context"
+if [ "$(contract_bindings_count "Performance Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: Performance Requirement should have 1 contract_bindings"
   exit 1
 fi
 
-if ! has_reused_contract_context "Performance Requirement" "specifications/Requirements.md#test-constraint-element"; then
-  echo "❌ FAILED: Expected reused_contract_context target not found"
+if ! has_contract_bindings "Performance Requirement" "specifications/Requirements.md#test-constraint-element"; then
+  echo "❌ FAILED: Expected contract_bindings target not found"
   exit 1
 fi
 
@@ -60,7 +60,7 @@ echo ""
 # ==================================
 echo "Test 2: Duplicate reuse returns error..."
 set +e
-ATTACH_DUP_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#test-constraint-element" 2>&1)
+ATTACH_DUP_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#test-constraint-element" 2>&1)
 ATTACH_DUP_EXIT=$?
 set -e
 
@@ -79,13 +79,13 @@ echo "✅ Test 2 passed"
 echo ""
 
 # ==================================
-# Test 3: Multiple contract reused_contract_context
+# Test 3: Multiple contract contract_bindings
 # ==================================
-echo "Test 3: Multiple contract reused_contract_context..."
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#test-behavior-element" > /dev/null 2>&1
+echo "Test 3: Multiple contract contract_bindings..."
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#test-behavior-element" > /dev/null 2>&1
 
-if [ "$(reused_contract_context_count "Performance Requirement")" -ne 2 ]; then
-  echo "❌ FAILED: Performance Requirement should have 2 reused_contract_context"
+if [ "$(contract_bindings_count "Performance Requirement")" -ne 2 ]; then
+  echo "❌ FAILED: Performance Requirement should have 2 contract_bindings"
   exit 1
 fi
 
@@ -96,10 +96,10 @@ echo ""
 # Test 4: Same contract to multiple elements
 # ==================================
 echo "Test 4: Same contract on multiple elements..."
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "No Reused Contract Context Requirement" reusesContract "#test-constraint-element" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "No Contract Bindings Requirement" bindContract "#test-constraint-element" > /dev/null 2>&1
 
-if [ "$(reused_contract_context_count "No Reused Contract Context Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: No Reused Contract Context Requirement should have 1 reused_contract_context"
+if [ "$(contract_bindings_count "No Contract Bindings Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: No Contract Bindings Requirement should have 1 contract_bindings"
   exit 1
 fi
 
@@ -107,18 +107,18 @@ echo "✅ Test 4 passed"
 echo ""
 
 # ==================================
-# Test 5: Remove Reused Context isolation
+# Test 5: Remove Contract Binding isolation
 # ==================================
-echo "Test 5: Remove Reused Context one reused_contract_context without affecting others..."
+echo "Test 5: Remove Contract Binding one contract_bindings without affecting others..."
 cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Performance Requirement" "Test Behavior Element" > /dev/null 2>&1
 
-if [ "$(reused_contract_context_count "Performance Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: Performance Requirement should have 1 reused_contract_context after remove reused context"
+if [ "$(contract_bindings_count "Performance Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: Performance Requirement should have 1 contract_bindings after remove contract binding"
   exit 1
 fi
 
-if [ "$(reused_contract_context_count "No Reused Contract Context Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: No Reused Contract Context Requirement reused_contract_context should remain unchanged"
+if [ "$(contract_bindings_count "No Contract Bindings Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: No Contract Bindings Requirement contract_bindings should remain unchanged"
   exit 1
 fi
 
@@ -126,13 +126,13 @@ echo "✅ Test 5 passed"
 echo ""
 
 # ==================================
-# Test 6: Remove Reused Context all from source element
+# Test 6: Remove Contract Binding all from source element
 # ==================================
-echo "Test 6: Remove Reused Context remaining reused_contract_context from source..."
+echo "Test 6: Remove Contract Binding remaining contract_bindings from source..."
 cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Performance Requirement" "Test Constraint Element" > /dev/null 2>&1
 
-if [ "$(reused_contract_context_count "Performance Requirement")" -ne 0 ]; then
-  echo "❌ FAILED: Performance Requirement should have no reused_contract_context"
+if [ "$(contract_bindings_count "Performance Requirement")" -ne 0 ]; then
+  echo "❌ FAILED: Performance Requirement should have no contract_bindings"
   exit 1
 fi
 
@@ -140,19 +140,19 @@ echo "✅ Test 6 passed"
 echo ""
 
 # ==================================
-# Test 7: Search filter has-reused_contract_context
+# Test 7: Search filter has-contract_bindings
 # ==================================
-echo "Test 7: Search --has-reused-contract-context..."
-SEARCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --has-reused-contract-context --short 2>&1)
+echo "Test 7: Search --has-contract-bindings..."
+SEARCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --has-contract-bindings --short 2>&1)
 
-if ! echo "$SEARCH_OUTPUT" | grep -q "No Reused Contract Context Requirement"; then
-  echo "❌ FAILED: Search should include 'No Reused Contract Context Requirement'"
+if ! echo "$SEARCH_OUTPUT" | grep -q "No Contract Bindings Requirement"; then
+  echo "❌ FAILED: Search should include 'No Contract Bindings Requirement'"
   echo "$SEARCH_OUTPUT"
   exit 1
 fi
 
 if echo "$SEARCH_OUTPUT" | grep -q "Performance Requirement"; then
-  echo "❌ FAILED: Search should not include 'Performance Requirement' after remove reused context"
+  echo "❌ FAILED: Search should not include 'Performance Requirement' after remove contract binding"
   echo "$SEARCH_OUTPUT"
   exit 1
 fi
@@ -161,21 +161,21 @@ echo "✅ Test 7 passed"
 echo ""
 
 # ==================================
-# Test 8: File-path target rejected for reusesContract
+# Test 8: File-path target rejected for bindContract
 # ==================================
 echo "Test 8: File-path target is rejected..."
 set +e
-ATTACH_PATH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "docs/SLA.txt" 2>&1)
+ATTACH_PATH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "docs/SLA.txt" 2>&1)
 ATTACH_PATH_EXIT=$?
 set -e
 
 if [ $ATTACH_PATH_EXIT -eq 0 ]; then
-  echo "❌ FAILED: File-path reusesContract target should fail"
+  echo "❌ FAILED: File-path bindContract target should fail"
   exit 1
 fi
 
 if ! echo "$ATTACH_PATH_OUTPUT" | grep -qi "must use reusable element identifiers"; then
-  echo "❌ FAILED: Error should explain identifier-only reused_contract_context targets"
+  echo "❌ FAILED: Error should explain identifier-only contract_bindings targets"
   echo "$ATTACH_PATH_OUTPUT"
   exit 1
 fi
@@ -184,19 +184,19 @@ echo "✅ Test 8 passed"
 echo ""
 
 # ==================================
-# Test 9: Validation rejects file-path reused_contract_context syntax
+# Test 9: Validation rejects file-path contract_bindings syntax
 # ==================================
-echo "Test 9: Validation rejects file-path reused_contract_context syntax..."
+echo "Test 9: Validation rejects file-path contract_bindings syntax..."
 cat >> "$TEST_DIR/specifications/Requirements.md" << 'EOF'
 
-### Invalid File ReusedContractContextEntry Requirement
+### Invalid File ContractBindingEntry Requirement
 
-This requirement intentionally uses invalid file-path reused_contract_context syntax.
+This requirement intentionally uses invalid file-path contract_bindings syntax.
 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [SLA](../docs/SLA.txt)
 ---
 EOF
@@ -207,17 +207,17 @@ VALIDATE_EXIT=$?
 set -e
 
 if [ $VALIDATE_EXIT -eq 0 ]; then
-  echo "❌ FAILED: Validation should fail for file-path reused_contract_context syntax"
+  echo "❌ FAILED: Validation should fail for file-path contract_bindings syntax"
   exit 1
 fi
 
-if ! echo "$VALIDATE_OUTPUT" | grep -qi "Invalid reused_contract_context"; then
-  echo "❌ FAILED: Validation error should mention invalid reused_contract_context format"
+if ! echo "$VALIDATE_OUTPUT" | grep -qi "Invalid contract_bindings"; then
+  echo "❌ FAILED: Validation error should mention invalid contract_bindings format"
   echo "$VALIDATE_OUTPUT"
   exit 1
 fi
 
-sed -i '/### Invalid File ReusedContractContextEntry Requirement/,/^---$/d' "$TEST_DIR/specifications/Requirements.md"
+sed -i '/### Invalid File ContractBindingEntry Requirement/,/^---$/d' "$TEST_DIR/specifications/Requirements.md"
 
 echo "✅ Test 9 passed"
 echo ""
@@ -228,7 +228,7 @@ echo ""
 echo "Test 10: Dry-run mode..."
 cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#test-behavior-element" --dry-run > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#test-behavior-element" --dry-run > /dev/null 2>&1
 
 if ! cmp -s "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"; then
   echo "❌ FAILED: Dry-run mode should not modify the file"
@@ -242,14 +242,14 @@ echo ""
 # ==================================
 # Test 11: Non-contract target rejected
 # ==================================
-echo "Test 11: Non-contract reused_contract_context target is rejected..."
+echo "Test 11: Non-contract contract_bindings target is rejected..."
 set +e
-ATTACH_NON_CONTRACT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#no-reused-contract-context-requirement" 2>&1)
+ATTACH_NON_CONTRACT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#no-contract-bindings-requirement" 2>&1)
 ATTACH_NON_CONTRACT_EXIT=$?
 set -e
 
 if [ $ATTACH_NON_CONTRACT_EXIT -eq 0 ]; then
-  echo "❌ FAILED: Non-contract reused_contract_context target should fail"
+  echo "❌ FAILED: Non-contract contract_bindings target should fail"
   exit 1
 fi
 
@@ -267,7 +267,7 @@ echo ""
 # ==================================
 echo "Test 12: Unresolved identifier target is rejected..."
 set +e
-ATTACH_MISSING_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" reusesContract "#missing-contract" 2>&1)
+ATTACH_MISSING_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#missing-contract" 2>&1)
 ATTACH_MISSING_EXIT=$?
 set -e
 
@@ -277,7 +277,7 @@ if [ $ATTACH_MISSING_EXIT -eq 0 ]; then
 fi
 
 if ! echo "$ATTACH_MISSING_OUTPUT" | grep -qi "could not be resolved"; then
-  echo "❌ FAILED: Error should mention unresolved reused_contract_context target"
+  echo "❌ FAILED: Error should mention unresolved contract_bindings target"
   echo "$ATTACH_MISSING_OUTPUT"
   exit 1
 fi
@@ -333,8 +333,8 @@ if [ ! -f "$TEST_DIR/src/test_script.sh" ]; then
   exit 1
 fi
 
-if [ "$(reused_contract_context_count "No Reused Contract Context Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: mv-asset should not change contract identifier reused_contract_context"
+if [ "$(contract_bindings_count "No Contract Bindings Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: mv-asset should not change contract identifier contract_bindings"
   exit 1
 fi
 
@@ -355,8 +355,8 @@ if [ -f "$TEST_DIR/src/test_script.sh" ]; then
   exit 1
 fi
 
-if [ "$(reused_contract_context_count "No Reused Contract Context Requirement")" -ne 1 ]; then
-  echo "❌ FAILED: rm-asset should not change contract identifier reused_contract_context"
+if [ "$(contract_bindings_count "No Contract Bindings Requirement")" -ne 1 ]; then
+  echo "❌ FAILED: rm-asset should not change contract identifier contract_bindings"
   exit 1
 fi
 
@@ -364,6 +364,6 @@ echo "✅ Test 14 passed"
 echo ""
 
 echo "===================================="
-echo "All Identifier Reused Contract Context tests passed"
+echo "All Identifier Contract Bindings tests passed"
 echo "===================================="
 exit 0

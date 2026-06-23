@@ -1,5 +1,5 @@
 use crate::element::{
-    ConceptReference, ContractType, Element, ElementType, FencedBlock, ReusedContractContextTarget,
+    ConceptReference, ContractType, Element, ElementType, FencedBlock, ContractBindingTarget,
     VerificationType, GOVERNANCE_METADATA_KEYS,
 };
 use crate::error::ReqvireError;
@@ -1852,16 +1852,16 @@ fn build_authored_model_turtle(
             ));
         }
 
-        for reused_contract_context in &element.reused_contract_context {
-            let Some(target_iri) = reused_contract_context_target_iri(
-                &reused_contract_context.target,
+        for contract_bindings in &element.contract_bindings {
+            let Some(target_iri) = contract_bindings_target_iri(
+                &contract_bindings.target,
                 registry,
                 &mut artifacts,
             ) else {
                 continue;
             };
             output.push_str(&format!(
-                "{} reqvire:reusesContract {} .\n",
+                "{} reqvire:bindsContract {} .\n",
                 subject, target_iri
             ));
         }
@@ -1884,7 +1884,7 @@ fn build_authored_model_turtle(
         }
 
         if !element.relations.is_empty()
-            || !element.reused_contract_context.is_empty()
+            || !element.contract_bindings.is_empty()
             || !element.concept_references.is_empty()
         {
             output.push('\n');
@@ -1958,9 +1958,9 @@ fn build_generated_model_turtle(
             );
         }
 
-        for reused_contract_context in &element.reused_contract_context {
-            let Some(target_iri) = reused_contract_context_target_iri(
-                &reused_contract_context.target,
+        for contract_bindings in &element.contract_bindings {
+            let Some(target_iri) = contract_bindings_target_iri(
+                &contract_bindings.target,
                 registry,
                 &mut artifacts,
             ) else {
@@ -1969,15 +1969,15 @@ fn build_generated_model_turtle(
             append_model_relation_turtle(
                 &mut output,
                 &subject,
-                "reused_contract_context",
+                "contract_bindings",
                 &target_iri,
-                &reused_contract_context.target.as_str(),
+                &contract_bindings.target.as_str(),
             );
             append_normalized_relation_family_turtle(
                 &mut output,
                 &subject,
                 &target_iri,
-                "reused_contract_context",
+                "contract_bindings",
             );
         }
     }
@@ -2141,23 +2141,23 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
             );
         }
 
-        for reused_contract_context in &element.reused_contract_context {
-            let Some(target_iri) = reused_contract_context_target_iri(
-                &reused_contract_context.target,
+        for contract_bindings in &element.contract_bindings {
+            let Some(target_iri) = contract_bindings_target_iri(
+                &contract_bindings.target,
                 registry,
                 &mut artifacts,
             ) else {
                 continue;
             };
             output.push_str(&format!(
-                "{} reqvire:reusesContract {} .\n",
+                "{} reqvire:bindsContract {} .\n",
                 subject, target_iri
             ));
-            let target_identifier = reused_contract_context.target.as_str();
+            let target_identifier = contract_bindings.target.as_str();
             append_model_relation_turtle(
                 &mut output,
                 &subject,
-                "reused_contract_context",
+                "contract_bindings",
                 &target_iri,
                 &target_identifier,
             );
@@ -2165,7 +2165,7 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
                 &mut output,
                 &subject,
                 &target_iri,
-                "reused_contract_context",
+                "contract_bindings",
             );
         }
 
@@ -2187,7 +2187,7 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
         }
 
         if !element.relations.is_empty()
-            || !element.reused_contract_context.is_empty()
+            || !element.contract_bindings.is_empty()
             || !element.concept_references.is_empty()
         {
             output.push('\n');
@@ -2386,9 +2386,9 @@ fn normalized_relation_projection(relation_name: &str) -> Option<NormalizedRelat
             inverse_property: "artifactSatisfiesElement",
             direction: RelationProjectionDirection::Inverse,
         },
-        "reused_contract_context" => NormalizedRelationProjection {
-            forward_property: "requirementUsesCrossSubgraphContract",
-            inverse_property: "crossSubgraphContractUsedByRequirement",
+        "contract_bindings" => NormalizedRelationProjection {
+            forward_property: "requirementBindsContract",
+            inverse_property: "contractBoundBy",
             direction: RelationProjectionDirection::Forward,
         },
         _ => return None,
@@ -3132,17 +3132,17 @@ fn target_iri_for_link(
     }
 }
 
-fn reused_contract_context_target_iri(
-    target: &ReusedContractContextTarget,
+fn contract_bindings_target_iri(
+    target: &ContractBindingTarget,
     registry: &GraphRegistry,
     artifacts: &mut BTreeSet<String>,
 ) -> Option<String> {
     match target {
-        ReusedContractContextTarget::ElementIdentifier(target_identifier) => registry
+        ContractBindingTarget::ElementIdentifier(target_identifier) => registry
             .nodes
             .get(target_identifier)
             .map(|target| element_iri(&target.element)),
-        ReusedContractContextTarget::FilePath(path) => {
+        ContractBindingTarget::FilePath(path) => {
             let value = path.to_string_lossy();
             let iri = artifact_iri("path", &value);
             artifacts.insert(format!(

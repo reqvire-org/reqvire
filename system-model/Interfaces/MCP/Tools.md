@@ -79,7 +79,7 @@ The system shall expose MCP read tools that return model evidence needed by exte
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
   * [Flexible Search Type Filtering Contract Specification](../../Reports/ModelReports/Specifications.md#flexible-search-type-filtering-contract-specification)
   * [Containment View Report Contract Specification](../../Reports/ModelReports/Specifications.md#containment-view-report-contract-specification)
@@ -112,7 +112,7 @@ The system shall expose an MCP read tool for SPARQL queries over Reqvire semanti
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Semantic Relation Family Projection Specification](../../Reports/ModelReports/Specifications.md#semantic-relation-family-projection-specification)
 
 #### Relations
@@ -270,7 +270,7 @@ The system shall expose mutation tools only through typed Reqvire core operation
 #### Details
 - The MCP interface shall expose mutation tools only after explicit mutation enablement.
 - MCP mutation tools shall use Reqvire core mutation logic.
-- MCP mutation tools shall preserve Reqvire semantic model validation, including reused_contract_context compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, and single ontology-root validation.
+- MCP mutation tools shall preserve Reqvire semantic model validation, including contract_bindings compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, and single ontology-root validation.
 - MCP mutation tools shall preserve Reqvire filesystem persistence behavior.
 - MCP mutation results shall report changed model evidence.
 - MCP mutation execution shall refresh MCP-visible model state after successful mutation.
@@ -278,7 +278,7 @@ The system shall expose mutation tools only through typed Reqvire core operation
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Create Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#create-element-workflow-specification)
@@ -333,7 +333,7 @@ The system shall expose MCP read tools for linting, coverage, verification trace
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
   * [Requirement Implementation Coverage Logic Specification](../../Reports/ModelReports/Specifications.md#requirement-implementation-coverage-logic-specification)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
@@ -360,7 +360,7 @@ The system shall expose MCP resources only as read-only, revision-tagged views o
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Resources Report Format Specification](../../Reports/ModelReports/Specifications.md#resources-report-format-specification)
   * [Containment View Report Contract Specification](../../Reports/ModelReports/Specifications.md#containment-view-report-contract-specification)
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
@@ -432,7 +432,7 @@ The system shall expose MCP tools through shared typed request and result interf
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations

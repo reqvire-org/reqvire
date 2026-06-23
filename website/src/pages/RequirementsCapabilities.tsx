@@ -160,9 +160,9 @@ and signature before the request reaches protected application logic.`}</CodeBlo
         </div>
       </Section>
 
-      <Section title="Reused Contract Context">
+      <Section title="Contract Bindings">
         <p className="text-zinc-600 mb-4">
-          Reused Contract Context makes cross-boundary requirement contracts
+          Contract Bindings makes cross-boundary requirement contracts
           explicit. Concept references bind prose to curated SKOS concepts;
           semantic-contract dependencies use structural ontology through
           constrainedBy/constrain and use/usedBy. A requirement can reuse a
@@ -181,7 +181,7 @@ and signature before the request reaches protected application logic.`}</CodeBlo
             },
             {
               name: "One-way flow",
-              desc: "The consuming requirement declares that its subgraph must fulfill the reused contract. Reciprocal cross-submodel reuse is rejected because it hides the intended dependency direction.",
+              desc: "The consuming requirement declares that its subgraph must fulfill the bound contract. Reciprocal cross-submodel reuse is rejected because it hides the intended dependency direction.",
             },
             {
               name: "Review impact",
@@ -197,7 +197,7 @@ The consumer service shall fulfill the shared access-token validation behavior.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Access Token Validation Behavior](../Identity/AuthBehaviors.md#access-token-validation-behavior)
 
 #### Relations
@@ -262,7 +262,7 @@ reqvire search --filter-owner "Identity Team"`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           Folders and files are physical containment only. They should make the
           model easy to browse, but authoritative semantics come from metadata,
-          relations, and Reused Contract Context.
+          relations, and Contract Bindings.
         </p>
         <CodeBlock>{`system-model/
   Product/

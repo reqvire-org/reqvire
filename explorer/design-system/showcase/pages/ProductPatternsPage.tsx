@@ -31,8 +31,7 @@ import {
   StoreNotice,
   TreeItem,
   TypeBadge,
-  type DetailReusedContractContextItem,
-  type DetailConceptReferenceItem,
+  type DetailContractBindingItem,
   type DetailMetaBadge,
   type DetailRelationItem,
   type ShellActionItem,
@@ -41,7 +40,6 @@ import {
 import {
   CODE_SAMPLE,
   DETAIL_ATTACHMENTS,
-  DETAIL_CONCEPT_REFERENCES,
   DETAIL_META_BADGES,
   DETAIL_RELATIONS,
   FILE_BROWSER_BREADCRUMBS,
@@ -103,8 +101,7 @@ interface ShowcaseDetailElement {
   metaBadges: DetailMetaBadge[];
   content: ReactNode;
   relations: DetailRelationItem[];
-  reused_contract_context: DetailReusedContractContextItem[];
-  conceptReferences: DetailConceptReferenceItem[];
+  contract_bindings: DetailContractBindingItem[];
 }
 
 const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
@@ -123,8 +120,7 @@ const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
       </MarkdownFrame>
     ),
     relations: DETAIL_RELATIONS,
-    reused_contract_context: DETAIL_ATTACHMENTS,
-    conceptReferences: DETAIL_CONCEPT_REFERENCES,
+    contract_bindings: DETAIL_ATTACHMENTS,
   },
   "VER-DET-010": {
     id: "VER-DET-010",
@@ -169,8 +165,7 @@ const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
         },
       },
     ],
-    reused_contract_context: DETAIL_ATTACHMENTS,
-    conceptReferences: DETAIL_CONCEPT_REFERENCES,
+    contract_bindings: DETAIL_ATTACHMENTS,
   },
   "CAP-DET-001": {
     id: "CAP-DET-001",
@@ -202,8 +197,7 @@ const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
         },
       },
     ],
-    reused_contract_context: [],
-    conceptReferences: DETAIL_CONCEPT_REFERENCES,
+    contract_bindings: [],
   },
 };
 
@@ -390,7 +384,7 @@ export function ProductPatternsPage() {
                   <rect x="448" y="42" width="156" height="76" rx="8" fill="var(--resource-tint)" stroke="var(--resource)" />
                   <text x="526" y="76" textAnchor="middle" fill="var(--text-strong)">Evidence</text>
                   <path d="M176 80 H232" stroke="var(--edge-trace)" strokeWidth="3" />
-                  <path d="M392 80 H448" stroke="var(--edge-reuse)" strokeWidth="3" />
+                  <path d="M392 80 H448" stroke="var(--edge-bind)" strokeWidth="3" />
                 </svg>
               </DiagramBlockFrame>
               <RendererNotice title="Renderer note">
@@ -452,12 +446,8 @@ export function ProductPatternsPage() {
                 </MarkdownFrame>
               }
               relations={DETAIL_RELATIONS}
-              reused_contract_context={DETAIL_ATTACHMENTS}
-              conceptReferences={DETAIL_CONCEPT_REFERENCES}
+              contract_bindings={DETAIL_ATTACHMENTS}
               onOpenElement={openElementDialog}
-              onOpenConceptReference={(reference) => {
-                if (reference.ontologyNodeId) setOntologyDialogNodeId(reference.ontologyNodeId);
-              }}
               onOpenResource={() => {}}
             />
           </div>
@@ -543,12 +533,8 @@ export function ProductPatternsPage() {
           metaBadges={currentElement.metaBadges}
           content={currentElement.content}
           relations={currentElement.relations}
-          reused_contract_context={currentElement.reused_contract_context}
-          conceptReferences={currentElement.conceptReferences}
+          contract_bindings={currentElement.contract_bindings}
           onOpenElement={pushElementDialog}
-          onOpenConceptReference={(reference) => {
-            if (reference.ontologyNodeId) setOntologyDialogNodeId(reference.ontologyNodeId);
-          }}
           onOpenResource={() => {}}
         />
       </DetailDialog>

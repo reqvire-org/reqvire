@@ -79,7 +79,7 @@ Validation must check:
 - ontology, capability, requirement, and contract compatibility from the ontology, capability, requirement, and semantic-contracts
 - evidence-backed verification compatibility from the verification contracts
 - canonical semantic relations are rejected for custom `other` and `other-TYPENAME` element types
-- contract restrictions: contract elements use only `define` relations and cannot have Reused Contract Context subsections
+- contract restrictions: contract elements use only `define` relations and cannot have Contract Bindings subsections
 - `definedBy` targets resolve to element identifiers, not plain file paths or `# Element` file links without element fragments
 
 This validation occurs:
@@ -130,34 +130,34 @@ The Reqvire SHACL context adapter must:
   * define: [Reqvire SHACL Context Adapter](ValidationRequirements.md#reqvire-shacl-context-adapter)
 ---
 
-### Reused Contract Context Scope Validation Contract Specification
+### Contract Bindings Scope Validation Contract Specification
 
 #### Details
-When validating reused_contract_context, the system is expected to enforce reused_contract_context scope constraints for contract-element identifier targets and report errors with clear messages indicating the reusesContract element, the reused_contract_context target, and the reason for the violation.
+When validating contract_bindings, the system is expected to enforce contract_bindings scope constraints for contract-element identifier targets and report errors with clear messages indicating the bindContract element, the contract_bindings target, and the reason for the violation.
 
-Reused Contract Context scope validation is expected to enforce:
+Contract Bindings scope validation is expected to enforce:
 - Hierarchical independence from the contract's defining hierarchy
 - Upstream propagation within a hierarchy branch
-- One-direction reused_contract_context flow between capability-root subgraphs
+- One-direction contract_bindings flow between capability-root subgraphs
 
 #### Metadata
   * type: specification
 ---
 
-### Reused Contract Context Target Validation Contract Specification
+### Contract Bindings Target Validation Contract Specification
 
 #### Details
-Reused Contract Context targets support model element identifier references with family-specific compatibility rules.
+Contract Bindings targets support model element identifier references with family-specific compatibility rules.
 
 **Identifier Targets:**
-- Requirement reused_contract_context must point to reusable requirement-owned non-semantic-contract element types only (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
-- Reused Contract Context to `ontology` is invalid; SKOS concept bindings use `#### Concept References` on non-ontology, non-semantic-contract elements, while semantic-contract ontology dependencies use `use`/`usedBy`
+- Requirement contract_bindings must point to reusable requirement-owned non-semantic-contract element types only (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
+- Contract Bindings to `ontology` is invalid; SKOS concept bindings use `#### Concept References` on non-ontology, non-semantic-contract elements, while semantic-contract ontology dependencies use `use`/`usedBy`
 - Normalized like relation targets (resolved to full identifier path)
 - Validation is expected to reject identifiers pointing to non-reusable element types
 - Validation is expected to reject unresolved identifiers
 - Provides clear error message indicating the expected element type
 
-This validation ensures that reused_contract_context reference reusable requirement-owned contracts and do not carry ontology semantics.
+This validation ensures that contract_bindings reference reusable requirement-owned contracts and do not carry ontology semantics.
 
 #### Metadata
   * type: specification

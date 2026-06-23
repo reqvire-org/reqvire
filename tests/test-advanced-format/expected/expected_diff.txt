@@ -43,6 +43,26 @@ Found 9 file(s) with formatting changes:
 
 
 
+📄 ContractBindingTest.md
+  01     # Elements
+  02
+  03     ### ContractBindingEntry Display Name Test
+  04
+  05     This requirement tests that contract bindings display names are preserved by format.
+  06 -   #### Contract Bindings
+  06 -     * [Human Readable Behavior Name](Behaviors.md#my-test-behavior)
+  06 -   ␤
+  06     #### Metadata
+  07       * type: requirement
+  08 +   #### Contract Bindings
+  09 +     * [My Test Behavior](Behaviors.md#my-test-behavior)
+  10 +   ␤
+  11     #### Relations
+  12       * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
+  13     ---
+
+
+
 📄 MOEs.md
   01     # Elements
   02 +   ### MOE_CE
@@ -86,26 +106,6 @@ Found 9 file(s) with formatting changes:
   32 -   #### Relations
   32 -     * specify: [Test Capability](#test-capability-test-advanced-format-moes-md)
   32 -   ␤
-
-
-
-📄 ReusedContractContextTest.md
-  01     # Elements
-  02
-  03     ### ReusedContractContextEntry Display Name Test
-  04
-  05     This requirement tests that reused contract context display names are preserved by format.
-  06 -   #### Reused Contract Context
-  06 -     * [Human Readable Behavior Name](Behaviors.md#my-test-behavior)
-  06 -   ␤
-  06     #### Metadata
-  07       * type: requirement
-  08 +   #### Reused Contract Context
-  09 +     * [My Test Behavior](Behaviors.md#my-test-behavior)
-  10 +   ␤
-  11     #### Relations
-  12       * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
-  13     ---
 
 
 

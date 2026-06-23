@@ -35,7 +35,7 @@ The system shall document MCP, coding-assistant integrations, prompt workflows, 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [MCP Prompt Guidance Specification](../MCP/Specifications.md#mcp-prompt-guidance-specification)
   * [MCP Protocol Standard Conformance Specification](../MCP/Specifications.md#mcp-protocol-standard-conformance-specification)
   * [MCP Semantic Query Tools Specification](../MCP/Specifications.md#mcp-semantic-query-tools-specification)
@@ -55,7 +55,7 @@ The system shall document everyday CLI workflows, model commands, report command
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [CLI Interface Structure Contract Specification](../CLI/Specifications.md#cli-interface-structure-contract-specification)
   * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
   * [Report Command Catalog Specification](../../Reports/ModelReports/Specifications.md#report-command-catalog-specification)
@@ -88,7 +88,7 @@ The system shall document requirement implementation coverage, verification cove
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Requirement Implementation Coverage Logic Specification](../../Reports/ModelReports/Specifications.md#requirement-implementation-coverage-logic-specification)
   * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
 
@@ -105,7 +105,7 @@ The system shall document Reqvire Markdown element syntax, relation syntax, mode
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Specification File Identification Contract Specification](../../ModelStructure/Specifications.md#specification-file-identification-contract-specification)
   * [Structure and Addressing in Markdown Documents Contract Specification](../../ModelStructure/Specifications.md#structure-and-addressing-in-markdown-documents-contract-specification)
 
@@ -122,7 +122,7 @@ The system shall document ontology authoring, external ontology sources, built-i
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Local External Ontology Source Specification](../../Semantics/SemanticModelSpecifications.md#local-external-ontology-source-specification)
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
   * [Ontology Projection Subgraph Materialization Specification](../../Reports/ModelReports/Specifications.md#ontology-projection-subgraph-materialization-specification)
@@ -137,12 +137,12 @@ The system shall document ontology authoring, external ontology sources, built-i
 
 ### Website Requirements and Contracts Documentation
 
-The system shall document capability, requirement, contract, semantic-contract, concept-reference, reused-contract-context, and governance rules using current Reqvire terminology.
+The system shall document capability, requirement, contract, semantic-contract, concept-reference, contract-bindings, and governance rules using current Reqvire terminology.
 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
   * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
@@ -155,12 +155,12 @@ The system shall document capability, requirement, contract, semantic-contract, 
 
 ### Website Semantic Model Documentation
 
-The system shall document the Reqvire semantic model, including element types, relation semantics, ownership, reused contract context, concept references, verification links, and implementation evidence.
+The system shall document the Reqvire semantic model, including element types, relation semantics, ownership, contract bindings, concept references, verification links, and implementation evidence.
 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
   * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
@@ -179,7 +179,7 @@ The system shall explain Reqvire as a semantic engineering framework for AI-assi
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
 
@@ -196,7 +196,7 @@ The system shall document verification objectives, concrete verification types, 
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
   * [Verification Roll-up Specification](../../Verification/Traceability/Specifications.md#verification-roll-up-specification)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)

@@ -91,7 +91,7 @@ window.reqvireProjectStore = { /* ExplorerProjectStore JSON */ };
   `relations`, `attachments`, `concept_refs`, `submodels`, `traces`, `coverage`,
   `ontology`, `knowledge_graph`, `search`, `summaries`, `routes`.
   The `attachments` key is the Project Store compatibility field for
-  Reused Contract Context entries.
+  Contract Bindings entries.
 
 `src/store/types.ts` is the authoritative TypeScript mirror of the Rust structs.
 

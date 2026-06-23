@@ -255,10 +255,10 @@ reqvire:relationTargetIdentifier a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
   rdfs:comment "Stable identifier of a relation target emitted by model-context RDF projection facts." .
-reqvire:reusedContractContextTargetIdentifier a owl:DatatypeProperty ;
+reqvire:contractBindingsTargetIdentifier a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
-  rdfs:comment "Stable identifier of an reused_contract_context target emitted by model-context RDF projection facts." .
+  rdfs:comment "Stable identifier of a contract binding target emitted by model-context RDF projection facts." .
 reqvire:conceptLabel a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
@@ -379,7 +379,7 @@ reqvire:sourceRelationType a owl:DatatypeProperty ;
 reqvire:semanticArtifactExportMode a reqvire:SemanticArtifactExport ;
   rdfs:comment "Semantic ontology export mode that emits generated ontology document declarations plus authored ontology vocabulary with source comments." .
 reqvire:fullSemanticModelExportMode a reqvire:FullSemanticModelExport ;
-  rdfs:comment "Semantic graph export mode that emits generated ontology document declarations, authored ontology and SHACL blocks, and RDF triples for Reqvire model elements, relations, reused_contract_context, concept references, ontology term declarations, shape references, and generated ontology projection facts." .
+  rdfs:comment "Semantic graph export mode that emits generated ontology document declarations, authored ontology and SHACL blocks, and RDF triples for Reqvire model elements, relations, contract_bindings, concept references, ontology term declarations, shape references, and generated ontology projection facts." .
 reqvire:externalUsedTermSeedQuery a reqvire:ExternalOntologySubsetConstructQuery ;
   reqvire:constructQueryName "external-used-term-seed-query" ;
   reqvire:constructFamily "external-used-subset" ;
@@ -641,7 +641,7 @@ reqvire:RdfProjectionShape
     sh:datatype xsd:string ;
   ] ;
   sh:property [
-    sh:path reqvire:reusedContractContextTargetIdentifier ;
+    sh:path reqvire:contractBindingsTargetIdentifier ;
     sh:datatype xsd:string ;
   ] ;
   sh:property [

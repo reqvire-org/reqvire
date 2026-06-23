@@ -11,7 +11,7 @@ The **Explorer** is the read/navigate surface over that graph. It is one applica
 | **Ontologies** | RDF/SHACL graph of the modeling vocabulary, with a node inspector. |
 | **Search** | Unified search across files, elements, resources, ontology terms, traces, coverage. |
 | **Traces** | Grouped verification trace rows and requirement roll-up diagrams. |
-| **Element detail** | A modal: metadata table, user-story content, prose details, and typed relations. |
+| **Element detail** | Shared modal/source detail body: type badge, metadata strip, prose with inline concept links, collapsible typed relations, and Contract Bindings. |
 
 > **Design intent.** The reference screenshots show *what exists and the direction* — not a pixel target. This system keeps the structure and semantics (the modes, the element-type color code, the sidebar + canvas + top-tab shell) and **elevates the craft**: warm product surfaces, slate text ramps, a rose chrome accent, Geist type, a 4px spacing grid, restrained elevation, and a clean component set.
 

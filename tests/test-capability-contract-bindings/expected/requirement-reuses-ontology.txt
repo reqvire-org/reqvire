@@ -1,0 +1,1 @@
+Requirement contract_bindings to ontology is rejected

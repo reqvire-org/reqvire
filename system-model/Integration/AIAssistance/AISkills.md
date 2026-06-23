@@ -7,7 +7,7 @@ The system shall define a dedicated AI-assistant skills submodel that provides i
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Contract Specification](../../ModelStructure/Specifications.md#contract-specification)
   * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)

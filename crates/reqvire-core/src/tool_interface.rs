@@ -209,9 +209,9 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 ("filter_page_content", json!({ "type": "string" })),
                 ("have_relations", json!({ "type": "string" })),
                 ("not_have_relations", json!({ "type": "string" })),
-                ("has_reused_contract_context", json!({ "type": "boolean" })),
+                ("has_contract_bindings", json!({ "type": "boolean" })),
                 (
-                    "filter_reused_contract_context",
+                    "filter_contract_bindings",
                     json!({ "type": "string" }),
                 ),
             ]),
@@ -583,7 +583,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             ),
             mutation_tool(
                 "reqvire.link",
-                "Add a relation or reused_contract_context.",
+                "Add a relation or contract_bindings.",
                 required_object_schema(
                     vec![
                         ("source", json!({ "type": "string" })),
@@ -596,7 +596,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             ),
             mutation_tool(
                 "reqvire.unlink",
-                "Remove a relation or reused_contract_context.",
+                "Remove a relation or contract_bindings.",
                 required_object_schema(
                     vec![
                         ("source", json!({ "type": "string" })),
@@ -856,8 +856,8 @@ fn search_tool(args: &Value, excluded_filename_patterns: &GlobSet) -> Result<Val
         string_arg(args, "filter_page_content").as_deref(),
         string_arg(args, "have_relations").as_deref(),
         string_arg(args, "not_have_relations").as_deref(),
-        bool_arg(args, "has_reused_contract_context", false),
-        string_arg(args, "filter_reused_contract_context").as_deref(),
+        bool_arg(args, "has_contract_bindings", false),
+        string_arg(args, "filter_contract_bindings").as_deref(),
     )?;
     parse_json_string(search::generate_search_report(
         &model.graph_registry,
@@ -2766,8 +2766,8 @@ fn query_patterns_section(include_examples: bool) -> Vec<Value> {
         }),
         json!({
             "id": "cross_subgraph_contract_context",
-            "title": "Requirements using Reused Contract Context",
-            "preferred_property": "reqvire:requirementUsesCrossSubgraphContract"
+            "title": "Requirements using Contract Bindings",
+            "preferred_property": "reqvire:requirementBindsContract"
         }),
     ];
 
@@ -2787,7 +2787,7 @@ fn query_patterns_section(include_examples: bool) -> Vec<Value> {
         if let Some(Value::Object(pattern)) = patterns.get_mut(2) {
             pattern.insert(
                 "sparql".to_string(),
-                json!("SELECT ?requirement ?contract WHERE { ?requirement a reqvire:Requirement ; reqvire:requirementUsesCrossSubgraphContract ?contract . } ORDER BY ?requirement ?contract"),
+                json!("SELECT ?requirement ?contract WHERE { ?requirement a reqvire:Requirement ; reqvire:requirementBindsContract ?contract . } ORDER BY ?requirement ?contract"),
             );
         }
     }
@@ -3395,7 +3395,7 @@ fn link_tool(args: &Value, excluded_filename_patterns: &GlobSet) -> Result<Value
     let relation_type = required_string_arg(args, "relation_type")?;
     let target = required_string_arg(args, "target")?;
     let git_root = git_commands::get_git_root_dir()?;
-    let result = if relation_type == "reusesContract" {
+    let result = if relation_type == "bindContract" {
         if crate::utils::is_external_url(&target) {
             return Err(ReqvireError::ProcessError(
                 "External URLs cannot be reused as contract context. Use a semantically specific relation only when the URL is valid evidence for that relation."
@@ -3788,8 +3788,8 @@ fn model_fingerprint(model: &ModelManager) -> String {
             relation.relation_type.name.hash(&mut hasher);
             relation.target.link.as_str().hash(&mut hasher);
         }
-        for reused_contract_context in &element.reused_contract_context {
-            reused_contract_context.target.as_str().hash(&mut hasher);
+        for contract_bindings in &element.contract_bindings {
+            contract_bindings.target.as_str().hash(&mut hasher);
         }
     }
 

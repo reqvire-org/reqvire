@@ -189,7 +189,7 @@ echo "Test 8 passed"
 echo ""
 
 # ==================================
-# Test 9: Unlink non-existent relation/reused_contract_context fails
+# Test 9: Unlink non-existent relation/contract_bindings fails
 # ==================================
 echo "Test 9: Unlink non-existent relation fails..."
 
@@ -255,7 +255,7 @@ echo ""
 echo "Test 12: Reusing Contract external URL fails with helpful message..."
 
 set +e
-ATTACH_URL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" reusesContract "https://example.com/doc.pdf" 2>&1)
+ATTACH_URL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" bindContract "https://example.com/doc.pdf" 2>&1)
 ATTACH_URL_EXIT=$?
 set -e
 

@@ -96,9 +96,9 @@ pub struct ChangedElement {
     pub added_relations: Vec<RelationSummary>,
     pub removed_relations: Vec<RelationSummary>,
     pub change_impact_tree: ElementNode,
-    /// Set of reused_contract_context target strings that changed (for rendering with ⚠️)
+    /// Set of contract_bindings target strings that changed (for rendering with ⚠️)
     #[serde(skip_serializing_if = "HashSet::is_empty")]
-    pub changed_reused_contract_context: HashSet<String>,
+    pub changed_contract_bindings: HashSet<String>,
 }
 
 impl ChangedElement {
@@ -293,7 +293,7 @@ impl ChangeImpactReport {
                     "added_relations": added_relations,
                     "removed_relations": removed_relations,
                     "change_impact_tree": impact_tree,
-                    "changed_reused_contract_context": elem.changed_reused_contract_context
+                    "changed_contract_bindings": elem.changed_contract_bindings
                 })
             })
             .collect();
@@ -411,9 +411,9 @@ impl ChangeImpactReport {
         }
         for elem in &self.changed {
             let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
-            // Add ⚠️ if element has content or reused_contract_context changes
+            // Add ⚠️ if element has content or contract_bindings changes
             let change_marker =
-                if elem.content_changed || !elem.changed_reused_contract_context.is_empty() {
+                if elem.content_changed || !elem.changed_contract_bindings.is_empty() {
                     " ⚠️"
                 } else {
                     ""
@@ -423,25 +423,25 @@ impl ChangeImpactReport {
                 elem.name, element_url, change_marker
             ));
 
-            // Render reused_contract_context with 📎 icon (and ⚠️ for changed ones)
-            let reused_contract_context = &elem.change_impact_tree.element.reused_contract_context;
-            for att in reused_contract_context {
+            // Render contract_bindings with 📎 icon (and ⚠️ for changed ones)
+            let contract_bindings = &elem.change_impact_tree.element.contract_bindings;
+            for att in contract_bindings {
                 let att_target = att.target.as_str();
-                let change_icon = if elem.changed_reused_contract_context.contains(&att_target) {
+                let change_icon = if elem.changed_contract_bindings.contains(&att_target) {
                     " ⚠️"
                 } else {
                     ""
                 };
-                let att_url = format_reused_contract_context_url(
+                let att_url = format_contract_bindings_url(
                     &att.target,
                     &elem.change_impact_tree.element.file_path,
                     base_url,
                     git_commit,
                 );
-                let att_name = format_reused_context_name(&att.target);
+                let contract_binding_name = format_contract_binding_name(&att.target);
                 output.push_str(&format!(
                     "    * 📎 [{}]({}){}\n",
-                    att_name, att_url, change_icon
+                    contract_binding_name, att_url, change_icon
                 ));
             }
 
@@ -452,7 +452,7 @@ impl ChangeImpactReport {
                 base_url,
                 git_commit,
                 new_element_ids,
-                &elem.changed_reused_contract_context,
+                &elem.changed_contract_bindings,
             );
             if !rendered_tree.trim().is_empty() {
                 output.push_str(&rendered_tree);
@@ -562,15 +562,15 @@ fn _generate_markdown_diff(old: &str, new: &str) -> String {
     format!("```diff\n{}```", diff_output)
 }
 
-/// Format reused_contract_context URL for rendering
-fn format_reused_contract_context_url(
-    target: &element::ReusedContractContextTarget,
+/// Format contract_bindings URL for rendering
+fn format_contract_bindings_url(
+    target: &element::ContractBindingTarget,
     _element_file: &str,
     base_url: &str,
     git_commit: &str,
 ) -> String {
     match target {
-        element::ReusedContractContextTarget::FilePath(path) => {
+        element::ContractBindingTarget::FilePath(path) => {
             format!(
                 "{}/blob/{}/{}",
                 base_url,
@@ -578,17 +578,17 @@ fn format_reused_contract_context_url(
                 path.to_string_lossy()
             )
         }
-        element::ReusedContractContextTarget::ElementIdentifier(id) => {
+        element::ContractBindingTarget::ElementIdentifier(id) => {
             format!("{}/blob/{}/{}", base_url, git_commit, id)
         }
     }
 }
 
-/// Format reused_contract_context name for rendering (extract just the name part)
-fn format_reused_context_name(target: &element::ReusedContractContextTarget) -> String {
+/// Format contract_bindings name for rendering (extract just the name part)
+fn format_contract_binding_name(target: &element::ContractBindingTarget) -> String {
     match target {
-        element::ReusedContractContextTarget::FilePath(path) => path.to_string_lossy().to_string(),
-        element::ReusedContractContextTarget::ElementIdentifier(id) => {
+        element::ContractBindingTarget::FilePath(path) => path.to_string_lossy().to_string(),
+        element::ContractBindingTarget::ElementIdentifier(id) => {
             // Extract element name from identifier (after #)
             id.split('#')
                 .next_back()
@@ -614,7 +614,7 @@ fn render_change_impact_tree(
     base_url: &str,
     git_commit: &str,
     new_element_ids: &HashSet<String>,
-    changed_reused_contract_context: &HashSet<String>,
+    changed_contract_bindings: &HashSet<String>,
 ) -> String {
     let mut output = String::new();
     let pad = "    ".repeat(indent);
@@ -636,24 +636,24 @@ fn render_change_impact_tree(
             pad, relation_node.relation_trigger, target.name, element_url, new_icon, change_icon
         ));
 
-        // Render reused_contract_context for child elements
-        for att in &target.reused_contract_context {
+        // Render contract_bindings for child elements
+        for att in &target.contract_bindings {
             let att_target = att.target.as_str();
-            let att_change_icon = if changed_reused_contract_context.contains(&att_target) {
+            let att_change_icon = if changed_contract_bindings.contains(&att_target) {
                 " ⚠️"
             } else {
                 ""
             };
-            let att_url = format_reused_contract_context_url(
+            let att_url = format_contract_bindings_url(
                 &att.target,
                 &target.file_path,
                 base_url,
                 git_commit,
             );
-            let att_name = format_reused_context_name(&att.target);
+            let contract_binding_name = format_contract_binding_name(&att.target);
             output.push_str(&format!(
                 "{}    * 📎 [{}]({}){}\n",
-                pad, att_name, att_url, att_change_icon
+                pad, contract_binding_name, att_url, att_change_icon
             ));
         }
 
@@ -663,7 +663,7 @@ fn render_change_impact_tree(
             base_url,
             git_commit,
             new_element_ids,
-            changed_reused_contract_context,
+            changed_contract_bindings,
         ));
     }
     output
@@ -932,8 +932,8 @@ pub fn apply_smart_filtering(
                 collect_tree_ids_recursively(&rel_node.element_node, &mut referenced_ids);
             }
         }
-        // Also collect reused_contract_context element identifiers
-        collect_reused_contract_context_element_ids(
+        // Also collect contract_bindings element identifiers
+        collect_contract_bindings_element_ids(
             &added.change_impact_tree.element,
             &mut referenced_ids,
         );
@@ -945,23 +945,23 @@ pub fn apply_smart_filtering(
                 collect_tree_ids_recursively(&rel_node.element_node, &mut referenced_ids);
             }
         }
-        // Also collect reused_contract_context element identifiers
-        collect_reused_contract_context_element_ids(
+        // Also collect contract_bindings element identifiers
+        collect_contract_bindings_element_ids(
             &changed.change_impact_tree.element,
             &mut referenced_ids,
         );
     }
 
-    // Step 3: Also collect reused_contract_context from children in the tree
+    // Step 3: Also collect contract_bindings from children in the tree
     for added in &report.added {
-        collect_reused_context_ids_from_tree(&added.change_impact_tree, &mut referenced_ids);
+        collect_contract_binding_ids_from_tree(&added.change_impact_tree, &mut referenced_ids);
     }
     for changed in &report.changed {
-        collect_reused_context_ids_from_tree(&changed.change_impact_tree, &mut referenced_ids);
+        collect_contract_binding_ids_from_tree(&changed.change_impact_tree, &mut referenced_ids);
     }
 
     // Step 4: Filter out added/changed elements that are referenced elsewhere (not root).
-    // This includes elements referenced via downstream relations OR via reused_contract_context.
+    // This includes elements referenced via downstream relations OR via contract_bindings.
     report
         .added
         .retain(|e| !referenced_ids.contains(&e.element_id));
@@ -998,43 +998,43 @@ fn is_smart_filter_child_relation(relation_type: &str) -> bool {
     )
 }
 
-/// Collect element identifiers from reused_contract_context (for smart filtering)
-fn collect_reused_contract_context_element_ids(elem: &element::Element, set: &mut HashSet<String>) {
-    for reused_contract_context in &elem.reused_contract_context {
-        if let element::ReusedContractContextTarget::ElementIdentifier(id) =
-            &reused_contract_context.target
+/// Collect element identifiers from contract_bindings (for smart filtering)
+fn collect_contract_bindings_element_ids(elem: &element::Element, set: &mut HashSet<String>) {
+    for contract_bindings in &elem.contract_bindings {
+        if let element::ContractBindingTarget::ElementIdentifier(id) =
+            &contract_bindings.target
         {
             set.insert(id.clone());
         }
     }
 }
 
-/// Recursively collect reused_contract_context element IDs from the entire tree
-fn collect_reused_context_ids_from_tree(node: &ElementNode, set: &mut HashSet<String>) {
-    collect_reused_contract_context_element_ids(&node.element, set);
+/// Recursively collect contract_bindings element IDs from the entire tree
+fn collect_contract_binding_ids_from_tree(node: &ElementNode, set: &mut HashSet<String>) {
+    collect_contract_bindings_element_ids(&node.element, set);
     for relation in &node.relations {
-        collect_reused_context_ids_from_tree(&relation.element_node, set);
+        collect_contract_binding_ids_from_tree(&relation.element_node, set);
     }
 }
 
-/// Get reused_contract_context hashes for an element, resolving element reused_contract_context hashes from registry
-/// Returns a sorted list of (reused_contract_context_target_string, hash) tuples for deterministic comparison
-fn get_reused_contract_context_hashes(
+/// Get contract_bindings hashes for an element, resolving element contract_bindings hashes from registry
+/// Returns a sorted list of (contract_bindings_target_string, hash) tuples for deterministic comparison
+fn get_contract_bindings_hashes(
     element: &element::Element,
     registry: &graph_registry::GraphRegistry,
 ) -> Vec<(String, String)> {
     let mut hashes: Vec<(String, String)> = element
-        .reused_contract_context
+        .contract_bindings
         .iter()
         .filter_map(|att| {
             let target_str = att.target.as_str();
             let hash = match &att.target {
-                element::ReusedContractContextTarget::FilePath(_) => {
-                    // File reused_contract_context - use stored content_hash
+                element::ContractBindingTarget::FilePath(_) => {
+                    // File contract_bindings - use stored content_hash
                     att.content_hash.clone()
                 }
-                element::ReusedContractContextTarget::ElementIdentifier(elem_id) => {
-                    // Element reused_contract_context - look up hash from registry
+                element::ContractBindingTarget::ElementIdentifier(elem_id) => {
+                    // Element contract_bindings - look up hash from registry
                     registry
                         .get_element(elem_id)
                         .map(|e| e.hash_impact_content.clone())
@@ -1047,17 +1047,17 @@ fn get_reused_contract_context_hashes(
     hashes
 }
 
-/// Get the set of reused_contract_context target strings that changed between two versions
-fn get_changed_reused_contract_context(
+/// Get the set of contract_bindings target strings that changed between two versions
+fn get_changed_contract_bindings(
     cur_elem: &element::Element,
     ref_elem: &element::Element,
     current_registry: &graph_registry::GraphRegistry,
     reference_registry: &graph_registry::GraphRegistry,
 ) -> HashSet<String> {
     let cur_hashes: Vec<(String, String)> =
-        get_reused_contract_context_hashes(cur_elem, current_registry);
+        get_contract_bindings_hashes(cur_elem, current_registry);
     let ref_hashes: Vec<(String, String)> =
-        get_reused_contract_context_hashes(ref_elem, reference_registry);
+        get_contract_bindings_hashes(ref_elem, reference_registry);
 
     // Collect just the content hashes for comparison
     let cur_hash_set: HashSet<&String> = cur_hashes.iter().map(|(_, h)| h).collect();
@@ -1065,18 +1065,18 @@ fn get_changed_reused_contract_context(
 
     let mut changed = HashSet::new();
 
-    // Check for changed or added reused_contract_context (hash in current but not in reference)
+    // Check for changed or added contract_bindings (hash in current but not in reference)
     for (target, cur_hash) in &cur_hashes {
         if !ref_hash_set.contains(cur_hash) {
             changed.insert(target.clone());
         }
     }
 
-    // Check for removed reused_contract_context (hash in reference but not in current)
+    // Check for removed contract_bindings (hash in reference but not in current)
     // We need to find the current target for hashes that were removed
     for (target, ref_hash) in &ref_hashes {
         if !cur_hash_set.contains(ref_hash) {
-            // Hash was removed - find if there's a current reused_contract_context with same target
+            // Hash was removed - find if there's a current contract_bindings with same target
             // or use the reference target
             let current_target = cur_hashes
                 .iter()
@@ -1333,20 +1333,20 @@ pub fn compute_change_impact(
         let ref_elem = reference.get_element(id).unwrap();
         let content_changed = cur_elem.hash_impact_content != ref_elem.hash_impact_content;
 
-        // Compare reused_contract_context hashes (resolved from registries) - compare only hash values, not targets
-        let cur_reused_contract_context_hashes =
-            get_reused_contract_context_hashes(cur_elem, current);
-        let ref_reused_contract_context_hashes =
-            get_reused_contract_context_hashes(ref_elem, reference);
-        let cur_hash_set: HashSet<&String> = cur_reused_contract_context_hashes
+        // Compare contract_bindings hashes (resolved from registries) - compare only hash values, not targets
+        let cur_contract_bindings_hashes =
+            get_contract_bindings_hashes(cur_elem, current);
+        let ref_contract_bindings_hashes =
+            get_contract_bindings_hashes(ref_elem, reference);
+        let cur_hash_set: HashSet<&String> = cur_contract_bindings_hashes
             .iter()
             .map(|(_, h)| h)
             .collect();
-        let ref_hash_set: HashSet<&String> = ref_reused_contract_context_hashes
+        let ref_hash_set: HashSet<&String> = ref_contract_bindings_hashes
             .iter()
             .map(|(_, h)| h)
             .collect();
-        let reused_contract_context_changed = cur_hash_set != ref_hash_set;
+        let contract_bindings_changed = cur_hash_set != ref_hash_set;
 
         // Only track changes to relations that propagate impact according to specifications
         let cur_relations_raw: Vec<_> = cur_elem
@@ -1398,21 +1398,21 @@ pub fn compute_change_impact(
             .map(|r| convert_relation_to_summary(r))
             .collect();
 
-        // Get changed reused_contract_context for rendering
-        let changed_reused_contract_context =
-            get_changed_reused_contract_context(cur_elem, ref_elem, current, reference);
+        // Get changed contract_bindings for rendering
+        let changed_contract_bindings =
+            get_changed_contract_bindings(cur_elem, ref_elem, current, reference);
 
         let has_changed = content_changed
-            || reused_contract_context_changed
+            || contract_bindings_changed
             || !added_relations.is_empty()
             || !removed_relations.is_empty();
         if has_changed {
             // Debug: print element changes
             log::debug!(
-                "Changed element '{}': content={}, reused_contract_context={}, relations={}",
+                "Changed element '{}': content={}, contract_bindings={}, relations={}",
                 cur_elem.name,
                 content_changed,
-                reused_contract_context_changed,
+                contract_bindings_changed,
                 cur_elem.relations.len()
             );
             for rel in &cur_elem.relations {
@@ -1433,7 +1433,7 @@ pub fn compute_change_impact(
                 added_relations,
                 removed_relations,
                 change_impact_tree,
-                changed_reused_contract_context,
+                changed_contract_bindings,
             });
         }
     }
@@ -1516,12 +1516,12 @@ pub fn compute_change_impact(
                     .map(|r| convert_relation_to_summary(r))
                     .collect();
 
-                // Get changed reused_contract_context for rendering
-                let changed_reused_contract_context =
-                    get_changed_reused_contract_context(cur_elem, ref_elem, current, reference);
+                // Get changed contract_bindings for rendering
+                let changed_contract_bindings =
+                    get_changed_contract_bindings(cur_elem, ref_elem, current, reference);
 
                 let has_changed = content_changed
-                    || !changed_reused_contract_context.is_empty()
+                    || !changed_contract_bindings.is_empty()
                     || !added_relations.is_empty()
                     || !removed_relations.is_empty();
                 if has_changed {
@@ -1543,7 +1543,7 @@ pub fn compute_change_impact(
                         added_relations,
                         removed_relations,
                         change_impact_tree,
-                        changed_reused_contract_context,
+                        changed_contract_bindings,
                     });
                 }
             }

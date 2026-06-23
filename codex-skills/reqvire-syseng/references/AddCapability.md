@@ -27,7 +27,7 @@ When constructing or refactoring a system model, work from model boundaries inwa
 5. Put curated terminology in native concept elements, put structural vocabulary and stable semantic relationships in ontology, and bind capability, requirement, contract, and verification prose to SKOS concepts with `#### Concept References`.
 6. Put implementable obligations in requirements that `specify` the local capability.
 7. Put local details in compatible contracts owned by the relevant requirement.
-8. Use reused_contract_context, not hierarchy, when another requirement root needs reusable requirement-owned contracts. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
+8. Use contract_bindings, not hierarchy, when another requirement root needs reusable requirement-owned contracts. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
 9. Validate `submodels`, `collect`, and change-impact paths after each boundary slice.
 
 ## Capability Design Rules
@@ -280,7 +280,7 @@ When an error occurs, the system shall log the error, notify the user, and attem
 EOF
 ```
 
-Link contracts to requirements using relations or reused_contract_context:
+Link contracts to requirements using relations or contract_bindings:
 
 ```bash
 # Link contract to requirement using definedBy relation (owner defines it)
@@ -288,14 +288,14 @@ reqvire link "Data Processing Requirement" "definedBy" "Data Format Specificatio
 
 # Reuse requirement contract element across explicit requirement subgraph boundaries
 # The contract must be owned by a requirement via definedBy
-reqvire link "Other Capability Requirement" reusesContract "Performance Constraint"
+reqvire link "Other Capability Requirement" bindContract "Performance Constraint"
 
 # Link a reusable semantic contract to a requirement and ontology
 reqvire link "Requirement Shape Contract" "constrain" "Other Capability Requirement"
 reqvire link "Requirement Shape Contract" "use" "Capability Ontology"
 
 # Reuse file (design document, specification document)
-reqvire link "Architecture Requirement" reusesContract "docs/architecture.pdf"
+reqvire link "Architecture Requirement" bindContract "docs/architecture.pdf"
 
 # Link to implementation file or external URL
 # Note: capability must not use satisfiedBy/satisfy.
@@ -303,9 +303,9 @@ reqvire link "System Requirement" "satisfiedBy" "src/auth/login.rs"
 reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
 ```
 
-**Reused Contract Context constraints:**
+**Contract Bindings constraints:**
 - Contracts must have a `define` relation before being reused
-- Capabilities do not author reused_contract_context; use `#### Concept References` for SKOS concept bindings
+- Capabilities do not author contract_bindings; use `#### Concept References` for SKOS concept bindings
 - Requirements may reuse only requirement-owned `specification`, `constraint`, `behavior`, `state`, or `input-output` contracts
 - Semantic contracts must not author `#### Concept References`; they depend on ontology through `use`
 
@@ -383,7 +383,7 @@ After adding requirements and verifications, follow the standard validation work
 3. `reqvire coverage` - Verify leaf verification coverage and requirement-only implementation coverage
 4. `reqvire format --fix` - Normalize formatting
 
-Additionally, use `reqvire resources` to see all files referenced by the model through `satisfiedBy` relations and reused_contract_context.
+Additionally, use `reqvire resources` to see all files referenced by the model through `satisfiedBy` relations and contract_bindings.
 
 ## Complete Example
 
@@ -396,7 +396,7 @@ Authentication capability for access-controlled product areas.
 #### Metadata
   * type: capability
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Authentication Ontology](Ontologies/Auth.md#authentication-ontology)
 
 #### Relations

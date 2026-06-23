@@ -1,5 +1,5 @@
-export { ReusedContractContextList } from "./ReusedContractContextList";
-export type { ReusedContractContextListProps } from "./ReusedContractContextList";
+export { ContractBindingList } from "./ContractBindingList";
+export type { ContractBindingListProps } from "./ContractBindingList";
 export { ConceptReferenceList } from "./ConceptReferenceList";
 export type { ConceptReferenceListProps } from "./ConceptReferenceList";
 export { InlineConceptReference } from "./InlineConceptReference";
@@ -19,7 +19,7 @@ export type { RelationEndpointProps } from "./RelationEndpoint";
 export { RelationList } from "./RelationList";
 export type { RelationListProps } from "./RelationList";
 export type {
-  DetailReusedContractContextItem,
+  DetailContractBindingItem,
   DetailConceptReferenceItem,
   DetailMetaBadge,
   DetailMetaProvenance,

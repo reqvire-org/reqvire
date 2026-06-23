@@ -102,7 +102,7 @@ reqvire mcp --enable-mutations`}</CodeBlock>
             full: true
           </code>{" "}
           when it also needs generated model context triples for elements,
-          relations, Reused Contract Context entries, concept references,
+          relations, Contract Bindings entries, concept references,
           ontology declarations, and shape references.
         </p>
       </Section>

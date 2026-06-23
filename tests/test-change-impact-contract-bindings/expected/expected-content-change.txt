@@ -1,0 +1,33 @@
+## Change Impact Report
+
+### Changed Elements
+
+* [Data Processing Requirement](specifications/Requirements.md#data-processing-requirement) ⚠️
+    * 📎 [Data Format Spec](specifications/Requirements.md#data-format-spec) ⚠️
+    * verifiedBy -> [Processing Test](specifications/Verifications.md#processing-test)
+    * derive -> [Processing Implementation](specifications/Requirements.md#processing-implementation)
+
+* [Data Validation Requirement](specifications/Requirements.md#data-validation-requirement) ⚠️
+    * 📎 [Data Format Spec](specifications/Requirements.md#data-format-spec) ⚠️
+    * verifiedBy -> [Validation Test](specifications/Verifications.md#validation-test)
+
+* [Independent Requirement With Same Contract Bindings](specifications/Requirements.md#independent-requirement-with-same-contract-bindings) ⚠️
+    * 📎 [Data Format Spec](specifications/Requirements.md#data-format-spec) ⚠️
+    * 📎 [Export Format Spec](specifications/Requirements.md#export-format-spec)
+    * verifiedBy -> [Export Test](specifications/Verifications.md#export-test)
+    * derive -> [Export Implementation](specifications/Requirements.md#export-implementation)
+
+
+---
+
+### Impact Scope
+
+* [Test Capability Test Change Impact Contract Bindings Specifications Requirements Md](specifications/Requirements.md#test-capability-test-change-impact-contract-bindings-specifications-requirements-md)
+
+---
+
+## Invalidated Verifications
+
+- [ ] [Export Test](specifications/Verifications.md#export-test)
+- [ ] [Processing Test](specifications/Verifications.md#processing-test)
+- [ ] [Validation Test](specifications/Verifications.md#validation-test)

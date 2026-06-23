@@ -104,7 +104,7 @@ export type { TreeItemProps } from "./components/navigation/TreeItem";
 
 export {
   AppShell,
-  ReusedContractContextList,
+  ContractBindingList,
   CodeBody,
   CodePreviewFrame,
   CodeToolbar,
@@ -115,6 +115,8 @@ export {
   DiagramBlockFrame,
   DocumentPanel,
   DocumentPanelToolbar,
+  SourcePageElement,
+  SourcePageElements,
   ElementDetailContent,
   ElementDetailMissingState,
   FileBrowserElementsPanel,
@@ -223,14 +225,14 @@ export {
 } from "./product-patterns";
 export type {
   AppShellProps,
-  ReusedContractContextListProps,
+  ContractBindingListProps,
   CodeBodyProps,
   CodePreviewFrameProps,
   CodeToolbarProps,
   ConceptReferenceListProps,
   InlineConceptReferenceProps,
   ConceptElementDetailContentProps,
-  DetailReusedContractContextItem,
+  DetailContractBindingItem,
   DetailConceptReferenceItem,
   DetailDialogProps,
   DetailMetaBadge,

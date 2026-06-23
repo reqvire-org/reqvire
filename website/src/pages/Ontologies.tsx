@@ -47,9 +47,9 @@ export default function Ontologies() {
             "Author shared ontology elements under the ontology plane, commonly system-model/Ontologies.",
             "Capabilities, requirements, contracts, verification objectives, and concrete verifications use Concept References for SKOS concept bindings.",
             "Semantic contracts do not author Concept References; they use ontology through explicit use relations.",
-            "Reused Contract Context is for reusable requirement-owned contracts from other subgraphs.",
+            "Contract Bindings is for reusable requirement-owned contracts from other subgraphs.",
             "Ontology hierarchy uses derive or derivedFrom only with other ontology elements.",
-            "Ontology elements do not author Reused Contract Context.",
+            "Ontology elements do not author Contract Bindings.",
           ]}
         />
       </Section>
@@ -288,7 +288,7 @@ auth:AccessTokenValidationShape
           shapes, SKOS concepts, and the combined semantic graph as separate
           surfaces. Use the combined graph only when downstream graph/database
           consumers need generated Reqvire model context triples, including
-          relations, Reused Contract Context entries, concept references, term
+          relations, Contract Bindings entries, concept references, term
           declarations, shape references, and ontology projection facts.
         </p>
         <BulletList

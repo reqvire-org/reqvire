@@ -7,7 +7,7 @@ The system shall allow structured markdown and unstructured. (eg., markdown, PDF
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Contract Specification](Specifications.md#contract-specification)
 
 #### Relations

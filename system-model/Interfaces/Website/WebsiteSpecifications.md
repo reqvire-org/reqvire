@@ -103,7 +103,7 @@ The page shall distinguish authored ontology/SHACL output, full semantic model c
 ### Website Requirements and Contracts Documentation Specification
 
 #### Details
-The requirements and capabilities page shall explain capability scope, requirement obligations, requirement-owned contracts, semantic contracts, governance metadata, concept references, and reused contract context.
+The requirements and capabilities page shall explain capability scope, requirement obligations, requirement-owned contracts, semantic contracts, governance metadata, concept references, and contract bindings.
 
 Contract wording shall use the canonical phrasing: contracts define requirements in precise terms, including source basis, specifications, constraints, behavior, state, interfaces, and input/output semantics. Semantic contracts shall be presented as ontology-plane SHACL profiles that constrain requirements through `constrainedBy`/`constrain` and use ontology through `use`/`usedBy`.
 
@@ -117,7 +117,7 @@ Contract wording shall use the canonical phrasing: contracts define requirements
 ### Website Semantic Model Documentation Specification
 
 #### Details
-The semantic model page shall explain Reqvire element families, relation semantics, ownership rules, submodel boundaries, concept references, reused contract context, verification links, and implementation evidence.
+The semantic model page shall explain Reqvire element families, relation semantics, ownership rules, submodel boundaries, concept references, contract bindings, verification links, and implementation evidence.
 
 This page shall distinguish non-semantic requirement-owned contracts from semantic contracts and shall keep relation vocabulary aligned with the canonical relation families.
 

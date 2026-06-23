@@ -1,4 +1,4 @@
-use crate::element::{Element, GovernanceMetadataSource, ReusedContractContextTarget};
+use crate::element::{Element, GovernanceMetadataSource, ContractBindingTarget};
 use crate::git_commands;
 use crate::graph_registry::GraphRegistry;
 use crate::ontology_graph::{build_graph_data, OntologyGraphData};
@@ -22,7 +22,7 @@ pub struct ExplorerProjectStore {
     pub resources: Vec<ProjectStoreResource>,
     pub elements: Vec<ProjectStoreElement>,
     pub relations: Vec<ProjectStoreRelation>,
-    pub reused_contract_context: Vec<ProjectStoreReusedContractContextEntry>,
+    pub contract_bindings: Vec<ProjectStoreContractBindingEntry>,
     pub concept_refs: Vec<ProjectStoreConceptReference>,
     pub thesaurus: ProjectStoreThesaurus,
     pub submodels: Value,
@@ -102,7 +102,7 @@ pub struct ProjectStoreRelation {
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct ProjectStoreReusedContractContextEntry {
+pub struct ProjectStoreContractBindingEntry {
     pub id: String,
     pub source_id: String,
     pub target: String,
@@ -187,7 +187,7 @@ pub struct ProjectStoreSummaries {
     pub folders: usize,
     pub resources: usize,
     pub relations: usize,
-    pub reused_contract_context: usize,
+    pub contract_bindings: usize,
     pub concept_refs: usize,
     pub ontology_blocks: usize,
     pub shape_blocks: usize,
@@ -211,7 +211,7 @@ pub fn build_project_store(
 ) -> ExplorerProjectStore {
     let elements = build_elements(registry);
     let (relations, mut resources) = build_relations(registry);
-    let reused_contract_context = build_reused_contract_context(registry, &mut resources);
+    let contract_bindings = build_contract_bindings(registry, &mut resources);
     let concept_refs = build_concept_refs(registry, &mut resources);
     enrich_resource_sources(&mut resources);
     let (files, folders) = build_files_and_folders(registry, &resources);
@@ -222,7 +222,7 @@ pub fn build_project_store(
     let knowledge_graph = build_knowledge_graph_projection(
         &elements,
         &relations,
-        &reused_contract_context,
+        &contract_bindings,
         &concept_refs,
         &resources,
         &submodels,
@@ -257,7 +257,7 @@ pub fn build_project_store(
         folders: folders.len(),
         resources: resources.len(),
         relations: relations.len(),
-        reused_contract_context: reused_contract_context.len(),
+        contract_bindings: contract_bindings.len(),
         concept_refs: concept_refs.len(),
         ontology_blocks: semantic_index.summary.ontology_blocks,
         shape_blocks: semantic_index.summary.shape_blocks,
@@ -273,7 +273,7 @@ pub fn build_project_store(
         resources: resources.into_values().collect(),
         elements,
         relations,
-        reused_contract_context,
+        contract_bindings,
         concept_refs,
         thesaurus,
         submodels,
@@ -438,7 +438,7 @@ pub fn project_store_javascript(
 fn build_knowledge_graph_projection(
     elements: &[ProjectStoreElement],
     relations: &[ProjectStoreRelation],
-    reused_contract_context: &[ProjectStoreReusedContractContextEntry],
+    contract_bindings: &[ProjectStoreContractBindingEntry],
     concept_refs: &[ProjectStoreConceptReference],
     resources: &BTreeMap<String, ProjectStoreResource>,
     submodels: &Value,
@@ -497,26 +497,26 @@ fn build_knowledge_graph_projection(
         }))
     });
 
-    let reused_context_edges =
-        reused_contract_context
+    let bound_context_edges =
+        contract_bindings
             .iter()
-            .filter_map(|reused_contract_context| {
-                let target = reused_contract_context
+            .filter_map(|contract_bindings| {
+                let target = contract_bindings
                     .resource_id
                     .as_ref()
                     .filter(|resource_id| resources.contains_key(resource_id.as_str()))
                     .cloned()
-                    .unwrap_or_else(|| reused_contract_context.target.clone());
-                if !element_ids.contains(reused_contract_context.source_id.as_str())
+                    .unwrap_or_else(|| contract_bindings.target.clone());
+                if !element_ids.contains(contract_bindings.source_id.as_str())
                     || (!element_ids.contains(target.as_str()) && !resources.contains_key(&target))
                 {
                     return None;
                 }
                 Some(json!({
-                    "source": reused_contract_context.source_id,
+                    "source": contract_bindings.source_id,
                     "target": target,
-                    "label": "reuses contract",
-                    "kind": "reused_contract_context",
+                    "label": "binds contract",
+                    "kind": "contract_bindings",
                     "authored": true
                 }))
             });
@@ -554,7 +554,7 @@ fn build_knowledge_graph_projection(
 
     nodes.extend(concept_nodes.into_values());
     let edges = relation_edges
-        .chain(reused_context_edges)
+        .chain(bound_context_edges)
         .chain(concept_edges)
         .collect::<Vec<_>>();
 
@@ -572,7 +572,7 @@ fn build_knowledge_graph_projection(
         "summary": {
             "elements": elements.len(),
             "relations": relations.len(),
-            "reused_contract_context": reused_contract_context.len(),
+            "contract_bindings": contract_bindings.len(),
             "concept_references": concept_refs.len(),
             "resources": resources.len(),
             "submodels": submodel_count
@@ -1175,31 +1175,31 @@ fn build_relations(
     (relations, resources)
 }
 
-fn build_reused_contract_context(
+fn build_contract_bindings(
     registry: &GraphRegistry,
     resources: &mut BTreeMap<String, ProjectStoreResource>,
-) -> Vec<ProjectStoreReusedContractContextEntry> {
+) -> Vec<ProjectStoreContractBindingEntry> {
     let mut entries = Vec::new();
     for element in registry.get_all_elements() {
-        for entry in &element.reused_contract_context {
+        for entry in &element.contract_bindings {
             let (target, target_kind, resource_id) = match &entry.target {
-                ReusedContractContextTarget::ElementIdentifier(id) => {
+                ContractBindingTarget::ElementIdentifier(id) => {
                     (id.clone(), "element".to_string(), None)
                 }
-                ReusedContractContextTarget::FilePath(path) => {
+                ContractBindingTarget::FilePath(path) => {
                     let target = path.to_string_lossy().to_string();
                     let resource_id = ensure_resource(
                         resources,
-                        "reused_contract_context-file",
+                        "contract_bindings-file",
                         &target,
                         &element.identifier,
-                        "reuses contract",
+                        "binds contract",
                     );
                     (target, "resource".to_string(), Some(resource_id))
                 }
             };
-            entries.push(ProjectStoreReusedContractContextEntry {
-                id: format!("reused_contract_context:{}:{}", element.identifier, target),
+            entries.push(ProjectStoreContractBindingEntry {
+                id: format!("contract_bindings:{}:{}", element.identifier, target),
                 source_id: element.identifier.clone(),
                 target,
                 target_kind,
@@ -1402,7 +1402,7 @@ fn ensure_resource(
             target: target.to_string(),
             display: short_label(target),
             file_path: if kind == "local-file"
-                || kind == "reused_contract_context-file"
+                || kind == "contract_bindings-file"
                 || kind == "evidence-file"
             {
                 Some(target.to_string())
@@ -1939,12 +1939,12 @@ ext:UnusedTerm a owl:Class ;
 
         let elements = build_elements(&registry);
         let (relations, mut resources) = build_relations(&registry);
-        let reused_contract_context = build_reused_contract_context(&registry, &mut resources);
+        let contract_bindings = build_contract_bindings(&registry, &mut resources);
         let concept_refs = build_concept_refs(&registry, &mut resources);
         let graph = build_knowledge_graph_projection(
             &elements,
             &relations,
-            &reused_contract_context,
+            &contract_bindings,
             &concept_refs,
             &resources,
             &serde_json::json!({"submodels":[]}),
@@ -2058,7 +2058,7 @@ ext:UnusedTerm a owl:Class ;
 
         let elements = build_elements(&registry);
         let (relations, mut resources) = build_relations(&registry);
-        let reused_contract_context = build_reused_contract_context(&registry, &mut resources);
+        let contract_bindings = build_contract_bindings(&registry, &mut resources);
         let concept_refs = build_concept_refs(&registry, &mut resources);
         assert_eq!(concept_refs.len(), 1);
         assert_eq!(
@@ -2069,7 +2069,7 @@ ext:UnusedTerm a owl:Class ;
         let graph = build_knowledge_graph_projection(
             &elements,
             &relations,
-            &reused_contract_context,
+            &contract_bindings,
             &concept_refs,
             &resources,
             &serde_json::json!({"submodels":[]}),
@@ -2089,7 +2089,7 @@ ext:UnusedTerm a owl:Class ;
         assert!(requirement_node.get("governance").is_none());
         assert!(requirement_node.get("incoming").is_none());
         assert!(requirement_node.get("outgoing").is_none());
-        assert!(requirement_node.get("reused_contract_context").is_none());
+        assert!(requirement_node.get("contract_bindings").is_none());
         assert!(requirement_node.get("concept_references").is_none());
         let concept_node = nodes
             .iter()

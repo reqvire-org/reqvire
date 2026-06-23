@@ -4,7 +4,7 @@ import {
   ConceptElementDetailContent,
   ElementDetailContent,
   ElementDetailMissingState,
-  type DetailReusedContractContextItem,
+  type DetailContractBindingItem,
   type DetailConceptReferenceItem,
   type DetailMetaBadge,
   type DetailRelationEndpointData,
@@ -48,13 +48,13 @@ export function ElementDetailModal({
     () => new Map(store.resources.map((resource) => [resource.id, resource])),
     [store.resources],
   );
-  const { relations, reused_contract_context, conceptRefs } = useMemo(() => {
+  const { relations, contract_bindings, conceptRefs } = useMemo(() => {
     if (!identifier) {
-      return { relations: [], reused_contract_context: [], conceptRefs: [] };
+      return { relations: [], contract_bindings: [], conceptRefs: [] };
     }
     return {
       relations: store.relations.filter((r) => r.source_id === identifier || r.target_id === identifier),
-      reused_contract_context: store.reused_contract_context.filter((a) => a.source_id === identifier),
+      contract_bindings: store.contract_bindings.filter((a) => a.source_id === identifier),
       conceptRefs: store.concept_refs.filter((c) => c.source_id === identifier),
     };
   }, [identifier, store]);
@@ -67,14 +67,14 @@ export function ElementDetailModal({
       .filter(isDetailRelationItem);
   }, [element, elementById, relations, resourceById]);
 
-  const reusedContractContextItems = useMemo(
+  const contractBindingsItems = useMemo(
     () =>
-      reused_contract_context.map((reused_contract_context): DetailReusedContractContextItem => {
-        const target = reusedContractContextDisplayTarget(reused_contract_context, elementById, resourceById);
+      contract_bindings.map((contract_bindings): DetailContractBindingItem => {
+        const target = contractBindingsDisplayTarget(contract_bindings, elementById, resourceById);
         return {
-          id: reused_contract_context.id,
-          targetId: reused_contract_context.target,
-          kind: reused_contract_context.target_kind,
+          id: contract_bindings.id,
+          targetId: contract_bindings.target,
+          kind: contract_bindings.target_kind,
           resourceKind: target.resourceKind,
           label: target.label,
           elementType: target.elementType,
@@ -83,7 +83,7 @@ export function ElementDetailModal({
           external: target.external,
         };
       }),
-    [reused_contract_context, elementById, resourceById],
+    [contract_bindings, elementById, resourceById],
   );
 
   const conceptReferenceItems = useMemo(
@@ -169,7 +169,7 @@ export function ElementDetailModal({
             mappedOntologyTerms={conceptDetail.mappedOntologyTerms}
             usedByModel={conceptDetail.usedByModel}
             relations={relationItems}
-            reused_contract_context={reusedContractContextItems}
+            contract_bindings={contractBindingsItems}
             conceptReferences={conceptReferenceItems}
             onOpenElement={onOpenElement}
             onOpenConceptReference={(reference) => {
@@ -194,14 +194,8 @@ export function ElementDetailModal({
               />
             }
             relations={relationItems}
-            reused_contract_context={reusedContractContextItems}
-            conceptReferences={[]}
+            contract_bindings={contractBindingsItems}
             onOpenElement={onOpenElement}
-            onOpenConceptReference={(reference) => {
-              if (reference.elementId) {
-                onOpenElement(reference.elementId);
-              }
-            }}
             onOpenResource={openHashRoute}
           />
         )
@@ -216,7 +210,7 @@ export function ElementDetailModal({
    explicit; inherited governance keeps only the value here and carries
    provenance in a low-emphasis label. The `type` key is skipped because the
    header type badge already states it. */
-function buildMetaBadges(element: {
+export function buildMetaBadges(element: {
   element_type: string;
   metadata: Record<string, string>;
   governance: Record<string, string>;
@@ -239,7 +233,7 @@ function buildMetaBadges(element: {
   return badges;
 }
 
-function cleanGovernanceValue(raw: string): Pick<DetailMetaBadge, "value" | "provenance"> {
+export function cleanGovernanceValue(raw: string): Pick<DetailMetaBadge, "value" | "provenance"> {
   const explicitMatch = raw.match(/^(.*?)\s*\(explicit\)$/);
   if (explicitMatch) {
     return { value: explicitMatch[1].trim(), provenance: "explicit" };
@@ -251,7 +245,7 @@ function cleanGovernanceValue(raw: string): Pick<DetailMetaBadge, "value" | "pro
   return { value: raw, provenance: "inherited" };
 }
 
-function sourceAnchorRoute(sourceAnchor: string, filePath: string): string {
+export function sourceAnchorRoute(sourceAnchor: string, filePath: string): string {
   if (sourceAnchor.startsWith("#/content/")) return sourceAnchor;
   if (sourceAnchor.startsWith("#")) return `${routeForContent(filePath)}${sourceAnchor}`;
 
@@ -266,7 +260,7 @@ function isString(value: string | undefined): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-interface ConceptElementDetailDto {
+export interface ConceptElementDetailDto {
   definition: string;
   scheme: DetailRelationEndpointData | null;
   altLabels: string[];
@@ -282,7 +276,7 @@ interface ConceptElementDetailDto {
   usedByModel: DetailRelationEndpointData[];
 }
 
-function buildConceptElementDetail({
+export function buildConceptElementDetail({
   element,
   elements,
   ontologyNodes,
@@ -565,24 +559,24 @@ function isOntologyGraphNode(value: OntologyGraphNode | undefined): value is Ont
   return Boolean(value);
 }
 
-function isDetailRelationEndpointData(
+export function isDetailRelationEndpointData(
   value: DetailRelationEndpointData | null,
 ): value is DetailRelationEndpointData {
   return Boolean(value);
 }
 
-function isDetailRelationItem(value: DetailRelationItem | null): value is DetailRelationItem {
+export function isDetailRelationItem(value: DetailRelationItem | null): value is DetailRelationItem {
   return value !== null;
 }
 
-function isPromotedConceptRelation(element: ProjectStoreElement, relation: ProjectStoreRelation) {
+export function isPromotedConceptRelation(element: ProjectStoreElement, relation: ProjectStoreRelation) {
   if (element.element_type !== "concept" && element.element_type !== "concept-scheme") return false;
   if (relation.source_id !== element.id && relation.target_id !== element.id) return false;
   const relationType = relation.canonical_relation_type || relation.relation_type;
   return ["broader", "narrower", "related", "exactMatch", "closeMatch"].includes(relationType);
 }
 
-function relationFlowFromSelectedElement(
+export function relationFlowFromSelectedElement(
   relation: ProjectStoreRelation,
   selectedId: string,
   elementById: (id: string) => ProjectStoreElement | undefined,
@@ -704,23 +698,23 @@ function relationTargetEndpoint(
   };
 }
 
-function reusedContractContextDisplayTarget(
-  reused_contract_context: { target: string; target_kind: string; resource_id: string | null },
+export function contractBindingsDisplayTarget(
+  contract_bindings: { target: string; target_kind: string; resource_id: string | null },
   elementById: (id: string) => Pick<ProjectStoreElement, "name" | "element_type" | "type_family"> | undefined,
   resourceById: Map<string, { display: string; target: string; kind: string; file_path: string | null; external_url: string | null }>,
 ): { label: string; resourceKind?: string; elementType?: string; typeFamily?: string; href: string | null; external: boolean } {
-  if (reused_contract_context.target_kind === "element") {
-    const element = elementById(reused_contract_context.target);
+  if (contract_bindings.target_kind === "element") {
+    const element = elementById(contract_bindings.target);
     return {
-      label: element?.name ?? reused_contract_context.target,
+      label: element?.name ?? contract_bindings.target,
       elementType: element?.element_type,
       typeFamily: element?.type_family,
-      href: routeForElement(reused_contract_context.target),
+      href: routeForElement(contract_bindings.target),
       external: false,
     };
   }
-  if (reused_contract_context.resource_id) {
-    const resource = resourceById.get(reused_contract_context.resource_id);
+  if (contract_bindings.resource_id) {
+    const resource = resourceById.get(contract_bindings.resource_id);
     if (resource) {
       if (resource.external_url) {
         return { label: resource.display || resource.target, resourceKind: resource.kind, href: resource.external_url, external: true };
@@ -731,5 +725,5 @@ function reusedContractContextDisplayTarget(
       return { label: resource.display || resource.target, resourceKind: resource.kind, href: null, external: false };
     }
   }
-  return { label: reused_contract_context.target, href: null, external: false };
+  return { label: contract_bindings.target, href: null, external: false };
 }

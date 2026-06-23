@@ -89,7 +89,7 @@
 
     /* Edge */
     --color-edge-default: oklch(83.02% 0.0189 258.36);
-    --color-edge-reuse:  oklch(65.82% 0.169  248.81);
+    --color-edge-bind:  oklch(65.82% 0.169  248.81);
 
     /* Dark semantic primitives */
     --color-dark-canvas:         oklch(18.97% 0.0206 258.33);
@@ -239,7 +239,7 @@
     --edge-derive:  var(--color-requirement);
     --edge-satisfy: var(--color-verification);
     --edge-trace:   var(--color-slate-400);
-    --edge-reuse:  var(--color-edge-reuse);
+    --edge-bind:  var(--color-edge-bind);
 
     /* ── Accent state surfaces ──────────────────────────────────── */
     --accent-bg-hover:   color-mix(in srgb, var(--accent) 5%, transparent);

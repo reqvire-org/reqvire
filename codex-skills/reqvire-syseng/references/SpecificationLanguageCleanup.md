@@ -12,7 +12,7 @@ Use this workflow when auditing specification/constraint/behavior language that 
 
 Keep requirements (and their `#### Details`) as the place for intent and intent-level constraints.
 Keep contracts focused on mechanism, constraints, and behaviors in non-normative language where possible.
-Ensure every cleanup decision is tied to a parent or sibling requirement through ownership/reused_contract_context traceability.
+Ensure every cleanup decision is tied to a parent or sibling requirement through ownership/contract_bindings traceability.
 
 ## Procedure
 
@@ -37,7 +37,7 @@ Before each batch, confirm expected ownership boundaries and keep one-shot chang
 
 ### 3) Apply and verify ownership links
 
-- If you move ownership text out of a contract, ensure the parent requirement still has clear traceability via `definedBy`/`Reused Contract Context`.
+- If you move ownership text out of a contract, ensure the parent requirement still has clear traceability via `definedBy`/`Contract Bindings`.
 - Do not leave duplicated normative language after move.
 - Keep contracts useful even after cleanup (no placeholder-only content).
 

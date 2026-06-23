@@ -157,16 +157,16 @@ assert_invalid_model "must not contain a #### Shapes section"
 write_model << 'EOF'
 # Elements
 
-### Ontology With Reused Contract Context
+### Ontology With Contract Bindings
 
-Ontology with reused_contract_context.
+Ontology with contract_bindings.
 
 #### Metadata
   * type: ontology
   * ontology_base: https://example.test/ontology
   * ontology_prefix: testonto
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Other Ontology](#other-ontology)
 
 #### Ontology
@@ -187,7 +187,7 @@ Other ontology.
   * ontology_prefix: testonto
 
 #### Relations
-  * derivedFrom: [Ontology With Reused Contract Context](#ontology-with-reused_contract_context)
+  * derivedFrom: [Ontology With Contract Bindings](#ontology-with-contract_bindings)
 
 #### Ontology
 ```turtle
@@ -197,6 +197,6 @@ other:Thing a owl:Class .
 ```
 ---
 EOF
-assert_invalid_model "cannot have reused_contract_context"
+assert_invalid_model "cannot have contract_bindings"
 
 exit 0

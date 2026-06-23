@@ -674,16 +674,16 @@ pub fn hash_content(content: &str) -> String {
     format!("{:x}", hasher.finish()).to_string()
 }
 
-/// Parses an reused_contract_context line from the Reused Contract Context subsection.
+/// Parses a contract binding line from the Contract Bindings subsection.
 /// Format: * [display-text](path) - display text can be filename or full path
 /// Returns the path (href) if valid, or an error if format is invalid.
-pub fn parse_reused_contract_context_line(line: &str) -> Result<String, ReqvireError> {
+pub fn parse_contract_bindings_line(line: &str) -> Result<String, ReqvireError> {
     let trimmed = line.trim();
 
     // Must start with bullet point
     if !trimmed.starts_with("* ") && !trimmed.starts_with("- ") {
-        return Err(ReqvireError::InvalidReusedContractContextFormat(format!(
-            "ReusedContractContextEntry must start with '* ' or '- ': '{}'",
+        return Err(ReqvireError::InvalidContractBindingFormat(format!(
+            "ContractBindingEntry must start with '* ' or '- ': '{}'",
             line
         )));
     }
@@ -698,8 +698,8 @@ pub fn parse_reused_contract_context_line(line: &str) -> Result<String, ReqvireE
     if let Some((_text, href)) = extract_markdown_link(link_part) {
         Ok(href)
     } else {
-        Err(ReqvireError::InvalidReusedContractContextFormat(format!(
-            "Invalid reused_contract_context format, expected '[text](path)': '{}'",
+        Err(ReqvireError::InvalidContractBindingFormat(format!(
+            "Invalid contract_bindings format, expected '[text](path)': '{}'",
             line
         )))
     }

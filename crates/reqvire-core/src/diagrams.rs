@@ -47,7 +47,7 @@ pub fn generate_containment_diagram(
     output.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:2px;\n");
     output.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
     output.push_str(
-        "  classDef reused_contract_context fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;\n\n",
+        "  classDef contract_bindings fill:#EFEBE9,stroke:#8D6E63,stroke-width:1.5px;\n\n",
     );
 
     // Define root node
@@ -114,7 +114,7 @@ fn generate_folder_tree(
         let doc_id = sanitize_design_doc_id(&doc.path);
         output.push_str(&format!("  {}[\"📝 {}\"]\n", doc_id, doc.name));
         output.push_str(&format!("  {} --> {}\n", parent_id, doc_id));
-        output.push_str(&format!("  class {} reused_contract_context\n", doc_id));
+        output.push_str(&format!("  class {} contract_bindings\n", doc_id));
     }
 
     // Generate files
@@ -125,15 +125,15 @@ fn generate_folder_tree(
         output.push_str(&format!("  subgraph {}[\"📄 {}\"]\n", file_id, file.name));
         output.push_str("    direction TB\n");
 
-        // Generate element nodes with reused_contract_context
+        // Generate element nodes with contract_bindings
         for element in &file.elements {
             let hash_id = generate_element_hash(&element.identifier);
             let mut label = escape_label(&element.name);
-            // Add reused_contract_context to label
-            for reused_contract_context in &element.reused_contract_context {
+            // Add contract_bindings to label
+            for contract_bindings in &element.contract_bindings {
                 label.push_str(&format!(
                     "<br/>📎 {}",
-                    escape_label(&reused_contract_context.name)
+                    escape_label(&contract_bindings.name)
                 ));
             }
             output.push_str(&format!("    {}[\"{}\"]\n", hash_id, label));

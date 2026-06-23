@@ -10,7 +10,7 @@ export default function Submodels() {
       <p className="text-base text-zinc-600 leading-relaxed mb-10">
         The submodels report analyzes independent capability-rooted subgraphs
         and the explicit couplings between them. It is useful when reviewing
-        architecture boundaries, reused contract context, refactors, and AI
+        architecture boundaries, contract bindings, refactors, and AI
         context collection.
       </p>
 
@@ -41,11 +41,11 @@ export default function Submodels() {
             },
             {
               name: "Reused context validation",
-              desc: "Cross-submodel dependencies should be explicit one-way reused contract context rather than hierarchy relations that blur ownership.",
+              desc: "Cross-submodel dependencies should be explicit one-way contract bindings rather than hierarchy relations that blur ownership.",
             },
             {
               name: "Change impact",
-              desc: "Change-impact analysis follows native relations and explicit reused contract context. Clear submodel boundaries make the resulting review scope easier to interpret and route.",
+              desc: "Change-impact analysis follows native relations and explicit contract bindings. Clear submodel boundaries make the resulting review scope easier to interpret and route.",
             },
             {
               name: "AI context",
@@ -68,7 +68,7 @@ export default function Submodels() {
           Use lint with auditable output when you need cleanup hints for the
           hierarchical subset of those problems, such as cross-boundary
           requirement hierarchy links that should usually be modeled with
-          ownership-preserving hierarchy or explicit Reused Contract Context instead.
+          ownership-preserving hierarchy or explicit Contract Bindings instead.
         </p>
         <CodeBlock>{`reqvire submodels
 reqvire submodels --json

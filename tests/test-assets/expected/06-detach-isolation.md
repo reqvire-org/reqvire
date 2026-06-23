@@ -9,7 +9,7 @@ Top-level container for test requirements.
 
 #### Relations
   * derive: [Performance Requirement](#performance-requirement)
-  * derive: [No Reused Contract Context Requirement](#no-reused-contract-context-requirement)
+  * derive: [No Contract Bindings Requirement](#no-contract-bindings-requirement)
 ---
 
 
@@ -40,9 +40,9 @@ The implementation shall follow the SLA guidelines.
   * derivedFrom: [Performance Requirement](#performance-requirement)
 ---
 
-### No Reused Contract Context Requirement
+### No Contract Bindings Requirement
 
-This requirement has no reused_contract_context.
+This requirement has no contract_bindings.
 
 #### Metadata
   * type: requirement
@@ -62,13 +62,13 @@ A separate requirement that owns contracts (outside main hierarchy).
   * definedBy: [Test Constraint Element](#test-constraint-element)
   * definedBy: [Test Behavior Element](#test-behavior-element)
 
-#### Reused Contract Context
+#### Contract Bindings
 * [../docs/SLA.txt](../docs/SLA.txt)
 ---
 
 ### Test Constraint Element
 
-This is a constraint Contract element for testing element reused_contract_context.
+This is a constraint Contract element for testing element contract_bindings.
 
 #### Details
 This constraint defines limits on system behavior.
@@ -80,7 +80,7 @@ This constraint defines limits on system behavior.
 
 ### Test Behavior Element
 
-This is a behavior Contract element for testing element reused_contract_context.
+This is a behavior Contract element for testing element contract_bindings.
 
 #### Details
 This behavior defines expected system operation.

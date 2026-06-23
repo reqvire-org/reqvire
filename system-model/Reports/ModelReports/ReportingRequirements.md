@@ -81,7 +81,7 @@ The system shall collect and consolidate context from a capability or requiremen
 
 #### Details
 The system shall define:
-- Content collection rules for elements, definedBy targets, and reused_contract_context
+- Content collection rules for elements, definedBy targets, and contract_bindings
 - Output format specifications for text and JSON modes
 - Direction-based traversal over capability hierarchy, requirement hierarchy, and the `specify`/`specifiedBy` bridge where defined by the collect traversal specification
 
@@ -141,7 +141,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Containment Specification](../../ModelStructure/Specifications.md#containment-specification)
   * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
@@ -162,7 +162,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
   * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
 
@@ -262,7 +262,7 @@ The system shall define comprehensive search filtering capabilities:
 - By requirement governance metadata values
 - By element content patterns
 - By presence/absence of relations
-- By presence/absence of reused_contract_context
+- By presence/absence of contract_bindings
 
 Search result element evidence shall include effective requirement governance metadata when applicable.
 Search result summaries shall include effective governance metadata counts for matched governance-bearing elements.
@@ -276,7 +276,7 @@ Search filter tokens, collect source tokens, coverage source tokens, submodel re
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
@@ -379,7 +379,7 @@ The implementation coverage report shall provide:
 
 ### Resources Report
 
-The system shall provide a resources report showing all files referenced by the model through relations and reused_contract_context in text, JSON, and Explorer views.
+The system shall provide a resources report showing all files referenced by the model through relations and contract_bindings in text, JSON, and Explorer views.
 
 #### Metadata
   * type: requirement
@@ -411,7 +411,7 @@ The report helps track verification completeness and identify gaps in requiremen
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Verification Roll-up Specification](../../Verification/Traceability/Specifications.md#verification-roll-up-specification)
   * [Verification Type Selection Guidelines](../../ModelStructure/Specifications.md#verification-type-selection-guidelines)
 
@@ -428,7 +428,7 @@ The system shall seed Explorer Traces SPA route data showing verification tracea
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
@@ -463,7 +463,7 @@ The system shall materialize generated ontology construct facts as a subgraph of
 #### Details
 The ontology projection subgraph shall:
 - Extend the existing in-memory RDF projection used by full semantic export; it is not a separate database, persistent store, or route-local model.
-- Be reused to the reusable `SemanticIndex` as structured generated projection data so semantic export, JSON-LD export, and Explorer rendering share one authoritative projection source.
+- Be bound to the reusable `SemanticIndex` as structured generated projection data so semantic export, JSON-LD export, and Explorer rendering share one authoritative projection source.
 - Be generated from authored ontology and semantic-contract RDF quads during semantic index processing or immediately after parsing.
 - Materialize o-kernel construct classifications into Reqvire ontology projection facts without changing authored Markdown ontology or semantic-contract blocks.
 - Preserve source element identifier, source name, source file, source line, source block kind, construct subject, construct object, construct members, construct property, ordered sequence index when relevant, symbol code point, rendered symbol, and derivation mode.
@@ -474,7 +474,7 @@ The ontology projection subgraph shall:
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
   * [Ontology Construct Classification Specification](../../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
 
@@ -490,7 +490,7 @@ The ontology projection subgraph shall:
 The system shall materialize ontology-defined relation-family projection facts as part of full semantic model export so semantic search can query relation meaning independently of raw Markdown relation token direction.
 
 #### Details
-- Full semantic model export shall treat authored model relations and reused contract context edges as first-class semantic relation records.
+- Full semantic model export shall treat authored model relations and contract bindings edges as first-class semantic relation records.
 - Full semantic model export shall emit deterministic `reqvire:ModelRelation` resources with source, target, relation type, and target identifier facts.
 - Full semantic model export shall emit canonical forward and inverse normalized predicates for ontology-defined relation families without removing raw authored relation predicates.
 - The relation-family projection shall be an in-memory semantic export projection, not a source Markdown mutation and not an MCP-owned materialization step.
@@ -519,7 +519,7 @@ When tracing structural changes, the system shall analyze the System model and d
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Traceability Reporting Specification](Specifications.md#traceability-reporting-specification)
 
 #### Relations

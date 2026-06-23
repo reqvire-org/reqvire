@@ -112,7 +112,7 @@ Requirement that consumes contract specification and is directly implemented.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Contract Specification](#contract-specification)
 
 #### Relations

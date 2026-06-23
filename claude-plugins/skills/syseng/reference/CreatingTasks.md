@@ -66,7 +66,7 @@ This ensures no elements are missed — `impact_scope` entries are common parent
 For each changed capability or requirement (from `added[]`, `changed[]`, or enumerated via downstream collect), gather upstream context:
 
 ```bash
-# Get full ancestor chain with reused_contract_context (upstream - default)
+# Get full ancestor chain with contract_bindings (upstream - default)
 reqvire collect "<element-name>" --json --output /tmp/context_<element-id>.json
 
 # Also save human-readable format for reference

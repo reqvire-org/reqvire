@@ -1,0 +1,4 @@
+
+❌ 1 validation failed with error(s):
+
+  1. Invalid contract_bindings target: 'Orphan-Spec' has no define relation. Contracts must define a requirement before they can be reused; contracts are requirement-owned only. Capabilities use concept references for SKOS concepts and are specified by requirements; verification coverage rolls up from verified requirements. (file: specifications/TestOrphanContractBinding.md, element: Req Reusing Contract Orphan)

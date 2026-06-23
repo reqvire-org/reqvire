@@ -57,7 +57,7 @@ The o-kernel shall expose separate vocabulary, RDF utility, SHACL, ontology inde
   * risk: medium
   * status: approved
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Ontology Kernel RDF Native Boundary Specification](OntologyKernelSpecifications.md#ontology-kernel-rdf-native-boundary-specification)
 
 #### Relations

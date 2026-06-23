@@ -3,7 +3,7 @@ import { DetailSection } from "./DetailSection";
 import { MetadataStrip } from "./MetadataStrip";
 import { RelationEndpoint } from "./RelationEndpoint";
 import { RelationList } from "./RelationList";
-import { ReusedContractContextList } from "./ReusedContractContextList";
+import { ContractBindingList } from "./ContractBindingList";
 import { ConceptReferenceList } from "./ConceptReferenceList";
 import {
   detailContentFlowUX,
@@ -17,7 +17,7 @@ import type {
   DetailMetaBadge,
   DetailRelationEndpointData,
   DetailRelationItem,
-  DetailReusedContractContextItem,
+  DetailContractBindingItem,
   ElementDetailContentSlot,
   OpenConceptReferenceHandler,
   OpenElementHandler,
@@ -40,8 +40,9 @@ export interface ConceptElementDetailContentProps {
   mappedOntologyTerms?: readonly DetailConceptReferenceItem[];
   usedByModel?: readonly DetailRelationEndpointData[];
   relations?: DetailRelationItem[];
-  reused_contract_context?: DetailReusedContractContextItem[];
+  contract_bindings?: DetailContractBindingItem[];
   conceptReferences?: readonly DetailConceptReferenceItem[];
+  detailListsDefaultExpanded?: boolean;
   onOpenElement: OpenElementHandler;
   onOpenConceptReference?: OpenConceptReferenceHandler;
   onOpenResource?: OpenResourceHandler;
@@ -106,8 +107,9 @@ export function ConceptElementDetailContent({
   mappedOntologyTerms = [],
   usedByModel = [],
   relations = [],
-  reused_contract_context = [],
+  contract_bindings = [],
   conceptReferences = [],
+  detailListsDefaultExpanded = true,
   onOpenElement,
   onOpenConceptReference,
   onOpenResource,
@@ -138,9 +140,16 @@ export function ConceptElementDetailContent({
           onOpenConceptReference={onOpenConceptReference}
         />
         <ConceptEndpointList title="Used by model" relationLabel="references" endpoints={usedByModel} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <RelationList title="Authored relations" relations={relations} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <ReusedContractContextList
-          reused_contract_context={reused_contract_context}
+        <RelationList
+          title="Authored relations"
+          relations={relations}
+          defaultExpanded={detailListsDefaultExpanded}
+          onOpenElement={onOpenElement}
+          onOpenResource={onOpenResource}
+        />
+        <ContractBindingList
+          contract_bindings={contract_bindings}
+          defaultExpanded={detailListsDefaultExpanded}
           onOpenElement={onOpenElement}
           onOpenResource={onOpenResource}
         />

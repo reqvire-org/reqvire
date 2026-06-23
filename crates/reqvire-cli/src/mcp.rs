@@ -617,9 +617,9 @@ fn reqvire_error(tool_name: &str, err: ReqvireError) -> Value {
         }
         ReqvireError::UnsupportedRelationType(_) => ("invalid_relation_type", None),
         ReqvireError::IncompatibleElementTypes(_) => ("invalid_element_type_for_relation", None),
-        ReqvireError::InvalidReusedContractContextScope(_)
-        | ReqvireError::InvalidReusedContractContextTarget(_) => {
-            ("reused_contract_context_contract_violation", None)
+        ReqvireError::InvalidContractBindingScope(_)
+        | ReqvireError::InvalidContractBindingTarget(_) => {
+            ("contract_bindings_contract_violation", None)
         }
         ReqvireError::InvalidOperation(message)
             if message.contains("Single-root hierarchy ownership violation") =>
@@ -646,8 +646,8 @@ fn recoverability_hint(code: &str) -> &'static str {
         "element_not_found" => "Check element name or identifier and retry.",
         "validation_failed" => "Run reqvire validate and resolve model errors before retrying.",
         "duplicate_element" => "Rename or remove duplicate elements before retrying.",
-        "reused_contract_context_contract_violation" => {
-            "Use a valid contract reused_contract_context that respects submodel reused_contract_context contracts."
+        "contract_bindings_contract_violation" => {
+            "Use a valid contract contract_bindings that respects submodel contract bindings."
         }
         "single_root_ownership_violation" => {
             "Adjust hierarchy so each requirement branch has a single root owner."

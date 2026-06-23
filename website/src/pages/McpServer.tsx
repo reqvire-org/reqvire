@@ -106,7 +106,7 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             },
             {
               name: "Read element",
-              desc: "reqvire.read_element returns element details, relations, Reused Contract Context entries, concept references, and optional size estimates.",
+              desc: "reqvire.read_element returns element details, relations, Contract Bindings entries, concept references, and optional size estimates.",
             },
             {
               name: "Collect",
@@ -214,7 +214,7 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             "duplicate_element",
             "element_not_found",
             "invalid_relation_type",
-            "reused_contract_context_contract_violation",
+            "contract_bindings_contract_violation",
             "single_root_ownership_violation",
             "filesystem_error",
           ]}

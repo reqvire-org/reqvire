@@ -67,7 +67,7 @@ This capability has special characters in its name including commas and slashes.
 
 ### Separate Requirement Branch
 
-A separate requirement hierarchy for testing reused_contract_context.
+A separate requirement hierarchy for testing contract_bindings.
 
 #### Metadata
   * type: requirement

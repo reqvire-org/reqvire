@@ -35,7 +35,7 @@ type RelationCategory =
   | "define"
   | "verify"
   | "satisfy"
-  | "reuse"
+  | "bind"
   | "concept-reference"
   | "trace";
 
@@ -55,7 +55,7 @@ function roleColor(kind: string) {
 function relationCategory(edge: { label?: unknown; kind?: unknown }): RelationCategory {
   const label = String(edge.label || "").toLowerCase();
   const kind = String(edge.kind || "").toLowerCase();
-  if (kind === "reused_contract_context" || label === "reuses contract") return "reuse";
+  if (kind === "contract_bindings" || label === "binds contract") return "bind";
   if (kind === "concept-reference" || label === "conceptref") return "concept-reference";
   if (label.includes("derive")) return "derive";
   if (label.includes("specif")) return "specify";
@@ -69,14 +69,14 @@ function relationCategory(edge: { label?: unknown; kind?: unknown }): RelationCa
 function displayEdgeLabel(edge: Pick<GraphEdge, "label" | "kind">): string {
   const label = String(edge.label || "");
   const kind = String(edge.kind || "").toLowerCase();
-  if (kind === "reused_contract_context" || label.toLowerCase() === "reuses contract") {
-    return "reused context";
+  if (kind === "contract_bindings" || label.toLowerCase() === "binds contract") {
+    return "contract binding";
   }
   return label;
 }
 
 function overlayVisible(category: RelationCategory, activeOverlays: Set<OverlayKey>) {
-  if (category === "reuse" || category === "concept-reference") {
+  if (category === "bind" || category === "concept-reference") {
     return activeOverlays.has("cross");
   }
   if (category === "verify" || category === "satisfy") {
@@ -140,7 +140,7 @@ function edgeColor(edge: { label?: unknown; kind?: unknown; relCategory?: unknow
     ? edge.relCategory as RelationCategory
     : relationCategory(edge);
   if (category === "concept-reference") return cssVar("--concept-reference");
-  if (category === "reuse") return cssVar("--edge-reuse");
+  if (category === "bind") return cssVar("--edge-bind");
   if (category === "derive") return cssVar("--edge-derive");
   if (category === "satisfy" || category === "verify") return cssVar("--edge-satisfy");
   if (category === "trace") return cssVar("--edge-trace");
@@ -333,7 +333,7 @@ export function KnowledgeGraphView({
           ...edge,
           type: "arrow",
           label: displayEdgeLabel(edge),
-          size: edge.kind === "reused_contract_context" || edge.kind === "concept-reference" ? 0.8 : 1.1,
+          size: edge.kind === "contract_bindings" || edge.kind === "concept-reference" ? 0.8 : 1.1,
           color: edgeColor(edge),
           hidden: !visibleEdge(edge),
         });

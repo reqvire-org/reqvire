@@ -11,14 +11,14 @@ use serde::Serialize;
 use std::collections::BTreeMap;
 use std::path::Path;
 
-/// Represents an reused_contract_context for display in containment hierarchy
+/// Represents a contract binding for display in containment hierarchy
 #[derive(Debug, Clone, Serialize)]
-pub struct ContainmentReusedContractContext {
+pub struct ContainmentContractBinding {
     /// Display name (element name or file name)
     pub name: String,
-    /// Whether this is an element reused_contract_context (true) or file reused_contract_context (false)
+    /// Whether this is an element contract_bindings (true) or file contract_bindings (false)
     pub is_element: bool,
-    /// Link to the reused_contract_context (element identifier or file path)
+    /// Link to the contract_bindings (element identifier or file path)
     pub link: Option<String>,
 }
 
@@ -30,7 +30,7 @@ pub struct ContainmentElement {
     pub element_type: ElementType,
     pub file_path: String,
     pub identifier: String,
-    pub reused_contract_context: Vec<ContainmentReusedContractContext>,
+    pub contract_bindings: Vec<ContainmentContractBinding>,
 }
 
 impl ContainmentElement {
@@ -41,28 +41,28 @@ impl ContainmentElement {
             element_type: element.element_type.clone(),
             file_path: element.file_path.clone(),
             identifier: element.identifier.clone(),
-            reused_contract_context: element
-                .reused_contract_context
+            contract_bindings: element
+                .contract_bindings
                 .iter()
                 .map(|a| match &a.target {
-                    crate::element::ReusedContractContextTarget::FilePath(path) => {
+                    crate::element::ContractBindingTarget::FilePath(path) => {
                         let file_name = path
                             .file_name()
                             .map(|n| n.to_string_lossy().into_owned())
                             .unwrap_or_else(|| path.to_string_lossy().into_owned());
-                        ContainmentReusedContractContext {
+                        ContainmentContractBinding {
                             name: file_name,
                             is_element: false,
                             link: Some(path.to_string_lossy().into_owned()),
                         }
                     }
-                    crate::element::ReusedContractContextTarget::ElementIdentifier(id) => {
+                    crate::element::ContractBindingTarget::ElementIdentifier(id) => {
                         // Look up element name from registry using the identifier
                         let name = registry
                             .get_element(id)
                             .map(|e| e.name.clone())
                             .unwrap_or_else(|| id.clone());
-                        ContainmentReusedContractContext {
+                        ContainmentContractBinding {
                             name,
                             is_element: true,
                             link: Some(id.clone()),

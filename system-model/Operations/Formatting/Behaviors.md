@@ -53,8 +53,8 @@ Deduplication rules for format fix operations.
 - Duplicate relations (same relation_type + same target) are removed, keeping first occurrence
 - Different relation types to same target are NOT duplicates (e.g., `derivedFrom: A` and `trace: A` are both kept)
 
-**Reused Contract Context subsection:**
-- Duplicate reused_contract_context (same target path or identifier) are removed, keeping first occurrence
+**Contract Bindings subsection:**
+- Duplicate contract_bindings (same target path or identifier) are removed, keeping first occurrence
 
 **Cross-section duplicates are NOT removed** - these require user decision and are reported by validation.
 

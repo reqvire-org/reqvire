@@ -1,0 +1,6 @@
+
+❌ 2 validation failed with error(s):
+
+  1. Invalid contract_bindings scope: 'Spec-1' cannot be bound to 'User Req X' because subgraph 'User Req A Capability' already binds contracts owned by subgraph 'User Req X Capability'. Contract Binding flow between subgraphs must remain one-directional. (file: specifications/Requirements.md, element: User Req X)
+
+  2. Invalid contract_bindings scope: 'Spec-X' cannot be bound to 'Req D Reverse Flow ContractBindingEntry' because subgraph 'User Req X Capability' already binds contracts owned by subgraph 'User Req A Capability'. Contract Binding flow between subgraphs must remain one-directional. (file: specifications/TestReverseDirectionContractBinding.md, element: Req D Reverse Flow ContractBindingEntry)

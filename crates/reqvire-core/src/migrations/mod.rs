@@ -1,5 +1,5 @@
 use crate::diff::{generate_file_diff, FileDiff};
-use crate::element::{Element, ElementType, REUSED_CONTRACT_CONTEXT_SECTION};
+use crate::element::{Element, ElementType, CONTRACT_BINDINGS_SECTION};
 use crate::error::ReqvireError;
 use crate::filesystem;
 use crate::graph_registry::{ElementNode, GraphRegistry};
@@ -50,10 +50,10 @@ pub const VERIFICATION_OBJECTIVE_HOLDER_ID: &str =
     "VerificationObjectiveMigration.md#verification-objective";
 pub const DOCUMENTS_HEADER_MIGRATION_ID: &str = "v0.15-documents-to-element-header";
 pub const CONTRACT_RELATION_MIGRATION_ID: &str = "v1.0-contract-relations";
-pub const REUSED_CONTRACT_CONTEXT_SECTION_MIGRATION_ID: &str =
-    "v1.1-reused-contract-context-section";
+pub const CONTRACT_BINDINGS_SECTION_MIGRATION_ID: &str = "v1.1-contract-bindings-section";
 pub const CONCEPT_REFERENCE_LINK_MIGRATION_ID: &str = "v1.2-concept-reference-links";
 const LEGACY_ATTACHMENTS_SECTION: &str = "Attachments";
+const LEGACY_REUSED_CONTRACT_CONTEXT_SECTION: &str = "Reused Contract Context";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct VerificationObjectiveMigrationSummary {
@@ -72,7 +72,7 @@ pub struct DocumentsHeaderMigrationSummary {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct ReusedContractContextSectionMigrationSummary {
+pub struct ContractBindingSectionMigrationSummary {
     pub migration_id: &'static str,
     pub files_changed: usize,
     pub affected_files: Vec<String>,
@@ -366,16 +366,16 @@ fn rewrite_documents_header_content(content: &str) -> Option<String> {
     changed.then(|| output.concat())
 }
 
-pub fn apply_reused_contract_context_section_migration(
+pub fn apply_contract_bindings_section_migration(
     excluded_filename_patterns: &GlobSet,
     dry_run: bool,
-) -> Result<(ReusedContractContextSectionMigrationSummary, Vec<FileDiff>), ReqvireError> {
+) -> Result<(ContractBindingSectionMigrationSummary, Vec<FileDiff>), ReqvireError> {
     let mut affected_files = Vec::new();
     let mut diffs = Vec::new();
 
     for path in utils::scan_markdown_files(None, excluded_filename_patterns) {
         let current = filesystem::read_file(&path)?;
-        let Some(next) = rewrite_reused_contract_context_section_content(&current) else {
+        let Some(next) = rewrite_contract_bindings_section_content(&current) else {
             continue;
         };
         let relative = utils::get_relative_path(&path)
@@ -394,8 +394,8 @@ pub fn apply_reused_contract_context_section_migration(
     affected_files.sort();
 
     Ok((
-        ReusedContractContextSectionMigrationSummary {
-            migration_id: REUSED_CONTRACT_CONTEXT_SECTION_MIGRATION_ID,
+        ContractBindingSectionMigrationSummary {
+            migration_id: CONTRACT_BINDINGS_SECTION_MIGRATION_ID,
             files_changed: affected_files.len(),
             affected_files,
         },
@@ -547,7 +547,7 @@ fn concept_reference_relative_link(
     utils::to_relative_identifier(target_identifier, &source_parent, false)
 }
 
-fn rewrite_reused_contract_context_section_content(content: &str) -> Option<String> {
+fn rewrite_contract_bindings_section_content(content: &str) -> Option<String> {
     let mut output = Vec::new();
     let mut changed = false;
 
@@ -560,13 +560,7 @@ fn rewrite_reused_contract_context_section_content(content: &str) -> Option<Stri
             (line, "")
         };
         let trimmed = body.trim();
-        let replacement = if trimmed == format!("#### {}", LEGACY_ATTACHMENTS_SECTION) {
-            Some(format!("#### {}", REUSED_CONTRACT_CONTEXT_SECTION))
-        } else if trimmed == format!("## {}", LEGACY_ATTACHMENTS_SECTION) {
-            Some(format!("## {}", REUSED_CONTRACT_CONTEXT_SECTION))
-        } else {
-            None
-        };
+        let replacement = contract_bindings_section_replacement(trimmed);
 
         if let Some(replacement) = replacement {
             let leading_len = body.len() - body.trim_start().len();
@@ -583,19 +577,29 @@ fn rewrite_reused_contract_context_section_content(content: &str) -> Option<Stri
 
     if !content.ends_with('\n') && output.is_empty() {
         let trimmed = content.trim();
-        let replacement = if trimmed == format!("#### {}", LEGACY_ATTACHMENTS_SECTION) {
-            Some(format!("#### {}", REUSED_CONTRACT_CONTEXT_SECTION))
-        } else if trimmed == format!("## {}", LEGACY_ATTACHMENTS_SECTION) {
-            Some(format!("## {}", REUSED_CONTRACT_CONTEXT_SECTION))
-        } else {
-            None
-        };
+        let replacement = contract_bindings_section_replacement(trimmed);
         if let Some(replacement) = replacement {
             return Some(replacement);
         }
     }
 
     changed.then(|| output.concat())
+}
+
+fn contract_bindings_section_replacement(trimmed: &str) -> Option<String> {
+    let legacy_names = [
+        LEGACY_ATTACHMENTS_SECTION,
+        LEGACY_REUSED_CONTRACT_CONTEXT_SECTION,
+    ];
+    for legacy_name in legacy_names {
+        if trimmed == format!("#### {}", legacy_name) {
+            return Some(format!("#### {}", CONTRACT_BINDINGS_SECTION));
+        }
+        if trimmed == format!("## {}", legacy_name) {
+            return Some(format!("## {}", CONTRACT_BINDINGS_SECTION));
+        }
+    }
+    None
 }
 
 fn has_user_created_objective_parent(registry: &GraphRegistry, verification_id: &str) -> bool {
@@ -816,16 +820,16 @@ mod tests {
     }
 
     #[test]
-    fn reused_contract_context_migration_rewrites_legacy_attachment_headings() {
-        let input = "### Requirement\n\n#### Attachments\n  * [Contract](Contracts.md#contract)\n\n## Attachments\n";
-        let rewritten = rewrite_reused_contract_context_section_content(input).unwrap();
+    fn contract_bindings_migration_rewrites_legacy_headings() {
+        let input = "### Requirement\n\n#### Reused Contract Context\n  * [Contract](Contracts.md#contract)\n\n## Attachments\n";
+        let rewritten = rewrite_contract_bindings_section_content(input).unwrap();
 
         assert_eq!(
             rewritten,
-            "### Requirement\n\n#### Reused Contract Context\n  * [Contract](Contracts.md#contract)\n\n## Reused Contract Context\n"
+            "### Requirement\n\n#### Contract Bindings\n  * [Contract](Contracts.md#contract)\n\n## Contract Bindings\n"
         );
         assert!(
-            rewrite_reused_contract_context_section_content("#### Reused Contract Context\n")
+            rewrite_contract_bindings_section_content("#### Contract Bindings\n")
                 .is_none()
         );
     }

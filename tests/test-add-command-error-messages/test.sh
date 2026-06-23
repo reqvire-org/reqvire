@@ -10,7 +10,7 @@ set -uo pipefail  # NOTE: Do NOT use -e, it causes silent failures with diff
 # - Command exits with error (non-zero) for invalid input
 # - Error output contains example element markdown
 # - Error output contains specific format guidance
-# - Example includes all subsections: Details, Metadata, Relations, Reused Contract Context
+# - Example includes all subsections: Details, Metadata, Relations, Contract Bindings
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -138,36 +138,36 @@ fi
 
 echo "✅ Test 4 passed"
 
-# Test 5: Invalid reused_contract_context format
-echo "Test 5: Invalid reused_contract_context format..."
+# Test 5: Invalid contract_bindings format
+echo "Test 5: Invalid contract_bindings format..."
 OUTPUT=$(cd "$TEST_DIR" && cat <<'EOF' | "$REQVIRE_BIN" add system-model/test.md 2>&1
 ### Test Element
 
 Description
 
-#### Reused Contract Context
-invalid reused_contract_context
+#### Contract Bindings
+invalid contract_bindings
 EOF
 )
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
-  echo "❌ FAILED: Expected error for invalid reused_contract_context"
+  echo "❌ FAILED: Expected error for invalid contract_bindings"
   exit 1
 fi
 
 if ! echo "$OUTPUT" | grep -q "Expected format.*Text.*link"; then
-  echo "❌ FAILED: Error message missing format guidance for reused_contract_context"
+  echo "❌ FAILED: Error message missing format guidance for contract_bindings"
   exit 1
 fi
 
 if ! echo "$OUTPUT" | grep -q "Example of correctly formatted element"; then
-  echo "❌ FAILED: Error message missing example for reused_contract_context error"
+  echo "❌ FAILED: Error message missing example for contract_bindings error"
   exit 1
 fi
 
-if ! echo "$OUTPUT" | grep -q "#### Reused Contract Context"; then
-  echo "❌ FAILED: Example missing Reused Contract Context subsection"
+if ! echo "$OUTPUT" | grep -q "#### Contract Bindings"; then
+  echo "❌ FAILED: Example missing Contract Bindings subsection"
   exit 1
 fi
 

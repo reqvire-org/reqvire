@@ -46,7 +46,7 @@ The Reqvire adapter shall ask the semantic index for parsed RDF quads from the o
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [SHACL Ontology Alignment Specification](../../Architecture/OntologyKernelSpecifications.md#shacl-ontology-alignment-specification)
   * [SHACL Structural Parser Registry Specification](../../Architecture/OntologyKernelSpecifications.md#shacl-structural-parser-registry-specification)
   * [Standards Reserved Vocabulary Recognition Specification](../../Architecture/OntologyKernelSpecifications.md#standards-reserved-vocabulary-recognition-specification)
@@ -148,7 +148,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
 
 #### Relations
@@ -177,14 +177,14 @@ Implementation details shall follow the associated contract specifications.
 
 ### Cross-Section Duplicate Validation
 
-The system shall detect when the same target appears in both the Relations and Reused Contract Context subsections of an element, treating this as a validation error.
+The system shall detect when the same target appears in both the Relations and Contract Bindings subsections of an element, treating this as a validation error.
 
 #### Details
 A constraint defines the detailed rules for cross-section duplicate detection.
 
 This applies to identifier targets.
 
-Within-section duplicates (same entry repeated within Relations OR within Reused Contract Context) are formatting issues handled by the format operation, not validation errors.
+Within-section duplicates (same entry repeated within Relations OR within Contract Bindings) are formatting issues handled by the format operation, not validation errors.
 
 #### Metadata
   * type: requirement
@@ -230,9 +230,9 @@ Validation shall resolve each native concept's scheme context through the canoni
   * verifiedBy: [Native Concept Taxonomy Scheme Boundary Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#native-concept-taxonomy-scheme-boundary-validation-test)
 ---
 
-### Reused Contract Context Target Validation
+### Contract Bindings Target Validation
 
-The system shall validate reused_contract_context targets and reject invalid reused_contract_context references during model validation.
+The system shall validate contract_bindings targets and reject invalid contract_bindings references during model validation.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -241,17 +241,17 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Relations
-  * definedBy: [Reused Contract Context Target Validation Contract Specification](Specifications.md#reused-contract-context-target-validation-contract-specification)
+  * definedBy: [Contract Bindings Target Validation Contract Specification](Specifications.md#contract-bindings-target-validation-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
-  * verifiedBy: [Reused Contract Context Subsection Parsing Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-subsection-parsing-verification)
-  * verifiedBy: [Reused Contract Context Validation Verification](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-validation-verification)
+  * verifiedBy: [Contract Bindings Subsection Parsing Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-subsection-parsing-verification)
+  * verifiedBy: [Contract Bindings Validation Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-validation-verification)
 ---
 
-### Reused Contract Context Scope Validation
+### Contract Bindings Scope Validation
 
-The system shall validate reused_contract_context scope constraints and report validation errors for violations.
+The system shall validate contract_bindings scope constraints and report validation errors for violations.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -259,16 +259,16 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
-  * [Reused Contract Context Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#reused-contract-context-hierarchical-independence-constraint)
-  * [Reused Contract Context Subgraph Direction Constraint](../../ModelStructure/Constraints.md#reused-contract-context-subgraph-direction-constraint)
-  * [Reused Contract Context Satisfied Contract Constraint](../../ModelStructure/Constraints.md#reused-contract-context-satisfied-contract-constraint)
+#### Contract Bindings
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Subgraph Direction Constraint](../../ModelStructure/Constraints.md#contract-bindings-subgraph-direction-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
 
 #### Relations
-  * definedBy: [Reused Contract Context Scope Validation Contract Specification](Specifications.md#reused-contract-context-scope-validation-contract-specification)
-  * derivedFrom: [Reused Contract Context Target Validation](#reused-contract-context-target-validation)
+  * definedBy: [Contract Bindings Scope Validation Contract Specification](Specifications.md#contract-bindings-scope-validation-contract-specification)
+  * derivedFrom: [Contract Bindings Target Validation](#contract-bindings-target-validation)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
-  * verifiedBy: [Reused Contract Context Scope Constraints Test](../../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-scope-constraints-test)
+  * verifiedBy: [Contract Bindings Scope Constraints Test](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-scope-constraints-test)
 ---
 
 ### Single Root Hierarchy Ownership

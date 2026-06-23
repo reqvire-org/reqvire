@@ -79,7 +79,7 @@
       "source_root_name": "Root Requirement",
       "target_root": "specifications/Requirements.md#standalone-submodel-root",
       "target_root_name": "Standalone Submodel Root",
-      "rationale": "Hierarchical relation 'derivedFrom' from 'specifications/Requirements.md#cross-submodel-linked-requirement' crosses from submodel 'specifications/Requirements.md#root-requirement' to 'specifications/Requirements.md#standalone-submodel-root'. Hierarchical structure should remain internal to a single ownership boundary. Replace this relation with an explicit reused_contract_context contract."
+      "rationale": "Hierarchical relation 'derivedFrom' from 'specifications/Requirements.md#cross-submodel-linked-requirement' crosses from submodel 'specifications/Requirements.md#root-requirement' to 'specifications/Requirements.md#standalone-submodel-root'. Hierarchical structure should remain internal to a single ownership boundary. Replace this relation with an explicit contract_bindings contract."
     }
   ]
 }

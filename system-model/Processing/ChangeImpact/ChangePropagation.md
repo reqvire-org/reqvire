@@ -52,15 +52,15 @@ When a requirement changes, impact analysis must be conducted based on its relat
      - **Additions**: Element ID exists only in current version
      - **Removals**: Element ID exists only in previous version
      - **Relocations**: Element ID exists in both, but file_path or section differs
-   - **Reused Contract Context Content Changes**:
-     - Reused Contract Context hashes are stored separately from element content hash
-     - For file reused_contract_context: content_hash is computed from file content during parsing
-     - For element reused_contract_context: hash is looked up from referenced element's hash_impact_content in registry
-     - Change impact compares both element hash AND reused_contract_context hashes independently
-     - Reuse operation: new reused_contract_context hash appears -> triggers impact
-     - Remove Reused Context operation: reused_contract_context hash removed -> triggers impact
+   - **Contract Bindings Content Changes**:
+     - Contract Bindings hashes are stored separately from element content hash
+     - For file contract_bindings: content_hash is computed from file content during parsing
+     - For element contract_bindings: hash is looked up from referenced element's hash_impact_content in registry
+     - Change impact compares both element hash AND contract_bindings hashes independently
+     - Reuse operation: new contract_bindings hash appears -> triggers impact
+     - Remove Contract Binding operation: contract_bindings hash removed -> triggers impact
      - mv-asset operation: path change only -> does NOT trigger impact (tracked for reporting like relation renames)
-     - If reused document content changes: reused_contract_context hash differs -> triggers impact on element
+     - If reused document content changes: contract_bindings hash differs -> triggers impact on element
      - Path renames are tracked separately for reference updates without impact propagation
    - Generate a ChangeSet representing all detected changes
    - Associate changes with specific elements in the model
@@ -212,7 +212,7 @@ If Safety Requirement changes, the Overheat Shutdown Test must be reviewed for u
 
 The system shall meet defined performance criteria as specified in the reused SLA document.
 
-#### Reused Contract Context
+#### Contract Bindings
 * [docs/SLA.pdf](docs/SLA.pdf)
 
 #### Relations
@@ -220,7 +220,7 @@ The system shall meet defined performance criteria as specified in the reused SL
   * verifiedBy: [test_cases/performance_tests.md](test_cases/performance_tests.md)
 ```
 
-**Scenario 1: Reused Contract Context Content Changes**
+**Scenario 1: Contract Bindings Content Changes**
 
 If `docs/SLA.pdf` content is modified (e.g., performance targets updated from 99.9% to 99.99% uptime):
 - Document content hash changes
@@ -228,7 +228,7 @@ If `docs/SLA.pdf` content is modified (e.g., performance targets updated from 99
 - Change impact propagates through satisfiedBy -> `architecture/load_balancer.md` requires review
 - Change impact propagates through verifiedBy -> `test_cases/performance_tests.md` requires update
 
-**Scenario 2: Reused Contract Context Path Rename**
+**Scenario 2: Contract Bindings Path Rename**
 
 If `docs/SLA.pdf` is renamed to `docs/service_level_agreement.pdf` using `mv-asset`:
 - Path changes but document content unchanged

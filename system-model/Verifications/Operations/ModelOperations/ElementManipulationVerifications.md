@@ -39,8 +39,8 @@ Test verifies that the add command rejects elements with duplicate entries.
 #### Details
 Test cases:
 1. **Duplicate relations**: Add element with same relation twice -> Error
-2. **Duplicate reused_contract_context**: Add element with same reused_contract_context twice -> Error
-3. **Cross-section duplicate**: Add element with same target in Relations and Reused Contract Context -> Error
+2. **Duplicate contract_bindings**: Add element with same contract_bindings twice -> Error
+3. **Cross-section duplicate**: Add element with same target in Relations and Contract Bindings -> Error
 
 #### Metadata
   * type: test-verification
@@ -73,15 +73,15 @@ Test verifies that the add command provides contextual error messages with examp
    - Verify error message includes "Expected format: '  * relationType: [Text](link)'"
    - Verify example includes Relations subsection
 
-5. **Invalid reused_contract_context format**: Provide reused_contract_context without proper markdown link
+5. **Invalid contract_bindings format**: Provide contract_bindings without proper markdown link
    - Verify error message includes "Expected format: '  * [Text](link)'"
-   - Verify example includes Reused Contract Context subsection
+   - Verify example includes Contract Bindings subsection
 
 6. **Example completeness**: Verify example includes all subsections
    - Details subsection with markdown formatting
    - Metadata subsection with type
    - Relations subsection with derivedFrom and satisfiedBy examples
-   - Reused Contract Context subsection
+   - Contract Bindings subsection
    - Separator (---)
 
 **Success Criteria:**
@@ -741,8 +741,8 @@ Test verifies that link commands detect cross-section conflicts.
 
 #### Details
 Test cases:
-1. Element has reused_contract_context to B -> `link A relation B` -> Error (already in Reused Contract Context)
-2. Element has relation to B -> `link A reusesContract B` -> Error (already in Relations)
+1. Element has contract_bindings to B -> `link A relation B` -> Error (already in Contract Bindings)
+2. Element has relation to B -> `link A bindContract B` -> Error (already in Relations)
 
 #### Metadata
   * type: test-verification
@@ -815,9 +815,9 @@ The test shall verify that the `link` command adds relations to elements followi
 **Test Steps - External URL Handling:**
 1. Link with relation type (e.g., trace) to external URL
 2. Verify relation is added with URL as target
-3. Attempt to reuse external URL using 'reusesContract' keyword
+3. Attempt to reuse external URL using 'bindContract' keyword
 4. Verify operation fails with clear error message
-5. Verify error message states that `reusesContract` requires a contract element identifier target
+5. Verify error message states that `bindContract` requires a contract element identifier target
 
 **Success Criteria:**
 - Adds relation to source element's Relations subsection (written to file)
@@ -826,7 +826,7 @@ The test shall verify that the `link` command adds relations to elements followi
 - Creates Relations subsection if missing
 - Source resolves by file path first, then element name
 - Target must be existing element name
-- Duplicate relations/reused_contract_context return error with 'already exists' message
+- Duplicate relations/contract_bindings return error with 'already exists' message
 - Validates relation type against supported types
 - Rejects incompatible element type relations before persistence
 - Supports --dry-run preview
@@ -834,7 +834,7 @@ The test shall verify that the `link` command adds relations to elements followi
 - Reports errors for invalid inputs
 - Enforces single-root ownership: violating links are rejected with deterministic single-root ownership error output
 - External URLs allowed for relations (trace, satisfiedBy, etc.)
-- Non-identifier targets rejected for 'reusesContract' with clear identifier-target error message
+- Non-identifier targets rejected for 'bindContract' with clear identifier-target error message
 
 #### Metadata
   * type: test-verification

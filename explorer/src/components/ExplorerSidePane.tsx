@@ -306,8 +306,8 @@ function ExplorerViewControls({
         value: formatSummaryValue(store.knowledge_graph.summary?.relations ?? store.relations.length),
       },
       {
-        label: "Reused Context",
-        value: formatSummaryValue(store.knowledge_graph.summary?.reused_contract_context ?? store.reused_contract_context.length),
+        label: "Contract Binding",
+        value: formatSummaryValue(store.knowledge_graph.summary?.contract_bindings ?? store.contract_bindings.length),
       },
     ];
 

@@ -10,9 +10,9 @@ TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Acceptance Criteria:
 # - System shall provide a CLI command `resources` that lists files referenced by the model
 # - Command shall support `--json` flag for JSON output format
-# - Resources report shall have two sections: Relations and Reused Contract Context
+# - Resources report shall have two sections: Relations and Contract Bindings
 # - Relations section lists files from InternalPath relations such as satisfiedBy
-# - Reused Contract Context section reports file targets from reused_contract_context (empty when only identifier reused_contract_context are used)
+# - Contract Bindings section reports file targets from contract_bindings (empty when only identifier contract_bindings are used)
 # - Files shall be sorted alphabetically by path
 # - References within each file shall be sorted by relation type, then by element identifier
 # - Text output shall include markdown links to referencing elements
@@ -20,7 +20,7 @@ TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 #
 # Test Criteria:
 # - Command exits with success (0) return code
-# - Text output matches expected format with both Relations and Reused Contract Context sections
+# - Text output matches expected format with both Relations and Contract Bindings sections
 # - JSON output is valid and contains required fields
 
 # Test 1: Basic Resources Report (Text Output)
@@ -76,8 +76,8 @@ if ! echo "$OUTPUT" | jq 'has("relations")' | grep -q true; then
     exit 1
 fi
 
-if ! echo "$OUTPUT" | jq 'has("reused_contract_context")' | grep -q true; then
-    echo "FAILED: JSON missing 'reused_contract_context' field"
+if ! echo "$OUTPUT" | jq 'has("contract_bindings")' | grep -q true; then
+    echo "FAILED: JSON missing 'contract_bindings' field"
     exit 1
 fi
 
@@ -92,8 +92,8 @@ if ! echo "$OUTPUT" | jq '.summary | has("total_relation_files")' | grep -q true
     exit 1
 fi
 
-if ! echo "$OUTPUT" | jq '.summary | has("total_reused_contract_context_files")' | grep -q true; then
-    echo "FAILED: JSON missing 'summary.total_reused_contract_context_files' field"
+if ! echo "$OUTPUT" | jq '.summary | has("total_contract_bindings_files")' | grep -q true; then
+    echo "FAILED: JSON missing 'summary.total_contract_bindings_files' field"
     exit 1
 fi
 
@@ -102,8 +102,8 @@ if ! echo "$OUTPUT" | jq '.summary | has("total_relation_references")' | grep -q
     exit 1
 fi
 
-if ! echo "$OUTPUT" | jq '.summary | has("total_reused_contract_context_references")' | grep -q true; then
-    echo "FAILED: JSON missing 'summary.total_reused_contract_context_references' field"
+if ! echo "$OUTPUT" | jq '.summary | has("total_contract_bindings_references")' | grep -q true; then
+    echo "FAILED: JSON missing 'summary.total_contract_bindings_references' field"
     exit 1
 fi
 
@@ -114,10 +114,10 @@ if [ "$RELATION_FILES" -ne 4 ]; then
     exit 1
 fi
 
-# Test 4: Verify reused_contract_context count
-ATTACHMENT_FILES=$(echo "$OUTPUT" | jq '.summary.total_reused_contract_context_files')
+# Test 4: Verify contract_bindings count
+ATTACHMENT_FILES=$(echo "$OUTPUT" | jq '.summary.total_contract_bindings_files')
 if [ "$ATTACHMENT_FILES" -ne 0 ]; then
-    echo "FAILED: Expected 0 reused_contract_context files, got $ATTACHMENT_FILES"
+    echo "FAILED: Expected 0 contract_bindings files, got $ATTACHMENT_FILES"
     exit 1
 fi
 
@@ -148,10 +148,10 @@ if ! echo "$OUTPUT" | jq '.relations[0].references[0] | has("element_name")' | g
     exit 1
 fi
 
-# Test 7: Verify reused_contract_context list is empty for identifier-only reused_contract_context fixtures
-ATTACHMENT_LIST_SIZE=$(echo "$OUTPUT" | jq '.reused_contract_context | length')
+# Test 7: Verify contract_bindings list is empty for identifier-only contract_bindings fixtures
+ATTACHMENT_LIST_SIZE=$(echo "$OUTPUT" | jq '.contract_bindings | length')
 if [ "$ATTACHMENT_LIST_SIZE" -ne 0 ]; then
-    echo "FAILED: Expected empty reused_contract_context list, got size: $ATTACHMENT_LIST_SIZE"
+    echo "FAILED: Expected empty contract_bindings list, got size: $ATTACHMENT_LIST_SIZE"
     exit 1
 fi
 

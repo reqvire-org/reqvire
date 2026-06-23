@@ -114,28 +114,28 @@ pub enum ReqvireError {
     SerializationError(String),
 
     #[allow(dead_code)]
-    #[error("Invalid reused_contract_context format: {0}")]
-    InvalidReusedContractContextFormat(String),
+    #[error("Invalid contract_bindings format: {0}")]
+    InvalidContractBindingFormat(String),
 
     #[allow(dead_code)]
-    #[error("Missing reused_contract_context target: {0}")]
-    MissingReusedContractContextTarget(String),
+    #[error("Missing contract_bindings target: {0}")]
+    MissingContractBindingTarget(String),
 
     #[allow(dead_code)]
-    #[error("Missing reused_contract_context file: {0}")]
-    MissingReusedContractContextFile(String),
+    #[error("Missing contract_bindings file: {0}")]
+    MissingContractBindingFile(String),
 
     #[allow(dead_code)]
-    #[error("Invalid reused_contract_context target: {0}")]
-    InvalidReusedContractContextTarget(String),
+    #[error("Invalid contract_bindings target: {0}")]
+    InvalidContractBindingTarget(String),
 
     #[allow(dead_code)]
-    #[error("Invalid reused_contract_context scope: {0}")]
-    InvalidReusedContractContextScope(String),
+    #[error("Invalid contract_bindings scope: {0}")]
+    InvalidContractBindingScope(String),
 
     #[allow(dead_code)]
-    #[error("Duplicate reused_contract_context: {0}")]
-    DuplicateReusedContractContext(String),
+    #[error("Duplicate contract_bindings: {0}")]
+    DuplicateContractBinding(String),
 
     #[allow(dead_code)]
     #[error("Cross-section duplicate: {0}")]

@@ -58,10 +58,11 @@
 <https://www.reqvire.org/ontology#Constraint> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#ConstraintRelationPattern> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#Contract> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#ContractBindingCompatibilityRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#ContractBindingPattern> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#ContractElementType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#ContractRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#CoverageState> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#CrossSubgraphContractDependencyPattern> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#CustomElement> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#CustomElementType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#DemonstrationVerification> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -136,7 +137,6 @@
 <https://www.reqvire.org/ontology#RequirementElementType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#RequirementOwnedContract> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#ReservedSubsection> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#ReusedContractContextCompatibilityRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#RiskValue> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#RuntimeOntologyArtifact> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#RuntimeOntologyNamespace> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -187,6 +187,7 @@
 <https://www.reqvire.org/ontology#batchLineCommentStyle> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#behaviorPhase> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#behaviorType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#bindsContract> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#blockCssCommentStyle> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#blockKind> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#blockXmlCommentStyle> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -246,6 +247,21 @@
 <https://www.reqvire.org/ontology#constructSubject> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#content> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#contentChangeKind> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingPattern> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingRelationCategory> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingRelationFamily> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingsContentChangeKind> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingsContentImpactRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingsHierarchyIndependenceRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingsOwnerType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingsRelationRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingsRuleDescription> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingsSourceType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingsSubgraphDirectionRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingsSubsection> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingsTargetIdentifier> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBindingsTargetType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#contractBoundBy> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#contractDefinesRequirement> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#contractOwnershipRelationFamily> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#contractPurpose> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -257,10 +273,6 @@
 <https://www.reqvire.org/ontology#criticalPriority> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#criticalRisk> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#crossSectionDuplicateRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#crossSubgraphContractDependencyPattern> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#crossSubgraphContractDependencyRelationCategory> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#crossSubgraphContractDependencyRelationFamily> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#crossSubgraphContractUsedByRequirement> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#crossSubmodelHierarchicalLintRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#crossSubmodelHierarchyLintRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#customElementTypePattern> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -396,7 +408,7 @@
 <https://www.reqvire.org/ontology#ontologyUsedBySemanticContract> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#otherType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#ownedByRequirement> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#ownedContractReusedContractContextRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#ownedContractContractBindingRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#owner> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#ownerToContractImpactRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#ownershipRelationPattern> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -450,33 +462,21 @@
 <https://www.reqvire.org/ontology#relocationChangeKind> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#relocationNoPropagationRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#removalChangeKind> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#requirementBindsContract> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#requirementConstrainedBySemanticContract> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#requirementContractBindingCompatibilityRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#requirementDefinedByContract> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#requirementObligationText> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#requirementReusedContractContextCompatibilityRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#requirementSpecifiesCapability> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#requirementToImplementationImpactRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#requirementToSemanticContractReviewRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#requirementToVerificationImpactRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#requirementType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#requirementUsesCrossSubgraphContract> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#requirementVerifiedByVerification> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#requiresReview> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#reservedVocabularyIri> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#restrictionKind> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#reuse> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusedContractContextContentChangeKind> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusedContractContextContentImpactRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusedContractContextHierarchyIndependenceRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusedContractContextOwnerType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusedContractContextRelationRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusedContractContextRuleDescription> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusedContractContextSourceType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusedContractContextSubgraphDirectionRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusedContractContextSubsection> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusedContractContextTargetIdentifier> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusedContractContextTargetType> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-<https://www.reqvire.org/ontology#reusesContract> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#reverseTraversalRelationUsageCategory> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#reviewStatus> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#reviewedByVerification> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -691,13 +691,13 @@
 <https://www.reqvire.org/ontology#crossSubmodelHierarchyLintRule> a <https://www.reqvire.org/ontology#LintingRule> ;
 	<https://www.reqvire.org/ontology#lintRuleName> "cross-submodel-hierarchy" ;
 	<https://www.reqvire.org/ontology#lintScope> "capability-rooted subgraphs" ;
-	<https://www.reqvire.org/ontology#lintCondition> "A hierarchical relation crosses capability-root boundaries where a specify relation, concept reference, semantic-contract relation, or requirement-owned contract reused_contract_context would preserve ownership more clearly." ;
+	<https://www.reqvire.org/ontology#lintCondition> "A hierarchical relation crosses capability-root boundaries where a specify relation, concept reference, semantic-contract relation, or requirement-owned contract contract_bindings would preserve ownership more clearly." ;
 	<https://www.reqvire.org/ontology#lintFindingKind> "cross-submodel-coupling" ;
 	<https://www.reqvire.org/ontology#lintRepairMode> "auditable-user-action" .
 <https://www.reqvire.org/ontology#redundantRelationLintRule> a <https://www.reqvire.org/ontology#LintingRule> ;
 	<https://www.reqvire.org/ontology#lintRuleName> "redundant-relation" ;
-	<https://www.reqvire.org/ontology#lintScope> "relations and reused_contract_context" ;
-	<https://www.reqvire.org/ontology#lintCondition> "A relation or reused_contract_context duplicates an already implied or repeated model edge." ;
+	<https://www.reqvire.org/ontology#lintScope> "relations and contract_bindings" ;
+	<https://www.reqvire.org/ontology#lintCondition> "A relation or contract_bindings duplicates an already implied or repeated model edge." ;
 	<https://www.reqvire.org/ontology#lintFindingKind> "redundant-relation" ;
 	<https://www.reqvire.org/ontology#lintRepairMode> "explicit-fix-or-format-when-lossless" .
 
@@ -796,27 +796,27 @@
 	<https://www.reqvire.org/ontology#validationCondition> "A native concept broader or narrower relation targets a concept that resolves to a different concept-scheme root." ;
 	<https://www.reqvire.org/ontology#validationOutcome> "Validation fails because SKOS broader/narrower taxonomy is scheme-local in Reqvire native concept authoring." ;
 	<https://www.reqvire.org/ontology#validationRepair> "Keep broader/narrower inside one concept scheme, or use related, exactMatch, or closeMatch for cross-scheme concept alignment." .
-<https://www.reqvire.org/ontology#reusedContractContextHierarchyIndependenceRule> a <https://www.reqvire.org/ontology#ValidationRule> ;
-	<https://www.reqvire.org/ontology#validationRuleName> "reused-contract-context-hierarchy-independence" ;
-	<https://www.reqvire.org/ontology#validationScope> "reused_contract_context" ;
+<https://www.reqvire.org/ontology#contractBindingsHierarchyIndependenceRule> a <https://www.reqvire.org/ontology#ValidationRule> ;
+	<https://www.reqvire.org/ontology#validationRuleName> "contract-bindings-hierarchy-independence" ;
+	<https://www.reqvire.org/ontology#validationScope> "contract_bindings" ;
 	<https://www.reqvire.org/ontology#validationSeverity> "error" ;
-	<https://www.reqvire.org/ontology#validationCondition> "An element reuses a contract already available through owner hierarchy or ancestor reused_contract_context propagation." ;
-	<https://www.reqvire.org/ontology#validationOutcome> "Validation fails because the reused_contract_context is redundant or hides the intended dependency boundary." ;
-	<https://www.reqvire.org/ontology#validationRepair> "Remove the redundant reused_contract_context or reuse the contract at the highest valid boundary." .
-<https://www.reqvire.org/ontology#reusedContractContextSubgraphDirectionRule> a <https://www.reqvire.org/ontology#ValidationRule> ;
-	<https://www.reqvire.org/ontology#validationRuleName> "reused-contract-context-subgraph-direction" ;
+	<https://www.reqvire.org/ontology#validationCondition> "An element reuses a contract already available through owner hierarchy or ancestor contract_bindings propagation." ;
+	<https://www.reqvire.org/ontology#validationOutcome> "Validation fails because the contract_bindings is redundant or hides the intended dependency boundary." ;
+	<https://www.reqvire.org/ontology#validationRepair> "Remove the redundant contract_bindings or reuse the contract at the highest valid boundary." .
+<https://www.reqvire.org/ontology#contractBindingsSubgraphDirectionRule> a <https://www.reqvire.org/ontology#ValidationRule> ;
+	<https://www.reqvire.org/ontology#validationRuleName> "contract-bindings-subgraph-direction" ;
 	<https://www.reqvire.org/ontology#validationScope> "capability-root-subgraphs" ;
 	<https://www.reqvire.org/ontology#validationSeverity> "error" ;
 	<https://www.reqvire.org/ontology#validationCondition> "Two requirement subgraphs reuse contracts to each other in both directions." ;
-	<https://www.reqvire.org/ontology#validationOutcome> "Validation fails because cross-subgraph reused_contract_context contracts must be one-directional." ;
+	<https://www.reqvire.org/ontology#validationOutcome> "Validation fails because cross-subgraph contract bindings must be one-directional." ;
 	<https://www.reqvire.org/ontology#validationRepair> "Keep one dependency direction and move shared contracts into a common reused source if needed." .
 <https://www.reqvire.org/ontology#crossSectionDuplicateRule> a <https://www.reqvire.org/ontology#ValidationRule> ;
 	<https://www.reqvire.org/ontology#validationRuleName> "cross-section-duplicate" ;
 	<https://www.reqvire.org/ontology#validationScope> "element-subsections" ;
 	<https://www.reqvire.org/ontology#validationSeverity> "error" ;
-	<https://www.reqvire.org/ontology#validationCondition> "The same target appears in both Relations and Reused Contract Context for one element." ;
+	<https://www.reqvire.org/ontology#validationCondition> "The same target appears in both Relations and Contract Bindings for one element." ;
 	<https://www.reqvire.org/ontology#validationOutcome> "Validation fails because the model cannot infer which semantic channel is intended." ;
-	<https://www.reqvire.org/ontology#validationRepair> "Remove either the relation entry or the reused_contract_context entry." .
+	<https://www.reqvire.org/ontology#validationRepair> "Remove either the relation entry or the contract_bindings entry." .
 <https://www.reqvire.org/ontology#semanticReferenceReachabilityValidationRule> a <https://www.reqvire.org/ontology#ValidationRule> ;
 	<https://www.reqvire.org/ontology#validationRuleName> "semantic-reference-reachability-validation" ;
 	<https://www.reqvire.org/ontology#validationScope> "semantic-contract-use-ontology-context" ;
@@ -837,7 +837,7 @@
 	<https://www.reqvire.org/ontology#validationSeverity> "warning" ;
 	<https://www.reqvire.org/ontology#validationCondition> "A user-authored hierarchical relation crosses capability-root submodel ownership boundaries." ;
 	<https://www.reqvire.org/ontology#validationOutcome> "Report as manual review because ownership boundary intent is ambiguous." ;
-	<https://www.reqvire.org/ontology#validationRepair> "Replace with reused_contract_context/trace or remodel hierarchy under one capability root." .
+	<https://www.reqvire.org/ontology#validationRepair> "Replace with contract_bindings/trace or remodel hierarchy under one capability root." .
 <https://www.reqvire.org/ontology#redundantHierarchicalLintRule> a <https://www.reqvire.org/ontology#ValidationRule> ;
 	<https://www.reqvire.org/ontology#validationRuleName> "lint-redundant-hierarchical-relation" ;
 	<https://www.reqvire.org/ontology#validationScope> "lint" ;
@@ -1041,7 +1041,7 @@
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Generated or authored ontology document identified by ontology base IRI and containing contributed ontology terms." .
 <https://www.reqvire.org/ontology#File> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://www.reqvire.org/ontology#Artifact> ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Repository-internal file artifact referenced by Reqvire relations, reused_contract_context, or evidence links." .
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Repository-internal file artifact referenced by Reqvire relations, contract_bindings, or evidence links." .
 <https://www.reqvire.org/ontology#CustomElement> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://www.reqvire.org/ontology#Element> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Custom model extension element whose authored metadata type follows other-TYPENAME and cannot author canonical semantic relations." .
@@ -1079,7 +1079,7 @@
 <https://www.reqvire.org/ontology#ElementLocation> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "File and section location context for an element, separate from stable identity." .
 <https://www.reqvire.org/ontology#ReferenceTargetKind> a <http://www.w3.org/2002/07/owl#Class> ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Stable semantic category for relation or reused_contract_context target resolution." .
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Stable semantic category for relation or contract_bindings target resolution." .
 <https://www.reqvire.org/ontology#ElementIdentifierTarget> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://www.reqvire.org/ontology#ReferenceTargetKind> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Reference target category that resolves to a specific model element." .
@@ -1162,7 +1162,7 @@
 <https://www.reqvire.org/ontology#capabilityType> a <https://www.reqvire.org/ontology#CapabilityElementType> ;
 	<https://www.reqvire.org/ontology#elementTypeName> "capability" ;
 	<https://www.reqvire.org/ontology#elementTypeCategory> "capability" ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, connected to ontology through reused_contract_context, and verified by evidence." ;
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, connected to ontology through contract_bindings, and verified by evidence." ;
 	<https://www.reqvire.org/ontology#defaultElementType> false .
 <https://www.reqvire.org/ontology#requirementType> a <https://www.reqvire.org/ontology#RequirementElementType> ;
 	<https://www.reqvire.org/ontology#elementTypeName> "requirement" ;
@@ -1209,8 +1209,8 @@
 <https://www.reqvire.org/ontology#detailsSubsection> a <https://www.reqvire.org/ontology#ReservedSubsection> ;
 	<https://www.reqvire.org/ontology#subsectionName> "Details" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Narrative requirement context and clarification that remains part of the owning element." .
-<https://www.reqvire.org/ontology#reusedContractContextSubsection> a <https://www.reqvire.org/ontology#ReservedSubsection> ;
-	<https://www.reqvire.org/ontology#subsectionName> "Reused Contract Context" ;
+<https://www.reqvire.org/ontology#contractBindingsSubsection> a <https://www.reqvire.org/ontology#ReservedSubsection> ;
+	<https://www.reqvire.org/ontology#subsectionName> "Contract Bindings" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Explicit cross-subgraph reuse of requirement-owned contract context." .
 <https://www.reqvire.org/ontology#conceptReferencesSubsection> a <https://www.reqvire.org/ontology#ReservedSubsection> ;
 	<https://www.reqvire.org/ontology#subsectionName> "Concept References" ;
@@ -1414,7 +1414,7 @@
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Analysis record for a changed element, impacted elements, propagation paths, and review status." .
 <https://www.reqvire.org/ontology#ChangeImpactPath> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Change impact path" ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Auditable path that explains how impact propagates through model relations, reused_contract_context, or semantic dependencies." .
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Auditable path that explains how impact propagates through model relations, contract_bindings, or semantic dependencies." .
 <https://www.reqvire.org/ontology#ChangeImpactEdge> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Change impact edge" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Single propagation step in a change-impact path." .
@@ -1450,53 +1450,53 @@
 	<http://www.w3.org/2000/01/rdf-schema#range> <https://www.reqvire.org/ontology#ChangeImpactEdge> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Propagation edge included in a change-impact path." .
 <https://www.reqvire.org/ontology#semanticDependency> a <http://www.w3.org/2002/07/owl#ObjectProperty> .
-_:c4e660b1a7402260dbe2c9b033a50810 a <http://www.w3.org/2002/07/owl#Class> .
-_:d6c501df7585ca94c9d5313f5b98684e <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactAnalysis> .
-_:c4e660b1a7402260dbe2c9b033a50810 <http://www.w3.org/2002/07/owl#unionOf> _:d6c501df7585ca94c9d5313f5b98684e .
-_:c0d0d900a1e0d64d3b1ec41bc18332f5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticDependency> .
-_:d6c501df7585ca94c9d5313f5b98684e <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:c0d0d900a1e0d64d3b1ec41bc18332f5 .
-_:c0d0d900a1e0d64d3b1ec41bc18332f5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://www.reqvire.org/ontology#semanticDependency> <http://www.w3.org/2000/01/rdf-schema#domain> _:c4e660b1a7402260dbe2c9b033a50810 .
-_:a5fe2d311bb00541b521e46f377b17bc a <http://www.w3.org/2002/07/owl#Class> .
-_:d8f06fdc33b5c1cf87b682899d2c9293 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticDependency> .
-_:a5fe2d311bb00541b521e46f377b17bc <http://www.w3.org/2002/07/owl#unionOf> _:d8f06fdc33b5c1cf87b682899d2c9293 .
-_:bd8fdc98d5d4fd51e3cc41b8c36f7b2d <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticContract> .
-_:d8f06fdc33b5c1cf87b682899d2c9293 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:bd8fdc98d5d4fd51e3cc41b8c36f7b2d .
-_:bd8fdc98d5d4fd51e3cc41b8c36f7b2d <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://www.reqvire.org/ontology#semanticDependency> <http://www.w3.org/2000/01/rdf-schema#range> _:a5fe2d311bb00541b521e46f377b17bc ;
+_:dfe4b75e87bd03eb4e3a5cfa8bc1371e a <http://www.w3.org/2002/07/owl#Class> .
+_:c8008101f72d421fe4a9fdc92298f715 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactAnalysis> .
+_:dfe4b75e87bd03eb4e3a5cfa8bc1371e <http://www.w3.org/2002/07/owl#unionOf> _:c8008101f72d421fe4a9fdc92298f715 .
+_:bc09282d16bb7e18ce15ba429f1c6a96 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticDependency> .
+_:c8008101f72d421fe4a9fdc92298f715 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:bc09282d16bb7e18ce15ba429f1c6a96 .
+_:bc09282d16bb7e18ce15ba429f1c6a96 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://www.reqvire.org/ontology#semanticDependency> <http://www.w3.org/2000/01/rdf-schema#domain> _:dfe4b75e87bd03eb4e3a5cfa8bc1371e .
+_:a1169da2c25ad920539200e190faf080 a <http://www.w3.org/2002/07/owl#Class> .
+_:f95c922da4cb98a8bbff248baf62e70c <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticDependency> .
+_:a1169da2c25ad920539200e190faf080 <http://www.w3.org/2002/07/owl#unionOf> _:f95c922da4cb98a8bbff248baf62e70c .
+_:bc0a8137ba00733803809d4385dd49fe <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticContract> .
+_:f95c922da4cb98a8bbff248baf62e70c <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:bc0a8137ba00733803809d4385dd49fe .
+_:bc0a8137ba00733803809d4385dd49fe <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://www.reqvire.org/ontology#semanticDependency> <http://www.w3.org/2000/01/rdf-schema#range> _:a1169da2c25ad920539200e190faf080 ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Semantic dependency considered during change-impact analysis, or the semantic contract target resolved by a dependency record." .
 <https://www.reqvire.org/ontology#reviewedByVerification> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#ImpactReview> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <https://www.reqvire.org/ontology#Verification> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Verification evidence or method used to review an impact." .
 <https://www.reqvire.org/ontology#impactReason> a <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-_:b487c2b8f9561dd0ce482361fffbf99a a <http://www.w3.org/2002/07/owl#Class> .
-_:a70056f51e7501de1bd5073d5560d9ca <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
-_:b487c2b8f9561dd0ce482361fffbf99a <http://www.w3.org/2002/07/owl#unionOf> _:a70056f51e7501de1bd5073d5560d9ca .
-_:db296887e32a020d9eb5f1c85d4d7fc <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
-_:a70056f51e7501de1bd5073d5560d9ca <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:db296887e32a020d9eb5f1c85d4d7fc .
-_:db296887e32a020d9eb5f1c85d4d7fc <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://www.reqvire.org/ontology#impactReason> <http://www.w3.org/2000/01/rdf-schema#domain> _:b487c2b8f9561dd0ce482361fffbf99a ;
+_:e34e0412f4c13fd2cf5ecc0045d50130 a <http://www.w3.org/2002/07/owl#Class> .
+_:e79f5760313cf0bc5ca86bc01ff94136 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
+_:e34e0412f4c13fd2cf5ecc0045d50130 <http://www.w3.org/2002/07/owl#unionOf> _:e79f5760313cf0bc5ca86bc01ff94136 .
+_:d553db065e60ab99efaae8db9d0b71c0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
+_:e79f5760313cf0bc5ca86bc01ff94136 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:d553db065e60ab99efaae8db9d0b71c0 .
+_:d553db065e60ab99efaae8db9d0b71c0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://www.reqvire.org/ontology#impactReason> <http://www.w3.org/2000/01/rdf-schema#domain> _:e34e0412f4c13fd2cf5ecc0045d50130 ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Human-readable reason explaining why an edge or rule propagates impact." .
 <https://www.reqvire.org/ontology#impactRelation> a <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-_:fb275e01621bc1c9804b1e66cf7a42cf a <http://www.w3.org/2002/07/owl#Class> .
-_:b071fc1bbb4055989f91c9d39e35480a <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
-_:fb275e01621bc1c9804b1e66cf7a42cf <http://www.w3.org/2002/07/owl#unionOf> _:b071fc1bbb4055989f91c9d39e35480a .
-_:d08c54ad5f2776fca436a678bbaf91c5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
-_:b071fc1bbb4055989f91c9d39e35480a <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:d08c54ad5f2776fca436a678bbaf91c5 .
-_:d08c54ad5f2776fca436a678bbaf91c5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://www.reqvire.org/ontology#impactRelation> <http://www.w3.org/2000/01/rdf-schema#domain> _:fb275e01621bc1c9804b1e66cf7a42cf ;
+_:dde8b77a1b4ba617f6e3bb23b0e461f7 a <http://www.w3.org/2002/07/owl#Class> .
+_:bdf94180bcfa715eb7767ecde6d84a87 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
+_:dde8b77a1b4ba617f6e3bb23b0e461f7 <http://www.w3.org/2002/07/owl#unionOf> _:bdf94180bcfa715eb7767ecde6d84a87 .
+_:b2dc3805ac9bdc9be953dc8e0eaa34ea <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
+_:bdf94180bcfa715eb7767ecde6d84a87 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:b2dc3805ac9bdc9be953dc8e0eaa34ea .
+_:b2dc3805ac9bdc9be953dc8e0eaa34ea <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://www.reqvire.org/ontology#impactRelation> <http://www.w3.org/2000/01/rdf-schema#domain> _:dde8b77a1b4ba617f6e3bb23b0e461f7 ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Canonical relation or dependency token that caused an impact edge or activates a propagation rule." .
 <https://www.reqvire.org/ontology#impactDirection> a <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-_:de5600856659ea356cd9f859b3e28f85 a <http://www.w3.org/2002/07/owl#Class> .
-_:f5006be38df321a8d4db522739d40f55 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
-_:de5600856659ea356cd9f859b3e28f85 <http://www.w3.org/2002/07/owl#unionOf> _:f5006be38df321a8d4db522739d40f55 .
-_:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
-_:f5006be38df321a8d4db522739d40f55 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:ed484632668599b917a81ad091d81e20 .
-_:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://www.reqvire.org/ontology#impactDirection> <http://www.w3.org/2000/01/rdf-schema#domain> _:de5600856659ea356cd9f859b3e28f85 ;
+_:e89c05dd9da1341ef06b7961450dd162 a <http://www.w3.org/2002/07/owl#Class> .
+_:a13d9e6b4ac56c539a5bb5993c207f79 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
+_:e89c05dd9da1341ef06b7961450dd162 <http://www.w3.org/2002/07/owl#unionOf> _:a13d9e6b4ac56c539a5bb5993c207f79 .
+_:b54f4153c88f630b915ac219ebf4d538 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
+_:a13d9e6b4ac56c539a5bb5993c207f79 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:b54f4153c88f630b915ac219ebf4d538 .
+_:b54f4153c88f630b915ac219ebf4d538 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://www.reqvire.org/ontology#impactDirection> <http://www.w3.org/2000/01/rdf-schema#domain> _:e89c05dd9da1341ef06b7961450dd162 ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Propagation direction token for an impact edge or propagation rule." .
 <https://www.reqvire.org/ontology#impactScope> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
@@ -1567,11 +1567,11 @@ _:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Stable element identity exists in both model states but location context changed." ;
 	<https://www.reqvire.org/ontology#changeKindName> "relocation" ;
 	<https://www.reqvire.org/ontology#changeKindMeaning> "Stable element identity exists in both model states but location context changed." .
-<https://www.reqvire.org/ontology#reusedContractContextContentChangeKind> a <https://www.reqvire.org/ontology#ChangeKind> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Reused Contract Context content change" ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Reused resource or reused element content changed independently of the reusesContract element text." ;
-	<https://www.reqvire.org/ontology#changeKindName> "reused-contract-context-content-change" ;
-	<https://www.reqvire.org/ontology#changeKindMeaning> "Reused resource or reused element content changed independently of the reusesContract element text." .
+<https://www.reqvire.org/ontology#contractBindingsContentChangeKind> a <https://www.reqvire.org/ontology#ChangeKind> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Contract Bindings content change" ;
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Reused resource or reused element content changed independently of the bindsContract element text." ;
+	<https://www.reqvire.org/ontology#changeKindName> "contract-bindings-content-change" ;
+	<https://www.reqvire.org/ontology#changeKindMeaning> "Reused resource or reused element content changed independently of the bindsContract element text." .
 <https://www.reqvire.org/ontology#directImpactClassification> a <https://www.reqvire.org/ontology#ImpactClassification> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Direct impact" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Impact caused by a change to the element itself." ;
@@ -1579,9 +1579,9 @@ _:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 	<https://www.reqvire.org/ontology#impactClassificationMeaning> "Impact caused by a change to the element itself." .
 <https://www.reqvire.org/ontology#indirectImpactClassification> a <https://www.reqvire.org/ontology#ImpactClassification> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Indirect impact" ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Impact propagated through relation, reused_contract_context, hierarchy, or semantic dependency context." ;
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Impact propagated through relation, contract_bindings, hierarchy, or semantic dependency context." ;
 	<https://www.reqvire.org/ontology#impactClassificationName> "indirect" ;
-	<https://www.reqvire.org/ontology#impactClassificationMeaning> "Impact propagated through relation, reused_contract_context, hierarchy, or semantic dependency context." .
+	<https://www.reqvire.org/ontology#impactClassificationMeaning> "Impact propagated through relation, contract_bindings, hierarchy, or semantic dependency context." .
 <https://www.reqvire.org/ontology#potentialImpactClassification> a <https://www.reqvire.org/ontology#ImpactClassification> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Potential impact" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Impact that may require review based on semantic analysis or indirect dependency evidence." ;
@@ -1686,15 +1686,15 @@ _:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 	<https://www.reqvire.org/ontology#propagationTarget> "semantic-contract" ;
 	<https://www.reqvire.org/ontology#propagationMode> "consistency-review-required" ;
 	<https://www.reqvire.org/ontology#impactReason> "Requirement obligation changes can make existing semantic contract constraints inconsistent with the requirement text." .
-<https://www.reqvire.org/ontology#reusedContractContextContentImpactRule> a <https://www.reqvire.org/ontology#ChangePropagationRule> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Reused Contract Context content impact" ;
-	<https://www.reqvire.org/ontology#changeRuleName> "reused-contract-context-content-impact" ;
+<https://www.reqvire.org/ontology#contractBindingsContentImpactRule> a <https://www.reqvire.org/ontology#ChangePropagationRule> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Contract Bindings content impact" ;
+	<https://www.reqvire.org/ontology#changeRuleName> "contract-bindings-content-impact" ;
 	<https://www.reqvire.org/ontology#changedThing> "reused-contract-content" ;
-	<https://www.reqvire.org/ontology#impactRelation> "reused_contract_context" ;
+	<https://www.reqvire.org/ontology#impactRelation> "contract_bindings" ;
 	<https://www.reqvire.org/ontology#impactDirection> "bidirectional" ;
-	<https://www.reqvire.org/ontology#propagationTarget> "reusesContract-element-and-owner-context" ;
+	<https://www.reqvire.org/ontology#propagationTarget> "bindsContract-element-and-owner-context" ;
 	<https://www.reqvire.org/ontology#propagationMode> "review-required" ;
-	<https://www.reqvire.org/ontology#impactReason> "Reused Contract Context content changes affect explicit cross-subgraph contract consumers." .
+	<https://www.reqvire.org/ontology#impactReason> "Contract Bindings content changes affect explicit cross-subgraph contract consumers." .
 <https://www.reqvire.org/ontology#semanticReferenceReachabilityRule> a <https://www.reqvire.org/ontology#ChangePropagationRule> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Semantic reference reachability" ;
 	<https://www.reqvire.org/ontology#changeRuleName> "semantic-reference-reachability" ;
@@ -1730,10 +1730,10 @@ _:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 <https://www.reqvire.org/ontology#TraversalRule> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Traversal rule" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Rule describing how a relation category may be traversed for model navigation." .
-<https://www.reqvire.org/ontology#ReusedContractContextCompatibilityRule> a <http://www.w3.org/2002/07/owl#Class> ;
+<https://www.reqvire.org/ontology#ContractBindingCompatibilityRule> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://www.reqvire.org/ontology#RelationConstraint> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Reused Contract Context compatibility rule" ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Constraint defining valid reused_contract_context source, target, and owner compatibility." .
+	<http://www.w3.org/2000/01/rdf-schema#label> "Contract Bindings compatibility rule" ;
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Constraint defining valid contract_bindings source, target, and owner compatibility." .
 <https://www.reqvire.org/ontology#RelationUsageCategory> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Relation usage category" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Controlled category grouping relation names by operational usage such as model traversal, change propagation, or rollup." .
@@ -1780,7 +1780,7 @@ _:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 	<http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://www.reqvire.org/ontology#RelationSemanticPattern> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Satisfaction relation pattern" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Relation pattern connecting requirements or evidence-backed verifications to implementation or evidence artifacts." .
-<https://www.reqvire.org/ontology#CrossSubgraphContractDependencyPattern> a <http://www.w3.org/2002/07/owl#Class> ;
+<https://www.reqvire.org/ontology#ContractBindingPattern> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://www.reqvire.org/ontology#RelationSemanticPattern> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Cross-subgraph contract dependency pattern" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Relation pattern for a requirement using reusable requirement-owned contract context from another subgraph without transferring ownership." .
@@ -1811,9 +1811,9 @@ _:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 <https://www.reqvire.org/ontology#satisfactionRelationPattern> a <http://www.w3.org/2002/07/owl#NamedIndividual> , <https://www.reqvire.org/ontology#RelationSemanticPattern> , <https://www.reqvire.org/ontology#SatisfactionRelationPattern> ;
 	<https://www.reqvire.org/ontology#semanticPatternName> "satisfaction" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Direct implementation or evidence satisfaction relationship." .
-<https://www.reqvire.org/ontology#crossSubgraphContractDependencyPattern> a <http://www.w3.org/2002/07/owl#NamedIndividual> , <https://www.reqvire.org/ontology#RelationSemanticPattern> , <https://www.reqvire.org/ontology#CrossSubgraphContractDependencyPattern> ;
-	<https://www.reqvire.org/ontology#semanticPatternName> "cross-subgraph-contract-dependency" ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Direct cross-subgraph dependency from a requirement to reusable requirement-owned contract context declared through the reused_contract_context authoring mechanism." .
+<https://www.reqvire.org/ontology#contractBindingPattern> a <http://www.w3.org/2002/07/owl#NamedIndividual> , <https://www.reqvire.org/ontology#RelationSemanticPattern> , <https://www.reqvire.org/ontology#ContractBindingPattern> ;
+	<https://www.reqvire.org/ontology#semanticPatternName> "contract-binding" ;
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Direct cross-subgraph dependency from a requirement to reusable requirement-owned contract context declared through the contract_bindings authoring mechanism." .
 <https://www.reqvire.org/ontology#hierarchyRelationFamily> a <http://www.w3.org/2002/07/owl#NamedIndividual> , <https://www.reqvire.org/ontology#RelationFamily> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Hierarchy relation family" ;
 	<https://www.reqvire.org/ontology#relationFamilyName> "hierarchy" ;
@@ -1856,12 +1856,12 @@ _:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 	<https://www.reqvire.org/ontology#relationFamilyMeaning> "Implementation or evidence satisfaction relationship from requirements or evidence-backed verifications to artifacts." ;
 	<https://www.reqvire.org/ontology#relationFamilyForwardProperty> <https://www.reqvire.org/ontology#elementSatisfiedByArtifact> ;
 	<https://www.reqvire.org/ontology#relationFamilyInverseProperty> <https://www.reqvire.org/ontology#artifactSatisfiesElement> .
-<https://www.reqvire.org/ontology#crossSubgraphContractDependencyRelationFamily> a <http://www.w3.org/2002/07/owl#NamedIndividual> , <https://www.reqvire.org/ontology#RelationFamily> ;
+<https://www.reqvire.org/ontology#contractBindingRelationFamily> a <http://www.w3.org/2002/07/owl#NamedIndividual> , <https://www.reqvire.org/ontology#RelationFamily> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Cross-subgraph contract dependency relation family" ;
-	<https://www.reqvire.org/ontology#relationFamilyName> "cross-subgraph-contract-dependency" ;
+	<https://www.reqvire.org/ontology#relationFamilyName> "contract-binding" ;
 	<https://www.reqvire.org/ontology#relationFamilyMeaning> "Dependency from a requirement to reusable requirement-owned contract context in another subgraph." ;
-	<https://www.reqvire.org/ontology#relationFamilyForwardProperty> <https://www.reqvire.org/ontology#requirementUsesCrossSubgraphContract> ;
-	<https://www.reqvire.org/ontology#relationFamilyInverseProperty> <https://www.reqvire.org/ontology#crossSubgraphContractUsedByRequirement> .
+	<https://www.reqvire.org/ontology#relationFamilyForwardProperty> <https://www.reqvire.org/ontology#requirementBindsContract> ;
+	<https://www.reqvire.org/ontology#relationFamilyInverseProperty> <https://www.reqvire.org/ontology#contractBoundBy> .
 <https://www.reqvire.org/ontology#derive> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#Element> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <https://www.reqvire.org/ontology#Element> ;
@@ -2111,31 +2111,31 @@ _:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 <https://www.reqvire.org/ontology#reuse> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#Element> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <https://www.reqvire.org/ontology#Element> ;
-	<http://www.w3.org/2002/07/owl#inverseOf> <https://www.reqvire.org/ontology#reusesContract> ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Inverse reused_contract_context relation from a reusable requirement-owned contract back to its consuming requirement." .
-<https://www.reqvire.org/ontology#reusesContract> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+	<http://www.w3.org/2002/07/owl#inverseOf> <https://www.reqvire.org/ontology#bindsContract> ;
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Inverse contract_bindings relation from a reusable requirement-owned contract back to its consuming requirement." .
+<https://www.reqvire.org/ontology#bindsContract> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#Element> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <https://www.reqvire.org/ontology#Element> ;
 	<http://www.w3.org/2002/07/owl#inverseOf> <https://www.reqvire.org/ontology#reuse> ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Forward reused_contract_context relation from a requirement to explicit reusable requirement-owned contract context." .
-<https://www.reqvire.org/ontology#requirementUsesCrossSubgraphContract> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Forward contract_bindings relation from a requirement to explicit reusable requirement-owned contract context." .
+<https://www.reqvire.org/ontology#requirementBindsContract> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#Requirement> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <https://www.reqvire.org/ontology#Contract> ;
-	<http://www.w3.org/2002/07/owl#inverseOf> <https://www.reqvire.org/ontology#crossSubgraphContractUsedByRequirement> ;
+	<http://www.w3.org/2002/07/owl#inverseOf> <https://www.reqvire.org/ontology#contractBoundBy> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Normalized direct relation from a requirement to reusable contract context it uses from another subgraph." .
-<https://www.reqvire.org/ontology#crossSubgraphContractUsedByRequirement> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+<https://www.reqvire.org/ontology#contractBoundBy> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#Contract> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <https://www.reqvire.org/ontology#Requirement> ;
-	<http://www.w3.org/2002/07/owl#inverseOf> <https://www.reqvire.org/ontology#requirementUsesCrossSubgraphContract> ;
+	<http://www.w3.org/2002/07/owl#inverseOf> <https://www.reqvire.org/ontology#requirementBindsContract> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Normalized inverse relation from reusable contract context to requirements in other subgraphs that use it." .
 <https://www.reqvire.org/ontology#implementedByArtifact> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#Capability> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <https://www.reqvire.org/ontology#Artifact> .
-_:b3925f03a7f9f27831bf9dd9d1ed54a4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#specifiedBy> .
-<https://www.reqvire.org/ontology#implementedByArtifact> <http://www.w3.org/2002/07/owl#propertyChainAxiom> _:b3925f03a7f9f27831bf9dd9d1ed54a4 .
-_:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#satisfiedBy> .
-_:b3925f03a7f9f27831bf9dd9d1ed54a4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:d6221451618c332c2693c98ed1db1284 .
-_:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:fa5decf5d4d1085607ac88cbb48f180d <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#specifiedBy> .
+<https://www.reqvire.org/ontology#implementedByArtifact> <http://www.w3.org/2002/07/owl#propertyChainAxiom> _:fa5decf5d4d1085607ac88cbb48f180d .
+_:cbf6b9de22632e74be2b99c3f7ff5d03 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#satisfiedBy> .
+_:fa5decf5d4d1085607ac88cbb48f180d <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:cbf6b9de22632e74be2b99c3f7ff5d03 .
+_:cbf6b9de22632e74be2b99c3f7ff5d03 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
 <https://www.reqvire.org/ontology#implementedByArtifact> <http://www.w3.org/2000/01/rdf-schema#comment> "Inferred capability-to-artifact trace when a capability is specified by a requirement satisfied by an artifact." .
 <https://www.reqvire.org/ontology#derive> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#authoredRelationLayer> .
 <https://www.reqvire.org/ontology#derivedFrom> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#authoredRelationLayer> .
@@ -2152,7 +2152,7 @@ _:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 <https://www.reqvire.org/ontology#satisfy> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#authoredRelationLayer> .
 <https://www.reqvire.org/ontology#satisfiedBy> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#authoredRelationLayer> .
 <https://www.reqvire.org/ontology#reuse> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#authoredRelationLayer> .
-<https://www.reqvire.org/ontology#reusesContract> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#authoredRelationLayer> .
+<https://www.reqvire.org/ontology#bindsContract> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#authoredRelationLayer> .
 <https://www.reqvire.org/ontology#parentElement> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#normalizedRelationLayer> .
 <https://www.reqvire.org/ontology#childElement> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#normalizedRelationLayer> .
 <https://www.reqvire.org/ontology#ancestorElement> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#normalizedRelationLayer> .
@@ -2185,8 +2185,8 @@ _:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 <https://www.reqvire.org/ontology#verificationVerifiesRequirement> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#normalizedRelationLayer> .
 <https://www.reqvire.org/ontology#elementSatisfiedByArtifact> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#normalizedRelationLayer> .
 <https://www.reqvire.org/ontology#artifactSatisfiesElement> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#normalizedRelationLayer> .
-<https://www.reqvire.org/ontology#requirementUsesCrossSubgraphContract> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#normalizedRelationLayer> .
-<https://www.reqvire.org/ontology#crossSubgraphContractUsedByRequirement> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#normalizedRelationLayer> .
+<https://www.reqvire.org/ontology#requirementBindsContract> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#normalizedRelationLayer> .
+<https://www.reqvire.org/ontology#contractBoundBy> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#normalizedRelationLayer> .
 <https://www.reqvire.org/ontology#implementedByArtifact> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#normalizedRelationLayer> .
 <https://www.reqvire.org/ontology#inverseRelation> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#RelationRule> ;
@@ -2264,22 +2264,22 @@ _:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#RelationRule> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Stable semantic description of a relation rule." .
-<https://www.reqvire.org/ontology#reusedContractContextSourceType> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
-	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#ReusedContractContextCompatibilityRule> ;
+<https://www.reqvire.org/ontology#contractBindingsSourceType> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#ContractBindingCompatibilityRule> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Canonical element type token allowed as an reused_contract_context source." .
-<https://www.reqvire.org/ontology#reusedContractContextTargetType> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
-	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#ReusedContractContextCompatibilityRule> ;
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Canonical element type token allowed as a contract binding source." .
+<https://www.reqvire.org/ontology#contractBindingsTargetType> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#ContractBindingCompatibilityRule> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Canonical element type or contract-family token allowed as an reused_contract_context target." .
-<https://www.reqvire.org/ontology#reusedContractContextOwnerType> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
-	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#ReusedContractContextCompatibilityRule> ;
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Canonical element type or contract-family token allowed as a contract binding target." .
+<https://www.reqvire.org/ontology#contractBindingsOwnerType> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#ContractBindingCompatibilityRule> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Canonical owner element type required for the reused_contract_context target." .
-<https://www.reqvire.org/ontology#reusedContractContextRuleDescription> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
-	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#ReusedContractContextCompatibilityRule> ;
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Canonical owner element type required for the contract_bindings target." .
+<https://www.reqvire.org/ontology#contractBindingsRuleDescription> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#ContractBindingCompatibilityRule> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Stable semantic description of an reused_contract_context compatibility rule." .
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Stable semantic description of a contract binding compatibility rule." .
 <https://www.reqvire.org/ontology#usageCategoryName> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#RelationUsageCategory> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
@@ -2337,7 +2337,7 @@ _:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Relation names through which changed upstream model meaning propagates to dependent downstream elements." ;
 	<https://www.reqvire.org/ontology#usageCategoryName> "change-propagation" ;
 	<https://www.reqvire.org/ontology#usageCategoryMeaning> "Relation names through which changed upstream model meaning propagates to dependent downstream elements." ;
-	<https://www.reqvire.org/ontology#usageCategoryRelationName> "derive" , "specifiedBy" , "satisfiedBy" , "definedBy" , "constrainedBy" , "constrain" , "use" , "usedBy" , "verifiedBy" , "reused_contract_context" .
+	<https://www.reqvire.org/ontology#usageCategoryRelationName> "derive" , "specifiedBy" , "satisfiedBy" , "definedBy" , "constrainedBy" , "constrain" , "use" , "usedBy" , "verifiedBy" , "contract_bindings" .
 <https://www.reqvire.org/ontology#verificationRollupRelationUsageCategory> a <https://www.reqvire.org/ontology#RelationUsageCategory> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Verification rollup relations" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Relation names used to roll verification state from requirement leaves toward ancestors." ;
@@ -2386,12 +2386,12 @@ _:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 	<https://www.reqvire.org/ontology#semanticCategoryName> "verification" ;
 	<https://www.reqvire.org/ontology#semanticCategoryMeaning> "Links between requirements and verification elements that verify them." ;
 	<https://www.reqvire.org/ontology#semanticCategoryRelationName> "verify" , "verifiedBy" .
-<https://www.reqvire.org/ontology#crossSubgraphContractDependencyRelationCategory> a <https://www.reqvire.org/ontology#RelationSemanticCategory> ;
+<https://www.reqvire.org/ontology#contractBindingRelationCategory> a <https://www.reqvire.org/ontology#RelationSemanticCategory> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Cross-subgraph contract dependency relation" ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Explicit dependency from a requirement to reusable requirement-owned contract context in another subgraph." ;
-	<https://www.reqvire.org/ontology#semanticCategoryName> "cross-subgraph-contract-dependency" ;
+	<https://www.reqvire.org/ontology#semanticCategoryName> "contract-binding" ;
 	<https://www.reqvire.org/ontology#semanticCategoryMeaning> "Explicit dependency from a requirement to reusable requirement-owned contract context in another subgraph." ;
-	<https://www.reqvire.org/ontology#semanticCategoryRelationName> "reused_contract_context" .
+	<https://www.reqvire.org/ontology#semanticCategoryRelationName> "contract_bindings" .
 <https://www.reqvire.org/ontology#deriveRelationRule> a <https://www.reqvire.org/ontology#RelationRule> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "derive" ;
 	<https://www.reqvire.org/ontology#relationName> "derive" ;
@@ -2592,30 +2592,30 @@ _:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 	<https://www.reqvire.org/ontology#createsOwnership> false ;
 	<https://www.reqvire.org/ontology#propagatesChangeImpact> false ;
 	<https://www.reqvire.org/ontology#relationRuleDescription> "Implementation or evidence artifact points back to the requirement or evidence-backed verification it satisfies." .
-<https://www.reqvire.org/ontology#reusedContractContextRelationRule> a <https://www.reqvire.org/ontology#RelationRule> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "reused_contract_context" ;
-	<https://www.reqvire.org/ontology#relationName> "reused_contract_context" ;
-	<https://www.reqvire.org/ontology#relationPattern> <https://www.reqvire.org/ontology#crossSubgraphContractDependencyPattern> ;
-	<https://www.reqvire.org/ontology#relationFamily> <https://www.reqvire.org/ontology#crossSubgraphContractDependencyRelationFamily> ;
-	<https://www.reqvire.org/ontology#normalizedForwardProperty> <https://www.reqvire.org/ontology#requirementUsesCrossSubgraphContract> ;
-	<https://www.reqvire.org/ontology#normalizedInverseProperty> <https://www.reqvire.org/ontology#crossSubgraphContractUsedByRequirement> ;
+<https://www.reqvire.org/ontology#contractBindingsRelationRule> a <https://www.reqvire.org/ontology#RelationRule> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "contract_bindings" ;
+	<https://www.reqvire.org/ontology#relationName> "contract_bindings" ;
+	<https://www.reqvire.org/ontology#relationPattern> <https://www.reqvire.org/ontology#contractBindingPattern> ;
+	<https://www.reqvire.org/ontology#relationFamily> <https://www.reqvire.org/ontology#contractBindingRelationFamily> ;
+	<https://www.reqvire.org/ontology#normalizedForwardProperty> <https://www.reqvire.org/ontology#requirementBindsContract> ;
+	<https://www.reqvire.org/ontology#normalizedInverseProperty> <https://www.reqvire.org/ontology#contractBoundBy> ;
 	<https://www.reqvire.org/ontology#allowedSourceType> "requirement" ;
 	<https://www.reqvire.org/ontology#allowedTargetType> "requirement-owned-contract" ;
 	<https://www.reqvire.org/ontology#relationDirection> "forward" ;
 	<https://www.reqvire.org/ontology#createsOwnership> false ;
 	<https://www.reqvire.org/ontology#propagatesChangeImpact> true ;
-	<https://www.reqvire.org/ontology#relationRuleDescription> "Reused Contract Context is the authoring mechanism for a requirement using compatible requirement-owned contract context from another subgraph." .
-<https://www.reqvire.org/ontology#requirementReusedContractContextCompatibilityRule> a <https://www.reqvire.org/ontology#ReusedContractContextCompatibilityRule> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Requirement reused_contract_context compatibility" ;
-	<https://www.reqvire.org/ontology#reusedContractContextSourceType> "requirement" ;
-	<https://www.reqvire.org/ontology#reusedContractContextTargetType> "source" , "constraint" , "behavior" , "specification" , "state" , "input-output" ;
-	<https://www.reqvire.org/ontology#reusedContractContextOwnerType> "requirement" ;
-	<https://www.reqvire.org/ontology#reusedContractContextRuleDescription> "Requirement reused_contract_context reference requirement-owned contracts from explicit dependency contexts." .
-<https://www.reqvire.org/ontology#ownedContractReusedContractContextRule> a <https://www.reqvire.org/ontology#ReusedContractContextCompatibilityRule> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Owned contract reused_contract_context compatibility" ;
-	<https://www.reqvire.org/ontology#reusedContractContextSourceType> "requirement" ;
-	<https://www.reqvire.org/ontology#reusedContractContextTargetType> "contract" ;
-	<https://www.reqvire.org/ontology#reusedContractContextRuleDescription> "A requirement reused_contract_context target must be a contract already owned by exactly one compatible requirement through define/definedBy." .
+	<https://www.reqvire.org/ontology#relationRuleDescription> "Contract Bindings is the authoring mechanism for a requirement using compatible requirement-owned contract context from another subgraph." .
+<https://www.reqvire.org/ontology#requirementContractBindingCompatibilityRule> a <https://www.reqvire.org/ontology#ContractBindingCompatibilityRule> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Requirement contract_bindings compatibility" ;
+	<https://www.reqvire.org/ontology#contractBindingsSourceType> "requirement" ;
+	<https://www.reqvire.org/ontology#contractBindingsTargetType> "source" , "constraint" , "behavior" , "specification" , "state" , "input-output" ;
+	<https://www.reqvire.org/ontology#contractBindingsOwnerType> "requirement" ;
+	<https://www.reqvire.org/ontology#contractBindingsRuleDescription> "Requirement contract_bindings reference requirement-owned contracts from explicit dependency contexts." .
+<https://www.reqvire.org/ontology#ownedContractContractBindingRule> a <https://www.reqvire.org/ontology#ContractBindingCompatibilityRule> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Owned contract contract_bindings compatibility" ;
+	<https://www.reqvire.org/ontology#contractBindingsSourceType> "requirement" ;
+	<https://www.reqvire.org/ontology#contractBindingsTargetType> "contract" ;
+	<https://www.reqvire.org/ontology#contractBindingsRuleDescription> "A requirement contract_bindings target must be a contract already owned by exactly one compatible requirement through define/definedBy." .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/SemanticExport.md#reqvire-semantic-export-ontology
@@ -2852,10 +2852,10 @@ _:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#RdfProjection> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Stable identifier of a relation target emitted by model-context RDF projection facts." .
-<https://www.reqvire.org/ontology#reusedContractContextTargetIdentifier> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+<https://www.reqvire.org/ontology#contractBindingsTargetIdentifier> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#RdfProjection> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Stable identifier of an reused_contract_context target emitted by model-context RDF projection facts." .
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Stable identifier of a contract binding target emitted by model-context RDF projection facts." .
 <https://www.reqvire.org/ontology#conceptLabel> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#RdfProjection> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
@@ -2971,7 +2971,7 @@ _:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 <https://www.reqvire.org/ontology#semanticArtifactExportMode> a <https://www.reqvire.org/ontology#SemanticArtifactExport> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Semantic ontology export mode that emits generated ontology document declarations plus authored ontology vocabulary with source comments." .
 <https://www.reqvire.org/ontology#fullSemanticModelExportMode> a <https://www.reqvire.org/ontology#FullSemanticModelExport> ;
-	<http://www.w3.org/2000/01/rdf-schema#comment> "Semantic graph export mode that emits generated ontology document declarations, authored ontology and SHACL blocks, and RDF triples for Reqvire model elements, relations, reused_contract_context, concept references, ontology term declarations, shape references, and generated ontology projection facts." .
+	<http://www.w3.org/2000/01/rdf-schema#comment> "Semantic graph export mode that emits generated ontology document declarations, authored ontology and SHACL blocks, and RDF triples for Reqvire model elements, relations, contract_bindings, concept references, ontology term declarations, shape references, and generated ontology projection facts." .
 <https://www.reqvire.org/ontology#externalUsedTermSeedQuery> a <https://www.reqvire.org/ontology#ExternalOntologySubsetConstructQuery> ;
 	<https://www.reqvire.org/ontology#constructQueryName> "external-used-term-seed-query" ;
 	<https://www.reqvire.org/ontology#constructFamily> "external-used-subset" ;
@@ -3031,10 +3031,10 @@ _:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 <https://www.reqvire.org/ontology#EvidenceBackedVerification> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Evidence-backed verification" ;
 	<http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://www.reqvire.org/ontology#ConcreteVerification> .
-_:a325a30f5c19a2ee4d3635611b4f9317 a <http://www.w3.org/2002/07/owl#Restriction> ;
+_:aa699d298e0d927aa0884044409bd762 a <http://www.w3.org/2002/07/owl#Restriction> ;
 	<http://www.w3.org/2002/07/owl#onProperty> <https://www.reqvire.org/ontology#satisfiedBy> ;
 	<http://www.w3.org/2002/07/owl#someValuesFrom> <https://www.reqvire.org/ontology#Artifact> .
-<https://www.reqvire.org/ontology#EvidenceBackedVerification> <http://www.w3.org/2000/01/rdf-schema#subClassOf> _:a325a30f5c19a2ee4d3635611b4f9317 ;
+<https://www.reqvire.org/ontology#EvidenceBackedVerification> <http://www.w3.org/2000/01/rdf-schema#subClassOf> _:aa699d298e0d927aa0884044409bd762 ;
 	<http://www.w3.org/2002/07/owl#disjointWith> <https://www.reqvire.org/ontology#NonEvidenceBackedVerification> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Verification class whose instances require satisfiedBy evidence for coverage satisfaction." .
 <https://www.reqvire.org/ontology#NonEvidenceBackedVerification> a <http://www.w3.org/2002/07/owl#Class> ;

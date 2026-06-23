@@ -21,11 +21,11 @@ Commands:
   rename            Rename element
   merge             Merge multiple elements into target element
   mv-file           Move entire specification file with all its elements
-  link              Add relation or reused_contract_context between elements
-  unlink            Remove relation or reused_contract_context between elements (auto-detects type)
+  link              Add relation or contract_bindings between elements
+  unlink            Remove relation or contract_bindings between elements (auto-detects type)
   relink            Replace an existing relation target with a new target in one operation
-  mv-asset          Move/rename asset file and update all references (Reused Contract Context and Relations)
-  rm-asset          Remove asset file and remove all references (Reused Contract Context and Relations)
+  mv-asset          Move/rename asset file and update all references (Contract Bindings and Relations)
+  rm-asset          Remove asset file and remove all references (Contract Bindings and Relations)
   containment       Generate containment view showing folder/file/element hierarchy
   resources         Generate resources report showing files referenced by the model
   semantic          Export semantic RDF layers
@@ -91,8 +91,8 @@ SEARCH OPTIONS:
       --filter-page-content <REGEX> Only include elements whose parent file page content matches this regular expression
       --have-relations <LIST>   Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")
       --not-have-relations <LIST> Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
-      --has-reused-contract-context Only include elements that have reused_contract_context
-      --filter-reused-contract-context <GLOB> Only include elements with reused_contract_context matching this glob pattern (e.g., "*.pdf", "docs/**/*")
+      --has-contract-bindings   Only include elements that have contract_bindings
+      --filter-contract-bindings <GLOB> Only include elements with contract_bindings matching this glob pattern (e.g., "*.pdf", "docs/**/*")
 
 CHANGE IMPACT OPTIONS:
       --git-commit <GIT_COMMIT> Git commit hash to use when comparing models
@@ -173,8 +173,8 @@ MV FILE OPTIONS:
 
 LINK OPTIONS:
        <SOURCE>                 Source element name
-       <RELATION_TYPE>          Relation type OR 'reusesContract'. Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, broader, narrower, related, exactMatch, closeMatch, satisfiedBy, satisfy, verifiedBy, verify. Use 'reusesContract' to reuse compatible requirement-owned contract elements
-       <TARGET>                 Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement reused_contract_context
+       <RELATION_TYPE>          Relation type OR 'bindContract'. Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, broader, narrower, related, exactMatch, closeMatch, satisfiedBy, satisfy, verifiedBy, verify. Use 'bindContract' to reuse compatible requirement-owned contract elements
+       <TARGET>                 Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement contract_bindings
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)

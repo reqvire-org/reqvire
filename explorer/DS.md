@@ -489,7 +489,7 @@ product patterns compose those primitives through typed semantic/token props.
 | `shell/` | `AppShell`, `ShellPane`, `PaneResizer`, `ShellMain`, `RouteFrame`, `RouteLayout`, `RoutePanel` |
 | `chrome/` | `WorkspaceToolbar`, `PaneChromeHeader`, `ReqvireRailMark` |
 | `side-pane/` | `SidePaneFrame`, pane filters, summaries, selections, trees, legends, and action rows |
-| `detail/` | `DetailDialog`, element detail content, relation and Reused Contract Context lists, concept references, and ontology detail bodies |
+| `detail/` | `DetailDialog`, element detail content, relation and Contract Bindings lists, concept references, and ontology detail bodies |
 | `content/` | `WorkspaceShell`, `DocumentPanel`, `MarkdownFrame`, `DiagramBlockFrame`, `CodePreviewFrame`, `CodeToolbar`, `CodeBody`, `RendererNotice` |
 | `thesaurus/` | `ThesaurusExplorer` for standalone SKOS concept schemes, concept taxonomy, concept references, and ontology `mapsToConcept` bridges |
 | `feedback/` | `StoreNotice`, `HelpContent`, `HelpDialog` |

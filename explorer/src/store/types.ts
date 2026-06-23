@@ -76,7 +76,7 @@ export interface ProjectStoreRelation {
   resource_id: string | null;
 }
 
-export interface ProjectStoreReusedContractContextEntry {
+export interface ProjectStoreContractBindingEntry {
   id: string;
   source_id: string;
   target: string;
@@ -153,7 +153,7 @@ export interface ProjectStoreSummaries {
   folders: number;
   resources: number;
   relations: number;
-  reused_contract_context: number;
+  contract_bindings: number;
   concept_refs: number;
   ontology_blocks: number;
   shape_blocks: number;
@@ -462,7 +462,7 @@ export interface KnowledgeGraphNode {
   governance?: KnowledgeGraphFact[];
   outgoing?: KnowledgeGraphFact[];
   incoming?: KnowledgeGraphFact[];
-  reused_contract_context?: KnowledgeGraphFact[];
+  contract_bindings?: KnowledgeGraphFact[];
   concept_references?: KnowledgeGraphFact[];
 }
 
@@ -484,7 +484,7 @@ export interface KnowledgeGraphProjection {
   summary?: {
     elements?: number;
     relations?: number;
-    reused_contract_context?: number;
+    contract_bindings?: number;
     concept_references?: number;
     resources?: number;
     submodels?: number;
@@ -502,7 +502,7 @@ export interface ExplorerProjectStore {
   resources: ProjectStoreResource[];
   elements: ProjectStoreElement[];
   relations: ProjectStoreRelation[];
-  reused_contract_context: ProjectStoreReusedContractContextEntry[];
+  contract_bindings: ProjectStoreContractBindingEntry[];
   concept_refs: ProjectStoreConceptReference[];
   thesaurus: ProjectStoreThesaurus;
   /** Opaque: capability-rooted submodel report projection. */

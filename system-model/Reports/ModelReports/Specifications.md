@@ -33,11 +33,11 @@ Technical specification for content collection from capability, requirement, and
  - ElementIdentifier (contract element): Include element's content
  - FilePath pointing to .md file: Read and include file content
  - FilePath pointing to other file types: Include as markdown link
-- For each reused_contract_context:
+- For each contract_bindings:
  - FilePath pointing to .md file: Read and include file content
  - FilePath pointing to other file types: Include as markdown link
  - ElementIdentifier: Include referenced element's content
-- Skip external URL reused_contract_context
+- Skip external URL contract_bindings
 
 **Output Ordering:**
 - Flat list structure (no nesting)
@@ -48,7 +48,7 @@ Technical specification for content collection from capability, requirement, and
 **Error Handling:**
 - Element not found: Error with message
 - Element not a capability, requirement, or ontology type: Error with message
-- Reused Contract Context file not found: Warning, continue with other content
+- Contract Bindings file not found: Warning, continue with other content
 - Circular reference: Detect and break cycle
 
 #### Metadata
@@ -67,7 +67,7 @@ Output format specification for collect command text and JSON modes.
 Each collected content block followed by source citation and separator:
 
 ```
-[Content from element or reused_contract_context]
+[Content from element or contract_bindings]
 
 — Source: [Element Name](file.md#element-id)
 
@@ -79,7 +79,7 @@ Each collected content block followed by source citation and separator:
 |-------------|-----------------|
 | Element | `— Source: [Element Name](file.md#element-id)` |
 | Contract Element (via definedBy) | `— Source: [Contract Name](file.md#contract-id) defining [Element Name](file.md#element-id)` |
-| Reused Contract Context Element | `— Source: [Contract Name](file.md#contract-id) reused to [Element Name](file.md#element-id)` |
+| Contract Bindings Element | `— Source: [Contract Name](file.md#contract-id) bound to [Element Name](file.md#element-id)` |
 
 **JSON Format:**
 ```json
@@ -102,14 +102,14 @@ Each collected content block followed by source citation and separator:
  "element_type": "specification",
  "content": "Technical contract details...",
  "depth": 0,
- "source_type": "reused_contract_context_element",
+ "source_type": "contract_bindings_element",
  "reused_by": "file.md#element-id"
  }
  ],
  "metadata": {
  "element_count": 5,
  "contract_count": 3,
- "reused_contract_context_count": 1,
+ "contract_bindings_count": 1,
  "total_items": 9
  }
 }
@@ -413,7 +413,7 @@ JSON output conventions:
 - `type`: Element type string
 - `file_path`: Relative path from git root
 - `relations`: Array of relation objects with `type` and `target` fields
-- `reused_contract_context`: Array of contract element identifier strings
+- `contract_bindings`: Array of contract element identifier strings
 
 **Error Handling:**
 - Error responses include `error` field with message
@@ -536,9 +536,9 @@ Model output format rules:
 - Pure Mermaid format includes only Mermaid flowchart text with no Markdown wrapper.
 - Markdown shows hierarchical structure using containment subgraphs (folders > files > elements).
 - Mermaid diagrams use folder and file subgraphs to visually group elements by physical location.
-- JSON format uses structured data with folders, files, sections, elements, relations, and reused_contract_context.
+- JSON format uses structured data with folders, files, sections, elements, relations, and contract_bindings.
 - Both formats represent the same filtered or complete model data.
-- Element reused_contract_context are included as an array of contract element identifier strings in both formats.
+- Element contract_bindings are included as an array of contract element identifier strings in both formats.
 
 #### Metadata
   * type: specification
@@ -561,10 +561,10 @@ The output must:
 - In full semantic model export mode, append RDF triples for Reqvire model context:
   - all parsed capability, requirement, ontology, semantic-contract, verification, and contract elements
   - element id, identifier, name, type, file path, and source line
-  - internal model relations, including `derive`, `derivedFrom`, `specify`, `specifiedBy`, `define`, `definedBy`, `constrain`, `constrainedBy`, `use`, `usedBy`, `verify`, `verifiedBy`, `satisfy`, `satisfiedBy`, and `reused_contract_context`
+  - internal model relations, including `derive`, `derivedFrom`, `specify`, `specifiedBy`, `define`, `definedBy`, `constrain`, `constrainedBy`, `use`, `usedBy`, `verify`, `verifiedBy`, `satisfy`, `satisfiedBy`, and `contract_bindings`
   - deterministic first-class `reqvire:ModelRelation` resources with `reqvire:relationSource`, `reqvire:relationTarget`, `reqvire:relationType`, and `reqvire:relationTargetIdentifier`
   - normalized relation-family predicates equivalent to the relation-family CONSTRUCT query specification, including canonical forward and inverse facts for authored forward, inverse, and non-directional relation tokens
-  - element reused_contract_context for reusable requirement-owned contracts
+  - element contract_bindings for reusable requirement-owned contracts
   - concept references from model elements to SKOS concepts
   - ontology term declaration edges from ontology elements to declared terms
   - semantic-contract shape reference edges from semantic contracts to referenced ontology terms
@@ -620,9 +620,9 @@ Report commands:
 - `collect`: capability-or-requirement context collection, with upstream or downstream traversal and source citations.
 - `coverage`: requirement verification coverage, evidence-backed verification satisfaction, implementation coverage, and capability coverage rollup.
 - `traces`: verification-to-capability-root traceability trees.
-- `search`: model element search with relations, reused_contract_context, semantic-contract fields, and effective governance metadata.
+- `search`: model element search with relations, contract_bindings, semantic-contract fields, and effective governance metadata.
 - `submodels`: independent capability-rooted subgraphs, cross-submodel couplings, and summary totals.
-- `resources`: relation file targets and reused_contract_context identifier targets grouped by resource.
+- `resources`: relation file targets and contract_bindings identifier targets grouped by resource.
 - `ontologies`: collected ontology `Ontology` and semantic-contract `Shapes` Turtle blocks.
 - `model`: logical model graph traversal with optional direction and type filtering.
 - `lint`: model quality findings grouped for auto-fix or manual review.
@@ -703,7 +703,7 @@ Implementation coverage source values are defined by this implementation coverag
 
 Implementation coverage scope includes only elements of type `requirement`. Elements of type `capability` are excluded from direct implementation coverage and receive implementation coverage through capability roll-up.
 
-The report must classify each requirement using the semantic coverage source vocabulary and the available `satisfiedBy`, `definedBy`, reused_contract_context, and child requirement evidence.
+The report must classify each requirement using the semantic coverage source vocabulary and the available `satisfiedBy`, `definedBy`, contract_bindings, and child requirement evidence.
 
 #### Metadata
   * type: specification
@@ -723,7 +723,7 @@ Canonical submodel, capability-root submodel, scoped submodel, and cross-submode
 **Refactor Rule:**
 When a relation crosses intended submodel boundaries, either:
 1. Move/reparent to restore hierarchical ownership, or
-2. Replace cross-boundary hierarchy links with reused-contract-context-based contracts.
+2. Replace cross-boundary hierarchy links with contract-bindings-based contracts.
 
 **Refactor Procedure:**
 Apply boundary refactoring recursively, top-down:
@@ -732,15 +732,15 @@ Apply boundary refactoring recursively, top-down:
 3. Continue recursively for each descendant branch until leaf requirements.
 4. At each level, enforce:
  - hierarchical relations remain internal to that branch/submodel,
- - cross-branch dependencies are reused_contract_context contracts.
+ - cross-branch dependencies are contract bindings.
 5. If a cross-boundary hierarchical relation is found, either:
  - move/reparent to restore ownership, or
- - replace with reused-contract-context-based contract.
+ - replace with contract-bindings-based contract.
 6. Re-run validation and submodel analysis after each boundary slice before continuing recursion.
 
 **Internal Sub-Boundaries:**
 A submodel may contain internal sub-boundaries (nested domains) with separate ownership and lifecycle.
-Cross-internal-boundary dependencies should be modeled as explicit reused_contract_context contracts when they represent contractual dependency, not hierarchical ownership.
+Cross-internal-boundary dependencies should be modeled as explicit contract bindings when they represent contractual dependency, not hierarchical ownership.
 
 **Submodel Resolution Rules:**
 - A submodel root is a capability element with no capability parent relation.
@@ -845,7 +845,7 @@ Technical specification for resources report structure and output formats.
 **Report Structure:**
 The resources report is expected to consist of two sections:
 1. Relations section
-2. Reused Contract Context section
+2. Contract Bindings section
 
 **Relations Section:**
 - Files from internal path relation targets such as `satisfiedBy`
@@ -853,8 +853,8 @@ The resources report is expected to consist of two sections:
 - Sorted by relation type, then by element identifier
 - Each file lists all elements that reference it with their relation types
 
-**Reused Contract Context Section:**
-- Contract element identifiers from reused_contract_context targets
+**Contract Bindings Section:**
+- Contract element identifiers from contract_bindings targets
 - Shows source element for each reference
 - Sorted by element identifier
 - Each contract identifier lists all elements that reuse it
@@ -863,9 +863,9 @@ The resources report is expected to consist of two sections:
 
 *Text/Markdown Format:*
 - Human-readable with markdown links
-- Entries listed alphabetically by path (relations) and identifier (reused_contract_context)
+- Entries listed alphabetically by path (relations) and identifier (contract_bindings)
 - Element references shown as clickable markdown links
-- Clear section headers separating Relations and Reused Contract Context
+- Clear section headers separating Relations and Contract Bindings
 
 *JSON Format:*
 - Structured data for programmatic use
@@ -922,8 +922,8 @@ WHERE {
 
 Implementation contract:
 - Current Rust semantic export projection must implement the same canonicalization without executing the CONSTRUCT query.
-- Full semantic model export must emit deterministic `reqvire:ModelRelation` resources for authored Markdown relations and reused contract context edges.
-- Full semantic model export must emit normalized forward and inverse predicates for `derive`/`derivedFrom`, `specify`/`specifiedBy`, `define`/`definedBy`, `constrain`/`constrainedBy`, `use`/`usedBy`, `verify`/`verifiedBy`, `satisfy`/`satisfiedBy`, and `reused_contract_context`.
+- Full semantic model export must emit deterministic `reqvire:ModelRelation` resources for authored Markdown relations and contract bindings edges.
+- Full semantic model export must emit normalized forward and inverse predicates for `derive`/`derivedFrom`, `specify`/`specifiedBy`, `define`/`definedBy`, `constrain`/`constrainedBy`, `use`/`usedBy`, `verify`/`verifiedBy`, `satisfy`/`satisfiedBy`, and `contract_bindings`.
 - Future reasoner-backed or SPARQL-backed materialization must produce triples equivalent to the construct-query result.
 - Generated relation-family projection facts must not be written back to authored Markdown ontology, semantic-contract, requirement, or contract blocks.
 
@@ -954,7 +954,7 @@ Default text output (when neither `--json` nor other format flags specified):
 - Full element name and identifier
 - Element type in brackets: `[requirement]`, `[test-verification]`
 - Relations listed with target identifiers
-- Reused Contract Context listed as contract element identifiers
+- Contract Bindings listed as contract element identifiers
 
 **Formatting:**
 - Color output when terminal supports it (errors in red, warnings in yellow)
@@ -972,13 +972,13 @@ Default text output (when neither `--json` nor other format flags specified):
 
 ### Traceability Reporting Specification
 
-Reqvire provides traceability reports over the Reqvire capability, requirement, verification, contract, reused_contract_context, and implementation graph.
+Reqvire provides traceability reports over the Reqvire capability, requirement, verification, contract, contract_bindings, and implementation graph.
 
 #### Details
 - Traceability reports must use Reqvire relation semantics for traversal direction, ownership, and evidence links.
 - Upward reports must trace implementation and verification evidence to requirements and owning capability roots where applicable.
 - Downstream reports must trace capability roots to specified requirements and requirement descendants.
-- Change-impact reports must use propagation relations, reused_contract_context, semantic dependencies, and impact scope rules to identify affected elements.
+- Change-impact reports must use propagation relations, contract_bindings, semantic dependencies, and impact scope rules to identify affected elements.
 
 #### Metadata
   * type: specification

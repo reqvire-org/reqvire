@@ -10,7 +10,7 @@ Type assignment behavior shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Element Type Metadata Specification](Specifications.md#element-type-metadata-specification)
 
 #### Relations
@@ -72,7 +72,7 @@ All manipulation operations shall:
   * definedBy: [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
   * definedBy: [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * definedBy: [Operation Command Contract Specification](Specifications.md#operation-command-contract-specification)
-  * derive: [Reused Contract Context Identifier Updates](#reused-contract-context-identifier-updates)
+  * derive: [Contract Bindings Identifier Updates](#contract-bindings-identifier-updates)
   * derive: [Create Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
   * derive: [Delete Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#delete-element-operation)
   * derive: [Element Manipulation File Persistence](../Operations/ModelOperations/ElementManipulationRequirements.md#element-manipulation-file-persistence)
@@ -84,26 +84,26 @@ All manipulation operations shall:
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
 ---
 
-### Reused Contract Context Identifier Updates
+### Contract Bindings Identifier Updates
 
-When moving or renaming Contract elements, the system shall update reused_contract_context identifiers in all referencing elements, using the same behavior as relation target updates.
+When moving or renaming Contract elements, the system shall update contract_bindings identifiers in all referencing elements, using the same behavior as relation target updates.
 
 #### Details
-This requirement ensures consistency between relation updates and reused_contract_context identifier updates during CRUD operations:
+This requirement ensures consistency between relation updates and contract_bindings identifier updates during CRUD operations:
 
-- When a Contract element is **moved** to a different file, all reused_contract_context referencing that element shall be updated with the new identifier path
-- When a Contract element is **renamed**, all reused_contract_context referencing that element shall be updated with the new element name in the identifier
+- When a Contract element is **moved** to a different file, all contract_bindings referencing that element shall be updated with the new identifier path
+- When a Contract element is **renamed**, all contract_bindings referencing that element shall be updated with the new element name in the identifier
 - The update behavior mirrors how relation targets are updated during move/rename operations
-- All files containing reused_contract_context that reference the affected element shall be modified
+- All files containing contract_bindings that reference the affected element shall be modified
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Reused Contract Context Identifier CRUD Update Behavior](Behaviors.md#reused-contract-context-identifier-crud-update-behavior)
+  * definedBy: [Contract Bindings Identifier CRUD Update Behavior](Behaviors.md#contract-bindings-identifier-crud-update-behavior)
   * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../crates/reqvire-core/src/crud.rs)
-  * verifiedBy: [Reused Contract Context Identifier CRUD Verification](../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-identifier-crud-verification)
+  * verifiedBy: [Contract Bindings Identifier CRUD Verification](../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-identifier-crud-verification)
 ---
 
 ### Git Repository as Project Root
@@ -232,7 +232,7 @@ Contract relation validation shall enforce the subtype-compatible contract vocab
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
 
 #### Relations
@@ -244,19 +244,19 @@ Contract relation validation shall enforce the subtype-compatible contract vocab
   * verifiedBy: [Contract Relations Rejection Test](../Verifications/ModelStructure/ParsingVerifications.md#contract-relations-rejection-test)
 ---
 
-### Reused Contract Context Scope Constraints
+### Contract Bindings Scope Constraints
 
-The system shall enforce scope constraints on contract-element reused_contract_context to ensure proper cross-submodel traceability while preventing redundant or invalid reused_contract_context relationships.
+The system shall enforce scope constraints on contract-element contract_bindings to ensure proper cross-submodel traceability while preventing redundant or invalid contract_bindings relationships.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Reused Contract Context Hierarchical Independence Constraint](Constraints.md#reused-contract-context-hierarchical-independence-constraint)
-  * definedBy: [Reused Contract Context Satisfied Contract Constraint](Constraints.md#reused-contract-context-satisfied-contract-constraint)
-  * definedBy: [Reused Contract Context Subgraph Direction Constraint](Constraints.md#reused-contract-context-subgraph-direction-constraint)
+  * definedBy: [Contract Bindings Hierarchical Independence Constraint](Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * definedBy: [Contract Bindings Satisfied Contract Constraint](Constraints.md#contract-bindings-satisfied-contract-constraint)
+  * definedBy: [Contract Bindings Subgraph Direction Constraint](Constraints.md#contract-bindings-subgraph-direction-constraint)
   * derivedFrom: [Contract Element Structure Constraints](#contract-element-structure-constraints)
-  * verifiedBy: [Reused Contract Context Scope Constraints Test](../Verifications/Operations/ModelOperations/ReusedContractContextVerifications.md#reused-contract-context-scope-constraints-test)
+  * verifiedBy: [Contract Bindings Scope Constraints Test](../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-scope-constraints-test)
 ---
 
 ### Element Type Relation Compatibility
@@ -298,9 +298,9 @@ When unlinking, the system shall:
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
-  * [Reused Contract Context Hierarchical Independence Constraint](Constraints.md#reused-contract-context-hierarchical-independence-constraint)
-  * [Reused Contract Context Satisfied Contract Constraint](Constraints.md#reused-contract-context-satisfied-contract-constraint)
+#### Contract Bindings
+  * [Contract Bindings Hierarchical Independence Constraint](Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](Constraints.md#contract-bindings-satisfied-contract-constraint)
 
 #### Relations
   * definedBy: [Relation Operations Specification](Specifications.md#relation-operations-specification)
@@ -322,7 +322,7 @@ Governance metadata behavior shall follow the associated contract specifications
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Requirement Governance Metadata Specification](Specifications.md#requirement-governance-metadata-specification)
 
 #### Relations
@@ -370,7 +370,7 @@ The system shall support defined verification categories following clearly defin
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
 
 #### Relations

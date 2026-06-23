@@ -1,5 +1,5 @@
 use crate::element;
-use crate::element::ReusedContractContextTarget;
+use crate::element::ContractBindingTarget;
 use crate::graph_registry::GraphRegistry;
 use crate::relation;
 use serde::Serialize;
@@ -60,7 +60,7 @@ struct VerificationTypeCounts {
 #[derive(Serialize)]
 struct CoverageSourceCounts {
     direct_satisfied: usize,
-    contract_satisfied_via_reused_contract_context: usize,
+    contract_satisfied_via_contract_bindings: usize,
     contract_satisfied_via_child: usize,
 }
 
@@ -396,10 +396,10 @@ impl CoverageReport {
             self.summary.coverage_sources.direct_satisfied
         ));
         output.push_str(&format!(
-            "- contract_satisfied_via_reused_contract_context: {}\n",
+            "- contract_satisfied_via_contract_bindings: {}\n",
             self.summary
                 .coverage_sources
-                .contract_satisfied_via_reused_contract_context
+                .contract_satisfied_via_contract_bindings
         ));
         output.push_str(&format!(
             "- contract_satisfied_via_child: {}\n\n",
@@ -599,7 +599,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         }
     }
 
-    // Third pass: implementation coverage (direct / contract via reused_contract_context / via child)
+    // Third pass: implementation coverage (direct / contract via contract_bindings / via child)
     let requirements: Vec<&element::Element> = registry
         .get_all_elements()
         .into_iter()
@@ -613,7 +613,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
 
     let mut owned_contracts: HashMap<String, Vec<String>> = HashMap::new();
     let mut children_by_requirement: HashMap<String, Vec<String>> = HashMap::new();
-    let mut reused_contract_context_consumers: HashMap<String, Vec<String>> = HashMap::new();
+    let mut contract_bindings_consumers: HashMap<String, Vec<String>> = HashMap::new();
     let mut direct_satisfaction: HashMap<String, Vec<String>> = HashMap::new();
 
     for req in &requirements {
@@ -662,12 +662,12 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         contracts.dedup();
         owned_contracts.insert(req.identifier.clone(), contracts);
 
-        // Contract identifier reused_contract_context (consumer -> contract)
-        for reused_contract_context in &req.reused_contract_context {
-            if let ReusedContractContextTarget::ElementIdentifier(id) =
-                &reused_contract_context.target
+        // Contract identifier contract_bindings (consumer -> contract)
+        for contract_bindings in &req.contract_bindings {
+            if let ContractBindingTarget::ElementIdentifier(id) =
+                &contract_bindings.target
             {
-                reused_contract_context_consumers
+                contract_bindings_consumers
                     .entry(id.clone())
                     .or_default()
                     .push(req.identifier.clone());
@@ -675,7 +675,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         }
     }
 
-    for consumers in reused_contract_context_consumers.values_mut() {
+    for consumers in contract_bindings_consumers.values_mut() {
         consumers.sort();
         consumers.dedup();
     }
@@ -702,11 +702,11 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
             continue;
         }
 
-        // contract covered via reused_contract_context by directly satisfied requirement
+        // contract covered via contract_bindings by directly satisfied requirement
         if let Some(contracts) = owned_contracts.get(&req.identifier) {
             let mut matched_consumer: Option<String> = None;
             for contract_id in contracts {
-                if let Some(consumers) = reused_contract_context_consumers.get(contract_id) {
+                if let Some(consumers) = contract_bindings_consumers.get(contract_id) {
                     if let Some(consumer) = consumers
                         .iter()
                         .find(|consumer_id| {
@@ -725,7 +725,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                 impl_coverage.insert(
                     req.identifier.clone(),
                     CoverageState {
-                        source: "contract_satisfied_via_reused_contract_context".to_string(),
+                        source: "contract_satisfied_via_contract_bindings".to_string(),
                         evidence: vec![consumer_id],
                     },
                 );
@@ -755,7 +755,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
 
     let mut coverage_sources = CoverageSourceCounts {
         direct_satisfied: 0,
-        contract_satisfied_via_reused_contract_context: 0,
+        contract_satisfied_via_contract_bindings: 0,
         contract_satisfied_via_child: 0,
     };
 
@@ -763,8 +763,8 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         if let Some(state) = impl_coverage.get(&req.identifier) {
             match state.source.as_str() {
                 "direct_satisfied" => coverage_sources.direct_satisfied += 1,
-                "contract_satisfied_via_reused_contract_context" => {
-                    coverage_sources.contract_satisfied_via_reused_contract_context += 1
+                "contract_satisfied_via_contract_bindings" => {
+                    coverage_sources.contract_satisfied_via_contract_bindings += 1
                 }
                 "contract_satisfied_via_child" => {
                     coverage_sources.contract_satisfied_via_child += 1

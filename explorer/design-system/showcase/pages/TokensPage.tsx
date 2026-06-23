@@ -58,7 +58,7 @@ const STATUS_TOKENS = [
 ] as const satisfies readonly { token: DesignSystemColorToken; label: string }[];
 
 const EDGE_TOKENS = [
-  "--edge-default", "--edge-derive", "--edge-satisfy", "--edge-trace", "--edge-reuse", "--concept-reference",
+  "--edge-default", "--edge-derive", "--edge-satisfy", "--edge-trace", "--edge-bind", "--concept-reference",
 ] as const satisfies readonly DesignSystemColorToken[];
 
 const RDF_TOKENS = [

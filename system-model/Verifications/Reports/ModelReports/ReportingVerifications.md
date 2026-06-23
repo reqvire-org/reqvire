@@ -47,7 +47,7 @@ This test verifies that the collect command aggregates capability, requirement, 
 - Command shall support `--direction` flag with values UPSTREAM (default) and DOWNSTREAM
 - When direction is UPSTREAM, command shall traverse derivedFrom relations in reverse direction (child to parents)
 - When direction is DOWNSTREAM, command shall traverse derive relations in forward direction (parent to children)
-- Command shall collect element content and reused_contract_context contents
+- Command shall collect element content and contract_bindings contents
 - Command shall output with source citations
 - Command shall include semantic contracts when collecting downstream from ontology context they use
 - Command shall reject element types other than capability, requirement, or ontology with error
@@ -76,8 +76,8 @@ This test verifies that the collect command aggregates capability, requirement, 
    - Ancestors ordered by depth (root first, depth 0)
    - Same-level elements sorted alphabetically
 
-4. **Reused Contract Context Content Collection**
-- element identifier reused_contract_context: referenced element content included
+4. **Contract Bindings Content Collection**
+- element identifier contract_bindings: referenced element content included
 
 5. **Error Handling - Element Not Found**
    Command: `reqvire collect non-existent-element`
@@ -205,7 +205,7 @@ Test cases:
 3. Collecting a capability UPSTREAM includes capability ancestors only.
 4. Collecting a capability DOWNSTREAM includes child capabilities, requirements that specify each capability, and requirement descendants.
 5. Authored concept references are included when collecting capability context.
-6. Collecting a requirement includes authored concept references without requiring ontology reused_contract_context.
+6. Collecting a requirement includes authored concept references without requiring ontology contract_bindings.
 
 #### Metadata
   * type: test-verification
@@ -653,17 +653,17 @@ Comprehensive test verifying model command generates model-centric nested output
    - exits code **0**
    - output begins with Mermaid graph syntax
    - output does not contain Markdown fenced code blocks
-   - output includes ontology, capability, requirement, and reused_contract_context edges when present in the model context
+   - output includes ontology, capability, requirement, and contract_bindings edges when present in the model context
 
 5. **Nested JSON Structure Validation**
    Command: `reqvire model --json`
    - JSON has keys: `elements`, `metadata`
-   - Each element has: `identifier`, `name`, `element_type`, `file_path`, `section`, `section_index`, `relations`, `reused_contract_context`
+   - Each element has: `identifier`, `name`, `element_type`, `file_path`, `section`, `section_index`, `relations`, `contract_bindings`
    - Each relation has: `relation_type`, target (element/file/external)
    - Element targets are nested recursively with same structure
    - File targets have: `path`, `type: "file"`
    - External targets have: `url`, `type: "external"`
-   - Reused Contract Context is an array of contract element identifier strings (empty array if no reused_contract_context)
+   - Contract Bindings is an array of contract element identifier strings (empty array if no contract_bindings)
    - Metadata has: `total_elements`, `total_relations`, `filtered_from`
 
 5. **Forward-Only Traversal Verification**
@@ -791,15 +791,15 @@ Expected checks:
 
 ### Resources Report Verification
 
-This test verifies that the resources command correctly generates reports showing file-based relations and identifier-based reused_contract_context.
+This test verifies that the resources command correctly generates reports showing file-based relations and identifier-based contract_bindings.
 
 #### Details
 
 ##### Acceptance Criteria
 **Report Structure:**
-- Report shall have two main sections: Relations and Reused Contract Context
+- Report shall have two main sections: Relations and Contract Bindings
 - Relations section lists files alphabetically by path
-- Reused Contract Context section lists contract identifiers alphabetically
+- Contract Bindings section lists contract identifiers alphabetically
 - Each entry shows referencing elements with markdown links
 
 **Relations Section:**
@@ -807,14 +807,14 @@ This test verifies that the resources command correctly generates reports showin
 - Each reference shows relation type and source element
 - References sorted by relation type, then by element identifier
 
-**Reused Contract Context Section:**
-- Includes contract identifiers from reused_contract_context targets
+**Contract Bindings Section:**
+- Includes contract identifiers from contract_bindings targets
 - Each reference shows source element
 - References sorted by element identifier
 
 **Output Formats:**
 - Text output uses markdown formatting with headers and bullet lists
-- JSON output provides structured data with relations, reused_contract_context, and summary
+- JSON output provides structured data with relations, contract_bindings, and summary
 
 **Explorer Integration:**
 - Resources view is available as a supporting SPA route in the served Explorer
@@ -825,7 +825,7 @@ This test verifies that the resources command correctly generates reports showin
    Command: `reqvire resources`
    - exits code **0**
    - output contains "## Relations" section header
-   - output contains "## Reused Contract Context" section header
+   - output contains "## Contract Bindings" section header
    - files are listed with ### headers
    - referencing elements shown as bullet points with markdown links
 
@@ -834,7 +834,7 @@ This test verifies that the resources command correctly generates reports showin
    - exits code **0**
    - output parses under `jq`
    - contains `relations` array with file_path and references
-   - contains `reused_contract_context` array with identifier and references
+   - contains `contract_bindings` array with identifier and references
    - contains `summary` with totals
 
 3. **Relations section content**
@@ -842,19 +842,19 @@ This test verifies that the resources command correctly generates reports showin
    - `satisfiedBy` relations to document files appear in Relations section
    - each reference includes relation_type, element_id, element_name
 
-4. **Reused Contract Context section content**
-   - contract identifier reused_contract_context appear in Reused Contract Context section
+4. **Contract Bindings section content**
+   - contract identifier contract_bindings appear in Contract Bindings section
    - each reference includes element_id, element_name
 
 5. **Sorting verification**
    - Relation files sorted alphabetically by path
-   - Reused Contract Context identifiers sorted alphabetically by identifier
+   - Contract Bindings identifiers sorted alphabetically by identifier
    - Within each entry, references sorted by relation_type then element_id
    - Consistent ordering across multiple runs
 
 6. **Empty sections handling**
    - If no InternalPath relations exist, Relations section shows appropriate message
-   - If no reused_contract_context identifiers exist, Reused Contract Context section shows appropriate message
+   - If no contract_bindings identifiers exist, Contract Bindings section shows appropriate message
 
 #### Metadata
   * type: test-verification
@@ -899,12 +899,12 @@ This test verifies that the system provides a unified `search` command functiona
 - All filter flags work individually and in combination (conjunctive AND logic)
 - Supplying an invalid regex to any regex-based filter fails with a non-zero exit code and displays a clear error message
 - Search results must include all relations for each element
-- Search results must include all reused_contract_context for each element (omitted in short mode)
+- Search results must include all contract_bindings for each element (omitted in short mode)
 - Search JSON results must include effective governance metadata for governance-bearing elements
 - Search JSON and text summaries must include effective governance metadata counters for matched governance-bearing elements
 - **Enhanced Content Display**: Search must display page content (frontmatter before first element) when not in short mode
 - **Count Information**: Search must show counts for files and elements in full mode (omitted in short mode)
-- **Short Mode Behavior**: Short mode omits: `content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_elements`, `global_counters`, `reused_contract_context`
+- **Short Mode Behavior**: Short mode omits: `content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_elements`, `global_counters`, `contract_bindings`
 
 ##### Test Criteria
 1. **Base JSON search**
@@ -1006,17 +1006,17 @@ This test verifies that the system provides a unified `search` command functiona
     - Verify all specified fields are omitted from JSON structure
     - Verify no null/empty placeholders for omitted fields (fields completely absent)
 
-16. **Reused Contract Context in search output (full mode)**
+16. **Contract Bindings in search output (full mode)**
     Command: `reqvire search --json`
-    - JSON output must include `reused_contract_context` field for each element
-    - Reused Contract Context is an array of contract element identifier strings
-    - Element identifier reused_contract_context displayed as full identifiers (e.g., `"specifications/File.md#contract-element"`)
-    - Elements without reused_contract_context have empty array `[]`
-    - Reused Contract Context identifiers are normalized to git-root-relative identifier format
+    - JSON output must include `contract_bindings` field for each element
+    - Contract Bindings is an array of contract element identifier strings
+    - Element identifier contract_bindings displayed as full identifiers (e.g., `"specifications/File.md#contract-element"`)
+    - Elements without contract_bindings have empty array `[]`
+    - Contract Bindings identifiers are normalized to git-root-relative identifier format
 
-17. **Reused Contract Context omitted in short mode**
+17. **Contract Bindings omitted in short mode**
     Command: `reqvire search --short --json`
-    - Element objects do NOT contain `reused_contract_context` field
+    - Element objects do NOT contain `contract_bindings` field
     - Field is completely absent (not empty array)
 
 18. **Governance metadata in search output and filters**

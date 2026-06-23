@@ -1,1 +1,0 @@
-error: Invalid reused_contract_context scope: 'Spec-1' cannot be reused to 'Req B' because it is within the contract's defining hierarchy. Reused Contract Context are only allowed from elements outside the definedBy chain.

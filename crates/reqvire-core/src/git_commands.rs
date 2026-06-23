@@ -137,7 +137,7 @@ pub fn get_branch_name() -> Result<String, ReqvireError> {
     if branch.is_empty() {
         let commit = get_commit_hash()?;
         branch = format!(
-            "removed reused context@{}",
+            "removed contract binding@{}",
             commit.chars().take(7).collect::<String>()
         );
     }

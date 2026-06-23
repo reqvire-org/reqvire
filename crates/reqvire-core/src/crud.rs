@@ -3,7 +3,7 @@
 // CLI should only parse arguments and call these functions
 
 use crate::diff::{generate_crud_diffs, generate_file_diff, CrudOperation, CrudResult, FileDiff};
-use crate::element::{ReusedContractContextEntry, ReusedContractContextTarget};
+use crate::element::{ContractBindingEntry, ContractBindingTarget};
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::model::ModelManager;
@@ -838,10 +838,10 @@ fn validate_semantic_contracts_after_mutation(
     }
 }
 
-fn validate_semantic_contracts_after_reused_contract_context_candidate(
+fn validate_semantic_contracts_after_contract_bindings_candidate(
     model_manager: &ModelManager,
     element_id: &str,
-    reused_contract_context_identifier: &str,
+    contract_bindings_identifier: &str,
     reuse: bool,
 ) -> Result<(), ReqvireError> {
     let mut candidate = model_manager.graph_registry.clone();
@@ -855,26 +855,26 @@ fn validate_semantic_contracts_after_reused_contract_context_candidate(
     if reuse {
         if !node
             .element
-            .reused_contract_context
+            .contract_bindings
             .iter()
-            .any(|reused_contract_context| {
-                reused_contract_context.target.as_str() == reused_contract_context_identifier
+            .any(|contract_bindings| {
+                contract_bindings.target.as_str() == contract_bindings_identifier
             })
         {
             node.element
-                .reused_contract_context
-                .push(ReusedContractContextEntry {
-                    target: ReusedContractContextTarget::ElementIdentifier(
-                        reused_contract_context_identifier.to_string(),
+                .contract_bindings
+                .push(ContractBindingEntry {
+                    target: ContractBindingTarget::ElementIdentifier(
+                        contract_bindings_identifier.to_string(),
                     ),
                     content_hash: None,
                 });
         }
     } else {
         node.element
-            .reused_contract_context
-            .retain(|reused_contract_context| {
-                reused_contract_context.target.as_str() != reused_contract_context_identifier
+            .contract_bindings
+            .retain(|contract_bindings| {
+                contract_bindings.target.as_str() != contract_bindings_identifier
             });
     }
 
@@ -1289,18 +1289,18 @@ pub fn move_file(
     })
 }
 
-/// Reuse a file to an element by adding it to the Reused Contract Context subsection
+/// Reuse a file to an element by adding it to the Contract Bindings subsection
 ///
 /// # Arguments
 /// * `model_manager` - The model manager
 /// * `element_name` - Name of the element to reuse to
-/// * `reused_context_path` - Path to the file to reuse (git-root-relative)
+/// * `contract_binding_path` - Path to the file to reuse (git-root-relative)
 /// * `git_root` - Git root directory
 /// * `dry_run` - If true, don't write changes to disk
 pub fn reuse(
     model_manager: &mut ModelManager,
     element_name: &str,
-    reused_context_path: &str,
+    contract_binding_path: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
@@ -1322,15 +1322,15 @@ pub fn reuse(
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
-    // Check if reused_contract_context already exists - return error
+    // Check if contract_bindings already exists - return error
     if element
-        .reused_contract_context
+        .contract_bindings
         .iter()
-        .any(|a| a.target.as_str() == reused_context_path)
+        .any(|a| a.target.as_str() == contract_binding_path)
     {
         return Err(ReqvireError::ElementError(format!(
-            "ReusedContractContextEntry '{}' already exists on '{}'",
-            reused_context_path, element_name
+            "ContractBindingEntry '{}' already exists on '{}'",
+            contract_binding_path, element_name
         )));
     }
 
@@ -1338,27 +1338,27 @@ pub fn reuse(
     let in_relations = element
         .relations
         .iter()
-        .any(|r| r.target.link.as_str() == reused_context_path);
+        .any(|r| r.target.link.as_str() == contract_binding_path);
 
     if in_relations {
         return Err(ReqvireError::CrossSectionDuplicate(format!(
-            "Target '{}' already exists in Relations of '{}'. Cannot add to Reused Contract Context.",
-            reused_context_path, element_name
+            "Target '{}' already exists in Relations of '{}'. Cannot add to Contract Bindings.",
+            contract_binding_path, element_name
         )));
     }
 
-    // Calculate file-relative path for the reused_contract_context link in markdown
+    // Calculate file-relative path for the contract_bindings link in markdown
     let file_dir = crate::utils::get_parent_dir(&file_path);
-    let reused_context_path_buf = PathBuf::from(reused_context_path);
-    let relative_reused_context_path = pathdiff::diff_paths(&reused_context_path_buf, &file_dir)
-        .unwrap_or_else(|| reused_context_path_buf.clone());
-    let relative_reused_context_str = relative_reused_context_path.to_string_lossy();
+    let contract_binding_path_buf = PathBuf::from(contract_binding_path);
+    let relative_contract_binding_path = pathdiff::diff_paths(&contract_binding_path_buf, &file_dir)
+        .unwrap_or_else(|| contract_binding_path_buf.clone());
+    let relative_contract_binding_str = relative_contract_binding_path.to_string_lossy();
 
-    // Find the element in the file and add/update Reused Contract Context subsection
-    let new_content = add_reused_contract_context_to_element(
+    // Find the element in the file and add/update Contract Bindings subsection
+    let new_content = add_contract_bindings_to_element(
         &content,
         element_name,
-        &relative_reused_context_str,
+        &relative_contract_binding_str,
     )?;
 
     // Generate diff
@@ -1378,17 +1378,17 @@ pub fn reuse(
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id,
-        element_name: format!("Reused {} to {}", reused_context_path, element_name),
+        element_name: format!("Reused {} to {}", contract_binding_path, element_name),
         diffs: vec![diff],
         dry_run,
     })
 }
 
-/// Remove Reused Context a file from an element by removing it from the Reused Contract Context subsection
-pub fn remove_reused_contract_context(
+/// Remove Contract Binding a file from an element by removing it from the Contract Bindings subsection
+pub fn remove_contract_bindings(
     model_manager: &mut ModelManager,
     element_name: &str,
-    reused_context_path: &str,
+    contract_binding_path: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
@@ -1410,18 +1410,18 @@ pub fn remove_reused_contract_context(
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
-    // Calculate file-relative path for finding the reused_contract_context link in markdown
+    // Calculate file-relative path for finding the contract_bindings link in markdown
     let file_dir = crate::utils::get_parent_dir(&file_path);
-    let reused_context_path_buf = PathBuf::from(reused_context_path);
-    let relative_reused_context_path = pathdiff::diff_paths(&reused_context_path_buf, &file_dir)
-        .unwrap_or_else(|| reused_context_path_buf.clone());
-    let relative_reused_context_str = relative_reused_context_path.to_string_lossy();
+    let contract_binding_path_buf = PathBuf::from(contract_binding_path);
+    let relative_contract_binding_path = pathdiff::diff_paths(&contract_binding_path_buf, &file_dir)
+        .unwrap_or_else(|| contract_binding_path_buf.clone());
+    let relative_contract_binding_str = relative_contract_binding_path.to_string_lossy();
 
-    // Remove reused_contract_context from element
-    let new_content = remove_reused_contract_context_from_element(
+    // Remove contract_bindings from element
+    let new_content = remove_contract_bindings_from_element(
         &content,
         element_name,
-        &relative_reused_context_str,
+        &relative_contract_binding_str,
     )?;
 
     // Generate diff
@@ -1442,48 +1442,48 @@ pub fn remove_reused_contract_context(
         operation: CrudOperation::Update,
         element_id,
         element_name: format!(
-            "Removed Reused Context {} from {}",
-            reused_context_path, element_name
+            "Removed Contract Binding {} from {}",
+            contract_binding_path, element_name
         ),
         diffs: vec![diff],
         dry_run,
     })
 }
 
-fn resolve_reused_contract_context_identifier_for_element(
+fn resolve_contract_bindings_identifier_for_element(
     model_manager: &ModelManager,
     target_element_file_path: &str,
-    reused_contract_context_target: &str,
+    contract_bindings_target: &str,
 ) -> Result<String, ReqvireError> {
-    if !reused_contract_context_target.contains('#') {
-        return Err(ReqvireError::InvalidReusedContractContextTarget(format!(
-            "Invalid reused_contract_context target '{}'. Reused Contract Context must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
-            reused_contract_context_target
+    if !contract_bindings_target.contains('#') {
+        return Err(ReqvireError::InvalidContractBindingTarget(format!(
+            "Invalid contract_bindings target '{}'. Contract Bindings must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
+            contract_bindings_target
         )));
     }
 
-    if reused_contract_context_target.starts_with('#') {
+    if contract_bindings_target.starts_with('#') {
         return Ok(format!(
             "{}{}",
-            target_element_file_path, reused_contract_context_target
+            target_element_file_path, contract_bindings_target
         ));
     }
 
     if model_manager
         .graph_registry
-        .get_element(reused_contract_context_target)
+        .get_element(contract_bindings_target)
         .is_some()
     {
-        return Ok(reused_contract_context_target.to_string());
+        return Ok(contract_bindings_target.to_string());
     }
 
     let base_path = std::path::Path::new(target_element_file_path)
         .parent()
         .unwrap_or_else(|| std::path::Path::new("."));
-    crate::utils::normalize_identifier(reused_contract_context_target, base_path).map_err(|e| {
-        ReqvireError::InvalidReusedContractContextTarget(format!(
-            "Invalid reused_contract_context target '{}': {}. Reused Contract Context must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
-            reused_contract_context_target, e
+    crate::utils::normalize_identifier(contract_bindings_target, base_path).map_err(|e| {
+        ReqvireError::InvalidContractBindingTarget(format!(
+            "Invalid contract_bindings target '{}': {}. Contract Bindings must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
+            contract_bindings_target, e
         ))
     })
 }
@@ -1492,7 +1492,7 @@ fn resolve_reused_contract_context_identifier_for_element(
 pub fn reuse_contract_element_identifier(
     model_manager: &mut ModelManager,
     element_name: &str,
-    reused_contract_context_target: &str,
+    contract_bindings_target: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
@@ -1507,134 +1507,134 @@ pub fn reuse_contract_element_identifier(
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
-    let reused_contract_context_identifier =
-        resolve_reused_contract_context_identifier_for_element(
+    let contract_bindings_identifier =
+        resolve_contract_bindings_identifier_for_element(
             model_manager,
             &file_path,
-            reused_contract_context_target,
+            contract_bindings_target,
         )?;
 
-    let reused_contract_context_element = model_manager
+    let contract_bindings_element = model_manager
         .graph_registry
-        .get_element(&reused_contract_context_identifier)
+        .get_element(&contract_bindings_identifier)
         .ok_or_else(|| {
-            ReqvireError::MissingReusedContractContextTarget(format!(
-                "ReusedContractContextEntry target '{}' could not be resolved to an existing element identifier.",
-                reused_contract_context_target
+            ReqvireError::MissingContractBindingTarget(format!(
+                "ContractBindingEntry target '{}' could not be resolved to an existing element identifier.",
+                contract_bindings_target
             ))
         })?;
 
-    if !reused_contract_context_element.element_type.is_contract() {
-        return Err(ReqvireError::InvalidReusedContractContextTarget(format!(
+    if !contract_bindings_element.element_type.is_contract() {
+        return Err(ReqvireError::InvalidContractBindingTarget(format!(
             "Element '{}' is not an reusable type. Only compatible requirement-owned Contract elements can be reused; ontology vocabulary uses Concept References.",
-            reused_contract_context_element.name
+            contract_bindings_element.name
         )));
     }
 
     if !target_element.element_type.is_requirement() {
-        return Err(ReqvireError::InvalidReusedContractContextTarget(format!(
-            "Element '{}' (type: {}) cannot author reused_contract_context. Only requirement elements may author reused_contract_context to reusable requirement-owned contracts; ontology vocabulary uses Concept References and semantic contracts use use/usedBy.",
+        return Err(ReqvireError::InvalidContractBindingTarget(format!(
+            "Element '{}' (type: {}) cannot author contract_bindings. Only requirement elements may author contract_bindings to reusable requirement-owned contracts; ontology vocabulary uses Concept References and semantic contracts use use/usedBy.",
             element_name,
             target_element.element_type.as_str(),
         )));
     }
 
-    let reused_context_type_valid = reused_contract_context_element
+    let contract_binding_type_valid = contract_bindings_element
         .element_type
         .is_requirement_contract();
 
-    if !reused_context_type_valid {
-        return Err(ReqvireError::InvalidReusedContractContextTarget(format!(
-            "Element '{}' (type: {}) cannot reuse '{}' (type: {}). Requirement reused_contract_context may target requirement-owned source, constraint, behavior, specification, state, or input-output only. Ontology vocabulary uses Concept References; semantic contracts constrain requirements through constrainedBy/constrain.",
+    if !contract_binding_type_valid {
+        return Err(ReqvireError::InvalidContractBindingTarget(format!(
+            "Element '{}' (type: {}) cannot reuse '{}' (type: {}). Requirement contract_bindings may target requirement-owned source, constraint, behavior, specification, state, or input-output only. Ontology vocabulary uses Concept References; semantic contracts constrain requirements through constrainedBy/constrain.",
             element_name,
             target_element.element_type.as_str(),
-            reused_contract_context_element.name,
-            reused_contract_context_element.element_type.as_str()
+            contract_bindings_element.name,
+            contract_bindings_element.element_type.as_str()
         )));
     }
 
-    if reused_contract_context_element.element_type.is_contract()
+    if contract_bindings_element.element_type.is_contract()
         && !model_manager
             .graph_registry
-            .contract_has_define_relation(&reused_contract_context_identifier)
+            .contract_has_define_relation(&contract_bindings_identifier)
     {
-        return Err(ReqvireError::InvalidReusedContractContextTarget(
+        return Err(ReqvireError::InvalidContractBindingTarget(
             format!(
                 "'{}' has no define relation. Contracts must define a requirement before they can be reused; contracts are requirement-owned only. Capabilities use concept references for SKOS concepts and are specified by requirements; verification coverage rolls up from verified requirements.",
-                reused_contract_context_element.name
+                contract_bindings_element.name
             )
         ));
     }
 
     let defining_reqs = model_manager
         .graph_registry
-        .get_defining_requirements(&reused_contract_context_identifier);
+        .get_defining_requirements(&contract_bindings_identifier);
     for defining_req_id in defining_reqs {
         if model_manager
             .graph_registry
             .is_in_hierarchy(&element_id, &defining_req_id)
         {
-            return Err(ReqvireError::InvalidReusedContractContextScope(
+            return Err(ReqvireError::InvalidContractBindingScope(
                 format!(
-                    "'{}' cannot be reused to '{}' because it is within the contract's defining hierarchy. Reused Contract Context are only allowed from elements outside the definedBy chain.",
-                    reused_contract_context_element.name, element_name
+                    "'{}' cannot be bound to '{}' because it is within the contract's defining hierarchy. Contract Bindings are only allowed from elements outside the definedBy chain.",
+                    contract_bindings_element.name, element_name
                 )
             ));
         }
     }
 
-    if reused_contract_context_element.element_type.is_contract() {
+    if contract_bindings_element.element_type.is_contract() {
         if let Some(msg) = model_manager
             .graph_registry
-            .build_reused_contract_context_direction_scope_error(
-                &reused_contract_context_identifier,
+            .build_contract_bindings_direction_scope_error(
+                &contract_bindings_identifier,
                 &element_id,
                 element_name,
                 None,
             )
         {
-            return Err(ReqvireError::InvalidReusedContractContextScope(msg));
+            return Err(ReqvireError::InvalidContractBindingScope(msg));
         }
     }
 
     if target_element
-        .reused_contract_context
+        .contract_bindings
         .iter()
-        .any(|a| a.target.as_str() == reused_contract_context_identifier)
+        .any(|a| a.target.as_str() == contract_bindings_identifier)
     {
         return Err(ReqvireError::ElementError(format!(
-            "ReusedContractContextEntry '{}' already exists on '{}'",
-            reused_contract_context_target, element_name
+            "ContractBindingEntry '{}' already exists on '{}'",
+            contract_bindings_target, element_name
         )));
     }
 
     let in_relations = target_element
         .relations
         .iter()
-        .any(|r| r.target.link.as_str() == reused_contract_context_identifier);
+        .any(|r| r.target.link.as_str() == contract_bindings_identifier);
     if in_relations {
         return Err(ReqvireError::CrossSectionDuplicate(format!(
-            "Target '{}' already exists in Relations of '{}'. Cannot add to Reused Contract Context.",
-            reused_contract_context_target, element_name
+            "Target '{}' already exists in Relations of '{}'. Cannot add to Contract Bindings.",
+            contract_bindings_target, element_name
         )));
     }
 
-    validate_semantic_contracts_after_reused_contract_context_candidate(
+    validate_semantic_contracts_after_contract_bindings_candidate(
         model_manager,
         &element_id,
-        &reused_contract_context_identifier,
+        &contract_bindings_identifier,
         true,
     )?;
 
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
-    let reused_context_display_name = reused_contract_context_element.name.clone();
-    let reused_context_file_path = reused_contract_context_element.file_path.clone();
+    let contract_binding_display_name = contract_bindings_element.name.clone();
+    let contract_binding_file_path = contract_bindings_element.file_path.clone();
 
-    let relative_identifier = if file_path == reused_context_file_path {
+    let relative_identifier = if file_path == contract_binding_file_path {
         let (_path, fragment_opt) =
-            crate::utils::extract_path_and_fragment(&reused_contract_context_identifier);
-        let fragment = fragment_opt.unwrap_or(&reused_contract_context_identifier);
+            crate::utils::extract_path_and_fragment(&contract_bindings_identifier);
+        let fragment = fragment_opt.unwrap_or(&contract_bindings_identifier);
         format!("#{}", fragment)
     } else {
         let target_file_path_buf = std::path::PathBuf::from(&file_path);
@@ -1643,17 +1643,17 @@ pub fn reuse_contract_element_identifier(
             .unwrap_or_else(|| std::path::Path::new("."))
             .to_path_buf();
         crate::utils::to_relative_identifier(
-            &reused_contract_context_identifier,
+            &contract_bindings_identifier,
             &target_folder,
             true,
         )
-        .unwrap_or_else(|_| reused_contract_context_identifier.clone())
+        .unwrap_or_else(|_| contract_bindings_identifier.clone())
     };
 
-    let new_content = add_element_reused_contract_context_to_element(
+    let new_content = add_element_contract_bindings_to_element(
         &content,
         element_name,
-        &reused_context_display_name,
+        &contract_binding_display_name,
         &relative_identifier,
     )?;
     let diff = generate_file_diff(&file_path, &content, &new_content);
@@ -1671,7 +1671,7 @@ pub fn reuse_contract_element_identifier(
         element_id,
         element_name: format!(
             "Reused element {} to {}",
-            reused_contract_context_target, element_name
+            contract_bindings_target, element_name
         ),
         diffs: vec![diff],
         dry_run,
@@ -1682,17 +1682,17 @@ pub fn reuse_contract_element_identifier(
 pub fn reuse_contract_element(
     model_manager: &mut ModelManager,
     element_name: &str,
-    reused_contract_context_element_name: &str,
+    contract_bindings_element_name: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    let reused_contract_context_identifier = model_manager
+    let contract_bindings_identifier = model_manager
         .graph_registry
-        .get_element_by_name(reused_contract_context_element_name)
+        .get_element_by_name(contract_bindings_element_name)
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!(
-                "ReusedContractContextEntry '{}' not found",
-                reused_contract_context_element_name
+                "ContractBindingEntry '{}' not found",
+                contract_bindings_element_name
             ))
         })?
         .identifier
@@ -1700,17 +1700,17 @@ pub fn reuse_contract_element(
     reuse_contract_element_identifier(
         model_manager,
         element_name,
-        &reused_contract_context_identifier,
+        &contract_bindings_identifier,
         git_root,
         dry_run,
     )
 }
 
-/// Remove Reused Context a Contract element identifier from an element.
+/// Remove Contract Binding a Contract element identifier from an element.
 pub fn remove_reused_contract_element_identifier(
     model_manager: &mut ModelManager,
     element_name: &str,
-    reused_contract_context_target: &str,
+    contract_bindings_target: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
@@ -1725,18 +1725,18 @@ pub fn remove_reused_contract_element_identifier(
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
-    let reused_contract_context_identifier =
-        resolve_reused_contract_context_identifier_for_element(
+    let contract_bindings_identifier =
+        resolve_contract_bindings_identifier_for_element(
             model_manager,
             &file_path,
-            reused_contract_context_target,
+            contract_bindings_target,
         )?;
 
-    let reused_context_display_name = model_manager
+    let contract_binding_display_name = model_manager
         .graph_registry
-        .get_element(&reused_contract_context_identifier)
+        .get_element(&contract_bindings_identifier)
         .map(|e| e.name.clone())
-        .unwrap_or_else(|| reused_contract_context_identifier.clone());
+        .unwrap_or_else(|| contract_bindings_identifier.clone());
 
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
@@ -1748,33 +1748,33 @@ pub fn remove_reused_contract_element_identifier(
         .to_path_buf();
     let relative_identifier = {
         let (identifier_path, fragment_opt) =
-            crate::utils::extract_path_and_fragment(&reused_contract_context_identifier);
+            crate::utils::extract_path_and_fragment(&contract_bindings_identifier);
         if identifier_path == file_path {
             format!(
                 "#{}",
-                fragment_opt.unwrap_or(&reused_contract_context_identifier)
+                fragment_opt.unwrap_or(&contract_bindings_identifier)
             )
         } else {
             crate::utils::to_relative_identifier(
-                &reused_contract_context_identifier,
+                &contract_bindings_identifier,
                 &target_folder,
                 true,
             )
-            .unwrap_or_else(|_| reused_contract_context_identifier.clone())
+            .unwrap_or_else(|_| contract_bindings_identifier.clone())
         }
     };
 
-    let new_content = remove_element_reused_contract_context_from_element(
+    let new_content = remove_element_contract_bindings_from_element(
         &content,
         element_name,
-        &reused_context_display_name,
+        &contract_binding_display_name,
         &relative_identifier,
     )?;
 
-    validate_semantic_contracts_after_reused_contract_context_candidate(
+    validate_semantic_contracts_after_contract_bindings_candidate(
         model_manager,
         &element_id,
-        &reused_contract_context_identifier,
+        &contract_bindings_identifier,
         false,
     )?;
 
@@ -1792,29 +1792,29 @@ pub fn remove_reused_contract_element_identifier(
         operation: CrudOperation::Update,
         element_id,
         element_name: format!(
-            "Removed Reused Context element {} from {}",
-            reused_contract_context_target, element_name
+            "Removed Contract Binding element {} from {}",
+            contract_bindings_target, element_name
         ),
         diffs: vec![diff],
         dry_run,
     })
 }
 
-/// Remove Reused Context a Contract element by name from another element.
+/// Remove Contract Binding a Contract element by name from another element.
 pub fn remove_reused_contract_element(
     model_manager: &mut ModelManager,
     element_name: &str,
-    reused_contract_context_element_name: &str,
+    contract_bindings_element_name: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    let reused_contract_context_identifier = model_manager
+    let contract_bindings_identifier = model_manager
         .graph_registry
-        .get_element_by_name(reused_contract_context_element_name)
+        .get_element_by_name(contract_bindings_element_name)
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!(
-                "ReusedContractContextEntry '{}' not found",
-                reused_contract_context_element_name
+                "ContractBindingEntry '{}' not found",
+                contract_bindings_element_name
             ))
         })?
         .identifier
@@ -1822,13 +1822,13 @@ pub fn remove_reused_contract_element(
     remove_reused_contract_element_identifier(
         model_manager,
         element_name,
-        &reused_contract_context_identifier,
+        &contract_bindings_identifier,
         git_root,
         dry_run,
     )
 }
 
-/// Move an asset file and update all references across elements (Reused Contract Context and Relations)
+/// Move an asset file and update all references across elements (Contract Bindings and Relations)
 pub fn mv_asset(
     model_manager: &mut ModelManager,
     old_path: &str,
@@ -1842,19 +1842,19 @@ pub fn mv_asset(
 
     let old_path_buf = PathBuf::from(old_path);
 
-    // Find all elements with this file as reused_contract_context OR as InternalPath relation target
+    // Find all elements with this file as contract_bindings OR as InternalPath relation target
     let mut affected_files: std::collections::HashSet<String> = std::collections::HashSet::new();
-    let mut reused_contract_context_count = 0;
+    let mut contract_bindings_count = 0;
     let mut relation_count = 0;
 
     for node in model_manager.graph_registry.nodes.values() {
         let elem = &node.element;
 
-        // Check reused_contract_context
-        for reused_contract_context in &elem.reused_contract_context {
-            if reused_contract_context.target.as_str() == old_path {
+        // Check contract_bindings
+        for contract_bindings in &elem.contract_bindings {
+            if contract_bindings.target.as_str() == old_path {
                 affected_files.insert(elem.file_path.clone());
-                reused_contract_context_count += 1;
+                contract_bindings_count += 1;
             }
         }
 
@@ -1870,7 +1870,7 @@ pub fn mv_asset(
     }
 
     if affected_files.is_empty() {
-        return Err(ReqvireError::MissingReusedContractContextTarget(format!(
+        return Err(ReqvireError::MissingContractBindingTarget(format!(
             "No elements reference file '{}'",
             old_path
         )));
@@ -1898,7 +1898,7 @@ pub fn mv_asset(
         let old_relative_str = old_relative.to_string_lossy();
         let new_relative_str = new_relative.to_string_lossy();
 
-        // Replace reused_contract_context links: [path](path)
+        // Replace contract_bindings links: [path](path)
         let old_link = format!("[{}]({})", old_relative_str, old_relative_str);
         let new_link = format!("[{}]({})", new_relative_str, new_relative_str);
         new_content = new_content.replace(&old_link, &new_link);
@@ -1941,10 +1941,10 @@ pub fn mv_asset(
         operation: CrudOperation::Move,
         element_id: old_path.to_string(),
         element_name: format!(
-            "Moved {} → {} ({} reused_contract_context(s), {} relation(s) in {} file(s))",
+            "Moved {} → {} ({} contract_bindings(s), {} relation(s) in {} file(s))",
             old_path,
             new_path,
-            reused_contract_context_count,
+            contract_bindings_count,
             relation_count,
             affected_files.len()
         ),
@@ -1953,7 +1953,7 @@ pub fn mv_asset(
     })
 }
 
-/// Remove an asset file and remove all references from elements (Reused Contract Context and Relations)
+/// Remove an asset file and remove all references from elements (Contract Bindings and Relations)
 pub fn rm_asset(
     model_manager: &mut ModelManager,
     file_path_arg: &str,
@@ -1964,19 +1964,19 @@ pub fn rm_asset(
     use std::fs;
     use std::path::PathBuf;
 
-    // Find all elements with this file as reused_contract_context OR as InternalPath relation target
+    // Find all elements with this file as contract_bindings OR as InternalPath relation target
     let mut affected_files: std::collections::HashSet<String> = std::collections::HashSet::new();
-    let mut reused_contract_context_count = 0;
+    let mut contract_bindings_count = 0;
     let mut relation_count = 0;
 
     for node in model_manager.graph_registry.nodes.values() {
         let elem = &node.element;
 
-        // Check reused_contract_context
-        for reused_contract_context in &elem.reused_contract_context {
-            if reused_contract_context.target.as_str() == file_path_arg {
+        // Check contract_bindings
+        for contract_bindings in &elem.contract_bindings {
+            if contract_bindings.target.as_str() == file_path_arg {
                 affected_files.insert(elem.file_path.clone());
-                reused_contract_context_count += 1;
+                contract_bindings_count += 1;
             }
         }
 
@@ -2005,9 +2005,9 @@ pub fn rm_asset(
             .unwrap_or_else(|| file_path_buf.clone());
         let relative_path_str = relative_path.to_string_lossy();
 
-        // Remove reused_contract_context
+        // Remove contract_bindings
         let mut new_content =
-            remove_reused_contract_context_from_file(&content, &relative_path_str)?;
+            remove_contract_bindings_from_file(&content, &relative_path_str)?;
 
         // Remove InternalPath relations
         new_content = remove_relation_with_path(&new_content, &relative_path_str)?;
@@ -2039,9 +2039,9 @@ pub fn rm_asset(
         operation: CrudOperation::Remove,
         element_id: file_path_arg.to_string(),
         element_name: format!(
-            "Removed {} ({} reused_contract_context(s), {} relation(s) from {} file(s))",
+            "Removed {} ({} contract_bindings(s), {} relation(s) from {} file(s))",
             file_path_arg,
-            reused_contract_context_count,
+            contract_bindings_count,
             relation_count,
             affected_files.len()
         ),
@@ -2256,19 +2256,19 @@ fn remove_relation_with_path(content: &str, path: &str) -> Result<String, Reqvir
     Ok(result)
 }
 
-// Helper function to add reused_contract_context to element in markdown content
-fn add_reused_contract_context_to_element(
+// Helper function to add contract_bindings to element in markdown content
+fn add_contract_bindings_to_element(
     content: &str,
     element_name: &str,
-    reused_context_path: &str,
+    contract_binding_path: &str,
 ) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let mut in_target_element = false;
     let mut inserted = false;
     let mut lines_iter = content.lines().peekable();
 
-    let reused_contract_context_line =
-        format!("* [{}]({})", reused_context_path, reused_context_path);
+    let contract_bindings_line =
+        format!("* [{}]({})", contract_binding_path, contract_binding_path);
 
     while let Some(line) = lines_iter.next() {
         let trimmed = line.trim();
@@ -2279,12 +2279,12 @@ fn add_reused_contract_context_to_element(
             in_target_element = name == element_name;
         }
 
-        // Check for Reused Contract Context subsection
-        if in_target_element && trimmed == "#### Reused Contract Context" {
+        // Check for Contract Bindings subsection
+        if in_target_element && trimmed == "#### Contract Bindings" {
             result.push_str(line);
             result.push('\n');
 
-            // Add the new reused_contract_context after existing ones
+            // Add the new contract_bindings after existing ones
             while let Some(next_line) = lines_iter.peek() {
                 let next_trimmed = next_line.trim();
                 if next_trimmed.starts_with("* ")
@@ -2298,18 +2298,18 @@ fn add_reused_contract_context_to_element(
                 }
             }
 
-            // Add our new reused_contract_context
-            result.push_str(&reused_contract_context_line);
+            // Add our new contract_bindings
+            result.push_str(&contract_bindings_line);
             result.push('\n');
             inserted = true;
             continue;
         }
 
-        // Check for separator (end of element) - insert Reused Contract Context section if not found
+        // Check for separator (end of element) - insert Contract Bindings section if not found
         if in_target_element && !inserted && trimmed == "---" {
-            // Need to add Reused Contract Context section before the separator
-            result.push_str("\n#### Reused Contract Context\n");
-            result.push_str(&reused_contract_context_line);
+            // Need to add Contract Bindings section before the separator
+            result.push_str("\n#### Contract Bindings\n");
+            result.push_str(&contract_bindings_line);
             result.push('\n');
             inserted = true;
         }
@@ -2320,7 +2320,7 @@ fn add_reused_contract_context_to_element(
 
     if !inserted {
         return Err(ReqvireError::ElementNotFound(format!(
-            "Could not find element '{}' to add reused_contract_context",
+            "Could not find element '{}' to add contract_bindings",
             element_name
         )));
     }
@@ -2328,19 +2328,19 @@ fn add_reused_contract_context_to_element(
     Ok(result)
 }
 
-// Helper function to remove reused_contract_context from element in markdown content
-fn remove_reused_contract_context_from_element(
+// Helper function to remove contract_bindings from element in markdown content
+fn remove_contract_bindings_from_element(
     content: &str,
     element_name: &str,
-    reused_context_path: &str,
+    contract_binding_path: &str,
 ) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let mut in_target_element = false;
-    let mut in_reused_contract_context_section = false;
+    let mut in_contract_bindings_section = false;
     let mut removed = false;
-    let mut remaining_reused_contract_context_count = 0;
+    let mut remaining_contract_bindings_count = 0;
 
-    let reused_context_link = format!("[{}]({})", reused_context_path, reused_context_path);
+    let contract_binding_link = format!("[{}]({})", contract_binding_path, contract_binding_path);
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -2355,32 +2355,32 @@ fn remove_reused_contract_context_from_element(
                 // We're leaving the target element
                 in_target_element = false;
             }
-            in_reused_contract_context_section = false;
+            in_contract_bindings_section = false;
         }
 
-        // Check for Reused Contract Context subsection
-        if in_target_element && trimmed == "#### Reused Contract Context" {
-            in_reused_contract_context_section = true;
+        // Check for Contract Bindings subsection
+        if in_target_element && trimmed == "#### Contract Bindings" {
+            in_contract_bindings_section = true;
         }
 
-        // Check for end of Reused Contract Context section (another h4 header or element separator)
-        if in_reused_contract_context_section
-            && ((trimmed.starts_with("####") && trimmed != "#### Reused Contract Context")
+        // Check for end of Contract Bindings section (another h4 header or element separator)
+        if in_contract_bindings_section
+            && ((trimmed.starts_with("####") && trimmed != "#### Contract Bindings")
                 || trimmed == "---")
         {
-            in_reused_contract_context_section = false;
+            in_contract_bindings_section = false;
         }
 
-        // Skip the reused_contract_context line we want to remove
-        if in_target_element && in_reused_contract_context_section {
+        // Skip the contract_bindings line we want to remove
+        if in_target_element && in_contract_bindings_section {
             if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
-                && trimmed.contains(&reused_context_link)
+                && trimmed.contains(&contract_binding_link)
             {
                 removed = true;
                 continue; // Skip this line
             }
             if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                remaining_reused_contract_context_count += 1;
+                remaining_contract_bindings_count += 1;
             }
         }
 
@@ -2388,16 +2388,16 @@ fn remove_reused_contract_context_from_element(
         result.push('\n');
     }
 
-    // If we removed the last reused_contract_context, clean up the empty Reused Contract Context section
-    if removed && remaining_reused_contract_context_count == 0 {
-        result = remove_empty_reused_contract_context_section(&result, element_name);
+    // If we removed the last contract_bindings, clean up the empty Contract Bindings section
+    if removed && remaining_contract_bindings_count == 0 {
+        result = remove_empty_contract_bindings_section(&result, element_name);
     }
 
     Ok(result)
 }
 
-// Helper function to add element reused_contract_context (with display name) to element in markdown content
-fn add_element_reused_contract_context_to_element(
+// Helper function to add element contract_bindings (with display name) to element in markdown content
+fn add_element_contract_bindings_to_element(
     content: &str,
     element_name: &str,
     display_name: &str,
@@ -2409,7 +2409,7 @@ fn add_element_reused_contract_context_to_element(
     let mut lines_iter = content.lines().peekable();
 
     // Format: * [Display Name](#identifier) or * [Display Name](file.md#identifier)
-    let reused_contract_context_line = format!("* [{}]({})", display_name, identifier);
+    let contract_bindings_line = format!("* [{}]({})", display_name, identifier);
 
     while let Some(line) = lines_iter.next() {
         let trimmed = line.trim();
@@ -2420,12 +2420,12 @@ fn add_element_reused_contract_context_to_element(
             in_target_element = name == element_name;
         }
 
-        // Check for Reused Contract Context subsection
-        if in_target_element && trimmed == "#### Reused Contract Context" {
+        // Check for Contract Bindings subsection
+        if in_target_element && trimmed == "#### Contract Bindings" {
             result.push_str(line);
             result.push('\n');
 
-            // Add the new reused_contract_context after existing ones
+            // Add the new contract_bindings after existing ones
             while let Some(next_line) = lines_iter.peek() {
                 let next_trimmed = next_line.trim();
                 if next_trimmed.starts_with("* ")
@@ -2439,18 +2439,18 @@ fn add_element_reused_contract_context_to_element(
                 }
             }
 
-            // Add our new reused_contract_context
-            result.push_str(&reused_contract_context_line);
+            // Add our new contract_bindings
+            result.push_str(&contract_bindings_line);
             result.push('\n');
             inserted = true;
             continue;
         }
 
-        // Check for separator (end of element) - insert Reused Contract Context section if not found
+        // Check for separator (end of element) - insert Contract Bindings section if not found
         if in_target_element && !inserted && trimmed == "---" {
-            // Need to add Reused Contract Context section before the separator
-            result.push_str("\n#### Reused Contract Context\n");
-            result.push_str(&reused_contract_context_line);
+            // Need to add Contract Bindings section before the separator
+            result.push_str("\n#### Contract Bindings\n");
+            result.push_str(&contract_bindings_line);
             result.push('\n');
             inserted = true;
         }
@@ -2461,7 +2461,7 @@ fn add_element_reused_contract_context_to_element(
 
     if !inserted {
         return Err(ReqvireError::ElementNotFound(format!(
-            "Could not find element '{}' to add reused_contract_context",
+            "Could not find element '{}' to add contract_bindings",
             element_name
         )));
     }
@@ -2469,8 +2469,8 @@ fn add_element_reused_contract_context_to_element(
     Ok(result)
 }
 
-// Helper function to remove element reused_contract_context from element in markdown content
-fn remove_element_reused_contract_context_from_element(
+// Helper function to remove element contract_bindings from element in markdown content
+fn remove_element_contract_bindings_from_element(
     content: &str,
     element_name: &str,
     display_name: &str,
@@ -2478,14 +2478,14 @@ fn remove_element_reused_contract_context_from_element(
 ) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let mut in_target_element = false;
-    let mut in_reused_contract_context_section = false;
+    let mut in_contract_bindings_section = false;
     let mut removed = false;
-    let mut remaining_reused_contract_context_count = 0;
+    let mut remaining_contract_bindings_count = 0;
 
     // Match by either identifier or display name in the link
-    let reused_context_link_by_id = format!("]({})", identifier);
-    let reused_context_link_full = format!("[{}]({})", display_name, identifier);
-    let reused_context_link_by_name = format!("[{}](", display_name);
+    let contract_binding_link_by_id = format!("]({})", identifier);
+    let contract_binding_link_full = format!("[{}]({})", display_name, identifier);
+    let contract_binding_link_by_name = format!("[{}](", display_name);
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -2498,34 +2498,34 @@ fn remove_element_reused_contract_context_from_element(
             } else if in_target_element {
                 in_target_element = false;
             }
-            in_reused_contract_context_section = false;
+            in_contract_bindings_section = false;
         }
 
-        // Check for Reused Contract Context subsection
-        if in_target_element && trimmed == "#### Reused Contract Context" {
-            in_reused_contract_context_section = true;
+        // Check for Contract Bindings subsection
+        if in_target_element && trimmed == "#### Contract Bindings" {
+            in_contract_bindings_section = true;
         }
 
-        // Check for end of Reused Contract Context section
-        if in_reused_contract_context_section
-            && ((trimmed.starts_with("####") && trimmed != "#### Reused Contract Context")
+        // Check for end of Contract Bindings section
+        if in_contract_bindings_section
+            && ((trimmed.starts_with("####") && trimmed != "#### Contract Bindings")
                 || trimmed == "---")
         {
-            in_reused_contract_context_section = false;
+            in_contract_bindings_section = false;
         }
 
-        // Skip the reused_contract_context line we want to remove
-        if in_target_element && in_reused_contract_context_section {
+        // Skip the contract_bindings line we want to remove
+        if in_target_element && in_contract_bindings_section {
             if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
-                && (trimmed.contains(&reused_context_link_by_id)
-                    || trimmed.contains(&reused_context_link_full)
-                    || trimmed.contains(&reused_context_link_by_name))
+                && (trimmed.contains(&contract_binding_link_by_id)
+                    || trimmed.contains(&contract_binding_link_full)
+                    || trimmed.contains(&contract_binding_link_by_name))
             {
                 removed = true;
                 continue; // Skip this line
             }
             if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                remaining_reused_contract_context_count += 1;
+                remaining_contract_bindings_count += 1;
             }
         }
 
@@ -2533,28 +2533,28 @@ fn remove_element_reused_contract_context_from_element(
         result.push('\n');
     }
 
-    // If we removed the last reused_contract_context, clean up the empty Reused Contract Context section
-    if removed && remaining_reused_contract_context_count == 0 {
-        result = remove_empty_reused_contract_context_section(&result, element_name);
+    // If we removed the last contract_bindings, clean up the empty Contract Bindings section
+    if removed && remaining_contract_bindings_count == 0 {
+        result = remove_empty_contract_bindings_section(&result, element_name);
     }
 
     Ok(result)
 }
 
-// Helper function to remove reused_contract_context from all elements in a file
-fn remove_reused_contract_context_from_file(
+// Helper function to remove contract_bindings from all elements in a file
+fn remove_contract_bindings_from_file(
     content: &str,
-    reused_context_path: &str,
+    contract_binding_path: &str,
 ) -> Result<String, ReqvireError> {
     let mut result = String::new();
-    let reused_context_link = format!("[{}]({})", reused_context_path, reused_context_path);
+    let contract_binding_link = format!("[{}]({})", contract_binding_path, contract_binding_path);
 
     for line in content.lines() {
         let trimmed = line.trim();
 
-        // Skip reused_contract_context lines matching our path
+        // Skip contract_bindings lines matching our path
         if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
-            && trimmed.contains(&reused_context_link)
+            && trimmed.contains(&contract_binding_link)
         {
             continue; // Skip this line
         }
@@ -2563,14 +2563,14 @@ fn remove_reused_contract_context_from_file(
         result.push('\n');
     }
 
-    // Clean up any empty Reused Contract Context sections
-    result = remove_all_empty_reused_contract_context_sections(&result);
+    // Clean up any empty Contract Bindings sections
+    result = remove_all_empty_contract_bindings_sections(&result);
 
     Ok(result)
 }
 
-// Helper function to remove empty Reused Contract Context section for a specific element
-fn remove_empty_reused_contract_context_section(content: &str, element_name: &str) -> String {
+// Helper function to remove empty Contract Bindings section for a specific element
+fn remove_empty_contract_bindings_section(content: &str, element_name: &str) -> String {
     let mut result = String::new();
     let mut in_target_element = false;
     let mut lines_iter = content.lines().peekable();
@@ -2584,10 +2584,10 @@ fn remove_empty_reused_contract_context_section(content: &str, element_name: &st
             in_target_element = name == element_name;
         }
 
-        // Check for empty Reused Contract Context subsection to remove
-        if in_target_element && trimmed == "#### Reused Contract Context" {
-            // Look ahead to see if there are any reused_contract_context lines
-            let mut has_reused_contract_context = false;
+        // Check for empty Contract Bindings subsection to remove
+        if in_target_element && trimmed == "#### Contract Bindings" {
+            // Look ahead to see if there are any contract_bindings lines
+            let mut has_contract_bindings = false;
             let mut temp_lines = vec![];
 
             while let Some(next_line) = lines_iter.peek() {
@@ -2595,14 +2595,14 @@ fn remove_empty_reused_contract_context_section(content: &str, element_name: &st
                 if next_trimmed.is_empty() {
                     temp_lines.push(lines_iter.next().unwrap());
                 } else if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
-                    has_reused_contract_context = true;
+                    has_contract_bindings = true;
                     break;
                 } else {
                     break;
                 }
             }
 
-            if has_reused_contract_context {
+            if has_contract_bindings {
                 // Keep the header and empty lines
                 result.push_str(line);
                 result.push('\n');
@@ -2611,7 +2611,7 @@ fn remove_empty_reused_contract_context_section(content: &str, element_name: &st
                     result.push('\n');
                 }
             }
-            // If no reused_contract_context, skip the header (and empty lines are already consumed)
+            // If no contract_bindings, skip the header (and empty lines are already consumed)
             continue;
         }
 
@@ -2622,18 +2622,18 @@ fn remove_empty_reused_contract_context_section(content: &str, element_name: &st
     result
 }
 
-// Helper function to remove all empty Reused Contract Context sections
-fn remove_all_empty_reused_contract_context_sections(content: &str) -> String {
+// Helper function to remove all empty Contract Bindings sections
+fn remove_all_empty_contract_bindings_sections(content: &str) -> String {
     let mut result = String::new();
     let mut lines_iter = content.lines().peekable();
 
     while let Some(line) = lines_iter.next() {
         let trimmed = line.trim();
 
-        // Check for Reused Contract Context subsection
-        if trimmed == "#### Reused Contract Context" {
-            // Look ahead to see if there are any reused_contract_context lines
-            let mut has_reused_contract_context = false;
+        // Check for Contract Bindings subsection
+        if trimmed == "#### Contract Bindings" {
+            // Look ahead to see if there are any contract_bindings lines
+            let mut has_contract_bindings = false;
             let mut temp_lines = vec![];
 
             while let Some(next_line) = lines_iter.peek() {
@@ -2641,14 +2641,14 @@ fn remove_all_empty_reused_contract_context_sections(content: &str) -> String {
                 if next_trimmed.is_empty() {
                     temp_lines.push(lines_iter.next().unwrap());
                 } else if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
-                    has_reused_contract_context = true;
+                    has_contract_bindings = true;
                     break;
                 } else {
                     break;
                 }
             }
 
-            if has_reused_contract_context {
+            if has_contract_bindings {
                 // Keep the header and empty lines
                 result.push_str(line);
                 result.push('\n');
@@ -2657,7 +2657,7 @@ fn remove_all_empty_reused_contract_context_sections(content: &str) -> String {
                     result.push('\n');
                 }
             }
-            // If no reused_contract_context, skip the header
+            // If no contract_bindings, skip the header
             continue;
         }
 
@@ -2866,9 +2866,9 @@ pub fn relink(
     })
 }
 
-/// Unlink a relation or reused_contract_context between two elements (auto-detects type)
+/// Unlink a relation or contract_bindings between two elements (auto-detects type)
 ///
-/// Searches relations first, then reused_contract_context. Only one relation per source-target pair is allowed.
+/// Searches relations first, then contract_bindings. Only one relation per source-target pair is allowed.
 ///
 /// # Arguments
 /// * `model_manager` - The model manager
@@ -2900,7 +2900,7 @@ pub fn unlink(
     let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
 
     // Try to remove relation via graph_registry
-    // This handles element-to-element relations (NOT reused_contract_context)
+    // This handles element-to-element relations (NOT contract_bindings)
     match model_manager
         .graph_registry
         .remove_element_relation_full(&source_id, target)?
@@ -2935,7 +2935,7 @@ pub fn unlink(
             })
         }
         None => {
-            // No relation found - check if it's an reused_contract_context instead
+            // No relation found - check if it's a contract binding instead
             // Get fresh source element (in case graph was modified)
             let source_element = model_manager
                 .graph_registry
@@ -2944,15 +2944,15 @@ pub fn unlink(
                     ReqvireError::ElementNotFound(format!("Source element '{}' not found", source))
                 })?;
 
-            // Check if target is an element reused_contract_context
+            // Check if target is an element contract_bindings
             if let Some(target_element) = model_manager.graph_registry.get_element_by_name(target) {
                 let target_id = &target_element.identifier;
-                let reused_context_match = source_element
-                    .reused_contract_context
+                let contract_binding_match = source_element
+                    .contract_bindings
                     .iter()
                     .find(|a| a.target.as_str() == target_id.as_str());
 
-                if reused_context_match.is_some() {
+                if contract_binding_match.is_some() {
                     return remove_reused_contract_element(
                         model_manager,
                         source,
@@ -2963,13 +2963,13 @@ pub fn unlink(
                 }
             }
 
-            // Check if target is a file path reused_contract_context
+            // Check if target is a file path contract_bindings
             let cwd = std::env::current_dir().unwrap_or_default();
             let file_exists_cwd = cwd.join(target).exists();
             let file_exists_git_root = git_root.join(target).exists();
 
             if file_exists_cwd || file_exists_git_root {
-                return remove_reused_contract_context(
+                return remove_contract_bindings(
                     model_manager,
                     source,
                     target,
@@ -2978,14 +2978,14 @@ pub fn unlink(
                 );
             }
 
-            // Check reused_contract_context by path string (even if file doesn't exist anymore)
-            let reused_context_by_path = source_element
-                .reused_contract_context
+            // Check contract_bindings by path string (even if file doesn't exist anymore)
+            let contract_binding_by_path = source_element
+                .contract_bindings
                 .iter()
                 .find(|a| a.target.as_str() == target || a.target.as_str().ends_with(target));
 
-            if reused_context_by_path.is_some() {
-                return remove_reused_contract_context(
+            if contract_binding_by_path.is_some() {
+                return remove_contract_bindings(
                     model_manager,
                     source,
                     target,
@@ -2996,7 +2996,7 @@ pub fn unlink(
 
             // Nothing found
             Err(ReqvireError::RelationError(format!(
-                "No relation or reused_contract_context found from '{}' to '{}'",
+                "No relation or contract_bindings found from '{}' to '{}'",
                 source, target
             )))
         }

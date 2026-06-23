@@ -8,7 +8,7 @@ pub const GOVERNANCE_METADATA_KEYS: &[&str] = &["status", "priority", "risk", "o
 pub const GOVERNANCE_STATUS_VALUES: &[&str] = &["draft", "review", "approved"];
 pub const GOVERNANCE_PRIORITY_VALUES: &[&str] = &["low", "medium", "high", "critical"];
 pub const GOVERNANCE_RISK_VALUES: &[&str] = &["low", "medium", "high", "critical"];
-pub const REUSED_CONTRACT_CONTEXT_SECTION: &str = "Reused Contract Context";
+pub const CONTRACT_BINDINGS_SECTION: &str = "Contract Bindings";
 
 pub fn is_governance_metadata_key(key: &str) -> bool {
     GOVERNANCE_METADATA_KEYS.contains(&key)
@@ -26,8 +26,8 @@ pub fn is_valid_governance_risk(value: &str) -> bool {
     GOVERNANCE_RISK_VALUES.contains(&value)
 }
 
-pub fn is_reused_contract_context_section(value: &str) -> bool {
-    value == REUSED_CONTRACT_CONTEXT_SECTION
+pub fn is_contract_bindings_section(value: &str) -> bool {
+    value == CONTRACT_BINDINGS_SECTION
 }
 
 /// All valid element types that can be used in --filter-type arguments.
@@ -94,40 +94,40 @@ pub fn element_types_help() -> String {
     )
 }
 
-/// Represents the target of an reused_contract_context - either a file path or an element identifier
+/// Represents the target of a contract binding - either a file path or an element identifier
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub enum ReusedContractContextTarget {
-    /// File path reused_contract_context (git-root-relative, normalized)
+pub enum ContractBindingTarget {
+    /// File path contract_bindings (git-root-relative, normalized)
     FilePath(PathBuf),
-    /// Element identifier reused_contract_context (must point to a Contract element)
+    /// Element identifier contract_bindings (must point to a Contract element)
     ElementIdentifier(String),
 }
 
-impl ReusedContractContextTarget {
-    /// Returns a string representation of the reused_contract_context target
+impl ContractBindingTarget {
+    /// Returns a string representation of the contract_bindings target
     pub fn as_str(&self) -> String {
         match self {
-            ReusedContractContextTarget::FilePath(path) => path.to_string_lossy().to_string(),
-            ReusedContractContextTarget::ElementIdentifier(id) => id.clone(),
+            ContractBindingTarget::FilePath(path) => path.to_string_lossy().to_string(),
+            ContractBindingTarget::ElementIdentifier(id) => id.clone(),
         }
     }
 
-    /// Returns true if this is a file path reused_contract_context
+    /// Returns true if this is a file path contract_bindings
     pub fn is_file_path(&self) -> bool {
-        matches!(self, ReusedContractContextTarget::FilePath(_))
+        matches!(self, ContractBindingTarget::FilePath(_))
     }
 
-    /// Returns true if this is an element identifier reused_contract_context
+    /// Returns true if this is an element identifier contract_bindings
     pub fn is_element_identifier(&self) -> bool {
-        matches!(self, ReusedContractContextTarget::ElementIdentifier(_))
+        matches!(self, ContractBindingTarget::ElementIdentifier(_))
     }
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct ReusedContractContextEntry {
-    pub target: ReusedContractContextTarget,
-    /// Content hash for file reused_contract_context (FilePath only).
-    /// For ElementIdentifier reused_contract_context, the hash is looked up from registry.
+pub struct ContractBindingEntry {
+    pub target: ContractBindingTarget,
+    /// Content hash for file contract_bindings (FilePath only).
+    /// For ElementIdentifier contract_bindings, the hash is looked up from registry.
     pub content_hash: Option<String>,
 }
 
@@ -261,7 +261,7 @@ pub enum SubSection {
     Metadata,
     Details,
     Properties,
-    ReusedContractContext,
+    ContractBinding,
     ConceptReferences,
     ScopeNote,
     Labels,
@@ -277,7 +277,7 @@ impl SubSection {
             SubSection::Metadata => "Metadata",
             SubSection::Details => "Details",
             SubSection::Properties => "Properties",
-            SubSection::ReusedContractContext => REUSED_CONTRACT_CONTEXT_SECTION,
+            SubSection::ContractBinding => CONTRACT_BINDINGS_SECTION,
             SubSection::ConceptReferences => "Concept References",
             SubSection::ScopeNote => "Scope Note",
             SubSection::Labels => "Labels",
@@ -313,7 +313,7 @@ impl SubSection {
             "Metadata" => SubSection::Metadata,
             "Details" => SubSection::Details,
             "Properties" => SubSection::Properties,
-            REUSED_CONTRACT_CONTEXT_SECTION => SubSection::ReusedContractContext,
+            CONTRACT_BINDINGS_SECTION => SubSection::ContractBinding,
             "Concept References" => SubSection::ConceptReferences,
             "Scope Note" => SubSection::ScopeNote,
             "Labels" => SubSection::Labels,
@@ -562,8 +562,8 @@ pub struct Element {
     // Order index within the file (used for preserving original order)
     pub file_order_index: usize,
     //
-    // Reused Contract Context - external documents linked to this element
-    pub reused_contract_context: Vec<ReusedContractContextEntry>,
+    // Contract Bindings - external documents linked to this element
+    pub contract_bindings: Vec<ContractBindingEntry>,
     //
     // Optional model-build metadata for JSON evidence consumers.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -612,7 +612,7 @@ impl Element {
             metadata: HashMap::new(),
             changed_since_commit: false,
             file_order_index: 0, // Will be set during parsing
-            reused_contract_context: vec![],
+            contract_bindings: vec![],
             size_estimate: None,
             semantic_contract: None,
             ontology: None,

@@ -167,43 +167,43 @@ if [ $EXIT_CODE_CONTRACT_SATISFY -ne 0 ]; then
   exit 1
 fi
 
-# Test 8: Contract types with reused_contract_context should fail
-echo "Test 8: Contract types with reused_contract_context"
+# Test 8: Contract types with contract_bindings should fail
+echo "Test 8: Contract types with contract_bindings"
 
 set +e
-OUTPUT_CONTRACT_ATTACH=$(cd "${TEST_DIR}/invalid-contract-reused-context" && "$REQVIRE_BIN" validate 2>&1)
+OUTPUT_CONTRACT_ATTACH=$(cd "${TEST_DIR}/invalid-contract-contract-binding" && "$REQVIRE_BIN" validate 2>&1)
 EXIT_CODE_CONTRACT_ATTACH=$?
 set -e
 
 if [ $EXIT_CODE_CONTRACT_ATTACH -eq 0 ]; then
-  echo "FAILED: Contract types with reused_contract_context should fail validation but returned success"
+  echo "FAILED: Contract types with contract_bindings should fail validation but returned success"
   echo "Output: $OUTPUT_CONTRACT_ATTACH"
   exit 1
 fi
 
-# Check for contract reused_contract_context error
-if ! echo "$OUTPUT_CONTRACT_ATTACH" | grep -qi "contract.*cannot have reused_contract_context\|cannot.*reused_contract_context"; then
-  echo "FAILED: Expected error message about contract types not allowed to have reused_contract_context"
+# Check for contract contract_bindings error
+if ! echo "$OUTPUT_CONTRACT_ATTACH" | grep -qi "contract.*cannot have contract_bindings\|cannot.*contract_bindings"; then
+  echo "FAILED: Expected error message about contract types not allowed to have contract_bindings"
   echo "Output: $OUTPUT_CONTRACT_ATTACH"
   exit 1
 fi
 
-# Test 10: Verification types with reused_contract_context should fail
-echo "Test 10: Verification types with reused_contract_context"
+# Test 10: Verification types with contract_bindings should fail
+echo "Test 10: Verification types with contract_bindings"
 
 set +e
-OUTPUT_VERIFICATION_ATTACH=$(cd "${TEST_DIR}/invalid-verification-reused-context" && "$REQVIRE_BIN" validate 2>&1)
+OUTPUT_VERIFICATION_ATTACH=$(cd "${TEST_DIR}/invalid-verification-contract-binding" && "$REQVIRE_BIN" validate 2>&1)
 EXIT_CODE_VERIFICATION_ATTACH=$?
 set -e
 
 if [ $EXIT_CODE_VERIFICATION_ATTACH -eq 0 ]; then
-  echo "FAILED: Verification types with reused_contract_context should fail validation but returned success"
+  echo "FAILED: Verification types with contract_bindings should fail validation but returned success"
   echo "Output: $OUTPUT_VERIFICATION_ATTACH"
   exit 1
 fi
 
-if ! echo "$OUTPUT_VERIFICATION_ATTACH" | grep -qi "cannot author reused_contract_context\|verification evidence.*satisfiedBy\|verified targets.*verify"; then
-  echo "FAILED: Expected error message about verification elements not authoring reused_contract_context"
+if ! echo "$OUTPUT_VERIFICATION_ATTACH" | grep -qi "cannot author contract_bindings\|verification evidence.*satisfiedBy\|verified targets.*verify"; then
+  echo "FAILED: Expected error message about verification elements not authoring contract_bindings"
   echo "Output: $OUTPUT_VERIFICATION_ATTACH"
   exit 1
 fi

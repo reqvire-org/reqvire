@@ -660,7 +660,7 @@ export const devFixture: ExplorerProjectStore = {
       resource_id: null,
     },
   ],
-  reused_contract_context: [],
+  contract_bindings: [],
   concept_refs: [],
   thesaurus: {
     schemes: [
@@ -802,7 +802,7 @@ export const devFixture: ExplorerProjectStore = {
       implementation_coverage_percentage: 50,
       coverage_sources: {
         direct_satisfied: 1,
-        contract_satisfied_via_reused_contract_context: 0,
+        contract_satisfied_via_contract_bindings: 0,
         contract_satisfied_via_child: 0,
       },
     },
@@ -1666,7 +1666,7 @@ export const devFixture: ExplorerProjectStore = {
           { name: "specifiedBy", value: "Example Requirement", link: "", kind: "authored" },
           { name: "specifiedBy", value: "Unverified Fixture Requirement", link: "", kind: "authored" },
         ],
-        reused_contract_context: [],
+        contract_bindings: [],
         concept_references: [],
       },
       {
@@ -1690,7 +1690,7 @@ export const devFixture: ExplorerProjectStore = {
           { name: "verify", value: "Example Verification", link: "", kind: "authored" },
           { name: "references", value: "Service Endpoint", link: "", kind: "concept-reference" },
         ],
-        reused_contract_context: [],
+        contract_bindings: [],
         concept_references: [
           { name: "Service Endpoint", value: "urn:reqvire:test:concepts#ServiceEndpoint", link: "", kind: "concept-reference" },
         ],
@@ -1710,7 +1710,7 @@ export const devFixture: ExplorerProjectStore = {
         governance: [{ name: "status", value: "draft", link: "", kind: "governance" }],
         outgoing: [{ name: "specify", value: "Example Capability", link: "", kind: "authored" }],
         incoming: [],
-        reused_contract_context: [],
+        contract_bindings: [],
         concept_references: [],
       },
       {
@@ -1728,7 +1728,7 @@ export const devFixture: ExplorerProjectStore = {
         governance: [],
         outgoing: [{ name: "define", value: "Example Requirement", link: "", kind: "authored" }],
         incoming: [],
-        reused_contract_context: [],
+        contract_bindings: [],
         concept_references: [],
       },
       {
@@ -1749,7 +1749,7 @@ export const devFixture: ExplorerProjectStore = {
           { name: "derive", value: "Example Verification", link: "", kind: "authored" },
           { name: "derive", value: "Unsatisfied Fixture Verification", link: "", kind: "authored" },
         ],
-        reused_contract_context: [],
+        contract_bindings: [],
         concept_references: [],
       },
       {
@@ -1771,7 +1771,7 @@ export const devFixture: ExplorerProjectStore = {
           { name: "satisfiedBy", value: "lib.rs", link: "", kind: "authored" },
         ],
         incoming: [],
-        reused_contract_context: [],
+        contract_bindings: [],
         concept_references: [],
       },
       {
@@ -1789,7 +1789,7 @@ export const devFixture: ExplorerProjectStore = {
         governance: [],
         outgoing: [{ name: "derivedFrom", value: "Fixture Verification Objective", link: "", kind: "authored" }],
         incoming: [],
-        reused_contract_context: [],
+        contract_bindings: [],
         concept_references: [],
       },
       {
@@ -1807,7 +1807,7 @@ export const devFixture: ExplorerProjectStore = {
         governance: [],
         outgoing: [],
         incoming: [{ name: "satisfiedBy", value: "Example Verification", link: "", kind: "authored" }],
-        reused_contract_context: [],
+        contract_bindings: [],
         concept_references: [],
       },
     ],
@@ -1873,7 +1873,7 @@ export const devFixture: ExplorerProjectStore = {
     summary: {
       elements: 16,
       relations: 19,
-      reused_contract_context: 0,
+      contract_bindings: 0,
       concept_references: 1,
       resources: 3,
       submodels: 1,
@@ -1894,7 +1894,7 @@ export const devFixture: ExplorerProjectStore = {
     folders: 7,
     resources: 3,
     relations: 13,
-    reused_contract_context: 0,
+    contract_bindings: 0,
     concept_refs: 0,
     ontology_blocks: 0,
     shape_blocks: 0,

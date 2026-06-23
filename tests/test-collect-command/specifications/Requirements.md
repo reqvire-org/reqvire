@@ -160,7 +160,7 @@ The leaf requirement at the bottom of the hierarchy.
 #### Details
 This is the leaf requirement that derives from the mid-level.
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Design Doc Specification](DesignDoc.md#design-doc-specification)
 
 #### Metadata

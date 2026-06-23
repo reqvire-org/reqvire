@@ -28,7 +28,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Two-Pass Validation Behavior](../../Operations/Validation/Behaviors.md#two-pass-validation-behavior)
   * [Validation Error Reporting Behavior](../../Operations/Validation/Behaviors.md#validation-error-reporting-behavior)
   * [Explorer Serve Pipeline Specification](Specifications.md#explorer-serve-pipeline-specification)
@@ -76,12 +76,12 @@ The system SHALL serve the embedded Reqvire Explorer SPA with all model artifact
   * definedBy: [Explorer Serve Pipeline Specification](Specifications.md#explorer-serve-pipeline-specification)
   * definedBy: [Model Browser and Graph Specification](Specifications.md#model-browser-and-graph-specification)
   * definedBy: [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
-  * derive: [Containment View Reused Contract Context Links](#containment-view-reused-contract-context-links)
-  * derive: [Diagram Reused Contract Context Display](#diagram-reused-contract-context-display)
+  * derive: [Containment View Contract Bindings Links](#containment-view-contract-bindings-links)
+  * derive: [Diagram Contract Bindings Display](#diagram-contract-bindings-display)
   * derive: [Model-Centric View Generation](#model-centric-view-generation)
   * derive: [Ontologies View Generation](#ontologies-view-generation)
   * derive: [Project Knowledge Graph View](#project-knowledge-graph-view)
-  * derive: [Reused Contract Context Link Serving](#reused-contract-context-link-serving)
+  * derive: [Contract Bindings Link Serving](#contract-bindings-link-serving)
   * derive: [SPA Explorer Shell and Project Store](#spa-explorer-shell-and-project-store)
   * derive: [Thesaurus View Generation](#thesaurus-view-generation)
   * derive: [Traces View Generation](#traces-view-generation)
@@ -104,9 +104,9 @@ The system SHALL serve the embedded Reqvire Explorer SPA with all model artifact
   * verifiedBy: [Explorer Serve Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#explorer-serve-verification)
 ---
 
-### Containment View Reused Contract Context Links
+### Containment View Contract Bindings Links
 
-The system shall preserve element reused_contract_context links in Model containment data and expose them from supported Explorer surfaces to provide quick access to associated contract elements and documents.
+The system shall preserve element contract_bindings links in Model containment data and expose them from supported Explorer surfaces to provide quick access to associated contract elements and documents.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -115,15 +115,15 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Relations
-  * definedBy: [Containment View Reused Contract Context Links Contract Specification](Specifications.md#containment-view-reused-contract-context-links-contract-specification)
+  * definedBy: [Containment View Contract Bindings Links Contract Specification](Specifications.md#containment-view-contract-bindings-links-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [containment.rs](../../../crates/reqvire-core/src/containment.rs)
-  * verifiedBy: [Model Containment Reused Contract Context Links Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-containment-reused-contract-context-links-verification)
+  * verifiedBy: [Model Containment Contract Bindings Links Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-containment-contract-bindings-links-verification)
 ---
 
-### Diagram Reused Contract Context Display
+### Diagram Contract Bindings Display
 
-The system shall display reused_contract_context links within element boxes in generated diagrams to show document associations visually.
+The system shall display contract_bindings links within element boxes in generated diagrams to show document associations visually.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -132,12 +132,12 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Relations
-  * definedBy: [Diagram Reused Contract Context Display Contract Specification](Specifications.md#diagram-reused-contract-context-display-contract-specification)
+  * definedBy: [Diagram Contract Bindings Display Contract Specification](Specifications.md#diagram-contract-bindings-display-contract-specification)
   * definedBy: [Explorer Mermaid Diagram Style Specification](Specifications.md#explorer-mermaid-diagram-style-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
   * satisfiedBy: [verification_trace.rs](../../../crates/reqvire-core/src/verification_trace.rs)
-  * verifiedBy: [Diagram Reused Contract Context Display Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#diagram-reused-contract-context-display-verification)
+  * verifiedBy: [Diagram Contract Bindings Display Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#diagram-contract-bindings-display-verification)
 ---
 
 ### Model-Centric View Generation
@@ -198,7 +198,7 @@ The Ontologies view shall:
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
   * [Ontology Projection Subgraph Materialization Specification](../../Reports/ModelReports/Specifications.md#ontology-projection-subgraph-materialization-specification)
 
@@ -222,7 +222,7 @@ The projection shall preserve source traceability, reuse o-kernel direct-authore
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Ontology Construct Classification Specification](../../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
 
 #### Relations
@@ -288,11 +288,11 @@ The Knowledge Graph view shall:
 - Answer what actual project elements and facts exist right now.
 - Be reached through the canonical `index.html#/model` Explorer route by selecting Graph mode; a separate Knowledge Graph route or document entry point shall not be generated.
 - Render the four system-model layers as first-class graph nodes: ontologies, capabilities, requirements, and verifications. Requirement-owned contracts may appear as subordinate requirement detail/contract nodes when actual project facts reference them, but they are not a separate system-model layer.
-- Render actual relation facts, reused_contract_context facts, concept-reference facts, file targets, and external targets as graph edges or resource nodes. Concept-reference facts target SKOS concept nodes and must not create a separate concept-reference node type.
-- Use Reqvire capability-root submodels as the structural graph partitioning contract; reused_contract_context, concept references, verification/satisfaction, and trace facts are overlays rather than submodel boundaries.
+- Render actual relation facts, contract_bindings facts, concept-reference facts, file targets, and external targets as graph edges or resource nodes. Concept-reference facts target SKOS concept nodes and must not create a separate concept-reference node type.
+- Use Reqvire capability-root submodels as the structural graph partitioning contract; contract_bindings, concept references, verification/satisfaction, and trace facts are overlays rather than submodel boundaries.
 - Treat structural ownership/backbone relations separately from cross-layer evidence relations: `derive` and `specify` organize the capability/requirement submodel backbone, while requirement-owned `define`, `reuse`, `satisfiedBy`, `verifiedBy`, and concept-reference facts connect subordinate details or layers as inspectable overlays.
 - Reuse the dense Explorer graph and modal-detail interaction pattern used by the ontology viewer, while focusing on project instances rather than ontology vocabulary definitions.
-- Provide modal detail evidence for element type, identifier, source location, governance, metadata, incoming facts, outgoing facts, reused_contract_context, and concept references.
+- Provide modal detail evidence for element type, identifier, source location, governance, metadata, incoming facts, outgoing facts, contract_bindings, and concept references.
 - Keep ontology vocabulary exploration in the Ontologies view; the Knowledge Graph view may show ontology terms only when they are referenced by actual project elements.
 
 #### Metadata
@@ -306,9 +306,9 @@ The Knowledge Graph view shall:
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
 ---
 
-### Reused Contract Context Link Serving
+### Contract Bindings Link Serving
 
-The system shall preserve reused_contract_context identifier links to referenced contract elements in the served Explorer to preserve document completeness and enable navigation.
+The system shall preserve contract_bindings identifier links to referenced contract elements in the served Explorer to preserve document completeness and enable navigation.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -317,10 +317,10 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Relations
-  * definedBy: [Reused Contract Context Link Serving Contract Specification](Specifications.md#reused-contract-context-link-serving-contract-specification)
+  * definedBy: [Contract Bindings Link Serving Contract Specification](Specifications.md#contract-bindings-link-serving-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
-  * verifiedBy: [Reused Contract Context Link Serving Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#reused-contract-context-link-serving-verification)
+  * verifiedBy: [Contract Bindings Link Serving Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#contract-bindings-link-serving-verification)
 ---
 
 ### SPA Explorer Shell and Project Store
@@ -345,7 +345,7 @@ The SPA Explorer shell shall:
 - Do not generate separate Explorer/report document entry points.
 - Seed a normalized project snapshot that distinguishes modeled source-file containers from modeled resource and evidence-file targets. The Model tree shall contain modeled element files plus existing repository-relative local implementation/evidence/resource files referenced by graph-registry facts, while unrelated repository files remain absent.
 - Keep containment, model, knowledge graph, verification traces, coverage, resources, ontology, search, summaries, and route state as view-neutral store projections rather than separate page-local data models.
-- Preserve the current relation model: capabilities may author concept references and are specified by requirements; requirements own contracts, satisfaction evidence, verification evidence, reusable contract reused_contract_context, and concept references. Capability coverage is computed from verified requirements.
+- Preserve the current relation model: capabilities may author concept references and are specified by requirements; requirements own contracts, satisfaction evidence, verification evidence, reusable contract contract_bindings, and concept references. Capability coverage is computed from verified requirements.
 
 #### Metadata
   * type: requirement
@@ -409,7 +409,7 @@ The Traces view shall:
 #### Metadata
   * type: requirement
 
-#### Reused Contract Context
+#### Contract Bindings
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
@@ -450,6 +450,6 @@ The system shall ensure color consistency between:
   * satisfiedBy: [ElementIcon.tsx](../../../explorer/design-system/components/data/ElementIcon.tsx)
   * satisfiedBy: [palette.ts](../../../explorer/design-system/palette.ts)
   * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
-  * satisfiedBy: [ReusedContractContextList.tsx](../../../explorer/design-system/product-patterns/detail/ReusedContractContextList.tsx)
+  * satisfiedBy: [ContractBindingList.tsx](../../../explorer/design-system/product-patterns/detail/ContractBindingList.tsx)
   * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
 ---

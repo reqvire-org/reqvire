@@ -75,7 +75,7 @@ Compatibility rules:
 The MCP interface is expected to expose read-only model evidence tools grounded in Reqvire core reports and lookup behavior.
 
 #### Details
-Model evidence tool behavior is inherited from reused Reqvire search, model, containment, collect, submodel, and ontology collection contracts. MCP adds typed request/result schemas, workspace/model revision metadata, and evidence references describing which elements, files, relations, reused_contract_context, ontology blocks, and shape blocks were included.
+Model evidence tool behavior is inherited from reused Reqvire search, model, containment, collect, submodel, and ontology collection contracts. MCP adds typed request/result schemas, workspace/model revision metadata, and evidence references describing which elements, files, relations, contract_bindings, ontology blocks, and shape blocks were included.
 
 `reqvire.search` tool calls are expected to expose typed request fields equivalent to the stable Reqvire search filters:
 - `short`: optional boolean controlling abbreviated output.
@@ -90,8 +90,8 @@ Model evidence tool behavior is inherited from reused Reqvire search, model, con
 - `filter_page_content`: optional parent file page content regex.
 - `have_relations`: optional comma-separated relation type list requiring all listed relations.
 - `not_have_relations`: optional comma-separated relation type list excluding elements that have all listed relations.
-- `has_reused_contract_context`: optional boolean requiring at least one reused_contract_context.
-- `filter_reused_contract_context`: optional reused_contract_context target glob.
+- `has_contract_bindings`: optional boolean requiring at least one contract_bindings.
+- `filter_contract_bindings`: optional contract_bindings target glob.
 
 Governance metadata filters apply to effective governance metadata values and exclude non-governance-bearing elements when active. Successful `reqvire.search` structured results include effective governance metadata for capability and requirement element evidence.
 
@@ -183,7 +183,7 @@ Durable mutation flow:
 Mutation flow constraints:
 - Mutation requests that bypass Reqvire model semantics are rejected.
 - Arbitrary file writes are not exposed as model mutation tools.
-- Single-root ownership, relation type compatibility, reused_contract_context contracts, and file persistence guarantees are inherited from Reqvire core operation contracts.
+- Single-root ownership, relation type compatibility, contract bindings, and file persistence guarantees are inherited from Reqvire core operation contracts.
 - Operation-specific preview requests for mutation-class tools are available only when mutation tools are advertised, except for conditional mutation tools such as `reqvire.format` where the read-only preview form may be advertised by default.
 
 #### Metadata
@@ -203,7 +203,7 @@ Mutation exposure and safety rules:
 - Mutation tools are registered and returned by MCP `tools/list` only when the server is started with `reqvire mcp --enable-mutations`.
 - Mutation operation semantics are inherited from reused Reqvire functional/operation contracts.
 - Controlled mutations update the Reqvire in-memory graph through core mutation logic before filesystem flush.
-- Controlled mutations run the same semantic model validation gates as Reqvire core before persistence. This includes ontology element structure, single connected ontology root, reused_contract_context compatibility, semantic-contract `Shapes` reference reachability, and `Concept References` resolution.
+- Controlled mutations run the same semantic model validation gates as Reqvire core before persistence. This includes ontology element structure, single connected ontology root, contract_bindings compatibility, semantic-contract `Shapes` reference reachability, and `Concept References` resolution.
 - Durable writes flush modified files to the filesystem with the same guarantees as reused file persistence behavior.
 - The MCP server keeps its internal graph synchronized from the updated core graph after each successful mutation before serving subsequent model reads.
 - The MCP server avoids mandatory full reparse after controlled mutations; full reparse is reserved for external filesystem drift, changed source fingerprints, or operations that require it.
@@ -232,7 +232,7 @@ Prompt capability behavior:
 Prompt set:
 - `reqvire.semantic.query` guides ontology-aware SPARQL query construction.
 - `reqvire.semantic.verification_search` guides semantic verification counts and evidence lookup.
-- `reqvire.semantic.contract_context_search` guides semantic-contract and reused contract context search.
+- `reqvire.semantic.contract_context_search` guides semantic-contract and contract bindings search.
 - `reqvire.workflow.explore_model` guides regular read-only Reqvire model exploration.
 - `reqvire.workflow.plan_change` guides model and implementation change planning.
 - `reqvire.workflow.verify_coverage` guides validation, lint, coverage, and verification trace review.
@@ -243,7 +243,7 @@ Prompt content rules:
 - Semantic prompts state that `include_external` exposes only the used external subset and is not a way to browse or dump raw full external ontology dependencies.
 - Regular workflow prompts reference non-semantic tools such as workspace status, search, read element, model, collect, lint, coverage, and traces.
 - Prompt content warns clients not to rebuild semantic stores or infer prefixes from raw Turtle when MCP vocabulary/prefix tools are available.
-- Prompt content distinguishes capability, requirement, contract, ontology, semantic-contract, verification, and reused contract context semantics where relevant.
+- Prompt content distinguishes capability, requirement, contract, ontology, semantic-contract, verification, and contract bindings semantics where relevant.
 
 Safety behavior:
 - Prompt listing and retrieval do not parse arbitrary files, execute shell commands, fetch remote URLs, or mutate workspace state.
@@ -620,8 +620,8 @@ Common semantic obligations:
 - Results identify the Reqvire operation/tool that produced them.
 - Results identify the relevant workspace/model revision when the operation depends on model state.
 - Results indicate dirty/clean workspace state when that affects interpretation.
-- Results expose evidence references to the files, elements, relations, reused_contract_context, reports, or diffs used to produce the result when those concepts are relevant.
-- Element-shaped results expose stable element identity, element type, source location, and requested relation/reused_contract_context/content views when those concepts are relevant.
+- Results expose evidence references to the files, elements, relations, contract_bindings, reports, or diffs used to produce the result when those concepts are relevant.
+- Element-shaped results expose stable element identity, element type, source location, and requested relation/contract_bindings/content views when those concepts are relevant.
 - Element-shaped results preserve semantic model ADT fields when present: `ontology`, `semantic_contract`, and `concept_references`.
 - Model-shaped results expose enough hierarchy, containment, and submodel boundary information to match the corresponding Reqvire operation contract.
 - Mutation-shaped results expose preview/executed state, changed files, diffs or equivalent change descriptions, diagnostics, affected scope, and refreshed revision metadata when available.
@@ -659,7 +659,7 @@ Common output envelope fields:
 - `mcp_protocol_revision`: negotiated MCP protocol revision.
 - `reqvire_tool_contract_version`: Reqvire MCP tool contract version.
 - `model_revision`: model fingerprint or revision identifier.
-- `evidence`: files, elements, relations, reused_contract_context, or reports used to produce the result.
+- `evidence`: files, elements, relations, contract_bindings, or reports used to produce the result.
 - `warnings`: non-fatal diagnostics.
 
 Workspace/session tools:

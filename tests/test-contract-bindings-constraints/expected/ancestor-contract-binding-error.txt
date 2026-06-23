@@ -1,0 +1,4 @@
+
+❌ 1 validation failed with error(s):
+
+  1. Invalid contract_bindings scope: 'Spec-2' cannot be bound to 'Ancestor Reusing Contract Spec' because it is within the contract's defining hierarchy. Contract Bindings are only allowed from elements outside the definedBy chain. (file: specifications/TestAncestorContractBinding.md, element: Ancestor Reusing Contract Spec)

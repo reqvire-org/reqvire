@@ -48,12 +48,12 @@ Moved element: Complex chars, element/name example (specifications/OtherRequirem
   [31m10 -   ### Capability E[0m
   [32m10 +   ### Parent Capability[0m
   [37m11[0m
-  [31m12 -   This capability has an reused_contract_context to a contract element.[0m
+  [31m12 -   This capability has a contract binding to a contract element.[0m
   [32m12 +   This is a parent requirement.[0m
   [37m13[0m
   [37m14     #### Metadata[0m
   [37m15       * type: requirement[0m
-  [31m16 -   #### Reused Contract Context[0m
+  [31m16 -   #### Contract Bindings[0m
   [31m16 -     * [Capability D Constraint](Requirements.md#capability-d-constraint)[0m
   [31m16 -   ␤[0m
   [37m16     #### Relations[0m
@@ -90,11 +90,11 @@ Moved element: Complex chars, element/name example (specifications/OtherRequirem
   [32m39 +   ### Capability E[0m
   [37m40[0m
   [31m41 -   This is a test requirement for capability A.[0m
-  [32m41 +   This capability has an reused_contract_context to a contract element.[0m
+  [32m41 +   This capability has a contract binding to a contract element.[0m
   [37m42[0m
   [37m43     #### Metadata[0m
   [37m44       * type: requirement[0m
-  [32m45 +   #### Reused Contract Context[0m
+  [32m45 +   #### Contract Bindings[0m
   [32m46 +     * [Capability D Constraint](Requirements.md#capability-d-constraint)[0m
   [32m47 +   ␤[0m
   [37m48     #### Relations[0m

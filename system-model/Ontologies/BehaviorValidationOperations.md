@@ -286,14 +286,14 @@ reqvire:lintRepairMode a owl:DatatypeProperty ;
 reqvire:crossSubmodelHierarchyLintRule a reqvire:LintingRule ;
   reqvire:lintRuleName "cross-submodel-hierarchy" ;
   reqvire:lintScope "capability-rooted subgraphs" ;
-  reqvire:lintCondition "A hierarchical relation crosses capability-root boundaries where a specify relation, concept reference, semantic-contract relation, or requirement-owned contract reused_contract_context would preserve ownership more clearly." ;
+  reqvire:lintCondition "A hierarchical relation crosses capability-root boundaries where a specify relation, concept reference, semantic-contract relation, or requirement-owned contract contract_bindings would preserve ownership more clearly." ;
   reqvire:lintFindingKind "cross-submodel-coupling" ;
   reqvire:lintRepairMode "auditable-user-action" .
 
 reqvire:redundantRelationLintRule a reqvire:LintingRule ;
   reqvire:lintRuleName "redundant-relation" ;
-  reqvire:lintScope "relations and reused_contract_context" ;
-  reqvire:lintCondition "A relation or reused_contract_context duplicates an already implied or repeated model edge." ;
+  reqvire:lintScope "relations and contract_bindings" ;
+  reqvire:lintCondition "A relation or contract_bindings duplicates an already implied or repeated model edge." ;
   reqvire:lintFindingKind "redundant-relation" ;
   reqvire:lintRepairMode "explicit-fix-or-format-when-lossless" .
 
@@ -414,29 +414,29 @@ reqvire:nativeConceptTaxonomySchemeBoundaryRule a reqvire:ValidationRule ;
   reqvire:validationOutcome "Validation fails because SKOS broader/narrower taxonomy is scheme-local in Reqvire native concept authoring." ;
   reqvire:validationRepair "Keep broader/narrower inside one concept scheme, or use related, exactMatch, or closeMatch for cross-scheme concept alignment." .
 
-reqvire:reusedContractContextHierarchyIndependenceRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "reused-contract-context-hierarchy-independence" ;
-  reqvire:validationScope "reused_contract_context" ;
+reqvire:contractBindingsHierarchyIndependenceRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "contract-bindings-hierarchy-independence" ;
+  reqvire:validationScope "contract_bindings" ;
   reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "An element reuses a contract already available through owner hierarchy or ancestor reused_contract_context propagation." ;
-  reqvire:validationOutcome "Validation fails because the reused_contract_context is redundant or hides the intended dependency boundary." ;
-  reqvire:validationRepair "Remove the redundant reused_contract_context or reuse the contract at the highest valid boundary." .
+  reqvire:validationCondition "An element reuses a contract already available through owner hierarchy or ancestor contract_bindings propagation." ;
+  reqvire:validationOutcome "Validation fails because the contract_bindings is redundant or hides the intended dependency boundary." ;
+  reqvire:validationRepair "Remove the redundant contract_bindings or reuse the contract at the highest valid boundary." .
 
-reqvire:reusedContractContextSubgraphDirectionRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "reused-contract-context-subgraph-direction" ;
+reqvire:contractBindingsSubgraphDirectionRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "contract-bindings-subgraph-direction" ;
   reqvire:validationScope "capability-root-subgraphs" ;
   reqvire:validationSeverity "error" ;
   reqvire:validationCondition "Two requirement subgraphs reuse contracts to each other in both directions." ;
-  reqvire:validationOutcome "Validation fails because cross-subgraph reused_contract_context contracts must be one-directional." ;
+  reqvire:validationOutcome "Validation fails because cross-subgraph contract bindings must be one-directional." ;
   reqvire:validationRepair "Keep one dependency direction and move shared contracts into a common reused source if needed." .
 
 reqvire:crossSectionDuplicateRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "cross-section-duplicate" ;
   reqvire:validationScope "element-subsections" ;
   reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "The same target appears in both Relations and Reused Contract Context for one element." ;
+  reqvire:validationCondition "The same target appears in both Relations and Contract Bindings for one element." ;
   reqvire:validationOutcome "Validation fails because the model cannot infer which semantic channel is intended." ;
-  reqvire:validationRepair "Remove either the relation entry or the reused_contract_context entry." .
+  reqvire:validationRepair "Remove either the relation entry or the contract_bindings entry." .
 
 reqvire:semanticReferenceReachabilityValidationRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "semantic-reference-reachability-validation" ;
@@ -460,7 +460,7 @@ reqvire:crossSubmodelHierarchicalLintRule a reqvire:ValidationRule ;
   reqvire:validationSeverity "warning" ;
   reqvire:validationCondition "A user-authored hierarchical relation crosses capability-root submodel ownership boundaries." ;
   reqvire:validationOutcome "Report as manual review because ownership boundary intent is ambiguous." ;
-  reqvire:validationRepair "Replace with reused_contract_context/trace or remodel hierarchy under one capability root." .
+  reqvire:validationRepair "Replace with contract_bindings/trace or remodel hierarchy under one capability root." .
 
 reqvire:redundantHierarchicalLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-redundant-hierarchical-relation" ;

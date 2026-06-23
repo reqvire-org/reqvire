@@ -8,7 +8,7 @@
  - `source`, `target`, and `relation_type`
  - owning source root
  - owning target root
- - rationale that states why the relation breaks submodel ownership and should be converted to reused-contract-context-based coupling.
+ - rationale that states why the relation breaks submodel ownership and should be converted to contract-bindings-based coupling.
 - Report such findings in:
  - default text output under **Needs Manual Review**
  - `--auditable` output
