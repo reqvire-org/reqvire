@@ -747,6 +747,17 @@ if ! grep -q "urn:reqvire:element:api-capability" <<< "$FULL_TTL_OUTPUT"; then
   exit 1
 fi
 
+for named_individual_fact in \
+  "<urn:reqvire:element:api-capability> a owl:NamedIndividual, reqvire:Element, reqvire:Capability" \
+  "<urn:reqvire:element:api-endpoint-requirement> a owl:NamedIndividual, reqvire:Element, reqvire:Requirement" \
+  "<urn:reqvire:element:api-endpoint-shape-contract> a owl:NamedIndividual, reqvire:Element, reqvire:SemanticContract"; do
+  if ! grep -qF "$named_individual_fact" <<< "$FULL_TTL_OUTPUT"; then
+    echo "FAILED: full Turtle output missing model-context owl:NamedIndividual fact: $named_individual_fact"
+    echo "$FULL_TTL_OUTPUT"
+    exit 1
+  fi
+done
+
 if ! grep -q "reqvire:conceptReference <https://example.test/concepts#ServiceEndpoint>" <<< "$FULL_TTL_OUTPUT"; then
   echo "FAILED: full Turtle output missing concept-reference term edge"
   echo "$FULL_TTL_OUTPUT"

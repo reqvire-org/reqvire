@@ -1761,6 +1761,7 @@ fn build_authored_model_turtle(
         "# -----------------------------------------------------------------------------\n",
     );
     output.push_str("# Reqvire authored model context\n\n");
+    output.push_str("@prefix owl: <http://www.w3.org/2002/07/owl#> .\n");
     output.push_str("@prefix reqvire: <https://www.reqvire.org/ontology#> .\n");
     output.push_str("\n");
 
@@ -2033,6 +2034,7 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
         "# -----------------------------------------------------------------------------\n",
     );
     output.push_str("# Reqvire full semantic model context\n\n");
+    output.push_str("@prefix owl: <http://www.w3.org/2002/07/owl#> .\n");
     output.push_str("@prefix reqvire: <https://www.reqvire.org/ontology#> .\n\n");
 
     let mut nodes: Vec<_> = registry.nodes.values().collect();
@@ -3054,11 +3056,25 @@ fn element_iri_from_identifier(identifier: &str) -> String {
 
 fn element_type_classes(element_type: &ElementType) -> Vec<&'static str> {
     match element_type {
-        ElementType::Capability => vec!["reqvire:Element", "reqvire:Capability"],
-        ElementType::Requirement(_) => vec!["reqvire:Element", "reqvire:Requirement"],
-        ElementType::Ontology => vec!["reqvire:Element", "reqvire:Ontology"],
-        ElementType::ConceptScheme => vec!["reqvire:Element", "reqvire:ConceptScheme"],
-        ElementType::Concept => vec!["reqvire:Element", "reqvire:Concept"],
+        ElementType::Capability => {
+            vec!["owl:NamedIndividual", "reqvire:Element", "reqvire:Capability"]
+        }
+        ElementType::Requirement(_) => {
+            vec!["owl:NamedIndividual", "reqvire:Element", "reqvire:Requirement"]
+        }
+        ElementType::Ontology => {
+            vec!["owl:NamedIndividual", "reqvire:Element", "reqvire:Ontology"]
+        }
+        ElementType::ConceptScheme => {
+            vec![
+                "owl:NamedIndividual",
+                "reqvire:Element",
+                "reqvire:ConceptScheme",
+            ]
+        }
+        ElementType::Concept => {
+            vec!["owl:NamedIndividual", "reqvire:Element", "reqvire:Concept"]
+        }
         ElementType::Verification(verification_type) => {
             let subtype = match verification_type {
                 VerificationType::Default | VerificationType::Test => "reqvire:TestVerification",
@@ -3067,13 +3083,26 @@ fn element_type_classes(element_type: &ElementType) -> Vec<&'static str> {
                 VerificationType::Inspection => "reqvire:InspectionVerification",
                 VerificationType::Demonstration => "reqvire:DemonstrationVerification",
             };
-            vec!["reqvire:Element", "reqvire:Verification", subtype]
+            vec![
+                "owl:NamedIndividual",
+                "reqvire:Element",
+                "reqvire:Verification",
+                subtype,
+            ]
         }
         ElementType::VerificationObjective => {
-            vec!["reqvire:Element", "reqvire:VerificationObjective"]
+            vec![
+                "owl:NamedIndividual",
+                "reqvire:Element",
+                "reqvire:VerificationObjective",
+            ]
         }
         ElementType::SemanticContract => {
-            vec!["reqvire:Element", "reqvire:SemanticContract"]
+            vec![
+                "owl:NamedIndividual",
+                "reqvire:Element",
+                "reqvire:SemanticContract",
+            ]
         }
         ElementType::Contract(contract_type) => {
             let subtype = match contract_type {
@@ -3084,10 +3113,19 @@ fn element_type_classes(element_type: &ElementType) -> Vec<&'static str> {
                 ContractType::State => "reqvire:State",
                 ContractType::InputOutput => "reqvire:InputOutput",
             };
-            vec!["reqvire:Element", "reqvire:Contract", subtype]
+            vec![
+                "owl:NamedIndividual",
+                "reqvire:Element",
+                "reqvire:Contract",
+                subtype,
+            ]
         }
-        ElementType::File => vec!["reqvire:Artifact", "reqvire:File"],
-        ElementType::Other(_) => vec!["reqvire:Element", "reqvire:CustomElement"],
+        ElementType::File => {
+            vec!["owl:NamedIndividual", "reqvire:Artifact", "reqvire:File"]
+        }
+        ElementType::Other(_) => {
+            vec!["owl:NamedIndividual", "reqvire:Element", "reqvire:CustomElement"]
+        }
     }
 }
 
@@ -3105,7 +3143,7 @@ fn target_iri_for_link(
             let value = path.to_string_lossy();
             let iri = artifact_iri("path", &value);
             artifacts.insert(format!(
-                "{} a reqvire:Artifact, reqvire:File ;\n  reqvire:filePath {} .\n\n",
+                "{} a owl:NamedIndividual, reqvire:Artifact, reqvire:File ;\n  reqvire:filePath {} .\n\n",
                 iri,
                 turtle_string(&value)
             ));
@@ -3114,7 +3152,7 @@ fn target_iri_for_link(
         LinkType::ExternalUrl(url) => {
             let iri = artifact_iri("url", url);
             artifacts.insert(format!(
-                "{} a reqvire:Artifact ;\n  reqvire:externalUrl {} .\n\n",
+                "{} a owl:NamedIndividual, reqvire:Artifact ;\n  reqvire:externalUrl {} .\n\n",
                 iri,
                 turtle_string(url)
             ));
@@ -3137,7 +3175,7 @@ fn reused_contract_context_target_iri(
             let value = path.to_string_lossy();
             let iri = artifact_iri("path", &value);
             artifacts.insert(format!(
-                "{} a reqvire:Artifact, reqvire:File ;\n  reqvire:filePath {} .\n\n",
+                "{} a owl:NamedIndividual, reqvire:Artifact, reqvire:File ;\n  reqvire:filePath {} .\n\n",
                 iri,
                 turtle_string(&value)
             ));

@@ -197,6 +197,7 @@ Semantic context construction:
 - Semantic model construction must not rescan element Markdown to parse reserved subsection grammar; only the model parser owns that grammar.
 - Include authored ontology RDF, semantic-contract SHACL RDF, generated ontology document declarations, generated ontology term definition links, and available source/provenance metadata.
 - When full semantic context is requested by a consumer, include model-context triples, relation-family projection facts, concept-reference facts, ontology term declaration facts, semantic-contract shape-reference facts, and generated ontology projection facts.
+- In full semantic context, emit concrete parsed Reqvire elements as `owl:NamedIndividual` instances of `reqvire:Element` and their more specific element class, such as `reqvire:Requirement`, `reqvire:Specification`, `reqvire:SemanticContract`, or concrete verification classes. Emit referenced files, evidence, and implementation targets as `owl:NamedIndividual` instances of `reqvire:Artifact` and any more specific artifact class such as `reqvire:File`. Do not add these model-context ABox individuals to clean authored ontology-only exports.
 
 Reqvire core uses o-kernel contracts for RDF-native parsing/classification and SHACL services, but the Reqvire semantic model remains the owner of graph-registry source mapping, element provenance, semantic-contract reachability, and product-specific projection policy.
 
