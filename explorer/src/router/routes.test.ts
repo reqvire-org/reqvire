@@ -30,6 +30,16 @@ describe("parseHash", () => {
     expect(r.elementId).toBe("system-model/Specifications.md#example-requirement");
   });
 
+  it("preserves previous route params for element overlays", () => {
+    const r = parseHash(
+      "#/elements/system-model/Thesaurus/Thesaurus.md#access-token",
+      { view: "content", param: "system-model/Specifications.md" },
+    );
+    expect(r.view).toBe("content");
+    expect(r.param).toBe("system-model/Specifications.md");
+    expect(r.elementId).toBe("system-model/Thesaurus/Thesaurus.md#access-token");
+  });
+
   it("parses file routes with their path param", () => {
     const r = parseHash("#/files/system-model/Specifications.md", "model");
     expect(r.view).toBe("files");

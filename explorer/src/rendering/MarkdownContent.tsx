@@ -109,6 +109,25 @@ export function MarkdownContent({
   );
 }
 
+export function stripConceptReferencesSection(markdown: string): string {
+  const lines = markdown.split(/\r?\n/);
+  const kept: string[] = [];
+  let skipping = false;
+
+  for (const line of lines) {
+    if (/^####\s+Concept References\s*$/i.test(line.trim())) {
+      skipping = true;
+      continue;
+    }
+    if (skipping && /^####\s+/.test(line.trim())) {
+      skipping = false;
+    }
+    if (!skipping) kept.push(line);
+  }
+
+  return kept.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
 function stripYamlFrontmatter(markdown: string): string {
   const normalized = markdown.replace(/^\uFEFF/, "");
   const lines = normalized.split(/\r?\n/);

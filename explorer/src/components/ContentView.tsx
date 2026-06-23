@@ -1,7 +1,7 @@
-import { DocumentPanel, RendererNotice } from "@ds";
+import { DocumentPanel, RendererNotice, type DetailConceptReferenceItem } from "@ds";
 import { useStore } from "../store/StoreContext";
-import { MarkdownContent } from "./MarkdownContent";
-import { routeForView } from "../router/routes";
+import { MarkdownContent, stripConceptReferencesSection } from "./MarkdownContent";
+import { routeForElement, routeForView } from "../router/routes";
 import { SourceCodePreview } from "./SourceCodePreview";
 
 interface ContentViewProps {
@@ -9,7 +9,7 @@ interface ContentViewProps {
 }
 
 export function ContentView({ path }: ContentViewProps) {
-  const { store } = useStore();
+  const { store, elementById } = useStore();
   const [filePath, fragmentId] = splitContentPath(path);
   const file = store.files.find((f) => f.path === filePath);
   const sourceResource = store.resources.find(
@@ -55,16 +55,54 @@ export function ContentView({ path }: ContentViewProps) {
     );
   }
 
+  const conceptReferences = conceptReferencesForFile(file.element_ids, store, elementById);
+
   return (
     <DocumentPanel toolbar={contentToolbar(file.path)}>
       <MarkdownContent
-        markdown={file.markdown_content}
+        markdown={stripConceptReferencesSection(file.markdown_content)}
         sourceFilePath={file.path}
         sourceAnchor={fragmentId ? `#/content/${file.path}#${fragmentId}` : `#/content/${file.path}`}
         scrollToAnchor={fragmentId}
+        conceptReferences={conceptReferences}
+        onOpenConceptReference={(reference) => {
+          if (reference.elementId) {
+            window.location.hash = routeForElement(reference.elementId);
+          }
+        }}
       />
     </DocumentPanel>
   );
+}
+
+function conceptReferencesForFile(
+  elementIds: readonly string[],
+  store: ReturnType<typeof useStore>["store"],
+  elementById: ReturnType<typeof useStore>["elementById"],
+): DetailConceptReferenceItem[] {
+  const sourceIds = new Set(elementIds);
+  return store.concept_refs
+    .filter((conceptRef) => sourceIds.has(conceptRef.source_id))
+    .map((conceptRef): DetailConceptReferenceItem => {
+      const nativeConcept = store.thesaurus.concepts.find(
+        (concept) => concept.element_id === conceptRef.target_element_id,
+      );
+      const sourceElement = elementById(conceptRef.source_id);
+      return {
+        id: `${sourceElement?.id ?? conceptRef.source_id}:${conceptRef.id}`,
+        label: conceptRef.label,
+        iri: conceptRef.iri,
+        elementId: conceptRef.target_element_id,
+        matchLabels: nativeConcept
+          ? [nativeConcept.label, ...nativeConcept.alt_labels, conceptRef.label].filter(isString)
+          : [conceptRef.label].filter(isString),
+        ontologyLabel: nativeConcept?.label,
+      };
+    });
+}
+
+function isString(value: string | undefined): value is string {
+  return typeof value === "string" && value.trim().length > 0;
 }
 
 function contentToolbar(filePath: string, label = "Source page") {

@@ -19,7 +19,7 @@ import type {
   ProjectStoreResource,
 } from "../store/types";
 import { routeForContent, routeForElement } from "../router/routes";
-import { MarkdownContent } from "./MarkdownContent";
+import { MarkdownContent, stripConceptReferencesSection } from "./MarkdownContent";
 
 /*
  * Element-detail modal container.
@@ -260,25 +260,6 @@ function sourceAnchorRoute(sourceAnchor: string, filePath: string): string {
   const fragment = hashIndex === -1 ? "" : sourceAnchor.slice(hashIndex);
   const markdownPath = path.endsWith(".html") ? `${path.slice(0, -".html".length)}.md` : path;
   return `${routeForContent(markdownPath || filePath)}${fragment}`;
-}
-
-function stripConceptReferencesSection(markdown: string): string {
-  const lines = markdown.split(/\r?\n/);
-  const kept: string[] = [];
-  let skipping = false;
-
-  for (const line of lines) {
-    if (/^####\s+Concept References\s*$/i.test(line.trim())) {
-      skipping = true;
-      continue;
-    }
-    if (skipping && /^####\s+/.test(line.trim())) {
-      skipping = false;
-    }
-    if (!skipping) kept.push(line);
-  }
-
-  return kept.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
 function isString(value: string | undefined): value is string {

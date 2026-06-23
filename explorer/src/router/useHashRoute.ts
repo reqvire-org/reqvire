@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DEFAULT_VIEW,
   parseHash,
+  routeForContent,
   routeForElement,
   routeForView,
   type ParsedRoute,
@@ -14,14 +15,19 @@ import {
  * overlays render over the correct underlying view.
  */
 export function useHashRoute() {
-  const lastViewRef = useRef<ViewId>(DEFAULT_VIEW);
+  const lastBaseRouteRef = useRef<Pick<ParsedRoute, "view" | "param">>({
+    view: DEFAULT_VIEW,
+    param: null,
+  });
 
   const read = useCallback((): ParsedRoute => {
     const parsed = parseHash(
       typeof window !== "undefined" ? window.location.hash : "",
-      lastViewRef.current,
+      lastBaseRouteRef.current,
     );
-    lastViewRef.current = parsed.view;
+    if (!parsed.elementId) {
+      lastBaseRouteRef.current = { view: parsed.view, param: parsed.param };
+    }
     return parsed;
   }, []);
 
@@ -60,8 +66,16 @@ export function useHashRoute() {
   );
 
   const closeElement = useCallback(() => {
-    applyHash(routeForView(lastViewRef.current));
+    applyHash(routeForBase(lastBaseRouteRef.current));
   }, [applyHash]);
 
   return { route, navigateView, openElement, closeElement };
+}
+
+function routeForBase(route: Pick<ParsedRoute, "view" | "param">) {
+  if (route.view === "content" && route.param) return routeForContent(route.param);
+  if (route.view === "files" && route.param) return `#/files/${route.param}`;
+  if (route.view === "resources" && route.param) return `#/resources/${route.param}`;
+  if (route.view === "search" && route.param) return `#/search/${encodeURIComponent(route.param)}`;
+  return routeForView(route.view);
 }

@@ -63,6 +63,8 @@ export interface ParsedRoute {
   elementId: string | null;
 }
 
+type PreviousRoute = ViewId | Pick<ParsedRoute, "view" | "param">;
+
 export function isViewId(value: string): value is ViewId {
   return ALL_VIEW_IDS.has(value as ViewId);
 }
@@ -89,7 +91,11 @@ export function routeForSearch(query: string): string {
  * view when the hash is an element-detail overlay so closing the modal returns
  * to the underlying Explorer route.
  */
-export function parseHash(rawHash: string, previousView: ViewId): ParsedRoute {
+export function parseHash(rawHash: string, previousRoute: PreviousRoute): ParsedRoute {
+  const previous =
+    typeof previousRoute === "string"
+      ? { view: previousRoute, param: null }
+      : previousRoute;
   let hash = rawHash.startsWith("#") ? rawHash.slice(1) : rawHash;
   if (hash.startsWith("/")) hash = hash.slice(1);
 
@@ -100,8 +106,8 @@ export function parseHash(rawHash: string, previousView: ViewId): ParsedRoute {
   if (hash.startsWith("elements/")) {
     const identifier = hash.slice("elements/".length);
     return {
-      view: previousView,
-      param: null,
+      view: previous.view,
+      param: previous.param,
       elementId: identifier.length > 0 ? identifier : null,
     };
   }
