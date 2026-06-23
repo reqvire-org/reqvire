@@ -11,7 +11,7 @@ import {
 } from "@ds";
 import { useStore } from "../store/StoreContext";
 import type { ProjectStoreElement } from "../store/types";
-import { MarkdownContent, stripConceptReferencesSection } from "./MarkdownContent";
+import { MarkdownContent, stripRenderedDetailSections } from "./MarkdownContent";
 import { routeForView } from "../router/routes";
 import { SourceCodePreview } from "./SourceCodePreview";
 import {
@@ -223,7 +223,7 @@ function SourceElementView({ element }: { element: ProjectStoreElement }) {
           metaBadges={buildMetaBadges(element)}
           content={
             <MarkdownContent
-              markdown={stripConceptReferencesSection(element.content)}
+              markdown={stripRenderedDetailSections(element.content)}
               sourceFilePath={element.file_path}
               sourceAnchor={sourceAnchorRoute(element.source_anchor, element.file_path)}
               conceptReferences={conceptReferenceItems}

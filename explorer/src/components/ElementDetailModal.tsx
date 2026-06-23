@@ -19,7 +19,7 @@ import type {
   ProjectStoreResource,
 } from "../store/types";
 import { routeForContent, routeForElement } from "../router/routes";
-import { MarkdownContent, stripConceptReferencesSection } from "./MarkdownContent";
+import { MarkdownContent, stripRenderedDetailSections } from "./MarkdownContent";
 
 /*
  * Element-detail modal container.
@@ -182,7 +182,7 @@ export function ElementDetailModal({
             metaBadges={buildMetaBadges(element)}
             content={
               <MarkdownContent
-                markdown={stripConceptReferencesSection(element.content)}
+                markdown={stripRenderedDetailSections(element.content)}
                 sourceFilePath={element.file_path}
                 sourceAnchor={element.source_anchor}
                 conceptReferences={conceptReferenceItems}

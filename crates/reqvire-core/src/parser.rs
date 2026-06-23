@@ -1,7 +1,7 @@
 use crate::element::{
     ConceptReference, Element, ElementType, FencedBlock, RequirementType,
     ContractBindingEntry, ContractBindingTarget, SubSection,
-    CONTRACT_BINDINGS_SECTION,
+    CONTRACT_BINDINGS_SECTION, is_legacy_contract_bindings_section,
 };
 use crate::error::ReqvireError;
 use crate::relation::{self, Relation};
@@ -384,7 +384,15 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
 
         // Parse #### subsections
         } else if trimmed.starts_with("#### ") && current_element.is_some() {
-            let subsection = SubSection::parse(trimmed[5..].trim());
+            let subsection_name = trimmed[5..].trim();
+            if is_legacy_contract_bindings_section(subsection_name) {
+                return Err(ReqvireError::InvalidMarkdownStructure(format!(
+                    "Legacy subsection '{}' is not supported. Use '#### {}' or run `reqvire migrate --fix`.",
+                    subsection_name, CONTRACT_BINDINGS_SECTION
+                )));
+            }
+
+            let subsection = SubSection::parse(subsection_name);
 
             if !subsection.is_repeatable() && seen_subsections.contains(&subsection) {
                 return Err(ReqvireError::DuplicateSubsection(format!(
@@ -1181,7 +1189,22 @@ pub fn parse_elements(
             errors.push(ReqvireError::InvalidMarkdownStructure(msg.clone()));
             debug!("Error: {}", msg);
         } else if trimmed.starts_with("#### ") && current_element.is_some() {
-            let subsection = SubSection::parse(trimmed[5..].trim());
+            let subsection_name = trimmed[5..].trim();
+
+            if !skip_current_element && is_legacy_contract_bindings_section(subsection_name) {
+                let msg = format!(
+                    "Legacy subsection '{}' in element '{}' is not supported. Use '#### {}' or run `reqvire migrate --fix`. (file: {}, line {})",
+                    subsection_name,
+                    current_element.as_ref().unwrap().name,
+                    CONTRACT_BINDINGS_SECTION,
+                    file_path.display(),
+                    line_num + 1
+                );
+                errors.push(ReqvireError::InvalidMarkdownStructure(msg.clone()));
+                debug!("Error: {}", msg);
+            }
+
+            let subsection = SubSection::parse(subsection_name);
 
             if !skip_current_element {
                 if !subsection.is_repeatable() && seen_subsections.contains(&subsection) {

@@ -9,6 +9,11 @@ pub const GOVERNANCE_STATUS_VALUES: &[&str] = &["draft", "review", "approved"];
 pub const GOVERNANCE_PRIORITY_VALUES: &[&str] = &["low", "medium", "high", "critical"];
 pub const GOVERNANCE_RISK_VALUES: &[&str] = &["low", "medium", "high", "critical"];
 pub const CONTRACT_BINDINGS_SECTION: &str = "Contract Bindings";
+// Remove this legacy rejection list when the matching migration paths are removed.
+// These names are intentionally invalid in canonical Markdown; they remain named
+// only so validation can tell authors to run `reqvire migrate --fix`.
+pub const LEGACY_CONTRACT_BINDINGS_SECTION_NAMES: &[&str] =
+    &["Attachments", "Reused Contract Context"];
 
 pub fn is_governance_metadata_key(key: &str) -> bool {
     GOVERNANCE_METADATA_KEYS.contains(&key)
@@ -28,6 +33,10 @@ pub fn is_valid_governance_risk(value: &str) -> bool {
 
 pub fn is_contract_bindings_section(value: &str) -> bool {
     value == CONTRACT_BINDINGS_SECTION
+}
+
+pub fn is_legacy_contract_bindings_section(value: &str) -> bool {
+    LEGACY_CONTRACT_BINDINGS_SECTION_NAMES.contains(&value)
 }
 
 /// All valid element types that can be used in --filter-type arguments.

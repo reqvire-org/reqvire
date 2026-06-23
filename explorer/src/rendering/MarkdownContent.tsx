@@ -128,8 +128,6 @@ export function stripRenderedDetailSections(markdown: string): string {
   return kept.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
-export const stripConceptReferencesSection = stripRenderedDetailSections;
-
 function isRenderedDetailSectionHeading(line: string): boolean {
   return /^####\s+(Concept References|Contract Bindings)\s*$/i.test(line.trim());
 }

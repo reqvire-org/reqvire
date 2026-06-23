@@ -114,6 +114,8 @@ Must be defined with a level 4 header: `#### Contract Bindings`.
 
 The Contract Bindings subsection links a requirement to explicit reusable contract context from another subgraph. Reused contract context does not provide ontology context. SKOS concept bindings belong in `#### Concept References`; semantic-contract ontology dependencies belong in `use`/`usedBy` relations.
 
+Legacy contract-binding subsection headings such as `#### Reused Contract Context` and `#### Attachments` are invalid in canonical Reqvire Markdown. `reqvire migrate --fix` performs the one-time rewrite to `#### Contract Bindings`; normal validation must reject the legacy headings instead of treating them as generic content.
+
 ### Element Identifier Contract Bindings
 
 Element identifier contract_bindings link to model elements that are reusable under the Reqvire relation and contract_bindings compatibility model.
