@@ -8,8 +8,6 @@ import {
   relationDisclosureCountUX,
   relationDisclosureSkinX,
   relationDisclosureTitleUX,
-  relationKindBaseUX,
-  relationKindSkinX,
   relationListUX,
   relationRowBaseUX,
 } from "./detailStyles";
@@ -78,7 +76,6 @@ function ContractBindingTarget({
 }) {
   return (
     <div className={cx(relationRowBaseUX)}>
-      <span className={cx(relationKindBaseUX, relationKindSkinX)}>{contract_bindings.kind}</span>
       <RelationEndpoint
         endpoint={{
           id: contract_bindings.targetId,

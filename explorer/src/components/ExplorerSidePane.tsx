@@ -26,7 +26,7 @@ import {
   type DesignSystemColorToken,
 } from "@ds";
 import { useStore } from "../store/StoreContext";
-import { VIEW_TITLES, type ViewId } from "../router/routes";
+import { routeForContent, VIEW_TITLES, type ViewId } from "../router/routes";
 import type {
   ExplorerProjectStore,
   KnowledgeGraphNode,
@@ -45,6 +45,8 @@ interface ExplorerSidePaneProps {
   onToggle: () => void;
   onNavigate: (view: ViewId) => void;
   onOpenElement: (id: string) => void;
+  sourceBrowsing?: boolean;
+  onOpenSourceRoute?: (hash: string) => void;
   onOpenOntologyNode: (id: string) => void;
 }
 
@@ -83,6 +85,8 @@ export function ExplorerSidePane({
   onToggle,
   onNavigate,
   onOpenElement,
+  sourceBrowsing = false,
+  onOpenSourceRoute,
   onOpenOntologyNode,
 }: ExplorerSidePaneProps) {
   const { store, elementById } = useStore();
@@ -135,6 +139,8 @@ export function ExplorerSidePane({
             elementById={elementById}
             onNavigate={onNavigate}
             onOpenElement={onOpenElement}
+            sourceBrowsing={sourceBrowsing}
+            onOpenSourceRoute={onOpenSourceRoute}
             depth={0}
             query={ui.modelTreeQuery}
           />
@@ -676,6 +682,8 @@ function TreeFolderNode({
   elementById,
   onNavigate,
   onOpenElement,
+  sourceBrowsing,
+  onOpenSourceRoute,
   depth,
   query,
 }: {
@@ -684,6 +692,8 @@ function TreeFolderNode({
   elementById: (id: string) => ProjectStoreElement | undefined;
   onNavigate: (view: ViewId) => void;
   onOpenElement: (id: string) => void;
+  sourceBrowsing: boolean;
+  onOpenSourceRoute?: (hash: string) => void;
   depth: number;
   query: string;
 }) {
@@ -721,6 +731,8 @@ function TreeFolderNode({
               elementById={elementById}
               onNavigate={onNavigate}
               onOpenElement={onOpenElement}
+              sourceBrowsing={sourceBrowsing}
+              onOpenSourceRoute={onOpenSourceRoute}
               depth={depth + 1}
               query={query}
             />
@@ -733,6 +745,8 @@ function TreeFolderNode({
               elementById={elementById}
               onNavigate={onNavigate}
               onOpenElement={onOpenElement}
+              sourceBrowsing={sourceBrowsing}
+              onOpenSourceRoute={onOpenSourceRoute}
               depth={depth + 1}
               query={query}
             />
@@ -855,6 +869,8 @@ function TreeFileNode({
   elementById,
   onNavigate,
   onOpenElement,
+  sourceBrowsing,
+  onOpenSourceRoute,
   depth,
   query,
 }: {
@@ -863,6 +879,8 @@ function TreeFileNode({
   elementById: (id: string) => ProjectStoreElement | undefined;
   onNavigate: (view: ViewId) => void;
   onOpenElement: (id: string) => void;
+  sourceBrowsing: boolean;
+  onOpenSourceRoute?: (hash: string) => void;
   depth: number;
   query: string;
 }) {
@@ -875,11 +893,22 @@ function TreeFileNode({
 
   function selectFile() {
     ui.setModelSelectionId(selectionId);
+    if (sourceBrowsing) {
+      onOpenSourceRoute?.(routeForContent(file.path));
+      return;
+    }
     if (activeView === "files") onNavigate("model");
   }
 
   function selectElement(elementId: string) {
     ui.setModelSelectionId(elementId);
+    if (sourceBrowsing) {
+      const element = elementById(elementId);
+      if (element) {
+        onOpenSourceRoute?.(element.source_anchor);
+      }
+      return;
+    }
     if (activeView === "files") onNavigate("model");
     onOpenElement(elementId);
   }

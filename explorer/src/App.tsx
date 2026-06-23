@@ -230,6 +230,10 @@ function ExplorerShell({ schemaMismatch }: { schemaMismatch: string | null }) {
           onToggle={toggleLeftPane}
           onNavigate={navigateView}
           onOpenElement={handleOpenElement}
+          sourceBrowsing={route.view === "content"}
+          onOpenSourceRoute={(hash) => {
+            window.location.hash = hash;
+          }}
           onOpenOntologyNode={setOntologyNodeId}
         />
       }
