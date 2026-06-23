@@ -216,6 +216,41 @@ export const conceptReferenceQualifierSkinX = css`
   overflow-wrap: anywhere;
 `;
 
+export const inlineConceptReferenceBaseUX = css`
+  display: inline;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: var(--border-w);
+  text-underline-offset: var(--space-1);
+`;
+
+export const inlineConceptReferenceSkinX = css`
+  background: transparent;
+  color: var(--text-body);
+  cursor: pointer;
+
+  &:hover {
+    background: transparent;
+    color: var(--text-link);
+    text-decoration-color: currentColor;
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-ring);
+    outline-offset: var(--space-1);
+    color: var(--text-link);
+    text-decoration-color: currentColor;
+  }
+`;
+
 export const relationTextSkinX = css`
   color: var(--text-body);
   font-size: var(--text-sm);

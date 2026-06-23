@@ -1045,12 +1045,12 @@ reqvire:SemanticBlockShape
 #### Relations
   * constrain: [Concept Relation Projection Materialization](../Reports/ModelReports/ReportingRequirements.md#concept-relation-projection-materialization)
   * constrain: [Ontology Projection Subgraph Materialization](../Reports/ModelReports/ReportingRequirements.md#ontology-projection-subgraph-materialization)
+  * constrain: [Semantic Relation Family Projection](../Reports/ModelReports/ReportingRequirements.md#semantic-relation-family-projection)
   * constrain: [Namespace-Scoped Ontology Export](../Semantics/SemanticModelRequirements.md#namespace-scoped-ontology-export)
   * constrain: [Ontology and Shapes Collection](../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
   * constrain: [Runtime Reqvire Ontology Artifact](../Semantics/SemanticModelRequirements.md#runtime-reqvire-ontology-artifact)
-  * constrain: [Runtime Reqvire SHACL Artifact](../Semantics/SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)
   * constrain: [Runtime Reqvire Ontology Synchronization](../Semantics/SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
-  * constrain: [Semantic Relation Family Projection](../Reports/ModelReports/ReportingRequirements.md#semantic-relation-family-projection)
+  * constrain: [Runtime Reqvire SHACL Artifact](../Semantics/SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
   * use: [Reqvire Semantic Export Ontology](#reqvire-semantic-export-ontology)
 ---

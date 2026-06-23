@@ -165,6 +165,39 @@ Filtering behavior:
   * define: [Comma-Separated Type Filter Parsing](ReportingRequirements.md#comma-separated-type-filter-parsing)
 ---
 
+### Concept Relation Projection Specification
+
+The semantic model export shall materialize normalized SKOS concept-relation facts from native concept Markdown relations as a separate conceptual projection.
+
+#### Details
+Normative concept projection contract:
+- Each authored concept relation is preserved as source evidence on the native concept element.
+- `broader` and `narrower` are inverse taxonomy aliases. Authored `A broader B` and authored `B narrower A` describe the same canonical taxonomy edge.
+- `related`, `exactMatch`, and `closeMatch` are symmetric concept association or mapping relations for projection purposes.
+- Consistent reciprocal authored pairs are valid and are deduplicated into one canonical concept edge before generated facts are emitted.
+- Conflicting taxonomy cycles, invalid targets, or non-concept targets remain validation errors.
+
+Generated SKOS facts:
+- For each canonical taxonomy edge where `child` is narrower than `parent`, emit `child skos:broader parent` and `parent skos:narrower child`.
+- For each canonical symmetric association or mapping edge, emit reciprocal SKOS facts when serializing a normalized concept projection, while graph renderers may collapse the reciprocal pair to one displayed edge.
+- Generated inverse and reciprocal facts are additional semantic-search/export facts and must not mutate authored Markdown.
+
+Projection surface contract:
+- `reqvire semantic concepts` and `reqvire semantic graph --full` consume the normalized concept-relation projection, not only direct-authored concept relation fields.
+- Full JSON-LD output must be equivalent to the normalized Turtle output.
+- Project Store `thesaurus` rows must derive `parent_id`, child/narrower lists, `related_ids`, `exact_match_ids`, and `close_match_ids` from the same normalized concept-relation projection.
+- Ontologies Concepts-layer graph data may keep directional SKOS taxonomy edges visible, but must canonicalize symmetric reciprocal concept edges to one visual edge.
+- MCP concept/thesaurus tools must expose normalized concept neighborhoods rather than requiring clients to infer inverse or symmetric links.
+- The normalized concept-relation projection is independent from ontology construct projection. It is not an o-kernel OWL/RDFS/SHACL construct classification.
+- Semantic projection SHACL may use reserved RDF/RDFS/OWL/XSD/SHACL vocabulary such as `rdf:type` in shape paths; runtime validation resolves those terms through the o-kernel reserved vocabulary registry, not through authored Reqvire ontology declarations.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Concept Relation Projection Materialization](ReportingRequirements.md#concept-relation-projection-materialization)
+---
+
 ### Containment View Report Contract Specification
 
 #### Details
@@ -263,7 +296,7 @@ Export modes:
 - Export and MCP metadata for external materialization must identify `external_materialization: "used_subset"` and include available counts for external sources, used external terms, and materialized external triples.
 
 #### Concept References
-  * Used external ontology subset: https://www.reqvire.org/concepts#UsedExternalOntologySubset
+  * [Used external ontology subset](../../Thesaurus/Thesaurus.md#used-external-ontology-subset)
 
 #### Metadata
   * type: specification
@@ -895,47 +928,14 @@ Implementation contract:
 - Generated relation-family projection facts must not be written back to authored Markdown ontology, semantic-contract, requirement, or contract blocks.
 
 #### Concept References
-  * Relation family construct query: https://www.reqvire.org/concepts#RelationFamilyConstructQuery
-  * Model relation: https://www.reqvire.org/concepts#ModelRelation
+  * [Relation family construct query](../../Thesaurus/Thesaurus.md#relation-family-construct-query)
+  * [Model relation](../../Thesaurus/Thesaurus.md#model-relation)
 
 #### Metadata
   * type: specification
 
 #### Relations
   * define: [Semantic Relation Family Projection](ReportingRequirements.md#semantic-relation-family-projection)
----
-
-### Concept Relation Projection Specification
-
-The semantic model export shall materialize normalized SKOS concept-relation facts from native concept Markdown relations as a separate conceptual projection.
-
-#### Details
-Normative concept projection contract:
-- Each authored concept relation is preserved as source evidence on the native concept element.
-- `broader` and `narrower` are inverse taxonomy aliases. Authored `A broader B` and authored `B narrower A` describe the same canonical taxonomy edge.
-- `related`, `exactMatch`, and `closeMatch` are symmetric concept association or mapping relations for projection purposes.
-- Consistent reciprocal authored pairs are valid and are deduplicated into one canonical concept edge before generated facts are emitted.
-- Conflicting taxonomy cycles, invalid targets, or non-concept targets remain validation errors.
-
-Generated SKOS facts:
-- For each canonical taxonomy edge where `child` is narrower than `parent`, emit `child skos:broader parent` and `parent skos:narrower child`.
-- For each canonical symmetric association or mapping edge, emit reciprocal SKOS facts when serializing a normalized concept projection, while graph renderers may collapse the reciprocal pair to one displayed edge.
-- Generated inverse and reciprocal facts are additional semantic-search/export facts and must not mutate authored Markdown.
-
-Projection surface contract:
-- `reqvire semantic concepts` and `reqvire semantic graph --full` consume the normalized concept-relation projection, not only direct-authored concept relation fields.
-- Full JSON-LD output must be equivalent to the normalized Turtle output.
-- Project Store `thesaurus` rows must derive `parent_id`, child/narrower lists, `related_ids`, `exact_match_ids`, and `close_match_ids` from the same normalized concept-relation projection.
-- Ontologies Concepts-layer graph data may keep directional SKOS taxonomy edges visible, but must canonicalize symmetric reciprocal concept edges to one visual edge.
-- MCP concept/thesaurus tools must expose normalized concept neighborhoods rather than requiring clients to infer inverse or symmetric links.
-- The normalized concept-relation projection is independent from ontology construct projection. It is not an o-kernel OWL/RDFS/SHACL construct classification.
-- Semantic projection SHACL may use reserved RDF/RDFS/OWL/XSD/SHACL vocabulary such as `rdf:type` in shape paths; runtime validation resolves those terms through the o-kernel reserved vocabulary registry, not through authored Reqvire ontology declarations.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Concept Relation Projection Materialization](ReportingRequirements.md#concept-relation-projection-materialization)
 ---
 
 ### Text Output Formatting

@@ -115,6 +115,7 @@ pub struct ProjectStoreReusedContractContextEntry {
 pub struct ProjectStoreConceptReference {
     pub id: String,
     pub source_id: String,
+    pub target_element_id: String,
     pub label: String,
     pub iri: String,
     pub line_number: usize,
@@ -1218,11 +1219,29 @@ fn build_concept_refs(
     let mut refs = Vec::new();
     for element in registry.get_all_elements() {
         for reference in &element.concept_references {
+            let Ok(target_id) = crate::parser::normalize_concept_reference_target(
+                &element.file_path,
+                &reference.target,
+            ) else {
+                continue;
+            };
+            let Some(target) = registry
+                .nodes
+                .get(&target_id)
+                .map(|node| &node.element)
+                .filter(|target| target.element_type.is_concept())
+            else {
+                continue;
+            };
+            let Some(iri) = registry.generated_concept_iri_for_element(target) else {
+                continue;
+            };
             refs.push(ProjectStoreConceptReference {
-                id: format!("concept-ref:{}:{}", element.identifier, reference.iri),
+                id: format!("concept-ref:{}:{}", element.identifier, target_id),
                 source_id: element.identifier.clone(),
+                target_element_id: target_id,
                 label: reference.label.clone(),
-                iri: reference.iri.clone(),
+                iri,
                 line_number: reference.line_number,
             });
         }
@@ -1973,17 +1992,63 @@ ext:UnusedTerm a owl:Class ;
     fn knowledge_graph_exports_concepts_as_ontology_nodes_and_reference_edges() {
         let mut registry = GraphRegistry::new();
 
+        let mut scheme = Element::new(
+            "Traceability Concepts",
+            "system-model/Checks.md#traceability-concepts",
+            "system-model/Checks.md",
+            1,
+            Some(ElementType::ConceptScheme),
+        );
+        scheme.metadata.insert(
+            "concept_base".to_string(),
+            "https://example.test/concepts".to_string(),
+        );
+        scheme
+            .metadata
+            .insert("concept_prefix".to_string(), "concept".to_string());
+        scheme.freeze_content();
+        registry
+            .register_element(scheme, "system-model/Checks.md")
+            .expect("concept scheme should register");
+
+        let mut concept = Element::new(
+            "Traceability",
+            "system-model/Checks.md#traceability",
+            "system-model/Checks.md",
+            8,
+            Some(ElementType::Concept),
+        );
+        concept.add_content(
+            r#"
+#### Relations
+* derivedFrom: [Traceability Concepts](#traceability-concepts)
+"#,
+        );
+        concept.freeze_content();
+        concept.add_relation(
+            Relation::new(
+                "derivedFrom",
+                "system-model/Checks.md#traceability-concepts".to_string(),
+                "system-model/Checks.md#traceability-concepts",
+                None,
+            )
+            .expect("concept scheme relation should be valid"),
+        );
+        registry
+            .register_element(concept, "system-model/Checks.md")
+            .expect("concept should register");
+
         let mut requirement = Element::new(
             "Traceability Requirement",
             "system-model/Checks.md#traceability-requirement",
             "system-model/Checks.md",
-            1,
+            16,
             Some(ElementType::Requirement(RequirementType::System)),
         );
         requirement.add_content(
             r#"
 #### Concept References
-* Traceability: https://example.test/concepts#Traceability
+* [Traceability](#traceability)
 "#,
         );
         requirement.freeze_content();
@@ -1995,6 +2060,12 @@ ext:UnusedTerm a owl:Class ;
         let (relations, mut resources) = build_relations(&registry);
         let reused_contract_context = build_reused_contract_context(&registry, &mut resources);
         let concept_refs = build_concept_refs(&registry, &mut resources);
+        assert_eq!(concept_refs.len(), 1);
+        assert_eq!(
+            concept_refs[0].target_element_id,
+            "system-model/Checks.md#traceability"
+        );
+        let concept_node_id = format!("concept:{}", concept_refs[0].iri);
         let graph = build_knowledge_graph_projection(
             &elements,
             &relations,
@@ -2022,10 +2093,7 @@ ext:UnusedTerm a owl:Class ;
         assert!(requirement_node.get("concept_references").is_none());
         let concept_node = nodes
             .iter()
-            .find(|node| {
-                node.get("id").and_then(Value::as_str)
-                    == Some("concept:https://example.test/concepts#Traceability")
-            })
+            .find(|node| node.get("id").and_then(Value::as_str) == Some(concept_node_id.as_str()))
             .expect("concept reference target should be exported as an ontology node");
         assert_eq!(
             concept_node.get("type").and_then(Value::as_str),
@@ -2051,8 +2119,7 @@ ext:UnusedTerm a owl:Class ;
         assert!(edges.iter().any(|edge| {
             edge.get("source").and_then(Value::as_str)
                 == Some("system-model/Checks.md#traceability-requirement")
-                && edge.get("target").and_then(Value::as_str)
-                    == Some("concept:https://example.test/concepts#Traceability")
+                && edge.get("target").and_then(Value::as_str) == Some(concept_node_id.as_str())
                 && edge.get("kind").and_then(Value::as_str) == Some("concept-reference")
         }));
     }

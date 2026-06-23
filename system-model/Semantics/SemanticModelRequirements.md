@@ -18,12 +18,12 @@ Turtle blocks remain explicit. External source sections do not inject prefixes, 
 Standard OWL reserved vocabulary and built-in datatype IRIs remain recognized by the o-kernel standards reserved vocabulary registry and do not require `#### External Ontology` declarations.
 
 #### Concept References
-  * External ontology source: https://www.reqvire.org/concepts#ExternalOntologySource
-  * External ontology prefix: https://www.reqvire.org/concepts#ExternalOntologyPrefix
-  * External ontology namespace: https://www.reqvire.org/concepts#ExternalOntologyNamespace
-  * External ontology resource: https://www.reqvire.org/concepts#ExternalOntologyResource
-  * External ontology source path: https://www.reqvire.org/concepts#ExternalOntologySourcePath
-  * External ontology format: https://www.reqvire.org/concepts#ExternalOntologyFormat
+  * [External ontology source](../Thesaurus/Thesaurus.md#external-ontology-source)
+  * [External ontology prefix](../Thesaurus/Thesaurus.md#external-ontology-prefix)
+  * [External ontology namespace](../Thesaurus/Thesaurus.md#external-ontology-namespace)
+  * [External ontology resource](../Thesaurus/Thesaurus.md#external-ontology-resource)
+  * [External ontology source path](../Thesaurus/Thesaurus.md#external-ontology-source-path)
+  * [External ontology format](../Thesaurus/Thesaurus.md#external-ontology-format)
 
 #### Metadata
   * type: requirement
@@ -56,9 +56,9 @@ SKOS enables Reqvire models to separate conceptual and structural semantic layer
 Built-in external ontology sources shall not be treated as RDF/OWL/SHACL language built-ins. They are parsed RDF source graphs owned by Reqvire core external-source policy.
 
 #### Concept References
-  * External ontology source: https://www.reqvire.org/concepts#ExternalOntologySource
-  * Built-in external ontology source: https://www.reqvire.org/concepts#BuiltInExternalOntologySource
-  * Used external ontology subset: https://www.reqvire.org/concepts#UsedExternalOntologySubset
+  * [External ontology source](../Thesaurus/Thesaurus.md#external-ontology-source)
+  * [Built-in external ontology source](../Thesaurus/Thesaurus.md#built-in-external-ontology-source)
+  * [Used external ontology subset](../Thesaurus/Thesaurus.md#used-external-ontology-subset)
 
 #### Metadata
   * type: requirement
@@ -84,7 +84,7 @@ Terms declared by built-in external ontology sources shall be available to ontol
 Imported terms shall remain marked as external declarations and shall not be promoted to authored Reqvire ontology terms. Imported terms shall not count as project-owned declarations for authored duplicate-term validation.
 
 #### Concept References
-  * External ontology source: https://www.reqvire.org/concepts#ExternalOntologySource
+  * [External ontology source](../Thesaurus/Thesaurus.md#external-ontology-source)
 
 #### Metadata
   * type: requirement
@@ -107,7 +107,7 @@ Selection shall seed used external terms from authored ontology RDF, SHACL RDF, 
 The selection contract is intentionally separate from external source declaration and public exposure policy. It identifies which external terms are used; it does not define the public output surface or the support facts needed to describe the terms.
 
 #### Concept References
-  * Used external ontology subset: https://www.reqvire.org/concepts#UsedExternalOntologySubset
+  * [Used external ontology subset](../Thesaurus/Thesaurus.md#used-external-ontology-subset)
 
 #### Metadata
   * type: requirement
@@ -129,8 +129,8 @@ The system shall apply the o-kernel referenced graph subset construction service
 Reqvire shall identify which parsed RDF graphs are ontology graphs of interest and which parsed RDF graphs are external dependency graphs, then pass those graph roles to the o-kernel service. The o-kernel service shall own reference extraction, support context, annotation context, RDF list closure, and bounded expansion for the standard external ontology dependency subset profile. Reqvire shall preserve external source metadata, keep constructed triples out of authored Markdown blocks, and pass constructed used external vocabulary content to the external vocabulary exposure policy.
 
 #### Concept References
-  * External ontology subset construct query: https://www.reqvire.org/concepts#ExternalOntologySubsetConstructQuery
-  * Raw external ontology graph: https://www.reqvire.org/concepts#RawExternalOntologyGraph
+  * [External ontology subset construct query](../Thesaurus/Thesaurus.md#external-ontology-subset-construct-query)
+  * [Raw external ontology graph](../Thesaurus/Thesaurus.md#raw-external-ontology-graph)
 
 #### Metadata
   * type: requirement
@@ -190,8 +190,8 @@ The filter shall accept either an ontology document base IRI such as `https://ww
 The filter shall apply to clean semantic exports only. It shall not be combined with `--full` output because authored-model facts and generated facts have a different graph scope from clean authored ontology and shape exports.
 
 #### Concept References
-  * Runtime ontology namespace: https://www.reqvire.org/concepts#RuntimeOntologyNamespace
-  * Namespace-scoped ontology export: https://www.reqvire.org/concepts#NamespaceScopedOntologyExport
+  * [Runtime ontology namespace](../Thesaurus/Thesaurus.md#runtime-ontology-namespace)
+  * [Namespace-scoped ontology export](../Thesaurus/Thesaurus.md#namespace-scoped-ontology-export)
 
 #### Metadata
   * type: requirement
@@ -220,8 +220,8 @@ When the authored model maps structural ontology terms to standalone native conc
 The artifact shall give runtime code a deterministic vocabulary snapshot while keeping ontology authoring, validation, and change impact anchored in the authored model.
 
 #### Concept References
-  * Runtime ontology artifact: https://www.reqvire.org/concepts#RuntimeOntologyArtifact
-  * Ontology document: https://www.reqvire.org/concepts#OntologyDocument
+  * [Runtime ontology artifact](../Thesaurus/Thesaurus.md#runtime-ontology-artifact)
+  * [Ontology document](../Thesaurus/Thesaurus.md#ontology-document)
 
 #### Metadata
   * type: requirement
@@ -232,6 +232,32 @@ The artifact shall give runtime code a deterministic vocabulary snapshot while k
   * derivedFrom: [Namespace-Scoped Ontology Export](#namespace-scoped-ontology-export)
   * satisfiedBy: [runtime_ontology.rs](../../crates/reqvire-core/src/runtime_ontology.rs)
   * satisfiedBy: [reqvire.ttl](../../crates/reqvire-core/src/runtime_ontology/reqvire.ttl)
+  * specify: [Runtime Reqvire Ontology Vocabulary](SemanticModelFeature.md#runtime-reqvire-ontology-vocabulary)
+  * verifiedBy: [Runtime Reqvire Ontology Artifact Verification](../Verifications/Semantics/SemanticModelVerifications.md#runtime-reqvire-ontology-artifact-verification)
+---
+
+### Runtime Reqvire Ontology Synchronization
+
+The system shall detect when embedded runtime Reqvire semantic artifacts are stale relative to the authored ontology model.
+
+#### Details
+The runtime ontology and SHACL artifacts shall be reproducible from the current authored model by running `reqvire semantic graph --namespace-base https://www.reqvire.org/ontology#`, applying the documented runtime-artifact curation and split step, and comparing the result with the embedded `reqvire.ttl` and `reqvire-shacl.ttl` artifacts after deterministic blank-node label normalization.
+
+When an ontology, semantic contract, semantic export rule, or documented runtime curation/split rule changes runtime artifact output, validation through the test suite shall fail until the runtime artifacts are regenerated. This makes change impact from authored runtime ontology and SHACL changes reach implementation artifacts and verification evidence.
+
+#### Concept References
+  * [Runtime ontology artifact](../Thesaurus/Thesaurus.md#runtime-ontology-artifact)
+  * [Ontology source of truth](../Thesaurus/Thesaurus.md#ontology-source-of-truth)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Runtime Reqvire Ontology Synchronization Specification](SemanticModelSpecifications.md#runtime-reqvire-ontology-synchronization-specification)
+  * derivedFrom: [Namespace-Scoped Ontology Export](#namespace-scoped-ontology-export)
+  * derivedFrom: [Runtime Reqvire Ontology Artifact](#runtime-reqvire-ontology-artifact)
+  * derivedFrom: [Runtime Reqvire SHACL Artifact](#runtime-reqvire-shacl-artifact)
+  * satisfiedBy: [test.sh](../../tests/test-runtime-ontology-artifact/test.sh)
   * specify: [Runtime Reqvire Ontology Vocabulary](SemanticModelFeature.md#runtime-reqvire-ontology-vocabulary)
   * verifiedBy: [Runtime Reqvire Ontology Artifact Verification](../Verifications/Semantics/SemanticModelVerifications.md#runtime-reqvire-ontology-artifact-verification)
 ---
@@ -260,32 +286,6 @@ The runtime ontology artifact and runtime SHACL artifact shall stay physically s
   * verifiedBy: [Runtime Reqvire Ontology Artifact Verification](../Verifications/Semantics/SemanticModelVerifications.md#runtime-reqvire-ontology-artifact-verification)
 ---
 
-### Runtime Reqvire Ontology Synchronization
-
-The system shall detect when embedded runtime Reqvire semantic artifacts are stale relative to the authored ontology model.
-
-#### Details
-The runtime ontology and SHACL artifacts shall be reproducible from the current authored model by running `reqvire semantic graph --namespace-base https://www.reqvire.org/ontology#`, applying the documented runtime-artifact curation and split step, and comparing the result with the embedded `reqvire.ttl` and `reqvire-shacl.ttl` artifacts after deterministic blank-node label normalization.
-
-When an ontology, semantic contract, semantic export rule, or documented runtime curation/split rule changes runtime artifact output, validation through the test suite shall fail until the runtime artifacts are regenerated. This makes change impact from authored runtime ontology and SHACL changes reach implementation artifacts and verification evidence.
-
-#### Concept References
-  * Runtime ontology artifact: https://www.reqvire.org/concepts#RuntimeOntologyArtifact
-  * Ontology source of truth: https://www.reqvire.org/concepts#OntologySourceOfTruth
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Runtime Reqvire Ontology Synchronization Specification](SemanticModelSpecifications.md#runtime-reqvire-ontology-synchronization-specification)
-  * derivedFrom: [Namespace-Scoped Ontology Export](#namespace-scoped-ontology-export)
-  * derivedFrom: [Runtime Reqvire Ontology Artifact](#runtime-reqvire-ontology-artifact)
-  * derivedFrom: [Runtime Reqvire SHACL Artifact](#runtime-reqvire-shacl-artifact)
-  * satisfiedBy: [test.sh](../../tests/test-runtime-ontology-artifact/test.sh)
-  * specify: [Runtime Reqvire Ontology Vocabulary](SemanticModelFeature.md#runtime-reqvire-ontology-vocabulary)
-  * verifiedBy: [Runtime Reqvire Ontology Artifact Verification](../Verifications/Semantics/SemanticModelVerifications.md#runtime-reqvire-ontology-artifact-verification)
----
-
 ### OWL Reserved Vocabulary Recognition
 
 The system shall apply the o-kernel standards reserved vocabulary registry when validating and exporting Reqvire ontology and semantic-contract RDF.
@@ -300,9 +300,9 @@ Built-in datatype IRIs from the kernel registry shall be accepted in datatype po
 Custom IRIs outside the reserved vocabulary registry remain subject to normal authored or external ontology resolution when term existence validation applies.
 
 #### Concept References
-  * OWL reserved vocabulary registry: https://www.reqvire.org/concepts#OwlReservedVocabularyRegistry
-  * OWL reserved vocabulary term: https://www.reqvire.org/concepts#OwlReservedVocabularyTerm
-  * OWL built-in datatype: https://www.reqvire.org/concepts#OwlBuiltInDatatype
+  * [OWL reserved vocabulary registry](../Thesaurus/Thesaurus.md#owl-reserved-vocabulary-registry)
+  * [OWL reserved vocabulary term](../Thesaurus/Thesaurus.md#owl-reserved-vocabulary-term)
+  * [OWL built-in datatype](../Thesaurus/Thesaurus.md#owl-built-in-datatype)
 
 #### Metadata
   * type: requirement

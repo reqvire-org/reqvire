@@ -86,7 +86,7 @@ Reserved subsection vocabulary is defined by the Reqvire core element ontology. 
  * **Details**: narrative element context
  * **Metadata**: element metadata, element type, and governance metadata where valid
  * **Reused Contract Context**: explicit reusable requirement-owned contract dependencies
- * **Concept References**: readable bindings from non-ontology, non-semantic-contract elements to generated native SKOS concepts
+ * **Concept References**: readable bindings from non-ontology, non-semantic-contract elements to native concept elements with derived generated SKOS IRIs
  * **Ontology**: ontology-element Turtle content
  * **External Ontology**: ontology-element local external vocabulary source declarations
  * **Shapes**: semantic-contract SHACL content

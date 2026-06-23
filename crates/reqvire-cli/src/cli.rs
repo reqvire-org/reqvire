@@ -138,7 +138,7 @@ pub enum Commands {
 
     /// Preview or apply source migrations for known model-breaking changes
     #[clap(
-        override_help = "Preview or apply source migrations for known model-breaking changes. By default, shows preview without applying changes\n\nMIGRATE OPTIONS:\n      --fix              Apply migration changes to files\n      --json             Output results in JSON format\n      --output <FILE>    Save JSON output to file (requires --json)\n\nCURRENT MIGRATIONS:\n    v0.15-documents-to-element-header - rewrite legacy single-element '# Documents' headers to '# Element'\n    v0.16-verification-objective - create one shared holder verification-objective in root VerificationObjectiveMigration.md and link standalone concrete verifications from that holder with derive\n    v1.0-contract-relations - rewrite legacy contract relation names to contract relation names: refinedBy -> definedBy and refine -> define\n    v1.1-reused-contract-context-section - rewrite legacy 'Reused Contract Context' reserved section headings to 'Reused Contract Context'"
+        override_help = "Preview or apply source migrations for known model-breaking changes. By default, shows preview without applying changes\n\nMIGRATE OPTIONS:\n      --fix              Apply migration changes to files\n      --json             Output results in JSON format\n      --output <FILE>    Save JSON output to file (requires --json)\n\nCURRENT MIGRATIONS:\n    v0.15-documents-to-element-header - rewrite legacy single-element '# Documents' headers to '# Element'\n    v0.16-verification-objective - create one shared holder verification-objective in root VerificationObjectiveMigration.md and link standalone concrete verifications from that holder with derive\n    v1.0-contract-relations - rewrite legacy contract relation names to contract relation names: refinedBy -> definedBy and refine -> define\n    v1.1-reused-contract-context-section - rewrite legacy 'Reused Contract Context' reserved section headings to 'Reused Contract Context'\n    v1.2-concept-reference-links - rewrite legacy Concept References entries from Label: IRI to Markdown links targeting native concept elements"
     )]
     Migrate {
         /// Apply migration changes to files
@@ -1521,9 +1521,17 @@ pub async fn handle_command(
                     excluded_filename_patterns,
                     dry_run,
                 )?;
+            let (concept_reference_summary, concept_reference_diffs) =
+                migrations::apply_concept_reference_link_migration(
+                    &model_manager.graph_registry,
+                    excluded_filename_patterns,
+                    dry_run,
+                )?;
 
             if !dry_run
-                && (documents_summary.files_changed > 0 || reused_context_summary.files_changed > 0)
+                && (documents_summary.files_changed > 0
+                    || reused_context_summary.files_changed > 0
+                    || concept_reference_summary.references_rewritten > 0)
             {
                 model_manager.parse_and_validate_with_options(
                     None,
@@ -1545,6 +1553,8 @@ pub async fn handle_command(
             format_result.diffs.extend(documents_diffs);
             format_result.files_changed += reused_context_diffs.len();
             format_result.diffs.extend(reused_context_diffs);
+            format_result.files_changed += concept_reference_diffs.len();
+            format_result.diffs.extend(concept_reference_diffs);
             format_result
                 .diffs
                 .sort_by(|a, b| a.file_path.cmp(&b.file_path));
@@ -1561,6 +1571,7 @@ pub async fn handle_command(
                     "migrations": {
                         "documents_header": documents_summary,
                         "reused_contract_context_section": reused_context_summary,
+                        "concept_reference_links": concept_reference_summary,
                         "contract_relations": contract_summary,
                         "verification_objective": verification_summary,
                     },
@@ -1575,6 +1586,7 @@ pub async fn handle_command(
                 handle_json_output(&json_str, &output)?;
             } else if documents_summary.files_changed == 0
                 && reused_context_summary.files_changed == 0
+                && concept_reference_summary.references_rewritten == 0
                 && contract_summary.relations_rewritten == 0
                 && verification_summary.derive_relations_added == 0
                 && verification_summary.objectives_created == 0
@@ -1583,18 +1595,20 @@ pub async fn handle_command(
             } else {
                 if dry_run {
                     println!(
-                        "Migration preview: {} legacy document header file(s), {} reused contract context heading file(s), {} contract relation rewrite(s), {} objective holder(s), {} derive relation(s).\n",
+                        "Migration preview: {} legacy document header file(s), {} reused contract context heading file(s), {} concept reference rewrite(s), {} contract relation rewrite(s), {} objective holder(s), {} derive relation(s).\n",
                         documents_summary.files_changed,
                         reused_context_summary.files_changed,
+                        concept_reference_summary.references_rewritten,
                         contract_summary.relations_rewritten,
                         verification_summary.objectives_created,
                         verification_summary.derive_relations_added
                     );
                 } else {
                     println!(
-                        "Applied migration: {} legacy document header file(s), {} reused contract context heading file(s), {} contract relation rewrite(s), {} objective holder(s), {} derive relation(s).\n",
+                        "Applied migration: {} legacy document header file(s), {} reused contract context heading file(s), {} concept reference rewrite(s), {} contract relation rewrite(s), {} objective holder(s), {} derive relation(s).\n",
                         documents_summary.files_changed,
                         reused_context_summary.files_changed,
+                        concept_reference_summary.references_rewritten,
                         contract_summary.relations_rewritten,
                         verification_summary.objectives_created,
                         verification_summary.derive_relations_added

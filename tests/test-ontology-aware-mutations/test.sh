@@ -109,8 +109,8 @@ The system shall validate billing payloads.
   * constrainedBy: [Billing Shape Contract](#billing-shape-contract)
 
 #### Concept References
-  * Billing payload class: https://example.test/concepts#BillingPayload
-  * Billing payload IRI: https://example.test/concepts#BillingId
+  * [Billing payload class](#billing-payload)
+  * [Billing payload IRI](#billing-id)
 
 ---
 
@@ -268,11 +268,11 @@ if ! grep -Fq "sh:path newbilling:billingId" "$TEST_DIR/specifications.md"; then
   echo "FAILED: SHACL path CURIE was not rewritten"
   exit 1
 fi
-if ! grep -Fq "Billing payload class: https://example.test/concepts#BillingPayload" "$TEST_DIR/specifications.md"; then
+if ! grep -Fq "[Billing payload class](#billing-payload)" "$TEST_DIR/specifications.md"; then
   echo "FAILED: concept reference class anchor was not preserved"
   exit 1
 fi
-if ! grep -Fq "Billing payload IRI: https://example.test/concepts#BillingId" "$TEST_DIR/specifications.md"; then
+if ! grep -Fq "[Billing payload IRI](#billing-id)" "$TEST_DIR/specifications.md"; then
   echo "FAILED: concept reference property anchor was not preserved"
   exit 1
 fi

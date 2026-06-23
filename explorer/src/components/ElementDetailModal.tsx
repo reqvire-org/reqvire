@@ -48,16 +48,6 @@ export function ElementDetailModal({
     () => new Map(store.resources.map((resource) => [resource.id, resource])),
     [store.resources],
   );
-  const ontologyNodeByIri = useMemo(() => {
-    const byIri = new Map<string, { id: string; label: string }>();
-    for (const node of store.ontology.graph_data?.nodes ?? []) {
-      const target = { id: node.id, label: node.label || node.full_uri || node.id };
-      byIri.set(node.full_uri, target);
-      byIri.set(node.id, target);
-    }
-    return byIri;
-  }, [store.ontology.graph_data?.nodes]);
-
   const { relations, reused_contract_context, conceptRefs } = useMemo(() => {
     if (!identifier) {
       return { relations: [], reused_contract_context: [], conceptRefs: [] };
@@ -99,16 +89,21 @@ export function ElementDetailModal({
   const conceptReferenceItems = useMemo(
     () =>
       conceptRefs.map((conceptRef): DetailConceptReferenceItem => {
-        const ontologyNode = ontologyNodeByIri.get(conceptRef.iri);
+        const nativeConcept = store.thesaurus.concepts.find(
+          (concept) => concept.element_id === conceptRef.target_element_id,
+        );
         return {
           id: conceptRef.id,
           label: conceptRef.label,
           iri: conceptRef.iri,
-          ontologyNodeId: ontologyNode?.id,
-          ontologyLabel: ontologyNode?.label,
+          elementId: conceptRef.target_element_id,
+          matchLabels: nativeConcept
+            ? [nativeConcept.label, ...nativeConcept.alt_labels, conceptRef.label]
+            : [conceptRef.label].filter(isString),
+          ontologyLabel: nativeConcept?.label,
         };
       }),
-    [conceptRefs, ontologyNodeByIri],
+    [conceptRefs, store.thesaurus.concepts],
   );
   const conceptDetail = useMemo(() => {
     if (!element || (element.element_type !== "concept" && element.element_type !== "concept-scheme")) return null;
@@ -187,17 +182,25 @@ export function ElementDetailModal({
             metaBadges={buildMetaBadges(element)}
             content={
               <MarkdownContent
-                markdown={element.content}
+                markdown={stripConceptReferencesSection(element.content)}
                 sourceFilePath={element.file_path}
                 sourceAnchor={element.source_anchor}
+                conceptReferences={conceptReferenceItems}
+                onOpenConceptReference={(reference) => {
+                  if (reference.elementId) {
+                    onOpenElement(reference.elementId);
+                  }
+                }}
               />
             }
             relations={relationItems}
             reused_contract_context={reusedContractContextItems}
-            conceptReferences={conceptReferenceItems}
+            conceptReferences={[]}
             onOpenElement={onOpenElement}
             onOpenConceptReference={(reference) => {
-              if (reference.ontologyNodeId) onOpenOntologyNode(reference.ontologyNodeId);
+              if (reference.elementId) {
+                onOpenElement(reference.elementId);
+              }
             }}
             onOpenResource={openHashRoute}
           />
@@ -257,6 +260,29 @@ function sourceAnchorRoute(sourceAnchor: string, filePath: string): string {
   const fragment = hashIndex === -1 ? "" : sourceAnchor.slice(hashIndex);
   const markdownPath = path.endsWith(".html") ? `${path.slice(0, -".html".length)}.md` : path;
   return `${routeForContent(markdownPath || filePath)}${fragment}`;
+}
+
+function stripConceptReferencesSection(markdown: string): string {
+  const lines = markdown.split(/\r?\n/);
+  const kept: string[] = [];
+  let skipping = false;
+
+  for (const line of lines) {
+    if (/^####\s+Concept References\s*$/i.test(line.trim())) {
+      skipping = true;
+      continue;
+    }
+    if (skipping && /^####\s+/.test(line.trim())) {
+      skipping = false;
+    }
+    if (!skipping) kept.push(line);
+  }
+
+  return kept.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function isString(value: string | undefined): value is string {
+  return typeof value === "string" && value.trim().length > 0;
 }
 
 interface ConceptElementDetailDto {

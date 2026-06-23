@@ -16,8 +16,8 @@ Product capability.
   * type: capability
 
 #### Concept References
-  * Product Payload: urn:reqvire:test:concept#ProductPayload
-  * Shared Property: urn:reqvire:test:concept#SharedProperty
+  * [Product Payload](#product-payload)
+  * [Shared Property](#shared-property)
 
 #### Relations
   * specifiedBy: [Payload Requirement](#payload-requirement)

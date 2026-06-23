@@ -1,6 +1,6 @@
 use crate::element::{
-    ContractType, Element, ElementType, FencedBlock, ReusedContractContextTarget, VerificationType,
-    GOVERNANCE_METADATA_KEYS,
+    ConceptReference, ContractType, Element, ElementType, FencedBlock, ReusedContractContextTarget,
+    VerificationType, GOVERNANCE_METADATA_KEYS,
 };
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
@@ -1756,7 +1756,6 @@ fn build_authored_model_turtle(
 ) -> Result<String, ReqvireError> {
     let mut output = String::new();
     let mut artifacts = BTreeSet::new();
-    let concept_reference_prefixes = full_context_ontology_prefixes(index);
     output.push_str(
         "# -----------------------------------------------------------------------------\n",
     );
@@ -1868,11 +1867,10 @@ fn build_authored_model_turtle(
         }
 
         for reference in &element.concept_references {
-            let resolved_iri = resolve_full_context_concept_reference_iri(
-                &reference.iri,
-                &concept_reference_prefixes,
-            )
-            .unwrap_or_else(|_| reference.iri.clone());
+            let Some(resolved_iri) = concept_reference_iri_value(registry, element, reference)
+            else {
+                continue;
+            };
             output.push_str(&format!(
                 "{} reqvire:conceptReference <{}> .\n",
                 subject,
@@ -2031,7 +2029,6 @@ fn build_generated_model_turtle(
 fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -> String {
     let mut output = String::new();
     let mut artifacts = BTreeSet::new();
-    let concept_reference_prefixes = full_context_ontology_prefixes(index);
     output.push_str(
         "# -----------------------------------------------------------------------------\n",
     );
@@ -2173,11 +2170,10 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
         }
 
         for reference in &element.concept_references {
-            let resolved_iri = resolve_full_context_concept_reference_iri(
-                &reference.iri,
-                &concept_reference_prefixes,
-            )
-            .unwrap_or_else(|_| reference.iri.clone());
+            let Some(resolved_iri) = concept_reference_iri_value(registry, element, reference)
+            else {
+                continue;
+            };
             output.push_str(&format!(
                 "{} reqvire:conceptReference <{}> .\n",
                 subject,
@@ -2441,30 +2437,6 @@ fn append_normalized_relation_family_turtle(
     ));
 }
 
-fn full_context_ontology_prefixes(index: &SemanticIndex) -> HashMap<String, String> {
-    let mut prefixes = HashMap::new();
-
-    for block in &index.blocks {
-        if !matches!(
-            block.kind,
-            SemanticBlockKind::Ontology | SemanticBlockKind::Concepts
-        ) {
-            continue;
-        }
-        for (prefix, iri) in parse_turtle_prefix_declarations(&block.content) {
-            prefixes.entry(prefix).or_insert(iri);
-        }
-    }
-
-    for declaration in &index.ontology_documents {
-        prefixes
-            .entry(declaration.ontology_prefix.clone())
-            .or_insert(declaration.term_namespace.clone());
-    }
-
-    prefixes
-}
-
 pub(crate) fn parse_turtle_prefix_declarations(content: &str) -> Vec<(String, String)> {
     let mut prefixes = Vec::new();
     for line in content.lines() {
@@ -2493,34 +2465,19 @@ pub(crate) fn parse_turtle_prefix_declarations(content: &str) -> Vec<(String, St
     prefixes
 }
 
-fn resolve_full_context_concept_reference_iri(
-    value: &str,
-    prefixes: &HashMap<String, String>,
-) -> Result<String, String> {
-    let trimmed = value.trim();
-    if let Some(iri) = trimmed
-        .strip_prefix('<')
-        .and_then(|value| value.strip_suffix('>'))
-    {
-        return Ok(iri.to_string());
+fn concept_reference_iri_value(
+    registry: &GraphRegistry,
+    source: &Element,
+    reference: &ConceptReference,
+) -> Option<String> {
+    let target_id =
+        crate::parser::normalize_concept_reference_target(&source.file_path, &reference.target)
+            .ok()?;
+    let target = registry.nodes.get(&target_id).map(|node| &node.element)?;
+    if !target.element_type.is_concept() {
+        return None;
     }
-    if trimmed.starts_with("urn:")
-        || trimmed.starts_with("http://")
-        || trimmed.starts_with("https://")
-    {
-        return Ok(trimmed.to_string());
-    }
-
-    let Some((prefix, local)) = trimmed.split_once(':') else {
-        return Err("expected absolute IRI, <IRI>, or CURIE".to_string());
-    };
-    let Some(base) = prefixes.get(prefix) else {
-        return Err(format!("prefix '{}' is not declared", prefix));
-    };
-    if local.is_empty() {
-        return Err("CURIE local name is empty".to_string());
-    }
-    Ok(format!("{}{}", base, local))
+    registry.generated_concept_iri_for_element(target)
 }
 
 fn build_ontology_projection_turtle(index: &SemanticIndex) -> String {
@@ -4181,15 +4138,13 @@ fn build_model_context_graph(registry: &GraphRegistry, index: &SemanticIndex) ->
         }
     }
 
-    let concept_reference_prefixes = full_context_ontology_prefixes(index);
     for node in registry.nodes.values() {
         let source = element_iri_value(&node.element);
         for reference in &node.element.concept_references {
-            let target = resolve_full_context_concept_reference_iri(
-                &reference.iri,
-                &concept_reference_prefixes,
-            )
-            .unwrap_or_else(|_| reference.iri.clone());
+            let Some(target) = concept_reference_iri_value(registry, &node.element, reference)
+            else {
+                continue;
+            };
             edges.insert(ModelContextEdge {
                 source: source.clone(),
                 target,

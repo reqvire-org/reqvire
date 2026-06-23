@@ -58,8 +58,8 @@ Reqvire adapter behavior:
 - Forward constructed used external vocabulary content to reporting exposure policy; this requirement does not define public visibility by itself.
 
 #### Concept References
-  * External ontology subset construct query: https://www.reqvire.org/concepts#ExternalOntologySubsetConstructQuery
-  * Raw external ontology graph: https://www.reqvire.org/concepts#RawExternalOntologyGraph
+  * [External ontology subset construct query](../Thesaurus/Thesaurus.md#external-ontology-subset-construct-query)
+  * [Raw external ontology graph](../Thesaurus/Thesaurus.md#raw-external-ontology-graph)
 
 #### Metadata
   * type: specification
@@ -257,27 +257,6 @@ Artifact contract:
   * define: [Runtime Reqvire Ontology Artifact](SemanticModelRequirements.md#runtime-reqvire-ontology-artifact)
 ---
 
-### Runtime Reqvire SHACL Artifact Specification
-
-The runtime Reqvire SHACL artifact contract defines the generated shape-rule Turtle snapshot embedded by Reqvire core.
-
-#### Details
-Artifact contract:
-- The artifact path is `crates/reqvire-core/src/runtime_ontology/reqvire-shacl.ttl`.
-- The Rust access point is `crates/reqvire-core/src/runtime_ontology.rs`.
-- The embedded constant `REQVIRE_SHACL_TTL` exposes generated SHACL Turtle content without requiring runtime access to `system-model/Ontologies`.
-- The artifact is generated from the authored Reqvire model with `reqvire semantic graph --namespace-base https://www.reqvire.org/ontology#`, then split from the ontology artifact using semantic block kind metadata.
-- The artifact must include authored runtime semantic-contract SHACL RDF whose declared subjects are in the runtime Reqvire term namespace.
-- The artifact must not include generated ontology document declarations, generated term definition links, authored ontology vocabulary blocks, `--full` model-context triples, generated ontology projection facts, raw external source dumps, or used external subset triples unless a future requirement changes the runtime bootstrap contract.
-- Runtime code may load `REQVIRE_ONTOLOGY_TTL` and `REQVIRE_SHACL_TTL` into one RDF store when it needs vocabulary plus validation rules, but the checked-in compile-time source files remain separate.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Runtime Reqvire SHACL Artifact](SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)
----
-
 ### Runtime Reqvire Ontology Synchronization Specification
 
 The synchronization contract defines how Reqvire prevents embedded runtime semantic artifacts from drifting from the authored ontology model.
@@ -306,6 +285,27 @@ If the authored model includes concept-layer imports or bridge usages that are n
 
 #### Relations
   * define: [Runtime Reqvire Ontology Synchronization](SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
+---
+
+### Runtime Reqvire SHACL Artifact Specification
+
+The runtime Reqvire SHACL artifact contract defines the generated shape-rule Turtle snapshot embedded by Reqvire core.
+
+#### Details
+Artifact contract:
+- The artifact path is `crates/reqvire-core/src/runtime_ontology/reqvire-shacl.ttl`.
+- The Rust access point is `crates/reqvire-core/src/runtime_ontology.rs`.
+- The embedded constant `REQVIRE_SHACL_TTL` exposes generated SHACL Turtle content without requiring runtime access to `system-model/Ontologies`.
+- The artifact is generated from the authored Reqvire model with `reqvire semantic graph --namespace-base https://www.reqvire.org/ontology#`, then split from the ontology artifact using semantic block kind metadata.
+- The artifact must include authored runtime semantic-contract SHACL RDF whose declared subjects are in the runtime Reqvire term namespace.
+- The artifact must not include generated ontology document declarations, generated term definition links, authored ontology vocabulary blocks, `--full` model-context triples, generated ontology projection facts, raw external source dumps, or used external subset triples unless a future requirement changes the runtime bootstrap contract.
+- Runtime code may load `REQVIRE_ONTOLOGY_TTL` and `REQVIRE_SHACL_TTL` into one RDF store when it needs vocabulary plus validation rules, but the checked-in compile-time source files remain separate.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Runtime Reqvire SHACL Artifact](SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)
 ---
 
 ### Used External Vocabulary Selection Specification
@@ -350,7 +350,7 @@ Implementation contract:
 - The seed query is a SELECT query because it identifies the used external term set.
 
 #### Concept References
-  * Used external ontology subset: https://www.reqvire.org/concepts#UsedExternalOntologySubset
+  * [Used external ontology subset](../Thesaurus/Thesaurus.md#used-external-ontology-subset)
 
 #### Metadata
   * type: specification

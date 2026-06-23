@@ -147,13 +147,21 @@ The system shall expose an API contract.
 
 Must be defined with a level 4 header: `#### Concept References`.
 
-Concept references bind readable element prose to generated native SKOS concepts. They may be authored on capability, requirement, contract, verification-objective, and concrete verification elements. They must not target arbitrary OWL classes, properties, individuals, or SKOS resources authored directly in ontology Turtle; structural ontology terms should point back to curated native concepts with `reqvire:mapsToConcept` when that bridge is useful. They must not be authored on ontology elements, because ontology elements declare structural terms in `#### Ontology`. They must not be authored on semantic-contract elements, because semantic contracts are semantic graph artifacts that use ontology through `use`/`usedBy` relations and SHACL `#### Shapes`.
+Concept references bind readable element prose to native `concept` elements; Reqvire derives generated native SKOS concept IRIs from those targets. They may be authored on capability, requirement, contract, verification-objective, and concrete verification elements. They must not target arbitrary OWL classes, properties, individuals, or SKOS resources authored directly in ontology Turtle; structural ontology terms should point back to curated native concepts with `reqvire:mapsToConcept` when that bridge is useful. They must not be authored on ontology elements, because ontology elements declare structural terms in `#### Ontology`. They must not be authored on semantic-contract elements, because semantic contracts are semantic graph artifacts that use ontology through `use`/`usedBy` relations and SHACL `#### Shapes`.
 
 **Parsing Rules:**
 - Entries are bullet points starting with `*`.
-- Format: `* Label: IRI_OR_CURIE`.
-- The parser records label, referenced IRI/CURIE text, and source line number.
-- Semantic validation resolves the referenced term against the element's ontology context; semantic validation does not reparse this markdown grammar.
+- Format: `* [Label](concept-element-link)`.
+- The link target must resolve with normal Reqvire Markdown link rules to an existing native `concept` element.
+- The parser records the authored label, normalized concept-element target, and source line number.
+- Semantic validation fails when the target is missing, does not have `type: concept`, or cannot derive a generated SKOS concept IRI from a `concept-scheme` namespace.
+- Semantic validation derives the generated SKOS concept IRI from the target concept element and scheme; authors do not write concept IRIs or CURIEs in this subsection.
+- `format --fix` normalizes already-valid concept-reference Markdown links to canonical source-relative targets. `migrate --fix` rewrites legacy `* Label: IRI` entries only when the IRI resolves to exactly one generated native concept element.
+
+**Example:**
+```markdown
+  * [External ontology source](../Thesaurus/Thesaurus.md#external-ontology-source)
+```
 
 ## Ontology Subsection
 

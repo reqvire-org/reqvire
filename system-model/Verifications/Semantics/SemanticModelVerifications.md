@@ -33,6 +33,6 @@ Expected checks:
   * satisfiedBy: [test.sh](../../../tests/test-runtime-ontology-artifact/test.sh)
   * verify: [Namespace-Scoped Ontology Export](../../Semantics/SemanticModelRequirements.md#namespace-scoped-ontology-export)
   * verify: [Runtime Reqvire Ontology Artifact](../../Semantics/SemanticModelRequirements.md#runtime-reqvire-ontology-artifact)
-  * verify: [Runtime Reqvire SHACL Artifact](../../Semantics/SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)
   * verify: [Runtime Reqvire Ontology Synchronization](../../Semantics/SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
+  * verify: [Runtime Reqvire SHACL Artifact](../../Semantics/SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)
 ---

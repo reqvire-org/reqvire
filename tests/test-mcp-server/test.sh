@@ -518,7 +518,7 @@ The system shall expose MCP semantic evidence for readable Access Token model co
   * type: requirement
 
 #### Concept References
-  * Access Token: concept:AccessToken
+  * [Access Token](#access-token)
 
 #### Relations
   * specify: [MCP Semantic Capability](#mcp-semantic-capability)
@@ -691,7 +691,7 @@ assert_jq_line "$DEFAULT_OUTPUT" 7 '.error.code == -32602 and (.error.data.messa
 assert_jq_line "$DEFAULT_OUTPUT" 8 '.error.code == -32602' "unknown or unadvertised tool returns protocol error"
 assert_jq_line "$DEFAULT_OUTPUT" 9 '.result.contents[0].uri == "reqvire://workspace/status" and .result.contents[0].mimeType == "application/json"' "resources/read returns JSON resource content"
 assert_jq_line "$DEFAULT_OUTPUT" 10 '.error.code == -32602' "format fix is rejected by default schema"
-assert_jq_line "$DEFAULT_OUTPUT" 11 '.result.structuredContent.concept_references[0].label == "Access Token" and .result.structuredContent.concept_references[0].iri == "concept:AccessToken"' "read_element returns concept references"
+assert_jq_line "$DEFAULT_OUTPUT" 11 '.result.structuredContent.concept_references[0].label == "Access Token" and .result.structuredContent.concept_references[0].target == "#access-token"' "read_element returns concept references"
 assert_jq_line "$DEFAULT_OUTPUT" 12 '.result.structuredContent.files[]?.elements[] | select(.name=="MCP Access Token Ontology") | .ontology.ontology.content | contains("testonto:AccessToken")' "search returns ontology ADT content"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.format == "turtle" and .result.structuredContent.semantic_layer == "ontologies" and (.result.structuredContent.content | contains("<https://example.test/ontology#AccessToken>")) and (.result.structuredContent.content | contains("<https://example.test/ontology#AccessTokenShape>") | not)' "semantic ontologies tool returns ontology-only Turtle content"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.content | contains("<https://example.test/ontology#AccessToken> rdfs:isDefinedBy <https://example.test/ontology>")' "semantic ontologies tool returns generated isDefinedBy edge for authored ontology term"

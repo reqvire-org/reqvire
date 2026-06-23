@@ -88,6 +88,7 @@ export interface ProjectStoreReusedContractContextEntry {
 export interface ProjectStoreConceptReference {
   id: string;
   source_id: string;
+  target_element_id: string;
   label: string;
   iri: string;
   line_number: number;

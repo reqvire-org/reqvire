@@ -1,6 +1,6 @@
 ---
 name: reqvire-concept-authoring
-description: Expert workflow for authoring Reqvire native concept schemes and concepts as SKOS thesauri. Use when creating or revising `concept-scheme` or `concept` elements, designing controlled vocabularies, concept taxonomies, broader/narrower/related links, labels, definitions, scope notes, examples, mappings, concept scheme namespaces, or concept references to generated SKOS concepts. Use instead of ontology-authoring when the task is terminology/thesaurus/concept curation rather than structural OWL/Turtle vocabulary or SHACL contracts.
+description: Expert workflow for authoring Reqvire native concept schemes and concepts as SKOS thesauri. Use when creating or revising `concept-scheme` or `concept` elements, designing controlled vocabularies, concept taxonomies, broader/narrower/related links, labels, definitions, scope notes, examples, mappings, concept scheme namespaces, or concept references to native concept elements. Use instead of ontology-authoring when the task is terminology/thesaurus/concept curation rather than structural OWL/Turtle vocabulary or SHACL contracts.
 ---
 
 # Reqvire Concept Authoring
@@ -47,6 +47,35 @@ concept schemes and concepts.
 
 Do not add `concept_id`, `concept_kind`, `pref_label`, or `language` metadata. Reqvire derives identity from the element identifier, `skos:prefLabel` from the element name, and `skos:definition` from the main element body. Language policy is intentionally deferred.
 
+## Concept and Element Naming
+
+Prefer pure domain names for native `concept` elements. A concept should own the clean thesaurus term because generated SKOS concepts are terminology anchors.
+
+Recommended precedence when an element name would otherwise collide:
+
+1. `concept` gets the pure name: `Payment`, `Invoice`, `Traceability`, `Verification Coverage`.
+2. `capability` becomes broader ability wording: `Payment Processing`, `Invoice Management`, `Traceability Management`, `API Operations`, `Audit Evidence Management`, `Fault Recovery`, `Regulatory Compliance Management`. Do not force every capability to be a `Feature`; use `Feature` only when the ability is genuinely product-feature shaped.
+3. `requirement` gets obligation wording, usually with `Requirement`: `Payment Settlement Requirement`, `Invoice Export Requirement`, `Traceability Link Resolution Requirement`.
+4. `specification` and other requirement-owned contracts get role-specific names: `Payment State Model Specification`, `Invoice Export Payload Specification`, `Retry Limit Constraint`, `Checkout Submission Behavior`, `Payment Lifecycle State`, `Webhook Event Input Output`.
+5. Verification elements get validation wording: `Payment Settlement Validation Test`, `Invoice Export Contract Verification`, `Traceability Rollup Analysis`, `API Compatibility Inspection`.
+6. `ontology` elements get structural/context holder names while Turtle can still define the pure term: element `Payment Ontology`, Turtle term `ex:Payment`.
+
+Do not solve naming conflicts by making concept names artificial or by relying on `(type, name)` tuple identity. Reqvire element names stay globally unique; concepts get the pure terminology names, and other element families carry their role in the name.
+
+## Concept Modeling Guardrails
+
+Concepts are curated terminology. They are not ontology classes, requirements, obligations, specifications, lifecycle states, or implementation behavior. A concept definition should explain what the term means to people and tools; it should not say what the system shall do.
+
+Use `broader` / `narrower` only when the relation passes the thesaurus "is-a kind of" test. Read `Child broader Parent` as "Child is a narrower term or kind of Parent." Good examples include `StripePaymentProvider broader PaymentProvider`, `CorrectionInvoice broader Invoice`, and `User broader Actor` when those are useful browse terms. Bad examples include generic catch-alls such as `PlatformConcept broader everything`, policy/obligation confusion such as `DataProtectionPolicy broader ComplianceObligation`, or status modeling when a property would be more precise.
+
+Use `related` when concepts are associated but not a good browse-tree parent/child pair. Examples: `PendingPayment related Invoice`, `DataProtectionPolicy related ComplianceObligation`, `NotificationChannel related Notification`, and `ActivitySource related ActivityEvent`.
+
+Do not blindly copy ontology `rdfs:subClassOf` into concept `broader`. OWL hierarchy is structural; SKOS hierarchy is thesaurus/navigation meaning. They can overlap, but they are not the same model. If the intended semantics are formal, such as `Payment hasStatus Pending`, model that with ontology classes/properties instead of forcing concept taxonomy.
+
+In SKOS terms, `PendingPayment broader Payment` can be valid when "pending payment" is deliberately treated as a narrower payment term for browsing/search. In OWL/domain modeling, pending may instead be a lifecycle status or state property of a payment. Choose the layer based on the intended use.
+
+Each concept scheme needs meaningful top concepts. Avoid making a scheme hang under a generic parent such as `PlatformConcept`; it creates weak diagrams and misleading modals. Each `concept-scheme` must also have a unique `concept_base` and `concept_prefix`; Reqvire rejects duplicate generated concept namespaces.
+
 ## Authoring Workflow
 
 1. Create one `concept-scheme` root with `concept_base` and `concept_prefix`.
@@ -58,7 +87,7 @@ Do not add `concept_id`, `concept_kind`, `pref_label`, or `language` metadata. R
 7. Add practical examples in `#### Examples`.
 8. Add cross-vocabulary mappings in `#### Mappings` only when SKOS mapping semantics are intentional.
 9. Use concept relations for taxonomy and association: `broader`, `narrower`, `related`, `exactMatch`, `closeMatch`.
-10. Use `#### Concept References` from non-ontology, non-semantic-contract elements to bind prose to generated concept IRIs.
+10. Use `#### Concept References` from non-ontology, non-semantic-contract elements to bind prose to native concept elements with Markdown links; Reqvire derives generated SKOS IRIs from those targets.
 
 ## Canonical Sections
 

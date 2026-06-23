@@ -27,7 +27,7 @@ The child product capability that specifies the root requirement.
   * type: capability
 
 #### Concept References
-  * Collect Contract: urn:reqvire:test:concept#CollectContract
+  * [Collect Contract](#collect-contract)
 
 #### Relations
   * derivedFrom: [Product Capability](#product-capability)

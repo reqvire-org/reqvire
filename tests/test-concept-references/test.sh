@@ -67,7 +67,7 @@ The system shall publish service endpoint contracts.
   * type: requirement
 
 #### Concept References
-  * Service Endpoint: https://example.test/concepts#ServiceEndpoint
+  * [Service Endpoint](#service-endpoint)
 
 #### Relations
   * specify: [API Capability](#api-capability)
@@ -107,10 +107,40 @@ if ! (cd "$TEST_DIR" && "$REQVIRE_BIN" validate > /tmp/concept-references-valid.
   exit 1
 fi
 
+perl -0pi -e 's/\* \[Service Endpoint\]\(#service-endpoint\)/* Service Endpoint: https:\/\/example.test\/concepts#ServiceEndpoint/' "$TEST_DIR/specifications/ConceptReferences.md"
+set +e
+LEGACY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+LEGACY_EXIT=$?
+set -e
+if [ $LEGACY_EXIT -eq 0 ]; then
+  echo "FAILED: legacy concept reference syntax should fail validation"
+  exit 1
+fi
+if ! echo "$LEGACY_OUTPUT" | grep -Fq "must use a Markdown link to a native concept element"; then
+  echo "FAILED: legacy concept reference syntax should report Markdown link requirement"
+  echo "$LEGACY_OUTPUT"
+  exit 1
+fi
+if ! (cd "$TEST_DIR" && "$REQVIRE_BIN" migrate --fix > /tmp/concept-references-migrate.out 2>&1); then
+  echo "FAILED: migrate --fix should rewrite legacy concept reference syntax"
+  cat /tmp/concept-references-migrate.out
+  exit 1
+fi
+if ! grep -Fq "* [Service Endpoint](#service-endpoint)" "$TEST_DIR/specifications/ConceptReferences.md"; then
+  echo "FAILED: migrate --fix should restore canonical concept reference Markdown link"
+  cat "$TEST_DIR/specifications/ConceptReferences.md"
+  exit 1
+fi
+if ! (cd "$TEST_DIR" && "$REQVIRE_BIN" validate > /tmp/concept-references-post-migrate.out 2>&1); then
+  echo "FAILED: migrated concept references should validate"
+  cat /tmp/concept-references-post-migrate.out
+  exit 1
+fi
+
 SEARCH_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json)
 SUMMARY=$(echo "$SEARCH_JSON" | jq '{
   concept_label: (.files["specifications/ConceptReferences.md"].elements[] | select(.name == "API Requirement") | .concept_references[0].label),
-  concept_iri: (.files["specifications/ConceptReferences.md"].elements[] | select(.name == "API Requirement") | .concept_references[0].iri),
+  concept_target: (.files["specifications/ConceptReferences.md"].elements[] | select(.name == "API Requirement") | .concept_references[0].target),
   concept_line_number_valid: (.files["specifications/ConceptReferences.md"].elements[] | select(.name == "API Requirement") | .concept_references[0].line_number > 0)
 }')
 printf "%s\n" "$SUMMARY" > /tmp/concept-references-summary.json
@@ -133,7 +163,7 @@ for marker in \
   "Concept reference not found" \
   "specifications/ConceptReferences.md#api-requirement" \
   "Service Endpoint" \
-  "https://example.test/concepts#ServiceEndpoint" \
+  "specifications/ConceptReferences.md#service-endpoint" \
   "Removed declaration source: specifications/ConceptReferences.md#service-endpoint"
 do
   if ! echo "$DELETE_OUTPUT" | grep -Fq "$marker"; then
@@ -190,7 +220,7 @@ The system shall publish service endpoint contracts.
   * type: requirement
 
 #### Concept References
-  * Missing Term: https://example.test/ontology#MissingTerm
+  * [Missing Term](#missing-term)
 
 #### Relations
   * specify: [API Capability](#api-capability)
@@ -314,7 +344,7 @@ The system shall publish service endpoint contracts.
   * type: requirement
 
 #### Concept References
-  * Region: https://example.test/concepts#Region
+  * [Region](#region)
 
 #### Relations
   * specify: [API Capability](#api-capability)
@@ -415,13 +445,13 @@ The system shall publish service endpoint contracts.
   * type: requirement
 
 #### Concept References
-  * Service Endpoint: https://example.test/ontology#ServiceEndpoint
+  * [Service Endpoint](#api-ontology)
 
 #### Relations
   * specify: [API Capability](#api-capability)
 ---
 EOF
-assert_invalid_model "Concept References may target only generated native concept resources typed as skos:Concept"
+assert_invalid_model "Concept References may target only native concept elements"
 
 rm -rf "${TEST_DIR}/specifications"
 mkdir -p "${TEST_DIR}/specifications"
@@ -438,7 +468,7 @@ API ontology terms.
   * ontology_prefix: testonto
 
 #### Concept References
-  * Service Endpoint: https://example.test/ontology#ServiceEndpoint
+  * [Service Endpoint](#api-ontology)
 
 #### Ontology
 ```turtle
@@ -484,7 +514,7 @@ API shape.
   * type: semantic-contract
 
 #### Concept References
-  * Service Endpoint: https://example.test/ontology#ServiceEndpoint
+  * [Service Endpoint](#api-ontology)
 
 #### Relations
   * use: [API Ontology](#api-ontology)

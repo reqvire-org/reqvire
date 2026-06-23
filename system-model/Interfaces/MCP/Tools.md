@@ -181,8 +181,8 @@ The system shall make semantic-export relation-family projection facts available
 - MCP shall not rebuild relation-family facts, execute projection-side construct materialization, mutate model source files, or write generated triples back to Markdown.
 
 #### Concept References
-  * Relation family construct query: https://www.reqvire.org/concepts#RelationFamilyConstructQuery
-  * Model relation: https://www.reqvire.org/concepts#ModelRelation
+  * [Relation family construct query](../../Thesaurus/Thesaurus.md#relation-family-construct-query)
+  * [Model relation](../../Thesaurus/Thesaurus.md#model-relation)
 
 #### Metadata
   * type: requirement
@@ -208,7 +208,7 @@ The system shall expose an MCP read tool that pages compact semantic vocabulary 
 - The vocabulary tool shall not rebuild or reload the semantic store to answer vocabulary discovery.
 
 #### Concept References
-  * Relation Family: https://www.reqvire.org/concepts#RelationFamily
+  * [Relation Family](../../Thesaurus/Thesaurus.md#relation-family)
 
 #### Metadata
   * type: requirement

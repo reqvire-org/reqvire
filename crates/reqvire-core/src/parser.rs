@@ -117,25 +117,25 @@ pub fn extract_concept_references(content: &str) -> (Vec<ConceptReference>, Vec<
 
         let Some(entry) = trimmed.strip_prefix("* ") else {
             diagnostics.push(format!(
-                "Concept References line {} must use '* Label: IRI_OR_CURIE' syntax.",
+                "Concept References line {} must use '* [Label](concept-element-link)' syntax.",
                 line_index + 1
             ));
             continue;
         };
 
-        let Some((label, iri)) = entry.split_once(':') else {
+        let Some((label, target)) = utils::extract_markdown_link(entry.trim()) else {
             diagnostics.push(format!(
-                "Concept References line {} must contain a label and IRI separated by ':'.",
+                "Concept References line {} must use a Markdown link to a native concept element.",
                 line_index + 1
             ));
             continue;
         };
 
         let label = label.trim();
-        let iri = iri.trim();
-        if label.is_empty() || iri.is_empty() {
+        let target = target.trim();
+        if label.is_empty() || target.is_empty() {
             diagnostics.push(format!(
-                "Concept References line {} must contain a non-empty label and IRI.",
+                "Concept References line {} must contain a non-empty label and concept element link.",
                 line_index + 1
             ));
             continue;
@@ -143,12 +143,31 @@ pub fn extract_concept_references(content: &str) -> (Vec<ConceptReference>, Vec<
 
         references.push(ConceptReference {
             label: label.to_string(),
-            iri: iri.to_string(),
+            target: target.to_string(),
             line_number: line_index + 1,
         });
     }
 
     (references, diagnostics)
+}
+
+pub fn normalize_concept_reference_target(
+    source_file_path: &str,
+    target: &str,
+) -> Result<String, ReqvireError> {
+    if target.starts_with('#') {
+        return Ok(format!("{}{}", source_file_path, target));
+    }
+
+    let git_root = crate::git_commands::get_git_root_dir()?;
+    let file_parent = Path::new(source_file_path).parent().ok_or_else(|| {
+        ReqvireError::PathError(format!(
+            "Cannot determine parent directory of '{}'",
+            source_file_path
+        ))
+    })?;
+    let base_path = git_root.join(file_parent);
+    utils::normalize_identifier(target, &base_path)
 }
 
 pub fn parse_external_ontology_sources(

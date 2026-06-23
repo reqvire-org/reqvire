@@ -439,7 +439,7 @@ Execution behavior:
 - The tool does not write generated vocabulary data back to Markdown source.
 
 #### Concept References
-  * Relation Family: https://www.reqvire.org/concepts#RelationFamily
+  * [Relation Family](../../Thesaurus/Thesaurus.md#relation-family)
 
 #### Metadata
   * type: specification

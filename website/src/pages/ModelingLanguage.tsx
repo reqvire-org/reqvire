@@ -84,7 +84,7 @@ API authentication capability.
   * type: capability
 
 #### Concept References
-  * Access Token: auth:AccessToken
+  * [Access Token](../Thesaurus/Auth.md#access-token)
 
 #### Relations
   * specifiedBy: [API Access Token Validation](Requirements.md#api-access-token-validation)`}</CodeBlock>
@@ -143,7 +143,7 @@ The system shall reject API requests whose access token does not conform to the 
   * type: requirement
 
 #### Concept References
-  * Access Token: auth:AccessToken
+  * [Access Token](../Thesaurus/Auth.md#access-token)
 
 #### Relations
   * specify: [API Authentication](#api-authentication)

@@ -101,11 +101,26 @@ Use an `ontology` when content defines reusable structural domain or model meani
 
 Use a `semantic-contract` when a closed-world SHACL profile should constrain one or more requirement obligations. Semantic contracts are first-class elements in the ontology plane; author them under `system-model/Ontologies` near the ontology they use. They must have `#### Shapes`, must not contain `#### Ontology`, must use one or more ontology elements through `use`/`usedBy`, and constrain requirements through `constrain`/`constrainedBy`.
 
-Use `#### Concept References` on non-ontology, non-semantic-contract elements when readable prose should bind human labels to SKOS concepts without filling text with CURIEs. The referenced IRI or CURIE must resolve to a generated native concept resource typed as `skos:Concept`. Structural OWL terms can point back to curated concepts through `reqvire:mapsToConcept`, but concept references should target the SKOS concept itself. Markdown concept references should use an absolute concept IRI unless the referenced prefix is available through reachable namespace context. Semantic contracts must not author concept references; they are already semantic graph elements and depend on ontology through `use`/`usedBy`.
+Use `#### Concept References` on non-ontology, non-semantic-contract elements when readable prose should bind human labels to native SKOS concepts without filling text with IRIs. Author each entry as a Markdown link to the native `concept` element, for example `* [Traceability](../Thesaurus/Thesaurus.md#traceability)`. Reqvire derives the generated `skos:Concept` IRI from that element for RDF export and tool output. Structural OWL terms can point back to curated concepts through `reqvire:mapsToConcept`, but model concept references must not target ontology terms, IRIs, or CURIEs directly. Semantic contracts must not author concept references; they are already semantic graph elements and depend on ontology through `use`/`usedBy`.
 
 Cleanup rule: ontology should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` contracts. Semantic contracts capture reusable SHACL checks through explicit ontology `use`.
 
 Use a `requirement` when the statement says what the system must do, especially when it naturally reads as `The system shall...`.
+
+### Element Naming When Concepts Collide
+
+Prefer pure domain names for native `concept` elements. If a concept name collides with a capability, requirement, contract, verification, or ontology element, keep the pure name on the concept and make the non-concept element name express its system role.
+
+Recommended precedence:
+
+1. `concept` gets the pure name: `Payment`, `Invoice`, `Traceability`, `Verification Coverage`.
+2. `capability` becomes broader ability wording: `Payment Processing`, `Invoice Management`, `Traceability Management`, `API Operations`, `Audit Evidence Management`, `Fault Recovery`, `Regulatory Compliance Management`. Use `Feature` only when the capability is genuinely product-feature shaped; otherwise choose a noun phrase for the ability, service, governance concern, interface concern, lifecycle concern, or operational concern.
+3. `requirement` gets obligation wording, usually with `Requirement`: `Payment Settlement Requirement`, `Invoice Export Requirement`, `Traceability Link Resolution Requirement`.
+4. `specification` and other requirement-owned contracts get role-specific names: `Payment State Model Specification`, `Invoice Export Payload Specification`, `Retry Limit Constraint`, `Checkout Submission Behavior`, `Payment Lifecycle State`, `Webhook Event Input Output`.
+5. Verification elements get validation wording: `Payment Settlement Validation Test`, `Invoice Export Contract Verification`, `Traceability Rollup Analysis`, `API Compatibility Inspection`.
+6. `ontology` elements get structural/context holder names while Turtle can still define the pure term: element `Payment Ontology`, Turtle term `ex:Payment`.
+
+Do not solve naming conflicts with `(type, name)` tuple identity or artificial concept names. Reqvire element names remain globally unique; pure terminology belongs to concepts, and implementation/obligation/contract/verification role belongs in the other element name.
 
 ## System Model Construction Method
 

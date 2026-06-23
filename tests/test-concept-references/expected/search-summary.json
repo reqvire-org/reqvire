@@ -1,5 +1,5 @@
 {
   "concept_label": "Service Endpoint",
-  "concept_iri": "https://example.test/concepts#ServiceEndpoint",
+  "concept_target": "#service-endpoint",
   "concept_line_number_valid": true
 }

@@ -651,7 +651,7 @@ static MARKDOWN_LINK_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\[(.+?)\]\((.+?)\)$").unwrap());
 
 /// Extracts text and link from a Markdown-style link if present.
-fn extract_markdown_link(input: &str) -> Option<(String, String)> {
+pub fn extract_markdown_link(input: &str) -> Option<(String, String)> {
     let input = input.trim();
     if let Some(captures) = MARKDOWN_LINK_RE.captures(input) {
         let text = captures.get(1)?.as_str().to_string();

@@ -10,6 +10,7 @@ This objective groups verification that the served Web Explorer renders model da
 #### Relations
   * derive: [Component Reuse Verification](#component-reuse-verification)
   * derive: [Diagram Reused Contract Context Display Verification](#diagram-reused-contract-context-display-verification)
+  * derive: [Element Detail Inline Concept Reference Verification](#element-detail-inline-concept-reference-verification)
   * derive: [Explorer Serve Verification](#explorer-serve-verification)
   * derive: [Export Command Verification](#export-command-verification)
   * derive: [Mobile Responsiveness Verification](#mobile-responsiveness-verification)
@@ -67,6 +68,35 @@ This test verifies that diagrams display reused_contract_context links within el
 
 #### Relations
   * verify: [Diagram Reused Contract Context Display](../../../Interfaces/WebExplorer/Capabilities.md#diagram-reused-contract-context-display)
+---
+
+### Element Detail Inline Concept Reference Verification
+
+This component test verifies that regular element-detail modals render authored concept references as inline native concept links instead of as a separate source subsection or ontology-node fallback.
+
+#### Details
+
+##### Acceptance Criteria:
+- The regular element-detail modal shall hide the authored `#### Concept References` source subsection from rendered body content.
+- Referenced native SKOS concepts shall be matched in prose by preferred label, alternative labels, and authored reference label.
+- Matching prose terms shall render as inline links using the standard Explorer link color with no resting background and underline only on hover or focus, rather than as badges, glyphs, pills, or a separate Concept References section.
+- Activating an inline concept-reference link shall open the referenced native `concept` element modal.
+- Authored model concept references shall not open ontology-node modals.
+
+##### Test Criteria:
+- Render an element-detail modal for an element with a native concept reference whose label appears in the main body.
+- Assert no `Concept References` section heading or raw concept IRI appears in the rendered modal body.
+- Assert the matching prose term is rendered as an inline concept-reference control.
+- Click the inline concept-reference control and assert the native concept element identifier is opened.
+- Render an element-detail modal where the body uses an alternative label for the referenced native concept.
+- Assert the alternative-label prose term opens the same native concept element.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [ElementDetailModal.test.tsx](../../../../explorer/src/components/ElementDetailModal.test.tsx)
+  * verify: [SPA Explorer Shell and Project Store](../../../Interfaces/WebExplorer/Capabilities.md#spa-explorer-shell-and-project-store)
 ---
 
 ### Explorer Serve Verification
@@ -349,7 +379,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - Element-detail routes shall open a Project Store-backed scrollable modal/dialog in the Explorer shell instead of using the source content route as the primary element navigation target.
 - Element-detail modal headers shall show only the actual element type as a text badge and shall not show an additional type-family/kind badge, marker dot, shape, or glyph when the element type is more specific.
 - Opening a related element from within the element-detail modal shall show a compact back control whose accessible label names the previous element and shall not render a duplicate visible `From:` context line.
-- Resolved concept references in the element-detail modal shall show the SKOS concept name first, show the authored concept-reference label as bracketed secondary context only when it differs meaningfully from the resolved concept name, expose the IRI as tooltip/location metadata, and open the ontology-node modal when activated.
+- Regular element-detail modals shall render model concept references as standard link-colored inline links on matching prose terms, with underline only on hover or focus, hide the authored `#### Concept References` source subsection, match native concept preferred labels, alternative labels, and authored reference labels, expose the concept IRI as tooltip/location metadata, and open the referenced native concept element modal when activated.
 - Concept relation lists in the element-detail modal shall exclude the selected concept itself, and reciprocal ontology edges for the same concept pair shall be deduplicated before rendering.
 - Element-detail modals shall expose source navigation as a secondary action using the source anchor.
 - The Coverage route shall render a left-pane coverage explorer with section counts for Overview, Capability coverage, Unverified requirements, Unimplemented requirements, Unsatisfied verifications, and Orphaned verifications, while keeping summary cards, charts, and legends out of the left pane.
@@ -358,7 +388,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 
 ##### Test Criteria:
 - Run `reqvire serve` on a minimal model with at least one capability, requirement, verification relation, satisfiedBy evidence file, reused_contract_context or concept-reference fact, and ontology term when available.
-- Run the Explorer component/unit tests that cover element-detail modal back context rendering, resolved concept-reference ontology modal routing, and exclusion of self-referential concept relation rows from the modal.
+- Run the Explorer component/unit tests that cover element-detail modal back context rendering, inline native concept-reference modal routing, alternative-label concept-reference matching, hidden authored concept-reference subsection rendering, and exclusion of self-referential concept relation rows from the modal.
 - Parse the generated store seed from `index.html` or its referenced static asset.
 - Assert all required top-level store sections exist.
 - Assert the `project` section exposes repository and branch metadata when running from a Git repository, and that Explorer tree roots render the combined repository/branch label.
@@ -370,7 +400,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - Assert element-detail modal headers render the actual element type as the only visible type badge and do not render a marker dot, shape, or glyph inside that badge; for example a `behavior` element shall not also show a separate `contract` badge.
 - Assert the Model view List/Grid modes render from Project Store `folders` and `files` without an iframe or third-party file-manager widget, expose breadcrumb navigation, sortable file rows, grid cards, central workspace search, icon/color legends, source-page secondary actions, and modeled-element rows that open the shared element-detail modal. Assert clicking anywhere on a Grid mode folder/file card opens or selects that card's item, while the source-page secondary action remains a separate control. Assert `#/files` and `#/files/<path>` deep-link into that behavior without creating a separate primary Filesystem view.
 - Assert the Model Graph mode paints the shell, graph canvas, and design-system spinner loading notice before deferred Sigma/ForceAtlas graph construction starts, clears the loading notice after renderer startup, and keeps full-graph ForceAtlas layout quality while using cached adjacency/focus lookup for interaction.
-- Assert the Model tree, grid cards, modeled-element lists, relation/reused_contract_context endpoints, and element legends use the shared Explorer `ElementIcon` type glyphs, that capability, semantic-contract, and verification-objective elements use their own role colors as plain squares with no glyph, that verification-objective uses the darker verification-objective token distinct from concrete verification, that resolved concept-reference endpoints use SKOS concept treatment, that unresolved concept-reference facts use the darker concept-reference treatment, that evidence-file artifacts use the neutral/default treatment, and that contract-family subtypes keep the shared contract color while rendering distinct glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
+- Assert the Model tree, grid cards, modeled-element lists, relation/reused_contract_context endpoints, and element legends use the shared Explorer `ElementIcon` type glyphs, that capability, semantic-contract, and verification-objective elements use their own role colors as plain squares with no glyph, that verification-objective uses the darker verification-objective token distinct from concrete verification, that inline concept-reference terms in element content use standard link color with no glyph or pill and underline only on hover or focus, that evidence-file artifacts use the neutral/default treatment, and that contract-family subtypes keep the shared contract color while rendering distinct glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
 - Assert selecting a folder, file, or modeled element in the left Model project tree updates the active Model workspace mode: List/Grid browse the selected folder or file, Graph focuses the matching graph node when one exists, and modeled-element rows open the shared element-detail modal without leaving the Model workspace.
 - Assert the Search route's left-pane result-type controls do not render a duplicate passive legend for the same result-type colors and labels.
 - Assert the Coverage route's left Explorer pane renders the coverage explorer section rows with counts, that selecting a row scrolls or selects the matching central Coverage section, and that the left pane does not duplicate the Coverage dashboard summaries or legend content.

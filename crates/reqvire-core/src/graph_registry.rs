@@ -1549,20 +1549,22 @@ impl GraphRegistry {
             return Vec::new();
         }
 
-        let semantic_index = semantic_contract::build_semantic_index(self);
-        let context = self.build_concept_reference_context(element_id);
-        let prefixes = semantic_index.ontology_prefix_map(&context);
         let mut ontology_ids = BTreeSet::new();
 
         for reference in references {
-            let Ok(resolved_iri) = resolve_concept_reference_iri(&reference.iri, &prefixes) else {
+            let Ok(target_id) = crate::parser::normalize_concept_reference_target(
+                &element.file_path,
+                &reference.target,
+            ) else {
                 continue;
             };
-            let Some(declarations) = semantic_index.ontology_declarations.get(&resolved_iri) else {
+            let Some(target) = self.nodes.get(&target_id).map(|node| &node.element) else {
                 continue;
             };
-            for declaration in declarations {
-                ontology_ids.insert(declaration.element_identifier.clone());
+            if target.element_type.is_concept() {
+                if let Some(scheme_id) = self.concept_scheme_context_id(&target.identifier) {
+                    ontology_ids.insert(scheme_id);
+                }
             }
         }
 
@@ -1583,24 +1585,21 @@ impl GraphRegistry {
             return Vec::new();
         }
 
-        let semantic_index = semantic_contract::build_semantic_index(self);
-        let context = self.build_concept_reference_context(element_id);
-        let prefixes = semantic_index.ontology_prefix_map(&context);
         let mut concept_ids = BTreeSet::new();
 
         for reference in references {
-            let Ok(resolved_iri) = resolve_concept_reference_iri(&reference.iri, &prefixes) else {
+            let Ok(target_id) = crate::parser::normalize_concept_reference_target(
+                &element.file_path,
+                &reference.target,
+            ) else {
                 continue;
             };
-            for candidate in self.nodes.values().map(|node| &node.element) {
-                if !candidate.element_type.is_concept() {
-                    continue;
-                }
-                if self.generated_concept_iri_for_element(candidate).as_deref()
-                    == Some(resolved_iri.as_str())
-                {
-                    concept_ids.insert(candidate.identifier.clone());
-                }
+            if self
+                .nodes
+                .get(&target_id)
+                .is_some_and(|node| node.element.element_type.is_concept())
+            {
+                concept_ids.insert(target_id);
             }
         }
 
@@ -2637,7 +2636,7 @@ impl GraphRegistry {
             .is_some_and(predicate)
     }
 
-    fn resolve_concept_element_id(&self, target: &str) -> Option<String> {
+    pub(crate) fn resolve_concept_element_id(&self, target: &str) -> Option<String> {
         self.nodes
             .get(target)
             .filter(|node| node.element.element_type.is_concept())
@@ -2661,7 +2660,7 @@ impl GraphRegistry {
             })
     }
 
-    fn generated_concept_iri_for_element(&self, element: &Element) -> Option<String> {
+    pub(crate) fn generated_concept_iri_for_element(&self, element: &Element) -> Option<String> {
         let scheme_id = if element.element_type.is_concept_scheme() {
             element.identifier.clone()
         } else if element.element_type.is_concept() {
@@ -2792,8 +2791,7 @@ impl GraphRegistry {
 
         errors.extend(self.validate_semantic_contract_shape_prefixes(&semantic_index));
 
-        errors
-            .extend(self.validate_concept_references(&semantic_index, removed_declaration_source));
+        errors.extend(self.validate_concept_references(removed_declaration_source));
 
         errors.extend(self.validate_maps_to_concept_targets(&semantic_index));
 
@@ -3041,7 +3039,6 @@ impl GraphRegistry {
 
     fn validate_concept_references(
         &self,
-        semantic_index: &semantic_contract::SemanticIndex,
         removed_declaration_source: Option<&str>,
     ) -> Vec<ReqvireError> {
         let mut errors = Vec::new();
@@ -3079,90 +3076,64 @@ impl GraphRegistry {
                 continue;
             }
 
-            let context = self.build_concept_reference_context(&element.identifier);
-            let context_set: BTreeSet<String> = context.iter().cloned().collect();
-            let prefixes = semantic_index.ontology_prefix_map(&context);
-
             for reference in references {
-                let resolved_iri = match resolve_concept_reference_iri(&reference.iri, &prefixes) {
-                    Ok(iri) => iri,
-                    Err(message) => {
+                let target_id = match crate::parser::normalize_concept_reference_target(
+                    &element.file_path,
+                    &reference.target,
+                ) {
+                    Ok(target_id) => target_id,
+                    Err(error) => {
                         errors.push(ReqvireError::InvalidMarkdownStructure(format!(
                             "Concept reference syntax error: element '{}' label '{}' at line {} references '{}': {}",
                             element.identifier,
                             reference.label,
                             reference.line_number,
-                            reference.iri,
-                            message
+                            reference.target,
+                            error
                         )));
                         continue;
                     }
                 };
 
-                let Some(declarations) = semantic_index.ontology_declarations.get(&resolved_iri)
-                else {
-                    if semantic_index.is_skos_concept_iri(&resolved_iri) {
-                        continue;
-                    }
+                let Some(target_node) = self.nodes.get(&target_id) else {
                     let removed_source = removed_declaration_source
                         .map(|source| format!(" Removed declaration source: {}.", source))
                         .unwrap_or_default();
                     errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Concept reference not found: element '{}' label '{}' references <{}>, but no native concept element generates this IRI.{} Update or remove the Concept References entry before deleting or editing the concept element.",
+                        "Concept reference not found: element '{}' label '{}' references concept element '{}'.{} Update or remove the Concept References entry before deleting or editing the concept element.",
                         element.identifier,
                         reference.label,
-                        resolved_iri,
+                        target_id,
                         removed_source
                     )));
                     continue;
                 };
 
-                let declaration_sources: BTreeSet<String> = declarations
-                    .iter()
-                    .map(|declaration| declaration.element_identifier.clone())
-                    .collect();
-                if declaration_sources
-                    .iter()
-                    .any(|declaration_source| context_set.contains(declaration_source))
-                {
-                    if !semantic_index.is_skos_concept_iri(&resolved_iri) {
-                        errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                            "Invalid concept reference target: element '{}' label '{}' references <{}>, but Concept References may target only generated native concept resources typed as skos:Concept. Use reqvire:mapsToConcept in authored ontology to bridge structural OWL terms to curated SKOS concepts, and update the Concept References entry to point at the native concept.",
-                            element.identifier,
-                            reference.label,
-                            resolved_iri
-                        )));
-                    }
+                if !target_node.element.element_type.is_concept() {
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "Invalid concept reference target: element '{}' label '{}' references '{}', but Concept References may target only native concept elements. Use reqvire:mapsToConcept in authored ontology to bridge structural OWL terms to curated SKOS concepts.",
+                        element.identifier,
+                        reference.label,
+                        target_id
+                    )));
                     continue;
                 }
 
-                continue;
+                if self
+                    .generated_concept_iri_for_element(&target_node.element)
+                    .is_none()
+                {
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "Invalid concept reference target: element '{}' label '{}' references '{}', but the target concept does not derive a concept-scheme namespace.",
+                        element.identifier,
+                        reference.label,
+                        target_id
+                    )));
+                }
             }
         }
 
         errors
-    }
-
-    fn build_concept_reference_context(&self, element_id: &str) -> Vec<String> {
-        let Some(node) = self.nodes.get(element_id) else {
-            return Vec::new();
-        };
-        let element = &node.element;
-
-        if element.element_type.is_ontology() || element.element_type.is_semantic_contract() {
-            return Vec::new();
-        }
-
-        self.nodes
-            .iter()
-            .filter_map(|(id, node)| {
-                if node.element.element_type.is_ontology() {
-                    Some(id.clone())
-                } else {
-                    None
-                }
-            })
-            .collect()
     }
 
     fn semantic_contract_used_ontology_context(&self, contract_id: &str) -> Vec<String> {
@@ -4073,7 +4044,8 @@ impl GraphRegistry {
 
         // Add the element content
         if !element.content.trim().is_empty() {
-            markdown.push_str(element.content.trim_end());
+            let content = self.normalize_concept_reference_links_for_format(element, _current_file);
+            markdown.push_str(content.trim_end());
             markdown.push('\n');
         }
 
@@ -4316,6 +4288,88 @@ impl GraphRegistry {
 
         // Apply generic formatting to ensure exactly one blank line before all #### headers
         Self::ensure_blank_lines_before_subsections(&markdown)
+    }
+
+    fn normalize_concept_reference_links_for_format(
+        &self,
+        element: &Element,
+        current_file: &str,
+    ) -> String {
+        let mut output = Vec::new();
+        let mut in_section = false;
+
+        for line in element.content.split_inclusive('\n') {
+            let (body, suffix) = if let Some(body) = line.strip_suffix("\r\n") {
+                (body, "\r\n")
+            } else if let Some(body) = line.strip_suffix('\n') {
+                (body, "\n")
+            } else {
+                (line, "")
+            };
+            let trimmed = body.trim();
+            if trimmed.starts_with("#### ") {
+                in_section = trimmed == "#### Concept References";
+                output.push(line.to_string());
+                continue;
+            }
+            if !in_section {
+                output.push(line.to_string());
+                continue;
+            }
+            let Some(entry) = trimmed.strip_prefix("* ") else {
+                output.push(line.to_string());
+                continue;
+            };
+            let Some((label, target)) = crate::utils::extract_markdown_link(entry) else {
+                output.push(line.to_string());
+                continue;
+            };
+            let Ok(target_id) =
+                crate::parser::normalize_concept_reference_target(&element.file_path, &target)
+            else {
+                output.push(line.to_string());
+                continue;
+            };
+            if !self
+                .nodes
+                .get(&target_id)
+                .is_some_and(|node| node.element.element_type.is_concept())
+            {
+                output.push(line.to_string());
+                continue;
+            }
+            let Some(link) = self.concept_reference_relative_link(current_file, &target_id) else {
+                output.push(line.to_string());
+                continue;
+            };
+            let leading_len = body.len() - body.trim_start().len();
+            output.push(format!(
+                "{}* [{}]({}){}",
+                &body[..leading_len],
+                label.trim(),
+                link,
+                suffix
+            ));
+        }
+
+        output.concat()
+    }
+
+    fn concept_reference_relative_link(
+        &self,
+        source_file: &str,
+        target_identifier: &str,
+    ) -> Option<String> {
+        let (target_file, target_fragment) =
+            crate::utils::extract_path_and_fragment(target_identifier);
+        if target_file == source_file {
+            return Some(format!("#{}", target_fragment.unwrap_or(target_identifier)));
+        }
+        let source_parent = std::path::PathBuf::from(source_file)
+            .parent()
+            .map(std::path::PathBuf::from)
+            .unwrap_or_default();
+        crate::utils::to_relative_identifier(target_identifier, &source_parent, false).ok()
     }
 
     /// Ensures every #### header has exactly one blank line before it (skips content inside <details> blocks)
@@ -6948,39 +7002,6 @@ fn replace_single_fenced_subsection(
     }
 
     Ok(output.trim_end_matches('\n').to_string())
-}
-
-fn resolve_concept_reference_iri(
-    value: &str,
-    prefixes: &HashMap<String, String>,
-) -> Result<String, String> {
-    let trimmed = value.trim();
-    if let Some(iri) = trimmed
-        .strip_prefix('<')
-        .and_then(|value| value.strip_suffix('>'))
-    {
-        return Ok(iri.to_string());
-    }
-    if trimmed.starts_with("urn:")
-        || trimmed.starts_with("http://")
-        || trimmed.starts_with("https://")
-    {
-        return Ok(trimmed.to_string());
-    }
-
-    let Some((prefix, local)) = trimmed.split_once(':') else {
-        return Err("expected absolute IRI, <IRI>, or CURIE".to_string());
-    };
-    let Some(base) = prefixes.get(prefix) else {
-        return Err(format!(
-            "prefix '{}' is not declared by a reachable ontology",
-            prefix
-        ));
-    };
-    if local.is_empty() {
-        return Err("CURIE local name is empty".to_string());
-    }
-    Ok(format!("{}{}", base, local))
 }
 
 #[cfg(test)]

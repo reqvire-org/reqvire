@@ -7,6 +7,8 @@ use crate::relation::{LinkType, Relation, RELATION_TYPES};
 use crate::utils;
 use globset::GlobSet;
 use serde::Serialize;
+use std::collections::BTreeMap;
+use std::path::PathBuf;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum MigrationSafety {
@@ -50,6 +52,7 @@ pub const DOCUMENTS_HEADER_MIGRATION_ID: &str = "v0.15-documents-to-element-head
 pub const CONTRACT_RELATION_MIGRATION_ID: &str = "v1.0-contract-relations";
 pub const REUSED_CONTRACT_CONTEXT_SECTION_MIGRATION_ID: &str =
     "v1.1-reused-contract-context-section";
+pub const CONCEPT_REFERENCE_LINK_MIGRATION_ID: &str = "v1.2-concept-reference-links";
 const LEGACY_ATTACHMENTS_SECTION: &str = "Attachments";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -83,6 +86,13 @@ pub struct ContractRelationMigrationSummary {
     pub affected_elements: Vec<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ConceptReferenceLinkMigrationSummary {
+    pub migration_id: &'static str,
+    pub references_rewritten: usize,
+    pub affected_files: Vec<String>,
+}
+
 pub fn candidates_for_validation_errors(errors: &[ReqvireError]) -> MigrationPlan {
     let mut candidates = Vec::new();
 
@@ -108,6 +118,17 @@ pub fn candidates_for_validation_errors(errors: &[ReqvireError]) -> MigrationPla
         });
     }
 
+    if errors.iter().any(is_concept_reference_link_migration_error) {
+        candidates.push(MigrationCandidate {
+            id: CONCEPT_REFERENCE_LINK_MIGRATION_ID,
+            from_version: "1.1",
+            to_version: "1.2",
+            safety: MigrationSafety::Automatic,
+            summary: "Rewrite legacy Concept References entries from Label: IRI to Markdown links that target native concept elements.",
+            dry_run_hint: "A dry run should show every concept-reference line rewritten before applying source edits.",
+        });
+    }
+
     MigrationPlan { candidates }
 }
 
@@ -124,6 +145,12 @@ fn is_contract_relation_migration_error(error: &ReqvireError) -> bool {
         || message.contains("legacy relation 'refine'")
         || message.contains("refinedBy -> definedBy")
         || message.contains("refine -> define")
+}
+
+fn is_concept_reference_link_migration_error(error: &ReqvireError) -> bool {
+    let message = error.to_string();
+    message.contains("Concept References line")
+        && message.contains("Markdown link to a native concept element")
 }
 
 pub fn apply_contract_relation_migration(
@@ -374,6 +401,150 @@ pub fn apply_reused_contract_context_section_migration(
         },
         diffs,
     ))
+}
+
+pub fn apply_concept_reference_link_migration(
+    registry: &GraphRegistry,
+    excluded_filename_patterns: &GlobSet,
+    dry_run: bool,
+) -> Result<(ConceptReferenceLinkMigrationSummary, Vec<FileDiff>), ReqvireError> {
+    let concept_iri_targets = concept_iri_targets(registry);
+    let mut affected_files = Vec::new();
+    let mut diffs = Vec::new();
+    let mut references_rewritten = 0;
+
+    for path in utils::scan_markdown_files(None, excluded_filename_patterns) {
+        let current = filesystem::read_file(&path)?;
+        let relative = utils::get_relative_path(&path)
+            .map(|path| path.to_string_lossy().to_string())
+            .unwrap_or_else(|_| path.to_string_lossy().to_string());
+        let Some((next, rewritten)) =
+            rewrite_concept_reference_links_content(&current, &relative, &concept_iri_targets)?
+        else {
+            continue;
+        };
+        let diff = generate_file_diff(&relative, &current, &next);
+        if !diff.lines.is_empty() {
+            diffs.push(diff);
+        }
+        if !dry_run {
+            filesystem::write_file(&path, next.as_bytes())?;
+        }
+        references_rewritten += rewritten;
+        affected_files.push(relative);
+    }
+
+    affected_files.sort();
+    affected_files.dedup();
+
+    Ok((
+        ConceptReferenceLinkMigrationSummary {
+            migration_id: CONCEPT_REFERENCE_LINK_MIGRATION_ID,
+            references_rewritten,
+            affected_files,
+        },
+        diffs,
+    ))
+}
+
+fn concept_iri_targets(registry: &GraphRegistry) -> BTreeMap<String, Option<String>> {
+    let mut targets = BTreeMap::new();
+    for element in registry.get_all_elements() {
+        if !element.element_type.is_concept() {
+            continue;
+        }
+        let Some(iri) = registry.generated_concept_iri_for_element(element) else {
+            continue;
+        };
+        match targets.get(&iri) {
+            Some(Some(existing)) if existing != &element.identifier => {
+                targets.insert(iri, None);
+            }
+            Some(_) => {}
+            None => {
+                targets.insert(iri, Some(element.identifier.clone()));
+            }
+        }
+    }
+    targets
+}
+
+fn rewrite_concept_reference_links_content(
+    content: &str,
+    source_file: &str,
+    concept_iri_targets: &BTreeMap<String, Option<String>>,
+) -> Result<Option<(String, usize)>, ReqvireError> {
+    let mut output = Vec::new();
+    let mut in_section = false;
+    let mut rewritten = 0;
+
+    for line in content.split_inclusive('\n') {
+        let (body, suffix) = if let Some(body) = line.strip_suffix("\r\n") {
+            (body, "\r\n")
+        } else if let Some(body) = line.strip_suffix('\n') {
+            (body, "\n")
+        } else {
+            (line, "")
+        };
+
+        let trimmed = body.trim();
+        if trimmed.starts_with("#### ") {
+            in_section = trimmed == "#### Concept References";
+            output.push(line.to_string());
+            continue;
+        }
+
+        if !in_section
+            || trimmed.is_empty()
+            || utils::extract_markdown_link(trimmed.strip_prefix("* ").unwrap_or(trimmed)).is_some()
+        {
+            output.push(line.to_string());
+            continue;
+        }
+
+        let Some(entry) = trimmed.strip_prefix("* ") else {
+            output.push(line.to_string());
+            continue;
+        };
+        let Some((label, iri)) = entry.split_once(':') else {
+            output.push(line.to_string());
+            continue;
+        };
+        let label = label.trim();
+        let iri = iri.trim();
+        let Some(Some(target_identifier)) = concept_iri_targets.get(iri) else {
+            output.push(line.to_string());
+            continue;
+        };
+
+        let link = concept_reference_relative_link(source_file, target_identifier)?;
+        let leading_len = body.len() - body.trim_start().len();
+        output.push(format!(
+            "{}* [{}]({}){}",
+            &body[..leading_len],
+            label,
+            link,
+            suffix
+        ));
+        rewritten += 1;
+    }
+
+    Ok((rewritten > 0).then(|| (output.concat(), rewritten)))
+}
+
+fn concept_reference_relative_link(
+    source_file: &str,
+    target_identifier: &str,
+) -> Result<String, ReqvireError> {
+    let (target_file, target_fragment) = utils::extract_path_and_fragment(target_identifier);
+    if target_file == source_file {
+        return Ok(format!("#{}", target_fragment.unwrap_or(target_identifier)));
+    }
+    let source_parent = PathBuf::from(source_file)
+        .parent()
+        .map(PathBuf::from)
+        .unwrap_or_default();
+    utils::to_relative_identifier(target_identifier, &source_parent, false)
 }
 
 fn rewrite_reused_contract_context_section_content(content: &str) -> Option<String> {

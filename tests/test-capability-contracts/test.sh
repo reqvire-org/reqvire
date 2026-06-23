@@ -16,8 +16,8 @@ Billing capability.
   * type: capability
 
 #### Concept References
-  * Invoice: urn:reqvire:test:concept#Invoice
-  * Tax Invoice: urn:reqvire:test:concept#TaxInvoice
+  * [Invoice](#invoice)
+  * [Tax Invoice](#tax-invoice)
 
 #### Relations
   * specifiedBy: [Billing Requirement](#billing-requirement)

@@ -93,6 +93,6 @@ The authored source of truth remains `system-model/Ontologies`. The generated `r
   * derivedFrom: [Semantic Model Core](#semantic-model-core)
   * specifiedBy: [Namespace-Scoped Ontology Export](SemanticModelRequirements.md#namespace-scoped-ontology-export)
   * specifiedBy: [Runtime Reqvire Ontology Artifact](SemanticModelRequirements.md#runtime-reqvire-ontology-artifact)
-  * specifiedBy: [Runtime Reqvire SHACL Artifact](SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)
   * specifiedBy: [Runtime Reqvire Ontology Synchronization](SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
+  * specifiedBy: [Runtime Reqvire SHACL Artifact](SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)
 ---

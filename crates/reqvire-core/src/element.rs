@@ -225,7 +225,7 @@ pub struct Concept {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ConceptReference {
     pub label: String,
-    pub iri: String,
+    pub target: String,
     pub line_number: usize,
 }
 

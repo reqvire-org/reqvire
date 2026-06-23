@@ -70,6 +70,24 @@ For new terminology or thesaurus work, use `reqvire-concept-authoring` instead o
 
 This ontology reference resumes when selected concepts need formal structural schema: OWL classes, object/datatype properties, individuals, axioms, SHACL target vocabulary, or explicit structural-to-concept bridges.
 
+### SKOS Taxonomy Is Not OWL Subclassing
+
+Do not mechanically copy ontology `rdfs:subClassOf` hierarchy into concept `broader` relations. OWL subclassing is structural and formal. SKOS broader/narrower is thesaurus/navigation meaning for people, search, and explanation.
+
+Use this split:
+
+- Use SKOS concepts when the work is terminology: labels, definitions, synonyms, browse trees, related terms, and concept mappings.
+- Use OWL classes and properties when the work is formal structure: type membership, domain/range, statuses, lifecycle states, constraints, validation targets, and reasoning.
+- Use `reqvire:mapsToConcept` to connect a structural term to a generated native concept when both layers are useful.
+
+Examples:
+
+- `StripePaymentProvider rdfs:subClassOf PaymentProvider` may also correspond to `StripePaymentProvider broader PaymentProvider` if both are useful concepts.
+- `Payment hasStatus Pending` should usually be a status property or controlled status value, not `PendingPayment rdfs:subClassOf Payment`.
+- `PendingPayment broader Payment` can still be a valid SKOS relation when the thesaurus intentionally treats pending payment as a narrower payment term for search/navigation.
+
+Before bridging ontology to concepts, verify that model `#### Concept References` use Markdown links to native `concept` elements, not ontology class/property IRIs. Reqvire derives generated `skos:Concept` IRIs from those native targets. Structural ontology terms may point to concepts with `reqvire:mapsToConcept`; non-ontology model concept references should target the concept layer directly.
+
 Use `reqvire:mapsToConcept` only when a structural term needs an explicit concept anchor:
 
 ```turtle
@@ -940,10 +958,10 @@ Concept reference example:
 
 ```markdown
 #### Concept References
-  * Managed Resource: https://example.org/concepts#ManagedResource
+  * [Managed Resource](../Thesaurus/Thesaurus.md#managed-resource)
 ```
 
-Capability, requirement, contract, verification-objective, and concrete verification prose can bind readable terms with `#### Concept References` when useful. The referenced IRI or CURIE must resolve to a generated native concept resource typed as `skos:Concept` in the model. Do not point concept references directly at OWL classes, properties, or structural individuals; bridge structural terms to concepts with `reqvire:mapsToConcept` in authored ontology when useful. Semantic contracts must not author concept references; their semantic dependencies are declared with `use`/`usedBy`.
+Capability, requirement, contract, verification-objective, and concrete verification prose can bind readable terms with `#### Concept References` when useful. Each entry must be a Markdown link to a native `concept` element. Reqvire derives the generated `skos:Concept` IRI from that target. Do not point concept references directly at OWL classes, properties, structural individuals, generated IRIs, or CURIEs; bridge structural terms to concepts with `reqvire:mapsToConcept` in authored ontology when useful. Semantic contracts must not author concept references; their semantic dependencies are declared with `use`/`usedBy`.
 
 ## Semantic Contract Boundary
 

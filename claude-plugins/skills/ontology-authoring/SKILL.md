@@ -97,6 +97,14 @@ Use `reqvire-concept-authoring` for the conceptual SKOS layer:
 - Curated human/domain terms, labels, synonyms, definitions, taxonomy, search/navigation anchors, scope notes, examples, and concept mappings.
 - Concept references from capabilities, requirements, contracts, and verifications to generated native SKOS concepts.
 
+### Concept vs Ontology Decision Rule
+
+Do not use ontology class hierarchy as a shortcut for concept taxonomy. `rdfs:subClassOf` means formal structural subtype; SKOS `broader` means a broader thesaurus/navigation term. They can overlap, but only copy the relationship when it also passes the concept "is-a kind of" browse-term test.
+
+Use native concepts for curated terminology: labels, definitions, synonyms, top concepts, broader/narrower browse structure, related terms, and cross-vocabulary concept mappings. Use ontology for formal semantics: classes, properties, individuals, domain/range, lifecycle states, statuses, constraints, and SHACL targets.
+
+If the intended meaning is `Payment hasStatus Pending`, model `Payment`, status classes/individuals, and a status property in ontology. Do not force that into concept taxonomy unless "Pending Payment" is intentionally a narrower payment term for search or navigation. Use `reqvire:mapsToConcept` only as a bridge from structural terms to generated native SKOS concept IRIs.
+
 Bridge the layers only when useful:
 
 - Use `reqvire:mapsToConcept` from a structural term or model resource to a generated native SKOS concept.

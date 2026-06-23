@@ -365,9 +365,9 @@ Reqvire implements relation semantics for ownership, hierarchy, capability speci
 - Authored relation tokens must map to a declared semantic relation family. Generic semantic escape-hatch relations are not part of the canonical model; authors should use a semantically specific relation family or ontology concept references.
 
 #### Concept References
-  * Relation Family: https://www.reqvire.org/concepts#RelationFamily
-  * Relation Rule: https://www.reqvire.org/concepts#RelationRule
-  * Relation Semantic Pattern: https://www.reqvire.org/concepts#RelationSemanticPattern
+  * [Relation Family](../Thesaurus/Thesaurus.md#relation-family)
+  * [Relation Rule](../Thesaurus/Thesaurus.md#relation-rule)
+  * [Relation Semantic Pattern](../Thesaurus/Thesaurus.md#relation-semantic-pattern)
 
 #### Metadata
   * type: specification

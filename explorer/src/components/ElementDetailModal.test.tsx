@@ -77,7 +77,7 @@ describe("ElementDetailModal", () => {
     expect(screen.queryByTitle(selfConceptIri)).toBeNull();
   });
 
-  it("renders resolved concept references as ontology term links instead of raw IRI text", () => {
+  it("does not render concept references as a separate subsection", () => {
     const onOpenOntologyNode = vi.fn();
     render(
       <StoreProvider
@@ -87,8 +87,9 @@ describe("ElementDetailModal", () => {
             {
               id: "concept:service-endpoint",
               source_id: "system-model/Specifications.md#example-requirement",
+              target_element_id: "system-model/Thesaurus/Thesaurus.md#service-endpoint",
               label: "API endpoint",
-              iri: "urn:reqvire:test:api:ServiceEndpoint",
+              iri: "urn:reqvire:test:concepts#ServiceEndpoint",
               line_number: 9,
             },
           ],
@@ -104,12 +105,87 @@ describe("ElementDetailModal", () => {
       </StoreProvider>,
     );
 
-    const conceptLink = screen.getByRole("button", { name: /ServiceEndpoint/ });
-    expect(conceptLink.getAttribute("title")).toBe("urn:reqvire:test:api:ServiceEndpoint");
-    expect(screen.getByText("(API endpoint)")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /ServiceEndpoint/ })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Concept References" })).toBeNull();
     expect(screen.queryByText("urn:reqvire:test:api:ServiceEndpoint")).toBeNull();
+    expect(onOpenOntologyNode).not.toHaveBeenCalled();
+  });
+
+  it("renders native concept references inline and opens the concept element", () => {
+    const onOpenElement = vi.fn();
+    render(
+      <StoreProvider
+        store={{
+          ...devFixture,
+          concept_refs: [
+            {
+              id: "concept:service-endpoint",
+              source_id: "system-model/Specifications.md#example-requirement",
+              target_element_id: "system-model/Thesaurus/Thesaurus.md#service-endpoint",
+              label: "system",
+              iri: "urn:reqvire:test:concepts#ServiceEndpoint",
+              line_number: 9,
+            },
+          ],
+        }}
+        schemaMismatch={null}
+      >
+        <ElementDetailModal
+          identifier="system-model/Specifications.md#example-requirement"
+          onClose={vi.fn()}
+          onOpenElement={onOpenElement}
+          onOpenOntologyNode={vi.fn()}
+        />
+      </StoreProvider>,
+    );
+
+    const conceptLink = screen.getByRole("button", { name: /system/ });
+    expect(conceptLink.getAttribute("title")).toBe("urn:reqvire:test:concepts#ServiceEndpoint");
 
     fireEvent.click(conceptLink);
-    expect(onOpenOntologyNode).toHaveBeenCalledWith("urn:reqvire:test:api:ServiceEndpoint");
+    expect(onOpenElement).toHaveBeenCalledWith("system-model/Thesaurus/Thesaurus.md#service-endpoint");
+    expect(screen.queryByRole("heading", { name: "Concept references" })).toBeNull();
+  });
+
+  it("renders native concept reference alt labels inline", () => {
+    const onOpenElement = vi.fn();
+    render(
+      <StoreProvider
+        store={{
+          ...devFixture,
+          elements: devFixture.elements.map((element) =>
+            element.id === "system-model/Specifications.md#example-requirement"
+              ? {
+                  ...element,
+                  content: "The system shall expose an Endpoint for fixture data.",
+                }
+              : element,
+          ),
+          concept_refs: [
+            {
+              id: "concept:service-endpoint",
+              source_id: "system-model/Specifications.md#example-requirement",
+              target_element_id: "system-model/Thesaurus/Thesaurus.md#service-endpoint",
+              label: "Service Endpoint",
+              iri: "urn:reqvire:test:concepts#ServiceEndpoint",
+              line_number: 9,
+            },
+          ],
+        }}
+        schemaMismatch={null}
+      >
+        <ElementDetailModal
+          identifier="system-model/Specifications.md#example-requirement"
+          onClose={vi.fn()}
+          onOpenElement={onOpenElement}
+          onOpenOntologyNode={vi.fn()}
+        />
+      </StoreProvider>,
+    );
+
+    const conceptLink = screen.getByRole("button", { name: /Endpoint/ });
+    fireEvent.click(conceptLink);
+    expect(onOpenElement).toHaveBeenCalledWith("system-model/Thesaurus/Thesaurus.md#service-endpoint");
+    expect(screen.queryByRole("heading", { name: "Concept references" })).toBeNull();
   });
 });

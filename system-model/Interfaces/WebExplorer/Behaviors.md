@@ -8,6 +8,7 @@ Navigation behavior in the served Explorer.
 **Inter-page Navigation:**
 - Element links in Explorer views navigate to `index.html#/elements/<identifier>` and open a scrollable Project Store-backed element modal without leaving the active Explorer context
 - Element modals include a secondary source-page link to the Explorer content route and source anchor when exact source browsing is needed
+- Element modals render authored concept references as inline links on matching content text and open the referenced native concept element modal when activated
 - File links navigate to file page
 - External links open in new tab
 

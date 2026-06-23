@@ -8,8 +8,8 @@ API capability.
   * type: capability
 
 #### Concept References
-  * Service Endpoint: https://example.test/concepts#ServiceEndpoint
-  * Native Traceability: https://example.test/concepts#NativeTraceability
+  * [Service Endpoint](#service-endpoint)
+  * [Native Traceability](#native-traceability)
 
 #### Relations
   * specifiedBy: [API Endpoint Requirement](#api-endpoint-requirement)
@@ -161,7 +161,7 @@ The system shall expose service endpoint contracts.
   * type: requirement
 
 #### Concept References
-  * Service Endpoint: https://example.test/concepts#ServiceEndpoint
+  * [Service Endpoint](#service-endpoint)
 
 #### Relations
   * specify: [API Capability](#api-capability)

@@ -161,9 +161,7 @@ auth:subject a owl:ObjectProperty ;
       <Section title="Concept References">
         <p className="text-zinc-600 mb-4">
           Concept references let non-ontology prose stay readable while binding
-          terms to generated SKOS concept CURIEs or IRIs. The referenced term
-          must resolve to a native concept resource typed as skos:Concept in the
-          model.
+          terms to native `concept` elements. Reqvire derives generated SKOS concept IRIs from those native targets for semantic export and tooling.
         </p>
         <CodeBlock>{`### API Authentication
 
@@ -173,7 +171,7 @@ API authentication capability.
   * type: capability
 
 #### Concept References
-  * Access Token: https://example.org/concepts#AccessToken
+  * [Access Token](../Thesaurus/Auth.md#access-token)
 
 #### Relations
   * specifiedBy: [API Access Token Validation](#api-access-token-validation)
@@ -187,7 +185,7 @@ The system shall reject API requests whose access token is invalid.
   * type: requirement
 
 #### Concept References
-  * Access Token: concept:AccessToken
+  * [Access Token](../Thesaurus/Auth.md#access-token)
 
 #### Relations
   * specify: [API Authentication](#api-authentication)`}</CodeBlock>

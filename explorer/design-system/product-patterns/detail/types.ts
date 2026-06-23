@@ -40,6 +40,8 @@ export interface DetailConceptReferenceItem {
   id: string;
   label: string;
   iri: string;
+  elementId?: string;
+  matchLabels?: string[];
   ontologyNodeId?: string;
   ontologyLabel?: string;
 }

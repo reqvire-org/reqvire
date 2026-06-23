@@ -17,11 +17,13 @@ import ReactMarkdown, {
 import remarkGfm from "remark-gfm";
 import {
   DiagramBlockFrame,
+  InlineConceptReference,
   MARKDOWN_TABLE_WRAP_CLASS,
   MarkdownFrame,
   RendererNotice,
   cssVar,
   replaceCssVarsForMermaid,
+  type DetailConceptReferenceItem,
   type MarkdownFrameVariant,
 } from "@ds";
 
@@ -33,6 +35,8 @@ interface MarkdownContentProps {
   sourceAnchor?: string;
   variant?: MarkdownContentVariant;
   scrollToAnchor?: string | null;
+  conceptReferences?: readonly DetailConceptReferenceItem[];
+  onOpenConceptReference?: (reference: DetailConceptReferenceItem) => void;
 }
 
 const PREVIEW_LIMIT = 420;
@@ -54,14 +58,16 @@ export function MarkdownContent({
   sourceAnchor: _sourceAnchor,
   variant = "detail",
   scrollToAnchor,
+  conceptReferences = [],
+  onOpenConceptReference,
 }: MarkdownContentProps) {
   const sourceHtmlPath = spaRouteForFile(sourceFilePath);
   const normalizedMarkdown = normalizeReqvireMarkdown(stripYamlFrontmatter(markdown));
   const content =
     variant === "preview" ? markdownPreview(normalizedMarkdown) : normalizedMarkdown.trim();
   const components = useMemo(
-    () => markdownComponents({ variant }),
-    [variant],
+    () => markdownComponents({ variant, conceptReferences, onOpenConceptReference }),
+    [conceptReferences, onOpenConceptReference, variant],
   );
 
   useEffect(() => {
@@ -227,7 +233,23 @@ function resolveRelativePath(baseDir: string, targetPath: string): string {
   return resolved.join("/");
 }
 
-function markdownComponents({ variant }: { variant: MarkdownContentVariant }): Components {
+function markdownComponents({
+  variant,
+  conceptReferences,
+  onOpenConceptReference,
+}: {
+  variant: MarkdownContentVariant;
+  conceptReferences: readonly DetailConceptReferenceItem[];
+  onOpenConceptReference?: (reference: DetailConceptReferenceItem) => void;
+}): Components {
+  const inlineOpenConceptReference = variant === "detail" ? onOpenConceptReference : undefined;
+  const inlineReferences = inlineOpenConceptReference
+    ? buildInlineConceptReferences(conceptReferences)
+    : [];
+  const inlineChildren = (children: ReactNode) => {
+    if (!inlineOpenConceptReference || inlineReferences.length === 0) return children;
+    return renderInlineConceptReferences(children, inlineReferences, inlineOpenConceptReference);
+  };
   const components: Components = {
   a({ href, children, node: _node, ...props }) {
     void _node;
@@ -255,6 +277,22 @@ function markdownComponents({ variant }: { variant: MarkdownContentVariant }): C
     void _node;
     if (!src) return null;
     return <img {...props} src={src} alt={alt ?? ""} />;
+  },
+  p({ children, node: _node, ...props }) {
+    void _node;
+    return <p {...props}>{inlineChildren(children)}</p>;
+  },
+  li({ children, node: _node, ...props }) {
+    void _node;
+    return <li {...props}>{inlineChildren(children)}</li>;
+  },
+  td({ children, node: _node, ...props }) {
+    void _node;
+    return <td {...props}>{inlineChildren(children)}</td>;
+  },
+  th({ children, node: _node, ...props }) {
+    void _node;
+    return <th {...props}>{inlineChildren(children)}</th>;
   },
   h1({ children, node: _node, ...props }) {
     void _node;
@@ -298,6 +336,127 @@ function markdownComponents({ variant }: { variant: MarkdownContentVariant }): C
   },
   };
   return components;
+}
+
+interface InlineReferenceMatch {
+  reference: DetailConceptReferenceItem;
+  labels: string[];
+}
+
+function buildInlineConceptReferences(
+  references: readonly DetailConceptReferenceItem[],
+): InlineReferenceMatch[] {
+  return references
+    .map((reference) => ({
+      reference,
+      labels: uniqueReferenceLabels(
+        reference.matchLabels && reference.matchLabels.length > 0
+          ? reference.matchLabels
+          : [reference.ontologyLabel, reference.label],
+      ),
+    }))
+    .filter((entry) => entry.labels.length > 0)
+    .sort((left, right) => right.labels[0].length - left.labels[0].length);
+}
+
+function uniqueReferenceLabels(labels: readonly (string | undefined)[]): string[] {
+  const seen = new Set<string>();
+  const unique: string[] = [];
+
+  for (const label of labels) {
+    const trimmed = label?.trim();
+    if (!trimmed) continue;
+    for (const candidate of conceptLabelVariants(trimmed)) {
+      const normalized = candidate.toLowerCase();
+      if (seen.has(normalized)) continue;
+      seen.add(normalized);
+      unique.push(candidate);
+    }
+  }
+
+  return unique.sort((left, right) => right.length - left.length);
+}
+
+function conceptLabelVariants(label: string): string[] {
+  const variants = [label];
+  if (!/[sxz]$/i.test(label) && !/(ch|sh)$/i.test(label)) {
+    variants.push(`${label}s`);
+  }
+  return variants;
+}
+
+function renderInlineConceptReferences(
+  children: ReactNode,
+  references: readonly InlineReferenceMatch[],
+  onOpenConceptReference: (reference: DetailConceptReferenceItem) => void,
+): ReactNode {
+  return Children.toArray(children).flatMap((child, childIndex) => {
+    if (typeof child !== "string") return child;
+    return renderInlineConceptReferenceText(child, references, onOpenConceptReference, childIndex);
+  });
+}
+
+function renderInlineConceptReferenceText(
+  text: string,
+  references: readonly InlineReferenceMatch[],
+  onOpenConceptReference: (reference: DetailConceptReferenceItem) => void,
+  childIndex: number,
+): ReactNode[] {
+  const rendered: ReactNode[] = [];
+  let cursor = 0;
+
+  while (cursor < text.length) {
+    const match = nextConceptReferenceMatch(text, cursor, references);
+    if (!match) {
+      rendered.push(text.slice(cursor));
+      break;
+    }
+    if (match.start > cursor) {
+      rendered.push(text.slice(cursor, match.start));
+    }
+    const label = text.slice(match.start, match.end);
+    rendered.push(
+      <InlineConceptReference
+        key={`concept-reference-${childIndex}-${match.start}-${match.reference.id}`}
+        reference={match.reference}
+        label={label}
+        onOpenConceptReference={onOpenConceptReference}
+      />,
+    );
+    cursor = match.end;
+  }
+
+  return rendered;
+}
+
+function nextConceptReferenceMatch(
+  text: string,
+  startIndex: number,
+  references: readonly InlineReferenceMatch[],
+): { start: number; end: number; reference: DetailConceptReferenceItem } | null {
+  let best: { start: number; end: number; reference: DetailConceptReferenceItem } | null = null;
+  const haystack = text.toLowerCase();
+
+  for (const entry of references) {
+    for (const label of entry.labels) {
+      const start = haystack.indexOf(label.toLowerCase(), startIndex);
+      if (start === -1 || !hasTextBoundary(text, start, start + label.length)) continue;
+      const candidate = { start, end: start + label.length, reference: entry.reference };
+      if (!best || candidate.start < best.start || (candidate.start === best.start && candidate.end > best.end)) {
+        best = candidate;
+      }
+    }
+  }
+
+  return best;
+}
+
+function hasTextBoundary(text: string, start: number, end: number): boolean {
+  return !isWordChar(text[start - 1]) && !isWordChar(text[end]);
+}
+
+function isWordChar(value: string | undefined): boolean {
+  return Boolean(value && /[A-Za-z0-9_]/.test(value));
 }
 
 function codeBlockFromPreChildren(

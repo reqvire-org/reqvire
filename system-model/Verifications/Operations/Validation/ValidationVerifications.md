@@ -372,6 +372,27 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * verify: [Validation Error Handling](../../../Operations/Validation/ValidationRequirements.md#validation-error-handling)
 ---
 
+### Native Concept Taxonomy Scheme Boundary Validation Test
+
+This verification proves that native concept taxonomy does not cross `concept-scheme` roots while cross-scheme concept association and mapping relations remain valid authoring channels.
+
+#### Details
+Expected checks:
+- A valid native concept fixture with one concept scheme validates successfully.
+- An invalid fixture that authors `broader` from one scheme to a concept in another scheme fails validation.
+- An invalid fixture that authors `narrower` from one scheme to a concept in another scheme fails validation.
+- The diagnostic names the source concept, relation kind, target concept, source scheme, target scheme, and cross-scheme repair guidance.
+- The same fixture may author cross-scheme `related`, `exactMatch`, and `closeMatch` relations without those relations producing the taxonomy-boundary error.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Validation and Semantic Integrity Verification Objective](#validation-and-semantic-integrity-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-concept-elements/test.sh)
+  * verify: [Native Concept Taxonomy Scheme Boundary Validation](../../../Operations/Validation/ValidationRequirements.md#native-concept-taxonomy-scheme-boundary-validation)
+---
+
 ### Requirements Files Search and Detection Test
 
 This test verifies that the system correctly searches for and detects structured document files according to specified patterns.
@@ -453,27 +474,6 @@ This test verifies that Reqvire correctly handles and validates relations to fra
   * satisfiedBy: [test.sh](../../../../tests/test-fragment-relations/test.sh)
   * verify: [Requirements Processing](../../../ModelStructure/Configuration.md#requirements-processing)
   * verify: [Relation Type Validation](../../../Operations/Validation/ValidationRequirements.md#relation-type-validation)
----
-
-### Native Concept Taxonomy Scheme Boundary Validation Test
-
-This verification proves that native concept taxonomy does not cross `concept-scheme` roots while cross-scheme concept association and mapping relations remain valid authoring channels.
-
-#### Details
-Expected checks:
-- A valid native concept fixture with one concept scheme validates successfully.
-- An invalid fixture that authors `broader` from one scheme to a concept in another scheme fails validation.
-- An invalid fixture that authors `narrower` from one scheme to a concept in another scheme fails validation.
-- The diagnostic names the source concept, relation kind, target concept, source scheme, target scheme, and cross-scheme repair guidance.
-- The same fixture may author cross-scheme `related`, `exactMatch`, and `closeMatch` relations without those relations producing the taxonomy-boundary error.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Validation and Semantic Integrity Verification Objective](#validation-and-semantic-integrity-verification-objective)
-  * satisfiedBy: [test.sh](../../../../tests/test-concept-elements/test.sh)
-  * verify: [Native Concept Taxonomy Scheme Boundary Validation](../../../Operations/Validation/ValidationRequirements.md#native-concept-taxonomy-scheme-boundary-validation)
 ---
 
 ### Semantic Contract Ontology Declaration Validation Test

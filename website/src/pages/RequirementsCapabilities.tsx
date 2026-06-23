@@ -72,7 +72,7 @@ API authentication capability and access-token domain context.
   * owner: Identity Team
 
 #### Concept References
-  * Access Token: https://example.org/ontology/auth#AccessToken
+  * [Access Token](../Thesaurus/Auth.md#access-token)
 
 #### Relations
   * specifiedBy: [API Access Token Validation](AuthRequirements.md#api-access-token-validation)`}</CodeBlock>
@@ -118,7 +118,7 @@ The system shall reject API requests whose access token is invalid.
   * owner: Identity Team
 
 #### Concept References
-  * Access Token: auth:AccessToken
+  * [Access Token](../Thesaurus/Auth.md#access-token)
 
 #### Relations
   * specify: [API Authentication](Auth.md#api-authentication)

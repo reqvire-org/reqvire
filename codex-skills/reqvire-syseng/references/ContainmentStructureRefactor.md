@@ -232,7 +232,7 @@ When adding or moving model content:
 4. If it elaborates an obligation or capability, put it as a contract in the same capability folder.
 5. If it is service or architecture detail for one capability, put it under that capability's `Architecture/` folder.
 6. If it proves behavior, put it under `Verifications/<Domain>/`.
-7. If another subgraph needs curated vocabulary, add concept references to generated SKOS concepts declared under `Thesaurus/`.
+7. If another subgraph needs curated vocabulary, add concept references to native concept elements declared under `Thesaurus/`.
 8. If another subgraph needs a reusable requirement-owned contract, reuse that contract explicitly.
 
 ## Refactor Workflow
