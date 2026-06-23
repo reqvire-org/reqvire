@@ -9,6 +9,7 @@ This objective groups verification that the served Web Explorer renders model da
 
 #### Relations
   * derive: [Component Reuse Verification](#component-reuse-verification)
+  * derive: [Contract Bindings Link Serving Verification](#contract-bindings-link-serving-verification)
   * derive: [Diagram Contract Bindings Display Verification](#diagram-contract-bindings-display-verification)
   * derive: [Element Detail Inline Concept Reference Verification](#element-detail-inline-concept-reference-verification)
   * derive: [Explorer Serve Verification](#explorer-serve-verification)
@@ -18,7 +19,6 @@ This objective groups verification that the served Web Explorer renders model da
   * derive: [Model View Element Navigation Test](#model-view-element-navigation-test)
   * derive: [Ontology Model Viewer Analysis Verification](#ontology-model-viewer-analysis-verification)
   * derive: [Responsive Design Verification](#responsive-design-verification)
-  * derive: [Contract Bindings Link Serving Verification](#contract-bindings-link-serving-verification)
   * derive: [Serve Command Verification](#serve-command-verification)
   * derive: [SPA Explorer Store Contract Verification](#spa-explorer-store-contract-verification)
   * derive: [Thesaurus Project Store Projection Verification](#thesaurus-project-store-projection-verification)
@@ -40,6 +40,30 @@ Expected checks:
 
 #### Relations
   * verify: [Component-Based Explorer Architecture](../../../Interfaces/WebExplorer/ExplorerRendering.md#component-based-explorer-architecture)
+---
+
+### Contract Bindings Link Serving Verification
+
+This test verifies that the served Explorer preserves contract_bindings identifier links to referenced contract elements.
+
+#### Details
+
+##### Acceptance Criteria:
+- System shall preserve all contract-identifier contract_bindings referenced by elements
+- Contract Bindings identifier links shall resolve to referenced contract elements in Explorer content and element detail workflows
+- Duplicate contract_bindings (same contract referenced multiple times) shall be processed consistently
+
+##### Test Criteria:
+- Create model with elements having contract_bindings
+- Run the Explorer through the serve workflow or a Project Store fixture
+- Verify contract_bindings links resolve to contract element records and source anchors
+- Verify identifier targets are navigable from rendered content routes and element modals
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Contract Bindings Link Serving](../../../Interfaces/WebExplorer/Capabilities.md#contract-bindings-link-serving)
 ---
 
 ### Diagram Contract Bindings Display Verification
@@ -336,30 +360,6 @@ Expected checks:
 #### Relations
   * verify: [Explorer Design System Styling](../../../Interfaces/WebExplorer/ExplorerRendering.md#explorer-design-system-styling)
   * verify: [Responsive Explorer Rendering](../../../Interfaces/WebExplorer/ExplorerRendering.md#responsive-explorer-rendering)
----
-
-### Contract Bindings Link Serving Verification
-
-This test verifies that the served Explorer preserves contract_bindings identifier links to referenced contract elements.
-
-#### Details
-
-##### Acceptance Criteria:
-- System shall preserve all contract-identifier contract_bindings referenced by elements
-- Contract Bindings identifier links shall resolve to referenced contract elements in Explorer content and element detail workflows
-- Duplicate contract_bindings (same contract referenced multiple times) shall be processed consistently
-
-##### Test Criteria:
-- Create model with elements having contract_bindings
-- Run the Explorer through the serve workflow or a Project Store fixture
-- Verify contract_bindings links resolve to contract element records and source anchors
-- Verify identifier targets are navigable from rendered content routes and element modals
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Contract Bindings Link Serving](../../../Interfaces/WebExplorer/Capabilities.md#contract-bindings-link-serving)
 ---
 
 ### SPA Explorer Store Contract Verification

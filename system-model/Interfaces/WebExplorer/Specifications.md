@@ -43,6 +43,24 @@ Model containment-mode contract_bindings rendering behavior:
   * define: [Containment View Contract Bindings Links](Capabilities.md#containment-view-contract-bindings-links)
 ---
 
+### Contract Bindings Link Serving Contract Specification
+
+#### Details
+Contract Bindings link behavior in the served Explorer:
+- Collects contract_bindings references from `element.contract_bindings` across the model.
+- Resolves each contract_bindings as a contract element identifier target.
+- Skips duplicate identifier processing when the same contract is referenced by multiple elements.
+- Keeps contract-bindings-link evidence available in Project Store data for content routes, graph views, search results, and element modals.
+
+This keeps served Explorer content complete with navigable contract contract_bindings links.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Contract Bindings Link Serving](Capabilities.md#contract-bindings-link-serving)
+---
+
 ### Diagram Contract Bindings Display Contract Specification
 
 #### Details
@@ -651,24 +669,6 @@ Breakpoints:
 
 #### Relations
   * define: [Responsive Explorer Rendering](ExplorerRendering.md#responsive-explorer-rendering)
----
-
-### Contract Bindings Link Serving Contract Specification
-
-#### Details
-Contract Bindings link behavior in the served Explorer:
-- Collects contract_bindings references from `element.contract_bindings` across the model.
-- Resolves each contract_bindings as a contract element identifier target.
-- Skips duplicate identifier processing when the same contract is referenced by multiple elements.
-- Keeps contract-bindings-link evidence available in Project Store data for content routes, graph views, search results, and element modals.
-
-This keeps served Explorer content complete with navigable contract contract_bindings links.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Contract Bindings Link Serving](Capabilities.md#contract-bindings-link-serving)
 ---
 
 ### SPA Explorer Store Contract Specification

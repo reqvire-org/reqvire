@@ -1,5 +1,38 @@
 # Elements
 
+### Contract Bindings Scope Validation Contract Specification
+
+#### Details
+When validating contract_bindings, the system is expected to enforce contract_bindings scope constraints for contract-element identifier targets and report errors with clear messages indicating the bindContract element, the contract_bindings target, and the reason for the violation.
+
+Contract Bindings scope validation is expected to enforce:
+- Hierarchical independence from the contract's defining hierarchy
+- Upstream propagation within a hierarchy branch
+- One-direction contract_bindings flow between capability-root subgraphs
+
+#### Metadata
+  * type: specification
+---
+
+### Contract Bindings Target Validation Contract Specification
+
+#### Details
+Contract Bindings targets support model element identifier references with family-specific compatibility rules.
+
+**Identifier Targets:**
+- Requirement contract_bindings must point to reusable requirement-owned non-semantic-contract element types only (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
+- Contract Bindings to `ontology` is invalid; SKOS concept bindings use `#### Concept References` on non-ontology, non-semantic-contract elements, while semantic-contract ontology dependencies use `use`/`usedBy`
+- Normalized like relation targets (resolved to full identifier path)
+- Validation is expected to reject identifiers pointing to non-reusable element types
+- Validation is expected to reject unresolved identifiers
+- Provides clear error message indicating the expected element type
+
+This validation ensures that contract_bindings reference reusable requirement-owned contracts and do not carry ontology semantics.
+
+#### Metadata
+  * type: specification
+---
+
 ### Excluded File Relation Validation Contract Specification
 
 #### Details
@@ -128,39 +161,6 @@ The Reqvire SHACL context adapter must:
 
 #### Relations
   * define: [Reqvire SHACL Context Adapter](ValidationRequirements.md#reqvire-shacl-context-adapter)
----
-
-### Contract Bindings Scope Validation Contract Specification
-
-#### Details
-When validating contract_bindings, the system is expected to enforce contract_bindings scope constraints for contract-element identifier targets and report errors with clear messages indicating the bindContract element, the contract_bindings target, and the reason for the violation.
-
-Contract Bindings scope validation is expected to enforce:
-- Hierarchical independence from the contract's defining hierarchy
-- Upstream propagation within a hierarchy branch
-- One-direction contract_bindings flow between capability-root subgraphs
-
-#### Metadata
-  * type: specification
----
-
-### Contract Bindings Target Validation Contract Specification
-
-#### Details
-Contract Bindings targets support model element identifier references with family-specific compatibility rules.
-
-**Identifier Targets:**
-- Requirement contract_bindings must point to reusable requirement-owned non-semantic-contract element types only (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
-- Contract Bindings to `ontology` is invalid; SKOS concept bindings use `#### Concept References` on non-ontology, non-semantic-contract elements, while semantic-contract ontology dependencies use `use`/`usedBy`
-- Normalized like relation targets (resolved to full identifier path)
-- Validation is expected to reject identifiers pointing to non-reusable element types
-- Validation is expected to reject unresolved identifiers
-- Provides clear error message indicating the expected element type
-
-This validation ensures that contract_bindings reference reusable requirement-owned contracts and do not carry ontology semantics.
-
-#### Metadata
-  * type: specification
 ---
 
 ### Semantic Contract Shape Validation Specification

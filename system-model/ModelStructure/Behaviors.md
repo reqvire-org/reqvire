@@ -1,5 +1,25 @@
 # Elements
 
+### Contract Bindings Identifier CRUD Update Behavior
+
+When a Contract element is moved or renamed through CRUD operations, all contract_bindings identifiers referencing that element must be updated using the same update mechanism as relation target updates.
+
+#### Details
+The update process follows these steps:
+
+1. **Identify affected contract_bindings**: Find all elements that have contract_bindings identifiers pointing to the affected Contract element
+2. **Update identifier paths**: For each affected contract_bindings:
+   - **On move**: Update the file path portion of the identifier to reflect the new location
+   - **On rename**: Update the element name portion of the identifier (fragment) to reflect the new name
+3. **Preserve link text**: The display text of the markdown link is preserved
+4. **File persistence**: Modified files are written back to disk with updated contract_bindings
+
+This behavior mirrors the existing relation target update behavior used when moving or renaming elements, ensuring consistency across the model.
+
+#### Metadata
+  * type: behavior
+---
+
 ### Dry-Run Mode Behavior
 
 Preview mode behavior for modification commands.
@@ -46,26 +66,6 @@ Contract elements do not participate in governance metadata inheritance as metad
 The model shall retain enough source information for consumers to distinguish explicit, inherited, and default effective values.
 
 Formatting and rewrite operations shall not insert inherited or default values into Markdown source. Only explicit metadata authored by the user, or explicitly changed by a mutation operation, shall be persisted.
-
-#### Metadata
-  * type: behavior
----
-
-### Contract Bindings Identifier CRUD Update Behavior
-
-When a Contract element is moved or renamed through CRUD operations, all contract_bindings identifiers referencing that element must be updated using the same update mechanism as relation target updates.
-
-#### Details
-The update process follows these steps:
-
-1. **Identify affected contract_bindings**: Find all elements that have contract_bindings identifiers pointing to the affected Contract element
-2. **Update identifier paths**: For each affected contract_bindings:
-   - **On move**: Update the file path portion of the identifier to reflect the new location
-   - **On rename**: Update the element name portion of the identifier (fragment) to reflect the new name
-3. **Preserve link text**: The display text of the markdown link is preserved
-4. **File persistence**: Modified files are written back to disk with updated contract_bindings
-
-This behavior mirrors the existing relation target update behavior used when moving or renaming elements, ensuring consistency across the model.
 
 #### Metadata
   * type: behavior

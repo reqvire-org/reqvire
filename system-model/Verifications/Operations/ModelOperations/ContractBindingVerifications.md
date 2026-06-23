@@ -8,10 +8,6 @@ This objective groups verification that contract_bindings and asset operations p
   * type: verification-objective
 
 #### Relations
-  * derive: [Contract Bindings Verification](#contract-bindings-verification)
-  * derive: [Move Asset Command Verification](#move-asset-command-verification)
-  * derive: [Remove Asset Command Verification](#remove-asset-command-verification)
-  * derive: [Remove Contract Binding Command Verification](#remove-contract-binding-command-verification)
   * derive: [Bind Contract Command Verification](#bind-contract-command-verification)
   * derive: [Contract Bindings Change Impact Verification](#contract-bindings-change-impact-verification)
   * derive: [Contract Bindings Identifier CRUD Verification](#contract-bindings-identifier-crud-verification)
@@ -20,115 +16,10 @@ This objective groups verification that contract_bindings and asset operations p
   * derive: [Contract Bindings Search Filters Verification](#contract-bindings-search-filters-verification)
   * derive: [Contract Bindings Subsection Parsing Verification](#contract-bindings-subsection-parsing-verification)
   * derive: [Contract Bindings Validation Verification](#contract-bindings-validation-verification)
----
-
-### Contract Bindings Verification
-
-Verify contract_bindings rules for requirement-owned contract elements and rejection of ontology contract_bindings.
-
-#### Details
-Test cases:
-- Capability contract_bindings to any target fails; capabilities use `#### Concept References` for semantic vocabulary and `specifiedBy` requirements for coverage and specification.
-- Requirement contract_bindings to an `ontology` element fails.
-- Requirement contract_bindings to a `semantic-contract` fails; requirements use `constrainedBy` instead.
-- Requirement contract_bindings to ontology is forbidden because ontology vocabulary dependencies use concept references or semantic-contract `use` relations.
-- Requirement contract_bindings to ordinary contracts is limited to requirement-owned contract elements.
-- Verification element contract_bindings to any target fails; verification evidence must use `satisfiedBy`, and verified targets must use `verify`.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-capability-contract-bindings/test.sh)
-  * verify: [Ontology and Semantic Contract Model](../../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
-  * verify: [Contract Bindings Scope Validation](../../../Operations/Validation/ValidationRequirements.md#contract-bindings-scope-validation)
-  * verify: [Contract Bindings Target Validation](../../../Operations/Validation/ValidationRequirements.md#contract-bindings-target-validation)
----
-
-### Move Asset Command Verification
-
-Verify mv-asset moves InternalPath files and updates path-based relations while leaving contract-identifier contract_bindings unchanged.
-
-#### Details
-Test cases for contract_bindings behavior:
-- Existing contract-identifier contract_bindings remain unchanged after mv-asset
-- No contract_bindings entries are rewritten due to path moves
-
-Test cases for Relations updates:
-- Find all satisfiedBy relations with InternalPath matching old path
-- Find all satisfy relations with InternalPath matching old path
-- Find all relation targets with InternalPath matching old path
-- Update relation target to new path
-- Handle relative path resolution from element's file location
-
-Test cases for filesystem and reporting:
-- Move/rename physical file on filesystem
-- Report count of affected Relations
-- Report list of modified specification files
-- Dry-run mode: show changes without applying (file not moved)
-- JSON mode: emit valid structured CRUD result output
-- JSON file mode: write valid structured CRUD result output to `--output <FILE>`
-- Validation passes after move
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
-  * verify: [CLI Move Asset Command](../../../Interfaces/CLI/Commands.md#cli-move-asset-command)
----
-
-### Remove Asset Command Verification
-
-Verify rm-asset deletes InternalPath files and removes path-based relations while leaving contract-identifier contract_bindings unchanged.
-
-#### Details
-Test cases for contract_bindings behavior:
-- Existing contract-identifier contract_bindings remain unchanged after rm-asset
-- No contract_bindings entries are removed by rm-asset
-
-Test cases for Relations updates:
-- Find all satisfiedBy relations with InternalPath matching path
-- Find all satisfy relations with InternalPath matching path
-- Find all relation targets with InternalPath matching path
-- Remove entire relation line from element
-
-Test cases for filesystem and reporting:
-- Delete physical file from filesystem
-- Report count of removed Relations
-- Report list of modified specification files
-- Dry-run mode: show changes without applying (file not deleted)
-- JSON mode: emit valid structured CRUD result output
-- JSON file mode: write valid structured CRUD result output to `--output <FILE>`
-- Validation passes after removal
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
-  * verify: [CLI Remove Asset Command](../../../Interfaces/CLI/Commands.md#cli-remove-asset-command)
----
-
-### Remove Contract Binding Command Verification
-
-Verify remove contract binding command removes identifier links and cleans up empty subsections.
-
-#### Details
-Test cases for identifier contract_bindings:
-- Remove link from Contract Bindings subsection
-- Remove subsection when no contract_bindings remain
-- Remove Contract Binding from one element doesn't affect others
-- Dry-run mode makes no changes
-- Remove Contract Binding Contract element by identifier target
-- Works for both same-file and cross-file contract identifiers
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
-  * verify: [Contract Bindings Commands](../../../Interfaces/CLI/Commands.md#contract-bindings-commands)
+  * derive: [Contract Bindings Verification](#contract-bindings-verification)
+  * derive: [Move Asset Command Verification](#move-asset-command-verification)
+  * derive: [Remove Asset Command Verification](#remove-asset-command-verification)
+  * derive: [Remove Contract Binding Command Verification](#remove-contract-binding-command-verification)
 ---
 
 ### Bind Contract Command Verification
@@ -343,4 +234,113 @@ Test cases for element identifiers:
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
   * verify: [Reserved Subsections Support](../../../ModelStructure/StructureAndParsing.md#reserved-subsections-support)
   * verify: [Contract Bindings Target Validation](../../../Operations/Validation/ValidationRequirements.md#contract-bindings-target-validation)
+---
+
+### Contract Bindings Verification
+
+Verify contract_bindings rules for requirement-owned contract elements and rejection of ontology contract_bindings.
+
+#### Details
+Test cases:
+- Capability contract_bindings to any target fails; capabilities use `#### Concept References` for semantic vocabulary and `specifiedBy` requirements for coverage and specification.
+- Requirement contract_bindings to an `ontology` element fails.
+- Requirement contract_bindings to a `semantic-contract` fails; requirements use `constrainedBy` instead.
+- Requirement contract_bindings to ontology is forbidden because ontology vocabulary dependencies use concept references or semantic-contract `use` relations.
+- Requirement contract_bindings to ordinary contracts is limited to requirement-owned contract elements.
+- Verification element contract_bindings to any target fails; verification evidence must use `satisfiedBy`, and verified targets must use `verify`.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-capability-contract-bindings/test.sh)
+  * verify: [Ontology and Semantic Contract Model](../../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
+  * verify: [Contract Bindings Scope Validation](../../../Operations/Validation/ValidationRequirements.md#contract-bindings-scope-validation)
+  * verify: [Contract Bindings Target Validation](../../../Operations/Validation/ValidationRequirements.md#contract-bindings-target-validation)
+---
+
+### Move Asset Command Verification
+
+Verify mv-asset moves InternalPath files and updates path-based relations while leaving contract-identifier contract_bindings unchanged.
+
+#### Details
+Test cases for contract_bindings behavior:
+- Existing contract-identifier contract_bindings remain unchanged after mv-asset
+- No contract_bindings entries are rewritten due to path moves
+
+Test cases for Relations updates:
+- Find all satisfiedBy relations with InternalPath matching old path
+- Find all satisfy relations with InternalPath matching old path
+- Find all relation targets with InternalPath matching old path
+- Update relation target to new path
+- Handle relative path resolution from element's file location
+
+Test cases for filesystem and reporting:
+- Move/rename physical file on filesystem
+- Report count of affected Relations
+- Report list of modified specification files
+- Dry-run mode: show changes without applying (file not moved)
+- JSON mode: emit valid structured CRUD result output
+- JSON file mode: write valid structured CRUD result output to `--output <FILE>`
+- Validation passes after move
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * verify: [CLI Move Asset Command](../../../Interfaces/CLI/Commands.md#cli-move-asset-command)
+---
+
+### Remove Asset Command Verification
+
+Verify rm-asset deletes InternalPath files and removes path-based relations while leaving contract-identifier contract_bindings unchanged.
+
+#### Details
+Test cases for contract_bindings behavior:
+- Existing contract-identifier contract_bindings remain unchanged after rm-asset
+- No contract_bindings entries are removed by rm-asset
+
+Test cases for Relations updates:
+- Find all satisfiedBy relations with InternalPath matching path
+- Find all satisfy relations with InternalPath matching path
+- Find all relation targets with InternalPath matching path
+- Remove entire relation line from element
+
+Test cases for filesystem and reporting:
+- Delete physical file from filesystem
+- Report count of removed Relations
+- Report list of modified specification files
+- Dry-run mode: show changes without applying (file not deleted)
+- JSON mode: emit valid structured CRUD result output
+- JSON file mode: write valid structured CRUD result output to `--output <FILE>`
+- Validation passes after removal
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * verify: [CLI Remove Asset Command](../../../Interfaces/CLI/Commands.md#cli-remove-asset-command)
+---
+
+### Remove Contract Binding Command Verification
+
+Verify remove contract binding command removes identifier links and cleans up empty subsections.
+
+#### Details
+Test cases for identifier contract_bindings:
+- Remove link from Contract Bindings subsection
+- Remove subsection when no contract_bindings remain
+- Remove Contract Binding from one element doesn't affect others
+- Dry-run mode makes no changes
+- Remove Contract Binding Contract element by identifier target
+- Works for both same-file and cross-file contract identifiers
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * verify: [Contract Bindings Commands](../../../Interfaces/CLI/Commands.md#contract-bindings-commands)
 ---

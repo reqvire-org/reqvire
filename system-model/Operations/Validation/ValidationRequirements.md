@@ -111,6 +111,47 @@ The system shall check the internal consistency of the system model, ensuring th
   * specify: [Validating Structures](../BehaviorValidationOperationsFeature.md#validating-structures)
 ---
 
+### Contract Bindings Target Validation
+
+The system shall validate contract_bindings targets and reject invalid contract_bindings references during model validation.
+
+#### Details
+Implementation details shall follow the associated contract specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Contract Bindings Target Validation Contract Specification](Specifications.md#contract-bindings-target-validation-contract-specification)
+  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
+  * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
+  * verifiedBy: [Contract Bindings Subsection Parsing Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-subsection-parsing-verification)
+  * verifiedBy: [Contract Bindings Validation Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-validation-verification)
+---
+
+### Contract Bindings Scope Validation
+
+The system shall validate contract_bindings scope constraints and report validation errors for violations.
+
+#### Details
+Implementation details shall follow the associated contract specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Subgraph Direction Constraint](../../ModelStructure/Constraints.md#contract-bindings-subgraph-direction-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
+
+#### Relations
+  * definedBy: [Contract Bindings Scope Validation Contract Specification](Specifications.md#contract-bindings-scope-validation-contract-specification)
+  * derivedFrom: [Contract Bindings Target Validation](#contract-bindings-target-validation)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
+  * verifiedBy: [Contract Bindings Scope Constraints Test](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-scope-constraints-test)
+---
+
 ### GraphRegistry as Primary Registry
 
 The system shall enhance GraphRegistry to serve as the primary structure for relation operations and validation during Pass 2.
@@ -228,47 +269,6 @@ Validation shall resolve each native concept's scheme context through the canoni
   * derivedFrom: [Relation Type Validation](#relation-type-validation)
   * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
   * verifiedBy: [Native Concept Taxonomy Scheme Boundary Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#native-concept-taxonomy-scheme-boundary-validation-test)
----
-
-### Contract Bindings Target Validation
-
-The system shall validate contract_bindings targets and reject invalid contract_bindings references during model validation.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Contract Bindings Target Validation Contract Specification](Specifications.md#contract-bindings-target-validation-contract-specification)
-  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
-  * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
-  * verifiedBy: [Contract Bindings Subsection Parsing Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-subsection-parsing-verification)
-  * verifiedBy: [Contract Bindings Validation Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-validation-verification)
----
-
-### Contract Bindings Scope Validation
-
-The system shall validate contract_bindings scope constraints and report validation errors for violations.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
-  * [Contract Bindings Subgraph Direction Constraint](../../ModelStructure/Constraints.md#contract-bindings-subgraph-direction-constraint)
-  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
-
-#### Relations
-  * definedBy: [Contract Bindings Scope Validation Contract Specification](Specifications.md#contract-bindings-scope-validation-contract-specification)
-  * derivedFrom: [Contract Bindings Target Validation](#contract-bindings-target-validation)
-  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
-  * verifiedBy: [Contract Bindings Scope Constraints Test](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-scope-constraints-test)
 ---
 
 ### Single Root Hierarchy Ownership

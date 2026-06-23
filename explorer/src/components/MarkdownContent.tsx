@@ -2,5 +2,5 @@ export {
   MarkdownContent,
   MermaidBlock,
   sourceUrlTransform,
-  stripConceptReferencesSection,
+  stripRenderedDetailSections,
 } from "../rendering/MarkdownContent";

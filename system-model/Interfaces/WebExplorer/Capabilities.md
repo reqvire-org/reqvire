@@ -77,11 +77,11 @@ The system SHALL serve the embedded Reqvire Explorer SPA with all model artifact
   * definedBy: [Model Browser and Graph Specification](Specifications.md#model-browser-and-graph-specification)
   * definedBy: [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
   * derive: [Containment View Contract Bindings Links](#containment-view-contract-bindings-links)
+  * derive: [Contract Bindings Link Serving](#contract-bindings-link-serving)
   * derive: [Diagram Contract Bindings Display](#diagram-contract-bindings-display)
   * derive: [Model-Centric View Generation](#model-centric-view-generation)
   * derive: [Ontologies View Generation](#ontologies-view-generation)
   * derive: [Project Knowledge Graph View](#project-knowledge-graph-view)
-  * derive: [Contract Bindings Link Serving](#contract-bindings-link-serving)
   * derive: [SPA Explorer Shell and Project Store](#spa-explorer-shell-and-project-store)
   * derive: [Thesaurus View Generation](#thesaurus-view-generation)
   * derive: [Traces View Generation](#traces-view-generation)
@@ -119,6 +119,23 @@ Implementation details shall follow the associated contract specifications.
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [containment.rs](../../../crates/reqvire-core/src/containment.rs)
   * verifiedBy: [Model Containment Contract Bindings Links Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-containment-contract-bindings-links-verification)
+---
+
+### Contract Bindings Link Serving
+
+The system shall preserve contract_bindings identifier links to referenced contract elements in the served Explorer to preserve document completeness and enable navigation.
+
+#### Details
+Implementation details shall follow the associated contract specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Contract Bindings Link Serving Contract Specification](Specifications.md#contract-bindings-link-serving-contract-specification)
+  * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
+  * verifiedBy: [Contract Bindings Link Serving Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#contract-bindings-link-serving-verification)
 ---
 
 ### Diagram Contract Bindings Display
@@ -306,23 +323,6 @@ The Knowledge Graph view shall:
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
 ---
 
-### Contract Bindings Link Serving
-
-The system shall preserve contract_bindings identifier links to referenced contract elements in the served Explorer to preserve document completeness and enable navigation.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Contract Bindings Link Serving Contract Specification](Specifications.md#contract-bindings-link-serving-contract-specification)
-  * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
-  * verifiedBy: [Contract Bindings Link Serving Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#contract-bindings-link-serving-verification)
----
-
 ### SPA Explorer Shell and Project Store
 
 The system shall provide `index.html` as the single-page Reqvire Explorer shell and seed it with a normalized browser-local Project Store that supports the primary Explorer routes and supporting report/detail views as the canonical browser experience.
@@ -449,7 +449,7 @@ The system shall ensure color consistency between:
   * satisfiedBy: [containment.rs](../../../crates/reqvire-core/src/containment.rs)
   * satisfiedBy: [ElementIcon.tsx](../../../explorer/design-system/components/data/ElementIcon.tsx)
   * satisfiedBy: [palette.ts](../../../explorer/design-system/palette.ts)
-  * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
   * satisfiedBy: [ContractBindingList.tsx](../../../explorer/design-system/product-patterns/detail/ContractBindingList.tsx)
+  * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
   * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
 ---

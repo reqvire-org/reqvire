@@ -35,9 +35,9 @@ Implementation details shall follow the associated contract specifications.
   * derive: [CLI Size Estimate JSON Option](#cli-size-estimate-json-option)
   * derive: [CLI Submodels Command](#cli-submodels-command)
   * derive: [CLI Traces Command](#cli-traces-command)
+  * derive: [Contract Bindings Commands](#contract-bindings-commands)
   * derive: [Explicit Workspace Selection](#explicit-workspace-selection)
   * derive: [Format Command](#format-command)
-  * derive: [Contract Bindings Commands](#contract-bindings-commands)
   * derive: [Validate Command](#validate-command)
   * derivedFrom: [CLI interface](../InterfacesRequirements.md#cli-interface)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
@@ -668,6 +668,52 @@ Implementation details shall follow the associated contract specifications.
   * verifiedBy: [Verification Traces Element Navigation Test](../../Verifications/Interfaces/CLI/CLIVerifications.md#verification-traces-element-navigation-test)
 ---
 
+### Contract Bindings Commands
+
+The system shall provide contract_bindings management through the unified link/unlink commands using the 'bindContract' keyword.
+
+#### Details
+Contract Bindings management behavior:
+
+**Bind contract (via link):**
+- Syntax: `reqvire link <element-name> bindContract <target> [--dry-run] [--json] [--output <FILE>]`
+- Target: Contract element identifier
+- Create Contract Bindings subsection if doesn't exist
+- Add link to subsection with format `* [display-name](file.md#contract-id)`
+- Skip if already bound (idempotent)
+- Support many-to-many (same contract to multiple elements)
+- Support dry-run mode for preview
+- Support structured JSON output and JSON file output
+
+**Remove Contract Binding (via unlink):**
+- Syntax: `reqvire unlink <element-name> <target> [--dry-run] [--json] [--output <FILE>]`
+- Auto-detects whether target is relation or contract_bindings
+- Remove link from Contract Bindings subsection
+- Remove subsection if no contract_bindings remain
+- Trigger change impact on element
+- Support dry-run mode for preview
+- Support structured JSON output and JSON file output
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
+
+#### Relations
+  * definedBy: [Contract Bindings Input Auto-Detection Behavior](Behaviors.md#contract-bindings-input-auto-detection-behavior)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
+  * verifiedBy: [Bind Contract Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#bind-contract-command-verification)
+  * verifiedBy: [Remove Contract Binding Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#remove-contract-binding-command-verification)
+---
+
 ### Detailed Error Handling and Logging
 
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
@@ -758,52 +804,6 @@ Implementation details shall follow the associated contract specifications.
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [Link Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#unlink-command-verification)
----
-
-### Contract Bindings Commands
-
-The system shall provide contract_bindings management through the unified link/unlink commands using the 'bindContract' keyword.
-
-#### Details
-Contract Bindings management behavior:
-
-**Bind contract (via link):**
-- Syntax: `reqvire link <element-name> bindContract <target> [--dry-run] [--json] [--output <FILE>]`
-- Target: Contract element identifier
-- Create Contract Bindings subsection if doesn't exist
-- Add link to subsection with format `* [display-name](file.md#contract-id)`
-- Skip if already bound (idempotent)
-- Support many-to-many (same contract to multiple elements)
-- Support dry-run mode for preview
-- Support structured JSON output and JSON file output
-
-**Remove Contract Binding (via unlink):**
-- Syntax: `reqvire unlink <element-name> <target> [--dry-run] [--json] [--output <FILE>]`
-- Auto-detects whether target is relation or contract_bindings
-- Remove link from Contract Bindings subsection
-- Remove subsection if no contract_bindings remain
-- Trigger change impact on element
-- Support dry-run mode for preview
-- Support structured JSON output and JSON file output
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
-  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
-
-#### Relations
-  * definedBy: [Contract Bindings Input Auto-Detection Behavior](Behaviors.md#contract-bindings-input-auto-detection-behavior)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
-  * verifiedBy: [Remove Contract Binding Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#remove-contract-binding-command-verification)
-  * verifiedBy: [Bind Contract Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#bind-contract-command-verification)
 ---
 
 ### Validate Command

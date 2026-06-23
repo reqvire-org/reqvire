@@ -1,23 +1,5 @@
 # Elements
 
-### Element Type Relation Compatibility Constraint
-
-Validation rules for element type and relation type combinations.
-
-#### Details
-Canonical relation compatibility is defined by the Reqvire relation ontology, core element type vocabulary, capability/requirement contract vocabulary, and verification type vocabulary.
-
-Validation shall enforce those model contracts so that:
-- hierarchy relations stay within capability, requirement, or ontology hierarchy families
-- `specify`/`specifiedBy` is the requirement-to-capability bridge
-- `define`/`definedBy` is limited to requirement-owned subordinate details and contracts
-- `satisfiedBy`/`satisfy` is limited to requirement and evidence-backed verification satisfaction
-- custom `other` and `other-TYPENAME` extension elements cannot author canonical semantic relations
-
-#### Metadata
-  * type: constraint
----
-
 ### Contract Bindings Hierarchical Independence Constraint
 
 Rules for preventing contract_bindings within the same requirement hierarchy.
@@ -75,6 +57,24 @@ For cross-subgraph contract contract_bindings, flow is defined from the bindCont
 - This rule applies at the capability-root hierarchy level, not only to directly involved requirements or capabilities
 
 **Rationale**: Contract Bindings contracts are used to model waterfall-style dependency flow between subgraphs. Allowing reverse contract_bindings flow between the same two subgraphs breaks boundary directionality and undermines contract bindings as one-way dependency edges.
+
+#### Metadata
+  * type: constraint
+---
+
+### Element Type Relation Compatibility Constraint
+
+Validation rules for element type and relation type combinations.
+
+#### Details
+Canonical relation compatibility is defined by the Reqvire relation ontology, core element type vocabulary, capability/requirement contract vocabulary, and verification type vocabulary.
+
+Validation shall enforce those model contracts so that:
+- hierarchy relations stay within capability, requirement, or ontology hierarchy families
+- `specify`/`specifiedBy` is the requirement-to-capability bridge
+- `define`/`definedBy` is limited to requirement-owned subordinate details and contracts
+- `satisfiedBy`/`satisfy` is limited to requirement and evidence-backed verification satisfaction
+- custom `other` and `other-TYPENAME` extension elements cannot author canonical semantic relations
 
 #### Metadata
   * type: constraint
