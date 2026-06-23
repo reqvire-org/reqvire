@@ -311,7 +311,7 @@ function ActiveView({
     case "files":
       return <FilesView path={param} activeView={view} onNavigate={onNavigate} onOpenElement={onOpenElement} />;
     case "content":
-      return <ContentView path={param ?? ""} />;
+      return <ContentView path={param ?? ""} onOpenElement={onOpenElement} />;
     case "search":
       return <SearchView initialQuery={param} activeView={view} onNavigate={onNavigate} onOpenElement={onOpenElement} />;
     default:

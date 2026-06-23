@@ -2,7 +2,6 @@ import { cx } from "@linaria/atomic";
 import { CodeRef } from "../../components/data/CodeRef";
 import { detailContentFlowUX, detailMutedUX } from "./detailStyles";
 import { ContractBindingList } from "./ContractBindingList";
-import { DetailSection } from "./DetailSection";
 import { MetadataStrip } from "./MetadataStrip";
 import { RelationList } from "./RelationList";
 import type {
@@ -38,7 +37,7 @@ export function ElementDetailContent({
       <MetadataStrip badges={metaBadges} />
 
       <div className={cx(detailContentFlowUX)}>
-        <DetailSection title="Content">{content}</DetailSection>
+        {content}
         <RelationList
           relations={relations}
           defaultExpanded={detailListsDefaultExpanded}

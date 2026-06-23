@@ -26,9 +26,10 @@ import {
 
 interface ContentViewProps {
   path: string;
+  onOpenElement: (id: string) => void;
 }
 
-export function ContentView({ path }: ContentViewProps) {
+export function ContentView({ path, onOpenElement }: ContentViewProps) {
   const { store, elementById } = useStore();
   const [filePath, fragmentId] = splitContentPath(path);
   const file = store.files.find((f) => f.path === filePath);
@@ -91,14 +92,20 @@ export function ContentView({ path }: ContentViewProps) {
     <DocumentPanel toolbar={contentToolbar(file.path)}>
       <SourcePageElements>
         {elements.map((element) => (
-          <SourceElementView key={element.id} element={element} />
+          <SourceElementView key={element.id} element={element} onOpenConceptElement={onOpenElement} />
         ))}
       </SourcePageElements>
     </DocumentPanel>
   );
 }
 
-function SourceElementView({ element }: { element: ProjectStoreElement }) {
+function SourceElementView({
+  element,
+  onOpenConceptElement,
+}: {
+  element: ProjectStoreElement;
+  onOpenConceptElement: (id: string) => void;
+}) {
   const { store, elementById } = useStore();
   const resourceById = useMemo(
     () => new Map(store.resources.map((resource) => [resource.id, resource])),
@@ -173,7 +180,7 @@ function SourceElementView({ element }: { element: ProjectStoreElement }) {
     });
   }, [element, elementById, store.concept_refs, store.elements, store.ontology.graph_data?.edges, store.ontology.graph_data?.nodes]);
 
-  const openElement = (id: string) => {
+  const openSourceElement = (id: string) => {
     const target = elementById(id);
     if (!target) return;
     window.location.hash = sourceAnchorRoute(target.source_anchor, target.file_path);
@@ -215,9 +222,9 @@ function SourceElementView({ element }: { element: ProjectStoreElement }) {
           contract_bindings={contractBindingItems}
           conceptReferences={conceptReferenceItems}
           detailListsDefaultExpanded={false}
-          onOpenElement={openElement}
+          onOpenElement={openSourceElement}
           onOpenConceptReference={(reference) => {
-            if (reference.elementId) openElement(reference.elementId);
+            if (reference.elementId) onOpenConceptElement(reference.elementId);
           }}
           onOpenResource={openResource}
         />
@@ -231,14 +238,14 @@ function SourceElementView({ element }: { element: ProjectStoreElement }) {
               sourceAnchor={sourceAnchorRoute(element.source_anchor, element.file_path)}
               conceptReferences={conceptReferenceItems}
               onOpenConceptReference={(reference) => {
-                if (reference.elementId) openElement(reference.elementId);
+                if (reference.elementId) onOpenConceptElement(reference.elementId);
               }}
             />
           }
           relations={relationItems}
           contract_bindings={contractBindingItems}
           detailListsDefaultExpanded={false}
-          onOpenElement={openElement}
+          onOpenElement={openSourceElement}
           onOpenResource={openResource}
         />
       )}

@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { css, cx } from "@linaria/atomic";
+import { Icon } from "../../components/core/Icon";
 import { DetailSection } from "./DetailSection";
 import { MetadataStrip } from "./MetadataStrip";
 import { RelationEndpoint } from "./RelationEndpoint";
@@ -7,6 +9,12 @@ import { ContractBindingList } from "./ContractBindingList";
 import { ConceptReferenceList } from "./ConceptReferenceList";
 import {
   detailContentFlowUX,
+  detailSectionUX,
+  relationDisclosureBaseUX,
+  relationDisclosureCountSkinX,
+  relationDisclosureCountUX,
+  relationDisclosureSkinX,
+  relationDisclosureTitleUX,
   relationKindBaseUX,
   relationKindSkinX,
   relationListUX,
@@ -128,18 +136,18 @@ export function ConceptElementDetailContent({
           onOpenElement={onOpenElement}
           onOpenResource={onOpenResource}
         />
-        <ConceptEndpointList title="Top concepts" relationLabel="top concept of" endpoints={topConcepts} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <ConceptEndpointList title="Broader concepts" relationLabel="broader of" endpoints={broader} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <ConceptEndpointList title="Narrower concepts" relationLabel="narrower of" endpoints={narrower} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <ConceptEndpointList title="Related concepts" relationLabel="related to" endpoints={related} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <ConceptEndpointList title="Exact matches" relationLabel="exact match of" endpoints={exactMatches} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
-        <ConceptEndpointList title="Close matches" relationLabel="close match of" endpoints={closeMatches} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Top concepts" relationLabel="top concept of" endpoints={topConcepts} defaultExpanded={detailListsDefaultExpanded} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Broader concepts" relationLabel="broader of" endpoints={broader} defaultExpanded={detailListsDefaultExpanded} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Narrower concepts" relationLabel="narrower of" endpoints={narrower} defaultExpanded={detailListsDefaultExpanded} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Related concepts" relationLabel="related to" endpoints={related} defaultExpanded={detailListsDefaultExpanded} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Exact matches" relationLabel="exact match of" endpoints={exactMatches} defaultExpanded={detailListsDefaultExpanded} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Close matches" relationLabel="close match of" endpoints={closeMatches} defaultExpanded={detailListsDefaultExpanded} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
         <ConceptReferenceList
           title="Mapped ontology terms"
           references={mappedOntologyTerms}
           onOpenConceptReference={onOpenConceptReference}
         />
-        <ConceptEndpointList title="Used by model" relationLabel="references" endpoints={usedByModel} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
+        <ConceptEndpointList title="Used by model" relationLabel="references" endpoints={usedByModel} defaultExpanded={detailListsDefaultExpanded} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
         <RelationList
           title="Authored relations"
           relations={relations}
@@ -223,27 +231,43 @@ function ConceptEndpointList({
   title,
   relationLabel,
   endpoints,
+  defaultExpanded = true,
   onOpenElement,
   onOpenResource,
 }: {
   title: string;
   relationLabel: string;
   endpoints: readonly DetailRelationEndpointData[];
+  defaultExpanded?: boolean;
   onOpenElement: OpenElementHandler;
   onOpenResource?: OpenResourceHandler;
 }) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+
   if (endpoints.length === 0) return null;
 
   return (
-    <DetailSection title={title}>
-      <div className={cx(relationListUX)}>
+    <section className={cx(detailSectionUX)}>
+      <button
+        type="button"
+        className={cx(relationDisclosureBaseUX, relationDisclosureSkinX)}
+        aria-expanded={expanded}
+        onClick={() => setExpanded((value) => !value)}
+      >
+        <Icon name={expanded ? "chevron-down" : "chevron-right"} size={14} />
+        <span className={cx(relationDisclosureTitleUX)}>{title}</span>
+        <span className={cx(relationDisclosureCountUX, relationDisclosureCountSkinX)}>{endpoints.length}</span>
+      </button>
+      {expanded ? (
+        <div className={cx(relationListUX)}>
         {endpoints.map((endpoint) => (
           <div key={`${relationLabel}-${endpoint.id}`} className={cx(relationRowBaseUX)}>
             <span className={cx(relationKindBaseUX, relationKindSkinX)}>{relationLabel}</span>
             <RelationEndpoint endpoint={endpoint} onOpenElement={onOpenElement} onOpenResource={onOpenResource} />
           </div>
         ))}
-      </div>
-    </DetailSection>
+        </div>
+      ) : null}
+    </section>
   );
 }
