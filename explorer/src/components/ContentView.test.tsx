@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
 import { ContentView } from "./ContentView";
@@ -7,7 +7,7 @@ import { ContentView } from "./ContentView";
 function renderContent(path: string) {
   return render(
     <StoreProvider store={devFixture} schemaMismatch={null}>
-      <ContentView path={path} />
+      <ContentView path={path} onOpenElement={vi.fn()} />
     </StoreProvider>,
   );
 }
