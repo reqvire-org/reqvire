@@ -207,6 +207,8 @@ const detailTitleRowUX = css`
   h2 {
     flex: 1 1 auto;
     min-width: 0;
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
   }
 `;
 

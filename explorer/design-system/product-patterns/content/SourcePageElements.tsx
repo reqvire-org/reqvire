@@ -41,7 +41,7 @@ const sourceTitleRowUX = css`
   h2 {
     margin: 0;
     color: var(--text-strong);
-    font-size: var(--text-2xl);
+    font-size: var(--text-xl);
     font-weight: var(--weight-bold);
     line-height: var(--leading-tight);
   }

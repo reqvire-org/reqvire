@@ -738,6 +738,7 @@ This keeps served Explorer content complete with navigable contract contract_bin
 - Routes must be deep-linkable: loading `index.html#/elements/<identifier>` must open the selected element inside the Explorer shell without leaving the current view family.
 - Element-detail routes must render as an in-shell, scrollable modal/dialog over the active Explorer view. The modal must use Project Store element records as the primary data source and must show at minimum element name, type, source file, source anchor, metadata, governance context, content, relations, contract_bindings, inline concept-reference links, and available verification/coverage/resource evidence.
 - Element-detail modal headers must show the actual element type as the single primary text badge. They must not show a second canonical family/kind badge, marker dot, shape, or glyph when the actual element type already carries the meaningful user-facing classification.
+- Element-detail modal titles must use the compact detail title scale so the type badge, title, back affordance, and close affordance fit comfortably without display-sized typography.
 - Element-detail modal relation navigation must maintain a local previous-element stack. Opening a related element from the modal must replace the modal content with the related element and show a compact back icon button whose accessible label and browser tooltip name the previous element.
 - Element-detail modal relation and Contract Bindings sections must be expanded by default, use the shared detail disclosure pattern, and keep target activation inside the modal navigation stack.
 - Element-detail modal headers must not render a second visible previous-element context line such as `From:` when the back button already carries the previous element name through its accessible label/title.
@@ -746,6 +747,7 @@ This keeps served Explorer content complete with navigable contract contract_bin
 - Closing the element-detail modal must return to the underlying Explorer route and preserve view context such as graph focus, filters, and search state when feasible.
 - Source-document element links must remain available as secondary source browsing destinations, but normal Explorer element navigation must prefer `index.html#/elements/<identifier>`.
 - Source content routes for modeled Markdown files must render modeled elements through the shared detail-body product patterns rather than raw Markdown sections. They must promote metadata/governance into the same badge strip used by element modals, render content with inline native concept links, and collapse relation and Contract Bindings sections by default.
+- Source content route element titles must use a compact document title scale smaller than display headings while still remaining visually primary within each source element block.
 - Source-page relation and Contract Bindings target activation must stay in source browsing context: clicking a target on a source page opens that target's served source route and fragment, while clicking a target inside an element modal opens that target inside the modal.
 
 **SPA View Compatibility Policy**
