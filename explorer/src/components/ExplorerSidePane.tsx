@@ -703,6 +703,9 @@ function TreeFolderNode({
   const expanded = Boolean(query.trim()) || open;
 
   function selectFolder() {
+    if (folder.files.length + folder.folders.length > 0) {
+      setOpen((value) => !value);
+    }
     ui.setModelSelectionId(selectionId);
     if (activeView === "files") onNavigate("model");
   }
@@ -892,6 +895,9 @@ function TreeFileNode({
   const selectionId = `file:${file.path}`;
 
   function selectFile() {
+    if (showElementChildren) {
+      setOpen((value) => !value);
+    }
     ui.setModelSelectionId(selectionId);
     if (sourceBrowsing) {
       onOpenSourceRoute?.(routeForContent(file.path));
@@ -905,7 +911,7 @@ function TreeFileNode({
     if (sourceBrowsing) {
       const element = elementById(elementId);
       if (element) {
-        onOpenSourceRoute?.(element.source_anchor);
+        onOpenSourceRoute?.(sourceRouteForElement(element));
       }
       return;
     }
@@ -947,6 +953,14 @@ function TreeFileNode({
       ))}
     </PaneTreeNode>
   );
+}
+
+function sourceRouteForElement(element: ProjectStoreElement) {
+  if (element.source_anchor.startsWith("#/content/")) return element.source_anchor;
+  if (element.source_anchor.startsWith("#")) {
+    return `${routeForContent(element.file_path)}${element.source_anchor}`;
+  }
+  return element.source_anchor;
 }
 
 interface ThesaurusPaneConcept {

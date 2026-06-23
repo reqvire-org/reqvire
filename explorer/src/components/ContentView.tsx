@@ -39,9 +39,12 @@ export function ContentView({ path }: ContentViewProps) {
 
   useEffect(() => {
     if (!fragmentId) return;
-    window.requestAnimationFrame(() => {
+    const frame = window.requestAnimationFrame(() => {
       document.getElementById(fragmentId)?.scrollIntoView({ block: "start" });
     });
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
   }, [fragmentId, filePath]);
 
   if (!file) {
@@ -252,8 +255,11 @@ function isProjectStoreElement(value: ProjectStoreElement | undefined): value is
 }
 
 function elementAnchorId(element: ProjectStoreElement) {
-  const hashIndex = element.id.indexOf("#");
-  return hashIndex === -1 ? element.id : element.id.slice(hashIndex + 1);
+  const hashIndex = element.source_anchor.indexOf("#", "#/content/".length);
+  if (hashIndex !== -1) {
+    return element.source_anchor.slice(hashIndex + 1);
+  }
+  return element.id;
 }
 
 function contentToolbar(filePath: string, label = "Source page") {
