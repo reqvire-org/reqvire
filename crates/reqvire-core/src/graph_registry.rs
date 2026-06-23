@@ -2314,19 +2314,64 @@ impl GraphRegistry {
                 for (relation, links) in [
                     ("broader", &concept.broader),
                     ("narrower", &concept.narrower),
-                    ("related", &concept.related),
                 ] {
                     for link in links {
-                        if self.concept_link_resolves_to_type(&link.target, |candidate| {
-                            candidate.element_type.is_concept()
-                        }) {
+                        let target_id = self.resolve_concept_element_id(&link.target);
+                        if target_id.is_none() {
+                            errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                                "File {}: Concept '{}' {} target '{}' must resolve to a concept element.",
+                                element.file_path, element.name, relation, link.target
+                            )));
                             continue;
                         }
-                        errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                            "File {}: Concept '{}' {} target '{}' must resolve to a concept element.",
-                            element.file_path, element.name, relation, link.target
-                        )));
+                        let Some(source_scheme_id) =
+                            self.concept_scheme_context_id(&element.identifier)
+                        else {
+                            continue;
+                        };
+                        let target_id = target_id.expect("checked concept target");
+                        let Some(target_scheme_id) = self.concept_scheme_context_id(&target_id)
+                        else {
+                            continue;
+                        };
+                        if source_scheme_id != target_scheme_id {
+                            let source_scheme = self
+                                .nodes
+                                .get(&source_scheme_id)
+                                .map(|node| node.element.name.as_str())
+                                .unwrap_or(source_scheme_id.as_str());
+                            let target_scheme = self
+                                .nodes
+                                .get(&target_scheme_id)
+                                .map(|node| node.element.name.as_str())
+                                .unwrap_or(target_scheme_id.as_str());
+                            let target_name = self
+                                .nodes
+                                .get(&target_id)
+                                .map(|node| node.element.name.as_str())
+                                .unwrap_or(link.label.as_str());
+                            errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                                "File {}: Concept taxonomy relation crosses concept schemes: concept '{}' uses {} to concept '{}', but source scheme '{}' differs from target scheme '{}'. Keep broader/narrower inside one concept scheme; use related, exactMatch, or closeMatch for cross-scheme concept alignment.",
+                                element.file_path,
+                                element.name,
+                                relation,
+                                target_name,
+                                source_scheme,
+                                target_scheme
+                            )));
+                        }
                     }
+                }
+                for link in &concept.related {
+                    if self.concept_link_resolves_to_type(&link.target, |candidate| {
+                        candidate.element_type.is_concept()
+                    }) {
+                        continue;
+                    }
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "File {}: Concept '{}' related target '{}' must resolve to a concept element.",
+                        element.file_path, element.name, link.target
+                    )));
                 }
                 for (relation, links) in [
                     ("exactMatch", &concept.exact_match),
@@ -2590,6 +2635,22 @@ impl GraphRegistry {
                     .map(|node| &node.element)
             })
             .is_some_and(predicate)
+    }
+
+    fn resolve_concept_element_id(&self, target: &str) -> Option<String> {
+        self.nodes
+            .get(target)
+            .filter(|node| node.element.element_type.is_concept())
+            .map(|_| target.to_string())
+            .or_else(|| {
+                self.nodes
+                    .values()
+                    .find(|node| {
+                        node.element.element_type.is_concept()
+                            && node.element.identifier.ends_with(target)
+                    })
+                    .map(|node| node.element.identifier.clone())
+            })
     }
 
     fn valid_concept_mapping_target(&self, target: &str) -> bool {

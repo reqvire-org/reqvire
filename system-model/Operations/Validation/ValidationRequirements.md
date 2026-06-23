@@ -210,6 +210,26 @@ The system shall validate relation types against a defined vocabulary and provid
   * verifiedBy: [Same-File Fragment Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#same-file-fragment-relations-test)
 ---
 
+### Native Concept Taxonomy Scheme Boundary Validation
+
+The system shall reject native concept `broader` and `narrower` taxonomy relations whose source and target concepts resolve to different `concept-scheme` roots.
+
+#### Details
+Native `broader` and `narrower` relations are scheme-local taxonomy relations. Cross-scheme concept alignment shall use non-taxonomic association or mapping relations instead: `related`, `exactMatch`, or `closeMatch`.
+
+Validation shall resolve each native concept's scheme context through the canonical `concept-scheme` ancestry used to generate SKOS IRIs. The rule shall run as part of normal model validation so invalid taxonomy does not reach semantic export, Explorer, MCP tools, or downstream graph stores.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * constrainedBy: [Validation Rule Diagnostic Shape](../../Ontologies/BehaviorValidationOperations.md#validation-rule-diagnostic-shape)
+  * definedBy: [Native Concept Taxonomy Scheme Boundary Validation Specification](Specifications.md#native-concept-taxonomy-scheme-boundary-validation-specification)
+  * derivedFrom: [Relation Type Validation](#relation-type-validation)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * verifiedBy: [Native Concept Taxonomy Scheme Boundary Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#native-concept-taxonomy-scheme-boundary-validation-test)
+---
+
 ### Reused Contract Context Target Validation
 
 The system shall validate reused_contract_context targets and reject invalid reused_contract_context references during model validation.

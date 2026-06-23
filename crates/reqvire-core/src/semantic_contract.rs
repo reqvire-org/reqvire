@@ -3059,10 +3059,18 @@ fn element_iri_from_identifier(identifier: &str) -> String {
 fn element_type_classes(element_type: &ElementType) -> Vec<&'static str> {
     match element_type {
         ElementType::Capability => {
-            vec!["owl:NamedIndividual", "reqvire:Element", "reqvire:Capability"]
+            vec![
+                "owl:NamedIndividual",
+                "reqvire:Element",
+                "reqvire:Capability",
+            ]
         }
         ElementType::Requirement(_) => {
-            vec!["owl:NamedIndividual", "reqvire:Element", "reqvire:Requirement"]
+            vec![
+                "owl:NamedIndividual",
+                "reqvire:Element",
+                "reqvire:Requirement",
+            ]
         }
         ElementType::Ontology => {
             vec!["owl:NamedIndividual", "reqvire:Element", "reqvire:Ontology"]
@@ -3126,7 +3134,11 @@ fn element_type_classes(element_type: &ElementType) -> Vec<&'static str> {
             vec!["owl:NamedIndividual", "reqvire:Artifact", "reqvire:File"]
         }
         ElementType::Other(_) => {
-            vec!["owl:NamedIndividual", "reqvire:Element", "reqvire:CustomElement"]
+            vec![
+                "owl:NamedIndividual",
+                "reqvire:Element",
+                "reqvire:CustomElement",
+            ]
         }
     }
 }
@@ -3858,7 +3870,9 @@ fn generated_concept_turtle(
             turtle.push_str(&format!(" ;\n  skos:{} {}", predicate, object));
         }
         turtle.push_str(" .\n");
-        for (subject, predicate, object) in external_symmetric_concept_relation_triples(element, &prefix) {
+        for (subject, predicate, object) in
+            external_symmetric_concept_relation_triples(element, &prefix)
+        {
             turtle.push_str(&format!("{} skos:{} {} .\n", subject, predicate, object));
         }
         return Ok(Some(turtle));
@@ -5710,7 +5724,9 @@ ext:UnusedTerm a owl:Class ;
                 ontology_base: "https://example.test/ontology".to_string(),
                 ontology_prefix: "ex".to_string(),
                 term_namespace: "https://example.test/ontology#".to_string(),
-                element_identifiers: vec!["system-model/Ontologies/Test.md#test-ontology".to_string()],
+                element_identifiers: vec![
+                    "system-model/Ontologies/Test.md#test-ontology".to_string()
+                ],
                 element_names: vec!["Test ontology".to_string()],
                 imports: Vec::new(),
             }],

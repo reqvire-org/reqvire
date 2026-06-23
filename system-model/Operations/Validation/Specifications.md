@@ -124,6 +124,26 @@ Reused Contract Context scope validation is expected to enforce:
   * type: specification
 ---
 
+### Native Concept Taxonomy Scheme Boundary Validation Specification
+
+The native concept taxonomy scheme boundary contract defines the hard validation rule for SKOS taxonomy authored through Reqvire native concept elements.
+
+#### Details
+Validation rules:
+- For every native `concept` element, resolve its source concept scheme using the same nearest `concept-scheme` ancestry used for generated SKOS concept IRIs.
+- For each authored `broader` or `narrower` relation, resolve the target to a native `concept` element and then resolve that target concept's scheme.
+- Validation shall fail when the source and target scheme identifiers differ.
+- Validation shall not reject cross-scheme `related`, `exactMatch`, or `closeMatch` relations. Those are the intended cross-scheme association and mapping channels.
+- The diagnostic shall name the source concept, relation kind, target concept, source scheme, target scheme, and repair guidance.
+- This rule runs during normal model validation before semantic concept export and before any consumers rely on materialized inverse concept relations.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Native Concept Taxonomy Scheme Boundary Validation](ValidationRequirements.md#native-concept-taxonomy-scheme-boundary-validation)
+---
+
 ### Reused Contract Context Target Validation Contract Specification
 
 #### Details

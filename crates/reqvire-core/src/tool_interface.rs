@@ -1154,7 +1154,11 @@ fn concept_get_tool(
 
     concept
         .map(|concept| json!({ "concept": concept }))
-        .ok_or_else(|| ReqvireError::ProcessError("No generated native concept matched the requested selector".to_string()))
+        .ok_or_else(|| {
+            ReqvireError::ProcessError(
+                "No generated native concept matched the requested selector".to_string(),
+            )
+        })
 }
 
 fn concept_mappings_list_tool(
@@ -1195,8 +1199,12 @@ fn concept_mappings_list_tool(
             let Some(target_iri) = term_iri(&quad.object) else {
                 continue;
             };
-            if source_filter.as_deref().is_some_and(|value| value != source_iri)
-                || target_filter.as_deref().is_some_and(|value| value != target_iri)
+            if source_filter
+                .as_deref()
+                .is_some_and(|value| value != source_iri)
+                || target_filter
+                    .as_deref()
+                    .is_some_and(|value| value != target_iri)
             {
                 continue;
             }

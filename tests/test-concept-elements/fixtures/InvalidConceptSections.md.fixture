@@ -135,3 +135,60 @@ invalidstructural:Thing a owl:Class .
 
 ontologyunderconcept:Thing a owl:Class .
 ```
+---
+
+### Cross Scheme Concept Scheme
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/cross-scheme-concepts
+  * concept_prefix: crossschemeconcept
+---
+
+### Cross Scheme Parent Concept
+
+Parent concept in a separate concept scheme.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Cross Scheme Concept Scheme](#cross-scheme-concept-scheme)
+---
+
+### Invalid Cross Scheme Broader Concept
+
+Concept that incorrectly uses broader across concept schemes.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Invalid Concept Scheme](#invalid-concept-scheme)
+  * broader: [Cross Scheme Parent Concept](#cross-scheme-parent-concept)
+---
+
+### Invalid Cross Scheme Narrower Concept
+
+Concept that incorrectly uses narrower across concept schemes.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Invalid Concept Scheme](#invalid-concept-scheme)
+  * narrower: [Cross Scheme Parent Concept](#cross-scheme-parent-concept)
+---
+
+### Valid Cross Scheme Association Concept
+
+Concept that may intentionally associate with concepts in another scheme.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Invalid Concept Scheme](#invalid-concept-scheme)
+  * related: [Cross Scheme Parent Concept](#cross-scheme-parent-concept)
+  * exactMatch: [Cross Scheme Parent Concept](#cross-scheme-parent-concept)
+  * closeMatch: [Cross Scheme Parent Concept](#cross-scheme-parent-concept)

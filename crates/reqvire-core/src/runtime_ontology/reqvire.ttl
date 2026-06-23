@@ -379,6 +379,7 @@
 <https://www.reqvire.org/ontology#metadataSubsection> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#multiBranchConvergenceLintRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#name> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+<https://www.reqvire.org/ontology#nativeConceptTaxonomySchemeBoundaryRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#nonEvidenceBackedVerificationRule> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#normalizedConceptRelationForwardProperty> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 <https://www.reqvire.org/ontology#normalizedConceptRelationInverseProperty> rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -788,6 +789,13 @@
 	<https://www.reqvire.org/ontology#validationCondition> "A relation source, relation type, or target violates relation compatibility rules." ;
 	<https://www.reqvire.org/ontology#validationOutcome> "Validation fails before the graph is used." ;
 	<https://www.reqvire.org/ontology#validationRepair> "Use a compatible relation type or change element types/ownership." .
+<https://www.reqvire.org/ontology#nativeConceptTaxonomySchemeBoundaryRule> a <https://www.reqvire.org/ontology#ValidationRule> ;
+	<https://www.reqvire.org/ontology#validationRuleName> "native-concept-taxonomy-scheme-boundary" ;
+	<https://www.reqvire.org/ontology#validationScope> "native-concept-taxonomy-relations" ;
+	<https://www.reqvire.org/ontology#validationSeverity> "error" ;
+	<https://www.reqvire.org/ontology#validationCondition> "A native concept broader or narrower relation targets a concept that resolves to a different concept-scheme root." ;
+	<https://www.reqvire.org/ontology#validationOutcome> "Validation fails because SKOS broader/narrower taxonomy is scheme-local in Reqvire native concept authoring." ;
+	<https://www.reqvire.org/ontology#validationRepair> "Keep broader/narrower inside one concept scheme, or use related, exactMatch, or closeMatch for cross-scheme concept alignment." .
 <https://www.reqvire.org/ontology#reusedContractContextHierarchyIndependenceRule> a <https://www.reqvire.org/ontology#ValidationRule> ;
 	<https://www.reqvire.org/ontology#validationRuleName> "reused-contract-context-hierarchy-independence" ;
 	<https://www.reqvire.org/ontology#validationScope> "reused_contract_context" ;
@@ -1442,53 +1450,53 @@
 	<http://www.w3.org/2000/01/rdf-schema#range> <https://www.reqvire.org/ontology#ChangeImpactEdge> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Propagation edge included in a change-impact path." .
 <https://www.reqvire.org/ontology#semanticDependency> a <http://www.w3.org/2002/07/owl#ObjectProperty> .
-_:a619b097add8c84b279ee8b033da312c a <http://www.w3.org/2002/07/owl#Class> .
-_:d85f828ea270b971dee37b46ca7612ff <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactAnalysis> .
-_:a619b097add8c84b279ee8b033da312c <http://www.w3.org/2002/07/owl#unionOf> _:d85f828ea270b971dee37b46ca7612ff .
-_:c81df780beeb4fe7e05836e587e878fb <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticDependency> .
-_:d85f828ea270b971dee37b46ca7612ff <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:c81df780beeb4fe7e05836e587e878fb .
-_:c81df780beeb4fe7e05836e587e878fb <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://www.reqvire.org/ontology#semanticDependency> <http://www.w3.org/2000/01/rdf-schema#domain> _:a619b097add8c84b279ee8b033da312c .
-_:fe263ccc36ed06883d9b8cfb0c8a8f4 a <http://www.w3.org/2002/07/owl#Class> .
-_:a97c2631b6c2609b88722313f471fa97 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticDependency> .
-_:fe263ccc36ed06883d9b8cfb0c8a8f4 <http://www.w3.org/2002/07/owl#unionOf> _:a97c2631b6c2609b88722313f471fa97 .
-_:d30d7c3266b84b6e62402b4265d77312 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticContract> .
-_:a97c2631b6c2609b88722313f471fa97 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:d30d7c3266b84b6e62402b4265d77312 .
-_:d30d7c3266b84b6e62402b4265d77312 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://www.reqvire.org/ontology#semanticDependency> <http://www.w3.org/2000/01/rdf-schema#range> _:fe263ccc36ed06883d9b8cfb0c8a8f4 ;
+_:c4e660b1a7402260dbe2c9b033a50810 a <http://www.w3.org/2002/07/owl#Class> .
+_:d6c501df7585ca94c9d5313f5b98684e <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactAnalysis> .
+_:c4e660b1a7402260dbe2c9b033a50810 <http://www.w3.org/2002/07/owl#unionOf> _:d6c501df7585ca94c9d5313f5b98684e .
+_:c0d0d900a1e0d64d3b1ec41bc18332f5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticDependency> .
+_:d6c501df7585ca94c9d5313f5b98684e <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:c0d0d900a1e0d64d3b1ec41bc18332f5 .
+_:c0d0d900a1e0d64d3b1ec41bc18332f5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://www.reqvire.org/ontology#semanticDependency> <http://www.w3.org/2000/01/rdf-schema#domain> _:c4e660b1a7402260dbe2c9b033a50810 .
+_:a5fe2d311bb00541b521e46f377b17bc a <http://www.w3.org/2002/07/owl#Class> .
+_:d8f06fdc33b5c1cf87b682899d2c9293 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticDependency> .
+_:a5fe2d311bb00541b521e46f377b17bc <http://www.w3.org/2002/07/owl#unionOf> _:d8f06fdc33b5c1cf87b682899d2c9293 .
+_:bd8fdc98d5d4fd51e3cc41b8c36f7b2d <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#SemanticContract> .
+_:d8f06fdc33b5c1cf87b682899d2c9293 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:bd8fdc98d5d4fd51e3cc41b8c36f7b2d .
+_:bd8fdc98d5d4fd51e3cc41b8c36f7b2d <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://www.reqvire.org/ontology#semanticDependency> <http://www.w3.org/2000/01/rdf-schema#range> _:a5fe2d311bb00541b521e46f377b17bc ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Semantic dependency considered during change-impact analysis, or the semantic contract target resolved by a dependency record." .
 <https://www.reqvire.org/ontology#reviewedByVerification> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#ImpactReview> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <https://www.reqvire.org/ontology#Verification> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Verification evidence or method used to review an impact." .
 <https://www.reqvire.org/ontology#impactReason> a <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-_:cd04cba6cbe90eeed53217a4fdca237e a <http://www.w3.org/2002/07/owl#Class> .
-_:e6c82c376747a43b2ee9b9cc990b097e <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
-_:cd04cba6cbe90eeed53217a4fdca237e <http://www.w3.org/2002/07/owl#unionOf> _:e6c82c376747a43b2ee9b9cc990b097e .
-_:f21b51e0674a4190c8cb7149e006295a <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
-_:e6c82c376747a43b2ee9b9cc990b097e <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:f21b51e0674a4190c8cb7149e006295a .
-_:f21b51e0674a4190c8cb7149e006295a <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://www.reqvire.org/ontology#impactReason> <http://www.w3.org/2000/01/rdf-schema#domain> _:cd04cba6cbe90eeed53217a4fdca237e ;
+_:b487c2b8f9561dd0ce482361fffbf99a a <http://www.w3.org/2002/07/owl#Class> .
+_:a70056f51e7501de1bd5073d5560d9ca <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
+_:b487c2b8f9561dd0ce482361fffbf99a <http://www.w3.org/2002/07/owl#unionOf> _:a70056f51e7501de1bd5073d5560d9ca .
+_:db296887e32a020d9eb5f1c85d4d7fc <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
+_:a70056f51e7501de1bd5073d5560d9ca <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:db296887e32a020d9eb5f1c85d4d7fc .
+_:db296887e32a020d9eb5f1c85d4d7fc <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://www.reqvire.org/ontology#impactReason> <http://www.w3.org/2000/01/rdf-schema#domain> _:b487c2b8f9561dd0ce482361fffbf99a ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Human-readable reason explaining why an edge or rule propagates impact." .
 <https://www.reqvire.org/ontology#impactRelation> a <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-_:d0860d5f1bbb12ba94089dd665b384e0 a <http://www.w3.org/2002/07/owl#Class> .
-_:d90039009e0ad55b282a76ff1dc60970 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
-_:d0860d5f1bbb12ba94089dd665b384e0 <http://www.w3.org/2002/07/owl#unionOf> _:d90039009e0ad55b282a76ff1dc60970 .
-_:aee0735af0b010f190c32792a9cc20d5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
-_:d90039009e0ad55b282a76ff1dc60970 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:aee0735af0b010f190c32792a9cc20d5 .
-_:aee0735af0b010f190c32792a9cc20d5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://www.reqvire.org/ontology#impactRelation> <http://www.w3.org/2000/01/rdf-schema#domain> _:d0860d5f1bbb12ba94089dd665b384e0 ;
+_:fb275e01621bc1c9804b1e66cf7a42cf a <http://www.w3.org/2002/07/owl#Class> .
+_:b071fc1bbb4055989f91c9d39e35480a <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
+_:fb275e01621bc1c9804b1e66cf7a42cf <http://www.w3.org/2002/07/owl#unionOf> _:b071fc1bbb4055989f91c9d39e35480a .
+_:d08c54ad5f2776fca436a678bbaf91c5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
+_:b071fc1bbb4055989f91c9d39e35480a <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:d08c54ad5f2776fca436a678bbaf91c5 .
+_:d08c54ad5f2776fca436a678bbaf91c5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://www.reqvire.org/ontology#impactRelation> <http://www.w3.org/2000/01/rdf-schema#domain> _:fb275e01621bc1c9804b1e66cf7a42cf ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Canonical relation or dependency token that caused an impact edge or activates a propagation rule." .
 <https://www.reqvire.org/ontology#impactDirection> a <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-_:c50814ea0c35e92d0daf97de055d9d87 a <http://www.w3.org/2002/07/owl#Class> .
-_:c97131895a85608d6097eff228ad2e6a <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
-_:c50814ea0c35e92d0daf97de055d9d87 <http://www.w3.org/2002/07/owl#unionOf> _:c97131895a85608d6097eff228ad2e6a .
-_:df7635eded0fec94260b8cc063840d63 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
-_:c97131895a85608d6097eff228ad2e6a <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:df7635eded0fec94260b8cc063840d63 .
-_:df7635eded0fec94260b8cc063840d63 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://www.reqvire.org/ontology#impactDirection> <http://www.w3.org/2000/01/rdf-schema#domain> _:c50814ea0c35e92d0daf97de055d9d87 ;
+_:de5600856659ea356cd9f859b3e28f85 a <http://www.w3.org/2002/07/owl#Class> .
+_:f5006be38df321a8d4db522739d40f55 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangeImpactEdge> .
+_:de5600856659ea356cd9f859b3e28f85 <http://www.w3.org/2002/07/owl#unionOf> _:f5006be38df321a8d4db522739d40f55 .
+_:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#ChangePropagationRule> .
+_:f5006be38df321a8d4db522739d40f55 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:ed484632668599b917a81ad091d81e20 .
+_:ed484632668599b917a81ad091d81e20 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://www.reqvire.org/ontology#impactDirection> <http://www.w3.org/2000/01/rdf-schema#domain> _:de5600856659ea356cd9f859b3e28f85 ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#string> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Propagation direction token for an impact edge or propagation rule." .
 <https://www.reqvire.org/ontology#impactScope> a <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
@@ -2123,11 +2131,11 @@ _:df7635eded0fec94260b8cc063840d63 <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 <https://www.reqvire.org/ontology#implementedByArtifact> a <http://www.w3.org/2002/07/owl#ObjectProperty> ;
 	<http://www.w3.org/2000/01/rdf-schema#domain> <https://www.reqvire.org/ontology#Capability> ;
 	<http://www.w3.org/2000/01/rdf-schema#range> <https://www.reqvire.org/ontology#Artifact> .
-_:cbb57780962023d1bc3d653fe619fe7e <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#specifiedBy> .
-<https://www.reqvire.org/ontology#implementedByArtifact> <http://www.w3.org/2002/07/owl#propertyChainAxiom> _:cbb57780962023d1bc3d653fe619fe7e .
-_:f29715133ff29c7b66519d3e36a1f8af <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#satisfiedBy> .
-_:cbb57780962023d1bc3d653fe619fe7e <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:f29715133ff29c7b66519d3e36a1f8af .
-_:f29715133ff29c7b66519d3e36a1f8af <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+_:b3925f03a7f9f27831bf9dd9d1ed54a4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#specifiedBy> .
+<https://www.reqvire.org/ontology#implementedByArtifact> <http://www.w3.org/2002/07/owl#propertyChainAxiom> _:b3925f03a7f9f27831bf9dd9d1ed54a4 .
+_:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://www.reqvire.org/ontology#satisfiedBy> .
+_:b3925f03a7f9f27831bf9dd9d1ed54a4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:d6221451618c332c2693c98ed1db1284 .
+_:d6221451618c332c2693c98ed1db1284 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
 <https://www.reqvire.org/ontology#implementedByArtifact> <http://www.w3.org/2000/01/rdf-schema#comment> "Inferred capability-to-artifact trace when a capability is specified by a requirement satisfied by an artifact." .
 <https://www.reqvire.org/ontology#derive> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#authoredRelationLayer> .
 <https://www.reqvire.org/ontology#derivedFrom> <https://www.reqvire.org/ontology#relationPredicateLayer> <https://www.reqvire.org/ontology#authoredRelationLayer> .
@@ -3023,10 +3031,10 @@ _:f29715133ff29c7b66519d3e36a1f8af <http://www.w3.org/1999/02/22-rdf-syntax-ns#r
 <https://www.reqvire.org/ontology#EvidenceBackedVerification> a <http://www.w3.org/2002/07/owl#Class> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Evidence-backed verification" ;
 	<http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://www.reqvire.org/ontology#ConcreteVerification> .
-_:a4f972e346cd70718e81eaba071cf3d2 a <http://www.w3.org/2002/07/owl#Restriction> ;
+_:a325a30f5c19a2ee4d3635611b4f9317 a <http://www.w3.org/2002/07/owl#Restriction> ;
 	<http://www.w3.org/2002/07/owl#onProperty> <https://www.reqvire.org/ontology#satisfiedBy> ;
 	<http://www.w3.org/2002/07/owl#someValuesFrom> <https://www.reqvire.org/ontology#Artifact> .
-<https://www.reqvire.org/ontology#EvidenceBackedVerification> <http://www.w3.org/2000/01/rdf-schema#subClassOf> _:a4f972e346cd70718e81eaba071cf3d2 ;
+<https://www.reqvire.org/ontology#EvidenceBackedVerification> <http://www.w3.org/2000/01/rdf-schema#subClassOf> _:a325a30f5c19a2ee4d3635611b4f9317 ;
 	<http://www.w3.org/2002/07/owl#disjointWith> <https://www.reqvire.org/ontology#NonEvidenceBackedVerification> ;
 	<http://www.w3.org/2000/01/rdf-schema#comment> "Verification class whose instances require satisfiedBy evidence for coverage satisfaction." .
 <https://www.reqvire.org/ontology#NonEvidenceBackedVerification> a <http://www.w3.org/2002/07/owl#Class> ;

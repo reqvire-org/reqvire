@@ -120,10 +120,7 @@ ex:Shape
             false
         );
         assert_eq!(
-            values.contains(&(
-                "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-                SH_PATH
-            )),
+            values.contains(&("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", SH_PATH)),
             false,
             "standard RDF path should be filtered"
         );

@@ -406,6 +406,14 @@ reqvire:relationTypeCompatibilityRule a reqvire:ValidationRule ;
   reqvire:validationOutcome "Validation fails before the graph is used." ;
   reqvire:validationRepair "Use a compatible relation type or change element types/ownership." .
 
+reqvire:nativeConceptTaxonomySchemeBoundaryRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "native-concept-taxonomy-scheme-boundary" ;
+  reqvire:validationScope "native-concept-taxonomy-relations" ;
+  reqvire:validationSeverity "error" ;
+  reqvire:validationCondition "A native concept broader or narrower relation targets a concept that resolves to a different concept-scheme root." ;
+  reqvire:validationOutcome "Validation fails because SKOS broader/narrower taxonomy is scheme-local in Reqvire native concept authoring." ;
+  reqvire:validationRepair "Keep broader/narrower inside one concept scheme, or use related, exactMatch, or closeMatch for cross-scheme concept alignment." .
+
 reqvire:reusedContractContextHierarchyIndependenceRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "reused-contract-context-hierarchy-independence" ;
   reqvire:validationScope "reused_contract_context" ;

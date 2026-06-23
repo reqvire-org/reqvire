@@ -244,6 +244,8 @@ for required_diagnostic in \
   "Duplicate concept namespace <https://example.test/duplicate-namespace#>" \
   "Concept 'Orphan Concept' must derive from a concept-scheme or another concept with scheme context." \
   "Concept 'Concept Under Ontology' must derive from a concept-scheme or another concept with scheme context." \
+  "Concept taxonomy relation crosses concept schemes: concept 'Invalid Cross Scheme Broader Concept' uses broader to concept 'Cross Scheme Parent Concept'" \
+  "Concept taxonomy relation crosses concept schemes: concept 'Invalid Cross Scheme Narrower Concept' uses narrower to concept 'Cross Scheme Parent Concept'" \
   "Concept schemes are standalone roots and own concept_base/concept_prefix directly."; do
   if ! grep -q "$required_diagnostic" <<< "$INVALID_VALIDATE_OUTPUT"; then
     echo "FAILED: validation output missing concept standalone diagnostic: $required_diagnostic"

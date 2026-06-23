@@ -609,14 +609,16 @@ fn build_thesaurus_projection(
             .iter()
             .map(|node| (node.id.as_str(), node))
             .collect();
-    let mut maps_to_by_concept: BTreeMap<String, Vec<ProjectStoreThesaurusUsage>> =
-        BTreeMap::new();
+    let mut maps_to_by_concept: BTreeMap<String, Vec<ProjectStoreThesaurusUsage>> = BTreeMap::new();
 
     for edge in &ontology_graph_data.edges {
         if edge.label != "mapsToConcept" && edge.label != "mappedFrom" {
             continue;
         }
-        if concept_iri_by_element_id.values().any(|iri| iri == &edge.target) {
+        if concept_iri_by_element_id
+            .values()
+            .any(|iri| iri == &edge.target)
+        {
             if let Some(source) = graph_node_by_id.get(edge.source.as_str()) {
                 maps_to_by_concept
                     .entry(edge.target.clone())
@@ -627,7 +629,10 @@ fn build_thesaurus_projection(
                         usage_type: source.semantic_type.clone(),
                     });
             }
-        } else if concept_iri_by_element_id.values().any(|iri| iri == &edge.source) {
+        } else if concept_iri_by_element_id
+            .values()
+            .any(|iri| iri == &edge.source)
+        {
             if let Some(target) = graph_node_by_id.get(edge.target.as_str()) {
                 maps_to_by_concept
                     .entry(edge.source.clone())
@@ -645,8 +650,7 @@ fn build_thesaurus_projection(
         .iter()
         .map(|element| (element.identifier.as_str(), *element))
         .collect();
-    let mut used_by_by_concept: BTreeMap<String, Vec<ProjectStoreThesaurusUsage>> =
-        BTreeMap::new();
+    let mut used_by_by_concept: BTreeMap<String, Vec<ProjectStoreThesaurusUsage>> = BTreeMap::new();
     for concept_ref in concept_refs {
         if let Some(source) = element_by_id.get(concept_ref.source_id.as_str()) {
             used_by_by_concept
@@ -803,10 +807,7 @@ fn normalized_thesaurus_relations(
                     .entry(source_iri.clone())
                     .or_insert_with(|| parent_iri.clone());
                 push_unique(
-                    relations
-                        .children_by_concept
-                        .entry(parent_iri)
-                        .or_default(),
+                    relations.children_by_concept.entry(parent_iri).or_default(),
                     source_iri.clone(),
                 );
             }
