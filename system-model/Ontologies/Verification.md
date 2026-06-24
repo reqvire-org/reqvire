@@ -360,10 +360,7 @@ reqvire:ConcreteVerificationShape
   sh:property [
     sh:path reqvire:verify ;
     sh:minCount 1 ;
-    sh:or (
-      [ sh:class reqvire:Capability ]
-      [ sh:class reqvire:Requirement ]
-    ) ;
+    sh:class reqvire:Requirement ;
   ] ;
   sh:property [
     sh:path reqvire:verifiedBy ;

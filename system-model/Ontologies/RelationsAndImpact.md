@@ -222,7 +222,7 @@ reqvire:CapabilityRelationShape
   ] ;
   sh:property [
     sh:path reqvire:verifiedBy ;
-    sh:class reqvire:Verification ;
+    sh:class reqvire:ConcreteVerification ;
   ] ;
   sh:property [
     sh:path reqvire:satisfiedBy ;
@@ -282,10 +282,7 @@ reqvire:VerificationRelationShape
   sh:targetClass reqvire:Verification ;
   sh:property [
     sh:path reqvire:verify ;
-    sh:or (
-      [ sh:class reqvire:Capability ]
-      [ sh:class reqvire:Requirement ]
-    ) ;
+    sh:class reqvire:Requirement ;
   ] ;
   sh:property [
     sh:path reqvire:derivedFrom ;
