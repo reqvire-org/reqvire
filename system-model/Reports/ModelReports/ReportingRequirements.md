@@ -443,6 +443,8 @@ The system shall expose the semantic model core context as CLI, MCP, serve-time,
 #### Details
 Ontology collection output consumes the semantic context from [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection), including generated ontology document declarations, generated term definition links, authored ontology RDF, semantic-contract SHACL RDF, optional full model context, generated projection facts, and optional used external vocabulary subset content.
 
+Turtle ontology collection output shall use the shared [Prefixed Turtle Semantic Export](../../Semantics/SemanticModelRequirements.md#prefixed-turtle-semantic-export) serializer contract so exported RDF remains graph-equivalent while presenting stable `@prefix` declarations and compact prefixed names where safe.
+
 The output contract owns serialization choices, command/API flags, Project Store payload shape, and Explorer artifact inclusion. It does not own source resolution, semantic-contract reachability, reserved vocabulary recognition, or built-in external source policy.
 
 #### Metadata
@@ -451,6 +453,7 @@ The output contract owns serialization choices, command/API flags, Project Store
 #### Relations
   * definedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
   * derivedFrom: [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
+  * derivedFrom: [Prefixed Turtle Semantic Export](../../Semantics/SemanticModelRequirements.md#prefixed-turtle-semantic-export)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
   * verifiedBy: [MCP Model Evidence Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)

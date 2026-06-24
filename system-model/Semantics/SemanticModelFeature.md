@@ -5,7 +5,7 @@
 As a **system engineer**, I want Reqvire to manage ontology, semantic-contract, and external vocabulary context as a core semantic model capability, so that validation, export, Explorer, MCP, and assistant workflows all depend on one authoritative semantic source layer.
 
 #### Details
-Semantic Model Core is the root capability for Reqvire-owned semantic model behavior. It owns ontology source resolution, semantic-contract vocabulary context, local and built-in external ontology source handling, used external vocabulary selection, and source provenance before any reporting or presentation surface consumes those facts.
+Semantic Model Core is the root capability for Reqvire-owned semantic model behavior. It owns ontology source resolution, semantic-contract vocabulary context, local and built-in external ontology source handling, used external vocabulary selection, prefixed Turtle serialization policy, and source provenance before any reporting or presentation surface consumes those facts.
 
 Reports, Explorer views, MCP tools, website docs, and assistant skills consume this capability through requirements and contracts. They do not own the semantic source policy.
 
@@ -25,6 +25,7 @@ Reports, Explorer views, MCP tools, website docs, and assistant skills consume t
   * specifiedBy: [Ontology and Shapes Collection](SemanticModelRequirements.md#ontology-and-shapes-collection)
   * specifiedBy: [Ontology Term Definition Link Materialization](SemanticModelRequirements.md#ontology-term-definition-link-materialization)
   * specifiedBy: [OWL Reserved Vocabulary Recognition](SemanticModelRequirements.md#owl-reserved-vocabulary-recognition)
+  * specifiedBy: [Prefixed Turtle Semantic Export](SemanticModelRequirements.md#prefixed-turtle-semantic-export)
   * specifiedBy: [Runtime Reqvire Ontology Artifact](SemanticModelRequirements.md#runtime-reqvire-ontology-artifact)
   * specifiedBy: [Runtime Reqvire Ontology Synchronization](SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
   * specifiedBy: [Used External Vocabulary Selection](SemanticModelRequirements.md#used-external-vocabulary-selection)

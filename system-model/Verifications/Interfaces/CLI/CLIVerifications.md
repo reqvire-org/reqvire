@@ -137,12 +137,14 @@ This verification shall prove that semantic export commands expose ontology, sha
 #### Details
 Expected checks:
 - Run `reqvire semantic ontologies` and verify the command succeeds and emits authored ontology vocabulary without semantic-contract SHACL shapes.
+- Verify Turtle exports include one deterministic top-level `@prefix` declaration block, use compact prefixed names for built-in and authored namespaces where safe, preserve multiple authored `owl:Ontology` document subjects and `owl:imports` facts, and remain parseable as RDF/Turtle.
 - Run `reqvire semantic shapes` and verify the command succeeds and emits semantic-contract SHACL shapes without authored ontology classes.
 - Run `reqvire semantic concepts --include-mappings` and verify the command succeeds and emits SKOS concepts plus optional `reqvire:mapsToConcept` bridge triples.
 - Run `reqvire concepts export --include-mappings` and verify the root Concepts command emits the same standalone Thesaurus SKOS layer plus optional valid bridge triples.
 - Run `reqvire concepts validate` and verify standalone concept-scheme namespace ownership, concept references, and `reqvire:mapsToConcept` targets validate through the canonical model validation path.
 - Run `reqvire semantic graph --full` and verify the command selects the full semantic graph export mode with model context, generated ontology projection facts, and `owl:NamedIndividual` typing for concrete parsed model elements.
 - Run JSON-LD variants and verify emitted JSON-LD is valid for supported layers.
+- Verify JSON-LD variants remain JSON-LD RDF serializations and do not emit Turtle `@prefix` syntax.
 - Run external-inclusive ontology/graph exports and verify only the used external subset is exposed.
 - Verify the legacy `reqvire ontologies` command remains a compatibility alias for combined semantic graph export.
 

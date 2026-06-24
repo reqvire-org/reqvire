@@ -146,6 +146,7 @@ Filter behavior:
 - Authored `#### Ontology` blocks shall be included when they belong to a matching ontology document or declare a named subject in the matching term namespace.
 - Authored `#### Shapes` blocks shall be included when they declare a shape subject in the matching term namespace.
 - The filter shall deduplicate the resulting Turtle/JSON-LD output through the same serializer path used by unfiltered clean exports.
+- Filtered Turtle output shall preserve the same deterministic prefix declaration and safe IRI compaction behavior as unfiltered prefixed Turtle semantic export.
 - The filter shall reject combination with `--full` until a separate model-context/projection filter contract exists.
 
 The filter is an export boundary only. It does not mutate authored ontology source, does not change validation scope, and does not turn unrelated ontology namespaces into runtime vocabulary.
@@ -233,6 +234,50 @@ Reqvire core uses o-kernel contracts for RDF-native parsing/classification and S
   * define: [Ontology and Shapes Collection](SemanticModelRequirements.md#ontology-and-shapes-collection)
 ---
 
+### Prefixed Turtle Semantic Export Specification
+
+The prefixed Turtle export contract defines how Reqvire serializes semantic RDF graphs as readable Turtle without changing graph identity.
+
+#### Details
+Serialization boundary:
+- Prefix compaction shall be applied at RDF serialization time after semantic blocks, generated ontology document declarations, generated definition links, optional model-context triples, generated projection facts, and optional used external subset triples have been collected as RDF terms.
+- The exporter shall not compact IRIs by string-rewriting already serialized Turtle.
+- Internal semantic stores, validation, graph construction, and Oxigraph loading shall continue to use full RDF IRIs.
+- The Turtle output shall remain parseable as ordinary RDF/Turtle and equivalent to the unprefixed RDF graph.
+- Final Turtle artifacts shall emit one deterministic top-level prefix declaration block before serialized graph triples and source comments. Prefix declarations are syntax bindings only; they must not be interpreted as ontology document membership or as a replacement for `owl:Ontology` document triples.
+
+Prefix map construction:
+- Built-in reserved prefixes shall include at least `reqvire`, `rdf`, `rdfs`, `owl`, `xsd`, `sh`, and `skos` when those namespaces appear in the serialized graph.
+- Authored ontology prefixes shall come from parsed ontology metadata such as `ontology_prefix` and `ontology_base`.
+- Native concept-scheme prefixes shall come from parsed concept-scheme metadata such as `concept_prefix` and `concept_base`.
+- Local and built-in external ontology source prefixes shall be included only when that external vocabulary is included in the selected output surface.
+- Prefix ordering shall be deterministic: built-ins first, authored ontology prefixes next, concept prefixes next, external prefixes last, with lexical ordering inside each group.
+- Full semantic export projection facts shall model prefixed Turtle output as a `PrefixedTurtleExport` linked to a `TurtlePrefixMap`, and the map shall contain one `TurtlePrefixDeclaration` per emitted prefix binding.
+
+Collision policy:
+- Built-in prefixes are reserved and must not be redefined by authored ontology, concept-scheme, or external-source metadata.
+- The same prefix token bound to multiple namespace IRIs shall be a validation or export error.
+- The same namespace bound to multiple prefix tokens shall prefer the canonical authored Reqvire prefix when one exists; otherwise aliases shall be rejected unless a later requirement defines alias export.
+- The serializer shall not silently invent random prefix aliases to work around collisions.
+
+Compaction policy:
+- The serializer may compact a named IRI only when the IRI starts with a registered namespace base and the suffix is a valid Turtle local name.
+- Named IRIs with invalid or empty local names shall remain serialized as full `<IRI>` terms.
+- Multiple `owl:Ontology` document subjects may appear in one export and shall be preserved as RDF graph facts.
+- `owl:Ontology`, `owl:imports`, generated ontology document declarations, and generated `rdfs:isDefinedBy` facts shall be preserved as RDF triples. Exact duplicate RDF triples may be emitted once.
+- Authored ontology document metadata such as `rdfs:label`, `owl:imports`, version annotations, and comments shall remain attached to the ontology document IRI subject in the exported graph.
+
+Format separation:
+- Turtle output shall use `@prefix` declarations.
+- JSON-LD output shall remain a separate RDF serialization mode and shall use JSON-LD context handling rather than Turtle `@prefix` declarations.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Prefixed Turtle Semantic Export](SemanticModelRequirements.md#prefixed-turtle-semantic-export)
+---
+
 ### Runtime Reqvire Ontology Artifact Specification
 
 The runtime Reqvire ontology artifact contract defines the generated ontology-vocabulary Turtle snapshot embedded by Reqvire core.
@@ -244,7 +289,8 @@ Artifact contract:
 - The embedded constant `REQVIRE_ONTOLOGY_TTL` exposes the generated ontology Turtle content without requiring runtime access to `system-model/Ontologies`.
 - The artifact is generated from the authored Reqvire model with `reqvire semantic graph --namespace-base https://www.reqvire.org/ontology#`.
 - The artifact must include generated ontology document declarations, generated term definition links, and authored runtime Reqvire ontology RDF whose declared subjects are in the runtime Reqvire term namespace.
-- Each generated Turtle section in the artifact must be self-contained for the prefixes it uses. If a section emits `owl:` or `rdfs:` terms, it must declare those prefixes explicitly even if another section also declares them.
+- Intermediate generated Turtle sections may be self-contained for the prefixes they use before final artifact assembly.
+- The final runtime Turtle artifact shall follow the shared prefixed Turtle export contract with one deterministic top-level prefix declaration block. The committed artifact must not depend on repeated in-section prefix declarations.
 - The artifact must not include `--full` model-context triples, generated ontology projection facts, raw external source dumps, or used external subset triples unless a future requirement changes the runtime bootstrap contract.
 - The artifact must not include semantic-contract SHACL shape blocks or ontology blocks whose declared subjects are outside the runtime Reqvire term namespace.
 - If the authored runtime ontology maps structural terms to standalone native concepts, the checked-in runtime artifact must be curated after namespace export so runtime bootstrap excludes concept-scheme `owl:imports`, the `reqvire:mapsToConcept` property declaration, generated definition links for `reqvire:mapsToConcept`, and authored `reqvire:mapsToConcept` bridge usage triples. Concept bridges are concept-layer evidence and are not runtime bootstrap facts.

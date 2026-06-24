@@ -178,6 +178,38 @@ The collection shall preserve source element identifiers, source file paths, sec
   * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
 ---
 
+### Prefixed Turtle Semantic Export
+
+The system shall serialize semantic RDF graph exports as readable Turtle with deterministic `@prefix` declarations and compact prefixed names where this is syntactically valid.
+
+#### Details
+Reqvire semantic exports remain RDF graphs. Turtle is the default RDF syntax for CLI, MCP, served ontology artifacts, runtime ontology artifacts, and downstream ontology tooling. OWL, RDFS, SHACL, SKOS, and Reqvire vocabulary terms are RDF terms in that graph; the exporter shall not treat "OWL Turtle" and "RDF Turtle" as separate data models.
+
+The Turtle serializer shall build a canonical prefix map from Reqvire built-ins, authored ontology namespace metadata, native concept-scheme namespace metadata, and included external ontology source prefixes. The serializer shall emit one stable top-level `@prefix` declaration block and compact an IRI only when the IRI starts with a registered namespace and the remaining local name is valid Turtle local-name syntax.
+
+The serializer shall preserve multiple authored `owl:Ontology` document subjects, authored `owl:imports` triples, generated ontology document declarations, generated `rdfs:isDefinedBy` links, and authored ontology-document metadata as RDF graph facts. Exact duplicate RDF triples may be deduplicated because RDF graph semantics do not preserve duplicate statements.
+
+JSON-LD output remains a separate RDF serialization surface. It shall use JSON-LD context behavior rather than Turtle `@prefix` declarations.
+
+#### Concept References
+  * [Namespace scoped ontology export](../Thesaurus/Thesaurus.md#namespace-scoped-ontology-export)
+  * [External ontology prefix](../Thesaurus/Thesaurus.md#external-ontology-prefix)
+  * [Ontology document](../Thesaurus/Thesaurus.md#ontology-document)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * constrainedBy: [Semantic Export Projection Shape](../Ontologies/SemanticExport.md#semantic-export-projection-shape)
+  * definedBy: [Prefixed Turtle Semantic Export Specification](SemanticModelSpecifications.md#prefixed-turtle-semantic-export-specification)
+  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
+  * derive: [Namespace-Scoped Ontology Export](#namespace-scoped-ontology-export)
+  * satisfiedBy: [semantic_contract.rs](../../crates/reqvire-core/src/semantic_contract.rs)
+  * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
+  * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+  * verifiedBy: [MCP Model Evidence Tools Verification](../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
+---
+
 ### Namespace-Scoped Ontology Export
 
 The system shall filter clean authored ontology exports to a requested ontology base or term namespace.
@@ -198,7 +230,7 @@ The filter shall apply to clean semantic exports only. It shall not be combined 
 
 #### Relations
   * definedBy: [Namespace-Scoped Ontology Export Specification](SemanticModelSpecifications.md#namespace-scoped-ontology-export-specification)
-  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
+  * derivedFrom: [Prefixed Turtle Semantic Export](#prefixed-turtle-semantic-export)
   * satisfiedBy: [semantic_contract.rs](../../crates/reqvire-core/src/semantic_contract.rs)
   * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
   * verifiedBy: [Runtime Reqvire Ontology Artifact Verification](../Verifications/Semantics/SemanticModelVerifications.md#runtime-reqvire-ontology-artifact-verification)
@@ -213,7 +245,7 @@ The runtime artifact shall be `crates/reqvire-core/src/runtime_ontology/reqvire.
 
 Authored ontology elements under `system-model/Ontologies` remain the source model. The runtime ontology artifact shall contain the namespace-scoped ontology export for the runtime Reqvire term namespace `https://www.reqvire.org/ontology#`: generated ontology document declarations, generated term definition links, and authored Reqvire runtime ontology RDF, without authored semantic-contract SHACL blocks, full model-context projection facts, or raw external source dumps.
 
-Each generated Turtle section in the runtime artifact shall be self-contained for the vocabularies it uses. If a generated section emits `owl:` or `rdfs:` classes or predicates, it shall declare those prefixes explicitly instead of relying on another section to have already declared them. Export assembly may deduplicate repeated prefix lines across sections, but no serialized section may depend on hidden prefix carryover.
+The final runtime Turtle artifact shall use the shared prefixed Turtle export contract with one deterministic top-level prefix declaration block. Intermediate generated sections may be self-contained before final artifact assembly, but the committed artifact shall not depend on repeated in-section prefix declarations.
 
 When the authored model maps structural ontology terms to standalone native concepts, namespace-scoped exports may contain authored `reqvire:mapsToConcept` bridge vocabulary and usages. The embedded runtime artifact is a bootstrap vocabulary snapshot for Reqvire core, so it shall be curated to exclude concept-scheme imports, `reqvire:mapsToConcept` declarations, and concept-bridge usage triples. The authored source remains responsible for those concept links; the runtime artifact carries only the structural runtime vocabulary needed by Reqvire core.
 
@@ -324,7 +356,7 @@ The system shall materialize standard `rdfs:isDefinedBy` links from authored nam
 #### Details
 Reqvire already owns the generated `owl:Ontology` document declaration for authored ontology elements through `ontology_base` and `ontology_prefix`. Runtime semantic context shall therefore add `rdfs:isDefinedBy <ontology_base>` facts for authored named ontology resources in `#### Ontology` blocks without requiring authors to repeat that statement manually.
 
-The generated `rdfs:isDefinedBy` section shall also declare the prefixes it uses, including `rdfs:` for the ownership predicate and `owl:` when ontology-document declarations are present. That section must remain parseable on its own even before export assembly deduplicates prefixes across the full artifact.
+The intermediate generated `rdfs:isDefinedBy` section may declare the prefixes it uses, including `rdfs:` for the ownership predicate and `owl:` when ontology-document declarations are present, so the generated fragment remains parseable before final export assembly. Final Turtle artifacts shall still use the shared top-level prefixed Turtle export contract.
 
 The materialization shall:
 - Apply to authored named subjects collected from `#### Ontology` blocks when the subject IRI is inside the generated ontology document term namespace.

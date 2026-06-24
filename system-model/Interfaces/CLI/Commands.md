@@ -412,6 +412,7 @@ The system shall provide semantic export commands that expose ontology vocabular
 #### Details
 The semantic export commands shall:
 - Emit RDF/Turtle by default and support `--jsonld` where the selected layer can be serialized as JSON-LD.
+- Turtle output uses deterministic `@prefix` declarations and compact prefixed names where safe; JSON-LD output remains a separate RDF serialization mode.
 - `semantic ontologies`: emit generated ontology document declarations plus authored OWL/RDF ontology vocabulary, with optional used external ontology subset inclusion.
 - `semantic shapes`: emit semantic-contract SHACL shapes only.
 - `semantic concepts`: emit SKOS concept scheme/thesaurus triples only, with optional `--include-mappings` for `reqvire:mapsToConcept` bridge triples.

@@ -554,9 +554,10 @@ The ontology collection output defines how Reqvire exposes semantic model core c
 #### Details
 The output must:
 - Consume the reusable semantic context built by [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection).
-- Emit RDF/Turtle by default, preserving collected block content with source comments.
+- Emit RDF/Turtle by default, preserving collected RDF graph content with source comments while using one deterministic top-level `@prefix` declaration block and compact prefixed names where the prefixed name is Turtle-safe.
 - Emit JSON-LD when requested by the CLI `--jsonld` option.
 - Include generated `rdfs:isDefinedBy` links from authored named ontology resources to their generated ontology document IRI as part of the default semantic export.
+- Preserve multiple authored `owl:Ontology` document subjects, `owl:imports` triples, generated ontology document declarations, generated definition links, and authored ontology-document metadata as RDF graph facts; exact duplicate triples may be emitted once.
 - Support full semantic model export when requested by the CLI `--full` option or MCP `full: true` argument.
 - In full semantic model export mode, append RDF triples for Reqvire model context:
   - all parsed capability, requirement, ontology, semantic-contract, verification, and contract elements

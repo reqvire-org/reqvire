@@ -1,4 +1,4 @@
-use crate::element::{Element, GovernanceMetadataSource, ContractBindingTarget};
+use crate::element::{ContractBindingTarget, Element, GovernanceMetadataSource};
 use crate::git_commands;
 use crate::graph_registry::GraphRegistry;
 use crate::ontology_graph::{build_graph_data, OntologyGraphData};
@@ -497,62 +497,41 @@ fn build_knowledge_graph_projection(
         }))
     });
 
-    let bound_context_edges =
-        contract_bindings
-            .iter()
-            .filter_map(|contract_bindings| {
-                let target = contract_bindings
-                    .resource_id
-                    .as_ref()
-                    .filter(|resource_id| resources.contains_key(resource_id.as_str()))
-                    .cloned()
-                    .unwrap_or_else(|| contract_bindings.target.clone());
-                if !element_ids.contains(contract_bindings.source_id.as_str())
-                    || (!element_ids.contains(target.as_str()) && !resources.contains_key(&target))
-                {
-                    return None;
-                }
-                Some(json!({
-                    "source": contract_bindings.source_id,
-                    "target": target,
-                    "label": "binds contract",
-                    "kind": "contract_bindings",
-                    "authored": true
-                }))
-            });
+    let bound_context_edges = contract_bindings.iter().filter_map(|contract_bindings| {
+        let target = contract_bindings
+            .resource_id
+            .as_ref()
+            .filter(|resource_id| resources.contains_key(resource_id.as_str()))
+            .cloned()
+            .unwrap_or_else(|| contract_bindings.target.clone());
+        if !element_ids.contains(contract_bindings.source_id.as_str())
+            || (!element_ids.contains(target.as_str()) && !resources.contains_key(&target))
+        {
+            return None;
+        }
+        Some(json!({
+            "source": contract_bindings.source_id,
+            "target": target,
+            "label": "binds contract",
+            "kind": "contract_bindings",
+            "authored": true
+        }))
+    });
 
-    let concept_edges = concept_refs.iter().map(|concept_ref| {
-        let concept_id = format!("concept:{}", concept_ref.iri);
-        json!({
+    let concept_edges = concept_refs.iter().filter_map(|concept_ref| {
+        if !element_ids.contains(concept_ref.source_id.as_str())
+            || !element_ids.contains(concept_ref.target_element_id.as_str())
+        {
+            return None;
+        }
+        Some(json!({
             "source": concept_ref.source_id,
-            "target": concept_id,
+            "target": concept_ref.target_element_id,
             "label": "conceptRef",
             "kind": "concept-reference",
             "authored": true
-        })
+        }))
     });
-
-    let mut concept_nodes: BTreeMap<String, Value> = BTreeMap::new();
-    for concept_ref in concept_refs {
-        let concept_id = format!("concept:{}", concept_ref.iri);
-        concept_nodes.entry(concept_id.clone()).or_insert_with(|| {
-            json!({
-                "id": concept_id,
-                "identifier": concept_ref.iri,
-                "label": concept_ref.label,
-                "type": "ontology",
-                "node_type": "ontology",
-                "element_type": "ontology",
-                "ontology_semantic_type": "skos-concept",
-                "file_path": "",
-                "line_number": concept_ref.line_number,
-                "link": "",
-                "description": concept_ref.iri
-            })
-        });
-    }
-
-    nodes.extend(concept_nodes.into_values());
     let edges = relation_edges
         .chain(bound_context_edges)
         .chain(concept_edges)
@@ -2065,7 +2044,6 @@ ext:UnusedTerm a owl:Class ;
             concept_refs[0].target_element_id,
             "system-model/Checks.md#traceability"
         );
-        let concept_node_id = format!("concept:{}", concept_refs[0].iri);
         let graph = build_knowledge_graph_projection(
             &elements,
             &relations,
@@ -2093,23 +2071,31 @@ ext:UnusedTerm a owl:Class ;
         assert!(requirement_node.get("concept_references").is_none());
         let concept_node = nodes
             .iter()
-            .find(|node| node.get("id").and_then(Value::as_str) == Some(concept_node_id.as_str()))
-            .expect("concept reference target should be exported as an ontology node");
+            .find(|node| {
+                node.get("id").and_then(Value::as_str)
+                    == Some("system-model/Checks.md#traceability")
+            })
+            .expect("concept reference target should be exported as its native concept node");
         assert_eq!(
             concept_node.get("type").and_then(Value::as_str),
-            Some("ontology")
+            Some("concept")
         );
         assert_eq!(
             concept_node.get("node_type").and_then(Value::as_str),
-            Some("ontology")
+            Some("concept")
         );
         assert_eq!(
             concept_node.get("element_type").and_then(Value::as_str),
-            Some("ontology")
+            Some("concept")
         );
         assert!(nodes.iter().all(|node| {
             node.get("type").and_then(Value::as_str) != Some("concept-reference")
                 && node.get("element_type").and_then(Value::as_str) != Some("concept-reference")
+                && !node
+                    .get("id")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .starts_with("concept:")
         }));
 
         let edges = graph
@@ -2119,7 +2105,8 @@ ext:UnusedTerm a owl:Class ;
         assert!(edges.iter().any(|edge| {
             edge.get("source").and_then(Value::as_str)
                 == Some("system-model/Checks.md#traceability-requirement")
-                && edge.get("target").and_then(Value::as_str) == Some(concept_node_id.as_str())
+                && edge.get("target").and_then(Value::as_str)
+                    == Some("system-model/Checks.md#traceability")
                 && edge.get("kind").and_then(Value::as_str) == Some("concept-reference")
         }));
     }

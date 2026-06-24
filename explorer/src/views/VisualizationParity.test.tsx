@@ -43,9 +43,9 @@ vi.mock("sigma", () => ({
   },
 }));
 
-function renderWithStore(view: React.ReactElement) {
+function renderWithStore(view: React.ReactElement, store = devFixture) {
   return render(
-    <StoreProvider store={devFixture} schemaMismatch={null}>
+    <StoreProvider store={store} schemaMismatch={null}>
       <ExplorerUiStateProvider>{view}</ExplorerUiStateProvider>
     </StoreProvider>,
   );
@@ -64,11 +64,71 @@ describe("native visualization parity views", () => {
     expect(container.querySelector("iframe")).toBeNull();
   });
 
+  it("opens selected concept-reference targets as native model elements", () => {
+    const conceptId = "system-model/Thesaurus/Thesaurus.md#service-endpoint";
+    const openElement = vi.fn();
+    const store = {
+      ...devFixture,
+      knowledge_graph: {
+        ...devFixture.knowledge_graph,
+        nodes: [
+          ...(devFixture.knowledge_graph.nodes ?? []),
+          {
+            id: conceptId,
+            identifier: conceptId,
+            label: "Service Endpoint",
+            type: "concept",
+            node_type: "concept",
+            element_type: "concept",
+            file_path: "system-model/Thesaurus/Thesaurus.md",
+            line_number: 70,
+            link: "#/content/system-model/Thesaurus/Thesaurus.md#service-endpoint",
+            description: "Endpoint concept referenced by the fixture requirement.",
+          },
+        ],
+        edges: [
+          ...(devFixture.knowledge_graph.edges ?? []),
+          {
+            source: "system-model/Specifications.md#example-requirement",
+            target: conceptId,
+            label: "conceptRef",
+            kind: "concept-reference",
+            authored: true,
+          },
+        ],
+      },
+    };
+
+    function SelectedConceptPane() {
+      const ui = useExplorerUiState();
+      useEffect(() => {
+        ui.setModelMode("graph");
+        ui.setKnowledgeGraphSelectionId(conceptId);
+      }, [ui]);
+      return (
+        <ExplorerSidePane
+          activeView="model"
+          open
+          onToggle={vi.fn()}
+          onNavigate={vi.fn()}
+          onOpenElement={openElement}
+          onOpenOntologyNode={vi.fn()}
+        />
+      );
+    }
+
+    renderWithStore(<SelectedConceptPane />, store);
+
+    fireEvent.click(screen.getByRole("button", { name: /Service Endpoint/ }));
+    expect(openElement).toHaveBeenCalledWith(conceptId);
+  });
+
   it("renders thesaurus concepts in the native Explorer shell route", () => {
     renderWithStore(<ThesaurusView onOpenElement={vi.fn()} />);
 
+    expect(screen.getByRole("img", { name: /Example Thesaurus concept map/ })).toBeTruthy();
     expect(screen.getAllByText("Service Endpoint").length).toBeGreaterThan(0);
-    expect(screen.getByText("Used by model")).toBeTruthy();
+    expect(screen.getByText("Concept scheme")).toBeTruthy();
   });
 
   it("uses the Explorer pane as the thesaurus concept tree", () => {
@@ -111,7 +171,8 @@ describe("native visualization parity views", () => {
     );
 
     expect(screen.getByLabelText("Verification trace tree")).toBeTruthy();
-    expect(screen.queryByText("Summary")).toBeNull();
+    expect(screen.getByText("Summary")).toBeTruthy();
+    expect(screen.getAllByText("Verifications").length).toBeGreaterThan(1);
     expect(screen.queryByText("Legend")).toBeNull();
     expect(screen.getByText("Specifications.md")).toBeTruthy();
     expect(screen.getByText("Example Verification")).toBeTruthy();

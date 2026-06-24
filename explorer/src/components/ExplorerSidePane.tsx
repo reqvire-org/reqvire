@@ -1311,6 +1311,8 @@ const ELEMENT_TYPE_ORDER = [
   "specification",
   "semantic-contract",
   "ontology",
+  "concept-scheme",
+  "concept",
   "resource",
   "other",
 ];

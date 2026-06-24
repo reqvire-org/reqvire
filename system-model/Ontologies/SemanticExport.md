@@ -20,6 +20,15 @@ reqvire:RdfProjection a owl:Class .
 reqvire:RdfTriple a owl:Class .
 reqvire:SemanticExport a owl:Class ;
   reqvire:mapsToConcept concept:SemanticExport .
+reqvire:PrefixedTurtleExport a owl:Class ;
+  rdfs:subClassOf reqvire:SemanticExport ;
+  rdfs:comment "Semantic RDF graph export serialized as Turtle with deterministic prefix declarations and safe compact prefixed names." .
+reqvire:TurtlePrefixDeclaration a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Prefix binding emitted by a Turtle semantic export serializer." .
+reqvire:TurtlePrefixMap a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Deterministic prefix map assembled from Reqvire built-ins, authored ontology metadata, concept-scheme metadata, and included external ontology sources." .
 reqvire:OntologyTerm a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection .
 reqvire:OwlReservedVocabularyRegistry a owl:Class ;
@@ -122,6 +131,14 @@ reqvire:projectionTriple a owl:ObjectProperty ;
 reqvire:exportSourceElement a owl:ObjectProperty ;
   rdfs:domain reqvire:SemanticExport ;
   rdfs:range reqvire:Element .
+reqvire:turtlePrefixMap a owl:ObjectProperty ;
+  rdfs:domain reqvire:PrefixedTurtleExport ;
+  rdfs:range reqvire:TurtlePrefixMap ;
+  rdfs:comment "Prefix map selected by a prefixed Turtle semantic export." .
+reqvire:turtlePrefixDeclaration a owl:ObjectProperty ;
+  rdfs:domain reqvire:TurtlePrefixMap ;
+  rdfs:range reqvire:TurtlePrefixDeclaration ;
+  rdfs:comment "Prefix declaration contained in a deterministic Turtle prefix map." .
 reqvire:declaresTerm a owl:ObjectProperty ;
   rdfs:domain reqvire:SemanticBlock ;
   rdfs:range reqvire:OntologyTerm .
@@ -375,11 +392,35 @@ reqvire:sourceRelationType a owl:DatatypeProperty ;
   rdfs:domain reqvire:ConceptRelationProjectionEvidence ;
   rdfs:range xsd:string ;
   rdfs:comment "Authored native concept relation token that contributed to a normalized concept relation projection." .
+reqvire:turtlePrefixName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:TurtlePrefixDeclaration ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Prefix token emitted before ':' in Turtle output." .
+reqvire:turtlePrefixNamespace a owl:DatatypeProperty ;
+  rdfs:domain reqvire:TurtlePrefixDeclaration ;
+  rdfs:range xsd:anyURI ;
+  rdfs:comment "Namespace IRI bound to a Turtle prefix token." .
+reqvire:turtlePrefixSourceKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:TurtlePrefixDeclaration ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Source category for a prefix binding, such as built-in, authored ontology, concept scheme, or external source." .
+reqvire:turtlePrefixReserved a owl:DatatypeProperty ;
+  rdfs:domain reqvire:TurtlePrefixDeclaration ;
+  rdfs:range xsd:boolean ;
+  rdfs:comment "True when the prefix token is reserved by Reqvire or standard RDF vocabulary policy and must not be redefined by model-authored metadata." .
+reqvire:turtlePrefixOrder a owl:DatatypeProperty ;
+  rdfs:domain reqvire:TurtlePrefixDeclaration ;
+  rdfs:range xsd:integer ;
+  rdfs:comment "Deterministic order used when writing prefix declarations." .
+reqvire:turtlePrefixScope a owl:DatatypeProperty ;
+  rdfs:domain reqvire:TurtlePrefixMap ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Scope where a prefix map is applied, such as top-level-export for final Turtle artifacts." .
 
 reqvire:semanticArtifactExportMode a reqvire:SemanticArtifactExport ;
-  rdfs:comment "Semantic ontology export mode that emits generated ontology document declarations plus authored ontology vocabulary with source comments." .
+  rdfs:comment "Semantic ontology export mode that emits generated ontology document declarations plus authored ontology vocabulary with source comments. Turtle serialization uses deterministic prefix declarations and safe compact prefixed names." .
 reqvire:fullSemanticModelExportMode a reqvire:FullSemanticModelExport ;
-  rdfs:comment "Semantic graph export mode that emits generated ontology document declarations, authored ontology and SHACL blocks, and RDF triples for Reqvire model elements, relations, contract_bindings, concept references, ontology term declarations, shape references, and generated ontology projection facts." .
+  rdfs:comment "Semantic graph export mode that emits generated ontology document declarations, authored ontology and SHACL blocks, and RDF triples for Reqvire model elements, relations, contract_bindings, concept references, ontology term declarations, shape references, and generated ontology projection facts. Turtle serialization uses deterministic prefix declarations and safe compact prefixed names." .
 reqvire:externalUsedTermSeedQuery a reqvire:ExternalOntologySubsetConstructQuery ;
   reqvire:constructQueryName "external-used-term-seed-query" ;
   reqvire:constructFamily "external-used-subset" ;
@@ -612,6 +653,61 @@ reqvire:SemanticExportShape
 reqvire:NamespaceScopedOntologyExportShape
   a sh:NodeShape ;
   sh:targetClass reqvire:NamespaceScopedOntologyExport .
+
+reqvire:PrefixedTurtleExportShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:PrefixedTurtleExport ;
+  sh:property [
+    sh:path reqvire:turtlePrefixMap ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:TurtlePrefixMap ;
+  ] .
+
+reqvire:TurtlePrefixMapShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:TurtlePrefixMap ;
+  sh:property [
+    sh:path reqvire:turtlePrefixScope ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in ("top-level-export" "intermediate-fragment") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:turtlePrefixDeclaration ;
+    sh:minCount 1 ;
+    sh:class reqvire:TurtlePrefixDeclaration ;
+  ] .
+
+reqvire:TurtlePrefixDeclarationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:TurtlePrefixDeclaration ;
+  sh:property [
+    sh:path reqvire:turtlePrefixName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:turtlePrefixNamespace ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:anyURI ;
+  ] ;
+  sh:property [
+    sh:path reqvire:turtlePrefixSourceKind ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in ("built-in" "authored-ontology" "concept-scheme" "external-source") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:turtlePrefixReserved ;
+    sh:datatype xsd:boolean ;
+  ] ;
+  sh:property [
+    sh:path reqvire:turtlePrefixOrder ;
+    sh:datatype xsd:integer ;
+  ] .
 
 reqvire:RuntimeOntologyArtifactShape
   a sh:NodeShape ;
@@ -1048,6 +1144,7 @@ reqvire:SemanticBlockShape
   * constrain: [Semantic Relation Family Projection](../Reports/ModelReports/ReportingRequirements.md#semantic-relation-family-projection)
   * constrain: [Namespace-Scoped Ontology Export](../Semantics/SemanticModelRequirements.md#namespace-scoped-ontology-export)
   * constrain: [Ontology and Shapes Collection](../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
+  * constrain: [Prefixed Turtle Semantic Export](../Semantics/SemanticModelRequirements.md#prefixed-turtle-semantic-export)
   * constrain: [Runtime Reqvire Ontology Artifact](../Semantics/SemanticModelRequirements.md#runtime-reqvire-ontology-artifact)
   * constrain: [Runtime Reqvire Ontology Synchronization](../Semantics/SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
   * constrain: [Runtime Reqvire SHACL Artifact](../Semantics/SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)

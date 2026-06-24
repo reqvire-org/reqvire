@@ -759,8 +759,9 @@ This verification shall prove that semantic ontology export materializes authore
 #### Details
 Expected checks:
 - Verify default Turtle semantic export contains generated ontology document declarations, ontology term declarations, and SHACL shape references without generated ontology projection facts.
-- Verify each generated Turtle section is parseable on its own and declares the prefixes it uses, including `owl:` and `rdfs:` in generated ontology-document and definition-link sections.
+- Verify default Turtle semantic export contains one deterministic top-level `@prefix` declaration block, uses compact prefixed names for built-in and authored namespaces where safe, and remains parseable as RDF/Turtle.
 - Verify generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI and list same-base ontology elements as contributors instead of emitting one document per element.
+- Verify multiple authored `owl:Ontology` document subjects, authored `owl:imports` facts, and authored ontology-document metadata survive semantic export as RDF graph facts.
 - Verify authored ontology classes, explicit named individuals, and class-typed named individuals receive generated `rdfs:isDefinedBy` links to the generated ontology document IRI in Turtle and JSON-LD semantic export.
 - Verify local Turtle/TTL, RDF/XML, and JSON-LD external ontology dependencies contribute only used external subset triples when external-inclusive export is requested.
 - Verify built-in external ontology sources, including SKOS, are available without local `#### External Ontology` declarations and can support authored conceptual-layer ontology content.

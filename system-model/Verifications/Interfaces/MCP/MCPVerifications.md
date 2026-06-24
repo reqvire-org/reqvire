@@ -263,7 +263,9 @@ This verification shall prove that quality and traceability tools return structu
 Expected checks:
 - Lint, coverage, traces, resources, ontologies, and change-impact tools match shared Reqvire operation contracts.
 - Ontologies tool returns collected ontology `Ontology` blocks and semantic-contract `Shapes` blocks in Turtle by default.
+- Turtle responses from semantic MCP tools include one deterministic top-level `@prefix` declaration block, use compact prefixed names where safe, preserve multiple authored `owl:Ontology` document subjects and `owl:imports` facts, and parse as RDF/Turtle.
 - Ontologies tool supports JSON-LD output through a typed MCP argument.
+- JSON-LD responses remain JSON-LD RDF serializations and do not emit Turtle `@prefix` syntax.
 - Semantic graph tool supports `full: true` and returns Reqvire model context triples and ontology projection facts alongside authored semantic content.
 - Startup validation failures are returned before the MCP server starts.
 - Git comparison tools include compared commit and current `HEAD` metadata.
