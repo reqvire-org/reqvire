@@ -31,20 +31,20 @@ if [ $CONCEPTS_EXIT -ne 0 ]; then
 fi
 
 for token in \
-  "<https://example.test/native-concepts#SparseConceptScheme>" \
-  "<http://www.w3.org/2004/02/skos/core#ConceptScheme>" \
-  "<https://example.test/native-concepts#SparseConcept>" \
-  "<https://example.test/native-concepts#DetailedConcept>" \
-  "<http://www.w3.org/2004/02/skos/core#Concept>" \
-  "<http://www.w3.org/2004/02/skos/core#inScheme>" \
-  "<http://www.w3.org/2004/02/skos/core#altLabel>" \
-  "<http://www.w3.org/2004/02/skos/core#scopeNote>" \
-  "<http://www.w3.org/2004/02/skos/core#example>" \
-  "<http://www.w3.org/2004/02/skos/core#broader>" \
-  "<http://www.w3.org/2004/02/skos/core#narrower>" \
-  "<http://www.w3.org/2004/02/skos/core#related>" \
-  "<http://www.w3.org/2004/02/skos/core#exactMatch>" \
-  "<http://www.w3.org/2004/02/skos/core#closeMatch>" \
+  "concept:SparseConceptScheme" \
+  "skos:ConceptScheme" \
+  "concept:SparseConcept" \
+  "concept:DetailedConcept" \
+  "skos:Concept" \
+  "skos:inScheme" \
+  "skos:altLabel" \
+  "skos:scopeNote" \
+  "skos:example" \
+  "skos:broader" \
+  "skos:narrower" \
+  "skos:related" \
+  "skos:exactMatch" \
+  "skos:closeMatch" \
   '"Sparse Concept"'; do
   if ! grep -qF "$token" <<< "$CONCEPTS_OUTPUT"; then
     echo "FAILED: semantic concepts output missing token: $token"

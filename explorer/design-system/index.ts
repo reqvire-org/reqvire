@@ -1,5 +1,6 @@
 export { Alert } from "./components/core/Alert";
 export type { AlertProps } from "./components/core/Alert";
+export { useLatestRef } from "./hooks/useLatestRef";
 export { Badge } from "./components/core/Badge";
 export type { BadgeProps } from "./components/core/Badge";
 export { BrandMark } from "./components/core/BrandMark";

@@ -111,6 +111,9 @@ design-system/
 │   ├── thesaurus/             # Standalone SKOS concept browser and concept detail map
 │   └── feedback/              # Product notices and help content
 │
+├── hooks/
+│   └── useLatestRef.ts        # Stable event-callback ref for renderer boundaries
+│
 ├── assets/
 │   ├── fonts/                 # Geist-Variable.woff2, GeistMono-Variable.woff2
 │   └── logo-mark.svg          # Canonical reusable Reqvire brand mark
@@ -473,6 +476,17 @@ They may customize primitives only through documented props or documented
 context/density/composition `--ds-*` variables. They must not redefine primitive
 state policy variables; state variants belong in primitive props and primitive
 CSS.
+
+Renderer-backed product patterns and app renderer boundaries use the canonical
+stable-callback rule: expensive renderer lifecycle effects depend on renderer
+data and configuration only, while UI callbacks are read at event time through
+`useLatestRef`. Do not put route/modal/open callbacks into Sigma, React Flow,
+Mermaid, or other canvas/SVG renderer mount-effect dependency arrays merely so
+event handlers can see the latest callback. This keeps modal opens, shell
+re-renders, and route metadata updates from tearing down and rebuilding
+long-lived renderers. The public helper is exported from `@ds` as
+`useLatestRef`; application renderer boundaries and design-system product
+patterns may use it for event callbacks.
 
 Shared route chrome must be consumed through the canonical exported product
 pattern directly. Do not keep view-specific aliases or compatibility wrapper

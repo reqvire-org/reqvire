@@ -15,6 +15,7 @@ import {
   GraphRoute,
   roleColorValue,
   Spinner,
+  useLatestRef,
 } from "@ds";
 
 type GraphEdge = NonNullable<KnowledgeGraphProjection["edges"]>[number] & {
@@ -228,6 +229,7 @@ export function KnowledgeGraphView({
   const rendererRef = useRef<Sigma | null>(null);
   const selectedRef = useRef<string | null>(null);
   const hoveredRef = useRef<string | null>(null);
+  const onOpenElementRef = useLatestRef(onOpenElement);
   const activeTypesRef = useRef(activeTypes);
   const activeOverlaysRef = useRef(activeOverlays);
   const graphFilterRevisionRef = useRef(0);
@@ -527,7 +529,7 @@ export function KnowledgeGraphView({
       });
       renderer.on("doubleClickNode", (event) => {
         const node = nodeById.get(event.node);
-        if (isOpenableGraphNode(node)) onOpenElement?.(node.identifier);
+        if (isOpenableGraphNode(node)) onOpenElementRef.current?.(node.identifier);
       });
       renderer.on("clickStage", () => {
         setGraphCursor("");
@@ -637,7 +639,7 @@ export function KnowledgeGraphView({
       graph = null;
       renderer = null;
     };
-  }, [degreeByNode, edgeAdjacency, edges, nodeById, nodes, onOpenElement, setSelectedId]);
+  }, [degreeByNode, edgeAdjacency, edges, nodeById, nodes, setSelectedId]);
 
   const graph = (
     <GraphRoute embedded={embedded}>

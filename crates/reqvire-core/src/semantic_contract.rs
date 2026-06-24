@@ -595,6 +595,145 @@ impl ExternalOntologyFormat {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+struct TurtlePrefixDeclaration {
+    prefix: String,
+    namespace: String,
+    source_rank: u8,
+}
+
+#[derive(Debug, Clone)]
+struct TurtlePrefixMap {
+    declarations: Vec<TurtlePrefixDeclaration>,
+}
+
+struct TurtlePrefixMapBuilder {
+    by_prefix: BTreeMap<String, TurtlePrefixDeclaration>,
+    prefix_by_namespace: BTreeMap<String, String>,
+}
+
+impl TurtlePrefixMapBuilder {
+    fn new() -> Self {
+        Self {
+            by_prefix: BTreeMap::new(),
+            prefix_by_namespace: BTreeMap::new(),
+        }
+    }
+
+    fn add(&mut self, prefix: &str, namespace: &str, source_rank: u8) -> Result<(), ReqvireError> {
+        let prefix = prefix.trim();
+        let namespace = namespace.trim();
+        if prefix.is_empty() || namespace.is_empty() {
+            return Ok(());
+        }
+
+        if let Some(existing) = self.by_prefix.get(prefix) {
+            if existing.namespace != namespace {
+                return Err(ReqvireError::ProcessError(format!(
+                    "Turtle prefix '{}' is bound to both '{}' and '{}'.",
+                    prefix, existing.namespace, namespace
+                )));
+            }
+            return Ok(());
+        }
+
+        if let Some(existing_prefix) = self.prefix_by_namespace.get(namespace) {
+            if existing_prefix != prefix {
+                return Err(ReqvireError::ProcessError(format!(
+                    "Turtle namespace '{}' is bound to both prefix '{}' and prefix '{}'. Prefix aliases are not supported.",
+                    namespace, existing_prefix, prefix
+                )));
+            }
+        }
+
+        self.by_prefix.insert(
+            prefix.to_string(),
+            TurtlePrefixDeclaration {
+                prefix: prefix.to_string(),
+                namespace: namespace.to_string(),
+                source_rank,
+            },
+        );
+        self.prefix_by_namespace
+            .insert(namespace.to_string(), prefix.to_string());
+        Ok(())
+    }
+
+    fn add_local(&mut self, prefix: &str, namespace: &str, source_rank: u8) {
+        let prefix = prefix.trim();
+        let namespace = namespace.trim();
+        if prefix.is_empty() || namespace.is_empty() {
+            return;
+        }
+
+        if let Some(existing) = self.by_prefix.get(prefix) {
+            if existing.namespace != namespace {
+                return;
+            }
+            return;
+        }
+
+        if self.prefix_by_namespace.contains_key(namespace) {
+            return;
+        }
+
+        self.by_prefix.insert(
+            prefix.to_string(),
+            TurtlePrefixDeclaration {
+                prefix: prefix.to_string(),
+                namespace: namespace.to_string(),
+                source_rank,
+            },
+        );
+        self.prefix_by_namespace
+            .insert(namespace.to_string(), prefix.to_string());
+    }
+
+    fn finish(self) -> TurtlePrefixMap {
+        let mut declarations = self.by_prefix.into_values().collect::<Vec<_>>();
+        declarations.sort_by(|a, b| {
+            a.source_rank
+                .cmp(&b.source_rank)
+                .then_with(|| a.prefix.cmp(&b.prefix))
+                .then_with(|| a.namespace.cmp(&b.namespace))
+        });
+        TurtlePrefixMap { declarations }
+    }
+}
+
+impl TurtlePrefixMap {
+    fn to_turtle_block(&self) -> String {
+        if self.declarations.is_empty() {
+            return String::new();
+        }
+        let mut output = String::new();
+        for declaration in &self.declarations {
+            output.push_str(&format!(
+                "@prefix {}: <{}> .\n",
+                declaration.prefix,
+                escape_iri(&declaration.namespace)
+            ));
+        }
+        output.push('\n');
+        output
+    }
+
+    fn serializer(&self) -> Result<RdfSerializer, ReqvireError> {
+        let mut serializer = RdfSerializer::from_format(RdfFormat::Turtle);
+        for declaration in &self.declarations {
+            serializer = serializer
+                .with_prefix(declaration.prefix.as_str(), declaration.namespace.as_str())
+                .map_err(|error| {
+                    ReqvireError::SerializationError(format!(
+                        "Invalid Turtle prefix '{}: <{}>': {}",
+                        declaration.prefix, declaration.namespace, error
+                    ))
+                })?;
+        }
+        Ok(serializer)
+    }
+}
+
 impl SemanticIndex {
     pub fn with_namespace_base_filter(
         &self,
@@ -848,10 +987,22 @@ impl SemanticIndex {
     }
 
     pub fn to_authored_ontology_turtle_string(&self) -> Result<String, ReqvireError> {
+        let prefix_map = self.turtle_prefix_map(false)?;
         let ontology_documents_turtle =
             build_ontology_document_declarations_turtle(&self.ontology_documents);
-        let mut output = ontology_documents_turtle.clone();
-        let mut seen_quads = quad_keys_from_turtle(&ontology_documents_turtle)?;
+        let mut output = String::new();
+        output.push_str(&prefix_map.to_turtle_block());
+        append_turtle_body(
+            &mut output,
+            &ontology_documents_turtle,
+            "Generated ontology document declarations",
+            &prefix_map,
+        )?;
+        let mut seen_quads = quad_keys_from_turtle_with_prefix_map(
+            &ontology_documents_turtle,
+            &prefix_map,
+            "Generated ontology document declarations",
+        )?;
         append_blocks_turtle(
             &mut output,
             self.blocks.iter().filter(|block| {
@@ -861,6 +1012,7 @@ impl SemanticIndex {
                 )
             }),
             &mut seen_quads,
+            &prefix_map,
         )?;
         Ok(output)
     }
@@ -869,24 +1021,38 @@ impl SemanticIndex {
         &self,
         include_external: bool,
     ) -> Result<String, ReqvireError> {
+        let prefix_map = self.turtle_prefix_map(include_external)?;
         let mut output = String::new();
         output.push_str("# Generated by Reqvire semantic ontology export\n");
         output.push_str(&format!(
             "# Blocks: {} ontology\n\n",
             self.summary.ontology_blocks
         ));
+        output.push_str(&prefix_map.to_turtle_block());
         let ontology_documents_turtle =
             build_ontology_document_declarations_turtle(&self.ontology_documents);
-        output.push_str(&ontology_documents_turtle);
+        append_turtle_body(
+            &mut output,
+            &ontology_documents_turtle,
+            "Generated ontology document declarations",
+            &prefix_map,
+        )?;
         let ontology_term_definitions_turtle = build_ontology_term_definitions_turtle(
             &self.ontology_documents,
             &self.ontology_declarations,
             &self.blocks,
         );
-        output.push_str(&ontology_term_definitions_turtle);
+        append_turtle_body(
+            &mut output,
+            &ontology_term_definitions_turtle,
+            "Generated ontology term definition links",
+            &prefix_map,
+        )?;
 
-        let mut seen_quads = quad_keys_from_turtle(
+        let mut seen_quads = quad_keys_from_turtle_with_prefix_map(
             &(ontology_documents_turtle + &ontology_term_definitions_turtle),
+            &prefix_map,
+            "Generated ontology declarations and definition links",
         )?;
         append_blocks_turtle(
             &mut output,
@@ -894,9 +1060,10 @@ impl SemanticIndex {
                 .iter()
                 .filter(|block| matches!(block.kind, SemanticBlockKind::Ontology)),
             &mut seen_quads,
+            &prefix_map,
         )?;
         if include_external {
-            append_used_external_subset_turtle(self, &mut output, &mut seen_quads)?;
+            append_used_external_subset_turtle(self, &mut output, &mut seen_quads, &prefix_map)?;
         }
         Ok(output)
     }
@@ -914,7 +1081,9 @@ impl SemanticIndex {
     }
 
     pub fn to_authored_ontology_layer_turtle_string(&self) -> Result<String, ReqvireError> {
+        let prefix_map = self.turtle_prefix_map(false)?;
         let mut output = String::new();
+        output.push_str(&prefix_map.to_turtle_block());
         let mut seen_quads = BTreeSet::new();
         append_blocks_turtle(
             &mut output,
@@ -925,12 +1094,15 @@ impl SemanticIndex {
                 )
             }),
             &mut seen_quads,
+            &prefix_map,
         )?;
         Ok(output)
     }
 
     pub fn to_shacl_turtle_string(&self) -> Result<String, ReqvireError> {
+        let prefix_map = self.turtle_prefix_map(false)?;
         let mut output = String::new();
+        output.push_str(&prefix_map.to_turtle_block());
         let mut seen_quads = BTreeSet::new();
         append_blocks_turtle(
             &mut output,
@@ -938,6 +1110,7 @@ impl SemanticIndex {
                 .iter()
                 .filter(|block| matches!(block.kind, SemanticBlockKind::Shapes)),
             &mut seen_quads,
+            &prefix_map,
         )?;
         Ok(output)
     }
@@ -951,10 +1124,12 @@ impl SemanticIndex {
         &self,
         include_mappings: bool,
     ) -> Result<String, ReqvireError> {
+        let prefix_map = self.turtle_prefix_map(false)?;
         let concept_iris = skos_concept_iris(self);
         let mut output = String::new();
         output.push_str("# Generated by Reqvire semantic concept export\n");
         output.push_str(&format!("# Concepts: {}\n\n", concept_iris.len()));
+        output.push_str(&prefix_map.to_turtle_block());
         let mut seen_quads = BTreeSet::new();
         let mut concept_quads = Vec::new();
         for block in &self.blocks {
@@ -974,7 +1149,7 @@ impl SemanticIndex {
             }
         }
         if !concept_quads.is_empty() {
-            let turtle = serialize_quads_turtle(&concept_quads)?;
+            let turtle = serialize_quads_turtle_body(&concept_quads, &prefix_map)?;
             output.push_str(turtle.trim());
             output.push_str("\n\n");
         }
@@ -1001,13 +1176,21 @@ impl SemanticIndex {
         &self,
         registry: &GraphRegistry,
     ) -> Result<String, ReqvireError> {
-        build_generated_model_turtle(registry, self)
+        let prefix_map = self.turtle_prefix_map(true)?;
+        build_generated_model_turtle(registry, self, &prefix_map)
     }
 
     pub fn to_raw_external_turtle_string(&self) -> Result<String, ReqvireError> {
+        let prefix_map = self.turtle_prefix_map(true)?;
         let mut output = String::new();
+        output.push_str(&prefix_map.to_turtle_block());
         let mut seen_quads = BTreeSet::new();
-        append_blocks_turtle(&mut output, self.external_blocks.iter(), &mut seen_quads)?;
+        append_blocks_turtle(
+            &mut output,
+            self.external_blocks.iter(),
+            &mut seen_quads,
+            &prefix_map,
+        )?;
         Ok(output)
     }
 
@@ -1047,24 +1230,38 @@ impl SemanticIndex {
         &self,
         include_external: bool,
     ) -> Result<String, ReqvireError> {
+        let prefix_map = self.turtle_prefix_map(include_external)?;
         let mut output = String::new();
         output.push_str("# Generated by Reqvire semantic index\n");
         output.push_str(&format!(
             "# Blocks: {} ontology, {} shapes\n\n",
             self.summary.ontology_blocks, self.summary.shape_blocks
         ));
+        output.push_str(&prefix_map.to_turtle_block());
         let ontology_documents_turtle =
             build_ontology_document_declarations_turtle(&self.ontology_documents);
-        output.push_str(&ontology_documents_turtle);
+        append_turtle_body(
+            &mut output,
+            &ontology_documents_turtle,
+            "Generated ontology document declarations",
+            &prefix_map,
+        )?;
         let ontology_term_definitions_turtle = build_ontology_term_definitions_turtle(
             &self.ontology_documents,
             &self.ontology_declarations,
             &self.blocks,
         );
-        output.push_str(&ontology_term_definitions_turtle);
+        append_turtle_body(
+            &mut output,
+            &ontology_term_definitions_turtle,
+            "Generated ontology term definition links",
+            &prefix_map,
+        )?;
 
-        let mut seen_quads = quad_keys_from_turtle(
+        let mut seen_quads = quad_keys_from_turtle_with_prefix_map(
             &(ontology_documents_turtle + &ontology_term_definitions_turtle),
+            &prefix_map,
+            "Generated ontology declarations and definition links",
         )?;
         for (block, quads) in normalized_export_blocks(&self.blocks, &mut seen_quads) {
             output.push_str(
@@ -1078,7 +1275,7 @@ impl SemanticIndex {
                 output.push_str(&format!("# Line: {}\n", block.line_number));
             }
             output.push('\n');
-            let turtle = serialize_quads_turtle(&quads)?;
+            let turtle = serialize_quads_turtle_body(&quads, &prefix_map)?;
             if !turtle.trim().is_empty() {
                 output.push_str(turtle.trim());
                 output.push_str("\n\n");
@@ -1101,7 +1298,8 @@ impl SemanticIndex {
                 output.push_str("# Name: Reqvire used external ontology subset\n");
                 output.push_str("# Kind: external-used-subset\n\n");
                 output.push('\n');
-                let turtle = serialize_quads_turtle(&used_external_subset_quads)?;
+                let turtle =
+                    serialize_quads_turtle_body(&used_external_subset_quads, &prefix_map)?;
                 if !turtle.trim().is_empty() {
                     output.push_str(turtle.trim());
                     output.push_str("\n\n");
@@ -1120,6 +1318,7 @@ impl SemanticIndex {
         &self,
         include_external: bool,
     ) -> Result<String, ReqvireError> {
+        let prefix_map = self.turtle_prefix_map(include_external)?;
         let mut serializer = RdfSerializer::from_format(RdfFormat::JsonLd {
             profile: JsonLdProfileSet::empty(),
         })
@@ -1134,8 +1333,9 @@ impl SemanticIndex {
         );
         let generated_turtle = ontology_documents_turtle + &ontology_term_definitions_turtle;
         if !generated_turtle.trim().is_empty() {
+            let parse_turtle = prefix_map.to_turtle_block() + &generated_turtle;
             for parsed in
-                RdfParser::from_format(RdfFormat::Turtle).for_reader(generated_turtle.as_bytes())
+                RdfParser::from_format(RdfFormat::Turtle).for_reader(parse_turtle.as_bytes())
             {
                 let quad = parsed.map_err(|error| {
                     ReqvireError::SerializationError(format!(
@@ -1149,7 +1349,11 @@ impl SemanticIndex {
             }
         }
 
-        let mut seen_quads = quad_keys_from_turtle(&generated_turtle)?;
+        let mut seen_quads = quad_keys_from_turtle_with_prefix_map(
+            &generated_turtle,
+            &prefix_map,
+            "Generated ontology declarations and definition links",
+        )?;
         for (_block, quads) in normalized_export_blocks(&self.blocks, &mut seen_quads) {
             for quad in quads {
                 serializer
@@ -1192,10 +1396,17 @@ impl SemanticIndex {
         &self,
         include_external: bool,
     ) -> Result<String, ReqvireError> {
+        let prefix_map = self.turtle_prefix_map(include_external)?;
         let mut output = self.to_turtle_string_with_external(include_external)?;
         output.push_str(&self.model_context_turtle);
+        output.push_str(&build_semantic_term_context_turtle(self));
         output.push_str(&build_ontology_projection_turtle(self));
-        Ok(output)
+        output.push_str(&build_turtle_prefix_projection_turtle(&prefix_map));
+        serialize_turtle_with_prefix_map(
+            &output,
+            &prefix_map,
+            "Full semantic Turtle projection",
+        )
     }
 
     pub fn to_full_jsonld_string(&self) -> Result<String, ReqvireError> {
@@ -1274,6 +1485,49 @@ impl SemanticIndex {
 
         self.with_namespace_base_filter(namespace_base)?
             .serialize_with_options(format, full, include_external)
+    }
+
+    fn turtle_prefix_map(&self, include_external: bool) -> Result<TurtlePrefixMap, ReqvireError> {
+        let mut builder = TurtlePrefixMapBuilder::new();
+        builder.add("reqvire", "https://www.reqvire.org/ontology#", 0)?;
+        builder.add("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#", 0)?;
+        builder.add("rdfs", "http://www.w3.org/2000/01/rdf-schema#", 0)?;
+        builder.add("owl", "http://www.w3.org/2002/07/owl#", 0)?;
+        builder.add("xsd", "http://www.w3.org/2001/XMLSchema#", 0)?;
+        builder.add("sh", "http://www.w3.org/ns/shacl#", 0)?;
+        builder.add("skos", SKOS_NS, 0)?;
+
+        for declaration in &self.ontology_documents {
+            builder.add(
+                &declaration.ontology_prefix,
+                &declaration.term_namespace,
+                10,
+            )?;
+        }
+
+        for block in &self.blocks {
+            let rank = match block.kind {
+                SemanticBlockKind::Ontology | SemanticBlockKind::Shapes => 10,
+                SemanticBlockKind::Concepts => 20,
+                SemanticBlockKind::ExternalOntology => 30,
+            };
+            for (prefix, namespace) in parse_turtle_prefix_declarations(&block.content) {
+                builder.add_local(&prefix, &namespace, rank);
+            }
+        }
+
+        if include_external {
+            for source in &self.external_sources {
+                builder.add(&source.prefix, &source.namespace, 30)?;
+            }
+            for block in &self.external_blocks {
+                for (prefix, namespace) in parse_turtle_prefix_declarations(&block.content) {
+                    builder.add_local(&prefix, &namespace, 30);
+                }
+            }
+        }
+
+        Ok(builder.finish())
     }
 }
 
@@ -1371,6 +1625,7 @@ fn append_blocks_turtle<'a>(
     output: &mut String,
     blocks: impl IntoIterator<Item = &'a SemanticBlock>,
     seen_quads: &mut BTreeSet<String>,
+    prefix_map: &TurtlePrefixMap,
 ) -> Result<(), ReqvireError> {
     for block in blocks {
         let mut quads = Vec::new();
@@ -1395,7 +1650,7 @@ fn append_blocks_turtle<'a>(
             output.push_str(&format!("# Line: {}\n", block.line_number));
         }
         output.push('\n');
-        let turtle = serialize_quads_turtle(&quads)?;
+        let turtle = serialize_quads_turtle_body(&quads, prefix_map)?;
         if !turtle.trim().is_empty() {
             output.push_str(turtle.trim());
             output.push_str("\n\n");
@@ -1438,6 +1693,7 @@ fn append_used_external_subset_turtle(
     index: &SemanticIndex,
     output: &mut String,
     seen_quads: &mut BTreeSet<String>,
+    prefix_map: &TurtlePrefixMap,
 ) -> Result<(), ReqvireError> {
     let used_external_subset_turtle = index.to_used_external_subset_turtle_string()?;
     let used_external_subset_quads = quads_from_turtle(
@@ -1455,7 +1711,7 @@ fn append_used_external_subset_turtle(
     output.push_str("# Source: reqvire:external-used-subset\n");
     output.push_str("# Name: Reqvire used external ontology subset\n");
     output.push_str("# Kind: external-used-subset\n\n");
-    let turtle = serialize_quads_turtle(&used_external_subset_quads)?;
+    let turtle = serialize_quads_turtle_body(&used_external_subset_quads, prefix_map)?;
     if !turtle.trim().is_empty() {
         output.push_str(turtle.trim());
         output.push_str("\n\n");
@@ -1494,6 +1750,23 @@ fn serialize_turtle_as_format(
             String::from_utf8(bytes).map_err(|e| ReqvireError::SerializationError(e.to_string()))
         }
     }
+}
+
+fn append_turtle_body(
+    output: &mut String,
+    turtle: &str,
+    label: &str,
+    prefix_map: &TurtlePrefixMap,
+) -> Result<(), ReqvireError> {
+    let parse_turtle = prefix_map.to_turtle_block() + turtle;
+    let quads = quads_from_turtle(&parse_turtle, label)?;
+    let quad_refs = quads.iter().collect::<Vec<_>>();
+    let body = serialize_quads_turtle_body(&quad_refs, prefix_map)?;
+    if !body.trim().is_empty() {
+        output.push_str(body.trim());
+        output.push_str("\n\n");
+    }
+    Ok(())
 }
 
 fn skos_concept_iris(index: &SemanticIndex) -> BTreeSet<String> {
@@ -1539,12 +1812,17 @@ fn is_concept_layer_quad(
         || (predicate.starts_with(SKOS_NS) && object.is_some_and(|iri| concept_iris.contains(iri)))
 }
 
-fn quad_keys_from_turtle(turtle: &str) -> Result<BTreeSet<String>, ReqvireError> {
+fn quad_keys_from_turtle_with_prefix_map(
+    turtle: &str,
+    prefix_map: &TurtlePrefixMap,
+    label: &str,
+) -> Result<BTreeSet<String>, ReqvireError> {
     let mut keys = BTreeSet::new();
     if turtle.trim().is_empty() {
         return Ok(keys);
     }
-    for quad in quads_from_turtle(turtle, "Generated ontology document declarations")? {
+    let parse_turtle = prefix_map.to_turtle_block() + turtle;
+    for quad in quads_from_turtle(&parse_turtle, label)? {
         keys.insert(quad_key(&quad));
     }
     Ok(keys)
@@ -1567,8 +1845,19 @@ fn quads_from_turtle(turtle: &str, label: &str) -> Result<Vec<Quad>, ReqvireErro
     Ok(quads)
 }
 
-fn serialize_quads_turtle(quads: &[&Quad]) -> Result<String, ReqvireError> {
-    let mut serializer = RdfSerializer::from_format(RdfFormat::Turtle).for_writer(Vec::new());
+fn serialize_quads_turtle_body(
+    quads: &[&Quad],
+    prefix_map: &TurtlePrefixMap,
+) -> Result<String, ReqvireError> {
+    let turtle = serialize_quads_turtle_with_prefixes(quads, prefix_map)?;
+    Ok(strip_turtle_prefix_declarations(&turtle))
+}
+
+fn serialize_quads_turtle_with_prefixes(
+    quads: &[&Quad],
+    prefix_map: &TurtlePrefixMap,
+) -> Result<String, ReqvireError> {
+    let mut serializer = prefix_map.serializer()?.for_writer(Vec::new());
     for quad in quads {
         serializer
             .serialize_quad((*quad).as_ref())
@@ -1578,6 +1867,34 @@ fn serialize_quads_turtle(quads: &[&Quad]) -> Result<String, ReqvireError> {
         .finish()
         .map_err(|e| ReqvireError::SerializationError(e.to_string()))?;
     String::from_utf8(bytes).map_err(|e| ReqvireError::SerializationError(e.to_string()))
+}
+
+fn serialize_turtle_with_prefix_map(
+    turtle: &str,
+    prefix_map: &TurtlePrefixMap,
+    label: &str,
+) -> Result<String, ReqvireError> {
+    let quads = quads_from_turtle(turtle, label)?;
+    let quad_refs = quads.iter().collect::<Vec<_>>();
+    let serialized = serialize_quads_turtle_with_prefixes(&quad_refs, prefix_map)?;
+    let body = strip_turtle_prefix_declarations(&serialized);
+    let mut output = prefix_map.to_turtle_block();
+    output.push_str(body.trim());
+    output.push('\n');
+    Ok(output)
+}
+
+fn strip_turtle_prefix_declarations(turtle: &str) -> String {
+    let mut output = String::new();
+    for line in turtle.lines() {
+        let trimmed = line.trim_start();
+        if trimmed.starts_with("@prefix ") || trimmed.starts_with("PREFIX ") {
+            continue;
+        }
+        output.push_str(line);
+        output.push('\n');
+    }
+    output.trim_start_matches('\n').to_string()
 }
 
 fn materialize_used_external_subset_turtle(index: &SemanticIndex) -> Result<String, ReqvireError> {
@@ -1909,6 +2226,7 @@ fn build_authored_model_turtle(
 fn build_generated_model_turtle(
     registry: &GraphRegistry,
     index: &SemanticIndex,
+    prefix_map: &TurtlePrefixMap,
 ) -> Result<String, ReqvireError> {
     let mut output = String::new();
     output.push_str(
@@ -1918,6 +2236,7 @@ fn build_generated_model_turtle(
     output.push_str("@prefix owl: <http://www.w3.org/2002/07/owl#> .\n");
     output.push_str("@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n");
     output.push_str("@prefix reqvire: <https://www.reqvire.org/ontology#> .\n");
+    output.push_str("@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n");
     output.push_str("\n");
     output.push_str(&build_ontology_document_declarations_turtle(
         &index.ontology_documents,
@@ -1928,6 +2247,7 @@ fn build_generated_model_turtle(
         &index.blocks,
     ));
     output.push_str(&build_ontology_projection_turtle(index));
+    output.push_str(&build_turtle_prefix_projection_turtle(prefix_map));
 
     let mut artifacts = BTreeSet::new();
     let mut nodes: Vec<_> = registry.nodes.values().collect();
@@ -2480,6 +2800,64 @@ fn concept_reference_iri_value(
     registry.generated_concept_iri_for_element(target)
 }
 
+fn build_semantic_term_context_turtle(index: &SemanticIndex) -> String {
+    let mut output = String::new();
+    let mut emitted = BTreeSet::new();
+
+    let mut declarations: Vec<_> = index
+        .ontology_declarations
+        .values()
+        .flat_map(|declarations| declarations.iter())
+        .filter(|declaration| !declaration.external)
+        .collect();
+    declarations.sort_by(|a, b| {
+        a.element_identifier
+            .cmp(&b.element_identifier)
+            .then_with(|| a.iri.cmp(&b.iri))
+            .then_with(|| a.role.cmp(&b.role))
+    });
+
+    let mut shape_references = index.shape_references.clone();
+    shape_references.sort();
+
+    if declarations.is_empty() && shape_references.is_empty() {
+        return output;
+    }
+
+    output.push_str(
+        "# -----------------------------------------------------------------------------\n",
+    );
+    output.push_str("# Reqvire generated semantic term context\n\n");
+    output.push_str("@prefix reqvire: <https://www.reqvire.org/ontology#> .\n\n");
+
+    for declaration in declarations {
+        let subject = element_iri_from_identifier(&declaration.element_identifier);
+        let statement = format!(
+            "{} reqvire:declaresTerm <{}> .\n",
+            subject,
+            escape_iri(&declaration.iri)
+        );
+        if emitted.insert(statement.clone()) {
+            output.push_str(&statement);
+        }
+    }
+
+    for reference in shape_references {
+        let subject = element_iri_from_identifier(&reference.element_identifier);
+        let statement = format!(
+            "{} reqvire:referencesTerm <{}> .\n",
+            subject,
+            escape_iri(&reference.iri)
+        );
+        if emitted.insert(statement.clone()) {
+            output.push_str(&statement);
+        }
+    }
+
+    output.push('\n');
+    output
+}
+
 fn build_ontology_projection_turtle(index: &SemanticIndex) -> String {
     let graph = &index.ontology_projection;
     if graph.is_empty() {
@@ -2681,6 +3059,76 @@ fn build_ontology_projection_turtle(index: &SemanticIndex) -> String {
     }
 
     output
+}
+
+fn build_turtle_prefix_projection_turtle(prefix_map: &TurtlePrefixMap) -> String {
+    if prefix_map.declarations.is_empty() {
+        return String::new();
+    }
+
+    let export_iri = "<urn:reqvire:semantic-export:prefixed-turtle>";
+    let map_iri = "<urn:reqvire:semantic-export:turtle-prefix-map:top-level-export>";
+    let mut output = String::new();
+    output.push_str(
+        "# -----------------------------------------------------------------------------\n",
+    );
+    output.push_str("# Reqvire generated Turtle prefix projection facts\n\n");
+    output.push_str("@prefix reqvire: <https://www.reqvire.org/ontology#> .\n");
+    output.push_str("@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n");
+    output.push_str(&format!(
+        "{} a reqvire:PrefixedTurtleExport ;\n  reqvire:turtlePrefixMap {} .\n\n",
+        export_iri, map_iri
+    ));
+    output.push_str(&format!(
+        "{} a reqvire:TurtlePrefixMap ;\n  reqvire:turtlePrefixScope \"top-level-export\"",
+        map_iri
+    ));
+    for declaration in &prefix_map.declarations {
+        output.push_str(&format!(
+            " ;\n  reqvire:turtlePrefixDeclaration {}",
+            turtle_prefix_declaration_iri(&declaration.prefix)
+        ));
+    }
+    output.push_str(" .\n\n");
+
+    for (index, declaration) in prefix_map.declarations.iter().enumerate() {
+        output.push_str(&format!(
+            "{} a reqvire:TurtlePrefixDeclaration ;\n",
+            turtle_prefix_declaration_iri(&declaration.prefix)
+        ));
+        output.push_str(&format!(
+            "  reqvire:turtlePrefixName {} ;\n",
+            turtle_string(&declaration.prefix)
+        ));
+        output.push_str(&format!(
+            "  reqvire:turtlePrefixNamespace {}^^xsd:anyURI ;\n",
+            turtle_string(&declaration.namespace)
+        ));
+        output.push_str(&format!(
+            "  reqvire:turtlePrefixSourceKind {} ;\n",
+            turtle_string(turtle_prefix_source_kind(declaration.source_rank))
+        ));
+        output.push_str(&format!(
+            "  reqvire:turtlePrefixReserved {} ;\n",
+            declaration.source_rank == 0
+        ));
+        output.push_str(&format!("  reqvire:turtlePrefixOrder {} .\n\n", index));
+    }
+
+    output
+}
+
+fn turtle_prefix_declaration_iri(prefix: &str) -> String {
+    format!("<urn:reqvire:semantic-export:turtle-prefix:{}>", escape_iri(prefix))
+}
+
+fn turtle_prefix_source_kind(source_rank: u8) -> &'static str {
+    match source_rank {
+        0 => "built-in",
+        10 => "authored-ontology",
+        20 => "concept-scheme",
+        _ => "external-source",
+    }
 }
 
 fn build_ontology_document_declarations_turtle(
@@ -5785,8 +6233,17 @@ concept:TraceabilityConstruct a owl:Class ;
         let external_output = index
             .to_turtle_string_with_external(true)
             .expect("include_external Turtle should serialize");
+        let external_quads = parse_test_quads(&external_output);
         assert!(external_output.contains("An idea or notion; a unit of thought."));
-        assert!(external_output.contains("http://www.w3.org/2004/02/skos/core#Concept"));
+        assert!(external_quads.iter().any(|quad| {
+            matches!(
+                &quad.subject,
+                oxigraph::model::NamedOrBlankNode::NamedNode(node) if node.as_str() == SKOS_CONCEPT
+            ) || matches!(
+                &quad.object,
+                Term::NamedNode(node) if node.as_str() == SKOS_CONCEPT
+            )
+        }));
         assert!(!external_output.contains("Ordered Collection"));
         assert!(!external_output.contains(
             "An ordered collection of concepts, where both the grouping and the ordering are meaningful."

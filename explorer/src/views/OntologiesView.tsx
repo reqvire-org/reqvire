@@ -5,7 +5,7 @@ import { mountOntologyGraph, type OntologyGraphRendererHandle } from "../lib/ont
 import { useStore } from "../store/StoreContext";
 import type { OntologyGraphData, OntologyGraphNode } from "../store/types";
 import { ViewFrame } from "./ViewFrame";
-import { GraphCanvasFrame, GraphCanvasNotice, GraphCanvasSurface, GraphRoute, Spinner } from "@ds";
+import { GraphCanvasFrame, GraphCanvasNotice, GraphCanvasSurface, GraphRoute, Spinner, useLatestRef } from "@ds";
 
 declare global {
   interface Window {
@@ -59,6 +59,7 @@ function OntologyGraphRenderer({
   const rendererRef = useRef<OntologyGraphRendererHandle | null>(null);
   const activeFiltersRef = useRef(activeFilters);
   const { setOntologySelectionId } = useExplorerUiState();
+  const setOntologySelectionIdRef = useLatestRef(setOntologySelectionId);
   const [notice, setNotice] = useState<string | null>("Loading ontology graph...");
 
   useEffect(() => {
@@ -74,7 +75,7 @@ function OntologyGraphRenderer({
       buildTimer = window.setTimeout(() => {
       try {
         const renderer = mountOntologyGraph(container, graphData, {
-          onSelect: (node: OntologyGraphNode | null) => setOntologySelectionId(node?.id ?? null),
+          onSelect: (node: OntologyGraphNode | null) => setOntologySelectionIdRef.current(node?.id ?? null),
         });
         rendererRef.current = renderer;
         window.syncOntologyGraphFilters?.(activeFiltersRef.current);
@@ -94,7 +95,7 @@ function OntologyGraphRenderer({
       rendererRef.current?.destroy();
       rendererRef.current = null;
     };
-  }, [graphData, setOntologySelectionId]);
+  }, [graphData, setOntologySelectionIdRef]);
 
   useEffect(() => {
     window.syncOntologyGraphFilters?.(activeFilters);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   Button,
   ElementIcon,
@@ -777,9 +777,7 @@ function TraceTreeFolderNode({
   const [open, setOpen] = useState(depth < 2 || hasSelectedDescendant);
   const expanded = Boolean(query.trim()) || open;
 
-  useEffect(() => {
-    if (hasSelectedDescendant) setOpen(true);
-  }, [hasSelectedDescendant]);
+  useOpenWhenSelectionEnters(hasSelectedDescendant, setOpen);
 
   return (
     <PaneTreeNode>
@@ -794,6 +792,9 @@ function TraceTreeFolderNode({
         selected={folder.path === ROOT_PATH && !selectedPath}
         onToggle={() => setOpen((value) => !value)}
         onSelect={() => {
+          if (folder.files.length + folder.folders.length > 0) {
+            setOpen((value) => !value);
+          }
           ui.setTraceFilePath(null);
           ui.setTraceSelectionId(null);
         }}
@@ -828,6 +829,9 @@ function TraceTreeFileNode({
   const expanded = Boolean(query.trim()) || open;
 
   function selectFile() {
+    if (file.verifications.length > 0) {
+      setOpen((value) => !value);
+    }
     ui.setTraceFilePath(file.path);
     ui.setTraceSelectionId(null);
   }
@@ -991,9 +995,7 @@ function ThesaurusSchemeTreeNode({
   const hasSelectedDescendant = selectedId ? scheme.concepts.some((concept) => concept.id === selectedId) : false;
   const [open, setOpen] = useState(hasSelectedDescendant || scheme.concepts.length <= 8);
 
-  useEffect(() => {
-    if (hasSelectedDescendant) setOpen(true);
-  }, [hasSelectedDescendant]);
+  useOpenWhenSelectionEnters(hasSelectedDescendant, setOpen);
 
   const children = thesaurusTopLevelConcepts(scheme.concepts);
   const expanded = Boolean(query.trim()) || open;
@@ -1011,6 +1013,9 @@ function ThesaurusSchemeTreeNode({
         selected={false}
         onToggle={() => setOpen((value) => !value)}
         onSelect={() => {
+          if (children.length > 0) {
+            setOpen((value) => !value);
+          }
           const first = children[0] ?? scheme.concepts[0];
           if (first) onSelectConcept(first.id);
         }}
@@ -1050,9 +1055,7 @@ function ThesaurusConceptTreeNode({
   const [open, setOpen] = useState(depth < 2 || hasSelectedDescendant);
   const expanded = Boolean(query.trim()) || open;
 
-  useEffect(() => {
-    if (hasSelectedDescendant) setOpen(true);
-  }, [hasSelectedDescendant]);
+  useOpenWhenSelectionEnters(hasSelectedDescendant, setOpen);
 
   return (
     <PaneTreeNode>
@@ -1066,7 +1069,12 @@ function ThesaurusConceptTreeNode({
         expandable={children.length > 0}
         selected={selectedId === concept.id}
         onToggle={() => setOpen((value) => !value)}
-        onSelect={() => onSelectConcept(concept.id)}
+        onSelect={() => {
+          if (children.length > 0) {
+            setOpen((value) => !value);
+          }
+          onSelectConcept(concept.id);
+        }}
         title={concept.description || concept.label}
       />
       {expanded && children.map((child) => (
@@ -1086,6 +1094,20 @@ function ThesaurusConceptTreeNode({
 
 function formatSummaryValue(value: string | number) {
   return typeof value === "number" ? value.toLocaleString() : value;
+}
+
+function useOpenWhenSelectionEnters(
+  hasSelectedDescendant: boolean,
+  setOpen: (update: boolean) => void,
+) {
+  const previouslyHadSelectedDescendant = useRef(hasSelectedDescendant);
+
+  useEffect(() => {
+    if (hasSelectedDescendant && !previouslyHadSelectedDescendant.current) {
+      setOpen(true);
+    }
+    previouslyHadSelectedDescendant.current = hasSelectedDescendant;
+  }, [hasSelectedDescendant, setOpen]);
 }
 
 function buildFileTree(files: ProjectStoreFile[], rootLabel: string): TreeFolder {

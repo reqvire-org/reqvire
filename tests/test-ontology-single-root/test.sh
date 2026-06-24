@@ -84,8 +84,9 @@ if ! grep -q "<https://example.test/ontology> a owl:Ontology" <<< "$VALID_EXPORT
   echo "$VALID_EXPORT"
   exit 1
 fi
-if ! grep -q "reqvire:ontologyElement <urn:reqvire:element:core-ontology>" <<< "$VALID_EXPORT" ||
-   ! grep -q "reqvire:ontologyElement <urn:reqvire:element:api-ontology>" <<< "$VALID_EXPORT"; then
+if ! grep -q "reqvire:ontologyElement" <<< "$VALID_EXPORT" ||
+   ! grep -q "<urn:reqvire:element:core-ontology>" <<< "$VALID_EXPORT" ||
+   ! grep -q "<urn:reqvire:element:api-ontology>" <<< "$VALID_EXPORT"; then
   echo "FAILED: ontology export should show same-base child ontology elements contributing to the root document"
   echo "$VALID_EXPORT"
   exit 1

@@ -1,4 +1,5 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { ExplorerUiStateProvider } from "../state/ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
@@ -8,6 +9,8 @@ import { OntologiesView } from "./OntologiesView";
 
 const sigmaState = vi.hoisted(() => ({
   graphs: [] as Array<{ forEachNode: (callback: (node: string, attributes: Record<string, unknown>) => void) => void }>,
+  constructs: 0,
+  kills: 0,
 }));
 
 vi.mock("graphology-layout-forceatlas2", () => ({
@@ -38,10 +41,13 @@ vi.mock("sigma/utils", () => ({
 vi.mock("sigma", () => ({
   default: class MockSigma {
     constructor(graph: { forEachNode: (callback: (node: string, attributes: Record<string, unknown>) => void) => void }) {
+      sigmaState.constructs += 1;
       sigmaState.graphs.push(graph);
     }
     refresh = vi.fn();
-    kill = vi.fn();
+    kill = vi.fn(() => {
+      sigmaState.kills += 1;
+    });
     on = vi.fn();
     getNodeDisplayData = vi.fn();
     getCamera = () => ({
@@ -52,11 +58,8 @@ vi.mock("sigma", () => ({
 }));
 
 function renderWithStore(store: ExplorerProjectStore = devFixture) {
-  Object.defineProperty(globalThis, "WebGLRenderingContext", {
-    configurable: true,
-    value: { FLOAT: 5126, TRIANGLES: 4, UNSIGNED_BYTE: 5121 },
-  });
-  sigmaState.graphs.length = 0;
+  setupWebGLMock();
+  resetSigmaState();
   return render(
     <>
       <StoreProvider store={store} schemaMismatch={null}>
@@ -66,6 +69,19 @@ function renderWithStore(store: ExplorerProjectStore = devFixture) {
       </StoreProvider>
     </>,
   );
+}
+
+function setupWebGLMock() {
+  Object.defineProperty(globalThis, "WebGLRenderingContext", {
+    configurable: true,
+    value: { FLOAT: 5126, TRIANGLES: 4, UNSIGNED_BYTE: 5121 },
+  });
+}
+
+function resetSigmaState() {
+  sigmaState.graphs.length = 0;
+  sigmaState.constructs = 0;
+  sigmaState.kills = 0;
 }
 
 describe("OntologiesView", () => {
@@ -107,6 +123,35 @@ describe("OntologiesView", () => {
     });
     expect(rendererTypes).not.toContain("owl");
     expect(rendererTypes.every((type) => type === "circle" || type === "constructGlyph")).toBe(true);
+  });
+
+  it("keeps the ontology graph mounted when the shell re-renders", async () => {
+    setupWebGLMock();
+    resetSigmaState();
+
+    function OntologyShell() {
+      const [revision, setRevision] = useState(0);
+      return (
+        <>
+          <button type="button" onClick={() => setRevision((value) => value + 1)}>
+            refresh shell {revision}
+          </button>
+          <StoreProvider store={devFixture} schemaMismatch={null}>
+            <ExplorerUiStateProvider>
+              <OntologiesView />
+            </ExplorerUiStateProvider>
+          </StoreProvider>
+        </>
+      );
+    }
+
+    render(<OntologyShell />);
+
+    await waitFor(() => expect(sigmaState.constructs).toBe(1));
+    fireEvent.click(screen.getByRole("button", { name: /refresh shell/ }));
+
+    expect(sigmaState.kills).toBe(0);
+    expect(sigmaState.constructs).toBe(1);
   });
 
   it("keeps Explorer external-source graph data limited to used external subset terms", () => {

@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { ExplorerSidePane } from "../components/ExplorerSidePane";
 import { ExplorerUiStateProvider, useExplorerUiState } from "../state/ExplorerUiState";
@@ -12,6 +12,9 @@ import {
 import { KnowledgeGraphView } from "./GraphLibraryViews";
 import { ThesaurusView } from "./ThesaurusView";
 
+const mockSigmaConstruct = vi.hoisted(() => vi.fn());
+const mockSigmaKill = vi.hoisted(() => vi.fn());
+
 vi.mock("graphology-layout-forceatlas2", () => ({
   default: {
     inferSettings: () => ({}),
@@ -22,6 +25,7 @@ vi.mock("graphology-layout-forceatlas2", () => ({
 vi.mock("sigma", () => ({
   default: class MockSigma {
     constructor(_graph: unknown, container: HTMLElement) {
+      mockSigmaConstruct();
       const canvas = document.createElement("canvas");
       canvas.setAttribute("data-testid", "mock-sigma-renderer");
       container.appendChild(canvas);
@@ -29,7 +33,9 @@ vi.mock("sigma", () => ({
 
     on() {}
     refresh() {}
-    kill() {}
+    kill() {
+      mockSigmaKill();
+    }
     getNodeDisplayData() {
       return { x: 0, y: 0 };
     }
@@ -52,6 +58,11 @@ function renderWithStore(view: React.ReactElement, store = devFixture) {
 }
 
 describe("native visualization parity views", () => {
+  beforeEach(() => {
+    mockSigmaConstruct.mockClear();
+    mockSigmaKill.mockClear();
+  });
+
   it("renders Graph as the native Sigma/Graphology project graph", async () => {
     const { container } = renderWithStore(
       <KnowledgeGraphView frameTestId="model-graph" onOpenElement={vi.fn()} />,
@@ -62,6 +73,33 @@ describe("native visualization parity views", () => {
     await waitFor(() => expect(screen.getByTestId("mock-sigma-renderer")).toBeTruthy());
     expect(screen.getByRole("img", { name: "Actual project elements and facts graph" })).toBeTruthy();
     expect(container.querySelector("iframe")).toBeNull();
+  });
+
+  it("keeps the project graph mounted when modal route handlers change", async () => {
+    function GraphShell() {
+      const [revision, setRevision] = useState(0);
+      return (
+        <>
+          <button type="button" onClick={() => setRevision((value) => value + 1)}>
+            refresh shell
+          </button>
+          <KnowledgeGraphView
+            frameTestId="model-graph"
+            onOpenElement={() => {
+              void revision;
+            }}
+          />
+        </>
+      );
+    }
+
+    renderWithStore(<GraphShell />);
+
+    await waitFor(() => expect(mockSigmaConstruct).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("button", { name: "refresh shell" }));
+
+    expect(mockSigmaKill).not.toHaveBeenCalled();
+    expect(mockSigmaConstruct).toHaveBeenCalledTimes(1);
   });
 
   it("opens selected concept-reference targets as native model elements", () => {
@@ -146,6 +184,32 @@ describe("native visualization parity views", () => {
     expect(screen.getByRole("tree", { name: "Concept hierarchy" })).toBeTruthy();
     expect(screen.getByText("Example Thesaurus")).toBeTruthy();
     expect(screen.getByText("Service Endpoint")).toBeTruthy();
+  });
+
+  it("collapses a selected thesaurus branch when its row is clicked again", () => {
+    function SelectedThesaurusPane() {
+      const ui = useExplorerUiState();
+      useEffect(() => {
+        ui.setThesaurusSelectionId("urn:reqvire:test:concepts#ServiceEndpoint");
+      }, [ui]);
+      return (
+        <ExplorerSidePane
+          activeView="thesaurus"
+          open
+          onToggle={vi.fn()}
+          onNavigate={vi.fn()}
+          onOpenElement={vi.fn()}
+          onOpenOntologyNode={vi.fn()}
+        />
+      );
+    }
+
+    renderWithStore(<SelectedThesaurusPane />);
+
+    expect(screen.getByText("Service Endpoint")).toBeTruthy();
+    fireEvent.click(screen.getByText("Example Thesaurus"));
+
+    expect(screen.queryByText("Service Endpoint")).toBeNull();
   });
 
   it("renders traces as native verification rows", () => {

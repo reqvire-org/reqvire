@@ -14,6 +14,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { RouteFrame, RouteLayout } from "../shell";
 import { WorkspaceShell } from "../content/WorkspaceShell";
+import { useLatestRef } from "../../hooks/useLatestRef";
 
 export interface ThesaurusConceptUsage {
   id?: string;
@@ -690,6 +691,8 @@ function ThesaurusSchemeMap({
   );
   const didFitLayoutRef = useRef<string | null>(null);
   const centeredSelectionRef = useRef<string | null>(null);
+  const onSelectRef = useLatestRef(onSelect);
+  const onOpenConceptRef = useLatestRef(onOpenConcept);
 
   useEffect(() => {
     if (!flowInstance || didFitLayoutRef.current === layoutKey) return;
@@ -740,15 +743,15 @@ function ThesaurusSchemeMap({
           onNodeClick={(_event, node) => {
             const sourceElementId = readFlowNodeSourceElementId(node);
             if (sourceElementId) {
-              onOpenConcept?.(sourceElementId);
+              onOpenConceptRef.current?.(sourceElementId);
               return;
             }
             if (node.type !== "concept") return;
-            onSelect(String(node.id));
+            onSelectRef.current(String(node.id));
           }}
           onNodeDoubleClick={(_event, node) => {
             const sourceElementId = readFlowNodeSourceElementId(node);
-            if (sourceElementId) onOpenConcept?.(sourceElementId);
+            if (sourceElementId) onOpenConceptRef.current?.(sourceElementId);
           }}
         />
       </div>
