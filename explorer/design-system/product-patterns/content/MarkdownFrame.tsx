@@ -54,8 +54,51 @@ const markdownBaseUX = css`
   ol,
   blockquote,
   pre,
+  .mermaid,
   .ux-markdown-table-wrap {
     margin: 0.55em 0;
+  }
+
+  .mermaid {
+    position: relative;
+    min-width: 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .mermaid + h1,
+  .mermaid + h2,
+  .mermaid + h3,
+  .mermaid + h4 {
+    margin-top: var(--space-8);
+  }
+
+  .diagram-nav-buttons {
+    position: absolute;
+    left: var(--space-4);
+    bottom: var(--space-4);
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    align-items: center;
+    padding: var(--space-1);
+    border-radius: var(--radius-md);
+  }
+
+  .diagram-nav-btn {
+    display: inline-flex;
+    min-width: var(--control-sm);
+    min-height: var(--control-sm);
+    align-items: center;
+    justify-content: center;
+    border: var(--border-w) solid transparent;
+    border-radius: var(--radius-xs);
+    padding: 0 var(--space-3);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-tight);
+    cursor: pointer;
   }
 
   ul,
@@ -184,6 +227,33 @@ const markdownSkinX = css`
   code,
   pre {
     background: var(--bg-sunken);
+  }
+
+  .mermaid {
+    background: var(--bg-surface);
+  }
+
+  .diagram-nav-buttons {
+    border: var(--border-w) solid var(--border-subtle);
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .diagram-nav-btn {
+    border-color: var(--border-subtle);
+    background: var(--bg-overlay);
+    color: var(--text-body);
+  }
+
+  .diagram-nav-btn:hover {
+    border-color: var(--accent);
+    background: var(--bg-hover);
+    color: var(--text-strong);
+  }
+
+  .diagram-nav-btn:focus-visible {
+    outline: var(--border-w) solid var(--text-link);
+    outline-offset: var(--space-1);
   }
 
   pre code {

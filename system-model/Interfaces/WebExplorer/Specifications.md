@@ -175,7 +175,7 @@ Explorer Mermaid rendering behavior:
 - Generated Mermaid source may use semantic class names for element roles and container roles. The Explorer renderer resolves those classes through design-system tokens before Mermaid rendering.
 - Class definitions must use concrete Mermaid-safe colors only after resolving semantic tokens; renderer code must not hardcode a duplicate color table.
 - Folder and file subgraphs show physical containment, while element nodes use role-specific classes and source links.
-- Mermaid diagrams embedded in source pages, model content, and trace roll-up views use the same typography, background, border, zoom/pan controls, and selected/hovered visual treatment as the rest of the Explorer.
+- Mermaid diagrams embedded in source pages, model content, and trace roll-up views use the same typography, background, border, zoom/pan controls, source-copy control, and selected/hovered visual treatment as the rest of the Explorer.
 - Each Mermaid diagram initializes independently after its route content is visible. Rendering many diagrams must not block the initial Explorer shell or require all diagrams to finish before the page becomes usable.
 - Small diagrams shrink to natural height. Large diagrams receive their own pan/zoom viewport and must not force unrelated page content or later diagrams into a fixed full-screen scroll region.
 - Contract Bindings labels in Model and Traces diagrams use display names rather than full `file#fragment` identifiers, while the full identifier remains the link target and structured data value.

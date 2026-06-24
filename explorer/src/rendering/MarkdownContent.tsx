@@ -578,7 +578,7 @@ export function MermaidBlock({
       }
       cleanupNodeClicks = bindMermaidNodeClicks(target, nodeClickTargets, onNodeClick);
       try {
-        cleanupInteraction = initializeMermaidInteraction(target);
+        cleanupInteraction = initializeMermaidInteraction(target, code);
       } catch (error) {
         console.warn("[Reqvire Explorer] Mermaid interaction setup failed", error);
       }
@@ -700,7 +700,7 @@ function mermaidSvgNodeMatches(node: Element, mermaidNodeId: string): boolean {
   ));
 }
 
-function initializeMermaidInteraction(container: HTMLDivElement): () => void {
+function initializeMermaidInteraction(container: HTMLDivElement, sourceCode: string): () => void {
   const svg = container.querySelector("svg");
   if (!(svg instanceof SVGSVGElement)) return () => undefined;
 
@@ -813,12 +813,14 @@ function initializeMermaidInteraction(container: HTMLDivElement): () => void {
     ["down", "Down", "Pan down"],
     ["left", "Left", "Pan left"],
     ["right", "Right", "Pan right"],
+    ["copy", "⧉", "Copy Mermaid source"],
   ].forEach(([action, label, ariaLabel]) => {
     const button = document.createElement("button");
     button.className = "diagram-nav-btn";
     button.type = "button";
     button.dataset.action = action;
     button.setAttribute("aria-label", ariaLabel);
+    button.setAttribute("title", ariaLabel);
     button.textContent = label;
     controls.appendChild(button);
   });
@@ -839,6 +841,11 @@ function initializeMermaidInteraction(container: HTMLDivElement): () => void {
         break;
       case "reset":
         reset();
+        break;
+      case "copy":
+        navigator.clipboard?.writeText(sourceCode).catch((error: unknown) => {
+          console.warn("[Reqvire Explorer] Mermaid source copy failed", error);
+        });
         break;
       case "up":
         panBy(0, -stepY);
