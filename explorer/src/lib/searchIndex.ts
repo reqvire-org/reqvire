@@ -59,6 +59,7 @@ export function createProjectSearchIndex(
         displayKind: 2,
         text: 1,
       },
+      combineWith: "AND",
       prefix: true,
       fuzzy: 0.18,
     },

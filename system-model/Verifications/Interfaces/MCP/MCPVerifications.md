@@ -145,9 +145,10 @@ Expected checks:
 - Verify `reqvire.semantic.shapes` returns SHACL shape content and excludes authored ontology classes.
 - Verify `reqvire.semantic.concepts` returns SKOS concept content and optional `reqvire:mapsToConcept` mappings.
 - Verify `reqvire.semantic.ontologies` returns generated `rdfs:isDefinedBy` links from authored named ontology resources to the generated ontology document IRI.
-- Verify `reqvire.semantic.ontologies` excludes local External Ontology dependency triples and external term declarations by default and includes only the used external subset from parsed Turtle/TTL, RDF/XML, and JSON-LD sources when `include_external` is true.
-- Verify `reqvire.semantic.ontologies` with `include_external` does not generate `rdfs:isDefinedBy` ownership links for imported external ontology terms.
-- Verify `reqvire.semantic.graph` supports full mode and returns Reqvire model context triples plus generated ontology projection facts alongside authored semantic content.
+- Verify `reqvire.semantic.ontologies` excludes local External Ontology dependency triples and external term declarations by default.
+- Verify `reqvire.semantic.export` with `layers: ["ontologies", "external-used"]` includes only the used external subset from parsed Turtle/TTL, RDF/XML, JSON-LD, and built-in external sources.
+- Verify `reqvire.semantic.export` with the `external-used` layer does not generate `rdfs:isDefinedBy` ownership links for imported external ontology terms.
+- Verify `reqvire.semantic.graph` is equivalent to `reqvire.semantic.export` with omitted layers and returns Reqvire model facts plus generated ontology projection facts alongside authored semantic content.
 - Verify semantic prefix and vocabulary tools exclude imported external ontology vocabulary by default, include only used external subset vocabulary when `include_external` is true, and mark included imported entries as external with source metadata and used-subset materialization metadata.
 - Verify `reqvire.semantic.sparql` queries the authored semantic store by default and can query only the used external subset when `include_external` is true.
 - Verify unused external ontology dependency terms remain unavailable through MCP semantic ontology, vocabulary, and SPARQL outputs.

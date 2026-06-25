@@ -21,8 +21,8 @@ ontology elements and SHACL semantic contracts.
 - Work from the repository root unless the user gives a different workspace.
 - Default CLI form: `npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" <command>`.
 - Inside the Reqvire source repository, `cargo run -- <command>` is also acceptable when the local binary is the intended target.
-- Inspect authored ontology content with `search --filter-type ontology --json`, `search --filter-type semantic-contract --json`, `model --filter-type ontology --json`, `semantic ontologies`, `semantic shapes`, and `semantic graph --full`.
-- Use `semantic ontologies --include-external` or `semantic graph --full --include-external` only when the used subset of local external ontology dependencies must be materialized.
+- Inspect authored ontology content with `search --filter-type ontology --json`, `search --filter-type semantic-contract --json`, `model --filter-type ontology --json`, `semantic export --layer ontologies`, `semantic export --layer shapes`, and `semantic export --layer model`.
+- Use `semantic export --layer ontologies --layer external-used` or `semantic export --layer model --layer external-used` only when the used subset of local external ontology dependencies must be materialized.
 - Prefer Reqvire CLI mutation commands for broad structural edits when available, such as `add`, `link`, `relink`, `mv`, `rm`, and `rename-element`.
 - Manual Markdown edits are valid for focused authoring. Preserve `# Elements`, `### Element Name`, `#### Metadata`, and Reqvire relation list syntax.
 - Author ontology elements with `type: ontology`, `ontology_base`, `ontology_prefix`, and `#### Ontology`; authored Turtle must declare the prefixes it uses.
@@ -32,7 +32,7 @@ ontology elements and SHACL semantic contracts.
 - Use ontology `derivedFrom` / `derive` for ontology hierarchy and document composition. Use `reqvire:mapsToConcept` in Turtle only when a structural term intentionally maps to a generated native SKOS concept.
 - Do not edit generated exports as the source of truth; edit authored Markdown elements and regenerate/export through Reqvire.
 - When changing ontology identity, check dependent semantic contracts, requirements constrained by shapes, concept bridges, Explorer ontology/thesaurus data, MCP semantic tools, and tests that assert exported Turtle.
-- When validation is part of the task, run focused checks such as `validate`, `semantic ontologies`, `semantic shapes`, `semantic graph --full`, and any affected fixture tests before finishing.
+- When validation is part of the task, run focused checks such as `validate`, `semantic export --layer ontologies`, `semantic export --layer shapes`, `semantic export --layer model`, and any affected fixture tests before finishing.
 
 ## Workflow
 
@@ -53,7 +53,7 @@ ontology elements and SHACL semantic contracts.
    - For each class candidate, immediately ask what object properties and datatype properties are needed: ownership, state, allocation, interface exposure, verification evidence, operational effect, constraints, and identifiers.
 4. Inspect the ontology plane:
    - `reqvire search --filter-type=ontology --short`
-   - `reqvire semantic ontologies`
+   - `reqvire semantic export --layer ontologies`
    - Read the existing `system-model/Ontologies/*.md` file that owns nearby vocabulary.
 5. Decide whether to extend an existing ontology or create a new ontology element.
    - Extend when the new terms belong to an existing vocabulary root.
@@ -65,7 +65,7 @@ ontology elements and SHACL semantic contracts.
 10. Link ontology hierarchy with `derivedFrom` only between ontology elements.
 11. Use `#### Concept References` on non-ontology, non-semantic-contract elements when their prose needs explicit bindings to SKOS concepts. Do not point concept references directly at OWL classes or properties; bridge structural terms to concepts with `reqvire:mapsToConcept` in authored ontology when useful.
 12. Add or update semantic contracts only when a closed-world SHACL profile is needed; link each contract to ontology with `use`/`usedBy` and to governed requirements with `constrain`/`constrainedBy`. Do not add `#### Concept References` to semantic contracts.
-13. Use `reqvire semantic ontologies` for authored OWL/RDF ontology vocabulary, `reqvire semantic shapes` for semantic-contract SHACL shapes, `reqvire semantic concepts` for SKOS concepts, and `reqvire semantic graph` for the combined semantic graph. Reqvire generates `rdfs:isDefinedBy <ontology_base>` facts only for authored named ontology resources whose IRIs are inside the resolved ontology term namespace; authors do not need to repeat them, and conflicting authored `rdfs:isDefinedBy` targets fail validation. Reqvire does not generate `rdfs:isDefinedBy` ownership facts for imported External Ontology terms. Use `reqvire semantic ontologies --include-external`, `reqvire semantic graph --include-external`, or MCP `include_external: true` when the used subset of local External Ontology dependencies must be materialized. Use MCP `reqvire.semantic.prefixes`, `reqvire.semantic.vocabulary`, or `reqvire.semantic.sparql` with `include_external: true` only when imported external prefixes, used vocabulary terms, or used subset triples are needed. Use MCP `reqvire.semantic.vocabulary` with `ontology_document` or `ontology_base` to filter authored terms to one OWL document, or with `include_external: true` plus `ontology_document` to filter used external subset terms to one external source. Use `reqvire semantic graph --full` when downstream graph/database tooling also needs model-context facts for element relations, contract_bindings, concept references, term declarations, shape references, and ontology projection facts. Use `reqvire semantic graph --full --include-external` when both the used external subset and full model context are needed. Concept references are term-reference edges, not generated `OntologyConstruct` records. Reqvire parses complete external ontology files internally for validation and term resolution, and `include_external` should be used only for used-subset materialization; raw full external dependency triples remain available only in explicit full-external workflows.
+13. Use `reqvire semantic export --layer ontologies` for authored OWL/RDF ontology vocabulary, `reqvire semantic export --layer shapes` for semantic-contract SHACL shapes, `reqvire semantic export --layer concepts` for SKOS concepts, and `reqvire semantic export` for the combined semantic export. Reqvire generates `rdfs:isDefinedBy <ontology_base>` facts only for authored named ontology resources whose IRIs are inside the resolved ontology term namespace; authors do not need to repeat them, and conflicting authored `rdfs:isDefinedBy` targets fail validation. Reqvire does not generate `rdfs:isDefinedBy` ownership facts for imported External Ontology terms. Use `reqvire semantic export --layer ontologies --layer external-used`, `reqvire semantic export --layer external-used`, or MCP `reqvire.semantic.export` with `layers: ["ontologies", "external-used"]` when the used subset of local External Ontology dependencies must be materialized. Use MCP `reqvire.semantic.prefixes`, `reqvire.semantic.vocabulary`, or `reqvire.semantic.sparql` with `include_external: true` only when imported external prefixes, used vocabulary terms, or used subset triples are needed. Use MCP `reqvire.semantic.vocabulary` with `ontology_document` or `ontology_base` to filter authored terms to one OWL document, or with `include_external: true` plus `ontology_document` to filter used external subset terms to one external source. Use `reqvire semantic export --layer model` when downstream graph/database tooling also needs model facts for element relations, contract_bindings, concept references, term declarations, shape references, and ontology projection facts. Use `reqvire semantic export --layer prefixes` when a consumer needs generated Turtle prefix projection facts. Use `reqvire semantic export --layer model --layer external-used` when both the used external subset and model facts are needed. Concept references are term-reference edges, not generated `OntologyConstruct` records. Reqvire parses complete external ontology files internally for validation and term resolution. Use the `external-used` export layer for RDF materialization and helper-tool `include_external` only for used-subset query visibility; raw full external dependency triples remain available only in explicit full-external workflows.
 14. Validate before finishing.
 
 ## Ontology From Existing Model Content
@@ -373,7 +373,7 @@ Run focused validation after ontology edits:
 
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" semantic ontologies
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" semantic export --layer ontologies
 ```
 
 When working in the Reqvire source repository, the local Rust CLI is also acceptable:

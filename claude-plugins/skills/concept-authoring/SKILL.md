@@ -24,8 +24,8 @@ concept schemes and concepts.
 - Work from the repository root unless the user gives a different workspace.
 - Default CLI form: `npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" <command>`.
 - Inside the Reqvire source repository, `cargo run -- <command>` is also acceptable when the local binary is the intended target.
-- Inspect authored concepts with `search --filter-type concept-scheme --json`, `search --filter-type concept --json`, `model --filter-type concept-scheme --json`, `semantic concepts`, `concepts export`, and `concepts validate`.
-- Use `concepts export --include-mappings` or `semantic graph --full` only when checking structural `reqvire:mapsToConcept` bridge triples or downstream graph-store behavior.
+- Inspect authored concepts with `search --filter-type concept-scheme --json`, `search --filter-type concept --json`, `model --filter-type concept-scheme --json`, `semantic export --layer concepts`, `concepts export`, and `concepts validate`.
+- Use `semantic export --layer ontologies --layer concepts` when checking authored structural `reqvire:mapsToConcept` bridge triples together with generated native SKOS concepts. Use `semantic export --layer model` when checking downstream graph-store model facts.
 - Prefer Reqvire CLI mutation commands for broad structural edits when available, such as `add`, `link`, `relink`, `mv`, `rm`, and `rename-element`.
 - Manual Markdown edits are valid for focused authoring. Preserve `# Elements`, `### Element Name`, `#### Metadata`, and Reqvire relation list syntax.
 - Place concept-scheme and concept elements under `system-model/Thesaurus` unless the existing project uses a different `system-model/` content structure.
@@ -36,7 +36,7 @@ concept schemes and concepts.
 - Relation syntax is `  * relationName: [Target Element](path.md#target-element)`.
 - Keep ontology-to-concept bridges in ontology Turtle with `reqvire:mapsToConcept`; do not model those bridges as concept Markdown fallback data.
 - When changing concept identity, check dependent ontology bridges, concept references, Explorer thesaurus data, MCP concept tools, and any tests that assert generated SKOS IRIs.
-- When validation is part of the task, run focused checks such as `validate`, `semantic concepts`, `concepts validate`, and any affected fixture tests before finishing.
+- When validation is part of the task, run focused checks such as `validate`, `semantic export --layer concepts`, `concepts validate`, and any affected fixture tests before finishing.
 
 ## Native Concept Model
 
@@ -185,7 +185,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-type=concept --json
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" concepts validate
 # Export generated SKOS plus ontology-to-concept bridges when needed:
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" concepts export --include-mappings
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" semantic export --layer ontologies --layer concepts
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" model --filter-type=concept-scheme
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
 ```

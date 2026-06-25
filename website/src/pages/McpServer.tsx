@@ -76,7 +76,12 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             "reqvire.containment",
             "reqvire.collect",
             "reqvire.submodels",
+            "reqvire.semantic.export",
             "reqvire.semantic.ontologies",
+            "reqvire.semantic.shapes",
+            "reqvire.semantic.concepts",
+            "reqvire.semantic.model",
+            "reqvire.semantic.graph",
             "reqvire.semantic.prefixes",
             "reqvire.semantic.vocabulary",
             "reqvire.semantic.sparql",
@@ -114,11 +119,11 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             },
             {
               name: "Ontologies",
-              desc: "reqvire.semantic.ontologies returns authored OWL/RDF ontology vocabulary as Turtle or JSON-LD, with include_external for used external subset triples and declarations. Raw full external dependency triples are excluded by default.",
+              desc: "reqvire.semantic.ontologies returns authored OWL/RDF ontology vocabulary as Turtle or JSON-LD. Used external subset materialization is requested through reqvire.semantic.export with the external-used layer.",
             },
             {
               name: "Semantic layers",
-              desc: "reqvire.semantic.shapes returns SHACL shapes, reqvire.semantic.concepts returns SKOS concept scheme/thesaurus triples generated from native concept elements, and reqvire.semantic.graph returns the combined semantic graph with optional full model context.",
+              desc: "reqvire.semantic.shapes returns SHACL shapes, reqvire.semantic.concepts returns SKOS concept scheme/thesaurus triples, reqvire.semantic.model returns generated model facts, and reqvire.semantic.export composes layers: ontologies, shapes, concepts, model, external-used, and prefixes.",
             },
             {
               name: "Concept tools",

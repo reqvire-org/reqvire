@@ -1,5 +1,5 @@
 use crate::element::{
-    ConceptReference, ContractType, Element, ElementType, FencedBlock, ContractBindingTarget,
+    ConceptReference, ContractBindingTarget, ContractType, Element, ElementType, FencedBlock,
     VerificationType, GOVERNANCE_METADATA_KEYS,
 };
 use crate::error::ReqvireError;
@@ -20,6 +20,7 @@ const GRAPH_AUTHORED_ONTOLOGY: &str = "urn:reqvire:semantic-graph:authored-ontol
 const GRAPH_AUTHORED_MODEL: &str = "urn:reqvire:semantic-graph:authored-model";
 const GRAPH_GENERATED: &str = "urn:reqvire:semantic-graph:generated";
 const GRAPH_RAW_EXTERNAL_SOURCE: &str = "urn:reqvire:semantic-graph:raw-external-source";
+const REQVIRE_NS: &str = "https://www.reqvire.org/ontology#";
 const SKOS_NS: &str = "http://www.w3.org/2004/02/skos/core#";
 const SKOS_CONCEPT: &str = "http://www.w3.org/2004/02/skos/core#Concept";
 const SKOS_CONCEPT_SCHEME: &str = "http://www.w3.org/2004/02/skos/core#ConceptScheme";
@@ -561,6 +562,29 @@ pub enum SemanticExportFormat {
     JsonLd,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SemanticExportLayer {
+    Ontologies,
+    Shapes,
+    Concepts,
+    Model,
+    ExternalUsed,
+    Prefixes,
+}
+
+impl SemanticExportLayer {
+    pub fn default_layers() -> Vec<Self> {
+        vec![
+            Self::Ontologies,
+            Self::Shapes,
+            Self::Concepts,
+            Self::Model,
+            Self::ExternalUsed,
+            Self::Prefixes,
+        ]
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 enum ExternalOntologyFormat {
     Turtle,
@@ -627,7 +651,7 @@ impl TurtlePrefixMapBuilder {
             return Ok(());
         }
 
-        if let Some(existing) = self.by_prefix.get(prefix) {
+        if let Some(existing) = self.by_prefix.get_mut(prefix) {
             if existing.namespace != namespace {
                 return Err(ReqvireError::ProcessError(format!(
                     "Turtle prefix '{}' is bound to both '{}' and '{}'.",
@@ -657,6 +681,10 @@ impl TurtlePrefixMapBuilder {
         self.prefix_by_namespace
             .insert(namespace.to_string(), prefix.to_string());
         Ok(())
+    }
+
+    fn add_reqvire_fallback_if_missing(&mut self) -> Result<(), ReqvireError> {
+        self.add("reqvire", REQVIRE_NS, 0)
     }
 
     fn add_local(&mut self, prefix: &str, namespace: &str, source_rank: u8) {
@@ -692,12 +720,39 @@ impl TurtlePrefixMapBuilder {
     fn finish(self) -> TurtlePrefixMap {
         let mut declarations = self.by_prefix.into_values().collect::<Vec<_>>();
         declarations.sort_by(|a, b| {
-            a.source_rank
-                .cmp(&b.source_rank)
+            turtle_prefix_sort_group(a)
+                .cmp(&turtle_prefix_sort_group(b))
+                .then_with(|| builtin_prefix_order(&a.prefix).cmp(&builtin_prefix_order(&b.prefix)))
                 .then_with(|| a.prefix.cmp(&b.prefix))
                 .then_with(|| a.namespace.cmp(&b.namespace))
         });
         TurtlePrefixMap { declarations }
+    }
+}
+
+fn turtle_prefix_sort_group(declaration: &TurtlePrefixDeclaration) -> u8 {
+    if declaration.prefix == "reqvire" && declaration.namespace == REQVIRE_NS {
+        return 0;
+    }
+
+    match declaration.source_rank {
+        0 => 1,
+        10 => 2,
+        20 => 3,
+        30 => 4,
+        _ => 5,
+    }
+}
+
+fn builtin_prefix_order(prefix: &str) -> u8 {
+    match prefix {
+        "rdf" => 0,
+        "rdfs" => 1,
+        "owl" => 2,
+        "xsd" => 3,
+        "sh" => 4,
+        "skos" => 5,
+        _ => u8::MAX,
     }
 }
 
@@ -1298,8 +1353,7 @@ impl SemanticIndex {
                 output.push_str("# Name: Reqvire used external ontology subset\n");
                 output.push_str("# Kind: external-used-subset\n\n");
                 output.push('\n');
-                let turtle =
-                    serialize_quads_turtle_body(&used_external_subset_quads, &prefix_map)?;
+                let turtle = serialize_quads_turtle_body(&used_external_subset_quads, &prefix_map)?;
                 if !turtle.trim().is_empty() {
                     output.push_str(turtle.trim());
                     output.push_str("\n\n");
@@ -1402,11 +1456,7 @@ impl SemanticIndex {
         output.push_str(&build_semantic_term_context_turtle(self));
         output.push_str(&build_ontology_projection_turtle(self));
         output.push_str(&build_turtle_prefix_projection_turtle(&prefix_map));
-        serialize_turtle_with_prefix_map(
-            &output,
-            &prefix_map,
-            "Full semantic Turtle projection",
-        )
+        serialize_turtle_with_prefix_map(&output, &prefix_map, "Full semantic Turtle projection")
     }
 
     pub fn to_full_jsonld_string(&self) -> Result<String, ReqvireError> {
@@ -1487,9 +1537,167 @@ impl SemanticIndex {
             .serialize_with_options(format, full, include_external)
     }
 
+    pub fn serialize_export_layers(
+        &self,
+        format: SemanticExportFormat,
+        layers: &[SemanticExportLayer],
+        namespace_base: Option<&str>,
+    ) -> Result<String, ReqvireError> {
+        let selected_layers = if layers.is_empty() {
+            SemanticExportLayer::default_layers()
+        } else {
+            layers
+                .iter()
+                .copied()
+                .collect::<BTreeSet<_>>()
+                .into_iter()
+                .collect()
+        };
+        let has_model = selected_layers.contains(&SemanticExportLayer::Model);
+        if has_model && namespace_base.is_some_and(|value| !value.trim().is_empty()) {
+            return Err(ReqvireError::ProcessError(
+                "--namespace-base filters clean authored semantic exports; it cannot be combined with the model layer.".to_string(),
+            ));
+        }
+
+        let include_external = selected_layers.contains(&SemanticExportLayer::ExternalUsed);
+        let mut index = self.with_namespace_base_filter(namespace_base)?;
+        index.apply_external_visibility(include_external)?;
+        let turtle = index.to_export_layers_turtle_string(&selected_layers)?;
+        serialize_turtle_as_format(&turtle, format, "Semantic layered export")
+    }
+
+    fn to_export_layers_turtle_string(
+        &self,
+        layers: &[SemanticExportLayer],
+    ) -> Result<String, ReqvireError> {
+        let include_external = layers.contains(&SemanticExportLayer::ExternalUsed);
+        let prefix_map = self.turtle_prefix_map(include_external)?;
+        let mut output = String::new();
+        output.push_str("# Generated by Reqvire semantic export\n");
+        output.push_str(&format!(
+            "# Layers: {}\n\n",
+            layers
+                .iter()
+                .map(semantic_export_layer_name)
+                .collect::<Vec<_>>()
+                .join(", ")
+        ));
+        output.push_str(&prefix_map.to_turtle_block());
+        let mut seen_quads = BTreeSet::new();
+
+        if layers.contains(&SemanticExportLayer::Ontologies) {
+            let ontology_documents_turtle =
+                build_ontology_document_declarations_turtle(&self.ontology_documents);
+            append_turtle_body_unique(
+                &mut output,
+                &ontology_documents_turtle,
+                "Generated ontology document declarations",
+                &mut seen_quads,
+                &prefix_map,
+            )?;
+            let ontology_term_definitions_turtle = build_ontology_term_definitions_turtle(
+                &self.ontology_documents,
+                &self.ontology_declarations,
+                &self.blocks,
+            );
+            append_turtle_body_unique(
+                &mut output,
+                &ontology_term_definitions_turtle,
+                "Generated ontology term definition links",
+                &mut seen_quads,
+                &prefix_map,
+            )?;
+            append_blocks_turtle(
+                &mut output,
+                self.blocks
+                    .iter()
+                    .filter(|block| matches!(block.kind, SemanticBlockKind::Ontology)),
+                &mut seen_quads,
+                &prefix_map,
+            )?;
+        }
+
+        if layers.contains(&SemanticExportLayer::Shapes) {
+            append_blocks_turtle(
+                &mut output,
+                self.blocks
+                    .iter()
+                    .filter(|block| matches!(block.kind, SemanticBlockKind::Shapes)),
+                &mut seen_quads,
+                &prefix_map,
+            )?;
+        }
+
+        if layers.contains(&SemanticExportLayer::Concepts) {
+            let concept_iris = skos_concept_iris(self);
+            let mut concept_quads = Vec::new();
+            for block in &self.blocks {
+                if !matches!(
+                    block.kind,
+                    SemanticBlockKind::Ontology | SemanticBlockKind::Concepts
+                ) {
+                    continue;
+                }
+                for quad in &block.quads {
+                    if is_concept_layer_quad(block.kind, quad, &concept_iris, false)
+                        && seen_quads.insert(quad_key(quad))
+                    {
+                        concept_quads.push(quad);
+                    }
+                }
+            }
+            append_quads_turtle_section(
+                &mut output,
+                "# Source: reqvire:concept-layer\n# Name: Reqvire SKOS concept layer\n# Kind: concepts\n\n",
+                &concept_quads,
+                &prefix_map,
+            )?;
+        }
+
+        if layers.contains(&SemanticExportLayer::Model) {
+            append_turtle_body_unique(
+                &mut output,
+                &self.model_context_turtle,
+                "Generated model context",
+                &mut seen_quads,
+                &prefix_map,
+            )?;
+            append_turtle_body_unique(
+                &mut output,
+                &build_semantic_term_context_turtle(self),
+                "Generated semantic term context",
+                &mut seen_quads,
+                &prefix_map,
+            )?;
+            append_turtle_body_unique(
+                &mut output,
+                &build_ontology_projection_turtle(self),
+                "Generated ontology projection",
+                &mut seen_quads,
+                &prefix_map,
+            )?;
+        }
+
+        if layers.contains(&SemanticExportLayer::Prefixes) {
+            append_turtle_body_unique(
+                &mut output,
+                &build_turtle_prefix_projection_turtle(&prefix_map),
+                "Generated Turtle prefix projection",
+                &mut seen_quads,
+                &prefix_map,
+            )?;
+        }
+
+        if include_external {
+            append_used_external_subset_turtle(self, &mut output, &mut seen_quads, &prefix_map)?;
+        }
+
+        Ok(output)
+    }
+
     fn turtle_prefix_map(&self, include_external: bool) -> Result<TurtlePrefixMap, ReqvireError> {
         let mut builder = TurtlePrefixMapBuilder::new();
-        builder.add("reqvire", "https://www.reqvire.org/ontology#", 0)?;
         builder.add("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#", 0)?;
         builder.add("rdfs", "http://www.w3.org/2000/01/rdf-schema#", 0)?;
         builder.add("owl", "http://www.w3.org/2002/07/owl#", 0)?;
@@ -1526,6 +1734,8 @@ impl SemanticIndex {
                 }
             }
         }
+
+        builder.add_reqvire_fallback_if_missing()?;
 
         Ok(builder.finish())
     }
@@ -1719,6 +1929,17 @@ fn append_used_external_subset_turtle(
     Ok(())
 }
 
+fn semantic_export_layer_name(layer: &SemanticExportLayer) -> &'static str {
+    match layer {
+        SemanticExportLayer::Ontologies => "ontologies",
+        SemanticExportLayer::Shapes => "shapes",
+        SemanticExportLayer::Concepts => "concepts",
+        SemanticExportLayer::Model => "model",
+        SemanticExportLayer::ExternalUsed => "external-used",
+        SemanticExportLayer::Prefixes => "prefixes",
+    }
+}
+
 fn serialize_turtle_as_format(
     turtle: &str,
     format: SemanticExportFormat,
@@ -1750,6 +1971,51 @@ fn serialize_turtle_as_format(
             String::from_utf8(bytes).map_err(|e| ReqvireError::SerializationError(e.to_string()))
         }
     }
+}
+
+fn append_turtle_body_unique(
+    output: &mut String,
+    turtle: &str,
+    label: &str,
+    seen_quads: &mut BTreeSet<String>,
+    prefix_map: &TurtlePrefixMap,
+) -> Result<(), ReqvireError> {
+    if turtle.trim().is_empty() {
+        return Ok(());
+    }
+    let parse_turtle = prefix_map.to_turtle_block() + turtle;
+    let quads = quads_from_turtle(&parse_turtle, label)?;
+    let quads = unique_quads(quads.iter(), seen_quads);
+    if quads.is_empty() {
+        return Ok(());
+    }
+    let body = serialize_quads_turtle_body(&quads, prefix_map)?;
+    if !body.trim().is_empty() {
+        output.push_str(body.trim());
+        output.push_str("\n\n");
+    }
+    Ok(())
+}
+
+fn append_quads_turtle_section(
+    output: &mut String,
+    header: &str,
+    quads: &[&Quad],
+    prefix_map: &TurtlePrefixMap,
+) -> Result<(), ReqvireError> {
+    if quads.is_empty() {
+        return Ok(());
+    }
+    output.push_str(
+        "# -----------------------------------------------------------------------------\n",
+    );
+    output.push_str(header);
+    let turtle = serialize_quads_turtle_body(quads, prefix_map)?;
+    if !turtle.trim().is_empty() {
+        output.push_str(turtle.trim());
+        output.push_str("\n\n");
+    }
+    Ok(())
 }
 
 fn append_turtle_body(
@@ -2170,11 +2436,9 @@ fn build_authored_model_turtle(
         }
 
         for contract_bindings in &element.contract_bindings {
-            let Some(target_iri) = contract_bindings_target_iri(
-                &contract_bindings.target,
-                registry,
-                &mut artifacts,
-            ) else {
+            let Some(target_iri) =
+                contract_bindings_target_iri(&contract_bindings.target, registry, &mut artifacts)
+            else {
                 continue;
             };
             output.push_str(&format!(
@@ -2279,11 +2543,9 @@ fn build_generated_model_turtle(
         }
 
         for contract_bindings in &element.contract_bindings {
-            let Some(target_iri) = contract_bindings_target_iri(
-                &contract_bindings.target,
-                registry,
-                &mut artifacts,
-            ) else {
+            let Some(target_iri) =
+                contract_bindings_target_iri(&contract_bindings.target, registry, &mut artifacts)
+            else {
                 continue;
             };
             append_model_relation_turtle(
@@ -2462,11 +2724,9 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
         }
 
         for contract_bindings in &element.contract_bindings {
-            let Some(target_iri) = contract_bindings_target_iri(
-                &contract_bindings.target,
-                registry,
-                &mut artifacts,
-            ) else {
+            let Some(target_iri) =
+                contract_bindings_target_iri(&contract_bindings.target, registry, &mut artifacts)
+            else {
                 continue;
             };
             output.push_str(&format!(
@@ -3110,7 +3370,7 @@ fn build_turtle_prefix_projection_turtle(prefix_map: &TurtlePrefixMap) -> String
         ));
         output.push_str(&format!(
             "  reqvire:turtlePrefixReserved {} ;\n",
-            declaration.source_rank == 0
+            turtle_prefix_is_reserved(declaration)
         ));
         output.push_str(&format!("  reqvire:turtlePrefixOrder {} .\n\n", index));
     }
@@ -3119,7 +3379,15 @@ fn build_turtle_prefix_projection_turtle(prefix_map: &TurtlePrefixMap) -> String
 }
 
 fn turtle_prefix_declaration_iri(prefix: &str) -> String {
-    format!("<urn:reqvire:semantic-export:turtle-prefix:{}>", escape_iri(prefix))
+    format!(
+        "<urn:reqvire:semantic-export:turtle-prefix:{}>",
+        escape_iri(prefix)
+    )
+}
+
+fn turtle_prefix_is_reserved(declaration: &TurtlePrefixDeclaration) -> bool {
+    (declaration.prefix == "reqvire" && declaration.namespace == REQVIRE_NS)
+        || (declaration.source_rank == 0)
 }
 
 fn turtle_prefix_source_kind(source_rank: u8) -> &'static str {

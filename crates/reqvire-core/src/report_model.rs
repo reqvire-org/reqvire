@@ -819,10 +819,7 @@ fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> 
                 // Build label with contract_bindings
                 let mut elem_label = escape_label(&elem.name);
                 for contract_bindings in &elem.contract_bindings_labels {
-                    elem_label.push_str(&format!(
-                        "<br/>📎 {}",
-                        escape_label(contract_bindings)
-                    ));
+                    elem_label.push_str(&format!("<br/>📎 {}", escape_label(contract_bindings)));
                 }
 
                 output.push_str(&format!(

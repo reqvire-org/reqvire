@@ -7,9 +7,11 @@ reqvire.model
 reqvire.containment
 reqvire.collect
 reqvire.submodels
+reqvire.semantic.export
 reqvire.semantic.ontologies
 reqvire.semantic.shapes
 reqvire.semantic.concepts
+reqvire.semantic.model
 reqvire.concepts.list
 reqvire.concepts.get
 reqvire.concept_schemes.list

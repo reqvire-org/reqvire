@@ -213,10 +213,8 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
 
     // Calculate totals
     let total_relation_references: usize = relations.iter().map(|f| f.references.len()).sum();
-    let total_contract_bindings_references: usize = contract_bindings
-        .iter()
-        .map(|f| f.references.len())
-        .sum();
+    let total_contract_bindings_references: usize =
+        contract_bindings.iter().map(|f| f.references.len()).sum();
 
     ResourcesReport {
         summary: ResourcesSummary {

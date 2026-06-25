@@ -146,7 +146,7 @@ cleanup_runtime_ontology_test() {
 trap cleanup_runtime_ontology_test EXIT
 
 set +e
-(cd "$REPO_ROOT" && "$REQVIRE_BIN" semantic graph --namespace-base https://www.reqvire.org/ontology# --output "$GENERATED_RUNTIME_ONTOLOGY" >/dev/null)
+(cd "$REPO_ROOT" && "$REQVIRE_BIN" semantic export --layer ontologies --layer shapes --namespace-base https://www.reqvire.org/ontology# --output "$GENERATED_RUNTIME_ONTOLOGY" >/dev/null)
 GENERATE_EXIT=$?
 set -e
 

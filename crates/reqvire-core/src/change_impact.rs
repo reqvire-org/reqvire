@@ -644,12 +644,8 @@ fn render_change_impact_tree(
             } else {
                 ""
             };
-            let att_url = format_contract_bindings_url(
-                &att.target,
-                &target.file_path,
-                base_url,
-                git_commit,
-            );
+            let att_url =
+                format_contract_bindings_url(&att.target, &target.file_path, base_url, git_commit);
             let contract_binding_name = format_contract_binding_name(&att.target);
             output.push_str(&format!(
                 "{}    * 📎 [{}]({}){}\n",
@@ -1001,9 +997,7 @@ fn is_smart_filter_child_relation(relation_type: &str) -> bool {
 /// Collect element identifiers from contract_bindings (for smart filtering)
 fn collect_contract_bindings_element_ids(elem: &element::Element, set: &mut HashSet<String>) {
     for contract_bindings in &elem.contract_bindings {
-        if let element::ContractBindingTarget::ElementIdentifier(id) =
-            &contract_bindings.target
-        {
+        if let element::ContractBindingTarget::ElementIdentifier(id) = &contract_bindings.target {
             set.insert(id.clone());
         }
     }
@@ -1334,10 +1328,8 @@ pub fn compute_change_impact(
         let content_changed = cur_elem.hash_impact_content != ref_elem.hash_impact_content;
 
         // Compare contract_bindings hashes (resolved from registries) - compare only hash values, not targets
-        let cur_contract_bindings_hashes =
-            get_contract_bindings_hashes(cur_elem, current);
-        let ref_contract_bindings_hashes =
-            get_contract_bindings_hashes(ref_elem, reference);
+        let cur_contract_bindings_hashes = get_contract_bindings_hashes(cur_elem, current);
+        let ref_contract_bindings_hashes = get_contract_bindings_hashes(ref_elem, reference);
         let cur_hash_set: HashSet<&String> = cur_contract_bindings_hashes
             .iter()
             .map(|(_, h)| h)

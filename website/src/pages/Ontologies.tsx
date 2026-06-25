@@ -285,48 +285,51 @@ auth:AccessTokenValidationShape
       <Section title="Export and Tools">
         <p className="text-zinc-600 mb-4">
           Semantic export commands keep authored ontology vocabulary, SHACL
-          shapes, SKOS concepts, and the combined semantic graph as separate
-          surfaces. Use the combined graph only when downstream graph/database
-          consumers need generated Reqvire model context triples, including
-          relations, Contract Bindings entries, concept references, term
-          declarations, shape references, and ontology projection facts.
+          shapes, SKOS concepts, Reqvire model facts, used external vocabulary,
+          and prefix projection facts as separate layers. Omit --layer when
+          downstream graph/database consumers need every public semantic layer.
         </p>
         <BulletList
           items={[
-            "Use reqvire semantic ontologies when a tool needs authored OWL/RDF ontology vocabulary only.",
-            "Use reqvire semantic shapes when a tool needs semantic-contract SHACL shapes only.",
-            "Use reqvire semantic concepts when a tool needs SKOS concept scheme and thesaurus triples only.",
+            "Use reqvire semantic export --layer ontologies when a tool needs authored OWL/RDF ontology vocabulary only.",
+            "Use reqvire semantic export --layer shapes when a tool needs semantic-contract SHACL shapes only.",
+            "Use reqvire semantic export --layer concepts when a tool needs SKOS concept scheme and thesaurus triples only.",
+            "Use reqvire semantic export --layer model when a graph/database needs Reqvire element, relation, contract binding, concept reference, semantic term context, and ontology projection facts.",
+            "Use reqvire semantic export --layer external-used when a graph/database needs the used subset of imported or built-in external ontology terms.",
+            "Use reqvire semantic export --layer prefixes when a consumer needs RDF facts describing the exported Turtle prefix map.",
             "Use reqvire concepts export or reqvire concepts validate when the workflow is specifically standalone Thesaurus concept-scheme work.",
-            "Use reqvire semantic graph --full when a graph/database should also know which model elements reference SKOS concepts.",
-            "Use reqvire semantic graph --full --include-external when a graph/database should receive authored triples, authored model facts, generated facts, and the used external subset.",
+            "Authored reqvire:mapsToConcept bridge triples are ontology-layer RDF; they are not a separate semantic export layer.",
+            "Use reqvire semantic export when a graph/database should receive authored triples, model facts, prefix projection facts, generated facts, and the used external subset.",
             "Reqvire emits generated rdfs:isDefinedBy links from authored named ontology resources to the resolved ontology_base document IRI; Explorer uses this as OWL document metadata for grouping, search, and modals rather than rendering ontology document nodes or isDefinedBy edges.",
             "Use reqvire.semantic.ontologies, reqvire.semantic.shapes, reqvire.semantic.concepts, or reqvire.semantic.graph through MCP depending on the semantic layer an assistant needs.",
             "Use reqvire.semantic.prefixes through MCP when an assistant needs ontology-defined namespaces and source prose before writing SPARQL; set include_external when used external subset prefixes are needed.",
             "Use reqvire.semantic.vocabulary through MCP when an assistant needs paged classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source maps, diagnostics, and prefixes before writing SPARQL; set ontology_document or ontology_base to filter terms to one OWL document, and set include_external when used external vocabulary should be listed.",
-            "Use reqvire.semantic.sparql through MCP when an assistant needs to query the model-owned Oxigraph semantic store directly; full mode is default and set include_external to query the used external subset.",
+            "Use reqvire.semantic.sparql through MCP when an assistant needs to query the model-owned Oxigraph semantic store directly; full mode is default and include_external queries the used external subset.",
             "Reqvire parses complete external ontology files internally for validation and term resolution, but raw full external dependency triples are not public semantic output.",
             "Use MCP prompts such as reqvire.semantic.query when an assistant needs query-construction guidance before calling vocabulary, prefix, or SPARQL tools.",
             "Concept References appear in full export as authored-model facts such as conceptReference and referencesTerm; they do not rewrite authored OWL/SHACL semantics.",
             "Concept References are authored-model term-reference edges, not generated OntologyConstruct records. OntologyConstruct is reserved for projected OWL/RDFS/SHACL patterns such as subclass, membership, restriction, property-chain, inverse-property, and shape-overlay constructs.",
           ]}
         />
-        <CodeBlock>{`reqvire semantic ontologies
-reqvire semantic ontologies --include-external
-reqvire semantic shapes
-reqvire semantic concepts --include-mappings
+        <CodeBlock>{`reqvire semantic export --layer ontologies
+reqvire semantic export --layer shapes
+reqvire semantic export --layer concepts
+reqvire semantic export --layer model
+reqvire semantic export --layer external-used
+reqvire semantic export --layer prefixes
+reqvire semantic export --layer ontologies --layer concepts --layer model
+reqvire semantic export
 reqvire concepts export
 reqvire concepts validate
-reqvire semantic graph --full
-reqvire semantic graph --full --include-external
 
 # MCP tool
 reqvire.semantic.ontologies({ "format": "turtle" })
-reqvire.semantic.ontologies({ "include_external": true })
+reqvire.semantic.export({ "layers": ["ontologies", "external-used"] })
 reqvire.concept_schemes.list({})
 reqvire.concepts.list({ "filter": "verification" })
 reqvire.semantic.shapes()
-reqvire.semantic.concepts({ "include_mappings": true })
-reqvire.semantic.graph({ "full": true })
+reqvire.semantic.export({ "layers": ["ontologies", "concepts"] })
+reqvire.semantic.graph({})
 reqvire.semantic.prefixes()
 reqvire.semantic.prefixes({ "include_external": true })
 reqvire.semantic.vocabulary({ "section": "relation_families", "limit": 50 })

@@ -68,10 +68,11 @@ The system shall expose MCP read tools that return model evidence needed by exte
 #### Details
 - The MCP interface shall expose read tools for authoritative Reqvire model evidence.
 - Model evidence tools shall support element lookup, model structure, containment, collection, submodel analysis, and split semantic export collection.
-- Semantic export tools shall be named under the `reqvire.semantic` namespace and shall expose separate read tools for ontology vocabulary, SHACL shapes, SKOS concepts, and the combined semantic graph.
-- The ontology and graph semantic tools shall support optional used external ontology subset materialization through a typed `include_external` argument without changing the default authored-only export.
+- Semantic export tools shall be named under the `reqvire.semantic` namespace and shall expose separate read tools for ontology vocabulary, SHACL shapes, SKOS concepts, generated model facts, a combined graph wrapper, and the canonical layer-composed export operation.
+- `reqvire.semantic.export` shall support typed `layers` values `ontologies`, `shapes`, `concepts`, `model`, `external-used`, and `prefixes`; omitted or empty layers shall export all public layers.
+- The `ontologies`, `shapes`, `concepts`, `model`, and `graph` tools shall be stable wrappers over the same export-layer serialization contract.
 - Semantic prefix and vocabulary tools shall keep imported external ontology declarations hidden by default and expose only used external subset entries through a typed `include_external` argument with explicit external markers and source metadata generated through the o-kernel subset layer.
-- Model evidence tools shall support read-only semantic query execution over collected ontology, SHACL, model-context, and ontology projection RDF when requested by a typed MCP operation, and shall support an explicit `include_external` argument for querying the graph that includes the used external subset.
+- Model evidence tools shall support read-only semantic query execution over collected ontology, SHACL, model, and ontology projection RDF when requested by a typed MCP operation, and shall support an explicit `include_external` argument for querying the graph that includes the used external subset.
 - Model evidence tools shall expose the canonical capability/requirement/ontology model, including `ontology` elements, `#### Concept References`, reusable `semantic-contract` shape profiles, constrained requirements, and ontology-use relations where the underlying Reqvire operation returns them.
 - Model evidence tools shall include revision metadata when model state affects interpretation.
 - Model evidence tools shall not mutate the model or filesystem.
@@ -102,8 +103,8 @@ The system shall expose an MCP read tool for SPARQL queries over Reqvire semanti
 #### Details
 - The MCP interface shall execute SPARQL queries against Reqvire's collected semantic RDF graph.
 - The semantic query tool shall use the existing in-memory semantic export and Oxigraph query engine.
-- The semantic query tool shall support authored ontology and SHACL RDF, and shall include generated Reqvire model-context, relation-family projection, and ontology projection facts by default when they are present in the full semantic export.
-- The semantic query response shall include graph-layer metadata for the active graph roles (`default`, `authored-ontology`, `authored-model`, `generated`, `external-used-subset`, `raw-external-source`) and shall mark the raw external source role as hidden from public query stores.
+- The semantic query tool shall support authored ontology and SHACL RDF, and shall include generated Reqvire model, relation-family projection, and ontology projection facts by default when they are present in the full semantic export.
+- The semantic query response shall include graph-layer metadata for the active query-store graph roles (`default`, `authored-ontology`, `authored-model`, `generated`, `external-used-subset`, `raw-external-source`) and shall mark the raw external source role as hidden from public query stores.
 - The semantic query tool shall return structured results for SELECT, ASK, CONSTRUCT, and DESCRIBE queries.
 - The semantic query interface shall provide ontology-defined prefix discovery so clients can construct namespace-correct SPARQL without rebuilding the RDF store.
 - The semantic query tool shall not mutate the model or filesystem.
@@ -177,7 +178,7 @@ The system shall make semantic-export relation-family projection facts available
 
 #### Details
 - MCP shall expose normalized relation-family vocabulary and query examples sourced from the ontology/semantic export contract.
-- MCP shall query relation-family projection facts from the existing full semantic graph; MCP does not own relation-family materialization.
+- MCP shall query relation-family projection facts from the existing semantic query graph; MCP does not own relation-family materialization.
 - MCP shall not rebuild relation-family facts, execute projection-side construct materialization, mutate model source files, or write generated triples back to Markdown.
 
 #### Concept References

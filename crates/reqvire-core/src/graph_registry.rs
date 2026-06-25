@@ -1036,10 +1036,8 @@ impl GraphRegistry {
             .filter_map(|defining_req_id| self.resolve_single_owning_capability(&defining_req_id))
             .find(|target_root_id| {
                 target_root_id != &source_root_id
-                    && self.has_contract_bindings_flow_between_roots(
-                        target_root_id,
-                        &source_root_id,
-                    )
+                    && self
+                        .has_contract_bindings_flow_between_roots(target_root_id, &source_root_id)
             })?;
         let reused_context_name = self.display_name_for_element(contract_bindings_identifier);
         let conflicting_root_name = self.display_name_for_element(&conflicting_root_id);
@@ -1360,8 +1358,7 @@ impl GraphRegistry {
                                         Some(&element.file_path),
                                     )
                                 {
-                                    errors
-                                        .push(ReqvireError::InvalidContractBindingScope(msg));
+                                    errors.push(ReqvireError::InvalidContractBindingScope(msg));
                                     hierarchy_violation = true;
                                 }
                             }
@@ -1397,8 +1394,7 @@ impl GraphRegistry {
                                             element.name
                                         )
                                     };
-                                    errors
-                                        .push(ReqvireError::InvalidContractBindingScope(msg));
+                                    errors.push(ReqvireError::InvalidContractBindingScope(msg));
                                 }
                             }
                         } else {
@@ -1849,23 +1845,18 @@ impl GraphRegistry {
                         if let Some(parent_node) = self.nodes.get(parent_id) {
                             // Check if parent has this contract_bindings
                             if parent_node.element.contract_bindings.iter().any(|a| {
-                                self.contract_bindings_targets_equal(
-                                    &a.target,
-                                    contract_bindings,
-                                )
+                                self.contract_bindings_targets_equal(&a.target, contract_bindings)
                             }) {
                                 return Some(parent_id.clone());
                             }
                         }
                         // Check ancestors recursively
-                        if let Some(found) = self
-                            .find_contract_bindings_in_ancestors_recursive(
-                                parent_id,
-                                contract_bindings,
-                                hierarchical_types,
-                                visited,
-                            )
-                        {
+                        if let Some(found) = self.find_contract_bindings_in_ancestors_recursive(
+                            parent_id,
+                            contract_bindings,
+                            hierarchical_types,
+                            visited,
+                        ) {
                             return Some(found);
                         }
                     }
@@ -1908,9 +1899,12 @@ impl GraphRegistry {
 
             if is_child {
                 // Check if child has this contract_bindings
-                if child_node.element.contract_bindings.iter().any(|a| {
-                    self.contract_bindings_targets_equal(&a.target, contract_bindings)
-                }) {
+                if child_node
+                    .element
+                    .contract_bindings
+                    .iter()
+                    .any(|a| self.contract_bindings_targets_equal(&a.target, contract_bindings))
+                {
                     return Some(child_id.clone());
                 }
                 // Check descendants recursively
@@ -5267,11 +5261,7 @@ impl GraphRegistry {
 
     /// Updates contract_bindings identifiers when a Contract element is moved or renamed
     /// Similar to update_relation_identifiers but for contract_bindings references
-    fn update_contract_bindings_identifiers(
-        &mut self,
-        old_identifier: &str,
-        new_identifier: &str,
-    ) {
+    fn update_contract_bindings_identifiers(&mut self, old_identifier: &str, new_identifier: &str) {
         // Find and update all contract_bindings identifiers pointing to the old identifier
         for node in self.nodes.values_mut() {
             for contract_bindings in &mut node.element.contract_bindings {

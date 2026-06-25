@@ -381,9 +381,7 @@ impl<'a> VerificationTraceGenerator<'a> {
                     file_elements.iter().collect();
                 sorted_elements.sort_by(|a, b| a.0.cmp(&b.0));
 
-                for (elem_id, elem_name, elem_type, contract_bindings_labels) in
-                    sorted_elements
-                {
+                for (elem_id, elem_name, elem_type, contract_bindings_labels) in sorted_elements {
                     let node_id = utils::hash_identifier(elem_id);
 
                     // Build label with contract_bindings

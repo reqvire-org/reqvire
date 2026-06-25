@@ -273,12 +273,11 @@ No type metadata - should default to requirement.
 #### Shapes
 ```turtle
 @prefix testonto: <https://example.test/ontology#> .
-@prefix reqvire: <urn:reqvire:test#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
-reqvire:DefaultTypeShape
+testonto:DefaultTypeShape
   a sh:NodeShape ;
-  sh:targetClass reqvire:DefaultTypeContract .
+  sh:targetClass testonto:DefaultTypeContract .
 ```
 
 ### Ontology Element
@@ -291,11 +290,10 @@ reqvire:DefaultTypeShape
 #### Ontology
 ```turtle
 @prefix testonto: <https://example.test/ontology#> .
-@prefix reqvire: <urn:reqvire:test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 <https://example.test/ontology> a owl:Ontology .
-reqvire:DefaultTypeContract a owl:Class .
+testonto:DefaultTypeContract a owl:Class .
 ```
 
 ### Verification

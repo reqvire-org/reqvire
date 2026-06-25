@@ -155,7 +155,7 @@ This is the foundation ontology used by the rest of the Reqvire ontology set. Ot
 
 reqvire:Element a owl:Class ;
   reqvire:mapsToConcept concept:Element ;
-  rdfs:comment "Base class for addressable Reqvire model elements and related model artifacts. Full semantic model-context exports emit concrete parsed model elements as owl:NamedIndividual instances of this class and their more specific Reqvire element class." .
+  rdfs:comment "Base class for addressable Reqvire model elements and related model artifacts. Full semantic model exports emit concrete parsed model elements as owl:NamedIndividual instances of this class and their more specific Reqvire element class." .
 reqvire:Capability a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   reqvire:mapsToConcept concept:Capability ;
@@ -179,7 +179,7 @@ reqvire:Verification a owl:Class ;
   reqvire:mapsToConcept concept:ConcreteVerification ;
   rdfs:comment "Evidence or method used to verify a requirement." .
 reqvire:Artifact a owl:Class ;
-  rdfs:comment "Referenced implementation, evidence, document, or external resource artifact. Full semantic model-context exports emit concrete referenced artifacts as owl:NamedIndividual instances of this class and any more specific artifact class such as reqvire:File." .
+  rdfs:comment "Referenced implementation, evidence, document, or external resource artifact. Full semantic model exports emit concrete referenced artifacts as owl:NamedIndividual instances of this class and any more specific artifact class such as reqvire:File." .
 reqvire:RuntimeOntologyArtifact a owl:Class ;
   rdfs:subClassOf reqvire:Artifact ;
   reqvire:mapsToConcept concept:RuntimeOntologyArtifact ;

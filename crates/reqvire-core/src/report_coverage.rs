@@ -664,9 +664,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
 
         // Contract identifier contract_bindings (consumer -> contract)
         for contract_bindings in &req.contract_bindings {
-            if let ContractBindingTarget::ElementIdentifier(id) =
-                &contract_bindings.target
-            {
+            if let ContractBindingTarget::ElementIdentifier(id) = &contract_bindings.target {
                 contract_bindings_consumers
                     .entry(id.clone())
                     .or_default()

@@ -13,17 +13,21 @@ if [ $TTL_EXIT -ne 0 ]; then
 fi
 
 set +e
-SEMANTIC_ONTOLOGIES_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic ontologies 2>&1)
+SEMANTIC_ONTOLOGIES_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic export --layer ontologies 2>&1)
 SEMANTIC_ONTOLOGIES_EXIT=$?
-SEMANTIC_SHAPES_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic shapes 2>&1)
+SEMANTIC_SHAPES_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic export --layer shapes 2>&1)
 SEMANTIC_SHAPES_EXIT=$?
-SEMANTIC_CONCEPTS_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic concepts --include-mappings 2>&1)
+SEMANTIC_CONCEPTS_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic export --layer concepts 2>&1)
 SEMANTIC_CONCEPTS_EXIT=$?
+SEMANTIC_MODEL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic export --layer model 2>&1)
+SEMANTIC_MODEL_EXIT=$?
+SEMANTIC_PREFIXES_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic export --layer prefixes 2>&1)
+SEMANTIC_PREFIXES_EXIT=$?
 CONCEPTS_EXPORT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" concepts export --include-mappings 2>&1)
 CONCEPTS_EXPORT_EXIT=$?
 CONCEPTS_VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" concepts validate 2>&1)
 CONCEPTS_VALIDATE_EXIT=$?
-SEMANTIC_GRAPH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic graph --full 2>&1)
+SEMANTIC_GRAPH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic export 2>&1)
 SEMANTIC_GRAPH_EXIT=$?
 NATIVE_CONCEPT_SEARCH_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type concept --json 2>&1)
 NATIVE_CONCEPT_SEARCH_EXIT=$?
@@ -36,20 +40,32 @@ NATIVE_CONCEPT_COLLECT_EXIT=$?
 set -e
 
 if [ $SEMANTIC_ONTOLOGIES_EXIT -ne 0 ]; then
-  echo "FAILED: semantic ontologies command failed"
+  echo "FAILED: semantic export --layer ontologies command failed"
   echo "$SEMANTIC_ONTOLOGIES_OUTPUT"
   exit 1
 fi
 
 if [ $SEMANTIC_SHAPES_EXIT -ne 0 ]; then
-  echo "FAILED: semantic shapes command failed"
+  echo "FAILED: semantic export --layer shapes command failed"
   echo "$SEMANTIC_SHAPES_OUTPUT"
   exit 1
 fi
 
 if [ $SEMANTIC_CONCEPTS_EXIT -ne 0 ]; then
-  echo "FAILED: semantic concepts command failed"
+  echo "FAILED: semantic export --layer concepts command failed"
   echo "$SEMANTIC_CONCEPTS_OUTPUT"
+  exit 1
+fi
+
+if [ $SEMANTIC_MODEL_EXIT -ne 0 ]; then
+  echo "FAILED: semantic export --layer model command failed"
+  echo "$SEMANTIC_MODEL_OUTPUT"
+  exit 1
+fi
+
+if [ $SEMANTIC_PREFIXES_EXIT -ne 0 ]; then
+  echo "FAILED: semantic export --layer prefixes command failed"
+  echo "$SEMANTIC_PREFIXES_OUTPUT"
   exit 1
 fi
 
@@ -66,7 +82,7 @@ if [ $CONCEPTS_VALIDATE_EXIT -ne 0 ]; then
 fi
 
 if [ $SEMANTIC_GRAPH_EXIT -ne 0 ]; then
-  echo "FAILED: semantic graph command failed"
+  echo "FAILED: default semantic export command failed"
   echo "$SEMANTIC_GRAPH_OUTPUT"
   exit 1
 fi
@@ -96,38 +112,44 @@ if [ $NATIVE_CONCEPT_COLLECT_EXIT -ne 0 ]; then
 fi
 
 if ! grep -q "testonto:ServiceEndpoint a owl:Class" <<< "$SEMANTIC_ONTOLOGIES_OUTPUT"; then
-  echo "FAILED: semantic ontologies output missing ontology class"
+  echo "FAILED: semantic export --layer ontologies output missing ontology class"
   echo "$SEMANTIC_ONTOLOGIES_OUTPUT"
   exit 1
 fi
 
 if grep -q "testonto:ServiceEndpointShape" <<< "$SEMANTIC_ONTOLOGIES_OUTPUT"; then
-  echo "FAILED: semantic ontologies output must not include semantic-contract SHACL shapes"
+  echo "FAILED: semantic export --layer ontologies output must not include semantic-contract SHACL shapes"
   echo "$SEMANTIC_ONTOLOGIES_OUTPUT"
   exit 1
 fi
 
 if ! grep -q "testonto:ServiceEndpointShape" <<< "$SEMANTIC_SHAPES_OUTPUT"; then
-  echo "FAILED: semantic shapes output missing SHACL shape"
+  echo "FAILED: semantic export --layer shapes output missing SHACL shape"
   echo "$SEMANTIC_SHAPES_OUTPUT"
   exit 1
 fi
 
 if grep -q "testonto:ServiceEndpoint a owl:Class" <<< "$SEMANTIC_SHAPES_OUTPUT"; then
-  echo "FAILED: semantic shapes output must not include authored ontology classes"
+  echo "FAILED: semantic export --layer shapes output must not include authored ontology classes"
   echo "$SEMANTIC_SHAPES_OUTPUT"
   exit 1
 fi
 
 if grep -q "concept:TraceabilityConcept" <<< "$SEMANTIC_CONCEPTS_OUTPUT"; then
-  echo "FAILED: semantic concepts output must not include legacy Turtle-authored SKOS concepts"
+  echo "FAILED: semantic export --layer concepts output must not include legacy Turtle-authored SKOS concepts"
   echo "$SEMANTIC_CONCEPTS_OUTPUT"
   exit 1
 fi
 
-if ! grep -q "reqvire:mapsToConcept" <<< "$SEMANTIC_CONCEPTS_OUTPUT"; then
-  echo "FAILED: semantic concepts --include-mappings output missing concept bridge"
+if grep -q "reqvire:mapsToConcept" <<< "$SEMANTIC_CONCEPTS_OUTPUT"; then
+  echo "FAILED: semantic export --layer concepts output must not include authored ontology concept bridge triples"
   echo "$SEMANTIC_CONCEPTS_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "reqvire:mapsToConcept" <<< "$SEMANTIC_ONTOLOGIES_OUTPUT"; then
+  echo "FAILED: semantic export --layer ontologies output missing authored concept bridge"
+  echo "$SEMANTIC_ONTOLOGIES_OUTPUT"
   exit 1
 fi
 
@@ -160,20 +182,20 @@ for native_concept_token in \
   "skos:related" \
   "concept:VerificationEvidence"; do
   if ! grep -qF "$native_concept_token" <<< "$SEMANTIC_CONCEPTS_OUTPUT"; then
-    echo "FAILED: semantic concepts output missing native Markdown concept token: $native_concept_token"
+    echo "FAILED: semantic export --layer concepts output missing native Markdown concept token: $native_concept_token"
     echo "$SEMANTIC_CONCEPTS_OUTPUT"
     exit 1
   fi
 done
 
 if grep -q "concept:NativeTraceability a skos:Concept" <<< "$SEMANTIC_ONTOLOGIES_OUTPUT"; then
-  echo "FAILED: semantic ontologies output must not include Markdown-generated native concept RDF"
+  echo "FAILED: semantic export --layer ontologies output must not include Markdown-generated native concept RDF"
   echo "$SEMANTIC_ONTOLOGIES_OUTPUT"
   exit 1
 fi
 
 if ! grep -q "concept:NativeTraceability a skos:Concept" <<< "$SEMANTIC_GRAPH_OUTPUT"; then
-  echo "FAILED: semantic graph output missing Markdown-generated native concept RDF"
+  echo "FAILED: default semantic export output missing Markdown-generated native concept RDF"
   echo "$SEMANTIC_GRAPH_OUTPUT"
   exit 1
 fi
@@ -227,8 +249,26 @@ if ! jq -e '
 fi
 
 if ! grep -q "reqvire:OntologyProjectionGraph" <<< "$SEMANTIC_GRAPH_OUTPUT"; then
-  echo "FAILED: semantic graph --full output missing generated ontology projection facts"
+  echo "FAILED: semantic export output missing generated ontology projection facts"
   echo "$SEMANTIC_GRAPH_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "urn:reqvire:element:api-capability" <<< "$SEMANTIC_MODEL_OUTPUT"; then
+  echo "FAILED: semantic export --layer model output missing generated model element facts"
+  echo "$SEMANTIC_MODEL_OUTPUT"
+  exit 1
+fi
+
+if grep -q "reqvire:TurtlePrefixDeclaration" <<< "$SEMANTIC_MODEL_OUTPUT"; then
+  echo "FAILED: semantic export --layer model output must not include prefix projection facts"
+  echo "$SEMANTIC_MODEL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "reqvire:TurtlePrefixDeclaration" <<< "$SEMANTIC_PREFIXES_OUTPUT"; then
+  echo "FAILED: semantic export --layer prefixes output missing prefix projection facts"
+  echo "$SEMANTIC_PREFIXES_OUTPUT"
   exit 1
 fi
 
@@ -330,7 +370,7 @@ FILTERED_FULL_EXIT=$?
 set -e
 
 if [ $FILTERED_FULL_EXIT -eq 0 ]; then
-  echo "FAILED: ontologies --full --namespace-base should be rejected until full-context filtering is specified"
+  echo "FAILED: ontologies --full --namespace-base should be rejected until model-layer filtering is specified"
   echo "$FILTERED_FULL_OUTPUT"
   exit 1
 fi
@@ -751,7 +791,7 @@ for named_individual_fact in \
   "<urn:reqvire:element:api-endpoint-requirement> a owl:NamedIndividual , reqvire:Element , reqvire:Requirement" \
   "<urn:reqvire:element:api-endpoint-shape-contract> a owl:NamedIndividual , reqvire:Element , reqvire:SemanticContract"; do
   if ! grep -qF "$named_individual_fact" <<< "$FULL_TTL_OUTPUT"; then
-    echo "FAILED: full Turtle output missing model-context owl:NamedIndividual fact: $named_individual_fact"
+    echo "FAILED: full Turtle output missing model owl:NamedIndividual fact: $named_individual_fact"
     echo "$FULL_TTL_OUTPUT"
     exit 1
   fi

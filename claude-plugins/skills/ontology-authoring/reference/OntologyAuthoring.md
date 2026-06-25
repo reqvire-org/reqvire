@@ -1012,4 +1012,4 @@ ex:SystemInterfaceShape
 - Non-ontology, non-semantic-contract elements use concept references for SKOS concept bindings.
 - Semantic contracts use ontology through `use`/`usedBy` and do not author concept references.
 - `reqvire validate` passes.
-- `reqvire semantic ontologies` emits the expected ontology terms.
+- `reqvire semantic export --layer ontologies` emits the expected ontology terms.

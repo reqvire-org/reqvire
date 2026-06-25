@@ -12,7 +12,7 @@ use crate::report_model;
 use crate::report_resources;
 use crate::report_submodels;
 use crate::search;
-use crate::semantic_contract::{self, SemanticExportFormat};
+use crate::semantic_contract::{self, SemanticExportFormat, SemanticExportLayer};
 use crate::semantic_store;
 use crate::verification_trace;
 use crate::{ModelBuildOptions, ModelManager};
@@ -250,22 +250,37 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             object_schema(vec![("from", json!({ "type": "string" }))]),
         ),
         read_tool(
-            "reqvire.semantic.ontologies",
-            "Collect authored OWL/RDF ontology vocabulary only.",
+            "reqvire.semantic.export",
+            "Export selected semantic RDF layers with the same layer contract as the CLI semantic export command.",
             object_schema(vec![
                 (
                     "format",
                     json!({ "type": "string", "enum": ["turtle", "jsonld"], "default": "turtle" }),
                 ),
                 (
-                    "include_external",
+                    "layers",
                     json!({
-                        "type": "boolean",
-                        "default": false,
-                        "description": "Include only the `reqvire:external-used-subset` graph role from external ontologies; raw external dependency graphs remain hidden."
+                        "type": "array",
+                        "items": { "type": "string", "enum": ["ontologies", "shapes", "concepts", "model", "external-used", "prefixes"] },
+                        "description": "Semantic export layers to include. Omit or pass an empty array to export all public layers."
+                    }),
+                ),
+                (
+                    "namespace_base",
+                    json!({
+                        "type": "string",
+                        "description": "Filter clean authored exports to one ontology base or term namespace. Cannot be combined with the model layer."
                     }),
                 ),
             ]),
+        ),
+        read_tool(
+            "reqvire.semantic.ontologies",
+            "Collect authored OWL/RDF ontology vocabulary only.",
+            object_schema(vec![(
+                "format",
+                json!({ "type": "string", "enum": ["turtle", "jsonld"], "default": "turtle" }),
+            )]),
         ),
         read_tool(
             "reqvire.semantic.shapes",
@@ -278,20 +293,18 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         read_tool(
             "reqvire.semantic.concepts",
             "Collect SKOS concept scheme/thesaurus triples only. Native concept schemes own concept_base/concept_prefix directly.",
-            object_schema(vec![
-                (
-                    "format",
-                    json!({ "type": "string", "enum": ["turtle", "jsonld"], "default": "turtle" }),
-                ),
-                (
-                    "include_mappings",
-                    json!({
-                        "type": "boolean",
-                        "default": false,
-                        "description": "Include structural reqvire:mapsToConcept bridge triples when they point to generated native concepts."
-                    }),
-                ),
-            ]),
+            object_schema(vec![(
+                "format",
+                json!({ "type": "string", "enum": ["turtle", "jsonld"], "default": "turtle" }),
+            )]),
+        ),
+        read_tool(
+            "reqvire.semantic.model",
+            "Collect generated Reqvire model RDF facts for elements, relations, concept references, semantic term context, and ontology projection facts.",
+            object_schema(vec![(
+                "format",
+                json!({ "type": "string", "enum": ["turtle", "jsonld"], "default": "turtle" }),
+            )]),
         ),
         read_tool(
             "reqvire.concepts.list",
@@ -325,22 +338,11 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.semantic.graph",
-            "Collect the combined semantic graph.",
-            object_schema(vec![
-                (
-                    "format",
-                    json!({ "type": "string", "enum": ["turtle", "jsonld"], "default": "turtle" }),
-                ),
-                ("full", json!({ "type": "boolean", "default": false })),
-                (
-                    "include_external",
-                    json!({
-                        "type": "boolean",
-                        "default": false,
-                        "description": "Include only the `reqvire:external-used-subset` graph role from external ontologies; raw external dependency graphs remain hidden."
-                    }),
-                ),
-            ]),
+            "Collect the combined public semantic export graph. Equivalent to reqvire.semantic.export with omitted layers.",
+            object_schema(vec![(
+                "format",
+                json!({ "type": "string", "enum": ["turtle", "jsonld"], "default": "turtle" }),
+            )]),
         ),
         read_tool(
             "reqvire.semantic.prefixes",
@@ -715,6 +717,9 @@ fn dispatch_tool(
         "reqvire.containment" => containment_tool(args, excluded_filename_patterns),
         "reqvire.collect" => collect_tool(args, excluded_filename_patterns),
         "reqvire.submodels" => submodels_tool(args, excluded_filename_patterns),
+        "reqvire.semantic.export" => {
+            semantic_export_tool(args, excluded_filename_patterns, with_size_estimates)
+        }
         "reqvire.semantic.ontologies" => {
             ontologies_tool(args, excluded_filename_patterns, with_size_estimates)
         }
@@ -723,6 +728,9 @@ fn dispatch_tool(
         }
         "reqvire.semantic.concepts" => {
             concepts_tool(args, excluded_filename_patterns, with_size_estimates)
+        }
+        "reqvire.semantic.model" => {
+            semantic_model_tool(args, excluded_filename_patterns, with_size_estimates)
         }
         "reqvire.concepts.list" => {
             concepts_list_tool(args, excluded_filename_patterns, with_size_estimates)
@@ -936,82 +944,35 @@ fn submodels_tool(
     parse_json_string(report.to_json_string())
 }
 
+fn semantic_export_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<Value, ReqvireError> {
+    let layers = semantic_export_layers_arg(args)?;
+    semantic_export_layers_tool(
+        args,
+        excluded_filename_patterns,
+        with_size_estimates,
+        layers,
+        "export",
+        None,
+    )
+}
+
 fn ontologies_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
 ) -> Result<Value, ReqvireError> {
-    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
-    let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
-        ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
-    })?;
-    let format = string_arg(args, "format").unwrap_or_else(|| "turtle".to_string());
-    let include_external = bool_arg(args, "include_external", false);
-    let graph_layers = semantic_graph_layers(false, include_external);
-    let mut serializable_index =
-        filtered_semantic_index(&semantic_store.index, OntologyContentFilter::Ontology);
-    serializable_index.apply_external_visibility(include_external)?;
-
-    let (format_name, export_format) = match format.as_str() {
-        "turtle" => ("turtle", SemanticExportFormat::Turtle),
-        "jsonld" => ("jsonld", SemanticExportFormat::JsonLd),
-        other => {
-            return Err(ReqvireError::ProcessError(format!(
-                "Invalid semantic ontology format '{}'. Valid values: turtle, jsonld",
-                other
-            )))
-        }
-    };
-    let content =
-        semantic_store
-            .index
-            .serialize_ontologies(export_format, include_external, None)?;
-    let external_metadata = semantic_contract::external_materialization_metadata(
-        &semantic_store.index,
-        &serializable_index,
-        include_external,
-    );
-
-    match format_name {
-        "turtle" => Ok(json!({
-            "format": format_name,
-            "semantic_layer": "ontologies",
-            "include_external": include_external,
-            "external_materialization": external_metadata["external_materialization"].clone(),
-            "external_counts": external_metadata["external_counts"].clone(),
-            "graph_layers": graph_layers.clone(),
-            "content": content,
-            "summary": serializable_index.summary,
-            "blocks": serializable_index.blocks,
-            "external_blocks": serializable_index.external_blocks,
-            "diagnostics": serializable_index.diagnostics,
-            "ontology_documents": serializable_index.ontology_documents,
-            "ontology_declarations": serializable_index.ontology_declarations,
-            "shape_references": serializable_index.shape_references
-        })),
-        "jsonld" => {
-            let jsonld: Value = serde_json::from_str(&content)
-                .map_err(|e| ReqvireError::SerializationError(e.to_string()))?;
-            Ok(json!({
-            "format": format_name,
-                "semantic_layer": "ontologies",
-                "include_external": include_external,
-                "external_materialization": external_metadata["external_materialization"].clone(),
-                "external_counts": external_metadata["external_counts"].clone(),
-                "graph_layers": graph_layers,
-                "content": content,
-                "jsonld": jsonld,
-                    "summary": serializable_index.summary,
-                    "blocks": serializable_index.blocks,
-                    "external_blocks": serializable_index.external_blocks,
-                    "diagnostics": serializable_index.diagnostics,
-                    "ontology_documents": serializable_index.ontology_documents,
-                    "ontology_declarations": serializable_index.ontology_declarations,
-                    "shape_references": serializable_index.shape_references
-                }))
-        }
-        _ => unreachable!(),
-    }
+    semantic_export_layers_tool(
+        args,
+        excluded_filename_patterns,
+        with_size_estimates,
+        vec![SemanticExportLayer::Ontologies],
+        "ontologies",
+        Some(OntologyContentFilter::Ontology),
+    )
 }
 
 fn shapes_tool(
@@ -1019,21 +980,13 @@ fn shapes_tool(
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
 ) -> Result<Value, ReqvireError> {
-    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
-    let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
-        ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
-    })?;
-    let (format_name, export_format) = semantic_tool_format(args, "semantic shapes")?;
-    let serializable_index =
-        filtered_semantic_index(&semantic_store.index, OntologyContentFilter::Shacl);
-    let content = semantic_store.index.serialize_shapes(export_format)?;
-    semantic_layer_response(
-        format_name,
+    semantic_export_layers_tool(
+        args,
+        excluded_filename_patterns,
+        with_size_estimates,
+        vec![SemanticExportLayer::Shapes],
         "shapes",
-        content,
-        &serializable_index,
-        false,
-        semantic_graph_layers(false, false),
+        Some(OntologyContentFilter::Shacl),
     )
 }
 
@@ -1047,10 +1000,11 @@ fn concepts_tool(
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let (format_name, export_format) = semantic_tool_format(args, "semantic concepts")?;
-    let include_mappings = bool_arg(args, "include_mappings", false);
-    let content = semantic_store
-        .index
-        .serialize_concepts(export_format, include_mappings)?;
+    let content = semantic_store.index.serialize_export_layers(
+        export_format,
+        &[SemanticExportLayer::Concepts],
+        None,
+    )?;
     let mut serializable_index =
         filtered_semantic_index(&semantic_store.index, OntologyContentFilter::Concepts);
     serializable_index.apply_external_visibility(false)?;
@@ -1070,13 +1024,144 @@ fn concepts_tool(
         content,
         &serializable_index,
         false,
-        semantic_graph_layers(false, false),
+        semantic_graph_layers_for_export(&[SemanticExportLayer::Concepts]),
     )?;
     if let Some(map) = object.as_object_mut() {
-        map.insert("include_mappings".to_string(), json!(include_mappings));
+        map.insert(
+            "layers".to_string(),
+            semantic_export_layer_values(&[SemanticExportLayer::Concepts]),
+        );
         map.insert("concepts".to_string(), json!(concepts));
     }
     Ok(object)
+}
+
+fn semantic_model_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<Value, ReqvireError> {
+    semantic_export_layers_tool(
+        args,
+        excluded_filename_patterns,
+        with_size_estimates,
+        vec![SemanticExportLayer::Model],
+        "model",
+        None,
+    )
+}
+
+fn semantic_graph_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<Value, ReqvireError> {
+    semantic_export_layers_tool(
+        args,
+        excluded_filename_patterns,
+        with_size_estimates,
+        Vec::new(),
+        "graph",
+        None,
+    )
+}
+
+fn semantic_export_layers_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+    requested_layers: Vec<SemanticExportLayer>,
+    semantic_layer: &str,
+    filter: Option<OntologyContentFilter>,
+) -> Result<Value, ReqvireError> {
+    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
+    let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
+        ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
+    })?;
+    let (format_name, export_format) = semantic_tool_format(args, semantic_layer)?;
+    let namespace_base = string_arg(args, "namespace_base");
+    let content = semantic_store.index.serialize_export_layers(
+        export_format,
+        &requested_layers,
+        namespace_base.as_deref(),
+    )?;
+    let effective_layers = if requested_layers.is_empty() {
+        SemanticExportLayer::default_layers()
+    } else {
+        requested_layers.clone()
+    };
+    let include_external = effective_layers.contains(&SemanticExportLayer::ExternalUsed);
+    let mut serializable_index = if let Some(filter) = filter {
+        filtered_semantic_index(&semantic_store.index, filter)
+    } else {
+        semantic_store.index.clone()
+    };
+    serializable_index.apply_external_visibility(include_external)?;
+    let external_metadata = semantic_contract::external_materialization_metadata(
+        &semantic_store.index,
+        &serializable_index,
+        include_external,
+    );
+    let mut object = semantic_layer_response(
+        format_name,
+        semantic_layer,
+        content,
+        &serializable_index,
+        include_external,
+        semantic_graph_layers_for_export(&effective_layers),
+    )?;
+    if let Some(map) = object.as_object_mut() {
+        map.insert(
+            "layers".to_string(),
+            semantic_export_layer_values(&effective_layers),
+        );
+        map.insert(
+            "external_materialization".to_string(),
+            external_metadata["external_materialization"].clone(),
+        );
+        map.insert(
+            "external_counts".to_string(),
+            external_metadata["external_counts"].clone(),
+        );
+        if let Some(namespace_base) = namespace_base {
+            map.insert("namespace_base".to_string(), json!(namespace_base));
+        }
+    }
+    Ok(object)
+}
+
+fn semantic_export_layers_arg(args: &Value) -> Result<Vec<SemanticExportLayer>, ReqvireError> {
+    let Some(value) = args.get("layers") else {
+        return Ok(Vec::new());
+    };
+    let Some(items) = value.as_array() else {
+        return Err(ReqvireError::ProcessError(
+            "semantic export layers must be an array of layer names".to_string(),
+        ));
+    };
+    let mut layers = Vec::new();
+    for item in items {
+        let Some(layer) = item.as_str() else {
+            return Err(ReqvireError::ProcessError(
+                "semantic export layers must be strings".to_string(),
+            ));
+        };
+        layers.push(match layer {
+            "ontologies" => SemanticExportLayer::Ontologies,
+            "shapes" => SemanticExportLayer::Shapes,
+            "concepts" => SemanticExportLayer::Concepts,
+            "model" => SemanticExportLayer::Model,
+            "external-used" => SemanticExportLayer::ExternalUsed,
+            "prefixes" => SemanticExportLayer::Prefixes,
+            other => {
+                return Err(ReqvireError::ProcessError(format!(
+                    "Invalid semantic export layer '{}'. Valid values: ontologies, shapes, concepts, model, external-used, prefixes",
+                    other
+                )))
+            }
+        });
+    }
+    Ok(layers)
 }
 
 fn concepts_list_tool(
@@ -1273,37 +1358,6 @@ fn concept_item_matches_filter(item: &Value, filter: Option<&str>) -> bool {
     .iter()
     .filter_map(|key| item.get(*key).and_then(Value::as_str))
     .any(|value| value.to_ascii_lowercase().contains(&filter))
-}
-
-fn semantic_graph_tool(
-    args: &Value,
-    excluded_filename_patterns: &GlobSet,
-    with_size_estimates: bool,
-) -> Result<Value, ReqvireError> {
-    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
-    let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
-        ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
-    })?;
-    let (format_name, export_format) = semantic_tool_format(args, "semantic graph")?;
-    let full = bool_arg(args, "full", false);
-    let include_external = bool_arg(args, "include_external", false);
-    let graph_layers = semantic_graph_layers(full, include_external);
-    let mut serializable_index = semantic_store.index.clone();
-    serializable_index.apply_external_visibility(include_external)?;
-    let content =
-        serializable_index.serialize_with_options(export_format, full, include_external)?;
-    let mut object = semantic_layer_response(
-        format_name,
-        "graph",
-        content,
-        &serializable_index,
-        include_external,
-        graph_layers,
-    )?;
-    if let Some(map) = object.as_object_mut() {
-        map.insert("full".to_string(), json!(full));
-    }
-    Ok(object)
 }
 
 fn semantic_tool_format(
@@ -2923,11 +2977,77 @@ fn sort_items(items: &mut [Value]) {
     items.sort_by(|left, right| left.to_string().cmp(&right.to_string()));
 }
 
+fn semantic_export_layer_name(layer: &SemanticExportLayer) -> &'static str {
+    match layer {
+        SemanticExportLayer::Ontologies => "ontologies",
+        SemanticExportLayer::Shapes => "shapes",
+        SemanticExportLayer::Concepts => "concepts",
+        SemanticExportLayer::Model => "model",
+        SemanticExportLayer::ExternalUsed => "external-used",
+        SemanticExportLayer::Prefixes => "prefixes",
+    }
+}
+
+fn semantic_export_layer_values(layers: &[SemanticExportLayer]) -> Value {
+    json!(layers
+        .iter()
+        .map(semantic_export_layer_name)
+        .collect::<Vec<_>>())
+}
+
 fn literal_value(term: &Term) -> Option<&str> {
     match term {
         Term::Literal(literal) => Some(literal.value()),
         _ => None,
     }
+}
+
+fn semantic_graph_layers_for_export(layers: &[SemanticExportLayer]) -> Vec<Value> {
+    let includes = |layer| layers.contains(&layer);
+    vec![
+        graph_layer(
+            "ontologies",
+            semantic_store::GRAPH_AUTHORED_ONTOLOGY,
+            includes(SemanticExportLayer::Ontologies),
+            "authored ontology RDF layer",
+        ),
+        graph_layer(
+            "shapes",
+            semantic_store::GRAPH_AUTHORED_ONTOLOGY,
+            includes(SemanticExportLayer::Shapes),
+            "authored semantic-contract SHACL layer",
+        ),
+        graph_layer(
+            "concepts",
+            semantic_store::GRAPH_AUTHORED_ONTOLOGY,
+            includes(SemanticExportLayer::Concepts),
+            "generated native SKOS concept layer",
+        ),
+        graph_layer(
+            "model",
+            semantic_store::GRAPH_AUTHORED_MODEL,
+            includes(SemanticExportLayer::Model),
+            "generated Reqvire model facts layer",
+        ),
+        graph_layer(
+            "external-used",
+            semantic_store::GRAPH_EXTERNAL_USED_SUBSET,
+            includes(SemanticExportLayer::ExternalUsed),
+            "used external subset produced by o-kernel",
+        ),
+        graph_layer(
+            "prefixes",
+            semantic_store::GRAPH_GENERATED,
+            includes(SemanticExportLayer::Prefixes),
+            "generated Turtle prefix projection layer",
+        ),
+        graph_layer(
+            "raw-external-source",
+            "urn:reqvire:semantic-graph:raw-external-source",
+            false,
+            "raw external dependency graph (internal only)",
+        ),
+    ]
 }
 
 fn semantic_graph_layers(full: bool, include_external: bool) -> Vec<Value> {
@@ -3561,9 +3681,11 @@ fn read_tool_names() -> Vec<&'static str> {
         "reqvire.containment",
         "reqvire.collect",
         "reqvire.submodels",
+        "reqvire.semantic.export",
         "reqvire.semantic.ontologies",
         "reqvire.semantic.shapes",
         "reqvire.semantic.concepts",
+        "reqvire.semantic.model",
         "reqvire.concepts.list",
         "reqvire.concepts.get",
         "reqvire.concept_schemes.list",

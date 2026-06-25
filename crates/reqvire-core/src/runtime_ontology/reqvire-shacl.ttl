@@ -10,64 +10,64 @@
 
 reqvire:BehaviorRuleShape a sh:NodeShape ;
 	sh:targetClass reqvire:BehaviorRule .
-_:b14e7f396bc08f4a06e84f8175644007 sh:path reqvire:ruleName ;
+_:c146b6882928cc1eadf66ee3576dedf sh:path reqvire:ruleName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:BehaviorRuleShape sh:property _:b14e7f396bc08f4a06e84f8175644007 .
-_:b6a4e46a0104fc9154f80a61b5655c0f sh:path reqvire:ruleCondition ;
+reqvire:BehaviorRuleShape sh:property _:c146b6882928cc1eadf66ee3576dedf .
+_:c6f32790d56e0e8e411804afa483be9c sh:path reqvire:ruleCondition ;
 	sh:datatype xsd:string .
-reqvire:BehaviorRuleShape sh:property _:b6a4e46a0104fc9154f80a61b5655c0f .
-_:b599a28bfaf239a27bf9b058524e8fd6 sh:path reqvire:ruleOutcome ;
+reqvire:BehaviorRuleShape sh:property _:c6f32790d56e0e8e411804afa483be9c .
+_:fa8d2d119ccb84bd13c2ad8a08a8b5e8 sh:path reqvire:ruleOutcome ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:BehaviorRuleShape sh:property _:b599a28bfaf239a27bf9b058524e8fd6 .
-_:fa19aa0ee3b329ee4a2313b97880a928 sh:path reqvire:sourceBehavior ;
+reqvire:BehaviorRuleShape sh:property _:fa8d2d119ccb84bd13c2ad8a08a8b5e8 .
+_:dd4cffb928be848aab04b6ad26aeea83 sh:path reqvire:sourceBehavior ;
 	sh:datatype xsd:string .
-reqvire:BehaviorRuleShape sh:property _:fa19aa0ee3b329ee4a2313b97880a928 .
-_:f424674bffc55088ea538574a6bcb94e sh:path reqvire:behaviorPhase ;
+reqvire:BehaviorRuleShape sh:property _:dd4cffb928be848aab04b6ad26aeea83 .
+_:a6e542fdec9f82a9e12eb346b4713daf sh:path reqvire:behaviorPhase ;
 	sh:datatype xsd:string .
-reqvire:BehaviorRuleShape sh:property _:f424674bffc55088ea538574a6bcb94e .
-_:b1d56cb30c7ce83103029a27e66b0abc sh:path reqvire:rulePriority ;
+reqvire:BehaviorRuleShape sh:property _:a6e542fdec9f82a9e12eb346b4713daf .
+_:f075f7f8b3d37aaa4c1e9da6fb229cc7 sh:path reqvire:rulePriority ;
 	sh:datatype xsd:string .
-reqvire:BehaviorRuleShape sh:property _:b1d56cb30c7ce83103029a27e66b0abc .
-_:d1bc1e3cdea18382da4ee396033f63c0 sh:path reqvire:precondition ;
+reqvire:BehaviorRuleShape sh:property _:f075f7f8b3d37aaa4c1e9da6fb229cc7 .
+_:cdf63bae6b240905afb013362ad0a207 sh:path reqvire:precondition ;
 	sh:datatype xsd:string .
-reqvire:BehaviorRuleShape sh:property _:d1bc1e3cdea18382da4ee396033f63c0 .
-_:ccf83bebc97f3dc1c4eb6072af6143c sh:path reqvire:postcondition ;
+reqvire:BehaviorRuleShape sh:property _:cdf63bae6b240905afb013362ad0a207 .
+_:f98281ed9950180750e699afa537aad5 sh:path reqvire:postcondition ;
 	sh:datatype xsd:string .
-reqvire:BehaviorRuleShape sh:property _:ccf83bebc97f3dc1c4eb6072af6143c .
+reqvire:BehaviorRuleShape sh:property _:f98281ed9950180750e699afa537aad5 .
 reqvire:StateTransitionShape a sh:NodeShape ;
 	sh:targetClass reqvire:StateTransition .
-_:cf527124836ba7ae5e31ec3df734e5b1 sh:path reqvire:fromState ;
+_:ca54b222307e4449411fdde92aa6b48d sh:path reqvire:fromState ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:StateTransitionShape sh:property _:cf527124836ba7ae5e31ec3df734e5b1 .
-_:d586c3ae8052c7e654d3f2134e6cf1d2 sh:path reqvire:toState ;
+reqvire:StateTransitionShape sh:property _:ca54b222307e4449411fdde92aa6b48d .
+_:eb335017659676c94f580c327b754919 sh:path reqvire:toState ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:StateTransitionShape sh:property _:d586c3ae8052c7e654d3f2134e6cf1d2 .
-_:e98155b13d52781331ca99b6a9fd3b95 sh:path reqvire:trigger ;
+reqvire:StateTransitionShape sh:property _:eb335017659676c94f580c327b754919 .
+_:b4d0fb45068c3fc51a1e0be3dd1cbe19 sh:path reqvire:trigger ;
 	sh:datatype xsd:string .
-reqvire:StateTransitionShape sh:property _:e98155b13d52781331ca99b6a9fd3b95 .
+reqvire:StateTransitionShape sh:property _:b4d0fb45068c3fc51a1e0be3dd1cbe19 .
 reqvire:BehaviorShape a sh:NodeShape ;
 	sh:targetClass reqvire:Behavior .
-_:adbfed5216dc9e57fe58877324df3e57 sh:path reqvire:hasRule ;
+_:d29302bf1a99814dce7bf1d38f663731 sh:path reqvire:hasRule ;
 	sh:class reqvire:BehaviorRule .
-reqvire:BehaviorShape sh:property _:adbfed5216dc9e57fe58877324df3e57 .
-_:e589a869137d3066dc68e49b1a79f395 sh:path reqvire:hasTransition ;
+reqvire:BehaviorShape sh:property _:d29302bf1a99814dce7bf1d38f663731 .
+_:fe74e1dcbe9e84e3ea0c9290020590b9 sh:path reqvire:hasTransition ;
 	sh:class reqvire:StateTransition .
-reqvire:BehaviorShape sh:property _:e589a869137d3066dc68e49b1a79f395 .
+reqvire:BehaviorShape sh:property _:fe74e1dcbe9e84e3ea0c9290020590b9 .
 reqvire:InputOutputMappingShape a sh:NodeShape ;
 	sh:targetClass reqvire:InputOutputMapping .
-_:f6c121c1faddc7bc5a1fbe70929242f6 sh:path reqvire:usesInput ;
+_:f502a080e3ea1fd5e89f2f6da0e65f59 sh:path reqvire:usesInput ;
 	sh:class reqvire:Element .
-reqvire:InputOutputMappingShape sh:property _:f6c121c1faddc7bc5a1fbe70929242f6 .
-_:ec38428a61806f6567b4956cb0b7819f sh:path reqvire:producesOutput ;
+reqvire:InputOutputMappingShape sh:property _:f502a080e3ea1fd5e89f2f6da0e65f59 .
+_:cb59d2c5b791d38c550c95a936331b21 sh:path reqvire:producesOutput ;
 	sh:class reqvire:Element .
-reqvire:InputOutputMappingShape sh:property _:ec38428a61806f6567b4956cb0b7819f .
+reqvire:InputOutputMappingShape sh:property _:cb59d2c5b791d38c550c95a936331b21 .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/BehaviorValidationOperations.md#lint-rule-metadata-shape
@@ -78,25 +78,25 @@ reqvire:InputOutputMappingShape sh:property _:ec38428a61806f6567b4956cb0b7819f .
 
 reqvire:LintingRuleShape a sh:NodeShape ;
 	sh:targetClass reqvire:LintingRule .
-_:b3776e3523058021f753c5bafaf3a2ec sh:path reqvire:lintRuleName ;
+_:dab61c9aa7d03212cc9157d2756c60c3 sh:path reqvire:lintRuleName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:LintingRuleShape sh:property _:b3776e3523058021f753c5bafaf3a2ec .
-_:ba796b34d2fd21ef744719c69d33eaae sh:path reqvire:lintScope ;
+reqvire:LintingRuleShape sh:property _:dab61c9aa7d03212cc9157d2756c60c3 .
+_:dbd60ae0492456160410438a2a93e0c9 sh:path reqvire:lintScope ;
 	sh:datatype xsd:string .
-reqvire:LintingRuleShape sh:property _:ba796b34d2fd21ef744719c69d33eaae .
-_:b35820942ea9beca3909555186bd2648 sh:path reqvire:lintCondition ;
+reqvire:LintingRuleShape sh:property _:dbd60ae0492456160410438a2a93e0c9 .
+_:a8c0b9f849e4a79cfeda893eebfb1199 sh:path reqvire:lintCondition ;
 	sh:datatype xsd:string .
-reqvire:LintingRuleShape sh:property _:b35820942ea9beca3909555186bd2648 .
-_:afc7c5d5dcbbc7f5030ba523ed7ecb98 sh:path reqvire:lintFindingKind ;
+reqvire:LintingRuleShape sh:property _:a8c0b9f849e4a79cfeda893eebfb1199 .
+_:af61cdc4ae82aedd68f90ff6ac085e65 sh:path reqvire:lintFindingKind ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:LintingRuleShape sh:property _:afc7c5d5dcbbc7f5030ba523ed7ecb98 .
-_:a556bfc8d490cbdd0c968ccc0eb06ca8 sh:path reqvire:lintRepairMode ;
+reqvire:LintingRuleShape sh:property _:af61cdc4ae82aedd68f90ff6ac085e65 .
+_:cbb56d71cff797c8ac9488ac72f82d94 sh:path reqvire:lintRepairMode ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:LintingRuleShape sh:property _:a556bfc8d490cbdd0c968ccc0eb06ca8 .
+reqvire:LintingRuleShape sh:property _:cbb56d71cff797c8ac9488ac72f82d94 .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/BehaviorValidationOperations.md#validation-rule-diagnostic-shape
@@ -107,58 +107,58 @@ reqvire:LintingRuleShape sh:property _:a556bfc8d490cbdd0c968ccc0eb06ca8 .
 
 reqvire:ValidationRuleShape a sh:NodeShape ;
 	sh:targetClass reqvire:ValidationRule .
-_:ce8749141e859ade61f1e7455b94d653 sh:path reqvire:validationRuleName ;
+_:ba6e4c612248e182978260d18dfc1853 sh:path reqvire:validationRuleName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ValidationRuleShape sh:property _:ce8749141e859ade61f1e7455b94d653 .
-_:d8e81b39fad92e1c94c3a175dae288d sh:path reqvire:validationScope ;
+reqvire:ValidationRuleShape sh:property _:ba6e4c612248e182978260d18dfc1853 .
+_:bb98fc85aa3c5965b484d4acc4e79322 sh:path reqvire:validationScope ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ValidationRuleShape sh:property _:d8e81b39fad92e1c94c3a175dae288d .
-_:fa13be111e0c64c60ce17d01c963ab63 sh:path reqvire:validationSeverity ;
+reqvire:ValidationRuleShape sh:property _:bb98fc85aa3c5965b484d4acc4e79322 .
+_:dbf4c843fcabe98ffce56579e44947ab sh:path reqvire:validationSeverity ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:e76f638ae29159e2e714c3f59b617c9d .
-_:e76f638ae29159e2e714c3f59b617c9d rdf:rest _:bf595ec2e53f24284976e3f86cf8b4e6 ;
+	sh:in _:ccddd047b79ac0670215b8a87d265153 .
+_:ccddd047b79ac0670215b8a87d265153 rdf:rest _:b9c5c75b905aa39cddc6ae61398470ce ;
 	rdf:first "error" .
-_:bf595ec2e53f24284976e3f86cf8b4e6 rdf:rest _:cf8f032e411102b287429aa742b70465 ;
+_:b9c5c75b905aa39cddc6ae61398470ce rdf:rest _:cc6858da19deb7cf4148235e45285538 ;
 	rdf:first "warning" .
-_:cf8f032e411102b287429aa742b70465 rdf:rest rdf:nil ;
+_:cc6858da19deb7cf4148235e45285538 rdf:rest rdf:nil ;
 	rdf:first "info" .
-reqvire:ValidationRuleShape sh:property _:fa13be111e0c64c60ce17d01c963ab63 .
-_:f047e1f7395198dfa26de2d262522772 sh:path reqvire:validationCondition ;
+reqvire:ValidationRuleShape sh:property _:dbf4c843fcabe98ffce56579e44947ab .
+_:fb43aca02fc043595f654f484b5ec480 sh:path reqvire:validationCondition ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ValidationRuleShape sh:property _:f047e1f7395198dfa26de2d262522772 .
-_:c7fdf32e5f6ad1da7661238606809d4c sh:path reqvire:validationOutcome ;
+reqvire:ValidationRuleShape sh:property _:fb43aca02fc043595f654f484b5ec480 .
+_:a0b0ca4c725655cefdfa543953370025 sh:path reqvire:validationOutcome ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ValidationRuleShape sh:property _:c7fdf32e5f6ad1da7661238606809d4c .
-_:cd2bd208e4e2b61fa79172a671ffab25 sh:path reqvire:validationRepair ;
+reqvire:ValidationRuleShape sh:property _:a0b0ca4c725655cefdfa543953370025 .
+_:c156fff9b0b50a14b86d63b24477a2ce sh:path reqvire:validationRepair ;
 	sh:datatype xsd:string .
-reqvire:ValidationRuleShape sh:property _:cd2bd208e4e2b61fa79172a671ffab25 .
+reqvire:ValidationRuleShape sh:property _:c156fff9b0b50a14b86d63b24477a2ce .
 reqvire:ValidationIssueKindShape a sh:NodeShape ;
 	sh:targetClass reqvire:ValidationIssueKind .
-_:f97765ee352955c6d774d30f7fa90845 sh:path reqvire:validationIssueKindName ;
+_:aaf2119a0f50d690a0d3b74d3c8037c2 sh:path reqvire:validationIssueKindName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ValidationIssueKindShape sh:property _:f97765ee352955c6d774d30f7fa90845 .
+reqvire:ValidationIssueKindShape sh:property _:aaf2119a0f50d690a0d3b74d3c8037c2 .
 reqvire:LintIssueShape a sh:NodeShape ;
 	sh:targetClass reqvire:LintIssue .
-_:b29fa0366da972fb415a2bbfc5a69ef2 sh:path reqvire:lintIssueKind ;
+_:aa163d9148b31be426dfdd58cb7ab5d7 sh:path reqvire:lintIssueKind ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:LintIssueShape sh:property _:b29fa0366da972fb415a2bbfc5a69ef2 .
+reqvire:LintIssueShape sh:property _:aa163d9148b31be426dfdd58cb7ab5d7 .
 reqvire:MutationSafetyGateShape a sh:NodeShape ;
 	sh:targetClass reqvire:MutationSafetyGate .
-_:f4e9a5377da207a6c30a8d9766f2af76 sh:path reqvire:blocksPersistence ;
+_:d74379a832c0db8a85a9a68b5a28ce70 sh:path reqvire:blocksPersistence ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:boolean .
-reqvire:MutationSafetyGateShape sh:property _:f4e9a5377da207a6c30a8d9766f2af76 .
+reqvire:MutationSafetyGateShape sh:property _:d74379a832c0db8a85a9a68b5a28ce70 .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/CapabilityRequirementModel.md#capability-structure-and-relation-shape
@@ -169,33 +169,33 @@ reqvire:MutationSafetyGateShape sh:property _:f4e9a5377da207a6c30a8d9766f2af76 .
 
 reqvire:CapabilityShape a sh:NodeShape ;
 	sh:targetClass reqvire:Capability .
-_:cf796e867c3344289907ddbf09d292da sh:path reqvire:derive ;
+_:c73caaff063edc4f17577d23ffd37871 sh:path reqvire:derive ;
 	sh:class reqvire:Capability .
-reqvire:CapabilityShape sh:property _:cf796e867c3344289907ddbf09d292da .
-_:cff3ff2fe5a34aacb90f56068580a141 sh:path reqvire:derivedFrom ;
+reqvire:CapabilityShape sh:property _:c73caaff063edc4f17577d23ffd37871 .
+_:f2e9dfe667d474b0f6bb20d1098da994 sh:path reqvire:derivedFrom ;
 	sh:class reqvire:Capability .
-reqvire:CapabilityShape sh:property _:cff3ff2fe5a34aacb90f56068580a141 .
-_:c843aa9dffd5ae6f5dd9a65b92523a14 sh:path reqvire:definedBy ;
+reqvire:CapabilityShape sh:property _:f2e9dfe667d474b0f6bb20d1098da994 .
+_:cd3d6d19c0b559e75f7abacf1267a937 sh:path reqvire:definedBy ;
 	sh:maxCount 0 .
-reqvire:CapabilityShape sh:property _:c843aa9dffd5ae6f5dd9a65b92523a14 .
-_:f4f62a745e68a918c5d97204cce6e182 sh:path reqvire:specifiedBy ;
+reqvire:CapabilityShape sh:property _:cd3d6d19c0b559e75f7abacf1267a937 .
+_:d6666a728335c4b06e773c9ad1d571c5 sh:path reqvire:specifiedBy ;
 	sh:class reqvire:Requirement .
-reqvire:CapabilityShape sh:property _:f4f62a745e68a918c5d97204cce6e182 .
-_:ce727e9e920be88e4f53ac7552c70998 sh:path reqvire:verifiedBy ;
+reqvire:CapabilityShape sh:property _:d6666a728335c4b06e773c9ad1d571c5 .
+_:b03ecb233c657617c9123eeb4265ec2f sh:path reqvire:verifiedBy ;
 	sh:class reqvire:Verification .
-reqvire:CapabilityShape sh:property _:ce727e9e920be88e4f53ac7552c70998 .
-_:ab676a53beaad215915b404c0706bcf6 sh:path reqvire:satisfiedBy ;
+reqvire:CapabilityShape sh:property _:b03ecb233c657617c9123eeb4265ec2f .
+_:a6a9311761ca745524fa074764c63104 sh:path reqvire:satisfiedBy ;
 	sh:maxCount 0 .
-reqvire:CapabilityShape sh:property _:ab676a53beaad215915b404c0706bcf6 .
-_:a8b7c09d24d0e3a7c43e0ff1386c75dc sh:path reqvire:satisfy ;
+reqvire:CapabilityShape sh:property _:a6a9311761ca745524fa074764c63104 .
+_:c02b048a2d7ebcc01b3093d110e5a9ee sh:path reqvire:satisfy ;
 	sh:maxCount 0 .
-reqvire:CapabilityShape sh:property _:a8b7c09d24d0e3a7c43e0ff1386c75dc .
-_:a8edb415b6a73b3a123a2d167f2bd6b2 sh:path reqvire:define ;
+reqvire:CapabilityShape sh:property _:c02b048a2d7ebcc01b3093d110e5a9ee .
+_:ca2426af34872841bfb021f7ddb3031d sh:path reqvire:define ;
 	sh:maxCount 0 .
-reqvire:CapabilityShape sh:property _:a8edb415b6a73b3a123a2d167f2bd6b2 .
-_:c7b80299331b30aededf3664af44d03e sh:path reqvire:specify ;
+reqvire:CapabilityShape sh:property _:ca2426af34872841bfb021f7ddb3031d .
+_:c9b8acea2c6669930b85fc7f865db4d5 sh:path reqvire:specify ;
 	sh:maxCount 0 .
-reqvire:CapabilityShape sh:property _:c7b80299331b30aededf3664af44d03e .
+reqvire:CapabilityShape sh:property _:c9b8acea2c6669930b85fc7f865db4d5 .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/CapabilityRequirementModel.md#contract-ownership-shape
@@ -206,75 +206,75 @@ reqvire:CapabilityShape sh:property _:c7b80299331b30aededf3664af44d03e .
 
 reqvire:ContractShape a sh:NodeShape ;
 	sh:targetClass reqvire:Contract .
-_:f9cdd50fc810d67f6924ed41ed1f6a6d sh:path reqvire:define ;
+_:fbb262dbda0beff05ebbbde0de0f87a7 sh:path reqvire:define ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:Requirement .
-reqvire:ContractShape sh:property _:f9cdd50fc810d67f6924ed41ed1f6a6d .
-_:e3f711e456729681c74a9e16c94abdc6 sh:path reqvire:derive ;
+reqvire:ContractShape sh:property _:fbb262dbda0beff05ebbbde0de0f87a7 .
+_:f4bd921fe7e7078406e5f9d215ab9fd4 sh:path reqvire:derive ;
 	sh:maxCount 0 .
-reqvire:ContractShape sh:property _:e3f711e456729681c74a9e16c94abdc6 .
-_:deebfab97c3f284dbe3561e457817cc0 sh:path reqvire:derivedFrom ;
+reqvire:ContractShape sh:property _:f4bd921fe7e7078406e5f9d215ab9fd4 .
+_:ae24ad8a01494597c6d2ac215d712020 sh:path reqvire:derivedFrom ;
 	sh:maxCount 0 .
-reqvire:ContractShape sh:property _:deebfab97c3f284dbe3561e457817cc0 .
-_:dbb80446e11d8f17e091cc8f36875c92 sh:path reqvire:specify ;
+reqvire:ContractShape sh:property _:ae24ad8a01494597c6d2ac215d712020 .
+_:f31c2339560cf55b8267673b0e466d0d sh:path reqvire:specify ;
 	sh:maxCount 0 .
-reqvire:ContractShape sh:property _:dbb80446e11d8f17e091cc8f36875c92 .
-_:c5b35bab68933224e4fa3092cedee0e1 sh:path reqvire:specifiedBy ;
+reqvire:ContractShape sh:property _:f31c2339560cf55b8267673b0e466d0d .
+_:e5a16cd1b341fb377cec27384e220dd8 sh:path reqvire:specifiedBy ;
 	sh:maxCount 0 .
-reqvire:ContractShape sh:property _:c5b35bab68933224e4fa3092cedee0e1 .
-_:d294ca96563deb0012f251fa8f9e6855 sh:path reqvire:verify ;
+reqvire:ContractShape sh:property _:e5a16cd1b341fb377cec27384e220dd8 .
+_:b3e4bf0fe13409f81768b3d0563677c9 sh:path reqvire:verify ;
 	sh:maxCount 0 .
-reqvire:ContractShape sh:property _:d294ca96563deb0012f251fa8f9e6855 .
-_:b2aad2de68cc1bf7bad64e1424b413cd sh:path reqvire:verifiedBy ;
+reqvire:ContractShape sh:property _:b3e4bf0fe13409f81768b3d0563677c9 .
+_:c2967f7f58dc6b5b140adb62e6f71644 sh:path reqvire:verifiedBy ;
 	sh:maxCount 0 .
-reqvire:ContractShape sh:property _:b2aad2de68cc1bf7bad64e1424b413cd .
-_:cb1eaf7d0b7ee64c1fa41e6f0dfe3b70 sh:path reqvire:satisfy ;
+reqvire:ContractShape sh:property _:c2967f7f58dc6b5b140adb62e6f71644 .
+_:f465ebb2caafc7b1d83549f3a3594e9f sh:path reqvire:satisfy ;
 	sh:maxCount 0 .
-reqvire:ContractShape sh:property _:cb1eaf7d0b7ee64c1fa41e6f0dfe3b70 .
-_:c792389ba412ea181c26eee1ed464dd2 sh:path reqvire:satisfiedBy ;
+reqvire:ContractShape sh:property _:f465ebb2caafc7b1d83549f3a3594e9f .
+_:f6d09ce93ec64a6e80d5d5a8df6fe0e9 sh:path reqvire:satisfiedBy ;
 	sh:maxCount 0 .
-reqvire:ContractShape sh:property _:c792389ba412ea181c26eee1ed464dd2 .
+reqvire:ContractShape sh:property _:f6d09ce93ec64a6e80d5d5a8df6fe0e9 .
 reqvire:SourceShape a sh:NodeShape ;
 	sh:targetClass reqvire:Source .
-_:e89bbc947101e61674154061935592b6 sh:path reqvire:define ;
+_:ef65a79bcffb5ee11ebba10149e158d8 sh:path reqvire:define ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:Requirement .
-reqvire:SourceShape sh:property _:e89bbc947101e61674154061935592b6 .
+reqvire:SourceShape sh:property _:ef65a79bcffb5ee11ebba10149e158d8 .
 reqvire:SpecificationShape a sh:NodeShape ;
 	sh:targetClass reqvire:Specification .
-_:b881bcdb5d91ee0e9de8e31ee7b4d6f6 sh:path reqvire:define ;
+_:ca56f99025032f13c82faf951ecbcbdf sh:path reqvire:define ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:Requirement .
-reqvire:SpecificationShape sh:property _:b881bcdb5d91ee0e9de8e31ee7b4d6f6 .
+reqvire:SpecificationShape sh:property _:ca56f99025032f13c82faf951ecbcbdf .
 reqvire:ConstraintShape a sh:NodeShape ;
 	sh:targetClass reqvire:Constraint .
-_:f2dc64aeeba9de1fb5bc4ee49f9de99d sh:path reqvire:define ;
+_:c02364d459af912823f872222984f84e sh:path reqvire:define ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:Requirement .
-reqvire:ConstraintShape sh:property _:f2dc64aeeba9de1fb5bc4ee49f9de99d .
-_:c37cea3c0b60d561a4774dbf3f0c0280 sh:path reqvire:define ;
+reqvire:ConstraintShape sh:property _:c02364d459af912823f872222984f84e .
+_:bc1dd6629d58e1a73c8f0276d14da42 sh:path reqvire:define ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:Requirement .
-reqvire:BehaviorShape sh:property _:c37cea3c0b60d561a4774dbf3f0c0280 .
+reqvire:BehaviorShape sh:property _:bc1dd6629d58e1a73c8f0276d14da42 .
 reqvire:StateShape a sh:NodeShape ;
 	sh:targetClass reqvire:State .
-_:aec37569fbcacd3a4ffb94ce6d6bdd6 sh:path reqvire:define ;
+_:b651b460fcccb046e0a4bbb2a98d186f sh:path reqvire:define ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:Requirement .
-reqvire:StateShape sh:property _:aec37569fbcacd3a4ffb94ce6d6bdd6 .
+reqvire:StateShape sh:property _:b651b460fcccb046e0a4bbb2a98d186f .
 reqvire:InputOutputShape a sh:NodeShape ;
 	sh:targetClass reqvire:InputOutput .
-_:f668327277e16fd21e6a4353c4a7b70e sh:path reqvire:define ;
+_:c85319e54818eb4105b1f2821b44efc9 sh:path reqvire:define ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:Requirement .
-reqvire:InputOutputShape sh:property _:f668327277e16fd21e6a4353c4a7b70e .
+reqvire:InputOutputShape sh:property _:c85319e54818eb4105b1f2821b44efc9 .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/CapabilityRequirementModel.md#custom-element-semantic-boundary-shape
@@ -285,45 +285,45 @@ reqvire:InputOutputShape sh:property _:f668327277e16fd21e6a4353c4a7b70e .
 
 reqvire:CustomElementShape a sh:NodeShape ;
 	sh:targetClass reqvire:CustomElement .
-_:b5ffbbccd0055acc231654fa62c06e25 sh:path reqvire:elementType ;
+_:c097083779b3b593c1e91f0e941cf8b6 sh:path reqvire:elementType ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
 	sh:pattern "^other-.+" .
-reqvire:CustomElementShape sh:property _:b5ffbbccd0055acc231654fa62c06e25 .
-_:b04768e49338580961b39d439019a102 sh:path reqvire:derive ;
+reqvire:CustomElementShape sh:property _:c097083779b3b593c1e91f0e941cf8b6 .
+_:d765ec7cb054628ac48b7d0040bf2c63 sh:path reqvire:derive ;
 	sh:maxCount 0 .
-reqvire:CustomElementShape sh:property _:b04768e49338580961b39d439019a102 .
-_:e8270903f23caeb670891d7b95e165d7 sh:path reqvire:derivedFrom ;
+reqvire:CustomElementShape sh:property _:d765ec7cb054628ac48b7d0040bf2c63 .
+_:b4237a9706d452006475fa1ff1fa30 sh:path reqvire:derivedFrom ;
 	sh:maxCount 0 .
-reqvire:CustomElementShape sh:property _:e8270903f23caeb670891d7b95e165d7 .
-_:de30401ed97f5d26038e7374fad3a5af sh:path reqvire:specify ;
+reqvire:CustomElementShape sh:property _:b4237a9706d452006475fa1ff1fa30 .
+_:ac5a213eb2b3ea8815ee0e9f12a7cce sh:path reqvire:specify ;
 	sh:maxCount 0 .
-reqvire:CustomElementShape sh:property _:de30401ed97f5d26038e7374fad3a5af .
-_:cc00f0cc01b3f86a3ab6c9c3ea6a53f5 sh:path reqvire:specifiedBy ;
+reqvire:CustomElementShape sh:property _:ac5a213eb2b3ea8815ee0e9f12a7cce .
+_:f8d2034eb537b82b62beb83107bcff93 sh:path reqvire:specifiedBy ;
 	sh:maxCount 0 .
-reqvire:CustomElementShape sh:property _:cc00f0cc01b3f86a3ab6c9c3ea6a53f5 .
-_:dfd255586a53a622365098873cab8aab sh:path reqvire:define ;
+reqvire:CustomElementShape sh:property _:f8d2034eb537b82b62beb83107bcff93 .
+_:c3f9967f5a4b70b5fefd161ff3023c2c sh:path reqvire:define ;
 	sh:maxCount 0 .
-reqvire:CustomElementShape sh:property _:dfd255586a53a622365098873cab8aab .
-_:c85893363e3e92240f986f4a8b7866b2 sh:path reqvire:definedBy ;
+reqvire:CustomElementShape sh:property _:c3f9967f5a4b70b5fefd161ff3023c2c .
+_:ffc05a486e890faa803b50ee5df3a5de sh:path reqvire:definedBy ;
 	sh:maxCount 0 .
-reqvire:CustomElementShape sh:property _:c85893363e3e92240f986f4a8b7866b2 .
-_:e36b841e8cab995e56fd6a9170fef978 sh:path reqvire:verify ;
+reqvire:CustomElementShape sh:property _:ffc05a486e890faa803b50ee5df3a5de .
+_:dfdc47f4a910c0cd153bf44206ee3865 sh:path reqvire:verify ;
 	sh:maxCount 0 .
-reqvire:CustomElementShape sh:property _:e36b841e8cab995e56fd6a9170fef978 .
-_:aeddc57d9758aeb048292357a8cbfccc sh:path reqvire:verifiedBy ;
+reqvire:CustomElementShape sh:property _:dfdc47f4a910c0cd153bf44206ee3865 .
+_:ccb7bdcbaab9753f9161500be44b818a sh:path reqvire:verifiedBy ;
 	sh:maxCount 0 .
-reqvire:CustomElementShape sh:property _:aeddc57d9758aeb048292357a8cbfccc .
-_:f81a5c84b63d09ade045bfe483569d93 sh:path reqvire:satisfy ;
+reqvire:CustomElementShape sh:property _:ccb7bdcbaab9753f9161500be44b818a .
+_:b802383353992d4c396ee10eeb05631 sh:path reqvire:satisfy ;
 	sh:maxCount 0 .
-reqvire:CustomElementShape sh:property _:f81a5c84b63d09ade045bfe483569d93 .
-_:d02a0164e7ca56422367b296ce201273 sh:path reqvire:satisfiedBy ;
+reqvire:CustomElementShape sh:property _:b802383353992d4c396ee10eeb05631 .
+_:fecfa486d63ddd9737c5d9d6e6e6e852 sh:path reqvire:satisfiedBy ;
 	sh:maxCount 0 .
-reqvire:CustomElementShape sh:property _:d02a0164e7ca56422367b296ce201273 .
-_:d918b25520a15435f4001c7caa7aec82 sh:path reqvire:bindsContract ;
+reqvire:CustomElementShape sh:property _:fecfa486d63ddd9737c5d9d6e6e6e852 .
+_:f38865a16055b422f5ee4e029fdb509a sh:path reqvire:bindsContract ;
 	sh:maxCount 0 .
-reqvire:CustomElementShape sh:property _:d918b25520a15435f4001c7caa7aec82 .
+reqvire:CustomElementShape sh:property _:f38865a16055b422f5ee4e029fdb509a .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/CapabilityRequirementModel.md#ontology-element-vocabulary-shape
@@ -334,32 +334,32 @@ reqvire:CustomElementShape sh:property _:d918b25520a15435f4001c7caa7aec82 .
 
 reqvire:OntologyElementShape a sh:NodeShape ;
 	sh:targetClass reqvire:Ontology .
-_:d861b632a116c3b9de46794751e76129 sh:path reqvire:ontologyText ;
+_:f17848ca66f929ea84d6acb09c2d79a0 sh:path reqvire:ontologyText ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:OntologyElementShape sh:property _:d861b632a116c3b9de46794751e76129 .
-_:ee5d2206c45182f484bc4eda675ca895 sh:path reqvire:shapesText ;
+reqvire:OntologyElementShape sh:property _:f17848ca66f929ea84d6acb09c2d79a0 .
+_:b1ffb9d4c6f03ae5903eccb5bdf13001 sh:path reqvire:shapesText ;
 	sh:maxCount 0 .
-reqvire:OntologyElementShape sh:property _:ee5d2206c45182f484bc4eda675ca895 .
-_:f88bc6abdc696bc3943fee4761a0b7db sh:path reqvire:bindsContract ;
+reqvire:OntologyElementShape sh:property _:b1ffb9d4c6f03ae5903eccb5bdf13001 .
+_:d2eb3341631cf262b4d80270fbbfa73f sh:path reqvire:bindsContract ;
 	sh:maxCount 0 .
-reqvire:OntologyElementShape sh:property _:f88bc6abdc696bc3943fee4761a0b7db .
-_:c76a3e6b3294ac357889a26f9132bad2 sh:path reqvire:derive ;
+reqvire:OntologyElementShape sh:property _:d2eb3341631cf262b4d80270fbbfa73f .
+_:c7dd8ec002d26dc059e668d5324d1676 sh:path reqvire:derive ;
 	sh:class reqvire:Ontology .
-reqvire:OntologyElementShape sh:property _:c76a3e6b3294ac357889a26f9132bad2 .
-_:dbcd41e36b451407152da787f284f8e0 sh:path reqvire:derivedFrom ;
+reqvire:OntologyElementShape sh:property _:c7dd8ec002d26dc059e668d5324d1676 .
+_:a1cd03e0d752e7af2e3a536a0561a634 sh:path reqvire:derivedFrom ;
 	sh:class reqvire:Ontology .
-reqvire:OntologyElementShape sh:property _:dbcd41e36b451407152da787f284f8e0 .
-_:eec525b61c4c5b44a889393d8357d76d sh:path reqvire:definedBy ;
+reqvire:OntologyElementShape sh:property _:a1cd03e0d752e7af2e3a536a0561a634 .
+_:df5bb10ed8396dab5b0636d8b6e3bc8d sh:path reqvire:definedBy ;
 	sh:maxCount 0 .
-reqvire:OntologyElementShape sh:property _:eec525b61c4c5b44a889393d8357d76d .
-_:cc095460e1fa2cfb894ca9c50fbccdfe sh:path reqvire:verifiedBy ;
+reqvire:OntologyElementShape sh:property _:df5bb10ed8396dab5b0636d8b6e3bc8d .
+_:d58d46a2e6b0ab153e1e300c6f118451 sh:path reqvire:verifiedBy ;
 	sh:maxCount 0 .
-reqvire:OntologyElementShape sh:property _:cc095460e1fa2cfb894ca9c50fbccdfe .
-_:d8a3016429d516b66edd4237229ee95c sh:path reqvire:satisfiedBy ;
+reqvire:OntologyElementShape sh:property _:d58d46a2e6b0ab153e1e300c6f118451 .
+_:a1b200303c09ec9a36a560de9ce94c2f sh:path reqvire:satisfiedBy ;
 	sh:maxCount 0 .
-reqvire:OntologyElementShape sh:property _:d8a3016429d516b66edd4237229ee95c .
+reqvire:OntologyElementShape sh:property _:a1b200303c09ec9a36a560de9ce94c2f .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/CapabilityRequirementModel.md#requirement-ownership-and-coverage-shape
@@ -370,53 +370,53 @@ reqvire:OntologyElementShape sh:property _:d8a3016429d516b66edd4237229ee95c .
 
 reqvire:RequirementShape a sh:NodeShape ;
 	sh:targetClass reqvire:Requirement ;
-	sh:or _:c26a30002dbeedc7a53e0017277a496e .
-_:bfe7691b915e2336a07a21c466b4ed0e sh:path reqvire:specify ;
+	sh:or _:c54c4c1cd2f541bea4a91e2623156573 .
+_:c123aada08e60db4ec2a4874f52b8880 sh:path reqvire:specify ;
 	sh:minCount 1 ;
 	sh:class reqvire:Capability .
-_:e98be1e19dd243d638b5ce5e8c78d0d0 sh:property _:bfe7691b915e2336a07a21c466b4ed0e .
-_:c26a30002dbeedc7a53e0017277a496e rdf:first _:e98be1e19dd243d638b5ce5e8c78d0d0 ;
-	rdf:rest _:e4a42ad6171abcce9f9cdd8092ceff1b .
-_:d987dced08ce8fcabe08cd6d32cc1fdc sh:path reqvire:derivedFrom ;
+_:ff0f08162eb1bafa2dcd1e13750a585e sh:property _:c123aada08e60db4ec2a4874f52b8880 .
+_:c54c4c1cd2f541bea4a91e2623156573 rdf:first _:ff0f08162eb1bafa2dcd1e13750a585e ;
+	rdf:rest _:ccafbe73ff3858aebf5f9c545e32584e .
+_:ca7b757437cf8f3230f253ff5b202d46 sh:path reqvire:derivedFrom ;
 	sh:minCount 1 ;
 	sh:class reqvire:Requirement .
-_:a96ba6627fde1b5d84a46f48cb7cb0ae sh:property _:d987dced08ce8fcabe08cd6d32cc1fdc .
-_:e4a42ad6171abcce9f9cdd8092ceff1b rdf:first _:a96ba6627fde1b5d84a46f48cb7cb0ae ;
+_:e4e25417292e6047b617a6bea887dd6c sh:property _:ca7b757437cf8f3230f253ff5b202d46 .
+_:ccafbe73ff3858aebf5f9c545e32584e rdf:first _:e4e25417292e6047b617a6bea887dd6c ;
 	rdf:rest rdf:nil .
-_:d0270735d6a02cdcdd608c96f423d1aa sh:path reqvire:specify ;
+_:d5eeeaa6d6e6eabf5b8c903539aef1cc sh:path reqvire:specify ;
 	sh:class reqvire:Capability .
-reqvire:RequirementShape sh:property _:d0270735d6a02cdcdd608c96f423d1aa .
-_:bc1a23eae29561b11416c8e75b3b3c0d sh:path reqvire:derivedFrom ;
+reqvire:RequirementShape sh:property _:d5eeeaa6d6e6eabf5b8c903539aef1cc .
+_:bc6b45f892c6e49baf2243234f9eeb70 sh:path reqvire:derivedFrom ;
 	sh:class reqvire:Requirement .
-reqvire:RequirementShape sh:property _:bc1a23eae29561b11416c8e75b3b3c0d .
-_:f2e7ea9830320948304523bf10d08c0d sh:path reqvire:derive ;
+reqvire:RequirementShape sh:property _:bc6b45f892c6e49baf2243234f9eeb70 .
+_:b2d0dac34e8ded622e57c8b21e1ff50 sh:path reqvire:derive ;
 	sh:class reqvire:Requirement .
-reqvire:RequirementShape sh:property _:f2e7ea9830320948304523bf10d08c0d .
-_:d5845bd879dbd397ef52607d8dff61f5 sh:path reqvire:definedBy ;
+reqvire:RequirementShape sh:property _:b2d0dac34e8ded622e57c8b21e1ff50 .
+_:a0d7482597f3045e6b5b6bead9fc1137 sh:path reqvire:definedBy ;
 	sh:class reqvire:Contract .
-reqvire:RequirementShape sh:property _:d5845bd879dbd397ef52607d8dff61f5 .
-_:cfff13a5df83da3158be45e7e639c276 sh:path reqvire:verifiedBy ;
+reqvire:RequirementShape sh:property _:a0d7482597f3045e6b5b6bead9fc1137 .
+_:e0ce292659b57f755e812cd10d342499 sh:path reqvire:verifiedBy ;
 	sh:class reqvire:Verification .
-reqvire:RequirementShape sh:property _:cfff13a5df83da3158be45e7e639c276 .
-_:c400e6aa35e03c682551e1282518649e sh:path reqvire:satisfiedBy ;
+reqvire:RequirementShape sh:property _:e0ce292659b57f755e812cd10d342499 .
+_:aa21e116cdbb1c32b5d226fe11d8fec4 sh:path reqvire:satisfiedBy ;
 	sh:class reqvire:Artifact .
-reqvire:RequirementShape sh:property _:c400e6aa35e03c682551e1282518649e .
-_:e2489b307f34ad7476fdaad7c3ce5a12 sh:path reqvire:requirementObligationText ;
+reqvire:RequirementShape sh:property _:aa21e116cdbb1c32b5d226fe11d8fec4 .
+_:e0400fa22cb64b851ace3ef2c0ff5de7 sh:path reqvire:requirementObligationText ;
 	sh:datatype xsd:string .
-reqvire:RequirementShape sh:property _:e2489b307f34ad7476fdaad7c3ce5a12 .
-_:f6837f733254b328ce1d749d8f4847d7 sh:path reqvire:satisfy ;
+reqvire:RequirementShape sh:property _:e0400fa22cb64b851ace3ef2c0ff5de7 .
+_:c8c0dff1bab7b7c0b6d9f27c98ece2c2 sh:path reqvire:satisfy ;
 	sh:maxCount 0 .
-reqvire:RequirementShape sh:property _:f6837f733254b328ce1d749d8f4847d7 .
-_:a531f90f9e04753c3ba164301d97bf88 sh:path reqvire:specifiedBy ;
+reqvire:RequirementShape sh:property _:c8c0dff1bab7b7c0b6d9f27c98ece2c2 .
+_:b5057bb586f282b8fa5a49b12f89393b sh:path reqvire:specifiedBy ;
 	sh:maxCount 0 .
-reqvire:RequirementShape sh:property _:a531f90f9e04753c3ba164301d97bf88 .
+reqvire:RequirementShape sh:property _:b5057bb586f282b8fa5a49b12f89393b .
 reqvire:RequirementOwnedContractShape a sh:NodeShape ;
 	sh:targetClass reqvire:RequirementOwnedContract .
-_:a6ab0c7d6733ffa27b1000713e8da8d3 sh:path reqvire:define ;
+_:e81d0411f2b8b4157808cde10bc44c5f sh:path reqvire:define ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:Requirement .
-reqvire:RequirementOwnedContractShape sh:property _:a6ab0c7d6733ffa27b1000713e8da8d3 .
+reqvire:RequirementOwnedContractShape sh:property _:e81d0411f2b8b4157808cde10bc44c5f .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/CapabilityRequirementModel.md#semantic-contract-structure-shape
@@ -427,35 +427,35 @@ reqvire:RequirementOwnedContractShape sh:property _:a6ab0c7d6733ffa27b1000713e8d
 
 reqvire:SemanticContractShape a sh:NodeShape ;
 	sh:targetClass reqvire:SemanticContract .
-_:de772ca3baf61c9cfd16e24ae2952f1f sh:path reqvire:semanticContractIri ;
+_:ce49d97f817c9fb065a76b4f20c8de05 sh:path reqvire:semanticContractIri ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:anyURI .
-reqvire:SemanticContractShape sh:property _:de772ca3baf61c9cfd16e24ae2952f1f .
-_:a03d99b2696dd9805fbcd2d525ab34b4 sh:path reqvire:semanticContractKind ;
+reqvire:SemanticContractShape sh:property _:ce49d97f817c9fb065a76b4f20c8de05 .
+_:f980719dc4ff62970450573332597403 sh:path reqvire:semanticContractKind ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:aebf1c08610508bbba009409d67a00fc .
-_:aebf1c08610508bbba009409d67a00fc rdf:rest rdf:nil ;
+	sh:in _:a73c16cfe1eefe27d02bb02009f9385a .
+_:a73c16cfe1eefe27d02bb02009f9385a rdf:rest rdf:nil ;
 	rdf:first "semantic-contract" .
-reqvire:SemanticContractShape sh:property _:a03d99b2696dd9805fbcd2d525ab34b4 .
-_:f3769d8bf1e36759b3410830aa48589c sh:path reqvire:ontologyText ;
+reqvire:SemanticContractShape sh:property _:f980719dc4ff62970450573332597403 .
+_:bdf6d73d521833877980712487e4f595 sh:path reqvire:ontologyText ;
 	sh:maxCount 0 .
-reqvire:SemanticContractShape sh:property _:f3769d8bf1e36759b3410830aa48589c .
-_:a655f7305cfbc84878007d194da18c98 sh:path reqvire:shapesText ;
+reqvire:SemanticContractShape sh:property _:bdf6d73d521833877980712487e4f595 .
+_:d70d0cba9bd035642e20029603282611 sh:path reqvire:shapesText ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:SemanticContractShape sh:property _:a655f7305cfbc84878007d194da18c98 .
-_:e0281fd6633515489a9696a7ab175e69 sh:path reqvire:constrain ;
+reqvire:SemanticContractShape sh:property _:d70d0cba9bd035642e20029603282611 .
+_:a378e86d6a1a11cac0d15458cda8d16c sh:path reqvire:constrain ;
 	sh:minCount 1 ;
 	sh:class reqvire:Requirement .
-reqvire:SemanticContractShape sh:property _:e0281fd6633515489a9696a7ab175e69 .
-_:e9e813e8556631626388841c69489d3f sh:path reqvire:use ;
+reqvire:SemanticContractShape sh:property _:a378e86d6a1a11cac0d15458cda8d16c .
+_:e36f74c1769d17874cb6b0ce24f75ff3 sh:path reqvire:use ;
 	sh:minCount 1 ;
 	sh:class reqvire:Ontology .
-reqvire:SemanticContractShape sh:property _:e9e813e8556631626388841c69489d3f .
+reqvire:SemanticContractShape sh:property _:e36f74c1769d17874cb6b0ce24f75ff3 .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/Core.md#element-identity-and-metadata-shape
@@ -466,89 +466,89 @@ reqvire:SemanticContractShape sh:property _:e9e813e8556631626388841c69489d3f .
 
 reqvire:ElementShape a sh:NodeShape ;
 	sh:targetClass reqvire:Element .
-_:da12013923a3c43d010c59a5d9a32123 sh:path reqvire:identifier ;
+_:dcae488931fdc1f858cf49d9b52c2b91 sh:path reqvire:identifier ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ElementShape sh:property _:da12013923a3c43d010c59a5d9a32123 .
-_:db74d045eb2bcc40f8eabb22276ee0c6 sh:path reqvire:name ;
+reqvire:ElementShape sh:property _:dcae488931fdc1f858cf49d9b52c2b91 .
+_:ac20b3c129cb916fee3221f9ea497fee sh:path reqvire:name ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ElementShape sh:property _:db74d045eb2bcc40f8eabb22276ee0c6 .
-_:ab2da465231fdaee81345c82cb866f2e sh:path reqvire:elementType ;
+reqvire:ElementShape sh:property _:ac20b3c129cb916fee3221f9ea497fee .
+_:cb115ceb6e8fd6c1274bf5ca1282ea5d sh:path reqvire:elementType ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ElementShape sh:property _:ab2da465231fdaee81345c82cb866f2e .
-_:d75ba7256e098471dd0b36f2c484b83e sh:path reqvire:id ;
+reqvire:ElementShape sh:property _:cb115ceb6e8fd6c1274bf5ca1282ea5d .
+_:b9388910a8b842feb76a82a361e7b9e9 sh:path reqvire:id ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ElementShape sh:property _:d75ba7256e098471dd0b36f2c484b83e .
-_:e467fb9ac054fe17298002f7bd46a541 sh:path reqvire:filePath ;
+reqvire:ElementShape sh:property _:b9388910a8b842feb76a82a361e7b9e9 .
+_:e72773033358935a5e102cd47159c5fb sh:path reqvire:filePath ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ElementShape sh:property _:e467fb9ac054fe17298002f7bd46a541 .
-_:a281df4fba059e5ba254965b85f70561 sh:path reqvire:fragment ;
+reqvire:ElementShape sh:property _:e72773033358935a5e102cd47159c5fb .
+_:a371c7e286801cca8af7621581043474 sh:path reqvire:fragment ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ElementShape sh:property _:a281df4fba059e5ba254965b85f70561 .
-_:cdd9b6100d2e3ac133a9aa77094c8e91 sh:path reqvire:content ;
+reqvire:ElementShape sh:property _:a371c7e286801cca8af7621581043474 .
+_:a4cb3d7039f31dd1ec8dc039cadf8ab3 sh:path reqvire:content ;
 	sh:datatype xsd:string .
-reqvire:ElementShape sh:property _:cdd9b6100d2e3ac133a9aa77094c8e91 .
+reqvire:ElementShape sh:property _:a4cb3d7039f31dd1ec8dc039cadf8ab3 .
 reqvire:ArtifactShape a sh:NodeShape ;
 	sh:targetClass reqvire:Artifact .
-_:f5ef611b67f85ad0bd5a096bfbf96018 sh:path reqvire:externalUrl ;
+_:f729719b53005ce7d2a526b5d16ad292 sh:path reqvire:externalUrl ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:anyURI .
-reqvire:ArtifactShape sh:property _:f5ef611b67f85ad0bd5a096bfbf96018 .
+reqvire:ArtifactShape sh:property _:f729719b53005ce7d2a526b5d16ad292 .
 reqvire:ElementTypeShape a sh:NodeShape ;
 	sh:targetClass reqvire:ElementType .
-_:b657b19a296684be74db827fcfd8e542 sh:path reqvire:elementTypeName ;
+_:fc569d8e97048e0657f9d65b3ee2b93 sh:path reqvire:elementTypeName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ElementTypeShape sh:property _:b657b19a296684be74db827fcfd8e542 .
-_:c49c161c6f24077fae2383b4e8ac5d50 sh:path reqvire:elementTypeCategory ;
+reqvire:ElementTypeShape sh:property _:fc569d8e97048e0657f9d65b3ee2b93 .
+_:af7dab822693cfac3e3203f4a0baab3 sh:path reqvire:elementTypeCategory ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ElementTypeShape sh:property _:c49c161c6f24077fae2383b4e8ac5d50 .
-_:ca67606ebd79db07ec6f96d46ee7afc4 sh:path reqvire:defaultElementType ;
+reqvire:ElementTypeShape sh:property _:af7dab822693cfac3e3203f4a0baab3 .
+_:c0cdc1c24ef0f97f5c39a01041d925e5 sh:path reqvire:defaultElementType ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:boolean .
-reqvire:ElementTypeShape sh:property _:ca67606ebd79db07ec6f96d46ee7afc4 .
+reqvire:ElementTypeShape sh:property _:c0cdc1c24ef0f97f5c39a01041d925e5 .
 reqvire:CustomElementTypeShape a sh:NodeShape ;
 	sh:targetClass reqvire:CustomElementType .
-_:b3f8fcd22b7c7dd5639227f3573b2865 sh:path reqvire:customElementTypePattern ;
+_:da4d9ed5463fd6124fb1d8d42376b5ca sh:path reqvire:customElementTypePattern ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:CustomElementTypeShape sh:property _:b3f8fcd22b7c7dd5639227f3573b2865 .
+reqvire:CustomElementTypeShape sh:property _:da4d9ed5463fd6124fb1d8d42376b5ca .
 reqvire:ReservedSubsectionShape a sh:NodeShape ;
 	sh:targetClass reqvire:ReservedSubsection .
-_:afe62b6a848c6bd14163e6245ce7939f sh:path reqvire:subsectionName ;
+_:b34f7f67418da2a495a597c5c3f2bf79 sh:path reqvire:subsectionName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ReservedSubsectionShape sh:property _:afe62b6a848c6bd14163e6245ce7939f .
+reqvire:ReservedSubsectionShape sh:property _:b34f7f67418da2a495a597c5c3f2bf79 .
 reqvire:ElementIdentityShape a sh:NodeShape ;
 	sh:targetClass reqvire:ElementIdentity .
-_:cdde352ff2ed637784bace3e2e8da7ce sh:path reqvire:identitySource ;
+_:b5edd7cc27134ca5effee8b71f80b361 sh:path reqvire:identitySource ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ElementIdentityShape sh:property _:cdde352ff2ed637784bace3e2e8da7ce .
-_:d25f1db1cff625c9ec7ee72aa8e99cf0 sh:path reqvire:identityStability ;
+reqvire:ElementIdentityShape sh:property _:b5edd7cc27134ca5effee8b71f80b361 .
+_:aeab06d31a77e7db4e8ea34d42230741 sh:path reqvire:identityStability ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ElementIdentityShape sh:property _:d25f1db1cff625c9ec7ee72aa8e99cf0 .
+reqvire:ElementIdentityShape sh:property _:aeab06d31a77e7db4e8ea34d42230741 .
 reqvire:ReferenceTargetKindShape a sh:NodeShape ;
 	sh:targetClass reqvire:ReferenceTargetKind .
-_:abbfb9c34d645b6475cc1d14700dee6 sh:path reqvire:referenceTargetKindName ;
+_:d4e11f34a1337773d003831369def079 sh:path reqvire:referenceTargetKindName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ReferenceTargetKindShape sh:property _:abbfb9c34d645b6475cc1d14700dee6 .
+reqvire:ReferenceTargetKindShape sh:property _:d4e11f34a1337773d003831369def079 .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/Governance.md#governance-metadata-scope-shape
@@ -559,116 +559,116 @@ reqvire:ReferenceTargetKindShape sh:property _:abbfb9c34d645b6475cc1d14700dee6 .
 
 reqvire:CapabilityGovernanceShape a sh:NodeShape ;
 	sh:targetClass reqvire:Capability .
-_:a9a4f701637d46f5716566e01775758e sh:path reqvire:status ;
+_:ad5664c7da65c14a41d8e18e808c2896 sh:path reqvire:status ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:cabe4c14d565f959ed3eea6663a6f9a0 .
-_:cabe4c14d565f959ed3eea6663a6f9a0 rdf:rest _:ec53e721d66e1a3d7c5cf7ae86159489 ;
+	sh:in _:c98b0dd12d6a7b4e483c5a1be618f1e0 .
+_:c98b0dd12d6a7b4e483c5a1be618f1e0 rdf:rest _:a18b5800444d635c5671a01a3e2996d6 ;
 	rdf:first "draft" .
-_:ec53e721d66e1a3d7c5cf7ae86159489 rdf:rest _:dc8250b7c10dac12fa40496fdf1fc535 ;
+_:a18b5800444d635c5671a01a3e2996d6 rdf:rest _:f75e17504209310fd0c88d422bb85d2d ;
 	rdf:first "review" .
-_:dc8250b7c10dac12fa40496fdf1fc535 rdf:rest rdf:nil ;
+_:f75e17504209310fd0c88d422bb85d2d rdf:rest rdf:nil ;
 	rdf:first "approved" .
-_:a9a4f701637d46f5716566e01775758e sh:message "Capability status metadata must be one of draft, review, or approved." .
-reqvire:CapabilityGovernanceShape sh:property _:a9a4f701637d46f5716566e01775758e .
-_:b724a7009b93ef30e40fed7ed66dd1c4 sh:path reqvire:priority ;
+_:ad5664c7da65c14a41d8e18e808c2896 sh:message "Capability status metadata must be one of draft, review, or approved." .
+reqvire:CapabilityGovernanceShape sh:property _:ad5664c7da65c14a41d8e18e808c2896 .
+_:d319309fe8abd50c0ec14e4e4f2829b3 sh:path reqvire:priority ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:c65da5d8736d9fd709a4cf7ae69de02a .
-_:c65da5d8736d9fd709a4cf7ae69de02a rdf:rest _:ad93ac7ea8664c3a0980beac926b3e09 ;
+	sh:in _:c584609c505d355a3a86659991104281 .
+_:c584609c505d355a3a86659991104281 rdf:rest _:e5ae3018c1c2ded04d70f8e1932f5055 ;
 	rdf:first "low" .
-_:ad93ac7ea8664c3a0980beac926b3e09 rdf:rest _:fcc4f49147dae4bc2807c8845cb154fa ;
+_:e5ae3018c1c2ded04d70f8e1932f5055 rdf:rest _:ffdfa8d1b050162ee94819c55280142d ;
 	rdf:first "medium" .
-_:fcc4f49147dae4bc2807c8845cb154fa rdf:rest _:eba888809c8ae16da8380b0bd547c399 ;
+_:ffdfa8d1b050162ee94819c55280142d rdf:rest _:a7ca2722185c8e1e64e951b7400247a4 ;
 	rdf:first "high" .
-_:eba888809c8ae16da8380b0bd547c399 rdf:rest rdf:nil ;
+_:a7ca2722185c8e1e64e951b7400247a4 rdf:rest rdf:nil ;
 	rdf:first "critical" .
-_:b724a7009b93ef30e40fed7ed66dd1c4 sh:message "Capability priority metadata must be one of low, medium, high, or critical." .
-reqvire:CapabilityGovernanceShape sh:property _:b724a7009b93ef30e40fed7ed66dd1c4 .
-_:c0f47b7f0dbebf1d96a0c003ba30b3e1 sh:path reqvire:risk ;
+_:d319309fe8abd50c0ec14e4e4f2829b3 sh:message "Capability priority metadata must be one of low, medium, high, or critical." .
+reqvire:CapabilityGovernanceShape sh:property _:d319309fe8abd50c0ec14e4e4f2829b3 .
+_:fcf14b0c40f64b361a907fd94cf98873 sh:path reqvire:risk ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:c774d331003b00ebd90f53da0dad565b .
-_:c774d331003b00ebd90f53da0dad565b rdf:rest _:a404029c10ddf8ab96133502711cdad4 ;
+	sh:in _:c030fad142c966e70c1dc8d513bf3443 .
+_:c030fad142c966e70c1dc8d513bf3443 rdf:rest _:fa8bc71c8824c7f120371f822de3bbd0 ;
 	rdf:first "low" .
-_:a404029c10ddf8ab96133502711cdad4 rdf:rest _:a847e949ecb5fcf2dbdae556ca2d353f ;
+_:fa8bc71c8824c7f120371f822de3bbd0 rdf:rest _:a7a25f497c7011008362d140f974349 ;
 	rdf:first "medium" .
-_:a847e949ecb5fcf2dbdae556ca2d353f rdf:rest _:b52671c815c592968504adc3613fe431 ;
+_:a7a25f497c7011008362d140f974349 rdf:rest _:c576500807128773746eaae6ae6afd6a ;
 	rdf:first "high" .
-_:b52671c815c592968504adc3613fe431 rdf:rest rdf:nil ;
+_:c576500807128773746eaae6ae6afd6a rdf:rest rdf:nil ;
 	rdf:first "critical" .
-_:c0f47b7f0dbebf1d96a0c003ba30b3e1 sh:message "Capability risk metadata must be one of low, medium, high, or critical." .
-reqvire:CapabilityGovernanceShape sh:property _:c0f47b7f0dbebf1d96a0c003ba30b3e1 .
-_:c66be22e23d9f82a78db6ed709c5de15 sh:path reqvire:owner ;
+_:fcf14b0c40f64b361a907fd94cf98873 sh:message "Capability risk metadata must be one of low, medium, high, or critical." .
+reqvire:CapabilityGovernanceShape sh:property _:fcf14b0c40f64b361a907fd94cf98873 .
+_:e9af09e4801e91fc844bc06143859ad8 sh:path reqvire:owner ;
 	sh:datatype xsd:string ;
 	sh:maxCount 1 ;
 	sh:message "Capability owner metadata must be a single string routing label." .
-reqvire:CapabilityGovernanceShape sh:property _:c66be22e23d9f82a78db6ed709c5de15 .
+reqvire:CapabilityGovernanceShape sh:property _:e9af09e4801e91fc844bc06143859ad8 .
 reqvire:RequirementGovernanceShape a sh:NodeShape ;
 	sh:targetClass reqvire:Requirement .
-_:bf8ec757aeaca15f6e50fb14ee604a8c sh:path reqvire:status ;
+_:c5e262b8eda4571a9cefb0d824e47f9c sh:path reqvire:status ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:b426f11325fd84685382f58457f2f76 .
-_:b426f11325fd84685382f58457f2f76 rdf:rest _:fdb394bd63d1260ad2be5584f35f024e ;
+	sh:in _:ca3b9e62e4aea256aab59de5e8ea65d0 .
+_:ca3b9e62e4aea256aab59de5e8ea65d0 rdf:rest _:fc4a202e6177c05eb77560ff42affc46 ;
 	rdf:first "draft" .
-_:fdb394bd63d1260ad2be5584f35f024e rdf:rest _:c2cdc990973a3e50df33ea31ae84df5d ;
+_:fc4a202e6177c05eb77560ff42affc46 rdf:rest _:ee2d189f0c0f6331cf5c29f2f879215e ;
 	rdf:first "review" .
-_:c2cdc990973a3e50df33ea31ae84df5d rdf:rest rdf:nil ;
+_:ee2d189f0c0f6331cf5c29f2f879215e rdf:rest rdf:nil ;
 	rdf:first "approved" .
-_:bf8ec757aeaca15f6e50fb14ee604a8c sh:message "Requirement status metadata must be one of draft, review, or approved." .
-reqvire:RequirementGovernanceShape sh:property _:bf8ec757aeaca15f6e50fb14ee604a8c .
-_:d3aacc9bd8ea9bee3cde706dde19d6d sh:path reqvire:priority ;
+_:c5e262b8eda4571a9cefb0d824e47f9c sh:message "Requirement status metadata must be one of draft, review, or approved." .
+reqvire:RequirementGovernanceShape sh:property _:c5e262b8eda4571a9cefb0d824e47f9c .
+_:e0c9804b75cea7e5a9501aca6a6aae82 sh:path reqvire:priority ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:bd881e33d1dda3f330ac4d7b64e5d436 .
-_:bd881e33d1dda3f330ac4d7b64e5d436 rdf:rest _:affbc8a1143ed9d1c4e1780c533c057a ;
+	sh:in _:aa889964b10d27d339426d948436e0f3 .
+_:aa889964b10d27d339426d948436e0f3 rdf:rest _:d64d086421880a782d35541e96b7ade8 ;
 	rdf:first "low" .
-_:affbc8a1143ed9d1c4e1780c533c057a rdf:rest _:d110c218a8737402f1745ce635ade43e ;
+_:d64d086421880a782d35541e96b7ade8 rdf:rest _:e55aca3382a76daceca7d47c0602142a ;
 	rdf:first "medium" .
-_:d110c218a8737402f1745ce635ade43e rdf:rest _:f49f41eebbefbdd071b2143f255568c0 ;
+_:e55aca3382a76daceca7d47c0602142a rdf:rest _:fba33ecc9f95cb66f2d1dee6716809a0 ;
 	rdf:first "high" .
-_:f49f41eebbefbdd071b2143f255568c0 rdf:rest rdf:nil ;
+_:fba33ecc9f95cb66f2d1dee6716809a0 rdf:rest rdf:nil ;
 	rdf:first "critical" .
-_:d3aacc9bd8ea9bee3cde706dde19d6d sh:message "Requirement priority metadata must be one of low, medium, high, or critical." .
-reqvire:RequirementGovernanceShape sh:property _:d3aacc9bd8ea9bee3cde706dde19d6d .
-_:f3cbb32982e87d5624b6ce1388a81269 sh:path reqvire:risk ;
+_:e0c9804b75cea7e5a9501aca6a6aae82 sh:message "Requirement priority metadata must be one of low, medium, high, or critical." .
+reqvire:RequirementGovernanceShape sh:property _:e0c9804b75cea7e5a9501aca6a6aae82 .
+_:dd77977ee1a451fcf5c18ea8f9078182 sh:path reqvire:risk ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:deab79a41a6100b40d3520e8d808b5a4 .
-_:deab79a41a6100b40d3520e8d808b5a4 rdf:rest _:f8976f2297d7e0ff471061c06ab3d6c5 ;
+	sh:in _:d8a34e8c8e065f8a4e42b76df49307c .
+_:d8a34e8c8e065f8a4e42b76df49307c rdf:rest _:cc43cf903d75128fb96ca61ed94506f9 ;
 	rdf:first "low" .
-_:f8976f2297d7e0ff471061c06ab3d6c5 rdf:rest _:e7d812642e153bc57c6ffcb662af8042 ;
+_:cc43cf903d75128fb96ca61ed94506f9 rdf:rest _:c0baf1c195dee37f1cdf24616c0db853 ;
 	rdf:first "medium" .
-_:e7d812642e153bc57c6ffcb662af8042 rdf:rest _:e751df1457b3fe47fa386fc4a2291475 ;
+_:c0baf1c195dee37f1cdf24616c0db853 rdf:rest _:d951ac53f7d0f0d94325a3a4849ed59e ;
 	rdf:first "high" .
-_:e751df1457b3fe47fa386fc4a2291475 rdf:rest rdf:nil ;
+_:d951ac53f7d0f0d94325a3a4849ed59e rdf:rest rdf:nil ;
 	rdf:first "critical" .
-_:f3cbb32982e87d5624b6ce1388a81269 sh:message "Requirement risk metadata must be one of low, medium, high, or critical." .
-reqvire:RequirementGovernanceShape sh:property _:f3cbb32982e87d5624b6ce1388a81269 .
-_:ddb9b6b4d047d3311860a77a8ea66de7 sh:path reqvire:owner ;
+_:dd77977ee1a451fcf5c18ea8f9078182 sh:message "Requirement risk metadata must be one of low, medium, high, or critical." .
+reqvire:RequirementGovernanceShape sh:property _:dd77977ee1a451fcf5c18ea8f9078182 .
+_:efde6bb87fc839e9d948d0afa7dbb1e6 sh:path reqvire:owner ;
 	sh:datatype xsd:string ;
 	sh:maxCount 1 ;
 	sh:message "Requirement owner metadata must be a single string routing label." .
-reqvire:RequirementGovernanceShape sh:property _:ddb9b6b4d047d3311860a77a8ea66de7 .
+reqvire:RequirementGovernanceShape sh:property _:efde6bb87fc839e9d948d0afa7dbb1e6 .
 reqvire:NonGovernanceElementShape a sh:NodeShape ;
 	sh:targetClass reqvire:Contract , reqvire:Verification , reqvire:Ontology , reqvire:CustomElement .
-_:a6308fd8703e090b0542ea5c803636e1 sh:path reqvire:status ;
+_:ab97ef11465fbdc7b7b5944743a560dd sh:path reqvire:status ;
 	sh:maxCount 0 ;
 	sh:message "Governance status metadata may be authored only by capability or requirement elements." .
-reqvire:NonGovernanceElementShape sh:property _:a6308fd8703e090b0542ea5c803636e1 .
-_:be298885f1d5685653a1aa68e935fc9a sh:path reqvire:priority ;
+reqvire:NonGovernanceElementShape sh:property _:ab97ef11465fbdc7b7b5944743a560dd .
+_:ba690195c7aa93ba4bf2c04ee4cc96c sh:path reqvire:priority ;
 	sh:maxCount 0 ;
 	sh:message "Governance priority metadata may be authored only by capability or requirement elements." .
-reqvire:NonGovernanceElementShape sh:property _:be298885f1d5685653a1aa68e935fc9a .
-_:eb1f998cf9fbbeca27988df40cb15647 sh:path reqvire:risk ;
+reqvire:NonGovernanceElementShape sh:property _:ba690195c7aa93ba4bf2c04ee4cc96c .
+_:ba8c06260ca82cb50a67d1b7138dca1f sh:path reqvire:risk ;
 	sh:maxCount 0 ;
 	sh:message "Governance risk metadata may be authored only by capability or requirement elements." .
-reqvire:NonGovernanceElementShape sh:property _:eb1f998cf9fbbeca27988df40cb15647 .
-_:c7d66977099c4bef01c24eeb667ee4af sh:path reqvire:owner ;
+reqvire:NonGovernanceElementShape sh:property _:ba8c06260ca82cb50a67d1b7138dca1f .
+_:ae7fcbd91cac66a291004a1a3b0e5dad sh:path reqvire:owner ;
 	sh:maxCount 0 ;
 	sh:message "Governance owner metadata may be authored only by capability or requirement elements." .
-reqvire:NonGovernanceElementShape sh:property _:c7d66977099c4bef01c24eeb667ee4af .
+reqvire:NonGovernanceElementShape sh:property _:ae7fcbd91cac66a291004a1a3b0e5dad .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/Integration.md#source-marker-traceability-shape
@@ -679,36 +679,36 @@ reqvire:NonGovernanceElementShape sh:property _:c7d66977099c4bef01c24eeb667ee4af
 
 reqvire:TraceabilityRelationKindShape a sh:NodeShape ;
 	sh:targetClass reqvire:TraceabilityRelationKind .
-_:cd07f74e1f554a8133c2e175a0715238 sh:path reqvire:traceabilityRelationKindName ;
+_:c1f9f757c359911db23c9d43a47de9f0 sh:path reqvire:traceabilityRelationKindName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:fe8e4b58d391edb850e00e0b10e9d7b1 .
-_:fe8e4b58d391edb850e00e0b10e9d7b1 rdf:rest rdf:nil ;
+	sh:in _:f832df1b496225d0587dc1a30e75fea .
+_:f832df1b496225d0587dc1a30e75fea rdf:rest rdf:nil ;
 	rdf:first "satisfies" .
-_:cd07f74e1f554a8133c2e175a0715238 sh:message "Traceability relation kinds must use a supported code marker relation token." .
-reqvire:TraceabilityRelationKindShape sh:property _:cd07f74e1f554a8133c2e175a0715238 .
+_:c1f9f757c359911db23c9d43a47de9f0 sh:message "Traceability relation kinds must use a supported code marker relation token." .
+reqvire:TraceabilityRelationKindShape sh:property _:c1f9f757c359911db23c9d43a47de9f0 .
 reqvire:CommentStyleKindShape a sh:NodeShape ;
 	sh:targetClass reqvire:CommentStyleKind .
-_:b47150ef56340d5e01350262e257d853 sh:path reqvire:commentStyleName ;
+_:d4143163de50d34178cdb5ec86408d8f sh:path reqvire:commentStyleName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:a6bfdd1afc6887a8b51e46772b00ed93 .
-_:a6bfdd1afc6887a8b51e46772b00ed93 rdf:rest _:f9d027ca37b74134810c681df0e981cb ;
+	sh:in _:fe6d7dd8d96327c2ba6332a2920f7d06 .
+_:fe6d7dd8d96327c2ba6332a2920f7d06 rdf:rest _:ecccd3f4cbb695efa11d79e8fe5da16a ;
 	rdf:first "hash-line" .
-_:f9d027ca37b74134810c681df0e981cb rdf:rest _:d41b833a7f234ae366ca819fac0017fc ;
+_:ecccd3f4cbb695efa11d79e8fe5da16a rdf:rest _:a30b067eea68bc55760c08b53cf8cce7 ;
 	rdf:first "slash-line" .
-_:d41b833a7f234ae366ca819fac0017fc rdf:rest _:bd5aeb2472a5069cf4d2179f8b19166a ;
+_:a30b067eea68bc55760c08b53cf8cce7 rdf:rest _:e8cb8e5bacebd69f86962f910020a6b5 ;
 	rdf:first "dash-line" .
-_:bd5aeb2472a5069cf4d2179f8b19166a rdf:rest _:be3c610d8244788f9c251e82c169340f ;
+_:e8cb8e5bacebd69f86962f910020a6b5 rdf:rest _:afde2b178228e28f5f1a194b25edd0e8 ;
 	rdf:first "batch-line" .
-_:be3c610d8244788f9c251e82c169340f rdf:rest _:fe1ff17c53b618787b66fe763e88702b ;
+_:afde2b178228e28f5f1a194b25edd0e8 rdf:rest _:f0dff819345e493392ebc9676f572a5e ;
 	rdf:first "css-block" .
-_:fe1ff17c53b618787b66fe763e88702b rdf:rest rdf:nil ;
+_:f0dff819345e493392ebc9676f572a5e rdf:rest rdf:nil ;
 	rdf:first "xml-block" .
-_:b47150ef56340d5e01350262e257d853 sh:message "Comment style kinds must use a supported source marker comment style token." .
-reqvire:CommentStyleKindShape sh:property _:b47150ef56340d5e01350262e257d853 .
+_:d4143163de50d34178cdb5ec86408d8f sh:message "Comment style kinds must use a supported source marker comment style token." .
+reqvire:CommentStyleKindShape sh:property _:d4143163de50d34178cdb5ec86408d8f .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/RelationsAndImpact.md#change-impact-analysis-shape
@@ -719,187 +719,187 @@ reqvire:CommentStyleKindShape sh:property _:b47150ef56340d5e01350262e257d853 .
 
 reqvire:ChangeImpactAnalysisShape a sh:NodeShape ;
 	sh:targetClass reqvire:ChangeImpactAnalysis .
-_:d3fd177f37529a1558acb1b38608e8b6 sh:path reqvire:changedElement ;
+_:b68e8496fa2e69429c7a31b8aa9f14f3 sh:path reqvire:changedElement ;
 	sh:minCount 1 ;
 	sh:class reqvire:Element .
-reqvire:ChangeImpactAnalysisShape sh:property _:d3fd177f37529a1558acb1b38608e8b6 .
-_:ca94ac04e7b42fa3e62e8bfc151d92db sh:path reqvire:impactedElement ;
+reqvire:ChangeImpactAnalysisShape sh:property _:b68e8496fa2e69429c7a31b8aa9f14f3 .
+_:a07063a2583e2064acf0974f71b74665 sh:path reqvire:impactedElement ;
 	sh:class reqvire:Element .
-reqvire:ChangeImpactAnalysisShape sh:property _:ca94ac04e7b42fa3e62e8bfc151d92db .
-_:db9685956b22ab8d0e25cb798623bb27 sh:path reqvire:impactPath ;
+reqvire:ChangeImpactAnalysisShape sh:property _:a07063a2583e2064acf0974f71b74665 .
+_:cf48d1a4053c8f0ab5980edba68e6264 sh:path reqvire:impactPath ;
 	sh:class reqvire:ChangeImpactPath .
-reqvire:ChangeImpactAnalysisShape sh:property _:db9685956b22ab8d0e25cb798623bb27 .
-_:cae980c707984b281fe8940a8384258b sh:path reqvire:requiresReview ;
+reqvire:ChangeImpactAnalysisShape sh:property _:cf48d1a4053c8f0ab5980edba68e6264 .
+_:c83875b0a7c2775b6b16b8bb5cf0f29d sh:path reqvire:requiresReview ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:boolean .
-reqvire:ChangeImpactAnalysisShape sh:property _:cae980c707984b281fe8940a8384258b .
+reqvire:ChangeImpactAnalysisShape sh:property _:c83875b0a7c2775b6b16b8bb5cf0f29d .
 reqvire:ChangeImpactPathShape a sh:NodeShape ;
 	sh:targetClass reqvire:ChangeImpactPath .
-_:d9b23c0ca1b7da7820e67240ecc24520 sh:path reqvire:impactEdge ;
+_:f6393e3e03906aca097e015a8d7e39ab sh:path reqvire:impactEdge ;
 	sh:class reqvire:ChangeImpactEdge .
-reqvire:ChangeImpactPathShape sh:property _:d9b23c0ca1b7da7820e67240ecc24520 .
+reqvire:ChangeImpactPathShape sh:property _:f6393e3e03906aca097e015a8d7e39ab .
 reqvire:ChangeImpactEdgeShape a sh:NodeShape ;
 	sh:targetClass reqvire:ChangeImpactEdge .
-_:b565a39264f495c109db23d517c6bfda sh:path reqvire:impactRelation ;
+_:d91b1c787eb0d95b9e981a041546069c sh:path reqvire:impactRelation ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ChangeImpactEdgeShape sh:property _:b565a39264f495c109db23d517c6bfda .
-_:cec78f0281af0417d5f2c70cdd73ca8 sh:path reqvire:impactDirection ;
+reqvire:ChangeImpactEdgeShape sh:property _:d91b1c787eb0d95b9e981a041546069c .
+_:c52540729cf3b7cb57a7dce41a4f7a67 sh:path reqvire:impactDirection ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:f5f115c06d139f2e1184ad9ba862fd0 .
-_:f5f115c06d139f2e1184ad9ba862fd0 rdf:rest _:b8c93a9788ee7dd92e458e89cbceff66 ;
+	sh:in _:c2c09cba0ac89cc122484898dbc85db0 .
+_:c2c09cba0ac89cc122484898dbc85db0 rdf:rest _:b6ca801c8d389f13a6a9a7b7fac840b9 ;
 	rdf:first "upstream" .
-_:b8c93a9788ee7dd92e458e89cbceff66 rdf:rest _:bb5f19dbd22809d413e37e3d914800ed ;
+_:b6ca801c8d389f13a6a9a7b7fac840b9 rdf:rest _:c61265a0524f131a73705f251997976c ;
 	rdf:first "downstream" .
-_:bb5f19dbd22809d413e37e3d914800ed rdf:rest rdf:nil ;
+_:c61265a0524f131a73705f251997976c rdf:rest rdf:nil ;
 	rdf:first "bidirectional" .
-reqvire:ChangeImpactEdgeShape sh:property _:cec78f0281af0417d5f2c70cdd73ca8 .
-_:e8f21c8392c17f8a165c687fe067db2 sh:path reqvire:impactReason ;
+reqvire:ChangeImpactEdgeShape sh:property _:c52540729cf3b7cb57a7dce41a4f7a67 .
+_:dc3c31c2d0407040329521547b105aeb sh:path reqvire:impactReason ;
 	sh:datatype xsd:string .
-reqvire:ChangeImpactEdgeShape sh:property _:e8f21c8392c17f8a165c687fe067db2 .
+reqvire:ChangeImpactEdgeShape sh:property _:dc3c31c2d0407040329521547b105aeb .
 reqvire:SemanticDependencyShape a sh:NodeShape ;
 	sh:targetClass reqvire:SemanticDependency .
-_:af3e298b2e10a7722ab57b72ad69c091 sh:path reqvire:semanticDependency ;
+_:fcf99048d3dda06b93fa9f6fcb9a492a sh:path reqvire:semanticDependency ;
 	sh:class reqvire:SemanticContract .
-reqvire:SemanticDependencyShape sh:property _:af3e298b2e10a7722ab57b72ad69c091 .
-_:af9963807565b42d9d5b882236f05903 sh:path reqvire:dependencyResolution ;
+reqvire:SemanticDependencyShape sh:property _:fcf99048d3dda06b93fa9f6fcb9a492a .
+_:f99aaeedfcafb278c7fb8f451c6f6b69 sh:path reqvire:dependencyResolution ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:c3cec42889a89bdc4eaa685d9f0e02f4 .
-_:c3cec42889a89bdc4eaa685d9f0e02f4 rdf:rest _:d36449a6434c3bfae672917dc56d2f2e ;
+	sh:in _:b44a2495841242e710c3babcb0227f1c .
+_:b44a2495841242e710c3babcb0227f1c rdf:rest _:a64adb789c32c91778aac9cb8f0780ae ;
 	rdf:first "native" .
-_:d36449a6434c3bfae672917dc56d2f2e rdf:rest _:ce10965ba2d7c4a03e008e5c4bdc4c92 ;
+_:a64adb789c32c91778aac9cb8f0780ae rdf:rest _:ea0cb2af43614a1ff632d68fe4872d8a ;
 	rdf:first "reused" .
-_:ce10965ba2d7c4a03e008e5c4bdc4c92 rdf:rest _:d28fbbfd236ecc104e0f12a4db027822 ;
+_:ea0cb2af43614a1ff632d68fe4872d8a rdf:rest _:a0bb87091fc349d7232ebdfba818a994 ;
 	rdf:first "not-found" .
-_:d28fbbfd236ecc104e0f12a4db027822 rdf:rest rdf:nil ;
+_:a0bb87091fc349d7232ebdfba818a994 rdf:rest rdf:nil ;
 	rdf:first "found-outside-context" .
-reqvire:SemanticDependencyShape sh:property _:af9963807565b42d9d5b882236f05903 .
+reqvire:SemanticDependencyShape sh:property _:f99aaeedfcafb278c7fb8f451c6f6b69 .
 reqvire:ImpactReviewShape a sh:NodeShape ;
 	sh:targetClass reqvire:ImpactReview .
-_:dae90030c475c42cdbfcf4fd2a4f53ac sh:path reqvire:reviewedByVerification ;
+_:a861a43028fcbf1b432b205a6d4cc97 sh:path reqvire:reviewedByVerification ;
 	sh:class reqvire:Verification .
-reqvire:ImpactReviewShape sh:property _:dae90030c475c42cdbfcf4fd2a4f53ac .
-_:f500f3012c3193efa64c68d2a2f224d0 sh:path reqvire:impactScope ;
+reqvire:ImpactReviewShape sh:property _:a861a43028fcbf1b432b205a6d4cc97 .
+_:e4312fb122f2a5b7a9bcad6a46ea0043 sh:path reqvire:impactScope ;
 	sh:datatype xsd:string .
-reqvire:ImpactReviewShape sh:property _:f500f3012c3193efa64c68d2a2f224d0 .
-_:dfe56637cccaf38252a98a031451111 sh:path reqvire:impactSeverity ;
+reqvire:ImpactReviewShape sh:property _:e4312fb122f2a5b7a9bcad6a46ea0043 .
+_:adb928565af24692154550f67521a985 sh:path reqvire:impactSeverity ;
 	sh:datatype xsd:string .
-reqvire:ImpactReviewShape sh:property _:dfe56637cccaf38252a98a031451111 .
+reqvire:ImpactReviewShape sh:property _:adb928565af24692154550f67521a985 .
 reqvire:ChangePropagationRuleShape a sh:NodeShape ;
 	sh:targetClass reqvire:ChangePropagationRule .
-_:d1dded55249946a8c35e329db53946a sh:path reqvire:changeRuleName ;
+_:dfcfa9d85c0157c5a29f4e80c0b6e665 sh:path reqvire:changeRuleName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:ee8df0c34a31712b26afee027c59152f .
-_:ee8df0c34a31712b26afee027c59152f rdf:rest _:f83b3d7dfdb5c0a7fb971fff3940da22 ;
+	sh:in _:a30b2e38264a1ea4f5b8bba583c5cde2 .
+_:a30b2e38264a1ea4f5b8bba583c5cde2 rdf:rest _:f681cbda9b309304dfc53e5dcc5946f9 ;
 	rdf:first "parent-to-child-impact" .
-_:f83b3d7dfdb5c0a7fb971fff3940da22 rdf:rest _:b9353930b764e6f217d63af0bfd9fe69 ;
+_:f681cbda9b309304dfc53e5dcc5946f9 rdf:rest _:e11c062739d60347a95340f3fca9beb3 ;
 	rdf:first "capability-to-specified-requirement-impact" .
-_:b9353930b764e6f217d63af0bfd9fe69 rdf:rest _:e683d4dcf67938f9a96de5afd4038187 ;
+_:e11c062739d60347a95340f3fca9beb3 rdf:rest _:ca922633cd236a566da8007c54757fd6 ;
 	rdf:first "requirement-to-implementation-impact" .
-_:e683d4dcf67938f9a96de5afd4038187 rdf:rest _:b448534bb579b30ba1d5193402979c73 ;
+_:ca922633cd236a566da8007c54757fd6 rdf:rest _:f2a86c60aa7afad468fa62956c4b9d8e ;
 	rdf:first "requirement-to-verification-impact" .
-_:b448534bb579b30ba1d5193402979c73 rdf:rest _:d9c928255e9a396caa0520804cba6df ;
+_:f2a86c60aa7afad468fa62956c4b9d8e rdf:rest _:f5d9e7bec8be7be559d1d7043ac13f34 ;
 	rdf:first "owner-to-contract-impact" .
-_:d9c928255e9a396caa0520804cba6df rdf:rest _:f9766172db29e1e53e6caaae72d9bc54 ;
+_:f5d9e7bec8be7be559d1d7043ac13f34 rdf:rest _:c6294709a0b884799821939bed0bb5fc ;
 	rdf:first "ontology-to-semantic-contract-impact" .
-_:f9766172db29e1e53e6caaae72d9bc54 rdf:rest _:b89e4959b4d1e9cece1e08d04918c8b4 ;
+_:c6294709a0b884799821939bed0bb5fc rdf:rest _:eb08ca461693d7c25a80908d6b9bb00 ;
 	rdf:first "semantic-contract-to-requirement-impact" .
-_:b89e4959b4d1e9cece1e08d04918c8b4 rdf:rest _:c509997b8bec00917485bf0943921971 ;
+_:eb08ca461693d7c25a80908d6b9bb00 rdf:rest _:c5cdd2bbceb92e0a80436852f79a84f6 ;
 	rdf:first "semantic-contract-ontology-use-dependency" .
-_:c509997b8bec00917485bf0943921971 rdf:rest _:afa89a826dd492522005d7744bc06070 ;
+_:c5cdd2bbceb92e0a80436852f79a84f6 rdf:rest _:c72eb169ae51e7c9642d81b2a73166a7 ;
 	rdf:first "concept-reference-dependency" .
-_:afa89a826dd492522005d7744bc06070 rdf:rest _:cc812c3d12bcc2f6a55db0e2e7f12a33 ;
+_:c72eb169ae51e7c9642d81b2a73166a7 rdf:rest _:a7b9b6094ff814600b72eedd12910231 ;
 	rdf:first "maps-to-concept-impact" .
-_:cc812c3d12bcc2f6a55db0e2e7f12a33 rdf:rest _:cf14c92538272cfc5163a5036084b324 ;
+_:a7b9b6094ff814600b72eedd12910231 rdf:rest _:f8f12c76902f99b954830f9be1ae8a3b ;
 	rdf:first "requirement-to-semantic-contract-review" .
-_:cf14c92538272cfc5163a5036084b324 rdf:rest _:e599af8c25eb0a3ba1c7666239800be ;
+_:f8f12c76902f99b954830f9be1ae8a3b rdf:rest _:d761b269debfe6d27f8a74b12832e8e1 ;
 	rdf:first "contract-bindings-content-impact" .
-_:e599af8c25eb0a3ba1c7666239800be rdf:rest _:bc0a8bc6d1eda0ec630e0dc5b70524fe ;
+_:d761b269debfe6d27f8a74b12832e8e1 rdf:rest _:d30d29691137a74337b347488cf165b1 ;
 	rdf:first "semantic-reference-reachability" .
-_:bc0a8bc6d1eda0ec630e0dc5b70524fe rdf:rest rdf:nil ;
+_:d30d29691137a74337b347488cf165b1 rdf:rest rdf:nil ;
 	rdf:first "relocation-without-content-change" .
-reqvire:ChangePropagationRuleShape sh:property _:d1dded55249946a8c35e329db53946a .
-_:c54aae17921453ba01cb9b6f87fa285d sh:path reqvire:changedThing ;
+reqvire:ChangePropagationRuleShape sh:property _:dfcfa9d85c0157c5a29f4e80c0b6e665 .
+_:b89315d6d1c9d5446fd1e7475853c5de sh:path reqvire:changedThing ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ChangePropagationRuleShape sh:property _:c54aae17921453ba01cb9b6f87fa285d .
-_:edde25453fb59fc30522d13052d8646b sh:path reqvire:propagationTarget ;
+reqvire:ChangePropagationRuleShape sh:property _:b89315d6d1c9d5446fd1e7475853c5de .
+_:c76f397d073822574daadc76f7a7142 sh:path reqvire:propagationTarget ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ChangePropagationRuleShape sh:property _:edde25453fb59fc30522d13052d8646b .
-_:ee7b2a4f124672603440d32ecd4a61e2 sh:path reqvire:propagationMode ;
+reqvire:ChangePropagationRuleShape sh:property _:c76f397d073822574daadc76f7a7142 .
+_:ba53cae9a37fff2f0fd5eeb56a53591a sh:path reqvire:propagationMode ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ChangePropagationRuleShape sh:property _:ee7b2a4f124672603440d32ecd4a61e2 .
-_:ad392b4abdcce36547bc1762f370c4c0 sh:path reqvire:impactRelation ;
+reqvire:ChangePropagationRuleShape sh:property _:ba53cae9a37fff2f0fd5eeb56a53591a .
+_:e03b12794e8ac5395d922cae40456040 sh:path reqvire:impactRelation ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ChangePropagationRuleShape sh:property _:ad392b4abdcce36547bc1762f370c4c0 .
-_:a387cc9409e7dc98dedc50056afb4e8f sh:path reqvire:impactDirection ;
+reqvire:ChangePropagationRuleShape sh:property _:e03b12794e8ac5395d922cae40456040 .
+_:db58e72f3156cab3ebcd107d717816cd sh:path reqvire:impactDirection ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:eaea02ff1c10401f4d65d6a3e2d24666 .
-_:eaea02ff1c10401f4d65d6a3e2d24666 rdf:rest _:b73ff111b179f30547aeb560eb6f6ca2 ;
+	sh:in _:e09bfa2348f72290fccdfb71e3d5decf .
+_:e09bfa2348f72290fccdfb71e3d5decf rdf:rest _:eeeede66841b186870187300eb9b3db5 ;
 	rdf:first "upstream" .
-_:b73ff111b179f30547aeb560eb6f6ca2 rdf:rest _:aa7a7234bc53bd022c8864f90efe7666 ;
+_:eeeede66841b186870187300eb9b3db5 rdf:rest _:e379c8e6d3e4f12ca9d01fde647be15 ;
 	rdf:first "downstream" .
-_:aa7a7234bc53bd022c8864f90efe7666 rdf:rest _:af0a7609f925c6f06298576f1d3930be ;
+_:e379c8e6d3e4f12ca9d01fde647be15 rdf:rest _:b025a04f241dca33776b3251746eb3b1 ;
 	rdf:first "bidirectional" .
-_:af0a7609f925c6f06298576f1d3930be rdf:rest rdf:nil ;
+_:b025a04f241dca33776b3251746eb3b1 rdf:rest rdf:nil ;
 	rdf:first "none" .
-reqvire:ChangePropagationRuleShape sh:property _:a387cc9409e7dc98dedc50056afb4e8f .
-_:a5e2a56dc54de6502536c8416d677bdf sh:path reqvire:impactReason ;
+reqvire:ChangePropagationRuleShape sh:property _:db58e72f3156cab3ebcd107d717816cd .
+_:b66232b6b471a00df6cbdd0da09a1573 sh:path reqvire:impactReason ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ChangePropagationRuleShape sh:property _:a5e2a56dc54de6502536c8416d677bdf .
+reqvire:ChangePropagationRuleShape sh:property _:b66232b6b471a00df6cbdd0da09a1573 .
 reqvire:ChangeKindShape a sh:NodeShape ;
 	sh:targetClass reqvire:ChangeKind .
-_:abc59796c97732ae462f4b1af8ec3da4 sh:path reqvire:changeKindName ;
+_:eaba7dc6480e0e6f9aee3f4bedbc24ea sh:path reqvire:changeKindName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:d5ec308de340a2bb7c4fc7d0feb0b626 .
-_:d5ec308de340a2bb7c4fc7d0feb0b626 rdf:rest _:da2f7c2c428220ee0953358526402f49 ;
+	sh:in _:d6f7ab7aed4b01be3d192ce989066730 .
+_:d6f7ab7aed4b01be3d192ce989066730 rdf:rest _:bfbfe79a6f82790ad5198167928bd528 ;
 	rdf:first "content-change" .
-_:da2f7c2c428220ee0953358526402f49 rdf:rest _:fc8a6f26ea511da2ab1c5f09b4362a9d ;
+_:bfbfe79a6f82790ad5198167928bd528 rdf:rest _:baa94586f3e5294ed06143ba43d123e ;
 	rdf:first "addition" .
-_:fc8a6f26ea511da2ab1c5f09b4362a9d rdf:rest _:cb65e378425e6264136a8494caafd10c ;
+_:baa94586f3e5294ed06143ba43d123e rdf:rest _:f791cbc63b578202647b144a6cbea166 ;
 	rdf:first "removal" .
-_:cb65e378425e6264136a8494caafd10c rdf:rest _:b4fee17e5aa3c02b59e22601b101b77a ;
+_:f791cbc63b578202647b144a6cbea166 rdf:rest _:fab4d736454106a70fbe80d76b0d1af9 ;
 	rdf:first "relocation" .
-_:b4fee17e5aa3c02b59e22601b101b77a rdf:rest rdf:nil ;
+_:fab4d736454106a70fbe80d76b0d1af9 rdf:rest rdf:nil ;
 	rdf:first "contract-bindings-content-change" .
-reqvire:ChangeKindShape sh:property _:abc59796c97732ae462f4b1af8ec3da4 .
-_:f1a1183632b6ab0d827c4c4e2aaf1b81 sh:path reqvire:changeKindMeaning ;
+reqvire:ChangeKindShape sh:property _:eaba7dc6480e0e6f9aee3f4bedbc24ea .
+_:fb7a60455be877916996d6311e97f1a5 sh:path reqvire:changeKindMeaning ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ChangeKindShape sh:property _:f1a1183632b6ab0d827c4c4e2aaf1b81 .
+reqvire:ChangeKindShape sh:property _:fb7a60455be877916996d6311e97f1a5 .
 reqvire:ImpactClassificationShape a sh:NodeShape ;
 	sh:targetClass reqvire:ImpactClassification .
-_:aa3488c959edbb0cba172e64163b8417 sh:path reqvire:impactClassificationName ;
+_:fa86a48f7b7ac517abd4c0b38fbfd322 sh:path reqvire:impactClassificationName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:fb9d83cc3a25a21a4135d461f94bd990 .
-_:fb9d83cc3a25a21a4135d461f94bd990 rdf:rest _:d20d1ac8b2662462614bb25e532b213b ;
+	sh:in _:ea6b29de5058b036187e32a26cffc8eb .
+_:ea6b29de5058b036187e32a26cffc8eb rdf:rest _:ea14e87be4ec9593c8c2c71f9b1a6434 ;
 	rdf:first "direct" .
-_:d20d1ac8b2662462614bb25e532b213b rdf:rest _:aad5ce8fb4293fcc4dfb817783103e41 ;
+_:ea14e87be4ec9593c8c2c71f9b1a6434 rdf:rest _:defc8dd78f474072e852fcbef50c30f5 ;
 	rdf:first "indirect" .
-_:aad5ce8fb4293fcc4dfb817783103e41 rdf:rest rdf:nil ;
+_:defc8dd78f474072e852fcbef50c30f5 rdf:rest rdf:nil ;
 	rdf:first "potential" .
-reqvire:ImpactClassificationShape sh:property _:aa3488c959edbb0cba172e64163b8417 .
-_:b03b0e58134191597ea6e116596fa997 sh:path reqvire:impactClassificationMeaning ;
+reqvire:ImpactClassificationShape sh:property _:fa86a48f7b7ac517abd4c0b38fbfd322 .
+_:e700195c9c2a74c5e829666f8f84b3e4 sh:path reqvire:impactClassificationMeaning ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ImpactClassificationShape sh:property _:b03b0e58134191597ea6e116596fa997 .
+reqvire:ImpactClassificationShape sh:property _:e700195c9c2a74c5e829666f8f84b3e4 .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/RelationsAndImpact.md#relation-compatibility-shape
@@ -910,498 +910,498 @@ reqvire:ImpactClassificationShape sh:property _:b03b0e58134191597ea6e116596fa997
 
 reqvire:CapabilityRelationShape a sh:NodeShape ;
 	sh:targetClass reqvire:Capability .
-_:e0f6076fa2640973bae447d9e5c517b1 sh:path reqvire:derive ;
+_:ff6ad9d94bcba335bcab296230857840 sh:path reqvire:derive ;
 	sh:class reqvire:Capability .
-reqvire:CapabilityRelationShape sh:property _:e0f6076fa2640973bae447d9e5c517b1 .
-_:e2facc58fa90f4dc2b92a0353fc300b7 sh:path reqvire:derivedFrom ;
+reqvire:CapabilityRelationShape sh:property _:ff6ad9d94bcba335bcab296230857840 .
+_:ac21580721459da1cedbba5c51d2553e sh:path reqvire:derivedFrom ;
 	sh:class reqvire:Capability .
-reqvire:CapabilityRelationShape sh:property _:e2facc58fa90f4dc2b92a0353fc300b7 .
-_:cae164f4cb9372dbaccf46703707b10e sh:path reqvire:specifiedBy ;
+reqvire:CapabilityRelationShape sh:property _:ac21580721459da1cedbba5c51d2553e .
+_:ea0a943c76f9fe4ed78e56966968e138 sh:path reqvire:specifiedBy ;
 	sh:class reqvire:Requirement .
-reqvire:CapabilityRelationShape sh:property _:cae164f4cb9372dbaccf46703707b10e .
-_:b532ec02dc95026c558cf078d6f5f86f sh:path reqvire:verifiedBy ;
+reqvire:CapabilityRelationShape sh:property _:ea0a943c76f9fe4ed78e56966968e138 .
+_:b48242499e9fc87baa2e2e5c59b86805 sh:path reqvire:verifiedBy ;
 	sh:class reqvire:ConcreteVerification .
-reqvire:CapabilityRelationShape sh:property _:b532ec02dc95026c558cf078d6f5f86f .
-_:cf500dde0371de2a963122f085b5c7d9 sh:path reqvire:satisfiedBy ;
+reqvire:CapabilityRelationShape sh:property _:b48242499e9fc87baa2e2e5c59b86805 .
+_:b28b98261782f4d1a89fc6f2185e768b sh:path reqvire:satisfiedBy ;
 	sh:maxCount 0 .
-reqvire:CapabilityRelationShape sh:property _:cf500dde0371de2a963122f085b5c7d9 .
-_:dd2b8e1536a2e7038cd0193d4041ca3 sh:path reqvire:satisfy ;
+reqvire:CapabilityRelationShape sh:property _:b28b98261782f4d1a89fc6f2185e768b .
+_:d3c13b5880c5f3a897920f1a08bb07dd sh:path reqvire:satisfy ;
 	sh:maxCount 0 .
-reqvire:CapabilityRelationShape sh:property _:dd2b8e1536a2e7038cd0193d4041ca3 .
+reqvire:CapabilityRelationShape sh:property _:d3c13b5880c5f3a897920f1a08bb07dd .
 reqvire:RequirementRelationShape a sh:NodeShape ;
 	sh:targetClass reqvire:Requirement ;
-	sh:or _:c878d73c8c282d474ace15cb49b4070b .
-_:fe8dad74e01d85f99af80d57c231444d sh:path reqvire:specify ;
+	sh:or _:d00a04726946cb3144a59dc9ae0849c .
+_:f9a9794ef50802e9c7eb5f00330c089d sh:path reqvire:specify ;
 	sh:minCount 1 ;
 	sh:class reqvire:Capability .
-_:bb9cc732f61f052a19604fb2bff7050b sh:property _:fe8dad74e01d85f99af80d57c231444d .
-_:c878d73c8c282d474ace15cb49b4070b rdf:first _:bb9cc732f61f052a19604fb2bff7050b ;
-	rdf:rest _:d8ba8755c47c7fa4be4639d1e54d4107 .
-_:aee4c1901776ab636e186cdb5c2fed92 sh:path reqvire:derivedFrom ;
+_:d06c388c40bc5f9a67c3a7b4d086177e sh:property _:f9a9794ef50802e9c7eb5f00330c089d .
+_:d00a04726946cb3144a59dc9ae0849c rdf:first _:d06c388c40bc5f9a67c3a7b4d086177e ;
+	rdf:rest _:b8ba1cb5124b3734579eccdb5a5df174 .
+_:fc1f3d760e436e9776c0deeb3090f0ea sh:path reqvire:derivedFrom ;
 	sh:minCount 1 ;
 	sh:class reqvire:Requirement .
-_:b08a3f94a4209a8c79fa80695fa42981 sh:property _:aee4c1901776ab636e186cdb5c2fed92 .
-_:d8ba8755c47c7fa4be4639d1e54d4107 rdf:first _:b08a3f94a4209a8c79fa80695fa42981 ;
+_:c989c8e94d0f317b9c03435ef5dd92e sh:property _:fc1f3d760e436e9776c0deeb3090f0ea .
+_:b8ba1cb5124b3734579eccdb5a5df174 rdf:first _:c989c8e94d0f317b9c03435ef5dd92e ;
 	rdf:rest rdf:nil .
-_:c7f3e98e21a4df544199d21f5c64466e sh:path reqvire:derive ;
+_:fbe2e3fdf4051a6a2ae96c7338e43150 sh:path reqvire:derive ;
 	sh:class reqvire:Requirement .
-reqvire:RequirementRelationShape sh:property _:c7f3e98e21a4df544199d21f5c64466e .
-_:b2f6d8f148db65a5e59c7e1aa7767d35 sh:path reqvire:derivedFrom ;
+reqvire:RequirementRelationShape sh:property _:fbe2e3fdf4051a6a2ae96c7338e43150 .
+_:a34951d510b52647af2b3e57ea99331a sh:path reqvire:derivedFrom ;
 	sh:class reqvire:Requirement .
-reqvire:RequirementRelationShape sh:property _:b2f6d8f148db65a5e59c7e1aa7767d35 .
-_:ec0e107751705459494fea35387d7ba sh:path reqvire:specify ;
+reqvire:RequirementRelationShape sh:property _:a34951d510b52647af2b3e57ea99331a .
+_:e8e92cd7ed4258218b3dc5a6aab0057c sh:path reqvire:specify ;
 	sh:class reqvire:Capability .
-reqvire:RequirementRelationShape sh:property _:ec0e107751705459494fea35387d7ba .
-_:ae4412e3d7d18de2a16e26a18dc8455d sh:path reqvire:verifiedBy ;
+reqvire:RequirementRelationShape sh:property _:e8e92cd7ed4258218b3dc5a6aab0057c .
+_:a2d3967da59be2e575f4727cdd3b2873 sh:path reqvire:verifiedBy ;
 	sh:class reqvire:Verification .
-reqvire:RequirementRelationShape sh:property _:ae4412e3d7d18de2a16e26a18dc8455d .
-_:b4d461fd585da7cf6d5fe2ef970a2978 sh:path reqvire:satisfiedBy ;
+reqvire:RequirementRelationShape sh:property _:a2d3967da59be2e575f4727cdd3b2873 .
+_:accaa9865a1f7443e3bd474cb0cd6590 sh:path reqvire:satisfiedBy ;
 	sh:class reqvire:Artifact .
-reqvire:RequirementRelationShape sh:property _:b4d461fd585da7cf6d5fe2ef970a2978 .
-_:c12065272609e5b4ed452c9ea718b34b sh:path reqvire:satisfy ;
+reqvire:RequirementRelationShape sh:property _:accaa9865a1f7443e3bd474cb0cd6590 .
+_:d16d5c0d95d8ff34297c122c23f44963 sh:path reqvire:satisfy ;
 	sh:maxCount 0 .
-reqvire:RequirementRelationShape sh:property _:c12065272609e5b4ed452c9ea718b34b .
+reqvire:RequirementRelationShape sh:property _:d16d5c0d95d8ff34297c122c23f44963 .
 reqvire:VerificationRelationShape a sh:NodeShape ;
 	sh:targetClass reqvire:Verification .
-_:f9c0473111d8786c6504df025b8032a2 sh:path reqvire:verify ;
+_:f933a784518f2123892b718365ebaff9 sh:path reqvire:verify ;
 	sh:class reqvire:Requirement .
-reqvire:VerificationRelationShape sh:property _:f9c0473111d8786c6504df025b8032a2 .
-_:b4afd196f6004e8fa593e2ecb1ccdc90 sh:path reqvire:derivedFrom ;
+reqvire:VerificationRelationShape sh:property _:f933a784518f2123892b718365ebaff9 .
+_:f01d1cdb745d1e2505222b45c90c785d sh:path reqvire:derivedFrom ;
 	sh:maxCount 0 .
-reqvire:VerificationRelationShape sh:property _:b4afd196f6004e8fa593e2ecb1ccdc90 .
+reqvire:VerificationRelationShape sh:property _:f01d1cdb745d1e2505222b45c90c785d .
 reqvire:EvidenceBackedVerificationRelationShape a sh:NodeShape ;
 	sh:targetClass reqvire:TestVerification , reqvire:FormalProofVerification .
-_:cc9bed717706aac32c1ce2c677d7d936 sh:path reqvire:satisfiedBy ;
+_:e4ad4e6fc7cd7dcd00bc2baf458c6b2e sh:path reqvire:satisfiedBy ;
 	sh:minCount 1 ;
 	sh:class reqvire:Artifact .
-reqvire:EvidenceBackedVerificationRelationShape sh:property _:cc9bed717706aac32c1ce2c677d7d936 .
+reqvire:EvidenceBackedVerificationRelationShape sh:property _:e4ad4e6fc7cd7dcd00bc2baf458c6b2e .
 reqvire:NonEvidenceBackedVerificationRelationShape a sh:NodeShape ;
 	sh:targetClass reqvire:AnalysisVerification , reqvire:InspectionVerification , reqvire:DemonstrationVerification .
-_:fa2421cc1eb882fb84dad085d199433c sh:path reqvire:satisfiedBy ;
+_:c3b634d173f812418150162703636d51 sh:path reqvire:satisfiedBy ;
 	sh:maxCount 0 .
-reqvire:NonEvidenceBackedVerificationRelationShape sh:property _:fa2421cc1eb882fb84dad085d199433c .
-_:f6b32298ea10994bf4d16758e45c8cc7 sh:path reqvire:satisfy ;
+reqvire:NonEvidenceBackedVerificationRelationShape sh:property _:c3b634d173f812418150162703636d51 .
+_:af43ad61c7be6f451fd1d66f0260a0bf sh:path reqvire:satisfy ;
 	sh:maxCount 0 .
-reqvire:NonEvidenceBackedVerificationRelationShape sh:property _:f6b32298ea10994bf4d16758e45c8cc7 .
+reqvire:NonEvidenceBackedVerificationRelationShape sh:property _:af43ad61c7be6f451fd1d66f0260a0bf .
 reqvire:CapabilityContractBindingRejectionShape a sh:NodeShape ;
 	sh:targetClass reqvire:Capability .
-_:a12847df7cc78da116fc41accb17457e sh:path reqvire:bindsContract ;
+_:b28bb5ff2244776402c3ccf44cd05030 sh:path reqvire:bindsContract ;
 	sh:maxCount 0 .
-reqvire:CapabilityContractBindingRejectionShape sh:property _:a12847df7cc78da116fc41accb17457e .
+reqvire:CapabilityContractBindingRejectionShape sh:property _:b28bb5ff2244776402c3ccf44cd05030 .
 reqvire:RequirementContractBindingShape a sh:NodeShape ;
 	sh:targetClass reqvire:Requirement .
-_:e724367804528ecadf3e51252909f07d sh:path reqvire:bindsContract ;
-	sh:or _:b63be75add1b43fe2f9448909f1e1231 .
-_:c5d1290c52214ac4e6c970b228dae113 sh:class reqvire:Constraint .
-_:b63be75add1b43fe2f9448909f1e1231 rdf:first _:c5d1290c52214ac4e6c970b228dae113 ;
-	rdf:rest _:a946485618fffdd53d437779920d5471 .
-_:b4344ab985af4c255891275b0c30b685 sh:class reqvire:Behavior .
-_:a946485618fffdd53d437779920d5471 rdf:first _:b4344ab985af4c255891275b0c30b685 ;
-	rdf:rest _:ba8e44e9a98050aa402ed047337ea28c .
-_:db0c129f8d4803252457ccd2f6c058b sh:class reqvire:Specification .
-_:ba8e44e9a98050aa402ed047337ea28c rdf:first _:db0c129f8d4803252457ccd2f6c058b ;
-	rdf:rest _:e9f84335d2af7b8d22d1bb5f6d87e0ed .
-_:e5bf8afaffeaaa1c14ecbb5e37982200 sh:class reqvire:State .
-_:e9f84335d2af7b8d22d1bb5f6d87e0ed rdf:first _:e5bf8afaffeaaa1c14ecbb5e37982200 ;
-	rdf:rest _:ff7948caaeb338885a4876f1e07ea73b .
-_:a5cab12d15a7d6cc60c6e735962230ae sh:class reqvire:InputOutput .
-_:ff7948caaeb338885a4876f1e07ea73b rdf:first _:a5cab12d15a7d6cc60c6e735962230ae ;
+_:edb67bc9baa58ebf257f031503e04ade sh:path reqvire:bindsContract ;
+	sh:or _:f6a8e5a16590cdefc093aa05e1de7729 .
+_:d0bd756a0144cabde6609c9e684c87a2 sh:class reqvire:Constraint .
+_:f6a8e5a16590cdefc093aa05e1de7729 rdf:first _:d0bd756a0144cabde6609c9e684c87a2 ;
+	rdf:rest _:da1307112f18c8ebfdd4c4c7a8c9846b .
+_:b40dc84e15b6d13b12e1ca2c7890da2e sh:class reqvire:Behavior .
+_:da1307112f18c8ebfdd4c4c7a8c9846b rdf:first _:b40dc84e15b6d13b12e1ca2c7890da2e ;
+	rdf:rest _:d0c38c39a35dee0d0e18ec3e06df91d9 .
+_:c1527808c810c77450ba7b8f0a957f23 sh:class reqvire:Specification .
+_:d0c38c39a35dee0d0e18ec3e06df91d9 rdf:first _:c1527808c810c77450ba7b8f0a957f23 ;
+	rdf:rest _:d96983edf35b3cf806e35bc459ed565 .
+_:abad4ff8f4cdf6ecd5f6f71cc2920fff sh:class reqvire:State .
+_:d96983edf35b3cf806e35bc459ed565 rdf:first _:abad4ff8f4cdf6ecd5f6f71cc2920fff ;
+	rdf:rest _:d68bbd2ee7cb123841fddee69acedb4e .
+_:a1fea0cd5af4d026fea64fc68f071b8 sh:class reqvire:InputOutput .
+_:d68bbd2ee7cb123841fddee69acedb4e rdf:first _:a1fea0cd5af4d026fea64fc68f071b8 ;
 	rdf:rest rdf:nil .
-reqvire:RequirementContractBindingShape sh:property _:e724367804528ecadf3e51252909f07d .
+reqvire:RequirementContractBindingShape sh:property _:edb67bc9baa58ebf257f031503e04ade .
 reqvire:NonContractBindingElementShape a sh:NodeShape ;
 	sh:targetClass reqvire:Contract , reqvire:Verification , reqvire:Ontology , reqvire:CustomElement .
-_:a3d9fc550961b056a4deafdd6a9dc11a sh:path reqvire:bindsContract ;
+_:e0427a8803cead07f819c7914a1f2b2a sh:path reqvire:bindsContract ;
 	sh:maxCount 0 .
-reqvire:NonContractBindingElementShape sh:property _:a3d9fc550961b056a4deafdd6a9dc11a .
+reqvire:NonContractBindingElementShape sh:property _:e0427a8803cead07f819c7914a1f2b2a .
 reqvire:RelationPredicateLayerAssignmentShape a sh:NodeShape ;
 	sh:targetSubjectsOf reqvire:relationPredicateLayer .
-_:ed93d7f765f7e6ebbafba0e56c201eee sh:path reqvire:relationPredicateLayer ;
+_:fea241ac273d74a12905c97591fe3a60 sh:path reqvire:relationPredicateLayer ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:RelationPredicateLayer .
-reqvire:RelationPredicateLayerAssignmentShape sh:property _:ed93d7f765f7e6ebbafba0e56c201eee .
+reqvire:RelationPredicateLayerAssignmentShape sh:property _:fea241ac273d74a12905c97591fe3a60 .
 reqvire:AuthoredRelationPredicateNodeShape a sh:NodeShape .
-_:e3cbbd37c0f384f4831e62f816d21175 sh:path reqvire:relationPredicateLayer ;
+_:d53c5395dce0eb010da847d9daa726a7 sh:path reqvire:relationPredicateLayer ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:hasValue reqvire:authoredRelationLayer .
-reqvire:AuthoredRelationPredicateNodeShape sh:property _:e3cbbd37c0f384f4831e62f816d21175 .
+reqvire:AuthoredRelationPredicateNodeShape sh:property _:d53c5395dce0eb010da847d9daa726a7 .
 reqvire:NormalizedRelationPredicateNodeShape a sh:NodeShape .
-_:a90e9cfb8ec8f93846db06547dde424d sh:path reqvire:relationPredicateLayer ;
+_:d0ad78c21c7e0efd2f4fa6f2abe40d0a sh:path reqvire:relationPredicateLayer ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:hasValue reqvire:normalizedRelationLayer .
-reqvire:NormalizedRelationPredicateNodeShape sh:property _:a90e9cfb8ec8f93846db06547dde424d .
+reqvire:NormalizedRelationPredicateNodeShape sh:property _:d0ad78c21c7e0efd2f4fa6f2abe40d0a .
 reqvire:RelationRuleShape a sh:NodeShape ;
 	sh:targetClass reqvire:RelationRule ;
 	sh:closed true .
-_:c014d333bed82bcd34d063ecdf88a797 rdf:first rdf:type .
-reqvire:RelationRuleShape sh:ignoredProperties _:c014d333bed82bcd34d063ecdf88a797 .
-_:f93f51d13b443bbb4c615c748d0e9de rdf:first rdfs:label .
-_:c014d333bed82bcd34d063ecdf88a797 rdf:rest _:f93f51d13b443bbb4c615c748d0e9de .
-_:d7c49c94b89b0649edcbb352e9f9a7c2 rdf:first rdfs:comment .
-_:f93f51d13b443bbb4c615c748d0e9de rdf:rest _:d7c49c94b89b0649edcbb352e9f9a7c2 .
-_:d7c49c94b89b0649edcbb352e9f9a7c2 rdf:rest rdf:nil .
-_:d199ef93f91c445457c17eabd6dab223 sh:path reqvire:relationName ;
+_:bd0066a5721e3a6be50cd6f5fddac9e4 rdf:first rdf:type .
+reqvire:RelationRuleShape sh:ignoredProperties _:bd0066a5721e3a6be50cd6f5fddac9e4 .
+_:c62efcf5c93941a1d523a63e340644d9 rdf:first rdfs:label .
+_:bd0066a5721e3a6be50cd6f5fddac9e4 rdf:rest _:c62efcf5c93941a1d523a63e340644d9 .
+_:c0db6b160c98f98e40d0f9935a49b8bd rdf:first rdfs:comment .
+_:c62efcf5c93941a1d523a63e340644d9 rdf:rest _:c0db6b160c98f98e40d0f9935a49b8bd .
+_:c0db6b160c98f98e40d0f9935a49b8bd rdf:rest rdf:nil .
+_:e0a0052199762b3b387f4ea9fbbe912b sh:path reqvire:relationName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:e53c1de142348d0ae0cbc744c1a04334 .
-_:e53c1de142348d0ae0cbc744c1a04334 rdf:rest _:a83bbd4d3527b0de8d30a7be31b6f5f2 ;
+	sh:in _:feddc8e83482796f85b8440c5dc8b84e .
+_:feddc8e83482796f85b8440c5dc8b84e rdf:rest _:d9dd335adeb2451f5164b12bc09ca6ba ;
 	rdf:first "derive" .
-_:a83bbd4d3527b0de8d30a7be31b6f5f2 rdf:rest _:a090e2c0bd352f30fd5700d17174eea9 ;
+_:d9dd335adeb2451f5164b12bc09ca6ba rdf:rest _:e7840e18cc21d8c623cb09619bf9192b ;
 	rdf:first "derivedFrom" .
-_:a090e2c0bd352f30fd5700d17174eea9 rdf:rest _:ac4e8c03f93ab54a09d6a1ab685a7c12 ;
+_:e7840e18cc21d8c623cb09619bf9192b rdf:rest _:cdf222963b832f68f760c01662cdebcd ;
 	rdf:first "specifiedBy" .
-_:ac4e8c03f93ab54a09d6a1ab685a7c12 rdf:rest _:fde3adccb4111d932ccf8ace24e23979 ;
+_:cdf222963b832f68f760c01662cdebcd rdf:rest _:d4f32f6f0b6fa8c1ec99b799f76ff285 ;
 	rdf:first "specify" .
-_:fde3adccb4111d932ccf8ace24e23979 rdf:rest _:fdaefae173c1f37d9201895383ba8fad ;
+_:d4f32f6f0b6fa8c1ec99b799f76ff285 rdf:rest _:ec5a5af59458893c3199ea4f8b465e3a ;
 	rdf:first "definedBy" .
-_:fdaefae173c1f37d9201895383ba8fad rdf:rest _:edcb04b1dc655e59032c8293edc7009e ;
+_:ec5a5af59458893c3199ea4f8b465e3a rdf:rest _:c52ccf2a49e9e8c8d6699727207f7126 ;
 	rdf:first "define" .
-_:edcb04b1dc655e59032c8293edc7009e rdf:rest _:d0eab1e8c4c200ff3c4d54a1b002457e ;
+_:c52ccf2a49e9e8c8d6699727207f7126 rdf:rest _:e09836f5b5edd51032a4f8b06e6bbfe ;
 	rdf:first "constrainedBy" .
-_:d0eab1e8c4c200ff3c4d54a1b002457e rdf:rest _:a5a7d726455d446ff9fc0d567dacc0d5 ;
+_:e09836f5b5edd51032a4f8b06e6bbfe rdf:rest _:abc1d5c99c644f71f6c0aae71bb89087 ;
 	rdf:first "constrain" .
-_:a5a7d726455d446ff9fc0d567dacc0d5 rdf:rest _:fab0bacd237af6c30d6c5a2f42146fc ;
+_:abc1d5c99c644f71f6c0aae71bb89087 rdf:rest _:a20d94190212a6a91148feb6b7be66b3 ;
 	rdf:first "use" .
-_:fab0bacd237af6c30d6c5a2f42146fc rdf:rest _:f45b043923ddbf41745578c869018078 ;
+_:a20d94190212a6a91148feb6b7be66b3 rdf:rest _:b8cba462b5055c106a35ddee06115c11 ;
 	rdf:first "usedBy" .
-_:f45b043923ddbf41745578c869018078 rdf:rest _:a249f8de811842efc08be67bdb48b03b ;
+_:b8cba462b5055c106a35ddee06115c11 rdf:rest _:cd80ec2e6acda8cd5cc6e7923ee3bb5a ;
 	rdf:first "verifiedBy" .
-_:a249f8de811842efc08be67bdb48b03b rdf:rest _:a963b83afc92bee289491899a0531952 ;
+_:cd80ec2e6acda8cd5cc6e7923ee3bb5a rdf:rest _:c2746612a80b5dba9f762e9cdc3f8e90 ;
 	rdf:first "verify" .
-_:a963b83afc92bee289491899a0531952 rdf:rest _:b855b75b35b152541b53d55e4e3dcc56 ;
+_:c2746612a80b5dba9f762e9cdc3f8e90 rdf:rest _:b078c4d1be12c429d40201606fdebc8d ;
 	rdf:first "satisfiedBy" .
-_:b855b75b35b152541b53d55e4e3dcc56 rdf:rest _:dda06b69abe13b896a8311a950636bbf ;
+_:b078c4d1be12c429d40201606fdebc8d rdf:rest _:b252b291358199a9b523da8c05dda5ed ;
 	rdf:first "satisfy" .
-_:dda06b69abe13b896a8311a950636bbf rdf:rest rdf:nil ;
+_:b252b291358199a9b523da8c05dda5ed rdf:rest rdf:nil ;
 	rdf:first "contract_bindings" .
-reqvire:RelationRuleShape sh:property _:d199ef93f91c445457c17eabd6dab223 .
-_:b1f308b0c5aeb2216678b58547dfc321 sh:path reqvire:allowedSourceType ;
+reqvire:RelationRuleShape sh:property _:e0a0052199762b3b387f4ea9fbbe912b .
+_:aa5a4703c915efa6302905c04595ce7a sh:path reqvire:allowedSourceType ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:RelationRuleShape sh:property _:b1f308b0c5aeb2216678b58547dfc321 .
-_:f56e28448d56ac254462ff17e2d6305f sh:path reqvire:allowedTargetType ;
+reqvire:RelationRuleShape sh:property _:aa5a4703c915efa6302905c04595ce7a .
+_:ef823dd89032033cf4337841f234813b sh:path reqvire:allowedTargetType ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:RelationRuleShape sh:property _:f56e28448d56ac254462ff17e2d6305f .
-_:fa456af806d9972527c480f05b14a54c sh:path reqvire:relationDirection ;
+reqvire:RelationRuleShape sh:property _:ef823dd89032033cf4337841f234813b .
+_:e23f895ed59c5352fd580e95692d3e4 sh:path reqvire:relationDirection ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:a2e51ae8bd1c5229041aa47a19532c6f .
-_:a2e51ae8bd1c5229041aa47a19532c6f rdf:rest _:f5adf6148deef4f17a7a75b620695149 ;
+	sh:in _:cdbd5f041f41715b64d2e427f30b77b0 .
+_:cdbd5f041f41715b64d2e427f30b77b0 rdf:rest _:a219054b47b2915db3ee212039f55891 ;
 	rdf:first "forward" .
-_:f5adf6148deef4f17a7a75b620695149 rdf:rest _:a2795c56e435f9460119c68cd2f1bc33 ;
+_:a219054b47b2915db3ee212039f55891 rdf:rest _:f757a68c78faa6ce04d575c2ac14ab78 ;
 	rdf:first "inverse" .
-_:a2795c56e435f9460119c68cd2f1bc33 rdf:rest rdf:nil ;
+_:f757a68c78faa6ce04d575c2ac14ab78 rdf:rest rdf:nil ;
 	rdf:first "non-directional" .
-reqvire:RelationRuleShape sh:property _:fa456af806d9972527c480f05b14a54c .
-_:a7801e7131ad45774cbd8000e3300f30 sh:path reqvire:inverseRelation ;
+reqvire:RelationRuleShape sh:property _:e23f895ed59c5352fd580e95692d3e4 .
+_:e5f578cf31b3b5802ea83de1d91c779b sh:path reqvire:inverseRelation ;
 	sh:maxCount 1 ;
 	sh:nodeKind sh:IRI ;
 	sh:node reqvire:AuthoredRelationPredicateNodeShape .
-reqvire:RelationRuleShape sh:property _:a7801e7131ad45774cbd8000e3300f30 .
-_:fe504cf77ef4897e7c4639a6b7c63636 sh:path reqvire:relationPattern ;
+reqvire:RelationRuleShape sh:property _:e5f578cf31b3b5802ea83de1d91c779b .
+_:f497a7efdeb176c65801e9c8f723e10e sh:path reqvire:relationPattern ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:RelationSemanticPattern .
-reqvire:RelationRuleShape sh:property _:fe504cf77ef4897e7c4639a6b7c63636 .
-_:ef1e23c15ac3502130deacef697baa21 sh:path reqvire:relationFamily ;
+reqvire:RelationRuleShape sh:property _:f497a7efdeb176c65801e9c8f723e10e .
+_:c52c74049795946cbf425210c4442d35 sh:path reqvire:relationFamily ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:RelationFamily .
-reqvire:RelationRuleShape sh:property _:ef1e23c15ac3502130deacef697baa21 .
-_:bb4cad794b0e4959b7e3c1ca025f587a sh:path reqvire:normalizedForwardProperty ;
+reqvire:RelationRuleShape sh:property _:c52c74049795946cbf425210c4442d35 .
+_:eefb483a775c86cb2238e3091d21d397 sh:path reqvire:normalizedForwardProperty ;
 	sh:maxCount 1 ;
 	sh:nodeKind sh:IRI ;
 	sh:node reqvire:NormalizedRelationPredicateNodeShape .
-reqvire:RelationRuleShape sh:property _:bb4cad794b0e4959b7e3c1ca025f587a .
-_:ec4046eda9ddc47c0a947ea867402092 sh:path reqvire:normalizedInverseProperty ;
+reqvire:RelationRuleShape sh:property _:eefb483a775c86cb2238e3091d21d397 .
+_:db6bcc1d49ab4135dcd1496392636b6b sh:path reqvire:normalizedInverseProperty ;
 	sh:maxCount 1 ;
 	sh:nodeKind sh:IRI ;
 	sh:node reqvire:NormalizedRelationPredicateNodeShape .
-reqvire:RelationRuleShape sh:property _:ec4046eda9ddc47c0a947ea867402092 .
-_:d0de9ba74fa0f7ae57f0ec103f42ef91 sh:path reqvire:transitiveClosureForwardProperty ;
+reqvire:RelationRuleShape sh:property _:db6bcc1d49ab4135dcd1496392636b6b .
+_:d81b94054e7d3d447e0e878c5666ff23 sh:path reqvire:transitiveClosureForwardProperty ;
 	sh:maxCount 1 ;
 	sh:nodeKind sh:IRI ;
 	sh:node reqvire:NormalizedRelationPredicateNodeShape .
-reqvire:RelationRuleShape sh:property _:d0de9ba74fa0f7ae57f0ec103f42ef91 .
-_:af9c5a4143a83092ba0de12a5b288a69 sh:path reqvire:transitiveClosureInverseProperty ;
+reqvire:RelationRuleShape sh:property _:d81b94054e7d3d447e0e878c5666ff23 .
+_:cd3b62272d3fe34f12c17c61237f277 sh:path reqvire:transitiveClosureInverseProperty ;
 	sh:maxCount 1 ;
 	sh:nodeKind sh:IRI ;
 	sh:node reqvire:NormalizedRelationPredicateNodeShape .
-reqvire:RelationRuleShape sh:property _:af9c5a4143a83092ba0de12a5b288a69 .
-_:e5974ce370d5d72a011129be1cb32002 sh:path reqvire:relationConstraint ;
+reqvire:RelationRuleShape sh:property _:cd3b62272d3fe34f12c17c61237f277 .
+_:f0cf9049b01d0366276ecb114a7c689d sh:path reqvire:relationConstraint ;
 	sh:class reqvire:RelationConstraint .
-reqvire:RelationRuleShape sh:property _:e5974ce370d5d72a011129be1cb32002 .
-_:a7c30eb6ef13e0cc20e0a68132d52d37 sh:path reqvire:propagatesChangeImpact ;
+reqvire:RelationRuleShape sh:property _:f0cf9049b01d0366276ecb114a7c689d .
+_:bb198dbbae5f6beb72e4f205bfea6d8c sh:path reqvire:propagatesChangeImpact ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:boolean .
-reqvire:RelationRuleShape sh:property _:a7c30eb6ef13e0cc20e0a68132d52d37 .
-_:a9a8553fc081c382cbee50e1e3699a63 sh:path reqvire:createsOwnership ;
+reqvire:RelationRuleShape sh:property _:bb198dbbae5f6beb72e4f205bfea6d8c .
+_:fd1ee219dd46feff852411c6e456ef23 sh:path reqvire:createsOwnership ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:boolean .
-reqvire:RelationRuleShape sh:property _:a9a8553fc081c382cbee50e1e3699a63 .
-_:f67061b5482c4556f79c592f9ffbe0f sh:path reqvire:relationRuleDescription ;
+reqvire:RelationRuleShape sh:property _:fd1ee219dd46feff852411c6e456ef23 .
+_:c0c556b253b5f72b3ac14cb7ef817099 sh:path reqvire:relationRuleDescription ;
 	sh:datatype xsd:string .
-reqvire:RelationRuleShape sh:property _:f67061b5482c4556f79c592f9ffbe0f .
+reqvire:RelationRuleShape sh:property _:c0c556b253b5f72b3ac14cb7ef817099 .
 reqvire:TraversalRuleShape a sh:NodeShape ;
 	sh:targetClass reqvire:TraversalRule ;
 	sh:closed true .
-_:f8a8d444dfadc5bc1c25fda59feba1a5 rdf:first rdf:type .
-reqvire:TraversalRuleShape sh:ignoredProperties _:f8a8d444dfadc5bc1c25fda59feba1a5 .
-_:b67809326e46028310d865c15372c864 rdf:first rdfs:label .
-_:f8a8d444dfadc5bc1c25fda59feba1a5 rdf:rest _:b67809326e46028310d865c15372c864 .
-_:ce0027b5a2b9e78b74846e7da2017e81 rdf:first rdfs:comment .
-_:b67809326e46028310d865c15372c864 rdf:rest _:ce0027b5a2b9e78b74846e7da2017e81 .
-_:ce0027b5a2b9e78b74846e7da2017e81 rdf:rest rdf:nil .
-_:a8a5a28073feeb6147fe0728f554c23e sh:path reqvire:traversalDirection ;
+_:fb5c8f376de306c3fd96c8235e352ea2 rdf:first rdf:type .
+reqvire:TraversalRuleShape sh:ignoredProperties _:fb5c8f376de306c3fd96c8235e352ea2 .
+_:f21e1a20c9d922923594459d8484a247 rdf:first rdfs:label .
+_:fb5c8f376de306c3fd96c8235e352ea2 rdf:rest _:f21e1a20c9d922923594459d8484a247 .
+_:faead851912df25522b23240a6f52412 rdf:first rdfs:comment .
+_:f21e1a20c9d922923594459d8484a247 rdf:rest _:faead851912df25522b23240a6f52412 .
+_:faead851912df25522b23240a6f52412 rdf:rest rdf:nil .
+_:c620f8884cfa2b9c7822f8f7348170af sh:path reqvire:traversalDirection ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:e8858793d72e0be98478c2fbe7d7f4bd .
-_:e8858793d72e0be98478c2fbe7d7f4bd rdf:rest _:a6df09efae488c6b992bc3a22ffbf74 ;
+	sh:in _:bff760ccbcd295dba19b7f907322416a .
+_:bff760ccbcd295dba19b7f907322416a rdf:rest _:adff610dada537865de2ecf160e2be4a ;
 	rdf:first "forward" .
-_:a6df09efae488c6b992bc3a22ffbf74 rdf:rest _:fb5c3ad43050559338a938e675c05262 ;
+_:adff610dada537865de2ecf160e2be4a rdf:rest _:d0c40876f11f1218f24c4ce6f4e3a283 ;
 	rdf:first "reverse" .
-_:fb5c3ad43050559338a938e675c05262 rdf:rest rdf:nil ;
+_:d0c40876f11f1218f24c4ce6f4e3a283 rdf:rest rdf:nil ;
 	rdf:first "bidirectional" .
-reqvire:TraversalRuleShape sh:property _:a8a5a28073feeb6147fe0728f554c23e .
+reqvire:TraversalRuleShape sh:property _:c620f8884cfa2b9c7822f8f7348170af .
 reqvire:ContractBindingCompatibilityRuleShape a sh:NodeShape ;
 	sh:targetClass reqvire:ContractBindingCompatibilityRule ;
 	sh:closed true .
-_:b5935ef7d3afd34718e226f02fd8d950 rdf:first rdf:type .
-reqvire:ContractBindingCompatibilityRuleShape sh:ignoredProperties _:b5935ef7d3afd34718e226f02fd8d950 .
-_:ad0c99fe653b961f55bf7998d7e3132f rdf:first rdfs:label .
-_:b5935ef7d3afd34718e226f02fd8d950 rdf:rest _:ad0c99fe653b961f55bf7998d7e3132f .
-_:dafad819510941e37321fa9b436bff3b rdf:first rdfs:comment .
-_:ad0c99fe653b961f55bf7998d7e3132f rdf:rest _:dafad819510941e37321fa9b436bff3b .
-_:dafad819510941e37321fa9b436bff3b rdf:rest rdf:nil .
-_:d460ca5608e48d1f1a59e448da1415c5 sh:path reqvire:contractBindingsSourceType ;
+_:e0175648886f046ccdd58ef9cb01ab99 rdf:first rdf:type .
+reqvire:ContractBindingCompatibilityRuleShape sh:ignoredProperties _:e0175648886f046ccdd58ef9cb01ab99 .
+_:dac359b5c87cb0c460fd960233988878 rdf:first rdfs:label .
+_:e0175648886f046ccdd58ef9cb01ab99 rdf:rest _:dac359b5c87cb0c460fd960233988878 .
+_:dc308a063c00bbc18c153e9537b276f0 rdf:first rdfs:comment .
+_:dac359b5c87cb0c460fd960233988878 rdf:rest _:dc308a063c00bbc18c153e9537b276f0 .
+_:dc308a063c00bbc18c153e9537b276f0 rdf:rest rdf:nil .
+_:ab821b653d769a3236967644425ed357 sh:path reqvire:contractBindingsSourceType ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ContractBindingCompatibilityRuleShape sh:property _:d460ca5608e48d1f1a59e448da1415c5 .
-_:e1445f85d3ee78a69e2410122cb4da90 sh:path reqvire:contractBindingsTargetType ;
+reqvire:ContractBindingCompatibilityRuleShape sh:property _:ab821b653d769a3236967644425ed357 .
+_:a91c8fb331a25b73ca04ca87534998a4 sh:path reqvire:contractBindingsTargetType ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:ContractBindingCompatibilityRuleShape sh:property _:e1445f85d3ee78a69e2410122cb4da90 .
-_:f8f5b59b6266a37ef5a1e9dfc8bee950 sh:path reqvire:contractBindingsOwnerType ;
+reqvire:ContractBindingCompatibilityRuleShape sh:property _:a91c8fb331a25b73ca04ca87534998a4 .
+_:c9bfe352c4e4c34bdbe5c65da618fc57 sh:path reqvire:contractBindingsOwnerType ;
 	sh:datatype xsd:string .
-reqvire:ContractBindingCompatibilityRuleShape sh:property _:f8f5b59b6266a37ef5a1e9dfc8bee950 .
-_:f1fe5167080769fb23fa2a6c96fc27c1 sh:path reqvire:contractBindingsRuleDescription ;
+reqvire:ContractBindingCompatibilityRuleShape sh:property _:c9bfe352c4e4c34bdbe5c65da618fc57 .
+_:f93bd0701f66a400a0365603c2343fbc sh:path reqvire:contractBindingsRuleDescription ;
 	sh:datatype xsd:string .
-reqvire:ContractBindingCompatibilityRuleShape sh:property _:f1fe5167080769fb23fa2a6c96fc27c1 .
+reqvire:ContractBindingCompatibilityRuleShape sh:property _:f93bd0701f66a400a0365603c2343fbc .
 reqvire:RelationUsageCategoryShape a sh:NodeShape ;
 	sh:targetClass reqvire:RelationUsageCategory ;
 	sh:closed true .
-_:b7c4b8e3848e8db680fa24cf3ac774a7 rdf:first rdf:type .
-reqvire:RelationUsageCategoryShape sh:ignoredProperties _:b7c4b8e3848e8db680fa24cf3ac774a7 .
-_:f8906ab23b54c7ab51cfe055e9ddcd5 rdf:first rdfs:label .
-_:b7c4b8e3848e8db680fa24cf3ac774a7 rdf:rest _:f8906ab23b54c7ab51cfe055e9ddcd5 .
-_:f1eaa21fd597c3966359606a2fa290f1 rdf:first rdfs:comment .
-_:f8906ab23b54c7ab51cfe055e9ddcd5 rdf:rest _:f1eaa21fd597c3966359606a2fa290f1 .
-_:f1eaa21fd597c3966359606a2fa290f1 rdf:rest rdf:nil .
-_:a57f3e9438075931f2be527cd04b984 sh:path reqvire:usageCategoryName ;
+_:f378a60fec6a243c1b7c5819a611e6d8 rdf:first rdf:type .
+reqvire:RelationUsageCategoryShape sh:ignoredProperties _:f378a60fec6a243c1b7c5819a611e6d8 .
+_:d232fdf753ec7b44abe5b98395b42cdf rdf:first rdfs:label .
+_:f378a60fec6a243c1b7c5819a611e6d8 rdf:rest _:d232fdf753ec7b44abe5b98395b42cdf .
+_:cfc2ed12fe56871f55972d82159dc639 rdf:first rdfs:comment .
+_:d232fdf753ec7b44abe5b98395b42cdf rdf:rest _:cfc2ed12fe56871f55972d82159dc639 .
+_:cfc2ed12fe56871f55972d82159dc639 rdf:rest rdf:nil .
+_:ddfa0dd8a0991b3df18f92d1e8ac2743 sh:path reqvire:usageCategoryName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:cf33cfc51f123f67c3fb974b0e10f45 .
-_:cf33cfc51f123f67c3fb974b0e10f45 rdf:rest _:c5460947203dd219fd0a50011b4d93fb ;
+	sh:in _:a0867daa6d2ec50f75566d6db4436a4d .
+_:a0867daa6d2ec50f75566d6db4436a4d rdf:rest _:d1f4d5b86cfc768e96a6c18fba39e013 ;
 	rdf:first "forward-model-traversal" .
-_:c5460947203dd219fd0a50011b4d93fb rdf:rest _:f4e43846f08a41d374258fcb11f2227f ;
+_:d1f4d5b86cfc768e96a6c18fba39e013 rdf:rest _:b3b95ed2111ebbd3482bbe8806ff16fe ;
 	rdf:first "reverse-traversal" .
-_:f4e43846f08a41d374258fcb11f2227f rdf:rest _:d5a422f2a5ad0710ca09592193d1d95c ;
+_:b3b95ed2111ebbd3482bbe8806ff16fe rdf:rest _:ec4b6a60b304da679d0fa1bc4ff0d27f ;
 	rdf:first "change-propagation" .
-_:d5a422f2a5ad0710ca09592193d1d95c rdf:rest rdf:nil ;
+_:ec4b6a60b304da679d0fa1bc4ff0d27f rdf:rest rdf:nil ;
 	rdf:first "verification-rollup" .
-reqvire:RelationUsageCategoryShape sh:property _:a57f3e9438075931f2be527cd04b984 .
-_:fdbf2d942c0a7d14d054df591d1924ca sh:path reqvire:usageCategoryRelationName ;
+reqvire:RelationUsageCategoryShape sh:property _:ddfa0dd8a0991b3df18f92d1e8ac2743 .
+_:c2cc3e84d44085253fc55cf8664053c3 sh:path reqvire:usageCategoryRelationName ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:eeb56e451a06fa0b0d9e434189863de4 .
-_:eeb56e451a06fa0b0d9e434189863de4 rdf:rest _:da91a94af6d7c618ff198824484ac80b ;
+	sh:in _:bbb99a5db4fe39e2239e0f4f4ad63fca .
+_:bbb99a5db4fe39e2239e0f4f4ad63fca rdf:rest _:ff3cb4bc6b14693995c3b3af82d65886 ;
 	rdf:first "derive" .
-_:da91a94af6d7c618ff198824484ac80b rdf:rest _:ee76a665c32362052b02e63ed2a5974e ;
+_:ff3cb4bc6b14693995c3b3af82d65886 rdf:rest _:f4ca7f2736623e910df833069206706b ;
 	rdf:first "derivedFrom" .
-_:ee76a665c32362052b02e63ed2a5974e rdf:rest _:d191bf085677637d2bcd05de3dcabaf4 ;
+_:f4ca7f2736623e910df833069206706b rdf:rest _:c8e03ad726b365ad19b7440b069b6644 ;
 	rdf:first "specifiedBy" .
-_:d191bf085677637d2bcd05de3dcabaf4 rdf:rest _:e2603bf19bb32f20ac368468422078f3 ;
+_:c8e03ad726b365ad19b7440b069b6644 rdf:rest _:f4e21e6f431449195c0f137839f39957 ;
 	rdf:first "specify" .
-_:e2603bf19bb32f20ac368468422078f3 rdf:rest _:b9e6c8af098bbbf764d52d57b9a3eff3 ;
+_:f4e21e6f431449195c0f137839f39957 rdf:rest _:bc10ab52a5604a3d7d18181728c4f511 ;
 	rdf:first "definedBy" .
-_:b9e6c8af098bbbf764d52d57b9a3eff3 rdf:rest _:d0abcbf4b8fe8f815e59450fa0b86a26 ;
+_:bc10ab52a5604a3d7d18181728c4f511 rdf:rest _:ae32deeefd0455190c2d5ed9928f1c2d ;
 	rdf:first "define" .
-_:d0abcbf4b8fe8f815e59450fa0b86a26 rdf:rest _:fdee7f3edd10715d1305c418ddb9e4b2 ;
+_:ae32deeefd0455190c2d5ed9928f1c2d rdf:rest _:e4a831763d88b5786d14d9ef5885715c ;
 	rdf:first "constrainedBy" .
-_:fdee7f3edd10715d1305c418ddb9e4b2 rdf:rest _:fe6c02a82d289403a651538746801f7e ;
+_:e4a831763d88b5786d14d9ef5885715c rdf:rest _:c192cb156caf37d40fff0b7cdab6ce7e ;
 	rdf:first "constrain" .
-_:fe6c02a82d289403a651538746801f7e rdf:rest _:e93fcde2a4d92107060a624106be1c2e ;
+_:c192cb156caf37d40fff0b7cdab6ce7e rdf:rest _:e7990ae1f88bc5564dfcc127b3c383b0 ;
 	rdf:first "use" .
-_:e93fcde2a4d92107060a624106be1c2e rdf:rest _:fe8d7b322e538decb0704877df12f924 ;
+_:e7990ae1f88bc5564dfcc127b3c383b0 rdf:rest _:f5b53f7eac113e6c172815b26653cfbc ;
 	rdf:first "usedBy" .
-_:fe8d7b322e538decb0704877df12f924 rdf:rest _:aecdfc9b1c44125295dfd95a86269fd9 ;
+_:f5b53f7eac113e6c172815b26653cfbc rdf:rest _:e51ee1bd602d5784eff0b1ef3ba7dae4 ;
 	rdf:first "verifiedBy" .
-_:aecdfc9b1c44125295dfd95a86269fd9 rdf:rest _:da347fecfb95f7d46a57f994a3f72652 ;
+_:e51ee1bd602d5784eff0b1ef3ba7dae4 rdf:rest _:f93048f0e8a154a66327444e8b336a19 ;
 	rdf:first "verify" .
-_:da347fecfb95f7d46a57f994a3f72652 rdf:rest _:e8f2988615d74427005288bae98b772f ;
+_:f93048f0e8a154a66327444e8b336a19 rdf:rest _:bf416e39590df1b84372684d7d15a21b ;
 	rdf:first "satisfiedBy" .
-_:e8f2988615d74427005288bae98b772f rdf:rest _:bce62e3373eb91d5ec516f85d86f18c7 ;
+_:bf416e39590df1b84372684d7d15a21b rdf:rest _:e8ac2568a9f6382e5d5da969fae39ce1 ;
 	rdf:first "satisfy" .
-_:bce62e3373eb91d5ec516f85d86f18c7 rdf:rest rdf:nil ;
+_:e8ac2568a9f6382e5d5da969fae39ce1 rdf:rest rdf:nil ;
 	rdf:first "contract_bindings" .
-reqvire:RelationUsageCategoryShape sh:property _:fdbf2d942c0a7d14d054df591d1924ca .
-_:cd9842d02655850d67471b02edd4716d sh:path reqvire:usageCategoryMeaning ;
+reqvire:RelationUsageCategoryShape sh:property _:c2cc3e84d44085253fc55cf8664053c3 .
+_:ea8dc69d217e534e752d94b8e0d1cb7f sh:path reqvire:usageCategoryMeaning ;
 	sh:datatype xsd:string .
-reqvire:RelationUsageCategoryShape sh:property _:cd9842d02655850d67471b02edd4716d .
+reqvire:RelationUsageCategoryShape sh:property _:ea8dc69d217e534e752d94b8e0d1cb7f .
 reqvire:RelationSemanticCategoryShape a sh:NodeShape ;
 	sh:targetClass reqvire:RelationSemanticCategory ;
 	sh:closed true .
-_:e47183cf4dcfe0ecde10db4efd2b27da rdf:first rdf:type .
-reqvire:RelationSemanticCategoryShape sh:ignoredProperties _:e47183cf4dcfe0ecde10db4efd2b27da .
-_:ca19b35fff79061c10b1eb9ec142d7ea rdf:first rdfs:label .
-_:e47183cf4dcfe0ecde10db4efd2b27da rdf:rest _:ca19b35fff79061c10b1eb9ec142d7ea .
-_:ccf8b3cef675167185505d9457ef2cbf rdf:first rdfs:comment .
-_:ca19b35fff79061c10b1eb9ec142d7ea rdf:rest _:ccf8b3cef675167185505d9457ef2cbf .
-_:ccf8b3cef675167185505d9457ef2cbf rdf:rest rdf:nil .
-_:f9f14e80de382f2f2d2fede87f6e8f6c sh:path reqvire:semanticCategoryName ;
+_:d0c7f8c432597dcffea86dba48e5916a rdf:first rdf:type .
+reqvire:RelationSemanticCategoryShape sh:ignoredProperties _:d0c7f8c432597dcffea86dba48e5916a .
+_:cc6834b2641f96a823c702000169dd8a rdf:first rdfs:label .
+_:d0c7f8c432597dcffea86dba48e5916a rdf:rest _:cc6834b2641f96a823c702000169dd8a .
+_:bd1f0f280f7adc332311144f8991bdb6 rdf:first rdfs:comment .
+_:cc6834b2641f96a823c702000169dd8a rdf:rest _:bd1f0f280f7adc332311144f8991bdb6 .
+_:bd1f0f280f7adc332311144f8991bdb6 rdf:rest rdf:nil .
+_:fa38acd2b27812db595db2b14ced1a6c sh:path reqvire:semanticCategoryName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:edeaf749c33d42572dd68aa46168408f .
-_:edeaf749c33d42572dd68aa46168408f rdf:rest _:dd58415b51a5ac30be1f8702f613694b ;
+	sh:in _:d0b160c2183c0f62447b8cc908ae100f .
+_:d0b160c2183c0f62447b8cc908ae100f rdf:rest _:fe1edbb57dd66eaf54af8b41d46f01aa ;
 	rdf:first "hierarchy" .
-_:dd58415b51a5ac30be1f8702f613694b rdf:rest _:ff0184f33bc634650f7378fdbdb06292 ;
+_:fe1edbb57dd66eaf54af8b41d46f01aa rdf:rest _:df121a4cb22df90e175a94de0840fdad ;
 	rdf:first "capability-specification" .
-_:ff0184f33bc634650f7378fdbdb06292 rdf:rest _:cdc0e21e1f220fbab0f247341f836950 ;
+_:df121a4cb22df90e175a94de0840fdad rdf:rest _:c7ee5e70232f10d61c17bf5fbdada664 ;
 	rdf:first "satisfaction" .
-_:cdc0e21e1f220fbab0f247341f836950 rdf:rest _:b4c8699544d1bb98f659da5e6d7ea0c5 ;
+_:c7ee5e70232f10d61c17bf5fbdada664 rdf:rest _:ad5a2c9cd2a3f1db8d1e790e19596940 ;
 	rdf:first "contract-ownership" .
-_:b4c8699544d1bb98f659da5e6d7ea0c5 rdf:rest _:ba71c9faf95af9fd78c6d12cdb1544eb ;
+_:ad5a2c9cd2a3f1db8d1e790e19596940 rdf:rest _:f4bb13e64ec63371e23c5222c285e62a ;
 	rdf:first "semantic-contract-constraint" .
-_:ba71c9faf95af9fd78c6d12cdb1544eb rdf:rest _:c4e94dcaf330e80aa82ab13b069514c1 ;
+_:f4bb13e64ec63371e23c5222c285e62a rdf:rest _:fc4008500119cfd6dadf56f81d53af80 ;
 	rdf:first "semantic-contract-ontology-use" .
-_:c4e94dcaf330e80aa82ab13b069514c1 rdf:rest _:dea5662129d7aacf59028fe1d13614d5 ;
+_:fc4008500119cfd6dadf56f81d53af80 rdf:rest _:e1d69f203476c392397016033ebbf358 ;
 	rdf:first "verification" .
-_:dea5662129d7aacf59028fe1d13614d5 rdf:rest rdf:nil ;
+_:e1d69f203476c392397016033ebbf358 rdf:rest rdf:nil ;
 	rdf:first "contract-binding" .
-reqvire:RelationSemanticCategoryShape sh:property _:f9f14e80de382f2f2d2fede87f6e8f6c .
-_:a3326edac4181aa05712eb9159821b9f sh:path reqvire:semanticCategoryRelationName ;
+reqvire:RelationSemanticCategoryShape sh:property _:fa38acd2b27812db595db2b14ced1a6c .
+_:b894978fb64a982f02ce5b9a7ebcca87 sh:path reqvire:semanticCategoryRelationName ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:f9027202fd799ba0a5c336fa189d294c .
-_:f9027202fd799ba0a5c336fa189d294c rdf:rest _:ffc3707db6f3c512498b3809f6882b35 ;
+	sh:in _:efbdcc81c648771477d8fe6c892540df .
+_:efbdcc81c648771477d8fe6c892540df rdf:rest _:ce5d9fdfc3032a6fc048ad3150fe9081 ;
 	rdf:first "derive" .
-_:ffc3707db6f3c512498b3809f6882b35 rdf:rest _:e0f255603c6a10b55517a55b9a3deb11 ;
+_:ce5d9fdfc3032a6fc048ad3150fe9081 rdf:rest _:f1ce0e48b54cf57903ee5c78b355160f ;
 	rdf:first "derivedFrom" .
-_:e0f255603c6a10b55517a55b9a3deb11 rdf:rest _:a1d5a24519acda1de7cb03b0a4bab203 ;
+_:f1ce0e48b54cf57903ee5c78b355160f rdf:rest _:ae5a3be20d8226138098a9e086e70bf2 ;
 	rdf:first "specifiedBy" .
-_:a1d5a24519acda1de7cb03b0a4bab203 rdf:rest _:bbdc0a1c8ec029ae770381e3a0baa7fc ;
+_:ae5a3be20d8226138098a9e086e70bf2 rdf:rest _:da88145aaf4d813f9bd865f8420bc349 ;
 	rdf:first "specify" .
-_:bbdc0a1c8ec029ae770381e3a0baa7fc rdf:rest _:c261a9cb8d21d5f9a00389cc63208123 ;
+_:da88145aaf4d813f9bd865f8420bc349 rdf:rest _:b6c2de62fc7cbcf52789e5a94e4c8360 ;
 	rdf:first "definedBy" .
-_:c261a9cb8d21d5f9a00389cc63208123 rdf:rest _:b8e2a5af687d1527a172286052cfd6f3 ;
+_:b6c2de62fc7cbcf52789e5a94e4c8360 rdf:rest _:c9431004e1732458bee00a6de4fa286d ;
 	rdf:first "define" .
-_:b8e2a5af687d1527a172286052cfd6f3 rdf:rest _:e76c918a030fe6e0fb713e6a3e3b37d8 ;
+_:c9431004e1732458bee00a6de4fa286d rdf:rest _:bd2961555fc697fd7234d7088c35aad7 ;
 	rdf:first "constrainedBy" .
-_:e76c918a030fe6e0fb713e6a3e3b37d8 rdf:rest _:ff350f9459fb377c0b4990a782303d36 ;
+_:bd2961555fc697fd7234d7088c35aad7 rdf:rest _:ed3efaa10e4d2cc1d8983d369dff61a0 ;
 	rdf:first "constrain" .
-_:ff350f9459fb377c0b4990a782303d36 rdf:rest _:cb6c332ffac85f1f1563bb1ab4ccbefa ;
+_:ed3efaa10e4d2cc1d8983d369dff61a0 rdf:rest _:cef5883608676cdc22464ec747690826 ;
 	rdf:first "use" .
-_:cb6c332ffac85f1f1563bb1ab4ccbefa rdf:rest _:d74b504e772173400edc2d73d718e989 ;
+_:cef5883608676cdc22464ec747690826 rdf:rest _:c046cf5d88db49a4f925407f1f044af6 ;
 	rdf:first "usedBy" .
-_:d74b504e772173400edc2d73d718e989 rdf:rest _:abb245a99f5a0ba54a19f09be4e4cdbc ;
+_:c046cf5d88db49a4f925407f1f044af6 rdf:rest _:c822c9e917a1704e2839391ac61b4910 ;
 	rdf:first "verifiedBy" .
-_:abb245a99f5a0ba54a19f09be4e4cdbc rdf:rest _:b2222e0a2ad5fe3e7ab1c730b06a1ea1 ;
+_:c822c9e917a1704e2839391ac61b4910 rdf:rest _:ec61cd4dc4554380f8be12dfe7da4395 ;
 	rdf:first "verify" .
-_:b2222e0a2ad5fe3e7ab1c730b06a1ea1 rdf:rest _:c9b16ff3322d72d6fd7e6212d80c95d5 ;
+_:ec61cd4dc4554380f8be12dfe7da4395 rdf:rest _:e2453be68434a660823a6ebff481e7bb ;
 	rdf:first "satisfiedBy" .
-_:c9b16ff3322d72d6fd7e6212d80c95d5 rdf:rest _:abdee06ba2c3b0c83341b084a2e61c7f ;
+_:e2453be68434a660823a6ebff481e7bb rdf:rest _:ea78de700108bd73a2303d1c319cc7f6 ;
 	rdf:first "satisfy" .
-_:abdee06ba2c3b0c83341b084a2e61c7f rdf:rest rdf:nil ;
+_:ea78de700108bd73a2303d1c319cc7f6 rdf:rest rdf:nil ;
 	rdf:first "contract_bindings" .
-reqvire:RelationSemanticCategoryShape sh:property _:a3326edac4181aa05712eb9159821b9f .
-_:b4e2de578eb26044f3c4597b0d6a42c0 sh:path reqvire:semanticCategoryMeaning ;
+reqvire:RelationSemanticCategoryShape sh:property _:b894978fb64a982f02ce5b9a7ebcca87 .
+_:e13e2e4e8f1ff56f37c3aee2c962a7d0 sh:path reqvire:semanticCategoryMeaning ;
 	sh:datatype xsd:string .
-reqvire:RelationSemanticCategoryShape sh:property _:b4e2de578eb26044f3c4597b0d6a42c0 .
+reqvire:RelationSemanticCategoryShape sh:property _:e13e2e4e8f1ff56f37c3aee2c962a7d0 .
 reqvire:RelationSemanticPatternShape a sh:NodeShape ;
 	sh:targetClass reqvire:RelationSemanticPattern ;
 	sh:closed true .
-_:e38f99f856e019557f2f75be2b1558f0 rdf:first rdf:type .
-reqvire:RelationSemanticPatternShape sh:ignoredProperties _:e38f99f856e019557f2f75be2b1558f0 .
-_:e780b5469348a345a275b1bd4db4d4be rdf:first rdfs:label .
-_:e38f99f856e019557f2f75be2b1558f0 rdf:rest _:e780b5469348a345a275b1bd4db4d4be .
-_:da5134e3e6408242c2b10eac3c9f00ac rdf:first rdfs:comment .
-_:e780b5469348a345a275b1bd4db4d4be rdf:rest _:da5134e3e6408242c2b10eac3c9f00ac .
-_:da5134e3e6408242c2b10eac3c9f00ac rdf:rest rdf:nil .
-_:fdb3ce04a92dca3f08cfbbc575c030eb sh:path reqvire:semanticPatternName ;
+_:e70454f4432202f1be8286639dc96298 rdf:first rdf:type .
+reqvire:RelationSemanticPatternShape sh:ignoredProperties _:e70454f4432202f1be8286639dc96298 .
+_:fd89f62848e56bce8ebc2f0303f966b3 rdf:first rdfs:label .
+_:e70454f4432202f1be8286639dc96298 rdf:rest _:fd89f62848e56bce8ebc2f0303f966b3 .
+_:de5c98fde3536012259de5eb46af5965 rdf:first rdfs:comment .
+_:fd89f62848e56bce8ebc2f0303f966b3 rdf:rest _:de5c98fde3536012259de5eb46af5965 .
+_:de5c98fde3536012259de5eb46af5965 rdf:rest rdf:nil .
+_:ac2792bbd27c2840d40378cb3a523d25 sh:path reqvire:semanticPatternName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:dfcb511848a0710f6cc8fe10bbededc9 .
-_:dfcb511848a0710f6cc8fe10bbededc9 rdf:rest _:e74c924e857187e3ec5226e8ec5c81aa ;
+	sh:in _:b8ddd9ec044b28bb02f9c8bb40764379 .
+_:b8ddd9ec044b28bb02f9c8bb40764379 rdf:rest _:fc549b12a583cfb62cb93767229edfc7 ;
 	rdf:first "hierarchy" .
-_:e74c924e857187e3ec5226e8ec5c81aa rdf:rest _:e98f675338fcb5d35463fa2ec6b7e212 ;
+_:fc549b12a583cfb62cb93767229edfc7 rdf:rest _:ed8875cbccd374dea20f1f764dd26447 ;
 	rdf:first "bridge" .
-_:e98f675338fcb5d35463fa2ec6b7e212 rdf:rest _:d8ae728218d1a2f6a46925922759ca01 ;
+_:ed8875cbccd374dea20f1f764dd26447 rdf:rest _:b8fbb3e8013d2988d4ba283134d98353 ;
 	rdf:first "ownership" .
-_:d8ae728218d1a2f6a46925922759ca01 rdf:rest _:de75b0655337a007841d57b0b2b154a ;
+_:b8fbb3e8013d2988d4ba283134d98353 rdf:rest _:eca5d8481a3a5f1903f812123cbc0715 ;
 	rdf:first "constraint" .
-_:de75b0655337a007841d57b0b2b154a rdf:rest _:e9f372da8df6986bfdb115907ff1776d ;
+_:eca5d8481a3a5f1903f812123cbc0715 rdf:rest _:d74163886d0a179c728d2be27f5eeaa9 ;
 	rdf:first "dependency" .
-_:e9f372da8df6986bfdb115907ff1776d rdf:rest _:dd582a32ab8fc6615507d95d11aafa50 ;
+_:d74163886d0a179c728d2be27f5eeaa9 rdf:rest _:c05dfadfbcce91d13a4eb0e86aeab519 ;
 	rdf:first "verification" .
-_:dd582a32ab8fc6615507d95d11aafa50 rdf:rest _:e6526f3a3f8fce9f516150a9c7ca2673 ;
+_:c05dfadfbcce91d13a4eb0e86aeab519 rdf:rest _:af1d0cbbfab480afab042786fb495caf ;
 	rdf:first "satisfaction" .
-_:e6526f3a3f8fce9f516150a9c7ca2673 rdf:rest rdf:nil ;
+_:af1d0cbbfab480afab042786fb495caf rdf:rest rdf:nil ;
 	rdf:first "contract-binding" .
-reqvire:RelationSemanticPatternShape sh:property _:fdb3ce04a92dca3f08cfbbc575c030eb .
+reqvire:RelationSemanticPatternShape sh:property _:ac2792bbd27c2840d40378cb3a523d25 .
 reqvire:RelationFamilyShape a sh:NodeShape ;
 	sh:targetClass reqvire:RelationFamily ;
 	sh:closed true .
-_:ce4ad19aebb3a3692a9491393f5cc070 rdf:first rdf:type .
-reqvire:RelationFamilyShape sh:ignoredProperties _:ce4ad19aebb3a3692a9491393f5cc070 .
-_:a9395474d3d3edff0463d13d85332d4 rdf:first rdfs:label .
-_:ce4ad19aebb3a3692a9491393f5cc070 rdf:rest _:a9395474d3d3edff0463d13d85332d4 .
-_:fd170d483402eb04ed9f56e99ff7ee25 rdf:first rdfs:comment .
-_:a9395474d3d3edff0463d13d85332d4 rdf:rest _:fd170d483402eb04ed9f56e99ff7ee25 .
-_:fd170d483402eb04ed9f56e99ff7ee25 rdf:rest rdf:nil .
-_:c4b31dd598ba140ebda42717d9d07c04 sh:path reqvire:relationFamilyName ;
+_:fdf7599e54e81ebab417f3a6a31ab252 rdf:first rdf:type .
+reqvire:RelationFamilyShape sh:ignoredProperties _:fdf7599e54e81ebab417f3a6a31ab252 .
+_:b273649f6ca647a7b039711f075906e6 rdf:first rdfs:label .
+_:fdf7599e54e81ebab417f3a6a31ab252 rdf:rest _:b273649f6ca647a7b039711f075906e6 .
+_:fad890927dc93d97598e3f1f5158506c rdf:first rdfs:comment .
+_:b273649f6ca647a7b039711f075906e6 rdf:rest _:fad890927dc93d97598e3f1f5158506c .
+_:fad890927dc93d97598e3f1f5158506c rdf:rest rdf:nil .
+_:f98c0141244c84b235eaebada10d4695 sh:path reqvire:relationFamilyName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:d75a99ea275d20ea25dc95ef1a1ddd85 .
-_:d75a99ea275d20ea25dc95ef1a1ddd85 rdf:rest _:cf90fa03af0829639841ca112f1e6d83 ;
+	sh:in _:e8b2c3696a5375ddb64a5f501c0ba4e7 .
+_:e8b2c3696a5375ddb64a5f501c0ba4e7 rdf:rest _:b31d3522710ca57d455230cb96c53430 ;
 	rdf:first "hierarchy" .
-_:cf90fa03af0829639841ca112f1e6d83 rdf:rest _:e0c866018767b0c389d541fa3d8fc169 ;
+_:b31d3522710ca57d455230cb96c53430 rdf:rest _:bea1a58ce9472f6aaa166534f90cea6f ;
 	rdf:first "capability-specification" .
-_:e0c866018767b0c389d541fa3d8fc169 rdf:rest _:fdfb865665cfcad4364b10814c758d13 ;
+_:bea1a58ce9472f6aaa166534f90cea6f rdf:rest _:f29575e65332dd96673e9eadc78d86d6 ;
 	rdf:first "contract-ownership" .
-_:fdfb865665cfcad4364b10814c758d13 rdf:rest _:cd6994d8a1c863557a1ab454a62d09b8 ;
+_:f29575e65332dd96673e9eadc78d86d6 rdf:rest _:ff1f7012b78ac746580adb6ee66230e4 ;
 	rdf:first "semantic-contract-constraint" .
-_:cd6994d8a1c863557a1ab454a62d09b8 rdf:rest _:b75b3b01b3a98251771dceb196ff2c7f ;
+_:ff1f7012b78ac746580adb6ee66230e4 rdf:rest _:e70bd91c057d527c294e0b735fb78a44 ;
 	rdf:first "semantic-contract-ontology-use" .
-_:b75b3b01b3a98251771dceb196ff2c7f rdf:rest _:dd170c6bd8d1c55b06bb5394dcba2027 ;
+_:e70bd91c057d527c294e0b735fb78a44 rdf:rest _:f9aa56c1f647aa6c4e0c17e32102a9a0 ;
 	rdf:first "verification" .
-_:dd170c6bd8d1c55b06bb5394dcba2027 rdf:rest _:d6228fbad64804fd78796f02a72cd67f ;
+_:f9aa56c1f647aa6c4e0c17e32102a9a0 rdf:rest _:a0dbe09f970482b0bbe58011c766df0 ;
 	rdf:first "satisfaction" .
-_:d6228fbad64804fd78796f02a72cd67f rdf:rest rdf:nil ;
+_:a0dbe09f970482b0bbe58011c766df0 rdf:rest rdf:nil ;
 	rdf:first "contract-binding" .
-reqvire:RelationFamilyShape sh:property _:c4b31dd598ba140ebda42717d9d07c04 .
-_:e5d094f481faa04675898e167964c5cb sh:path reqvire:relationFamilyMeaning ;
+reqvire:RelationFamilyShape sh:property _:f98c0141244c84b235eaebada10d4695 .
+_:ff04758866e14ce0ae8ca8cc567e6210 sh:path reqvire:relationFamilyMeaning ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:RelationFamilyShape sh:property _:e5d094f481faa04675898e167964c5cb .
-_:dd778200d142f575d7c5d11a9918be41 sh:path reqvire:relationFamilyForwardProperty ;
+reqvire:RelationFamilyShape sh:property _:ff04758866e14ce0ae8ca8cc567e6210 .
+_:bf6e6da3470e83ed9102ab0a964f79b4 sh:path reqvire:relationFamilyForwardProperty ;
 	sh:maxCount 1 ;
 	sh:nodeKind sh:IRI ;
 	sh:node reqvire:NormalizedRelationPredicateNodeShape .
-reqvire:RelationFamilyShape sh:property _:dd778200d142f575d7c5d11a9918be41 .
-_:a9e5f3290d9aefa8e91bbca394ce7502 sh:path reqvire:relationFamilyInverseProperty ;
+reqvire:RelationFamilyShape sh:property _:bf6e6da3470e83ed9102ab0a964f79b4 .
+_:febb269ecea666cda0089fbb60b07dd1 sh:path reqvire:relationFamilyInverseProperty ;
 	sh:maxCount 1 ;
 	sh:nodeKind sh:IRI ;
 	sh:node reqvire:NormalizedRelationPredicateNodeShape .
-reqvire:RelationFamilyShape sh:property _:a9e5f3290d9aefa8e91bbca394ce7502 .
+reqvire:RelationFamilyShape sh:property _:febb269ecea666cda0089fbb60b07dd1 .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/SemanticExport.md#semantic-export-projection-shape
@@ -1412,414 +1412,414 @@ reqvire:RelationFamilyShape sh:property _:a9e5f3290d9aefa8e91bbca394ce7502 .
 
 reqvire:GraphRegistryShape a sh:NodeShape ;
 	sh:targetClass reqvire:GraphRegistry .
-_:c76912814950a6e34ad2f893ea8cc727 sh:path reqvire:registryElement ;
+_:a5be0fba05c59fac797f4d23b0649a12 sh:path reqvire:registryElement ;
 	sh:class reqvire:Element .
-reqvire:GraphRegistryShape sh:property _:c76912814950a6e34ad2f893ea8cc727 .
+reqvire:GraphRegistryShape sh:property _:a5be0fba05c59fac797f4d23b0649a12 .
 reqvire:SemanticExportShape a sh:NodeShape ;
 	sh:targetClass reqvire:SemanticExport .
-_:a702f2ff938ed045e306adc9356d6452 sh:path reqvire:exportSourceElement ;
+_:f9b799cb9355eeba83260a979d46da79 sh:path reqvire:exportSourceElement ;
 	sh:class reqvire:Element .
-reqvire:SemanticExportShape sh:property _:a702f2ff938ed045e306adc9356d6452 .
-_:e7f24902991cc7731e6a22014e529070 sh:path reqvire:elementName ;
+reqvire:SemanticExportShape sh:property _:f9b799cb9355eeba83260a979d46da79 .
+_:ac52aaa05420c12afeccb86949d689d3 sh:path reqvire:elementName ;
 	sh:datatype xsd:string .
-reqvire:SemanticExportShape sh:property _:e7f24902991cc7731e6a22014e529070 .
-_:d16205f618edbbd587eb7bacfdefff47 sh:path reqvire:elementIdentifier ;
+reqvire:SemanticExportShape sh:property _:ac52aaa05420c12afeccb86949d689d3 .
+_:cbc37eca5ba1b9445ca0c568bfd630d5 sh:path reqvire:elementIdentifier ;
 	sh:datatype xsd:string .
-reqvire:SemanticExportShape sh:property _:d16205f618edbbd587eb7bacfdefff47 .
-_:b468971a4a074e634338a2d5734c83ca sh:path reqvire:elementId ;
+reqvire:SemanticExportShape sh:property _:cbc37eca5ba1b9445ca0c568bfd630d5 .
+_:ff24f2fc64983dc1b050d2dbd2528577 sh:path reqvire:elementId ;
 	sh:datatype xsd:string .
-reqvire:SemanticExportShape sh:property _:b468971a4a074e634338a2d5734c83ca .
+reqvire:SemanticExportShape sh:property _:ff24f2fc64983dc1b050d2dbd2528577 .
 reqvire:NamespaceScopedOntologyExportShape a sh:NodeShape ;
 	sh:targetClass reqvire:NamespaceScopedOntologyExport .
 reqvire:PrefixedTurtleExportShape a sh:NodeShape ;
 	sh:targetClass reqvire:PrefixedTurtleExport .
-_:b2a0c9271f282e342db04b6955583732 sh:path reqvire:turtlePrefixMap ;
+_:f9b70706f3b7db080c4ee2861c2aa039 sh:path reqvire:turtlePrefixMap ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:TurtlePrefixMap .
-reqvire:PrefixedTurtleExportShape sh:property _:b2a0c9271f282e342db04b6955583732 .
+reqvire:PrefixedTurtleExportShape sh:property _:f9b70706f3b7db080c4ee2861c2aa039 .
 reqvire:TurtlePrefixMapShape a sh:NodeShape ;
 	sh:targetClass reqvire:TurtlePrefixMap .
-_:e2b37259403f42c1334693fafe917cc8 sh:path reqvire:turtlePrefixScope ;
+_:a686b39b28a59f9e87dd04d4eb99d49c sh:path reqvire:turtlePrefixScope ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
-	sh:in _:ca9d73a645676ec746aeabfc7d45b8f8 .
-_:ca9d73a645676ec746aeabfc7d45b8f8 rdf:rest _:f6ecef115a888195476b754c2ffee892 ;
+	sh:in _:e5bd6489fee1de93bf963e0fdd9c359c .
+_:e5bd6489fee1de93bf963e0fdd9c359c rdf:rest _:e2d0802629d8ff3ddb66e33fcf87c6c1 ;
 	rdf:first "top-level-export" .
-_:f6ecef115a888195476b754c2ffee892 rdf:rest rdf:nil ;
+_:e2d0802629d8ff3ddb66e33fcf87c6c1 rdf:rest rdf:nil ;
 	rdf:first "intermediate-fragment" .
-reqvire:TurtlePrefixMapShape sh:property _:e2b37259403f42c1334693fafe917cc8 .
-_:d76b75494938fcded16eac90bdf16f59 sh:path reqvire:turtlePrefixDeclaration ;
+reqvire:TurtlePrefixMapShape sh:property _:a686b39b28a59f9e87dd04d4eb99d49c .
+_:c77b1149b1cfb65de3083923ba43270e sh:path reqvire:turtlePrefixDeclaration ;
 	sh:minCount 1 ;
 	sh:class reqvire:TurtlePrefixDeclaration .
-reqvire:TurtlePrefixMapShape sh:property _:d76b75494938fcded16eac90bdf16f59 .
+reqvire:TurtlePrefixMapShape sh:property _:c77b1149b1cfb65de3083923ba43270e .
 reqvire:TurtlePrefixDeclarationShape a sh:NodeShape ;
 	sh:targetClass reqvire:TurtlePrefixDeclaration .
-_:bf8782ba921e462f8a136580a85ddcb5 sh:path reqvire:turtlePrefixName ;
+_:c27b67f5a0a81f8f612b31ad70e2245e sh:path reqvire:turtlePrefixName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:TurtlePrefixDeclarationShape sh:property _:bf8782ba921e462f8a136580a85ddcb5 .
-_:f073e503d549e6876feaba0d672312c1 sh:path reqvire:turtlePrefixNamespace ;
+reqvire:TurtlePrefixDeclarationShape sh:property _:c27b67f5a0a81f8f612b31ad70e2245e .
+_:df2d6bc3830068310df780b3cf2a92c sh:path reqvire:turtlePrefixNamespace ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:anyURI .
-reqvire:TurtlePrefixDeclarationShape sh:property _:f073e503d549e6876feaba0d672312c1 .
-_:ca8cf6f1d4be51c19ae9de8f78354a0a sh:path reqvire:turtlePrefixSourceKind ;
+reqvire:TurtlePrefixDeclarationShape sh:property _:df2d6bc3830068310df780b3cf2a92c .
+_:c19d423ac355b8469feb31e9de1e2d41 sh:path reqvire:turtlePrefixSourceKind ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
-	sh:in _:a869df99b9361771f301091bebd2dcd8 .
-_:a869df99b9361771f301091bebd2dcd8 rdf:rest _:a1d7012e8311d28e907cedb8f2319d06 ;
+	sh:in _:a70c7130de58b7831e7fdc3689f774a1 .
+_:a70c7130de58b7831e7fdc3689f774a1 rdf:rest _:fe2115fc6b7a6d935e05350f6c495480 ;
 	rdf:first "built-in" .
-_:a1d7012e8311d28e907cedb8f2319d06 rdf:rest _:fc1b1500dbd6c68db1d772c16ee998a9 ;
+_:fe2115fc6b7a6d935e05350f6c495480 rdf:rest _:d5cabe4b6386f53c1f8a4a3fcdeed339 ;
 	rdf:first "authored-ontology" .
-_:fc1b1500dbd6c68db1d772c16ee998a9 rdf:rest _:ca0e42dbdd9f1ce05529c9c514c8e244 ;
+_:d5cabe4b6386f53c1f8a4a3fcdeed339 rdf:rest _:ce6e5b41186a15b3d655042b1dca6026 ;
 	rdf:first "concept-scheme" .
-_:ca0e42dbdd9f1ce05529c9c514c8e244 rdf:rest rdf:nil ;
+_:ce6e5b41186a15b3d655042b1dca6026 rdf:rest rdf:nil ;
 	rdf:first "external-source" .
-reqvire:TurtlePrefixDeclarationShape sh:property _:ca8cf6f1d4be51c19ae9de8f78354a0a .
-_:e2949437c7b16c65125866eac9c2079a sh:path reqvire:turtlePrefixReserved ;
+reqvire:TurtlePrefixDeclarationShape sh:property _:c19d423ac355b8469feb31e9de1e2d41 .
+_:fd8348b3b0a73c7d7d7f1b0fbe133c9a sh:path reqvire:turtlePrefixReserved ;
 	sh:datatype xsd:boolean .
-reqvire:TurtlePrefixDeclarationShape sh:property _:e2949437c7b16c65125866eac9c2079a .
-_:b9e5519e53dd93de15cce3e2342a6114 sh:path reqvire:turtlePrefixOrder ;
+reqvire:TurtlePrefixDeclarationShape sh:property _:fd8348b3b0a73c7d7d7f1b0fbe133c9a .
+_:dfdce56005bbfd7e3ccecfec63c64f24 sh:path reqvire:turtlePrefixOrder ;
 	sh:datatype xsd:integer .
-reqvire:TurtlePrefixDeclarationShape sh:property _:b9e5519e53dd93de15cce3e2342a6114 .
+reqvire:TurtlePrefixDeclarationShape sh:property _:dfdce56005bbfd7e3ccecfec63c64f24 .
 reqvire:RuntimeOntologyArtifactShape a sh:NodeShape ;
 	sh:targetClass reqvire:RuntimeOntologyArtifact .
 reqvire:RdfProjectionShape a sh:NodeShape ;
 	sh:targetClass reqvire:RdfProjection .
-_:db90174c35396b57c391291811419dcd sh:path reqvire:projectionTriple ;
+_:dea0dc66196df87999100627df9ebdb0 sh:path reqvire:projectionTriple ;
 	sh:class reqvire:RdfTriple .
-reqvire:RdfProjectionShape sh:property _:db90174c35396b57c391291811419dcd .
-_:b1ef6124c7b108eba2443c319ca3e706 sh:path reqvire:relationTarget ;
+reqvire:RdfProjectionShape sh:property _:dea0dc66196df87999100627df9ebdb0 .
+_:d8ef64d0cdcb586e586f8a96066b4979 sh:path reqvire:relationTarget ;
 	sh:class reqvire:Element .
-reqvire:RdfProjectionShape sh:property _:b1ef6124c7b108eba2443c319ca3e706 .
-_:cd8111f57e5cf5a4e9823047c9125858 sh:path reqvire:conceptReference ;
+reqvire:RdfProjectionShape sh:property _:d8ef64d0cdcb586e586f8a96066b4979 .
+_:d22e46aede1598ef6f13c6f4674a993c sh:path reqvire:conceptReference ;
 	sh:class reqvire:Element .
-reqvire:RdfProjectionShape sh:property _:cd8111f57e5cf5a4e9823047c9125858 .
-_:fab54c5132cd30a9025de9bd984c974c sh:path reqvire:relationType ;
+reqvire:RdfProjectionShape sh:property _:d22e46aede1598ef6f13c6f4674a993c .
+_:ad813305807917786b31c06f0ab51c23 sh:path reqvire:relationType ;
 	sh:datatype xsd:string .
-reqvire:RdfProjectionShape sh:property _:fab54c5132cd30a9025de9bd984c974c .
-_:b41bddbe58fe8865a80042669f783504 sh:path reqvire:relationTargetIdentifier ;
+reqvire:RdfProjectionShape sh:property _:ad813305807917786b31c06f0ab51c23 .
+_:b56f8ded39fee8ab64d451a846639e94 sh:path reqvire:relationTargetIdentifier ;
 	sh:datatype xsd:string .
-reqvire:RdfProjectionShape sh:property _:b41bddbe58fe8865a80042669f783504 .
-_:bb48574734019e14c0699e6991d4585a sh:path reqvire:contractBindingsTargetIdentifier ;
+reqvire:RdfProjectionShape sh:property _:b56f8ded39fee8ab64d451a846639e94 .
+_:f240318a2c9c9fed42a9a28e0f087755 sh:path reqvire:contractBindingsTargetIdentifier ;
 	sh:datatype xsd:string .
-reqvire:RdfProjectionShape sh:property _:bb48574734019e14c0699e6991d4585a .
-_:e8647c4ea306f42d053f4937bda97b2d sh:path reqvire:conceptLabel ;
+reqvire:RdfProjectionShape sh:property _:f240318a2c9c9fed42a9a28e0f087755 .
+_:d2dfe3916b38e3c1eba4fbe8756b14a3 sh:path reqvire:conceptLabel ;
 	sh:datatype xsd:string .
-reqvire:RdfProjectionShape sh:property _:e8647c4ea306f42d053f4937bda97b2d .
-_:c7d1791202ba8b5338b606c480f665ac sh:path reqvire:referenceKind ;
+reqvire:RdfProjectionShape sh:property _:d2dfe3916b38e3c1eba4fbe8756b14a3 .
+_:a30302e0351244163fd924711bbe841f sh:path reqvire:referenceKind ;
 	sh:datatype xsd:string .
-reqvire:RdfProjectionShape sh:property _:c7d1791202ba8b5338b606c480f665ac .
+reqvire:RdfProjectionShape sh:property _:a30302e0351244163fd924711bbe841f .
 reqvire:OntologyProjectionGraphShape a sh:NodeShape ;
 	sh:targetClass reqvire:OntologyProjectionGraph .
-_:a613dc01c09ca9cc55422b2f24bf6eb6 sh:path reqvire:ontologyConstructProjection ;
+_:c5bfbb7c04dd7c258aa295dbcba57bab sh:path reqvire:ontologyConstructProjection ;
 	sh:class reqvire:OntologyConstructProjection .
-reqvire:OntologyProjectionGraphShape sh:property _:a613dc01c09ca9cc55422b2f24bf6eb6 .
-_:e8697fa5fadc2e131712792851800324 sh:path reqvire:projectedConstruct ;
+reqvire:OntologyProjectionGraphShape sh:property _:c5bfbb7c04dd7c258aa295dbcba57bab .
+_:e279b91602915af78f50b78c0a19192a sh:path reqvire:projectedConstruct ;
 	sh:class reqvire:OntologyConstruct .
-reqvire:OntologyProjectionGraphShape sh:property _:e8697fa5fadc2e131712792851800324 .
-_:e256b24387e69eeb297dabe5512d610c sh:path reqvire:projectionDerivationMode ;
+reqvire:OntologyProjectionGraphShape sh:property _:e279b91602915af78f50b78c0a19192a .
+_:c4bd2421f55b5109ca76336a01c3f69e sh:path reqvire:projectionDerivationMode ;
 	sh:datatype xsd:string .
-reqvire:OntologyProjectionGraphShape sh:property _:e256b24387e69eeb297dabe5512d610c .
+reqvire:OntologyProjectionGraphShape sh:property _:c4bd2421f55b5109ca76336a01c3f69e .
 reqvire:ConceptRelationProjectionShape a sh:NodeShape ;
 	sh:targetClass reqvire:ConceptRelationProjection .
-_:b81b3057d34d217cb4de1e9b9709db0a sh:path reqvire:projectionDerivationMode ;
+_:d5e8c3ea13f7ea4758dc478ae4605053 sh:path reqvire:projectionDerivationMode ;
 	sh:datatype xsd:string .
-reqvire:ConceptRelationProjectionShape sh:property _:b81b3057d34d217cb4de1e9b9709db0a .
-_:e871d92bbf98bb378da177eaffe3ef73 sh:path reqvire:constructSourceBlock ;
+reqvire:ConceptRelationProjectionShape sh:property _:d5e8c3ea13f7ea4758dc478ae4605053 .
+_:d3c84779326e281ebfb4ff3057308155 sh:path reqvire:constructSourceBlock ;
 	sh:class reqvire:SemanticBlock .
-reqvire:ConceptRelationProjectionShape sh:property _:e871d92bbf98bb378da177eaffe3ef73 .
-_:dac5ded4cdb022e2a8044275c28e38f4 sh:path reqvire:canonicalConceptRelationSource ;
+reqvire:ConceptRelationProjectionShape sh:property _:d3c84779326e281ebfb4ff3057308155 .
+_:e73fce2419e0372d2e02359aafb3a9ba sh:path reqvire:canonicalConceptRelationSource ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:OntologyTerm .
-reqvire:ConceptRelationProjectionShape sh:property _:dac5ded4cdb022e2a8044275c28e38f4 .
-_:d42ce6d4596102aff3b2d38df7ceea13 sh:path reqvire:canonicalConceptRelationTarget ;
+reqvire:ConceptRelationProjectionShape sh:property _:e73fce2419e0372d2e02359aafb3a9ba .
+_:afe46b3330e89d5ba4fe38094bca2913 sh:path reqvire:canonicalConceptRelationTarget ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:OntologyTerm .
-reqvire:ConceptRelationProjectionShape sh:property _:d42ce6d4596102aff3b2d38df7ceea13 .
-_:f975ba2cac11c17201b781f6f543e361 sh:path reqvire:normalizedConceptRelationForwardProperty ;
+reqvire:ConceptRelationProjectionShape sh:property _:afe46b3330e89d5ba4fe38094bca2913 .
+_:c644c2d8039d9a9f74f1b9592cf8afd6 sh:path reqvire:normalizedConceptRelationForwardProperty ;
 	sh:minCount 1 ;
 	sh:maxCount 1 .
-_:dc52fdfa1466acd86d85e3263c6e6bb8 rdf:first skos:broader .
-_:f975ba2cac11c17201b781f6f543e361 sh:in _:dc52fdfa1466acd86d85e3263c6e6bb8 .
-_:b6634263fb17cf8956acc6effa86a258 rdf:first skos:narrower .
-_:dc52fdfa1466acd86d85e3263c6e6bb8 rdf:rest _:b6634263fb17cf8956acc6effa86a258 .
-_:b3e13cadc2a902d64dd9b7c691e94b84 rdf:first skos:related .
-_:b6634263fb17cf8956acc6effa86a258 rdf:rest _:b3e13cadc2a902d64dd9b7c691e94b84 .
-_:e167f393e1821dd20f9a8ce9a087b2cf rdf:first skos:exactMatch .
-_:b3e13cadc2a902d64dd9b7c691e94b84 rdf:rest _:e167f393e1821dd20f9a8ce9a087b2cf .
-_:bf8e7ac9b1cd7e470d40e1f178e5dc20 rdf:first skos:closeMatch .
-_:e167f393e1821dd20f9a8ce9a087b2cf rdf:rest _:bf8e7ac9b1cd7e470d40e1f178e5dc20 .
-_:bf8e7ac9b1cd7e470d40e1f178e5dc20 rdf:rest rdf:nil .
-reqvire:ConceptRelationProjectionShape sh:property _:f975ba2cac11c17201b781f6f543e361 .
-_:fd7892d21f4932ad6e7b9553f7b248fa sh:path reqvire:normalizedConceptRelationInverseProperty ;
+_:d9c3cadc641b85b8b0d30e3ca3222d96 rdf:first skos:broader .
+_:c644c2d8039d9a9f74f1b9592cf8afd6 sh:in _:d9c3cadc641b85b8b0d30e3ca3222d96 .
+_:be0e5da458d88f32394db05809816d70 rdf:first skos:narrower .
+_:d9c3cadc641b85b8b0d30e3ca3222d96 rdf:rest _:be0e5da458d88f32394db05809816d70 .
+_:bd4ef04008a63d6ad3251433aa1523ac rdf:first skos:related .
+_:be0e5da458d88f32394db05809816d70 rdf:rest _:bd4ef04008a63d6ad3251433aa1523ac .
+_:d3f3fa31d8595da61c9a17275f7dd90e rdf:first skos:exactMatch .
+_:bd4ef04008a63d6ad3251433aa1523ac rdf:rest _:d3f3fa31d8595da61c9a17275f7dd90e .
+_:cd3296c01a3a48ff597956c3844d0945 rdf:first skos:closeMatch .
+_:d3f3fa31d8595da61c9a17275f7dd90e rdf:rest _:cd3296c01a3a48ff597956c3844d0945 .
+_:cd3296c01a3a48ff597956c3844d0945 rdf:rest rdf:nil .
+reqvire:ConceptRelationProjectionShape sh:property _:c644c2d8039d9a9f74f1b9592cf8afd6 .
+_:e0a2b3828d23af45e9e796c73c82c638 sh:path reqvire:normalizedConceptRelationInverseProperty ;
 	sh:minCount 1 ;
 	sh:maxCount 1 .
-_:b50b50c80fa756982d64577913effe17 rdf:first skos:broader .
-_:fd7892d21f4932ad6e7b9553f7b248fa sh:in _:b50b50c80fa756982d64577913effe17 .
-_:ff45261e0b7b2a3d3112e8c35a9ee0ea rdf:first skos:narrower .
-_:b50b50c80fa756982d64577913effe17 rdf:rest _:ff45261e0b7b2a3d3112e8c35a9ee0ea .
-_:a668d76066852a4c347527b7291a0680 rdf:first skos:related .
-_:ff45261e0b7b2a3d3112e8c35a9ee0ea rdf:rest _:a668d76066852a4c347527b7291a0680 .
-_:ce06dd0be8747d87724516c3d1d34b2a rdf:first skos:exactMatch .
-_:a668d76066852a4c347527b7291a0680 rdf:rest _:ce06dd0be8747d87724516c3d1d34b2a .
-_:cc37285941befc33e338692ca0580b4c rdf:first skos:closeMatch .
-_:ce06dd0be8747d87724516c3d1d34b2a rdf:rest _:cc37285941befc33e338692ca0580b4c .
-_:cc37285941befc33e338692ca0580b4c rdf:rest rdf:nil .
-reqvire:ConceptRelationProjectionShape sh:property _:fd7892d21f4932ad6e7b9553f7b248fa .
-_:e17baadafa58f18431cefd79880b768e sh:path reqvire:conceptRelationProjectionEvidence ;
+_:fb40da585ac836f48ed5075448f90ac5 rdf:first skos:broader .
+_:e0a2b3828d23af45e9e796c73c82c638 sh:in _:fb40da585ac836f48ed5075448f90ac5 .
+_:e19e9f63e41097641410adb8853c48bc rdf:first skos:narrower .
+_:fb40da585ac836f48ed5075448f90ac5 rdf:rest _:e19e9f63e41097641410adb8853c48bc .
+_:aa0c97044a61bccc0e7ccf8398ab29cc rdf:first skos:related .
+_:e19e9f63e41097641410adb8853c48bc rdf:rest _:aa0c97044a61bccc0e7ccf8398ab29cc .
+_:a54b3554dd5ea48d88326963ef2337cf rdf:first skos:exactMatch .
+_:aa0c97044a61bccc0e7ccf8398ab29cc rdf:rest _:a54b3554dd5ea48d88326963ef2337cf .
+_:bea2df392f8aa4becd2c8318215da32d rdf:first skos:closeMatch .
+_:a54b3554dd5ea48d88326963ef2337cf rdf:rest _:bea2df392f8aa4becd2c8318215da32d .
+_:bea2df392f8aa4becd2c8318215da32d rdf:rest rdf:nil .
+reqvire:ConceptRelationProjectionShape sh:property _:e0a2b3828d23af45e9e796c73c82c638 .
+_:ff98ef77bf87806fa2a749e7dbc599a2 sh:path reqvire:conceptRelationProjectionEvidence ;
 	sh:class reqvire:ConceptRelationProjectionEvidence .
-reqvire:ConceptRelationProjectionShape sh:property _:e17baadafa58f18431cefd79880b768e .
+reqvire:ConceptRelationProjectionShape sh:property _:ff98ef77bf87806fa2a749e7dbc599a2 .
 reqvire:ConceptRelationProjectionEvidenceShape a sh:NodeShape ;
 	sh:targetClass reqvire:ConceptRelationProjectionEvidence .
-_:d4c73425e3a3eee18fe2f0a98b589e71 sh:path reqvire:constructSourceBlock ;
+_:af8abe95d84beb64ec30d9183c4ea8f6 sh:path reqvire:constructSourceBlock ;
 	sh:minCount 1 ;
 	sh:class reqvire:SemanticBlock .
-reqvire:ConceptRelationProjectionEvidenceShape sh:property _:d4c73425e3a3eee18fe2f0a98b589e71 .
-_:b18d1af51408d23ceb879088323b8b88 sh:path reqvire:sourceRelationType ;
+reqvire:ConceptRelationProjectionEvidenceShape sh:property _:af8abe95d84beb64ec30d9183c4ea8f6 .
+_:a9de174743bd93e40af3a6c9e7d83ce0 sh:path reqvire:sourceRelationType ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
-	sh:in _:dc79f871e664fe1bc4ad5aedf04a539d .
-_:dc79f871e664fe1bc4ad5aedf04a539d rdf:rest _:bbe5c33b8acc53601331e9b8b7b64eb1 ;
+	sh:in _:c5f35f796c9ce6620d88bfb182563fbf .
+_:c5f35f796c9ce6620d88bfb182563fbf rdf:rest _:d17642d9e1ad7e8334883321ab9f9277 ;
 	rdf:first "broader" .
-_:bbe5c33b8acc53601331e9b8b7b64eb1 rdf:rest _:b8bd81c588ce56c62e9e9185335b6887 ;
+_:d17642d9e1ad7e8334883321ab9f9277 rdf:rest _:bfa30765c0d47676f851e5d6bd16196a ;
 	rdf:first "narrower" .
-_:b8bd81c588ce56c62e9e9185335b6887 rdf:rest _:b32aeb077b03309b7bffcab86b56207e ;
+_:bfa30765c0d47676f851e5d6bd16196a rdf:rest _:ac3fdfbdffe2a4d9706d90bc01b35a66 ;
 	rdf:first "related" .
-_:b32aeb077b03309b7bffcab86b56207e rdf:rest _:e0386b6fa822e31f26e8d4efa819784a ;
+_:ac3fdfbdffe2a4d9706d90bc01b35a66 rdf:rest _:efbaa00fd3fd7ed20feea5be4c472e1b ;
 	rdf:first "exactMatch" .
-_:e0386b6fa822e31f26e8d4efa819784a rdf:rest rdf:nil ;
+_:efbaa00fd3fd7ed20feea5be4c472e1b rdf:rest rdf:nil ;
 	rdf:first "closeMatch" .
-reqvire:ConceptRelationProjectionEvidenceShape sh:property _:b18d1af51408d23ceb879088323b8b88 .
-_:c312382d0942bddd9d5303262025ef0f sh:path reqvire:constructSubject ;
+reqvire:ConceptRelationProjectionEvidenceShape sh:property _:a9de174743bd93e40af3a6c9e7d83ce0 .
+_:ccda057e2b7a47f1e70c221c9cbcab89 sh:path reqvire:constructSubject ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:OntologyTerm .
-reqvire:ConceptRelationProjectionEvidenceShape sh:property _:c312382d0942bddd9d5303262025ef0f .
-_:a59100edae7665925cf4c2dad18c8be0 sh:path reqvire:constructObject ;
+reqvire:ConceptRelationProjectionEvidenceShape sh:property _:ccda057e2b7a47f1e70c221c9cbcab89 .
+_:d3592b6cdeece862991f6824c2be3ed4 sh:path reqvire:constructObject ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:OntologyTerm .
-reqvire:ConceptRelationProjectionEvidenceShape sh:property _:a59100edae7665925cf4c2dad18c8be0 .
+reqvire:ConceptRelationProjectionEvidenceShape sh:property _:d3592b6cdeece862991f6824c2be3ed4 .
 reqvire:OntologyConstructProjectionShape a sh:NodeShape ;
 	sh:targetClass reqvire:OntologyConstructProjection .
-_:e7dc6624b1ca4feb696289895b9d3730 sh:path reqvire:constructFamily ;
+_:d58ed53315aac5594b2776b04f9c16a8 sh:path reqvire:constructFamily ;
 	sh:datatype xsd:string .
-reqvire:OntologyConstructProjectionShape sh:property _:e7dc6624b1ca4feb696289895b9d3730 .
-_:f8776353d463d42b472caf77386ead17 sh:path reqvire:projectedConstruct ;
+reqvire:OntologyConstructProjectionShape sh:property _:d58ed53315aac5594b2776b04f9c16a8 .
+_:d11281ab1aba51ee692ff8706cf7be04 sh:path reqvire:projectedConstruct ;
 	sh:class reqvire:OntologyConstruct .
-reqvire:OntologyConstructProjectionShape sh:property _:f8776353d463d42b472caf77386ead17 .
-_:b6f77249892d96a64b2b0dcca82b8f40 sh:path reqvire:projectionDerivationMode ;
+reqvire:OntologyConstructProjectionShape sh:property _:d11281ab1aba51ee692ff8706cf7be04 .
+_:faeb7fe2fc9c2c6b16bcbab7047c586c sh:path reqvire:projectionDerivationMode ;
 	sh:datatype xsd:string .
-reqvire:OntologyConstructProjectionShape sh:property _:b6f77249892d96a64b2b0dcca82b8f40 .
+reqvire:OntologyConstructProjectionShape sh:property _:faeb7fe2fc9c2c6b16bcbab7047c586c .
 reqvire:OntologyConstructShape a sh:NodeShape ;
 	sh:targetClass reqvire:OntologyConstruct .
-_:a0fa46ec336a778b79ebd52e4ab77ec2 sh:path reqvire:constructFamily ;
+_:a554e8e07c02e2043a517fc4491ff1cd sh:path reqvire:constructFamily ;
 	sh:datatype xsd:string .
-reqvire:OntologyConstructShape sh:property _:a0fa46ec336a778b79ebd52e4ab77ec2 .
-_:a29857a8c9d630b43989dfd983d8313d sh:path reqvire:constructKind ;
+reqvire:OntologyConstructShape sh:property _:a554e8e07c02e2043a517fc4491ff1cd .
+_:ff22c9ead119e14038cee7f5b048e0ca sh:path reqvire:constructKind ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:OntologyConstructShape sh:property _:a29857a8c9d630b43989dfd983d8313d .
-_:d508b140a9f2de4c3059ae134eccb471 sh:path reqvire:constructSourceBlock ;
+reqvire:OntologyConstructShape sh:property _:ff22c9ead119e14038cee7f5b048e0ca .
+_:e02cfefbf5e6a38496e19f62c9a16c3c sh:path reqvire:constructSourceBlock ;
 	sh:class reqvire:SemanticBlock .
-reqvire:OntologyConstructShape sh:property _:d508b140a9f2de4c3059ae134eccb471 .
-_:a892a4f4c7e97d47ae3e109e3f91eef5 sh:path reqvire:constructSubject ;
+reqvire:OntologyConstructShape sh:property _:e02cfefbf5e6a38496e19f62c9a16c3c .
+_:faf08eaa28a8bf6408ab6563e54b08b0 sh:path reqvire:constructSubject ;
 	sh:class reqvire:OntologyTerm .
-reqvire:OntologyConstructShape sh:property _:a892a4f4c7e97d47ae3e109e3f91eef5 .
-_:d5e5c7c94769f6471f25aa293640cdac sh:path reqvire:constructPredicate ;
+reqvire:OntologyConstructShape sh:property _:faf08eaa28a8bf6408ab6563e54b08b0 .
+_:c286909a4d1014dc6ae3c95d034da47f sh:path reqvire:constructPredicate ;
 	sh:class reqvire:OntologyTerm .
-reqvire:OntologyConstructShape sh:property _:d5e5c7c94769f6471f25aa293640cdac .
-_:d24e8ea6b4b11dfdd00eb3d7f1d7e562 sh:path reqvire:constructObject ;
+reqvire:OntologyConstructShape sh:property _:c286909a4d1014dc6ae3c95d034da47f .
+_:a6c2fe1effa89ea49dbf6222464824db sh:path reqvire:constructObject ;
 	sh:class reqvire:OntologyTerm .
-reqvire:OntologyConstructShape sh:property _:d24e8ea6b4b11dfdd00eb3d7f1d7e562 .
-_:b1ffbf65f662f89990315c0b5df331cc sh:path reqvire:constructProperty ;
+reqvire:OntologyConstructShape sh:property _:a6c2fe1effa89ea49dbf6222464824db .
+_:b7f9232438bdbb368b8221f111c90e8d sh:path reqvire:constructProperty ;
 	sh:class reqvire:OntologyTerm .
-reqvire:OntologyConstructShape sh:property _:b1ffbf65f662f89990315c0b5df331cc .
-_:add3e721f3e13667f96fc21dc939f45f sh:path reqvire:constructMember ;
+reqvire:OntologyConstructShape sh:property _:b7f9232438bdbb368b8221f111c90e8d .
+_:dfd6ae65da00ae2ba849ff0478c66094 sh:path reqvire:constructMember ;
 	sh:class reqvire:OntologyConstructMember .
-reqvire:OntologyConstructShape sh:property _:add3e721f3e13667f96fc21dc939f45f .
-_:c1d920f26f49ec6c9820a352faba3ef4 sh:path reqvire:constructProvenance ;
+reqvire:OntologyConstructShape sh:property _:dfd6ae65da00ae2ba849ff0478c66094 .
+_:e5611606caca0f01bc1ae6061aee14a sh:path reqvire:constructProvenance ;
 	sh:class reqvire:OntologyProjectionProvenance .
-reqvire:OntologyConstructShape sh:property _:c1d920f26f49ec6c9820a352faba3ef4 .
-_:eeccfcbf14f13490ab01007be7a4eba9 sh:path reqvire:propertyCharacteristic ;
+reqvire:OntologyConstructShape sh:property _:e5611606caca0f01bc1ae6061aee14a .
+_:ba3caace964c75c270f4568cc39086d2 sh:path reqvire:propertyCharacteristic ;
 	sh:datatype xsd:string .
-reqvire:OntologyConstructShape sh:property _:eeccfcbf14f13490ab01007be7a4eba9 .
-_:cd3dbcc4f846388d277ae0fba6c74cde sh:path reqvire:restrictionKind ;
+reqvire:OntologyConstructShape sh:property _:ba3caace964c75c270f4568cc39086d2 .
+_:a05ae56cc871893d3f27c8dc2d764f7a sh:path reqvire:restrictionKind ;
 	sh:datatype xsd:string .
-reqvire:OntologyConstructShape sh:property _:cd3dbcc4f846388d277ae0fba6c74cde .
-_:c6b1273976d7a0474ef57445736a7f47 sh:path reqvire:classExpressionKind ;
+reqvire:OntologyConstructShape sh:property _:a05ae56cc871893d3f27c8dc2d764f7a .
+_:ada0be954519eedb2e91ee7580a866dd sh:path reqvire:classExpressionKind ;
 	sh:datatype xsd:string .
-reqvire:OntologyConstructShape sh:property _:c6b1273976d7a0474ef57445736a7f47 .
-_:f3033cd50f8e855b9fc3d521839b50be sh:path reqvire:shapeOverlayKind ;
+reqvire:OntologyConstructShape sh:property _:ada0be954519eedb2e91ee7580a866dd .
+_:c9c34efcf33f8f05a0ee5c2c2459c8a1 sh:path reqvire:shapeOverlayKind ;
 	sh:datatype xsd:string .
-reqvire:OntologyConstructShape sh:property _:f3033cd50f8e855b9fc3d521839b50be .
+reqvire:OntologyConstructShape sh:property _:c9c34efcf33f8f05a0ee5c2c2459c8a1 .
 reqvire:SemanticConstructQueryShape a sh:NodeShape ;
 	sh:targetClass reqvire:SemanticConstructQuery .
-_:df0314b61752ef383255e08768370f67 sh:path reqvire:constructQueryName ;
+_:f29ee639de0573717eca2748954a4797 sh:path reqvire:constructQueryName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:SemanticConstructQueryShape sh:property _:df0314b61752ef383255e08768370f67 .
-_:f7ce25f0f8c1b7ea67511ace9e939982 sh:path reqvire:constructQueryText ;
+reqvire:SemanticConstructQueryShape sh:property _:f29ee639de0573717eca2748954a4797 .
+_:d14341d27119d63a4774194b8f495b87 sh:path reqvire:constructQueryText ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string .
-reqvire:SemanticConstructQueryShape sh:property _:f7ce25f0f8c1b7ea67511ace9e939982 .
-_:e65c863271a98164911843d727749a8b sh:path reqvire:constructQueryPurpose ;
+reqvire:SemanticConstructQueryShape sh:property _:d14341d27119d63a4774194b8f495b87 .
+_:b1e51bcf3d0b824b4d42babdf518c332 sh:path reqvire:constructQueryPurpose ;
 	sh:datatype xsd:string .
-reqvire:SemanticConstructQueryShape sh:property _:e65c863271a98164911843d727749a8b .
-_:e63a3e1494b49454857af0bc2e688702 sh:path reqvire:constructQueryMaterializesProperty ;
+reqvire:SemanticConstructQueryShape sh:property _:b1e51bcf3d0b824b4d42babdf518c332 .
+_:e00a62fc4addb6d7d76fb84bd50893b5 sh:path reqvire:constructQueryMaterializesProperty ;
 	sh:nodeKind sh:IRI .
-reqvire:SemanticConstructQueryShape sh:property _:e63a3e1494b49454857af0bc2e688702 .
+reqvire:SemanticConstructQueryShape sh:property _:e00a62fc4addb6d7d76fb84bd50893b5 .
 reqvire:NormalizedRelationConstructQueryShape a sh:NodeShape ;
 	sh:targetClass reqvire:NormalizedRelationConstructQuery .
-_:cea2e358356aa3590f5742d3f2b46fb9 sh:path reqvire:projectionDerivationMode ;
+_:d858d88ada072bad06e4024e317fbdc5 sh:path reqvire:projectionDerivationMode ;
 	sh:hasValue "construct-query-specified" .
-reqvire:NormalizedRelationConstructQueryShape sh:property _:cea2e358356aa3590f5742d3f2b46fb9 ;
-	sh:xone _:e5862d8fd5eaa04ce102228d36bdfbee .
-_:ec8cd6a38f0892d51b443b1cf3a05bd8 sh:path rdf:type ;
+reqvire:NormalizedRelationConstructQueryShape sh:property _:d858d88ada072bad06e4024e317fbdc5 ;
+	sh:xone _:df1abeb1433136b30cfc916a4d513796 .
+_:acf0064b71dcc97867be4d3c09917adc sh:path rdf:type ;
 	sh:hasValue reqvire:RelationFamilyConstructQuery .
-_:e7a0e65e8593d15af5f12b4893f47710 sh:property _:ec8cd6a38f0892d51b443b1cf3a05bd8 .
-_:e5862d8fd5eaa04ce102228d36bdfbee rdf:first _:e7a0e65e8593d15af5f12b4893f47710 ;
-	rdf:rest _:d185e69f325e834c625567d05b69170 .
-_:d1a733408dcb563627bc7662df489d6 sh:path rdf:type ;
+_:f98aa36d41b5aaaef4bb069b0506242c sh:property _:acf0064b71dcc97867be4d3c09917adc .
+_:df1abeb1433136b30cfc916a4d513796 rdf:first _:f98aa36d41b5aaaef4bb069b0506242c ;
+	rdf:rest _:a0393e643c3564a7ed38ff60f570c023 .
+_:ade1422b206e66073a5a84603f8fca94 sh:path rdf:type ;
 	sh:hasValue reqvire:ConceptRelationConstructQuery .
-_:e1f3dc252fa6cf9926fc01837391499d sh:property _:d1a733408dcb563627bc7662df489d6 .
-_:d185e69f325e834c625567d05b69170 rdf:first _:e1f3dc252fa6cf9926fc01837391499d ;
+_:d9ba275371cd7939d8781ced3a8baf3 sh:property _:ade1422b206e66073a5a84603f8fca94 .
+_:a0393e643c3564a7ed38ff60f570c023 rdf:first _:d9ba275371cd7939d8781ced3a8baf3 ;
 	rdf:rest rdf:nil .
-_:eec90984d1a9a41203f00b1037232c6f sh:path reqvire:constructQueryMaterializesProperty ;
+_:b9b7354d0e808b00fed7d4355ea9ae8c sh:path reqvire:constructQueryMaterializesProperty ;
 	sh:minCount 1 ;
 	sh:nodeKind sh:IRI .
-reqvire:NormalizedRelationConstructQueryShape sh:property _:eec90984d1a9a41203f00b1037232c6f .
+reqvire:NormalizedRelationConstructQueryShape sh:property _:b9b7354d0e808b00fed7d4355ea9ae8c .
 reqvire:ConceptRelationConstructQueryShape a sh:NodeShape ;
 	sh:targetClass reqvire:ConceptRelationConstructQuery .
-_:d623b093359070d789a73811d1cee75f sh:path reqvire:constructFamily ;
+_:ee16b5455fdf28d7853d7525d8eca167 sh:path reqvire:constructFamily ;
 	sh:hasValue "concept-relation" .
-reqvire:ConceptRelationConstructQueryShape sh:property _:d623b093359070d789a73811d1cee75f .
-_:f48bf06859601235805c762f85417abd sh:path reqvire:constructKind ;
+reqvire:ConceptRelationConstructQueryShape sh:property _:ee16b5455fdf28d7853d7525d8eca167 .
+_:c7756d197821398e8686d2784db3df74 sh:path reqvire:constructKind ;
 	sh:hasValue "concept-relation-normalized-projection" .
-reqvire:ConceptRelationConstructQueryShape sh:property _:f48bf06859601235805c762f85417abd .
-_:b754aa987153d883aefac078e3031187 sh:path reqvire:constructQueryMaterializesProperty ;
+reqvire:ConceptRelationConstructQueryShape sh:property _:c7756d197821398e8686d2784db3df74 .
+_:c832e8c3082d345eaa2bd5bdc2371924 sh:path reqvire:constructQueryMaterializesProperty ;
 	sh:hasValue skos:broader .
-reqvire:ConceptRelationConstructQueryShape sh:property _:b754aa987153d883aefac078e3031187 .
-_:fca4f4106282eaafe30ecef00de86b2c sh:path reqvire:constructQueryMaterializesProperty ;
+reqvire:ConceptRelationConstructQueryShape sh:property _:c832e8c3082d345eaa2bd5bdc2371924 .
+_:c25d4be91edf2cdec451e54570c3f6f2 sh:path reqvire:constructQueryMaterializesProperty ;
 	sh:hasValue skos:narrower .
-reqvire:ConceptRelationConstructQueryShape sh:property _:fca4f4106282eaafe30ecef00de86b2c .
-_:ead15dd8386a02ef4a5cc7493acf7a40 sh:path reqvire:constructQueryMaterializesProperty ;
+reqvire:ConceptRelationConstructQueryShape sh:property _:c25d4be91edf2cdec451e54570c3f6f2 .
+_:d74571a5ed03eb1538e9bda1697e7110 sh:path reqvire:constructQueryMaterializesProperty ;
 	sh:hasValue skos:related .
-reqvire:ConceptRelationConstructQueryShape sh:property _:ead15dd8386a02ef4a5cc7493acf7a40 .
-_:b6e1b8ea0f6ec32a2f50e3ff15b609a5 sh:path reqvire:constructQueryMaterializesProperty ;
+reqvire:ConceptRelationConstructQueryShape sh:property _:d74571a5ed03eb1538e9bda1697e7110 .
+_:e486cf6ccba106164e6509ff3b927a19 sh:path reqvire:constructQueryMaterializesProperty ;
 	sh:hasValue skos:exactMatch .
-reqvire:ConceptRelationConstructQueryShape sh:property _:b6e1b8ea0f6ec32a2f50e3ff15b609a5 .
-_:b6a8b377ff6ce7d7459f2bb2a89a2637 sh:path reqvire:constructQueryMaterializesProperty ;
+reqvire:ConceptRelationConstructQueryShape sh:property _:e486cf6ccba106164e6509ff3b927a19 .
+_:d0a2be49e266789608e5c7cfe3c11311 sh:path reqvire:constructQueryMaterializesProperty ;
 	sh:hasValue skos:closeMatch .
-reqvire:ConceptRelationConstructQueryShape sh:property _:b6a8b377ff6ce7d7459f2bb2a89a2637 .
+reqvire:ConceptRelationConstructQueryShape sh:property _:d0a2be49e266789608e5c7cfe3c11311 .
 reqvire:RelationFamilyConstructQueryShape a sh:NodeShape ;
 	sh:targetClass reqvire:RelationFamilyConstructQuery .
-_:c2fcb37768ce1a754321d8021635510c sh:path reqvire:constructFamily ;
+_:db935585b1281d109eba4cdc55ffbc04 sh:path reqvire:constructFamily ;
 	sh:hasValue "semantic-search" .
-reqvire:RelationFamilyConstructQueryShape sh:property _:c2fcb37768ce1a754321d8021635510c .
-_:bc852b63b72f7faedcd1d170528255f3 sh:path reqvire:constructKind ;
+reqvire:RelationFamilyConstructQueryShape sh:property _:db935585b1281d109eba4cdc55ffbc04 .
+_:f3b7a75c4a78ab2f6341beb918cf97c9 sh:path reqvire:constructKind ;
 	sh:hasValue "relation-family-normalized-projection" .
-reqvire:RelationFamilyConstructQueryShape sh:property _:bc852b63b72f7faedcd1d170528255f3 .
-_:a4078089a012c9c60270dec9899c3234 sh:path reqvire:constructQueryMaterializesFamily ;
+reqvire:RelationFamilyConstructQueryShape sh:property _:f3b7a75c4a78ab2f6341beb918cf97c9 .
+_:f6dd5c48bc7c1ccf5ac7728d01553b5f sh:path reqvire:constructQueryMaterializesFamily ;
 	sh:minCount 1 ;
 	sh:class reqvire:RelationFamily .
-reqvire:RelationFamilyConstructQueryShape sh:property _:a4078089a012c9c60270dec9899c3234 .
+reqvire:RelationFamilyConstructQueryShape sh:property _:f6dd5c48bc7c1ccf5ac7728d01553b5f .
 reqvire:OntologyConstructMemberShape a sh:NodeShape ;
 	sh:targetClass reqvire:OntologyConstructMember .
-_:f9ce725b4c3c48c59b3d80d85911d1e8 sh:path reqvire:memberTerm ;
+_:fa25713ca364771161445907f5a0a835 sh:path reqvire:memberTerm ;
 	sh:class reqvire:OntologyTerm .
-reqvire:OntologyConstructMemberShape sh:property _:f9ce725b4c3c48c59b3d80d85911d1e8 .
-_:ed9dc1a9cc3c1251cbdc27b20a6631cf sh:path reqvire:constructSourceBlock ;
+reqvire:OntologyConstructMemberShape sh:property _:fa25713ca364771161445907f5a0a835 .
+_:f1deaeec5788acb1a04ff0e2922c3022 sh:path reqvire:constructSourceBlock ;
 	sh:class reqvire:SemanticBlock .
-reqvire:OntologyConstructMemberShape sh:property _:ed9dc1a9cc3c1251cbdc27b20a6631cf .
-_:eab052a8f1418b4664f921017d1eff07 sh:path reqvire:constructSequenceIndex ;
+reqvire:OntologyConstructMemberShape sh:property _:f1deaeec5788acb1a04ff0e2922c3022 .
+_:f8bad0ba8601e2f4d53a1c4873a8313a sh:path reqvire:constructSequenceIndex ;
 	sh:datatype xsd:integer .
-reqvire:OntologyConstructMemberShape sh:property _:eab052a8f1418b4664f921017d1eff07 .
+reqvire:OntologyConstructMemberShape sh:property _:f8bad0ba8601e2f4d53a1c4873a8313a .
 reqvire:OntologyProjectionProvenanceShape a sh:NodeShape ;
 	sh:targetClass reqvire:OntologyProjectionProvenance .
-_:b24d2930b01c094763a91c903754dc07 sh:path reqvire:projectionDerivationMode ;
+_:c2d2cffaa9518ff4ce2b3ab00b679e4f sh:path reqvire:projectionDerivationMode ;
 	sh:datatype xsd:string .
-reqvire:OntologyProjectionProvenanceShape sh:property _:b24d2930b01c094763a91c903754dc07 .
-_:c5d1200ad017ec2b910770b571a1418c sh:path reqvire:provenanceSource ;
+reqvire:OntologyProjectionProvenanceShape sh:property _:c2d2cffaa9518ff4ce2b3ab00b679e4f .
+_:c05e3b5b96d7c532e1aeaa6881d9cf63 sh:path reqvire:provenanceSource ;
 	sh:class reqvire:OntologyProjectionSource .
-reqvire:OntologyProjectionProvenanceShape sh:property _:c5d1200ad017ec2b910770b571a1418c .
-_:ef97f41397650ac30d9802f962d7c868 sh:path reqvire:provenanceEvidence ;
+reqvire:OntologyProjectionProvenanceShape sh:property _:c05e3b5b96d7c532e1aeaa6881d9cf63 .
+_:def8eb1330900fa94dc6ba049589468f sh:path reqvire:provenanceEvidence ;
 	sh:class reqvire:OntologyProjectionEvidence .
-reqvire:OntologyProjectionProvenanceShape sh:property _:ef97f41397650ac30d9802f962d7c868 .
+reqvire:OntologyProjectionProvenanceShape sh:property _:def8eb1330900fa94dc6ba049589468f .
 reqvire:OntologyProjectionEvidenceShape a sh:NodeShape ;
 	sh:targetClass reqvire:OntologyProjectionEvidence .
-_:e559ef1aec2b123666e289516eec9db4 sh:path reqvire:constructSourceBlock ;
+_:b4af9f1645c1e87fd494d866b3a136c sh:path reqvire:constructSourceBlock ;
 	sh:class reqvire:SemanticBlock .
-reqvire:OntologyProjectionEvidenceShape sh:property _:e559ef1aec2b123666e289516eec9db4 .
-_:a002c6fb1caeb6d3ebdc5895c743d948 sh:path reqvire:constructSubject ;
+reqvire:OntologyProjectionEvidenceShape sh:property _:b4af9f1645c1e87fd494d866b3a136c .
+_:d27ba4a448c844c5ee60bf249567df33 sh:path reqvire:constructSubject ;
 	sh:class reqvire:OntologyTerm .
-reqvire:OntologyProjectionEvidenceShape sh:property _:a002c6fb1caeb6d3ebdc5895c743d948 .
-_:f247c6c0cb76eab42ed18dd85cee383d sh:path reqvire:constructPredicate ;
+reqvire:OntologyProjectionEvidenceShape sh:property _:d27ba4a448c844c5ee60bf249567df33 .
+_:ed9ab09ddc4f808f4fbe096344f1f934 sh:path reqvire:constructPredicate ;
 	sh:class reqvire:OntologyTerm .
-reqvire:OntologyProjectionEvidenceShape sh:property _:f247c6c0cb76eab42ed18dd85cee383d .
-_:e925e2144cd461e3bc45d2244981f5a3 sh:path reqvire:constructObject ;
+reqvire:OntologyProjectionEvidenceShape sh:property _:ed9ab09ddc4f808f4fbe096344f1f934 .
+_:a329c896730037f04fb5449bb2efb329 sh:path reqvire:constructObject ;
 	sh:class reqvire:OntologyTerm .
-reqvire:OntologyProjectionEvidenceShape sh:property _:e925e2144cd461e3bc45d2244981f5a3 .
+reqvire:OntologyProjectionEvidenceShape sh:property _:a329c896730037f04fb5449bb2efb329 .
 reqvire:OntologyTermShape a sh:NodeShape ;
 	sh:targetClass reqvire:OntologyTerm .
-_:eb3b71f64208f94db010dc9210964f2c sh:path reqvire:termKind ;
+_:e347692a24a3c2f76e814059e9367600 sh:path reqvire:termKind ;
 	sh:datatype xsd:string .
-reqvire:OntologyTermShape sh:property _:eb3b71f64208f94db010dc9210964f2c .
-_:c9a045255e0afad0bd9b40219a6f7af5 sh:path reqvire:termValue ;
+reqvire:OntologyTermShape sh:property _:e347692a24a3c2f76e814059e9367600 .
+_:a3ef9f515fd73747cc08e4d000090f97 sh:path reqvire:termValue ;
 	sh:datatype xsd:string .
-reqvire:OntologyTermShape sh:property _:c9a045255e0afad0bd9b40219a6f7af5 .
-_:df6acb77371cd4e95d4827642b0920ce sh:path reqvire:conceptLabel ;
+reqvire:OntologyTermShape sh:property _:a3ef9f515fd73747cc08e4d000090f97 .
+_:e8e2bb3a9bf64b32bf62be021559c4de sh:path reqvire:conceptLabel ;
 	sh:datatype xsd:string .
-reqvire:OntologyTermShape sh:property _:df6acb77371cd4e95d4827642b0920ce .
+reqvire:OntologyTermShape sh:property _:e8e2bb3a9bf64b32bf62be021559c4de .
 reqvire:OwlReservedVocabularyRegistryShape a sh:NodeShape ;
 	sh:targetClass reqvire:OwlReservedVocabularyRegistry .
-_:fcd8a2e30c9065a35f47192f55f61379 sh:path reqvire:recognizesReservedVocabularyTerm ;
+_:d2363c6dca82a32f79f09be9956f9c8d sh:path reqvire:recognizesReservedVocabularyTerm ;
 	sh:class reqvire:OwlReservedVocabularyTerm .
-reqvire:OwlReservedVocabularyRegistryShape sh:property _:fcd8a2e30c9065a35f47192f55f61379 .
+reqvire:OwlReservedVocabularyRegistryShape sh:property _:d2363c6dca82a32f79f09be9956f9c8d .
 reqvire:OwlReservedVocabularyTermShape a sh:NodeShape ;
 	sh:targetClass reqvire:OwlReservedVocabularyTerm .
-_:bc13fa7a4ce7c053d7412903bebc8a11 sh:path reqvire:reservedVocabularyIri ;
+_:a81f380a880c8110843f67052fdffe08 sh:path reqvire:reservedVocabularyIri ;
 	sh:minCount 1 ;
 	sh:datatype xsd:anyURI .
-reqvire:OwlReservedVocabularyTermShape sh:property _:bc13fa7a4ce7c053d7412903bebc8a11 .
+reqvire:OwlReservedVocabularyTermShape sh:property _:a81f380a880c8110843f67052fdffe08 .
 reqvire:OntologyProjectionSourceShape a sh:NodeShape ;
 	sh:targetClass reqvire:OntologyProjectionSource .
-_:f51cc97b1ae559a72a6d3e67d9c8809e sh:path reqvire:sourceBlockId ;
+_:a000951bfa06479ffead0c6e494b9b96 sh:path reqvire:sourceBlockId ;
 	sh:datatype xsd:string .
-reqvire:OntologyProjectionSourceShape sh:property _:f51cc97b1ae559a72a6d3e67d9c8809e .
-_:b4edcc0c95cd329c465be5a636155ad7 sh:path reqvire:sourceElementIdentifier ;
+reqvire:OntologyProjectionSourceShape sh:property _:a000951bfa06479ffead0c6e494b9b96 .
+_:ab879961e2d23425c72c1eac8a71ebc3 sh:path reqvire:sourceElementIdentifier ;
 	sh:datatype xsd:string .
-reqvire:OntologyProjectionSourceShape sh:property _:b4edcc0c95cd329c465be5a636155ad7 .
-_:da326ab48bb2edec12d3062dfee6e9f8 sh:path reqvire:sourceName ;
+reqvire:OntologyProjectionSourceShape sh:property _:ab879961e2d23425c72c1eac8a71ebc3 .
+_:cc90b96c5c402ce8a24d0869b25fb122 sh:path reqvire:sourceName ;
 	sh:datatype xsd:string .
-reqvire:OntologyProjectionSourceShape sh:property _:da326ab48bb2edec12d3062dfee6e9f8 .
-_:ef2f35f485027b2cafa38226d8abf43a sh:path reqvire:filePath ;
+reqvire:OntologyProjectionSourceShape sh:property _:cc90b96c5c402ce8a24d0869b25fb122 .
+_:eeb1fa07772c6ae3337c4f1d2ee40b2 sh:path reqvire:filePath ;
 	sh:datatype xsd:string .
-reqvire:OntologyProjectionSourceShape sh:property _:ef2f35f485027b2cafa38226d8abf43a .
-_:b9daf549d392f048b24c2f188b1be72e sh:path reqvire:lineNumber ;
+reqvire:OntologyProjectionSourceShape sh:property _:eeb1fa07772c6ae3337c4f1d2ee40b2 .
+_:e23bd24324b2d9b63f08470e03b8c060 sh:path reqvire:lineNumber ;
 	sh:datatype xsd:integer .
-reqvire:OntologyProjectionSourceShape sh:property _:b9daf549d392f048b24c2f188b1be72e .
-_:c6e846e80b9a3eb600699d2d94c7a723 sh:path reqvire:blockKind ;
+reqvire:OntologyProjectionSourceShape sh:property _:e23bd24324b2d9b63f08470e03b8c060 .
+_:e04d6b1ba35c10c7791d09cc6761105d sh:path reqvire:blockKind ;
 	sh:datatype xsd:string .
-reqvire:OntologyProjectionSourceShape sh:property _:c6e846e80b9a3eb600699d2d94c7a723 .
+reqvire:OntologyProjectionSourceShape sh:property _:e04d6b1ba35c10c7791d09cc6761105d .
 reqvire:SemanticBlockShape a sh:NodeShape ;
 	sh:targetClass reqvire:SemanticBlock .
-_:a5711c30e989f5fb00f77d3dba3937ee sh:path reqvire:declaresTerm ;
+_:c93ca4d9f324b2d4b1c90bb30a6afa53 sh:path reqvire:declaresTerm ;
 	sh:class reqvire:OntologyTerm .
-reqvire:SemanticBlockShape sh:property _:a5711c30e989f5fb00f77d3dba3937ee .
-_:c70f1f380097fe17ecfd2afde8a9c921 sh:path reqvire:referencesTerm ;
+reqvire:SemanticBlockShape sh:property _:c93ca4d9f324b2d4b1c90bb30a6afa53 .
+_:c238a1cd5fd1341291f007c69221d25d sh:path reqvire:referencesTerm ;
 	sh:class reqvire:OntologyTerm .
-reqvire:SemanticBlockShape sh:property _:c70f1f380097fe17ecfd2afde8a9c921 .
-_:ac6357499c9279f46de41db808c43530 sh:path reqvire:lineNumber ;
+reqvire:SemanticBlockShape sh:property _:c238a1cd5fd1341291f007c69221d25d .
+_:ce4cae3a15fbfa092a1b6e8cb063fb94 sh:path reqvire:lineNumber ;
 	sh:datatype xsd:integer .
-reqvire:SemanticBlockShape sh:property _:ac6357499c9279f46de41db808c43530 .
+reqvire:SemanticBlockShape sh:property _:ce4cae3a15fbfa092a1b6e8cb063fb94 .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/Verification.md#verification-coverage-rollup-shape
@@ -1830,83 +1830,83 @@ reqvire:SemanticBlockShape sh:property _:ac6357499c9279f46de41db808c43530 .
 
 reqvire:CapabilityCoverageShape a sh:NodeShape ;
 	sh:targetClass reqvire:CapabilityCoverage .
-_:bf84f4ce162cdc9f8f442f3b74ee6648 sh:path reqvire:rollupCapability ;
+_:b17c490876d43e8821c918e3923f9ca2 sh:path reqvire:rollupCapability ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:Capability .
-reqvire:CapabilityCoverageShape sh:property _:bf84f4ce162cdc9f8f442f3b74ee6648 .
-_:fb19b1960332a211c9d991be2c60542f sh:path reqvire:coverageState ;
+reqvire:CapabilityCoverageShape sh:property _:b17c490876d43e8821c918e3923f9ca2 .
+_:bef1d34ed9d94f1cf917fd7d88fbc3c1 sh:path reqvire:coverageState ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:afe9b1daa91b3efe5ac29378f058f442 .
-_:afe9b1daa91b3efe5ac29378f058f442 rdf:rest _:f7cbf94e17e80b8c7bd587c158e444be ;
+	sh:in _:f2a20446c2a1275d7785fe5aae7116d4 .
+_:f2a20446c2a1275d7785fe5aae7116d4 rdf:rest _:a57fba645eebf74acfa663bbec56ce25 ;
 	rdf:first "verified" .
-_:f7cbf94e17e80b8c7bd587c158e444be rdf:rest _:c7453c4ebdd0845d13f207d14cade88e ;
+_:a57fba645eebf74acfa663bbec56ce25 rdf:rest _:ccb594902cd38922cfbc2080e02eaffe ;
 	rdf:first "partially-verified" .
-_:c7453c4ebdd0845d13f207d14cade88e rdf:rest _:c227e2ed32576526611ab8dc23eaae04 ;
+_:ccb594902cd38922cfbc2080e02eaffe rdf:rest _:f204f9e28a214bdc9b8cdbcace895484 ;
 	rdf:first "unverified" .
-_:c227e2ed32576526611ab8dc23eaae04 rdf:rest rdf:nil ;
+_:f204f9e28a214bdc9b8cdbcace895484 rdf:rest rdf:nil ;
 	rdf:first "blocked" .
-reqvire:CapabilityCoverageShape sh:property _:fb19b1960332a211c9d991be2c60542f .
-_:a3d3fd12b1ebd45cfdb5d552e1d2667d sh:path reqvire:blockedByRequirement ;
+reqvire:CapabilityCoverageShape sh:property _:bef1d34ed9d94f1cf917fd7d88fbc3c1 .
+_:e83386d338eb68cbf3443289ff4c8815 sh:path reqvire:blockedByRequirement ;
 	sh:class reqvire:Requirement .
-reqvire:CapabilityCoverageShape sh:property _:a3d3fd12b1ebd45cfdb5d552e1d2667d .
+reqvire:CapabilityCoverageShape sh:property _:e83386d338eb68cbf3443289ff4c8815 .
 reqvire:RequirementCoverageShape a sh:NodeShape ;
 	sh:targetClass reqvire:RequirementCoverage .
-_:a127544d98479bfe3f0e2fa45beae8a8 sh:path reqvire:rollupRequirement ;
+_:e3661dfc9ca4e6b6c0513ef8b1092c29 sh:path reqvire:rollupRequirement ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:class reqvire:Requirement .
-reqvire:RequirementCoverageShape sh:property _:a127544d98479bfe3f0e2fa45beae8a8 .
-_:d7c3f9a91e9c43806e74fcae7aa25bbd sh:path reqvire:coveredByVerification ;
+reqvire:RequirementCoverageShape sh:property _:e3661dfc9ca4e6b6c0513ef8b1092c29 .
+_:af1251d95d9c0a18c4dbdd605dc67e36 sh:path reqvire:coveredByVerification ;
 	sh:class reqvire:ConcreteVerification .
-reqvire:RequirementCoverageShape sh:property _:d7c3f9a91e9c43806e74fcae7aa25bbd .
-_:a75e4924d2c127de75d5d45127850044 sh:path reqvire:coverageReason ;
+reqvire:RequirementCoverageShape sh:property _:af1251d95d9c0a18c4dbdd605dc67e36 .
+_:e598d241bf2033da78753774736cf65c sh:path reqvire:coverageReason ;
 	sh:datatype xsd:string .
-reqvire:RequirementCoverageShape sh:property _:a75e4924d2c127de75d5d45127850044 .
-_:a03f068d527c3c6fa771afd9ba300ab2 sh:path reqvire:coverageState ;
+reqvire:RequirementCoverageShape sh:property _:e598d241bf2033da78753774736cf65c .
+_:dff6a13465d93185f6c4d6da01859eca sh:path reqvire:coverageState ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:a59b05bfc8e41f210d16b639b09300b1 .
-_:a59b05bfc8e41f210d16b639b09300b1 rdf:rest _:eb4b12110126495a0ff686fe750dec67 ;
+	sh:in _:e61f059da5329498f894c8379620a579 .
+_:e61f059da5329498f894c8379620a579 rdf:rest _:f523976b4cd74ff05aecff427f3fd36e ;
 	rdf:first "verified" .
-_:eb4b12110126495a0ff686fe750dec67 rdf:rest _:ea137a60cd7883273b9b7584baf0e9bf ;
+_:f523976b4cd74ff05aecff427f3fd36e rdf:rest _:a8f805308ef343db2f356b9ca50ac58c ;
 	rdf:first "unverified" .
-_:ea137a60cd7883273b9b7584baf0e9bf rdf:rest rdf:nil ;
+_:a8f805308ef343db2f356b9ca50ac58c rdf:rest rdf:nil ;
 	rdf:first "blocked" .
-reqvire:RequirementCoverageShape sh:property _:a03f068d527c3c6fa771afd9ba300ab2 .
+reqvire:RequirementCoverageShape sh:property _:dff6a13465d93185f6c4d6da01859eca .
 reqvire:VerificationRollupRuleShape a sh:NodeShape ;
 	sh:targetClass reqvire:VerificationRollupRule .
-_:e1a6ffc431eefa18083629980c3be680 sh:path reqvire:rollupRuleName ;
+_:e1825a2cccc40ac13e9cd5697907ff11 sh:path reqvire:rollupRuleName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:ffab53259ecabd8f23aed35e1063bb1 .
-_:ffab53259ecabd8f23aed35e1063bb1 rdf:rest _:cd39caac68c68cbf532b8779437efe2a ;
+	sh:in _:b5518c01be46581e549180b639c92efd .
+_:b5518c01be46581e549180b639c92efd rdf:rest _:b97cdccaee5dd67c7d325c17695d7a02 ;
 	rdf:first "leaf-requirement-verification" .
-_:cd39caac68c68cbf532b8779437efe2a rdf:rest _:e191e34fb064f4859c829bf4c93e541d ;
+_:b97cdccaee5dd67c7d325c17695d7a02 rdf:rest _:d4191738da73795a4dde9d130209588b ;
 	rdf:first "parent-requirement-rollup" .
-_:e191e34fb064f4859c829bf4c93e541d rdf:rest _:ea3905029276bacc2d62d9926cbe3739 ;
+_:d4191738da73795a4dde9d130209588b rdf:rest _:b66fc53d0df04bcbdefe9a07b1378a1d ;
 	rdf:first "capability-coverage-rollup" .
-_:ea3905029276bacc2d62d9926cbe3739 rdf:rest _:ff370604550fed8b9515d2c1da474b83 ;
+_:b66fc53d0df04bcbdefe9a07b1378a1d rdf:rest _:ce7464b1d686fd9cfbf9120923691ea8 ;
 	rdf:first "evidence-backed-verification-satisfaction" .
-_:ff370604550fed8b9515d2c1da474b83 rdf:rest rdf:nil ;
+_:ce7464b1d686fd9cfbf9120923691ea8 rdf:rest rdf:nil ;
 	rdf:first "non-evidence-backed-verification-satisfaction" .
-reqvire:VerificationRollupRuleShape sh:property _:e1a6ffc431eefa18083629980c3be680 .
-_:a976f1a935cc24a6678d3e72fbd194d7 sh:path reqvire:rollupCondition ;
+reqvire:VerificationRollupRuleShape sh:property _:e1825a2cccc40ac13e9cd5697907ff11 .
+_:dcb7fae13142ce79c7259d95031a5b5f sh:path reqvire:rollupCondition ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:VerificationRollupRuleShape sh:property _:a976f1a935cc24a6678d3e72fbd194d7 .
-_:ac9295bccca89866111b1f0dfaa0d2f sh:path reqvire:rollupOutcome ;
+reqvire:VerificationRollupRuleShape sh:property _:dcb7fae13142ce79c7259d95031a5b5f .
+_:d190a17739c763a4c19fecc23505389e sh:path reqvire:rollupOutcome ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:VerificationRollupRuleShape sh:property _:ac9295bccca89866111b1f0dfaa0d2f .
-_:b9a17634448270c737c370da6d02e722 sh:path reqvire:evidenceBacked ;
+reqvire:VerificationRollupRuleShape sh:property _:d190a17739c763a4c19fecc23505389e .
+_:c1637c390dc203d27e3206b6f6025259 sh:path reqvire:evidenceBacked ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:boolean .
-reqvire:VerificationRollupRuleShape sh:property _:b9a17634448270c737c370da6d02e722 .
+reqvire:VerificationRollupRuleShape sh:property _:c1637c390dc203d27e3206b6f6025259 .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/Verification.md#verification-target-and-evidence-shape
@@ -1917,74 +1917,74 @@ reqvire:VerificationRollupRuleShape sh:property _:b9a17634448270c737c370da6d02e7
 
 reqvire:ConcreteVerificationShape a sh:NodeShape ;
 	sh:targetClass reqvire:TestVerification , reqvire:FormalProofVerification , reqvire:AnalysisVerification , reqvire:InspectionVerification , reqvire:DemonstrationVerification .
-_:bd0ab9389ebbf7813e624139cf10685c sh:path reqvire:verify ;
+_:f01dd0defc87fbf0bf74fd3a5b96e4eb sh:path reqvire:verify ;
 	sh:minCount 1 ;
 	sh:class reqvire:Requirement .
-reqvire:ConcreteVerificationShape sh:property _:bd0ab9389ebbf7813e624139cf10685c .
-_:e7fe66f89129073185640deb772ec197 sh:path reqvire:verifiedBy ;
+reqvire:ConcreteVerificationShape sh:property _:f01dd0defc87fbf0bf74fd3a5b96e4eb .
+_:bd5a3cbe3bc4744a10177bc04c044b2a sh:path reqvire:verifiedBy ;
 	sh:maxCount 0 .
-reqvire:ConcreteVerificationShape sh:property _:e7fe66f89129073185640deb772ec197 .
-_:b8f55d567c9fc3a239f7dac5db04a6c6 sh:path reqvire:derivedFrom ;
+reqvire:ConcreteVerificationShape sh:property _:bd5a3cbe3bc4744a10177bc04c044b2a .
+_:fc43b0e2acb2a7a34676f019422fadc6 sh:path reqvire:derivedFrom ;
 	sh:minCount 1 ;
 	sh:class reqvire:VerificationObjective .
-reqvire:ConcreteVerificationShape sh:property _:b8f55d567c9fc3a239f7dac5db04a6c6 .
+reqvire:ConcreteVerificationShape sh:property _:fc43b0e2acb2a7a34676f019422fadc6 .
 reqvire:EvidenceBackedVerificationShape a sh:NodeShape ;
 	sh:targetClass reqvire:TestVerification , reqvire:FormalProofVerification .
-_:c4d3a1d45340914a1ccf6a85c9da6738 sh:path reqvire:satisfiedBy ;
+_:a0c3f8781af3cc3efe40461be038ed4f sh:path reqvire:satisfiedBy ;
 	sh:minCount 1 ;
 	sh:class reqvire:Artifact .
-reqvire:EvidenceBackedVerificationShape sh:property _:c4d3a1d45340914a1ccf6a85c9da6738 .
-_:b47828bd45839356efefc5833847c4e3 sh:path reqvire:satisfy ;
+reqvire:EvidenceBackedVerificationShape sh:property _:a0c3f8781af3cc3efe40461be038ed4f .
+_:f52190f657abd5c53ece92e4151a5432 sh:path reqvire:satisfy ;
 	sh:maxCount 0 .
-reqvire:EvidenceBackedVerificationShape sh:property _:b47828bd45839356efefc5833847c4e3 .
+reqvire:EvidenceBackedVerificationShape sh:property _:f52190f657abd5c53ece92e4151a5432 .
 reqvire:NonEvidenceBackedVerificationShape a sh:NodeShape ;
 	sh:targetClass reqvire:AnalysisVerification , reqvire:InspectionVerification , reqvire:DemonstrationVerification .
-_:f0b3516397cbd5fc66d6aee09988f3f5 sh:path reqvire:satisfiedBy ;
+_:fe0bed56c0c6398e0c3c787e3a8feda1 sh:path reqvire:satisfiedBy ;
 	sh:maxCount 0 .
-reqvire:NonEvidenceBackedVerificationShape sh:property _:f0b3516397cbd5fc66d6aee09988f3f5 .
-_:f83b31b44188ce715c3258a3c2cff872 sh:path reqvire:satisfy ;
+reqvire:NonEvidenceBackedVerificationShape sh:property _:fe0bed56c0c6398e0c3c787e3a8feda1 .
+_:ea88bde90f41d0b25d900242aa7fce10 sh:path reqvire:satisfy ;
 	sh:maxCount 0 .
-reqvire:NonEvidenceBackedVerificationShape sh:property _:f83b31b44188ce715c3258a3c2cff872 .
+reqvire:NonEvidenceBackedVerificationShape sh:property _:ea88bde90f41d0b25d900242aa7fce10 .
 reqvire:VerificationObjectiveShape a sh:NodeShape ;
 	sh:targetClass reqvire:VerificationObjective .
-_:a7cf3e7f9a14b48884a7aab988facedf sh:path reqvire:verify ;
+_:ff6198afd953395297ed83c4b7779541 sh:path reqvire:verify ;
 	sh:maxCount 0 .
-reqvire:VerificationObjectiveShape sh:property _:a7cf3e7f9a14b48884a7aab988facedf .
-_:e1ab677fd035fd5a994bfe74e4fc7bf7 sh:path reqvire:verifiedBy ;
+reqvire:VerificationObjectiveShape sh:property _:ff6198afd953395297ed83c4b7779541 .
+_:c96aa56dbf65de6981b5723d56f40002 sh:path reqvire:verifiedBy ;
 	sh:maxCount 0 .
-reqvire:VerificationObjectiveShape sh:property _:e1ab677fd035fd5a994bfe74e4fc7bf7 .
-_:ca89eff55ce6e7961072c43ed4acbe5b sh:path reqvire:satisfiedBy ;
+reqvire:VerificationObjectiveShape sh:property _:c96aa56dbf65de6981b5723d56f40002 .
+_:cfbb2a0e49c364fd072d788bf9eb7e74 sh:path reqvire:satisfiedBy ;
 	sh:maxCount 0 .
-reqvire:VerificationObjectiveShape sh:property _:ca89eff55ce6e7961072c43ed4acbe5b .
-_:f0f0f34affa26fbc7e9514addf6b5dff sh:path reqvire:satisfy ;
+reqvire:VerificationObjectiveShape sh:property _:cfbb2a0e49c364fd072d788bf9eb7e74 .
+_:e4b033c75a6f62ff90367eafcc511903 sh:path reqvire:satisfy ;
 	sh:maxCount 0 .
-reqvire:VerificationObjectiveShape sh:property _:f0f0f34affa26fbc7e9514addf6b5dff .
+reqvire:VerificationObjectiveShape sh:property _:e4b033c75a6f62ff90367eafcc511903 .
 reqvire:VerificationTypeShape a sh:NodeShape ;
 	sh:targetClass reqvire:VerificationType .
-_:a318298e5a7f3b3ccb7b63bd8130dae3 sh:path reqvire:verificationTypeName ;
+_:bfbe88c5bad2de169300f58275845509 sh:path reqvire:verificationTypeName ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:string ;
-	sh:in _:f15d5e3176c49ffd74c2da874a61d6cc .
-_:f15d5e3176c49ffd74c2da874a61d6cc rdf:rest _:a242b55f20efed3590d2b2345688f5af ;
+	sh:in _:bed9c637214f1604ce49ff06cc83f575 .
+_:bed9c637214f1604ce49ff06cc83f575 rdf:rest _:b27a5462bae5eed36b78b61d2dfdf0da ;
 	rdf:first "verification" .
-_:a242b55f20efed3590d2b2345688f5af rdf:rest _:fb948c2085e1b2647f0ada9a40dc6103 ;
+_:b27a5462bae5eed36b78b61d2dfdf0da rdf:rest _:ad8a71b736687a9d8765afcba0a72deb ;
 	rdf:first "test-verification" .
-_:fb948c2085e1b2647f0ada9a40dc6103 rdf:rest _:d5848d6a8bffca82bf2a0ab99fa142ff ;
+_:ad8a71b736687a9d8765afcba0a72deb rdf:rest _:fcc548cff358014114c9733f56868637 ;
 	rdf:first "formal-proof-verification" .
-_:d5848d6a8bffca82bf2a0ab99fa142ff rdf:rest _:cc5687b93965c5453a946ac9a2a9ece0 ;
+_:fcc548cff358014114c9733f56868637 rdf:rest _:b9fe31b1963dfaa63aa6cd687d85345b ;
 	rdf:first "analysis-verification" .
-_:cc5687b93965c5453a946ac9a2a9ece0 rdf:rest _:fc13c52b378980c83fdf6ae3f8f0281e ;
+_:b9fe31b1963dfaa63aa6cd687d85345b rdf:rest _:e2a15a0b7e12ce57aa362331c24833af ;
 	rdf:first "inspection-verification" .
-_:fc13c52b378980c83fdf6ae3f8f0281e rdf:rest rdf:nil ;
+_:e2a15a0b7e12ce57aa362331c24833af rdf:rest rdf:nil ;
 	rdf:first "demonstration-verification" .
-reqvire:VerificationTypeShape sh:property _:a318298e5a7f3b3ccb7b63bd8130dae3 .
-_:d16ba9d0bdf31fed87ffabf3bc90a717 sh:path reqvire:verificationEvidenceBacked ;
+reqvire:VerificationTypeShape sh:property _:bfbe88c5bad2de169300f58275845509 .
+_:c5732f1dccb9d9d3461a01145f341420 sh:path reqvire:verificationEvidenceBacked ;
 	sh:minCount 1 ;
 	sh:maxCount 1 ;
 	sh:datatype xsd:boolean .
-reqvire:VerificationTypeShape sh:property _:d16ba9d0bdf31fed87ffabf3bc90a717 .
-_:d24e0478628f08da4fcf5b13aa54124d sh:path reqvire:verificationTypeDescription ;
+reqvire:VerificationTypeShape sh:property _:c5732f1dccb9d9d3461a01145f341420 .
+_:bbc557445554570aa75f887aa98563a3 sh:path reqvire:verificationTypeDescription ;
 	sh:minCount 1 ;
 	sh:datatype xsd:string .
-reqvire:VerificationTypeShape sh:property _:d24e0478628f08da4fcf5b13aa54124d .
+reqvire:VerificationTypeShape sh:property _:bbc557445554570aa75f887aa98563a3 .

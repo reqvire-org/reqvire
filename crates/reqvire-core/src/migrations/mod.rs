@@ -828,9 +828,6 @@ mod tests {
             rewritten,
             "### Requirement\n\n#### Contract Bindings\n  * [Contract](Contracts.md#contract)\n\n## Contract Bindings\n"
         );
-        assert!(
-            rewrite_contract_bindings_section_content("#### Contract Bindings\n")
-                .is_none()
-        );
+        assert!(rewrite_contract_bindings_section_content("#### Contract Bindings\n").is_none());
     }
 }

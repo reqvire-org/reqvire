@@ -209,7 +209,7 @@ After refactoring, run focused checks before broad validation:
 
 ```bash
 cargo run -q -p reqvire-cli -- validate
-cargo run -q -p reqvire-cli -- semantic ontologies
+cargo run -q -p reqvire-cli -- semantic export --layer ontologies
 ```
 
 If shapes or output fixtures changed, also run the affected test slice, usually:

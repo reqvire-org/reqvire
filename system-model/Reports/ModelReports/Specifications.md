@@ -183,7 +183,7 @@ Generated SKOS facts:
 - Generated inverse and reciprocal facts are additional semantic-search/export facts and must not mutate authored Markdown.
 
 Projection surface contract:
-- `reqvire semantic concepts` and `reqvire semantic graph --full` consume the normalized concept-relation projection, not only direct-authored concept relation fields.
+- `reqvire semantic export --layer concepts` and `reqvire semantic export` consume the normalized concept-relation projection, not only direct-authored concept relation fields.
 - Full JSON-LD output must be equivalent to the normalized Turtle output.
 - Project Store `thesaurus` rows must derive `parent_id`, child/narrower lists, `related_ids`, `exact_match_ids`, and `close_match_ids` from the same normalized concept-relation projection.
 - Ontologies Concepts-layer graph data may keep directional SKOS taxonomy edges visible, but must canonicalize symmetric reciprocal concept edges to one visual edge.
@@ -286,12 +286,15 @@ Exposure rules:
 - CLI, MCP, Explorer, website, and assistant-facing contracts must not specify a public full third-party ontology dump mode.
 
 Export modes:
-- `reqvire semantic ontologies` emits generated ontology document declarations plus authored ontology vocabulary only.
-- `reqvire semantic shapes` emits semantic-contract SHACL shapes only.
-- `reqvire semantic concepts` emits SKOS concept scheme/thesaurus triples only, with optional mapping triples.
-- `reqvire semantic graph --full` emits authored triples, Reqvire model context, and generated ontology projection facts.
-- `reqvire semantic ontologies --include-external` and `reqvire semantic graph --include-external` additionally emit only the used external subset.
-- MCP semantic ontology, vocabulary, prefix, and SPARQL tools keep external source declarations and triples hidden by default and expose only the used external subset when `include_external` is true.
+- `reqvire semantic export --layer ontologies` emits generated ontology document declarations plus authored ontology vocabulary only.
+- `reqvire semantic export --layer shapes` emits semantic-contract SHACL shapes only.
+- `reqvire semantic export --layer concepts` emits SKOS concept scheme/thesaurus triples only.
+- Authored structural `reqvire:mapsToConcept` bridge triples that point to generated native concepts are emitted by `reqvire semantic export --layer ontologies`.
+- `reqvire semantic export --layer model` emits Reqvire model facts, generated ontology projection facts, and semantic term context.
+- `reqvire semantic export --layer external-used` emits only the used external subset.
+- `reqvire semantic export --layer prefixes` emits generated Turtle prefix projection facts.
+- `reqvire semantic export` emits all public semantic export layers by default.
+- MCP semantic export exposes used external subset RDF through the `external-used` layer; MCP vocabulary, prefix, and SPARQL helper tools keep external source declarations and triples hidden by default and expose only the used external subset when `include_external` is true.
 - Vocabulary and source-map entries for imported terms must carry an explicit external marker and source metadata.
 - Export and MCP metadata for external materialization must identify `external_materialization: "used_subset"` and include available counts for external sources, used external terms, and materialized external triples.
 
@@ -558,7 +561,7 @@ The output must:
 - Emit JSON-LD when requested by the CLI `--jsonld` option.
 - Include generated `rdfs:isDefinedBy` links from authored named ontology resources to their generated ontology document IRI as part of the default semantic export.
 - Preserve multiple authored `owl:Ontology` document subjects, `owl:imports` triples, generated ontology document declarations, generated definition links, and authored ontology-document metadata as RDF graph facts; exact duplicate triples may be emitted once.
-- Support full semantic model export when requested by the CLI `--full` option or MCP `full: true` argument.
+- Support full semantic model export when requested by the CLI `model` layer or MCP `full: true` argument.
 - In full semantic model export mode, append RDF triples for Reqvire model context:
   - all parsed capability, requirement, ontology, semantic-contract, verification, and contract elements
   - element id, identifier, name, type, file path, and source line
@@ -600,7 +603,7 @@ Projection subgraph generation behavior:
 - Keep rendered symbol metadata as structured Project Store/UI data rather than semantic RDF projection facts. Ontology projection RDF records model constructs, provenance, terms, and source evidence only.
 
 Consumer behavior:
-- `reqvire semantic graph --full` and `reqvire semantic graph --full --jsonld` include generated ontology projection subgraph facts.
+- `reqvire semantic export` and `reqvire semantic export --jsonld` include generated ontology projection subgraph facts.
 - Served `ontologies.ttl` includes generated ontology document declarations plus authored ontology and SHACL blocks, without generated ontology projection subgraph facts. Generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI; ontology elements in the same base are contributors to that document.
 - The Ontologies SPA route must build from the same generated projection facts used by full semantic export instead of maintaining a separate route-local construct model.
 - The projection subgraph is a reusable semantic data product for later SPARQL-backed search, semantic validation, or inferred-materialization work, but those later features require their own execution requirements.

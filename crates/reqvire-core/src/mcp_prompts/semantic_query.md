@@ -6,7 +6,7 @@ Workflow:
 - Call `reqvire.semantic.vocabulary` first with `section: "all"` or a narrower section to discover prefixes, classes, properties, native SKOS concept schemes/concepts, relation families, query patterns, and diagnostics.
 - Use `section: "concepts"` when the question is about thesaurus terms, concept schemes, SKOS labels/definitions, broader/narrower/related links, mappings, or generated Markdown-native concept source provenance.
 - Use `reqvire.concept_schemes.list`, `reqvire.concepts.list`, or `reqvire.concepts.get` when the question is specifically about standalone native Thesaurus entries and does not require SPARQL.
-- Call `reqvire.semantic.concepts` when the user needs the clean generated SKOS concept/thesaurus RDF layer; pass `include_mappings: true` only when structural `reqvire:mapsToConcept` bridge triples are relevant.
+- Call `reqvire.semantic.concepts` when the user needs the clean generated SKOS concept/thesaurus RDF layer; call `reqvire.semantic.export` with `layers: ["ontologies", "concepts"]` when structural `reqvire:mapsToConcept` bridge triples and generated SKOS concepts are both relevant.
 - Use the returned `sparql_prefix_block` verbatim when writing SPARQL.
 - If a namespace or prefix is unclear, call `reqvire.semantic.prefixes` and inspect source element content.
 - Prefer normalized semantic properties and relation-family query patterns over hard-coded markdown relation names.

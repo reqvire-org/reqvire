@@ -70,8 +70,8 @@ help Print help for commands
 
 Ontologies options:
 --jsonld Output JSON-LD format instead of RDF/Turtle (.ttl)
---full Include Reqvire model context triples and ontology projection facts in the semantic export
---include-external Include the used external ontology subset
+--layer model Include Reqvire model facts and ontology projection facts in the semantic export
+--layer external-used Include the used external ontology subset
 --output <FILE> Save output to file
 
 Options:
@@ -217,7 +217,7 @@ The `mv-file` command behavior is governed by the reused file-move workflow and 
 ### CLI Ontologies Command Contract Specification
 
 #### Details
-The semantic export command family is governed by the reused ontology collection and semantic export contracts. Canonical users should select the narrowest command that matches the requested layer: `semantic ontologies`, `semantic shapes`, `semantic concepts`, or `semantic graph`. Turtle output follows the shared prefixed Turtle serializer contract so CLI exports contain deterministic `@prefix` declarations and safe compact prefixed names. Canonical native thesaurus workflows may use the root `concepts export` and `concepts validate` commands when the user intent is standalone concept-scheme work rather than generic semantic-layer export. The legacy `ontologies` command remains a compatibility alias for combined graph export.
+The semantic export command family is governed by the reused ontology collection and semantic export contracts. Canonical users should use `semantic export` and select the narrowest required layer with repeatable `--layer` flags: `ontologies`, `shapes`, `concepts`, `model`, `external-used`, and `prefixes`. Omitting `--layer` exports all public semantic layers. Turtle output follows the shared prefixed Turtle serializer contract so CLI exports contain deterministic `@prefix` declarations and safe compact prefixed names. Canonical native thesaurus workflows may use the root `concepts export` and `concepts validate` commands when the user intent is standalone concept-scheme work rather than generic semantic-layer export. Authored `reqvire:mapsToConcept` bridge triples are part of the ontology layer. Generated `reqvire:TurtlePrefixDeclaration` facts are part of the prefixes layer. The legacy `ontologies` command remains a compatibility alias for combined graph export.
 
 #### Metadata
   * type: specification

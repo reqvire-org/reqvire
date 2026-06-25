@@ -861,21 +861,17 @@ fn validate_semantic_contracts_after_contract_bindings_candidate(
                 contract_bindings.target.as_str() == contract_bindings_identifier
             })
         {
-            node.element
-                .contract_bindings
-                .push(ContractBindingEntry {
-                    target: ContractBindingTarget::ElementIdentifier(
-                        contract_bindings_identifier.to_string(),
-                    ),
-                    content_hash: None,
-                });
+            node.element.contract_bindings.push(ContractBindingEntry {
+                target: ContractBindingTarget::ElementIdentifier(
+                    contract_bindings_identifier.to_string(),
+                ),
+                content_hash: None,
+            });
         }
     } else {
-        node.element
-            .contract_bindings
-            .retain(|contract_bindings| {
-                contract_bindings.target.as_str() != contract_bindings_identifier
-            });
+        node.element.contract_bindings.retain(|contract_bindings| {
+            contract_bindings.target.as_str() != contract_bindings_identifier
+        });
     }
 
     let semantic_errors = candidate.validate_semantic_contracts_in_memory()?;
@@ -1350,16 +1346,14 @@ pub fn reuse(
     // Calculate file-relative path for the contract_bindings link in markdown
     let file_dir = crate::utils::get_parent_dir(&file_path);
     let contract_binding_path_buf = PathBuf::from(contract_binding_path);
-    let relative_contract_binding_path = pathdiff::diff_paths(&contract_binding_path_buf, &file_dir)
-        .unwrap_or_else(|| contract_binding_path_buf.clone());
+    let relative_contract_binding_path =
+        pathdiff::diff_paths(&contract_binding_path_buf, &file_dir)
+            .unwrap_or_else(|| contract_binding_path_buf.clone());
     let relative_contract_binding_str = relative_contract_binding_path.to_string_lossy();
 
     // Find the element in the file and add/update Contract Bindings subsection
-    let new_content = add_contract_bindings_to_element(
-        &content,
-        element_name,
-        &relative_contract_binding_str,
-    )?;
+    let new_content =
+        add_contract_bindings_to_element(&content, element_name, &relative_contract_binding_str)?;
 
     // Generate diff
     let diff = generate_file_diff(&file_path, &content, &new_content);
@@ -1413,8 +1407,9 @@ pub fn remove_contract_bindings(
     // Calculate file-relative path for finding the contract_bindings link in markdown
     let file_dir = crate::utils::get_parent_dir(&file_path);
     let contract_binding_path_buf = PathBuf::from(contract_binding_path);
-    let relative_contract_binding_path = pathdiff::diff_paths(&contract_binding_path_buf, &file_dir)
-        .unwrap_or_else(|| contract_binding_path_buf.clone());
+    let relative_contract_binding_path =
+        pathdiff::diff_paths(&contract_binding_path_buf, &file_dir)
+            .unwrap_or_else(|| contract_binding_path_buf.clone());
     let relative_contract_binding_str = relative_contract_binding_path.to_string_lossy();
 
     // Remove contract_bindings from element
@@ -1507,12 +1502,11 @@ pub fn reuse_contract_element_identifier(
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
-    let contract_bindings_identifier =
-        resolve_contract_bindings_identifier_for_element(
-            model_manager,
-            &file_path,
-            contract_bindings_target,
-        )?;
+    let contract_bindings_identifier = resolve_contract_bindings_identifier_for_element(
+        model_manager,
+        &file_path,
+        contract_bindings_target,
+    )?;
 
     let contract_bindings_element = model_manager
         .graph_registry
@@ -1642,12 +1636,8 @@ pub fn reuse_contract_element_identifier(
             .parent()
             .unwrap_or_else(|| std::path::Path::new("."))
             .to_path_buf();
-        crate::utils::to_relative_identifier(
-            &contract_bindings_identifier,
-            &target_folder,
-            true,
-        )
-        .unwrap_or_else(|_| contract_bindings_identifier.clone())
+        crate::utils::to_relative_identifier(&contract_bindings_identifier, &target_folder, true)
+            .unwrap_or_else(|_| contract_bindings_identifier.clone())
     };
 
     let new_content = add_element_contract_bindings_to_element(
@@ -1725,12 +1715,11 @@ pub fn remove_reused_contract_element_identifier(
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
-    let contract_bindings_identifier =
-        resolve_contract_bindings_identifier_for_element(
-            model_manager,
-            &file_path,
-            contract_bindings_target,
-        )?;
+    let contract_bindings_identifier = resolve_contract_bindings_identifier_for_element(
+        model_manager,
+        &file_path,
+        contract_bindings_target,
+    )?;
 
     let contract_binding_display_name = model_manager
         .graph_registry
@@ -1750,10 +1739,7 @@ pub fn remove_reused_contract_element_identifier(
         let (identifier_path, fragment_opt) =
             crate::utils::extract_path_and_fragment(&contract_bindings_identifier);
         if identifier_path == file_path {
-            format!(
-                "#{}",
-                fragment_opt.unwrap_or(&contract_bindings_identifier)
-            )
+            format!("#{}", fragment_opt.unwrap_or(&contract_bindings_identifier))
         } else {
             crate::utils::to_relative_identifier(
                 &contract_bindings_identifier,
@@ -2006,8 +1992,7 @@ pub fn rm_asset(
         let relative_path_str = relative_path.to_string_lossy();
 
         // Remove contract_bindings
-        let mut new_content =
-            remove_contract_bindings_from_file(&content, &relative_path_str)?;
+        let mut new_content = remove_contract_bindings_from_file(&content, &relative_path_str)?;
 
         // Remove InternalPath relations
         new_content = remove_relation_with_path(&new_content, &relative_path_str)?;
@@ -2969,13 +2954,7 @@ pub fn unlink(
             let file_exists_git_root = git_root.join(target).exists();
 
             if file_exists_cwd || file_exists_git_root {
-                return remove_contract_bindings(
-                    model_manager,
-                    source,
-                    target,
-                    git_root,
-                    dry_run,
-                );
+                return remove_contract_bindings(model_manager, source, target, git_root, dry_run);
             }
 
             // Check contract_bindings by path string (even if file doesn't exist anymore)
@@ -2985,13 +2964,7 @@ pub fn unlink(
                 .find(|a| a.target.as_str() == target || a.target.as_str().ends_with(target));
 
             if contract_binding_by_path.is_some() {
-                return remove_contract_bindings(
-                    model_manager,
-                    source,
-                    target,
-                    git_root,
-                    dry_run,
-                );
+                return remove_contract_bindings(model_manager, source, target, git_root, dry_run);
             }
 
             // Nothing found

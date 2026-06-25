@@ -9,7 +9,7 @@ export default function Verifications() {
         Verification confirms that system behavior, implementation evidence, or
         operational evidence satisfies the capabilities and requirements it is
         linked to. Reqvire keeps those verification links inside the same
-        semantic graph as requirements, contracts, and implementation
+        default semantic export as requirements, contracts, and implementation
         artifacts.
       </p>
 

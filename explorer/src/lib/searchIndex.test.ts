@@ -62,6 +62,24 @@ const documents: ProjectSearchDocument[] = [
     route: "#/content/claude-plugins/commands/analyze-coverage.md",
     text: "Analyze coverage command documentation.",
   },
+  {
+    id: "Platform/Observability/ActivityFeedSpecifications.md#database-created-message",
+    kind: "element",
+    displayKind: "element",
+    elementType: "specification",
+    title: "Database Created Message",
+    route: "#/elements/Platform/Observability/ActivityFeedSpecifications.md#database-created-message",
+    text: "Activity feed message sent when a new database is created.",
+  },
+  {
+    id: "Platform/Observability/ActivityFeedSpecifications.md#clone-created-target-message",
+    kind: "element",
+    displayKind: "element",
+    elementType: "specification",
+    title: "Clone Created Target Message",
+    route: "#/elements/Platform/Observability/ActivityFeedSpecifications.md#clone-created-target-message",
+    text: "Activity feed message sent to cloned database when a clone is created.",
+  },
 ];
 
 describe("project search index", () => {
@@ -83,7 +101,7 @@ describe("project search index", () => {
     const results = searchProjectDocuments(index, "ontology shape", allKinds);
 
     expect(results[0]?.title).toBe("Reqvire Core Element Ontology Shape Profile");
-    expect(results.some((result) => result.title === "Core.md")).toBe(true);
+    expect(results.some((result) => result.title === "Core.md")).toBe(false);
   });
 
   it("matches path tokens and body text for implementation-style queries", () => {
@@ -98,6 +116,15 @@ describe("project search index", () => {
     const results = searchProjectDocuments(index, "verificaton reuse", allKinds);
 
     expect(results[0]?.title).toBe("Reuse Command Verification");
+  });
+
+  it("requires every query term to match the result", () => {
+    const index = createProjectSearchIndex(documents);
+    const results = searchProjectDocuments(index, "clone database", allKinds);
+    const titles = results.map((result) => result.title);
+
+    expect(titles).toContain("Clone Created Target Message");
+    expect(titles).not.toContain("Database Created Message");
   });
 
   it("filters by visible search kind", () => {

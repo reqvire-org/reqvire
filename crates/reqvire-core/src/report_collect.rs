@@ -1,4 +1,4 @@
-use crate::element::{ElementType, ContractBindingTarget};
+use crate::element::{ContractBindingTarget, ElementType};
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::relation;

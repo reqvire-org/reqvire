@@ -29,14 +29,11 @@ Commands:
   containment       Generate containment view showing folder/file/element hierarchy
   resources         Generate resources report showing files referenced by the model
   semantic          Export semantic RDF layers
-    semantic ontologies Export authored OWL/RDF ontology vocabulary only
-    semantic shapes Export semantic-contract SHACL shapes only
-    semantic concepts Export canonical Markdown-native SKOS concept scheme/thesaurus triples only
-    semantic graph  Export the combined semantic graph
+    semantic export Export selected semantic RDF layers
   concepts          Work with standalone Reqvire concept schemes and thesaurus concepts
     concepts export Export generated SKOS concept scheme/thesaurus triples
     concepts validate Validate standalone concept schemes, concept references, and mappings
-  ontologies        Compatibility alias for `reqvire semantic graph`
+  ontologies        Compatibility alias for combined semantic export
   submodels         Analyze independent capability-rooted submodels and cross-submodel couplings
   collect           Collect content from capability, requirement, ontology, concept-scheme, or concept context
   help               Print this message or the help of the given subcommand(s)
@@ -217,26 +214,10 @@ RESOURCES OPTIONS:
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
-SEMANTIC ONTOLOGIES OPTIONS:
+SEMANTIC EXPORT OPTIONS:
+      --layer <LAYER>           Include layer: ontologies, shapes, concepts, model, external-used, prefixes. Repeatable; omitted means all layers
       --jsonld                  Output JSON-LD format instead of RDF/Turtle (.ttl)
-      --include-external        Include used local external ontology subset triples
-      --namespace-base <IRI>    Filter export to one ontology base or term namespace
-      --output <FILE>           Save output to file
-
-SEMANTIC SHAPES OPTIONS:
-      --jsonld                  Output JSON-LD format instead of RDF/Turtle (.ttl)
-      --output <FILE>           Save output to file
-
-SEMANTIC CONCEPTS OPTIONS:
-      --jsonld                  Output JSON-LD format instead of RDF/Turtle (.ttl)
-      --include-mappings        Include structural reqvire:mapsToConcept bridge triples that point to generated native concepts
-      --output <FILE>           Save output to file
-
-SEMANTIC GRAPH OPTIONS:
-      --jsonld                  Output JSON-LD format instead of RDF/Turtle (.ttl)
-      --full                    Include Reqvire model context triples and ontology projection facts
-      --include-external        Include used local external ontology subset triples
-      --namespace-base <IRI>    Filter clean authored graph to one ontology base or term namespace
+      --namespace-base <IRI>    Filter clean authored export to one ontology base or term namespace. Cannot be combined with model
       --output <FILE>           Save output to file
 
 CONCEPTS EXPORT OPTIONS:

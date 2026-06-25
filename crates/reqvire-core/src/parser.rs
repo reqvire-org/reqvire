@@ -1,7 +1,7 @@
 use crate::element::{
-    ConceptReference, Element, ElementType, FencedBlock, RequirementType,
-    ContractBindingEntry, ContractBindingTarget, SubSection,
-    CONTRACT_BINDINGS_SECTION, is_legacy_contract_bindings_section,
+    is_legacy_contract_bindings_section, ConceptReference, ContractBindingEntry,
+    ContractBindingTarget, Element, ElementType, FencedBlock, RequirementType, SubSection,
+    CONTRACT_BINDINGS_SECTION,
 };
 use crate::error::ReqvireError;
 use crate::relation::{self, Relation};
@@ -540,22 +540,16 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                             let target = ContractBindingTarget::ElementIdentifier(normalized);
 
                             // Check for duplicate contract_bindings
-                            if element
-                                .contract_bindings
-                                .iter()
-                                .any(|a| a.target == target)
-                            {
+                            if element.contract_bindings.iter().any(|a| a.target == target) {
                                 return Err(ReqvireError::DuplicateContractBinding(format!(
                                     "Duplicate contract_bindings '{}'",
                                     href
                                 )));
                             }
-                            element
-                                .contract_bindings
-                                .push(ContractBindingEntry {
-                                    target,
-                                    content_hash: None,
-                                });
+                            element.contract_bindings.push(ContractBindingEntry {
+                                target,
+                                content_hash: None,
+                            });
                         }
                         Err(e) => {
                             return Err(ReqvireError::InvalidContractBindingFormat(format!(
@@ -926,7 +920,9 @@ fn parse_single_element_file(
                                 &href_to_normalize,
                                 &file_dir,
                             ) {
-                                Ok(normalized) => ContractBindingTarget::ElementIdentifier(normalized),
+                                Ok(normalized) => {
+                                    ContractBindingTarget::ElementIdentifier(normalized)
+                                }
                                 Err(e) => {
                                     errors.push(ReqvireError::InvalidContractBindingFormat(format!(
                                         "Invalid contract_bindings identifier in single-element file '{}', line {}: {}",
@@ -1395,9 +1391,8 @@ pub fn parse_elements(
                                     "Invalid contract bindings identifier in element '{}': '{}' (file: {}, line {}). Contract Bindings entries must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
                                     element.name, href, file, line_num + 1
                                 );
-                                errors.push(ReqvireError::InvalidContractBindingFormat(
-                                    msg.clone(),
-                                ));
+                                errors
+                                    .push(ReqvireError::InvalidContractBindingFormat(msg.clone()));
                                 debug!("Error: {}", msg);
                                 continue;
                             }
@@ -1413,48 +1408,37 @@ pub fn parse_elements(
                                 .parent()
                                 .unwrap_or_else(|| Path::new("."))
                                 .to_path_buf();
-                            let (target, content_hash): (
-                                ContractBindingTarget,
-                                Option<String>,
-                            ) = match utils::normalize_identifier(&href_to_normalize, &file_dir) {
-                                Ok(normalized) => (
-                                    ContractBindingTarget::ElementIdentifier(normalized),
-                                    None,
-                                ),
-                                Err(e) => {
-                                    let msg = format!(
+                            let (target, content_hash): (ContractBindingTarget, Option<String>) =
+                                match utils::normalize_identifier(&href_to_normalize, &file_dir) {
+                                    Ok(normalized) => {
+                                        (ContractBindingTarget::ElementIdentifier(normalized), None)
+                                    }
+                                    Err(e) => {
+                                        let msg = format!(
                                             "Invalid contract_bindings identifier in element '{}': {} (file: {}, line {})",
                                             element.name, e, file, line_num + 1
                                         );
-                                    errors.push(ReqvireError::InvalidContractBindingFormat(
-                                        msg.clone(),
-                                    ));
-                                    debug!("Error: {}", msg);
-                                    continue;
-                                }
-                            };
+                                        errors.push(ReqvireError::InvalidContractBindingFormat(
+                                            msg.clone(),
+                                        ));
+                                        debug!("Error: {}", msg);
+                                        continue;
+                                    }
+                                };
 
                             // Check for duplicates
-                            if !element
-                                .contract_bindings
-                                .iter()
-                                .any(|a| a.target == target)
-                            {
-                                element
-                                    .contract_bindings
-                                    .push(ContractBindingEntry {
-                                        target,
-                                        content_hash,
-                                    });
+                            if !element.contract_bindings.iter().any(|a| a.target == target) {
+                                element.contract_bindings.push(ContractBindingEntry {
+                                    target,
+                                    content_hash,
+                                });
                             } else {
                                 let msg =
                                     format!(
                                     "Duplicate contract_bindings '{}' in element '{}' (file: {}, line {})",
                                     href, element.name, file, line_num + 1
                                 );
-                                errors.push(ReqvireError::DuplicateContractBinding(
-                                    msg.clone(),
-                                ));
+                                errors.push(ReqvireError::DuplicateContractBinding(msg.clone()));
                                 debug!("Warning: {}", msg);
                             }
                         }
@@ -1466,9 +1450,7 @@ pub fn parse_elements(
                                 file,
                                 line_num + 1
                             );
-                            errors.push(ReqvireError::InvalidContractBindingFormat(
-                                msg.clone(),
-                            ));
+                            errors.push(ReqvireError::InvalidContractBindingFormat(msg.clone()));
                             debug!("Error: {}", msg);
                         }
                     }

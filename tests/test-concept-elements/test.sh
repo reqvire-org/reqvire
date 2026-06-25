@@ -4,7 +4,7 @@ set -uo pipefail
 set +e
 VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
 VALIDATE_EXIT=$?
-CONCEPTS_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic concepts 2>&1)
+CONCEPTS_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic export --layer concepts 2>&1)
 CONCEPTS_EXIT=$?
 MODEL_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --filter-type concept-scheme --json 2>&1)
 MODEL_EXIT=$?
@@ -25,7 +25,7 @@ if [ $VALIDATE_EXIT -ne 0 ]; then
 fi
 
 if [ $CONCEPTS_EXIT -ne 0 ]; then
-  echo "FAILED: semantic concepts command failed"
+  echo "FAILED: semantic export --layer concepts command failed"
   echo "$CONCEPTS_OUTPUT"
   exit 1
 fi
@@ -47,7 +47,7 @@ for token in \
   "skos:closeMatch" \
   '"Sparse Concept"'; do
   if ! grep -qF "$token" <<< "$CONCEPTS_OUTPUT"; then
-    echo "FAILED: semantic concepts output missing token: $token"
+    echo "FAILED: semantic export --layer concepts output missing token: $token"
     echo "$CONCEPTS_OUTPUT"
     exit 1
   fi

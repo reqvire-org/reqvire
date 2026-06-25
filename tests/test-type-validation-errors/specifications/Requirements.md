@@ -93,12 +93,11 @@ A semantic contract for positive type validation.
 #### Shapes
 ```turtle
 @prefix testonto: <https://example.test/ontology#> .
-@prefix reqvire: <urn:reqvire:test#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
-reqvire:TypeValidationShape
+testonto:TypeValidationShape
   a sh:NodeShape ;
-  sh:targetClass reqvire:TypeValidationContract .
+  sh:targetClass testonto:TypeValidationContract .
 ```
 ---
 
@@ -114,10 +113,9 @@ An ontology for positive type validation.
 #### Ontology
 ```turtle
 @prefix testonto: <https://example.test/ontology#> .
-@prefix reqvire: <urn:reqvire:test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 <https://example.test/ontology> a owl:Ontology .
-reqvire:TypeValidationContract a owl:Class .
+testonto:TypeValidationContract a owl:Class .
 ```
 ---

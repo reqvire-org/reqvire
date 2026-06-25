@@ -407,20 +407,24 @@ The command shall reject `mv-file --squash` when the target file is an existing 
 
 ### CLI Ontologies Command
 
-The system shall provide semantic export commands that expose ontology vocabulary, SHACL shapes, SKOS concepts, and the combined semantic graph as separate CLI surfaces. The system shall also provide a root `concepts` command family for standalone Thesaurus concept-scheme work. The legacy `ontologies` command remains a compatibility alias for the combined semantic graph export, while canonical semantic workflows use `semantic ontologies`, `semantic shapes`, `semantic concepts`, and `semantic graph`.
+The system shall provide one canonical `semantic export` command that exposes ontology vocabulary, SHACL shapes, SKOS concepts, Reqvire model facts, used external ontology subset facts, and prefix projection facts as selectable RDF export layers. The system shall also provide a root `concepts` command family for standalone Thesaurus concept-scheme work. The legacy `ontologies` command remains a compatibility alias for combined graph export.
 
 #### Details
 The semantic export commands shall:
 - Emit RDF/Turtle by default and support `--jsonld` where the selected layer can be serialized as JSON-LD.
 - Turtle output uses deterministic `@prefix` declarations and compact prefixed names where safe; JSON-LD output remains a separate RDF serialization mode.
-- `semantic ontologies`: emit generated ontology document declarations plus authored OWL/RDF ontology vocabulary, with optional used external ontology subset inclusion.
-- `semantic shapes`: emit semantic-contract SHACL shapes only.
-- `semantic concepts`: emit SKOS concept scheme/thesaurus triples only, with optional `--include-mappings` for `reqvire:mapsToConcept` bridge triples.
-- `semantic graph`: emit the combined semantic graph; `--full` includes RDF triples for Reqvire model elements, relations, contract_bindings, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts.
+- `semantic export --layer ontologies`: emit generated ontology document declarations plus authored OWL/RDF ontology vocabulary.
+- `semantic export --layer shapes`: emit semantic-contract SHACL shapes.
+- `semantic export --layer concepts`: emit SKOS concept scheme/thesaurus triples.
+- Authored `reqvire:mapsToConcept` bridge triples remain part of `semantic export --layer ontologies`; they are authored ontology RDF, not a separate mapping layer.
+- `semantic export --layer model`: emit RDF triples for Reqvire model elements, relations, contract_bindings, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts.
+- `semantic export --layer external-used`: emit only the used external ontology subset derived from local or built-in ontology dependency sources.
+- `semantic export --layer prefixes`: emit generated `reqvire:TurtlePrefixDeclaration` projection facts that describe the exported prefix map.
+- `semantic export` without `--layer`: emit all public semantic export layers.
 - `concepts export`: emit generated SKOS concept scheme/thesaurus triples from standalone `concept-scheme` roots, with optional `--include-mappings` for valid `reqvire:mapsToConcept` bridge triples.
 - `concepts validate`: validate standalone concept schemes, concept references, and `reqvire:mapsToConcept` bridge targets through the same model validation path.
-- Support `--include-external` on ontology and graph exports to include only the used external subset derived from local or built-in ontology dependency sources.
-- Support `--namespace-base <IRI>` on ontology and graph exports to filter the clean authored layer to one ontology base or term namespace.
+- Support repeatable `--layer <LAYER>` with `ontologies`, `shapes`, `concepts`, `model`, `external-used`, and `prefixes`.
+- Support `--namespace-base <IRI>` on clean authored exports to filter to one ontology base or term namespace; reject combinations with `model`.
 - Provide no CLI flag or mode that emits complete third-party ontology source dumps; users that need raw external source already have the local dependency file.
 - Support `--output <FILE>` to write the selected format to a file.
 - Reuse the semantic index built from the graph registry instead of reparsing Turtle separately from validation.

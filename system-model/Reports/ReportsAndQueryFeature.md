@@ -25,7 +25,7 @@ Report requirements define traversal direction, output structure, filters, JSON 
 As a **System Engineer**, I want Reqvire to expose ontology and shape content as semantic artifacts, so that downstream tools can inspect and reuse the model's semantic vocabulary without parsing Markdown directly.
 
 #### Details
-Semantic model export is the capability for collecting ontology vocabulary, SHACL shapes, SKOS concepts, and combined semantic graph content from the semantic model core, exporting readable prefixed Turtle and JSON-LD semantic artifacts, optionally materializing the used external ontology subset, projecting Reqvire model context as RDF, materializing generated ontology projection facts, and keeping semantic exports traceable to their Reqvire source elements.
+Semantic model export is the capability for collecting ontology vocabulary, SHACL shapes, SKOS concepts, and combined semantic export content from the semantic model core, exporting readable prefixed Turtle and JSON-LD semantic artifacts, optionally materializing the used external ontology subset, projecting Reqvire model context as RDF, materializing generated ontology projection facts, and keeping semantic exports traceable to their Reqvire source elements.
 
 External ontology source parsing, built-in external source resolution, term validation, and used-subset construction are owned by [Semantic Model Core](../Semantics/SemanticModelFeature.md#semantic-model-core). Reporting owns the public export surface and exposure policy for those semantic facts.
 

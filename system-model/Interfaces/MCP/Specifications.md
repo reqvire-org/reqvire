@@ -102,20 +102,22 @@ Semantic model evidence rules:
 - `reqvire.read_element` returns `concept_references` for non-ontology, non-semantic-contract elements that author `#### Concept References`.
 - `reqvire.collect` includes authored concept references for capability/requirement collection and semantic-contract ontology-use context for semantic-contract evidence where the underlying Reqvire operation returns it.
 - `reqvire.model` and `reqvire.submodels` preserve capability roots, requirement ownership through `specify`/`specifiedBy`, ontology hierarchy through `derive`/`derivedFrom`, and concept-reference facts needed for semantic dependency traceability.
-- `reqvire.semantic.ontologies` exposes authored OWL/RDF ontology vocabulary only. It accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`. It accepts optional `include_external`; omitted or false excludes local and built-in External Ontology dependency triples and external term declarations, while true includes only used external subset triples and declarations sourced from `reqvire:external-used-subset` (o-kernel-managed named graph).
+- `reqvire.semantic.export` exposes the canonical layer-composed semantic RDF export. It accepts optional `format`, optional repeatable-equivalent `layers` array with `ontologies`, `shapes`, `concepts`, `model`, `external-used`, and `prefixes`, and optional `namespace_base`. Omitted or empty `layers` exports all public layers.
+- `reqvire.semantic.ontologies` exposes authored OWL/RDF ontology vocabulary only. It accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`. Authored `reqvire:mapsToConcept` bridge triples remain in this ontology layer.
 - `reqvire.semantic.shapes` exposes semantic-contract SHACL shapes only. It accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`.
-- `reqvire.semantic.concepts` exposes SKOS concept scheme/thesaurus triples only. It accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`, and optional `include_mappings` controls whether `reqvire:mapsToConcept` bridge triples are included.
+- `reqvire.semantic.concepts` exposes SKOS concept scheme/thesaurus triples only. It accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`. It does not include authored ontology bridge triples.
 - `reqvire.concept_schemes.list` exposes standalone native concept schemes and their `concept_base`/`concept_prefix` namespace context.
 - `reqvire.concepts.list` exposes standalone native SKOS concepts generated from Reqvire `concept` elements, with optional filtering by text or scheme IRI.
 - `reqvire.concepts.get` reads one generated native concept or concept scheme by generated IRI, source element identifier, or source element name.
 - `reqvire.concept_mappings.list` lists validated `reqvire:mapsToConcept` bridge triples from structural ontology terms to generated native SKOS concepts; target validation is enforced by canonical model startup and validation.
-- `reqvire.semantic.graph` exposes the combined semantic graph. It accepts optional `format`, optional `full`, and optional `include_external`; full mode adds Reqvire model context triples and generated ontology projection facts, while `include_external` adds only the used external subset.
+- `reqvire.semantic.model` exposes generated Reqvire model facts for elements, relations, concept references, semantic term context, and ontology projection facts. It accepts optional `format`.
+- `reqvire.semantic.graph` exposes the combined public semantic export. It accepts optional `format` and is equivalent to `reqvire.semantic.export` with omitted layers.
 - Semantic export responses return selected serialized content, effective semantic layer, effective external materialization state where relevant, semantic index summary, collected block metadata, graph layer metadata, diagnostics, generated ontology document declarations, visible ontology term declarations, and SHACL shape references.
 - `reqvire.semantic.prefixes` returns ontology element-defined prefixes, namespaces, source provenance, source prose content, and a reusable SPARQL prefix block. It accepts optional `include_external`; omitted or false returns authored ontology prefixes only, while true also returns local external ontology source prefixes marked as external and used-subset materialization metadata.
 - `reqvire.semantic.vocabulary` returns compact paged semantic vocabulary with prefixes included in every response for SPARQL query construction. It accepts optional `include_external`; omitted or false returns authored vocabulary only, while true also returns used external subset vocabulary terms marked as external with external source metadata.
 - MCP semantic tools that return Turtle use the same prefixed Turtle semantic export contract as CLI output, including deterministic `@prefix` declarations, safe compact prefixed names, preservation of authored `owl:Ontology` and `owl:imports` facts, and no Turtle prefix behavior for JSON-LD responses.
 - `reqvire.semantic.sparql` executes SPARQL against the semantic store used by the combined semantic graph. It accepts optional `include_external`; omitted or false queries the authored semantic store only, while true queries a store that includes only the used external subset.
-- Semantic tool responses expose `graph_layers` metadata with `default`, `authored-ontology`, `authored-model`, `generated`, `external-used-subset`, and `raw-external-source` role flags so clients can target named-graph scopes explicitly while raw external source graphs remain hidden.
+- Export tool responses expose `graph_layers` metadata with layer roles `ontologies`, `shapes`, `concepts`, `model`, `external-used`, `prefixes`, and `raw-external-source`; query-helper responses expose store graph roles `default`, `authored-ontology`, `authored-model`, `generated`, `external-used-subset`, and `raw-external-source`. Raw external source graphs remain hidden.
 
 #### Metadata
   * type: specification
@@ -678,7 +680,9 @@ Model evidence tools:
 - `reqvire.semantic.ontologies`
 - `reqvire.semantic.shapes`
 - `reqvire.semantic.concepts`
+- `reqvire.semantic.model`
 - `reqvire.semantic.graph`
+- `reqvire.semantic.export`
 - `reqvire.semantic.prefixes`
 - `reqvire.semantic.vocabulary`
 - `reqvire.semantic.sparql`
@@ -761,7 +765,9 @@ Read-only tools:
 - `reqvire.semantic.ontologies`
 - `reqvire.semantic.shapes`
 - `reqvire.semantic.concepts`
+- `reqvire.semantic.model`
 - `reqvire.semantic.graph`
+- `reqvire.semantic.export`
 - `reqvire.semantic.prefixes`
 - `reqvire.semantic.vocabulary`
 - `reqvire.semantic.sparql`

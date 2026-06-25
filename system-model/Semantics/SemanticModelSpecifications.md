@@ -31,7 +31,7 @@ Behavior:
 - Built-in source terms are available for ontology Turtle validation, semantic-contract SHACL alignment, and native concept RDF generation.
 - Authored ontology resources typed by a class declared in a built-in source are treated as authored named individuals for structural ontology validation, but they are not valid concept-reference targets unless they are generated from native `concept` elements.
 - Authored Turtle must still explicitly declare `@prefix skos: <http://www.w3.org/2004/02/skos/core#> .`; the built-in source does not inject hidden Turtle prefixes.
-- `reqvire semantic ontologies --include-external`, `reqvire semantic graph --include-external`, and MCP `include_external: true` materialize only the used subset of built-in external source triples, following the same used-subset policy as local external ontology sources.
+- `reqvire semantic export --layer ontologies --layer external-used`, `reqvire semantic export --layer external-used`, and MCP `reqvire.semantic.export` with the `external-used` layer materialize only the used subset of built-in external source triples, following the same used-subset policy as local external ontology sources. MCP helper-tool `include_external: true` provides query-time visibility into the same used subset.
 - Invalid SKOS terms that are not present in the pinned RDF source do not become valid merely because they share the SKOS namespace.
 
 Conceptual/structural layer separation:
@@ -138,7 +138,7 @@ The namespace-scoped ontology export contract defines the clean semantic export 
 
 #### Details
 Filter behavior:
-- `reqvire semantic ontologies` and `reqvire semantic graph` shall accept `--namespace-base <IRI>`.
+- `reqvire semantic export --layer ontologies` and `reqvire semantic export` shall accept `--namespace-base <IRI>`.
 - The value may be an ontology document base IRI, such as `https://www.reqvire.org/ontology`, or a term namespace IRI, such as `https://www.reqvire.org/ontology#`.
 - Reqvire shall normalize the value to the term namespace before filtering.
 - Generated ontology document declarations shall be limited to matching ontology documents.
@@ -147,7 +147,7 @@ Filter behavior:
 - Authored `#### Shapes` blocks shall be included when they declare a shape subject in the matching term namespace.
 - The filter shall deduplicate the resulting Turtle/JSON-LD output through the same serializer path used by unfiltered clean exports.
 - Filtered Turtle output shall preserve the same deterministic prefix declaration and safe IRI compaction behavior as unfiltered prefixed Turtle semantic export.
-- The filter shall reject combination with `--full` until a separate model-context/projection filter contract exists.
+- The filter shall reject combination with the `model` layer until a separate model/projection filter contract exists.
 
 The filter is an export boundary only. It does not mutate authored ontology source, does not change validation scope, and does not turn unrelated ontology namespaces into runtime vocabulary.
 
@@ -190,7 +190,7 @@ Runtime materialization:
 - For each authored named subject collected from a `#### Ontology` block whose IRI is inside the generated ontology document term namespace, emit one generated triple: `<term> rdfs:isDefinedBy <ontology-document-iri>`.
 - Resolve `<ontology-document-iri>` from the same `ontology_base` used for the generated `owl:Ontology` declaration.
 - Exclude the ontology document IRI itself from generated term definition links.
-- Include generated definition links in default Turtle output, JSON-LD output, full semantic export, MCP semantic ontology output, and any semantic store built from the same semantic index.
+- Include generated definition links in default Turtle output, JSON-LD output, default semantic export, MCP semantic ontology output, and any semantic store built from the same semantic index.
 - Declare the prefixes used by the generated definition-link section itself, at minimum `rdfs:` and `owl:` when those terms appear in that serialized section.
 - Expose the resolved ontology document as metadata that MCP vocabulary and Explorer graph projections can use for grouping, exact filtering, and modal evidence.
 - Do not generate definition links for imported external ontology terms or named subjects outside the owning document term namespace.
@@ -222,8 +222,8 @@ Semantic context construction:
 - Keep authored Markdown as the source of truth; semantic context construction must not mutate authored ontology or semantic-contract blocks.
 - Semantic model construction must not rescan element Markdown to parse reserved subsection grammar; only the model parser owns that grammar.
 - Include authored ontology RDF, semantic-contract SHACL RDF, generated ontology document declarations, generated ontology term definition links, and available source/provenance metadata.
-- When full semantic context is requested by a consumer, include model-context triples, relation-family projection facts, concept-reference facts, ontology term declaration facts, semantic-contract shape-reference facts, and generated ontology projection facts.
-- In full semantic context, emit concrete parsed Reqvire elements as `owl:NamedIndividual` instances of `reqvire:Element` and their more specific element class, such as `reqvire:Requirement`, `reqvire:Specification`, `reqvire:SemanticContract`, or concrete verification classes. Emit referenced files, evidence, and implementation targets as `owl:NamedIndividual` instances of `reqvire:Artifact` and any more specific artifact class such as `reqvire:File`. Do not add these model-context ABox individuals to clean authored ontology-only exports.
+- When full semantic context is requested by a consumer, include model triples, relation-family projection facts, concept-reference facts, ontology term declaration facts, semantic-contract shape-reference facts, and generated ontology projection facts.
+- In full semantic context, emit concrete parsed Reqvire elements as `owl:NamedIndividual` instances of `reqvire:Element` and their more specific element class, such as `reqvire:Requirement`, `reqvire:Specification`, `reqvire:SemanticContract`, or concrete verification classes. Emit referenced files, evidence, and implementation targets as `owl:NamedIndividual` instances of `reqvire:Artifact` and any more specific artifact class such as `reqvire:File`. Do not add these model ABox individuals to clean authored ontology-only exports.
 
 Reqvire core uses o-kernel contracts for RDF-native parsing/classification and SHACL services, but the Reqvire semantic model remains the owner of graph-registry source mapping, element provenance, semantic-contract reachability, and product-specific projection policy.
 
@@ -240,22 +240,23 @@ The prefixed Turtle export contract defines how Reqvire serializes semantic RDF 
 
 #### Details
 Serialization boundary:
-- Prefix compaction shall be applied at RDF serialization time after semantic blocks, generated ontology document declarations, generated definition links, optional model-context triples, generated projection facts, and optional used external subset triples have been collected as RDF terms.
+- Prefix compaction shall be applied at RDF serialization time after semantic blocks, generated ontology document declarations, generated definition links, optional model triples, generated projection facts, and optional used external subset triples have been collected as RDF terms.
 - The exporter shall not compact IRIs by string-rewriting already serialized Turtle.
 - Internal semantic stores, validation, graph construction, and Oxigraph loading shall continue to use full RDF IRIs.
 - The Turtle output shall remain parseable as ordinary RDF/Turtle and equivalent to the unprefixed RDF graph.
 - Final Turtle artifacts shall emit one deterministic top-level prefix declaration block before serialized graph triples and source comments. Prefix declarations are syntax bindings only; they must not be interpreted as ontology document membership or as a replacement for `owl:Ontology` document triples.
 
 Prefix map construction:
-- Built-in reserved prefixes shall include at least `reqvire`, `rdf`, `rdfs`, `owl`, `xsd`, `sh`, and `skos` when those namespaces appear in the serialized graph.
+- The `reqvire` prefix shall always be available for generated Reqvire export/runtime vocabulary. In the Reqvire repository it is sourced from the authored Reqvire ontology element when that ontology declares the canonical namespace; in downstream repositories it is a built-in export namespace.
+- Built-in standards prefixes shall include at least `rdf`, `rdfs`, `owl`, `xsd`, `sh`, and `skos` when those namespaces appear in the serialized graph.
 - Authored ontology prefixes shall come from parsed ontology metadata such as `ontology_prefix` and `ontology_base`.
 - Native concept-scheme prefixes shall come from parsed concept-scheme metadata such as `concept_prefix` and `concept_base`.
 - Local and built-in external ontology source prefixes shall be included only when that external vocabulary is included in the selected output surface.
-- Prefix ordering shall be deterministic: built-ins first, authored ontology prefixes next, concept prefixes next, external prefixes last, with lexical ordering inside each group.
+- Prefix ordering shall be deterministic: `reqvire` first, standards vocabulary prefixes next, authored ontology prefixes next, concept prefixes next, external prefixes last, with lexical ordering inside each group unless a group defines a canonical vocabulary order.
 - Full semantic export projection facts shall model prefixed Turtle output as a `PrefixedTurtleExport` linked to a `TurtlePrefixMap`, and the map shall contain one `TurtlePrefixDeclaration` per emitted prefix binding.
 
 Collision policy:
-- Built-in prefixes are reserved and must not be redefined by authored ontology, concept-scheme, or external-source metadata.
+- The canonical `reqvire` prefix and built-in standards prefixes are reserved and must not be redefined by authored ontology, concept-scheme, or external-source metadata. An authored Reqvire ontology declaration may own the canonical `reqvire` prefix only when it binds to the canonical Reqvire namespace.
 - The same prefix token bound to multiple namespace IRIs shall be a validation or export error.
 - The same namespace bound to multiple prefix tokens shall prefer the canonical authored Reqvire prefix when one exists; otherwise aliases shall be rejected unless a later requirement defines alias export.
 - The serializer shall not silently invent random prefix aliases to work around collisions.
@@ -287,11 +288,11 @@ Artifact contract:
 - The artifact path is `crates/reqvire-core/src/runtime_ontology/reqvire.ttl`.
 - The Rust access point is `crates/reqvire-core/src/runtime_ontology.rs`.
 - The embedded constant `REQVIRE_ONTOLOGY_TTL` exposes the generated ontology Turtle content without requiring runtime access to `system-model/Ontologies`.
-- The artifact is generated from the authored Reqvire model with `reqvire semantic graph --namespace-base https://www.reqvire.org/ontology#`.
+- The artifact is generated from the authored Reqvire model with `reqvire semantic export --layer ontologies --layer shapes --namespace-base https://www.reqvire.org/ontology#`.
 - The artifact must include generated ontology document declarations, generated term definition links, and authored runtime Reqvire ontology RDF whose declared subjects are in the runtime Reqvire term namespace.
 - Intermediate generated Turtle sections may be self-contained for the prefixes they use before final artifact assembly.
 - The final runtime Turtle artifact shall follow the shared prefixed Turtle export contract with one deterministic top-level prefix declaration block. The committed artifact must not depend on repeated in-section prefix declarations.
-- The artifact must not include `--full` model-context triples, generated ontology projection facts, raw external source dumps, or used external subset triples unless a future requirement changes the runtime bootstrap contract.
+- The artifact must not include model-layer triples, generated ontology projection facts, raw external source dumps, or used external subset triples unless a future requirement changes the runtime bootstrap contract.
 - The artifact must not include semantic-contract SHACL shape blocks or ontology blocks whose declared subjects are outside the runtime Reqvire term namespace.
 - If the authored runtime ontology maps structural terms to standalone native concepts, the checked-in runtime artifact must be curated after namespace export so runtime bootstrap excludes concept-scheme `owl:imports`, the `reqvire:mapsToConcept` property declaration, generated definition links for `reqvire:mapsToConcept`, and authored `reqvire:mapsToConcept` bridge usage triples. Concept bridges are concept-layer evidence and are not runtime bootstrap facts.
 - The artifact is derived implementation, not authored ontology source. Changes to vocabulary terms shall be made in `system-model/Ontologies` first, then propagated by regenerating the artifact.
@@ -309,7 +310,7 @@ The synchronization contract defines how Reqvire prevents embedded runtime seman
 
 #### Details
 Synchronization behavior:
-- A dedicated e2e test shall regenerate the runtime namespace-scoped ontology export from the current workspace using `reqvire semantic graph --namespace-base https://www.reqvire.org/ontology# --output <temporary-file>`.
+- A dedicated e2e test shall regenerate the runtime namespace-scoped ontology export from the current workspace using `reqvire semantic export --layer ontologies --layer shapes --namespace-base https://www.reqvire.org/ontology# --output <temporary-file>`.
 - If runtime-artifact curation rules are active, the test shall apply those rules to the regenerated export before comparison.
 - The test shall split regenerated output into `reqvire.ttl` ontology vocabulary and `reqvire-shacl.ttl` SHACL rules using semantic block kind metadata.
 - The regenerated, curated, and split temporary outputs shall be compared with `crates/reqvire-core/src/runtime_ontology/reqvire.ttl` and `crates/reqvire-core/src/runtime_ontology/reqvire-shacl.ttl` after deterministic blank-node label normalization.
@@ -321,7 +322,7 @@ Synchronization behavior:
 Regeneration command:
 
 ```bash
-cargo run -q -p reqvire-cli -- semantic graph --namespace-base https://www.reqvire.org/ontology# --output /tmp/reqvire-runtime-semantic-export.ttl
+cargo run -q -p reqvire-cli -- semantic export --layer ontologies --layer shapes --namespace-base https://www.reqvire.org/ontology# --output /tmp/reqvire-runtime-semantic-export.ttl
 ```
 
 If the authored model includes concept-layer imports or bridge usages that are not runtime bootstrap facts, maintainers must apply the documented runtime curation before committing `reqvire.ttl` and `reqvire-shacl.ttl`. The curation and split are part of the runtime artifact contract, not an ad hoc edit.
@@ -342,9 +343,9 @@ Artifact contract:
 - The artifact path is `crates/reqvire-core/src/runtime_ontology/reqvire-shacl.ttl`.
 - The Rust access point is `crates/reqvire-core/src/runtime_ontology.rs`.
 - The embedded constant `REQVIRE_SHACL_TTL` exposes generated SHACL Turtle content without requiring runtime access to `system-model/Ontologies`.
-- The artifact is generated from the authored Reqvire model with `reqvire semantic graph --namespace-base https://www.reqvire.org/ontology#`, then split from the ontology artifact using semantic block kind metadata.
+- The artifact is generated from the authored Reqvire model with `reqvire semantic export --layer ontologies --layer shapes --namespace-base https://www.reqvire.org/ontology#`, then split from the ontology artifact using semantic block kind metadata.
 - The artifact must include authored runtime semantic-contract SHACL RDF whose declared subjects are in the runtime Reqvire term namespace.
-- The artifact must not include generated ontology document declarations, generated term definition links, authored ontology vocabulary blocks, `--full` model-context triples, generated ontology projection facts, raw external source dumps, or used external subset triples unless a future requirement changes the runtime bootstrap contract.
+- The artifact must not include generated ontology document declarations, generated term definition links, authored ontology vocabulary blocks, model-layer triples, generated ontology projection facts, raw external source dumps, or used external subset triples unless a future requirement changes the runtime bootstrap contract.
 - Runtime code may load `REQVIRE_ONTOLOGY_TTL` and `REQVIRE_SHACL_TTL` into one RDF store when it needs vocabulary plus validation rules, but the checked-in compile-time source files remain separate.
 
 #### Metadata

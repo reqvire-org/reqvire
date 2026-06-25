@@ -2,7 +2,7 @@
 
 ### Reqvire Semantic Export Ontology
 
-The Reqvire semantic export ontology defines RDF export concepts for collected ontology vocabulary, SHACL shapes, SKOS concepts, and combined semantic graph content.
+The Reqvire semantic export ontology defines RDF export concepts for collected ontology vocabulary, SHACL shapes, SKOS concepts, and combined semantic export content.
 
 Semantic exports preserve Markdown as the source of truth while exposing parsed ontology and shape content for downstream semantic tooling.
 
@@ -267,15 +267,15 @@ reqvire:lineNumber a owl:DatatypeProperty ;
 reqvire:relationType a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
-  rdfs:comment "Canonical relation type token emitted by model-context RDF projection facts." .
+  rdfs:comment "Canonical relation type token emitted by model RDF projection facts." .
 reqvire:relationTargetIdentifier a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
-  rdfs:comment "Stable identifier of a relation target emitted by model-context RDF projection facts." .
+  rdfs:comment "Stable identifier of a relation target emitted by model RDF projection facts." .
 reqvire:contractBindingsTargetIdentifier a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
-  rdfs:comment "Stable identifier of a contract binding target emitted by model-context RDF projection facts." .
+  rdfs:comment "Stable identifier of a contract binding target emitted by model RDF projection facts." .
 reqvire:conceptLabel a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
@@ -295,7 +295,7 @@ reqvire:reservedVocabularyIri a owl:DatatypeProperty ;
 reqvire:referenceKind a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
-  rdfs:comment "Canonical concept-reference kind token emitted by model-context RDF projection facts." .
+  rdfs:comment "Canonical concept-reference kind token emitted by model RDF projection facts." .
 reqvire:externalOntologyPrefix a owl:DatatypeProperty ;
   rdfs:domain reqvire:ExternalOntologySource ;
   rdfs:range xsd:string ;
@@ -426,7 +426,7 @@ reqvire:externalUsedTermSeedQuery a reqvire:ExternalOntologySubsetConstructQuery
   reqvire:constructFamily "external-used-subset" ;
   reqvire:constructKind "seed-query" ;
   reqvire:projectionDerivationMode "construct-query-specified" ;
-  reqvire:constructQueryPurpose "Select external ontology terms referenced by authored ontology, SHACL, concept-reference, model-context, or generated semantic projection facts whose IRIs fall under declared external namespaces." ;
+  reqvire:constructQueryPurpose "Select external ontology terms referenced by authored ontology, SHACL, concept-reference, model, or generated semantic projection facts whose IRIs fall under declared external namespaces." ;
   reqvire:constructQueryText """
 PREFIX reqvire: <https://www.reqvire.org/ontology#>
 

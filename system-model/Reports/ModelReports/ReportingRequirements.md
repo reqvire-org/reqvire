@@ -2,7 +2,7 @@
 
 ### Concept Relation Projection Materialization
 
-The system shall materialize normalized SKOS concept-relation facts from native concept Markdown relations so concept exports, full semantic graph output, Project Store thesaurus data, Ontologies Concepts-layer rendering, and MCP concept tools consume the same concept-relation projection.
+The system shall materialize normalized SKOS concept-relation facts from native concept Markdown relations so concept exports, default semantic export output, Project Store thesaurus data, Ontologies Concepts-layer rendering, and MCP concept tools consume the same concept-relation projection.
 
 #### Details
 The concept relation projection shall:
@@ -13,7 +13,7 @@ The concept relation projection shall:
 - Materialize reciprocal SKOS concept association or mapping facts where the SKOS predicate is symmetric, while consumers may canonicalize those reciprocal facts to one visual edge.
 - Keep raw authored Markdown relation evidence separate from generated normalized concept-relation projection facts.
 - Not write generated inverse or reciprocal SKOS facts back to authored Markdown.
-- Feed generated concept-relation facts into `reqvire semantic concepts`, `reqvire semantic graph --full`, full JSON-LD output, served Project Store `thesaurus` projection, Ontologies Concepts-layer graph data, and MCP concept/thesaurus tools.
+- Feed generated concept-relation facts into `reqvire semantic export --layer concepts`, `reqvire semantic export`, full JSON-LD output, served Project Store `thesaurus` projection, Ontologies Concepts-layer graph data, and MCP concept/thesaurus tools.
 - Remain separate from ontology construct projection because SKOS concept taxonomy and mappings are conceptual thesaurus facts, not OWL/RDFS/SHACL construct classifications.
 
 #### Metadata
@@ -32,7 +32,7 @@ The system shall expose only constructed used external vocabulary content throug
 #### Details
 Semantic output surfaces shall not expose raw full external ontology files. When `include_external` is requested, Reqvire shall expose only the used external vocabulary content selected and constructed from internal external dependency inputs. Unused external dependency facts shall remain internal and shall not appear in CLI ontology output, MCP semantic ontology output, MCP vocabulary output, MCP SPARQL graphs, or Explorer ontology views.
 
-Default semantic export and MCP semantic metadata shall keep authored ontology, SHACL shape, SKOS concept, and combined graph concerns as separate surfaces. `reqvire semantic ontologies --include-external`, `reqvire semantic graph --include-external`, and MCP `include_external: true` shall include used external subset triples, used external declarations, and used external vocabulary metadata where that layer supports external materialization. `reqvire semantic graph --full --include-external` and MCP full semantic query with `include_external: true` shall include authored triples, the used external subset, Reqvire model context, and generated ontology projection facts.
+Default semantic export and MCP semantic metadata shall keep authored ontology, SHACL shape, SKOS concept, generated model, used external subset, and prefix projection concerns as separate layers. `reqvire semantic export --layer ontologies --layer external-used`, `reqvire semantic export --layer external-used`, and MCP `reqvire.semantic.export` with `layers: ["ontologies", "external-used"]` shall include used external subset triples, used external declarations, and used external vocabulary metadata. `reqvire semantic export` and MCP `reqvire.semantic.export` with omitted layers shall include authored triples, the used external subset, Reqvire model facts, generated ontology projection facts, and prefix projection facts. MCP semantic query helpers shall use `include_external: true` only for query-time used-subset visibility.
 
 No CLI, MCP, Explorer, website, or assistant-facing contract shall specify a public full third-party ontology dump mode.
 
@@ -441,7 +441,7 @@ The system shall seed Explorer Traces SPA route data showing verification tracea
 The system shall expose the semantic model core context as CLI, MCP, serve-time, and Explorer ontology output without making reporting the owner of ontology or semantic-contract source semantics.
 
 #### Details
-Ontology collection output consumes the semantic context from [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection), including generated ontology document declarations, generated term definition links, authored ontology RDF, semantic-contract SHACL RDF, optional full model context, generated projection facts, and optional used external vocabulary subset content.
+Ontology collection output consumes the semantic context from [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection), including generated ontology document declarations, generated term definition links, authored ontology RDF, semantic-contract SHACL RDF, optional model layer, generated projection facts, and optional used external vocabulary subset content.
 
 Turtle ontology collection output shall use the shared [Prefixed Turtle Semantic Export](../../Semantics/SemanticModelRequirements.md#prefixed-turtle-semantic-export) serializer contract so exported RDF remains graph-equivalent while presenting stable `@prefix` declarations and compact prefixed names where safe.
 
@@ -472,7 +472,7 @@ The ontology projection subgraph shall:
 - Preserve source element identifier, source name, source file, source line, source block kind, construct subject, construct object, construct members, construct property, ordered sequence index when relevant, symbol code point, rendered symbol, and derivation mode.
 - Derive normalized SHACL slot/facet projection records from node-shape target classes and property-shape paths so WebInterface ontology views and semantic exports can share the same source-backed semantic evidence.
 - Distinguish direct-authored projection from inferred projection. Direct-authored projection is in scope; OWL reasoning, SHACL-AF rule execution, and inferred materialization require separate inference requirements before they can contribute generated facts.
-- Feed generated facts into `reqvire semantic graph --full`, `reqvire semantic graph --full --jsonld`, and the Ontologies Explorer through the same in-memory projection context. The served `ontologies.ttl` artifact includes generated ontology document declarations plus authored ontology/SHACL collection output, but does not include generated ontology projection facts unless full semantic output is requested.
+- Feed generated facts into `reqvire semantic export`, `reqvire semantic export --jsonld`, and the Ontologies Explorer through the same in-memory projection context. The served `ontologies.ttl` artifact includes generated ontology document declarations plus authored ontology/SHACL collection output, but does not include generated ontology projection facts unless full semantic output is requested.
 
 #### Metadata
   * type: requirement

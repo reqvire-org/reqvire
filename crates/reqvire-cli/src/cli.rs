@@ -1,7 +1,7 @@
 use crate::mcp;
 use crate::serve;
 use anyhow::Result;
-use clap::{CommandFactory, Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
 use globset::GlobSet;
 use log::info;
 use reqvire::change_impact;
@@ -21,7 +21,7 @@ use reqvire::report_coverage;
 use reqvire::report_model;
 use reqvire::report_resources;
 use reqvire::report_submodels;
-use reqvire::semantic_contract::{self, SemanticExportFormat};
+use reqvire::semantic_contract::{self, SemanticExportFormat, SemanticExportLayer};
 use reqvire::verification_trace;
 use reqvire::GraphRegistry;
 use reqvire::ModelBuildOptions;
@@ -700,7 +700,7 @@ pub enum Commands {
 
     /// Export semantic RDF layers
     #[clap(
-        override_help = "Export semantic RDF layers\n\nSEMANTIC COMMANDS:\n    ontologies   Export authored OWL/RDF ontology vocabulary only\n    shapes       Export semantic-contract SHACL shapes only\n    concepts     Export canonical Markdown-native SKOS concept scheme/thesaurus triples only\n    graph        Export the combined semantic graph"
+        override_help = "Export semantic RDF layers\n\nSEMANTIC COMMANDS:\n    export   Export selected semantic RDF layers; no --layer exports all layers"
     )]
     Semantic {
         #[clap(subcommand)]
@@ -716,9 +716,9 @@ pub enum Commands {
         command: ConceptCommands,
     },
 
-    /// Compatibility alias for `reqvire semantic graph`
+    /// Compatibility alias for combined semantic export
     #[clap(
-        override_help = "Compatibility alias for `reqvire semantic graph`\n\nONTOLOGIES OPTIONS:\n      --jsonld                   Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --full                     Include Reqvire model context triples and ontology projection facts in the semantic export\n      --include-external         Include used local external ontology subset triples\n      --namespace-base <IRI>     Filter clean authored export to one ontology base or term namespace\n      --output <FILE>            Save output to file"
+        override_help = "Compatibility alias for combined semantic export\n\nONTOLOGIES OPTIONS:\n      --jsonld                   Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --full                     Include Reqvire model context triples and ontology projection facts in the semantic export\n      --include-external         Include used local external ontology subset triples\n      --namespace-base <IRI>     Filter clean authored export to one ontology base or term namespace\n      --output <FILE>            Save output to file"
     )]
     Ontologies {
         /// Output JSON-LD format instead of RDF/Turtle (.ttl)
@@ -797,89 +797,55 @@ pub enum Commands {
 
 #[derive(Subcommand, Debug)]
 pub enum SemanticCommands {
-    /// Export authored OWL/RDF ontology vocabulary only
+    /// Export selected semantic RDF layers
     #[clap(
-        override_help = "Export authored OWL/RDF ontology vocabulary only\n\nSEMANTIC ONTOLOGIES OPTIONS:\n      --jsonld                   Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --include-external         Include used local external ontology subset triples\n      --namespace-base <IRI>     Filter export to one ontology base or term namespace\n      --output <FILE>            Save output to file"
+        override_help = "Export selected semantic RDF layers\n\nSEMANTIC EXPORT OPTIONS:\n      --layer <LAYER>            Include layer: ontologies, shapes, concepts, model, external-used, prefixes. Repeatable; omitted means all layers\n      --jsonld                   Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --namespace-base <IRI>     Filter clean authored export to one ontology base or term namespace. Cannot be combined with model\n      --output <FILE>            Save output to file"
     )]
-    Ontologies {
-        /// Output JSON-LD format instead of RDF/Turtle (.ttl)
-        #[clap(long, help_heading = "SEMANTIC ONTOLOGIES OPTIONS")]
-        jsonld: bool,
-
-        /// Include used local external ontology subset triples
-        #[clap(long, help_heading = "SEMANTIC ONTOLOGIES OPTIONS")]
-        include_external: bool,
-
-        /// Filter export to one ontology base or term namespace
-        #[clap(long, value_name = "IRI", help_heading = "SEMANTIC ONTOLOGIES OPTIONS")]
-        namespace_base: Option<String>,
-
-        /// Save output to file
+    Export {
+        /// Include layer: ontologies, shapes, concepts, model, external-used, prefixes. Repeatable; omitted means all layers
         #[clap(
             long,
-            value_name = "FILE",
-            help_heading = "SEMANTIC ONTOLOGIES OPTIONS"
+            value_enum,
+            value_name = "LAYER",
+            help_heading = "SEMANTIC EXPORT OPTIONS"
         )]
-        output: Option<String>,
-    },
+        layer: Vec<SemanticLayerArg>,
 
-    /// Export semantic-contract SHACL shapes only
-    #[clap(
-        override_help = "Export semantic-contract SHACL shapes only\n\nSEMANTIC SHAPES OPTIONS:\n      --jsonld         Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --output <FILE>  Save output to file"
-    )]
-    Shapes {
         /// Output JSON-LD format instead of RDF/Turtle (.ttl)
-        #[clap(long, help_heading = "SEMANTIC SHAPES OPTIONS")]
+        #[clap(long, help_heading = "SEMANTIC EXPORT OPTIONS")]
         jsonld: bool,
 
-        /// Save output to file
-        #[clap(long, value_name = "FILE", help_heading = "SEMANTIC SHAPES OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Export canonical Markdown-native SKOS concept scheme/thesaurus triples only
-    #[clap(
-        override_help = "Export canonical Markdown-native SKOS concept scheme/thesaurus triples only\n\nSEMANTIC CONCEPTS OPTIONS:\n      --jsonld             Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --include-mappings   Include structural reqvire:mapsToConcept bridge triples that point to generated native concepts\n      --output <FILE>      Save output to file"
-    )]
-    Concepts {
-        /// Output JSON-LD format instead of RDF/Turtle (.ttl)
-        #[clap(long, help_heading = "SEMANTIC CONCEPTS OPTIONS")]
-        jsonld: bool,
-
-        /// Include structural reqvire:mapsToConcept bridge triples that point to generated native concepts
-        #[clap(long, help_heading = "SEMANTIC CONCEPTS OPTIONS")]
-        include_mappings: bool,
-
-        /// Save output to file
-        #[clap(long, value_name = "FILE", help_heading = "SEMANTIC CONCEPTS OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Export the combined semantic graph
-    #[clap(
-        override_help = "Export the combined semantic graph\n\nSEMANTIC GRAPH OPTIONS:\n      --jsonld                   Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --full                     Include Reqvire model context triples and ontology projection facts\n      --include-external         Include used local external ontology subset triples\n      --namespace-base <IRI>     Filter clean authored graph to one ontology base or term namespace\n      --output <FILE>            Save output to file"
-    )]
-    Graph {
-        /// Output JSON-LD format instead of RDF/Turtle (.ttl)
-        #[clap(long, help_heading = "SEMANTIC GRAPH OPTIONS")]
-        jsonld: bool,
-
-        /// Include Reqvire model context triples and ontology projection facts
-        #[clap(long, help_heading = "SEMANTIC GRAPH OPTIONS")]
-        full: bool,
-
-        /// Include used local external ontology subset triples
-        #[clap(long, help_heading = "SEMANTIC GRAPH OPTIONS")]
-        include_external: bool,
-
-        /// Filter clean authored graph to one ontology base or term namespace
-        #[clap(long, value_name = "IRI", help_heading = "SEMANTIC GRAPH OPTIONS")]
+        /// Filter clean authored export to one ontology base or term namespace. Cannot be combined with model
+        #[clap(long, value_name = "IRI", help_heading = "SEMANTIC EXPORT OPTIONS")]
         namespace_base: Option<String>,
 
         /// Save output to file
-        #[clap(long, value_name = "FILE", help_heading = "SEMANTIC GRAPH OPTIONS")]
+        #[clap(long, value_name = "FILE", help_heading = "SEMANTIC EXPORT OPTIONS")]
         output: Option<String>,
     },
+}
+
+#[derive(Clone, Debug, ValueEnum)]
+pub enum SemanticLayerArg {
+    Ontologies,
+    Shapes,
+    Concepts,
+    Model,
+    ExternalUsed,
+    Prefixes,
+}
+
+impl From<SemanticLayerArg> for SemanticExportLayer {
+    fn from(value: SemanticLayerArg) -> Self {
+        match value {
+            SemanticLayerArg::Ontologies => SemanticExportLayer::Ontologies,
+            SemanticLayerArg::Shapes => SemanticExportLayer::Shapes,
+            SemanticLayerArg::Concepts => SemanticExportLayer::Concepts,
+            SemanticLayerArg::Model => SemanticExportLayer::Model,
+            SemanticLayerArg::ExternalUsed => SemanticExportLayer::ExternalUsed,
+            SemanticLayerArg::Prefixes => SemanticExportLayer::Prefixes,
+        }
+    }
 }
 
 #[derive(Subcommand, Debug)]
@@ -2172,46 +2138,20 @@ pub async fn handle_command(
         Some(Commands::Semantic { command }) => {
             let index = semantic_contract::build_semantic_index(&model_manager.graph_registry);
             match command {
-                SemanticCommands::Ontologies {
+                SemanticCommands::Export {
+                    layer,
                     jsonld,
-                    include_external,
                     namespace_base,
                     output,
                 } => {
                     let format = semantic_export_format(jsonld);
-                    let output_content = index.serialize_ontologies(
+                    let layers = layer
+                        .into_iter()
+                        .map(SemanticExportLayer::from)
+                        .collect::<Vec<_>>();
+                    let output_content = index.serialize_export_layers(
                         format,
-                        include_external,
-                        namespace_base.as_deref(),
-                    )?;
-                    write_or_print_semantic_output(output.as_ref(), output_content)?;
-                }
-                SemanticCommands::Shapes { jsonld, output } => {
-                    let format = semantic_export_format(jsonld);
-                    let output_content = index.serialize_shapes(format)?;
-                    write_or_print_semantic_output(output.as_ref(), output_content)?;
-                }
-                SemanticCommands::Concepts {
-                    jsonld,
-                    include_mappings,
-                    output,
-                } => {
-                    let format = semantic_export_format(jsonld);
-                    let output_content = index.serialize_concepts(format, include_mappings)?;
-                    write_or_print_semantic_output(output.as_ref(), output_content)?;
-                }
-                SemanticCommands::Graph {
-                    jsonld,
-                    full,
-                    include_external,
-                    namespace_base,
-                    output,
-                } => {
-                    let format = semantic_export_format(jsonld);
-                    let output_content = index.serialize_with_options_and_filter(
-                        format,
-                        full,
-                        include_external,
+                        &layers,
                         namespace_base.as_deref(),
                     )?;
                     write_or_print_semantic_output(output.as_ref(), output_content)?;

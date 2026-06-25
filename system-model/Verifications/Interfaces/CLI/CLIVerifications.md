@@ -136,16 +136,19 @@ This verification shall prove that semantic export commands expose ontology, sha
 
 #### Details
 Expected checks:
-- Run `reqvire semantic ontologies` and verify the command succeeds and emits authored ontology vocabulary without semantic-contract SHACL shapes.
+- Run `reqvire semantic export --layer ontologies` and verify the command succeeds and emits authored ontology vocabulary without semantic-contract SHACL shapes.
 - Verify Turtle exports include one deterministic top-level `@prefix` declaration block, use compact prefixed names for built-in and authored namespaces where safe, preserve multiple authored `owl:Ontology` document subjects and `owl:imports` facts, and remain parseable as RDF/Turtle.
-- Run `reqvire semantic shapes` and verify the command succeeds and emits semantic-contract SHACL shapes without authored ontology classes.
-- Run `reqvire semantic concepts --include-mappings` and verify the command succeeds and emits SKOS concepts plus optional `reqvire:mapsToConcept` bridge triples.
+- Run `reqvire semantic export --layer shapes` and verify the command succeeds and emits semantic-contract SHACL shapes without authored ontology classes.
+- Run `reqvire semantic export --layer concepts` and verify the command succeeds and emits SKOS concepts without authored ontology bridge triples.
+- Run `reqvire semantic export --layer ontologies` and verify authored `reqvire:mapsToConcept` bridge triples are present when ontology terms map to generated native concepts.
+- Run `reqvire semantic export --layer model` and verify generated Reqvire element, relation, contract binding, concept reference, semantic term context, and ontology projection facts are present without Turtle prefix projection facts.
+- Run `reqvire semantic export --layer prefixes` and verify generated `reqvire:TurtlePrefixDeclaration` projection facts are present.
 - Run `reqvire concepts export --include-mappings` and verify the root Concepts command emits the same standalone Thesaurus SKOS layer plus optional valid bridge triples.
 - Run `reqvire concepts validate` and verify standalone concept-scheme namespace ownership, concept references, and `reqvire:mapsToConcept` targets validate through the canonical model validation path.
-- Run `reqvire semantic graph --full` and verify the command selects the full semantic graph export mode with model context, generated ontology projection facts, and `owl:NamedIndividual` typing for concrete parsed model elements.
+- Run `reqvire semantic export` and verify the default export includes all public layers with model facts, generated ontology projection facts, prefix projection facts, used external subset materialization, and `owl:NamedIndividual` typing for concrete parsed model elements.
+- Run `reqvire semantic export --layer external-used` and verify only the used external subset is exposed, not raw full third-party ontology source graphs.
 - Run JSON-LD variants and verify emitted JSON-LD is valid for supported layers.
 - Verify JSON-LD variants remain JSON-LD RDF serializations and do not emit Turtle `@prefix` syntax.
-- Run external-inclusive ontology/graph exports and verify only the used external subset is exposed.
 - Verify the legacy `reqvire ontologies` command remains a compatibility alias for combined semantic graph export.
 
 #### Metadata

@@ -60,7 +60,7 @@ export default function Advanced() {
             },
             {
               name: "reqvire semantic",
-              desc: "Exports ontology vocabulary, SHACL shapes, SKOS concepts, or the combined semantic graph as explicit RDF layers.",
+              desc: "Exports ontology vocabulary, SHACL shapes, SKOS concepts, or the combined semantic export as explicit RDF layers.",
             },
             {
               name: "reqvire resources",

@@ -440,7 +440,7 @@ reqvire:semanticContractType a reqvire:SemanticContractElementType ;
 	rdfs:comment "Canonical ontology document for same-base Reqvire ontology elements; derived ontology elements contribute vocabulary to this document." .
 reqvire:Element a owl:Class ;
 	reqvire:mapsToConcept concept:Element ;
-	rdfs:comment "Base class for addressable Reqvire model elements and related model artifacts. Full semantic model-context exports emit concrete parsed model elements as owl:NamedIndividual instances of this class and their more specific Reqvire element class." .
+	rdfs:comment "Base class for addressable Reqvire model elements and related model artifacts. Full semantic model exports emit concrete parsed model elements as owl:NamedIndividual instances of this class and their more specific Reqvire element class." .
 reqvire:Capability a owl:Class ;
 	rdfs:subClassOf reqvire:Element ;
 	reqvire:mapsToConcept concept:Capability ;
@@ -464,7 +464,7 @@ reqvire:Verification a owl:Class ;
 	reqvire:mapsToConcept concept:ConcreteVerification ;
 	rdfs:comment "Evidence or method used to verify a requirement." .
 reqvire:Artifact a owl:Class ;
-	rdfs:comment "Referenced implementation, evidence, document, or external resource artifact. Full semantic model-context exports emit concrete referenced artifacts as owl:NamedIndividual instances of this class and any more specific artifact class such as reqvire:File." .
+	rdfs:comment "Referenced implementation, evidence, document, or external resource artifact. Full semantic model exports emit concrete referenced artifacts as owl:NamedIndividual instances of this class and any more specific artifact class such as reqvire:File." .
 reqvire:RuntimeOntologyArtifact a owl:Class ;
 	rdfs:subClassOf reqvire:Artifact ;
 	reqvire:mapsToConcept concept:RuntimeOntologyArtifact ;
@@ -907,53 +907,53 @@ reqvire:impactEdge a owl:ObjectProperty ;
 	rdfs:range reqvire:ChangeImpactEdge ;
 	rdfs:comment "Propagation edge included in a change-impact path." .
 reqvire:semanticDependency a owl:ObjectProperty .
-_:d16f3fe06c7de652ad64e8d039e06059 a owl:Class .
-_:ddf2122390f68ad25ecb625b70bef0a4 rdf:first reqvire:ChangeImpactAnalysis .
-_:d16f3fe06c7de652ad64e8d039e06059 owl:unionOf _:ddf2122390f68ad25ecb625b70bef0a4 .
-_:e456dd850b03cb2211d8616c4afab046 rdf:first reqvire:SemanticDependency .
-_:ddf2122390f68ad25ecb625b70bef0a4 rdf:rest _:e456dd850b03cb2211d8616c4afab046 .
-_:e456dd850b03cb2211d8616c4afab046 rdf:rest rdf:nil .
-reqvire:semanticDependency rdfs:domain _:d16f3fe06c7de652ad64e8d039e06059 .
-_:e0c6ff42d408050882c32ab8c0ac932e a owl:Class .
-_:a61476c580ca50000478d4ed628616cb rdf:first reqvire:SemanticDependency .
-_:e0c6ff42d408050882c32ab8c0ac932e owl:unionOf _:a61476c580ca50000478d4ed628616cb .
-_:f82f1bee231626e48d09b6d63ed3ca1d rdf:first reqvire:SemanticContract .
-_:a61476c580ca50000478d4ed628616cb rdf:rest _:f82f1bee231626e48d09b6d63ed3ca1d .
-_:f82f1bee231626e48d09b6d63ed3ca1d rdf:rest rdf:nil .
-reqvire:semanticDependency rdfs:range _:e0c6ff42d408050882c32ab8c0ac932e ;
+_:a325ae56826d61c46a885cfefd942b5e a owl:Class .
+_:dd9de2e42f42ab0c085417397172f7c2 rdf:first reqvire:ChangeImpactAnalysis .
+_:a325ae56826d61c46a885cfefd942b5e owl:unionOf _:dd9de2e42f42ab0c085417397172f7c2 .
+_:a2baa48a6c7684522543e3a436d4571a rdf:first reqvire:SemanticDependency .
+_:dd9de2e42f42ab0c085417397172f7c2 rdf:rest _:a2baa48a6c7684522543e3a436d4571a .
+_:a2baa48a6c7684522543e3a436d4571a rdf:rest rdf:nil .
+reqvire:semanticDependency rdfs:domain _:a325ae56826d61c46a885cfefd942b5e .
+_:d237656244a5a08c17ed83dc222b73f5 a owl:Class .
+_:ac2c2c7e39e25696261618a5a7b176d3 rdf:first reqvire:SemanticDependency .
+_:d237656244a5a08c17ed83dc222b73f5 owl:unionOf _:ac2c2c7e39e25696261618a5a7b176d3 .
+_:e63992995bb233e1e7e99095aa1c8ec1 rdf:first reqvire:SemanticContract .
+_:ac2c2c7e39e25696261618a5a7b176d3 rdf:rest _:e63992995bb233e1e7e99095aa1c8ec1 .
+_:e63992995bb233e1e7e99095aa1c8ec1 rdf:rest rdf:nil .
+reqvire:semanticDependency rdfs:range _:d237656244a5a08c17ed83dc222b73f5 ;
 	rdfs:comment "Semantic dependency considered during change-impact analysis, or the semantic contract target resolved by a dependency record." .
 reqvire:reviewedByVerification a owl:ObjectProperty ;
 	rdfs:domain reqvire:ImpactReview ;
 	rdfs:range reqvire:Verification ;
 	rdfs:comment "Verification evidence or method used to review an impact." .
 reqvire:impactReason a owl:DatatypeProperty .
-_:e2a8cd6b6c89b731dc5c7b3ec88bc192 a owl:Class .
-_:b53513758626fd1cf3fa5a54910b1a51 rdf:first reqvire:ChangeImpactEdge .
-_:e2a8cd6b6c89b731dc5c7b3ec88bc192 owl:unionOf _:b53513758626fd1cf3fa5a54910b1a51 .
-_:a019e148dbbe00dd0d0d3b19ea07cb87 rdf:first reqvire:ChangePropagationRule .
-_:b53513758626fd1cf3fa5a54910b1a51 rdf:rest _:a019e148dbbe00dd0d0d3b19ea07cb87 .
-_:a019e148dbbe00dd0d0d3b19ea07cb87 rdf:rest rdf:nil .
-reqvire:impactReason rdfs:domain _:e2a8cd6b6c89b731dc5c7b3ec88bc192 ;
+_:eeae08b7dd4322063ff55064c4b1ed8a a owl:Class .
+_:e253a6aa795d9ad726d55bd4cee3af4f rdf:first reqvire:ChangeImpactEdge .
+_:eeae08b7dd4322063ff55064c4b1ed8a owl:unionOf _:e253a6aa795d9ad726d55bd4cee3af4f .
+_:fa0dfb8f655a1f3906241acb11b41aeb rdf:first reqvire:ChangePropagationRule .
+_:e253a6aa795d9ad726d55bd4cee3af4f rdf:rest _:fa0dfb8f655a1f3906241acb11b41aeb .
+_:fa0dfb8f655a1f3906241acb11b41aeb rdf:rest rdf:nil .
+reqvire:impactReason rdfs:domain _:eeae08b7dd4322063ff55064c4b1ed8a ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Human-readable reason explaining why an edge or rule propagates impact." .
 reqvire:impactRelation a owl:DatatypeProperty .
-_:c23f062c3f1c7715f6bd4e29dfc91eda a owl:Class .
-_:c0f390114445cedcd4703c64a6c5c0d rdf:first reqvire:ChangeImpactEdge .
-_:c23f062c3f1c7715f6bd4e29dfc91eda owl:unionOf _:c0f390114445cedcd4703c64a6c5c0d .
-_:d1df3e00a471c8d105bca58f9eb9050e rdf:first reqvire:ChangePropagationRule .
-_:c0f390114445cedcd4703c64a6c5c0d rdf:rest _:d1df3e00a471c8d105bca58f9eb9050e .
-_:d1df3e00a471c8d105bca58f9eb9050e rdf:rest rdf:nil .
-reqvire:impactRelation rdfs:domain _:c23f062c3f1c7715f6bd4e29dfc91eda ;
+_:e7fc4e4349c974099d8d221121572dee a owl:Class .
+_:db81a3e1188235c0decdc405bc4233d7 rdf:first reqvire:ChangeImpactEdge .
+_:e7fc4e4349c974099d8d221121572dee owl:unionOf _:db81a3e1188235c0decdc405bc4233d7 .
+_:d7c77b4f41a683b23cdffaa107d3102b rdf:first reqvire:ChangePropagationRule .
+_:db81a3e1188235c0decdc405bc4233d7 rdf:rest _:d7c77b4f41a683b23cdffaa107d3102b .
+_:d7c77b4f41a683b23cdffaa107d3102b rdf:rest rdf:nil .
+reqvire:impactRelation rdfs:domain _:e7fc4e4349c974099d8d221121572dee ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Canonical relation or dependency token that caused an impact edge or activates a propagation rule." .
 reqvire:impactDirection a owl:DatatypeProperty .
-_:ba54fe65da9a87ef4984d686ed28b14e a owl:Class .
-_:dea3b07edae500d3e04b17ddc77e68a rdf:first reqvire:ChangeImpactEdge .
-_:ba54fe65da9a87ef4984d686ed28b14e owl:unionOf _:dea3b07edae500d3e04b17ddc77e68a .
-_:e9c4efe5aff5aa2f9f80151fa2fc4ba5 rdf:first reqvire:ChangePropagationRule .
-_:dea3b07edae500d3e04b17ddc77e68a rdf:rest _:e9c4efe5aff5aa2f9f80151fa2fc4ba5 .
-_:e9c4efe5aff5aa2f9f80151fa2fc4ba5 rdf:rest rdf:nil .
-reqvire:impactDirection rdfs:domain _:ba54fe65da9a87ef4984d686ed28b14e ;
+_:fd9abc319a0fc125099f91650fe9ca49 a owl:Class .
+_:d1e212c3d6366b0a1d98fc60204c8868 rdf:first reqvire:ChangeImpactEdge .
+_:fd9abc319a0fc125099f91650fe9ca49 owl:unionOf _:d1e212c3d6366b0a1d98fc60204c8868 .
+_:c593a12ef22eaa7e42d5d024acd5b961 rdf:first reqvire:ChangePropagationRule .
+_:d1e212c3d6366b0a1d98fc60204c8868 rdf:rest _:c593a12ef22eaa7e42d5d024acd5b961 .
+_:c593a12ef22eaa7e42d5d024acd5b961 rdf:rest rdf:nil .
+reqvire:impactDirection rdfs:domain _:fd9abc319a0fc125099f91650fe9ca49 ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Propagation direction token for an impact edge or propagation rule." .
 reqvire:impactScope a owl:DatatypeProperty ;
@@ -1597,11 +1597,11 @@ reqvire:contractBoundBy a owl:ObjectProperty ;
 reqvire:implementedByArtifact a owl:ObjectProperty ;
 	rdfs:domain reqvire:Capability ;
 	rdfs:range reqvire:Artifact .
-_:b4d8265787ea9fbb126aeb39345366eb rdf:first reqvire:specifiedBy .
-reqvire:implementedByArtifact owl:propertyChainAxiom _:b4d8265787ea9fbb126aeb39345366eb .
-_:de13a3552ec595daf64e1609bd980d1 rdf:first reqvire:satisfiedBy .
-_:b4d8265787ea9fbb126aeb39345366eb rdf:rest _:de13a3552ec595daf64e1609bd980d1 .
-_:de13a3552ec595daf64e1609bd980d1 rdf:rest rdf:nil .
+_:cc8bea75340e9cd05edc3b4ed3a71be6 rdf:first reqvire:specifiedBy .
+reqvire:implementedByArtifact owl:propertyChainAxiom _:cc8bea75340e9cd05edc3b4ed3a71be6 .
+_:f33dd51609a4f16486aeebd190a3bfcc rdf:first reqvire:satisfiedBy .
+_:cc8bea75340e9cd05edc3b4ed3a71be6 rdf:rest _:f33dd51609a4f16486aeebd190a3bfcc .
+_:f33dd51609a4f16486aeebd190a3bfcc rdf:rest rdf:nil .
 reqvire:implementedByArtifact rdfs:comment "Inferred capability-to-artifact trace when a capability is specified by a requirement satisfied by an artifact." .
 reqvire:derive reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
 reqvire:derivedFrom reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
@@ -2342,15 +2342,15 @@ reqvire:lineNumber a owl:DatatypeProperty ;
 reqvire:relationType a owl:DatatypeProperty ;
 	rdfs:domain reqvire:RdfProjection ;
 	rdfs:range xsd:string ;
-	rdfs:comment "Canonical relation type token emitted by model-context RDF projection facts." .
+	rdfs:comment "Canonical relation type token emitted by model RDF projection facts." .
 reqvire:relationTargetIdentifier a owl:DatatypeProperty ;
 	rdfs:domain reqvire:RdfProjection ;
 	rdfs:range xsd:string ;
-	rdfs:comment "Stable identifier of a relation target emitted by model-context RDF projection facts." .
+	rdfs:comment "Stable identifier of a relation target emitted by model RDF projection facts." .
 reqvire:contractBindingsTargetIdentifier a owl:DatatypeProperty ;
 	rdfs:domain reqvire:RdfProjection ;
 	rdfs:range xsd:string ;
-	rdfs:comment "Stable identifier of a contract binding target emitted by model-context RDF projection facts." .
+	rdfs:comment "Stable identifier of a contract binding target emitted by model RDF projection facts." .
 reqvire:conceptLabel a owl:DatatypeProperty ;
 	rdfs:domain reqvire:RdfProjection ;
 	rdfs:range xsd:string ;
@@ -2370,7 +2370,7 @@ reqvire:reservedVocabularyIri a owl:DatatypeProperty ;
 reqvire:referenceKind a owl:DatatypeProperty ;
 	rdfs:domain reqvire:RdfProjection ;
 	rdfs:range xsd:string ;
-	rdfs:comment "Canonical concept-reference kind token emitted by model-context RDF projection facts." .
+	rdfs:comment "Canonical concept-reference kind token emitted by model RDF projection facts." .
 reqvire:externalOntologyPrefix a owl:DatatypeProperty ;
 	rdfs:domain reqvire:ExternalOntologySource ;
 	rdfs:range xsd:string ;
@@ -2500,7 +2500,7 @@ reqvire:externalUsedTermSeedQuery a reqvire:ExternalOntologySubsetConstructQuery
 	reqvire:constructFamily "external-used-subset" ;
 	reqvire:constructKind "seed-query" ;
 	reqvire:projectionDerivationMode "construct-query-specified" ;
-	reqvire:constructQueryPurpose "Select external ontology terms referenced by authored ontology, SHACL, concept-reference, model-context, or generated semantic projection facts whose IRIs fall under declared external namespaces." ;
+	reqvire:constructQueryPurpose "Select external ontology terms referenced by authored ontology, SHACL, concept-reference, model, or generated semantic projection facts whose IRIs fall under declared external namespaces." ;
 	reqvire:constructQueryText "\nPREFIX reqvire: <https://www.reqvire.org/ontology#>\n\nSELECT DISTINCT ?term\nWHERE {\n  ?source a reqvire:ExternalOntologySource ;\n    reqvire:externalOntologyNamespace ?namespace .\n  {\n    ?block reqvire:referencesTerm ?term .\n  }\n  UNION {\n    ?block reqvire:declaresTerm ?term .\n  }\n  UNION {\n    ?projection reqvire:conceptReference ?term .\n  }\n  UNION {\n    ?projection reqvire:constructSubject|reqvire:constructPredicate|reqvire:constructObject|reqvire:constructProperty ?term .\n  }\n  FILTER(isIRI(?term))\n  FILTER(STRSTARTS(STR(?term), STR(?namespace)))\n}\n" .
 reqvire:externalUsedTermDirectDescriptionConstructQuery a reqvire:ExternalOntologySubsetConstructQuery ;
 	reqvire:constructQueryName "external-used-term-direct-description-construct" ;
@@ -2555,10 +2555,10 @@ reqvire:ConcreteVerification a owl:Class ;
 reqvire:EvidenceBackedVerification a owl:Class ;
 	rdfs:label "Evidence-backed verification" ;
 	rdfs:subClassOf reqvire:ConcreteVerification .
-_:aa3db527ec1cf112bddd55408ea37b4d a owl:Restriction ;
+_:b51d6789d1cfd0f4a07c5dde3ca973a a owl:Restriction ;
 	owl:onProperty reqvire:satisfiedBy ;
 	owl:someValuesFrom reqvire:Artifact .
-reqvire:EvidenceBackedVerification rdfs:subClassOf _:aa3db527ec1cf112bddd55408ea37b4d ;
+reqvire:EvidenceBackedVerification rdfs:subClassOf _:b51d6789d1cfd0f4a07c5dde3ca973a ;
 	owl:disjointWith reqvire:NonEvidenceBackedVerification ;
 	rdfs:comment "Verification class whose instances require satisfiedBy evidence for coverage satisfaction." .
 reqvire:NonEvidenceBackedVerification a owl:Class ;
