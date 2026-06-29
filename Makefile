@@ -10,7 +10,7 @@ define update_version
 	sed -i 's/^version = ".*"/version = "$(1)"/' $(CARGO_TOML)
 endef
 
-.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major explorer build
+.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major explorer build check clippy fmt-check test e2e
 
 # Build the React/Vite Explorer SPA bundle. The served index.html is
 # this bundle; crates/reqvire-core/build.rs embeds explorer/dist at compile time, so this must
@@ -22,6 +22,26 @@ explorer:
 # Build the Explorer bundle, then the Rust workspace (so the bundle is embedded).
 build: explorer
 	cargo build
+
+# Run cargo check across the workspace.
+check:
+	cargo check --workspace
+
+# Run clippy with workspace lint configuration.
+clippy:
+	cargo clippy --workspace --all-targets
+
+# Check formatting without modifying files.
+fmt-check:
+	cargo fmt --all -- --check
+
+# Run the Rust test suite.
+test:
+	cargo test --workspace
+
+# Run end-to-end shell-based test suite.
+e2e:
+	bash tests/run_all.sh
 
 # Version update targets
 update-patch:

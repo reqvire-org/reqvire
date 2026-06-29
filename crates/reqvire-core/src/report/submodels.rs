@@ -3,8 +3,9 @@ use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::relation::LinkType;
 use crate::utils;
+use rustc_hash::{FxHashMap, FxHashSet};
 use serde::Serialize;
-use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Serialize)]
 pub struct SubmodelsReport {
@@ -43,7 +44,7 @@ pub struct SubmodelsSummary {
 
 impl SubmodelsReport {
     pub fn to_json_string(&self) -> String {
-        serde_json::to_string_pretty(&self).unwrap()
+        serde_json::to_string_pretty(&self).expect("failed to serialize JSON")
     }
 
     pub fn format_text(&self) -> String {
@@ -192,8 +193,8 @@ fn parent_ids_by_relation_and_type(
     parents.into_iter().collect()
 }
 
-fn build_child_map(parent_map: &HashMap<String, Vec<String>>) -> HashMap<String, Vec<String>> {
-    let mut child_map: HashMap<String, Vec<String>> = HashMap::new();
+fn build_child_map(parent_map: &FxHashMap<String, Vec<String>>) -> FxHashMap<String, Vec<String>> {
+    let mut child_map: FxHashMap<String, Vec<String>> = FxHashMap::default();
     for (child_id, parent_ids) in parent_map {
         for parent_id in parent_ids {
             child_map
@@ -212,9 +213,9 @@ fn build_child_map(parent_map: &HashMap<String, Vec<String>>) -> HashMap<String,
 
 fn resolve_requirement_subtree_roots(
     requirement_id: &str,
-    parent_map: &HashMap<String, Vec<String>>,
-    memo: &mut HashMap<String, BTreeSet<String>>,
-    visiting: &mut HashSet<String>,
+    parent_map: &FxHashMap<String, Vec<String>>,
+    memo: &mut FxHashMap<String, BTreeSet<String>>,
+    visiting: &mut FxHashSet<String>,
 ) -> BTreeSet<String> {
     if let Some(cached) = memo.get(requirement_id) {
         return cached.clone();
@@ -247,9 +248,9 @@ fn resolve_requirement_subtree_roots(
 
 fn resolve_capability_roots(
     capability_id: &str,
-    capability_parent_map: &HashMap<String, Vec<String>>,
-    memo: &mut HashMap<String, BTreeSet<String>>,
-    visiting: &mut HashSet<String>,
+    capability_parent_map: &FxHashMap<String, Vec<String>>,
+    memo: &mut FxHashMap<String, BTreeSet<String>>,
+    visiting: &mut FxHashSet<String>,
 ) -> BTreeSet<String> {
     if let Some(cached) = memo.get(capability_id) {
         return cached.clone();
@@ -285,12 +286,12 @@ fn resolve_capability_roots(
 
 fn resolve_requirement_capability_roots(
     requirement_id: &str,
-    requirement_parent_map: &HashMap<String, Vec<String>>,
-    requirement_specify_map: &HashMap<String, Vec<String>>,
-    capability_parent_map: &HashMap<String, Vec<String>>,
-    capability_memo: &mut HashMap<String, BTreeSet<String>>,
-    requirement_memo: &mut HashMap<String, BTreeSet<String>>,
-    visiting: &mut HashSet<String>,
+    requirement_parent_map: &FxHashMap<String, Vec<String>>,
+    requirement_specify_map: &FxHashMap<String, Vec<String>>,
+    capability_parent_map: &FxHashMap<String, Vec<String>>,
+    capability_memo: &mut FxHashMap<String, BTreeSet<String>>,
+    requirement_memo: &mut FxHashMap<String, BTreeSet<String>>,
+    visiting: &mut FxHashSet<String>,
 ) -> BTreeSet<String> {
     if let Some(cached) = requirement_memo.get(requirement_id) {
         return cached.clone();
@@ -312,7 +313,7 @@ fn resolve_requirement_capability_roots(
             &capability_id,
             capability_parent_map,
             capability_memo,
-            &mut HashSet::new(),
+            &mut FxHashSet::default(),
         );
         for root in capability_roots {
             result.insert(root);
@@ -345,7 +346,7 @@ fn resolve_requirement_capability_roots(
 
 fn collect_requirement_descendants(
     start_id: &str,
-    requirement_child_map: &HashMap<String, Vec<String>>,
+    requirement_child_map: &FxHashMap<String, Vec<String>>,
 ) -> BTreeSet<String> {
     let mut result = BTreeSet::new();
     let mut stack = vec![start_id.to_string()];
@@ -366,9 +367,9 @@ fn collect_requirement_descendants(
 
 fn collect_capability_subtree_requirements(
     capability_id: &str,
-    capability_child_map: &HashMap<String, Vec<String>>,
-    capability_to_requirements_map: &HashMap<String, Vec<String>>,
-    requirement_child_map: &HashMap<String, Vec<String>>,
+    capability_child_map: &FxHashMap<String, Vec<String>>,
+    capability_to_requirements_map: &FxHashMap<String, Vec<String>>,
+    requirement_child_map: &FxHashMap<String, Vec<String>>,
 ) -> BTreeSet<String> {
     let mut capability_ids = BTreeSet::new();
     let mut stack = vec![capability_id.to_string()];
@@ -419,9 +420,9 @@ pub fn generate_submodels_report(
         .map(|e| e.identifier.clone())
         .collect();
 
-    let requirement_set: HashSet<String> = requirement_ids.iter().cloned().collect();
+    let requirement_set: FxHashSet<String> = requirement_ids.iter().cloned().collect();
 
-    let mut capability_parent_map: HashMap<String, Vec<String>> = HashMap::new();
+    let mut capability_parent_map: FxHashMap<String, Vec<String>> = FxHashMap::default();
     for capability_id in &capability_ids {
         capability_parent_map.insert(
             capability_id.clone(),
@@ -435,9 +436,9 @@ pub fn generate_submodels_report(
     }
     let capability_child_map = build_child_map(&capability_parent_map);
 
-    let mut requirement_parent_map: HashMap<String, Vec<String>> = HashMap::new();
-    let mut requirement_specify_map: HashMap<String, Vec<String>> = HashMap::new();
-    let mut capability_to_requirements_map: HashMap<String, Vec<String>> = HashMap::new();
+    let mut requirement_parent_map: FxHashMap<String, Vec<String>> = FxHashMap::default();
+    let mut requirement_specify_map: FxHashMap<String, Vec<String>> = FxHashMap::default();
+    let mut capability_to_requirements_map: FxHashMap<String, Vec<String>> = FxHashMap::default();
 
     for requirement_id in &requirement_ids {
         requirement_parent_map.insert(
@@ -470,22 +471,22 @@ pub fn generate_submodels_report(
     }
     let requirement_child_map = build_child_map(&requirement_parent_map);
 
-    let mut capability_memo: HashMap<String, BTreeSet<String>> = HashMap::new();
+    let mut capability_memo: FxHashMap<String, BTreeSet<String>> = FxHashMap::default();
     let mut root_capabilities = BTreeSet::new();
     for capability_id in &capability_ids {
         let roots = resolve_capability_roots(
             capability_id,
             &capability_parent_map,
             &mut capability_memo,
-            &mut HashSet::new(),
+            &mut FxHashSet::default(),
         );
         for root in roots {
             root_capabilities.insert(root);
         }
     }
 
-    let mut requirement_memo: HashMap<String, BTreeSet<String>> = HashMap::new();
-    let mut root_assignment: HashMap<String, String> = HashMap::new();
+    let mut requirement_memo: FxHashMap<String, BTreeSet<String>> = FxHashMap::default();
+    let mut root_assignment: FxHashMap<String, String> = FxHashMap::default();
     let mut root_counts: BTreeMap<String, usize> = BTreeMap::new();
 
     for root_id in &root_capabilities {
@@ -500,7 +501,7 @@ pub fn generate_submodels_report(
             &capability_parent_map,
             &mut capability_memo,
             &mut requirement_memo,
-            &mut HashSet::new(),
+            &mut FxHashSet::default(),
         );
         if let Some(root_id) = roots.first().cloned() {
             root_assignment.insert(requirement_id.clone(), root_id.clone());
@@ -511,7 +512,7 @@ pub fn generate_submodels_report(
     let submodels: Vec<SubmodelSummary> = root_counts
         .iter()
         .map(|(root_id, count)| {
-            let root = registry.get_element(root_id).unwrap();
+            let root = registry.get_element(root_id).expect("element not found");
             SubmodelSummary {
                 root_id: root_id.clone(),
                 root_name: root.name.clone(),
@@ -640,7 +641,7 @@ pub fn generate_submodels_report(
         } else if matches!(from_element.element_type, ElementType::Requirement(_)) {
             let root_id = from_id;
 
-            let mut scoped_nodes: HashSet<String> = HashSet::new();
+            let mut scoped_nodes: FxHashSet<String> = FxHashSet::default();
             let mut stack = vec![root_id.clone()];
             while let Some(current) = stack.pop() {
                 if !scoped_nodes.insert(current.clone()) {
@@ -656,7 +657,7 @@ pub fn generate_submodels_report(
             // The selected requirement defines scope boundary, but is not a reported submodel entry.
             scoped_nodes.remove(&root_id);
 
-            let mut scoped_parent_map: HashMap<String, Vec<String>> = HashMap::new();
+            let mut scoped_parent_map: FxHashMap<String, Vec<String>> = FxHashMap::default();
             for node_id in &scoped_nodes {
                 let parents = requirement_parent_map
                     .get(node_id)
@@ -668,14 +669,14 @@ pub fn generate_submodels_report(
                 scoped_parent_map.insert(node_id.clone(), parents);
             }
 
-            let mut scoped_memo: HashMap<String, BTreeSet<String>> = HashMap::new();
+            let mut scoped_memo: FxHashMap<String, BTreeSet<String>> = FxHashMap::default();
             let mut scoped_root_counts: BTreeMap<String, usize> = BTreeMap::new();
             for node_id in &scoped_nodes {
                 let roots = resolve_requirement_subtree_roots(
                     node_id,
                     &scoped_parent_map,
                     &mut scoped_memo,
-                    &mut HashSet::new(),
+                    &mut FxHashSet::default(),
                 );
                 if let Some(scoped_root_id) = roots.first().cloned() {
                     *scoped_root_counts.entry(scoped_root_id).or_insert(0) += 1;

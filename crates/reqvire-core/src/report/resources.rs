@@ -1,11 +1,11 @@
 // Resources Report Module
 // Generates reports showing all files referenced by the model through relations and contract_bindings
 
-use crate::element::{ContractBindingTarget, CONTRACT_BINDINGS_SECTION};
+use crate::element::ContractBindingTarget;
 use crate::graph_registry::GraphRegistry;
 use crate::relation::LinkType;
+use rustc_hash::FxHashMap;
 use serde::Serialize;
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 #[derive(Serialize)]
@@ -37,98 +37,19 @@ pub struct ResourcesSummary {
     pub total_contract_bindings_references: usize,
 }
 
-/// Helper function to format an identifier as a markdown link
-fn format_identifier_link(identifier: &str, name: &str) -> String {
-    if let Some(hash_pos) = identifier.rfind('#') {
-        let file_part = &identifier[..hash_pos];
-        let fragment_part = &identifier[hash_pos..];
-        format!("[{}]({}{})", name, file_part, fragment_part)
-    } else {
-        format!("[{}]({})", name, identifier)
-    }
-}
-
 impl ResourcesReport {
     pub fn to_json_string(&self) -> String {
-        serde_json::to_string_pretty(&self).unwrap()
-    }
-
-    pub fn print(&self, json_output: bool) {
-        if json_output {
-            println!("{}", self.to_json_string());
-        } else {
-            print!("{}", self.format_text());
-        }
-    }
-
-    pub fn format_text(&self) -> String {
-        let mut output = String::new();
-
-        // Relations Section
-        output.push_str("## Relations\n\n");
-        output.push_str("Files referenced via relations such as satisfiedBy:\n\n");
-
-        if self.relations.is_empty() {
-            output.push_str("*No files referenced via relations.*\n\n");
-        } else {
-            for file_ref in &self.relations {
-                output.push_str(&format!("### {}\n", file_ref.file_path));
-                for reference in &file_ref.references {
-                    let link =
-                        format_identifier_link(&reference.element_id, &reference.element_name);
-                    if let Some(rel_type) = &reference.relation_type {
-                        output.push_str(&format!("  * {} (via {})\n", link, rel_type));
-                    } else {
-                        output.push_str(&format!("  * {}\n", link));
-                    }
-                }
-                output.push_str("---\n\n");
-            }
-        }
-
-        // Contract Bindings Section
-        output.push_str("## ");
-        output.push_str(CONTRACT_BINDINGS_SECTION);
-        output.push_str("\n\n");
-        output.push_str("Files referenced via contract_bindings:\n\n");
-
-        if self.contract_bindings.is_empty() {
-            output.push_str("*No files referenced via contract_bindings.*\n\n");
-        } else {
-            for file_ref in &self.contract_bindings {
-                output.push_str(&format!("### {}\n", file_ref.file_path));
-                for reference in &file_ref.references {
-                    let link =
-                        format_identifier_link(&reference.element_id, &reference.element_name);
-                    output.push_str(&format!("  * {}\n", link));
-                }
-                output.push_str("---\n\n");
-            }
-        }
-
-        // Summary
-        output.push_str("## Summary\n\n");
-        output.push_str(&format!(
-            "- **Relation Files:** {} ({} references)\n",
-            self.summary.total_relation_files, self.summary.total_relation_references
-        ));
-        output.push_str(&format!(
-            "- **ContractBindingEntry Files:** {} ({} references)\n",
-            self.summary.total_contract_bindings_files,
-            self.summary.total_contract_bindings_references
-        ));
-
-        output
+        serde_json::to_string_pretty(&self).expect("failed to serialize JSON")
     }
 }
 
 /// Generate the resources report from the graph registry
 pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
     // Collect InternalPath relations: file_path -> Vec<(relation_type, element_id, element_name)>
-    let mut relation_map: HashMap<PathBuf, Vec<(String, String, String)>> = HashMap::new();
+    let mut relation_map: FxHashMap<PathBuf, Vec<(String, String, String)>> = FxHashMap::default();
 
     // Collect FilePath contract_bindings: file_path -> Vec<(element_id, element_name)>
-    let mut contract_bindings_map: HashMap<PathBuf, Vec<(String, String)>> = HashMap::new();
+    let mut contract_bindings_map: FxHashMap<PathBuf, Vec<(String, String)>> = FxHashMap::default();
 
     // Iterate all elements
     for element in registry.get_all_elements() {

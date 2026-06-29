@@ -80,7 +80,7 @@ pub fn describe_terms(
     policy: DescribePolicy,
 ) -> Description {
     let source_quads = quads.into_iter().collect::<Vec<_>>();
-    let selected = selected_terms.iter().cloned().collect::<Vec<_>>();
+    let selected = selected_terms.to_vec();
     let selected_keys = selected.iter().map(term_key).collect::<BTreeSet<_>>();
     let support_predicates = policy
         .support_predicates
@@ -111,7 +111,7 @@ pub fn describe_terms(
     }
 
     while let Some((term, depth)) = queue.pop_front() {
-        for quad in source_quads.iter().filter(|quad| &quad.subject == &term) {
+        for quad in source_quads.iter().filter(|quad| quad.subject == term) {
             if !support_predicates.contains(quad.predicate.as_str()) {
                 continue;
             }

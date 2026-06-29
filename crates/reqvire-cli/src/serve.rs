@@ -59,7 +59,7 @@ pub async fn serve_explorer(
             mcp_enable_mutations,
             false,
             excluded_filename_patterns,
-            state.write_lock.clone(),
+            Arc::clone(&state.write_lock),
             Some(post_write_hook),
         );
     }

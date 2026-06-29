@@ -64,6 +64,31 @@ Integrated validation execution behavior:
   * define: [Integrated Validation](ValidationRequirements.md#integrated-validation)
 ---
 
+### Structured Validation Diagnostic Contract Specification
+
+Validation failures are expected to retain machine-readable diagnostic context until the final interface rendering boundary.
+
+#### Details
+Diagnostic data contract:
+- `code`: stable diagnostic token when the validator can classify the failure.
+- `message`: human-readable summary suitable for existing terminal output.
+- `context.file`: git-root-relative file path when the failure is tied to a source file.
+- `context.line` and `context.column`: one-based source location values when known.
+- `context.element_id`: full Reqvire element identifier when the failure is tied to a model element.
+
+Rendering rules:
+- Text output may preserve the existing message format while sourcing fields from structured diagnostics.
+- JSON and MCP output should expose the structured fields directly.
+- Missing context fields must be omitted or null rather than replaced with misleading placeholder values.
+- Diagnostic codes should be additive and stable once exposed to machine consumers.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Structured Validation Diagnostics](ValidationRequirements.md#structured-validation-diagnostics)
+---
+
 ### Internal Consistency Validator Contract Specification
 
 #### Details
@@ -117,7 +142,7 @@ Validation must check:
 
 This validation occurs:
 - During model parsing and validation (model.rs, parser.rs)
-- During link operations at CRUD time (graph_registry.rs)
+- During link operations at CRUD time (`graph_registry/crud_ops.rs`)
 
 #### Metadata
   * type: specification

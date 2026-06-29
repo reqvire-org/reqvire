@@ -16,8 +16,8 @@ pub struct BuiltinExternalOntology {
 pub const SKOS: BuiltinExternalOntology = BuiltinExternalOntology {
     id: "skos",
     prefix: "skos",
-    namespace: "http://www.w3.org/2004/02/skos/core#",
-    resource: "http://www.w3.org/2004/02/skos/core",
+    namespace: o_kernel::vocab::SKOS_NS,
+    resource: o_kernel::vocab::SKOS_ONTOLOGY,
     source: "builtin:skos.rdf",
     format: "rdfxml",
     content: include_str!("builtin_external_sources/skos.rdf"),

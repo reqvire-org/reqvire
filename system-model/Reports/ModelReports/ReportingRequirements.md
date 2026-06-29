@@ -64,7 +64,7 @@ When requested the system shall provide human readable and machine readable Syst
   * definedBy: [Report Command Catalog Specification](Specifications.md#report-command-catalog-specification)
   * definedBy: [Text Output Formatting](Specifications.md#text-output-formatting)
   * definedBy: [Traceability Reporting Specification](Specifications.md#traceability-reporting-specification)
-  * derive: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
+  * derive: [Browser Trace Diagram Generation](DiagramGeneration.md#browser-trace-diagram-generation)
   * derive: [Collect Capability and Requirement Context](#collect-capability-and-requirement-context)
   * derive: [JSON Element Size Estimate Exposure](#json-element-size-estimate-exposure)
   * derive: [Model Structure and Summaries](#model-structure-and-summaries)
@@ -92,7 +92,7 @@ The system shall define:
   * definedBy: [Collect Content Specification](Specifications.md#collect-content-specification)
   * definedBy: [Collect Output Format Specification](Specifications.md#collect-output-format-specification)
   * derivedFrom: [Model Reports](#model-reports)
-  * satisfiedBy: [report_collect.rs](../../../crates/reqvire-core/src/report_collect.rs)
+  * satisfiedBy: [collect.rs](../../../crates/reqvire-core/src/report/collect.rs)
 ---
 
 ### JSON Element Size Estimate Exposure
@@ -112,7 +112,7 @@ The system shall expose element-level `size_estimate` records in JSON model evid
   * definedBy: [JSON Element Size Estimate Output Specification](Specifications.md#json-element-size-estimate-output-specification)
   * derivedFrom: [Model Reports](#model-reports)
   * satisfiedBy: [element.rs](../../../crates/reqvire-core/src/element.rs)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * verifiedBy: [JSON Element Size Estimate Output Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#json-element-size-estimate-output-verification)
 ---
 
@@ -125,7 +125,7 @@ When requested the system shall generate reports summarizing the structure and r
 
 #### Relations
   * derive: [Containment View Report](#containment-view-report)
-  * derive: [Model Diagram Output Formats](#model-diagram-output-formats)
+  * derive: [Model JSON Output Format](#model-json-output-format)
   * derive: [Requirement Submodels Report](#requirement-submodels-report)
   * derive: [Search Report Generator](#search-report-generator)
   * derivedFrom: [Model Reports](#model-reports)
@@ -143,7 +143,6 @@ Implementation details shall follow the associated contract specifications.
 
 #### Contract Bindings
   * [Containment Specification](../../ModelStructure/Specifications.md#containment-specification)
-  * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
 #### Relations
@@ -152,9 +151,9 @@ Implementation details shall follow the associated contract specifications.
   * verifiedBy: [Containment View Design Documents Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#containment-view-design-documents-test)
 ---
 
-### Model Diagram Output Formats
+### Model JSON Output Format
 
-System shall support Markdown, pure Mermaid, and JSON output formats.
+System shall support JSON model output as the canonical CLI and operation result format.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -162,15 +161,11 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
-  * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
-  * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
-
 #### Relations
-  * definedBy: [Model Diagram Output Formats Contract Specification](Specifications.md#model-diagram-output-formats-contract-specification)
+  * definedBy: [Model JSON Output Format Contract Specification](Specifications.md#model-json-output-format-contract-specification)
   * derive: [Forward-Only Relation Traversal](#forward-only-relation-traversal)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * verifiedBy: [Model Command Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#model-command-verification)
 ---
 
@@ -186,8 +181,8 @@ Traversal behavior shall follow the associated behavior contract.
 
 #### Relations
   * definedBy: [Forward-Only Relation Traversal Behavior](Behaviors.md#forward-only-relation-traversal-behavior)
-  * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
-  * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
+  * derivedFrom: [Model JSON Output Format](#model-json-output-format)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * verifiedBy: [Model Command Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#model-command-verification)
 ---
 
@@ -200,8 +195,8 @@ The system shall support reverse relation traversal for model views, following d
 
 #### Relations
   * definedBy: [Reverse Relation Traversal Behavior](Behaviors.md#reverse-relation-traversal-behavior)
-  * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * derivedFrom: [Model JSON Output Format](#model-json-output-format)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * verifiedBy: [Reverse Model Traversal Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#reverse-model-traversal-test)
 ---
 
@@ -214,8 +209,8 @@ The system shall support filtering starting elements by type for model traversal
 
 #### Relations
   * definedBy: [Start Element Type Filter Behavior](Behaviors.md#start-element-type-filter-behavior)
-  * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * derivedFrom: [Model JSON Output Format](#model-json-output-format)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * verifiedBy: [Start Type Filter Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#start-type-filter-test)
 ---
 
@@ -242,7 +237,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Requirement Submodels Report Specification](Specifications.md#requirement-submodels-report-specification)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * satisfiedBy: [report_submodels.rs](../../../crates/reqvire-core/src/report_submodels.rs)
+  * satisfiedBy: [submodels.rs](../../../crates/reqvire-core/src/report/submodels.rs)
   * verifiedBy: [Submodels Report Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#submodels-report-verification)
 ---
 
@@ -374,12 +369,12 @@ The implementation coverage report shall provide:
   * definedBy: [Implementation Coverage Output Structure Specification](Specifications.md#implementation-coverage-output-structure-specification)
   * definedBy: [Requirement Implementation Coverage Logic Specification](Specifications.md#requirement-implementation-coverage-logic-specification)
   * derivedFrom: [Model Reports](#model-reports)
-  * satisfiedBy: [report_coverage.rs](../../../crates/reqvire-core/src/report_coverage.rs)
+  * satisfiedBy: [coverage.rs](../../../crates/reqvire-core/src/report/coverage.rs)
 ---
 
 ### Resources Report
 
-The system shall provide a resources report showing all files referenced by the model through relations and contract_bindings in text, JSON, and Explorer views.
+The system shall provide a resources report showing all files referenced by the model through relations and contract_bindings in JSON and Explorer views.
 
 #### Metadata
   * type: requirement
@@ -387,6 +382,7 @@ The system shall provide a resources report showing all files referenced by the 
 #### Relations
   * definedBy: [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
   * derivedFrom: [Model Reports](#model-reports)
+  * satisfiedBy: [resources.rs](../../../crates/reqvire-core/src/report/resources.rs)
   * verifiedBy: [Resources Report Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#resources-report-verification)
 ---
 
@@ -509,7 +505,8 @@ The system shall materialize ontology-defined relation-family projection facts a
 #### Relations
   * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/SemanticExport.md#semantic-export-projection-shape)
   * definedBy: [Semantic Relation Family Projection Specification](Specifications.md#semantic-relation-family-projection-specification)
-  * satisfiedBy: [semantic_contract.rs](../../../crates/reqvire-core/src/semantic_contract.rs)
+  * satisfiedBy: [export.rs](../../../crates/reqvire-core/src/semantic_contract/export.rs)
+  * satisfiedBy: [vocabulary.rs](../../../crates/reqvire-core/src/semantic_contract/vocabulary.rs)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
   * verifiedBy: [MCP Semantic Query Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-query-tools-verification)

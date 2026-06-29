@@ -1,8 +1,8 @@
 use crate::error::ReqvireError;
 use crate::utils::EXTERNAL_SCHEMES;
+use rustc_hash::FxHashMap;
 use serde::Serialize;
 use std::cmp::Ordering;
-use std::collections::HashMap;
 use std::hash::Hash;
 use std::hash::Hasher;
 use std::path::PathBuf;
@@ -17,9 +17,9 @@ pub struct RelationTypeInfo {
     pub label: &'static str,
 }
 
-pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
+pub static RELATION_TYPES: LazyLock<FxHashMap<&'static str, RelationTypeInfo>> =
     LazyLock::new(|| {
-        let mut m = HashMap::new();
+        let mut m = FxHashMap::default();
 
         // Derive relations
         m.insert(
@@ -679,50 +679,58 @@ pub fn validate_relation_element_types(
             };
             source_valid && target_valid
         }
-        "definedBy" | "refinedBy" => match (source_type, target_type) {
+        "definedBy" | "refinedBy" => matches!(
+            (source_type, target_type),
             (
                 ElementType::Requirement(_),
                 ElementType::Contract(
                     ContractType::Source
-                    | ContractType::Constraint
-                    | ContractType::Behavior
-                    | ContractType::Specification
-                    | ContractType::State
-                    | ContractType::InputOutput,
+                        | ContractType::Constraint
+                        | ContractType::Behavior
+                        | ContractType::Specification
+                        | ContractType::State
+                        | ContractType::InputOutput,
                 ),
-            ) => true,
-            _ => false,
-        },
-        "define" | "refine" => match (source_type, target_type) {
+            )
+        ),
+        "define" | "refine" => matches!(
+            (source_type, target_type),
             (
                 ElementType::Contract(
                     ContractType::Source
-                    | ContractType::Constraint
-                    | ContractType::Behavior
-                    | ContractType::Specification
-                    | ContractType::State
-                    | ContractType::InputOutput,
+                        | ContractType::Constraint
+                        | ContractType::Behavior
+                        | ContractType::Specification
+                        | ContractType::State
+                        | ContractType::InputOutput,
                 ),
                 ElementType::Requirement(_),
-            ) => true,
-            _ => false,
-        },
-        "constrainedBy" => match (source_type, target_type) {
-            (ElementType::Requirement(_), ElementType::SemanticContract) => true,
-            _ => false,
-        },
-        "constrain" => match (source_type, target_type) {
-            (ElementType::SemanticContract, ElementType::Requirement(_)) => true,
-            _ => false,
-        },
-        "use" => match (source_type, target_type) {
-            (ElementType::SemanticContract, ElementType::Ontology) => true,
-            _ => false,
-        },
-        "usedBy" => match (source_type, target_type) {
-            (ElementType::Ontology, ElementType::SemanticContract) => true,
-            _ => false,
-        },
+            )
+        ),
+        "constrainedBy" => {
+            matches!(
+                (source_type, target_type),
+                (ElementType::Requirement(_), ElementType::SemanticContract)
+            )
+        }
+        "constrain" => {
+            matches!(
+                (source_type, target_type),
+                (ElementType::SemanticContract, ElementType::Requirement(_))
+            )
+        }
+        "use" => {
+            matches!(
+                (source_type, target_type),
+                (ElementType::SemanticContract, ElementType::Ontology)
+            )
+        }
+        "usedBy" => {
+            matches!(
+                (source_type, target_type),
+                (ElementType::Ontology, ElementType::SemanticContract)
+            )
+        }
         "broader" | "narrower" | "related" => {
             matches!(source_type, ElementType::Concept)
                 && matches!(target_type, ElementType::Concept)

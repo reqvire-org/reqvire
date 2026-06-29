@@ -46,14 +46,12 @@ impl SearchFilters {
         contract_bindings: Option<&str>,
     ) -> Result<Self, ReqvireError> {
         fn compile_glob(pat: &str) -> Result<GlobMatcher, ReqvireError> {
-            let glob = Glob::new(pat)
-                .map_err(|e| ReqvireError::InvalidGlob(e.to_string()))?
-                .compile_matcher();
+            let glob = Glob::new(pat)?.compile_matcher();
             Ok(glob)
         }
 
         fn compile_regex(pattern: &str) -> Result<Regex, ReqvireError> {
-            Regex::new(pattern).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))
+            Regex::new(pattern).map_err(ReqvireError::from)
         }
 
         let file_glob = file.map(compile_glob).transpose()?;
@@ -476,8 +474,7 @@ pub fn generate_search_report(
     let result = build_search_result(registry, filters, short_mode);
 
     if json_output {
-        serde_json::to_string_pretty(&result)
-            .map_err(|e| ReqvireError::SerializationError(e.to_string()))
+        serde_json::to_string_pretty(&result).map_err(ReqvireError::from)
     } else {
         Ok(generate_search_text(&result, short_mode))
     }

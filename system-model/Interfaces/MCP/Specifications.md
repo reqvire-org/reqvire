@@ -492,6 +492,8 @@ Server state includes:
 Cache rules:
 - Reqvire markdown files remain the durable source of truth.
 - Reqvire core parsing remains authoritative for model semantics.
+- Parsed model cache fingerprints are based on the scanned markdown file set, each file path, file size, file content hash, and active model build options.
+- Cache freshness must not depend only on filesystem modification timestamps.
 - Cached state is invalidated when source files, git state, excluded patterns, Reqvire version, or Reqvire tool contract version changes.
 - Controlled MCP mutations sync MCP internal state from the updated Reqvire core graph after successful core mutation.
 - External filesystem drift triggers cache invalidation and reparse before serving stale model data.

@@ -140,28 +140,21 @@ Implementation details shall follow the associated contract specifications.
 
 ### CLI Containment Command
 
-The system shall provide a `containment` command to generate markdown output with the containment view diagram showing the folder/file/element hierarchy.
+The system shall provide a `containment` command that emits JSON containment hierarchy data showing the folder/file/element hierarchy.
 
 #### Details
 The `containment` command shall:
-- Output markdown format with header and embedded Mermaid flowchart diagram
-- Support `--json` flag for structured JSON output
+- Output structured JSON by default
 - Support `--short` flag to show only root elements (those without hierarchical parents in same file)
 - Default behavior (without --short): show ALL elements in each file
 - Exit with code 0 on success, non-zero on error
-- Command syntax: `reqvire containment [--json] [--short]`
-
-The markdown output shall include:
-- `# Containment View` header
-- Mermaid code block with flowchart diagram (using `graph TD` direction)
-- Description indicating whether all elements or only root elements are displayed
+- Command syntax: `reqvire containment [--short]`
 
 #### Metadata
   * type: requirement
 
 #### Contract Bindings
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
   * [ContainmentView](../WebExplorer/ContainmentView.md#containmentview)
   * [Model Browser and Graph Specification](../WebExplorer/Specifications.md#model-browser-and-graph-specification)
 
@@ -170,7 +163,6 @@ The markdown output shall include:
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [containment.rs](../../../crates/reqvire-core/src/containment.rs)
-  * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
 ---
 
 ### CLI Coverage Command
@@ -215,7 +207,7 @@ The diff output contract shall define a shared presentation format for command r
 
 ### CLI JSON File Output Option
 
-The system shall provide an `--output <FILE>` option on all commands that support `--json`, allowing JSON output to be written to a file instead of stdout.
+The system shall provide an `--output <FILE>` option on CLI commands that emit JSON, allowing JSON output to be written to a file instead of stdout.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -308,15 +300,14 @@ Implementation details shall follow the associated contract specifications. The 
 System shall provide CLI command to generate model diagrams with optional filtering and output format selection.
 
 #### Details
-Implementation details shall follow the associated contract specifications. The command shall support default model-root traversal, filtered traversal, Markdown output, pure Mermaid output, and JSON output.
+Implementation details shall follow the associated contract specifications. The command shall support default model-root traversal, filtered traversal, and JSON output.
 
 #### Metadata
   * type: requirement
 
 #### Contract Bindings
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
-  * [Model Diagram Output Formats Contract Specification](../../Reports/ModelReports/Specifications.md#model-diagram-output-formats-contract-specification)
+  * [Model JSON Output Format Contract Specification](../../Reports/ModelReports/Specifications.md#model-json-output-format-contract-specification)
   * [Reverse Relation Traversal Behavior](../../Reports/ModelReports/Behaviors.md#reverse-relation-traversal-behavior)
   * [Start Element Type Filter Behavior](../../Reports/ModelReports/Behaviors.md#start-element-type-filter-behavior)
   * [Type Validation Error Behavior](../../Operations/Validation/Behaviors.md#type-validation-error-behavior)
@@ -325,7 +316,7 @@ Implementation details shall follow the associated contract specifications. The 
   * definedBy: [CLI Model Diagram Command Contract Specification](Specifications.md#cli-model-diagram-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Model Command Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#model-command-verification)
 ---
@@ -440,7 +431,7 @@ The semantic export commands shall:
   * definedBy: [CLI Ontologies Command Contract Specification](Specifications.md#cli-ontologies-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * satisfiedBy: [semantic_contract.rs](../../../crates/reqvire-core/src/semantic_contract.rs)
+  * satisfiedBy: [index.rs](../../../crates/reqvire-core/src/semantic_contract/index.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
 ---
@@ -589,9 +580,8 @@ The CLI shall provide an opt-in `--with-size-estimates` option for supported JSO
 #### Details
 - The option shall enable model building with element size estimates for the command invocation.
 - The option shall be valid only for commands that emit JSON model evidence.
-- The option shall require `--json` when used by CLI report commands.
-- If the option is used without `--json`, the CLI shall fail with a clear error.
-- The option shall not change non-JSON output behavior.
+- The option shall not require a separate output-format flag on commands whose canonical output is JSON.
+- Commands that still have human-readable modes shall require JSON output selection before exposing size-estimate fields.
 
 #### Metadata
   * type: requirement
@@ -643,34 +633,14 @@ Implementation details shall follow the associated contract specifications.
 #### Contract Bindings
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
-  * [Explorer Mermaid Diagram Style Specification](../WebExplorer/Specifications.md#explorer-mermaid-diagram-style-specification)
   * [Type Validation Error Behavior](../../Operations/Validation/Behaviors.md#type-validation-error-behavior)
 
 #### Relations
   * definedBy: [CLI Traces Command Contract Specification](Specifications.md#cli-traces-command-contract-specification)
-  * derive: [Verification Traces Element Navigation](#verification-traces-element-navigation)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Verification Traces Filter Options Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#verification-traces-filter-options-test)
-  * verifiedBy: [Verification Traces From-Folder Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#verification-traces-from-folder-test)
----
-
-### Verification Traces Element Navigation
-
-The system shall make verification element names in the traces report clickable links that navigate to the element's definition in its source file.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Verification Traces Element Navigation Contract Specification](Specifications.md#verification-traces-element-navigation-contract-specification)
-  * derivedFrom: [CLI Traces Command](#cli-traces-command)
-  * satisfiedBy: [verification_trace.rs](../../../crates/reqvire-core/src/verification_trace.rs)
-  * verifiedBy: [Verification Traces Element Navigation Test](../../Verifications/Interfaces/CLI/CLIVerifications.md#verification-traces-element-navigation-test)
 ---
 
 ### Contract Bindings Commands
@@ -736,6 +706,7 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Detailed Error Handling and Logging Contract Specification](Specifications.md#detailed-error-handling-and-logging-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
+  * satisfiedBy: [main.rs](../../../crates/reqvire-cli/src/main.rs)
 ---
 
 ### Explicit Workspace Selection

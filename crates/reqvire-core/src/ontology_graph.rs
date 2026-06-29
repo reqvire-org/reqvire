@@ -1,3 +1,4 @@
+use crate::semantic_contract::REQVIRE_MAPS_TO_CONCEPT;
 use crate::semantic_contract::{
     OntologyClassExpressionKind, OntologyConstruct, OntologyConstructFamily, OntologyConstructKind,
     OntologyProjectionSource, OntologyProjectionTerm, OntologyProjectionTermKind,
@@ -20,23 +21,6 @@ const GRAPH_SOURCE_SHAPE: &str = "shape";
 const GRAPH_SOURCE_CONCEPT: &str = "concept";
 const GRAPH_SOURCE_EXTERNAL_ONTOLOGY: &str = "external-ontology";
 const GRAPH_SOURCE_MODEL_CONTEXT: &str = "model-context";
-const SKOS_CONCEPT: &str = "http://www.w3.org/2004/02/skos/core#Concept";
-const SKOS_CONCEPT_SCHEME: &str = "http://www.w3.org/2004/02/skos/core#ConceptScheme";
-const SKOS_PREF_LABEL: &str = "http://www.w3.org/2004/02/skos/core#prefLabel";
-const SKOS_DEFINITION: &str = "http://www.w3.org/2004/02/skos/core#definition";
-const SKOS_SCOPE_NOTE: &str = "http://www.w3.org/2004/02/skos/core#scopeNote";
-const SKOS_IN_SCHEME: &str = "http://www.w3.org/2004/02/skos/core#inScheme";
-const SKOS_HAS_TOP_CONCEPT: &str = "http://www.w3.org/2004/02/skos/core#hasTopConcept";
-const SKOS_TOP_CONCEPT_OF: &str = "http://www.w3.org/2004/02/skos/core#topConceptOf";
-const SKOS_BROADER: &str = "http://www.w3.org/2004/02/skos/core#broader";
-const SKOS_NARROWER: &str = "http://www.w3.org/2004/02/skos/core#narrower";
-const SKOS_RELATED: &str = "http://www.w3.org/2004/02/skos/core#related";
-const SKOS_EXACT_MATCH: &str = "http://www.w3.org/2004/02/skos/core#exactMatch";
-const SKOS_CLOSE_MATCH: &str = "http://www.w3.org/2004/02/skos/core#closeMatch";
-const SKOS_BROAD_MATCH: &str = "http://www.w3.org/2004/02/skos/core#broadMatch";
-const SKOS_NARROW_MATCH: &str = "http://www.w3.org/2004/02/skos/core#narrowMatch";
-const SKOS_RELATED_MATCH: &str = "http://www.w3.org/2004/02/skos/core#relatedMatch";
-const REQVIRE_MAPS_TO_CONCEPT: &str = "https://www.reqvire.org/ontology#mapsToConcept";
 
 #[derive(Debug, Clone, Serialize)]
 pub struct OntologyGraphData {
@@ -415,11 +399,7 @@ fn add_graph_data_from_blocks(
                                 mark_skos_node(nodes, &target_id, "skos-concept");
                             }
                         }
-                        if predicate == SKOS_IN_SCHEME {
-                            if let Some(source_node) = nodes.get_mut(&subject_id) {
-                                source_node.scheme_iri = target_id.clone();
-                            }
-                        } else if predicate == SKOS_TOP_CONCEPT_OF {
+                        if predicate == SKOS_IN_SCHEME || predicate == SKOS_TOP_CONCEPT_OF {
                             if let Some(source_node) = nodes.get_mut(&subject_id) {
                                 source_node.scheme_iri = target_id.clone();
                             }
@@ -2052,7 +2032,7 @@ fn default_semantic_type(id: &str, node_type: &str) -> &'static str {
 }
 
 fn upgrade_semantic_type(current: &mut &'static str, candidate: &'static str) {
-    if semantic_type_rank(candidate) > semantic_type_rank(*current) {
+    if semantic_type_rank(candidate) > semantic_type_rank(current) {
         *current = candidate;
     }
 }
@@ -2136,15 +2116,15 @@ pub fn clean_uri(value: &str) -> String {
 fn is_constraint_predicate(predicate: &str) -> bool {
     matches!(
         predicate,
-        "http://www.w3.org/ns/shacl#minCount"
-            | "http://www.w3.org/ns/shacl#maxCount"
+        SH_MIN_COUNT
+            | SH_MAX_COUNT
             | SH_DATATYPE
-            | "http://www.w3.org/ns/shacl#targetClass"
-            | "http://www.w3.org/ns/shacl#class"
-            | "http://www.w3.org/ns/shacl#nodeKind"
-            | "http://www.w3.org/ns/shacl#path"
-            | "http://www.w3.org/ns/shacl#pattern"
-            | "http://www.w3.org/ns/shacl#in"
+            | SH_TARGET_CLASS
+            | SH_CLASS
+            | SH_NODE_KIND
+            | SH_PATH
+            | SH_PATTERN
+            | SH_IN
     )
 }
 
@@ -2249,7 +2229,7 @@ mod tests {
         SemanticBlockKind, SemanticIndex, SemanticIndexSummary,
     };
     use oxigraph::io::{RdfFormat, RdfParser};
-    use std::collections::HashMap;
+    use rustc_hash::FxHashMap;
 
     fn parse_test_quads(turtle: &str) -> Vec<oxigraph::model::Quad> {
         RdfParser::from_format(RdfFormat::Turtle)
@@ -2346,7 +2326,7 @@ ex:rule a ex:Thing .
                 element_names: vec!["Test Ontology".to_string()],
                 imports: Vec::new(),
             }],
-            ontology_declarations: HashMap::from([(
+            ontology_declarations: FxHashMap::from_iter([(
                 "https://example.test/ontology#Thing".to_string(),
                 vec![OntologyTermDeclaration {
                     iri: "https://example.test/ontology#Thing".to_string(),
@@ -2436,7 +2416,7 @@ concept:ChangeImpact a skos:Concept ;
             external_sources: Vec::new(),
             diagnostics: Vec::new(),
             ontology_documents: Vec::new(),
-            ontology_declarations: HashMap::new(),
+            ontology_declarations: FxHashMap::default(),
             shape_references: Vec::new(),
             ontology_projection: empty_projection_graph(),
             model_context: ModelContextGraph {
@@ -2520,7 +2500,7 @@ concept:LegacyTraceability a skos:Concept ;
             external_sources: Vec::new(),
             diagnostics: Vec::new(),
             ontology_documents: Vec::new(),
-            ontology_declarations: HashMap::new(),
+            ontology_declarations: FxHashMap::default(),
             shape_references: Vec::new(),
             ontology_projection: empty_projection_graph(),
             model_context: ModelContextGraph {

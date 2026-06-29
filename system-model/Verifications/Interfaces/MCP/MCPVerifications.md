@@ -426,6 +426,7 @@ This verification shall prove that MCP cached state is subordinate to Reqvire so
 Expected checks:
 - Verify workspace status reports workspace root, git `HEAD`, dirty state, Reqvire version, MCP protocol revision, Reqvire tool contract version, model fingerprint, and last diagnostics.
 - Verify source file, git state, excluded-pattern, Reqvire version, or Reqvire tool contract changes invalidate cached model state.
+- Verify markdown content changes invalidate cached model state even when filesystem modification time is preserved.
 - Verify controlled MCP mutations refresh MCP internal state from the updated Reqvire core graph.
 - Verify external filesystem drift triggers invalidation/reparse before serving stale model data.
 - Verify dirty worktree state is reported in metadata and does not block tools when the equivalent Reqvire core operation can run.
@@ -445,6 +446,8 @@ This verification shall prove that MCP tools use shared Reqvire operation contra
 Expected checks:
 - Run representative Reqvire operations through MCP tools.
 - Run representative Reqvire operations through an external Rust fixture using the public Reqvire tool registry API.
+- Verify source-level delegation for migrated read/report operations: MCP read tools call the shared operations layer instead of directly reimplementing search, model, collect, submodels, resources, coverage, traces, containment, lint, format, or change-impact behavior.
+- Verify matching CLI report command handlers call the shared operations layer for migrated operations while retaining CLI-only parsing and rendering responsibilities.
 - Verify result schemas match shared contract definitions.
 - Verify transport-only options such as JSON stdout/file output are not exposed as MCP request fields.
 - Verify no-argument tools use valid MCP object input schemas.

@@ -9,7 +9,8 @@ use crate::graph_registry::GraphRegistry;
 use crate::model::ModelManager;
 use crate::relation::LinkType;
 use globset::GlobSet;
-use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use rustc_hash::{FxHashMap, FxHashSet};
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
@@ -35,8 +36,8 @@ struct OntologyDocumentState {
 
 #[derive(Clone, Debug, Default)]
 struct OntologyMutationSnapshot {
-    terms: HashMap<OntologyTermKey, OntologyTermState>,
-    documents_by_element: HashMap<String, OntologyDocumentState>,
+    terms: FxHashMap<OntologyTermKey, OntologyTermState>,
+    documents_by_element: FxHashMap<String, OntologyDocumentState>,
     ambiguous_terms: BTreeSet<String>,
 }
 
@@ -58,7 +59,7 @@ struct PrefixBinding {
     namespace: String,
 }
 
-fn snapshot_modified_files(model_manager: &ModelManager) -> HashSet<String> {
+fn snapshot_modified_files(model_manager: &ModelManager) -> FxHashSet<String> {
     model_manager
         .graph_registry
         .modified_files
@@ -69,7 +70,7 @@ fn snapshot_modified_files(model_manager: &ModelManager) -> HashSet<String> {
 
 fn collect_new_modified_files(
     model_manager: &ModelManager,
-    before: &HashSet<String>,
+    before: &FxHashSet<String>,
 ) -> Vec<String> {
     let mut modified_files: Vec<String> = model_manager
         .graph_registry
@@ -793,7 +794,7 @@ fn rewrite_concept_reference_target(
 
 fn finalize_crud_operation(
     model_manager: &mut ModelManager,
-    modified_before: &HashSet<String>,
+    modified_before: &FxHashSet<String>,
     git_root: &Path,
     dry_run: bool,
     removed_declaration_source: Option<&str>,
@@ -834,7 +835,7 @@ fn validate_semantic_contracts_after_mutation(
     if semantic_errors.is_empty() {
         Ok(())
     } else {
-        Err(ReqvireError::ValidationError(semantic_errors))
+        Err(ReqvireError::validation_diagnostics(semantic_errors))
     }
 }
 
@@ -878,7 +879,7 @@ fn validate_semantic_contracts_after_contract_bindings_candidate(
     if semantic_errors.is_empty() {
         Ok(())
     } else {
-        Err(ReqvireError::ValidationError(semantic_errors))
+        Err(ReqvireError::validation_diagnostics(semantic_errors))
     }
 }
 
@@ -1829,7 +1830,7 @@ pub fn mv_asset(
     let old_path_buf = PathBuf::from(old_path);
 
     // Find all elements with this file as contract_bindings OR as InternalPath relation target
-    let mut affected_files: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut affected_files: rustc_hash::FxHashSet<String> = rustc_hash::FxHashSet::default();
     let mut contract_bindings_count = 0;
     let mut relation_count = 0;
 
@@ -1951,7 +1952,7 @@ pub fn rm_asset(
     use std::path::PathBuf;
 
     // Find all elements with this file as contract_bindings OR as InternalPath relation target
-    let mut affected_files: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut affected_files: rustc_hash::FxHashSet<String> = rustc_hash::FxHashSet::default();
     let mut contract_bindings_count = 0;
     let mut relation_count = 0;
 
@@ -2084,8 +2085,8 @@ pub fn merge_elements(
         .map(|el| el.file_path.clone())
         .collect();
 
-    let mut before_content: std::collections::HashMap<String, String> =
-        std::collections::HashMap::new();
+    let mut before_content: rustc_hash::FxHashMap<String, String> =
+        rustc_hash::FxHashMap::default();
     let grouped_before = model_manager.graph_registry.group_elements_by_location();
 
     // Capture content for target file
@@ -2276,7 +2277,7 @@ fn add_contract_bindings_to_element(
                     || next_trimmed.starts_with("- ")
                     || next_trimmed.is_empty()
                 {
-                    result.push_str(lines_iter.next().unwrap());
+                    result.push_str(lines_iter.next().expect("iterator exhausted"));
                     result.push('\n');
                 } else {
                     break;
@@ -2417,7 +2418,7 @@ fn add_element_contract_bindings_to_element(
                     || next_trimmed.starts_with("- ")
                     || next_trimmed.is_empty()
                 {
-                    result.push_str(lines_iter.next().unwrap());
+                    result.push_str(lines_iter.next().expect("iterator exhausted"));
                     result.push('\n');
                 } else {
                     break;
@@ -2578,7 +2579,7 @@ fn remove_empty_contract_bindings_section(content: &str, element_name: &str) -> 
             while let Some(next_line) = lines_iter.peek() {
                 let next_trimmed = next_line.trim();
                 if next_trimmed.is_empty() {
-                    temp_lines.push(lines_iter.next().unwrap());
+                    temp_lines.push(lines_iter.next().expect("iterator exhausted"));
                 } else if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
                     has_contract_bindings = true;
                     break;
@@ -2624,7 +2625,7 @@ fn remove_all_empty_contract_bindings_sections(content: &str) -> String {
             while let Some(next_line) = lines_iter.peek() {
                 let next_trimmed = next_line.trim();
                 if next_trimmed.is_empty() {
-                    temp_lines.push(lines_iter.next().unwrap());
+                    temp_lines.push(lines_iter.next().expect("iterator exhausted"));
                 } else if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
                     has_contract_bindings = true;
                     break;

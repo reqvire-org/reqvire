@@ -235,18 +235,18 @@ The system shall implement all CRUD operations using a delegation pattern where 
 #### Details
 All element manipulation operations follow this architectural pattern:
 - CRUD layer (crud.rs) provides public API and orchestration logic
-- Graph registry layer (graph_registry.rs) performs validation and executes changes
+- Graph registry layer (`graph_registry/validation.rs` and `graph_registry/crud_ops.rs`) performs validation and executes changes
 - CRUD delegates to graph_registry for all model mutations
 
 **Operation Delegation Mapping:**
 ```
-crud.add_element() → graph_registry.add_element_to_file()
-crud.remove_element() → graph_registry.remove_element_with_cleanup()
-crud.move_element() → graph_registry.move_element_comprehensive()
-crud.merge_elements() → graph_registry.merge_elements()
-crud.rename_element() → graph_registry.rename_element()
-crud.link() → graph_registry.add_element_relation_full()
-crud.unlink() → graph_registry.remove_element_relation_full()
+crud.add_element() → graph_registry::crud_ops::add_element_to_file()
+crud.remove_element() → graph_registry::crud_ops::remove_element_with_cleanup()
+crud.move_element() → graph_registry::crud_ops::move_element_comprehensive()
+crud.merge_elements() → graph_registry::crud_ops::merge_elements()
+crud.rename_element() → graph_registry::crud_ops::rename_element()
+crud.link() → graph_registry::crud_ops::add_element_relation_full()
+crud.unlink() → graph_registry::crud_ops::remove_element_relation_full()
 ```
 
 **Benefits:**
@@ -260,7 +260,7 @@ crud.unlink() → graph_registry.remove_element_relation_full()
 
 #### Relations
   * satisfiedBy: [crud.rs](crates/reqvire-core/src/crud.rs)
-  * satisfiedBy: [graph_registry.rs](crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](crates/reqvire-core/src/graph_registry/crud_ops.rs)
 ---
 
 ### Shared Utility Functions
@@ -271,7 +271,7 @@ The system shall extract common code patterns into shared utility functions to r
 When a code pattern appears in multiple locations, it should be extracted into a shared utility function. This follows the DRY (Don't Repeat Yourself) principle and improves maintainability.
 
 **Example: Parent Directory Extraction**
-The `get_parent_dir()` utility function provides consistent parent directory extraction logic used across crud.rs and graph_registry.rs, replacing 6 instances of duplicate code.
+The `get_parent_dir()` utility function provides consistent parent directory extraction logic used across `crud.rs` and graph registry CRUD helpers, replacing duplicate code.
 
 ```rust
 pub fn get_parent_dir(file_path: &str) -> PathBuf {
@@ -293,5 +293,5 @@ pub fn get_parent_dir(file_path: &str) -> PathBuf {
 #### Relations
   * satisfiedBy: [utils.rs](crates/reqvire-core/src/utils.rs)
   * satisfiedBy: [crud.rs](crates/reqvire-core/src/crud.rs)
-  * satisfiedBy: [graph_registry.rs](crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](crates/reqvire-core/src/graph_registry/crud_ops.rs)
 ---

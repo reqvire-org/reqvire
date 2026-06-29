@@ -2,8 +2,8 @@ use crate::element::{ContractBindingTarget, ElementType};
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::relation;
+use rustc_hash::FxHashSet;
 use serde::Serialize;
-use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
 
@@ -139,8 +139,8 @@ pub fn generate_collect_report(
     let mut contract_bindings_count = 0;
     let mut ontology_count = 0;
     let mut concept_context_count = 0;
-    let mut collected_ontology_context: HashSet<String> = HashSet::new();
-    let mut collected_concept_context: HashSet<String> = HashSet::new();
+    let mut collected_ontology_context: FxHashSet<String> = FxHashSet::default();
+    let mut collected_concept_context: FxHashSet<String> = FxHashSet::default();
 
     // For upstream: chain is start→root, reverse to get root first (depth 0)
     // For downstream: chain is already start→leaves (start at depth 0)
@@ -266,8 +266,7 @@ pub fn generate_collect_report(
     };
 
     if json_output {
-        serde_json::to_string_pretty(&report)
-            .map_err(|e| ReqvireError::SerializationError(e.to_string()))
+        serde_json::to_string_pretty(&report).map_err(ReqvireError::from)
     } else {
         Ok(generate_text_output(&report))
     }
@@ -328,7 +327,7 @@ fn collect_parent_chain_by_type(
     kind: ElementTypeKind,
 ) -> Vec<String> {
     let mut chain = Vec::new();
-    let mut visited = HashSet::new();
+    let mut visited = FxHashSet::default();
     let mut current_level = vec![start_id.to_string()];
 
     while !current_level.is_empty() {
@@ -391,7 +390,7 @@ fn collect_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Str
 
 fn collect_concept_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
     let mut chain = Vec::new();
-    let mut visited = HashSet::new();
+    let mut visited = FxHashSet::default();
     let mut current_level = vec![start_id.to_string()];
 
     while !current_level.is_empty() {
@@ -435,7 +434,7 @@ fn collect_concept_downstream_chain(registry: &GraphRegistry, start_id: &str) ->
 
 fn collect_requirement_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
     let mut chain = Vec::new();
-    let mut visited = HashSet::new();
+    let mut visited = FxHashSet::default();
     let mut current_level = vec![start_id.to_string()];
 
     while !current_level.is_empty() {
@@ -481,7 +480,7 @@ fn collect_requirement_downstream_chain(registry: &GraphRegistry, start_id: &str
 
 fn collect_capability_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
     let mut chain = Vec::new();
-    let mut visited = HashSet::new();
+    let mut visited = FxHashSet::default();
     let mut current_level = vec![start_id.to_string()];
 
     while !current_level.is_empty() {
@@ -543,7 +542,7 @@ fn collect_capability_downstream_chain(registry: &GraphRegistry, start_id: &str)
 
 fn collect_ontology_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
     let mut chain = Vec::new();
-    let mut visited = HashSet::new();
+    let mut visited = FxHashSet::default();
     let mut current_level = vec![start_id.to_string()];
 
     while !current_level.is_empty() {
@@ -595,7 +594,7 @@ fn collect_ontology_downstream_chain(registry: &GraphRegistry, start_id: &str) -
 
 fn semantic_contracts_using_ontology(registry: &GraphRegistry, ontology_id: &str) -> Vec<String> {
     let mut contracts = Vec::new();
-    let mut seen = HashSet::new();
+    let mut seen = FxHashSet::default();
 
     if let Some(ontology) = registry.get_element(ontology_id) {
         for rel in &ontology.relations {
@@ -649,7 +648,7 @@ fn element_matches_kind(registry: &GraphRegistry, element_id: &str, kind: Elemen
 }
 
 fn find_owning_capability(registry: &GraphRegistry, requirement_id: &str) -> Option<String> {
-    let mut visited = HashSet::new();
+    let mut visited = FxHashSet::default();
     let mut current_level = vec![requirement_id.to_string()];
 
     while !current_level.is_empty() {

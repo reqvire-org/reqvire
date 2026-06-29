@@ -50,9 +50,33 @@ The system shall support an opt-in model build mode that computes canonical size
   * definedBy: [Element Size Estimate Model Build Specification](Specifications.md#element-size-estimate-model-build-specification)
   * derivedFrom: [Efficient Processing](#efficient-processing)
   * satisfiedBy: [element.rs](../../crates/reqvire-core/src/element.rs)
-  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [registration.rs](../../crates/reqvire-core/src/graph_registry/registration.rs)
   * satisfiedBy: [model.rs](../../crates/reqvire-core/src/model.rs)
   * verifiedBy: [Element Size Estimate Model Build Verification](../Verifications/ModelStructure/ParsingVerifications.md#element-size-estimate-model-build-verification)
+---
+
+### In-Memory Model Build Cache
+
+The system shall cache parsed `ModelManager` instances keyed by a fingerprint of the scanned workspace markdown files and the active model build options, so that repeated tool dispatches over an unchanged workspace return a cached model without re-parsing.
+
+#### Details
+- The cache key shall combine `ModelBuildOptions` with a sorted map of every scanned `.md` file path to a content fingerprint (`FileFingerprint`) capturing file length and content hash.
+- A cache hit returns a clone of the stored model without re-reading or re-validating any source file.
+- A cache miss rebuilds the model via `parse_and_validate_with_options`, stores the result, and returns a clone.
+- CRUD mutations (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-asset, rm-asset) shall invalidate the cache, forcing a rebuild on the next load.
+- Only the current working tree is cached; git-commit scans bypass the cache and use `parse_and_validate` directly.
+- The cache mutex lock shall be released before rebuild I/O to avoid holding it during parsing.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [In-Memory Model Build Cache Specification](Specifications.md#in-memory-model-build-cache-specification)
+  * derivedFrom: [Efficient Processing](#efficient-processing)
+  * satisfiedBy: [model_cache.rs](../../crates/reqvire-core/src/model_cache.rs)
+  * satisfiedBy: [arg_helpers.rs](../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
+  * verifiedBy: [In-Memory Model Build Cache Verification](../Verifications/ModelStructure/ParsingVerifications.md#in-memory-model-build-cache-verification)
+
 ---
 
 ### Element Manipulation Operations
@@ -274,7 +298,8 @@ Mutation commands that create or rewrite relations shall enforce the same compat
   * definedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
   * definedBy: [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
+  * satisfiedBy: [validation.rs](../../crates/reqvire-core/src/graph_registry/validation.rs)
   * satisfiedBy: [relation.rs](../../crates/reqvire-core/src/relation.rs)
   * verifiedBy: [Verification Objective Mutation Test](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
   * verifiedBy: [Element Type Relation Compatibility Test](../Verifications/Operations/Validation/ValidationVerifications.md#element-type-relation-compatibility-test)
@@ -306,7 +331,7 @@ When unlinking, the system shall:
   * definedBy: [Relation Operations Specification](Specifications.md#relation-operations-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
   * satisfiedBy: [crud.rs](../../crates/reqvire-core/src/crud.rs)
-  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [Link Command Verification](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#unlink-command-verification)
   * verifiedBy: [Verification Objective Mutation Test](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
@@ -328,7 +353,7 @@ Governance metadata behavior shall follow the associated contract specifications
 #### Relations
   * definedBy: [Requirement Governance Metadata Inheritance Behavior](Behaviors.md#requirement-governance-metadata-inheritance-behavior)
   * satisfiedBy: [element.rs](../../crates/reqvire-core/src/element.rs)
-  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [hierarchy.rs](../../crates/reqvire-core/src/graph_registry/hierarchy.rs)
   * satisfiedBy: [search.rs](../../crates/reqvire-core/src/search.rs)
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
   * verifiedBy: [Requirement Governance Metadata Verification](../Verifications/ModelStructure/ParsingVerifications.md#requirement-governance-metadata-verification)

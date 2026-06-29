@@ -215,7 +215,7 @@ pub fn build_project_store(
     let concept_refs = build_concept_refs(registry, &mut resources);
     enrich_resource_sources(&mut resources);
     let (files, folders) = build_files_and_folders(registry, &resources);
-    let submodels = crate::report_submodels::generate_submodels_report(registry, None)
+    let submodels = crate::report::submodels::generate_submodels_report(registry, None)
         .ok()
         .and_then(|report| serde_json::to_value(report).ok())
         .unwrap_or_else(|| json!({"submodels":[],"cross_submodel_couplings":[],"summary":{}}));
@@ -246,11 +246,11 @@ pub fn build_project_store(
         "ttl_href": "ontologies.ttl"
     });
     let trace_report =
-        crate::verification_trace::VerificationTraceGenerator::new(registry, false, None)
-            .generate();
+        crate::verification_trace::VerificationTraceGenerator::new(registry).generate();
     let traces = serde_json::to_value(trace_report).unwrap_or_else(|_| json!({"files":{}}));
-    let coverage = serde_json::to_value(crate::report_coverage::generate_coverage_report(registry))
-        .unwrap_or_else(|_| json!({}));
+    let coverage =
+        serde_json::to_value(crate::report::coverage::generate_coverage_report(registry))
+            .unwrap_or_else(|_| json!({}));
     let summaries = ProjectStoreSummaries {
         elements: elements.len(),
         files: files.len(),
@@ -423,8 +423,7 @@ fn explorer_external_materialization_metadata(
 pub fn project_store_javascript(
     store: &ExplorerProjectStore,
 ) -> Result<String, crate::error::ReqvireError> {
-    let json = serde_json::to_string_pretty(store)
-        .map_err(|error| crate::error::ReqvireError::SerializationError(error.to_string()))?;
+    let json = serde_json::to_string_pretty(store)?;
     let escaped = json
         .replace('<', "\\u003c")
         .replace('>', "\\u003e")
@@ -970,7 +969,7 @@ fn build_files_and_folders(
         }
         let folder = Path::new(&path)
             .parent()
-            .map(|p| path_string(p))
+            .map(path_string)
             .unwrap_or_default();
         folder_children
             .entry(folder.clone())
@@ -1518,9 +1517,9 @@ mod tests {
         SemanticBlockKind, SemanticIndexSummary,
     };
     use oxigraph::io::{RdfFormat, RdfParser};
-    use std::collections::HashMap;
+    use rustc_hash::FxHashMap;
 
-    const TEST_RDFS_SUBCLASS_OF: &str = "http://www.w3.org/2000/01/rdf-schema#subClassOf";
+    const TEST_RDFS_SUBCLASS_OF: &str = o_kernel::vocab::RDFS_SUBCLASS_OF;
 
     fn parse_test_quads(turtle: &str) -> Vec<oxigraph::model::Quad> {
         RdfParser::from_format(RdfFormat::Turtle)
@@ -1635,7 +1634,7 @@ ext:UnusedTerm a owl:Class ;
             }],
             diagnostics: Vec::new(),
             ontology_documents: Vec::new(),
-            ontology_declarations: HashMap::from([
+            ontology_declarations: FxHashMap::from_iter([
                 (
                     "https://example.test/external#ProjectedTerm".to_string(),
                     vec![external_declaration(

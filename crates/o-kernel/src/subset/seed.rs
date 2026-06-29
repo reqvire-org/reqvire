@@ -22,7 +22,7 @@ pub fn collect_reference_terms(
             )));
             match quad.object {
                 Term::NamedNode(node) => {
-                    terms.insert(format!("{}", node.as_str()));
+                    terms.insert(node.as_str().to_string());
                 }
                 Term::BlankNode(node) => {
                     terms.insert(format!("{}{}", "_:", node.as_str()));

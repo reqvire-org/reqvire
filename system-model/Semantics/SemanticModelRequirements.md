@@ -32,7 +32,7 @@ Standard OWL reserved vocabulary and built-in datatype IRIs remain recognized by
   * definedBy: [Local External Ontology Source Specification](SemanticModelSpecifications.md#local-external-ontology-source-specification)
   * derive: [External Vocabulary Reference Resolution](#external-vocabulary-reference-resolution)
   * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
-  * satisfiedBy: [semantic_contract.rs](../../crates/reqvire-core/src/semantic_contract.rs)
+  * satisfiedBy: [mod.rs](../../crates/reqvire-core/src/semantic_contract/mod.rs)
   * specify: [External Ontology Source Management](SemanticModelFeature.md#external-ontology-source-management)
 ---
 
@@ -173,7 +173,9 @@ The collection shall preserve source element identifiers, source file paths, sec
   * derive: [OWL Reserved Vocabulary Recognition](#owl-reserved-vocabulary-recognition)
   * satisfiedBy: [explorer_runtime.rs](../../crates/reqvire-core/src/explorer_runtime.rs)
   * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
-  * satisfiedBy: [semantic_contract.rs](../../crates/reqvire-core/src/semantic_contract.rs)
+  * satisfiedBy: [index.rs](../../crates/reqvire-core/src/semantic_contract/index.rs)
+  * satisfiedBy: [prefixes.rs](../../crates/reqvire-core/src/semantic_contract/prefixes.rs)
+  * satisfiedBy: [vocabulary.rs](../../crates/reqvire-core/src/semantic_contract/vocabulary.rs)
   * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
   * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
 ---
@@ -204,7 +206,7 @@ JSON-LD output remains a separate RDF serialization surface. It shall use JSON-L
   * definedBy: [Prefixed Turtle Semantic Export Specification](SemanticModelSpecifications.md#prefixed-turtle-semantic-export-specification)
   * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
   * derive: [Namespace-Scoped Ontology Export](#namespace-scoped-ontology-export)
-  * satisfiedBy: [semantic_contract.rs](../../crates/reqvire-core/src/semantic_contract.rs)
+  * satisfiedBy: [export.rs](../../crates/reqvire-core/src/semantic_contract/export.rs)
   * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
   * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
   * verifiedBy: [MCP Model Evidence Tools Verification](../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
@@ -231,7 +233,7 @@ The filter shall apply to clean semantic exports only. It shall not be combined 
 #### Relations
   * definedBy: [Namespace-Scoped Ontology Export Specification](SemanticModelSpecifications.md#namespace-scoped-ontology-export-specification)
   * derivedFrom: [Prefixed Turtle Semantic Export](#prefixed-turtle-semantic-export)
-  * satisfiedBy: [semantic_contract.rs](../../crates/reqvire-core/src/semantic_contract.rs)
+  * satisfiedBy: [export.rs](../../crates/reqvire-core/src/semantic_contract/export.rs)
   * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
   * verifiedBy: [Runtime Reqvire Ontology Artifact Verification](../Verifications/Semantics/SemanticModelVerifications.md#runtime-reqvire-ontology-artifact-verification)
 ---
@@ -378,7 +380,8 @@ Explorer ontology graph rendering shall use the ownership metadata for grouping,
 #### Relations
   * definedBy: [Ontology Term Definition Link Materialization Specification](SemanticModelSpecifications.md#ontology-term-definition-link-materialization-specification)
   * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
-  * satisfiedBy: [semantic_contract.rs](../../crates/reqvire-core/src/semantic_contract.rs)
+  * satisfiedBy: [index.rs](../../crates/reqvire-core/src/semantic_contract/index.rs)
+  * satisfiedBy: [prefixes.rs](../../crates/reqvire-core/src/semantic_contract/prefixes.rs)
   * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
   * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
   * verifiedBy: [MCP Model Evidence Tools Verification](../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)

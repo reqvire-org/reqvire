@@ -151,16 +151,16 @@ impl ContainmentHierarchy {
 
 /// Filter elements to show only top-level parents (those without hierarchical parents in same file)
 fn filter_top_level_elements<'a>(elements: &[&'a Element]) -> Vec<&'a Element> {
-    use std::collections::HashSet;
+    use rustc_hash::FxHashSet;
 
     // Get hierarchical relation types (derivedFrom)
     let hierarchical_types = crate::relation::get_hierarchical_relation_types();
 
     // Collect all element IDs (fragments) in this file
-    let element_ids: HashSet<String> = elements.iter().map(|e| e.id.clone()).collect();
+    let element_ids: FxHashSet<String> = elements.iter().map(|e| e.id.clone()).collect();
 
     // Find elements that have derivedFrom relations pointing to elements in the same file
-    let mut child_elements: HashSet<String> = HashSet::new();
+    let mut child_elements: FxHashSet<String> = FxHashSet::default();
     for element in elements {
         for relation in &element.relations {
             if hierarchical_types.contains(&relation.relation_type.name) {
@@ -192,8 +192,7 @@ fn scan_design_documents(
     let mut design_docs: BTreeMap<Vec<String>, Vec<DesignDocument>> = BTreeMap::new();
 
     // Get all unique parent folders from the files map
-    let mut parent_folders: std::collections::HashSet<Vec<String>> =
-        std::collections::HashSet::new();
+    let mut parent_folders: rustc_hash::FxHashSet<Vec<String>> = rustc_hash::FxHashSet::default();
     for file_path in files_map.keys() {
         let path = Path::new(file_path);
         if let Some(parent) = path.parent() {
@@ -264,8 +263,7 @@ fn build_folder_structure(
     let mut folder_files: BTreeMap<Vec<String>, Vec<ContainmentFile>> = BTreeMap::new();
 
     // Track all folder paths (including intermediate folders without direct files)
-    let mut all_folder_paths: std::collections::HashSet<Vec<String>> =
-        std::collections::HashSet::new();
+    let mut all_folder_paths: rustc_hash::FxHashSet<Vec<String>> = rustc_hash::FxHashSet::default();
 
     for (file_path, elements) in files_map {
         let path = Path::new(file_path);
@@ -314,7 +312,7 @@ fn build_folder_structure(
 fn build_folder_recursive(
     current_path: &[String],
     folder_files: &BTreeMap<Vec<String>, Vec<ContainmentFile>>,
-    all_folder_paths: &std::collections::HashSet<Vec<String>>,
+    all_folder_paths: &rustc_hash::FxHashSet<Vec<String>>,
     design_docs: &BTreeMap<Vec<String>, Vec<DesignDocument>>,
 ) -> ContainmentFolder {
     let folder_name = current_path
@@ -332,7 +330,7 @@ fn build_folder_recursive(
     let mut subfolders = Vec::new();
     let current_depth = current_path.len();
 
-    let mut seen_subfolders: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut seen_subfolders: rustc_hash::FxHashSet<String> = rustc_hash::FxHashSet::default();
 
     for folder_path in all_folder_paths.iter() {
         if folder_path.len() == current_depth + 1 {

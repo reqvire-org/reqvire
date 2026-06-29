@@ -93,8 +93,9 @@ Each command has its own options displayed in a flattened section
 
 #### Details
 `--output` option behavior:
-- Be available on every command that has a `--json` flag.
-- Require `--json` to also be set; report an error when `--output` is used without `--json`.
+- Be available on commands that emit JSON output.
+- For commands with a selectable `--json` mode, require `--json` to also be set and report an error when `--output` is used without JSON output selection.
+- For JSON-only commands such as `model`, `containment`, `resources`, and `traces`, accept `--output` directly because JSON is the only output mode.
 - Write JSON content to the specified file path.
 - Create the file if it does not exist, and overwrite it if it does.
 - Print a confirmation message to stdout: `✅ Output saved to <filepath>`.
@@ -278,6 +279,7 @@ The `rename` command behavior is governed by the reused rename workflow and rela
 
 #### Details
 The `resources` command behavior is governed by the reused relation and contract_bindings inventory contracts.
+The command emits JSON by default and does not expose a separate output-format flag.
 
 #### Metadata
   * type: specification
@@ -300,7 +302,7 @@ The `search` command behavior is governed by the reused search/filter/output con
 The CLI `--with-size-estimates` option is expected to be an opt-in JSON evidence option.
 
 #### Details
-The `--with-size-estimates` option behavior is governed by the reused report-evidence contracts.
+The `--with-size-estimates` option behavior is governed by the reused report-evidence contracts. On `model`, which is JSON-only, the flag directly enriches the canonical JSON output without requiring a separate format-selection flag.
 
 #### Metadata
   * type: specification
@@ -337,6 +339,9 @@ CLI error handling and logging behavior:
 - Returns contextual error messages that help users identify command failure causes.
 - Preserves actionable feedback format so remediation steps are visible near errors.
 - Uses shared validation/error reporting behavior for consistent message quality across commands.
+- Configures logging without mutating the process environment at runtime.
+- Defaults log filtering to `error` when `RUST_LOG` is unset so structured stdout output is not polluted by logs.
+- Honors `RUST_LOG` when users explicitly request more verbose diagnostics.
 - Emits non-zero exit codes for command failures.
 
 #### Metadata
@@ -468,16 +473,4 @@ The `validate` command behavior is governed by the reused validation strategy an
 
 #### Relations
   * define: [Validate Command](Commands.md#validate-command)
----
-
-### Verification Traces Element Navigation Contract Specification
-
-#### Details
-Verification trace element navigation behavior is governed by the reused verification-trace link-format contracts.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Verification Traces Element Navigation](Commands.md#verification-traces-element-navigation)
 ---

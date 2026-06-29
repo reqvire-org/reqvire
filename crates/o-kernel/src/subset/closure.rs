@@ -89,7 +89,7 @@ fn collect_term_support_edges(
     let mut edges = Vec::new();
     for graph_name in dependency_graphs {
         for quad_result in store.quads_for_pattern(
-            Some(term.as_ref().into()),
+            Some(term.as_ref()),
             None,
             None,
             Some(graph_name.as_ref().into()),
@@ -181,7 +181,7 @@ fn collect_list_edges_for_term(
     let mut edges = Vec::new();
     for graph_name in dependency_graphs {
         for quad_result in store.quads_for_pattern(
-            Some(term.as_ref().into()),
+            Some(term.as_ref()),
             None,
             None,
             Some(graph_name.as_ref().into()),

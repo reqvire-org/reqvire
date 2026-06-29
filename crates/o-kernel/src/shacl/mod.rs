@@ -579,13 +579,13 @@ impl<'a> ShaclParser<'a> {
     fn shape_candidates(&self) -> HashSet<NamedOrBlankNode> {
         let mut candidates = HashSet::new();
         for quad in self.quads {
-            if quad.predicate.as_str() == RDF_TYPE {
-                if matches!(
+            if quad.predicate.as_str() == RDF_TYPE
+                && matches!(
                     term_iri(&quad.object),
                     Some(SH_NODE_SHAPE | SH_PROPERTY_SHAPE | SH_SHAPE)
-                ) {
-                    candidates.insert(quad.subject.clone());
-                }
+                )
+            {
+                candidates.insert(quad.subject.clone());
             }
             if matches!(
                 quad.predicate.as_str(),
@@ -883,7 +883,7 @@ impl<'a> ShaclParser<'a> {
                 if let Some(inverse) = first_named_object(self.quads, &node, SH_INVERSE_PATH) {
                     return Ok(AstPath::Inverse(inverse));
                 }
-                if let Some(sequence) = rdf_list_terms(self.quads, term).ok() {
+                if let Ok(sequence) = rdf_list_terms(self.quads, term) {
                     let mut elements = Vec::new();
                     for item in sequence {
                         elements.push(self.parse_path(&item)?);

@@ -59,7 +59,7 @@ When generating formatted output, the system shall:
 #### Relations
   * definedBy: [Document Structure Specification](Specifications.md#document-structure-specification)
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
 ---
@@ -116,7 +116,7 @@ This ensures:
 #### Relations
   * definedBy: [Relation Ordering Specification](Specifications.md#relation-ordering-specification)
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [Relation Ordering Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#relation-ordering-verification)
 ---
 
@@ -159,7 +159,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Full Relations Insertion Contract Specification](Specifications.md#full-relations-insertion-contract-specification)
   * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
   * verifiedBy: [Full Relations Insertion Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#full-relations-insertion-verification)
 ---
@@ -172,7 +172,7 @@ The system shall replace absolute links with relative links, where applicable an
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * satisfiedBy: [utils.rs](../../../crates/reqvire-core/src/utils.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
   * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)

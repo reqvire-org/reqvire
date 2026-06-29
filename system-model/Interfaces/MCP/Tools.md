@@ -38,7 +38,7 @@ The system shall keep Reqvire MCP tool interfaces protocol-neutral below the MCP
   * definedBy: [MCP Contract Layer Boundary Specification](Specifications.md#mcp-contract-layer-boundary-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [tool_interface.rs](../../../crates/reqvire-core/src/tool_interface.rs)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/tool_interface/mod.rs)
   * verifiedBy: [MCP Contract Layer Boundary Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-contract-layer-boundary-verification)
 ---
 
@@ -93,6 +93,7 @@ The system shall expose MCP read tools that return model evidence needed by exte
   * definedBy: [MCP Model Evidence Tools Specification](Specifications.md#mcp-model-evidence-tools-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
   * verifiedBy: [MCP Model Evidence Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
 ---
 
@@ -120,7 +121,7 @@ The system shall expose an MCP read tool for SPARQL queries over Reqvire semanti
   * definedBy: [MCP Semantic Query Tools Specification](Specifications.md#mcp-semantic-query-tools-specification)
   * derivedFrom: [MCP Model Evidence Tools](#mcp-model-evidence-tools)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [tool_interface.rs](../../../crates/reqvire-core/src/tool_interface.rs)
+  * satisfiedBy: [semantic_tools.rs](../../../crates/reqvire-core/src/tool_interface/semantic_tools.rs)
   * verifiedBy: [MCP Semantic Query Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-query-tools-verification)
 ---
 
@@ -168,7 +169,8 @@ The system shall expose an MCP read tool that lists ontology-defined prefixes an
   * definedBy: [MCP Semantic Prefix Registry Tools Specification](Specifications.md#mcp-semantic-prefix-registry-tools-specification)
   * derivedFrom: [MCP Semantic Query Tools](#mcp-semantic-query-tools)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [tool_interface.rs](../../../crates/reqvire-core/src/tool_interface.rs)
+  * satisfiedBy: [prefixes.rs](../../../crates/reqvire-core/src/semantic_contract/prefixes.rs)
+  * satisfiedBy: [semantic_tools.rs](../../../crates/reqvire-core/src/tool_interface/semantic_tools.rs)
   * verifiedBy: [MCP Semantic Prefix Registry Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-prefix-registry-tools-verification)
 ---
 
@@ -191,7 +193,7 @@ The system shall make semantic-export relation-family projection facts available
 #### Relations
   * definedBy: [MCP Semantic Relation Family Projection Access Specification](Specifications.md#mcp-semantic-relation-family-projection-access-specification)
   * derivedFrom: [MCP Semantic Query Tools](#mcp-semantic-query-tools)
-  * satisfiedBy: [tool_interface.rs](../../../crates/reqvire-core/src/tool_interface.rs)
+  * satisfiedBy: [semantic_tools.rs](../../../crates/reqvire-core/src/tool_interface/semantic_tools.rs)
   * verifiedBy: [MCP Semantic Query Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-query-tools-verification)
 ---
 
@@ -218,7 +220,8 @@ The system shall expose an MCP read tool that pages compact semantic vocabulary 
   * definedBy: [MCP Semantic Vocabulary Tools Specification](Specifications.md#mcp-semantic-vocabulary-tools-specification)
   * derivedFrom: [MCP Semantic Query Tools](#mcp-semantic-query-tools)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [tool_interface.rs](../../../crates/reqvire-core/src/tool_interface.rs)
+  * satisfiedBy: [vocabulary.rs](../../../crates/reqvire-core/src/semantic_contract/vocabulary.rs)
+  * satisfiedBy: [semantic_tools.rs](../../../crates/reqvire-core/src/tool_interface/semantic_tools.rs)
   * verifiedBy: [MCP Semantic Vocabulary Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-semantic-vocabulary-tools-verification)
 ---
 
@@ -261,6 +264,7 @@ The system shall execute MCP mutations through deterministic operation-specific 
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
   * verifiedBy: [MCP Mutation Execution Flow Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-mutation-execution-flow-verification)
 ---
 
@@ -298,6 +302,7 @@ The system shall expose mutation tools only through typed Reqvire core operation
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
   * verifiedBy: [MCP Mutation Tool Safety Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-mutation-tool-safety-verification)
 ---
 
@@ -345,6 +350,7 @@ The system shall expose MCP read tools for linting, coverage, verification trace
   * definedBy: [MCP Quality Traceability Tools Specification](Specifications.md#mcp-quality-traceability-tools-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
   * verifiedBy: [MCP Quality Traceability Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-quality-traceability-tools-verification)
 ---
 
@@ -370,6 +376,7 @@ The system shall expose MCP resources only as read-only, revision-tagged views o
   * definedBy: [MCP Resource Interface Specification](Specifications.md#mcp-resource-interface-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
   * verifiedBy: [MCP Resource Interface Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-resource-interface-verification)
 ---
 
@@ -394,7 +401,7 @@ The system shall provide `reqvire mcp` as the command that starts the Reqvire MC
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [main.rs](../../../crates/reqvire-cli/src/main.rs)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [tool_interface.rs](../../../crates/reqvire-core/src/tool_interface.rs)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/tool_interface/mod.rs)
   * verifiedBy: [MCP Server Command Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-server-command-verification)
   * verifiedBy: [MCP Size Estimate Startup Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-size-estimate-startup-verification)
 ---
@@ -415,6 +422,8 @@ The system shall keep MCP server cached model state subordinate to Reqvire sourc
 #### Relations
   * definedBy: [MCP Server State and Cache Specification](Specifications.md#mcp-server-state-and-cache-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+  * satisfiedBy: [arg_helpers.rs](../../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
+  * satisfiedBy: [model_cache.rs](../../../crates/reqvire-core/src/model_cache.rs)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * verifiedBy: [MCP Server State and Cache Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-server-state-and-cache-verification)
 ---
@@ -429,6 +438,7 @@ The system shall expose MCP tools through shared typed request and result interf
 - MCP protocol concerns shall remain at the adapter boundary.
 - MCP tools shall provide machine-readable discovery metadata for clients.
 - Shared Reqvire tool interfaces shall be exposed by the Reqvire library so in-process applications can discover and call the same operations without using MCP transport.
+- MCP read/report tools shall delegate operation behavior to the same shared operation layer used by matching CLI read/report commands when the operation has been migrated.
 
 #### Metadata
   * type: requirement
@@ -441,7 +451,11 @@ The system shall expose MCP tools through shared typed request and result interf
   * definedBy: [MCP Tool Call Contracts Specification](Specifications.md#mcp-tool-call-contracts-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [tool_interface.rs](../../../crates/reqvire-core/src/tool_interface.rs)
+  * satisfiedBy: [operations.rs](../../../crates/reqvire-core/src/operations/mod.rs)
+  * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
+  * satisfiedBy: [definitions.rs](../../../crates/reqvire-core/src/tool_interface/definitions.rs)
+  * satisfiedBy: [dispatch.rs](../../../crates/reqvire-core/src/tool_interface/dispatch.rs)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/tool_interface/mod.rs)
   * verifiedBy: [MCP Shared Operation Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-shared-operation-contracts-verification)
   * verifiedBy: [MCP Tool Call Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-call-contracts-verification)
 ---

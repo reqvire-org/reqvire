@@ -117,7 +117,7 @@ for TYPE in state input-output formal-proof-verification verification-objective 
 
   echo "Test 4: Valid --filter-type $TYPE is accepted by model" >> "${TEST_DIR}/test_results.log"
   set +e
-  OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --filter-type="$TYPE" --json 2>&1)
+  OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --filter-type="$TYPE" 2>&1)
   EXIT_CODE=$?
   set -e
 

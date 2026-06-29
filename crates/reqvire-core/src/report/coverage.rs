@@ -2,8 +2,9 @@ use crate::element;
 use crate::element::ContractBindingTarget;
 use crate::graph_registry::GraphRegistry;
 use crate::relation;
+use rustc_hash::{FxHashMap, FxHashSet};
 use serde::Serialize;
-use std::collections::{BTreeSet, HashMap, HashSet};
+use std::collections::BTreeSet;
 
 #[derive(Serialize)]
 pub struct CoverageReport {
@@ -88,19 +89,19 @@ struct CapabilityCoverageDetails {
 
 #[derive(Serialize)]
 struct RequirementsByFile {
-    files: HashMap<String, Vec<RequirementDetails>>,
+    files: FxHashMap<String, Vec<RequirementDetails>>,
 }
 #[derive(Serialize)]
 struct VerificationsByFile {
-    files: HashMap<String, Vec<VerificationDetails>>,
+    files: FxHashMap<String, Vec<VerificationDetails>>,
 }
 #[derive(Serialize)]
 struct CoveredRequirementsByFile {
-    files: HashMap<String, Vec<ImplementationCoveredRequirementDetails>>,
+    files: FxHashMap<String, Vec<ImplementationCoveredRequirementDetails>>,
 }
 #[derive(Serialize)]
 struct UncoveredRequirementsByFile {
-    files: HashMap<String, Vec<ImplementationUncoveredRequirementDetails>>,
+    files: FxHashMap<String, Vec<ImplementationUncoveredRequirementDetails>>,
 }
 
 #[derive(Serialize, Clone)]
@@ -149,8 +150,8 @@ fn round_to_two_decimals(value: f64) -> f64 {
 
 fn find_directly_satisfied_descendant(
     start_requirement: &str,
-    children_by_requirement: &HashMap<String, Vec<String>>,
-    direct_satisfaction: &HashMap<String, Vec<String>>,
+    children_by_requirement: &FxHashMap<String, Vec<String>>,
+    direct_satisfaction: &FxHashMap<String, Vec<String>>,
 ) -> Option<String> {
     let mut stack: Vec<String> = children_by_requirement
         .get(start_requirement)
@@ -175,7 +176,7 @@ fn find_directly_satisfied_descendant(
 
 impl CoverageReport {
     pub fn to_json_string(&self) -> String {
-        serde_json::to_string_pretty(&self).unwrap()
+        serde_json::to_string_pretty(&self).expect("failed to serialize JSON")
     }
 
     pub fn print(&self, json_output: bool) {
@@ -489,22 +490,25 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         demonstration: 0,
     };
 
-    let mut verified_leaf_files: HashMap<String, Vec<RequirementDetails>> = HashMap::new();
-    let mut unverified_leaf_files: HashMap<String, Vec<RequirementDetails>> = HashMap::new();
-    let mut verified_leaf_ids: HashSet<String> = HashSet::new();
-    let mut unverified_leaf_ids: HashSet<String> = HashSet::new();
-    let mut satisfied_test_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
-    let mut unsatisfied_test_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
-    let mut orphaned_verifications_files: HashMap<String, Vec<VerificationDetails>> =
-        HashMap::new();
-    let mut covered_requirements_files: HashMap<
+    let mut verified_leaf_files: FxHashMap<String, Vec<RequirementDetails>> = FxHashMap::default();
+    let mut unverified_leaf_files: FxHashMap<String, Vec<RequirementDetails>> =
+        FxHashMap::default();
+    let mut verified_leaf_ids: FxHashSet<String> = FxHashSet::default();
+    let mut unverified_leaf_ids: FxHashSet<String> = FxHashSet::default();
+    let mut satisfied_test_files: FxHashMap<String, Vec<VerificationDetails>> =
+        FxHashMap::default();
+    let mut unsatisfied_test_files: FxHashMap<String, Vec<VerificationDetails>> =
+        FxHashMap::default();
+    let mut orphaned_verifications_files: FxHashMap<String, Vec<VerificationDetails>> =
+        FxHashMap::default();
+    let mut covered_requirements_files: FxHashMap<
         String,
         Vec<ImplementationCoveredRequirementDetails>,
-    > = HashMap::new();
-    let mut uncovered_requirements_files: HashMap<
+    > = FxHashMap::default();
+    let mut uncovered_requirements_files: FxHashMap<
         String,
         Vec<ImplementationUncoveredRequirementDetails>,
-    > = HashMap::new();
+    > = FxHashMap::default();
 
     // First pass: collect all verification counts
     for element in registry.get_all_elements() {
@@ -611,10 +615,10 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         })
         .collect();
 
-    let mut owned_contracts: HashMap<String, Vec<String>> = HashMap::new();
-    let mut children_by_requirement: HashMap<String, Vec<String>> = HashMap::new();
-    let mut contract_bindings_consumers: HashMap<String, Vec<String>> = HashMap::new();
-    let mut direct_satisfaction: HashMap<String, Vec<String>> = HashMap::new();
+    let mut owned_contracts: FxHashMap<String, Vec<String>> = FxHashMap::default();
+    let mut children_by_requirement: FxHashMap<String, Vec<String>> = FxHashMap::default();
+    let mut contract_bindings_consumers: FxHashMap<String, Vec<String>> = FxHashMap::default();
+    let mut direct_satisfaction: FxHashMap<String, Vec<String>> = FxHashMap::default();
 
     for req in &requirements {
         // Direct implementation evidence
@@ -678,7 +682,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         consumers.dedup();
     }
 
-    let mut impl_coverage: HashMap<String, CoverageState> = HashMap::new();
+    let mut impl_coverage: FxHashMap<String, CoverageState> = FxHashMap::default();
     for req in &requirements {
         // direct_satisfied
         if let Some(evidence) = direct_satisfaction.get(&req.identifier) {
@@ -950,13 +954,13 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
 
 fn build_capability_coverage(
     registry: &GraphRegistry,
-    children_by_requirement: &HashMap<String, Vec<String>>,
-    verified_leaf_ids: &HashSet<String>,
-    unverified_leaf_ids: &HashSet<String>,
-    impl_coverage: &HashMap<String, CoverageState>,
+    children_by_requirement: &FxHashMap<String, Vec<String>>,
+    verified_leaf_ids: &FxHashSet<String>,
+    unverified_leaf_ids: &FxHashSet<String>,
+    impl_coverage: &FxHashMap<String, CoverageState>,
 ) -> Vec<CapabilityCoverageDetails> {
-    let mut capability_children: HashMap<String, Vec<String>> = HashMap::new();
-    let mut capability_requirements: HashMap<String, Vec<String>> = HashMap::new();
+    let mut capability_children: FxHashMap<String, Vec<String>> = FxHashMap::default();
+    let mut capability_requirements: FxHashMap<String, Vec<String>> = FxHashMap::default();
 
     for element in registry.get_all_elements() {
         if !matches!(element.element_type, element::ElementType::Capability) {
@@ -1110,7 +1114,7 @@ struct CoverageState {
 
 fn collect_requirement_subtree_ids(
     roots: Option<&Vec<String>>,
-    children_by_requirement: &HashMap<String, Vec<String>>,
+    children_by_requirement: &FxHashMap<String, Vec<String>>,
 ) -> BTreeSet<String> {
     let mut result = BTreeSet::new();
     let mut stack = roots.cloned().unwrap_or_default();
@@ -1132,7 +1136,7 @@ fn collect_requirement_subtree_ids(
 
 fn collect_capability_subtree_ids(
     root: &str,
-    capability_children: &HashMap<String, Vec<String>>,
+    capability_children: &FxHashMap<String, Vec<String>>,
 ) -> BTreeSet<String> {
     let mut result = BTreeSet::new();
     let mut stack = vec![root.to_string()];
@@ -1153,8 +1157,8 @@ fn collect_capability_subtree_ids(
 
 fn count_leaf_requirements<'a, I>(
     requirement_ids: I,
-    verified_leaf_ids: &HashSet<String>,
-    unverified_leaf_ids: &HashSet<String>,
+    verified_leaf_ids: &FxHashSet<String>,
+    unverified_leaf_ids: &FxHashSet<String>,
 ) -> usize
 where
     I: Iterator<Item = &'a String>,

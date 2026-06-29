@@ -152,7 +152,7 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Diagram Contract Bindings Display Contract Specification](Specifications.md#diagram-contract-bindings-display-contract-specification)
   * definedBy: [Explorer Mermaid Diagram Style Specification](Specifications.md#explorer-mermaid-diagram-style-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * satisfiedBy: [verification_trace.rs](../../../crates/reqvire-core/src/verification_trace.rs)
   * verifiedBy: [Diagram Contract Bindings Display Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#diagram-contract-bindings-display-verification)
 ---
@@ -172,7 +172,7 @@ Implementation details shall follow the associated contract specifications.
   * derive: [Model View Element Navigation](#model-view-element-navigation)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
 ---
 
 ### Model View Element Navigation
@@ -188,7 +188,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Model View Element Navigation Contract Specification](Specifications.md#model-view-element-navigation-contract-specification)
   * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * verifiedBy: [Model View Element Navigation Test](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-view-element-navigation-test)
 ---
 
@@ -410,6 +410,7 @@ The Traces view shall:
   * type: requirement
 
 #### Contract Bindings
+  * [Browser Trace Diagram Generation Contract Specification](../../Reports/ModelReports/Specifications.md#browser-trace-diagram-generation-contract-specification)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations

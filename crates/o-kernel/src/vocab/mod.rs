@@ -2,6 +2,8 @@ use oxigraph::model::{NamedOrBlankNode, Term};
 
 pub mod reserved;
 
+pub use reserved::{OWL_NS, RDFS_NS, RDF_NS, SHACL_NS, XSD_NS};
+
 pub const MODULE: &str = "vocab";
 
 pub const RDF_TYPE: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
@@ -112,6 +114,28 @@ pub const SH_SPARQL: &str = "http://www.w3.org/ns/shacl#sparql";
 pub const SH_SELECT: &str = "http://www.w3.org/ns/shacl#select";
 pub const SH_CLOSED: &str = "http://www.w3.org/ns/shacl#closed";
 pub const SH_IGNORED_PROPERTIES: &str = "http://www.w3.org/ns/shacl#ignoredProperties";
+
+pub const SKOS_NS: &str = "http://www.w3.org/2004/02/skos/core#";
+pub const SKOS_ONTOLOGY: &str = "http://www.w3.org/2004/02/skos/core";
+pub const SKOS_CONCEPT: &str = "http://www.w3.org/2004/02/skos/core#Concept";
+pub const SKOS_CONCEPT_SCHEME: &str = "http://www.w3.org/2004/02/skos/core#ConceptScheme";
+pub const SKOS_PREF_LABEL: &str = "http://www.w3.org/2004/02/skos/core#prefLabel";
+pub const SKOS_DEFINITION: &str = "http://www.w3.org/2004/02/skos/core#definition";
+pub const SKOS_SCOPE_NOTE: &str = "http://www.w3.org/2004/02/skos/core#scopeNote";
+pub const SKOS_IN_SCHEME: &str = "http://www.w3.org/2004/02/skos/core#inScheme";
+pub const SKOS_HAS_TOP_CONCEPT: &str = "http://www.w3.org/2004/02/skos/core#hasTopConcept";
+pub const SKOS_TOP_CONCEPT_OF: &str = "http://www.w3.org/2004/02/skos/core#topConceptOf";
+pub const SKOS_BROADER: &str = "http://www.w3.org/2004/02/skos/core#broader";
+pub const SKOS_NARROWER: &str = "http://www.w3.org/2004/02/skos/core#narrower";
+pub const SKOS_RELATED: &str = "http://www.w3.org/2004/02/skos/core#related";
+pub const SKOS_EXACT_MATCH: &str = "http://www.w3.org/2004/02/skos/core#exactMatch";
+pub const SKOS_CLOSE_MATCH: &str = "http://www.w3.org/2004/02/skos/core#closeMatch";
+pub const SKOS_BROAD_MATCH: &str = "http://www.w3.org/2004/02/skos/core#broadMatch";
+pub const SKOS_NARROW_MATCH: &str = "http://www.w3.org/2004/02/skos/core#narrowMatch";
+pub const SKOS_RELATED_MATCH: &str = "http://www.w3.org/2004/02/skos/core#relatedMatch";
+pub const SKOS_ALT_LABEL: &str = "http://www.w3.org/2004/02/skos/core#altLabel";
+pub const SKOS_HIDDEN_LABEL: &str = "http://www.w3.org/2004/02/skos/core#hiddenLabel";
+pub const SKOS_EXAMPLE: &str = "http://www.w3.org/2004/02/skos/core#example";
 
 pub fn subject_iri(subject: &NamedOrBlankNode) -> Option<&str> {
     match subject {

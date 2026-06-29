@@ -549,3 +549,34 @@ Usage guidelines for selecting appropriate verification types.
 #### Metadata
   * type: specification
 ---
+
+### In-Memory Model Build Cache Specification
+
+#### Details
+The cache is a static `Mutex<Option<CachedModel>>` global holding the most recently built `ModelManager` together with the `CacheKey` that produced it.
+
+**Cache key:**
+- `options: ModelBuildOptions` — the full build-option struct (including `lenient` and `with_size_estimates`). Two different option sets always produce different keys.
+- `files: BTreeMap<PathBuf, FileFingerprint>` — a sorted map of every scanned markdown file to its content fingerprint.
+- `FileFingerprint = { len: u64, content_hash: String }` — file byte length plus a content hash of the file contents.
+
+**Fingerprint computation:**
+- Files are discovered by scanning the same markdown files the parser would consider (`utils::scan_markdown_files`), using the same exclusion patterns.
+- For each file, contents are read and hashed. Added, removed, or modified files change the fingerprint and force a rebuild.
+
+**Load path (`load_cached_model`):**
+1. Compute the fingerprint and key.
+2. Lock the cache and compare keys. On a match, clone and return the stored model without re-parsing.
+3. On a miss, release the lock, rebuild via `ModelManager::parse_and_validate_with_options`, then store a clone of the rebuilt model under the new key and return the clone.
+
+**Invalidation (`invalidate`):**
+- Clears the stored entry, forcing the next `load_cached_model` call to rebuild. Called after every CRUD write in `tool_interface.rs` (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-asset, rm-asset).
+
+**Scope:**
+- Only the current working tree is cached. Git-commit history scans (`parse_and_validate`) bypass the cache entirely.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [In-Memory Model Build Cache](ModelManagement.md#in-memory-model-build-cache)

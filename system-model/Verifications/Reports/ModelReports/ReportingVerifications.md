@@ -2,7 +2,7 @@
 
 ### Reporting, Search, Coverage, and Model Export Verification Objective
 
-This objective groups verification that Reqvire reporting commands expose collect, search, coverage, traces, containment, resources, submodels, model traversal, JSON, and diagram output correctly.
+This objective groups verification that Reqvire reporting commands expose collect, search, coverage, traces, containment, resources, submodels, model traversal, and JSON output correctly.
 
 #### Metadata
   * type: verification-objective
@@ -15,8 +15,6 @@ This objective groups verification that Reqvire reporting commands expose collec
   * derive: [Containment Hierarchy Extraction Test](#containment-hierarchy-extraction-test)
   * derive: [Containment View Design Documents Test](#containment-view-design-documents-test)
   * derive: [Containment View JSON Output Test](#containment-view-json-output-test)
-  * derive: [Containment View Mermaid Diagram Test](#containment-view-mermaid-diagram-test)
-  * derive: [Containment View Text Output Test](#containment-view-text-output-test)
   * derive: [Custom Element Type Tracking Test](#custom-element-type-tracking-test)
   * derive: [JSON Element Size Estimate Output Verification](#json-element-size-estimate-output-verification)
   * derive: [Model Command Verification](#model-command-verification)
@@ -31,7 +29,6 @@ This objective groups verification that Reqvire reporting commands expose collec
   * derive: [Submodels Report Verification](#submodels-report-verification)
   * derive: [Verification Coverage Report Test](#verification-coverage-report-test)
   * derive: [Verification Traces Filter Options Test](#verification-traces-filter-options-test)
-  * derive: [Verification Traces From-Folder Test](#verification-traces-from-folder-test)
 ---
 
 ### CLI Collect Command Test
@@ -145,16 +142,17 @@ This test verifies that the collect command aggregates capability, requirement, 
 
 ### CLI JSON File Output Test
 
-This test verifies that the `--output` flag writes JSON output to a file when used with `--json` across CLI commands.
+This test verifies that the `--output` flag writes JSON output to a file across CLI commands that emit JSON.
 
 #### Details
 
 ##### Acceptance Criteria
-- `--output <FILE>` writes JSON to file when combined with `--json`
-- All public commands that expose `--json`, including relation and asset mutation commands, support the same `--output <FILE>` behavior
+- `--output <FILE>` writes JSON to file when combined with `--json` for commands that still expose selectable JSON output
+- JSON-only commands such as `model`, `containment`, `resources`, and `traces` accept `--output <FILE>` directly
+- All public commands that emit JSON, including relation and asset mutation commands, support the same `--output <FILE>` behavior
 - Confirmation message printed to stdout: `✅ Output saved to <filepath>`
-- File contains valid JSON identical to what `--json` alone would produce on stdout
-- `--output` without `--json` produces an error and non-zero exit code
+- File contains valid JSON identical to what the same command would produce on stdout
+- `--output` without JSON output selection produces an error and non-zero exit code only for commands that still have non-JSON output modes
 - File is created if it doesn't exist
 - File is overwritten if it exists
 
@@ -375,128 +373,6 @@ This test verifies that the system generates valid, well-structured JSON output 
   * verify: [Containment View Report](../../../Reports/ModelReports/ReportingRequirements.md#containment-view-report)
 ---
 
-### Containment View Mermaid Diagram Test
-
-This test verifies that the system generates valid Mermaid flowchart diagrams with correct syntax, nested subgraphs, semantic element classes, and clickable links.
-
-#### Details
-
-##### Test Criteria
-1. **Mermaid syntax validation:**
-   - Verify output starts with `flowchart TD`
-   - Verify all subgraphs use correct syntax: `subgraph ID ["Label"]`
-   - Verify subgraphs are properly closed with `end`
-   - Test diagram can be rendered by Mermaid parser
-   - Validate with mermaid-cli or online editor
-
-2. **Subgraph structure:**
-   - Verify folders use deterministic subgraph labels
-   - Verify files use deterministic subgraph labels
-   - Verify subgraphs are properly nested
-   - Test nested structure: folder → subfolder → file
-   - Verify `direction TB` is set for nested subgraphs
-
-3. **Element nodes:**
-   - Verify nodes use 16-character hash IDs
-   - Verify node labels show element names
-   - Verify hash IDs are unique across diagram
-   - Test hash ID generation is deterministic
-   - Verify nodes are placed within file subgraphs
-
-4. **Semantic classes:**
-   - Verify `class` directives for element types
-   - Test capability, requirement, verification, and default node classes are emitted from element type semantics
-   - Verify class definitions or semantic class names are included for supported Mermaid consumers
-   - Verify generated class names are deterministic and usable by the Explorer Mermaid renderer
-
-5. **Clickable links:**
-   - Verify `click` directives for all element nodes
-   - Verify links use correct format: `click hashId "path#fragment"`
-   - Verify paths are relative to diagram location
-   - Test links with special characters in fragments
-   - Verify fragment normalization (lowercase, hyphens)
-
-6. **Deterministic output:**
-   - Verify node ordering is consistent
-   - Verify hash IDs are stable across runs
-   - Compare output across multiple executions
-   - Test byte-identical output
-
-7. **Element display modes:**
-   - Default mode (no flags): verify ALL elements are displayed in each file
-   - With `--short` flag: verify only root elements are displayed (those without hierarchical parents in same file)
-   - Verify element count changes appropriately between modes
-   - Verify description text reflects current display mode
-
-##### Acceptance Criteria
-- Mermaid diagram syntax is valid
-- Subgraphs correctly represent folder/file hierarchy
-- Element nodes use hash IDs and show names
-- Styling classes are applied correctly
-- Clickable links navigate to correct elements
-- Output is deterministic
-- Default mode shows all elements
-- Short mode shows only root elements
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
-  * verify: [Containment View Report](../../../Reports/ModelReports/ReportingRequirements.md#containment-view-report)
----
-
-### Containment View Text Output Test
-
-This test verifies that the system generates correctly formatted human-readable text output for the containment view with proper indentation and element metadata display.
-
-#### Details
-
-##### Test Criteria
-1. **Hierarchical indentation:**
-   - Verify indentation uses 2 spaces per level
-   - Test nested structure: root (0), folder (2), subfolder (4), file (6), element (8)
-   - Verify consistent indentation across all levels
-
-2. **Container markers:**
-   - Verify folders display with a stable folder marker and name
-   - Verify files display with a stable file marker and path
-   - Verify elements display with `[<type>] <name>`
-   - Test all element types have correct bracket notation
-
-3. **Element type display:**
-   - Test `[requirement]` for requirements
-   - Test `[capability]` for capability elements
-   - Test `[verification]` and `[test-verification]` for verifications
-   - Test custom element types
-
-4. **Content accuracy:**
-   - Verify all folders are displayed
-   - Verify all files are displayed with correct paths
-   - Verify all elements are displayed with correct names
-   - Test empty folders and files are handled correctly
-
-5. **Output format validation:**
-   - Verify output is valid UTF-8 text
-   - Verify line breaks are consistent
-   - Test output matches expected format exactly
-   - Compare against reference output
-
-##### Acceptance Criteria
-- Text output uses correct indentation (2 spaces per level)
-- Container markers are displayed correctly
-- Element types are shown in brackets
-- All hierarchy levels are represented
-- Output is human-readable and well-formatted
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
-  * verify: [Containment View Report](../../../Reports/ModelReports/ReportingRequirements.md#containment-view-report)
----
-
 ### Custom Element Type Tracking Test
 
 This test verifies that the system correctly tracks and displays custom element types in model summary reports, providing accurate counts in both text and JSON output formats.
@@ -596,7 +472,7 @@ Expected checks:
 - Run model JSON output without size estimates and verify element payloads omit `size_estimate`.
 - Run model JSON output with size estimates enabled and verify top-level element payloads include `size_estimate`.
 - Verify nested relation element targets include `size_estimate` when size estimates are enabled.
-- Verify non-JSON model output remains unchanged and does not render size-estimate fields.
+- Verify the canonical model JSON remains unchanged except for the explicit size-estimate fields.
 - Verify the size estimate has `content_bytes`, `rendered_context_bytes`, and `estimated_tokens`.
 
 #### Metadata
@@ -615,17 +491,14 @@ Comprehensive test verifying model command generates model-centric nested output
 #### Details
 
 ##### Acceptance Criteria
-1. `reqvire model` generates model-centric output showing ontology-root and capability-root structures with nested relations
+1. `reqvire model` generates JSON model-centric output showing ontology-root and capability-root structures with nested relations
 2. `reqvire model --from=<name>` generates nested structure starting from specified element
-3. `reqvire model --json` generates valid JSON with nested element structure
-4. `reqvire model --from=<name> --json` generates filtered JSON from specified starting point
-5. Default mode filters to top-level model roots according to model traversal rules
-6. `reqvire model --mmd` generates pure Mermaid flowchart text without a Markdown wrapper
-7. Relations contain full target element details recursively
+3. Default mode filters to top-level model roots according to model traversal rules
+4. Relations contain full target element details recursively
 
 ##### Test Criteria
 1. **Default Model Output (Model Roots)**
-   Command: `reqvire model --json`
+   Command: `reqvire model`
    - exits code **0**
    - output parses as valid JSON
    - JSON contains `elements` array with model roots at top level
@@ -634,29 +507,15 @@ Comprehensive test verifying model command generates model-centric nested output
    - Nested relations contain full element details recursively
 
 2. **Filtered Model Output (From Specific Element)**
-   Command: `reqvire model --from=<test-element-name> --json`
+   Command: `reqvire model --from=<test-element-name>`
    - exits code **0**
    - output parses as valid JSON
    - JSON elements array contains specified element at top level
    - metadata.filtered_from contains element name
    - Only forward-related elements appear in nested structure
 
-3. **Markdown Output with Mermaid Diagrams**
+3. **Nested JSON Structure Validation**
    Command: `reqvire model`
-   - exits code **0**
-   - output contains metadata (Total Elements, Total Relations)
-   - output contains Mermaid diagram blocks showing all nested relations
-   - diagrams use hash identifiers for node IDs
-
-4. **Pure Mermaid Output**
-   Command: `reqvire model --mmd`
-   - exits code **0**
-   - output begins with Mermaid graph syntax
-   - output does not contain Markdown fenced code blocks
-   - output includes ontology, capability, requirement, and contract_bindings edges when present in the model context
-
-5. **Nested JSON Structure Validation**
-   Command: `reqvire model --json`
    - JSON has keys: `elements`, `metadata`
    - Each element has: `identifier`, `name`, `element_type`, `file_path`, `section`, `section_index`, `relations`, `contract_bindings`
    - Each relation has: `relation_type`, target (element/file/external)
@@ -666,14 +525,14 @@ Comprehensive test verifying model command generates model-centric nested output
    - Contract Bindings is an array of contract element identifier strings (empty array if no contract_bindings)
    - Metadata has: `total_elements`, `total_relations`, `filtered_from`
 
-5. **Forward-Only Traversal Verification**
+4. **Forward-Only Traversal Verification**
    - Create test with element A that derives B, and B derives C
    - Running `reqvire model --from=<A-name>` includes B and C nested in relations
    - Create element D that is derived from B (backward relation)
    - Running `reqvire model --from=<A-name>` includes B and C but NOT D
    - Confirms only forward relations (derive, satisfiedBy, verifiedBy, trace) are followed
 
-6. **Cycle Detection Verification**
+5. **Cycle Detection Verification**
    - System prevents infinite recursion when cycles exist in forward relations
    - Nested structure handles circular dependencies gracefully
    - Each element appears at most once in traversal
@@ -684,7 +543,7 @@ Comprehensive test verifying model command generates model-centric nested output
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
   * verify: [Forward-Only Relation Traversal](../../../Reports/ModelReports/ReportingRequirements.md#forward-only-relation-traversal)
-  * verify: [Model Diagram Output Formats](../../../Reports/ModelReports/ReportingRequirements.md#model-diagram-output-formats)
+  * verify: [Model JSON Output Format](../../../Reports/ModelReports/ReportingRequirements.md#model-json-output-format)
 ---
 
 ### Model Containment Report Integration Test
@@ -801,7 +660,7 @@ This test verifies that the resources command correctly generates reports showin
 - Report shall have two main sections: Relations and Contract Bindings
 - Relations section lists files alphabetically by path
 - Contract Bindings section lists contract identifiers alphabetically
-- Each entry shows referencing elements with markdown links
+- Each entry shows referencing element identifiers and names
 
 **Relations Section:**
 - Includes files from InternalPath relation targets (satisfiedBy, trace, etc.)
@@ -813,8 +672,7 @@ This test verifies that the resources command correctly generates reports showin
 - Each reference shows source element
 - References sorted by element identifier
 
-**Output Formats:**
-- Text output uses markdown formatting with headers and bullet lists
+**Output Format:**
 - JSON output provides structured data with relations, contract_bindings, and summary
 
 **Explorer Integration:**
@@ -822,21 +680,19 @@ This test verifies that the resources command correctly generates reports showin
 - Supporting report routes are reachable through canonical route links or source/report affordances, not a shared top header
 
 ##### Test Criteria
-1. **Basic text output**
+1. **Basic JSON output**
    Command: `reqvire resources`
-   - exits code **0**
-   - output contains "## Relations" section header
-   - output contains "## Contract Bindings" section header
-   - files are listed with ### headers
-   - referencing elements shown as bullet points with markdown links
-
-2. **JSON output structure**
-   Command: `reqvire resources --json`
    - exits code **0**
    - output parses under `jq`
    - contains `relations` array with file_path and references
    - contains `contract_bindings` array with identifier and references
    - contains `summary` with totals
+
+2. **Explicit output file**
+   Command: `reqvire resources --output resources.json`
+   - exits code **0**
+   - file content parses under `jq`
+   - file contains `relations`, `contract_bindings`, and `summary`
 
 3. **Relations section content**
    - satisfiedBy relations to code files appear in Relations section
@@ -854,8 +710,8 @@ This test verifies that the resources command correctly generates reports showin
    - Consistent ordering across multiple runs
 
 6. **Empty sections handling**
-   - If no InternalPath relations exist, Relations section shows appropriate message
-   - If no contract_bindings identifiers exist, Contract Bindings section shows appropriate message
+   - If no InternalPath relations exist, Relations array is empty and summary count is zero
+   - If no contract_bindings identifiers exist, Contract Bindings array is empty and summary count is zero
 
 #### Metadata
   * type: test-verification
@@ -1236,17 +1092,13 @@ This test verifies that the system correctly generates verification coverage rep
 
 ### Verification Traces Filter Options Test
 
-This test verifies that the verification-traces command filter options work correctly when generating upward trace trees from verification elements to owning capability roots.
+This test verifies that the `traces` command filter options work correctly when generating upward trace trees from verification elements to owning capability roots.
 
 #### Details
 
 ##### Acceptance Criteria
 - System shall provide CLI command `traces` that generates upward trace trees from verifications
-- Command shall output to stdout in Markdown format with embedded Mermaid diagrams by default
-- Command shall support `--json` flag for structured JSON output without diagrams
-- Mermaid diagrams shall show verification element as root with arrows following relation semantics
-- Mermaid diagrams shall include clickable links on all nodes (verifications and requirements)
-- Directly verified requirements shall be marked/highlighted in diagrams using CSS classes
+- Command shall output structured JSON by default
 - System shall traverse all upward parent relations to reach owning capability roots
 - System shall merge multiple verification paths into single tree per verification
 - System shall support `--filter-id=<id>` filter for specific verification element
@@ -1256,129 +1108,38 @@ This test verifies that the verification-traces command filter options work corr
 - JSON output shall include verification ID, directly verified requirements, and complete trace tree structure
 
 ##### Test Criteria
-1. **Basic Markdown Output**
-   Command: `reqvire verification-traces`
-   - exits code **0**
-   - output contains `# Verification Traceability Report`
-   - output contains Mermaid diagram blocks with `graph BT`
-   - diagrams include verification element nodes and requirement nodes
-   - diagrams include click handlers for all nodes (format: `click NODE_ID "url"`)
-   - directly verified requirements have `:::verified` CSS class in diagram
-
-2. **JSON Output**
-   Command: `reqvire verification-traces --json`
+1. **Basic JSON Output**
+   Command: `reqvire traces`
    - exits code **0**
    - output parses as valid JSON
-   - JSON contains `verifications` array
-   - each verification includes `verification_id`, `verification_name`, `verification_type`
+   - JSON contains `files` object grouping verifications by source file
+   - each verification includes `identifier`, `name`, `type`
    - each verification includes `directly_verified_requirements` array
    - each verification includes `trace_tree` with nested requirement structure
 
-3. **Correct Arrow Directions**
-   - Mermaid diagrams use `SYS001 -.->|verify| VER001` or `CAP001 -.->|verify| VER001` format (verified element links to verification)
-   - Mermaid diagrams use `USER001 -.->|derive| SYS001` format (parent derives child)
-   - Arrow directions match Reqvire relation semantics (TargetToElement, ElementToTarget)
-
-4. **Specific Verification Filter**
-   Command: `reqvire verification-traces --filter-id="specifications/Verifications/ValidationTests.md#invalid-relations-test"`
+2. **Specific Verification Filter**
+   Command: `reqvire traces --filter-id="specifications/Verifications/ValidationTests.md#invalid-relations-test"`
    - exits code **0**
    - output contains only trace for specified verification
    - other verifications are excluded
 
-5. **Name Pattern Filter**
-   Command: `reqvire verification-traces --filter-name=".*Coverage.*"`
+3. **Name Pattern Filter**
+   Command: `reqvire traces --filter-name=".*Coverage.*"`
    - exits code **0**
    - output contains only verifications matching regex pattern
    - non-matching verifications are excluded
 
-6. **Type Filter**
-   Command: `reqvire verification-traces --filter-type="test-verification"`
+4. **Type Filter**
+   Command: `reqvire traces --filter-type="test-verification"`
    - exits code **0**
    - output contains only test-verification elements
    - analysis, inspection, demonstration, and formal proof verifications are excluded
 
-7. **Combined Filters**
-   Command: `reqvire verification-traces --filter-type="test-verification" --filter-name=".*Test"`
+5. **Combined Filters**
+   Command: `reqvire traces --filter-type="test-verification" --filter-name=".*Test"`
    - exits code **0**
    - output contains only verifications matching ALL filter criteria (AND logic)
    - verifications matching only one filter are excluded
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
-  * verify: [CLI Traces Command](../../../Interfaces/CLI/Commands.md#cli-traces-command)
----
-
-### Verification Traces From-Folder Test
-
-This test verifies that the --from-folder option correctly generates relative links in verification traces output when the output file will be saved in a specific folder location.
-
-#### Details
-
-##### Acceptance Criteria
-- System shall provide `--from-folder=<path>` option for `traces` command
-- Option shall accept a relative path to the folder where output will be saved
-- When `diagrams_with_blobs` is false (default), generated Mermaid diagram links shall be relative to the specified folder
-- When `diagrams_with_blobs` is true with Git info, links shall remain as GitHub blob URLs (absolute)
-- Links shall be correctly calculated so they work when output file is saved in the from-folder location
-- Option shall work with both Markdown and JSON output formats
-- Option shall work in combination with filter options
-
-##### Test Criteria
-1. **Basic From-Folder Option**
-   Command: `reqvire traces --from-folder=docs/reports`
-   - exits code **0**
-   - output contains Mermaid diagrams with click handlers
-   - click handler links are relative paths calculated from `docs/reports/` to git root
-   - example: if element identifier is `specifications/file.md#element`, link should be `../../specifications/file.md#element`
-
-2. **From-Folder with Current Directory**
-   Command: `reqvire traces --from-folder=.`
-   - exits code **0**
-   - links are relative to current directory (git root)
-   - same as omitting --from-folder option
-
-3. **From-Folder with Nested Path**
-   Command: `reqvire traces --from-folder=output/verification/traces`
-   - exits code **0**
-   - links correctly navigate up three levels then to specifications
-   - example: `../../specifications/file.md#element` becomes `../../../specifications/file.md#element`
-
-4. **From-Folder with JSON Output**
-   Command: `reqvire traces --from-folder=docs/reports --json`
-   - exits code **0**
-   - JSON output parses correctly
-   - JSON element identifiers remain absolute (from git root)
-   - from-folder only affects Markdown diagram links, not JSON structure
-
-5. **From-Folder Combined with Filters**
-   Command: `reqvire traces --from-folder=docs/reports --filter-type=test-verification`
-   - exits code **0**
-   - filtering works correctly
-   - generated links still relative to `docs/reports/`
-
-6. **From-Folder with Git Blobs Enabled**
-   Environment: `diagrams_with_blobs=true` in config
-   Command: `reqvire traces --from-folder=docs/reports`
-   - exits code **0**
-   - links remain as GitHub blob URLs (absolute)
-   - from-folder has no effect on external GitHub links
-
-7. **From-Folder Path Calculation Correctness**
-   - For from-folder `a/b/c` and identifier `specs/req.md#id`:
-     - Link should be `../../../specs/req.md#id`
-   - For from-folder `output` and identifier `specifications/Requirements.md#element`:
-     - Link should be `../specifications/Requirements.md#element`
-   - Path traversal (..) count matches folder depth
-
-8. **From-Folder Special Case for Root**
-   Command: `reqvire traces --from-folder=/`
-   - exits code **0**
-   - identifiers remain as git-root-relative paths (no relative path calculation)
-   - links use identifiers as-is (e.g., `specifications/file.md#element`)
-   - special case `/` indicates reqvire root (git root)
 
 #### Metadata
   * type: test-verification

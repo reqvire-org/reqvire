@@ -70,12 +70,12 @@ pub fn write_file<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, content: C) -> Result
         create_dir_all(parent)?;
     }
 
-    fs::write(path.as_ref(), content).map_err(|e| ReqvireError::IoError(e))
+    fs::write(path.as_ref(), content).map_err(ReqvireError::IoError)
 }
 
 /// Create directory and any parent directories if they don't exist
 pub fn create_dir_all<P: AsRef<Path>>(path: P) -> Result<(), ReqvireError> {
-    fs::create_dir_all(path.as_ref()).map_err(|e| ReqvireError::IoError(e))
+    fs::create_dir_all(path.as_ref()).map_err(ReqvireError::IoError)
 }
 
 /// Creates a temporary working directory with a unique name based on process ID

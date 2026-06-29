@@ -7,7 +7,7 @@
 use crate::element::Element;
 use crate::graph_registry::GraphRegistry;
 use crate::relation::VERIFICATION_TRACES_RELATIONS;
-use std::collections::HashSet;
+use rustc_hash::FxHashSet;
 
 /// Build upward trace tree from a list of directly linked requirements
 /// Returns a list of redundant requirement IDs (ancestors that are also directly linked)
@@ -23,14 +23,14 @@ pub fn find_redundant_relations(
     registry: &GraphRegistry,
 ) -> Vec<String> {
     // Track which ancestors are reachable from each directly-linked requirement
-    let mut reachable_from: std::collections::HashMap<String, HashSet<String>> =
-        std::collections::HashMap::new();
+    let mut reachable_from: rustc_hash::FxHashMap<String, FxHashSet<String>> =
+        rustc_hash::FxHashMap::default();
 
     // Build reachability map from each directly-linked requirement
     for req_id in directly_linked {
         if let Some(req) = registry.get_element(req_id) {
-            let mut visited = HashSet::new();
-            let mut ancestors = HashSet::new();
+            let mut visited = FxHashSet::default();
+            let mut ancestors = FxHashSet::default();
             collect_ancestors(req, &mut visited, &mut ancestors, registry);
             reachable_from.insert(req_id.clone(), ancestors);
         }
@@ -39,7 +39,7 @@ pub fn find_redundant_relations(
     // Find redundant requirements: a directly-linked requirement is redundant
     // if it's reachable from MULTIPLE (≥2) OTHER directly-linked requirements
     // This detects "branching redundancy" where multiple paths converge on the same node
-    let mut redundant = HashSet::new();
+    let mut redundant = FxHashSet::default();
     for req_id in directly_linked {
         // Count how many OTHER directly-linked requirements can reach this one
         let mut reachable_count = 0;
@@ -64,8 +64,8 @@ pub fn find_redundant_relations(
 /// Recursively collect all ancestor IDs reachable from a requirement
 fn collect_ancestors(
     requirement: &Element,
-    visited: &mut HashSet<String>,
-    ancestors: &mut HashSet<String>,
+    visited: &mut FxHashSet<String>,
+    ancestors: &mut FxHashSet<String>,
     registry: &GraphRegistry,
 ) {
     // Prevent cycles

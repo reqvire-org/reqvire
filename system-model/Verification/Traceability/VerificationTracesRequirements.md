@@ -32,7 +32,7 @@ The system shall implement a verification roll-up strategy where parent requirem
 #### Relations
   * definedBy: [Verification Roll-up Specification](Specifications.md#verification-roll-up-specification)
   * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
-  * satisfiedBy: [report_coverage.rs](../../../crates/reqvire-core/src/report_coverage.rs)
+  * satisfiedBy: [coverage.rs](../../../crates/reqvire-core/src/report/coverage.rs)
 ---
 
 ### Verification Trace Builder

@@ -12,30 +12,11 @@ use reqvire::error::ReqvireError;
 
 #[tokio::main]
 async fn main() {
-    if std::env::var("RUST_LOG").is_err() {
-        std::env::set_var("RUST_LOG", "error");
-    }
-
     let args = Args::parse_args();
 
-    // Check if any command uses JSON output to suppress logs
-    let uses_json = match &args.command {
-        Some(cli::Commands::ChangeImpact { json, .. }) => *json,
-        Some(cli::Commands::Format { json, .. }) => *json,
-        Some(cli::Commands::Search { json, .. }) => *json,
-        Some(cli::Commands::Traces { json, .. }) => *json,
-        Some(cli::Commands::Coverage { json, .. }) => *json,
-        Some(cli::Commands::Concepts {
-            command: cli::ConceptCommands::Validate { json, .. },
-        }) => *json,
-        _ => false,
-    };
-
-    if uses_json {
-        std::env::set_var("RUST_LOG", "error");
-    }
-
-    env_logger::init();
+    // Configure logging without mutating the process environment. Default to
+    // `error` when RUST_LOG is unset so logs do not corrupt structured stdout.
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("error")).init();
 
     if let Err(err) = apply_workspace(args.workspace.as_ref()) {
         error!("{}", err);
@@ -50,6 +31,15 @@ async fn main() {
                 ReqvireError::ValidationError(errors) => {
                     let mut messages: Vec<String> =
                         errors.iter().map(|err| err.to_string()).collect();
+                    messages.sort();
+                    eprintln!("Validation failed with {} error(s):", messages.len());
+                    for (idx, msg) in messages.iter().enumerate() {
+                        eprintln!("{}. {}", idx + 1, msg);
+                    }
+                }
+                ReqvireError::ValidationDiagnostics { related_errors, .. } => {
+                    let mut messages: Vec<String> =
+                        related_errors.iter().map(|err| err.to_string()).collect();
                     messages.sort();
                     eprintln!("Validation failed with {} error(s):", messages.len());
                     for (idx, msg) in messages.iter().enumerate() {

@@ -20,6 +20,27 @@ Boundary rules:
   * define: [MCP Interface](InterfacesRequirements.md#mcp-interface)
 ---
 
+### Shared Core Operation Layer Specification
+
+Reqvire operation semantics are expected to be owned by core request/result APIs that can be called by more than one external adapter.
+
+#### Details
+Contract rules:
+- A shared operation owns model-loading decisions where applicable, validation gates, report construction, mutation preview/application behavior where applicable, and result evidence for its operation scope.
+- CLI and MCP adapters may add transport-specific parsing, output rendering, protocol metadata, and error wrapping, but must not fork the underlying operation behavior.
+- Stable operation outputs shall be represented as structured Rust result types before CLI JSON serialization or MCP `structuredContent` wrapping.
+- Shared operations shall cover element lookup, search, model, collect, submodels, resources, coverage, traces, containment, lint, format, and change-impact behavior before broader mutation operations are migrated.
+- Semantic read/query helpers remain a separate semantic-tool adapter scope until they are explicitly migrated into the shared operation layer.
+- Mutation operation sharing shall include explicit dry-run, diff, persistence, post-mutation validation, and cache invalidation semantics before adapters are converted.
+- Adapter tests should cover at least one representative operation through CLI and MCP-facing paths when an operation is migrated.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Shared Core Operation Layer](InterfacesRequirements.md#shared-core-operation-layer)
+---
+
 ### Web Interface Contract Specification
 
 #### Details

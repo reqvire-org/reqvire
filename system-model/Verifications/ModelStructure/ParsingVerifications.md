@@ -16,6 +16,7 @@ This objective groups verification that Reqvire parses element structure, subsec
   * derive: [Non-Reserved Subsections Content Test](#non-reserved-subsections-content-test)
   * derive: [Requirement Governance Metadata Verification](#requirement-governance-metadata-verification)
   * derive: [Specification File Identification Test](#specification-file-identification-test)
+  * derive: [In-Memory Model Build Cache Verification](#in-memory-model-build-cache-verification)
 ---
 
 ### Contract Element Type Parsing Test
@@ -391,4 +392,34 @@ This test verifies that the system only parses markdown files where the first H1
 #### Relations
   * satisfiedBy: [test.sh](../../../tests/test-gitignore-integration/test.sh)
   * verify: [Specification File Identification](../../ModelStructure/StructureAndParsing.md#specification-file-identification)
+---
+
+
+### In-Memory Model Build Cache Verification
+
+This verification shall prove that the in-memory model build cache returns cached models on unchanged workspaces and rebuilds after content changes or CRUD invalidation.
+
+#### Details
+
+##### Acceptance Criteria
+- Two consecutive `reqvire.read_element` (or `reqvire.search`) calls over an unchanged workspace return equal results, demonstrating a cache hit without re-parsing.
+- Modifying, adding, or removing a `.md` file changes the workspace fingerprint and triggers a rebuild so the new content is reflected.
+- After a CRUD write (e.g. `reqvire.add_element`), the cache is invalidated and the next read reflects the newly added element.
+- Changing `with_size_estimates` or `lenient` build options produces a different cache key and an appropriately different model.
+- Git-commit scan paths (`--git-commit`) do not use the cache.
+
+##### Test Criteria
+1. Start a `reqvire mcp` server against a fixture workspace.
+2. Issue two identical `reqvire.read_element` (or `reqvire.search`) calls back-to-back; assert both return the same element set (cache hit, no re-parse).
+3. Issue a `reqvire.add_element` CRUD call to add a new element; assert the call succeeds.
+4. Issue another `reqvire.search`; assert the newly added element is present, proving `invalidate()` cleared the cache and forced a rebuild.
+5. Modify, add, or remove a `.md` file and issue a read; assert the result reflects the change (fingerprint change forces rebuild).
+6. Run a `reqvire change-impact --git-commit=<hash>` scan and confirm it does not consult the cache.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../tests/test-cache-integration/test.sh)
+  * verify: [In-Memory Model Build Cache](../../ModelStructure/ModelManagement.md#in-memory-model-build-cache)
 ---

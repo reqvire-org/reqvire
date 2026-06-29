@@ -1,38 +1,25 @@
 # Elements
 
-### Interactive Mermaid Diagrams
+### Browser Trace Diagram Generation
 
-The system shall produce interactive visual representations of relationships within the System model in the form of Mermaid diagrams, enabling users to explore relations, navigate the model structure, and understand dependencies.
+When displaying Explorer trace views, the browser client shall generate per-verification Mermaid roll-up diagrams from Project Store trace data without requiring CLI Markdown or Mermaid report output.
 
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
-  * definedBy: [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
-  * definedBy: [Mermaid Interactive Capabilities Specification](Specifications.md#mermaid-interactive-capabilities-specification)
-  * derive: [Diagram Generation](#diagram-generation)
-  * derivedFrom: [Model Reports](ReportingRequirements.md#model-reports)
----
-
-### Diagram Generation
-
-When requested through reporting commands, the system shall generate Mermaid diagrams with relation filtering in command output without mutating authored model files.
+#### Details
+Trace diagrams define the report-owned trace diagram data and roll-up behavior. WebExplorer trace rendering reuses this behavior through contract bindings from the Traces view requirement.
 
 #### Metadata
   * type: requirement
 
 #### Relations
+  * definedBy: [Browser Trace Diagram Generation Contract Specification](Specifications.md#browser-trace-diagram-generation-contract-specification)
   * derive: [Interactive Mermaid Diagram Node Behavior](#interactive-mermaid-diagram-node-behavior)
-  * derive: [Reqvire Relationship Rendering](#reqvire-relationship-rendering)
-  * derivedFrom: [Interactive Mermaid Diagrams](#interactive-mermaid-diagrams)
-  * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * derivedFrom: [Model Reports](ReportingRequirements.md#model-reports)
+  * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
 ---
 
 ### Interactive Mermaid Diagram Node Behavior
 
-The system shall implement interactive click behavior for Mermaid diagram nodes emitted by model, containment, and trace report outputs.
+The Explorer trace view shall implement interactive click behavior for Mermaid diagram nodes rendered from browser-generated trace roll-up diagrams.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -41,12 +28,9 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Relations
-  * definedBy: [Mermaid Diagram Link Behavior](Behaviors.md#mermaid-diagram-link-behavior)
   * definedBy: [Interactive Mermaid Diagram Node Behavior Contract Specification](Specifications.md#interactive-mermaid-diagram-node-behavior-contract-specification)
-  * derivedFrom: [Diagram Generation](#diagram-generation)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * derivedFrom: [Browser Trace Diagram Generation](#browser-trace-diagram-generation)
+  * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
 ---
 
 ### Reqvire Relationship Rendering
@@ -67,6 +51,6 @@ Each relation type has specific visual properties and directional semantics defi
 
 #### Relations
   * definedBy: [Reqvire Relation Rendering Specification](Specifications.md#reqvire-relation-rendering-specification)
-  * derivedFrom: [Diagram Generation](#diagram-generation)
-  * satisfiedBy: [diagrams.rs](../../../crates/reqvire-core/src/diagrams.rs)
+  * derivedFrom: [Browser Trace Diagram Generation](#browser-trace-diagram-generation)
+  * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
 ---

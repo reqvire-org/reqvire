@@ -1,34 +1,31 @@
 use crate::error::ReqvireError;
 use crate::git_commands;
-use anyhow::Result;
 use globset::GlobSet;
 use log::debug;
 use pathdiff::diff_paths;
 use regex::Regex;
 use rustc_hash::FxHasher;
-use std::cell::RefCell;
 use std::hash::Hasher;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::LazyLock;
 use walkdir::WalkDir;
 
-thread_local! {
-    static QUIET_MODE: RefCell<bool> = const { RefCell::new(false) };
-}
+static QUIET_MODE: AtomicBool = AtomicBool::new(false);
 
 /// Enable quiet mode (suppress verbose output)
 pub fn enable_quiet_mode() {
-    QUIET_MODE.with(|quiet| *quiet.borrow_mut() = true);
+    QUIET_MODE.store(true, Ordering::Relaxed);
 }
 
 /// Disable quiet mode (show verbose output)
 pub fn disable_quiet_mode() {
-    QUIET_MODE.with(|quiet| *quiet.borrow_mut() = false);
+    QUIET_MODE.store(false, Ordering::Relaxed);
 }
 
 /// Check if quiet mode is enabled
 pub fn is_quiet_mode() -> bool {
-    QUIET_MODE.with(|quiet| *quiet.borrow())
+    QUIET_MODE.load(Ordering::Relaxed)
 }
 
 /// Prints to stdout only if quiet mode is not enabled
@@ -648,7 +645,7 @@ fn normalize_nonlink_identifier(input: &str) -> (String, String) {
 
 /// Cached regex for markdown link extraction
 static MARKDOWN_LINK_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^\[(.+?)\]\((.+?)\)$").unwrap());
+    LazyLock::new(|| Regex::new(r"^\[(.+?)\]\((.+?)\)$").expect("invalid regex pattern"));
 
 /// Extracts text and link from a Markdown-style link if present.
 pub fn extract_markdown_link(input: &str) -> Option<(String, String)> {

@@ -246,6 +246,103 @@
       "contract_bindings": []
     },
     {
+      "identifier": "specifications/Verifications/Tests.md#json-output-format-test",
+      "name": "JSON Output Format Test",
+      "element_type": "test-verification",
+      "file_path": "specifications/Verifications/Tests.md",
+      "file_order_index": 4,
+      "relations": [
+        {
+          "relation_type": "derivedFrom",
+          "element": {
+            "identifier": "specifications/Verifications/Tests.md#verification-objective",
+            "name": "Verification Objective",
+            "element_type": "verification-objective",
+            "file_path": "specifications/Verifications/Tests.md",
+            "file_order_index": 0,
+            "relations": [],
+            "contract_bindings": []
+          }
+        },
+        {
+          "relation_type": "verify",
+          "element": {
+            "identifier": "specifications/SystemRequirements.md#default-json-output-format",
+            "name": "Default JSON Output Format",
+            "element_type": "requirement",
+            "file_path": "specifications/SystemRequirements.md",
+            "file_order_index": 4,
+            "relations": [
+              {
+                "relation_type": "derivedFrom",
+                "element": {
+                  "identifier": "specifications/Capabilities.md#model-structure-exploration",
+                  "name": "Model Structure Exploration",
+                  "element_type": "requirement",
+                  "file_path": "specifications/Capabilities.md",
+                  "file_order_index": 1,
+                  "relations": [
+                    {
+                      "relation_type": "specify",
+                      "element": {
+                        "identifier": "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md",
+                        "name": "Test Capability Test Model Command Specifications Capabilities Md",
+                        "element_type": "capability",
+                        "file_path": "specifications/Capabilities.md",
+                        "file_order_index": 0,
+                        "relations": [],
+                        "contract_bindings": []
+                      }
+                    }
+                  ],
+                  "contract_bindings": []
+                }
+              }
+            ],
+            "contract_bindings": []
+          }
+        },
+        {
+          "relation_type": "verify",
+          "element": {
+            "identifier": "specifications/SystemRequirements.md#json-output-format",
+            "name": "JSON Output Format",
+            "element_type": "requirement",
+            "file_path": "specifications/SystemRequirements.md",
+            "file_order_index": 6,
+            "relations": [
+              {
+                "relation_type": "derivedFrom",
+                "element": {
+                  "identifier": "specifications/SystemRequirements.md#model-diagram-generation",
+                  "name": "Model Diagram Generation",
+                  "element_type": "requirement",
+                  "file_path": "specifications/SystemRequirements.md",
+                  "file_order_index": 0,
+                  "relations": [],
+                  "contract_bindings": []
+                }
+              }
+            ],
+            "contract_bindings": []
+          }
+        },
+        {
+          "relation_type": "verify",
+          "element": {
+            "identifier": "specifications/SystemRequirements.md#output-format-flag-removal",
+            "name": "Output Format Flag Removal",
+            "element_type": "requirement",
+            "file_path": "specifications/SystemRequirements.md",
+            "file_order_index": 5,
+            "relations": [],
+            "contract_bindings": []
+          }
+        }
+      ],
+      "contract_bindings": []
+    },
+    {
       "identifier": "specifications/Verifications/Tests.md#model-generation-test",
       "name": "Model Generation Test",
       "element_type": "test-verification",
@@ -299,103 +396,6 @@
                 }
               }
             ],
-            "contract_bindings": []
-          }
-        }
-      ],
-      "contract_bindings": []
-    },
-    {
-      "identifier": "specifications/Verifications/Tests.md#output-format-test",
-      "name": "Output Format Test",
-      "element_type": "test-verification",
-      "file_path": "specifications/Verifications/Tests.md",
-      "file_order_index": 4,
-      "relations": [
-        {
-          "relation_type": "derivedFrom",
-          "element": {
-            "identifier": "specifications/Verifications/Tests.md#verification-objective",
-            "name": "Verification Objective",
-            "element_type": "verification-objective",
-            "file_path": "specifications/Verifications/Tests.md",
-            "file_order_index": 0,
-            "relations": [],
-            "contract_bindings": []
-          }
-        },
-        {
-          "relation_type": "verify",
-          "element": {
-            "identifier": "specifications/SystemRequirements.md#json-output-format",
-            "name": "JSON Output Format",
-            "element_type": "requirement",
-            "file_path": "specifications/SystemRequirements.md",
-            "file_order_index": 6,
-            "relations": [
-              {
-                "relation_type": "derivedFrom",
-                "element": {
-                  "identifier": "specifications/SystemRequirements.md#model-diagram-generation",
-                  "name": "Model Diagram Generation",
-                  "element_type": "requirement",
-                  "file_path": "specifications/SystemRequirements.md",
-                  "file_order_index": 0,
-                  "relations": [
-                    {
-                      "relation_type": "derivedFrom",
-                      "element": {
-                        "identifier": "specifications/Capabilities.md#model-structure-exploration",
-                        "name": "Model Structure Exploration",
-                        "element_type": "requirement",
-                        "file_path": "specifications/Capabilities.md",
-                        "file_order_index": 1,
-                        "relations": [
-                          {
-                            "relation_type": "specify",
-                            "element": {
-                              "identifier": "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md",
-                              "name": "Test Capability Test Model Command Specifications Capabilities Md",
-                              "element_type": "capability",
-                              "file_path": "specifications/Capabilities.md",
-                              "file_order_index": 0,
-                              "relations": [],
-                              "contract_bindings": []
-                            }
-                          }
-                        ],
-                        "contract_bindings": []
-                      }
-                    }
-                  ],
-                  "contract_bindings": []
-                }
-              }
-            ],
-            "contract_bindings": []
-          }
-        },
-        {
-          "relation_type": "verify",
-          "element": {
-            "identifier": "specifications/SystemRequirements.md#markdown-output-format",
-            "name": "Markdown Output Format",
-            "element_type": "requirement",
-            "file_path": "specifications/SystemRequirements.md",
-            "file_order_index": 4,
-            "relations": [],
-            "contract_bindings": []
-          }
-        },
-        {
-          "relation_type": "verify",
-          "element": {
-            "identifier": "specifications/SystemRequirements.md#pure-mermaid-output-format",
-            "name": "Pure Mermaid Output Format",
-            "element_type": "requirement",
-            "file_path": "specifications/SystemRequirements.md",
-            "file_order_index": 5,
-            "relations": [],
             "contract_bindings": []
           }
         }
