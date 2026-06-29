@@ -16,7 +16,7 @@ use reqvire::explorer_runtime::{
     build_runtime_assets, embedded_asset, index_html, is_workspace_asset_path,
     ExplorerRuntimeAssets,
 };
-use reqvire::{ModelBuildOptions, ModelManager};
+use reqvire::{model_cache, ModelBuildOptions};
 
 #[derive(Clone)]
 pub(crate) struct ServeState {
@@ -181,9 +181,7 @@ async fn runtime_asset_response(
 }
 
 async fn refresh_runtime_assets(state: &ServeState) -> Result<(), ReqvireError> {
-    let mut model = ModelManager::new();
-    model.parse_and_validate_with_options(
-        None,
+    let model = model_cache::load_cached_model(
         state.excluded_filename_patterns.as_ref(),
         ModelBuildOptions {
             lenient: false,

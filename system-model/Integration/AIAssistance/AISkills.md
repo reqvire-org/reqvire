@@ -45,6 +45,9 @@ Artifact contract details shall follow the associated contract specification.
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [MCP Prompt Guidance Specification](../../Interfaces/MCP/Specifications.md#mcp-prompt-guidance-specification)
+
 #### Relations
   * definedBy: [AI Skills Markdown Artifact Specification](#ai-skills-markdown-artifact-specification)
   * derivedFrom: [AI Assistant Skill-Guided Reqvire Modeling](#ai-assistant-skill-guided-reqvire-modeling)

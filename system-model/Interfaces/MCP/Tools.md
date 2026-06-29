@@ -122,8 +122,8 @@ The system shall expose MCP prompts that guide regular Reqvire workflows and sem
 #### Details
 - The MCP interface shall advertise the standard MCP prompts capability.
 - The MCP interface shall support `prompts/list` and `prompts/get` for Reqvire-authored prompt templates.
-- Prompt templates shall include regular Reqvire model exploration, change planning, and verification coverage review workflows.
-- Prompt templates shall include semantic query, semantic verification search, and semantic contract-context search workflows.
+- Prompt templates shall include regular Reqvire model exploration, change planning, implementation task generation, capability/requirement authoring, verification authoring/alignment, model-structure refactoring, change-impact audit, concept authoring, model-quality audit, and verification coverage review workflows.
+- Prompt templates shall include semantic query, semantic verification search, semantic contract-context search, and ontology/semantic-contract authoring workflows.
 - Semantic prompt templates shall direct clients to use `reqvire.semantic.vocabulary`, `reqvire.semantic.prefixes`, and `reqvire.semantic.sparql` for ontology-aware questions, and shall state that `include_external` exposes only the used external subset (`reqvire:external-used-subset`) rather than raw external dependency files.
 - Prompt templates shall be imported into Rust at build time and shall not be read from workspace source files at runtime.
 - Prompt retrieval shall not mutate the model or filesystem.

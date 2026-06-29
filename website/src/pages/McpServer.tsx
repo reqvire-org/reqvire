@@ -147,7 +147,7 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             },
             {
               name: "Prompts",
-              desc: "MCP prompts provide build-time guidance for regular Reqvire exploration, change planning, coverage review, semantic query construction, semantic verification search, and contract-context search.",
+              desc: "MCP prompts provide build-time guidance for Reqvire exploration, authoring, refactoring, change-impact audit, task generation, model-quality review, coverage review, semantic query construction, semantic verification search, contract-context search, and ontology/semantic-contract authoring.",
             },
           ]}
         />
@@ -171,10 +171,18 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
           items={[
             "reqvire.workflow.explore_model",
             "reqvire.workflow.plan_change",
+            "reqvire.workflow.generate_implementation_tasks",
+            "reqvire.workflow.author_capability_requirement",
+            "reqvire.workflow.author_or_align_verification",
+            "reqvire.workflow.refactor_model_structure",
+            "reqvire.workflow.audit_change_impact",
+            "reqvire.workflow.author_concepts",
+            "reqvire.workflow.model_quality_audit",
             "reqvire.workflow.verify_coverage",
             "reqvire.semantic.query",
             "reqvire.semantic.verification_search",
             "reqvire.semantic.contract_context_search",
+            "reqvire.semantic.author_ontology_contract",
           ]}
         />
       </Section>
