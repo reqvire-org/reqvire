@@ -11,10 +11,17 @@ From the root directory:
 ./tests/run_tests.sh
 ```
 
+The runner always prints a final benchmark summary. The elapsed time is the
+sum of time spent inside `reqvire` binary invocations; fixture copy, temporary
+git setup, shell assertions, and diff checks are not included. Each test result
+line also shows the total Reqvire time for all Reqvire calls made by that test.
+
 ### Run Specific Test
 ```bash
 ./tests/run_tests.sh test-diagram-generation
 ```
+
+The same Reqvire timing summary is printed for a single test.
 
 ### Build Before Testing
 Tests use the debug binary:
