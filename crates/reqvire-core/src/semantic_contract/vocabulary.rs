@@ -6,10 +6,10 @@ pub(super) enum RelationProjectionDirection {
     Inverse,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct NormalizedRelationProjection {
-    pub(super) forward_property: &'static str,
-    pub(super) inverse_property: &'static str,
+    pub(super) forward_property: String,
+    pub(super) inverse_property: String,
     pub(super) direction: RelationProjectionDirection,
 }
 
@@ -44,7 +44,12 @@ pub(super) fn build_ontology_projection(
         }
     }
 
-    let projection = constructs::classify_ontology_constructs_with_sources(&sourced_quads);
+    let projection = constructs::classify_ontology_constructs_with_sources_and_options(
+        &sourced_quads,
+        &constructs::OntologyConstructClassifierOptions {
+            id_namespace: "urn:reqvire".to_string(),
+        },
+    );
     kernel_projection_to_reqvire_graph(&projection, &source_lookup)
 }
 
@@ -366,15 +371,4 @@ pub(super) fn projection_term_key(term: &OntologyProjectionTerm) -> String {
     format!("{}:{}", term.kind.as_str(), term.value)
 }
 
-pub(super) fn stable_hash(value: &str) -> String {
-    const FNV_OFFSET: u64 = 0xcbf29ce484222325;
-    const FNV_PRIME: u64 = 0x100000001b3;
-
-    let mut hash = FNV_OFFSET;
-    for byte in value.as_bytes() {
-        hash ^= u64::from(*byte);
-        hash = hash.wrapping_mul(FNV_PRIME);
-    }
-
-    format!("{hash:016x}")
-}
+pub(super) use o_kernel::stable::stable_hash;

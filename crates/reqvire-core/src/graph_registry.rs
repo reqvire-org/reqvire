@@ -36,7 +36,7 @@ use content_merge::{
     merge_ontology_blocks_into_target, replace_single_fenced_subsection,
 };
 
-use validation::concept_validation_local_name;
+use crate::concept::concept_local_name as concept_validation_local_name;
 
 fn concept_namespace_iri(base: &str) -> String {
     format!("{}#", base.trim_end_matches('#'))

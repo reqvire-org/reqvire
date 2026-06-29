@@ -858,13 +858,10 @@ fn apply_ontology_document_ownership(
     nodes: &mut BTreeMap<String, OntologyGraphNode>,
     report: &SemanticIndex,
 ) {
-    let mut document_by_element = BTreeMap::new();
+    let document_by_element = report.ontology_document_by_element();
     let mut ontology_document_iris = BTreeSet::new();
     for document in &report.ontology_documents {
         ontology_document_iris.insert(document.iri.as_str());
-        for element_identifier in &document.element_identifiers {
-            document_by_element.insert(element_identifier.as_str(), document.iri.as_str());
-        }
     }
 
     for node in nodes.values_mut() {
@@ -908,30 +905,68 @@ fn ensure_node_with_layer(
     layer: &str,
     block: &SemanticBlock,
 ) {
+    let semantic_update = is_datatype_iri(id).then_some("datatype");
+    let source = source_metadata(block);
+    let source_kind = source_kind_for_block(block);
+    let semantic_type = default_semantic_type(id, node_type);
+    upsert_ontology_graph_node(
+        nodes,
+        OntologyGraphNodeUpsert {
+            id: id.to_string(),
+            label: clean_uri(id),
+            node_type,
+            semantic_type,
+            layer,
+            source_kind,
+            full_uri: id.to_string(),
+            source,
+            semantic_update,
+        },
+    );
+}
+
+struct OntologyGraphNodeUpsert<'a> {
+    id: String,
+    label: String,
+    node_type: &'a str,
+    semantic_type: &'a str,
+    layer: &'a str,
+    source_kind: &'a str,
+    full_uri: String,
+    source: OntologyGraphSource,
+    semantic_update: Option<&'static str>,
+}
+
+fn upsert_ontology_graph_node(
+    nodes: &mut BTreeMap<String, OntologyGraphNode>,
+    upsert: OntologyGraphNodeUpsert<'_>,
+) {
     nodes
-        .entry(id.to_string())
+        .entry(upsert.id.clone())
         .and_modify(|node| {
-            upgrade_node_type(&mut node.node_type, node_type);
-            add_node_source(node, block);
-            if is_datatype_iri(id) {
-                upgrade_semantic_type_string(&mut node.semantic_type, "datatype");
+            upgrade_node_type(&mut node.node_type, upsert.node_type);
+            if let Some(semantic_type) = upsert.semantic_update {
+                upgrade_semantic_type_string(&mut node.semantic_type, semantic_type);
+            }
+            if !node.sources.contains(&upsert.source) {
+                node.sources.push(upsert.source.clone());
             }
         })
         .or_insert_with(|| OntologyGraphNode {
-            id: id.to_string(),
-            label: clean_uri(id),
-            node_type: node_type.to_string(),
-            semantic_type: default_semantic_type(id, node_type).to_string(),
-            layer: layer.to_string(),
-            source_kind: source_kind_for_block(block).to_string(),
-            full_uri: id.to_string(),
+            id: upsert.id,
+            label: upsert.label,
+            node_type: upsert.node_type.to_string(),
+            semantic_type: upsert.semantic_type.to_string(),
+            layer: upsert.layer.to_string(),
+            source_kind: upsert.source_kind.to_string(),
+            full_uri: upsert.full_uri,
             ontology_document: String::new(),
             scheme_iri: String::new(),
             scheme_label: String::new(),
             comment: "None specified.".to_string(),
             rdf_types: Vec::new(),
             type_evidence: Vec::new(),
-            sources: vec![source_metadata(block)],
+            sources: vec![upsert.source],
             constraints: Vec::new(),
             badges: Vec::new(),
             equivalence_group: String::new(),
@@ -1435,51 +1470,25 @@ fn ensure_projection_node(
                 "owl"
             }
         });
-    nodes
-        .entry(id.clone())
-        .and_modify(|node| {
-            upgrade_node_type(&mut node.node_type, node_type);
-            if let Some(semantic_hint) = semantic_hint {
-                upgrade_semantic_type_string(&mut node.semantic_type, semantic_hint);
-            } else if is_datatype_iri(&id) {
-                upgrade_semantic_type_string(&mut node.semantic_type, "datatype");
-            }
-            if !node.sources.contains(&source) {
-                node.sources.push(source.clone());
-            }
-        })
-        .or_insert_with(|| {
-            let semantic_type = semantic_hint
-                .or_else(|| projection_term_semantic_hint(term))
-                .unwrap_or_else(|| default_semantic_type(&id, node_type))
-                .to_string();
-            OntologyGraphNode {
-                id: id.clone(),
-                label: projection_node_label(term, semantic_hint),
-                node_type: visual_node_type_for_semantic_type(&semantic_type).to_string(),
-                semantic_type,
-                layer: GRAPH_LAYER_AUTHORED.to_string(),
-                source_kind: source_kind_from_source_value(&source.kind).to_string(),
-                full_uri: id,
-                ontology_document: String::new(),
-                scheme_iri: String::new(),
-                scheme_label: String::new(),
-                comment: "None specified.".to_string(),
-                rdf_types: Vec::new(),
-                type_evidence: Vec::new(),
-                sources: vec![source.clone()],
-                constraints: Vec::new(),
-                badges: Vec::new(),
-                equivalence_group: String::new(),
-                inverse_properties: Vec::new(),
-                property_chains: Vec::new(),
-                domain: Vec::new(),
-                range: Vec::new(),
-                literal_values: Vec::new(),
-                slot_facets: Vec::new(),
-                constructs: Vec::new(),
-            }
-        });
+    let semantic_type = semantic_hint
+        .or_else(|| projection_term_semantic_hint(term))
+        .unwrap_or_else(|| default_semantic_type(&id, node_type));
+    let semantic_update = semantic_hint.or_else(|| is_datatype_iri(&id).then_some("datatype"));
+    let source_kind = source_kind_from_source_value(&source.kind);
+    upsert_ontology_graph_node(
+        nodes,
+        OntologyGraphNodeUpsert {
+            id: id.clone(),
+            label: projection_node_label(term, semantic_hint),
+            node_type: visual_node_type_for_semantic_type(semantic_type),
+            semantic_type,
+            layer: GRAPH_LAYER_AUTHORED,
+            source_kind,
+            full_uri: id,
+            source,
+            semantic_update,
+        },
+    );
 }
 
 fn push_construct_detail(node: &mut OntologyGraphNode, construct: &OntologyConstruct) {
@@ -1543,14 +1552,13 @@ fn construct_detail(construct: &OntologyConstruct) -> OntologyGraphConstructDeta
 }
 
 fn source_metadata_from_projection(source: &OntologyProjectionSource) -> OntologyGraphSource {
-    OntologyGraphSource {
-        source: source.source_element_identifier.clone(),
-        source_name: source.source_name.clone(),
-        file_path: source.file_path.clone(),
-        line_number: source.line_number,
-        kind: source.source_block.clone(),
-        link: source_html_link(&source.source_element_identifier, &source.file_path),
-    }
+    ontology_graph_source_metadata(
+        &source.source_element_identifier,
+        &source.source_name,
+        &source.file_path,
+        source.line_number,
+        &source.source_block,
+    )
 }
 
 fn symbol_badge(symbol: &OntologySymbol) -> OntologyGraphBadge {
@@ -1805,21 +1813,30 @@ fn shape_overlay_kind_label(kind: OntologyShapeOverlayKind) -> &'static str {
     }
 }
 
-fn add_node_source(node: &mut OntologyGraphNode, block: &SemanticBlock) {
-    let source = source_metadata(block);
-    if !node.sources.contains(&source) {
-        node.sources.push(source);
-    }
+fn source_metadata(block: &SemanticBlock) -> OntologyGraphSource {
+    ontology_graph_source_metadata(
+        &block.source,
+        &block.source_name,
+        &block.file_path,
+        block.line_number,
+        block.kind.as_str(),
+    )
 }
 
-fn source_metadata(block: &SemanticBlock) -> OntologyGraphSource {
+fn ontology_graph_source_metadata(
+    source: &str,
+    source_name: &str,
+    file_path: &str,
+    line_number: usize,
+    kind: &str,
+) -> OntologyGraphSource {
     OntologyGraphSource {
-        source: block.source.clone(),
-        source_name: block.source_name.clone(),
-        file_path: block.file_path.clone(),
-        line_number: block.line_number,
-        kind: block.kind.as_str().to_string(),
-        link: source_html_link(&block.source, &block.file_path),
+        source: source.to_string(),
+        source_name: source_name.to_string(),
+        file_path: file_path.to_string(),
+        line_number,
+        kind: kind.to_string(),
+        link: source_html_link(source, file_path),
     }
 }
 
@@ -2228,15 +2245,8 @@ mod tests {
         OntologyProjectionGraph, OntologyTermDeclaration, OntologyTermRole, SemanticBlock,
         SemanticBlockKind, SemanticIndex, SemanticIndexSummary,
     };
-    use oxigraph::io::{RdfFormat, RdfParser};
+    use crate::test_support::parse_test_quads;
     use rustc_hash::FxHashMap;
-
-    fn parse_test_quads(turtle: &str) -> Vec<oxigraph::model::Quad> {
-        RdfParser::from_format(RdfFormat::Turtle)
-            .for_reader(turtle.as_bytes())
-            .map(|quad| quad.expect("test Turtle should parse"))
-            .collect()
-    }
 
     fn ontology_block(content: &str) -> SemanticBlock {
         SemanticBlock {

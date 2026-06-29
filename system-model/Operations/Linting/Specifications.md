@@ -210,7 +210,7 @@ Redundant verify relation detection behavior:
 - Detects cases where a verification directly verifies both a leaf requirement and its ancestor.
 - Uses verification trace tree analysis to determine ancestor reachability.
 - Treats leaf verification as sufficient when hierarchy roll-up already covers ancestors.
-- Reuses trace-tree logic from [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder).
+- Reuses trace-tree logic from [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction).
 - Reports redundant direct verify relations as model noise.
 - Categorizes these findings as auto-fixable.
 

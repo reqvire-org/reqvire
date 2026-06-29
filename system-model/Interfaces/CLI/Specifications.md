@@ -3,7 +3,12 @@
 ### CLI Add Element Command Contract Specification
 
 #### Details
-The `add` command behavior is governed by the reused create-element workflow, override behavior, and ontology-aware mutation contracts.
+The `add` command accepts element content from stdin or `--content`, validates the target location, applies create-element workflow semantics, and returns the shared mutation result shape.
+
+Command-specific rules:
+- It must invoke the shared create-element workflow for parsing, relation validation, ordering, persistence, dry-run diff output, and JSON output.
+- Override mode must reuse Create Element Override Behavior, including ontology-aware rebasing when the replaced element is an ontology element.
+- It must not implement a separate relation or ontology mutation path outside the shared model-operation contracts.
 
 #### Metadata
   * type: specification
@@ -12,7 +17,12 @@ The `add` command behavior is governed by the reused create-element workflow, ov
 ### CLI Collect Command Contract Specification
 
 #### Details
-The `collect` command behavior is governed by the reused collection traversal and output contracts.
+The `collect` command exposes the report collection contracts as a CLI operation.
+
+Command-specific rules:
+- It must accept a start capability, requirement, or ontology context supported by the collect traversal specification.
+- It must delegate traversal, contract_bindings inclusion, source citation, and output payload shape to Collect Content Specification and Collect Output Format Specification.
+- It must not define command-local traversal rules.
 
 #### Metadata
   * type: specification
@@ -21,7 +31,12 @@ The `collect` command behavior is governed by the reused collection traversal an
 ### CLI Coverage Command Contract Specification
 
 #### Details
-The `coverage` command behavior is governed by the reused coverage report contracts.
+The `coverage` command exposes verification coverage and requirement implementation coverage reports.
+
+Command-specific rules:
+- It must select the shared coverage report engines rather than computing coverage in the CLI layer.
+- It must preserve the shared JSON output contract when machine-readable output is requested.
+- It must keep verification type selection, implementation coverage evidence classification, and text formatting in the reused coverage contracts.
 
 #### Metadata
   * type: specification
@@ -137,7 +152,13 @@ Command output is written to stdout for easy redirection to files.
 ### CLI Merge Element Command Contract Specification
 
 #### Details
-The `merge` command behavior is governed by the reused merge content, compatibility, and workflow contracts.
+The `merge` command exposes the shared merge-element workflow through the CLI.
+
+Command-specific rules:
+- It must accept one target element and one or more source elements.
+- It must delegate type compatibility, content transformation, relation rewrites, source deletion, empty-file cleanup, and ontology merge behavior to the merge content, compatibility, and workflow contracts.
+- It must preserve JSON output behavior through the shared JSON output contract.
+- It must not implement command-local merge semantics outside the graph-backed model-operation contracts.
 
 #### Metadata
   * type: specification
@@ -173,22 +194,27 @@ Migrate command behavior:
   * define: [CLI Migrate Command](Commands.md#cli-migrate-command)
 ---
 
-### CLI Model Diagram Command Contract Specification
+### CLI Model Command Contract Specification
 
 #### Details
-The `model` command behavior is governed by the reused model-diagram output contracts.
+The `model` command behavior is governed by the reused model JSON output contracts.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * define: [CLI Model Diagram Command](Commands.md#cli-model-diagram-command)
+  * define: [CLI Model Command](Commands.md#cli-model-command)
 ---
 
 ### CLI Move Asset Command Contract Specification
 
 #### Details
-The `mv-asset` command behavior is governed by the reused asset-move and reference-update contracts.
+The `mv-asset` command moves or renames internal-path assets and updates model references through shared mutation contracts.
+
+Command-specific rules:
+- It must resolve asset paths relative to the selected workspace/git root.
+- It must update all InternalPath references that point to the moved asset.
+- It must support dry-run diff, JSON mutation output, and file persistence behavior through shared contracts.
 
 #### Metadata
   * type: specification
@@ -209,7 +235,12 @@ The `mv` command behavior is governed by the reused move workflow and target-loc
 ### CLI Move File Command Contract Specification
 
 #### Details
-The `mv-file` command behavior is governed by the reused file-move workflow and file-format contracts.
+The `mv-file` command exposes the shared file-move operation through the CLI.
+
+Command-specific rules:
+- It must accept source and target paths relative to the selected workspace/git root.
+- It must support dry-run diff and JSON mutation output through shared output contracts.
+- It must delegate relation reference updates, squash behavior, target validation, and `# Element` rejection rules to Move File Operation Contract Specification and target-location constraints.
 
 #### Metadata
   * type: specification
@@ -218,7 +249,26 @@ The `mv-file` command behavior is governed by the reused file-move workflow and 
 ### CLI Ontologies Command Contract Specification
 
 #### Details
-The semantic export command family is governed by the reused ontology collection and semantic export contracts. Canonical users should use `semantic export` and select the narrowest required layer with repeatable `--layer` flags: `ontologies`, `shapes`, `concepts`, `model`, `external-used`, and `prefixes`. Omitting `--layer` exports all public semantic layers. Turtle output follows the shared prefixed Turtle serializer contract so CLI exports contain deterministic `@prefix` declarations and safe compact prefixed names. Canonical native thesaurus workflows may use the root `concepts export` and `concepts validate` commands when the user intent is standalone concept-scheme work rather than generic semantic-layer export. Authored `reqvire:mapsToConcept` bridge triples are part of the ontology layer. Generated `reqvire:TurtlePrefixDeclaration` facts are part of the prefixes layer. The legacy `ontologies` command remains a compatibility alias for combined graph export.
+The semantic export command family is governed by the reused ontology collection and semantic export contracts. Canonical users should use `semantic export` and select the narrowest required layer with repeatable `--layer` flags.
+
+Command-specific rules:
+- `semantic export --layer ontologies` emits generated ontology document declarations plus authored OWL/RDF ontology vocabulary.
+- `semantic export --layer shapes` emits semantic-contract SHACL shapes.
+- `semantic export --layer concepts` emits SKOS concept scheme/thesaurus triples.
+- `semantic export --layer model` emits Reqvire model facts, relation-family projection facts, ontology term declarations, semantic-contract shape references, and generated ontology projection facts.
+- `semantic export --layer external-used` emits only the used external ontology subset.
+- `semantic export --layer prefixes` emits generated `reqvire:TurtlePrefixDeclaration` projection facts.
+- Omitting `--layer` exports all public semantic layers.
+- Turtle output follows the shared prefixed Turtle serializer contract; JSON-LD output remains a separate RDF serialization mode selected by `--jsonld` when supported by the selected layer.
+- `--namespace-base <IRI>` applies only to clean authored exports and must be rejected with the `model` layer.
+- Authored `reqvire:mapsToConcept` bridge triples are part of the ontology layer, not a separate mapping layer.
+- Canonical native thesaurus workflows may use `concepts export` and `concepts validate` for standalone concept-scheme work.
+- `concepts export` emits generated SKOS concept scheme/thesaurus triples, with optional `--include-mappings` for valid `reqvire:mapsToConcept` bridge triples.
+- `concepts validate` validates standalone concept schemes, concept references, and `reqvire:mapsToConcept` bridge targets through the normal model validation path.
+- No CLI flag or mode may emit complete third-party ontology source dumps.
+- `--output <FILE>` writes the selected format to a file.
+- The command must reuse the semantic index built from the graph registry instead of reparsing Turtle separately from validation.
+- The legacy `ontologies` command remains a compatibility alias for combined graph export.
 
 #### Metadata
   * type: specification
@@ -230,7 +280,12 @@ The semantic export command family is governed by the reused ontology collection
 ### CLI Relink Command Contract Specification
 
 #### Details
-The `relink` command behavior is governed by the reused relink workflow and atomic validity contracts.
+The `relink` command exposes atomic relation target replacement through the CLI.
+
+Command-specific rules:
+- It must accept a source element, relation name, old target, and new target.
+- It must delegate candidate rewiring, hierarchical boundary semantics, validation-before-persist, rollback, dry-run diff, and JSON output to the atomic relink workflow and validity contracts.
+- It must not implement command-local relation rewriting outside the shared graph-backed mutation path.
 
 #### Metadata
   * type: specification
@@ -242,7 +297,12 @@ The `relink` command behavior is governed by the reused relink workflow and atom
 ### CLI Remove Asset Command Contract Specification
 
 #### Details
-The `rm-asset` command behavior is governed by the reused asset-move/remove and output contracts.
+The `rm-asset` command removes internal-path assets and removes model references through shared mutation contracts.
+
+Command-specific rules:
+- It must resolve the asset path relative to the selected workspace/git root.
+- It must remove all InternalPath references that point to the removed asset.
+- It must support dry-run diff, JSON mutation output, and file persistence behavior through shared contracts.
 
 #### Metadata
   * type: specification
@@ -254,7 +314,11 @@ The `rm-asset` command behavior is governed by the reused asset-move/remove and 
 ### CLI Remove Element Command Contract Specification
 
 #### Details
-The `rm` command behavior is governed by the reused delete workflow and relation-cleanup contracts.
+The `rm` command exposes the shared delete-element workflow.
+
+Command-specific rules:
+- It must delete existing model elements through the shared workflow, including orphan-child prevention, semantic-contract mutation validation, relation cleanup, empty-file cleanup, dry-run diff, and JSON mutation output.
+- It must not implement command-local deletion semantics outside the graph-backed model-operation contracts.
 
 #### Metadata
   * type: specification
@@ -291,7 +355,12 @@ The command emits JSON by default and does not expose a separate output-format f
 ### CLI Search Command Contract Specification
 
 #### Details
-The `search` command behavior is governed by the reused search/filter/output contracts.
+The `search` command exposes model search, filtering, and evidence serialization.
+
+Command-specific rules:
+- It must delegate file, element, type, governance, relation, contract_bindings, short/full, and content filtering to the report search contracts.
+- Full JSON results must expose parsed semantic ADT fields for ontology and semantic-contract elements when present.
+- It must not define a separate CLI-only search schema outside the shared JSON output and search-filtering contracts.
 
 #### Metadata
   * type: specification
@@ -302,7 +371,13 @@ The `search` command behavior is governed by the reused search/filter/output con
 The CLI `--with-size-estimates` option is expected to be an opt-in JSON evidence option.
 
 #### Details
-The `--with-size-estimates` option behavior is governed by the reused report-evidence contracts. On `model`, which is JSON-only, the flag directly enriches the canonical JSON output without requiring a separate format-selection flag.
+The `--with-size-estimates` option behavior is governed by the reused report-evidence contracts.
+
+Option rules:
+- The option enables model building with element size estimates for the command invocation.
+- The option is valid only for commands that emit JSON model evidence.
+- JSON-only commands such as `model` may accept the option directly because JSON is the canonical output.
+- Commands with human-readable modes must require JSON output selection before exposing size-estimate fields.
 
 #### Metadata
   * type: specification
@@ -423,6 +498,13 @@ The CLI is expected to resolve and enter an explicitly selected workspace before
 #### Details
 The `--workspace` behavior is governed by the reused workspace-selection and startup contracts.
 
+Option rules:
+- The CLI provides a global workspace selection option.
+- Workspace selection applies before model parsing, ignore-pattern loading, git root discovery, reporting, and mutation execution.
+- Workspace selection preserves existing current-directory behavior when the option is omitted.
+- Workspace selection applies consistently to normal CLI commands and MCP server startup.
+- Invalid workspace directories are rejected before command execution.
+
 #### Metadata
   * type: specification
 
@@ -456,6 +538,13 @@ Mutating command hierarchy safety is governed by the reused validation and atomi
 #### Details
 Relation command behavior is governed by the reused relation, contract_bindings, and atomicity contracts.
 
+Command-specific rules:
+- `reqvire link <element-name> <relation> <target>` adds an authored relation unless the relation keyword is the contract binding keyword.
+- `reqvire link <element-name> bindContract <target>` adds a Contract Bindings entry to a reusable requirement-owned contract target and creates the subsection when needed.
+- `reqvire unlink <element-name> <target>` auto-detects whether the target is an authored relation target or a Contract Bindings target and removes the matching entry.
+- Contract Bindings removal removes the subsection when no entries remain.
+- The commands must preserve dry-run preview, JSON mutation output, file persistence, relation validation, contract_bindings scope validation, idempotency, and atomic failure behavior from the reused contracts.
+
 #### Metadata
   * type: specification
 
@@ -466,7 +555,13 @@ Relation command behavior is governed by the reused relation, contract_bindings,
 ### Validate Command Contract Specification
 
 #### Details
-The `validate` command behavior is governed by the reused validation strategy and output contracts.
+The `validate` command exposes the shared model validation strategy as an explicit CLI operation.
+
+Command-specific rules:
+- It must run the same two-pass validation and semantic-contract checks used by model-dependent commands.
+- It must report validation diagnostics through the shared validation error reporting and JSON output contracts.
+- It must not mutate the model or filesystem.
+- It must exit non-zero when validation fails.
 
 #### Metadata
   * type: specification

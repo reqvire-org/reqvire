@@ -2,7 +2,7 @@
 
 ### Capability Structure and Relation Shape
 
-Defines SHACL constraints for capability structure, concept-reference semantics, specification, verification, and forbidden implementation satisfaction or contract ownership edges.
+Defines SHACL constraints for capability ownership boundaries that are not part of the generic relation compatibility matrix.
 
 #### Shapes
 ```turtle
@@ -14,31 +14,7 @@ reqvire:CapabilityShape
   a sh:NodeShape ;
   sh:targetClass reqvire:Capability ;
   sh:property [
-    sh:path reqvire:derive ;
-    sh:class reqvire:Capability ;
-  ] ;
-  sh:property [
-    sh:path reqvire:derivedFrom ;
-    sh:class reqvire:Capability ;
-  ] ;
-  sh:property [
     sh:path reqvire:definedBy ;
-    sh:maxCount 0 ;
-  ] ;
-  sh:property [
-    sh:path reqvire:specifiedBy ;
-    sh:class reqvire:Requirement ;
-  ] ;
-  sh:property [
-    sh:path reqvire:verifiedBy ;
-    sh:class reqvire:Verification ;
-  ] ;
-  sh:property [
-    sh:path reqvire:satisfiedBy ;
-    sh:maxCount 0 ;
-  ] ;
-  sh:property [
-    sh:path reqvire:satisfy ;
     sh:maxCount 0 ;
   ] ;
   sh:property [
@@ -56,7 +32,7 @@ reqvire:CapabilityShape
 
 #### Relations
   * constrain: [Ontology and Semantic Contract Model](../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
-  * use: [Reqvire Capability Ontology](#reqvire-capability-ontology)
+  * use: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
 
@@ -177,7 +153,7 @@ reqvire:InputOutputShape
 
 #### Relations
   * constrain: [Contract Element Structure Constraints](../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
-  * use: [Reqvire Capability Ontology](#reqvire-capability-ontology)
+  * use: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
   * use: [Reqvire Requirement Ontology](#reqvire-requirement-ontology)
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
@@ -401,39 +377,6 @@ reqvire:RequirementOwnedContractShape
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
 
-### Reqvire Capability Ontology
-
-The Reqvire capability ontology defines capability elements as first-class operational, product, business, regulatory, or system abilities.
-
-Capabilities decompose into child capabilities, bind curated SKOS vocabulary through concept references, and derive implementation-facing requirements through `specifiedBy`/`specify`. Requirements specify capabilities and own subordinate contract details/contracts; they do not replace capability ownership of operational meaning or concept-reference context. Verification coverage for capabilities is computed from verified requirements that specify them.
-
-#### Ontology
-```turtle
-@prefix reqvire: <https://www.reqvire.org/ontology#> .
-@prefix concept: <https://www.reqvire.org/concepts#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-
-reqvire:Source a owl:Class ;
-  rdfs:subClassOf reqvire:RequirementOwnedContract ;
-  reqvire:mapsToConcept concept:RequirementContract ;
-  rdfs:comment "Requirement-owned source contract for stakeholder, regulatory, contractual, policy, or other source context that explains why a requirement exists." .
-
-reqvire:sourceType a reqvire:ContractElementType ;
-  reqvire:elementTypeName "source" ;
-  reqvire:elementTypeCategory "contract" ;
-  rdfs:comment "Requirement-owned source context such as stakeholder statements, regulations, policies, standards, contracts, or external obligations." ;
-  reqvire:defaultElementType false .
-```
-
-#### Metadata
-  * type: ontology
-
-#### Relations
-  * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
----
-
 ### Reqvire Requirement Ontology
 
 The Reqvire requirement ontology defines requirement obligations and requirement-owned contract types.
@@ -452,6 +395,10 @@ reqvire:RequirementOwnedContract a owl:Class ;
   rdfs:subClassOf reqvire:Contract ;
   reqvire:mapsToConcept concept:RequirementContract ;
   rdfs:comment "Contract class whose instances are owned by requirement elements through define/definedBy." .
+reqvire:Source a owl:Class ;
+  rdfs:subClassOf reqvire:RequirementOwnedContract ;
+  reqvire:mapsToConcept concept:RequirementContract ;
+  rdfs:comment "Requirement-owned source contract for stakeholder, regulatory, contractual, policy, or other source context that explains why a requirement exists." .
 reqvire:Specification a owl:Class ;
   rdfs:subClassOf reqvire:RequirementOwnedContract ;
   reqvire:mapsToConcept concept:RequirementContract ;
@@ -490,6 +437,11 @@ reqvire:requirementObligationText a owl:DatatypeProperty ;
   rdfs:range xsd:string ;
   rdfs:comment "Normative obligation text associated with a requirement." .
 
+reqvire:sourceType a reqvire:ContractElementType ;
+  reqvire:elementTypeName "source" ;
+  reqvire:elementTypeCategory "contract" ;
+  rdfs:comment "Requirement-owned source context such as stakeholder statements, regulations, policies, standards, contracts, or external obligations." ;
+  reqvire:defaultElementType false .
 reqvire:specificationType a reqvire:ContractElementType ;
   reqvire:elementTypeName "specification" ;
   reqvire:elementTypeCategory "contract" ;

@@ -270,14 +270,14 @@ The system SHALL generate diagrams when requested.
 ### Test Verification Format
 Create verification in `specifications/Verifications/Tests.md`:
 ```markdown
-### Diagram Generation Test
+### Model JSON Test
 
-Test verifies that diagrams are generated correctly:
-1. Run `model --mmd`, `model`, or `containment`
-2. Verify Mermaid output is emitted to stdout
+Test verifies that model reports are generated correctly:
+1. Run `model` or `containment`
+2. Verify JSON output is emitted to stdout
 3. Confirm authored Markdown source files are not modified
 
-Expected: command output contains valid Mermaid diagram text
+Expected: command output contains valid JSON report data
 
 #### Metadata
   * type: test-verification
@@ -300,17 +300,17 @@ Expected: command output contains valid Mermaid diagram text
 "$REQVIRE_BIN" model-summary --filter-file="specifications/*.md"
 ```
 
-### Diagram Generation Tests
+### Model Report Tests
 ```bash
-# Generate pure Mermaid model output
-MMD_OUTPUT=$("$REQVIRE_BIN" model --mmd)
+# Generate model JSON output
+MODEL_OUTPUT=$("$REQVIRE_BIN" model)
 
-# Check for Mermaid graph declaration
-grep -q '^graph ' <<< "$MMD_OUTPUT"
+# Check for model JSON structure
+jq -e 'has("elements") and has("metadata")' <<< "$MODEL_OUTPUT"
 
-# Containment still emits fenced Markdown with Mermaid content
+# Containment emits JSON structure
 CONTAINMENT_OUTPUT=$("$REQVIRE_BIN" containment)
-grep -q '```mermaid' <<< "$CONTAINMENT_OUTPUT"
+jq -e 'has("root") or has("folders") or has("files")' <<< "$CONTAINMENT_OUTPUT"
 ```
 
 ### Format Tests

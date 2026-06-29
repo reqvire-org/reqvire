@@ -117,31 +117,14 @@ impl GraphRegistry {
             return Vec::new();
         };
         let element = &node.element;
-        if element.element_type.is_ontology() || element.element_type.is_semantic_contract() {
-            return Vec::new();
-        }
-
-        let (references, _) = crate::parser::extract_concept_references(&element.content);
-        if references.is_empty() {
-            return Vec::new();
-        }
-
         let mut ontology_ids = BTreeSet::new();
 
-        for reference in references {
-            let Ok(target_id) = crate::parser::normalize_concept_reference_target(
-                &element.file_path,
-                &reference.target,
-            ) else {
-                continue;
-            };
+        for target_id in self.concept_reference_target_ids(element) {
             let Some(target) = self.nodes.get(&target_id).map(|node| &node.element) else {
                 continue;
             };
-            if target.element_type.is_concept() {
-                if let Some(scheme_id) = self.concept_scheme_context_id(&target.identifier) {
-                    ontology_ids.insert(scheme_id);
-                }
+            if let Some(scheme_id) = self.concept_scheme_context_id(&target.identifier) {
+                ontology_ids.insert(scheme_id);
             }
         }
 
@@ -153,13 +136,17 @@ impl GraphRegistry {
             return Vec::new();
         };
         let element = &node.element;
+        self.expand_concept_context(self.concept_reference_target_ids(element))
+    }
+
+    fn concept_reference_target_ids(&self, element: &Element) -> BTreeSet<String> {
         if element.element_type.is_ontology() || element.element_type.is_semantic_contract() {
-            return Vec::new();
+            return BTreeSet::new();
         }
 
         let (references, _) = crate::parser::extract_concept_references(&element.content);
         if references.is_empty() {
-            return Vec::new();
+            return BTreeSet::new();
         }
 
         let mut concept_ids = BTreeSet::new();
@@ -180,7 +167,7 @@ impl GraphRegistry {
             }
         }
 
-        self.expand_concept_context(concept_ids)
+        concept_ids
     }
 
     fn expand_concept_context(&self, concept_ids: BTreeSet<String>) -> Vec<String> {
@@ -402,21 +389,26 @@ impl GraphRegistry {
     }
 
     pub(super) fn concept_scheme_context_id(&self, element_id: &str) -> Option<String> {
-        let mut visited = BTreeSet::new();
-        self.concept_scheme_context_id_recursive(element_id, &mut visited)
+        self.concept_scheme_context_element(element_id)
+            .map(|element| element.identifier.clone())
     }
 
-    fn concept_scheme_context_id_recursive(
+    pub(crate) fn concept_scheme_context_element(&self, element_id: &str) -> Option<&Element> {
+        let mut visited = BTreeSet::new();
+        self.concept_scheme_context_element_recursive(element_id, &mut visited)
+    }
+
+    fn concept_scheme_context_element_recursive(
         &self,
         element_id: &str,
         visited: &mut BTreeSet<String>,
-    ) -> Option<String> {
+    ) -> Option<&Element> {
         if !visited.insert(element_id.to_string()) {
             return None;
         }
         let element = self.nodes.get(element_id).map(|node| &node.element)?;
         if element.element_type.is_concept_scheme() {
-            return Some(element_id.to_string());
+            return Some(element);
         }
         if !element.element_type.is_concept() {
             return None;
@@ -430,11 +422,11 @@ impl GraphRegistry {
             };
             let target = self.nodes.get(target_id).map(|node| &node.element)?;
             if target.element_type.is_concept_scheme() {
-                return Some(target_id.clone());
+                return Some(target);
             }
             if target.element_type.is_concept() {
                 if let Some(scheme_id) =
-                    self.concept_scheme_context_id_recursive(target_id, visited)
+                    self.concept_scheme_context_element_recursive(target_id, visited)
                 {
                     return Some(scheme_id);
                 }

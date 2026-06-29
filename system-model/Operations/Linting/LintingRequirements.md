@@ -121,7 +121,7 @@ The system shall detect and auto-remove redundant derivedFrom relations where an
 
 ### Redundant Verify Relations Detection
 
-The system shall detect redundant verify relations where a verification directly verifies both a child requirement and its ancestor in the requirement hierarchy, leveraging the existing verification trace tree logic from the Verification Trace Builder.
+The system shall detect redundant direct verify relations.
 
 #### Details
 Implementation details shall follow the associated contract specifications.

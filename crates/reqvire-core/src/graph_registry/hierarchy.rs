@@ -430,7 +430,7 @@ impl GraphRegistry {
 
                 // Must NOT have outgoing forward relations to elements (nothing derives from it)
                 let has_forward_children = element.relations.iter().any(|r| {
-                    relation::DIAGRAM_RELATIONS.contains(&r.relation_type.name)
+                    relation::MODEL_TRAVERSAL_RELATIONS.contains(&r.relation_type.name)
                         && matches!(r.target.link, relation::LinkType::Identifier(_))
                 });
 

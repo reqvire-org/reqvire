@@ -34,6 +34,12 @@ struct OntologyDocumentState {
     namespace: String,
 }
 
+struct AssetReferenceSummary {
+    affected_files: FxHashSet<String>,
+    contract_bindings_count: usize,
+    relation_count: usize,
+}
+
 #[derive(Clone, Debug, Default)]
 struct OntologyMutationSnapshot {
     terms: FxHashMap<OntologyTermKey, OntologyTermState>,
@@ -639,7 +645,9 @@ fn ensure_prefix_binding(block: &str, prefix: &str, namespace: &str) -> String {
     let mut lines = Vec::new();
 
     for line in block.lines() {
-        if let Some((line_prefix, line_namespace)) = parse_turtle_prefix_line_local(line.trim()) {
+        if let Some((line_prefix, line_namespace)) =
+            crate::semantic_contract::parse_turtle_prefix_line(line.trim())
+        {
             if line_prefix == prefix {
                 found = true;
                 if line_namespace == namespace {
@@ -656,28 +664,14 @@ fn ensure_prefix_binding(block: &str, prefix: &str, namespace: &str) -> String {
     if !found {
         let insert_at = lines
             .iter()
-            .position(|line| parse_turtle_prefix_line_local(line.trim()).is_none())
+            .position(|line| {
+                crate::semantic_contract::parse_turtle_prefix_line(line.trim()).is_none()
+            })
             .unwrap_or(lines.len());
         lines.insert(insert_at, binding);
     }
 
     lines.join("\n")
-}
-
-fn parse_turtle_prefix_line_local(line: &str) -> Option<(String, String)> {
-    let rest = line
-        .strip_prefix("@prefix ")
-        .or_else(|| line.strip_prefix("@PREFIX "))
-        .or_else(|| line.strip_prefix("PREFIX "))?;
-    let rest = rest.trim_start();
-    let (prefix, rest) = rest.split_once(':')?;
-    let rest = rest.trim_start();
-    let namespace_start = rest.find('<')? + 1;
-    let namespace_end = rest[namespace_start..].find('>')? + namespace_start;
-    Some((
-        prefix.trim().to_string(),
-        rest[namespace_start..namespace_end].to_string(),
-    ))
 }
 
 fn rewrite_concept_reference_sections(
@@ -1823,40 +1817,13 @@ pub fn mv_asset(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use crate::relation::LinkType;
     use std::fs;
     use std::path::PathBuf;
 
     let old_path_buf = PathBuf::from(old_path);
+    let references = find_asset_references(model_manager, old_path);
 
-    // Find all elements with this file as contract_bindings OR as InternalPath relation target
-    let mut affected_files: rustc_hash::FxHashSet<String> = rustc_hash::FxHashSet::default();
-    let mut contract_bindings_count = 0;
-    let mut relation_count = 0;
-
-    for node in model_manager.graph_registry.nodes.values() {
-        let elem = &node.element;
-
-        // Check contract_bindings
-        for contract_bindings in &elem.contract_bindings {
-            if contract_bindings.target.as_str() == old_path {
-                affected_files.insert(elem.file_path.clone());
-                contract_bindings_count += 1;
-            }
-        }
-
-        // Check relations with InternalPath
-        for relation in &elem.relations {
-            if let LinkType::InternalPath(ref path) = relation.target.link {
-                if path.to_string_lossy() == old_path {
-                    affected_files.insert(elem.file_path.clone());
-                    relation_count += 1;
-                }
-            }
-        }
-    }
-
-    if affected_files.is_empty() {
+    if references.affected_files.is_empty() {
         return Err(ReqvireError::MissingContractBindingTarget(format!(
             "No elements reference file '{}'",
             old_path
@@ -1866,7 +1833,7 @@ pub fn mv_asset(
     let mut all_diffs = vec![];
 
     // Update references in each affected file
-    for file_path in &affected_files {
+    for file_path in &references.affected_files {
         let absolute_file_path = git_root.join(file_path);
         let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
@@ -1931,9 +1898,9 @@ pub fn mv_asset(
             "Moved {} → {} ({} contract_bindings(s), {} relation(s) in {} file(s))",
             old_path,
             new_path,
-            contract_bindings_count,
-            relation_count,
-            affected_files.len()
+            references.contract_bindings_count,
+            references.relation_count,
+            references.affected_files.len()
         ),
         diffs: all_diffs,
         dry_run,
@@ -1947,42 +1914,16 @@ pub fn rm_asset(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use crate::relation::LinkType;
     use std::fs;
     use std::path::PathBuf;
 
-    // Find all elements with this file as contract_bindings OR as InternalPath relation target
-    let mut affected_files: rustc_hash::FxHashSet<String> = rustc_hash::FxHashSet::default();
-    let mut contract_bindings_count = 0;
-    let mut relation_count = 0;
-
-    for node in model_manager.graph_registry.nodes.values() {
-        let elem = &node.element;
-
-        // Check contract_bindings
-        for contract_bindings in &elem.contract_bindings {
-            if contract_bindings.target.as_str() == file_path_arg {
-                affected_files.insert(elem.file_path.clone());
-                contract_bindings_count += 1;
-            }
-        }
-
-        // Check relations with InternalPath
-        for relation in &elem.relations {
-            if let LinkType::InternalPath(ref path) = relation.target.link {
-                if path.to_string_lossy() == file_path_arg {
-                    affected_files.insert(elem.file_path.clone());
-                    relation_count += 1;
-                }
-            }
-        }
-    }
+    let references = find_asset_references(model_manager, file_path_arg);
 
     let mut all_diffs = vec![];
     let file_path_buf = PathBuf::from(file_path_arg);
 
     // Remove references from each affected file
-    for spec_file_path in &affected_files {
+    for spec_file_path in &references.affected_files {
         let absolute_file_path = git_root.join(spec_file_path);
         let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
@@ -2027,13 +1968,45 @@ pub fn rm_asset(
         element_name: format!(
             "Removed {} ({} contract_bindings(s), {} relation(s) from {} file(s))",
             file_path_arg,
-            contract_bindings_count,
-            relation_count,
-            affected_files.len()
+            references.contract_bindings_count,
+            references.relation_count,
+            references.affected_files.len()
         ),
         diffs: all_diffs,
         dry_run,
     })
+}
+
+fn find_asset_references(model_manager: &ModelManager, asset_path: &str) -> AssetReferenceSummary {
+    let mut affected_files = FxHashSet::default();
+    let mut contract_bindings_count = 0;
+    let mut relation_count = 0;
+
+    for node in model_manager.graph_registry.nodes.values() {
+        let elem = &node.element;
+
+        for contract_bindings in &elem.contract_bindings {
+            if contract_bindings.target.as_str() == asset_path {
+                affected_files.insert(elem.file_path.clone());
+                contract_bindings_count += 1;
+            }
+        }
+
+        for relation in &elem.relations {
+            if let LinkType::InternalPath(ref path) = relation.target.link {
+                if path.to_string_lossy() == asset_path {
+                    affected_files.insert(elem.file_path.clone());
+                    relation_count += 1;
+                }
+            }
+        }
+    }
+
+    AssetReferenceSummary {
+        affected_files,
+        contract_bindings_count,
+        relation_count,
+    }
 }
 
 /// Merge multiple source elements into a target element
@@ -2248,13 +2221,20 @@ fn add_contract_bindings_to_element(
     element_name: &str,
     contract_binding_path: &str,
 ) -> Result<String, ReqvireError> {
+    let contract_bindings_line =
+        format!("* [{}]({})", contract_binding_path, contract_binding_path);
+    add_contract_binding_line_to_element(content, element_name, &contract_bindings_line)
+}
+
+fn add_contract_binding_line_to_element(
+    content: &str,
+    element_name: &str,
+    contract_bindings_line: &str,
+) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let mut in_target_element = false;
     let mut inserted = false;
     let mut lines_iter = content.lines().peekable();
-
-    let contract_bindings_line =
-        format!("* [{}]({})", contract_binding_path, contract_binding_path);
 
     while let Some(line) = lines_iter.next() {
         let trimmed = line.trim();
@@ -2320,66 +2300,10 @@ fn remove_contract_bindings_from_element(
     element_name: &str,
     contract_binding_path: &str,
 ) -> Result<String, ReqvireError> {
-    let mut result = String::new();
-    let mut in_target_element = false;
-    let mut in_contract_bindings_section = false;
-    let mut removed = false;
-    let mut remaining_contract_bindings_count = 0;
-
     let contract_binding_link = format!("[{}]({})", contract_binding_path, contract_binding_path);
-
-    for line in content.lines() {
-        let trimmed = line.trim();
-
-        // Check if we're entering a new element
-        if trimmed.starts_with("### ") {
-            let name = trimmed.trim_start_matches("### ").trim();
-            // Only track target element, don't reset counts when leaving
-            if name == element_name {
-                in_target_element = true;
-            } else if in_target_element {
-                // We're leaving the target element
-                in_target_element = false;
-            }
-            in_contract_bindings_section = false;
-        }
-
-        // Check for Contract Bindings subsection
-        if in_target_element && trimmed == "#### Contract Bindings" {
-            in_contract_bindings_section = true;
-        }
-
-        // Check for end of Contract Bindings section (another h4 header or element separator)
-        if in_contract_bindings_section
-            && ((trimmed.starts_with("####") && trimmed != "#### Contract Bindings")
-                || trimmed == "---")
-        {
-            in_contract_bindings_section = false;
-        }
-
-        // Skip the contract_bindings line we want to remove
-        if in_target_element && in_contract_bindings_section {
-            if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
-                && trimmed.contains(&contract_binding_link)
-            {
-                removed = true;
-                continue; // Skip this line
-            }
-            if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                remaining_contract_bindings_count += 1;
-            }
-        }
-
-        result.push_str(line);
-        result.push('\n');
-    }
-
-    // If we removed the last contract_bindings, clean up the empty Contract Bindings section
-    if removed && remaining_contract_bindings_count == 0 {
-        result = remove_empty_contract_bindings_section(&result, element_name);
-    }
-
-    Ok(result)
+    remove_contract_binding_lines_from_element(content, element_name, |trimmed| {
+        trimmed.contains(&contract_binding_link)
+    })
 }
 
 // Helper function to add element contract_bindings (with display name) to element in markdown content
@@ -2389,70 +2313,9 @@ fn add_element_contract_bindings_to_element(
     display_name: &str,
     identifier: &str,
 ) -> Result<String, ReqvireError> {
-    let mut result = String::new();
-    let mut in_target_element = false;
-    let mut inserted = false;
-    let mut lines_iter = content.lines().peekable();
-
     // Format: * [Display Name](#identifier) or * [Display Name](file.md#identifier)
     let contract_bindings_line = format!("* [{}]({})", display_name, identifier);
-
-    while let Some(line) = lines_iter.next() {
-        let trimmed = line.trim();
-
-        // Check if we're entering the target element
-        if trimmed.starts_with("### ") {
-            let name = trimmed.trim_start_matches("### ").trim();
-            in_target_element = name == element_name;
-        }
-
-        // Check for Contract Bindings subsection
-        if in_target_element && trimmed == "#### Contract Bindings" {
-            result.push_str(line);
-            result.push('\n');
-
-            // Add the new contract_bindings after existing ones
-            while let Some(next_line) = lines_iter.peek() {
-                let next_trimmed = next_line.trim();
-                if next_trimmed.starts_with("* ")
-                    || next_trimmed.starts_with("- ")
-                    || next_trimmed.is_empty()
-                {
-                    result.push_str(lines_iter.next().expect("iterator exhausted"));
-                    result.push('\n');
-                } else {
-                    break;
-                }
-            }
-
-            // Add our new contract_bindings
-            result.push_str(&contract_bindings_line);
-            result.push('\n');
-            inserted = true;
-            continue;
-        }
-
-        // Check for separator (end of element) - insert Contract Bindings section if not found
-        if in_target_element && !inserted && trimmed == "---" {
-            // Need to add Contract Bindings section before the separator
-            result.push_str("\n#### Contract Bindings\n");
-            result.push_str(&contract_bindings_line);
-            result.push('\n');
-            inserted = true;
-        }
-
-        result.push_str(line);
-        result.push('\n');
-    }
-
-    if !inserted {
-        return Err(ReqvireError::ElementNotFound(format!(
-            "Could not find element '{}' to add contract_bindings",
-            element_name
-        )));
-    }
-
-    Ok(result)
+    add_contract_binding_line_to_element(content, element_name, &contract_bindings_line)
 }
 
 // Helper function to remove element contract_bindings from element in markdown content
@@ -2462,16 +2325,31 @@ fn remove_element_contract_bindings_from_element(
     display_name: &str,
     identifier: &str,
 ) -> Result<String, ReqvireError> {
+    // Match by either identifier or display name in the link
+    let contract_binding_link_by_id = format!("]({})", identifier);
+    let contract_binding_link_full = format!("[{}]({})", display_name, identifier);
+    let contract_binding_link_by_name = format!("[{}](", display_name);
+
+    remove_contract_binding_lines_from_element(content, element_name, |trimmed| {
+        trimmed.contains(&contract_binding_link_by_id)
+            || trimmed.contains(&contract_binding_link_full)
+            || trimmed.contains(&contract_binding_link_by_name)
+    })
+}
+
+fn remove_contract_binding_lines_from_element<F>(
+    content: &str,
+    element_name: &str,
+    matches_contract_binding: F,
+) -> Result<String, ReqvireError>
+where
+    F: Fn(&str) -> bool,
+{
     let mut result = String::new();
     let mut in_target_element = false;
     let mut in_contract_bindings_section = false;
     let mut removed = false;
     let mut remaining_contract_bindings_count = 0;
-
-    // Match by either identifier or display name in the link
-    let contract_binding_link_by_id = format!("]({})", identifier);
-    let contract_binding_link_full = format!("[{}]({})", display_name, identifier);
-    let contract_binding_link_by_name = format!("[{}](", display_name);
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -2503,9 +2381,7 @@ fn remove_element_contract_bindings_from_element(
         // Skip the contract_bindings line we want to remove
         if in_target_element && in_contract_bindings_section {
             if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
-                && (trimmed.contains(&contract_binding_link_by_id)
-                    || trimmed.contains(&contract_binding_link_full)
-                    || trimmed.contains(&contract_binding_link_by_name))
+                && matches_contract_binding(trimmed)
             {
                 removed = true;
                 continue; // Skip this line
@@ -2557,6 +2433,15 @@ fn remove_contract_bindings_from_file(
 
 // Helper function to remove empty Contract Bindings section for a specific element
 fn remove_empty_contract_bindings_section(content: &str, element_name: &str) -> String {
+    remove_empty_contract_bindings_sections(content, Some(element_name))
+}
+
+// Helper function to remove all empty Contract Bindings sections
+fn remove_all_empty_contract_bindings_sections(content: &str) -> String {
+    remove_empty_contract_bindings_sections(content, None)
+}
+
+fn remove_empty_contract_bindings_sections(content: &str, target_element: Option<&str>) -> String {
     let mut result = String::new();
     let mut in_target_element = false;
     let mut lines_iter = content.lines().peekable();
@@ -2565,13 +2450,13 @@ fn remove_empty_contract_bindings_section(content: &str, element_name: &str) -> 
         let trimmed = line.trim();
 
         // Check if we're entering the target element
-        if trimmed.starts_with("### ") {
+        if target_element.is_some() && trimmed.starts_with("### ") {
             let name = trimmed.trim_start_matches("### ").trim();
-            in_target_element = name == element_name;
+            in_target_element = Some(name) == target_element;
         }
 
         // Check for empty Contract Bindings subsection to remove
-        if in_target_element && trimmed == "#### Contract Bindings" {
+        if (target_element.is_none() || in_target_element) && trimmed == "#### Contract Bindings" {
             // Look ahead to see if there are any contract_bindings lines
             let mut has_contract_bindings = false;
             let mut temp_lines = vec![];
@@ -2598,52 +2483,6 @@ fn remove_empty_contract_bindings_section(content: &str, element_name: &str) -> 
                 }
             }
             // If no contract_bindings, skip the header (and empty lines are already consumed)
-            continue;
-        }
-
-        result.push_str(line);
-        result.push('\n');
-    }
-
-    result
-}
-
-// Helper function to remove all empty Contract Bindings sections
-fn remove_all_empty_contract_bindings_sections(content: &str) -> String {
-    let mut result = String::new();
-    let mut lines_iter = content.lines().peekable();
-
-    while let Some(line) = lines_iter.next() {
-        let trimmed = line.trim();
-
-        // Check for Contract Bindings subsection
-        if trimmed == "#### Contract Bindings" {
-            // Look ahead to see if there are any contract_bindings lines
-            let mut has_contract_bindings = false;
-            let mut temp_lines = vec![];
-
-            while let Some(next_line) = lines_iter.peek() {
-                let next_trimmed = next_line.trim();
-                if next_trimmed.is_empty() {
-                    temp_lines.push(lines_iter.next().expect("iterator exhausted"));
-                } else if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
-                    has_contract_bindings = true;
-                    break;
-                } else {
-                    break;
-                }
-            }
-
-            if has_contract_bindings {
-                // Keep the header and empty lines
-                result.push_str(line);
-                result.push('\n');
-                for temp in temp_lines {
-                    result.push_str(temp);
-                    result.push('\n');
-                }
-            }
-            // If no contract_bindings, skip the header
             continue;
         }
 

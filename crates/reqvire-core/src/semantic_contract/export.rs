@@ -9,6 +9,12 @@ use super::vocabulary::{
     projection_term_key, stable_hash, NormalizedRelationProjection, RelationProjectionDirection,
 };
 use super::*;
+use crate::rdf_store::{load_default_graph, load_named_graph};
+use crate::runtime_ontology::REQVIRE_ONTOLOGY_TTL;
+use oxigraph::io::{RdfFormat, RdfParser, RdfSerializer};
+use oxigraph::model::{NamedOrBlankNode, Term};
+use rustc_hash::FxHashMap;
+use std::sync::LazyLock;
 
 pub(super) fn export_filter_term_namespace(
     namespace_base: &str,
@@ -92,7 +98,7 @@ pub fn external_materialization_metadata(
     })
 }
 
-pub(super) fn materialized_external_subjects(block: &SemanticBlock) -> BTreeSet<String> {
+pub(crate) fn materialized_external_subjects(block: &SemanticBlock) -> BTreeSet<String> {
     block
         .quads
         .iter()
@@ -198,17 +204,6 @@ pub(super) fn append_used_external_subset_turtle(
     Ok(())
 }
 
-pub(super) fn semantic_export_layer_name(layer: &SemanticExportLayer) -> &'static str {
-    match layer {
-        SemanticExportLayer::Ontologies => "ontologies",
-        SemanticExportLayer::Shapes => "shapes",
-        SemanticExportLayer::Concepts => "concepts",
-        SemanticExportLayer::Model => "model",
-        SemanticExportLayer::ExternalUsed => "external-used",
-        SemanticExportLayer::Prefixes => "prefixes",
-    }
-}
-
 pub(super) fn serialize_turtle_as_format(
     turtle: &str,
     format: SemanticExportFormat,
@@ -254,12 +249,7 @@ pub(super) fn append_turtle_body_unique(
     if quads.is_empty() {
         return Ok(());
     }
-    let body = serialize_quads_turtle_body(&quads, prefix_map)?;
-    if !body.trim().is_empty() {
-        output.push_str(body.trim());
-        output.push_str("\n\n");
-    }
-    Ok(())
+    append_serialized_turtle_body(output, &quads, prefix_map)
 }
 
 pub(super) fn append_quads_turtle_section(
@@ -292,7 +282,15 @@ pub(super) fn append_turtle_body(
     let parse_turtle = prefix_map.to_turtle_block() + turtle;
     let quads = quads_from_turtle(&parse_turtle, label)?;
     let quad_refs = quads.iter().collect::<Vec<_>>();
-    let body = serialize_quads_turtle_body(&quad_refs, prefix_map)?;
+    append_serialized_turtle_body(output, &quad_refs, prefix_map)
+}
+
+fn append_serialized_turtle_body(
+    output: &mut String,
+    quads: &[&Quad],
+    prefix_map: &TurtlePrefixMap,
+) -> Result<(), ReqvireError> {
+    let body = serialize_quads_turtle_body(quads, prefix_map)?;
     if !body.trim().is_empty() {
         output.push_str(body.trim());
         output.push_str("\n\n");
@@ -529,51 +527,6 @@ pub(super) fn build_external_subset_derivation_store(
     Ok(store)
 }
 
-pub(super) fn load_default_graph(
-    store: &Store,
-    turtle: &str,
-    label: &str,
-) -> Result<(), ReqvireError> {
-    if turtle.trim().is_empty() {
-        return Ok(());
-    }
-    store
-        .load_from_reader(
-            RdfParser::from_format(RdfFormat::Turtle).without_named_graphs(),
-            turtle.as_bytes(),
-        )
-        .map_err(|error| {
-            ReqvireError::ProcessError(format!("Failed to load {} into Oxigraph: {}", label, error))
-        })
-}
-
-pub(super) fn load_named_graph(
-    store: &Store,
-    turtle: &str,
-    graph_iri: &str,
-    label: &str,
-) -> Result<(), ReqvireError> {
-    if turtle.trim().is_empty() {
-        return Ok(());
-    }
-    let graph_name = NamedNode::new(graph_iri).map_err(|error| {
-        ReqvireError::ProcessError(format!(
-            "Invalid semantic named graph IRI '{}': {}",
-            graph_iri, error
-        ))
-    })?;
-    store
-        .load_from_reader(
-            RdfParser::from_format(RdfFormat::Turtle)
-                .without_named_graphs()
-                .with_default_graph(graph_name),
-            turtle.as_bytes(),
-        )
-        .map_err(|error| {
-            ReqvireError::ProcessError(format!("Failed to load {} into Oxigraph: {}", label, error))
-        })
-}
-
 pub(super) fn serialize_constructed_subset_turtle(
     quads: &[o_kernel::subset::ConstructedQuad],
 ) -> Result<String, ReqvireError> {
@@ -612,129 +565,14 @@ pub(super) fn build_authored_model_turtle(
     output.push_str("@prefix reqvire: <https://www.reqvire.org/ontology#> .\n");
     output.push('\n');
 
-    let mut nodes: Vec<_> = registry.nodes.values().collect();
-    nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
-
-    for node in nodes {
-        let element = &node.element;
-        let subject = element_iri(element);
-
-        output.push_str(&format!(
-            "{} a {} ;\n",
-            subject,
-            element_type_classes(&element.element_type).join(", ")
-        ));
-        output.push_str(&format!(
-            "  reqvire:elementId {} ;\n",
-            turtle_string(&element.id)
-        ));
-        output.push_str(&format!(
-            "  reqvire:elementIdentifier {} ;\n",
-            turtle_string(&element.identifier)
-        ));
-        output.push_str(&format!(
-            "  reqvire:elementName {} ;\n",
-            turtle_string(&element.name)
-        ));
-        output.push_str(&format!(
-            "  reqvire:elementType {} ;\n",
-            turtle_string(&element.element_type.to_metadata_string())
-        ));
-        output.push_str(&format!(
-            "  reqvire:filePath {} ;\n",
-            turtle_string(&element.file_path)
-        ));
-        output.push_str(&format!(
-            "  reqvire:lineNumber {} .\n\n",
-            element.line_number
-        ));
-
-        for key in GOVERNANCE_METADATA_KEYS {
-            if let Some(value) = element.metadata.get(*key) {
-                output.push_str(&format!(
-                    "{} reqvire:{} {} .\n",
-                    subject,
-                    key,
-                    turtle_string(value)
-                ));
-            }
-        }
-
-        if let Some(ontology) = &element.ontology {
-            if let Some(block) = &ontology.ontology {
-                output.push_str(&format!(
-                    "{} reqvire:ontologyText {} .\n",
-                    subject,
-                    turtle_string(&block.content)
-                ));
-            }
-        }
-        if let Some(contract) = &element.semantic_contract {
-            output.push_str(&format!(
-                "{} reqvire:semanticContractIri {} .\n",
-                subject,
-                turtle_string(&contract.iri)
-            ));
-            output.push_str(&format!(
-                "{} reqvire:semanticContractKind \"semantic-contract\" .\n",
-                subject
-            ));
-            if let Some(block) = &contract.shapes {
-                output.push_str(&format!(
-                    "{} reqvire:shapesText {} .\n",
-                    subject,
-                    turtle_string(&block.content)
-                ));
-            }
-        }
-
-        for relation in &element.relations {
-            let Some(target_iri) =
-                target_iri_for_link(&relation.target.link, registry, &mut artifacts)
-            else {
-                continue;
-            };
-            output.push_str(&format!(
-                "{} reqvire:{} {} .\n",
-                subject, relation.relation_type.name, target_iri
-            ));
-        }
-
-        for contract_bindings in &element.contract_bindings {
-            let Some(target_iri) =
-                contract_bindings_target_iri(&contract_bindings.target, registry, &mut artifacts)
-            else {
-                continue;
-            };
-            output.push_str(&format!(
-                "{} reqvire:bindsContract {} .\n",
-                subject, target_iri
-            ));
-        }
-
-        for reference in &element.concept_references {
-            let Some(resolved_iri) = concept_reference_iri_value(registry, element, reference)
-            else {
-                continue;
-            };
-            output.push_str(&format!(
-                "{} reqvire:conceptReference <{}> .\n",
-                subject,
-                escape_iri(&resolved_iri)
-            ));
-            output.push_str(&format!(
-                "{} reqvire:referencesTerm <{}> .\n",
-                subject,
-                escape_iri(&resolved_iri)
-            ));
-        }
-
-        if !element.relations.is_empty()
-            || !element.contract_bindings.is_empty()
-            || !element.concept_references.is_empty()
-        {
-            output.push('\n');
-        }
+    for element in sorted_registry_elements(registry) {
+        append_model_element_context_turtle(
+            &mut output,
+            element,
+            registry,
+            &mut artifacts,
+            ModelContextTurtleMode::Authored,
+        );
     }
 
     let mut external_sources = index.external_sources.clone();
@@ -750,6 +588,199 @@ pub(super) fn build_authored_model_turtle(
 
     output.push('\n');
     Ok(output)
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ModelContextTurtleMode {
+    Authored,
+    Full,
+}
+
+fn sorted_registry_elements(registry: &GraphRegistry) -> Vec<&Element> {
+    let mut nodes: Vec<_> = registry.nodes.values().collect();
+    nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
+    nodes.into_iter().map(|node| &node.element).collect()
+}
+
+fn append_model_element_context_turtle(
+    output: &mut String,
+    element: &Element,
+    registry: &GraphRegistry,
+    artifacts: &mut BTreeSet<String>,
+    mode: ModelContextTurtleMode,
+) {
+    let subject = element_iri(element);
+    append_model_element_identity_turtle(output, element, &subject);
+    append_model_element_relations_turtle(output, element, registry, artifacts, mode, &subject);
+    append_model_element_concept_references_turtle(output, element, registry, &subject);
+
+    if !element.relations.is_empty()
+        || !element.contract_bindings.is_empty()
+        || !element.concept_references.is_empty()
+    {
+        output.push('\n');
+    }
+}
+
+fn append_model_element_identity_turtle(output: &mut String, element: &Element, subject: &str) {
+    output.push_str(&format!(
+        "{} a {} ;\n",
+        subject,
+        element_type_classes(&element.element_type).join(", ")
+    ));
+    output.push_str(&format!(
+        "  reqvire:elementId {} ;\n",
+        turtle_string(&element.id)
+    ));
+    output.push_str(&format!(
+        "  reqvire:elementIdentifier {} ;\n",
+        turtle_string(&element.identifier)
+    ));
+    output.push_str(&format!(
+        "  reqvire:elementName {} ;\n",
+        turtle_string(&element.name)
+    ));
+    output.push_str(&format!(
+        "  reqvire:elementType {} ;\n",
+        turtle_string(&element.element_type.to_metadata_string())
+    ));
+    output.push_str(&format!(
+        "  reqvire:filePath {} ;\n",
+        turtle_string(&element.file_path)
+    ));
+    output.push_str(&format!(
+        "  reqvire:lineNumber {} .\n\n",
+        element.line_number
+    ));
+
+    for key in GOVERNANCE_METADATA_KEYS {
+        if let Some(value) = element.metadata.get(*key) {
+            output.push_str(&format!(
+                "{} reqvire:{} {} .\n",
+                subject,
+                key,
+                turtle_string(value)
+            ));
+        }
+    }
+
+    if let Some(ontology) = &element.ontology {
+        if let Some(block) = &ontology.ontology {
+            output.push_str(&format!(
+                "{} reqvire:ontologyText {} .\n",
+                subject,
+                turtle_string(&block.content)
+            ));
+        }
+    }
+    if let Some(contract) = &element.semantic_contract {
+        output.push_str(&format!(
+            "{} reqvire:semanticContractIri {} .\n",
+            subject,
+            turtle_string(&contract.iri)
+        ));
+        output.push_str(&format!(
+            "{} reqvire:semanticContractKind \"semantic-contract\" .\n",
+            subject
+        ));
+        if let Some(block) = &contract.shapes {
+            output.push_str(&format!(
+                "{} reqvire:shapesText {} .\n",
+                subject,
+                turtle_string(&block.content)
+            ));
+        }
+    }
+}
+
+fn append_model_element_relations_turtle(
+    output: &mut String,
+    element: &Element,
+    registry: &GraphRegistry,
+    artifacts: &mut BTreeSet<String>,
+    mode: ModelContextTurtleMode,
+    subject: &str,
+) {
+    for relation in &element.relations {
+        let Some(target_iri) = target_iri_for_link(&relation.target.link, registry, artifacts)
+        else {
+            continue;
+        };
+        output.push_str(&format!(
+            "{} reqvire:{} {} .\n",
+            subject, relation.relation_type.name, target_iri
+        ));
+        if mode == ModelContextTurtleMode::Full {
+            append_model_relation_turtle(
+                output,
+                subject,
+                relation.relation_type.name,
+                &target_iri,
+                relation.target.link.as_str(),
+            );
+            output.push_str(&format!(
+                "{} reqvire:relationTarget {} .\n",
+                subject, target_iri
+            ));
+            append_normalized_relation_family_turtle(
+                output,
+                subject,
+                &target_iri,
+                relation.relation_type.name,
+            );
+        }
+    }
+
+    for contract_bindings in &element.contract_bindings {
+        let Some(target_iri) =
+            contract_bindings_target_iri(&contract_bindings.target, registry, artifacts)
+        else {
+            continue;
+        };
+        output.push_str(&format!(
+            "{} reqvire:bindsContract {} .\n",
+            subject, target_iri
+        ));
+        if mode == ModelContextTurtleMode::Full {
+            let target_identifier = contract_bindings.target.as_str();
+            append_model_relation_turtle(
+                output,
+                subject,
+                "contract_bindings",
+                &target_iri,
+                &target_identifier,
+            );
+            append_normalized_relation_family_turtle(
+                output,
+                subject,
+                &target_iri,
+                "contract_bindings",
+            );
+        }
+    }
+}
+
+fn append_model_element_concept_references_turtle(
+    output: &mut String,
+    element: &Element,
+    registry: &GraphRegistry,
+    subject: &str,
+) {
+    for reference in &element.concept_references {
+        let Some(resolved_iri) = concept_reference_iri_value(registry, element, reference) else {
+            continue;
+        };
+        output.push_str(&format!(
+            "{} reqvire:conceptReference <{}> .\n",
+            subject,
+            escape_iri(&resolved_iri)
+        ));
+        output.push_str(&format!(
+            "{} reqvire:referencesTerm <{}> .\n",
+            subject,
+            escape_iri(&resolved_iri)
+        ));
+    }
 }
 
 pub(super) fn build_generated_model_turtle(
@@ -886,160 +917,14 @@ pub(super) fn build_model_context_turtle(
     output.push_str("@prefix owl: <http://www.w3.org/2002/07/owl#> .\n");
     output.push_str("@prefix reqvire: <https://www.reqvire.org/ontology#> .\n\n");
 
-    let mut nodes: Vec<_> = registry.nodes.values().collect();
-    nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
-
-    for node in nodes {
-        let element = &node.element;
-
-        let subject = element_iri(element);
-        output.push_str(&format!(
-            "{} a {} ;\n",
-            subject,
-            element_type_classes(&element.element_type).join(", ")
-        ));
-        output.push_str(&format!(
-            "  reqvire:elementId {} ;\n",
-            turtle_string(&element.id)
-        ));
-        output.push_str(&format!(
-            "  reqvire:elementIdentifier {} ;\n",
-            turtle_string(&element.identifier)
-        ));
-        output.push_str(&format!(
-            "  reqvire:elementName {} ;\n",
-            turtle_string(&element.name)
-        ));
-        output.push_str(&format!(
-            "  reqvire:elementType {} ;\n",
-            turtle_string(&element.element_type.to_metadata_string())
-        ));
-        output.push_str(&format!(
-            "  reqvire:filePath {} ;\n",
-            turtle_string(&element.file_path)
-        ));
-        output.push_str(&format!(
-            "  reqvire:lineNumber {} .\n\n",
-            element.line_number
-        ));
-
-        for key in GOVERNANCE_METADATA_KEYS {
-            if let Some(value) = element.metadata.get(*key) {
-                output.push_str(&format!(
-                    "{} reqvire:{} {} .\n",
-                    subject,
-                    key,
-                    turtle_string(value)
-                ));
-            }
-        }
-
-        if let Some(ontology) = &element.ontology {
-            if let Some(block) = &ontology.ontology {
-                output.push_str(&format!(
-                    "{} reqvire:ontologyText {} .\n",
-                    subject,
-                    turtle_string(&block.content)
-                ));
-            }
-        }
-        if let Some(contract) = &element.semantic_contract {
-            output.push_str(&format!(
-                "{} reqvire:semanticContractIri {} .\n",
-                subject,
-                turtle_string(&contract.iri)
-            ));
-            output.push_str(&format!(
-                "{} reqvire:semanticContractKind \"semantic-contract\" .\n",
-                subject
-            ));
-            if let Some(block) = &contract.shapes {
-                output.push_str(&format!(
-                    "{} reqvire:shapesText {} .\n",
-                    subject,
-                    turtle_string(&block.content)
-                ));
-            }
-        }
-
-        for relation in &element.relations {
-            let Some(target_iri) =
-                target_iri_for_link(&relation.target.link, registry, &mut artifacts)
-            else {
-                continue;
-            };
-            output.push_str(&format!(
-                "{} reqvire:{} {} .\n",
-                subject, relation.relation_type.name, target_iri
-            ));
-            append_model_relation_turtle(
-                &mut output,
-                &subject,
-                relation.relation_type.name,
-                &target_iri,
-                relation.target.link.as_str(),
-            );
-            output.push_str(&format!(
-                "{} reqvire:relationTarget {} .\n",
-                subject, target_iri
-            ));
-            append_normalized_relation_family_turtle(
-                &mut output,
-                &subject,
-                &target_iri,
-                relation.relation_type.name,
-            );
-        }
-
-        for contract_bindings in &element.contract_bindings {
-            let Some(target_iri) =
-                contract_bindings_target_iri(&contract_bindings.target, registry, &mut artifacts)
-            else {
-                continue;
-            };
-            output.push_str(&format!(
-                "{} reqvire:bindsContract {} .\n",
-                subject, target_iri
-            ));
-            let target_identifier = contract_bindings.target.as_str();
-            append_model_relation_turtle(
-                &mut output,
-                &subject,
-                "contract_bindings",
-                &target_iri,
-                &target_identifier,
-            );
-            append_normalized_relation_family_turtle(
-                &mut output,
-                &subject,
-                &target_iri,
-                "contract_bindings",
-            );
-        }
-
-        for reference in &element.concept_references {
-            let Some(resolved_iri) = concept_reference_iri_value(registry, element, reference)
-            else {
-                continue;
-            };
-            output.push_str(&format!(
-                "{} reqvire:conceptReference <{}> .\n",
-                subject,
-                escape_iri(&resolved_iri)
-            ));
-            output.push_str(&format!(
-                "{} reqvire:referencesTerm <{}> .\n",
-                subject,
-                escape_iri(&resolved_iri)
-            ));
-        }
-
-        if !element.relations.is_empty()
-            || !element.contract_bindings.is_empty()
-            || !element.concept_references.is_empty()
-        {
-            output.push('\n');
-        }
+    for element in sorted_registry_elements(registry) {
+        append_model_element_context_turtle(
+            &mut output,
+            element,
+            registry,
+            &mut artifacts,
+            ModelContextTurtleMode::Full,
+        );
     }
 
     for artifact in artifacts {
@@ -1152,85 +1037,85 @@ pub(super) fn external_ontology_source_iri(source: &ExternalOntologySource) -> S
 pub(super) fn normalized_relation_projection(
     relation_name: &str,
 ) -> Option<NormalizedRelationProjection> {
-    let projection = match relation_name {
-        "derive" => NormalizedRelationProjection {
-            forward_property: "childElement",
-            inverse_property: "parentElement",
-            direction: RelationProjectionDirection::Forward,
-        },
-        "derivedFrom" => NormalizedRelationProjection {
-            forward_property: "childElement",
-            inverse_property: "parentElement",
-            direction: RelationProjectionDirection::Inverse,
-        },
-        "specifiedBy" => NormalizedRelationProjection {
-            forward_property: "capabilitySpecifiedByRequirement",
-            inverse_property: "requirementSpecifiesCapability",
-            direction: RelationProjectionDirection::Forward,
-        },
-        "specify" => NormalizedRelationProjection {
-            forward_property: "capabilitySpecifiedByRequirement",
-            inverse_property: "requirementSpecifiesCapability",
-            direction: RelationProjectionDirection::Inverse,
-        },
-        "definedBy" => NormalizedRelationProjection {
-            forward_property: "requirementDefinedByContract",
-            inverse_property: "contractDefinesRequirement",
-            direction: RelationProjectionDirection::Forward,
-        },
-        "define" => NormalizedRelationProjection {
-            forward_property: "requirementDefinedByContract",
-            inverse_property: "contractDefinesRequirement",
-            direction: RelationProjectionDirection::Inverse,
-        },
-        "constrainedBy" => NormalizedRelationProjection {
-            forward_property: "requirementConstrainedBySemanticContract",
-            inverse_property: "semanticContractConstrainsRequirement",
-            direction: RelationProjectionDirection::Forward,
-        },
-        "constrain" => NormalizedRelationProjection {
-            forward_property: "requirementConstrainedBySemanticContract",
-            inverse_property: "semanticContractConstrainsRequirement",
-            direction: RelationProjectionDirection::Inverse,
-        },
-        "use" => NormalizedRelationProjection {
-            forward_property: "semanticContractUsesOntology",
-            inverse_property: "ontologyUsedBySemanticContract",
-            direction: RelationProjectionDirection::Forward,
-        },
-        "usedBy" => NormalizedRelationProjection {
-            forward_property: "semanticContractUsesOntology",
-            inverse_property: "ontologyUsedBySemanticContract",
-            direction: RelationProjectionDirection::Inverse,
-        },
-        "verifiedBy" => NormalizedRelationProjection {
-            forward_property: "requirementVerifiedByVerification",
-            inverse_property: "verificationVerifiesRequirement",
-            direction: RelationProjectionDirection::Forward,
-        },
-        "verify" => NormalizedRelationProjection {
-            forward_property: "requirementVerifiedByVerification",
-            inverse_property: "verificationVerifiesRequirement",
-            direction: RelationProjectionDirection::Inverse,
-        },
-        "satisfiedBy" => NormalizedRelationProjection {
-            forward_property: "elementSatisfiedByArtifact",
-            inverse_property: "artifactSatisfiesElement",
-            direction: RelationProjectionDirection::Forward,
-        },
-        "satisfy" => NormalizedRelationProjection {
-            forward_property: "elementSatisfiedByArtifact",
-            inverse_property: "artifactSatisfiesElement",
-            direction: RelationProjectionDirection::Inverse,
-        },
-        "contract_bindings" => NormalizedRelationProjection {
-            forward_property: "requirementBindsContract",
-            inverse_property: "contractBoundBy",
-            direction: RelationProjectionDirection::Forward,
-        },
-        _ => return None,
-    };
-    Some(projection)
+    NORMALIZED_RELATION_PROJECTIONS.get(relation_name).cloned()
+}
+
+#[derive(Default)]
+struct RelationRuleProjectionBuilder {
+    relation_name: Option<String>,
+    forward_property: Option<String>,
+    inverse_property: Option<String>,
+    direction: Option<RelationProjectionDirection>,
+}
+
+static NORMALIZED_RELATION_PROJECTIONS: LazyLock<FxHashMap<String, NormalizedRelationProjection>> =
+    LazyLock::new(load_normalized_relation_projections);
+
+fn load_normalized_relation_projections() -> FxHashMap<String, NormalizedRelationProjection> {
+    const REQVIRE: &str = "https://www.reqvire.org/ontology#";
+    const RELATION_NAME: &str = "https://www.reqvire.org/ontology#relationName";
+    const RELATION_DIRECTION: &str = "https://www.reqvire.org/ontology#relationDirection";
+    const NORMALIZED_FORWARD_PROPERTY: &str =
+        "https://www.reqvire.org/ontology#normalizedForwardProperty";
+    const NORMALIZED_INVERSE_PROPERTY: &str =
+        "https://www.reqvire.org/ontology#normalizedInverseProperty";
+
+    let mut builders: FxHashMap<String, RelationRuleProjectionBuilder> = FxHashMap::default();
+
+    for quad in RdfParser::from_format(RdfFormat::Turtle)
+        .for_reader(REQVIRE_ONTOLOGY_TTL.as_bytes())
+        .filter_map(Result::ok)
+    {
+        let subject = match &quad.subject {
+            NamedOrBlankNode::NamedNode(node) => node.as_str().to_string(),
+            NamedOrBlankNode::BlankNode(node) => node.as_str().to_string(),
+        };
+        let builder = builders.entry(subject).or_default();
+
+        match quad.predicate.as_str() {
+            RELATION_NAME => {
+                if let Term::Literal(literal) = &quad.object {
+                    builder.relation_name = Some(literal.value().to_string());
+                }
+            }
+            RELATION_DIRECTION => {
+                if let Term::Literal(literal) = &quad.object {
+                    builder.direction = match literal.value() {
+                        "forward" => Some(RelationProjectionDirection::Forward),
+                        "inverse" => Some(RelationProjectionDirection::Inverse),
+                        _ => None,
+                    };
+                }
+            }
+            NORMALIZED_FORWARD_PROPERTY => {
+                if let Term::NamedNode(node) = &quad.object {
+                    builder.forward_property =
+                        node.as_str().strip_prefix(REQVIRE).map(ToOwned::to_owned);
+                }
+            }
+            NORMALIZED_INVERSE_PROPERTY => {
+                if let Term::NamedNode(node) = &quad.object {
+                    builder.inverse_property =
+                        node.as_str().strip_prefix(REQVIRE).map(ToOwned::to_owned);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    builders
+        .into_values()
+        .filter_map(|builder| {
+            Some((
+                builder.relation_name?,
+                NormalizedRelationProjection {
+                    forward_property: builder.forward_property?,
+                    inverse_property: builder.inverse_property?,
+                    direction: builder.direction?,
+                },
+            ))
+        })
+        .collect()
 }
 
 pub(super) fn append_model_relation_turtle(
@@ -1892,20 +1777,8 @@ pub(super) fn target_iri_for_link(
     artifacts: &mut BTreeSet<String>,
 ) -> Option<String> {
     match link {
-        LinkType::Identifier(target_identifier) => registry
-            .nodes
-            .get(target_identifier)
-            .map(|target| element_iri(&target.element)),
-        LinkType::InternalPath(path) => {
-            let value = path.to_string_lossy();
-            let iri = artifact_iri("path", &value);
-            artifacts.insert(format!(
-                "{} a owl:NamedIndividual, reqvire:Artifact, reqvire:File ;\n  reqvire:filePath {} .\n\n",
-                iri,
-                turtle_string(&value)
-            ));
-            Some(iri)
-        }
+        LinkType::Identifier(target_identifier) => element_target_iri(target_identifier, registry),
+        LinkType::InternalPath(path) => file_artifact_target_iri(path, artifacts),
         LinkType::ExternalUrl(url) => {
             let iri = artifact_iri("url", url);
             artifacts.insert(format!(
@@ -1924,21 +1797,32 @@ pub(super) fn contract_bindings_target_iri(
     artifacts: &mut BTreeSet<String>,
 ) -> Option<String> {
     match target {
-        ContractBindingTarget::ElementIdentifier(target_identifier) => registry
-            .nodes
-            .get(target_identifier)
-            .map(|target| element_iri(&target.element)),
-        ContractBindingTarget::FilePath(path) => {
-            let value = path.to_string_lossy();
-            let iri = artifact_iri("path", &value);
-            artifacts.insert(format!(
-                "{} a owl:NamedIndividual, reqvire:Artifact, reqvire:File ;\n  reqvire:filePath {} .\n\n",
-                iri,
-                turtle_string(&value)
-            ));
-            Some(iri)
+        ContractBindingTarget::ElementIdentifier(target_identifier) => {
+            element_target_iri(target_identifier, registry)
         }
+        ContractBindingTarget::FilePath(path) => file_artifact_target_iri(path, artifacts),
     }
+}
+
+fn element_target_iri(target_identifier: &str, registry: &GraphRegistry) -> Option<String> {
+    registry
+        .nodes
+        .get(target_identifier)
+        .map(|target| element_iri(&target.element))
+}
+
+fn file_artifact_target_iri(
+    path: &std::path::Path,
+    artifacts: &mut BTreeSet<String>,
+) -> Option<String> {
+    let value = path.to_string_lossy();
+    let iri = artifact_iri("path", &value);
+    artifacts.insert(format!(
+        "{} a owl:NamedIndividual, reqvire:Artifact, reqvire:File ;\n  reqvire:filePath {} .\n\n",
+        iri,
+        turtle_string(&value)
+    ));
+    Some(iri)
 }
 
 pub(super) fn artifact_iri(kind: &str, value: &str) -> String {

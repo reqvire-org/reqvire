@@ -13,7 +13,8 @@ use axum::Router;
 use percent_encoding::percent_decode_str;
 use reqvire::error::ReqvireError;
 use reqvire::explorer_runtime::{
-    build_runtime_assets, embedded_asset, index_html, ExplorerRuntimeAssets,
+    build_runtime_assets, embedded_asset, index_html, is_workspace_asset_path,
+    ExplorerRuntimeAssets,
 };
 use reqvire::{ModelBuildOptions, ModelManager};
 
@@ -245,29 +246,6 @@ fn workspace_file_response(method: Method, request_path: &str) -> Option<Respons
         )),
         Err(_) => Some(response_with_status(StatusCode::NOT_FOUND)),
     }
-}
-
-fn is_workspace_asset_path(path: &Path) -> bool {
-    matches!(
-        path.extension().and_then(|ext| ext.to_str()).map(|ext| ext.to_ascii_lowercase()),
-        Some(ext)
-            if matches!(
-                ext.as_str(),
-                "png"
-                    | "jpg"
-                    | "jpeg"
-                    | "gif"
-                    | "webp"
-                    | "svg"
-                    | "pdf"
-                    | "txt"
-                    | "csv"
-                    | "json"
-                    | "jsonld"
-                    | "ttl"
-                    | "turtle"
-            )
-    )
 }
 
 fn resolve_request_path(raw_request_path: &str) -> Result<String, StatusCode> {

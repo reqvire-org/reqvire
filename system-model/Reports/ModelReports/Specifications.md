@@ -252,23 +252,23 @@ All report outputs are expected to use deterministic ordering to enable reliable
   * type: specification
 ---
 
-### Diagram Relation Filtering Specification
+### Model Relation Traversal Filtering Specification
 
-Technical specification for relation filtering in diagram generation to render only forward relations while ensuring complete element hierarchy representation.
+Technical specification for relation filtering in model JSON traversal to include one canonical forward relation from each inverse relation pair while preserving complete element hierarchy representation.
 
 #### Details
-**Diagram Relation Filtering Rules:**
-When generating diagrams, the system is expected to apply the following relation filtering rules:
+**Model Relation Traversal Filtering Rules:**
+When generating model JSON, the system is expected to apply the following relation filtering rules:
 
-1. **Diagram Relation Filtering**: Only relations specified in the DIAGRAM_RELATIONS list is expected to be rendered to prevent duplicate arrows representing the same logical relationship
+1. **Canonical Relation Filtering**: Only relations specified in the `MODEL_TRAVERSAL_RELATIONS` list are expected to be traversed to prevent duplicate edges representing the same logical relationship
 2. **Complete Hierarchy Inclusion**: Include reachable child elements needed by the requested report scope
-3. **List-Based Rendering**: Relations is expected to be rendered according to the DIAGRAM_RELATIONS list which defines which relation from each opposite pair should be shown
+3. **List-Based Traversal**: Relations are expected to be traversed according to the `MODEL_TRAVERSAL_RELATIONS` list, which defines which relation from each opposite pair should be used
 
 **Filtering Benefits:**
 The filtering ensures that:
-- Bidirectional relationships (e.g., `derivedFrom`/`derive`) appear as single arrows using the relation specified in DIAGRAM_RELATIONS
+- Bidirectional relationships (e.g., `derivedFrom`/`derive`) appear once in structured output using the relation specified in `MODEL_TRAVERSAL_RELATIONS`
 - Hierarchical context is preserved by showing derived children relevant to the requested report scope
-- Diagram readability is maintained while accurately representing the complete model structure
+- JSON output remains readable while accurately representing the complete model structure
 
 #### Metadata
   * type: specification
@@ -472,28 +472,6 @@ Style guidelines for markdown text report output (model, coverage, traces, conta
   * type: specification
 ---
 
-### Explorer Mermaid Interactive Capabilities Specification
-
-Technical specification for interactive Mermaid diagram navigation and filtering capabilities.
-
-#### Details
-**Explorer Navigation:**
-Users are expected to view Mermaid diagrams in Explorer contexts where Mermaid content is present:
-- Source Markdown pages render authored Mermaid code blocks.
-- Trace views render browser-generated roll-up Mermaid diagrams from Project Store trace data.
-- Mermaid node interactions open Explorer element routes or source routes where node target metadata is available.
-
-**Interactive Capabilities:**
-The visualization helps users:
-- Understand the model's logical structure
-- Navigate relationships between elements
-- Explore the model from any starting point
-- Filter and focus on specific subtrees of the model
-
-#### Metadata
-  * type: specification
----
-
 ### Model JSON Output Format Contract Specification
 
 #### Details
@@ -501,7 +479,7 @@ Model output format rules:
 - JSON is the canonical CLI and operation output format for `model`.
 - `reqvire model` emits structured JSON by default.
 - The `model` command does not expose a separate output-format flag.
-- Markdown/text output and pure Mermaid output are not supported by the `model` command.
+- Alternative output-format flags are not supported by the `model` command.
 - JSON format uses structured data with folders, files, sections, elements, relations, and contract_bindings.
 - Element contract_bindings are included as an array of contract element identifier strings.
 
@@ -559,6 +537,7 @@ Projection subgraph generation behavior:
 - Store generated construct facts in the existing semantic export context as in-memory RDF statements derived from o-kernel construct classification records enriched with Reqvire source and provenance metadata. Generated facts are not written back to authored Markdown ontology or semantic-contract blocks.
 - Keep projection data deterministic and serializable from `SemanticIndex` without reparsing raw Turtle in the Ontologies renderer.
 - Use stable generated IRIs or blank-node identifiers derived from canonical source evidence and construct membership so repeated exports remain deterministic.
+- Select the Reqvire projection ID namespace at the Reqvire semantic-contract adapter boundary by invoking o-kernel ontology construct classification with `urn:reqvire` as the classifier ID namespace. O-kernel remains namespace-neutral by default and must not hard-code Reqvire projection identifiers.
 - Materialize one `reqvire:OntologyConstructProjection` record per projection pass or construct family and one or more `reqvire:OntologyConstruct` records for extracted constructs.
 - Record `reqvire:projectionDerivationMode "direct-authored"` for facts derived only from authored quads without reasoning.
 - Record `reqvire:constructSourceBlock`, source element metadata, source line, construct subject, construct object, construct property, construct member, and `reqvire:constructSequenceIndex` where order matters.
@@ -670,6 +649,17 @@ Implementation coverage source values are defined by this implementation coverag
 Implementation coverage scope includes only elements of type `requirement`. Elements of type `capability` are excluded from direct implementation coverage and receive implementation coverage through capability roll-up.
 
 The report must classify each requirement using the semantic coverage source vocabulary and the available `satisfiedBy`, `definedBy`, contract_bindings, and child requirement evidence.
+
+Coverage classification:
+- **Directly satisfied**: requirement has one or more `satisfiedBy` relations.
+- **Contract via contract_bindings**: requirement owns contract elements through `definedBy`, and at least one owned contract is reused by a requirement that is directly satisfied.
+- **Contract via child**: requirement owns contract elements through `definedBy`, and at least one derived descendant requirement has `satisfiedBy`.
+- **Uncovered**: requirement has no coverage evidence from the above sources.
+
+Rules:
+- Contract Bindings propagation uses only contract element identifiers as contracts.
+- Generic derivation roll-up is not used for implementation coverage.
+- Coverage source and evidence identifiers must be reported in text and JSON outputs.
 
 #### Metadata
   * type: specification
@@ -848,8 +838,9 @@ The semantic model export is expected to materialize ontology-defined relation-f
 
 #### Details
 Normative construct-query contract:
-- Relation-family normalization is defined for every `reqvire:RelationRule` that declares `reqvire:normalizedForwardProperty` and `reqvire:normalizedInverseProperty`.
+- Relation-family normalization is defined for every `reqvire:RelationRule` that declares `reqvire:relationName`, `reqvire:relationDirection`, `reqvire:normalizedForwardProperty`, and `reqvire:normalizedInverseProperty`.
 - Each authored relation edge is treated as a first-class `reqvire:ModelRelation` with `reqvire:relationSource`, `reqvire:relationTarget`, and `reqvire:relationType` so source/target pairing is preserved.
+- Contract binding edges are treated as first-class `reqvire:ModelRelation` records with `reqvire:relationType "contract_bindings"` so they participate in the same ontology-defined projection as authored relation entries.
 - For relation rules with `reqvire:relationDirection "forward"`, the authored source is the canonical forward source and the authored target is the canonical forward target.
 - For relation rules with `reqvire:relationDirection "inverse"`, the authored target is the canonical forward source and the authored source is the canonical forward target.
 - The projection emits both canonical forward and canonical inverse normalized predicates.
@@ -881,8 +872,10 @@ WHERE {
 
 Implementation contract:
 - Current Rust semantic export projection must implement the same canonicalization without executing the CONSTRUCT query.
+- Current Rust semantic export projection must derive the normalized relation mapping from the runtime Reqvire ontology `reqvire:RelationRule` metadata instead of maintaining a separate hard-coded source-to-predicate table.
 - Full semantic model export must emit deterministic `reqvire:ModelRelation` resources for authored Markdown relations and contract bindings edges.
 - Full semantic model export must emit normalized forward and inverse predicates for `derive`/`derivedFrom`, `specify`/`specifiedBy`, `define`/`definedBy`, `constrain`/`constrainedBy`, `use`/`usedBy`, `verify`/`verifiedBy`, `satisfy`/`satisfiedBy`, and `contract_bindings`.
+- `contract_bindings` must normalize to `reqvire:bindsContract` from the consuming requirement to the reusable contract and `reqvire:boundByContract` from the reusable contract back to the consuming requirement.
 - Future reasoner-backed or SPARQL-backed materialization must produce triples equivalent to the construct-query result.
 - Generated relation-family projection facts must not be written back to authored Markdown ontology, semantic-contract, requirement, or contract blocks.
 

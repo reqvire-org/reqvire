@@ -8,7 +8,6 @@ use crate::utils;
 use globset::GlobSet;
 use serde::Serialize;
 use std::collections::BTreeMap;
-use std::path::PathBuf;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum MigrationSafety {
@@ -308,28 +307,11 @@ pub fn apply_documents_header_migration(
     excluded_filename_patterns: &GlobSet,
     dry_run: bool,
 ) -> Result<(DocumentsHeaderMigrationSummary, Vec<FileDiff>), ReqvireError> {
-    let mut affected_files = Vec::new();
-    let mut diffs = Vec::new();
-
-    for path in utils::scan_markdown_files(None, excluded_filename_patterns) {
-        let current = filesystem::read_file(&path)?;
-        let Some(next) = rewrite_documents_header_content(&current) else {
-            continue;
-        };
-        let relative = utils::get_relative_path(&path)
-            .map(|path| path.to_string_lossy().to_string())
-            .unwrap_or_else(|_| path.to_string_lossy().to_string());
-        let diff = generate_file_diff(&relative, &current, &next);
-        if !diff.lines.is_empty() {
-            diffs.push(diff);
-        }
-        if !dry_run {
-            filesystem::write_file(&path, next.as_bytes())?;
-        }
-        affected_files.push(relative);
-    }
-
-    affected_files.sort();
+    let (affected_files, diffs) = apply_content_rewrite_migration(
+        excluded_filename_patterns,
+        dry_run,
+        rewrite_documents_header_content,
+    )?;
 
     Ok((
         DocumentsHeaderMigrationSummary {
@@ -370,12 +352,33 @@ pub fn apply_contract_bindings_section_migration(
     excluded_filename_patterns: &GlobSet,
     dry_run: bool,
 ) -> Result<(ContractBindingSectionMigrationSummary, Vec<FileDiff>), ReqvireError> {
+    let (affected_files, diffs) = apply_content_rewrite_migration(
+        excluded_filename_patterns,
+        dry_run,
+        rewrite_contract_bindings_section_content,
+    )?;
+
+    Ok((
+        ContractBindingSectionMigrationSummary {
+            migration_id: CONTRACT_BINDINGS_SECTION_MIGRATION_ID,
+            files_changed: affected_files.len(),
+            affected_files,
+        },
+        diffs,
+    ))
+}
+
+fn apply_content_rewrite_migration(
+    excluded_filename_patterns: &GlobSet,
+    dry_run: bool,
+    rewrite: impl Fn(&str) -> Option<String>,
+) -> Result<(Vec<String>, Vec<FileDiff>), ReqvireError> {
     let mut affected_files = Vec::new();
     let mut diffs = Vec::new();
 
     for path in utils::scan_markdown_files(None, excluded_filename_patterns) {
         let current = filesystem::read_file(&path)?;
-        let Some(next) = rewrite_contract_bindings_section_content(&current) else {
+        let Some(next) = rewrite(&current) else {
             continue;
         };
         let relative = utils::get_relative_path(&path)
@@ -393,14 +396,7 @@ pub fn apply_contract_bindings_section_migration(
 
     affected_files.sort();
 
-    Ok((
-        ContractBindingSectionMigrationSummary {
-            migration_id: CONTRACT_BINDINGS_SECTION_MIGRATION_ID,
-            files_changed: affected_files.len(),
-            affected_files,
-        },
-        diffs,
-    ))
+    Ok((affected_files, diffs))
 }
 
 pub fn apply_concept_reference_link_migration(
@@ -517,7 +513,7 @@ fn rewrite_concept_reference_links_content(
             continue;
         };
 
-        let link = concept_reference_relative_link(source_file, target_identifier)?;
+        let link = utils::concept_reference_relative_link(source_file, target_identifier)?;
         let leading_len = body.len() - body.trim_start().len();
         output.push(format!(
             "{}* [{}]({}){}",
@@ -530,21 +526,6 @@ fn rewrite_concept_reference_links_content(
     }
 
     Ok((rewritten > 0).then(|| (output.concat(), rewritten)))
-}
-
-fn concept_reference_relative_link(
-    source_file: &str,
-    target_identifier: &str,
-) -> Result<String, ReqvireError> {
-    let (target_file, target_fragment) = utils::extract_path_and_fragment(target_identifier);
-    if target_file == source_file {
-        return Ok(format!("#{}", target_fragment.unwrap_or(target_identifier)));
-    }
-    let source_parent = PathBuf::from(source_file)
-        .parent()
-        .map(PathBuf::from)
-        .unwrap_or_default();
-    utils::to_relative_identifier(target_identifier, &source_parent, false)
 }
 
 fn rewrite_contract_bindings_section_content(content: &str) -> Option<String> {

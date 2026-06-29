@@ -303,7 +303,7 @@ This test verifies that design documents (files in DesignDocuments folders) are 
 2. Run `reqvire containment` command
 3. Verify design documents appear in output grouped by folder
 4. Verify design documents are visually distinguished from elements
-5. In diagram output, verify design document nodes have click handlers
+5. Verify design document entries include stable source paths for Explorer navigation
 
 #### Expected Results
 - Design documents are shown under their parent folder
@@ -556,7 +556,7 @@ This test verifies that containment report generation exposes deterministic fold
 1. **Report generation:**
    - Run `reqvire containment` command.
    - Verify containment output includes folders, files, elements, and design-document containers.
-   - Verify generated Mermaid containment output is deterministic.
+   - Verify JSON containment output is deterministic.
 
 2. **Navigation integration:**
    - Verify containment paths are stable and scoped to the current workspace.
@@ -629,6 +629,7 @@ Expected checks:
 - Verify unused external ontology dependency terms do not appear in external-inclusive semantic export.
 - Verify imported external ontology terms do not receive Reqvire-generated `rdfs:isDefinedBy` ownership links.
 - Verify full semantic export contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements, plus generated ontology projection graph, projection, construct, symbol, source/provenance, member, and subject/object/predicate facts for direct-authored constructs.
+- Verify full semantic export materializes relation-family projection facts from runtime ontology `reqvire:RelationRule` metadata, including `contract_bindings` normalized as `reqvire:bindsContract` and `reqvire:boundByContract`.
 - Verify representative reserved vocabulary IRIs from the RDF, RDFS, OWL, XSD, and SHACL registry survive ontology serialization and do not require local External Ontology source declarations.
 - Verify validation rejects fake terms in standards reserved vocabulary namespaces when those terms are not present in the o-kernel bundled standards graphs or explicit XSD policy.
 - Verify validation rejects an authored named ontology resource whose explicit `rdfs:isDefinedBy` target conflicts with the generated ontology document IRI.
@@ -724,14 +725,12 @@ This test verifies that the resources command correctly generates reports showin
 
 ### Reverse Model Traversal Test
 
-Test verifies reverse traversal output against golden files for both JSON and Markdown modes.
+Test verifies reverse traversal output against JSON golden files.
 
 #### Details
 Test cases:
-1. Run `reqvire model --reverse --json`; assert command success and valid JSON output.
+1. Run `reqvire model --reverse`; assert command success and valid JSON output.
 2. Compare JSON output to `expected/expected_reverse_output.json`.
-3. Run `reqvire model --reverse`; assert command success.
-4. Compare Markdown output to `expected/expected_reverse_output.md`.
 
 #### Metadata
   * type: test-verification

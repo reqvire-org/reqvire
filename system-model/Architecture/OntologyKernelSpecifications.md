@@ -442,7 +442,9 @@ Service rules:
 - Parse SHACL targets, property paths, and syntax constraints from RDF quads.
 - Report generic SHACL syntax sanity diagnostics without source-document assumptions.
 - Provide generic ontology construct classification over RDF quads for OWL/RDFS constructs such as subclass inclusion, membership, domain/range, restrictions, class expressions, inverse properties, equivalence, disjointness, property chains, and shape overlays.
+- Generate deterministic ontology construct and construct-projection identifiers using a caller-configurable ID namespace. The default namespace must be neutral to the kernel, currently `urn:o-kernel`.
 - Keep source provenance, layer placement, and consumer-specific diagnostic mapping outside the kernel.
+- Keep product-specific namespaces, Reqvire ontology classes, graph-registry source mapping, and export DTO ownership outside the kernel. Reqvire consumers that need `urn:reqvire` projection identifiers must pass that namespace through the classifier options at the adapter boundary.
 
 #### Metadata
   * type: specification

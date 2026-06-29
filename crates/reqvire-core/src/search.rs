@@ -5,7 +5,7 @@ use crate::element;
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::relation;
-use globset::{Glob, GlobMatcher};
+use globset::GlobMatcher;
 use regex::Regex;
 use serde::Serialize;
 use std::collections::BTreeMap;
@@ -45,16 +45,11 @@ impl SearchFilters {
         has_contract_bindings: bool,
         contract_bindings: Option<&str>,
     ) -> Result<Self, ReqvireError> {
-        fn compile_glob(pat: &str) -> Result<GlobMatcher, ReqvireError> {
-            let glob = Glob::new(pat)?.compile_matcher();
-            Ok(glob)
-        }
-
         fn compile_regex(pattern: &str) -> Result<Regex, ReqvireError> {
             Regex::new(pattern).map_err(ReqvireError::from)
         }
 
-        let file_glob = file.map(compile_glob).transpose()?;
+        let file_glob = file.map(crate::utils::compile_glob_matcher).transpose()?;
         let name_re = name_regex.map(compile_regex).transpose()?;
 
         // Parse and validate comma-separated element types
@@ -113,7 +108,9 @@ impl SearchFilters {
         let owner_re = owner_regex.map(compile_regex).transpose()?;
         let content_re = content.map(compile_regex).transpose()?;
         let page_content_re = page_content.map(compile_regex).transpose()?;
-        let contract_bindings_glob = contract_bindings.map(compile_glob).transpose()?;
+        let contract_bindings_glob = contract_bindings
+            .map(crate::utils::compile_glob_matcher)
+            .transpose()?;
 
         // Parse and validate comma-separated relation lists
         let have_relations = if let Some(s) = have_relations {

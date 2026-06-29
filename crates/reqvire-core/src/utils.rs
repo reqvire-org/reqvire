@@ -1,10 +1,11 @@
 use crate::error::ReqvireError;
 use crate::git_commands;
-use globset::GlobSet;
+use globset::{Glob, GlobMatcher, GlobSet};
 use log::debug;
 use pathdiff::diff_paths;
 use regex::Regex;
 use rustc_hash::FxHasher;
+use std::collections::BTreeSet;
 use std::hash::Hasher;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -26,6 +27,84 @@ pub fn disable_quiet_mode() {
 /// Check if quiet mode is enabled
 pub fn is_quiet_mode() -> bool {
     QUIET_MODE.load(Ordering::Relaxed)
+}
+
+pub(crate) fn compile_glob_matcher(pattern: &str) -> Result<GlobMatcher, ReqvireError> {
+    Ok(Glob::new(pattern)?.compile_matcher())
+}
+
+pub(crate) fn concept_reference_relative_link(
+    source_file: &str,
+    target_identifier: &str,
+) -> Result<String, ReqvireError> {
+    let (target_file, target_fragment) = extract_path_and_fragment(target_identifier);
+    if target_file == source_file {
+        return Ok(format!("#{}", target_fragment.unwrap_or(target_identifier)));
+    }
+    let source_parent = PathBuf::from(source_file)
+        .parent()
+        .map(PathBuf::from)
+        .unwrap_or_default();
+    to_relative_identifier(target_identifier, &source_parent, false)
+}
+
+pub(crate) fn resolve_model_target_identifier(
+    registry: &crate::graph_registry::GraphRegistry,
+    source_file_path: &str,
+    target_identifier: &str,
+) -> Option<String> {
+    if registry.get_element(target_identifier).is_some() {
+        return Some(target_identifier.to_string());
+    }
+
+    if target_identifier.starts_with('#') {
+        let full_identifier = format!("{}{}", source_file_path, target_identifier);
+        if registry.get_element(&full_identifier).is_some() {
+            return Some(full_identifier);
+        }
+    }
+
+    let (_, fragment_opt) = extract_path_and_fragment(target_identifier);
+    if let Some(fragment) = fragment_opt {
+        if registry.get_element(fragment).is_some() {
+            return Some(fragment.to_string());
+        }
+    }
+
+    None
+}
+
+pub(crate) fn resolve_parent_map_roots(
+    element_id: &str,
+    parent_map: &rustc_hash::FxHashMap<String, Vec<String>>,
+    memo: &mut rustc_hash::FxHashMap<String, BTreeSet<String>>,
+    visiting: &mut rustc_hash::FxHashSet<String>,
+) -> BTreeSet<String> {
+    if let Some(cached) = memo.get(element_id) {
+        return cached.clone();
+    }
+
+    if visiting.contains(element_id) {
+        return BTreeSet::new();
+    }
+    visiting.insert(element_id.to_string());
+
+    let mut roots = BTreeSet::new();
+    let parent_ids = parent_map.get(element_id).cloned().unwrap_or_default();
+
+    if parent_ids.is_empty() {
+        roots.insert(element_id.to_string());
+    } else {
+        for parent_id in parent_ids {
+            roots.extend(resolve_parent_map_roots(
+                &parent_id, parent_map, memo, visiting,
+            ));
+        }
+    }
+
+    visiting.remove(element_id);
+    memo.insert(element_id.to_string(), roots.clone());
+    roots
 }
 
 /// Prints to stdout only if quiet mode is not enabled
@@ -661,13 +740,16 @@ pub fn extract_markdown_link(input: &str) -> Option<(String, String)> {
 
 /// Generates a fast and lightweight hash ID
 pub fn hash_identifier(identifier: &str) -> String {
-    let mut hasher = FxHasher::default();
-    hasher.write(identifier.as_bytes());
-    format!("{:x}", hasher.finish()).to_string()
+    hash_string(identifier)
 }
+
 pub fn hash_content(content: &str) -> String {
+    hash_string(content)
+}
+
+fn hash_string(value: &str) -> String {
     let mut hasher = FxHasher::default();
-    hasher.write(content.as_bytes());
+    hasher.write(value.as_bytes());
     format!("{:x}", hasher.finish()).to_string()
 }
 

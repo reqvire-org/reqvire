@@ -1,3 +1,4 @@
+use super::formatting::format_identifier_markdown_link;
 use crate::element::ElementType;
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
@@ -114,13 +115,7 @@ impl SubmodelsReport {
 }
 
 fn format_identifier_link(identifier: &str, name: &str) -> String {
-    if let Some(hash_pos) = identifier.rfind('#') {
-        let file_part = &identifier[..hash_pos];
-        let fragment_part = &identifier[hash_pos..];
-        format!("[{}]({}{})", name, file_part, fragment_part)
-    } else {
-        format!("[{}]({})", name, identifier)
-    }
+    format_identifier_markdown_link(name, identifier)
 }
 
 fn is_requirement_element(element_type: &ElementType) -> bool {
@@ -136,25 +131,7 @@ fn resolve_target_identifier(
     source_file_path: &str,
     target_identifier: &str,
 ) -> Option<String> {
-    if registry.get_element(target_identifier).is_some() {
-        return Some(target_identifier.to_string());
-    }
-
-    if target_identifier.starts_with('#') {
-        let full_identifier = format!("{}{}", source_file_path, target_identifier);
-        if registry.get_element(&full_identifier).is_some() {
-            return Some(full_identifier);
-        }
-    }
-
-    let (_, fragment_opt) = utils::extract_path_and_fragment(target_identifier);
-    if let Some(fragment) = fragment_opt {
-        if registry.get_element(fragment).is_some() {
-            return Some(fragment.to_string());
-        }
-    }
-
-    None
+    utils::resolve_model_target_identifier(registry, source_file_path, target_identifier)
 }
 
 fn parent_ids_by_relation_and_type(
@@ -211,79 +188,6 @@ fn build_child_map(parent_map: &FxHashMap<String, Vec<String>>) -> FxHashMap<Str
     child_map
 }
 
-fn resolve_requirement_subtree_roots(
-    requirement_id: &str,
-    parent_map: &FxHashMap<String, Vec<String>>,
-    memo: &mut FxHashMap<String, BTreeSet<String>>,
-    visiting: &mut FxHashSet<String>,
-) -> BTreeSet<String> {
-    if let Some(cached) = memo.get(requirement_id) {
-        return cached.clone();
-    }
-
-    if visiting.contains(requirement_id) {
-        return BTreeSet::new();
-    }
-    visiting.insert(requirement_id.to_string());
-
-    let mut result = BTreeSet::new();
-    let parent_ids = parent_map.get(requirement_id).cloned().unwrap_or_default();
-
-    if parent_ids.is_empty() {
-        result.insert(requirement_id.to_string());
-    } else {
-        for parent_id in parent_ids {
-            let parent_roots =
-                resolve_requirement_subtree_roots(&parent_id, parent_map, memo, visiting);
-            for root in parent_roots {
-                result.insert(root);
-            }
-        }
-    }
-
-    visiting.remove(requirement_id);
-    memo.insert(requirement_id.to_string(), result.clone());
-    result
-}
-
-fn resolve_capability_roots(
-    capability_id: &str,
-    capability_parent_map: &FxHashMap<String, Vec<String>>,
-    memo: &mut FxHashMap<String, BTreeSet<String>>,
-    visiting: &mut FxHashSet<String>,
-) -> BTreeSet<String> {
-    if let Some(cached) = memo.get(capability_id) {
-        return cached.clone();
-    }
-
-    if visiting.contains(capability_id) {
-        return BTreeSet::new();
-    }
-    visiting.insert(capability_id.to_string());
-
-    let mut result = BTreeSet::new();
-    let parent_ids = capability_parent_map
-        .get(capability_id)
-        .cloned()
-        .unwrap_or_default();
-
-    if parent_ids.is_empty() {
-        result.insert(capability_id.to_string());
-    } else {
-        for parent_id in parent_ids {
-            let parent_roots =
-                resolve_capability_roots(&parent_id, capability_parent_map, memo, visiting);
-            for root in parent_roots {
-                result.insert(root);
-            }
-        }
-    }
-
-    visiting.remove(capability_id);
-    memo.insert(capability_id.to_string(), result.clone());
-    result
-}
-
 fn resolve_requirement_capability_roots(
     requirement_id: &str,
     requirement_parent_map: &FxHashMap<String, Vec<String>>,
@@ -309,7 +213,7 @@ fn resolve_requirement_capability_roots(
         .cloned()
         .unwrap_or_default()
     {
-        let capability_roots = resolve_capability_roots(
+        let capability_roots = utils::resolve_parent_map_roots(
             &capability_id,
             capability_parent_map,
             capability_memo,
@@ -474,7 +378,7 @@ pub fn generate_submodels_report(
     let mut capability_memo: FxHashMap<String, BTreeSet<String>> = FxHashMap::default();
     let mut root_capabilities = BTreeSet::new();
     for capability_id in &capability_ids {
-        let roots = resolve_capability_roots(
+        let roots = utils::resolve_parent_map_roots(
             capability_id,
             &capability_parent_map,
             &mut capability_memo,
@@ -672,7 +576,7 @@ pub fn generate_submodels_report(
             let mut scoped_memo: FxHashMap<String, BTreeSet<String>> = FxHashMap::default();
             let mut scoped_root_counts: BTreeMap<String, usize> = BTreeMap::new();
             for node_id in &scoped_nodes {
-                let roots = resolve_requirement_subtree_roots(
+                let roots = utils::resolve_parent_map_roots(
                     node_id,
                     &scoped_parent_map,
                     &mut scoped_memo,

@@ -226,11 +226,7 @@ Implementation details shall follow the associated contract specifications.
 The system shall detect when the same target appears in both the Relations and Contract Bindings subsections of an element, treating this as a validation error.
 
 #### Details
-A constraint defines the detailed rules for cross-section duplicate detection.
-
-This applies to identifier targets.
-
-Within-section duplicates (same entry repeated within Relations OR within Contract Bindings) are formatting issues handled by the format operation, not validation errors.
+Detailed cross-section and within-section duplicate handling rules shall follow the associated constraint.
 
 #### Metadata
   * type: requirement
@@ -261,9 +257,7 @@ The system shall validate relation types against a defined vocabulary and provid
 The system shall reject native concept `broader` and `narrower` taxonomy relations whose source and target concepts resolve to different `concept-scheme` roots.
 
 #### Details
-Native `broader` and `narrower` relations are scheme-local taxonomy relations. Cross-scheme concept alignment shall use non-taxonomic association or mapping relations instead: `related`, `exactMatch`, or `closeMatch`.
-
-Validation shall resolve each native concept's scheme context through the canonical `concept-scheme` ancestry used to generate SKOS IRIs. The rule shall run as part of normal model validation so invalid taxonomy does not reach semantic export, Explorer, MCP tools, or downstream graph stores.
+Detailed scheme resolution, accepted cross-scheme alternatives, diagnostic, and validation-timing rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -314,10 +308,7 @@ The system shall define two-pass validation behavior.
 The system shall display all valid type options when type validation fails.
 
 #### Details
-- Invalid element types shall show list of valid element types including custom type pattern
-- Invalid relation types shall show list of valid relation types
-- Element type list format: "type1, type2, ... For custom types use: other-TYPENAME"
-- Relation type list format: "type1, type2, ..." (alphabetically sorted)
+Detailed element-type, relation-type, list-format, custom-type, and sorting behavior shall follow the associated behavior contract.
 
 #### Metadata
   * type: requirement
@@ -402,9 +393,12 @@ The system shall implement a markdown structure validator that enforces Reqvire'
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
 ---
 
-### Validate Relation Types
+### Validate Relation Element Type Compatibility
 
-The system shall validate relation types and allow only supported types.
+The system shall validate that relation endpoints use element types compatible with the relation type.
+
+#### Details
+Relation vocabulary-name validation is owned by Relation Type Validation. This requirement owns endpoint compatibility across the already-supported relation vocabulary.
 
 #### Metadata
   * type: requirement
@@ -426,7 +420,7 @@ Implementation details shall follow the associated contract specifications.
 
 #### Relations
   * definedBy: [Relation Element Type Validator Contract Specification](Specifications.md#relation-element-type-validator-contract-specification)
-  * derivedFrom: [Validate Relation Types](#validate-relation-types)
+  * derivedFrom: [Validate Relation Element Type Compatibility](#validate-relation-element-type-compatibility)
   * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)

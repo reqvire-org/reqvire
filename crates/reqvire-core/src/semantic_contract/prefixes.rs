@@ -96,53 +96,21 @@ pub(super) fn resolve_ontology_base(
     ontology_id: &str,
     memo: &mut FxHashMap<String, Option<String>>,
 ) -> Option<String> {
-    if let Some(cached) = memo.get(ontology_id) {
-        return cached.clone();
-    }
-    memo.insert(ontology_id.to_string(), None);
-
-    let node = registry.nodes.get(ontology_id)?;
-    if let Some(base) = node
-        .element
-        .metadata
-        .get("ontology_base")
-        .map(|value| value.trim())
-        .filter(|value| !value.is_empty())
-    {
-        let base = base.to_string();
-        memo.insert(ontology_id.to_string(), Some(base.clone()));
-        return Some(base);
-    }
-
-    let mut parent_ids: Vec<String> = node
-        .element
-        .relations
-        .iter()
-        .filter(|relation| relation.relation_type.name == "derivedFrom")
-        .filter_map(|relation| match &relation.target.link {
-            LinkType::Identifier(target_id) => registry
-                .nodes
-                .get(target_id)
-                .filter(|target| target.element.element_type.is_ontology())
-                .map(|_| target_id.clone()),
-            _ => None,
-        })
-        .collect();
-    parent_ids.sort();
-
-    for parent_id in parent_ids {
-        if let Some(base) = resolve_ontology_base(registry, &parent_id, memo) {
-            memo.insert(ontology_id.to_string(), Some(base.clone()));
-            return Some(base);
-        }
-    }
-
-    None
+    resolve_inherited_ontology_metadata(registry, ontology_id, "ontology_base", memo)
 }
 
 pub(super) fn resolve_ontology_prefix(
     registry: &GraphRegistry,
     ontology_id: &str,
+    memo: &mut FxHashMap<String, Option<String>>,
+) -> Option<String> {
+    resolve_inherited_ontology_metadata(registry, ontology_id, "ontology_prefix", memo)
+}
+
+fn resolve_inherited_ontology_metadata(
+    registry: &GraphRegistry,
+    ontology_id: &str,
+    metadata_key: &str,
     memo: &mut FxHashMap<String, Option<String>>,
 ) -> Option<String> {
     if let Some(cached) = memo.get(ontology_id) {
@@ -151,16 +119,16 @@ pub(super) fn resolve_ontology_prefix(
     memo.insert(ontology_id.to_string(), None);
 
     let node = registry.nodes.get(ontology_id)?;
-    if let Some(prefix) = node
+    if let Some(value) = node
         .element
         .metadata
-        .get("ontology_prefix")
+        .get(metadata_key)
         .map(|value| value.trim())
         .filter(|value| !value.is_empty())
     {
-        let prefix = prefix.to_string();
-        memo.insert(ontology_id.to_string(), Some(prefix.clone()));
-        return Some(prefix);
+        let value = value.to_string();
+        memo.insert(ontology_id.to_string(), Some(value.clone()));
+        return Some(value);
     }
 
     let mut parent_ids: Vec<String> = node
@@ -180,9 +148,11 @@ pub(super) fn resolve_ontology_prefix(
     parent_ids.sort();
 
     for parent_id in parent_ids {
-        if let Some(prefix) = resolve_ontology_prefix(registry, &parent_id, memo) {
-            memo.insert(ontology_id.to_string(), Some(prefix.clone()));
-            return Some(prefix);
+        if let Some(value) =
+            resolve_inherited_ontology_metadata(registry, &parent_id, metadata_key, memo)
+        {
+            memo.insert(ontology_id.to_string(), Some(value.clone()));
+            return Some(value);
         }
     }
 
@@ -209,7 +179,7 @@ pub(super) fn turtle_prefix_binding(content: &str, expected_prefix: &str) -> Opt
     None
 }
 
-pub(super) fn parse_turtle_prefix_line(line: &str) -> Option<(String, String)> {
+pub(crate) fn parse_turtle_prefix_line(line: &str) -> Option<(String, String)> {
     let rest = line
         .strip_prefix("@prefix ")
         .or_else(|| line.strip_prefix("@PREFIX "))

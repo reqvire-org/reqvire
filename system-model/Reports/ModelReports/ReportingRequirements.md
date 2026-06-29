@@ -5,16 +5,7 @@
 The system shall materialize normalized SKOS concept-relation facts from native concept Markdown relations so concept exports, default semantic export output, Project Store thesaurus data, Ontologies Concepts-layer rendering, and MCP concept tools consume the same concept-relation projection.
 
 #### Details
-The concept relation projection shall:
-- Treat authored `broader` and `narrower` concept relations as inverse aliases for one taxonomy edge.
-- Treat authored `related`, `exactMatch`, and `closeMatch` concept relations as symmetric concept association or mapping edges.
-- Accept either direction in Markdown authoring, and accept consistent reciprocal authoring without reporting a duplicate relation error.
-- Materialize both explicit SKOS directions for taxonomy: `skos:broader` from narrower concept to broader concept and `skos:narrower` from broader concept to narrower concept.
-- Materialize reciprocal SKOS concept association or mapping facts where the SKOS predicate is symmetric, while consumers may canonicalize those reciprocal facts to one visual edge.
-- Keep raw authored Markdown relation evidence separate from generated normalized concept-relation projection facts.
-- Not write generated inverse or reciprocal SKOS facts back to authored Markdown.
-- Feed generated concept-relation facts into `reqvire semantic export --layer concepts`, `reqvire semantic export`, full JSON-LD output, served Project Store `thesaurus` projection, Ontologies Concepts-layer graph data, and MCP concept/thesaurus tools.
-- Remain separate from ontology construct projection because SKOS concept taxonomy and mappings are conceptual thesaurus facts, not OWL/RDFS/SHACL construct classifications.
+Detailed inverse, symmetric, reciprocal, non-mutation, consumer, and ontology-projection separation rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -30,11 +21,7 @@ The concept relation projection shall:
 The system shall expose only constructed used external vocabulary content through external-inclusive semantic output surfaces.
 
 #### Details
-Semantic output surfaces shall not expose raw full external ontology files. When `include_external` is requested, Reqvire shall expose only the used external vocabulary content selected and constructed from internal external dependency inputs. Unused external dependency facts shall remain internal and shall not appear in CLI ontology output, MCP semantic ontology output, MCP vocabulary output, MCP SPARQL graphs, or Explorer ontology views.
-
-Default semantic export and MCP semantic metadata shall keep authored ontology, SHACL shape, SKOS concept, generated model, used external subset, and prefix projection concerns as separate layers. `reqvire semantic export --layer ontologies --layer external-used`, `reqvire semantic export --layer external-used`, and MCP `reqvire.semantic.export` with `layers: ["ontologies", "external-used"]` shall include used external subset triples, used external declarations, and used external vocabulary metadata. `reqvire semantic export` and MCP `reqvire.semantic.export` with omitted layers shall include authored triples, the used external subset, Reqvire model facts, generated ontology projection facts, and prefix projection facts. MCP semantic query helpers shall use `include_external: true` only for query-time used-subset visibility.
-
-No CLI, MCP, Explorer, website, or assistant-facing contract shall specify a public full third-party ontology dump mode.
+Detailed raw-source exclusion, used-subset exposure, layer behavior, MCP visibility, metadata, and no-full-dump rules shall follow the associated specification.
 
 #### Concept References
   * [Used external ontology subset](../../Thesaurus/Thesaurus.md#used-external-ontology-subset)
@@ -100,10 +87,7 @@ The system shall define:
 The system shall expose element-level `size_estimate` records in JSON model evidence outputs when the model was built with size estimates enabled.
 
 #### Details
-- JSON outputs that serialize model elements shall include `size_estimate` when element size estimates are enabled.
-- Non-JSON outputs shall not include size-estimate fields and shall remain unchanged.
-- Report-level aggregate size summaries are out of scope.
-- The initial JSON evidence outputs in scope are model evidence outputs that serialize elements directly or as nested relation targets.
+Detailed JSON-only inclusion, enabled-only behavior, nested element target handling, and aggregate-summary exclusion rules shall follow the associated output specification.
 
 #### Metadata
   * type: requirement
@@ -219,17 +203,7 @@ The system shall support filtering starting elements by type for model traversal
 The system shall provide a submodels report that identifies independent capability-root subgraphs and cross-submodel requirement couplings.
 
 #### Details
-The report shall support:
-- Full model view listing all discovered capability-rooted submodels and cross-submodel couplings
-- Filtered view scoped to one capability or requirement subtree by element name
-- Scope filtering follows transitive descendants via capability hierarchy, `specifiedBy`, and requirement hierarchy in downstream direction.
-- When filtered from a capability, the selected capability is reported as the scoped capability submodel and requirement counts include requirements in that capability subtree.
-- When filtered from a requirement, the selected requirement is a boundary and is not counted as a reported submodel entry; first-level child requirement branches are reported as scoped requirement submodels.
-- When a selected requirement subtree has no child submodels, the filtered report contains zero scoped submodels.
-- The report summary includes deterministic counts for total submodels, total requirements represented in scope, and total cross-submodel couplings; in scoped mode, counts are computed from the scoped submodels and couplings only.
-- Summary content follows the report paragraph: `Submodels`, `Requirements`, and `Cross-Submodel Couplings`.
-
-Implementation details shall follow the associated contract specifications.
+Detailed scope resolution, filtered capability/requirement behavior, empty-submodel behavior, coupling detection, and deterministic summary rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -349,23 +323,12 @@ The system shall implement a validation report generator that compiles and forma
 The system shall generate requirement implementation coverage reports that identify which requirements are implemented using direct `satisfiedBy` evidence and contract consumption evidence.
 
 #### Details
-The implementation coverage report shall provide:
-- Total count of requirements in scope (`requirement` only; excludes direct capability rows)
-- Count and percentage of implementation-covered requirements
-- Count and percentage of implementation-uncovered requirements
-- Coverage source classification for covered requirements:
-  - direct `satisfiedBy` on the requirement
-  - contract coverage through owned contract elements reused by directly satisfied requirements
-  - contract coverage when a requirement that owns contract has directly satisfied derived descendants
-- Detailed lists grouped by file and section, including coverage source and evidence references
-- Output in both human-readable text and machine-readable JSON formats
-- Coverage percentages shall be reported with at most 2 decimal places
+Detailed scope, source classification, evidence, output, grouping, and percentage formatting rules shall follow the associated behavior and specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Implementation Coverage Behavior](Behaviors.md#implementation-coverage-behavior)
   * definedBy: [Implementation Coverage Output Structure Specification](Specifications.md#implementation-coverage-output-structure-specification)
   * definedBy: [Requirement Implementation Coverage Logic Specification](Specifications.md#requirement-implementation-coverage-logic-specification)
   * derivedFrom: [Model Reports](#model-reports)
@@ -391,18 +354,7 @@ The system shall provide a resources report showing all files referenced by the 
 The system shall generate verification coverage reports focusing on leaf requirements, showing the percentage and details of verified and unverified requirements following clearly defined coverage philosophy.
 
 #### Details
-The verification coverage report shall provide:
-- Total count of leaf requirements with breakdown by requirement type
-- Count and percentage of verified leaf requirements (those with verifiedBy relations)
-- Count and percentage of unverified leaf requirements
-- Total count of verification artifacts with breakdown by verification type
-- Count and percentage of satisfied test-verification artifacts
-- Verification objectives shall be visible in model/search reports but excluded from verification coverage denominators because they organize verification intent rather than verifying requirements directly.
-- Count and percentage of orphaned verification artifacts
-- Detailed lists grouped by file and section
-- Output in both human-readable text and machine-readable JSON formats
-
-The report helps track verification completeness and identify gaps in requirement verification coverage.
+Detailed leaf-requirement scope, verification artifact handling, objective exclusion, grouping, output, and percentage rules shall follow the associated behavior and specification.
 
 #### Metadata
   * type: requirement
@@ -437,11 +389,7 @@ The system shall seed Explorer Traces SPA route data showing verification tracea
 The system shall expose the semantic model core context as CLI, MCP, serve-time, and Explorer ontology output without making reporting the owner of ontology or semantic-contract source semantics.
 
 #### Details
-Ontology collection output consumes the semantic context from [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection), including generated ontology document declarations, generated term definition links, authored ontology RDF, semantic-contract SHACL RDF, optional model layer, generated projection facts, and optional used external vocabulary subset content.
-
-Turtle ontology collection output shall use the shared [Prefixed Turtle Semantic Export](../../Semantics/SemanticModelRequirements.md#prefixed-turtle-semantic-export) serializer contract so exported RDF remains graph-equivalent while presenting stable `@prefix` declarations and compact prefixed names where safe.
-
-The output contract owns serialization choices, command/API flags, Project Store payload shape, and Explorer artifact inclusion. It does not own source resolution, semantic-contract reachability, reserved vocabulary recognition, or built-in external source policy.
+Detailed semantic context consumption, serialization choices, command/API flags, Project Store payload shape, Explorer artifact inclusion, and source-semantics boundaries shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -460,15 +408,7 @@ The output contract owns serialization choices, command/API flags, Project Store
 The system shall materialize generated ontology construct facts as a subgraph of the existing in-memory RDF projection so semantic exports and the Ontologies Explorer consume the same ontology construct facts.
 
 #### Details
-The ontology projection subgraph shall:
-- Extend the existing in-memory RDF projection used by full semantic export; it is not a separate database, persistent store, or route-local model.
-- Be bound to the reusable `SemanticIndex` as structured generated projection data so semantic export, JSON-LD export, and Explorer rendering share one authoritative projection source.
-- Be generated from authored ontology and semantic-contract RDF quads during semantic index processing or immediately after parsing.
-- Materialize o-kernel construct classifications into Reqvire ontology projection facts without changing authored Markdown ontology or semantic-contract blocks.
-- Preserve source element identifier, source name, source file, source line, source block kind, construct subject, construct object, construct members, construct property, ordered sequence index when relevant, symbol code point, rendered symbol, and derivation mode.
-- Derive normalized SHACL slot/facet projection records from node-shape target classes and property-shape paths so WebInterface ontology views and semantic exports can share the same source-backed semantic evidence.
-- Distinguish direct-authored projection from inferred projection. Direct-authored projection is in scope; OWL reasoning, SHACL-AF rule execution, and inferred materialization require separate inference requirements before they can contribute generated facts.
-- Feed generated facts into `reqvire semantic export`, `reqvire semantic export --jsonld`, and the Ontologies Explorer through the same in-memory projection context. The served `ontologies.ttl` artifact includes generated ontology document declarations plus authored ontology/SHACL collection output, but does not include generated ontology projection facts unless full semantic output is requested.
+Detailed projection storage, generation timing, source/provenance fields, SHACL slot/facet records, direct-authored scope, identifier namespace ownership, and export/Explorer consumer rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -489,11 +429,7 @@ The ontology projection subgraph shall:
 The system shall materialize ontology-defined relation-family projection facts as part of full semantic model export so semantic search can query relation meaning independently of raw Markdown relation token direction.
 
 #### Details
-- Full semantic model export shall treat authored model relations and contract bindings edges as first-class semantic relation records.
-- Full semantic model export shall emit deterministic `reqvire:ModelRelation` resources with source, target, relation type, and target identifier facts.
-- Full semantic model export shall emit canonical forward and inverse normalized predicates for ontology-defined relation families without removing raw authored relation predicates.
-- The relation-family projection shall be an in-memory semantic export projection, not a source Markdown mutation and not an MCP-owned materialization step.
-- The projection shall follow the ontology-authored `reqvire:RelationRule` semantics and the relation-family construct-query contract.
+Detailed relation-record, canonicalization, construct-query, implementation-boundary, non-mutation, and contract_bindings projection rules shall follow the associated specification.
 
 #### Concept References
   * [Relation family construct query](../../Thesaurus/Thesaurus.md#relation-family-construct-query)

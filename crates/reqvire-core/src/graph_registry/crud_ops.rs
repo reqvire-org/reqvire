@@ -381,6 +381,51 @@ impl GraphRegistry {
         }
     }
 
+    fn append_element_metadata(markdown: &mut String, element: &Element, heading: &str) {
+        markdown.push_str(heading);
+        markdown.push('\n');
+        markdown.push_str(&format!(
+            "  * type: {}\n",
+            element.element_type.to_metadata_string()
+        ));
+        let mut custom_metadata: Vec<_> = element
+            .metadata
+            .iter()
+            .filter(|(key, _)| *key != "type" && *key != "_single_element_format")
+            .collect();
+        custom_metadata.sort_by_key(|(key, _)| *key);
+        for (key, value) in custom_metadata {
+            markdown.push_str(&format!("  * {}: {}\n", key, value));
+        }
+        markdown.push('\n');
+    }
+
+    fn sorted_relations_for_format<'a>(
+        element: &'a Element,
+        with_full_relations: bool,
+    ) -> Vec<&'a Relation> {
+        let mut relations_to_include: Vec<_> = if with_full_relations {
+            element.relations.iter().collect()
+        } else {
+            element
+                .relations
+                .iter()
+                .filter(|relation| relation.user_created)
+                .collect()
+        };
+        relations_to_include.sort_by(|a, b| {
+            Self::relation_format_rank(element, a.relation_type.name)
+                .cmp(&Self::relation_format_rank(element, b.relation_type.name))
+                .then(a.relation_type.name.cmp(b.relation_type.name))
+                .then(a.target.link.as_str().cmp(b.target.link.as_str()))
+        });
+        relations_to_include.dedup_by(|a, b| {
+            a.relation_type.name == b.relation_type.name
+                && a.target.link.as_str() == b.target.link.as_str()
+        });
+        relations_to_include
+    }
+
     pub(super) fn element_to_markdown_with_context(
         &self,
         element: &Element,
@@ -399,28 +444,8 @@ impl GraphRegistry {
             markdown.push('\n');
         }
 
-        // Add metadata subsection
-        // Always include metadata to preserve structure during CRUD operations
-        let mut custom_metadata: Vec<_> = element
-            .metadata
-            .iter()
-            .filter(|(key, _)| *key != "type" && *key != "_single_element_format") // type is handled separately
-            .collect();
-        custom_metadata.sort_by_key(|(key, _)| *key);
-
-        markdown.push_str("#### Metadata\n");
-
-        // Add type metadata
-        markdown.push_str(&format!(
-            "  * type: {}\n",
-            element.element_type.to_metadata_string()
-        ));
-
-        // Add other metadata
-        for (key, value) in custom_metadata {
-            markdown.push_str(&format!("  * {}: {}\n", key, value));
-        }
-        markdown.push('\n');
+        // Always include metadata to preserve structure during CRUD operations.
+        Self::append_element_metadata(&mut markdown, element, "#### Metadata");
 
         // Add contract_bindings subsection if there are contract_bindings
         // Deduplicate contract_bindings by target, keeping first occurrence
@@ -499,32 +524,7 @@ impl GraphRegistry {
             markdown.push('\n');
         }
 
-        // Add relations subsection if there are relations to include
-        // When with_full_relations is true, include all relations (user-created and auto-generated)
-        // Otherwise, only include user-created relations
-        let mut relations_to_include: Vec<_> = if with_full_relations {
-            element.relations.iter().collect()
-        } else {
-            element
-                .relations
-                .iter()
-                .filter(|r| r.user_created)
-                .collect()
-        };
-        // Sort relations for deterministic output. Native concept elements keep
-        // hierarchy context first, then SKOS concept relations in authoring
-        // profile order, instead of pure alphabetical order.
-        relations_to_include.sort_by(|a, b| {
-            Self::relation_format_rank(element, a.relation_type.name)
-                .cmp(&Self::relation_format_rank(element, b.relation_type.name))
-                .then(a.relation_type.name.cmp(b.relation_type.name))
-                .then(a.target.link.as_str().cmp(b.target.link.as_str()))
-        });
-        // Remove duplicate relations (same relation_type + same target), keeping first occurrence
-        relations_to_include.dedup_by(|a, b| {
-            a.relation_type.name == b.relation_type.name
-                && a.target.link.as_str() == b.target.link.as_str()
-        });
+        let relations_to_include = Self::sorted_relations_for_format(element, with_full_relations);
         if !relations_to_include.is_empty() {
             markdown.push_str("#### Relations\n");
             for relation in relations_to_include {
@@ -688,7 +688,9 @@ impl GraphRegistry {
                 output.push(line.to_string());
                 continue;
             }
-            let Some(link) = self.concept_reference_relative_link(current_file, &target_id) else {
+            let Some(link) =
+                crate::utils::concept_reference_relative_link(current_file, &target_id).ok()
+            else {
                 output.push(line.to_string());
                 continue;
             };
@@ -703,23 +705,6 @@ impl GraphRegistry {
         }
 
         output.concat()
-    }
-
-    fn concept_reference_relative_link(
-        &self,
-        source_file: &str,
-        target_identifier: &str,
-    ) -> Option<String> {
-        let (target_file, target_fragment) =
-            crate::utils::extract_path_and_fragment(target_identifier);
-        if target_file == source_file {
-            return Some(format!("#{}", target_fragment.unwrap_or(target_identifier)));
-        }
-        let source_parent = std::path::PathBuf::from(source_file)
-            .parent()
-            .map(std::path::PathBuf::from)
-            .unwrap_or_default();
-        crate::utils::to_relative_identifier(target_identifier, &source_parent, false).ok()
     }
 
     /// Ensures every #### header has exactly one blank line before it (skips content inside <details> blocks)
@@ -907,41 +892,9 @@ impl GraphRegistry {
         let mut markdown = String::new();
         markdown.push_str("# Element\n\n");
 
-        markdown.push_str("## Metadata\n");
-        markdown.push_str(&format!(
-            "  * type: {}\n",
-            element.element_type.to_metadata_string()
-        ));
-        let mut custom_metadata: Vec<_> = element
-            .metadata
-            .iter()
-            .filter(|(k, _)| *k != "type" && *k != "_single_element_format")
-            .collect();
-        custom_metadata.sort_by_key(|(k, _)| *k);
-        for (k, v) in custom_metadata {
-            markdown.push_str(&format!("  * {}: {}\n", k, v));
-        }
-        markdown.push('\n');
+        Self::append_element_metadata(&mut markdown, element, "## Metadata");
 
-        let mut relations_to_include: Vec<_> = if with_full_relations {
-            element.relations.iter().collect()
-        } else {
-            element
-                .relations
-                .iter()
-                .filter(|r| r.user_created)
-                .collect()
-        };
-        relations_to_include.sort_by(|a, b| {
-            a.relation_type
-                .name
-                .cmp(b.relation_type.name)
-                .then(a.target.link.as_str().cmp(b.target.link.as_str()))
-        });
-        relations_to_include.dedup_by(|a, b| {
-            a.relation_type.name == b.relation_type.name
-                && a.target.link.as_str() == b.target.link.as_str()
-        });
+        let relations_to_include = Self::sorted_relations_for_format(element, with_full_relations);
         if !relations_to_include.is_empty() {
             markdown.push_str("## Relations\n");
             for relation in relations_to_include {
@@ -1400,27 +1353,12 @@ impl GraphRegistry {
         let mut markdown_files_written = 0;
 
         for (file_path, elements) in grouped_elements {
-            // Generate the markdown content for this file
-            let markdown_content =
-                self.generate_file_markdown(&file_path, &elements, with_full_relations);
-
-            // Determine the output file path
-            let output_file_path = output_dir.join(&file_path);
-
-            // Create parent directories if needed
-            if let Some(parent_dir) = output_file_path.parent() {
-                fs::create_dir_all(parent_dir).map_err(ReqvireError::IoError)?;
-            }
-
-            // Write the markdown file
-            fs::write(&output_file_path, markdown_content).map_err(ReqvireError::IoError)?;
-
-            debug!(
-                "Flushed {} elements to {}",
-                elements.len(),
-                output_file_path.display()
-            );
-
+            self.write_grouped_markdown_file(
+                &file_path,
+                &elements,
+                output_dir,
+                with_full_relations,
+            )?;
             markdown_files_written += 1;
         }
 
@@ -1457,20 +1395,12 @@ impl GraphRegistry {
 
         for file_path in file_paths {
             if let Some(elements) = grouped_elements.get(file_path) {
-                // Generate the markdown content for this file
-                let markdown_content =
-                    self.generate_file_markdown(file_path, elements, with_full_relations);
-
-                // Determine the output file path
-                let output_file_path = output_dir.join(file_path);
-
-                // Create parent directories if needed
-                if let Some(parent_dir) = output_file_path.parent() {
-                    fs::create_dir_all(parent_dir).map_err(ReqvireError::IoError)?;
-                }
-
-                // Write the markdown file
-                fs::write(&output_file_path, markdown_content).map_err(ReqvireError::IoError)?;
+                self.write_grouped_markdown_file(
+                    file_path,
+                    elements,
+                    output_dir,
+                    with_full_relations,
+                )?;
 
                 // Collect InternalPath relations from elements in this file
                 for element in elements {
@@ -1480,12 +1410,6 @@ impl GraphRegistry {
                         }
                     }
                 }
-
-                debug!(
-                    "Flushed {} elements to {}",
-                    elements.len(),
-                    output_file_path.display()
-                );
 
                 markdown_files_written += 1;
             }
@@ -1503,6 +1427,32 @@ impl GraphRegistry {
         );
 
         Ok((markdown_files_written, internal_files_copied))
+    }
+
+    fn write_grouped_markdown_file(
+        &self,
+        file_path: &str,
+        elements: &[&Element],
+        output_dir: &Path,
+        with_full_relations: bool,
+    ) -> Result<(), ReqvireError> {
+        let markdown_content =
+            self.generate_file_markdown(file_path, elements, with_full_relations);
+        let output_file_path = output_dir.join(file_path);
+
+        if let Some(parent_dir) = output_file_path.parent() {
+            fs::create_dir_all(parent_dir).map_err(ReqvireError::IoError)?;
+        }
+
+        fs::write(&output_file_path, markdown_content).map_err(ReqvireError::IoError)?;
+
+        debug!(
+            "Flushed {} elements to {}",
+            elements.len(),
+            output_file_path.display()
+        );
+
+        Ok(())
     }
 
     // Dynamic graph manipulation methods

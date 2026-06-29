@@ -254,9 +254,9 @@ pub static RELATION_TYPES: LazyLock<FxHashMap<&'static str, RelationTypeInfo>> =
 
 pub const LEGACY_CONTRACT_RELATIONS: &[&str] = &["refinedBy", "refine"];
 
-/// Relations to show in diagrams (one from each pair to avoid duplicates)
-/// These are typically the "forward" relations from the old direction system
-pub const DIAGRAM_RELATIONS: &[&str] = &[
+/// Canonical forward relations used for model traversal and relation projection.
+/// One relation from each inverse pair is selected to avoid duplicate edges.
+pub const MODEL_TRAVERSAL_RELATIONS: &[&str] = &[
     "derive",      // Not derivedFrom
     "specifiedBy", // Not specify
     "satisfiedBy", // Not satisfy
@@ -269,6 +269,38 @@ pub const DIAGRAM_RELATIONS: &[&str] = &[
     "closeMatch", // Concept mapping
     "verifiedBy", // Not verify
 ];
+
+pub fn canonical_model_traversal_edge(
+    source: &str,
+    target: &str,
+    relation_name: &str,
+) -> (String, String, String) {
+    if MODEL_TRAVERSAL_RELATIONS.contains(&relation_name) {
+        return (
+            source.to_string(),
+            target.to_string(),
+            relation_name.to_string(),
+        );
+    }
+    let canonical = RELATION_TYPES
+        .get(relation_name)
+        .and_then(|info| info.opposite)
+        .filter(|opposite| MODEL_TRAVERSAL_RELATIONS.contains(opposite))
+        .unwrap_or(relation_name);
+    if canonical == relation_name {
+        (
+            source.to_string(),
+            target.to_string(),
+            relation_name.to_string(),
+        )
+    } else {
+        (
+            target.to_string(),
+            source.to_string(),
+            canonical.to_string(),
+        )
+    }
+}
 
 /// Relations that propagate changes in impact analysis
 /// When these relations exist, changes to the source affect the target
@@ -285,7 +317,7 @@ pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
     "verifiedBy", // Requirement changes invalidate verifications
 ];
 
-/// Backward relations for reverse model traversal (opposite of DIAGRAM_RELATIONS)
+/// Backward relations for reverse model traversal (opposite of MODEL_TRAVERSAL_RELATIONS)
 /// These traverse from leaves upward to roots
 pub const BACKWARD_RELATIONS: &[&str] = &[
     "derivedFrom", // Opposite of derive

@@ -163,7 +163,7 @@ fn should_skip_workspace_asset_dir(name: &str) -> bool {
     )
 }
 
-fn is_workspace_asset_path(path: &std::path::Path) -> bool {
+pub fn is_workspace_asset_path(path: &std::path::Path) -> bool {
     matches!(
         path.extension()
             .and_then(|ext| ext.to_str())

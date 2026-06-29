@@ -11,6 +11,7 @@ use super::prefixes::{
 };
 use super::vocabulary::{build_ontology_projection, ontology_term_role};
 use super::*;
+use crate::concept::concept_local_name;
 
 pub(super) fn concept_reference_iri_value(
     registry: &GraphRegistry,
@@ -543,39 +544,7 @@ pub(super) fn concept_scheme_context<'a>(
     registry: &'a GraphRegistry,
     element: &'a Element,
 ) -> Option<&'a Element> {
-    if element.element_type.is_concept_scheme() {
-        return Some(element);
-    }
-    let mut seen = BTreeSet::new();
-    concept_scheme_context_recursive(registry, element, &mut seen)
-}
-
-pub(super) fn concept_scheme_context_recursive<'a>(
-    registry: &'a GraphRegistry,
-    element: &'a Element,
-    seen: &mut BTreeSet<String>,
-) -> Option<&'a Element> {
-    if !seen.insert(element.identifier.clone()) {
-        return None;
-    }
-    for relation in &element.relations {
-        if relation.relation_type.name != "derivedFrom" {
-            continue;
-        }
-        let LinkType::Identifier(target_id) = &relation.target.link else {
-            continue;
-        };
-        let target = registry.nodes.get(target_id).map(|node| &node.element)?;
-        if target.element_type.is_concept_scheme() {
-            return Some(target);
-        }
-        if target.element_type.is_concept() {
-            if let Some(scheme) = concept_scheme_context_recursive(registry, target, seen) {
-                return Some(scheme);
-            }
-        }
-    }
-    None
+    registry.concept_scheme_context_element(&element.identifier)
 }
 
 pub(super) fn normalized_concept_relation_objects(
@@ -708,16 +677,8 @@ pub(super) fn concept_link_target_element<'a>(
     target: &str,
 ) -> Option<&'a Element> {
     registry
-        .nodes
-        .get(target)
-        .map(|node| &node.element)
-        .or_else(|| {
-            registry
-                .nodes
-                .values()
-                .find(|node| node.element.identifier.ends_with(target))
-                .map(|node| &node.element)
-        })
+        .resolve_concept_element_id(target)
+        .and_then(|target_id| registry.nodes.get(&target_id).map(|node| &node.element))
 }
 
 pub(super) fn concept_link_object(
@@ -737,27 +698,6 @@ pub(super) fn concept_link_object(
 
 pub(super) fn concept_curie(prefix: &str, element: &Element) -> String {
     format!("{}:{}", prefix, concept_local_name(&element.name))
-}
-
-pub(super) fn concept_local_name(name: &str) -> String {
-    let mut local = String::new();
-    for part in name
-        .split(|ch: char| !ch.is_ascii_alphanumeric())
-        .filter(|part| !part.is_empty())
-    {
-        let mut chars = part.chars();
-        if let Some(first) = chars.next() {
-            local.push(first.to_ascii_uppercase());
-            for ch in chars {
-                local.push(ch);
-            }
-        }
-    }
-    if local.is_empty() {
-        "Concept".to_string()
-    } else {
-        local
-    }
 }
 
 pub(super) fn build_model_context_graph(
@@ -873,31 +813,7 @@ pub(super) fn canonical_model_context_relation_edge(
     target: &str,
     relation_name: &str,
 ) -> (String, String, String) {
-    if relation::DIAGRAM_RELATIONS.contains(&relation_name) {
-        return (
-            source.to_string(),
-            target.to_string(),
-            relation_name.to_string(),
-        );
-    }
-    let canonical = relation::RELATION_TYPES
-        .get(relation_name)
-        .and_then(|info| info.opposite)
-        .filter(|opposite| relation::DIAGRAM_RELATIONS.contains(opposite))
-        .unwrap_or(relation_name);
-    if canonical == relation_name {
-        (
-            source.to_string(),
-            target.to_string(),
-            relation_name.to_string(),
-        )
-    } else {
-        (
-            target.to_string(),
-            source.to_string(),
-            canonical.to_string(),
-        )
-    }
+    relation::canonical_model_traversal_edge(source, target, relation_name)
 }
 
 pub(super) fn build_ontology_document_declarations(

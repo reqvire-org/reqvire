@@ -1,26 +1,5 @@
 use super::*;
 
-pub(super) fn concept_validation_local_name(name: &str) -> String {
-    let mut local = String::new();
-    for part in name
-        .split(|ch: char| !ch.is_ascii_alphanumeric())
-        .filter(|part| !part.is_empty())
-    {
-        let mut chars = part.chars();
-        if let Some(first) = chars.next() {
-            local.push(first.to_ascii_uppercase());
-            for ch in chars {
-                local.push(ch);
-            }
-        }
-    }
-    if local.is_empty() {
-        "Concept".to_string()
-    } else {
-        local
-    }
-}
-
 impl GraphRegistry {
     /// Validates that no element has the same target in both Relations and Contract Bindings subsections
     pub(super) fn validate_cross_section_duplicates(
@@ -1996,13 +1975,6 @@ mod tests {
             },
             user_created: true,
         });
-    }
-
-    #[test]
-    fn concept_validation_local_name_camelcases_parts() {
-        assert_eq!(concept_validation_local_name("foo-bar"), "FooBar");
-        assert_eq!(concept_validation_local_name(""), "Concept");
-        assert_eq!(concept_validation_local_name("FOO_BAR baz"), "FOOBARBaz");
     }
 
     #[test]

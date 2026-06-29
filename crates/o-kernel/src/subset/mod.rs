@@ -5,6 +5,7 @@ pub mod construct;
 pub mod reference;
 pub mod seed;
 
+use crate::rdf::named_or_blank_node_key;
 use crate::vocab::{
     OWL_ALL_VALUES_FROM, OWL_CARDINALITY, OWL_COMPLEMENT_OF, OWL_DISJOINT_WITH,
     OWL_EQUIVALENT_CLASS, OWL_EQUIVALENT_PROPERTY, OWL_HAS_VALUE, OWL_INTERSECTION_OF,
@@ -238,7 +239,7 @@ where
 fn quad_key(quad: &Quad) -> String {
     format!(
         "{} {} {} {}",
-        named_or_blank_to_key(&quad.subject),
+        named_or_blank_node_key(&quad.subject),
         quad.predicate.as_str(),
         term_to_key(&quad.object),
         graph_key(&quad.graph_name),
@@ -269,24 +270,17 @@ fn sorted_named_or_blank_keys<'a, I>(names: I) -> Vec<String>
 where
     I: Iterator<Item = &'a NamedOrBlankNode>,
 {
-    let mut values = names.map(named_or_blank_to_key).collect::<Vec<_>>();
+    let mut values = names.map(named_or_blank_node_key).collect::<Vec<_>>();
     values.sort();
     values
 }
 
 pub(crate) fn term_key(term: &NamedOrBlankNode) -> String {
-    named_or_blank_to_key(term)
+    named_or_blank_node_key(term)
 }
 
 pub(crate) fn quad_key_for_sort(quad: &Quad) -> String {
     quad_key(quad)
-}
-
-fn named_or_blank_to_key(term: &NamedOrBlankNode) -> String {
-    match term {
-        NamedOrBlankNode::NamedNode(node) => node.as_str().to_string(),
-        NamedOrBlankNode::BlankNode(node) => format!("_:{}", node.as_str()),
-    }
 }
 
 #[cfg(test)]
@@ -321,7 +315,7 @@ mod tests {
     fn reference_extraction_tracks_subject_predicate_object_and_list_members() {
         let store = Store::new().expect("store creates");
         load_turtle(
-            "urn:reqvire:test:authored",
+            "urn:o-kernel:test:authored",
             r#"
 @prefix ex: <https://example.test/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -333,7 +327,7 @@ ex:ListHead rdf:first ex:ListMember ; rdf:rest rdf:nil .
 
         let result = build_external_dependency_subset(
             &store,
-            vec!["urn:reqvire:test:authored"],
+            vec!["urn:o-kernel:test:authored"],
             Vec::<String>::new(),
         )
         .expect("subset build succeeds");
@@ -364,7 +358,7 @@ ex:ListHead rdf:first ex:ListMember ; rdf:rest rdf:nil .
     fn support_expansion_respects_depth_and_reports_boundary_terms() {
         let store = Store::new().expect("store creates");
         load_turtle(
-            "urn:reqvire:test:authored",
+            "urn:o-kernel:test:authored",
             r#"
 @prefix ex: <https://example.test/> .
 ex:Seed ex:seeded "seed" .
@@ -372,7 +366,7 @@ ex:Seed ex:seeded "seed" .
             &store,
         );
         load_turtle(
-            "urn:reqvire:test:dependency",
+            "urn:o-kernel:test:dependency",
             r#"
 @prefix ex: <https://example.test/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -386,8 +380,8 @@ ex:Support1 rdfs:label "support" .
 
         let result = build_external_dependency_subset(
             &store,
-            vec!["urn:reqvire:test:authored"],
-            vec!["urn:reqvire:test:dependency"],
+            vec!["urn:o-kernel:test:authored"],
+            vec!["urn:o-kernel:test:dependency"],
         )
         .expect("subset build succeeds");
 
@@ -407,7 +401,7 @@ ex:Support1 rdfs:label "support" .
     fn annotation_triples_are_included_for_selected_and_support_terms() {
         let store = Store::new().expect("store creates");
         load_turtle(
-            "urn:reqvire:test:authored",
+            "urn:o-kernel:test:authored",
             r#"
 @prefix ex: <https://example.test/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -416,7 +410,7 @@ ex:Seed rdfs:subClassOf ex:Support .
             &store,
         );
         load_turtle(
-            "urn:reqvire:test:dependency",
+            "urn:o-kernel:test:dependency",
             r#"
 @prefix ex: <https://example.test/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -429,8 +423,8 @@ ex:Support rdfs:label "support" .
 
         let result = build_external_dependency_subset(
             &store,
-            vec!["urn:reqvire:test:authored"],
-            vec!["urn:reqvire:test:dependency"],
+            vec!["urn:o-kernel:test:authored"],
+            vec!["urn:o-kernel:test:dependency"],
         )
         .expect("subset build succeeds");
 
@@ -445,7 +439,7 @@ ex:Support rdfs:label "support" .
     fn list_closure_preserves_order_and_terminal_nil() {
         let store = Store::new().expect("store creates");
         load_turtle(
-            "urn:reqvire:test:authored",
+            "urn:o-kernel:test:authored",
             r#"
 @prefix ex: <https://example.test/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -454,7 +448,7 @@ ex:Seed rdfs:subClassOf ex:Head .
             &store,
         );
         load_turtle(
-            "urn:reqvire:test:dependency",
+            "urn:o-kernel:test:dependency",
             r#"
 @prefix ex: <https://example.test/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -470,8 +464,8 @@ _:cell rdf:first ex:B ;
 
         let result = build_external_dependency_subset(
             &store,
-            vec!["urn:reqvire:test:authored"],
-            vec!["urn:reqvire:test:dependency"],
+            vec!["urn:o-kernel:test:authored"],
+            vec!["urn:o-kernel:test:dependency"],
         )
         .expect("subset build succeeds");
 

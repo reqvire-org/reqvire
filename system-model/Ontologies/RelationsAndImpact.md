@@ -1108,8 +1108,8 @@ reqvire:contractBindingRelationFamily a owl:NamedIndividual, reqvire:RelationFam
   rdfs:label "Cross-subgraph contract dependency relation family" ;
   reqvire:relationFamilyName "contract-binding" ;
   reqvire:relationFamilyMeaning "Dependency from a requirement to reusable requirement-owned contract context in another subgraph." ;
-  reqvire:relationFamilyForwardProperty reqvire:requirementBindsContract ;
-  reqvire:relationFamilyInverseProperty reqvire:contractBoundBy .
+  reqvire:relationFamilyForwardProperty reqvire:bindsContract ;
+  reqvire:relationFamilyInverseProperty reqvire:boundByContract .
 
 reqvire:derive a owl:ObjectProperty ;
   rdfs:domain reqvire:Element ;
@@ -1357,26 +1357,16 @@ reqvire:artifactSatisfiesElement a owl:ObjectProperty ;
   rdfs:range reqvire:Element ;
   owl:inverseOf reqvire:elementSatisfiedByArtifact ;
   rdfs:comment "Normalized direct satisfaction relation from an implementation or evidence artifact to the element it satisfies." .
-reqvire:reuse a owl:ObjectProperty ;
-  rdfs:domain reqvire:Element ;
-  rdfs:range reqvire:Element ;
-  owl:inverseOf reqvire:bindsContract ;
-  rdfs:comment "Inverse contract_bindings relation from a reusable requirement-owned contract back to its consuming requirement." .
 reqvire:bindsContract a owl:ObjectProperty ;
-  rdfs:domain reqvire:Element ;
-  rdfs:range reqvire:Element ;
-  owl:inverseOf reqvire:reuse ;
-  rdfs:comment "Forward contract_bindings relation from a requirement to explicit reusable requirement-owned contract context." .
-reqvire:requirementBindsContract a owl:ObjectProperty ;
   rdfs:domain reqvire:Requirement ;
   rdfs:range reqvire:Contract ;
-  owl:inverseOf reqvire:contractBoundBy ;
-  rdfs:comment "Normalized direct relation from a requirement to reusable contract context it uses from another subgraph." .
-reqvire:contractBoundBy a owl:ObjectProperty ;
+  owl:inverseOf reqvire:boundByContract ;
+  rdfs:comment "Forward contract_bindings projection from a requirement to explicit reusable requirement-owned contract context." .
+reqvire:boundByContract a owl:ObjectProperty ;
   rdfs:domain reqvire:Contract ;
   rdfs:range reqvire:Requirement ;
-  owl:inverseOf reqvire:requirementBindsContract ;
-  rdfs:comment "Normalized inverse relation from reusable contract context to requirements in other subgraphs that use it." .
+  owl:inverseOf reqvire:bindsContract ;
+  rdfs:comment "Inverse contract_bindings projection from reusable contract context to requirements in other subgraphs that bind it." .
 reqvire:implementedByArtifact a owl:ObjectProperty ;
   rdfs:domain reqvire:Capability ;
   rdfs:range reqvire:Artifact ;
@@ -1397,8 +1387,8 @@ reqvire:verify reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
 reqvire:verifiedBy reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
 reqvire:satisfy reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
 reqvire:satisfiedBy reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
-reqvire:reuse reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
-reqvire:bindsContract reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
+reqvire:bindsContract reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:boundByContract reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
 
 reqvire:parentElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
 reqvire:childElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
@@ -1432,8 +1422,6 @@ reqvire:requirementVerifiedByVerification reqvire:relationPredicateLayer reqvire
 reqvire:verificationVerifiesRequirement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
 reqvire:elementSatisfiedByArtifact reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
 reqvire:artifactSatisfiesElement reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
-reqvire:requirementBindsContract reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
-reqvire:contractBoundBy reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
 reqvire:implementedByArtifact reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
 
 reqvire:inverseRelation a owl:ObjectProperty ;
@@ -1862,8 +1850,8 @@ reqvire:contractBindingsRelationRule a reqvire:RelationRule ;
   reqvire:relationName "contract_bindings" ;
   reqvire:relationPattern reqvire:contractBindingPattern ;
   reqvire:relationFamily reqvire:contractBindingRelationFamily ;
-  reqvire:normalizedForwardProperty reqvire:requirementBindsContract ;
-  reqvire:normalizedInverseProperty reqvire:contractBoundBy ;
+  reqvire:normalizedForwardProperty reqvire:bindsContract ;
+  reqvire:normalizedInverseProperty reqvire:boundByContract ;
   reqvire:allowedSourceType "requirement" ;
   reqvire:allowedTargetType "requirement-owned-contract" ;
   reqvire:relationDirection "forward" ;

@@ -132,15 +132,6 @@ When deleting an element, the system is expected to:
   * type: specification
 ---
 
-### Element Manipulation File Persistence Contract Specification
-
-#### Details
-The system is expected to persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.
-
-#### Metadata
-  * type: specification
----
-
 ### Merge Element Workflow Specification
 
 Detailed workflow for merging multiple source elements into a target element.

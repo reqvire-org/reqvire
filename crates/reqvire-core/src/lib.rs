@@ -1,5 +1,6 @@
 pub mod builtin_external_sources;
 pub mod change_impact;
+pub(crate) mod concept;
 pub mod config;
 pub mod containment;
 pub mod crud;
@@ -21,6 +22,7 @@ pub mod model_cache;
 pub mod ontology_graph;
 pub mod operations;
 pub mod parser;
+pub(crate) mod rdf_store;
 pub mod relation;
 pub mod report;
 pub mod runtime_ontology;
@@ -28,6 +30,8 @@ pub mod search;
 pub mod semantic_contract;
 pub mod semantic_store;
 pub mod subsection;
+#[cfg(test)]
+pub(crate) mod test_support;
 pub mod tool_interface;
 pub mod trace_tree_builder;
 pub mod utils;

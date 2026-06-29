@@ -389,87 +389,68 @@ fn collect_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Str
 }
 
 fn collect_concept_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
-    let mut chain = Vec::new();
-    let mut visited = FxHashSet::default();
-    let mut current_level = vec![start_id.to_string()];
-
-    while !current_level.is_empty() {
-        let mut sorted_level = current_level.clone();
-        sorted_level.sort();
-
-        for elem_id in &sorted_level {
-            if visited.contains(elem_id) {
-                continue;
-            }
-            visited.insert(elem_id.clone());
-            chain.push(elem_id.clone());
-        }
-
-        let mut next_level = Vec::new();
-        for elem_id in &sorted_level {
-            if let Some(elem) = registry.get_element(elem_id) {
-                for rel in &elem.relations {
-                    if rel.relation_type.name == "derive" {
-                        if let relation::LinkType::Identifier(target_id) = &rel.target.link {
-                            if !visited.contains(target_id)
-                                && element_matches_kind(
-                                    registry,
-                                    target_id,
-                                    ElementTypeKind::Concept,
-                                )
-                            {
-                                next_level.push(target_id.clone());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        current_level = next_level;
-    }
-
-    chain
+    collect_typed_derive_downstream_chain(registry, start_id, ElementTypeKind::Concept)
 }
 
 fn collect_requirement_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
+    collect_typed_derive_downstream_chain(registry, start_id, ElementTypeKind::Requirement)
+}
+
+fn collect_typed_derive_downstream_chain(
+    registry: &GraphRegistry,
+    start_id: &str,
+    kind: ElementTypeKind,
+) -> Vec<String> {
+    collect_sorted_downstream_chain(registry, start_id, |registry, elem_id, visited| {
+        let Some(elem) = registry.get_element(elem_id) else {
+            return Vec::new();
+        };
+
+        elem.relations
+            .iter()
+            .filter(|rel| rel.relation_type.name == "derive")
+            .filter_map(|rel| match &rel.target.link {
+                relation::LinkType::Identifier(target_id)
+                    if !visited.contains(target_id)
+                        && element_matches_kind(registry, target_id, kind) =>
+                {
+                    Some(target_id.clone())
+                }
+                _ => None,
+            })
+            .collect()
+    })
+}
+
+fn collect_sorted_downstream_chain<F>(
+    registry: &GraphRegistry,
+    start_id: &str,
+    mut successors: F,
+) -> Vec<String>
+where
+    F: FnMut(&GraphRegistry, &str, &FxHashSet<String>) -> Vec<String>,
+{
     let mut chain = Vec::new();
     let mut visited = FxHashSet::default();
     let mut current_level = vec![start_id.to_string()];
 
     while !current_level.is_empty() {
-        // Sort for deterministic ordering
         let mut sorted_level = current_level.clone();
         sorted_level.sort();
 
+        let mut newly_visited = Vec::new();
         for elem_id in &sorted_level {
             if visited.contains(elem_id) {
                 continue;
             }
             visited.insert(elem_id.clone());
             chain.push(elem_id.clone());
+            newly_visited.push(elem_id.clone());
         }
 
-        // Find next level (children via derive)
         let mut next_level = Vec::new();
-        for elem_id in &sorted_level {
-            if let Some(elem) = registry.get_element(elem_id) {
-                for rel in &elem.relations {
-                    if rel.relation_type.name == "derive" {
-                        if let relation::LinkType::Identifier(target_id) = &rel.target.link {
-                            if !visited.contains(target_id)
-                                && element_matches_kind(
-                                    registry,
-                                    target_id,
-                                    ElementTypeKind::Requirement,
-                                )
-                            {
-                                next_level.push(target_id.clone());
-                            }
-                        }
-                    }
-                }
-            }
+        for elem_id in newly_visited {
+            next_level.extend(successors(registry, &elem_id, &visited));
         }
 
         current_level = next_level;
@@ -479,65 +460,44 @@ fn collect_requirement_downstream_chain(registry: &GraphRegistry, start_id: &str
 }
 
 fn collect_capability_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
-    let mut chain = Vec::new();
-    let mut visited = FxHashSet::default();
-    let mut current_level = vec![start_id.to_string()];
-
-    while !current_level.is_empty() {
-        let mut sorted_level = current_level.clone();
-        sorted_level.sort();
-
-        for elem_id in &sorted_level {
-            if visited.contains(elem_id) {
-                continue;
-            }
-            visited.insert(elem_id.clone());
-            chain.push(elem_id.clone());
-        }
-
+    collect_sorted_downstream_chain(registry, start_id, |registry, elem_id, visited| {
         let mut next_level = Vec::new();
-        for elem_id in &sorted_level {
-            if let Some(elem) = registry.get_element(elem_id) {
-                match &elem.element_type {
-                    ElementType::Capability => {
-                        for rel in &elem.relations {
-                            if matches!(rel.relation_type.name, "derive" | "specifiedBy") {
-                                if let relation::LinkType::Identifier(target_id) = &rel.target.link
-                                {
-                                    if !visited.contains(target_id) {
-                                        next_level.push(target_id.clone());
-                                    }
+        if let Some(elem) = registry.get_element(elem_id) {
+            match &elem.element_type {
+                ElementType::Capability => {
+                    for rel in &elem.relations {
+                        if matches!(rel.relation_type.name, "derive" | "specifiedBy") {
+                            if let relation::LinkType::Identifier(target_id) = &rel.target.link {
+                                if !visited.contains(target_id) {
+                                    next_level.push(target_id.clone());
                                 }
                             }
                         }
                     }
-                    ElementType::Requirement(_) => {
-                        for rel in &elem.relations {
-                            if rel.relation_type.name == "derive" {
-                                if let relation::LinkType::Identifier(target_id) = &rel.target.link
-                                {
-                                    if !visited.contains(target_id)
-                                        && element_matches_kind(
-                                            registry,
-                                            target_id,
-                                            ElementTypeKind::Requirement,
-                                        )
-                                    {
-                                        next_level.push(target_id.clone());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    _ => {}
                 }
+                ElementType::Requirement(_) => {
+                    for rel in &elem.relations {
+                        if rel.relation_type.name == "derive" {
+                            if let relation::LinkType::Identifier(target_id) = &rel.target.link {
+                                if !visited.contains(target_id)
+                                    && element_matches_kind(
+                                        registry,
+                                        target_id,
+                                        ElementTypeKind::Requirement,
+                                    )
+                                {
+                                    next_level.push(target_id.clone());
+                                }
+                            }
+                        }
+                    }
+                }
+                _ => {}
             }
         }
 
-        current_level = next_level;
-    }
-
-    chain
+        next_level
+    })
 }
 
 fn collect_ontology_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
@@ -697,61 +657,14 @@ fn collect_contract_bindings_content(
     git_root: &Path,
 ) -> Option<CollectedItem> {
     match &contract_bindings.target {
-        ContractBindingTarget::FilePath(path) => {
-            let full_path = git_root.join(path);
-            let path_str = path.to_string_lossy().to_string();
-
-            // Check if it's a markdown file
-            if path_str.ends_with(".md") {
-                // Try to read file content
-                match fs::read_to_string(&full_path) {
-                    Ok(content) => Some(CollectedItem {
-                        name: path
-                            .file_name()
-                            .map(|n| n.to_string_lossy().to_string())
-                            .unwrap_or_else(|| path_str.clone()),
-                        identifier: path_str,
-                        file_path: path.to_string_lossy().to_string(),
-                        element_type: "contract_bindings".to_string(),
-                        content,
-                        depth,
-                        source_type: SourceType::ContractBindingFile,
-                        reused_by: Some(parent_identifier.to_string()),
-                    }),
-                    Err(_) => {
-                        // File not found - create link instead
-                        Some(CollectedItem {
-                            name: path
-                                .file_name()
-                                .map(|n| n.to_string_lossy().to_string())
-                                .unwrap_or_else(|| path_str.clone()),
-                            identifier: path_str.clone(),
-                            file_path: path.to_string_lossy().to_string(),
-                            element_type: "contract_bindings".to_string(),
-                            content: format!("[{}]({})", path_str, path_str),
-                            depth,
-                            source_type: SourceType::ContractBindingFile,
-                            reused_by: Some(parent_identifier.to_string()),
-                        })
-                    }
-                }
-            } else {
-                // Non-markdown file - create link
-                Some(CollectedItem {
-                    name: path
-                        .file_name()
-                        .map(|n| n.to_string_lossy().to_string())
-                        .unwrap_or_else(|| path_str.clone()),
-                    identifier: path_str.clone(),
-                    file_path: path.to_string_lossy().to_string(),
-                    element_type: "contract_bindings".to_string(),
-                    content: format!("[{}]({})", path_str, path_str),
-                    depth,
-                    source_type: SourceType::ContractBindingFile,
-                    reused_by: Some(parent_identifier.to_string()),
-                })
-            }
-        }
+        ContractBindingTarget::FilePath(path) => collect_file_target_content(
+            path,
+            "contract_bindings",
+            SourceType::ContractBindingFile,
+            parent_identifier,
+            depth,
+            git_root,
+        ),
         ContractBindingTarget::ElementIdentifier(elem_id) => {
             // Look up element content from registry
             registry.get_element(elem_id).map(|elem| {
@@ -797,62 +710,50 @@ fn collect_contract_content(
                 reused_by: Some(parent_identifier.to_string()),
             })
         }
-        relation::LinkType::InternalPath(path) => {
-            // File path - read file content (same logic as contract_bindings file handling)
-            let full_path = git_root.join(path);
-            let path_str = path.to_string_lossy().to_string();
-
-            if path_str.ends_with(".md") {
-                match fs::read_to_string(&full_path) {
-                    Ok(content) => Some(CollectedItem {
-                        name: path
-                            .file_name()
-                            .map(|n| n.to_string_lossy().to_string())
-                            .unwrap_or_else(|| path_str.clone()),
-                        identifier: path_str,
-                        file_path: path.to_string_lossy().to_string(),
-                        element_type: "contract".to_string(),
-                        content,
-                        depth,
-                        source_type: SourceType::RefinedByFile,
-                        reused_by: Some(parent_identifier.to_string()),
-                    }),
-                    Err(_) => Some(CollectedItem {
-                        name: path
-                            .file_name()
-                            .map(|n| n.to_string_lossy().to_string())
-                            .unwrap_or_else(|| path_str.clone()),
-                        identifier: path_str.clone(),
-                        file_path: path.to_string_lossy().to_string(),
-                        element_type: "contract".to_string(),
-                        content: format!("[{}]({})", path_str, path_str),
-                        depth,
-                        source_type: SourceType::RefinedByFile,
-                        reused_by: Some(parent_identifier.to_string()),
-                    }),
-                }
-            } else {
-                // Non-markdown file - create link
-                Some(CollectedItem {
-                    name: path
-                        .file_name()
-                        .map(|n| n.to_string_lossy().to_string())
-                        .unwrap_or_else(|| path_str.clone()),
-                    identifier: path_str.clone(),
-                    file_path: path.to_string_lossy().to_string(),
-                    element_type: "contract".to_string(),
-                    content: format!("[{}]({})", path_str, path_str),
-                    depth,
-                    source_type: SourceType::RefinedByFile,
-                    reused_by: Some(parent_identifier.to_string()),
-                })
-            }
-        }
+        relation::LinkType::InternalPath(path) => collect_file_target_content(
+            path,
+            "contract",
+            SourceType::RefinedByFile,
+            parent_identifier,
+            depth,
+            git_root,
+        ),
         relation::LinkType::ExternalUrl(_) => {
             // Skip external URLs
             None
         }
     }
+}
+
+fn collect_file_target_content(
+    path: &Path,
+    element_type: &str,
+    source_type: SourceType,
+    parent_identifier: &str,
+    depth: usize,
+    git_root: &Path,
+) -> Option<CollectedItem> {
+    let full_path = git_root.join(path);
+    let path_str = path.to_string_lossy().to_string();
+    let content = if path_str.ends_with(".md") {
+        fs::read_to_string(&full_path).unwrap_or_else(|_| format!("[{}]({})", path_str, path_str))
+    } else {
+        format!("[{}]({})", path_str, path_str)
+    };
+
+    Some(CollectedItem {
+        name: path
+            .file_name()
+            .map(|name| name.to_string_lossy().to_string())
+            .unwrap_or_else(|| path_str.clone()),
+        identifier: path_str.clone(),
+        file_path: path_str,
+        element_type: element_type.to_string(),
+        content,
+        depth,
+        source_type,
+        reused_by: Some(parent_identifier.to_string()),
+    })
 }
 
 /// Generate text output with source citations

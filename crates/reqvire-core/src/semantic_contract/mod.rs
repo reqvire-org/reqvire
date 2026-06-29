@@ -8,7 +8,7 @@ use crate::relation::{self, LinkType};
 use o_kernel::diagnostics::is_false;
 use o_kernel::{constructs, ontology, shacl, vocab::*};
 use oxigraph::io::{JsonLdProfileSet, RdfFormat, RdfParser, RdfSerializer};
-use oxigraph::model::{NamedNode, Quad, Term, Triple};
+use oxigraph::model::{Quad, Triple};
 use oxigraph::store::Store;
 use rustc_hash::FxHashMap;
 use serde::Serialize;
@@ -581,6 +581,17 @@ impl SemanticExportLayer {
             Self::Prefixes,
         ]
     }
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Ontologies => "ontologies",
+            Self::Shapes => "shapes",
+            Self::Concepts => "concepts",
+            Self::Model => "model",
+            Self::ExternalUsed => "external-used",
+            Self::Prefixes => "prefixes",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -924,6 +935,10 @@ impl SemanticIndex {
     }
 
     pub fn is_skos_concept_iri(&self, iri: &str) -> bool {
+        self.concept_layer_subject_has_type(iri, SKOS_CONCEPT)
+    }
+
+    pub fn concept_layer_subject_has_type(&self, iri: &str, type_iri: &str) -> bool {
         self.blocks
             .iter()
             .filter(|block| matches!(block.kind, SemanticBlockKind::Concepts))
@@ -931,7 +946,7 @@ impl SemanticIndex {
             .any(|quad| {
                 quad.predicate.as_str() == RDF_TYPE
                     && subject_iri(&quad.subject) == Some(iri)
-                    && term_iri(&quad.object) == Some(SKOS_CONCEPT)
+                    && term_iri(&quad.object) == Some(type_iri)
             })
     }
 
@@ -969,24 +984,16 @@ impl SemanticIndex {
             }
         }
 
-        for declaration in &self.ontology_documents {
-            if declaration
-                .element_identifiers
-                .iter()
-                .any(|identifier| context.contains(identifier.as_str()))
-            {
-                prefixes
-                    .entry(declaration.ontology_prefix.clone())
-                    .or_insert(declaration.term_namespace.clone());
-            }
+        for declaration in self.ontology_documents_for_context(&context) {
+            prefixes
+                .entry(declaration.ontology_prefix.clone())
+                .or_insert(declaration.term_namespace.clone());
         }
 
-        for source in &self.external_sources {
-            if source.builtin || context.contains(source.owner_identifier.as_str()) {
-                prefixes
-                    .entry(source.prefix.clone())
-                    .or_insert(source.namespace.clone());
-            }
+        for source in self.external_sources_for_context(&context) {
+            prefixes
+                .entry(source.prefix.clone())
+                .or_insert(source.namespace.clone());
         }
 
         prefixes
@@ -999,15 +1006,7 @@ impl SemanticIndex {
         let mut by_prefix: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
         let mut prefix_by_namespace: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
 
-        for declaration in &self.ontology_documents {
-            if !declaration
-                .element_identifiers
-                .iter()
-                .any(|identifier| ontology_context.contains(identifier.as_str()))
-            {
-                continue;
-            }
-
+        for declaration in self.ontology_documents_for_context(ontology_context) {
             by_prefix
                 .entry(declaration.ontology_prefix.clone())
                 .or_default()
@@ -1018,11 +1017,7 @@ impl SemanticIndex {
                 .insert(declaration.ontology_prefix.clone());
         }
 
-        for source in &self.external_sources {
-            if !source.builtin && !ontology_context.contains(source.owner_identifier.as_str()) {
-                continue;
-            }
-
+        for source in self.external_sources_for_context(ontology_context) {
             by_prefix
                 .entry(source.prefix.clone())
                 .or_default()
@@ -1037,6 +1032,43 @@ impl SemanticIndex {
             by_prefix,
             prefix_by_namespace,
         }
+    }
+
+    fn ontology_documents_for_context<'a>(
+        &'a self,
+        ontology_context: &BTreeSet<&str>,
+    ) -> Vec<&'a OntologyDocumentDeclaration> {
+        self.ontology_documents
+            .iter()
+            .filter(|declaration| {
+                declaration
+                    .element_identifiers
+                    .iter()
+                    .any(|identifier| ontology_context.contains(identifier.as_str()))
+            })
+            .collect()
+    }
+
+    fn external_sources_for_context<'a>(
+        &'a self,
+        ontology_context: &BTreeSet<&str>,
+    ) -> Vec<&'a ExternalOntologySource> {
+        self.external_sources
+            .iter()
+            .filter(|source| {
+                source.builtin || ontology_context.contains(source.owner_identifier.as_str())
+            })
+            .collect()
+    }
+
+    pub fn ontology_document_by_element(&self) -> BTreeMap<&str, &str> {
+        let mut document_by_element = BTreeMap::new();
+        for document in &self.ontology_documents {
+            for element_identifier in &document.element_identifiers {
+                document_by_element.insert(element_identifier.as_str(), document.iri.as_str());
+            }
+        }
+        document_by_element
     }
 
     pub fn to_authored_ontology_turtle_string(&self) -> Result<String, ReqvireError> {
@@ -1134,25 +1166,20 @@ impl SemanticIndex {
     }
 
     pub fn to_authored_ontology_layer_turtle_string(&self) -> Result<String, ReqvireError> {
-        let prefix_map = self.turtle_prefix_map(false)?;
-        let mut output = String::new();
-        output.push_str(&prefix_map.to_turtle_block());
-        let mut seen_quads = BTreeSet::new();
-        append_blocks_turtle(
-            &mut output,
-            self.blocks.iter().filter(|block| {
-                matches!(
-                    block.kind,
-                    SemanticBlockKind::Ontology | SemanticBlockKind::Shapes
-                )
-            }),
-            &mut seen_quads,
-            &prefix_map,
-        )?;
-        Ok(output)
+        self.to_selected_layer_turtle_string(&[
+            SemanticBlockKind::Ontology,
+            SemanticBlockKind::Shapes,
+        ])
     }
 
     pub fn to_shacl_turtle_string(&self) -> Result<String, ReqvireError> {
+        self.to_selected_layer_turtle_string(&[SemanticBlockKind::Shapes])
+    }
+
+    fn to_selected_layer_turtle_string(
+        &self,
+        selected_layers: &[SemanticBlockKind],
+    ) -> Result<String, ReqvireError> {
         let prefix_map = self.turtle_prefix_map(false)?;
         let mut output = String::new();
         output.push_str(&prefix_map.to_turtle_block());
@@ -1161,7 +1188,7 @@ impl SemanticIndex {
             &mut output,
             self.blocks
                 .iter()
-                .filter(|block| matches!(block.kind, SemanticBlockKind::Shapes)),
+                .filter(|block| selected_layers.contains(&block.kind)),
             &mut seen_quads,
             &prefix_map,
         )?;
@@ -1565,7 +1592,7 @@ impl SemanticIndex {
             "# Layers: {}\n\n",
             layers
                 .iter()
-                .map(semantic_export_layer_name)
+                .map(SemanticExportLayer::as_str)
                 .collect::<Vec<_>>()
                 .join(", ")
         ));
@@ -1736,21 +1763,17 @@ use export::*;
 use index::*;
 
 pub use export::external_materialization_metadata;
+pub(crate) use export::materialized_external_subjects;
 pub use index::build_semantic_index;
-pub(crate) use prefixes::parse_turtle_prefix_declarations;
+pub(crate) use prefixes::{parse_turtle_prefix_declarations, parse_turtle_prefix_line};
 
 #[cfg(test)]
 mod tests {
     use super::export::normalized_relation_projection;
     use super::vocabulary::RelationProjectionDirection;
     use super::*;
-
-    fn parse_test_quads(turtle: &str) -> Vec<Quad> {
-        RdfParser::from_format(RdfFormat::Turtle)
-            .for_reader(turtle.as_bytes())
-            .map(|quad| quad.expect("test Turtle should parse"))
-            .collect()
-    }
+    use crate::test_support::parse_test_quads;
+    use oxigraph::model::Term;
 
     fn external_block(content: &str) -> SemanticBlock {
         SemanticBlock {
@@ -1803,6 +1826,15 @@ mod tests {
         assert_eq!(define.forward_property, "requirementDefinedByContract");
         assert_eq!(define.inverse_property, "contractDefinesRequirement");
         assert_eq!(define.direction, RelationProjectionDirection::Inverse);
+
+        let contract_bindings = normalized_relation_projection("contract_bindings")
+            .expect("contract_bindings should project");
+        assert_eq!(contract_bindings.forward_property, "bindsContract");
+        assert_eq!(contract_bindings.inverse_property, "boundByContract");
+        assert_eq!(
+            contract_bindings.direction,
+            RelationProjectionDirection::Forward
+        );
     }
 
     fn iri_term(iri: &str) -> OntologyProjectionTerm {

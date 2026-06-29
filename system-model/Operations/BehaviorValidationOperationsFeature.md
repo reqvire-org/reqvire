@@ -84,5 +84,5 @@ Validation requirements define when model state is acceptable, when a mutation m
   * specifiedBy: [Validate Filesystem Structure](Validation/ValidationRequirements.md#validate-filesystem-structure)
   * specifiedBy: [Validate Internal Consistency](Validation/ValidationRequirements.md#validate-internal-consistency)
   * specifiedBy: [Validate Markdown Structure](Validation/ValidationRequirements.md#validate-markdown-structure)
-  * specifiedBy: [Validate Relation Types](Validation/ValidationRequirements.md#validate-relation-types)
+  * specifiedBy: [Validate Relation Element Type Compatibility](Validation/ValidationRequirements.md#validate-relation-element-type-compatibility)
 ---

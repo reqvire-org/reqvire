@@ -96,7 +96,6 @@ The system shall persist all element manipulation operations to the source files
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
 
 #### Relations
-  * definedBy: [Element Manipulation File Persistence Contract Specification](Specifications.md#element-manipulation-file-persistence-contract-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
@@ -108,9 +107,7 @@ The system shall persist all element manipulation operations to the source files
 The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and contract_bindings while enforcing type compatibility and removing source elements after successful merge.
 
 #### Details
-When the merge target is a `# Element` model file element, the operation shall preserve the `# Element` file format and keep the result as a single-element file.
-The operation shall reject merges where a source element is in a `# Element` file and the target element is in a `# Elements` file. That conversion can violate `# Elements` parsing constraints and shall be performed manually.
-When the target is an ontology element, the operation shall preserve the target ontology metadata, rewrite each source ontology block to the target ontology boundary, and fold all rewritten authored Turtle into the target's single `#### Ontology` block. Ontology merges shall preserve a valid dependency chain by recalculating any affected inherited prefix bindings, document declarations, `owl:imports`, and reachable SHACL references before persistence.
+Detailed merge workflow, document-format, type-compatibility, content transformation, and ontology merge rules shall follow the associated specifications and constraints.
 
 #### Metadata
   * type: requirement
@@ -162,7 +159,7 @@ The operation shall reject moves into an existing `# Element` file when that mov
 The system shall provide the capability to move entire specification files with all their elements to a new location in the repository while updating all relation references throughout the model.
 
 #### Details
-When `--squash` is requested, the operation shall reject squashing into an existing `# Element` target file. `# Element` files are single-element model files and cannot accept squashed multi-element content.
+Detailed file-move, relation-update, squash-mode, target-validation, and error behavior shall follow the associated contract specification.
 
 #### Metadata
   * type: requirement

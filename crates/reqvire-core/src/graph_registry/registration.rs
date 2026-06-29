@@ -1,5 +1,11 @@
 use super::*;
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum RelationIdentifierMode {
+    AllowBareFragment,
+    HashFragmentOnly,
+}
+
 impl GraphRegistry {
     pub(super) fn is_single_element_format_file(&self, file_path: &str) -> bool {
         self.nodes.values().any(|node| {
@@ -410,30 +416,11 @@ impl GraphRegistry {
         source_element: &Element,
         target_id: &str,
     ) -> Option<String> {
-        if self.nodes.contains_key(target_id) {
-            return Some(target_id.to_string());
-        }
-
-        // Same-file fragment forms used during CRUD mutations ("#fragment" or "fragment")
-        let fragment = target_id.trim_start_matches('#');
-        if !fragment.is_empty() {
-            let same_file_identifier = format!("{}#{}", source_element.file_path, fragment);
-            if self.nodes.contains_key(&same_file_identifier) {
-                return Some(same_file_identifier);
-            }
-        }
-
-        // Relative path identifiers (e.g. ../X.md#y) can be normalized with source file context.
-        let base_path = std::path::Path::new(&source_element.file_path)
-            .parent()
-            .unwrap_or_else(|| std::path::Path::new("."));
-        if let Ok(normalized) = crate::utils::normalize_identifier(target_id, base_path) {
-            if self.nodes.contains_key(&normalized) {
-                return Some(normalized);
-            }
-        }
-
-        None
+        self.normalize_relation_identifier(
+            &source_element.file_path,
+            target_id,
+            RelationIdentifierMode::AllowBareFragment,
+        )
     }
 
     /// Canonicalize an identifier-style relation target for a given source context.
@@ -444,14 +431,26 @@ impl GraphRegistry {
         source_file_path: &str,
         target_id: &str,
     ) -> Option<String> {
+        self.normalize_relation_identifier(
+            source_file_path,
+            target_id,
+            RelationIdentifierMode::HashFragmentOnly,
+        )
+    }
+
+    fn normalize_relation_identifier(
+        &self,
+        source_file_path: &str,
+        target_id: &str,
+        mode: RelationIdentifierMode,
+    ) -> Option<String> {
         if self.nodes.contains_key(target_id) {
             return Some(target_id.to_string());
         }
 
         let (_, fragment_opt) = crate::utils::extract_path_and_fragment(target_id);
 
-        // Same-file fragment references stay local to the source file.
-        if target_id.starts_with('#') {
+        if target_id.starts_with('#') || mode == RelationIdentifierMode::AllowBareFragment {
             if let Some(fragment) = fragment_opt {
                 let same_file_identifier = format!("{}#{}", source_file_path, fragment);
                 if self.nodes.contains_key(&same_file_identifier) {
@@ -460,7 +459,7 @@ impl GraphRegistry {
             }
         }
 
-        // For relative references such as "../File.md#x" and "File.md#x", resolve from source file.
+        // Relative path identifiers (e.g. ../X.md#y) can be normalized with source file context.
         let base_path = std::path::Path::new(source_file_path)
             .parent()
             .unwrap_or_else(|| std::path::Path::new("."));

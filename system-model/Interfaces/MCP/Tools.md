@@ -26,10 +26,7 @@ The system shall provide safe local-first MCP defaults that avoid arbitrary shel
 The system shall keep Reqvire MCP tool interfaces protocol-neutral below the MCP adapter.
 
 #### Details
-- The MCP adapter boundary shall remain independent of MCP transport implementation details.
-- Shared MCP-facing Reqvire structures shall depend on Reqvire model concepts and core operations.
-- The MCP adapter shall map shared Reqvire structures into MCP protocol messages.
-- The MCP adapter shall call the shared Reqvire tool registry instead of owning a separate tool implementation.
+Detailed protocol-neutral type ownership, adapter mapping, shared registry, SDK/runtime independence, and CLI/MCP derivation rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -102,14 +99,7 @@ The system shall expose MCP read tools that return model evidence needed by exte
 The system shall expose an MCP read tool for SPARQL queries over Reqvire semantic RDF evidence.
 
 #### Details
-- The MCP interface shall execute SPARQL queries against Reqvire's collected semantic RDF graph.
-- The semantic query tool shall use the existing in-memory semantic export and Oxigraph query engine.
-- The semantic query tool shall support authored ontology and SHACL RDF, and shall include generated Reqvire model, relation-family projection, and ontology projection facts by default when they are present in the full semantic export.
-- The semantic query response shall include graph-layer metadata for the active query-store graph roles (`default`, `authored-ontology`, `authored-model`, `generated`, `external-used-subset`, `raw-external-source`) and shall mark the raw external source role as hidden from public query stores.
-- The semantic query tool shall return structured results for SELECT, ASK, CONSTRUCT, and DESCRIBE queries.
-- The semantic query interface shall provide ontology-defined prefix discovery so clients can construct namespace-correct SPARQL without rebuilding the RDF store.
-- The semantic query tool shall not mutate the model or filesystem.
-- The semantic query tool shall not expose arbitrary shell execution, arbitrary filesystem reads, or remote URL fetching.
+Detailed engine, graph composition, graph-role metadata, query-form result shape, prefix discovery, error, read-only, and safety rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -250,10 +240,7 @@ The system shall serialize mutation execution per workspace when the MCP transpo
 The system shall execute MCP mutations through deterministic operation-specific preview and execution behavior backed by Reqvire core.
 
 #### Details
-- MCP mutation execution shall support operation-specific preview and execution controls.
-- MCP mutation execution shall use Reqvire core for preview and execution semantics.
-- MCP mutation execution shall report changed files, diffs, diagnostics, and affected scope when available.
-- MCP mutation execution shall synchronize MCP-visible model state after successful execution.
+Detailed preview, execution, diagnostics, changed-file reporting, affected-scope reporting, synchronization, and mutation-safety rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -359,10 +346,7 @@ The system shall expose MCP read tools for linting, coverage, verification trace
 The system shall expose MCP resources only as read-only, revision-tagged views of workspace, model, element, file, and report state.
 
 #### Details
-- The MCP interface shall expose read-only resources for model browsing.
-- MCP resources shall represent authoritative Reqvire model or report state.
-- MCP resources shall not mutate the filesystem.
-- MCP resources shall not become a second model source of truth.
+Detailed resource listing, template, read, revision metadata, non-mutating behavior, and source-of-truth rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -433,12 +417,7 @@ The system shall keep MCP server cached model state subordinate to Reqvire sourc
 The system shall expose MCP tools through shared typed request and result interfaces for matching Reqvire operations.
 
 #### Details
-- The MCP interface shall expose Reqvire operations through typed request and result interfaces.
-- MCP tools shall reuse Reqvire core operation semantics.
-- MCP protocol concerns shall remain at the adapter boundary.
-- MCP tools shall provide machine-readable discovery metadata for clients.
-- Shared Reqvire tool interfaces shall be exposed by the Reqvire library so in-process applications can discover and call the same operations without using MCP transport.
-- MCP read/report tools shall delegate operation behavior to the same shared operation layer used by matching CLI read/report commands when the operation has been migrated.
+Detailed request/result types, shared operation semantics, adapter boundary, discovery metadata, registry, and error-contract rules shall follow the associated specifications.
 
 #### Metadata
   * type: requirement
@@ -507,10 +486,7 @@ The system shall implement Streamable HTTP transport with local-safe defaults an
 The system shall provide MCP structured payload interfaces derived from shared Reqvire operation results.
 
 #### Details
-- The MCP interface shall provide structured machine-readable tool results.
-- MCP structured results shall remain consistent with authoritative Reqvire operation results.
-- MCP structured results shall expose stable model evidence semantics.
-- MCP clients shall not need to parse human terminal output to recover authoritative model evidence.
+Detailed schema-source, semantic evidence, mutation/error result, versioning, and terminal-output separation rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -527,10 +503,7 @@ The system shall provide MCP structured payload interfaces derived from shared R
 The system shall expose only supported Reqvire model operations as MCP tools.
 
 #### Details
-- The MCP server shall expose only stable Reqvire model operations as tools.
-- The MCP server shall not expose arbitrary command execution.
-- The MCP server shall not expose internal or server-management commands as tools.
-- The MCP server shall treat successful validation as a startup prerequisite instead of a model tool.
+Detailed supported-operation, exclusion, internal/server-management boundary, startup-validation, and MCP contract rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement

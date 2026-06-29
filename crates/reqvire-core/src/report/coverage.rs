@@ -1,3 +1,4 @@
+use super::formatting::format_identifier_markdown_link;
 use crate::element;
 use crate::element::ContractBindingTarget;
 use crate::graph_registry::GraphRegistry;
@@ -135,13 +136,7 @@ struct ImplementationUncoveredRequirementDetails {
 /// Helper function to format an identifier as a markdown link
 /// Splits identifier like "path/file.md#fragment" into proper link format
 fn format_identifier_link(identifier: &str) -> String {
-    if let Some(hash_pos) = identifier.rfind('#') {
-        let file_part = &identifier[..hash_pos];
-        let fragment_part = &identifier[hash_pos..];
-        format!("[{}]({}{})", identifier, file_part, fragment_part)
-    } else {
-        format!("[{}]({})", identifier, identifier)
-    }
+    format_identifier_markdown_link(identifier, identifier)
 }
 
 fn round_to_two_decimals(value: f64) -> f64 {
@@ -1116,36 +1111,29 @@ fn collect_requirement_subtree_ids(
     roots: Option<&Vec<String>>,
     children_by_requirement: &FxHashMap<String, Vec<String>>,
 ) -> BTreeSet<String> {
-    let mut result = BTreeSet::new();
     let mut stack = roots.cloned().unwrap_or_default();
     stack.sort();
-
-    while let Some(current) = stack.pop() {
-        if !result.insert(current.clone()) {
-            continue;
-        }
-        if let Some(children) = children_by_requirement.get(&current) {
-            for child in children.iter().rev() {
-                stack.push(child.clone());
-            }
-        }
-    }
-
-    result
+    collect_subtree_ids(stack, children_by_requirement)
 }
 
 fn collect_capability_subtree_ids(
     root: &str,
     capability_children: &FxHashMap<String, Vec<String>>,
 ) -> BTreeSet<String> {
+    collect_subtree_ids(vec![root.to_string()], capability_children)
+}
+
+fn collect_subtree_ids(
+    mut stack: Vec<String>,
+    children_by_parent: &FxHashMap<String, Vec<String>>,
+) -> BTreeSet<String> {
     let mut result = BTreeSet::new();
-    let mut stack = vec![root.to_string()];
 
     while let Some(current) = stack.pop() {
         if !result.insert(current.clone()) {
             continue;
         }
-        if let Some(children) = capability_children.get(&current) {
+        if let Some(children) = children_by_parent.get(&current) {
             for child in children.iter().rev() {
                 stack.push(child.clone());
             }

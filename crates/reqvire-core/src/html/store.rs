@@ -3,8 +3,9 @@ use crate::git_commands;
 use crate::graph_registry::GraphRegistry;
 use crate::ontology_graph::{build_graph_data, OntologyGraphData};
 use crate::relation::{self, LinkType};
-use crate::semantic_contract::{SemanticBlock, SemanticIndex};
-use oxigraph::model::NamedOrBlankNode;
+use crate::semantic_contract::{
+    external_materialization_metadata, materialized_external_subjects, SemanticIndex,
+};
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
@@ -353,71 +354,11 @@ fn explorer_visible_semantic_index(source: &SemanticIndex) -> (SemanticIndex, Va
     (visible, external_metadata)
 }
 
-fn materialized_external_subjects(block: &SemanticBlock) -> BTreeSet<String> {
-    block
-        .quads
-        .iter()
-        .filter_map(|quad| match &quad.subject {
-            NamedOrBlankNode::NamedNode(node) => Some(node.as_str().to_string()),
-            NamedOrBlankNode::BlankNode(_) => None,
-        })
-        .collect()
-}
-
 fn explorer_external_materialization_metadata(
     source: &SemanticIndex,
     visible: &SemanticIndex,
 ) -> Value {
-    let materialized_terms: BTreeSet<String> = visible
-        .external_blocks
-        .iter()
-        .flat_map(materialized_external_subjects)
-        .collect();
-    let available_external_declaration_count = source
-        .ontology_declarations
-        .values()
-        .flat_map(|declarations| declarations.iter())
-        .filter(|declaration| declaration.external)
-        .count();
-    let visible_external_declaration_count = visible
-        .ontology_declarations
-        .values()
-        .flat_map(|declarations| declarations.iter())
-        .filter(|declaration| declaration.external)
-        .count();
-    let used_external_source_count = source
-        .external_sources
-        .iter()
-        .filter(|source| {
-            materialized_terms
-                .iter()
-                .any(|term| term.starts_with(&source.namespace))
-        })
-        .count();
-    let raw_external_triple_count: usize = source
-        .external_blocks
-        .iter()
-        .map(|block| block.quads.len())
-        .sum();
-    let materialized_external_triple_count: usize = visible
-        .external_blocks
-        .iter()
-        .map(|block| block.quads.len())
-        .sum();
-
-    json!({
-        "external_materialization": if source.external_sources.is_empty() { "none" } else { "used_subset" },
-        "external_counts": {
-            "declared_external_source_count": source.external_sources.len(),
-            "visible_external_source_count": used_external_source_count,
-            "used_external_source_count": used_external_source_count,
-            "available_external_term_declaration_count": available_external_declaration_count,
-            "visible_external_term_declaration_count": visible_external_declaration_count,
-            "materialized_external_term_count": materialized_terms.len(),
-            "raw_external_triple_count": raw_external_triple_count,
-            "materialized_external_triple_count": materialized_external_triple_count
-        }
-    })
+    external_materialization_metadata(source, visible, !source.external_sources.is_empty())
 }
 
 pub fn project_store_javascript(
@@ -1431,31 +1372,7 @@ fn canonical_relation_edge(
     target_id: &str,
     name: &str,
 ) -> (String, String, String) {
-    if relation::DIAGRAM_RELATIONS.contains(&name) {
-        return (
-            source_id.to_string(),
-            target_id.to_string(),
-            name.to_string(),
-        );
-    }
-    let canonical = relation::RELATION_TYPES
-        .get(name)
-        .and_then(|info| info.opposite)
-        .filter(|opposite| relation::DIAGRAM_RELATIONS.contains(opposite))
-        .unwrap_or(name);
-    if canonical == name {
-        (
-            source_id.to_string(),
-            target_id.to_string(),
-            name.to_string(),
-        )
-    } else {
-        (
-            target_id.to_string(),
-            source_id.to_string(),
-            canonical.to_string(),
-        )
-    }
+    relation::canonical_model_traversal_edge(source_id, target_id, name)
 }
 
 fn default_routes() -> ProjectStoreRoutes {
@@ -1516,17 +1433,10 @@ mod tests {
         OntologyProjectionTermKind, OntologyTermDeclaration, OntologyTermRole, SemanticBlock,
         SemanticBlockKind, SemanticIndexSummary,
     };
-    use oxigraph::io::{RdfFormat, RdfParser};
+    use crate::test_support::parse_test_quads;
     use rustc_hash::FxHashMap;
 
     const TEST_RDFS_SUBCLASS_OF: &str = o_kernel::vocab::RDFS_SUBCLASS_OF;
-
-    fn parse_test_quads(turtle: &str) -> Vec<oxigraph::model::Quad> {
-        RdfParser::from_format(RdfFormat::Turtle)
-            .for_reader(turtle.as_bytes())
-            .map(|quad| quad.expect("test Turtle should parse"))
-            .collect()
-    }
 
     fn external_block(content: &str) -> SemanticBlock {
         SemanticBlock {

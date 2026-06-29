@@ -222,34 +222,3 @@ impl ModelManager {
             .build_relations(excluded_filename_patterns)
     }
 }
-
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn test_extract_path_and_fragment() {
-        // Test file reference with fragment.
-        let input = "/user/repo#readme";
-        let (file, frag) = crate::utils::extract_path_and_fragment(input);
-        assert_eq!(file, "/user/repo");
-        assert_eq!(frag, Some("readme"));
-
-        // Test fragment-only with leading '#'.
-        let input = "#intro";
-        let (file, frag) = crate::utils::extract_path_and_fragment(input);
-        assert_eq!(file, "");
-        assert_eq!(frag, Some("intro"));
-
-        // Test file only.
-        let input = "document.md";
-        let (file, frag) = crate::utils::extract_path_and_fragment(input);
-        assert_eq!(file, "document.md");
-        assert_eq!(frag, None);
-
-        // Test fragment-only without '#' (treated as fragment-only)
-        let input = "onlyfragment";
-        let (file, frag) = crate::utils::extract_path_and_fragment(input);
-        assert_eq!(file, "");
-        assert_eq!(frag, Some("onlyfragment"));
-    }
-}

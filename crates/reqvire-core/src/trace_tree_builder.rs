@@ -4,7 +4,6 @@
 /// from requirements and detect redundant relations. Used by both:
 /// - verification_trace: for redundant verify relations
 /// - lint: for both redundant verify and maybe-redundant hierarchical relations
-use crate::element::Element;
 use crate::graph_registry::GraphRegistry;
 use crate::relation::VERIFICATION_TRACES_RELATIONS;
 use rustc_hash::FxHashSet;
@@ -28,12 +27,7 @@ pub fn find_redundant_relations(
 
     // Build reachability map from each directly-linked requirement
     for req_id in directly_linked {
-        if let Some(req) = registry.get_element(req_id) {
-            let mut visited = FxHashSet::default();
-            let mut ancestors = FxHashSet::default();
-            collect_ancestors(req, &mut visited, &mut ancestors, registry);
-            reachable_from.insert(req_id.clone(), ancestors);
-        }
+        reachable_from.insert(req_id.clone(), collect_ancestor_ids(req_id, registry));
     }
 
     // Find redundant requirements: a directly-linked requirement is redundant
@@ -61,18 +55,31 @@ pub fn find_redundant_relations(
     redundant_vec
 }
 
-/// Recursively collect all ancestor IDs reachable from a requirement
-fn collect_ancestors(
-    requirement: &Element,
-    visited: &mut FxHashSet<String>,
-    ancestors: &mut FxHashSet<String>,
+pub(crate) fn collect_ancestor_ids(
+    requirement_id: &str,
     registry: &GraphRegistry,
+) -> FxHashSet<String> {
+    let mut ancestors = FxHashSet::default();
+    let mut visited = FxHashSet::default();
+    collect_ancestor_ids_recursive(requirement_id, registry, &mut ancestors, &mut visited);
+    ancestors
+}
+
+fn collect_ancestor_ids_recursive(
+    requirement_id: &str,
+    registry: &GraphRegistry,
+    ancestors: &mut FxHashSet<String>,
+    visited: &mut FxHashSet<String>,
 ) {
     // Prevent cycles
-    if visited.contains(&requirement.identifier) {
+    if visited.contains(requirement_id) {
         return;
     }
-    visited.insert(requirement.identifier.clone());
+    visited.insert(requirement_id.to_string());
+
+    let Some(requirement) = registry.get_element(requirement_id) else {
+        return;
+    };
 
     // Find parent relations (those in VERIFICATION_TRACES_RELATIONS)
     for relation in &requirement.relations {
@@ -83,9 +90,7 @@ fn collect_ancestors(
                 ancestors.insert(parent_id.clone());
 
                 // Recursively collect ancestors of this parent
-                if let Some(parent) = registry.get_element(parent_id) {
-                    collect_ancestors(parent, visited, ancestors, registry);
-                }
+                collect_ancestor_ids_recursive(parent_id, registry, ancestors, visited);
             }
         }
     }

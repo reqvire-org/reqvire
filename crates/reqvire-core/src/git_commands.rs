@@ -251,17 +251,30 @@ pub fn get_git_root_dir() -> Result<PathBuf, ReqvireError> {
 /// from the git repository root. Returns a list of file paths.
 pub fn ls_tree_commit(commit: &str) -> Result<Vec<String>, ReqvireError> {
     let git_root = get_git_root_dir()?;
+    ls_tree_commit_from_dir(commit, &git_root, || {
+        format!("git ls-tree failed (commit = {})", commit)
+    })
+}
 
+fn ls_tree_commit_from_dir<F>(
+    commit: &str,
+    directory: &PathBuf,
+    error_context: F,
+) -> Result<Vec<String>, ReqvireError>
+where
+    F: FnOnce() -> String,
+{
     let output = Command::new("git")
         .args(["ls-tree", "--name-only", "-r", commit])
-        .current_dir(&git_root)
+        .current_dir(directory)
         .output()?;
 
     if !output.status.success() {
         let stderr_str = String::from_utf8_lossy(&output.stderr);
         return Err(ReqvireError::GitCommandError(format!(
-            "git ls-tree failed (commit = {}): {}",
-            commit, stderr_str
+            "{}: {}",
+            error_context(),
+            stderr_str
         )));
     }
 
@@ -302,26 +315,10 @@ pub fn ls_tree_commit_in_folder(
     commit: &str,
     folder: &PathBuf,
 ) -> Result<Vec<String>, ReqvireError> {
-    let output = Command::new("git")
-        .args(["ls-tree", "--name-only", "-r", commit])
-        .current_dir(folder)
-        .output()?;
-
-    if !output.status.success() {
-        // Convert stderr to string for error context
-        let stderr_str = String::from_utf8_lossy(&output.stderr);
-        return Err(ReqvireError::GitCommandError(format!(
-            "git ls-tree failed (commit = {}, folder = {:?}): {}",
-            commit, folder, stderr_str
-        )));
-    }
-
-    // Convert stdout lines into a Vec<String>
-    let stdout_str = String::from_utf8_lossy(&output.stdout);
-    let files = stdout_str
-        .lines()
-        .map(|line| line.to_string())
-        .collect::<Vec<String>>();
-
-    Ok(files)
+    ls_tree_commit_from_dir(commit, folder, || {
+        format!(
+            "git ls-tree failed (commit = {}, folder = {:?})",
+            commit, folder
+        )
+    })
 }

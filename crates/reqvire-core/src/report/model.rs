@@ -16,7 +16,7 @@ pub struct ModelCentricReport {
 /// Direction of traversal for model report
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TraversalDirection {
-    Forward, // Root to leaves through diagram traversal relations.
+    Forward, // Root to leaves through canonical traversal relations.
     Reverse, // Leaves to roots (derivedFrom, satisfy, verify)
 }
 
@@ -238,7 +238,7 @@ fn build_element_recursive(
 
     // Choose which relations to follow based on direction
     let allowed_relations = match direction {
-        TraversalDirection::Forward => relation::DIAGRAM_RELATIONS,
+        TraversalDirection::Forward => relation::MODEL_TRAVERSAL_RELATIONS,
         TraversalDirection::Reverse => relation::BACKWARD_RELATIONS,
     };
 
@@ -401,7 +401,7 @@ fn count_relations_recursive(
     visited.insert(element_id.to_string());
 
     let allowed_relations = match direction {
-        TraversalDirection::Forward => relation::DIAGRAM_RELATIONS,
+        TraversalDirection::Forward => relation::MODEL_TRAVERSAL_RELATIONS,
         TraversalDirection::Reverse => relation::BACKWARD_RELATIONS,
     };
 

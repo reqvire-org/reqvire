@@ -809,6 +809,24 @@ if grep -q "reqvire:bindsContract <urn:reqvire:element:api-ontology>" <<< "$FULL
   exit 1
 fi
 
+if ! grep -qF "reqvire:bindsContract <urn:reqvire:element:api-endpoint-contract>" <<< "$FULL_TTL_OUTPUT"; then
+  echo "FAILED: full Turtle output missing contract_bindings normalized forward predicate"
+  echo "$FULL_TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -qF "reqvire:boundByContract <urn:reqvire:element:api-client-requirement>" <<< "$FULL_TTL_OUTPUT"; then
+  echo "FAILED: full Turtle output missing contract_bindings normalized inverse predicate"
+  echo "$FULL_TTL_OUTPUT"
+  exit 1
+fi
+
+if grep -q "requirementBindsContract\\|contractBoundBy\\|reqvire:reuse" <<< "$FULL_TTL_OUTPUT"; then
+  echo "FAILED: full Turtle output contains legacy contract binding projection vocabulary"
+  echo "$FULL_TTL_OUTPUT"
+  exit 1
+fi
+
 if ! grep -q "reqvire:specifiedBy <urn:reqvire:element:api-endpoint-requirement>" <<< "$FULL_TTL_OUTPUT"; then
   echo "FAILED: full Turtle output missing capability requirement specifiedBy edge"
   echo "$FULL_TTL_OUTPUT"

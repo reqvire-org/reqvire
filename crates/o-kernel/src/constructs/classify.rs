@@ -1,11 +1,10 @@
+use crate::rdf::named_or_blank_node_key;
+use crate::stable::stable_hash;
 use crate::vocab::*;
 use oxigraph::model::{NamedOrBlankNode, Quad, Term};
 use std::collections::{BTreeMap, BTreeSet};
 
 use super::{owl_expression, owl_property, rdf_rdfs, restriction, shacl_overlay};
-
-pub const FNV_OFFSET: u64 = 0xcbf29ce484222325;
-pub const FNV_PRIME: u64 = 0x100000001b3;
 
 #[derive(Debug, Clone)]
 pub struct SourcedQuad {
@@ -98,6 +97,19 @@ pub struct OntologyProjection {
     pub projections: Vec<OntologyConstructProjection>,
     pub constructs: Vec<OntologyConstruct>,
     pub symbols: Vec<OntologySymbol>,
+}
+
+#[derive(Debug, Clone)]
+pub struct OntologyConstructClassifierOptions {
+    pub id_namespace: String,
+}
+
+impl Default for OntologyConstructClassifierOptions {
+    fn default() -> Self {
+        Self {
+            id_namespace: "urn:o-kernel".to_string(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -244,6 +256,13 @@ impl ConstructMut<'_> {
 }
 
 pub fn classify_ontology_constructs(quads: &[Quad]) -> OntologyProjection {
+    classify_ontology_constructs_with_options(quads, &OntologyConstructClassifierOptions::default())
+}
+
+pub fn classify_ontology_constructs_with_options(
+    quads: &[Quad],
+    options: &OntologyConstructClassifierOptions,
+) -> OntologyProjection {
     let sourced: Vec<SourcedQuad> = quads
         .iter()
         .map(|quad| SourcedQuad {
@@ -251,13 +270,24 @@ pub fn classify_ontology_constructs(quads: &[Quad]) -> OntologyProjection {
             quad: quad.clone(),
         })
         .collect();
-    classify_ontology_constructs_with_sources(&sourced)
+    classify_ontology_constructs_with_sources_and_options(&sourced, options)
 }
 
 pub fn classify_ontology_constructs_with_sources(quads: &[SourcedQuad]) -> OntologyProjection {
+    classify_ontology_constructs_with_sources_and_options(
+        quads,
+        &OntologyConstructClassifierOptions::default(),
+    )
+}
+
+pub fn classify_ontology_constructs_with_sources_and_options(
+    quads: &[SourcedQuad],
+    options: &OntologyConstructClassifierOptions,
+) -> OntologyProjection {
     let object_index = collect_projection_object_index(quads);
     let rdf_lists = collect_projection_rdf_lists(quads);
-    let mut builder = OntologyConstructBuilder::new(rdf_lists, object_index);
+    let mut builder =
+        OntologyConstructBuilder::new_with_options(rdf_lists, object_index, options.clone());
 
     for sourced_quad in quads {
         let handled = rdf_rdfs::classify(&mut builder, sourced_quad);
@@ -290,18 +320,33 @@ pub(crate) struct OntologyConstructBuilder {
     equivalence_edges: Vec<EquivalenceEdge>,
     rdf_lists: BTreeMap<String, Vec<OntologyConstructMember>>,
     object_index: BTreeMap<(String, String), Vec<OntologyConstructTerm>>,
+    options: OntologyConstructClassifierOptions,
 }
 
 impl OntologyConstructBuilder {
+    #[cfg(test)]
     pub(crate) fn new(
         rdf_lists: BTreeMap<String, Vec<OntologyConstructMember>>,
         object_index: BTreeMap<(String, String), Vec<OntologyConstructTerm>>,
+    ) -> Self {
+        Self::new_with_options(
+            rdf_lists,
+            object_index,
+            OntologyConstructClassifierOptions::default(),
+        )
+    }
+
+    pub(crate) fn new_with_options(
+        rdf_lists: BTreeMap<String, Vec<OntologyConstructMember>>,
+        object_index: BTreeMap<(String, String), Vec<OntologyConstructTerm>>,
+        options: OntologyConstructClassifierOptions,
     ) -> Self {
         Self {
             constructs: BTreeMap::new(),
             equivalence_edges: Vec::new(),
             rdf_lists,
             object_index,
+            options,
         }
     }
 
@@ -461,6 +506,7 @@ impl OntologyConstructBuilder {
         let object_id = construct_term_node_id(&object);
 
         let id = construct_id(
+            &self.options.id_namespace,
             kind,
             &subject,
             Some(&predicate),
@@ -498,7 +544,7 @@ impl OntologyConstructBuilder {
         predicate: &str,
     ) -> Vec<OntologyConstructTerm> {
         self.object_index
-            .get(&(subject_key(subject), predicate.to_string()))
+            .get(&(named_or_blank_node_key(subject), predicate.to_string()))
             .cloned()
             .unwrap_or_default()
     }
@@ -568,7 +614,8 @@ impl OntologyConstructBuilder {
                 construct_ids.dedup();
                 OntologyConstructProjection {
                     id: format!(
-                        "urn:reqvire:ontology-projection:{}:{}",
+                        "{}:ontology-projection:{}:{}",
+                        self.options.id_namespace,
                         family.as_str(),
                         stable_hash(&construct_ids.join("|"))
                     ),
@@ -646,6 +693,7 @@ impl OntologyConstructBuilder {
             }
 
             let id = construct_id(
+                &self.options.id_namespace,
                 OntologyConstructKind::EquivalenceGroup,
                 &subject,
                 None,
@@ -683,7 +731,7 @@ fn collect_projection_rdf_lists(
 
     for input in inputs {
         let quad = &input.quad;
-        let subject = subject_key(&quad.subject);
+        let subject = named_or_blank_node_key(&quad.subject);
         match quad.predicate.as_str() {
             RDF_FIRST => {
                 list_nodes.insert(subject.clone());
@@ -750,7 +798,7 @@ fn collect_projection_object_index(
     for input in inputs {
         let quad = &input.quad;
         let key = (
-            subject_key(&quad.subject),
+            named_or_blank_node_key(&quad.subject),
             quad.predicate.as_str().to_string(),
         );
         let value = construct_term_from_term(&quad.object);
@@ -763,13 +811,6 @@ fn collect_projection_object_index(
     }
 
     object_index
-}
-
-fn subject_key(subject: &NamedOrBlankNode) -> String {
-    match subject {
-        NamedOrBlankNode::NamedNode(node) => node.as_str().to_string(),
-        NamedOrBlankNode::BlankNode(node) => node.to_string(),
-    }
 }
 
 pub(crate) fn construct_term_from_subject(subject: &NamedOrBlankNode) -> OntologyConstructTerm {
@@ -825,6 +866,7 @@ fn construct_term_key(term: &OntologyConstructTerm) -> String {
 }
 
 fn construct_id(
+    id_namespace: &str,
     kind: OntologyConstructKind,
     subject: &OntologyConstructTerm,
     predicate: Option<&OntologyConstructTerm>,
@@ -857,20 +899,11 @@ fn construct_id(
     }
 
     format!(
-        "urn:reqvire:ontology-construct:{}:{}",
+        "{}:ontology-construct:{}:{}",
+        id_namespace,
         kind.as_str(),
         stable_hash(&canonical)
     )
-}
-
-fn stable_hash(value: &str) -> String {
-    let mut hash = FNV_OFFSET;
-    for byte in value.as_bytes() {
-        hash ^= u64::from(*byte);
-        hash = hash.wrapping_mul(FNV_PRIME);
-    }
-
-    format!("{hash:016x}")
 }
 
 fn compact_iri_label(value: &str) -> String {
@@ -1014,6 +1047,37 @@ mod tests {
             construct.object.as_ref().map(|term| term.value.as_str()),
             Some(object.as_str())
         );
+        assert!(construct.id.starts_with("urn:o-kernel:ontology-construct:"));
+        assert!(projection.projections[0]
+            .id
+            .starts_with("urn:o-kernel:ontology-projection:"));
+    }
+
+    #[test]
+    fn classifier_options_control_id_namespace() {
+        let quad = SourcedQuad {
+            source: "test".to_string(),
+            quad: Quad {
+                subject: NamedOrBlankNode::NamedNode(iri("https://example.org/p")),
+                predicate: NamedNode::new(RDFS_DOMAIN).expect("predicate IRI"),
+                object: Term::NamedNode(iri("https://example.org/o")),
+                graph_name: oxigraph::model::GraphName::DefaultGraph,
+            },
+        };
+
+        let projection = classify_ontology_constructs_with_sources_and_options(
+            &[quad],
+            &OntologyConstructClassifierOptions {
+                id_namespace: "urn:example:kernel".to_string(),
+            },
+        );
+
+        assert!(projection.constructs[0]
+            .id
+            .starts_with("urn:example:kernel:ontology-construct:"));
+        assert!(projection.projections[0]
+            .id
+            .starts_with("urn:example:kernel:ontology-projection:"));
     }
 
     #[test]

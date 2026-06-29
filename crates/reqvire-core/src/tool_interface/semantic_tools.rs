@@ -1,4 +1,6 @@
 use super::*;
+use crate::concept::concept_local_name;
+use crate::Element;
 
 pub(crate) fn semantic_export_tool(
     args: &Value,
@@ -746,49 +748,29 @@ fn ontology_prefix_source(
 }
 
 fn concept_scheme_prefix_entries(model: &ModelManager) -> Vec<Value> {
-    let mut entries = model
-        .graph_registry
-        .get_all_elements()
+    let mut entries = concept_scheme_prefix_records(model)
         .into_iter()
-        .filter(|element| element.element_type.is_concept_scheme())
-        .filter_map(|element| {
-            let payload = element.concept_scheme.as_ref()?;
-            let namespace_base = payload.namespace_base.as_ref()?;
-            let namespace_prefix = payload.namespace_prefix.as_ref()?;
-            let namespace = format!("{}#", namespace_base.trim_end_matches('#'));
-            let scheme_iri = format!(
-                "{}{}",
-                namespace,
-                concept_vocabulary_local_name(&element.name)
-            );
-            let concept_scheme = json!({
-                "scheme_element_identifier": element.identifier,
-                "scheme_element_name": element.name,
-                "file_path": element.file_path,
-                "line_number": element.line_number,
-                "scheme_iri": scheme_iri
-            });
-            let source = json!({
-                "element_identifier": element.identifier,
-                "element_name": element.name,
-                "file_path": element.file_path,
-                "line_number": element.line_number,
-                "content": semantic_prefix_source_content(&element.content)
-            });
-            Some(json!({
-                "prefix": namespace_prefix,
-                "namespace": namespace,
-                "concept_base": namespace_base,
-                "term_namespace": namespace,
-                "scheme_iri": scheme_iri,
+        .map(|record| {
+            json!({
+                "prefix": record.namespace_prefix,
+                "namespace": record.namespace,
+                "concept_base": record.namespace_base,
+                "term_namespace": record.namespace,
+                "scheme_iri": record.scheme_iri,
                 "external": false,
-                "source": source,
-                "concept_schemes": [concept_scheme],
+                "source": concept_scheme_prefix_source(record.element),
+                "concept_schemes": [{
+                    "scheme_element_identifier": record.element.identifier,
+                    "scheme_element_name": record.element.name,
+                    "file_path": record.element.file_path,
+                    "line_number": record.element.line_number,
+                    "scheme_iri": record.scheme_iri
+                }],
                 "contributors": [{
-                    "element_identifier": element.identifier,
-                    "element_name": element.name
+                    "element_identifier": record.element.identifier,
+                    "element_name": record.element.name
                 }]
-            }))
+            })
         })
         .collect::<Vec<_>>();
     sort_items(&mut entries);
@@ -796,55 +778,62 @@ fn concept_scheme_prefix_entries(model: &ModelManager) -> Vec<Value> {
 }
 
 fn concept_scheme_vocabulary_prefixes(model: &ModelManager) -> Vec<Value> {
-    let mut prefixes = model
-        .graph_registry
-        .get_all_elements()
+    let mut prefixes = concept_scheme_prefix_records(model)
         .into_iter()
-        .filter(|element| element.element_type.is_concept_scheme())
-        .filter_map(|element| {
-            let payload = element.concept_scheme.as_ref()?;
-            let namespace_base = payload.namespace_base.as_ref()?;
-            let namespace_prefix = payload.namespace_prefix.as_ref()?;
-            let namespace = format!("{}#", namespace_base.trim_end_matches('#'));
-            Some(json!({
-                "prefix": namespace_prefix,
-                "namespace": namespace,
-                "concept_base": namespace_base,
-                "term_namespace": namespace,
+        .map(|record| {
+            json!({
+                "prefix": record.namespace_prefix,
+                "namespace": record.namespace,
+                "concept_base": record.namespace_base,
+                "term_namespace": record.namespace,
                 "external": false,
-                "source": {
-                    "element_identifier": element.identifier,
-                    "element_name": element.name,
-                    "file_path": element.file_path,
-                    "line_number": element.line_number,
-                    "content": semantic_prefix_source_content(&element.content)
-                }
-            }))
+                "source": concept_scheme_prefix_source(record.element)
+            })
         })
         .collect::<Vec<_>>();
     sort_items(&mut prefixes);
     prefixes
 }
 
-fn concept_vocabulary_local_name(name: &str) -> String {
-    let mut local = String::new();
-    for part in name
-        .split(|ch: char| !ch.is_ascii_alphanumeric())
-        .filter(|part| !part.is_empty())
-    {
-        let mut chars = part.chars();
-        if let Some(first) = chars.next() {
-            local.push(first.to_ascii_uppercase());
-            for ch in chars {
-                local.push(ch);
-            }
-        }
-    }
-    if local.is_empty() {
-        "Concept".to_string()
-    } else {
-        local
-    }
+struct ConceptSchemePrefixRecord<'a> {
+    element: &'a Element,
+    namespace_base: &'a str,
+    namespace_prefix: &'a str,
+    namespace: String,
+    scheme_iri: String,
+}
+
+fn concept_scheme_prefix_records(model: &ModelManager) -> Vec<ConceptSchemePrefixRecord<'_>> {
+    model
+        .graph_registry
+        .get_all_elements()
+        .into_iter()
+        .filter(|element| element.element_type.is_concept_scheme())
+        .filter_map(|element| {
+            let payload = element.concept_scheme.as_ref()?;
+            let namespace_base = payload.namespace_base.as_deref()?;
+            let namespace_prefix = payload.namespace_prefix.as_deref()?;
+            let namespace = format!("{}#", namespace_base.trim_end_matches('#'));
+            let scheme_iri = format!("{}{}", namespace, concept_local_name(&element.name));
+            Some(ConceptSchemePrefixRecord {
+                element,
+                namespace_base,
+                namespace_prefix,
+                namespace,
+                scheme_iri,
+            })
+        })
+        .collect()
+}
+
+fn concept_scheme_prefix_source(element: &Element) -> Value {
+    json!({
+        "element_identifier": element.identifier,
+        "element_name": element.name,
+        "file_path": element.file_path,
+        "line_number": element.line_number,
+        "content": semantic_prefix_source_content(&element.content)
+    })
 }
 
 fn external_ontology_prefix_source(
@@ -1232,13 +1221,7 @@ fn build_vocabulary_sections(
 }
 
 fn ontology_document_by_term(index: &semantic_contract::SemanticIndex) -> BTreeMap<String, String> {
-    let mut document_by_element = BTreeMap::new();
-    for document in &index.ontology_documents {
-        for element_identifier in &document.element_identifiers {
-            document_by_element.insert(element_identifier.as_str(), document.iri.as_str());
-        }
-    }
-
+    let document_by_element = index.ontology_document_by_element();
     let mut document_by_term = BTreeMap::new();
     for declarations in index.ontology_declarations.values() {
         for declaration in declarations {
@@ -1361,14 +1344,8 @@ fn ontology_terms_section(
                 continue;
             }
             let info = term_index.get(&declaration.iri);
-            let mut item = serde_json::Map::new();
-            item.insert("iri".to_string(), json!(declaration.iri));
-            item.insert(
-                "curie".to_string(),
-                json!(curie(&declaration.iri, prefixes)),
-            );
+            let mut item = base_term_item(&declaration.iri, prefixes, info, declaration.external);
             item.insert("role".to_string(), json!(role));
-            item.insert("external".to_string(), json!(declaration.external));
             if let Some(ontology_document) = ontology_document_by_term.get(&declaration.iri) {
                 item.insert("ontology_document".to_string(), json!(ontology_document));
             }
@@ -1379,14 +1356,6 @@ fn ontology_terms_section(
                     json!(declaration.materialized_in_used_subset),
                 );
             }
-            item.insert(
-                "label".to_string(),
-                json!(info.and_then(|entry| entry.label.clone())),
-            );
-            item.insert(
-                "comment".to_string(),
-                json!(info.and_then(|entry| entry.comment.clone())),
-            );
             if let Some(info) = info {
                 if let Some(domain) = first_iri_property(info, vocab::RDFS_DOMAIN, prefixes) {
                     item.insert("domain".to_string(), json!(domain));
@@ -1396,13 +1365,10 @@ fn ontology_terms_section(
                 }
             }
             if include_source {
-                let source = if declaration.external {
-                    info.map(|entry| source_for_term(index, entry))
-                        .unwrap_or(Value::Null)
-                } else {
-                    source_for_element_identifier(model, &declaration.element_identifier)
-                };
-                item.insert("source".to_string(), source);
+                item.insert(
+                    "source".to_string(),
+                    source_for_ontology_declaration(model, index, term_index, declaration),
+                );
             }
             items.push(Value::Object(item));
         }
@@ -1517,9 +1483,9 @@ fn concepts_section(
         if !is_scheme && !is_concept {
             continue;
         }
-        let generated_from_markdown =
-            term_has_type_in_concept_block(index, iri, vocab::SKOS_CONCEPT_SCHEME)
-                || term_has_type_in_concept_block(index, iri, vocab::SKOS_CONCEPT);
+        let generated_from_markdown = index
+            .concept_layer_subject_has_type(iri, vocab::SKOS_CONCEPT_SCHEME)
+            || index.concept_layer_subject_has_type(iri, vocab::SKOS_CONCEPT);
         if !generated_from_markdown {
             continue;
         }
@@ -1753,13 +1719,8 @@ fn controlled_vocabularies_section(
         if semantic_types.is_empty() {
             continue;
         }
-        let mut item = serde_json::Map::new();
-        item.insert("iri".to_string(), json!(iri));
-        item.insert("curie".to_string(), json!(curie(iri, prefixes)));
-        item.insert("external".to_string(), json!(term_info_external(info)));
+        let mut item = base_term_item(iri, prefixes, Some(info), term_info_external(info));
         item.insert("types".to_string(), json!(semantic_types));
-        item.insert("label".to_string(), json!(info.label));
-        item.insert("comment".to_string(), json!(info.comment));
         if include_source {
             item.insert("source".to_string(), source_for_term(index, info));
         }
@@ -1820,23 +1781,7 @@ fn source_map_section(
         .values()
         .flat_map(|declarations| declarations.iter())
         .map(|declaration| {
-            let source = if declaration.external {
-                term_index
-                    .get(&declaration.iri)
-                    .map(|info| source_for_term(index, info))
-                    .unwrap_or(Value::Null)
-            } else {
-                source_for_element_identifier(model, &declaration.element_identifier)
-            };
-            json!({
-                "term": curie(&declaration.iri, prefixes),
-                "iri": declaration.iri,
-                "role": declaration.role.to_string(),
-                "external": declaration.external,
-                "external_materialization": if declaration.external { Value::String("used_subset".to_string()) } else { Value::Null },
-                "materialized_in_used_subset": declaration.external && declaration.materialized_in_used_subset,
-                "source": source
-            })
+            source_map_declaration_item(model, index, &term_index, declaration, prefixes)
         })
         .collect()
 }
@@ -1857,7 +1802,7 @@ fn query_patterns_section(include_examples: bool) -> Vec<Value> {
         json!({
             "id": "cross_subgraph_contract_context",
             "title": "Requirements using Contract Bindings",
-            "preferred_property": "reqvire:requirementBindsContract"
+            "preferred_property": "reqvire:bindsContract"
         }),
     ];
 
@@ -1877,7 +1822,7 @@ fn query_patterns_section(include_examples: bool) -> Vec<Value> {
         if let Some(Value::Object(pattern)) = patterns.get_mut(2) {
             pattern.insert(
                 "sparql".to_string(),
-                json!("SELECT ?requirement ?contract WHERE { ?requirement a reqvire:Requirement ; reqvire:requirementBindsContract ?contract . } ORDER BY ?requirement ?contract"),
+                json!("SELECT ?requirement ?contract WHERE { ?requirement a reqvire:Requirement ; reqvire:bindsContract ?contract . } ORDER BY ?requirement ?contract"),
             );
         }
     }
@@ -1907,6 +1852,43 @@ fn source_for_element_identifier(model: &ModelManager, identifier: &str) -> Valu
             "content": semantic_prefix_source_content(&element.content)
         }),
         None => Value::Null,
+    }
+}
+
+fn base_term_item(
+    iri: &str,
+    prefixes: &[VocabularyPrefix],
+    info: Option<&TermInfo>,
+    external: bool,
+) -> serde_json::Map<String, Value> {
+    let mut item = serde_json::Map::new();
+    item.insert("iri".to_string(), json!(iri));
+    item.insert("curie".to_string(), json!(curie(iri, prefixes)));
+    item.insert("external".to_string(), json!(external));
+    item.insert(
+        "label".to_string(),
+        json!(info.and_then(|entry| entry.label.clone())),
+    );
+    item.insert(
+        "comment".to_string(),
+        json!(info.and_then(|entry| entry.comment.clone())),
+    );
+    item
+}
+
+fn source_for_ontology_declaration(
+    model: &ModelManager,
+    index: &semantic_contract::SemanticIndex,
+    term_index: &BTreeMap<String, TermInfo>,
+    declaration: &semantic_contract::OntologyTermDeclaration,
+) -> Value {
+    if declaration.external {
+        term_index
+            .get(&declaration.iri)
+            .map(|info| source_for_term(index, info))
+            .unwrap_or(Value::Null)
+    } else {
+        source_for_element_identifier(model, &declaration.element_identifier)
     }
 }
 
@@ -1941,25 +1923,26 @@ fn source_for_term(index: &semantic_contract::SemanticIndex, info: &TermInfo) ->
         .unwrap_or(Value::Null)
 }
 
-fn term_info_external(info: &TermInfo) -> bool {
-    matches!(info.source_block, Some(source) if source.external)
+fn source_map_declaration_item(
+    model: &ModelManager,
+    index: &semantic_contract::SemanticIndex,
+    term_index: &BTreeMap<String, TermInfo>,
+    declaration: &semantic_contract::OntologyTermDeclaration,
+    prefixes: &[VocabularyPrefix],
+) -> Value {
+    json!({
+        "term": curie(&declaration.iri, prefixes),
+        "iri": declaration.iri,
+        "role": declaration.role.to_string(),
+        "external": declaration.external,
+        "external_materialization": if declaration.external { Value::String("used_subset".to_string()) } else { Value::Null },
+        "materialized_in_used_subset": declaration.external && declaration.materialized_in_used_subset,
+        "source": source_for_ontology_declaration(model, index, term_index, declaration)
+    })
 }
 
-fn term_has_type_in_concept_block(
-    index: &semantic_contract::SemanticIndex,
-    iri: &str,
-    type_iri: &str,
-) -> bool {
-    index
-        .blocks
-        .iter()
-        .filter(|block| matches!(block.kind, semantic_contract::SemanticBlockKind::Concepts))
-        .flat_map(|block| block.quads.iter())
-        .any(|quad| {
-            quad.predicate.as_str() == vocab::RDF_TYPE
-                && subject_iri(&quad.subject) == Some(iri)
-                && term_iri(&quad.object) == Some(type_iri)
-        })
+fn term_info_external(info: &TermInfo) -> bool {
+    matches!(info.source_block, Some(source) if source.external)
 }
 
 fn ontology_document_for_iri<'a>(
@@ -2013,21 +1996,10 @@ fn sort_items(items: &mut [Value]) {
     items.sort_by_key(|left| left.to_string());
 }
 
-fn semantic_export_layer_name(layer: &SemanticExportLayer) -> &'static str {
-    match layer {
-        SemanticExportLayer::Ontologies => "ontologies",
-        SemanticExportLayer::Shapes => "shapes",
-        SemanticExportLayer::Concepts => "concepts",
-        SemanticExportLayer::Model => "model",
-        SemanticExportLayer::ExternalUsed => "external-used",
-        SemanticExportLayer::Prefixes => "prefixes",
-    }
-}
-
 fn semantic_export_layer_values(layers: &[SemanticExportLayer]) -> Value {
     json!(layers
         .iter()
-        .map(semantic_export_layer_name)
+        .map(SemanticExportLayer::as_str)
         .collect::<Vec<_>>())
 }
 

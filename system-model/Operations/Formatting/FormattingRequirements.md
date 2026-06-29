@@ -39,19 +39,7 @@ The system shall provide formatting capability to ensure consistent formatting i
 When generating formatted output, the system shall ensure all documents follow a consistent hierarchical structure.
 
 #### Details
-When generating formatted output, the system shall:
-- Always output `# Elements` as the page header (all specification files must have this header)
-- Add a default section header `## Elements` when elements exist without an explicit section header
-- Preserve existing section headers when present (starting with `## `)
-- Correctly distinguish between level 1 headers (`# `) and level 2 or deeper headers (`##`, `###`)
-
-**Default Header Names:**
-- Page header: Always `# Elements` (required for all specification files)
-- Section header: "Elements" (the default section name used by parser)
-
-**Normalization Rules:**
-1. If document has `# Elements` then `###` (no `##`): Add section header only
-2. If document has `# Elements` and `##`: No header additions needed
+Detailed header, section, preservation, and normalization rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -101,14 +89,7 @@ This operation only removes within-section duplicates (entries repeated in the s
 When formatting or persisting specification files, the system shall sort relations within each element for deterministic and consistent output.
 
 #### Details
-Relations are sorted using the following criteria:
-1. Primary sort: Alphabetically by relation type name (e.g., `derivedFrom` before `satisfiedBy`, `satisfiedBy` before `verifiedBy`)
-2. Secondary sort: Alphabetically by target identifier within the same relation type
-
-This ensures:
-- Deterministic output regardless of parsing order or HashMap iteration order
-- Consistent diffs when comparing formatted files
-- Predictable relation ordering for review and verification
+Detailed relation sort criteria and deterministic output rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -128,21 +109,9 @@ The system shall display formatting changes suggestion in similar manner as git 
   * type: requirement
 
 #### Relations
-  * derive: [Git-Style Diff Output for Format](#git-style-diff-output-for-format)
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
   * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
----
-
-### Git-Style Diff Output for Format
-
-The system shall display formatting change suggestions in a git-style diff format, color-coded when possible, to clearly show what modifications will be or have been made to the documents.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Formatting Output](#formatting-output)
   * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
 ---
 

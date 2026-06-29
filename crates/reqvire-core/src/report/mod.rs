@@ -2,6 +2,7 @@
 
 pub mod collect;
 pub mod coverage;
+mod formatting;
 pub mod model;
 pub mod resources;
 pub mod submodels;
