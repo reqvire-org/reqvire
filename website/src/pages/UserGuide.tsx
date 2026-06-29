@@ -15,14 +15,6 @@ export default function UserGuide() {
           Quick Install
         </h3>
         <CodeBlock>{`curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install.sh | bash`}</CodeBlock>
-
-        <h3 className="text-lg font-semibold text-zinc-900 mb-3 mt-6">
-          Build from Source
-        </h3>
-        <CodeBlock>{`git clone https://github.com/reqvire-org/reqvire.git
-cd reqvire
-cargo build --release
-target/release/reqvire --version`}</CodeBlock>
       </Section>
 
       <Section title="Workspace Selection">
