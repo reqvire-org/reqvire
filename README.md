@@ -141,8 +141,18 @@ reqvire --workspace /absolute/path/to/workspace mcp --enable-mutations
 ## Claude Code
 
 The Reqvire Claude Code plugin is distributed through the reqvire-org plugin
-marketplace. See the assistant documentation for current installation commands
-and client setup.
+marketplace. Marketplace installation is the default Claude Code path:
+
+```text
+/plugin marketplace add https://github.com/reqvire-org/reqvire
+/plugin install reqvire@reqvire-org
+```
+
+For environments that use the local Claude skills folder directly:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install-claude-skill.sh | bash
+```
 
 ---
 
@@ -152,12 +162,16 @@ This repository includes installable Codex skill packages for Reqvire model work
 
 ```text
 codex-skills/reqvire-syseng
+codex-skills/reqvire-audit
 codex-skills/reqvire-ontology-authoring
 codex-skills/reqvire-concept-authoring
 ```
 
 Use `reqvire-syseng` for semantic engineering, capability, requirement,
 verification, traceability, migration, and general Reqvire CLI workflows.
+
+Use `reqvire-audit` for validation, linting, coverage, change-impact, and
+model-review evidence workflows.
 
 Use `reqvire-ontology-authoring` for ontology scoping, OWL/Turtle vocabulary,
 semantic contracts, structural-to-concept bridges, namespace decisions, and ontology
@@ -182,9 +196,7 @@ export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2
 Install globally:
 
 ```bash
-git clone https://github.com/reqvire-org/reqvire.git
-cd reqvire
-./scripts/install-codex-skill.sh
+curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install-codex-skill.sh | bash
 ```
 
 The installer uses `CODEX_HOME` if set, otherwise defaults to:
@@ -197,6 +209,7 @@ Installed locations:
 
 ```text
 $CODEX_HOME/skills/reqvire-syseng
+$CODEX_HOME/skills/reqvire-audit
 $CODEX_HOME/skills/reqvire-ontology-authoring
 $CODEX_HOME/skills/reqvire-concept-authoring
 ```

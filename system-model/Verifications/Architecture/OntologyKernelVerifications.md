@@ -28,14 +28,17 @@ Required Rust test coverage:
 - Verify RDF list member order is preserved for property chains and class expressions.
 - Verify classification does not perform OWL reasoning, SHACL-AF rule execution, or inferred materialization.
 - Verify returned construct records are generic and require consumers to add source provenance and runtime graph placement outside o-kernel.
+- Verify default construct and construct-projection identifiers use the neutral `urn:o-kernel` namespace.
+- Verify caller-provided classifier options control the construct and construct-projection ID namespace without introducing Reqvire-specific strings into o-kernel output.
 
-This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
+The o-kernel unit tests in `crates/o-kernel/src/constructs/classify.rs` cover ontology construct classification, default neutral ID namespaces, and caller-provided ID namespace selection.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * verify: [Ontology Construct Classification](../../Architecture/OntologyKernelRequirements.md#ontology-construct-classification)
+  * satisfiedBy: [classify.rs](../../../crates/o-kernel/src/constructs/classify.rs)
 ---
 
 ### O-Kernel Physical Module Unit Test Verification

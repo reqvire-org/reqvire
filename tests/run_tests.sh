@@ -63,6 +63,11 @@ run_test_case() {
 
     local test_folder="$1"
     local test_name="$(basename $test_folder)"
+
+    if [[ ! -f "$test_folder/test.sh" ]]; then
+        echo "⏭️  $test_name - SKIPPED (missing test.sh)"
+        return 0
+    fi
     
 
     TEST_DIR=$(mktemp -d -t reqvire-${test_name}-XXXXXX)

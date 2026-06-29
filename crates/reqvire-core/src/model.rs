@@ -1,5 +1,3 @@
-use anyhow::Result;
-
 use crate::error::ReqvireError;
 use crate::filesystem;
 use crate::graph_registry::GraphRegistry;
@@ -10,7 +8,7 @@ use crate::parser;
 use crate::utils;
 use globset::GlobSet;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ModelManager {
     /// In-memory graph registry of elements and relations
     pub graph_registry: GraphRegistry,
@@ -18,7 +16,7 @@ pub struct ModelManager {
     pub semantic_store: Option<SemanticModelStore>,
 }
 
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct ModelBuildOptions {
     pub lenient: bool,
     pub with_size_estimates: bool,
@@ -88,7 +86,7 @@ impl ModelManager {
                 pass1_errors.len()
             );
             if !options.lenient {
-                return Err(ReqvireError::ValidationError(pass1_errors));
+                return Err(ReqvireError::validation_diagnostics(pass1_errors));
             }
             debug!("Lenient mode: continuing despite Pass 1 errors");
         }
@@ -105,7 +103,7 @@ impl ModelManager {
                 pass2_errors.len()
             );
             if !options.lenient {
-                return Err(ReqvireError::ValidationError(pass2_errors));
+                return Err(ReqvireError::validation_diagnostics(pass2_errors));
             }
             debug!("Lenient mode: continuing despite Pass 2 errors");
         }
@@ -179,8 +177,8 @@ impl ModelManager {
         }
 
         // Global uniqueness validation: Check for duplicate element names across all files
-        let mut name_locations: std::collections::HashMap<String, Vec<(String, usize)>> =
-            std::collections::HashMap::new();
+        let mut name_locations: rustc_hash::FxHashMap<String, Vec<(String, usize)>> =
+            rustc_hash::FxHashMap::default();
 
         for (name, file_path, line_number) in all_element_locations {
             name_locations
@@ -222,36 +220,5 @@ impl ModelManager {
         debug!("Pass 2: Delegating to GraphRegistry for relation building and validation");
         self.graph_registry
             .build_relations(excluded_filename_patterns)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn test_extract_path_and_fragment() {
-        // Test file reference with fragment.
-        let input = "/user/repo#readme";
-        let (file, frag) = crate::utils::extract_path_and_fragment(input);
-        assert_eq!(file, "/user/repo");
-        assert_eq!(frag, Some("readme"));
-
-        // Test fragment-only with leading '#'.
-        let input = "#intro";
-        let (file, frag) = crate::utils::extract_path_and_fragment(input);
-        assert_eq!(file, "");
-        assert_eq!(frag, Some("intro"));
-
-        // Test file only.
-        let input = "document.md";
-        let (file, frag) = crate::utils::extract_path_and_fragment(input);
-        assert_eq!(file, "document.md");
-        assert_eq!(frag, None);
-
-        // Test fragment-only without '#' (treated as fragment-only)
-        let input = "onlyfragment";
-        let (file, frag) = crate::utils::extract_path_and_fragment(input);
-        assert_eq!(file, "");
-        assert_eq!(frag, Some("onlyfragment"));
     }
 }

@@ -19,8 +19,8 @@
               {
                 "relation_type": "verifiedBy",
                 "element": {
-                  "identifier": "specifications/Verifications/Tests.md#output-format-test",
-                  "name": "Output Format Test",
+                  "identifier": "specifications/Verifications/Tests.md#json-output-format-test",
+                  "name": "JSON Output Format Test",
                   "element_type": "test-verification",
                   "file_path": "specifications/Verifications/Tests.md",
                   "file_order_index": 4,

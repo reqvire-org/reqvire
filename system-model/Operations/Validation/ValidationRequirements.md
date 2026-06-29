@@ -33,6 +33,9 @@ This validation shall allow valid SHACL target mechanisms while preserving Reqvi
   * definedBy: [Semantic Contract Shape Validation Specification](Specifications.md#semantic-contract-shape-validation-specification)
   * derive: [Reqvire SHACL Context Adapter](#reqvire-shacl-context-adapter)
   * derivedFrom: [Ontology and Semantic Contract Model](../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
+  * satisfiedBy: [ontology_context.rs](../../../crates/reqvire-core/src/graph_registry/ontology_context.rs)
+  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/semantic_contract/mod.rs)
   * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
 ---
 
@@ -54,8 +57,9 @@ The Reqvire adapter shall ask the semantic index for parsed RDF quads from the o
 #### Relations
   * definedBy: [Reqvire SHACL Context Adapter Specification](Specifications.md#reqvire-shacl-context-adapter-specification)
   * derivedFrom: [Semantic Contract Shape Validation](#semantic-contract-shape-validation)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
-  * satisfiedBy: [semantic_contract.rs](../../../crates/reqvire-core/src/semantic_contract.rs)
+  * satisfiedBy: [ontology_context.rs](../../../crates/reqvire-core/src/graph_registry/ontology_context.rs)
+  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/semantic_contract/mod.rs)
   * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
 ---
 
@@ -174,7 +178,8 @@ The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 com
 #### Relations
   * definedBy: [Requirements Processing Specification](Specifications.md#requirements-processing-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [registration.rs](../../../crates/reqvire-core/src/graph_registry/registration.rs)
+  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
   * verifiedBy: [Requirements Files Search and Detection Test](../../Verifications/Operations/Validation/ValidationVerifications.md#requirements-files-search-and-detection-test)
 ---
@@ -221,11 +226,7 @@ Implementation details shall follow the associated contract specifications.
 The system shall detect when the same target appears in both the Relations and Contract Bindings subsections of an element, treating this as a validation error.
 
 #### Details
-A constraint defines the detailed rules for cross-section duplicate detection.
-
-This applies to identifier targets.
-
-Within-section duplicates (same entry repeated within Relations OR within Contract Bindings) are formatting issues handled by the format operation, not validation errors.
+Detailed cross-section and within-section duplicate handling rules shall follow the associated constraint.
 
 #### Metadata
   * type: requirement
@@ -256,9 +257,7 @@ The system shall validate relation types against a defined vocabulary and provid
 The system shall reject native concept `broader` and `narrower` taxonomy relations whose source and target concepts resolve to different `concept-scheme` roots.
 
 #### Details
-Native `broader` and `narrower` relations are scheme-local taxonomy relations. Cross-scheme concept alignment shall use non-taxonomic association or mapping relations instead: `related`, `exactMatch`, or `closeMatch`.
-
-Validation shall resolve each native concept's scheme context through the canonical `concept-scheme` ancestry used to generate SKOS IRIs. The rule shall run as part of normal model validation so invalid taxonomy does not reach semantic export, Explorer, MCP tools, or downstream graph stores.
+Detailed scheme resolution, accepted cross-scheme alternatives, diagnostic, and validation-timing rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -267,7 +266,7 @@ Validation shall resolve each native concept's scheme context through the canoni
   * constrainedBy: [Validation Rule Diagnostic Shape](../../Ontologies/BehaviorValidationOperations.md#validation-rule-diagnostic-shape)
   * definedBy: [Native Concept Taxonomy Scheme Boundary Validation Specification](Specifications.md#native-concept-taxonomy-scheme-boundary-validation-specification)
   * derivedFrom: [Relation Type Validation](#relation-type-validation)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
   * verifiedBy: [Native Concept Taxonomy Scheme Boundary Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#native-concept-taxonomy-scheme-boundary-validation-test)
 ---
 
@@ -284,7 +283,7 @@ Validation details shall follow the associated hierarchy ownership constraint.
 #### Relations
   * definedBy: [Single Root Hierarchy Ownership Constraint](Constraints.md#single-root-hierarchy-ownership-constraint)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
   * verifiedBy: [Single Root Hierarchy Ownership Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#single-root-hierarchy-ownership-validation-test)
 ---
 
@@ -309,10 +308,7 @@ The system shall define two-pass validation behavior.
 The system shall display all valid type options when type validation fails.
 
 #### Details
-- Invalid element types shall show list of valid element types including custom type pattern
-- Invalid relation types shall show list of valid relation types
-- Element type list format: "type1, type2, ... For custom types use: other-TYPENAME"
-- Relation type list format: "type1, type2, ..." (alphabetically sorted)
+Detailed element-type, relation-type, list-format, custom-type, and sorting behavior shall follow the associated behavior contract.
 
 #### Metadata
   * type: requirement
@@ -351,6 +347,25 @@ This ensures users see all relevant errors at once rather than fixing issues one
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
 ---
 
+### Structured Validation Diagnostics
+
+The system shall preserve validation diagnostics as structured data before rendering them for CLI, JSON, or MCP consumers.
+
+#### Details
+- Diagnostics shall carry a stable diagnostic code when one is known.
+- Diagnostics shall carry a human-readable message compatible with existing text output expectations.
+- Diagnostics shall carry source context when known, including file, line, column, and element identifier.
+- CLI text output shall render diagnostics for humans without requiring JSON parsing.
+- JSON and MCP consumers shall be able to consume structured diagnostic fields without scraping terminal text.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Structured Validation Diagnostic Contract Specification](Specifications.md#structured-validation-diagnostic-contract-specification)
+  * derivedFrom: [Validation Error Handling](#validation-error-handling)
+---
+
 ### Validate Markdown Structure
 
 The system shall validate the Markdown structure of system model to ensure compliance with formatting standards.
@@ -378,9 +393,12 @@ The system shall implement a markdown structure validator that enforces Reqvire'
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
 ---
 
-### Validate Relation Types
+### Validate Relation Element Type Compatibility
 
-The system shall validate relation types and allow only supported types.
+The system shall validate that relation endpoints use element types compatible with the relation type.
+
+#### Details
+Relation vocabulary-name validation is owned by Relation Type Validation. This requirement owns endpoint compatibility across the already-supported relation vocabulary.
 
 #### Metadata
   * type: requirement
@@ -402,8 +420,8 @@ Implementation details shall follow the associated contract specifications.
 
 #### Relations
   * definedBy: [Relation Element Type Validator Contract Specification](Specifications.md#relation-element-type-validator-contract-specification)
-  * derivedFrom: [Validate Relation Types](#validate-relation-types)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * derivedFrom: [Validate Relation Element Type Compatibility](#validate-relation-element-type-compatibility)
+  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Element Type Relation Compatibility Test](../../Verifications/Operations/Validation/ValidationVerifications.md#element-type-relation-compatibility-test)

@@ -57,9 +57,9 @@ Ontology roots, concept roots, and capability roots are ontology, concept-scheme
 ---
 
 
-### Markdown Output Format
+### Default JSON Output Format
 
-System shall generate markdown output with embedded Mermaid diagrams.
+System shall generate structured JSON output by default.
 
 #### Metadata
   * type: requirement
@@ -69,9 +69,9 @@ System shall generate markdown output with embedded Mermaid diagrams.
 
 ---
 
-### Pure Mermaid Output Format
+### Output Format Flag Removal
 
-System shall generate pure Mermaid output without Markdown wrapper text.
+System shall reject removed model output-format flags instead of retaining compatibility aliases.
 
 #### Metadata
   * type: requirement

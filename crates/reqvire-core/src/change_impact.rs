@@ -6,9 +6,10 @@ use crate::relation::{LinkType, Relation, RelationTarget};
 use crate::semantic_contract::{self, SemanticBlockKind};
 use difference::{Changeset, Difference};
 use o_kernel::rdf::term_iri;
+use rustc_hash::{FxHashMap, FxHashSet};
 use serde::Serialize;
 use serde_json::{json, Value};
-use std::collections::{BTreeSet, HashMap, HashSet};
+use std::collections::BTreeSet;
 use std::path::PathBuf;
 
 /// Represents a simplified relation for reporting.
@@ -97,8 +98,8 @@ pub struct ChangedElement {
     pub removed_relations: Vec<RelationSummary>,
     pub change_impact_tree: ElementNode,
     /// Set of contract_bindings target strings that changed (for rendering with ⚠️)
-    #[serde(skip_serializing_if = "HashSet::is_empty")]
-    pub changed_contract_bindings: HashSet<String>,
+    #[serde(skip_serializing_if = "FxHashSet::is_empty")]
+    pub changed_contract_bindings: FxHashSet<String>,
 }
 
 impl ChangedElement {
@@ -118,9 +119,9 @@ pub struct ChangeImpactReport {
     pub impact_scope: Vec<ImpactScopeRoot>,
     pub invalidated_verifications: Vec<InvalidatedVerification>,
     #[serde(skip)]
-    pub all_added_element_ids: HashSet<String>,
+    pub all_added_element_ids: FxHashSet<String>,
     #[serde(skip)]
-    pub all_changed_element_ids: HashSet<String>,
+    pub all_changed_element_ids: FxHashSet<String>,
 }
 
 impl Default for ChangeImpactReport {
@@ -138,8 +139,8 @@ impl ChangeImpactReport {
             relocated: Vec::new(),
             impact_scope: Vec::new(),
             invalidated_verifications: Vec::new(),
-            all_added_element_ids: HashSet::new(),
-            all_changed_element_ids: HashSet::new(),
+            all_added_element_ids: FxHashSet::default(),
+            all_changed_element_ids: FxHashSet::default(),
         }
     }
 
@@ -387,7 +388,7 @@ impl ChangeImpactReport {
             let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
             output.push_str("* ");
             output.push_str(&format!("[{}]({})\n", elem.name, element_url));
-            let empty_changed: HashSet<String> = HashSet::new();
+            let empty_changed: FxHashSet<String> = FxHashSet::default();
             let rendered_tree = render_change_impact_tree(
                 &elem.change_impact_tree,
                 1,
@@ -506,7 +507,7 @@ impl ChangeImpactReport {
         previous_git_commit: &str,
     ) -> String {
         serde_json::to_string_pretty(&self.to_json(base_url, git_commit, previous_git_commit))
-            .unwrap()
+            .expect("failed to serialize JSON")
     }
 
     pub fn print(
@@ -613,8 +614,8 @@ fn render_change_impact_tree(
     indent: usize,
     base_url: &str,
     git_commit: &str,
-    new_element_ids: &HashSet<String>,
-    changed_contract_bindings: &HashSet<String>,
+    new_element_ids: &FxHashSet<String>,
+    changed_contract_bindings: &FxHashSet<String>,
 ) -> String {
     let mut output = String::new();
     let pad = "    ".repeat(indent);
@@ -879,10 +880,10 @@ fn collect_verification_elements_from_impact_tree(
     node: &ElementNode,
 ) -> Vec<InvalidatedVerification> {
     let mut collected = Vec::new();
-    let mut seen = HashSet::new();
+    let mut seen = FxHashSet::default();
     fn walk(
         node: &ElementNode,
-        seen: &mut HashSet<String>,
+        seen: &mut FxHashSet<String>,
         collected: &mut Vec<InvalidatedVerification>,
     ) {
         if let element::ElementType::Verification(_) = node.element.element_type {
@@ -903,7 +904,7 @@ fn collect_verification_elements_from_impact_tree(
     collected
 }
 
-fn propagate_changed_flags(node: &mut ElementNode, changed_ids: &HashSet<String>) {
+fn propagate_changed_flags(node: &mut ElementNode, changed_ids: &FxHashSet<String>) {
     for relation in &mut node.relations {
         let child = &mut relation.element_node;
         if changed_ids.contains(&child.element.identifier) {
@@ -921,7 +922,7 @@ pub fn apply_smart_filtering(
     // Step 1: Collect ALL added element IDs BEFORE filtering
 
     // Step 2: Collect IDs of elements referenced in trees (i.e. children, not roots)
-    let mut referenced_ids = HashSet::new();
+    let mut referenced_ids = FxHashSet::default();
     for added in &report.added {
         for rel_node in &added.change_impact_tree.relations {
             if is_smart_filter_child_relation(&rel_node.relation_trigger) {
@@ -966,7 +967,7 @@ pub fn apply_smart_filtering(
         .retain(|e| !referenced_ids.contains(&e.element_id));
 }
 
-fn collect_tree_ids_recursively(node: &ElementNode, set: &mut HashSet<String>) {
+fn collect_tree_ids_recursively(node: &ElementNode, set: &mut FxHashSet<String>) {
     // Insert this node's identifier
     set.insert(node.element.identifier.clone());
 
@@ -995,7 +996,7 @@ fn is_smart_filter_child_relation(relation_type: &str) -> bool {
 }
 
 /// Collect element identifiers from contract_bindings (for smart filtering)
-fn collect_contract_bindings_element_ids(elem: &element::Element, set: &mut HashSet<String>) {
+fn collect_contract_bindings_element_ids(elem: &element::Element, set: &mut FxHashSet<String>) {
     for contract_bindings in &elem.contract_bindings {
         if let element::ContractBindingTarget::ElementIdentifier(id) = &contract_bindings.target {
             set.insert(id.clone());
@@ -1004,7 +1005,7 @@ fn collect_contract_bindings_element_ids(elem: &element::Element, set: &mut Hash
 }
 
 /// Recursively collect contract_bindings element IDs from the entire tree
-fn collect_contract_binding_ids_from_tree(node: &ElementNode, set: &mut HashSet<String>) {
+fn collect_contract_binding_ids_from_tree(node: &ElementNode, set: &mut FxHashSet<String>) {
     collect_contract_bindings_element_ids(&node.element, set);
     for relation in &node.relations {
         collect_contract_binding_ids_from_tree(&relation.element_node, set);
@@ -1047,17 +1048,17 @@ fn get_changed_contract_bindings(
     ref_elem: &element::Element,
     current_registry: &graph_registry::GraphRegistry,
     reference_registry: &graph_registry::GraphRegistry,
-) -> HashSet<String> {
+) -> FxHashSet<String> {
     let cur_hashes: Vec<(String, String)> =
         get_contract_bindings_hashes(cur_elem, current_registry);
     let ref_hashes: Vec<(String, String)> =
         get_contract_bindings_hashes(ref_elem, reference_registry);
 
     // Collect just the content hashes for comparison
-    let cur_hash_set: HashSet<&String> = cur_hashes.iter().map(|(_, h)| h).collect();
-    let ref_hash_set: HashSet<&String> = ref_hashes.iter().map(|(_, h)| h).collect();
+    let cur_hash_set: FxHashSet<&String> = cur_hashes.iter().map(|(_, h)| h).collect();
+    let ref_hash_set: FxHashSet<&String> = ref_hashes.iter().map(|(_, h)| h).collect();
 
-    let mut changed = HashSet::new();
+    let mut changed = FxHashSet::default();
 
     // Check for changed or added contract_bindings (hash in current but not in reference)
     for (target, cur_hash) in &cur_hashes {
@@ -1194,7 +1195,7 @@ pub fn compute_impact_scope(
 ) -> Vec<ImpactScopeRoot> {
     // Step 1: Collect capability/requirement element IDs from changed + added
     // Use all_changed/all_added IDs (pre-smart-filtering) for complete scope
-    let mut scope_set: HashSet<String> = HashSet::new();
+    let mut scope_set: FxHashSet<String> = FxHashSet::default();
 
     for id in report
         .all_changed_element_ids
@@ -1215,7 +1216,7 @@ pub fn compute_impact_scope(
             if !is_scope_element(ref_elem) {
                 continue;
             }
-            let mut visited = HashSet::new();
+            let mut visited = FxHashSet::default();
             let mut current_id = removed.element_id.clone();
             visited.insert(current_id.clone());
 
@@ -1252,7 +1253,7 @@ pub fn compute_impact_scope(
     // Step 3: Bottom-up merge loop
     loop {
         // For each element in scope_set, find its model parent in current registry
-        let mut parent_map: HashMap<String, Vec<String>> = HashMap::new();
+        let mut parent_map: FxHashMap<String, Vec<String>> = FxHashMap::default();
         let mut no_parent: Vec<String> = Vec::new();
 
         for id in &scope_set {
@@ -1269,7 +1270,7 @@ pub fn compute_impact_scope(
         }
 
         // Merge: for parents with 2+ children, replace children with parent
-        let mut new_set: HashSet<String> = HashSet::new();
+        let mut new_set: FxHashSet<String> = FxHashSet::default();
         for id in &no_parent {
             new_set.insert(id.clone());
         }
@@ -1310,12 +1311,12 @@ pub fn compute_change_impact(
     reference: &graph_registry::GraphRegistry,
 ) -> Result<ChangeImpactReport, ReqvireError> {
     let mut report = ChangeImpactReport::new();
-    let current_ids: HashSet<String> = current
+    let current_ids: FxHashSet<String> = current
         .get_all_elements()
         .iter()
         .map(|e| e.identifier.clone())
         .collect();
-    let reference_ids: HashSet<String> = reference
+    let reference_ids: FxHashSet<String> = reference
         .get_all_elements()
         .iter()
         .map(|e| e.identifier.clone())
@@ -1323,18 +1324,18 @@ pub fn compute_change_impact(
 
     // Process elements present in both registries.
     for id in current_ids.intersection(&reference_ids) {
-        let cur_elem = current.get_element(id).unwrap();
-        let ref_elem = reference.get_element(id).unwrap();
+        let cur_elem = current.get_element(id).expect("element not found");
+        let ref_elem = reference.get_element(id).expect("element not found");
         let content_changed = cur_elem.hash_impact_content != ref_elem.hash_impact_content;
 
         // Compare contract_bindings hashes (resolved from registries) - compare only hash values, not targets
         let cur_contract_bindings_hashes = get_contract_bindings_hashes(cur_elem, current);
         let ref_contract_bindings_hashes = get_contract_bindings_hashes(ref_elem, reference);
-        let cur_hash_set: HashSet<&String> = cur_contract_bindings_hashes
+        let cur_hash_set: FxHashSet<&String> = cur_contract_bindings_hashes
             .iter()
             .map(|(_, h)| h)
             .collect();
-        let ref_hash_set: HashSet<&String> = ref_contract_bindings_hashes
+        let ref_hash_set: FxHashSet<&String> = ref_contract_bindings_hashes
             .iter()
             .map(|(_, h)| h)
             .collect();
@@ -1353,21 +1354,21 @@ pub fn compute_change_impact(
             .collect();
 
         // Normalize relations for semantic comparison (by Element ID, not identifier)
-        let cur_relations_normalized: HashSet<_> = cur_relations_raw
+        let cur_relations_normalized: FxHashSet<_> = cur_relations_raw
             .iter()
             .map(|r| normalize_relation_for_comparison(r))
             .collect();
-        let ref_relations_normalized: HashSet<_> = ref_relations_raw
+        let ref_relations_normalized: FxHashSet<_> = ref_relations_raw
             .iter()
             .map(|r| normalize_relation_for_comparison(r))
             .collect();
 
         // Find truly added/removed relations based on semantic comparison
-        let added_relation_keys: HashSet<_> = cur_relations_normalized
+        let added_relation_keys: FxHashSet<_> = cur_relations_normalized
             .difference(&ref_relations_normalized)
             .cloned()
             .collect();
-        let removed_relation_keys: HashSet<_> = ref_relations_normalized
+        let removed_relation_keys: FxHashSet<_> = ref_relations_normalized
             .difference(&cur_relations_normalized)
             .cloned()
             .collect();
@@ -1430,13 +1431,13 @@ pub fn compute_change_impact(
         }
     }
     // Detect relocated elements (same name, different identifier)
-    let mut relocated_element_names = HashSet::new();
-    let current_by_name: std::collections::HashMap<String, &element::Element> = current
+    let mut relocated_element_names = FxHashSet::default();
+    let current_by_name: rustc_hash::FxHashMap<String, &element::Element> = current
         .get_all_elements()
         .iter()
         .map(|e| (e.name.clone(), *e))
         .collect();
-    let reference_by_name: std::collections::HashMap<String, &element::Element> = reference
+    let reference_by_name: rustc_hash::FxHashMap<String, &element::Element> = reference
         .get_all_elements()
         .iter()
         .map(|e| (e.name.clone(), *e))
@@ -1473,20 +1474,20 @@ pub fn compute_change_impact(
                     })
                     .collect();
 
-                let cur_relations_normalized: HashSet<_> = cur_relations_raw
+                let cur_relations_normalized: FxHashSet<_> = cur_relations_raw
                     .iter()
                     .map(|r| normalize_relation_for_comparison(r))
                     .collect();
-                let ref_relations_normalized: HashSet<_> = ref_relations_raw
+                let ref_relations_normalized: FxHashSet<_> = ref_relations_raw
                     .iter()
                     .map(|r| normalize_relation_for_comparison(r))
                     .collect();
 
-                let added_relation_keys: HashSet<_> = cur_relations_normalized
+                let added_relation_keys: FxHashSet<_> = cur_relations_normalized
                     .difference(&ref_relations_normalized)
                     .cloned()
                     .collect();
-                let removed_relation_keys: HashSet<_> = ref_relations_normalized
+                let removed_relation_keys: FxHashSet<_> = ref_relations_normalized
                     .difference(&cur_relations_normalized)
                     .cloned()
                     .collect();
@@ -1547,7 +1548,7 @@ pub fn compute_change_impact(
 
     // Process added elements (present only in current registry, excluding relocated).
     for id in current_ids.difference(&reference_ids) {
-        let cur_elem = current.get_element(id).unwrap();
+        let cur_elem = current.get_element(id).expect("element not found");
         // Skip if this element was relocated (not truly added)
         if relocated_element_names.contains(&cur_elem.name) {
             continue;
@@ -1572,7 +1573,7 @@ pub fn compute_change_impact(
     }
     // Process removed elements (present only in reference registry, excluding relocated).
     for id in reference_ids.difference(&current_ids) {
-        let ref_elem = reference.get_element(id).unwrap();
+        let ref_elem = reference.get_element(id).expect("element not found");
         // Skip if this element was relocated (not truly removed)
         if relocated_element_names.contains(&ref_elem.name) {
             continue;
@@ -1590,7 +1591,7 @@ pub fn compute_change_impact(
         });
     }
     // Collect all changed element IDs to propagate change flags in impact trees
-    let changed_element_ids: HashSet<String> = report
+    let changed_element_ids: FxHashSet<String> = report
         .changed
         .iter()
         .map(|elem| elem.element_id.clone())

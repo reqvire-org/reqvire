@@ -17,8 +17,9 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn main() {
-    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
-    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let manifest_dir =
+        PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect("environment variable not set"));
+    let out_dir = PathBuf::from(env::var("OUT_DIR").expect("environment variable not set"));
     let repo_root = manifest_dir
         .parent()
         .and_then(Path::parent)
@@ -117,7 +118,9 @@ fn copy_tree(root: &Path, src: &Path, dst_root: &Path, files: &mut Vec<String>) 
         if path.is_dir() {
             copy_tree(root, &path, dst_root, files);
         } else if path.is_file() {
-            let rel = path.strip_prefix(root).unwrap();
+            let rel = path
+                .strip_prefix(root)
+                .expect("failed to strip path prefix");
             let dest = dst_root.join(rel);
             if let Some(parent) = dest.parent() {
                 fs::create_dir_all(parent).expect("create parent dir");

@@ -1,12 +1,9 @@
 use crate::mcp;
 use crate::serve;
-use anyhow::Result;
 use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
 use globset::GlobSet;
 use log::info;
-use reqvire::change_impact;
 use reqvire::crud;
-use reqvire::diagrams;
 use reqvire::diff::{render_crud_json, render_crud_result};
 use reqvire::element::Element;
 use reqvire::error::ReqvireError;
@@ -14,20 +11,15 @@ use reqvire::explorer_runtime;
 use reqvire::format::{format_files, render_diff, render_diff_json};
 use reqvire::git_commands;
 use reqvire::graph_registry::Page;
-use reqvire::lint;
 use reqvire::migrations;
-use reqvire::report_collect;
-use reqvire::report_coverage;
-use reqvire::report_model;
-use reqvire::report_resources;
-use reqvire::report_submodels;
+use reqvire::operations;
+use reqvire::report;
 use reqvire::semantic_contract::{self, SemanticExportFormat, SemanticExportLayer};
-use reqvire::verification_trace;
 use reqvire::GraphRegistry;
 use reqvire::ModelBuildOptions;
 use reqvire::ModelManager;
+use rustc_hash::FxHashMap;
 use serde::Serialize;
-use std::collections::HashMap;
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -266,24 +258,12 @@ pub enum Commands {
 
     /// Generate verification traces showing upward paths from verifications to capability-rooted requirements
     #[clap(
-        override_help = "Generate verification traces showing upward paths from verifications to capability-rooted requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)\n      --from-folder <PATH>        Generate links relative to this folder path\n      --links-with-blobs          Use GitHub blob URLs in diagram links instead of relative paths\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type. Valid types: test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification"
+        override_help = "Generate verification traces showing upward paths from verifications to capability-rooted requirements\n\nTRACES OPTIONS:\n      --output <FILE>             Save JSON output to file\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type. Valid types: test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification"
     )]
     Traces {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "TRACES OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
+        /// Save JSON output to file
         #[clap(long, value_name = "FILE", help_heading = "TRACES OPTIONS")]
         output: Option<String>,
-
-        /// Relative path to folder where output will be saved (for generating relative links in Mermaid diagrams)
-        #[clap(long, value_name = "PATH", help_heading = "TRACES OPTIONS")]
-        from_folder: Option<String>,
-
-        /// Use GitHub blob URLs in diagram links instead of relative paths
-        #[clap(long, help_heading = "TRACES OPTIONS")]
-        links_with_blobs: bool,
 
         /// Only include verification with this specific identifier
         #[clap(long, value_name = "ID", help_heading = "TRACES OPTIONS")]
@@ -318,12 +298,8 @@ pub enum Commands {
     /// Use --from <NAME> to start from specific element.
     /// Use --reverse for leaf-to-root traversal.
     ///
-    /// Output formats:
-    /// - JSON: Nested structure with element details in relations
-    /// - Markdown: Mermaid diagrams with all nested relationships
-    /// - Mermaid: pure Mermaid flowchart text with --mmd
     #[clap(
-        override_help = "Generate model-centric structure with nested relations\n\nBy default, shows ontology roots, concept roots, and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n  - Mermaid: pure Mermaid flowchart text with --mmd\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)\n      --mmd                       Output pure Mermaid flowchart text\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save output to file (requires --json or --mmd)"
+        override_help = "Generate model-centric JSON structure with nested relations\n\nBy default, shows ontology roots, concept roots, and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save JSON output to file"
     )]
     Model {
         /// Start from specific element by name
@@ -338,19 +314,11 @@ pub enum Commands {
         #[clap(long, value_name = "TYPE", help_heading = "MODEL OPTIONS")]
         filter_type: Option<String>,
 
-        /// Output results in JSON format (nested structure)
-        #[clap(long, help_heading = "MODEL OPTIONS")]
-        json: bool,
-
-        /// Output pure Mermaid flowchart text
-        #[clap(long, help_heading = "MODEL OPTIONS", conflicts_with = "json")]
-        mmd: bool,
-
         /// Include element size estimates in JSON output
         #[clap(long, help_heading = "MODEL OPTIONS")]
         with_size_estimates: bool,
 
-        /// Save output to file (requires --json or --mmd)
+        /// Save JSON output to file
         #[clap(long, value_name = "FILE", help_heading = "MODEL OPTIONS")]
         output: Option<String>,
     },
@@ -668,14 +636,10 @@ pub enum Commands {
 
     /// Generate containment view showing folder/file/element hierarchy
     #[clap(
-        override_help = "Generate containment view showing folder/file/element hierarchy\n\nCONTAINMENT OPTIONS:\n      --json              Output results in JSON format\n      --output <FILE>     Save JSON output to file (requires --json)\n      --short             Show only root elements (without hierarchical parents)"
+        override_help = "Generate containment view JSON showing folder/file/element hierarchy\n\nCONTAINMENT OPTIONS:\n      --output <FILE>     Save JSON output to file\n      --short             Show only root elements (without hierarchical parents)"
     )]
     Containment {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "CONTAINMENT OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
+        /// Save JSON output to file
         #[clap(long, value_name = "FILE", help_heading = "CONTAINMENT OPTIONS")]
         output: Option<String>,
 
@@ -686,14 +650,10 @@ pub enum Commands {
 
     /// Generate resources report showing files referenced by the model
     #[clap(
-        override_help = "Generate resources report showing files referenced by the model\n\nRESOURCES OPTIONS:\n      --json              Output results in JSON format\n      --output <FILE>     Save JSON output to file (requires --json)"
+        override_help = "Generate resources JSON report showing files referenced by the model\n\nRESOURCES OPTIONS:\n      --output <FILE>     Save JSON output to file"
     )]
     Resources {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "RESOURCES OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
+        /// Save JSON output to file
         #[clap(long, value_name = "FILE", help_heading = "RESOURCES OPTIONS")]
         output: Option<String>,
     },
@@ -1116,7 +1076,10 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
             errors: error_strings,
             migration_candidates: migration_plan.candidates,
         };
-        println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&json_result).expect("failed to serialize JSON")
+        );
     } else {
         println!("\n❌ {} validation failed with error(s):", errors.len());
         println!();
@@ -1143,9 +1106,9 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::Validate { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
         Some(Commands::Search { json, .. }) => *json,
-        Some(Commands::Traces { json, .. }) => *json,
+        Some(Commands::Traces { .. }) => true,
         Some(Commands::Coverage { json, .. }) => *json,
-        Some(Commands::Model { json, .. }) => *json,
+        Some(Commands::Model { .. }) => true,
         Some(Commands::Lint { json, .. }) => *json,
         Some(Commands::Submodels { json, .. }) => *json,
         Some(Commands::Link { json, .. }) => *json,
@@ -1153,6 +1116,8 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::Relink { json, .. }) => *json,
         Some(Commands::MvAsset { json, .. }) => *json,
         Some(Commands::RmAsset { json, .. }) => *json,
+        Some(Commands::Containment { .. }) => true,
+        Some(Commands::Resources { .. }) => true,
         Some(Commands::Concepts {
             command: ConceptCommands::Validate { json, .. },
         }) => *json,
@@ -1215,11 +1180,9 @@ pub async fn handle_command(
             Commands::Validate { output, json, .. } => (output.is_some(), *json),
             Commands::Search { output, json, .. } => (output.is_some(), *json),
             Commands::ChangeImpact { output, json, .. } => (output.is_some(), *json),
-            Commands::Traces { output, json, .. } => (output.is_some(), *json),
+            Commands::Traces { output, .. } => (output.is_some(), true),
             Commands::Coverage { output, json, .. } => (output.is_some(), *json),
-            Commands::Model {
-                output, json, mmd, ..
-            } => (output.is_some(), *json || *mmd),
+            Commands::Model { output, .. } => (output.is_some(), true),
             Commands::Lint { output, json, .. } => (output.is_some(), *json),
             Commands::Add { output, json, .. } => (output.is_some(), *json),
             Commands::Rm { output, json, .. } => (output.is_some(), *json),
@@ -1232,8 +1195,8 @@ pub async fn handle_command(
             Commands::Relink { output, json, .. } => (output.is_some(), *json),
             Commands::MvAsset { output, json, .. } => (output.is_some(), *json),
             Commands::RmAsset { output, json, .. } => (output.is_some(), *json),
-            Commands::Containment { output, json, .. } => (output.is_some(), *json),
-            Commands::Resources { output, json, .. } => (output.is_some(), *json),
+            Commands::Containment { output, .. } => (output.is_some(), true),
+            Commands::Resources { output, .. } => (output.is_some(), true),
             Commands::Ontologies { .. } => (false, false),
             Commands::Concepts { command } => match command {
                 ConceptCommands::Export { output, .. } => (output.is_some(), true),
@@ -1244,19 +1207,7 @@ pub async fn handle_command(
             _ => (false, false),
         };
         if has_output && !has_json {
-            eprintln!("error: --output requires --json or a command-specific raw output flag");
-            return Ok(1);
-        }
-
-        if matches!(
-            cmd,
-            Commands::Model {
-                json: false,
-                with_size_estimates: true,
-                ..
-            }
-        ) {
-            eprintln!("error: --with-size-estimates requires --json");
+            eprintln!("error: --output requires --json");
             return Ok(1);
         }
     }
@@ -1288,7 +1239,6 @@ pub async fn handle_command(
     let with_size_estimates = matches!(
         args.command,
         Some(Commands::Model {
-            json: true,
             with_size_estimates: true,
             ..
         })
@@ -1310,13 +1260,20 @@ pub async fn handle_command(
             print_validation_results(errors, json_output);
             return Ok(1);
         }
+        Err(ReqvireError::ValidationDiagnostics { related_errors, .. }) => {
+            print_validation_results(related_errors, json_output);
+            return Ok(1);
+        }
         Err(e) => {
             if json_output {
                 let json_result = ValidationResult {
                     errors: vec![e.to_string()],
                     migration_candidates: Vec::new(),
                 };
-                println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&json_result).expect("failed to serialize JSON")
+                );
             } else {
                 eprintln!("❌ Parsing failed: {}", e);
             }
@@ -1335,7 +1292,8 @@ pub async fn handle_command(
                     errors: vec![],
                     migration_candidates: Vec::new(),
                 };
-                let json_str = serde_json::to_string_pretty(&json_result).unwrap();
+                let json_str =
+                    serde_json::to_string_pretty(&json_result).expect("failed to serialize JSON");
                 handle_json_output(&json_str, &output)?;
             } else {
                 println!("✅ No validation issues found");
@@ -1378,12 +1336,8 @@ pub async fn handle_command(
             )?;
 
             // Generate search report
-            let report_output = reqvire::search::generate_search_report(
-                &model_manager.graph_registry,
-                &filters,
-                json,
-                short,
-            )?;
+            let report_output =
+                operations::search_report(&model_manager.graph_registry, &filters, json, short)?;
 
             if json {
                 handle_json_output(&report_output, &output)?;
@@ -1397,55 +1351,11 @@ pub async fn handle_command(
             git_commit,
             output,
         }) => {
-            let base_url = git_commands::get_repository_base_url().map_err(|_| {
-                ReqvireError::ProcessError(
-                    "❌ Failed to determine repository base url.".to_string(),
-                )
-            })?;
-
-            let current_commit = git_commands::get_commit_hash().map_err(|_| {
-                ReqvireError::ProcessError(
-                    "❌ Failed to retrieve the current commit hash.".to_string(),
-                )
-            })?;
-
-            let mut reference_model_manager = ModelManager::new();
-            match reference_model_manager.parse_and_validate_with_mode(
-                Some(&git_commit),
-                excluded_filename_patterns,
-                false,
-            ) {
-                Ok(_) => {}
-                Err(ReqvireError::ValidationError(errors)) => {
-                    log::warn!(
-                        "Reference model at commit {} has {} validation issue(s); continuing in lenient mode.",
-                        git_commit,
-                        errors.len()
-                    );
-                    reference_model_manager.parse_and_validate_with_mode(
-                        Some(&git_commit),
-                        excluded_filename_patterns,
-                        true,
-                    )?;
-                }
-                Err(e) => {
-                    return Err(ReqvireError::ProcessError(format!(
-                        "❌ Failed to parse reference model at commit {}: {}",
-                        git_commit, e
-                    )));
-                }
-            }
-
-            let report = change_impact::compute_change_impact(
+            let (report, base_url, current_commit) = operations::change_impact_report(
                 &model_manager.graph_registry,
-                &reference_model_manager.graph_registry,
-            )
-            .map_err(|e| {
-                ReqvireError::ProcessError(format!(
-                    "❌ Failed to generate change impact report: {:?}",
-                    e
-                ))
-            })?;
+                &git_commit,
+                excluded_filename_patterns,
+            )?;
 
             if json {
                 let json_str = report.to_json_string(&base_url, &current_commit, &git_commit);
@@ -1466,9 +1376,8 @@ pub async fn handle_command(
             with_full_relations,
         }) => {
             // Default is dry-run mode (preview only), --fix flag applies changes
-            let dry_run = !fix;
             let format_result =
-                format_files(&model_manager.graph_registry, dry_run, with_full_relations)?;
+                operations::format_diff(&model_manager.graph_registry, fix, with_full_relations)?;
 
             if json {
                 let json_str = render_diff_json(&format_result);
@@ -1585,49 +1494,28 @@ pub async fn handle_command(
             Ok(0)
         }
         Some(Commands::Traces {
-            json,
             output,
-            from_folder,
-            links_with_blobs,
             filter_id,
             filter_name,
             filter_type,
         }) => {
             // Generate verification traces report (upward paths from verifications to requirements)
-            let generator = verification_trace::VerificationTraceGenerator::new(
+            let report = operations::traces_report(
                 &model_manager.graph_registry,
-                links_with_blobs,
-                from_folder.clone(),
-            );
+                filter_id.as_deref(),
+                filter_name.as_deref(),
+                filter_type.as_deref(),
+            )?;
 
-            let mut report = generator.generate();
-
-            // Apply filters
-            if filter_id.is_some() || filter_name.is_some() || filter_type.is_some() {
-                report = verification_trace::apply_filters(
-                    report,
-                    filter_id.as_deref(),
-                    filter_name.as_deref(),
-                    filter_type.as_deref(),
-                )?;
-            }
-
-            // Output the report
-            if json {
-                let json_str = serde_json::to_string_pretty(&report).map_err(|e| {
-                    ReqvireError::ProcessError(format!("Failed to serialize report: {}", e))
-                })?;
-                handle_json_output(&json_str, &output)?;
-            } else {
-                let markdown_output = generator.generate_markdown(&report);
-                println!("{}", markdown_output);
-            }
+            let json_str = serde_json::to_string_pretty(&report).map_err(|e| {
+                ReqvireError::ProcessError(format!("Failed to serialize report: {}", e))
+            })?;
+            handle_json_output(&json_str, &output)?;
 
             Ok(0)
         }
         Some(Commands::Coverage { json, output }) => {
-            let coverage_report =
-                report_coverage::generate_coverage_report(&model_manager.graph_registry);
+            let coverage_report = operations::coverage_report(&model_manager.graph_registry);
             if json {
                 handle_json_output(&coverage_report.to_json_string(), &output)?;
             } else {
@@ -1639,8 +1527,6 @@ pub async fn handle_command(
             from,
             reverse,
             filter_type,
-            json,
-            mmd,
             with_size_estimates: _,
             output,
         }) => {
@@ -1650,29 +1536,13 @@ pub async fn handle_command(
                 .map(|s| s.split(',').map(|t| t.trim()).collect());
 
             // Generate model-centric report with optional filtering
-            let report_output = if mmd {
-                report_model::generate_model_mmd(
-                    &model_manager.graph_registry,
-                    from.as_deref(),
-                    reverse,
-                    type_filter,
-                    "TD",
-                )?
-            } else {
-                report_model::generate_model_report(
-                    &model_manager.graph_registry,
-                    from.as_deref(),
-                    reverse,
-                    type_filter,
-                    json,
-                    "TD",
-                )?
-            };
-            if json || mmd {
-                handle_json_output(&report_output, &output)?;
-            } else {
-                println!("{}", report_output);
-            }
+            let report_output = operations::model_report(
+                &model_manager.graph_registry,
+                from.as_deref(),
+                reverse,
+                type_filter,
+            )?;
+            handle_json_output(&report_output, &output)?;
             Ok(0)
         }
         Some(Commands::Lint {
@@ -1683,7 +1553,7 @@ pub async fn handle_command(
             output,
         }) => {
             // Run lint analysis
-            let lint_report = lint::analyze_model(&model_manager.graph_registry);
+            let lint_report = operations::lint_report(&model_manager.graph_registry);
 
             if fix {
                 // Apply automatic fixes
@@ -2098,41 +1968,20 @@ pub async fn handle_command(
             }
             Ok(0)
         }
-        Some(Commands::Containment {
-            json,
-            output,
-            short,
-        }) => {
-            if json {
-                // Build containment hierarchy
-                let hierarchy = reqvire::containment::ContainmentHierarchy::build(
-                    &model_manager.graph_registry,
-                    short,
-                )?;
-                // Serialize to JSON
-                let json_str = serde_json::to_string_pretty(&hierarchy).map_err(|e| {
-                    ReqvireError::ElementError(format!("JSON serialization error: {}", e))
-                })?;
-                handle_json_output(&json_str, &output)?;
-            } else {
-                let diagram_output =
-                    diagrams::generate_containment_diagram(&model_manager.graph_registry, short)?;
-                println!("{}", diagram_output);
-            }
+        Some(Commands::Containment { output, short }) => {
+            let hierarchy =
+                operations::containment_hierarchy(&model_manager.graph_registry, short)?;
+            let json_str = serde_json::to_string_pretty(&hierarchy).map_err(|e| {
+                ReqvireError::ElementError(format!("JSON serialization error: {}", e))
+            })?;
+            handle_json_output(&json_str, &output)?;
             Ok(0)
         }
-        Some(Commands::Resources { json, output }) => {
-            if json {
-                handle_json_output(
-                    &report_resources::generate_resources_report(&model_manager.graph_registry)
-                        .to_json_string(),
-                    &output,
-                )?;
-            } else {
-                let report =
-                    report_resources::generate_resources_report(&model_manager.graph_registry);
-                report.print(false);
-            }
+        Some(Commands::Resources { output }) => {
+            handle_json_output(
+                &operations::resources_report(&model_manager.graph_registry).to_json_string(),
+                &output,
+            )?;
             Ok(0)
         }
         Some(Commands::Semantic { command }) => {
@@ -2177,7 +2026,8 @@ pub async fn handle_command(
                         errors: vec![],
                         migration_candidates: Vec::new(),
                     };
-                    let json_str = serde_json::to_string_pretty(&json_result).unwrap();
+                    let json_str = serde_json::to_string_pretty(&json_result)
+                        .expect("failed to serialize JSON");
                     handle_json_output(&json_str, &output)?;
                 } else {
                     println!("✅ Concept validation passed");
@@ -2218,10 +2068,8 @@ pub async fn handle_command(
             Ok(0)
         }
         Some(Commands::Submodels { from, json, output }) => {
-            let report = report_submodels::generate_submodels_report(
-                &model_manager.graph_registry,
-                from.as_deref(),
-            )?;
+            let report =
+                operations::submodels_report(&model_manager.graph_registry, from.as_deref())?;
             if json {
                 handle_json_output(&report.to_json_string(), &output)?;
             } else {
@@ -2236,8 +2084,8 @@ pub async fn handle_command(
             output,
         }) => {
             let collect_direction = match direction.to_uppercase().as_str() {
-                "UPSTREAM" => report_collect::CollectDirection::Upstream,
-                "DOWNSTREAM" => report_collect::CollectDirection::Downstream,
+                "UPSTREAM" => report::collect::CollectDirection::Upstream,
+                "DOWNSTREAM" => report::collect::CollectDirection::Downstream,
                 _ => {
                     eprintln!(
                         "error: invalid direction '{}'. Valid values: UPSTREAM, DOWNSTREAM",
@@ -2246,11 +2094,9 @@ pub async fn handle_command(
                     return Ok(1);
                 }
             };
-            let git_root = git_commands::get_git_root_dir()?;
-            let report_output = report_collect::generate_collect_report(
+            let report_output = operations::collect_report(
                 &model_manager.graph_registry,
                 &element_name,
-                &git_root,
                 json,
                 collect_direction,
             )?;
@@ -2370,7 +2216,7 @@ fn run_shell(model_manager: &mut ModelManager) -> Result<(), ReqvireError> {
 
     loop {
         print!("reqvire> ");
-        io::stdout().flush().unwrap();
+        io::stdout().flush().expect("unexpected error");
 
         let mut input = String::new();
         match io::stdin().read_line(&mut input) {
@@ -2598,7 +2444,7 @@ fn process_shell_command(
         }
         "stats" => {
             let elements = graph_registry.get_all_elements();
-            let mut type_counts = HashMap::new();
+            let mut type_counts = FxHashMap::default();
             for element in &elements {
                 let type_str = format!("{:?}", element.element_type);
                 *type_counts.entry(type_str).or_insert(0) += 1;

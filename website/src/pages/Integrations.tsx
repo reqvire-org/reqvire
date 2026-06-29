@@ -72,7 +72,7 @@ export default function Integrations() {
         <CodeBlock>{`curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install.sh | bash
 reqvire validate
 reqvire coverage --json --output reports/coverage.json
-reqvire traces --json --output reports/traces.json
+reqvire traces --output reports/traces.json
 reqvire change-impact --json --output reports/impact.json`}</CodeBlock>
       </Section>
 

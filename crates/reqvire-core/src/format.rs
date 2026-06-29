@@ -148,5 +148,5 @@ pub fn render_diff_json(format_result: &FormatResult) -> String {
             })
         }).collect::<Vec<_>>()
     });
-    serde_json::to_string_pretty(&json_result).unwrap()
+    serde_json::to_string_pretty(&json_result).expect("failed to serialize JSON")
 }

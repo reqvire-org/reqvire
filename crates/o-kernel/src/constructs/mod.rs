@@ -8,8 +8,10 @@ pub mod restriction;
 pub mod shacl_overlay;
 
 pub use classify::{
-    classify_ontology_constructs, classify_ontology_constructs_with_sources,
-    OntologyClassExpressionKind, OntologyConstruct, OntologyConstructEvidence,
+    classify_ontology_constructs, classify_ontology_constructs_with_options,
+    classify_ontology_constructs_with_sources,
+    classify_ontology_constructs_with_sources_and_options, OntologyClassExpressionKind,
+    OntologyConstruct, OntologyConstructClassifierOptions, OntologyConstructEvidence,
     OntologyConstructFamily, OntologyConstructKind, OntologyConstructMember,
     OntologyConstructProjection, OntologyConstructSource, OntologyConstructTerm,
     OntologyConstructTermKind, OntologyProjection, OntologyPropertyCharacteristic,

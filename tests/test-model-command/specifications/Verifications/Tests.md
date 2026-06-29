@@ -28,7 +28,7 @@ Test verifies --from flag filters model starting from specified element.
 
 #### Details
 Test procedure:
-1. Run model command WITH --from <element-name> flag with --json
+1. Run model command WITH --from <element-name> flag
 2. Compare output against expected_filtered_output.json
 3. Verify output starts from specified element at top level
 4. Verify relations are nested recursively from that starting point
@@ -72,36 +72,32 @@ Expected files:
 
 ---
 
-### Output Format Test
+### JSON Output Format Test
 
-Test verifies nested JSON structure and output formats against expected files.
+Test verifies canonical nested JSON structure against expected files.
 
 #### Details
 Test procedure:
-1. Run model command with --json flag
+1. Run model command
 2. Compare output against expected_output.json
 3. Verify JSON structure matches expected:
    - Elements array with all required fields (identifier, name, element_type, file_path, section, section_index)
    - Relations nested inside elements with target details
    - Three target types handled correctly: element (recursive), file path, external URL
    - Metadata counts elements/relations without duplicates
-4. Run model command without --json flag
-5. Compare markdown output against expected_output.md
-6. Verify mermaid diagrams present and correctly formatted with all nested relations
-7. Run model command with --mmd flag
-8. Verify output is pure Mermaid text without Markdown fenced code blocks
+4. Run model command with removed --json flag and verify it fails
+5. Run model command with removed --mmd flag and verify it fails
 
 Expected files:
 - tests/test-model-command/expected_output.json
-- tests/test-model-command/expected_output.md
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * derivedFrom: [Verification Objective](#verification-objective)
-  * verify: [Markdown Output Format](../SystemRequirements.md#markdown-output-format)
-  * verify: [Pure Mermaid Output Format](../SystemRequirements.md#pure-mermaid-output-format)
+  * verify: [Default JSON Output Format](../SystemRequirements.md#default-json-output-format)
+  * verify: [Output Format Flag Removal](../SystemRequirements.md#output-format-flag-removal)
   * verify: [JSON Output Format](../SystemRequirements.md#json-output-format)
 
 ---
@@ -112,7 +108,7 @@ Test verifies --reverse flag traverses from leaves to roots.
 
 #### Details
 Test procedure:
-1. Run model command with --reverse flag and --json
+1. Run model command with --reverse flag
 2. Verify output starts from leaf elements
 3. Verify metadata.direction shows "Reverse"
 4. Verify relations use backward relation types (derivedFrom, satisfy, verify)
@@ -133,7 +129,7 @@ Test verifies --filter-type flag filters starting elements by type.
 
 #### Details
 Test procedure:
-1. Run model command with --filter-type=test-verification and --json
+1. Run model command with --filter-type=test-verification
 2. Verify only test-verification elements appear at top level
 3. Verify metadata.type_filter contains the specified types
 4. Run model command with --reverse --filter-type=test-verification

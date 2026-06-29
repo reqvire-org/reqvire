@@ -17,14 +17,12 @@ This verification proves that embedded runtime Reqvire ontology and SHACL artifa
 
 #### Details
 Expected checks:
-- Regenerate the runtime namespace-scoped ontology export from the real repository root with `reqvire semantic export --layer ontologies --layer shapes --namespace-base https://www.reqvire.org/ontology# --output <temporary-file>`.
-- Apply documented runtime-artifact curation rules to the regenerated output when the authored model includes concept-layer imports or structural-to-concept bridge usage triples that are not runtime bootstrap facts.
-- Split the regenerated output into ontology vocabulary and SHACL rule artifacts using semantic block kind metadata.
-- Compare the regenerated, curated, and split output with `crates/reqvire-core/src/runtime_ontology/reqvire.ttl` and `crates/reqvire-core/src/runtime_ontology/reqvire-shacl.ttl` after deterministic blank-node label normalization.
-- Verify regenerated runtime Turtle artifacts include deterministic prefix declarations, compact built-in and Reqvire prefixed names where safe, and remain parseable RDF/Turtle after artifact curation and split.
+- Regenerate runtime artifacts from the real repository root into a temporary directory by running separate namespace-scoped `reqvire semantic export --layer ontologies` and `reqvire semantic export --layer shapes` commands.
+- Compare the regenerated temporary output with `crates/reqvire-core/src/runtime_ontology/reqvire.ttl` and `crates/reqvire-core/src/runtime_ontology/reqvire-shacl.ttl` after deterministic blank-node label normalization.
+- Verify regenerated runtime Turtle artifacts include deterministic prefix declarations, compact built-in and Reqvire prefixed names where safe, and remain parseable RDF/Turtle.
 - Fail the dedicated runtime ontology artifact test when either embedded runtime artifact is stale or when ontology and SHACL blocks are mixed.
 - Keep the check out of copied fixture workspaces so it verifies the actual Reqvire authored ontology model.
-- Exercise the namespace export boundary and curation pipeline used by the runtime artifact rather than the whole authored ontology export.
+- Exercise the same export commands documented for the artifact update script while ensuring the verification itself does not replace checked-in source artifacts.
 
 #### Metadata
   * type: test-verification

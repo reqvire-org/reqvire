@@ -13,6 +13,7 @@ Two-phase validation process for model parsing.
 
 **Pass 2: Graph Validation**
 - Build in-memory model representation from elements
+- Use the in-memory registry populated by pass 1 rather than re-reading markdown source files
 - Validate relations (existence, type compatibility)
 - Cross-component validation
 - Report errors if found

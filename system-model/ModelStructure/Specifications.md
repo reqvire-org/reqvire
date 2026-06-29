@@ -214,15 +214,6 @@ Git repository scope defines source-file discovery and path normalization. It do
   * type: specification
 ---
 
-### Identifiers and Relations Contract Specification
-
-#### Details
-The system is expected to implement **Identifiers** and **Relations** following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.
-
-#### Metadata
-  * type: specification
----
-
 ### Ignore Files Specification
 
 Rules for processing .gitignore and .reqvireignore exclusion patterns.
@@ -376,15 +367,6 @@ Reqvire implements relation semantics for ownership, hierarchy, capability speci
   * define: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
 ---
 
-### Relation Types and behaviors Contract Specification
-
-#### Details
-The system is expected to implement relations following clearly defined specifications for types and behaviors.
-
-#### Metadata
-  * type: specification
----
-
 ### Requirement Governance Metadata Specification
 
 Specification for declaring requirement governance metadata keys and values through the Metadata subsection.
@@ -418,9 +400,14 @@ Risk represents requirement realization risk in the systems engineering sense: u
 
 #### Details
 Requirements-processing scope behavior:
-- Applies `.gitignore` exclusions for files not in version-control processing scope.
-- Applies `.reqvireignore` exclusions for files excluded from requirements parsing.
-- Parses remaining in-scope files through the structured model pipeline.
+- Discovery starts at the git repository root and walks folders and subfolders deterministically.
+- Only supported structured Markdown files remain eligible for model parsing after document-type detection.
+- Root `.gitignore` exclusions remove files from structured parsing and model relation target eligibility.
+- Root `.reqvireignore` exclusions remove files from structured parsing while preserving file-reference eligibility where the relation contracts allow it.
+- Remaining in-scope files are parsed through the structured model pipeline.
+- Pass 1 collects elements and local document structure.
+- Pass 2 builds graph registry relations and validates target existence, type compatibility, and model-level consistency.
+- Processing diagnostics must report git-root-relative paths.
 
 #### Metadata
   * type: specification
@@ -479,10 +466,20 @@ The implementation shall enforce the ontology and semantic-contract structure:
 ### Structure and Addressing in Markdown Documents Contract Specification
 
 #### Details
-The system is expected to implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
+This contract delegates the canonical Markdown grammar to `MarkdownStructure` and binds consumers to the same model-addressing rules used by the parser.
+
+Consumers of this contract must treat the following as one structure contract:
+- Supported document forms are the parser-recognized `# Elements` multi-element document and `# Element` single-element document.
+- Element headings, reserved subsections, metadata blocks, relation lists, Contract Bindings, Concept References, ontology blocks, and SHACL shape blocks are interpreted according to the Markdown structure model.
+- Element IDs are derived from element names; element identifiers are repository-relative file paths plus element fragments.
+- Relation targets and Contract Bindings targets use the same identifier resolution, normalization, and validation rules as model parsing.
+- Presentation or documentation consumers must not invent a parallel Markdown grammar or alternative identifier scheme.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * define: [Structure and Addressing in Markdown Documents](StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
 ---
 
 ### Structured Markdown Files Search and Detection Contract Specification
@@ -549,3 +546,34 @@ Usage guidelines for selecting appropriate verification types.
 #### Metadata
   * type: specification
 ---
+
+### In-Memory Model Build Cache Specification
+
+#### Details
+The cache is a static `Mutex<Option<CachedModel>>` global holding the most recently built `ModelManager` together with the `CacheKey` that produced it.
+
+**Cache key:**
+- `options: ModelBuildOptions` — the full build-option struct (including `lenient` and `with_size_estimates`). Two different option sets always produce different keys.
+- `files: BTreeMap<PathBuf, FileFingerprint>` — a sorted map of every scanned markdown file to its content fingerprint.
+- `FileFingerprint = { len: u64, content_hash: String }` — file byte length plus a content hash of the file contents.
+
+**Fingerprint computation:**
+- Files are discovered by scanning the same markdown files the parser would consider (`utils::scan_markdown_files`), using the same exclusion patterns.
+- For each file, contents are read and hashed. Added, removed, or modified files change the fingerprint and force a rebuild.
+
+**Load path (`load_cached_model`):**
+1. Compute the fingerprint and key.
+2. Lock the cache and compare keys. On a match, clone and return the stored model without re-parsing.
+3. On a miss, release the lock, rebuild via `ModelManager::parse_and_validate_with_options`, then store a clone of the rebuilt model under the new key and return the clone.
+
+**Invalidation (`invalidate`):**
+- Clears the stored entry, forcing the next `load_cached_model` call to rebuild. Called after every CRUD write in `tool_interface.rs` (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-asset, rm-asset).
+
+**Scope:**
+- Only the current working tree is cached. Git-commit history scans (`parse_and_validate`) bypass the cache entirely.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [In-Memory Model Build Cache](ModelManagement.md#in-memory-model-build-cache)

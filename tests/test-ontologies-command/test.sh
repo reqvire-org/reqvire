@@ -33,7 +33,7 @@ NATIVE_CONCEPT_SEARCH_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-ty
 NATIVE_CONCEPT_SEARCH_EXIT=$?
 NATIVE_SCHEME_SEARCH_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type concept-scheme --json 2>&1)
 NATIVE_SCHEME_SEARCH_EXIT=$?
-NATIVE_CONCEPT_MODEL_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --filter-type concept-scheme --json 2>&1)
+NATIVE_CONCEPT_MODEL_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --filter-type concept-scheme 2>&1)
 NATIVE_CONCEPT_MODEL_EXIT=$?
 NATIVE_CONCEPT_COLLECT_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" collect "API Endpoint Requirement" --json 2>&1)
 NATIVE_CONCEPT_COLLECT_EXIT=$?
@@ -809,6 +809,24 @@ if grep -q "reqvire:bindsContract <urn:reqvire:element:api-ontology>" <<< "$FULL
   exit 1
 fi
 
+if ! grep -qF "reqvire:bindsContract <urn:reqvire:element:api-endpoint-contract>" <<< "$FULL_TTL_OUTPUT"; then
+  echo "FAILED: full Turtle output missing contract_bindings normalized forward predicate"
+  echo "$FULL_TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -qF "reqvire:boundByContract <urn:reqvire:element:api-client-requirement>" <<< "$FULL_TTL_OUTPUT"; then
+  echo "FAILED: full Turtle output missing contract_bindings normalized inverse predicate"
+  echo "$FULL_TTL_OUTPUT"
+  exit 1
+fi
+
+if grep -q "requirementBindsContract\\|contractBoundBy\\|reqvire:reuse" <<< "$FULL_TTL_OUTPUT"; then
+  echo "FAILED: full Turtle output contains legacy contract binding projection vocabulary"
+  echo "$FULL_TTL_OUTPUT"
+  exit 1
+fi
+
 if ! grep -q "reqvire:specifiedBy <urn:reqvire:element:api-endpoint-requirement>" <<< "$FULL_TTL_OUTPUT"; then
   echo "FAILED: full Turtle output missing capability requirement specifiedBy edge"
   echo "$FULL_TTL_OUTPUT"
@@ -930,12 +948,12 @@ if ! jq -e '
 fi
 
 set +e
-MODEL_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --from "API Endpoint Requirement" --json 2>&1)
+MODEL_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --from "API Endpoint Requirement" 2>&1)
 MODEL_JSON_EXIT=$?
 set -e
 
 if [ $MODEL_JSON_EXIT -ne 0 ]; then
-  echo "FAILED: model --json command failed"
+  echo "FAILED: model command failed"
   echo "$MODEL_JSON_OUTPUT"
   exit 1
 fi

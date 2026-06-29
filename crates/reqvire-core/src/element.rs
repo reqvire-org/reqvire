@@ -1,7 +1,7 @@
 use crate::relation::Relation;
 use crate::utils;
+use rustc_hash::FxHashMap;
 use serde::Serialize;
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 pub const GOVERNANCE_METADATA_KEYS: &[&str] = &["status", "priority", "risk", "owner"];
@@ -561,7 +561,7 @@ pub struct Element {
     pub file_path: String,
     pub line_number: usize,
     pub element_type: ElementType,
-    pub metadata: HashMap<String, String>,
+    pub metadata: FxHashMap<String, String>,
     //
     // hash of content that is taken into impact change detection
     pub hash_impact_content: String,
@@ -618,7 +618,7 @@ impl Element {
             file_path: file_path.to_string(),
             line_number,
             element_type: element_type.unwrap_or(ElementType::Requirement(RequirementType::System)),
-            metadata: HashMap::new(),
+            metadata: FxHashMap::default(),
             changed_since_commit: false,
             file_order_index: 0, // Will be set during parsing
             contract_bindings: vec![],

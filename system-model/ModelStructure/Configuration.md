@@ -39,10 +39,7 @@ Implementation details shall follow the associated contract specifications.
 The system shall integrate with Git workflows by reading exclusion patterns from .gitignore and .reqvireignore files.
 
 #### Details
-- The system shall read exclusion patterns from repository root .gitignore and .reqvireignore files
-- The system shall exclude files matching patterns from being parsed as structured markdown
-- The system shall differentiate between .gitignore exclusions (complete) and .reqvireignore exclusions (parsing only)
-- The system shall implement ignore file processing following clearly defined specifications
+Detailed source-file, pattern, parsing exclusion, complete exclusion, fallback, and reference behavior shall follow the associated specification.
 
 #### Metadata
   * type: requirement

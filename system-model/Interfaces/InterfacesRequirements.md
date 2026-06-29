@@ -50,6 +50,31 @@ The system shall provide a Model Context Protocol interface for external tools, 
   * specify: [MCP Tool Interface](InterfacesFeature.md#mcp-tool-interface)
 ---
 
+### Shared Core Operation Layer
+
+The system shall provide transport-neutral Reqvire core operations that are reused by CLI and MCP adapters.
+
+#### Details
+- Core operation semantics shall live below CLI argument parsing and below MCP protocol wrapping.
+- CLI command handlers shall parse user input, call shared operations, and render terminal or JSON output.
+- MCP handlers shall map typed tool requests to shared operations and wrap results in MCP protocol responses.
+- Read/report operations shall be shared before broader mutation operations, because mutation operations also own dry-run, diff, persistence, and cache invalidation behavior.
+- Conditional mutation/report operations such as format and lint may be migrated when their preview/report path and mutating path preserve the same command and MCP side-effect controls.
+- Shared operation result types shall preserve machine-readable evidence so CLI JSON and MCP structured responses do not diverge.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Shared Core Operation Layer Specification](Specifications.md#shared-core-operation-layer-specification)
+  * derivedFrom: [CLI interface](#cli-interface)
+  * derivedFrom: [MCP Interface](#mcp-interface)
+  * satisfiedBy: [operations.rs](../../crates/reqvire-core/src/operations/mod.rs)
+  * satisfiedBy: [read_tools.rs](../../crates/reqvire-core/src/tool_interface/read_tools.rs)
+  * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
+  * verifiedBy: [MCP Shared Operation Contracts Verification](../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-shared-operation-contracts-verification)
+---
+
 ### Web Interface
 
 The system SHALL provide a web-based interface to browse the System model, including Explorer-rendered diagrams, reports, and verification traces.

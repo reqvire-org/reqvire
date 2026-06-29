@@ -349,31 +349,13 @@ impl<'a> OntologyAligner<'a> {
         for target in targets {
             match target {
                 TargetIdentifier::Class(class) | TargetIdentifier::ImplicitClass(class) => {
-                    if !self.ontology.declared_classes.contains(class) {
-                        errors.push(AlignmentError::UndeclaredClass {
-                            shape_id: id.clone(),
-                            class_node: class.clone(),
-                            predicate: SH_TARGET_CLASS,
-                        });
-                    }
+                    self.push_undeclared_class(id, class, SH_TARGET_CLASS, errors);
                 }
                 TargetIdentifier::SubjectsOf(property) => {
-                    if !self.ontology.declared_properties.contains(property) {
-                        errors.push(AlignmentError::UndeclaredProperty {
-                            shape_id: id.clone(),
-                            property_iri: property.clone(),
-                            predicate: SH_TARGET_SUBJECTS_OF,
-                        });
-                    }
+                    self.push_undeclared_property(id, property, SH_TARGET_SUBJECTS_OF, errors);
                 }
                 TargetIdentifier::ObjectsOf(property) => {
-                    if !self.ontology.declared_properties.contains(property) {
-                        errors.push(AlignmentError::UndeclaredProperty {
-                            shape_id: id.clone(),
-                            property_iri: property.clone(),
-                            predicate: SH_TARGET_OBJECTS_OF,
-                        });
-                    }
+                    self.push_undeclared_property(id, property, SH_TARGET_OBJECTS_OF, errors);
                 }
                 TargetIdentifier::Node(Term::NamedNode(node_iri)) => {
                     if !self.ontology.available_terms.contains(node_iri) {
@@ -429,13 +411,7 @@ impl<'a> OntologyAligner<'a> {
         for constraint in constraints {
             match constraint {
                 SyntaxConstraint::Class { class_node } => {
-                    if !self.ontology.declared_classes.contains(class_node) {
-                        errors.push(AlignmentError::UndeclaredClass {
-                            shape_id: id.clone(),
-                            class_node: class_node.clone(),
-                            predicate: SH_CLASS,
-                        });
-                    }
+                    self.push_undeclared_class(id, class_node, SH_CLASS, errors);
                 }
                 SyntaxConstraint::Datatype { datatype_iri } => {
                     if !self.ontology.declared_datatypes.contains(datatype_iri)
@@ -449,43 +425,51 @@ impl<'a> OntologyAligner<'a> {
                     }
                 }
                 SyntaxConstraint::Equals { property_iri } => {
-                    if !self.ontology.declared_properties.contains(property_iri) {
-                        errors.push(AlignmentError::UndeclaredProperty {
-                            shape_id: id.clone(),
-                            property_iri: property_iri.clone(),
-                            predicate: SH_EQUALS,
-                        });
-                    }
+                    self.push_undeclared_property(id, property_iri, SH_EQUALS, errors);
                 }
                 SyntaxConstraint::Disjoint { property_iri } => {
-                    if !self.ontology.declared_properties.contains(property_iri) {
-                        errors.push(AlignmentError::UndeclaredProperty {
-                            shape_id: id.clone(),
-                            property_iri: property_iri.clone(),
-                            predicate: SH_DISJOINT,
-                        });
-                    }
+                    self.push_undeclared_property(id, property_iri, SH_DISJOINT, errors);
                 }
                 SyntaxConstraint::LessThan { property_iri } => {
-                    if !self.ontology.declared_properties.contains(property_iri) {
-                        errors.push(AlignmentError::UndeclaredProperty {
-                            shape_id: id.clone(),
-                            property_iri: property_iri.clone(),
-                            predicate: SH_LESS_THAN,
-                        });
-                    }
+                    self.push_undeclared_property(id, property_iri, SH_LESS_THAN, errors);
                 }
                 SyntaxConstraint::LessThanOrEquals { property_iri } => {
-                    if !self.ontology.declared_properties.contains(property_iri) {
-                        errors.push(AlignmentError::UndeclaredProperty {
-                            shape_id: id.clone(),
-                            property_iri: property_iri.clone(),
-                            predicate: SH_LESS_THAN_OR_EQUALS,
-                        });
-                    }
+                    self.push_undeclared_property(id, property_iri, SH_LESS_THAN_OR_EQUALS, errors);
                 }
                 _ => {}
             }
+        }
+    }
+
+    fn push_undeclared_class(
+        &self,
+        shape_id: &NamedOrBlankNode,
+        class_node: &NamedOrBlankNode,
+        predicate: &'static str,
+        errors: &mut Vec<AlignmentError>,
+    ) {
+        if !self.ontology.declared_classes.contains(class_node) {
+            errors.push(AlignmentError::UndeclaredClass {
+                shape_id: shape_id.clone(),
+                class_node: class_node.clone(),
+                predicate,
+            });
+        }
+    }
+
+    fn push_undeclared_property(
+        &self,
+        shape_id: &NamedOrBlankNode,
+        property_iri: &NamedNode,
+        predicate: &'static str,
+        errors: &mut Vec<AlignmentError>,
+    ) {
+        if !self.ontology.declared_properties.contains(property_iri) {
+            errors.push(AlignmentError::UndeclaredProperty {
+                shape_id: shape_id.clone(),
+                property_iri: property_iri.clone(),
+                predicate,
+            });
         }
     }
 }
@@ -579,13 +563,13 @@ impl<'a> ShaclParser<'a> {
     fn shape_candidates(&self) -> HashSet<NamedOrBlankNode> {
         let mut candidates = HashSet::new();
         for quad in self.quads {
-            if quad.predicate.as_str() == RDF_TYPE {
-                if matches!(
+            if quad.predicate.as_str() == RDF_TYPE
+                && matches!(
                     term_iri(&quad.object),
                     Some(SH_NODE_SHAPE | SH_PROPERTY_SHAPE | SH_SHAPE)
-                ) {
-                    candidates.insert(quad.subject.clone());
-                }
+                )
+            {
+                candidates.insert(quad.subject.clone());
             }
             if matches!(
                 quad.predicate.as_str(),
@@ -883,7 +867,7 @@ impl<'a> ShaclParser<'a> {
                 if let Some(inverse) = first_named_object(self.quads, &node, SH_INVERSE_PATH) {
                     return Ok(AstPath::Inverse(inverse));
                 }
-                if let Some(sequence) = rdf_list_terms(self.quads, term).ok() {
+                if let Ok(sequence) = rdf_list_terms(self.quads, term) {
                     let mut elements = Vec::new();
                     for item in sequence {
                         elements.push(self.parse_path(&item)?);

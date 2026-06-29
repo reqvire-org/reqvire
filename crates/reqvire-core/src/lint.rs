@@ -11,8 +11,8 @@ use crate::relation::{
 };
 use crate::trace_tree_builder;
 use crate::utils;
+use rustc_hash::{FxHashMap, FxHashSet};
 use serde::Serialize;
-use std::collections::{BTreeSet, HashMap, HashSet};
 
 #[derive(Debug, Serialize, Clone)]
 pub struct LintReport {
@@ -100,7 +100,7 @@ impl LintReport {
         } else {
             self.clone()
         };
-        serde_json::to_string_pretty(&filtered_report).unwrap()
+        serde_json::to_string_pretty(&filtered_report).expect("failed to serialize JSON")
     }
 
     pub fn print(&self, json: bool, show_only_fixable: bool, show_only_auditable: bool) {
@@ -417,7 +417,7 @@ fn detect_cross_submodel_hierarchical_relations(
     let hierarchical_relation_types = get_hierarchical_relation_types();
     let (root_assignment, requirement_ids) =
         build_requirement_root_assignment(registry, &hierarchical_relation_types);
-    let mut seen = HashSet::new();
+    let mut seen = FxHashSet::default();
 
     for source_id in requirement_ids {
         let Some(source_root_id) = root_assignment.get(&source_id) else {
@@ -511,7 +511,7 @@ fn detect_cross_submodel_hierarchical_relations(
 fn build_requirement_root_assignment(
     registry: &GraphRegistry,
     hierarchical_relation_types: &[&str],
-) -> (HashMap<String, String>, Vec<String>) {
+) -> (FxHashMap<String, String>, Vec<String>) {
     let mut requirement_ids: Vec<String> = registry
         .get_all_elements()
         .into_iter()
@@ -525,11 +525,11 @@ fn build_requirement_root_assignment(
         .collect();
     requirement_ids.sort();
 
-    let requirement_set: HashSet<String> = requirement_ids.iter().cloned().collect();
-    let mut parent_map: HashMap<String, Vec<String>> = HashMap::new();
+    let requirement_set: FxHashSet<String> = requirement_ids.iter().cloned().collect();
+    let mut parent_map: FxHashMap<String, Vec<String>> = FxHashMap::default();
 
     for requirement_id in &requirement_ids {
-        let mut parents = HashSet::new();
+        let mut parents = FxHashSet::default();
         let Some(source_elem) = registry.get_element(requirement_id) else {
             continue;
         };
@@ -557,12 +557,16 @@ fn build_requirement_root_assignment(
         parent_map.insert(requirement_id.clone(), parents.into_iter().collect());
     }
 
-    let mut memo = HashMap::new();
-    let mut root_assignment = HashMap::new();
+    let mut memo = FxHashMap::default();
+    let mut root_assignment = FxHashMap::default();
 
     for requirement_id in &requirement_ids {
-        let roots =
-            resolve_root_candidates(requirement_id, &parent_map, &mut memo, &mut HashSet::new());
+        let roots = utils::resolve_parent_map_roots(
+            requirement_id,
+            &parent_map,
+            &mut memo,
+            &mut FxHashSet::default(),
+        );
         if let Some(root_id) = roots.first().cloned() {
             root_assignment.insert(requirement_id.clone(), root_id);
         }
@@ -571,63 +575,12 @@ fn build_requirement_root_assignment(
     (root_assignment, requirement_ids)
 }
 
-fn resolve_root_candidates(
-    requirement_id: &str,
-    parent_map: &HashMap<String, Vec<String>>,
-    memo: &mut HashMap<String, BTreeSet<String>>,
-    visiting: &mut HashSet<String>,
-) -> BTreeSet<String> {
-    if let Some(cached) = memo.get(requirement_id) {
-        return cached.clone();
-    }
-
-    if visiting.contains(requirement_id) {
-        return BTreeSet::new();
-    }
-    visiting.insert(requirement_id.to_string());
-
-    let mut roots = BTreeSet::new();
-    let parents = parent_map.get(requirement_id).cloned().unwrap_or_default();
-
-    if parents.is_empty() {
-        roots.insert(requirement_id.to_string());
-    } else {
-        for parent_id in parents {
-            for root in resolve_root_candidates(&parent_id, parent_map, memo, visiting) {
-                roots.insert(root);
-            }
-        }
-    }
-
-    visiting.remove(requirement_id);
-    memo.insert(requirement_id.to_string(), roots.clone());
-    roots
-}
-
 fn resolve_lint_target_identifier(
     registry: &GraphRegistry,
     source_file_path: &str,
     target_identifier: &str,
 ) -> Option<String> {
-    if registry.get_element(target_identifier).is_some() {
-        return Some(target_identifier.to_string());
-    }
-
-    if target_identifier.starts_with('#') {
-        let full_identifier = format!("{}{}", source_file_path, target_identifier);
-        if registry.get_element(&full_identifier).is_some() {
-            return Some(full_identifier);
-        }
-    }
-
-    let (_, fragment) = utils::extract_path_and_fragment(target_identifier);
-    if let Some(fragment) = fragment {
-        if registry.get_element(fragment).is_some() {
-            return Some(fragment.to_string());
-        }
-    }
-
-    None
+    utils::resolve_model_target_identifier(registry, source_file_path, target_identifier)
 }
 
 fn detect_concept_authoring_warnings(registry: &GraphRegistry) -> Vec<ManualReviewIssue> {
@@ -693,8 +646,8 @@ fn concept_authoring_warning(
     }
 }
 
-fn native_top_concept_ids(registry: &GraphRegistry) -> HashSet<String> {
-    let mut top_concepts = HashSet::new();
+fn native_top_concept_ids(registry: &GraphRegistry) -> FxHashSet<String> {
+    let mut top_concepts = FxHashSet::default();
     for scheme in registry
         .get_all_elements()
         .into_iter()
@@ -704,28 +657,12 @@ fn native_top_concept_ids(registry: &GraphRegistry) -> HashSet<String> {
             continue;
         };
         for link in &payload.top_concepts {
-            if let Some(target_id) = resolve_concept_element_target(registry, &link.target) {
+            if let Some(target_id) = registry.resolve_concept_element_id(&link.target) {
                 top_concepts.insert(target_id);
             }
         }
     }
     top_concepts
-}
-
-fn resolve_concept_element_target(registry: &GraphRegistry, target: &str) -> Option<String> {
-    registry
-        .get_element(target)
-        .filter(|element| element.element_type.is_concept())
-        .map(|element| element.identifier.clone())
-        .or_else(|| {
-            registry
-                .get_all_elements()
-                .into_iter()
-                .find(|element| {
-                    element.element_type.is_concept() && element.identifier.ends_with(target)
-                })
-                .map(|element| element.identifier.clone())
-        })
 }
 
 /// Detect redundant verify relations in verifications
@@ -848,7 +785,7 @@ fn detect_hierarchical_redundancies(
         }
 
         // For each direct parent, collect all its ancestors
-        let mut parent_ancestors: HashMap<String, HashSet<String>> = HashMap::new();
+        let mut parent_ancestors: FxHashMap<String, FxHashSet<String>> = FxHashMap::default();
         for parent_id in &direct_parents {
             let ancestors = collect_ancestors(parent_id, registry);
             parent_ancestors.insert(parent_id.clone(), ancestors);
@@ -900,7 +837,7 @@ fn detect_hierarchical_redundancies(
                                 parent_id,
                                 redundant_id,
                                 registry,
-                                &mut HashSet::new(),
+                                &mut FxHashSet::default(),
                             )
                         })
                         .cloned()
@@ -958,38 +895,8 @@ fn detect_hierarchical_redundancies(
 }
 
 /// Collect all ancestors of a requirement by traversing upward through hierarchical relations
-fn collect_ancestors(requirement_id: &str, registry: &GraphRegistry) -> HashSet<String> {
-    let mut ancestors = HashSet::new();
-    let mut visited = HashSet::new();
-    collect_ancestors_recursive(requirement_id, registry, &mut ancestors, &mut visited);
-    ancestors
-}
-
-/// Recursively collect ancestors
-fn collect_ancestors_recursive(
-    requirement_id: &str,
-    registry: &GraphRegistry,
-    ancestors: &mut HashSet<String>,
-    visited: &mut HashSet<String>,
-) {
-    // Prevent cycles
-    if visited.contains(requirement_id) {
-        return;
-    }
-    visited.insert(requirement_id.to_string());
-
-    if let Some(requirement) = registry.get_element(requirement_id) {
-        // Find all parent relations
-        for relation in &requirement.relations {
-            if VERIFICATION_TRACES_RELATIONS.contains(&relation.relation_type.name) {
-                if let crate::relation::LinkType::Identifier(parent_id) = &relation.target.link {
-                    ancestors.insert(parent_id.clone());
-                    // Recursively collect ancestors of this parent
-                    collect_ancestors_recursive(parent_id, registry, ancestors, visited);
-                }
-            }
-        }
-    }
+fn collect_ancestors(requirement_id: &str, registry: &GraphRegistry) -> FxHashSet<String> {
+    trace_tree_builder::collect_ancestor_ids(requirement_id, registry)
 }
 
 /// Check if a path exists from source to target through hierarchical relations
@@ -997,7 +904,7 @@ fn path_exists_to_target(
     current_id: &str,
     target_id: &str,
     registry: &GraphRegistry,
-    visited: &mut HashSet<String>,
+    visited: &mut FxHashSet<String>,
 ) -> bool {
     // Prevent cycles
     if visited.contains(current_id) {
@@ -1064,7 +971,7 @@ fn detect_multi_branch_convergence(registry: &GraphRegistry) -> Vec<ManualReview
         }
 
         // For each direct parent, collect all its ancestors
-        let mut parent_ancestors: HashMap<String, HashSet<String>> = HashMap::new();
+        let mut parent_ancestors: FxHashMap<String, FxHashSet<String>> = FxHashMap::default();
         for parent_id in &direct_parents {
             let ancestors = collect_ancestors(parent_id, registry);
             parent_ancestors.insert(parent_id.clone(), ancestors);
@@ -1073,7 +980,7 @@ fn detect_multi_branch_convergence(registry: &GraphRegistry) -> Vec<ManualReview
         // Find common ancestors that are reached through multiple branches
         // We need to find ancestors that appear in multiple parent's ancestor sets
         // BUT we skip ancestors that are direct parents (those are handled by redundant hierarchical detection)
-        let mut ancestor_counts: HashMap<String, Vec<String>> = HashMap::new();
+        let mut ancestor_counts: FxHashMap<String, Vec<String>> = FxHashMap::default();
         for (parent_id, ancestors) in &parent_ancestors {
             for ancestor_id in ancestors {
                 // Skip if this ancestor is also a direct parent
@@ -1200,7 +1107,7 @@ fn distance_to_ancestor(
     target_id: &str,
     registry: &GraphRegistry,
 ) -> Option<usize> {
-    let mut visited = HashSet::new();
+    let mut visited = FxHashSet::default();
     distance_to_ancestor_recursive(current_id, target_id, registry, &mut visited, 0)
 }
 
@@ -1209,7 +1116,7 @@ fn distance_to_ancestor_recursive(
     current_id: &str,
     target_id: &str,
     registry: &GraphRegistry,
-    visited: &mut HashSet<String>,
+    visited: &mut FxHashSet<String>,
     current_distance: usize,
 ) -> Option<usize> {
     // Prevent cycles

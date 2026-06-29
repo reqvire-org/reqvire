@@ -86,36 +86,16 @@ fn collect_term_support_edges(
     term: &NamedOrBlankNode,
     support_predicates: &[&str],
 ) -> Result<Vec<ConstructedQuad>, SubsetError> {
-    let mut edges = Vec::new();
-    for graph_name in dependency_graphs {
-        for quad_result in store.quads_for_pattern(
-            Some(term.as_ref().into()),
-            None,
-            None,
-            Some(graph_name.as_ref().into()),
-        ) {
-            let quad = quad_result.map_err(|error| SubsetError::StoreFailure {
-                error: error.to_string(),
-            })?;
-
-            if !support_predicates.contains(&quad.predicate.as_str()) {
-                continue;
-            }
-
-            if !matches!(quad.object, Term::NamedNode(_) | Term::BlankNode(_)) {
-                continue;
-            }
-
-            edges.push(ConstructedQuad {
-                quad,
-                kind: ConstructedQuadKind::Support,
-            });
-        }
-    }
-
-    edges.sort_by_key(|edge| quad_key_for_sort(&edge.quad));
-    edges.dedup_by_key(|edge| quad_key_for_sort(&edge.quad));
-    Ok(edges)
+    collect_subject_edges(
+        store,
+        dependency_graphs,
+        term,
+        ConstructedQuadKind::Support,
+        |quad| {
+            support_predicates.contains(&quad.predicate.as_str())
+                && matches!(quad.object, Term::NamedNode(_) | Term::BlankNode(_))
+        },
+    )
 }
 
 pub fn collect_list_closure(
@@ -178,10 +158,26 @@ fn collect_list_edges_for_term(
     dependency_graphs: &[NamedNode],
     term: &NamedOrBlankNode,
 ) -> Result<Vec<ConstructedQuad>, SubsetError> {
+    collect_subject_edges(
+        store,
+        dependency_graphs,
+        term,
+        ConstructedQuadKind::ListClosure,
+        |quad| quad.predicate.as_str() == RDF_FIRST || quad.predicate.as_str() == RDF_REST,
+    )
+}
+
+fn collect_subject_edges(
+    store: &Store,
+    dependency_graphs: &[NamedNode],
+    term: &NamedOrBlankNode,
+    kind: ConstructedQuadKind,
+    include: impl Fn(&oxigraph::model::Quad) -> bool,
+) -> Result<Vec<ConstructedQuad>, SubsetError> {
     let mut edges = Vec::new();
     for graph_name in dependency_graphs {
         for quad_result in store.quads_for_pattern(
-            Some(term.as_ref().into()),
+            Some(term.as_ref()),
             None,
             None,
             Some(graph_name.as_ref().into()),
@@ -190,11 +186,8 @@ fn collect_list_edges_for_term(
                 error: error.to_string(),
             })?;
 
-            if quad.predicate.as_str() == RDF_FIRST || quad.predicate.as_str() == RDF_REST {
-                edges.push(ConstructedQuad {
-                    quad,
-                    kind: ConstructedQuadKind::ListClosure,
-                });
+            if include(&quad) {
+                edges.push(ConstructedQuad { quad, kind });
             }
         }
     }

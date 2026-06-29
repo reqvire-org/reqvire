@@ -2,7 +2,7 @@
 
 ### CLI Interface Verification Objective
 
-This objective groups verification that the Reqvire command-line interface exposes stable commands, options, workspace selection, ontology output, and navigation behavior.
+This objective groups verification that the Reqvire command-line interface exposes stable commands, options, workspace selection, and ontology output behavior.
 
 #### Metadata
   * type: verification-objective
@@ -14,7 +14,6 @@ This objective groups verification that the Reqvire command-line interface expos
   * derive: [CLI Ontologies Command Verification](#cli-ontologies-command-verification)
   * derive: [CLI Size Estimate JSON Option Verification](#cli-size-estimate-json-option-verification)
   * derive: [Explicit Workspace Selection Verification](#explicit-workspace-selection-verification)
-  * derive: [Verification Traces Element Navigation Test](#verification-traces-element-navigation-test)
 ---
 
 ### CLI Git Commit Hash Flag Test
@@ -165,10 +164,8 @@ This verification shall prove that the CLI size-estimate option is JSON-only and
 
 #### Details
 Expected checks:
-- Run `reqvire model --json --with-size-estimates` and verify element payloads include `size_estimate`.
-- Run `reqvire model --with-size-estimates` without `--json` and verify the command fails with a clear diagnostic.
-- Run `reqvire model --json` without `--with-size-estimates` and verify element payloads omit `size_estimate`.
-- Verify non-JSON model output is unchanged when the option is absent.
+- Run `reqvire model --with-size-estimates` and verify element payloads include `size_estimate`.
+- Run `reqvire model` without `--with-size-estimates` and verify element payloads omit `size_estimate`.
 
 #### Metadata
   * type: test-verification
@@ -199,25 +196,4 @@ Expected checks:
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-workspace-flag/test.sh)
   * verify: [Explicit Workspace Selection](../../../Interfaces/CLI/Commands.md#explicit-workspace-selection)
----
-
-### Verification Traces Element Navigation Test
-
-Test verifies that verification element names in the traces report are clickable links.
-
-#### Test Steps
-1. Run `reqvire traces` command to generate traces report
-2. Verify output contains verification headers as markdown links
-3. Verify links follow format `[Verification Name](file_path#fragment)`
-
-#### Expected Results
-- Verification names are rendered as markdown links
-- Links point to source file with verification fragment
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
-  * verify: [Verification Traces Element Navigation](../../../Interfaces/CLI/Commands.md#verification-traces-element-navigation)
 ---

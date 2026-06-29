@@ -236,15 +236,37 @@ Prompt set:
 - `reqvire.semantic.query` guides ontology-aware SPARQL query construction.
 - `reqvire.semantic.verification_search` guides semantic verification counts and evidence lookup.
 - `reqvire.semantic.contract_context_search` guides semantic-contract and contract bindings search.
+- `reqvire.semantic.author_ontology_contract` guides ontology and semantic-contract authoring with semantic vocabulary evidence.
 - `reqvire.workflow.explore_model` guides regular read-only Reqvire model exploration.
 - `reqvire.workflow.plan_change` guides model and implementation change planning.
+- `reqvire.workflow.generate_implementation_tasks` guides traceable task generation from capability-scoped model changes.
+- `reqvire.workflow.author_capability_requirement` guides capability, requirement, contract, concept-reference, and traceability authoring.
+- `reqvire.workflow.author_or_align_verification` guides verification objective, concrete verification, evidence, and test-criteria alignment.
+- `reqvire.workflow.refactor_model_structure` guides intent-preserving model structure refactors, contract extraction, containment, and submodel boundaries.
+- `reqvire.workflow.audit_change_impact` guides system-model change-impact audits and identifies impacted elements that need model updates.
+- `reqvire.workflow.author_concepts` guides native concept-scheme and concept authoring for SKOS thesauri.
+- `reqvire.workflow.model_quality_audit` guides validation, lint, coverage, containment, redundant verification, and model-health audits.
 - `reqvire.workflow.verify_coverage` guides validation, lint, coverage, and verification trace review.
 
 Prompt content rules:
 - Semantic prompts direct clients to discover prefixes and vocabulary before writing SPARQL.
 - Semantic prompts reference `reqvire.semantic.vocabulary`, `reqvire.semantic.prefixes`, and `reqvire.semantic.sparql`.
 - Semantic prompts state that `include_external` exposes only the used external subset and is not a way to browse or dump raw full external ontology dependencies.
+- Ontology/semantic-contract authoring prompts require layer decisions between native concepts, ontology, requirements, requirement-owned contracts, and semantic contracts before edits are proposed.
+- Ontology/semantic-contract authoring prompts require ontology boundary checks for `ontology_base`, `ontology_prefix`, explicit Turtle prefixes, `use`/`usedBy`, `constrain`/`constrainedBy`, and SHACL-vs-OWL ownership.
 - Regular workflow prompts reference non-semantic tools such as workspace status, search, read element, model, collect, lint, coverage, and traces.
+- Implementation-task prompts require change-impact buckets, downstream collection from `impact_scope[]`, governance metadata (`status`, `priority`, `risk`, `owner`), requirement implementation links, verification evidence links, and contract-binding consumers to be included in task planning. They require Reqvire command evidence to be preferred over raw Markdown scanning and require task plans to separate new requirements, modified requirements, affected reusable contracts, affected verifications, and final validation/evidence updates.
+- Capability/requirement authoring prompts distinguish capabilities from requirements, require EARS-style implementable obligations for requirements, preserve `specify`/`specifiedBy`, `definedBy`/`define`, concept references, semantic contracts, and verification expectations. They require submodel inspection before capability-root selection and forbid adding governance metadata unless the user, source material, or existing parent context explicitly calls for authored values.
+- Verification authoring prompts require verification-objective parents, concrete verification types, `verify`/`verifiedBy` requirement targets, evidence-backed `satisfiedBy` rules, leaf-requirement rollup, and alignment between verification criteria and actual tests or evidence.
+- Model-structure refactor prompts require intent preservation, contract extraction, containment checks, submodel boundary review, contract-bindings replacement for cross-boundary reuse, and validation in slices. They require cross-subgraph dependency visibility to be preserved through explicit replacements such as contract bindings, concept references, semantic-contract relations, or local requirement-owned contracts.
+- Change-impact audit prompts reference change-impact analysis and require direct changes, propagated impacts, invalidated verifications, and no-update decisions to be reported separately.
+- Change-impact audit prompts instruct clients to state the comparison base; analyze the structured `added[]`, `changed[]`, `removed[]`, `relocated[]`, `impact_scope[]`, and `invalidated_verifications[]` buckets; and treat `impact_scope[]` as the high-level affected-area summary.
+- Change-impact audit prompts instruct clients to collect downstream from each impact-scope root so descendants are not skipped.
+- Change-impact audit prompts include change-propagation rules for parent-child hierarchy, capability-to-requirement review, requirement-to-verification invalidation, satisfiedBy evidence review, verification-only changes, and contract-binding consumers.
+- Change-impact audit prompts include review of impacted documentation or assistant-guidance artifacts bound to changed specifications.
+- Concept-authoring prompts require native `concept-scheme`/`concept` authoring, unique concept namespaces, SKOS taxonomy/mapping rules, concept-reference consumers, concept naming precedence, generated SKOS identity guardrails, and concept-vs-ontology decisions.
+- Ontology/semantic-contract authoring prompts forbid governance metadata and implementation satisfaction claims on ontology elements.
+- Model-quality audit prompts require findings to be separated into validation, coverage, lint/model-quality, containment/submodel, semantic-structure, safe auto-fix, and manual-review categories.
 - Prompt content warns clients not to rebuild semantic stores or infer prefixes from raw Turtle when MCP vocabulary/prefix tools are available.
 - Prompt content distinguishes capability, requirement, contract, ontology, semantic-contract, verification, and contract bindings semantics where relevant.
 
@@ -492,6 +514,8 @@ Server state includes:
 Cache rules:
 - Reqvire markdown files remain the durable source of truth.
 - Reqvire core parsing remains authoritative for model semantics.
+- Parsed model cache fingerprints are based on the scanned markdown file set, each file path, file size, file content hash, and active model build options.
+- Cache freshness must not depend only on filesystem modification timestamps.
 - Cached state is invalidated when source files, git state, excluded patterns, Reqvire version, or Reqvire tool contract version changes.
 - Controlled MCP mutations sync MCP internal state from the updated Reqvire core graph after successful core mutation.
 - External filesystem drift triggers cache invalidation and reparse before serving stale model data.

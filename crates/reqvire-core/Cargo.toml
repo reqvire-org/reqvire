@@ -11,6 +11,9 @@ documentation.workspace = true
 [package.metadata.dist]
 dist = false
 
+[lints]
+workspace = true
+
 [dependencies]
 # Parsing and content manipulation
 pulldown-cmark = { workspace = true }
@@ -24,7 +27,6 @@ walkdir = { workspace = true }
 globset = { workspace = true }
 
 # Error handling
-anyhow = { workspace = true }
 thiserror = { workspace = true }
 log = { workspace = true }
 
@@ -33,7 +35,6 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 
 # Performance
-rayon = { workspace = true }
 rustc-hash = { workspace = true }
 oxigraph = { workspace = true }
 o-kernel = { workspace = true }

@@ -4,9 +4,43 @@ tmpspec
 tmpdoc
 
 # Rust-specific ignores
-/target/
-reqvire-agent/target/
+target/
+**/target/
 **/*.rs.bk
+
+# Node.js ignores
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+coverage/
+**/coverage/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python ignores
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+**/.pytest_cache/
+.mypy_cache/
+**/.mypy_cache/
+.ruff_cache/
+**/.ruff_cache/
+.tox/
+.nox/
+.venv/
+venv/
+env/
+build/
+**/build/
+*.egg-info/
+**/*.egg-info/
 
 # IDE files
 .idea/

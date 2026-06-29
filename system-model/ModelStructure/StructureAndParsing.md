@@ -70,7 +70,6 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
 
 #### Relations
   * definedBy: [IdentifiersAndRelations](IdentifiersAndRelations.md#identifiersandrelations)
-  * definedBy: [Identifiers and Relations Contract Specification](Specifications.md#identifiers-and-relations-contract-specification)
   * derive: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
   * derivedFrom: [Element Identity Model](#element-identity-model)
   * satisfiedBy: [relation.rs](../../crates/reqvire-core/src/relation.rs)

@@ -8,12 +8,13 @@ pub mod owl_reserved;
 pub mod prelude;
 pub mod rdf;
 pub mod shacl;
+pub mod stable;
 pub mod subset;
 pub mod vocab;
 
 #[cfg(test)]
 mod tests {
-    use super::{constructs, describe, diagnostics, ontology, prelude, rdf, subset, vocab};
+    use super::{constructs, describe, diagnostics, ontology, prelude, rdf, stable, subset, vocab};
 
     #[test]
     fn public_module_paths_compile() {
@@ -26,6 +27,7 @@ mod tests {
             core::any::type_name_of_val(&describe::MODULE),
             core::any::type_name_of_val(&subset::MODULE),
             core::any::type_name_of_val(&prelude::MODULE),
+            core::any::type_name_of_val(&stable::stable_hash),
         );
     }
 }

@@ -1,6 +1,5 @@
 use crate::error::ReqvireError;
-use anyhow::Result;
-use std::collections::HashMap;
+use rustc_hash::FxHashMap;
 use std::path::PathBuf;
 use std::process::Command;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -10,18 +9,18 @@ static REPO_URL: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(N
 static COMMIT_HASH: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
 static GIT_ROOT_DIR: LazyLock<Mutex<Option<PathBuf>>> = LazyLock::new(|| Mutex::new(None));
 static BRANCH_NAME: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
-static GIT_ROOT_CACHE: LazyLock<Mutex<HashMap<PathBuf, String>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
+static GIT_ROOT_CACHE: LazyLock<Mutex<FxHashMap<PathBuf, String>>> =
+    LazyLock::new(|| Mutex::new(FxHashMap::default()));
 
 // Disable caching in tests to prevent interference between parallel tests
 static DISABLE_CACHE_FOR_TESTS: AtomicBool = AtomicBool::new(false);
 
 pub fn clear_git_cache() {
-    REPO_URL.lock().unwrap().take();
-    COMMIT_HASH.lock().unwrap().take();
-    GIT_ROOT_DIR.lock().unwrap().take();
-    BRANCH_NAME.lock().unwrap().take();
-    GIT_ROOT_CACHE.lock().unwrap().clear();
+    REPO_URL.lock().expect("mutex not poisoned").take();
+    COMMIT_HASH.lock().expect("mutex not poisoned").take();
+    GIT_ROOT_DIR.lock().expect("mutex not poisoned").take();
+    BRANCH_NAME.lock().expect("mutex not poisoned").take();
+    GIT_ROOT_CACHE.lock().expect("mutex not poisoned").clear();
 }
 
 #[cfg(test)]
@@ -36,7 +35,7 @@ fn is_cache_disabled() -> bool {
 
 /// Retrieves the repository base URL (HTTPS format) from Git remote configuration.
 pub fn get_repository_base_url() -> Result<String, ReqvireError> {
-    let mut cached = REPO_URL.lock().unwrap();
+    let mut cached = REPO_URL.lock().expect("mutex not poisoned");
     if let Some(ref url) = *cached {
         return Ok(url.clone());
     }
@@ -87,7 +86,7 @@ pub fn get_repository_base_url() -> Result<String, ReqvireError> {
 
 /// Retrieves the current commit hash from the repository.
 pub fn get_commit_hash() -> Result<String, ReqvireError> {
-    let mut cached = COMMIT_HASH.lock().unwrap();
+    let mut cached = COMMIT_HASH.lock().expect("mutex not poisoned");
     if let Some(ref hash) = *cached {
         return Ok(hash.clone());
     }
@@ -117,7 +116,7 @@ pub fn get_commit_hash() -> Result<String, ReqvireError> {
 
 /// Retrieves the current Git branch name.
 pub fn get_branch_name() -> Result<String, ReqvireError> {
-    let mut cached = BRANCH_NAME.lock().unwrap();
+    let mut cached = BRANCH_NAME.lock().expect("mutex not poisoned");
     if let Some(ref branch) = *cached {
         return Ok(branch.clone());
     }
@@ -184,7 +183,7 @@ pub fn get_file_at_commit(
 
 /// Finds the Git repository root for a given absolute folder path.
 pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, ReqvireError> {
-    let mut cache = GIT_ROOT_CACHE.lock().unwrap();
+    let mut cache = GIT_ROOT_CACHE.lock().expect("mutex not poisoned");
     if let Some(cached_root) = cache.get(absolute_folder_path) {
         return Ok(cached_root.clone());
     }
@@ -221,7 +220,7 @@ pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, Reqv
 pub fn get_git_root_dir() -> Result<PathBuf, ReqvireError> {
     // Skip caching in tests to prevent parallel test interference
     if !is_cache_disabled() {
-        let cached = GIT_ROOT_DIR.lock().unwrap();
+        let cached = GIT_ROOT_DIR.lock().expect("mutex not poisoned");
         if let Some(ref path) = *cached {
             return Ok(path.clone());
         }
@@ -241,7 +240,7 @@ pub fn get_git_root_dir() -> Result<PathBuf, ReqvireError> {
 
     // Only cache if caching is enabled
     if !is_cache_disabled() {
-        let mut cached = GIT_ROOT_DIR.lock().unwrap();
+        let mut cached = GIT_ROOT_DIR.lock().expect("mutex not poisoned");
         *cached = Some(path.clone());
     }
 
@@ -252,17 +251,30 @@ pub fn get_git_root_dir() -> Result<PathBuf, ReqvireError> {
 /// from the git repository root. Returns a list of file paths.
 pub fn ls_tree_commit(commit: &str) -> Result<Vec<String>, ReqvireError> {
     let git_root = get_git_root_dir()?;
+    ls_tree_commit_from_dir(commit, &git_root, || {
+        format!("git ls-tree failed (commit = {})", commit)
+    })
+}
 
+fn ls_tree_commit_from_dir<F>(
+    commit: &str,
+    directory: &PathBuf,
+    error_context: F,
+) -> Result<Vec<String>, ReqvireError>
+where
+    F: FnOnce() -> String,
+{
     let output = Command::new("git")
         .args(["ls-tree", "--name-only", "-r", commit])
-        .current_dir(&git_root)
+        .current_dir(directory)
         .output()?;
 
     if !output.status.success() {
         let stderr_str = String::from_utf8_lossy(&output.stderr);
         return Err(ReqvireError::GitCommandError(format!(
-            "git ls-tree failed (commit = {}): {}",
-            commit, stderr_str
+            "{}: {}",
+            error_context(),
+            stderr_str
         )));
     }
 
@@ -303,26 +315,10 @@ pub fn ls_tree_commit_in_folder(
     commit: &str,
     folder: &PathBuf,
 ) -> Result<Vec<String>, ReqvireError> {
-    let output = Command::new("git")
-        .args(["ls-tree", "--name-only", "-r", commit])
-        .current_dir(folder)
-        .output()?;
-
-    if !output.status.success() {
-        // Convert stderr to string for error context
-        let stderr_str = String::from_utf8_lossy(&output.stderr);
-        return Err(ReqvireError::GitCommandError(format!(
-            "git ls-tree failed (commit = {}, folder = {:?}): {}",
-            commit, folder, stderr_str
-        )));
-    }
-
-    // Convert stdout lines into a Vec<String>
-    let stdout_str = String::from_utf8_lossy(&output.stdout);
-    let files = stdout_str
-        .lines()
-        .map(|line| line.to_string())
-        .collect::<Vec<String>>();
-
-    Ok(files)
+    ls_tree_commit_from_dir(commit, folder, || {
+        format!(
+            "git ls-tree failed (commit = {}, folder = {:?})",
+            commit, folder
+        )
+    })
 }

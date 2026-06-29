@@ -1,8 +1,7 @@
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
+use crate::rdf_store::{load_default_graph, load_named_graph};
 use crate::semantic_contract::{self, SemanticIndex};
-use oxigraph::io::{RdfFormat, RdfParser};
-use oxigraph::model::NamedNode;
 use oxigraph::store::Store;
 use std::fmt;
 
@@ -147,47 +146,6 @@ fn new_store() -> Result<Store, ReqvireError> {
     Store::new().map_err(|error| {
         ReqvireError::ProcessError(format!("Failed to create RDF store: {}", error))
     })
-}
-
-fn load_named_graph(
-    store: &Store,
-    turtle: &str,
-    graph_iri: &str,
-    label: &str,
-) -> Result<(), ReqvireError> {
-    if turtle.trim().is_empty() {
-        return Ok(());
-    }
-    let graph_name = NamedNode::new(graph_iri).map_err(|error| {
-        ReqvireError::ProcessError(format!(
-            "Invalid semantic named graph IRI '{}': {}",
-            graph_iri, error
-        ))
-    })?;
-    store
-        .load_from_reader(
-            RdfParser::from_format(RdfFormat::Turtle)
-                .without_named_graphs()
-                .with_default_graph(graph_name),
-            turtle.as_bytes(),
-        )
-        .map_err(|error| {
-            ReqvireError::ProcessError(format!("Failed to load {} into Oxigraph: {}", label, error))
-        })
-}
-
-fn load_default_graph(store: &Store, turtle: &str, label: &str) -> Result<(), ReqvireError> {
-    if turtle.trim().is_empty() {
-        return Ok(());
-    }
-    store
-        .load_from_reader(
-            RdfParser::from_format(RdfFormat::Turtle).without_named_graphs(),
-            turtle.as_bytes(),
-        )
-        .map_err(|error| {
-            ReqvireError::ProcessError(format!("Failed to load {} into Oxigraph: {}", label, error))
-        })
 }
 
 #[cfg(test)]

@@ -218,9 +218,11 @@ This verification shall prove that MCP prompt templates are discoverable, retrie
 #### Details
 Expected checks:
 - Verify initialization advertises a standard MCP prompts capability.
-- Verify `prompts/list` returns regular workflow prompts and semantic query prompts.
+- Verify `prompts/list` returns regular workflow prompts, semantic query prompts, authoring prompts, refactor prompts, task-generation prompts, and audit prompts.
 - Verify `prompts/get` for `reqvire.semantic.query` returns text that references semantic vocabulary, prefix, SPARQL tools, ontology-document vocabulary filtering, and states that `include_external` exposes only the used external subset.
 - Verify `prompts/get` for a regular workflow prompt returns text that references standard Reqvire model exploration tools.
+- Verify `prompts/get` for `reqvire.workflow.audit_change_impact` returns text that references change-impact analysis, direct changes, propagated impacts, structured impact buckets, impact-scope review, invalidated verifications, contract-binding consumers, documentation artifacts, and system-model update decisions.
+- Verify `prompts/get` for the new authoring and audit workflows returns text that references implementation task generation, governance metadata, Reqvire command evidence, EARS requirements, submodel inspection, verification objectives, evidence-backed satisfiedBy links, model refactor boundaries, dependency-preserving cross-subgraph replacements, ontology/semantic-contract layer decisions, ontology governance/satisfaction guardrails, native concept authoring, concept naming/identity guardrails, and model-quality audit categories.
 - Verify unknown prompt names return a protocol error.
 - Verify prompt retrieval does not mutate model source files.
 
@@ -426,6 +428,7 @@ This verification shall prove that MCP cached state is subordinate to Reqvire so
 Expected checks:
 - Verify workspace status reports workspace root, git `HEAD`, dirty state, Reqvire version, MCP protocol revision, Reqvire tool contract version, model fingerprint, and last diagnostics.
 - Verify source file, git state, excluded-pattern, Reqvire version, or Reqvire tool contract changes invalidate cached model state.
+- Verify markdown content changes invalidate cached model state even when filesystem modification time is preserved.
 - Verify controlled MCP mutations refresh MCP internal state from the updated Reqvire core graph.
 - Verify external filesystem drift triggers invalidation/reparse before serving stale model data.
 - Verify dirty worktree state is reported in metadata and does not block tools when the equivalent Reqvire core operation can run.
@@ -445,6 +448,8 @@ This verification shall prove that MCP tools use shared Reqvire operation contra
 Expected checks:
 - Run representative Reqvire operations through MCP tools.
 - Run representative Reqvire operations through an external Rust fixture using the public Reqvire tool registry API.
+- Verify source-level delegation for migrated read/report operations: MCP read tools call the shared operations layer instead of directly reimplementing search, model, collect, submodels, resources, coverage, traces, containment, lint, format, or change-impact behavior.
+- Verify matching CLI report command handlers call the shared operations layer for migrated operations while retaining CLI-only parsing and rendering responsibilities.
 - Verify result schemas match shared contract definitions.
 - Verify transport-only options such as JSON stdout/file output are not exposed as MCP request fields.
 - Verify no-argument tools use valid MCP object input schemas.

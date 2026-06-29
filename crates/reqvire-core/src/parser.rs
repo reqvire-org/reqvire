@@ -7,7 +7,8 @@ use crate::error::ReqvireError;
 use crate::relation::{self, Relation};
 use crate::utils;
 use log::debug;
-use std::collections::{BTreeMap, HashSet};
+use rustc_hash::FxHashSet;
+use std::collections::BTreeMap;
 use std::path::Path;
 
 pub const ELEMENTS_HEADER: &str = "# Elements";
@@ -324,7 +325,7 @@ You can use **markdown formatting**.
 pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, ReqvireError> {
     let mut current_element: Option<Element> = None;
     let mut current_subsection = SubSection::Other("".to_string());
-    let mut seen_subsections = HashSet::new();
+    let mut seen_subsections = FxHashSet::default();
     let mut in_details_block = false;
     let mut found_header = false;
 
@@ -764,7 +765,7 @@ fn parse_single_element_file(
     let mut element_content = String::new();
     let mut element_relations: Vec<Relation> = Vec::new();
     let mut element_contract_bindings: Vec<ContractBindingEntry> = Vec::new();
-    let mut metadata: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    let mut metadata: rustc_hash::FxHashMap<String, String> = rustc_hash::FxHashMap::default();
 
     enum DocSection {
         None,
@@ -1039,9 +1040,9 @@ pub fn parse_elements(
     let mut elements = Vec::new();
     let mut current_element: Option<Element> = None;
     let mut errors = Vec::new();
-    let mut seen_identifiers = HashSet::new();
+    let mut seen_identifiers = FxHashSet::default();
     let mut skip_current_element = false;
-    let mut seen_subsections = HashSet::new();
+    let mut seen_subsections = FxHashSet::default();
     let mut in_details_block = false;
 
     let mut current_subsection = SubSection::Other("".to_string());
@@ -1178,7 +1179,7 @@ pub fn parse_elements(
             // Level 5+ headers are only allowed inside Details subsection
             let msg = format!(
                 "Invalid header level in element '{}': Level 5+ headers (#####+) can only appear inside '#### Details' subsection (file: {}, line {})",
-                current_element.as_ref().unwrap().name,
+                current_element.as_ref().expect("unexpected error").name,
                 file_path.display(),
                 line_num + 1
             );
@@ -1191,7 +1192,7 @@ pub fn parse_elements(
                 let msg = format!(
                     "Legacy subsection '{}' in element '{}' is not supported. Use '#### {}' or run `reqvire migrate --fix`. (file: {}, line {})",
                     subsection_name,
-                    current_element.as_ref().unwrap().name,
+                    current_element.as_ref().expect("unexpected error").name,
                     CONTRACT_BINDINGS_SECTION,
                     file_path.display(),
                     line_num + 1
@@ -1207,7 +1208,7 @@ pub fn parse_elements(
                     let msg = format!(
                         "Duplicate subsection '{}' in element '{}' (file: {}, line {})",
                         subsection.name(),
-                        current_element.as_ref().unwrap().name,
+                        current_element.as_ref().expect("unexpected error").name,
                         file_path.display(),
                         line_num + 1
                     );

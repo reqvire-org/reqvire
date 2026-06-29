@@ -376,5 +376,5 @@ pub fn render_crud_json(result: &CrudResult) -> String {
         }).collect::<Vec<_>>()
     });
 
-    serde_json::to_string_pretty(&json_result).unwrap()
+    serde_json::to_string_pretty(&json_result).expect("failed to serialize JSON")
 }

@@ -13,9 +13,10 @@ use axum::Router;
 use percent_encoding::percent_decode_str;
 use reqvire::error::ReqvireError;
 use reqvire::explorer_runtime::{
-    build_runtime_assets, embedded_asset, index_html, ExplorerRuntimeAssets,
+    build_runtime_assets, embedded_asset, index_html, is_workspace_asset_path,
+    ExplorerRuntimeAssets,
 };
-use reqvire::{ModelBuildOptions, ModelManager};
+use reqvire::{model_cache, ModelBuildOptions};
 
 #[derive(Clone)]
 pub(crate) struct ServeState {
@@ -59,7 +60,7 @@ pub async fn serve_explorer(
             mcp_enable_mutations,
             false,
             excluded_filename_patterns,
-            state.write_lock.clone(),
+            Arc::clone(&state.write_lock),
             Some(post_write_hook),
         );
     }
@@ -180,9 +181,7 @@ async fn runtime_asset_response(
 }
 
 async fn refresh_runtime_assets(state: &ServeState) -> Result<(), ReqvireError> {
-    let mut model = ModelManager::new();
-    model.parse_and_validate_with_options(
-        None,
+    let model = model_cache::load_cached_model(
         state.excluded_filename_patterns.as_ref(),
         ModelBuildOptions {
             lenient: false,
@@ -245,29 +244,6 @@ fn workspace_file_response(method: Method, request_path: &str) -> Option<Respons
         )),
         Err(_) => Some(response_with_status(StatusCode::NOT_FOUND)),
     }
-}
-
-fn is_workspace_asset_path(path: &Path) -> bool {
-    matches!(
-        path.extension().and_then(|ext| ext.to_str()).map(|ext| ext.to_ascii_lowercase()),
-        Some(ext)
-            if matches!(
-                ext.as_str(),
-                "png"
-                    | "jpg"
-                    | "jpeg"
-                    | "gif"
-                    | "webp"
-                    | "svg"
-                    | "pdf"
-                    | "txt"
-                    | "csv"
-                    | "json"
-                    | "jsonld"
-                    | "ttl"
-                    | "turtle"
-            )
-    )
 }
 
 fn resolve_request_path(raw_request_path: &str) -> Result<String, StatusCode> {

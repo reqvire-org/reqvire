@@ -1,16 +1,16 @@
-use std::collections::HashMap;
+use rustc_hash::FxHashMap;
 
 #[derive(Debug, Clone)]
 pub enum Subsection {
-    Metadata(HashMap<String, String>),
+    Metadata(FxHashMap<String, String>),
     Relations(Vec<String>),
     Details(String),
     Other(String, String),
 }
 
 impl Subsection {
-    pub fn parse_metadata(content: &str) -> HashMap<String, String> {
-        let mut metadata = HashMap::new();
+    pub fn parse_metadata(content: &str) -> FxHashMap<String, String> {
+        let mut metadata = FxHashMap::default();
         for line in content.lines() {
             if let Some((key, value)) = line.trim().split_once(": ") {
                 metadata.insert(key.to_string(), value.to_string());

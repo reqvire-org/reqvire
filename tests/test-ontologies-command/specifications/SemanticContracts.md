@@ -165,7 +165,30 @@ The system shall expose service endpoint contracts.
 
 #### Relations
   * specify: [API Capability](#api-capability)
+  * definedBy: [API Endpoint Contract](#api-endpoint-contract)
   * constrainedBy: [API Endpoint Shape Contract](#api-endpoint-shape-contract)
+---
+
+### API Endpoint Contract
+
+Reusable endpoint contract context.
+
+#### Metadata
+  * type: specification
+---
+
+### API Client Requirement
+
+The system shall consume API endpoint contract context from a separate requirement branch.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [API Endpoint Contract](#api-endpoint-contract)
+
+#### Relations
+  * specify: [API Capability](#api-capability)
 ---
 
 ### API Endpoint Shape Contract

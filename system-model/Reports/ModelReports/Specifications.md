@@ -205,9 +205,8 @@ The containment report and Model containment modes show the physical organizatio
 - Root folder → Subfolders → Files → Elements
 - Sections skipped (elements shown directly under files)
 
-The system is expected to generate reports in multiple formats:
-- Mermaid diagrams for visualization
-- JSON for programmatic access
+The system is expected to generate containment data in canonical structured formats:
+- JSON for CLI and programmatic access
 - Project Store data for WebInterface Explorer integration
 
 The system is expected to include design documents:
@@ -253,23 +252,23 @@ All report outputs are expected to use deterministic ordering to enable reliable
   * type: specification
 ---
 
-### Diagram Relation Filtering Specification
+### Model Relation Traversal Filtering Specification
 
-Technical specification for relation filtering in diagram generation to render only forward relations while ensuring complete element hierarchy representation.
+Technical specification for relation filtering in model JSON traversal to include one canonical forward relation from each inverse relation pair while preserving complete element hierarchy representation.
 
 #### Details
-**Diagram Relation Filtering Rules:**
-When generating diagrams, the system is expected to apply the following relation filtering rules:
+**Model Relation Traversal Filtering Rules:**
+When generating model JSON, the system is expected to apply the following relation filtering rules:
 
-1. **Diagram Relation Filtering**: Only relations specified in the DIAGRAM_RELATIONS list is expected to be rendered to prevent duplicate arrows representing the same logical relationship
+1. **Canonical Relation Filtering**: Only relations specified in the `MODEL_TRAVERSAL_RELATIONS` list are expected to be traversed to prevent duplicate edges representing the same logical relationship
 2. **Complete Hierarchy Inclusion**: Include reachable child elements needed by the requested report scope
-3. **List-Based Rendering**: Relations is expected to be rendered according to the DIAGRAM_RELATIONS list which defines which relation from each opposite pair should be shown
+3. **List-Based Traversal**: Relations are expected to be traversed according to the `MODEL_TRAVERSAL_RELATIONS` list, which defines which relation from each opposite pair should be used
 
 **Filtering Benefits:**
 The filtering ensures that:
-- Bidirectional relationships (e.g., `derivedFrom`/`derive`) appear as single arrows using the relation specified in DIAGRAM_RELATIONS
+- Bidirectional relationships (e.g., `derivedFrom`/`derive`) appear once in structured output using the relation specified in `MODEL_TRAVERSAL_RELATIONS`
 - Hierarchical context is preserved by showing derived children relevant to the requested report scope
-- Diagram readability is maintained while accurately representing the complete model structure
+- JSON output remains readable while accurately representing the complete model structure
 
 #### Metadata
   * type: specification
@@ -357,25 +356,28 @@ Technical specification for implementation coverage report output structure.
 ### Interactive Mermaid Diagram Node Behavior Contract Specification
 
 #### Details
-Clickable Mermaid diagram nodes must resolve to model element identifiers, source-relative paths, or stable repository links according to the command output mode.
+Clickable Mermaid diagram nodes rendered by the Explorer trace view must resolve to model element identifiers, source-relative paths, or stable Explorer routes according to trace view context.
 
-CLI flag options may be provided where a command emits links that need stable GitHub blob URLs:
-* GitHub-rendered Mermaid diagrams need stable blob URLs when source-relative links are insufficient
-* Stable blob URLs can make output less portable, so commands must keep relative links as the default unless the command contract says otherwise
+Generated CLI report output for `model`, `containment`, `resources`, and `traces` is JSON-only. Those commands do not emit Mermaid click directives or Markdown link output.
 
-When generating diagram node links and when `--links-with-blobs` flag is set to `true`, the system is expected to:
-- Use stable git repository links (`{repository-url}/blob/{commit-hash}/{file-path}`) when git repository information is available
-- Fallback to relative markdown links when git repository information is not available
-- Use the current commit hash to ensure links remain stable even as the repository evolves
-- Match the same link format used in traceability matrices and change impact reports
-- Preserve interactive behavior across all generated diagrams
-
-The `traces` command exposes `--links-with-blobs` for trace Mermaid output.
-
-The `change-impact` command is expected to continue to use GitHub blob URLs by default (unchanged behavior).
+The `change-impact` command is expected to continue to use GitHub blob URLs by default where its report contract requires stable source links.
 
 #### Metadata
   * type: specification
+---
+
+### Browser Trace Diagram Generation Contract Specification
+
+#### Details
+Browser trace diagram generation consumes Project Store trace data derived from report trace trees and produces per-verification Mermaid roll-up diagram source in the Explorer Traces view. CLI report commands remain JSON-only and do not emit Markdown or Mermaid output.
+
+The contract defines the report-owned trace diagram behavior that WebExplorer trace rendering may reuse through contract bindings without creating a cross-domain hierarchy relation.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Browser Trace Diagram Generation](DiagramGeneration.md#browser-trace-diagram-generation)
 ---
 
 ### JSON Element Size Estimate Output Specification
@@ -385,8 +387,8 @@ JSON report outputs are expected to preserve element size-estimate metadata when
 #### Details
 - JSON output serializers that include model elements must include the element `size_estimate` field when present.
 - JSON output serializers must omit `size_estimate` when the model was not built with size estimates enabled.
-- Text, Markdown, Mermaid, HTML, and other non-JSON outputs must not display size-estimate metadata.
-- The initial output scope is element payloads in `model --json` and equivalent structured model evidence.
+- Non-JSON outputs must not display size-estimate metadata.
+- The initial output scope is element payloads in `model` JSON output and equivalent structured model evidence.
 - Nested relation element targets in model JSON must preserve their own `size_estimate` fields when present.
 - Aggregate report-level `size_estimate` records are deferred and must not be added by this specification.
 
@@ -399,7 +401,7 @@ JSON report outputs are expected to preserve element size-estimate metadata when
 
 ### JSON Output Structure
 
-Standard JSON output structure for CLI commands that support the `--json` flag.
+Standard JSON output structure for CLI commands that emit JSON, either as canonical output or through a selectable `--json` mode.
 
 #### Details
 JSON output conventions:
@@ -424,9 +426,9 @@ JSON output conventions:
 - Exit code accompanies JSON (0=success, non-zero=error)
 
 **File Output:**
-- When `--output <FILE>` is provided alongside `--json`, write JSON to file instead of stdout
+- When `--output <FILE>` is provided, write JSON to file instead of stdout
 - Print confirmation message to stdout: `✅ Output saved to <filepath>`
-- `--output` without `--json` is an error
+- `--output` without JSON output selection is an error only for commands that still have non-JSON modes
 
 #### Metadata
   * type: specification
@@ -464,90 +466,28 @@ Style guidelines for markdown text report output (model, coverage, traces, conta
 - Indentation shows nesting (2 spaces per level)
 
 **Code Blocks:**
-- Mermaid diagrams in ```mermaid blocks
-- JSON output in ```json blocks
+- JSON examples in ```json blocks
 
 #### Metadata
   * type: specification
 ---
 
-### Mermaid Diagram Generation Specification
-
-Technical specification for Mermaid diagram generation approach and structure.
-
-#### Details
-**Diagram Generation Approach:**
-Diagram generation follows a report-output approach:
-- `model` markdown output embeds Mermaid diagrams for the selected model scope.
-- `model --mmd` emits pure Mermaid text for downstream renderers.
-- `containment` emits a Mermaid view of physical folder/file/element containment.
-- `traces` markdown output embeds Mermaid diagrams for verification trace paths.
-- Authored Markdown source files are not mutated to insert generated diagrams.
-
-**Diagram Styling:**
-The system is expected to implement diagram styling including:
-- Containment structure with nested subgraphs for physical organization
-- Element type-specific CSS classes for visual differentiation
-- Relation-specific line styles and colors
-- Interactive highlighting on hover
-- Consistent background and border styling
-
-**Model Structure Visualization:**
-The system is expected to provide visualization of the complete model structure showing an element-centric view with nested relations:
-- Display elements with their properties (identifier, name, type, file location)
-- Show relations nested inside elements with full target details
-- Support recursive nesting for element-to-element relations
-- Handle file path and external URL relations
-- Provide metadata about total elements and relations
-- Use consistent visual styling with mermaid diagrams showing hash-based node identifiers
-
-#### Metadata
-  * type: specification
----
-
-### Mermaid Interactive Capabilities Specification
-
-Technical specification for interactive Mermaid diagram navigation and filtering capabilities.
-
-#### Details
-**Model Navigation and Filtering:**
-Users is expected to be able to generate and view model structure diagrams from any starting point:
-- Default view shows ontology roots, concept roots, and capability roots according to model hierarchy traversal rules
-- Filter from specific element using --from flag
-- Generate complete model structure with nested relations showing element details recursively
-- Mermaid diagrams display all nested relations recursively
-
-**Diagram Output:**
-The system is expected to generate Mermaid diagrams embedded in markdown format for visual representation of the model structure. When pure Mermaid output is requested, the system emits Mermaid text only, without Markdown prose or fenced code blocks.
-
-**Interactive Capabilities:**
-The visualization helps users:
-- Understand the model's logical structure
-- Navigate relationships between elements
-- Explore the model from any starting point
-- Filter and focus on specific subtrees of the model
-
-#### Metadata
-  * type: specification
----
-
-### Model Diagram Output Formats Contract Specification
+### Model JSON Output Format Contract Specification
 
 #### Details
 Model output format rules:
-- Markdown format includes embedded Mermaid diagram with model structure.
-- Pure Mermaid format includes only Mermaid flowchart text with no Markdown wrapper.
-- Markdown shows hierarchical structure using containment subgraphs (folders > files > elements).
-- Mermaid diagrams use folder and file subgraphs to visually group elements by physical location.
+- JSON is the canonical CLI and operation output format for `model`.
+- `reqvire model` emits structured JSON by default.
+- The `model` command does not expose a separate output-format flag.
+- Alternative output-format flags are not supported by the `model` command.
 - JSON format uses structured data with folders, files, sections, elements, relations, and contract_bindings.
-- Both formats represent the same filtered or complete model data.
-- Element contract_bindings are included as an array of contract element identifier strings in both formats.
+- Element contract_bindings are included as an array of contract element identifier strings.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * define: [Model Diagram Output Formats](ReportingRequirements.md#model-diagram-output-formats)
+  * define: [Model JSON Output Format](ReportingRequirements.md#model-json-output-format)
 ---
 
 ### Ontology Collection Output Specification
@@ -597,6 +537,7 @@ Projection subgraph generation behavior:
 - Store generated construct facts in the existing semantic export context as in-memory RDF statements derived from o-kernel construct classification records enriched with Reqvire source and provenance metadata. Generated facts are not written back to authored Markdown ontology or semantic-contract blocks.
 - Keep projection data deterministic and serializable from `SemanticIndex` without reparsing raw Turtle in the Ontologies renderer.
 - Use stable generated IRIs or blank-node identifiers derived from canonical source evidence and construct membership so repeated exports remain deterministic.
+- Select the Reqvire projection ID namespace at the Reqvire semantic-contract adapter boundary by invoking o-kernel ontology construct classification with `urn:reqvire` as the classifier ID namespace. O-kernel remains namespace-neutral by default and must not hard-code Reqvire projection identifiers.
 - Materialize one `reqvire:OntologyConstructProjection` record per projection pass or construct family and one or more `reqvire:OntologyConstruct` records for extracted constructs.
 - Record `reqvire:projectionDerivationMode "direct-authored"` for facts derived only from authored quads without reasoning.
 - Record `reqvire:constructSourceBlock`, source element metadata, source line, construct subject, construct object, construct property, construct member, and `reqvire:constructSequenceIndex` where order matters.
@@ -708,6 +649,17 @@ Implementation coverage source values are defined by this implementation coverag
 Implementation coverage scope includes only elements of type `requirement`. Elements of type `capability` are excluded from direct implementation coverage and receive implementation coverage through capability roll-up.
 
 The report must classify each requirement using the semantic coverage source vocabulary and the available `satisfiedBy`, `definedBy`, contract_bindings, and child requirement evidence.
+
+Coverage classification:
+- **Directly satisfied**: requirement has one or more `satisfiedBy` relations.
+- **Contract via contract_bindings**: requirement owns contract elements through `definedBy`, and at least one owned contract is reused by a requirement that is directly satisfied.
+- **Contract via child**: requirement owns contract elements through `definedBy`, and at least one derived descendant requirement has `satisfiedBy`.
+- **Uncovered**: requirement has no coverage evidence from the above sources.
+
+Rules:
+- Contract Bindings propagation uses only contract element identifiers as contracts.
+- Generic derivation roll-up is not used for implementation coverage.
+- Coverage source and evidence identifiers must be reported in text and JSON outputs.
 
 #### Metadata
   * type: specification
@@ -863,24 +815,17 @@ The resources report is expected to consist of two sections:
 - Sorted by element identifier
 - Each contract identifier lists all elements that reuse it
 
-**Output Formats:**
-
-*Text/Markdown Format:*
-- Human-readable with markdown links
-- Entries listed alphabetically by path (relations) and identifier (contract_bindings)
-- Element references shown as clickable markdown links
-- Clear section headers separating Relations and Contract Bindings
+**Output Format:**
 
 *JSON Format:*
 - Structured data for programmatic use
-- Same logical structure as text format
 - Includes file paths, element identifiers, relation types
 - Suitable for automated processing and integration
 
 **Explorer Serve:**
 - Resources report data available in the Explorer as a supporting route or report link, not as a primary left Explorer view link
 - Shows complete list of referenced files with element traceability
-- Maintains same structure as text/JSON outputs
+- Maintains same logical structure as JSON output
 - Provides clickable navigation between resources and elements
 
 #### Metadata
@@ -893,8 +838,9 @@ The semantic model export is expected to materialize ontology-defined relation-f
 
 #### Details
 Normative construct-query contract:
-- Relation-family normalization is defined for every `reqvire:RelationRule` that declares `reqvire:normalizedForwardProperty` and `reqvire:normalizedInverseProperty`.
+- Relation-family normalization is defined for every `reqvire:RelationRule` that declares `reqvire:relationName`, `reqvire:relationDirection`, `reqvire:normalizedForwardProperty`, and `reqvire:normalizedInverseProperty`.
 - Each authored relation edge is treated as a first-class `reqvire:ModelRelation` with `reqvire:relationSource`, `reqvire:relationTarget`, and `reqvire:relationType` so source/target pairing is preserved.
+- Contract binding edges are treated as first-class `reqvire:ModelRelation` records with `reqvire:relationType "contract_bindings"` so they participate in the same ontology-defined projection as authored relation entries.
 - For relation rules with `reqvire:relationDirection "forward"`, the authored source is the canonical forward source and the authored target is the canonical forward target.
 - For relation rules with `reqvire:relationDirection "inverse"`, the authored target is the canonical forward source and the authored source is the canonical forward target.
 - The projection emits both canonical forward and canonical inverse normalized predicates.
@@ -926,8 +872,10 @@ WHERE {
 
 Implementation contract:
 - Current Rust semantic export projection must implement the same canonicalization without executing the CONSTRUCT query.
+- Current Rust semantic export projection must derive the normalized relation mapping from the runtime Reqvire ontology `reqvire:RelationRule` metadata instead of maintaining a separate hard-coded source-to-predicate table.
 - Full semantic model export must emit deterministic `reqvire:ModelRelation` resources for authored Markdown relations and contract bindings edges.
 - Full semantic model export must emit normalized forward and inverse predicates for `derive`/`derivedFrom`, `specify`/`specifiedBy`, `define`/`definedBy`, `constrain`/`constrainedBy`, `use`/`usedBy`, `verify`/`verifiedBy`, `satisfy`/`satisfiedBy`, and `contract_bindings`.
+- `contract_bindings` must normalize to `reqvire:bindsContract` from the consuming requirement to the reusable contract and `reqvire:boundByContract` from the reusable contract back to the consuming requirement.
 - Future reasoner-backed or SPARQL-backed materialization must produce triples equivalent to the construct-query result.
 - Generated relation-family projection facts must not be written back to authored Markdown ontology, semantic-contract, requirement, or contract blocks.
 

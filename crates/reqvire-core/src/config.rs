@@ -20,59 +20,38 @@ fn find_git_root() -> Option<PathBuf> {
 
 /// Reads gitignore patterns from the repository root .gitignore file.
 fn read_gitignore_patterns() -> Vec<String> {
-    let git_root = match find_git_root() {
-        Some(root) => root,
-        None => {
-            debug!("No git repository found, skipping .gitignore");
-            return vec![];
-        }
-    };
-
-    let gitignore_path = git_root.join(".gitignore");
-
-    if !gitignore_path.exists() {
-        debug!("No .gitignore file found at repository root");
-        return vec![];
-    }
-
-    match fs::read_to_string(&gitignore_path) {
-        Ok(content) => content
-            .lines()
-            .filter(|line| !line.trim().is_empty() && !line.trim().starts_with('#'))
-            .map(gitignore_pattern_to_glob)
-            .collect(),
-        Err(e) => {
-            warn!("Failed to read .gitignore content: {}", e);
-            vec![]
-        }
-    }
+    read_root_ignore_patterns(".gitignore")
 }
 
 /// Reads reqvireignore patterns from the repository root .reqvireignore file.
 fn read_reqvireignore_patterns() -> Vec<String> {
+    read_root_ignore_patterns(".reqvireignore")
+}
+
+fn read_root_ignore_patterns(filename: &str) -> Vec<String> {
     let git_root = match find_git_root() {
         Some(root) => root,
         None => {
-            debug!("No git repository found, skipping .reqvireignore");
+            debug!("No git repository found, skipping {}", filename);
             return vec![];
         }
     };
 
-    let reqvireignore_path = git_root.join(".reqvireignore");
+    let ignore_path = git_root.join(filename);
 
-    if !reqvireignore_path.exists() {
-        debug!("No .reqvireignore file found at repository root");
+    if !ignore_path.exists() {
+        debug!("No {} file found at repository root", filename);
         return vec![];
     }
 
-    match fs::read_to_string(&reqvireignore_path) {
+    match fs::read_to_string(&ignore_path) {
         Ok(content) => content
             .lines()
             .filter(|line| !line.trim().is_empty() && !line.trim().starts_with('#'))
             .map(gitignore_pattern_to_glob)
             .collect(),
         Err(e) => {
-            warn!("Failed to read .reqvireignore content: {}", e);
+            warn!("Failed to read {} content: {}", filename, e);
             vec![]
         }
     }

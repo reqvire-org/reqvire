@@ -60,7 +60,7 @@ pub fn export_to_dir(
     }
 
     let store_js_path = output_dir.join("assets").join("project-store.js");
-    fs::create_dir_all(store_js_path.parent().unwrap())
+    fs::create_dir_all(store_js_path.parent().expect("unexpected error"))
         .map_err(|e| ReqvireError::ProcessError(format!("Failed to create assets dir: {}", e)))?;
     fs::write(&store_js_path, assets.project_store_js.as_bytes()).map_err(|e| {
         ReqvireError::ProcessError(format!("Failed to write project-store.js: {}", e))
@@ -163,7 +163,7 @@ fn should_skip_workspace_asset_dir(name: &str) -> bool {
     )
 }
 
-fn is_workspace_asset_path(path: &std::path::Path) -> bool {
+pub fn is_workspace_asset_path(path: &std::path::Path) -> bool {
     matches!(
         path.extension()
             .and_then(|ext| ext.to_str())

@@ -97,10 +97,7 @@ CHANGE IMPACT OPTIONS:
       --output <FILE>           Save JSON output to file (requires --json)
 
 TRACES OPTIONS:
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-      --from-folder <PATH>      Relative path to folder where output will be saved (for generating relative links in Mermaid diagrams)
-      --links-with-blobs        Use GitHub blob URLs in diagram links instead of relative paths
+      --output <FILE>           Save JSON output to file
       --filter-id <ID>          Only include verification with this specific identifier
       --filter-name <REGEX>     Only include verifications whose name matches this regular expression
       --filter-type <TYPE>      Only include verifications of the given type. Valid: test-verification, analysis-verification, inspection-verification, demonstration-verification
@@ -113,10 +110,8 @@ MODEL OPTIONS:
       --from <NAME>             Start from specific element by name
       --reverse                 Traverse from leaves to roots (follow backward relations)
       --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
-      --json                    Output results in JSON format (nested structure)
-      --mmd                     Output pure Mermaid flowchart text
       --with-size-estimates     Include element size estimates in JSON output
-      --output <FILE>           Save output to file (requires --json or --mmd)
+      --output <FILE>           Save JSON output to file
 
 LINT OPTIONS:
       --fixable                 Show only auto-fixable issues
@@ -206,13 +201,11 @@ RM ASSET OPTIONS:
       --output <FILE>           Save JSON output to file (requires --json)
 
 CONTAINMENT OPTIONS:
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
+      --output <FILE>           Save JSON output to file
       --short                   Show only root elements (without hierarchical parents in same file)
 
 RESOURCES OPTIONS:
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
+      --output <FILE>           Save JSON output to file
 
 SEMANTIC EXPORT OPTIONS:
       --layer <LAYER>           Include layer: ontologies, shapes, concepts, model, external-used, prefixes. Repeatable; omitted means all layers

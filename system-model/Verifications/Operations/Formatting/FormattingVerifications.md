@@ -197,7 +197,7 @@ This test verifies the format command requirements, focusing on normalizing and 
   * verify: [Structure and Addressing in Markdown Documents](../../../ModelStructure/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * verify: [Document Structure Normalization](../../../Operations/Formatting/FormattingRequirements.md#document-structure-normalization)
   * verify: [Format Consistency Enforcement](../../../Operations/Formatting/FormattingRequirements.md#format-consistency-enforcement)
-  * verify: [Git-Style Diff Output for Format](../../../Operations/Formatting/FormattingRequirements.md#git-style-diff-output-for-format)
+  * verify: [Formatting Output](../../../Operations/Formatting/FormattingRequirements.md#formatting-output)
   * verify: [Replace Absolute Links with Relative Links](../../../Operations/Formatting/FormattingRequirements.md#replace-absolute-links-with-relative-links)
 ---
 

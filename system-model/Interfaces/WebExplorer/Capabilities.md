@@ -47,7 +47,7 @@ Implementation details shall follow the associated contract specifications.
 The system shall allow the Explorer serve command to expose the Reqvire MCP Streamable HTTP endpoint at `/mcp` on the same HTTP listener when explicitly enabled.
 
 #### Details
-When enabled, the embedded MCP endpoint shall reuse the normal Reqvire MCP tool registry, transport behavior, and mutation gating while preserving Explorer SPA routing for non-MCP paths.
+Detailed embedded endpoint, registry reuse, transport, mutation gating, route preservation, runtime refresh, and endpoint display rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -152,7 +152,7 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Diagram Contract Bindings Display Contract Specification](Specifications.md#diagram-contract-bindings-display-contract-specification)
   * definedBy: [Explorer Mermaid Diagram Style Specification](Specifications.md#explorer-mermaid-diagram-style-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * satisfiedBy: [verification_trace.rs](../../../crates/reqvire-core/src/verification_trace.rs)
   * verifiedBy: [Diagram Contract Bindings Display Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#diagram-contract-bindings-display-verification)
 ---
@@ -172,7 +172,7 @@ Implementation details shall follow the associated contract specifications.
   * derive: [Model View Element Navigation](#model-view-element-navigation)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
 ---
 
 ### Model View Element Navigation
@@ -188,7 +188,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Model View Element Navigation Contract Specification](Specifications.md#model-view-element-navigation-contract-specification)
   * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
-  * satisfiedBy: [report_model.rs](../../../crates/reqvire-core/src/report_model.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * verifiedBy: [Model View Element Navigation Test](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-view-element-navigation-test)
 ---
 
@@ -234,7 +234,7 @@ The Ontologies view shall:
 The system shall consume o-kernel construct classifications and Reqvire semantic-index context to produce generated ontology projection facts that suppress RDF serialization mechanics and expose stable ontology concepts for both full semantic export and Explorer visualization.
 
 #### Details
-The projection shall preserve source traceability, reuse o-kernel direct-authored OWL/RDFS/SHACL construct classification data through `SemanticIndex`, expose that data as a reusable ontology projection subgraph inside the existing in-memory RDF projection, derive Reqvire viewer slot/facet records from SHACL property shapes, and omit primary rendering of `rdf:type` edges, RDF list plumbing, metaclass resources, and anonymous blank-node implementation details unless those nodes represent a meaningful ontology construct.
+Detailed semantic-index, source-traceability, projection-subgraph, SHACL slot/facet, RDF-mechanics suppression, and Explorer/export consumer rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -269,7 +269,7 @@ Construct grouping shall cover equivalence groups, inverse properties, property-
 The system shall render OWL object properties and datatype properties as first-class relationship semantics: properties appear as labeled domain/range edges and ontology-node detail evidence, rather than standalone graph boxes.
 
 #### Details
-The property visualization shall aggregate many domain and range classes without multiplying identical property arcs, distinguish object-property ranges from datatype-property ranges, and show property semantics through compact edge labels, badges, or modal sections on selected classes, individuals, and terms. When a named property is used by multiple SHACL property shapes, the ontology node modal shall present those as target-class usages with source-shape evidence rather than as duplicate property definitions.
+Detailed domain/range aggregation, deduplicated relationship rendering, modal evidence, source citation, SHACL slot/facet, and property characteristic rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -371,15 +371,7 @@ The SPA Explorer shell shall:
 The system shall expose a Thesaurus Explorer view during serve workflows that presents standalone native concept schemes and concepts as curated SKOS terminology instead of as ontology children or filesystem folders.
 
 #### Details
-The Thesaurus view shall:
-- Render concept-scheme roots and broader/narrower concept hierarchy from Project Store semantic concept data, using canonical SKOS `scheme_iri` / `scheme_label` membership rather than source-name, namespace, ontology-document, filesystem, or element-hierarchy fallback grouping.
-- Use a concept-scheme navigator in the left Explorer pane rather than the Model project tree.
-- Show selected concept details, definitions, alternative labels, scope notes, examples, taxonomy, related concepts, exact/close mappings, concept references, mapped ontology terms, and authored relation evidence from generated native concept data.
-- Provide a single Map workspace that shows the selected concept scheme as an interactive concept map; Thesaurus must not expose a Browse/Map segmented mode control.
-- Render Thesaurus Map through the shared design-system product pattern using React Flow for node interaction and a deterministic concept-scheme mind-map layout, with boxed label-first concept nodes and no role labels beside concept names.
-- Open the shared element-detail modal for native `concept-scheme` and `concept` elements when map nodes are activated and source element metadata is available, using a concept-optimized modal body for SKOS properties, concept relations, exact/close mappings, ontology mappings, model usage, and remaining authored relations.
-- Preserve source navigation to the Markdown `concept-scheme` or `concept` element that generated the selected SKOS resource.
-- Keep structural ontology exploration in the Ontologies route, while allowing ontology bridge context such as `reqvire:mapsToConcept` to appear as concept usage evidence.
+Detailed route source, concept-scheme grouping, navigation, modal, map rendering, source navigation, and ontology-boundary rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -400,16 +392,13 @@ The Thesaurus view shall:
 The system shall expose verification traceability as a specialist Explorer view backed by Project Store trace projections and rendered through the shared Explorer shell.
 
 #### Details
-The Traces view shall:
-- Present verification trace flow and trace rows from browser-local Project Store data generated by the serve pipeline.
-- Use the shared Explorer left pane for trace file selection, flow/rows mode controls, selected verification links, and compact summary evidence.
-- Render flow visualizations and Mermaid roll-up diagrams with the same Explorer design-system palette, typography, modal-detail pattern, and non-blocking diagram rendering behavior as other Explorer graph views.
-- Keep trace rendering as a browser-interface concern while Functional Output owns the underlying trace tree construction and Project Store trace data projection.
+Detailed route data, left-pane behavior, flow/row rendering, Mermaid roll-up diagram rendering, modal interaction, and trace-data ownership rules shall follow the associated specifications.
 
 #### Metadata
   * type: requirement
 
 #### Contract Bindings
+  * [Browser Trace Diagram Generation Contract Specification](../../Reports/ModelReports/Specifications.md#browser-trace-diagram-generation-contract-specification)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations

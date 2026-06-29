@@ -23,6 +23,25 @@
   * define: [Cross-Submodel Hierarchical Relation Detection](LintingRequirements.md#cross-submodel-hierarchical-relation-detection)
 ---
 
+### Rust Workspace Lint Policy Specification
+
+The Rust workspace lint policy is expected to provide a common clippy baseline for all workspace crates.
+
+#### Details
+Policy requirements:
+- The root `Cargo.toml` owns `[workspace.lints.clippy]` so lint levels are centralized.
+- `clippy::all`, `clippy::nursery`, `clippy::unwrap_used`, and `clippy::clone_on_ref_ptr` are warning-level checks.
+- `clippy::pedantic` may remain staged until the warning baseline is clean and documented.
+- The `Makefile` exposes a `clippy` target that runs `cargo clippy --workspace --all-targets`.
+- The `Makefile` exposes formatting and e2e targets so implementation quality checks can be run consistently with tests.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Rust Workspace Lint Policy](LintingRequirements.md#rust-workspace-lint-policy)
+---
+
 ### Lint Auto-fix Capability Contract Specification
 
 #### Details
@@ -191,7 +210,7 @@ Redundant verify relation detection behavior:
 - Detects cases where a verification directly verifies both a leaf requirement and its ancestor.
 - Uses verification trace tree analysis to determine ancestor reachability.
 - Treats leaf verification as sufficient when hierarchy roll-up already covers ancestors.
-- Reuses trace-tree logic from [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder).
+- Reuses trace-tree logic from [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction).
 - Reports redundant direct verify relations as model noise.
 - Categorizes these findings as auto-fixable.
 

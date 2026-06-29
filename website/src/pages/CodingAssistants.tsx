@@ -19,7 +19,7 @@ export default function CodingAssistants() {
           items={[
             {
               name: "Claude Code plugin",
-              desc: "Marketplace plugin with Reqvire slash commands and systems-engineering skills for model analysis, requirement authoring, verification work, impact analysis, and task generation.",
+              desc: "Marketplace plugin with Reqvire skills for model analysis, requirement authoring, verification work, impact analysis, and task generation.",
             },
             {
               name: "Codex skill package",
@@ -36,16 +36,22 @@ export default function CodingAssistants() {
       <Section title="Claude Code Plugin">
         <p className="text-zinc-600 mb-4">
           Add the Reqvire marketplace, install the plugin, then restart Claude
-          Code.
+          Code. This is the default Claude Code installation path.
         </p>
         <CodeBlock>{`/plugin marketplace add https://github.com/reqvire-org/reqvire
 /plugin install reqvire@reqvire-org`}</CodeBlock>
+        <p className="text-zinc-600 mt-4 mb-4">
+          Direct skill install is also available for environments that use the
+          local Claude skills folder:
+        </p>
+        <CodeBlock>{`curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install-claude-skill.sh | bash`}</CodeBlock>
         <div className="mt-4">
           <BulletList
             items={[
-              "Skills: syseng, ontology-authoring, and concept-authoring.",
-              "Commands include analyze-model, add-requirement, add-verification, add-capability, analyze-coverage, analyze-impact, collect, lint-model, consolidate, generate-tasks, rename-element, mv, mv-file, and rm.",
-              "Plugin content comes from claude-plugins/skills/syseng, claude-plugins/skills/ontology-authoring, and claude-plugins/skills/concept-authoring.",
+              "Skills: syseng, audit, ontology-authoring, and concept-authoring.",
+              "The direct installer uses CLAUDE_HOME when set, otherwise it installs into ~/.claude/skills.",
+              "Use the plugin for guided model exploration, authoring, impact review, coverage analysis, ontology work, and concept/thesaurus work.",
+              "Skill workflows use the current Reqvire CLI and MCP tool surfaces instead of relying on legacy slash-command inventories.",
             ]}
           />
         </div>
@@ -53,19 +59,30 @@ export default function CodingAssistants() {
 
       <Section title="Codex Skills">
         <p className="text-zinc-600 mb-4">
-          Reqvire includes Codex skill packages in the repository. The installer
-          copies them to{" "}
-          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
-            $CODEX_HOME/skills
-          </code>{" "}
-          and replaces any older Reqvire skill copies.
+          Reqvire also provides Codex skills for semantic engineering workflows.
+          They package guidance for system-model work without requiring users to
+          memorize the full CLI and ontology conventions.
         </p>
-        <CodeBlock>{`./scripts/install-codex-skill.sh
-
-# Installed skill directories
-$CODEX_HOME/skills/reqvire-syseng
-$CODEX_HOME/skills/reqvire-ontology-authoring
-$CODEX_HOME/skills/reqvire-concept-authoring`}</CodeBlock>
+        <CodeBlock>{`curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install-codex-skill.sh | bash`}</CodeBlock>
+        <p className="text-zinc-600 mt-4 mb-4">
+          The installer uses{" "}
+          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
+            CODEX_HOME
+          </code>{" "}
+          when set, otherwise it installs into{" "}
+          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
+            ~/.codex/skills
+          </code>
+          . Restart Codex after installing or updating skills.
+        </p>
+        <BulletList
+          items={[
+            "reqvire-syseng: capability, requirement, contract, verification, traceability, and model-structure work.",
+            "reqvire-audit: validation, linting, coverage, change-impact, and review evidence workflows.",
+            "reqvire-ontology-authoring: authored OWL/Turtle vocabulary, semantic-contract boundaries, and ontology refactoring.",
+            "reqvire-concept-authoring: native SKOS concept schemes, concepts, mappings, and concept-reference authoring.",
+          ]}
+        />
       </Section>
 
       <Section title="MCP Server">

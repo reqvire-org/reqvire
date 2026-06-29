@@ -15,14 +15,6 @@ export default function UserGuide() {
           Quick Install
         </h3>
         <CodeBlock>{`curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install.sh | bash`}</CodeBlock>
-
-        <h3 className="text-lg font-semibold text-zinc-900 mb-3 mt-6">
-          Build from Source
-        </h3>
-        <CodeBlock>{`git clone https://github.com/reqvire-org/reqvire.git
-cd reqvire
-cargo build --release
-target/release/reqvire --version`}</CodeBlock>
       </Section>
 
       <Section title="Workspace Selection">
@@ -54,7 +46,7 @@ npx -y @reqvire-org/reqvire@latest --workspace /path/to/repository mcp`}</CodeBl
             { cmd: "reqvire lint", desc: "Find model quality issues such as redundant relations and cross-boundary hierarchy problems." },
             { cmd: "reqvire lint --auditable", desc: "Report remediation-ready structural findings." },
             { cmd: "reqvire search", desc: "Filter the model by type, file, name, content, relations, and governance metadata." },
-            { cmd: "reqvire model", desc: "Render the ontology/capability-rooted model view with Mermaid diagrams by default." },
+            { cmd: "reqvire model", desc: "Emit the ontology/concept/capability-rooted model view as structured JSON." },
             { cmd: "reqvire traces", desc: "Generate verification trace trees from verifications to owning capability roots." },
             { cmd: "reqvire coverage", desc: "Report verification coverage and requirement implementation coverage." },
             { cmd: "reqvire change-impact", desc: "Analyze review impact from changed model content and relations." },
@@ -64,15 +56,16 @@ npx -y @reqvire-org/reqvire@latest --workspace /path/to/repository mcp`}</CodeBl
 
       <Section title="JSON and Output Files">
         <p className="text-zinc-600 mb-4">
-          Most report commands support{" "}
+          Commands such as validate, search, lint, coverage, collect,
+          submodels, and change-impact support selectable{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             --json
           </code>
-          . Combine it with{" "}
+          . Model, containment, resources, and traces are JSON-only; use{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             --output
           </code>{" "}
-          to write machine-readable output directly to a file.
+          to write their JSON directly to a file.
         </p>
         <CodeBlock>{`reqvire validate --json --output results.json
 reqvire search --json --output search-results.json
@@ -180,26 +173,23 @@ reqvire collect "Capability Requirement" --direction DOWNSTREAM --json
 reqvire collect "Capability Requirement" --direction UPSTREAM --json --output context.json`}</CodeBlock>
       </Section>
 
-      <Section title="Reports and Diagrams">
+      <Section title="Reports">
         <p className="text-zinc-600 mb-4">
-          Reqvire report commands produce Markdown by default where that is
-          useful for review, and JSON for automation. Mermaid diagrams are
-          emitted by model and trace views unless a machine-readable format is
-          requested.
+          Model, containment, resources, and traces reports emit JSON directly.
+          Commands that still support human-readable review output keep their
+          selectable JSON mode for automation.
         </p>
         <CodeBlock>{`reqvire model
-reqvire model --mmd
-reqvire model --json --output reports/model.json
+reqvire model --output reports/model.json
 reqvire model --from "API Authentication"
 reqvire model --filter-type capability,requirement
 
 reqvire traces
-reqvire traces --json --output reports/traces.json
+reqvire traces --output reports/traces.json
 reqvire traces --filter-type test-verification
-reqvire traces --links-with-blobs
 
 reqvire resources
-reqvire resources --json --output reports/resources.json
+reqvire resources --output reports/resources.json
 
 reqvire submodels
 reqvire submodels --from "API Authentication"
@@ -218,7 +208,7 @@ reqvire change-impact --git-commit origin/main
 reqvire change-impact --git-commit origin/main --json --output reports/impact.json
 
 reqvire search --filter-risk high,critical --filter-status review
-reqvire traces --json --output reports/traces.json
+reqvire traces --output reports/traces.json
 reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
         <div className="mt-5">
           <BulletList
@@ -297,7 +287,7 @@ jobs:
           reqvire validate --json --output reports/validate.json
           reqvire lint --auditable --json --output reports/lint.json
           reqvire coverage --json --output reports/coverage.json
-          reqvire traces --json --output reports/traces.json
+          reqvire traces --output reports/traces.json
           reqvire change-impact --git-commit "origin/\${{ github.base_ref }}" --json --output reports/impact.json
 
       - name: Upload Reqvire reports
@@ -373,7 +363,9 @@ jobs:
           if grep -q '/reqvire impact' <<< "\${{ github.event.comment.body }}"; then
             reqvire change-impact --git-commit "$BASE_COMMIT" > reqvire-report.md
           elif grep -q '/reqvire traces' <<< "\${{ github.event.comment.body }}"; then
-            reqvire traces > reqvire-report.md
+            echo '<pre><code class="language-json">' > reqvire-report.md
+            reqvire traces >> reqvire-report.md
+            echo '</code></pre>' >> reqvire-report.md
           elif grep -q '/reqvire coverage' <<< "\${{ github.event.comment.body }}"; then
             reqvire coverage > reqvire-report.md
           fi

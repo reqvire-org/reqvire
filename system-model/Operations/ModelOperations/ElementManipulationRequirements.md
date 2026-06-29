@@ -15,7 +15,7 @@ For hierarchical relinks (`derivedFrom`/`derive`), the operation shall support s
   * definedBy: [Atomic Relation Relink Workflow Specification](Specifications.md#atomic-relation-relink-workflow-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [Atomic Relation Relink Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#atomic-relation-relink-test)
   * verifiedBy: [Verification Objective Mutation Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
 ---
@@ -34,7 +34,8 @@ When a CRUD mutation changes model elements or relations, the system shall rejec
   * definedBy: [CRUD Semantic Contract Validation Specification](Specifications.md#crud-semantic-contract-validation-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
+  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
   * verifiedBy: [Delete Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#delete-element-test)
 ---
 
@@ -60,7 +61,7 @@ The system shall provide the capability to create new model elements by acceptin
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
   * satisfiedBy: [utils.rs](../../../crates/reqvire-core/src/utils.rs)
   * verifiedBy: [Create Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#create-element-test)
@@ -80,7 +81,7 @@ The system shall provide the capability to delete existing model elements while 
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [Delete Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#delete-element-test)
 ---
 
@@ -95,10 +96,9 @@ The system shall persist all element manipulation operations to the source files
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
 
 #### Relations
-  * definedBy: [Element Manipulation File Persistence Contract Specification](Specifications.md#element-manipulation-file-persistence-contract-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [File Persistence Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#file-persistence-test)
 ---
 
@@ -107,9 +107,7 @@ The system shall persist all element manipulation operations to the source files
 The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and contract_bindings while enforcing type compatibility and removing source elements after successful merge.
 
 #### Details
-When the merge target is a `# Element` model file element, the operation shall preserve the `# Element` file format and keep the result as a single-element file.
-The operation shall reject merges where a source element is in a `# Element` file and the target element is in a `# Elements` file. That conversion can violate `# Elements` parsing constraints and shall be performed manually.
-When the target is an ontology element, the operation shall preserve the target ontology metadata, rewrite each source ontology block to the target ontology boundary, and fold all rewritten authored Turtle into the target's single `#### Ontology` block. Ontology merges shall preserve a valid dependency chain by recalculating any affected inherited prefix bindings, document declarations, `owl:imports`, and reachable SHACL references before persistence.
+Detailed merge workflow, document-format, type-compatibility, content transformation, and ontology merge rules shall follow the associated specifications and constraints.
 
 #### Metadata
   * type: requirement
@@ -125,7 +123,8 @@ When the target is an ontology element, the operation shall preserve the target 
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [content_merge.rs](../../../crates/reqvire-core/src/graph_registry/content_merge.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [Merge Elements Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#merge-elements-test)
   * verifiedBy: [Verification Objective Mutation Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
 ---
@@ -150,7 +149,7 @@ The operation shall reject moves into an existing `# Element` file when that mov
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [Move Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#move-element-test)
   * verifiedBy: [Verification Objective Mutation Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
 ---
@@ -160,7 +159,7 @@ The operation shall reject moves into an existing `# Element` file when that mov
 The system shall provide the capability to move entire specification files with all their elements to a new location in the repository while updating all relation references throughout the model.
 
 #### Details
-When `--squash` is requested, the operation shall reject squashing into an existing `# Element` target file. `# Element` files are single-element model files and cannot accept squashed multi-element content.
+Detailed file-move, relation-update, squash-mode, target-validation, and error behavior shall follow the associated contract specification.
 
 #### Metadata
   * type: requirement
@@ -174,7 +173,7 @@ When `--squash` is requested, the operation shall reject squashing into an exist
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [Move File Squash Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#move-file-squash-test)
 ---
 
@@ -191,7 +190,7 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Relation Consistency Maintenance Contract Specification](Specifications.md#relation-consistency-maintenance-contract-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [Relation Consistency Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#relation-consistency-test)
 ---
 
@@ -210,7 +209,7 @@ Implementation details shall follow the associated contract specifications.
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
 ---
 
 ### Target Location Validation and Auto-Creation
@@ -230,7 +229,7 @@ The system shall define target location validation constraints.
 #### Relations
   * definedBy: [Target Location Constraint](Constraints.md#target-location-constraint)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * satisfiedBy: [utils.rs](../../../crates/reqvire-core/src/utils.rs)
   * verifiedBy: [Target Location Validation Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#target-location-validation-test)
 ---

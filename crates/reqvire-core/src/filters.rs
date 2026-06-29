@@ -1,7 +1,7 @@
 use crate::element;
 use crate::error::ReqvireError;
 use crate::relation;
-use globset::{Glob, GlobMatcher};
+use globset::GlobMatcher;
 use regex::Regex;
 
 pub struct Filters {
@@ -28,16 +28,9 @@ impl Filters {
         has_contract_bindings: bool,
         contract_bindings: Option<&str>,
     ) -> Result<Self, ReqvireError> {
-        fn compile_glob(pat: &str) -> Result<GlobMatcher, ReqvireError> {
-            let glob = Glob::new(pat)
-                .map_err(|e| ReqvireError::InvalidGlob(e.to_string()))?
-                .compile_matcher();
-            Ok(glob)
-        }
-
-        let file_glob = file.map(compile_glob).transpose()?;
+        let file_glob = file.map(crate::utils::compile_glob_matcher).transpose()?;
         let name_re = match name_regex {
-            Some(r) => Some(Regex::new(r).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))?),
+            Some(r) => Some(Regex::new(r)?),
             None => None,
         };
         // Validate element type if provided
@@ -55,10 +48,12 @@ impl Filters {
             None
         };
         let content_re = match content {
-            Some(r) => Some(Regex::new(r).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))?),
+            Some(r) => Some(Regex::new(r)?),
             None => None,
         };
-        let contract_bindings_glob = contract_bindings.map(compile_glob).transpose()?;
+        let contract_bindings_glob = contract_bindings
+            .map(crate::utils::compile_glob_matcher)
+            .transpose()?;
 
         Ok(Filters {
             file_glob,

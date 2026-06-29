@@ -50,9 +50,33 @@ The system shall support an opt-in model build mode that computes canonical size
   * definedBy: [Element Size Estimate Model Build Specification](Specifications.md#element-size-estimate-model-build-specification)
   * derivedFrom: [Efficient Processing](#efficient-processing)
   * satisfiedBy: [element.rs](../../crates/reqvire-core/src/element.rs)
-  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [registration.rs](../../crates/reqvire-core/src/graph_registry/registration.rs)
   * satisfiedBy: [model.rs](../../crates/reqvire-core/src/model.rs)
   * verifiedBy: [Element Size Estimate Model Build Verification](../Verifications/ModelStructure/ParsingVerifications.md#element-size-estimate-model-build-verification)
+---
+
+### In-Memory Model Build Cache
+
+The system shall cache parsed `ModelManager` instances keyed by a fingerprint of the scanned workspace markdown files and the active model build options, so that repeated tool dispatches over an unchanged workspace return a cached model without re-parsing.
+
+#### Details
+- The cache key shall combine `ModelBuildOptions` with a sorted map of every scanned `.md` file path to a content fingerprint (`FileFingerprint`) capturing file length and content hash.
+- A cache hit returns a clone of the stored model without re-reading or re-validating any source file.
+- A cache miss rebuilds the model via `parse_and_validate_with_options`, stores the result, and returns a clone.
+- CRUD mutations (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-asset, rm-asset) shall invalidate the cache, forcing a rebuild on the next load.
+- Only the current working tree is cached; git-commit scans bypass the cache and use `parse_and_validate` directly.
+- The cache mutex lock shall be released before rebuild I/O to avoid holding it during parsing.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [In-Memory Model Build Cache Specification](Specifications.md#in-memory-model-build-cache-specification)
+  * derivedFrom: [Efficient Processing](#efficient-processing)
+  * satisfiedBy: [model_cache.rs](../../crates/reqvire-core/src/model_cache.rs)
+  * satisfiedBy: [arg_helpers.rs](../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
+  * verifiedBy: [In-Memory Model Build Cache Verification](../Verifications/ModelStructure/ParsingVerifications.md#in-memory-model-build-cache-verification)
+
 ---
 
 ### Element Manipulation Operations
@@ -137,7 +161,6 @@ The system shall implement relations following clearly defined specifications fo
 
 #### Relations
   * definedBy: [Relation Semantics Specification](Specifications.md#relation-semantics-specification)
-  * definedBy: [Relation Types and behaviors Contract Specification](Specifications.md#relation-types-and-behaviors-contract-specification)
   * derive: [Element Type Relation Compatibility](#element-type-relation-compatibility)
   * derive: [Relation Management Operations](#relation-management-operations)
   * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
@@ -197,9 +220,7 @@ Capability coverage shall remain separate from capability validation. Capability
 The system shall support first-class `ontology` elements for reusable semantic vocabulary and reusable `semantic-contract` elements for SHACL shape profiles that constrain requirements.
 
 #### Details
-Ontology elements shall define ontology vocabulary, model concepts, semantic categories, and reusable domain meaning. Authored Reqvire ontology elements shall be kept under the dedicated `system-model/Ontologies` folder rather than nested in capability files. The top parent ontology element in each ontology subgraph shall define non-empty `ontology_base` and `ontology_prefix` metadata; descendant ontology elements inherit both through `derivedFrom`/`derive` hierarchy. Authored OWL ontology blocks define classes, properties, individuals, hierarchy, and axioms in the corresponding hash term namespace. The root ontology block should explicitly declare `<ontology_base> a owl:Ontology` for authored OWL document identity. Reqvire uses the inherited `ontology_prefix` as the canonical CURIE label and `<ontology_base>#` as the canonical namespace; authored Turtle blocks that use the inherited prefix must explicitly declare that prefix to the canonical namespace, and validation fails when the declaration is missing or points to a different namespace. Reqvire emits one generated document-level `owl:Ontology` declaration per resolved `ontology_base`; ontology elements that inherit the same base contribute authored vocabulary to that same document, while `derivedFrom` across different resolved bases becomes `owl:imports`. Authored child ontology blocks do not need to repeat document-level `owl:Ontology` or `owl:imports` declarations. Ontology-controlled vocabulary records shall carry formal semantics through IRI identity, typed class membership, hierarchy, and axioms; standard annotation properties such as `rdfs:label` and `rdfs:comment` may be used for optional presentation metadata, but canonical authored tokens, parser fields, interface enum values, report kinds, controlled-vocabulary payloads, and queryable meanings shall remain declared domain properties. Deprecated presentation-only ontology properties shall not remain in authored Reqvire ontology source after refactoring. Semantic contracts shall define reusable SHACL shape profiles that explicitly use ontology through `use`/`usedBy`, may constrain zero or more requirements through `constrainedBy`/`constrain`, and must not define ontology vocabulary. The model structure capability must include ontology rebasing as part of the owned ontology context, so that changes to `ontology_base` or `ontology_prefix` are handled atomically and the dependent boundary chain is rewritten rather than edited piecemeal.
-
-Non-ontology, non-semantic-contract elements may bind readable prose to SKOS concepts with `#### Concept References`. Requirement elements may be constrained by semantic contracts through `constrainedBy`/`constrain`. Semantic contracts use ontology vocabulary through `use`/`usedBy`; they are already part of the semantic graph and must not author concept references. Requirements may be defined by source, behavior, state, specification, constraint, and input-output contracts when they need subordinate detail over ontology-backed terms. Capabilities must not own source, constraint, behavior, specification, state, input-output, or semantic-contract elements through `definedBy`/`define`.
+Detailed ontology metadata, inheritance, OWL document, semantic-contract, concept-reference, contract ownership, validation, indexing, export, and rebasing rules shall follow the associated specifications and constraints.
 
 #### Metadata
   * type: requirement
@@ -264,8 +285,7 @@ The system shall enforce scope constraints on contract-element contract_bindings
 The system shall enforce element type constraints for relation types, ensuring that only valid combinations of source and target element types are allowed for each relation type.
 
 #### Details
-The system shall define element type relation compatibility constraints.
-Mutation commands that create or rewrite relations shall enforce the same compatibility matrix before persisting source files.
+Detailed compatibility matrix, source/target type rules, and mutation enforcement rules shall follow the associated constraint and type specifications.
 
 #### Metadata
   * type: requirement
@@ -274,7 +294,8 @@ Mutation commands that create or rewrite relations shall enforce the same compat
   * definedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
   * definedBy: [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
+  * satisfiedBy: [validation.rs](../../crates/reqvire-core/src/graph_registry/validation.rs)
   * satisfiedBy: [relation.rs](../../crates/reqvire-core/src/relation.rs)
   * verifiedBy: [Verification Objective Mutation Test](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
   * verifiedBy: [Element Type Relation Compatibility Test](../Verifications/Operations/Validation/ValidationVerifications.md#element-type-relation-compatibility-test)
@@ -306,7 +327,7 @@ When unlinking, the system shall:
   * definedBy: [Relation Operations Specification](Specifications.md#relation-operations-specification)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
   * satisfiedBy: [crud.rs](../../crates/reqvire-core/src/crud.rs)
-  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [crud_ops.rs](../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [Link Command Verification](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#unlink-command-verification)
   * verifiedBy: [Verification Objective Mutation Test](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
@@ -328,7 +349,7 @@ Governance metadata behavior shall follow the associated contract specifications
 #### Relations
   * definedBy: [Requirement Governance Metadata Inheritance Behavior](Behaviors.md#requirement-governance-metadata-inheritance-behavior)
   * satisfiedBy: [element.rs](../../crates/reqvire-core/src/element.rs)
-  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [hierarchy.rs](../../crates/reqvire-core/src/graph_registry/hierarchy.rs)
   * satisfiedBy: [search.rs](../../crates/reqvire-core/src/search.rs)
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
   * verifiedBy: [Requirement Governance Metadata Verification](../Verifications/ModelStructure/ParsingVerifications.md#requirement-governance-metadata-verification)

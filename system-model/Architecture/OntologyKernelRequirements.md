@@ -5,9 +5,7 @@
 The system shall keep consumer-specific parsing, source mapping, diagnostics, runtime graph policy, store assembly policy, and response shaping outside `o-kernel`.
 
 #### Details
-The o-kernel shall not depend on consumer element models, model registries, source-document formats, source-location metadata, runtime graph visibility rules, or presentation DTOs.
-
-Consumers shall adapt their own data into RDF quads and shall map kernel results back to source locations outside the kernel boundary.
+Detailed boundary, adaptation, and consumer-ownership rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -27,7 +25,7 @@ Consumers shall adapt their own data into RDF quads and shall map kernel results
 The system shall provide an `o-kernel` crate that exposes a generic contract for standards-based RDF, RDFS, OWL, XSD, SHACL, and SPARQL-compatible ontology processing.
 
 #### Details
-The kernel contract shall define reusable algorithm services over RDF data without assuming any consumer-specific model, document language, source map, graph-layer policy, or presentation format.
+Detailed public API, dependency-direction, and consumer-exclusion rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -72,9 +70,7 @@ The o-kernel shall expose separate vocabulary, RDF utility, SHACL, ontology inde
 The system shall provide an o-kernel service that constructs description triples for selected RDF terms from supplied RDF graph data.
 
 #### Details
-The service shall accept selected RDF terms, supplied RDF graph data, support predicate policy, annotation predicate policy, and support depth policy. It shall construct direct description triples, selected support triples, and selected annotation triples without assuming why the terms were selected or how the constructed triples will be exposed.
-
-The service shall not depend on consumer source declarations, external dependency policy, output visibility rules, source maps, diagnostics, or presentation payloads.
+Detailed term selection, support/annotation policy, depth policy, construction, metadata, and consumer-boundary rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -95,7 +91,7 @@ The service shall not depend on consumer source declarations, external dependenc
 The system shall provide an o-kernel service that constructs a bounded external ontology dependency subset graph from dependency RDF graphs referenced by ontology graphs of interest.
 
 #### Details
-The service shall accept ontology graphs of interest and external dependency RDF graphs. It shall own the standard ontology dependency subset profile for reference extraction, support context, annotation context, RDF list closure, and bounded expansion. It shall discover dependency terms referenced by the ontology graphs of interest, construct a bounded subset graph for those dependency terms, and return generic construction metadata. Consumer-specific graph role assignment, source provenance, output visibility, and presentation mapping shall remain outside the service.
+Detailed graph inputs, dependency profile, reference extraction, support context, annotation context, RDF list closure, bounded expansion, metadata, and consumer-boundary rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -136,7 +132,7 @@ The kernel shall not introduce a custom RDF store, triple model, quad model, que
 The system shall provide standards-based SHACL syntax services, reserved vocabulary recognition, and ontology construct classification as o-kernel services.
 
 #### Details
-The kernel services shall include SHACL target, path, constraint, and syntax sanity parsing; generic RDF/RDFS/OWL/XSD/SHACL vocabulary constants; reserved vocabulary recognition; and generic ontology construct classification over RDF quads.
+Detailed SHACL, reserved-vocabulary, RDF utility, and construct-classification service rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -159,7 +155,7 @@ The kernel services shall include SHACL target, path, constraint, and syntax san
 The system shall classify direct-authored OWL, RDFS, RDF, and SHACL constructs from RDF quads without applying reasoning or consumer-specific layer placement.
 
 #### Details
-The classifier shall identify construct families such as property domain/range, subclass inclusion, class membership, disjointness, equivalence, inverse properties, property chains, property characteristics, restrictions, class expressions, and SHACL shape overlays. Classification shall preserve RDF list member order for ordered RDF constructs and shall return generic construct records. Consumer-specific source provenance and runtime graph placement shall remain outside the classifier.
+The classifier shall cover standards-based ontology construct families and return consumer-neutral construct records. Detailed construct families, ordering, namespace, provenance, and consumer-boundary rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -180,9 +176,7 @@ The classifier shall identify construct families such as property domain/range, 
 The system shall align compiled SHACL shape registries against a supplied domain ontology index.
 
 #### Details
-The aligner shall accept a compiled shape registry and a domain ontology index derived from supplied RDF quads. The index shall expose declared classes, properties, datatypes, and available named terms from that supplied graph. The aligner shall cross-check SHACL targets, paths, class constraints, datatype constraints, target-node references, and relational property constraints against that supplied ontology index, then return generic alignment errors.
-
-Value constraints such as `sh:hasValue` and `sh:in` shall be preserved in the registry without requiring every value IRI to be a declared ontology term.
+Detailed registry inputs, ontology-index contents, SHACL reference checks, value-constraint handling, and diagnostic rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -224,11 +218,7 @@ The parser registry shall consume RDF terms and quads, discover SHACL shape node
 The system shall recognize RDF, RDFS, OWL, XSD, and SHACL reserved vocabulary IRIs by expanded IRI and semantic position.
 
 #### Details
-Reserved vocabulary recognition shall be based on expanded IRIs, not prefix-name matching. RDF, RDFS, OWL, and SHACL vocabulary terms shall be derived from compile-time bundled standards RDF/Turtle graphs owned by o-kernel. XSD datatype and facet recognition shall remain an explicit kernel datatype policy because XML Schema datatypes are language built-ins rather than a project external ontology source.
-
-The registry shall classify reserved IRIs by semantic position, including built-in datatypes, datatype facets, annotation vocabulary, reserved classes, reserved object properties, reserved data properties, and SHACL syntax vocabulary.
-
-The registry shall not treat arbitrary custom IRIs as reserved vocabulary merely because an IRI starts with a standard namespace.
+Detailed expanded-IRI matching, bundled standards graph, datatype/facet, semantic-position, and rejection rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement

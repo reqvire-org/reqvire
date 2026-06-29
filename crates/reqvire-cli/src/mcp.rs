@@ -1,5 +1,5 @@
 use globset::GlobSet;
-use reqvire::error::ReqvireError;
+use reqvire::error::{ReqvireError, ValidationDiagnostic};
 use reqvire::mcp_prompts::{prompt_definitions_json, prompt_get_result_json};
 use reqvire::tool_interface::{
     request_requires_write_tool, resource_definitions as shared_resource_definitions,
@@ -131,6 +131,7 @@ impl ReqvireMcpServer {
     }
 }
 
+#[allow(clippy::manual_async_fn)]
 impl ServerHandler for ReqvireMcpServer {
     fn get_info(&self) -> ServerInfo {
         ServerInfo::new(
@@ -420,10 +421,7 @@ fn handle_rpc_value(
         }
     };
 
-    if request.id.is_none() {
-        return None;
-    }
-
+    request.id.as_ref()?;
     let id = request.id.unwrap_or(Value::Null);
     match request.method.as_str() {
         "tools/list" => Some(rpc_result(
@@ -606,11 +604,27 @@ fn tool_error(tool_name: &str, err: ReqvireError) -> Value {
 }
 
 fn reqvire_error(tool_name: &str, err: ReqvireError) -> Value {
+    let mut diagnostics: Option<Vec<Value>> = None;
     let (code, related_errors) = match &err {
         ReqvireError::ValidationError(errors) => (
             "validation_failed",
             Some(errors.iter().map(ToString::to_string).collect::<Vec<_>>()),
         ),
+        ReqvireError::ValidationDiagnostics {
+            diagnostics: diags,
+            related_errors: errors,
+        } => {
+            diagnostics = Some(
+                diags
+                    .iter()
+                    .map(|d| diagnostic_to_value(d))
+                    .collect::<Vec<_>>(),
+            );
+            (
+                "validation_failed",
+                Some(errors.iter().map(ToString::to_string).collect::<Vec<_>>()),
+            )
+        }
         ReqvireError::DuplicateElement(_) => ("duplicate_element", None),
         ReqvireError::ElementNotFound(_) | ReqvireError::MissingElement(_) => {
             ("element_not_found", None)
@@ -629,16 +643,45 @@ fn reqvire_error(tool_name: &str, err: ReqvireError) -> Value {
         ReqvireError::IoError(_) => ("filesystem_error", None),
         ReqvireError::GitCommandError(_) => ("git_error", None),
         ReqvireError::SerializationError(_) => ("serialization_error", None),
+        ReqvireError::SerdeJsonError(_) => ("serialization_error", None),
         _ => ("reqvire_error", None),
     };
 
-    json!({
+    let mut error = json!({
         "code": code,
         "message": err.to_string(),
         "tool": tool_name,
         "recoverability": recoverability_hint(code),
         "related_errors": related_errors
-    })
+    });
+    if let Some(diags) = diagnostics {
+        error["diagnostics"] = json!(diags);
+    }
+    error
+}
+
+fn diagnostic_to_value(diagnostic: &ValidationDiagnostic) -> Value {
+    let mut value = json!({
+        "code": diagnostic.code,
+        "message": diagnostic.message,
+    });
+    if let Some(context) = &diagnostic.context {
+        let mut ctx = serde_json::Map::new();
+        if let Some(file) = &context.file {
+            ctx.insert("file".to_string(), Value::String(file.clone()));
+        }
+        if let Some(line) = context.line {
+            ctx.insert("line".to_string(), Value::Number(line.into()));
+        }
+        if let Some(column) = context.column {
+            ctx.insert("column".to_string(), Value::Number(column.into()));
+        }
+        if let Some(element_id) = &context.element_id {
+            ctx.insert("element_id".to_string(), Value::String(element_id.clone()));
+        }
+        value["context"] = Value::Object(ctx);
+    }
+    value
 }
 
 fn recoverability_hint(code: &str) -> &'static str {

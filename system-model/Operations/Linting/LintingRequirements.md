@@ -21,12 +21,33 @@ When filtering lint results, the system shall allow focusing on specific categor
 #### Relations
   * constrainedBy: [Lint Rule Metadata Shape](../../Ontologies/BehaviorValidationOperations.md#lint-rule-metadata-shape)
   * definedBy: [Lint Output Specification](Specifications.md#lint-output-specification)
+  * derive: [Rust Workspace Lint Policy](#rust-workspace-lint-policy)
   * derive: [Cross-Submodel Hierarchical Relation Detection](#cross-submodel-hierarchical-relation-detection)
   * derive: [Lint Auto-fix Capability](#lint-auto-fix-capability)
   * derive: [Multi-Branch Convergence Detection](#multi-branch-convergence-detection)
   * derive: [Redundant Hierarchical Relations Detection and Auto-Removal](#redundant-hierarchical-relations-detection-and-auto-removal)
   * derive: [Redundant Verify Relations Detection](#redundant-verify-relations-detection)
   * specify: [Linting Model Quality](../BehaviorValidationOperationsFeature.md#linting-model-quality)
+---
+
+### Rust Workspace Lint Policy
+
+The system shall define and run a Rust workspace lint policy for implementation quality checks.
+
+#### Details
+- The workspace shall define shared clippy lint levels in the root Cargo manifest.
+- The workspace shall provide a repeatable clippy command target.
+- The lint policy shall warn on targeted risks identified by code review, including broad clippy checks, `clippy::nursery`, `unwrap_used`, and reference-counted clone mistakes.
+- Pedantic linting may remain staged separately when enabling it would create broad low-value churn.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Rust Workspace Lint Policy Specification](Specifications.md#rust-workspace-lint-policy-specification)
+  * derivedFrom: [Model Linting](#model-linting)
+  * satisfiedBy: [Cargo.toml](../../../Cargo.toml)
+  * satisfiedBy: [Makefile](../../../Makefile)
 ---
 
 ### Cross-Submodel Hierarchical Relation Detection
@@ -100,7 +121,7 @@ The system shall detect and auto-remove redundant derivedFrom relations where an
 
 ### Redundant Verify Relations Detection
 
-The system shall detect redundant verify relations where a verification directly verifies both a child requirement and its ancestor in the requirement hierarchy, leveraging the existing verification trace tree logic from the Verification Trace Builder.
+The system shall detect redundant direct verify relations.
 
 #### Details
 Implementation details shall follow the associated contract specifications.

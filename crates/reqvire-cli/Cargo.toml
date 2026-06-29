@@ -18,6 +18,9 @@ dist = true
 npm-scope = "@reqvire-org"
 npm-package = "reqvire"
 
+[lints]
+workspace = true
+
 [dependencies]
 reqvire = { workspace = true }
 
@@ -28,15 +31,13 @@ clap = { workspace = true }
 log = { workspace = true }
 env_logger = { workspace = true }
 
-# Error handling
-anyhow = { workspace = true }
-
 # Serialization
 serde = { workspace = true }
 serde_json = { workspace = true }
 
 # File handling
 globset = { workspace = true }
+rustc-hash = { workspace = true }
 ignore = "0.4"
 
 # HTTP server
@@ -44,7 +45,7 @@ tokio = { workspace = true }
 axum = { workspace = true }
 tower-http = { workspace = true }
 percent-encoding = { workspace = true }
-rmcp = { version = "1.6.0", features = ["server", "macros", "schemars", "transport-streamable-http-server"] }
+rmcp = { version = "1.8.0", features = ["server", "macros", "schemars", "transport-streamable-http-server"] }
 
 [dev-dependencies]
 assert_fs = { workspace = true }
