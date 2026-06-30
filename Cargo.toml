@@ -14,7 +14,7 @@ unwrap_used = "warn"
 clone_on_ref_ptr = "warn"
 
 [workspace.package]
-version = "1.2.0"
+version = "1.2.1"
 edition = "2021"
 rust-version = "1.86"
 license = "Apache-2.0"

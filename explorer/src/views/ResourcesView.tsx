@@ -2,6 +2,7 @@ import { useStore } from "../store/StoreContext";
 import { ViewFrame } from "./ViewFrame";
 import type { ExplorerViewProps } from "./types/ExplorerViewProps";
 import { SourceCodePreview } from "../rendering/SourceCodePreview";
+import { routeForResource } from "../router/routes";
 import {
   DocumentPanelToolbar,
   ResourceDetailCard,
@@ -64,7 +65,7 @@ export function ResourcesView({
     kind: r.kind,
     display: r.display,
     target: r.target,
-    href: r.file_path ? `#/content/${r.file_path}` : null,
+    href: routeForResource(r.id),
     externalUrl: r.external_url,
     relationTypes: r.relation_types,
   }));

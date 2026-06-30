@@ -81,6 +81,10 @@ export function routeForContent(path: string): string {
   return `#/content/${path}`;
 }
 
+export function routeForResource(identifier: string): string {
+  return `#/resources/${identifier}`;
+}
+
 export function routeForSearch(query: string): string {
   const trimmed = query.trim();
   return trimmed ? `#/search/${encodeURIComponent(trimmed)}` : "#/search";

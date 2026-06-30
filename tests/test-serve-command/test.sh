@@ -118,11 +118,15 @@ if ! echo "$STORE_CONTENT" | grep -q '"path": "specifications/Requirements.md"';
     exit 1
 fi
 
-if ! echo "$STORE_CONTENT" | grep -q '"path": "scripts/evidence.sh"' ||
-   ! echo "$STORE_CONTENT" | grep -q '"parent_folder": "scripts"' ||
+if echo "$STORE_CONTENT" | grep -q '"path": "scripts/evidence.sh"'; then
+    echo "❌ FAILED: Project Store included a resource-only evidence file in the model tree"
+    exit 1
+fi
+
+if ! echo "$STORE_CONTENT" | grep -q '"file_path": "scripts/evidence.sh"' ||
    ! echo "$STORE_CONTENT" | grep -q '"id": "resource:scripts/evidence.sh"' ||
    ! echo "$STORE_CONTENT" | grep -q 'serve command evidence'; then
-    echo "❌ FAILED: Project Store did not include the existing graph-referenced evidence file as a resource-backed tree file"
+    echo "❌ FAILED: Project Store did not include the existing graph-referenced evidence file as a resource"
     exit 1
 fi
 

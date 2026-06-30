@@ -13,7 +13,7 @@ export const devFixture: ExplorerProjectStore = {
   schema_version: EXPECTED_SCHEMA_VERSION,
   project: {
     name: "reqvire",
-    root_label: "reqvire @ dev-fixture",
+    root_label: "reqvire workspace",
     workspace_root: "/workspace/reqvire",
     eligible_git_worktrees: [
       {
@@ -37,7 +37,6 @@ export const devFixture: ExplorerProjectStore = {
         "system-model/Verifications",
         "system-model/Ontologies",
         "system-model/Thesaurus",
-        "system-model/Evidence",
         "system-model/Specifications.md",
       ],
     },
@@ -47,7 +46,6 @@ export const devFixture: ExplorerProjectStore = {
     { path: "system-model/Verifications", parent: "system-model", children: ["system-model/Verifications/API.md"] },
     { path: "system-model/Ontologies", parent: "system-model", children: ["system-model/Ontologies/API.md"] },
     { path: "system-model/Thesaurus", parent: "system-model", children: ["system-model/Thesaurus/Thesaurus.md"] },
-    { path: "system-model/Evidence", parent: "system-model", children: ["system-model/Evidence/api-smoke-report.json", "system-model/Evidence/openapi-fragment.yaml"] },
   ],
   files: [
     {
@@ -199,22 +197,6 @@ export const devFixture: ExplorerProjectStore = {
         "system-model/Specifications.md#verification-coverage",
       ],
       resource_ids: [],
-    },
-    {
-      path: "system-model/Evidence/api-smoke-report.json",
-      display_path: "system-model/Evidence/api-smoke-report.json",
-      markdown_content: "{\n  \"status\": \"passed\",\n  \"checks\": [\"endpoint\", \"payload\", \"error-response\"]\n}\n",
-      parent_folder: "system-model/Evidence",
-      element_ids: [],
-      resource_ids: ["resource:system-model/Evidence/api-smoke-report.json"],
-    },
-    {
-      path: "system-model/Evidence/openapi-fragment.yaml",
-      display_path: "system-model/Evidence/openapi-fragment.yaml",
-      markdown_content: "paths:\n  /fixture:\n    get:\n      operationId: getFixture\n",
-      parent_folder: "system-model/Evidence",
-      element_ids: [],
-      resource_ids: ["resource:system-model/Evidence/openapi-fragment.yaml"],
     },
     {
       path: "system-model/Specifications.md",
@@ -1899,8 +1881,8 @@ export const devFixture: ExplorerProjectStore = {
   ],
   summaries: {
     elements: 16,
-    files: 9,
-    folders: 7,
+    files: 7,
+    folders: 6,
     resources: 3,
     relations: 13,
     contract_bindings: 0,

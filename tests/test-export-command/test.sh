@@ -51,11 +51,15 @@ if ! grep -q '"path": "specifications/Requirements.md"' "$EXPORT_DIR/assets/proj
     exit 1
 fi
 
-if ! grep -q '"path": "scripts/evidence.sh"' "$EXPORT_DIR/assets/project-store.js" ||
-   ! grep -q '"parent_folder": "scripts"' "$EXPORT_DIR/assets/project-store.js" ||
+if grep -q '"path": "scripts/evidence.sh"' "$EXPORT_DIR/assets/project-store.js"; then
+    echo "❌ FAILED: Project Store included a resource-only evidence file in the model tree"
+    exit 1
+fi
+
+if ! grep -q '"file_path": "scripts/evidence.sh"' "$EXPORT_DIR/assets/project-store.js" ||
    ! grep -q '"id": "resource:scripts/evidence.sh"' "$EXPORT_DIR/assets/project-store.js" ||
    ! grep -q 'export command evidence' "$EXPORT_DIR/assets/project-store.js"; then
-    echo "❌ FAILED: Project Store did not include the existing graph-referenced evidence file as a resource-backed tree file"
+    echo "❌ FAILED: Project Store did not include the existing graph-referenced evidence file as a resource"
     exit 1
 fi
 

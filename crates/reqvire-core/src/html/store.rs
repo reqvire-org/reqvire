@@ -10,7 +10,7 @@ use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
-use std::path::{Component, Path, PathBuf};
+use std::path::{Path, PathBuf};
 
 const SCHEMA_VERSION: &str = "2026-06-30.project-store.v4";
 
@@ -305,15 +305,14 @@ fn build_project_metadata() -> ProjectStoreProject {
     let eligible_git_worktrees = project_store_git_worktrees();
     let repository = resolve_repository_name();
     let branch = git_commands::get_branch_name().ok();
+    let workspace_name = workspace_display_name(&workspace_root);
     let name = repository
         .clone()
-        .unwrap_or_else(|| "Reqvire project".to_string());
-    let root_label = match (&repository, &branch) {
-        (Some(repo), Some(branch)) => format!("{repo} @ {branch}"),
-        (Some(repo), None) => repo.clone(),
-        (None, Some(branch)) => format!("Reqvire project @ {branch}"),
-        (None, None) => "Reqvire root".to_string(),
-    };
+        .or_else(|| workspace_name.clone())
+        .unwrap_or_else(|| "Reqvire workspace".to_string());
+    let root_label = workspace_name
+        .map(|name| format!("{name} workspace"))
+        .unwrap_or_else(|| "Reqvire workspace".to_string());
 
     ProjectStoreProject {
         name,
@@ -323,6 +322,15 @@ fn build_project_metadata() -> ProjectStoreProject {
         repository,
         branch,
     }
+}
+
+fn workspace_display_name(workspace_root: &str) -> Option<String> {
+    Path::new(workspace_root)
+        .file_name()
+        .and_then(|name| name.to_str())
+        .map(str::trim)
+        .filter(|name| !name.is_empty() && *name != ".")
+        .map(str::to_string)
 }
 
 fn project_store_git_worktrees() -> Vec<ProjectStoreGitWorktree> {
@@ -933,9 +941,7 @@ fn build_files_and_folders(
     resources: &BTreeMap<String, ProjectStoreResource>,
 ) -> (Vec<ProjectStoreFile>, Vec<ProjectStoreFolder>) {
     let grouped = registry.group_elements_by_location();
-    let mut included_paths: BTreeSet<String> = grouped.keys().cloned().collect();
     let mut resource_ids_by_file: BTreeMap<String, Vec<String>> = BTreeMap::new();
-    let mut resource_text_by_file: BTreeMap<String, String> = BTreeMap::new();
     let mut files = Vec::new();
     let mut folder_children: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
 
@@ -943,19 +949,10 @@ fn build_files_and_folders(
         let Some(file_path) = resource.file_path.as_deref() else {
             continue;
         };
-        if !is_existing_local_project_file_path(file_path) {
-            continue;
-        }
-        included_paths.insert(file_path.to_string());
         resource_ids_by_file
             .entry(file_path.to_string())
             .or_default()
             .push(resource.id.clone());
-        if let Some(source_text) = resource.source_text.as_ref() {
-            resource_text_by_file
-                .entry(file_path.to_string())
-                .or_insert_with(|| source_text.clone());
-        }
     }
 
     for ids in resource_ids_by_file.values_mut() {
@@ -963,14 +960,10 @@ fn build_files_and_folders(
         ids.dedup();
     }
 
-    for path in included_paths {
-        let elements = grouped.get(&path).cloned().unwrap_or_default();
+    for (path, elements) in grouped {
         let resource_ids = resource_ids_by_file
             .remove(path.as_str())
             .unwrap_or_default();
-        if elements.is_empty() && resource_ids.is_empty() {
-            continue;
-        }
         let folder = Path::new(&path)
             .parent()
             .map(path_string)
@@ -980,11 +973,7 @@ fn build_files_and_folders(
             .or_default()
             .insert(path.clone());
         add_folder_ancestors(&folder, &mut folder_children);
-        let markdown_content = if elements.is_empty() {
-            resource_text_by_file.remove(&path).unwrap_or_default()
-        } else {
-            registry.generate_file_markdown(&path, &elements, true)
-        };
+        let markdown_content = registry.generate_file_markdown(&path, &elements, true);
         files.push(ProjectStoreFile {
             display_path: path.clone(),
             markdown_content,
@@ -1012,33 +1001,6 @@ fn build_files_and_folders(
         })
         .collect();
     (files, folders)
-}
-
-fn is_local_project_file_path(path: &str) -> bool {
-    let path = Path::new(path);
-    !path.is_absolute()
-        && !path
-            .components()
-            .any(|component| matches!(component, Component::ParentDir))
-}
-
-fn is_existing_local_project_file_path(path: &str) -> bool {
-    if !is_local_project_file_path(path) {
-        return false;
-    }
-    let Some(project_root) = project_root_dir() else {
-        return false;
-    };
-    let candidate = project_root.join(path);
-    let eligible = crate::workspace::WorkspaceScope::discover_from(project_root.clone())
-        .map(|scope| scope.is_eligible_path(&candidate))
-        .unwrap_or(false);
-    if !eligible {
-        return false;
-    }
-    fs::metadata(candidate)
-        .map(|metadata| metadata.is_file())
-        .unwrap_or(false)
 }
 
 fn project_root_dir() -> Option<PathBuf> {
@@ -1270,14 +1232,7 @@ fn build_search_documents(
             text: file.display_path.clone(),
         });
     }
-    let included_resource_ids: BTreeSet<&str> = files
-        .iter()
-        .flat_map(|file| file.resource_ids.iter().map(String::as_str))
-        .collect();
     for resource in resources.values() {
-        if resource.file_path.is_some() && !included_resource_ids.contains(resource.id.as_str()) {
-            continue;
-        }
         docs.push(ProjectStoreSearchDocument {
             id: resource.id.clone(),
             kind: "resource".to_string(),
@@ -1729,7 +1684,7 @@ ext:UnusedTerm a owl:Class ;
     }
 
     #[test]
-    fn explorer_files_include_only_model_files_and_registry_linked_resources() {
+    fn explorer_files_include_only_model_files_and_keeps_resources_separate() {
         let mut registry = GraphRegistry::new();
         registry.register_page(
             "README.md".to_string(),
@@ -1790,7 +1745,7 @@ ext:UnusedTerm a owl:Class ;
             .map(|file| file.path.as_str())
             .collect::<BTreeSet<_>>();
         assert!(file_paths.contains("system-model/API.md"));
-        assert!(file_paths.contains("crates/reqvire-core/src/html/store.rs"));
+        assert!(!file_paths.contains("crates/reqvire-core/src/html/store.rs"));
         assert!(!file_paths.contains("src/generated_placeholder.rs"));
         assert!(!file_paths.contains("README.md"));
         assert!(!file_paths.contains("notes/Plan.md"));
@@ -1803,18 +1758,17 @@ ext:UnusedTerm a owl:Class ;
             model_file.element_ids,
             vec!["system-model/API.md#api-requirement".to_string()]
         );
-        let resource_file = files
-            .iter()
-            .find(|file| file.path == "crates/reqvire-core/src/html/store.rs")
-            .expect("existing relation-backed resource file should be present in the tree");
-        assert!(resource_file.element_ids.is_empty());
-        assert_eq!(resource_file.parent_folder, "crates/reqvire-core/src/html");
+        let resource = resources
+            .get("resource:crates/reqvire-core/src/html/store.rs")
+            .expect("existing relation-backed resource should be preserved as a resource");
         assert_eq!(
-            resource_file.resource_ids,
-            vec!["resource:crates/reqvire-core/src/html/store.rs".to_string()]
+            resource.file_path.as_deref(),
+            Some("crates/reqvire-core/src/html/store.rs")
         );
-        assert!(resource_file
-            .markdown_content
+        assert!(resource
+            .source_text
+            .as_deref()
+            .unwrap_or_default()
             .contains("build_project_store"));
 
         let search_ids = search
@@ -1824,7 +1778,7 @@ ext:UnusedTerm a owl:Class ;
         assert!(search_ids.contains("system-model/API.md#api-requirement"));
         assert!(search_ids.contains("system-model/API.md"));
         assert!(search_ids.contains("resource:crates/reqvire-core/src/html/store.rs"));
-        assert!(!search_ids.contains("resource:src/generated_placeholder.rs"));
+        assert!(search_ids.contains("resource:src/generated_placeholder.rs"));
         assert!(!search_ids.contains("crates/reqvire-core/src/html/store.rs"));
         assert!(!search_ids.contains("src/generated_placeholder.rs"));
         assert!(!search_ids.contains("README.md"));

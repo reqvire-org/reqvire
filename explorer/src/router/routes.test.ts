@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseHash, routeForElement, routeForView } from "./routes";
+import { parseHash, routeForElement, routeForResource, routeForView } from "./routes";
 
 describe("parseHash", () => {
   it("defaults empty hash to model", () => {
@@ -64,6 +64,7 @@ describe("parseHash", () => {
   it("round-trips view and element route builders", () => {
     expect(routeForView("traces")).toBe("#/traces");
     expect(routeForElement("a/b.md#c")).toBe("#/elements/a/b.md#c");
+    expect(routeForResource("resource:a/b.txt")).toBe("#/resources/resource:a/b.txt");
     expect(parseHash(routeForElement("a/b.md#c"), "model").elementId).toBe("a/b.md#c");
   });
 });

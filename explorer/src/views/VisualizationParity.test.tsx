@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { useEffect, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { ExplorerSidePane } from "../components/ExplorerSidePane";
@@ -184,6 +184,40 @@ describe("native visualization parity views", () => {
     expect(screen.getByRole("tree", { name: "Concept hierarchy" })).toBeTruthy();
     expect(screen.getByText("Example Thesaurus")).toBeTruthy();
     expect(screen.getByText("Service Endpoint")).toBeTruthy();
+  });
+
+  it("shows graph-linked resources in the model tree with folder structure", () => {
+    window.location.hash = "#/model";
+    renderWithStore(
+      <ExplorerSidePane
+        activeView="model"
+        open
+        onToggle={vi.fn()}
+        onNavigate={vi.fn()}
+        onOpenElement={vi.fn()}
+        onOpenOntologyNode={vi.fn()}
+      />,
+    );
+
+    const tree = screen.getByRole("tree", { name: "Project tree" });
+    expect(within(tree).queryByText("reqvire workspace")).toBeNull();
+    expect(within(tree).queryByText("reqvire @ dev-fixture")).toBeNull();
+    expect(within(tree).getByText("Model")).toBeTruthy();
+    expect(within(tree).getByText("Resources")).toBeTruthy();
+    expect(within(tree).getAllByText("reqvire").length).toBeGreaterThanOrEqual(2);
+    expect(within(tree).getAllByText("system-model").length).toBeGreaterThanOrEqual(1);
+
+    const search = screen.getByRole("searchbox", { name: "Filter project tree" });
+    fireEvent.change(search, { target: { value: "api-smoke" } });
+
+    expect(within(tree).getByText("reqvire")).toBeTruthy();
+    expect(within(tree).getByText("Evidence")).toBeTruthy();
+    const resourceRow = within(tree).getByTitle("system-model/Evidence/api-smoke-report.json");
+    expect(resourceRow.querySelector('[data-element-role="other"]')).toBeTruthy();
+    expect(resourceRow.querySelector('[data-element-role="resource"]')).toBeNull();
+    fireEvent.click(resourceRow);
+
+    expect(window.location.hash).toBe("#/resources/resource:system-model/Evidence/api-smoke-report.json");
   });
 
   it("collapses a selected thesaurus branch when its row is clicked again", () => {

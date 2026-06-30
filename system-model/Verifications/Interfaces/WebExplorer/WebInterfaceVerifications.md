@@ -133,7 +133,7 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 - System shall serve `index.html` as the primary SPA Explorer shell and browser-local Project Store host
 - `index.html` shall contain a Project Store seed before Explorer views render
 - The Model route shall display folders, files, elements, and the project graph through native List, Grid, and Graph modes.
-- The Model project tree shall initialize with only the root project node expanded, so first-level folders/files are visible while deeper folder and file element rows remain collapsed until user action or selected-descendant reveal behavior requires expansion.
+- The Model project tree shall initialize with top-level `Model` and `Resources` branches and their Git worktree identity folders expanded, so first useful content folders/files are visible while deeper folder and file element rows remain collapsed until user action or selected-descendant reveal behavior requires expansion.
 - Modeled-element Grid cards shall use a single leading element marker, keep the title close to that marker, and render adjacent type badges without repeating the marker dot, shape, or glyph.
 - Graph mode shall render the project knowledge graph with pan/zoom, search/focus, selected-node state, and graph filters in the Model left pane.
 - The native Explorer shell shall not render primary left-pane view links; Ontologies and Traces are reached as specialist Explorer views, while the project Knowledge Graph is reached as Model Graph mode.
@@ -141,8 +141,8 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 - Old Explorer page URLs shall not be generated; equivalent content shall be reachable through SPA routes and source-document links.
 - Links in diagrams and text shall resolve through Explorer content routes or Project Store source-content records
 - Paths in served content shall maintain the original relative structure
-- Project Store file records shall expose source content generated directly from modeled element source files and existing graph-referenced eligible Git-worktree implementation/evidence/resource files, without depending on generated Markdown files on disk.
-- Relation-backed implementation files, evidence files, scripts, images, and other local resource targets shall remain Project Store resources for relation semantics, and existing workspace-root-relative targets inside eligible Git worktrees shall appear in the Model tree under their full path.
+- Project Store file records shall expose source content generated directly from modeled element source files, without depending on generated Markdown files on disk.
+- Relation-backed implementation files, evidence files, scripts, images, documentation files, and other local resource targets shall remain Project Store resources for relation semantics, may carry source-preview content when the local file exists, and shall be visible in Explorer as resource/evidence entries under a top-level `Resources` branch without appearing as modeled file containers unless the same path also contains modeled elements.
 - System should work in environments without Git repositories
 
 ##### Test Criteria:
@@ -151,14 +151,14 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 - `/assets/project-store.js` contains an Explorer Project Store seed
 - The Project Store seed includes required sections for files, resources, elements, relations, contract_bindings, concept references, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes
 - The Project Store seed distinguishes modeled file containers from modeled resources/evidence files
-- Project Store file records include normalized source Markdown content derived from the registry for modeled files and raw source-preview content for existing registry-linked local resources
-- Relation-backed local resource targets are present as resources with source-preview content when the local file exists, and existing resource-only paths appear in the Project Store `files` and `folders` hierarchy under their full workspace-root-relative path
+- Project Store file records include normalized source Markdown content derived from the registry for modeled files.
+- Relation-backed local resource targets are present as resources with source-preview content when the local file exists, are reachable through Explorer resource/evidence navigation with folder structure under the `Resources` branch, and resource-only paths are absent from the Project Store `files` and `folders` hierarchy.
 - Nonexistent local targets, unsupported parsed pages, unrelated repository files, and external URLs are absent from the Project Store file-tree hierarchy
 - A plain `assets/project-store.js` request after a direct filesystem edit returns the already-materialized runtime store and does not regenerate model data from disk
 - Hash routes for primary Model, file deep links, Ontologies, and Traces views plus supporting Coverage, Resources, Elements, and Search workflows are declared; the project Knowledge Graph is not a separate hash route
 - Retired Explorer page URLs are absent from generated output and canonical route mappings
 - Explorer content preserves the structure and information from the source files
-- Model tree initial render shows only root-level project children and does not eagerly expand child folders or file element rows.
+- Model tree initial render shows top-level `Model` and `Resources` branches with Git worktree identity folders expanded and does not eagerly expand deeper child folders or file element rows.
 - Modeled-element Grid card markup renders one `ElementIcon` per element card and uses text-only type badges when the icon is already present.
 - Mermaid click links resolve through canonical Explorer routes or source anchors
 - Both GitHub-style URLs and direct file paths in mermaid click links are handled correctly
@@ -372,7 +372,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - `index.html` shall be the primary Explorer shell and Project Store host, served as a native SPA built with Vite/TypeScript/React and the Reqvire Explorer design system.
 - The served shell shall reference local compiled bundle, stylesheet, design-system, and font assets with no CDN-loaded framework, no CDN-loaded styling runtime, and no runtime CSS compiler.
 - The Project Store seed shall be present before view rendering and shall include a schema/version marker.
-- The Project Store `project` section shall include effective workspace root identity and eligible Git worktree metadata when Git metadata is available, and the Model tree root shall render that identity instead of a generic `Project` label.
+- The Project Store `project` section shall include effective workspace root identity and eligible Git worktree metadata when Git metadata is available, and the Model tree shall render `Model` and `Resources` as visible top-level rows without a visible workspace-root wrapper. Each branch shall group local entries under eligible Git worktree identity folders so single-repo and multi-repo workspaces expose repository/worktree identity.
 - The store shall expose normalized top-level sections for project, folders, files, resources, elements, relations, contract_bindings, concept references, thesaurus, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes.
 - File containers and modeled resources shall be represented as separate record families with explicit cross-references when the same path appears in both roles.
 - Route definitions shall include canonical hash routes for current views and element/file/search detail workflows.
@@ -391,7 +391,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - Run the Explorer component/unit tests that cover element-detail modal back context rendering, inline native concept-reference modal routing, alternative-label concept-reference matching, hidden authored concept-reference subsection rendering, and exclusion of self-referential concept relation rows from the modal.
 - Parse the generated store seed from `index.html` or its referenced static asset.
 - Assert all required top-level store sections exist.
-- Assert the `project` section exposes effective workspace identity and available Git worktree metadata when running with source-control metadata, and that Explorer tree roots render the workspace identity consistently.
+- Assert the `project` section exposes effective workspace identity and available Git worktree metadata when running with source-control metadata, and that Explorer tree roots render top-level `Model` and `Resources` branches with Git worktree identity grouping folders.
 - Assert at least one Markdown source path appears in `files`.
 - Assert at least one implementation or evidence path referenced by `satisfiedBy` or contract_bindings appears in `resources`.
 - Assert `files` records carry source navigation metadata while `resources` records carry referring-fact evidence.
@@ -400,7 +400,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - Assert element-detail modal headers render the actual element type as the only visible type badge and do not render a marker dot, shape, or glyph inside that badge; for example a `behavior` element shall not also show a separate `contract` badge.
 - Assert the Model view List/Grid modes render from Project Store `folders` and `files` without an iframe or third-party file-manager widget, expose breadcrumb navigation, sortable file rows, grid cards, central workspace search, icon/color legends, source-page secondary actions, and modeled-element rows that open the shared element-detail modal. Assert clicking anywhere on a Grid mode folder/file card opens or selects that card's item, while the source-page secondary action remains a separate control. Assert `#/files` and `#/files/<path>` deep-link into that behavior without creating a separate primary Filesystem view.
 - Assert the Model Graph mode paints the shell, graph canvas, and design-system spinner loading notice before deferred Sigma/ForceAtlas graph construction starts, clears the loading notice after renderer startup, and keeps full-graph ForceAtlas layout quality while using cached adjacency/focus lookup for interaction.
-- Assert the Model tree, grid cards, modeled-element lists, relation/contract_bindings endpoints, and element legends use the shared Explorer `ElementIcon` type glyphs, that capability, semantic-contract, and verification-objective elements use their own role colors as plain squares with no glyph, that verification-objective uses the darker verification-objective token distinct from concrete verification, that inline concept-reference terms in element content use standard link color with no glyph or pill and underline only on hover or focus, that evidence-file artifacts use the neutral/default treatment, and that contract-family subtypes keep the shared contract color while rendering distinct glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
+- Assert the Model tree, grid cards, modeled-element lists, relation/contract_bindings endpoints, and element legends use the shared Explorer `ElementIcon` type glyphs, that capability, semantic-contract, and verification-objective elements use their own role colors as plain squares with no glyph, that verification-objective uses the darker verification-objective token distinct from concrete verification, that inline concept-reference terms in element content use standard link color with no glyph or pill and underline only on hover or focus, that evidence-file artifacts and resource/evidence tree leaves use the neutral/default treatment rather than the yellow file/source resource token, and that contract-family subtypes keep the shared contract color while rendering distinct glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
 - Assert selecting a folder, file, or modeled element in the left Model project tree updates the active Model workspace mode: List/Grid browse the selected folder or file, Graph focuses the matching graph node when one exists, and modeled-element rows open the shared element-detail modal without leaving the Model workspace.
 - Assert the Search route's left-pane result-type controls do not render a duplicate passive legend for the same result-type colors and labels.
 - Assert the Coverage route's left Explorer pane renders the coverage explorer section rows with counts, that selecting a row scrolls or selects the matching central Coverage section, and that the left pane does not duplicate the Coverage dashboard summaries or legend content.

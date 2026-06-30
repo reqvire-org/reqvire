@@ -150,32 +150,38 @@ Both visualizations consume JSON data in this format:
 
 ```json
 {
-  "name": "Reqvire root",
+  "name": "Model",
   "type": "folder",
   "children": [
     {
-      "name": "requirements",
+      "name": "reqvire",
       "type": "folder",
       "children": [
         {
-          "name": "UserStories.md",
-          "type": "file",
-          "link": "#/content/system-model/UserStories.md",
+          "name": "system-model",
+          "type": "folder",
           "children": [
             {
-              "name": "Authentication",
-              "type": "capability",
-              "link": "#/content/system-model/UserStories.md#authentication",
+              "name": "UserStories.md",
+              "type": "file",
+              "link": "#/content/system-model/UserStories.md",
               "children": [
                 {
-                  "name": "auth-design",
-                  "type": "contract-bindings-element",
-                  "link": "#/content/system-model/Design.md#auth-design"
-                },
-                {
-                  "name": "AuthSpec.pdf",
-                  "type": "contract-bindings-file",
-                  "link": "docs/AuthSpec.pdf"
+                  "name": "Authentication",
+                  "type": "capability",
+                  "link": "#/content/system-model/UserStories.md#authentication",
+                  "children": [
+                    {
+                      "name": "auth-design",
+                      "type": "contract-bindings-element",
+                      "link": "#/content/system-model/Design.md#auth-design"
+                    },
+                    {
+                      "name": "AuthSpec.pdf",
+                      "type": "contract-bindings-file",
+                      "link": "docs/AuthSpec.pdf"
+                    }
+                  ]
                 }
               ]
             }
