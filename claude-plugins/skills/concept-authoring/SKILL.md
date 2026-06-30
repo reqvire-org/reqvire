@@ -26,7 +26,7 @@ concept schemes and concepts.
 - Inside the Reqvire source repository, `cargo run -- <command>` is also acceptable when the local binary is the intended target.
 - Inspect authored concepts with `search --filter-type concept-scheme --json`, `search --filter-type concept --json`, `model --filter-type concept-scheme --json`, `semantic export --layer concepts`, `concepts export`, and `concepts validate`.
 - Use `semantic export --layer ontologies --layer concepts` when checking authored structural `reqvire:mapsToConcept` bridge triples together with generated native SKOS concepts. Use `semantic export --layer model` when checking downstream graph-store model facts.
-- Prefer Reqvire CLI mutation commands for broad structural edits when available, such as `add`, `link`, `relink`, `mv`, `rm`, and `rename-element`.
+- Prefer Reqvire CLI mutation commands for broad structural edits when available, such as `add`, `link`, `relink`, `mv`, `mv-file`, `mv-folder`, `rm`, and `rename-element`.
 - Manual Markdown edits are valid for focused authoring. Preserve `# Elements`, `### Element Name`, `#### Metadata`, and Reqvire relation list syntax.
 - Place concept-scheme and concept elements under `system-model/Thesaurus` unless the existing project uses a different `system-model/` content structure.
 - Author concept-scheme elements with `type: concept-scheme`, `concept_base`, and `concept_prefix`; this element is the namespace and SKOS `ConceptScheme` holder.

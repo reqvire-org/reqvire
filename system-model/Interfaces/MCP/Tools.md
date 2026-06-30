@@ -264,6 +264,7 @@ The system shall expose mutation tools only through typed Reqvire core operation
 - MCP mutation tools shall use Reqvire core mutation logic.
 - MCP mutation tools shall preserve Reqvire semantic model validation, including contract_bindings compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, and single ontology-root validation.
 - MCP mutation tools shall preserve Reqvire filesystem persistence behavior.
+- MCP mutation tools shall expose folder moves through the same recursive move, identifier update, reference update, preview, validation, and persistence behavior as the CLI `mv-folder` command.
 - MCP mutation results shall report changed model evidence.
 - MCP mutation execution shall refresh MCP-visible model state after successful mutation.
 
@@ -279,6 +280,7 @@ The system shall expose mutation tools only through typed Reqvire core operation
   * [Rename Element Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#rename-element-operation-contract-specification)
   * [Merge Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#merge-element-workflow-specification)
   * [Move File Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#move-file-operation-contract-specification)
+  * [Move Folder Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#move-folder-operation-contract-specification)
   * [Relation Operations Specification](../../ModelStructure/Specifications.md#relation-operations-specification)
   * [Atomic Relation Relink Workflow Specification](../../Operations/ModelOperations/Specifications.md#atomic-relation-relink-workflow-specification)
   * [Relation Consistency Maintenance Contract Specification](../../Operations/ModelOperations/Specifications.md#relation-consistency-maintenance-contract-specification)
@@ -289,6 +291,27 @@ The system shall expose mutation tools only through typed Reqvire core operation
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * verifiedBy: [MCP Mutation Tool Safety Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-mutation-tool-safety-verification)
+---
+
+### MCP Move Folder Tool
+
+The system shall expose a typed `reqvire.move_folder` MCP mutation tool for moving or renaming a folder subtree through the shared folder-move operation.
+
+#### Details
+- The tool shall be omitted unless mutation tools are explicitly enabled.
+- The tool shall accept source folder, target folder, and preview/execution controls as typed MCP fields.
+- The tool shall delegate recursive relocation, identifier rewrites, relation updates, contract_bindings updates, Concept References updates, InternalPath updates, validation, preview, and persistence to the shared folder-move operation.
+- The tool shall report moved folders, moved files, moved elements, changed referencing files, validation status, and affected scope.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [definitions.rs](../../../crates/reqvire-core/src/tool_interface/definitions.rs)
+  * satisfiedBy: [dispatch.rs](../../../crates/reqvire-core/src/tool_interface/dispatch.rs)
   * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
   * verifiedBy: [MCP Mutation Tool Safety Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-mutation-tool-safety-verification)
 ---

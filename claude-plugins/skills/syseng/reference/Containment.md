@@ -56,7 +56,7 @@ This reference is for **read-only inspection**. For executing a containment refa
    - Files that could be merged (too few elements)
    - Better folder organization
    - Naming improvements
-   - Structural refactoring using mv-file or mv commands
+   - Structural refactoring using mv, mv-file, or mv-folder commands
 
 ## Understanding Containment vs. Traceability
 
@@ -111,6 +111,9 @@ Provide clear, actionable recommendations:
 
 **Folder Reorganization:**
 - Move security-related files from `system-model/` to new `security/` folder
+  ```bash
+  npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-folder "system-model/SecurityDrafts" "system-model/Security"
+  ```
 
 ## When to Use Containment Analysis
 
@@ -119,6 +122,6 @@ Use containment analysis when:
 - **Refactoring planning** - Decide which files to split, merge, or reorganize
 - **Onboarding** - Help new team members understand model structure
 - **Finding organizational issues** - Locate files that are too large, too small, or misplaced
-- **Planning mv-file operations** - Understand current structure before reorganizing
+- **Planning mv-file or mv-folder operations** - Understand current structure before reorganizing
 
 For executing the refactor, see [ContainmentStructureRefactor](ContainmentStructureRefactor.md).

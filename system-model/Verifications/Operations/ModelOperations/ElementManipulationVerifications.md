@@ -2,7 +2,7 @@
 
 ### Element Mutation and File Operation Verification Objective
 
-This objective groups verification that element creation, removal, movement, renaming, linking, relinking, merging, file movement, and ontology-aware mutations preserve model validity.
+This objective groups verification that element creation, removal, movement, renaming, linking, relinking, merging, file movement, folder movement, and ontology-aware mutations preserve model validity.
 
 #### Metadata
   * type: verification-objective
@@ -14,6 +14,7 @@ This objective groups verification that element creation, removal, movement, ren
   * derive: [CLI Add Element Test](#cli-add-element-test)
   * derive: [CLI Move Element Test](#cli-move-element-test)
   * derive: [CLI Move File Test](#cli-move-file-test)
+  * derive: [CLI Move Folder Test](#cli-move-folder-test)
   * derive: [CLI Remove Element Test](#cli-remove-element-test)
   * derive: [CLI Rename Element Test](#cli-rename-element-test)
   * derive: [Create Element Override Test](#create-element-override-test)
@@ -25,6 +26,7 @@ This objective groups verification that element creation, removal, movement, ren
   * derive: [Merge Elements Test](#merge-elements-test)
   * derive: [Move Element Test](#move-element-test)
   * derive: [Move File Squash Test](#move-file-squash-test)
+  * derive: [Move Folder Test](#move-folder-test)
   * derive: [Ontology Boundary-Changing Mutation Test](#ontology-boundary-changing-mutation-test)
   * derive: [Relation Consistency Test](#relation-consistency-test)
   * derive: [Target Location Validation Test](#target-location-validation-test)
@@ -370,6 +372,64 @@ The test shall verify that the `mv-file` command moves entire specification file
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-subdirectory-functionality/test.sh)
   * verify: [CLI Move File Command](../../../Interfaces/CLI/Commands.md#cli-move-file-command)
+---
+
+### CLI Move Folder Test
+
+The test shall verify that the `mv-folder` command recursively moves or renames a folder subtree, updates moved element identifiers, updates path-based model references, and exposes dry-run and JSON output behavior.
+
+#### Details
+**Test Setup:**
+- Create a source folder with multiple Markdown model files, nested subfolders, and referenced local files.
+- Include elements with incoming relations from outside the moved folder.
+- Include moved contract elements referenced by contract_bindings outside the moved folder.
+- Include moved concept elements referenced through `#### Concept References` outside the moved folder.
+- Include relations and references between elements inside the moved folder.
+- Prepare a target folder path that does not exist.
+
+**Test Steps - Basic Move Folder:**
+1. Run `reqvire mv-folder <source-folder> <target-folder>`.
+2. Verify the source folder is removed from the filesystem.
+3. Verify the target folder is created with the complete recursive file subtree.
+4. Verify all moved model files, non-model files, element content, metadata, ontology blocks, and semantic-contract shapes are preserved.
+5. Verify all moved element identifiers are updated to the new folder path.
+6. Verify incoming relations from files outside the moved folder point to the new identifiers.
+7. Verify contract_bindings from files outside the moved folder point to moved contract elements at their new identifiers.
+8. Verify Concept References from files outside the moved folder point to moved concept elements at their new identifiers.
+9. Verify references between moved files remain valid after relocation.
+10. Verify model validation passes after the move.
+
+**Test Steps - Preview and JSON:**
+1. Run `reqvire mv-folder --dry-run <source-folder> <target-folder>`.
+2. Verify no filesystem changes occur.
+3. Verify preview output reports moved folders, moved files, moved element mappings, changed referencing files, and diffs.
+4. Run `reqvire mv-folder --json <source-folder> <target-folder>`.
+5. Verify JSON output includes old-to-new folder paths, file paths, element identifiers, changed references, and validation status.
+
+**Test Steps - Error Cases:**
+1. Try to move a non-existent source folder.
+2. Try to move a source path that is a file.
+3. Try to move to a target folder that already exists.
+4. Try to move a folder into one of its own descendants.
+5. Try to move outside the selected workspace scope.
+6. Verify errors are reported clearly, exit status is non-zero, and no files are changed.
+
+**Success Criteria:**
+- Recursively moves the folder subtree.
+- Preserves moved file content and model structure.
+- Updates moved element identifiers.
+- Updates relation references, contract_bindings, Concept References, and InternalPath references covered by Reqvire model semantics.
+- Preserves references within the moved subtree.
+- Supports dry-run preview and JSON output.
+- Rejects unsafe paths, collisions, file sources, recursive moves, and workspace-scope escapes.
+- Leaves the model valid after successful execution.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-crud-mv-folder/test.sh)
+  * verify: [CLI Move Folder Command](../../../Interfaces/CLI/Commands.md#cli-move-folder-command)
 ---
 
 ### CLI Remove Element Test
@@ -1020,6 +1080,32 @@ The test shall verify that the `mv-file --squash` command moves all elements fro
   * satisfiedBy: [test.sh](../../../../tests/test-crud-mv-file-squash/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-document-operation-constraints/test.sh)
   * verify: [Move File Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-file-operation)
+---
+
+### Move Folder Test
+
+The test shall verify that the shared folder-move operation recursively relocates a folder subtree and rewrites every affected model reference before persistence.
+
+#### Details
+**Acceptance Criteria:**
+- The operation builds a complete old-path to new-path move plan for every file under the source folder.
+- The operation rejects missing sources, file sources, existing targets, target paths inside the source folder, overwrite collisions, and workspace-scope escapes before changing files.
+- The operation rewrites identifiers for every moved model element.
+- The operation rewrites incoming relation targets for moved elements.
+- The operation rewrites contract_bindings that target moved contract elements.
+- The operation rewrites Concept References that target moved concept elements.
+- The operation rewrites model-owned InternalPath references that target moved files.
+- The operation preserves internal relations between moved elements and leaves them resolvable after the move.
+- The operation validates the candidate model before persistence, including contract_bindings compatibility, concept-reference resolution, semantic-contract SHACL reference reachability, and ontology-root validation.
+- Dry-run mode reports the full plan and diffs without filesystem changes.
+- Non-dry-run mode persists the recursive move atomically enough that a validation failure leaves source files unchanged.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-crud-mv-folder/test.sh)
+  * verify: [Move Folder Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-folder-operation)
 ---
 
 ### Ontology Boundary-Changing Mutation Test

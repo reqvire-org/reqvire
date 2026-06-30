@@ -414,6 +414,18 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 ),
             ),
             mutation_tool(
+                "reqvire.move_folder",
+                "Move or rename a folder subtree and update model references.",
+                required_object_schema(
+                    vec![
+                        ("source_folder", json!({ "type": "string" })),
+                        ("target_folder", json!({ "type": "string" })),
+                        ("dry_run", json!({ "type": "boolean", "default": false })),
+                    ],
+                    vec!["source_folder", "target_folder"],
+                ),
+            ),
+            mutation_tool(
                 "reqvire.link",
                 "Add a relation or contract_bindings.",
                 required_object_schema(
@@ -570,6 +582,7 @@ pub(crate) fn mutation_tool_names() -> Vec<&'static str> {
         "reqvire.rename_element",
         "reqvire.merge_elements",
         "reqvire.move_file",
+        "reqvire.move_folder",
         "reqvire.link",
         "reqvire.unlink",
         "reqvire.relink",

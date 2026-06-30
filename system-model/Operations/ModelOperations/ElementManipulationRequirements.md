@@ -177,6 +177,28 @@ Detailed file-move, relation-update, squash-mode, target-validation, and error b
   * verifiedBy: [Move File Squash Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#move-file-squash-test)
 ---
 
+### Move Folder Operation
+
+The system shall provide the capability to move or rename an entire folder subtree inside the selected workspace while updating all model identifiers and path-based model references that target files or elements under the moved folder.
+
+#### Details
+Detailed folder-move, recursive file relocation, target-collision, identifier-update, reference-update, dry-run, JSON-output, and error behavior shall follow the associated contract specification.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Target Location Constraint](Constraints.md#target-location-constraint)
+
+#### Relations
+  * definedBy: [Move Folder Operation Contract Specification](Specifications.md#move-folder-operation-contract-specification)
+  * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
+  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
+  * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
+  * verifiedBy: [Move Folder Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#move-folder-test)
+---
+
 ### Relation Consistency Maintenance
 
 The system shall maintain bidirectional relation consistency when elements are manipulated, ensuring that forward and backward relations remain synchronized.

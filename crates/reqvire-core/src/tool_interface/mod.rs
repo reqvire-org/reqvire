@@ -48,8 +48,8 @@ use semantic_tools::{
 mod mutation_tools;
 use mutation_tools::{
     add_element_tool, link_tool, merge_elements_tool, move_asset_tool, move_element_tool,
-    move_file_tool, relink_tool, remove_asset_tool, remove_element_tool, rename_element_tool,
-    unlink_tool,
+    move_file_tool, move_folder_tool, relink_tool, remove_asset_tool, remove_element_tool,
+    rename_element_tool, unlink_tool,
 };
 
 mod dispatch;

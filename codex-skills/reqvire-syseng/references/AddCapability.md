@@ -540,6 +540,9 @@ reqvire mv "Capability Requirement" "system-model/Product/CapabilityName/Require
 # Move entire file to new location
 reqvire mv-file "system-model/Old.md" "system-model/Product/CapabilityName/New.md"
 
+# Move an entire folder subtree to new location
+reqvire mv-folder "system-model/Product/DraftCapability" "system-model/Product/CapabilityName"
+
 # Merge file into existing file (squash - combine contents)
 reqvire mv-file --squash "system-model/Source.md" "system-model/Target.md"
 ```

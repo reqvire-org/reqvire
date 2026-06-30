@@ -78,6 +78,7 @@ pub(crate) fn dispatch_tool(
         "reqvire.rename_element" => rename_element_tool(args, excluded_filename_patterns),
         "reqvire.merge_elements" => merge_elements_tool(args, excluded_filename_patterns),
         "reqvire.move_file" => move_file_tool(args, excluded_filename_patterns),
+        "reqvire.move_folder" => move_folder_tool(args, excluded_filename_patterns),
         "reqvire.link" => link_tool(args, excluded_filename_patterns),
         "reqvire.unlink" => unlink_tool(args, excluded_filename_patterns),
         "reqvire.relink" => relink_tool(args, excluded_filename_patterns),

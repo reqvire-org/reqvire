@@ -501,6 +501,31 @@ pub enum Commands {
         output: Option<String>,
     },
 
+    /// Move or rename an entire folder subtree
+    #[clap(
+        name = "mv-folder",
+        override_help = "Move or rename an entire folder subtree\n\nMV-FOLDER OPTIONS:\n       <SOURCE_FOLDER>          Source folder path (relative to current working directory)\n       <TARGET_FOLDER>          Target folder path (relative to current working directory)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv-folder <source-folder> <target-folder>"
+    )]
+    MvFolder {
+        /// Source folder path (relative to current working directory)
+        source_folder: String,
+
+        /// Target folder path (relative to current working directory)
+        target_folder: String,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "MV-FOLDER OPTIONS")]
+        dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MV-FOLDER OPTIONS")]
+        json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "MV-FOLDER OPTIONS")]
+        output: Option<String>,
+    },
+
     /// Add relation or contract_bindings between elements
     #[clap(
         name = "link",
@@ -1828,6 +1853,33 @@ pub async fn handle_command(
                 &git_root,
                 dry_run,
                 squash,
+            )?;
+
+            // Output result
+            if json {
+                handle_json_output(&render_crud_json(&result), &output)?;
+            } else {
+                render_crud_result(&result);
+            }
+
+            Ok(0)
+        }
+        Some(Commands::MvFolder {
+            source_folder,
+            target_folder,
+            dry_run,
+            json,
+            output,
+        }) => {
+            // Call CRUD operation
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = crud::move_folder(
+                &mut model_manager,
+                &source_folder,
+                &target_folder,
+                &current_dir,
+                &git_root,
+                dry_run,
             )?;
 
             // Output result

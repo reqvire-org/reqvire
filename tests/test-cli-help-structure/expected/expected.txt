@@ -21,6 +21,7 @@ Commands:
   rename            Rename element
   merge             Merge multiple elements into target element
   mv-file           Move entire specification file with all its elements
+  mv-folder         Move or rename an entire folder subtree
   link              Add relation or contract_bindings between elements
   unlink            Remove relation or contract_bindings between elements (auto-detects type)
   relink            Replace an existing relation target with a new target in one operation
@@ -159,6 +160,13 @@ MV FILE OPTIONS:
        <SOURCE_FILE>            Source file path (relative to current working directory)
        <TARGET_FILE>            Target file path (relative to current working directory)
       --squash                  Move all elements to target file's first section (if target exists)
+      --dry-run                 Preview changes without applying
+      --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
+
+MV FOLDER OPTIONS:
+       <SOURCE_FOLDER>          Source folder path (relative to current working directory)
+       <TARGET_FOLDER>          Target folder path (relative to current working directory)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)

@@ -63,7 +63,7 @@ The system shall cache parsed `ModelManager` instances keyed by a fingerprint of
 - The cache key shall combine `ModelBuildOptions` with a sorted map of every scanned `.md` file path to a content fingerprint (`FileFingerprint`) capturing file length and content hash.
 - A cache hit returns a clone of the stored model without re-reading or re-validating any source file.
 - A cache miss rebuilds the model via `parse_and_validate_with_options`, stores the result, and returns a clone.
-- CRUD mutations (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-asset, rm-asset) shall invalidate the cache, forcing a rebuild on the next load.
+- CRUD mutations (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-folder, mv-asset, rm-asset) shall invalidate the cache, forcing a rebuild on the next load.
 - Only the current working tree is cached; git-commit scans bypass the cache and use `parse_and_validate` directly.
 - The cache mutex lock shall be released before rebuild I/O to avoid holding it during parsing.
 
@@ -102,6 +102,7 @@ All manipulation operations shall:
   * derive: [Element Manipulation File Persistence](../Operations/ModelOperations/ElementManipulationRequirements.md#element-manipulation-file-persistence)
   * derive: [Move Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#move-element-operation)
   * derive: [Move File Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#move-file-operation)
+  * derive: [Move Folder Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#move-folder-operation)
   * derive: [Relation Consistency Maintenance](../Operations/ModelOperations/ElementManipulationRequirements.md#relation-consistency-maintenance)
   * derive: [Rename Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#rename-element-operation)
   * derive: [Target Location Validation and Auto-Creation](../Operations/ModelOperations/ElementManipulationRequirements.md#target-location-validation-and-auto-creation)

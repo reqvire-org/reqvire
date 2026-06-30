@@ -1280,6 +1280,208 @@ pub fn move_file(
     })
 }
 
+/// Move an entire folder subtree and update model references under it.
+pub fn move_folder(
+    model_manager: &mut ModelManager,
+    source_folder: &str,
+    target_folder: &str,
+    current_dir: &Path,
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    use crate::utils;
+    use std::fs;
+
+    let absolute_source = current_dir.join(source_folder);
+    let source_folder_normalized = normalize_folder_arg(
+        &utils::get_relative_path(&absolute_source)?
+            .to_string_lossy()
+            .to_string(),
+    );
+
+    let absolute_target = current_dir.join(target_folder);
+    let target_folder_normalized = normalize_folder_arg(
+        &utils::get_relative_path(&absolute_target)?
+            .to_string_lossy()
+            .to_string(),
+    );
+
+    if source_folder_normalized.is_empty() || source_folder_normalized == "." {
+        return Err(ReqvireError::InvalidOperation(
+            "Cannot move the workspace root folder".to_string(),
+        ));
+    }
+    if target_folder_normalized.is_empty() || target_folder_normalized == "." {
+        return Err(ReqvireError::InvalidOperation(
+            "Target folder must not be the workspace root".to_string(),
+        ));
+    }
+    if folder_path_is_under(&target_folder_normalized, &source_folder_normalized) {
+        return Err(ReqvireError::InvalidOperation(format!(
+            "Cannot move folder '{}' into its own subtree '{}'",
+            source_folder, target_folder
+        )));
+    }
+
+    let source_abs = git_root.join(&source_folder_normalized);
+    if !source_abs.exists() {
+        return Err(ReqvireError::LocationNotFound(format!(
+            "Source folder '{}' does not exist",
+            source_folder
+        )));
+    }
+    if !source_abs.is_dir() {
+        return Err(ReqvireError::InvalidOperation(format!(
+            "Source path '{}' is not a directory",
+            source_folder
+        )));
+    }
+
+    let target_abs = git_root.join(&target_folder_normalized);
+    if target_abs.exists() {
+        return Err(ReqvireError::DuplicateElement(format!(
+            "Target folder '{}' already exists",
+            target_folder
+        )));
+    }
+
+    let moved_model_files: BTreeSet<String> = model_manager
+        .graph_registry
+        .nodes
+        .values()
+        .map(|node| node.element.file_path.clone())
+        .chain(model_manager.graph_registry.pages.keys().cloned())
+        .filter(|file_path| folder_path_is_under(file_path, &source_folder_normalized))
+        .collect();
+
+    // Track which files were modified before the operation
+    let modified_before = snapshot_modified_files(model_manager);
+    let registry_snapshot = model_manager.graph_registry.clone();
+    let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
+
+    let identifier_mappings = model_manager
+        .graph_registry
+        .move_folder(&source_folder_normalized, &target_folder_normalized)?;
+
+    let diffs = match finalize_crud_operation(
+        model_manager,
+        &modified_before,
+        git_root,
+        dry_run,
+        None,
+        Some(&ontology_before),
+    ) {
+        Ok(diffs) => diffs,
+        Err(err) => {
+            model_manager.graph_registry = registry_snapshot;
+            return Err(err);
+        }
+    };
+
+    if !dry_run {
+        for entry in walkdir::WalkDir::new(&source_abs)
+            .into_iter()
+            .filter_map(Result::ok)
+            .filter(|entry| entry.file_type().is_file())
+        {
+            let old_abs = entry.path();
+            let old_relative = old_abs
+                .strip_prefix(git_root)
+                .map_err(|err| ReqvireError::PathError(err.to_string()))?
+                .to_string_lossy()
+                .replace('\\', "/");
+            if moved_model_files.contains(&old_relative) {
+                continue;
+            }
+
+            let new_relative = replace_folder_prefix_string(
+                &old_relative,
+                &source_folder_normalized,
+                &target_folder_normalized,
+            );
+            let new_abs = git_root.join(&new_relative);
+            if let Some(parent) = new_abs.parent() {
+                fs::create_dir_all(parent).map_err(ReqvireError::IoError)?;
+            }
+            fs::rename(old_abs, &new_abs).map_err(ReqvireError::IoError)?;
+        }
+
+        if source_abs.exists() {
+            fs::remove_dir_all(&source_abs).map_err(ReqvireError::IoError)?;
+        }
+
+        prune_empty_parent_dirs(
+            source_abs.parent().unwrap_or(git_root),
+            git_root,
+            &target_abs,
+        )?;
+    }
+
+    let element_count = identifier_mappings.len();
+    let element_name = format!(
+        "{} element{} from {} → {}",
+        element_count,
+        if element_count == 1 { "" } else { "s" },
+        source_folder,
+        target_folder
+    );
+
+    Ok(CrudResult {
+        operation: CrudOperation::Move,
+        element_id: source_folder_normalized,
+        element_name,
+        diffs,
+        dry_run,
+    })
+}
+
+fn normalize_folder_arg(path: &str) -> String {
+    path.trim_matches('/')
+        .trim_end_matches('/')
+        .replace('\\', "/")
+}
+
+fn folder_path_is_under(path: &str, folder: &str) -> bool {
+    let path = path.trim_matches('/');
+    let folder = folder.trim_matches('/');
+    path == folder || path.starts_with(&format!("{}/", folder))
+}
+
+fn replace_folder_prefix_string(path: &str, source_folder: &str, target_folder: &str) -> String {
+    let path = path.trim_matches('/');
+    let source_folder = source_folder.trim_matches('/');
+    let target_folder = target_folder.trim_matches('/');
+    if path == source_folder {
+        return target_folder.to_string();
+    }
+    let suffix = path
+        .strip_prefix(&format!("{}/", source_folder))
+        .unwrap_or(path);
+    format!("{}/{}", target_folder, suffix)
+}
+
+fn prune_empty_parent_dirs(
+    dir: &Path,
+    git_root: &Path,
+    target_abs: &Path,
+) -> Result<(), ReqvireError> {
+    let mut current = dir.to_path_buf();
+    while current != git_root && current.starts_with(git_root) && !target_abs.starts_with(&current)
+    {
+        if current
+            .read_dir()
+            .map_err(ReqvireError::IoError)?
+            .next()
+            .is_some()
+        {
+            break;
+        }
+        std::fs::remove_dir(&current).map_err(ReqvireError::IoError)?;
+        current = current.parent().unwrap_or(git_root).to_path_buf();
+    }
+    Ok(())
+}
+
 /// Reuse a file to an element by adding it to the Contract Bindings subsection
 ///
 /// # Arguments

@@ -23,7 +23,7 @@ ontology elements and SHACL semantic contracts.
 - Inside the Reqvire source repository, `cargo run -- <command>` is also acceptable when the local binary is the intended target.
 - Inspect authored ontology content with `search --filter-type ontology --json`, `search --filter-type semantic-contract --json`, `model --filter-type ontology --json`, `semantic export --layer ontologies`, `semantic export --layer shapes`, and `semantic export --layer model`.
 - Use `semantic export --layer ontologies --layer external-used` or `semantic export --layer model --layer external-used` only when the used subset of local external ontology dependencies must be materialized.
-- Prefer Reqvire CLI mutation commands for broad structural edits when available, such as `add`, `link`, `relink`, `mv`, `rm`, and `rename-element`.
+- Prefer Reqvire CLI mutation commands for broad structural edits when available, such as `add`, `link`, `relink`, `mv`, `mv-file`, `mv-folder`, `rm`, and `rename-element`.
 - Manual Markdown edits are valid for focused authoring. Preserve `# Elements`, `### Element Name`, `#### Metadata`, and Reqvire relation list syntax.
 - Author ontology elements with `type: ontology`, `ontology_base`, `ontology_prefix`, and `#### Ontology`; authored Turtle must declare the prefixes it uses.
 - Author semantic contracts with `type: semantic-contract` and `#### Shapes`; link contracts to ontology elements with `use` / `usedBy` and to governed model elements with `constrain` / `constrainedBy`.

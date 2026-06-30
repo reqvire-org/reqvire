@@ -45,6 +45,7 @@ This pre-persistence validation applies to graph-backed mutation commands:
 - `rename`
 - `merge`
 - `mv-file`
+- `mv-folder`
 - `link`
 - `unlink`
 - `relink`
@@ -239,6 +240,52 @@ When the --squash flag is provided and the target file already exists, the syste
 
 #### Metadata
   * type: specification
+---
+
+### Move Folder Operation Contract Specification
+
+#### Details
+When moving a folder, the system is expected to:
+- Accept a source folder path and target folder path relative to the selected workspace scope.
+- Validate both source and target paths using target-location safety rules.
+- Reject moves where the source folder does not exist, is not a directory, is outside the selected workspace scope, or is excluded from model processing.
+- Reject moves where the target path already exists.
+- Reject moves that would place the folder inside itself or otherwise create recursive path ancestry.
+- Recursively move all files and subfolders from the source folder to the target folder.
+- Update every moved model element identifier to reflect its new file path.
+- Update all relation references throughout the model that point to any moved element.
+- Update all contract_bindings throughout the model that point to any moved contract element.
+- Update all concept references throughout the model that point to any moved concept element.
+- Update InternalPath references covered by Reqvire model semantics when the target path is inside the moved folder.
+- Preserve file content, document structure, element ordering, metadata, ontology blocks, semantic-contract shapes, and non-model files in the moved subtree.
+- Remove the source folder after successful relocation.
+- Remove empty parent directories only when they become empty as a direct result of the move and are still inside the selected workspace scope.
+- Validate the candidate model before persistence, including relation integrity, contract_bindings compatibility, concept-reference resolution, semantic-contract SHACL reference reachability, and ontology-root validation.
+- Provide updates report following Diff Output Format Specification.
+
+The system is expected to reject the operation with a clear error message if:
+- The source folder does not exist.
+- The source path is a file rather than a directory.
+- The target folder already exists.
+- The source or target path fails validation.
+- The target is inside the source folder.
+- A moved file would overwrite an existing file.
+- Candidate validation fails after the folder move.
+
+**Identifier Update:**
+- Every moved element identifier changes from `<old-folder>/<relative-file>#<element-name>` to `<new-folder>/<relative-file>#<element-name>`.
+- All references to old identifiers are expected to be updated to the new identifiers.
+- References that point to files or assets under the moved folder are expected to have their path component updated.
+
+**Preview and Machine Output:**
+- Dry-run mode is expected to report the recursive move plan, affected files, old-to-new identifier mappings, and diffs without changing the filesystem.
+- JSON output is expected to include moved folder paths, moved file paths, moved element mappings, changed referencing files, validation status, and rejected-cause details when the operation fails.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Move Folder Operation](ElementManipulationRequirements.md#move-folder-operation)
 ---
 
 ### Orphaned Children Error Message Specification

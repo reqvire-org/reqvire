@@ -394,6 +394,31 @@ Detailed path arguments, dry-run/JSON output, target validation, squash behavior
   * verifiedBy: [Subdirectory Processing Verification](../../Verifications/Operations/Validation/ValidationVerifications.md#subdirectory-processing-verification)
 ---
 
+### CLI Move Folder Command
+
+The system shall provide a `mv-folder` command that exposes the folder-move operation through the CLI.
+
+#### Details
+Detailed path arguments, dry-run/JSON output, recursive move behavior, target-collision rejection, reference updates, and shared operation delegation shall follow the associated command specification and model-operation contract.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+  * [Move Folder Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#move-folder-operation-contract-specification)
+
+#### Relations
+  * definedBy: [CLI Move Folder Command Contract Specification](Specifications.md#cli-move-folder-command-contract-specification)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * verifiedBy: [CLI Move Folder Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-move-folder-test)
+---
+
 ### CLI Ontologies Command
 
 The system shall provide semantic export CLI commands for selectable Reqvire semantic RDF layers and standalone native concept-scheme workflows.

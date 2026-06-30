@@ -167,8 +167,71 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 ---
 
-## When to Use mv vs mv-file
+## Move Folder
+
+Move an entire folder subtree with all model files and local evidence files to a new location, automatically updating model identifiers, relations, contract bindings, concept references, and local path references that point into the moved subtree.
+
+### Steps
+
+1. **Understand the context:**
+   - Identify the source folder to move
+   - Determine the target folder location
+   - Verify the source folder is inside the workspace and contains the intended model files
+   - Check that the target folder does not already exist
+
+2. **Preview the folder move operation:**
+   ```bash
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-folder "<source-folder>" "<target-folder>" --dry-run
+   ```
+
+   This shows:
+   - Which files will be modified
+   - Which model identifiers will move to the new folder path
+   - Which relations, contract bindings, concept references, and local file paths will be updated
+   - Git-style diffs for affected files
+
+3. **Apply the folder move:**
+   ```bash
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-folder "<source-folder>" "<target-folder>"
+   ```
+
+   The mv-folder command automatically:
+   - Moves every file under the source folder to the same relative path under the target folder
+   - Updates element identifiers from `<source-folder>/...#<slug>` to `<target-folder>/...#<slug>`
+   - Updates relations and contract bindings that reference moved elements
+   - Updates concept references and local file paths that point into the moved folder
+   - Preserves non-model files under the moved subtree
+   - Removes the original folder after successful move
+
+4. **Verify the changes:**
+   ```bash
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
+   ```
+
+### Important Notes
+
+- **Folder-level refactor**: Use `mv-folder` for package, subsystem, capability, or repository-folder reshapes where many files move together.
+- **Target must be new**: Move into a new folder path. Use `mv-file --squash` for file-level consolidation into existing files.
+- **No recursive target**: The target folder cannot be inside the source folder.
+- **Reference safety**: Local references into the moved folder are rewritten; unrelated external paths are left unchanged.
+
+### Examples
+
+**Move a capability folder:**
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-folder "system-model/Drafts/Auth" "system-model/Identity/Auth"
+```
+
+**Preview a subsystem folder rename:**
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-folder "system-model/Platform" "system-model/CorePlatform" --dry-run
+```
+
+---
+
+## When to Use mv vs mv-file vs mv-folder
 
 - **`mv`**: Moving individual requirements or verifications between files
 - **`mv-file`**: Moving entire files with all their elements; reorganizing specification file structure
 - **`mv-file --squash`**: Merging multiple specification files into one
+- **`mv-folder`**: Moving an entire folder subtree while preserving its internal file layout and updating references

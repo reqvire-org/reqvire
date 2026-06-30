@@ -250,7 +250,7 @@ When adding or moving model content:
    - contract_bindings substitutions
    - validation risks
 5. Confirm high-risk boundary decisions with the user before bulk moves.
-6. Apply changes in slices with `mv`, `mv-file`, `link`, `unlink`, or `relink`.
+6. Apply changes in slices with `mv`, `mv-file`, `mv-folder`, `link`, `unlink`, or `relink`.
 7. Validate after each slice:
    - `reqvire validate`
    - `reqvire lint`

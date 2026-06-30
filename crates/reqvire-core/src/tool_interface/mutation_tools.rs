@@ -123,6 +123,25 @@ pub(crate) fn move_file_tool(
     parse_json_string(render_crud_json(&result))
 }
 
+pub(crate) fn move_folder_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+) -> Result<Value, ReqvireError> {
+    let mut model = load_model(excluded_filename_patterns)?;
+    let result = crud::move_folder(
+        &mut model,
+        &required_string_arg(args, "source_folder")?,
+        &required_string_arg(args, "target_folder")?,
+        &current_dir_path(),
+        &git_commands::get_git_root_dir()?,
+        bool_arg(args, "dry_run", false),
+    )?;
+    if !bool_arg(args, "dry_run", false) {
+        crate::model_cache::invalidate();
+    }
+    parse_json_string(render_crud_json(&result))
+}
+
 pub(crate) fn link_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,

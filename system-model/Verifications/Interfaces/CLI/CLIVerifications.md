@@ -76,7 +76,7 @@ This test verifies that the CLI help output displays all commands and their opti
    - output contains "Options:" section with `-h, --help`, `-V, --version`
 
 2. **Command listing completeness**
-   - All current CLI commands are listed: serve, mcp, format, migrate, validate, search, change-impact, traces, coverage, model, lint, add, rm, mv, rename, merge, mv-file, link, unlink, relink, mv-asset, rm-asset, containment, resources, ontologies, submodels, collect
+   - All current CLI commands are listed: serve, mcp, format, migrate, validate, search, change-impact, traces, coverage, model, lint, add, rm, mv, rename, merge, mv-file, mv-folder, link, unlink, relink, mv-asset, rm-asset, containment, resources, ontologies, submodels, collect
 
 3. **Options flattening - all command-specific option sections present**
    - SERVE OPTIONS section visible

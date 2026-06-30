@@ -207,6 +207,7 @@ Mutation exposure and safety rules:
 - Mutation operation semantics are inherited from reused Reqvire functional/operation contracts.
 - Controlled mutations update the Reqvire in-memory graph through core mutation logic before filesystem flush.
 - Controlled mutations run the same semantic model validation gates as Reqvire core before persistence. This includes ontology element structure, single connected ontology root, contract_bindings compatibility, semantic-contract `Shapes` reference reachability, and `Concept References` resolution.
+- Folder mutation tools inherit the `mv-folder` contract and report moved folders, moved files, moved elements, changed referencing files, validation status, and affected scope in preview and execution results.
 - Durable writes flush modified files to the filesystem with the same guarantees as reused file persistence behavior.
 - The MCP server keeps its internal graph synchronized from the updated core graph after each successful mutation before serving subsequent model reads.
 - The MCP server avoids mandatory full reparse after controlled mutations; full reparse is reserved for external filesystem drift, changed source fingerprints, or operations that require it.
@@ -726,6 +727,7 @@ Mutation and maintenance tools:
 - `reqvire.rename_element`
 - `reqvire.merge_elements`
 - `reqvire.move_file`
+- `reqvire.move_folder`
 - `reqvire.link`
 - `reqvire.unlink`
 - `reqvire.relink`
@@ -811,6 +813,7 @@ Mutation tools:
 - `reqvire.rename_element`
 - `reqvire.merge_elements`
 - `reqvire.move_file`
+- `reqvire.move_folder`
 - `reqvire.link`
 - `reqvire.unlink`
 - `reqvire.relink`

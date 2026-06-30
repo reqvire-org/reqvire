@@ -32,6 +32,7 @@ reqvire.move_element
 reqvire.rename_element
 reqvire.merge_elements
 reqvire.move_file
+reqvire.move_folder
 reqvire.link
 reqvire.unlink
 reqvire.relink

@@ -1,5 +1,115 @@
 use super::*;
 
+fn normalize_folder_path(path: &str) -> String {
+    path.trim_matches('/')
+        .trim_end_matches('/')
+        .replace('\\', "/")
+}
+
+fn path_is_under_folder(path: &str, folder: &str) -> bool {
+    let path = path.trim_matches('/');
+    let folder = folder.trim_matches('/');
+    path == folder || path.starts_with(&format!("{}/", folder))
+}
+
+fn replace_folder_prefix(path: &str, source_folder: &str, target_folder: &str) -> String {
+    let path = path.trim_matches('/');
+    let source_folder = source_folder.trim_matches('/');
+    let target_folder = target_folder.trim_matches('/');
+    if path == source_folder {
+        return target_folder.to_string();
+    }
+    let suffix = path
+        .strip_prefix(&format!("{}/", source_folder))
+        .unwrap_or(path);
+    format!("{}/{}", target_folder, suffix)
+}
+
+fn rewrite_moved_concept_reference_targets(
+    element: &mut Element,
+    identifier_map: &FxHashMap<String, String>,
+    moved_old_ids: &FxHashSet<String>,
+) -> bool {
+    if !element.content.contains("#### Concept References") {
+        return false;
+    }
+
+    let mut changed = false;
+    let mut output = Vec::new();
+    let mut in_section = false;
+
+    for line in element.content.split_inclusive('\n') {
+        let (body, suffix) = if let Some(body) = line.strip_suffix("\r\n") {
+            (body, "\r\n")
+        } else if let Some(body) = line.strip_suffix('\n') {
+            (body, "\n")
+        } else {
+            (line, "")
+        };
+
+        let trimmed = body.trim();
+        if trimmed.starts_with("#### ") {
+            in_section = trimmed == "#### Concept References";
+            output.push(line.to_string());
+            continue;
+        }
+        if !in_section {
+            output.push(line.to_string());
+            continue;
+        }
+
+        let Some(entry) = trimmed.strip_prefix("* ") else {
+            output.push(line.to_string());
+            continue;
+        };
+        let Some((label, target)) = crate::utils::extract_markdown_link(entry) else {
+            output.push(line.to_string());
+            continue;
+        };
+        let Ok(resolved_target) =
+            crate::parser::normalize_concept_reference_target(&element.file_path, &target)
+        else {
+            output.push(line.to_string());
+            continue;
+        };
+
+        let Some(new_target) = identifier_map.get(&resolved_target).or_else(|| {
+            if moved_old_ids.contains(&resolved_target) {
+                identifier_map.get(&resolved_target)
+            } else {
+                None
+            }
+        }) else {
+            output.push(line.to_string());
+            continue;
+        };
+
+        let Ok(link) =
+            crate::utils::concept_reference_relative_link(&element.file_path, new_target)
+        else {
+            output.push(line.to_string());
+            continue;
+        };
+
+        let leading_len = body.len() - body.trim_start().len();
+        output.push(format!(
+            "{}* [{}]({}){}",
+            &body[..leading_len],
+            label.trim(),
+            link,
+            suffix
+        ));
+        changed = true;
+    }
+
+    if changed {
+        element.content = output.concat();
+        element.concept_references = crate::parser::extract_concept_references(&element.content).0;
+    }
+
+    changed
+}
+
 impl GraphRegistry {
     /// Updates an element's identifier and rewires all incoming relations
     pub fn update_identifier(&mut self, old_id: &str, new_id: &str) {
@@ -1331,6 +1441,185 @@ impl GraphRegistry {
 
         for file in &modified_files {
             self.modified_files.insert(file.clone());
+        }
+
+        Ok(identifier_mappings)
+    }
+
+    /// Move an entire folder subtree and update model paths under it.
+    pub fn move_folder(
+        &mut self,
+        source_folder: &str,
+        target_folder: &str,
+    ) -> Result<Vec<(String, String)>, ReqvireError> {
+        let source_folder = normalize_folder_path(source_folder);
+        let target_folder = normalize_folder_path(target_folder);
+
+        if source_folder.is_empty() || source_folder == "." {
+            return Err(ReqvireError::InvalidOperation(
+                "Cannot move the workspace root folder".to_string(),
+            ));
+        }
+        if target_folder.is_empty() || target_folder == "." {
+            return Err(ReqvireError::InvalidOperation(
+                "Target folder must not be the workspace root".to_string(),
+            ));
+        }
+        if path_is_under_folder(&target_folder, &source_folder) {
+            return Err(ReqvireError::InvalidOperation(format!(
+                "Cannot move folder '{}' into its own subtree '{}'",
+                source_folder, target_folder
+            )));
+        }
+
+        let moved_files: Vec<(String, String)> = self
+            .nodes
+            .values()
+            .map(|node| node.element.file_path.clone())
+            .chain(self.pages.keys().cloned())
+            .filter(|file_path| path_is_under_folder(file_path, &source_folder))
+            .map(|old_file| {
+                let new_file = replace_folder_prefix(&old_file, &source_folder, &target_folder);
+                (old_file, new_file)
+            })
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .collect();
+
+        if moved_files.is_empty() {
+            return Err(ReqvireError::LocationNotFound(format!(
+                "Source folder '{}' not found or contains no model files",
+                source_folder
+            )));
+        }
+
+        for (_, target_file) in &moved_files {
+            let target_has_unmoved_model_file = self
+                .nodes
+                .values()
+                .any(|node| node.element.file_path == *target_file)
+                || self.pages.contains_key(target_file);
+            if target_has_unmoved_model_file {
+                return Err(ReqvireError::DuplicateElement(format!(
+                    "Target file '{}' already exists",
+                    target_file
+                )));
+            }
+        }
+
+        let mut identifier_mappings: Vec<(String, String)> = Vec::new();
+        for (old_file, new_file) in &moved_files {
+            for node in self.nodes.values() {
+                if node.element.file_path == *old_file {
+                    let slug = node
+                        .element
+                        .identifier
+                        .split('#')
+                        .next_back()
+                        .unwrap_or(&node.element.identifier);
+                    identifier_mappings.push((
+                        node.element.identifier.clone(),
+                        format!("{}#{}", new_file, slug),
+                    ));
+                }
+            }
+        }
+
+        let identifier_map: FxHashMap<String, String> =
+            identifier_mappings.iter().cloned().collect();
+        let moved_old_ids: FxHashSet<String> = identifier_mappings
+            .iter()
+            .map(|(old_id, _)| old_id.clone())
+            .collect();
+
+        for (old_id, new_id) in &identifier_mappings {
+            if let Some(node) = self.nodes.get_mut(old_id) {
+                node.element.file_path =
+                    replace_folder_prefix(&node.element.file_path, &source_folder, &target_folder);
+                node.element.identifier = new_id.clone();
+            }
+        }
+
+        for (old_file, new_file) in &moved_files {
+            if let Some(page) = self.pages.remove(old_file) {
+                self.pages.insert(new_file.clone(), page);
+            }
+        }
+
+        for (old_id, new_id) in &identifier_mappings {
+            if let Some(node) = self.nodes.remove(old_id) {
+                self.nodes.insert(new_id.clone(), node);
+            }
+        }
+
+        let mut modified_files: BTreeSet<String> = moved_files
+            .iter()
+            .flat_map(|(old_file, new_file)| [old_file.clone(), new_file.clone()])
+            .collect();
+
+        for node in self.nodes.values_mut() {
+            let mut node_modified = false;
+
+            for relation in &mut node.element.relations {
+                match &mut relation.target.link {
+                    LinkType::Identifier(target_id) => {
+                        if let Some(new_id) = identifier_map.get(target_id) {
+                            *target_id = new_id.clone();
+                            node_modified = true;
+                        }
+                    }
+                    LinkType::InternalPath(path) => {
+                        let path_string = path.to_string_lossy().to_string();
+                        if path_is_under_folder(&path_string, &source_folder) {
+                            *path = PathBuf::from(replace_folder_prefix(
+                                &path_string,
+                                &source_folder,
+                                &target_folder,
+                            ));
+                            node_modified = true;
+                        }
+                    }
+                    LinkType::ExternalUrl(_) => {}
+                }
+            }
+
+            for contract_binding in &mut node.element.contract_bindings {
+                match &mut contract_binding.target {
+                    crate::element::ContractBindingTarget::ElementIdentifier(target_id) => {
+                        if let Some(new_id) = identifier_map.get(target_id) {
+                            *target_id = new_id.clone();
+                            node_modified = true;
+                        }
+                    }
+                    crate::element::ContractBindingTarget::FilePath(path) => {
+                        let path_string = path.to_string_lossy().to_string();
+                        if path_is_under_folder(&path_string, &source_folder) {
+                            *path = PathBuf::from(replace_folder_prefix(
+                                &path_string,
+                                &source_folder,
+                                &target_folder,
+                            ));
+                            node_modified = true;
+                        }
+                    }
+                }
+            }
+
+            if rewrite_moved_concept_reference_targets(
+                &mut node.element,
+                &identifier_map,
+                &moved_old_ids,
+            ) {
+                node_modified = true;
+            }
+
+            if node_modified {
+                modified_files.insert(node.element.file_path.clone());
+            }
+        }
+
+        for file in modified_files {
+            self.modified_files.insert(file);
         }
 
         Ok(identifier_mappings)

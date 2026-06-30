@@ -86,6 +86,7 @@ reqvire semantic export --jsonld --output semantic-graph.jsonld`}</CodeBlock>
             { cmd: "reqvire merge <target> <source>", desc: "Merge source element content and relations into a target." },
             { cmd: "reqvire mv-file <old> <new>", desc: "Move or rename a model file while updating model references." },
             { cmd: "reqvire mv-file <old> <new> --squash", desc: "Merge all elements from one file into another file." },
+            { cmd: "reqvire mv-folder <old> <new>", desc: "Move or rename a model folder while updating model references and local evidence paths." },
             { cmd: "reqvire mv-asset <old> <new>", desc: "Move a referenced non-model file and update references." },
             { cmd: "reqvire rm-asset <path>", desc: "Remove a referenced asset from the model." },
           ]}
@@ -113,6 +114,7 @@ reqvire merge "Access Token Validation" "Legacy Token Validation" --dry-run
 
 reqvire mv-file system-model/OldAuth.md system-model/Identity/Auth.md
 reqvire mv-file system-model/AuthDrafts.md system-model/Identity/Auth.md --squash
+reqvire mv-folder system-model/IdentityDrafts system-model/Identity
 reqvire mv-asset docs/auth-flow.pdf docs/identity/auth-flow.pdf
 reqvire rm-asset docs/obsolete-auth-flow.pdf --dry-run`}</CodeBlock>
         </div>

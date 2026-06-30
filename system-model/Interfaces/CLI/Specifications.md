@@ -71,6 +71,7 @@ mv Move element to different location
 rename Rename element
 merge Merge multiple elements into target element
 mv-file Move entire specification file
+mv-folder Move or rename an entire folder subtree
 link Add relation or contract_bindings between elements
 unlink Remove relation or contract_bindings (auto-detects)
 relink Replace an existing relation target with a new target in one operation
@@ -244,6 +245,24 @@ Command-specific rules:
 
 #### Metadata
   * type: specification
+---
+
+### CLI Move Folder Command Contract Specification
+
+#### Details
+The `mv-folder` command exposes the shared folder-move operation through the CLI.
+
+Command-specific rules:
+- It must accept source and target folder paths relative to the selected workspace scope.
+- It must support dry-run diff and JSON mutation output through shared output contracts.
+- It must delegate recursive file relocation, moved-element identifier rewrites, relation reference updates, contract_bindings updates, concept-reference updates, InternalPath reference updates, target validation, collision rejection, and candidate validation to Move Folder Operation Contract Specification and target-location constraints.
+- It must not implement command-local folder mutation semantics outside the shared graph-backed model-operation contracts.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [CLI Move Folder Command](Commands.md#cli-move-folder-command)
 ---
 
 ### CLI Ontologies Command Contract Specification

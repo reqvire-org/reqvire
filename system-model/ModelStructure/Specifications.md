@@ -567,7 +567,7 @@ The cache is a static `Mutex<Option<CachedModel>>` global holding the most recen
 3. On a miss, release the lock, rebuild via `ModelManager::parse_and_validate_with_options`, then store a clone of the rebuilt model under the new key and return the clone.
 
 **Invalidation (`invalidate`):**
-- Clears the stored entry, forcing the next `load_cached_model` call to rebuild. Called after every CRUD write in `tool_interface.rs` (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-asset, rm-asset).
+- Clears the stored entry, forcing the next `load_cached_model` call to rebuild. Called after every CRUD write in `tool_interface.rs` (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-folder, mv-asset, rm-asset).
 
 **Scope:**
 - Only the current working tree is cached. Git-commit history scans (`parse_and_validate`) bypass the cache entirely.

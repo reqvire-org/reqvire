@@ -201,6 +201,7 @@ Expected checks:
 - Operation-specific preview mutation requests, such as `dry_run: true`, return changed files and diffs or equivalent change descriptions without filesystem changes.
 - Non-dry-run requests use Reqvire core mutation logic and flush filesystem changes before reporting success.
 - Non-dry-run mutation requests that would break requirement contract_bindings compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, or single ontology-root validation are rejected before persistence.
+- Folder mutation requests verify the `mv-folder` MCP tool is absent unless mutations are enabled, then verify dry-run and execution responses include moved folder paths, moved file paths, moved element mappings, changed referencing files, validation status, and affected scope.
 - After successful mutation, subsequent MCP reads observe the refreshed internal graph state.
 - Post-mutation results include validation summary, refreshed model revision, and affected element/submodel metadata.
 

@@ -424,6 +424,7 @@ unlink "Source" "Target"
 relink "Source" "derivedFrom" "Old" "New"
 mv "Element" "target.md" [position]
 mv-file "source.md" "target.md" [--squash]
+mv-folder "source-dir" "target-dir"
 merge "Primary" "Duplicate" [--dry-run]
 rm "Element" [--dry-run]
 rename-element "Old Name" "New Name"

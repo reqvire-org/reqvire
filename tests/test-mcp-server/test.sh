@@ -858,7 +858,7 @@ run_http_mcp_sequence "$DRY_RUN_PORT" "$DRY_RUN_OUTPUT" \
 stop_http_mcp
 trap - EXIT
 
-assert_jq_line "$DRY_RUN_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.add_element") != null and index("reqvire.link") != null' "mutation mode advertises mutation tools"
+assert_jq_line "$DRY_RUN_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.add_element") != null and index("reqvire.link") != null and index("reqvire.move_folder") != null' "mutation mode advertises mutation tools"
 assert_jq_line "$DRY_RUN_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.add_element") | .annotations.readOnlyHint == false' "mutation tools are non-read-only"
 assert_jq_line "$DRY_RUN_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.format") | .inputSchema.properties.fix.type == "boolean"' "mutation mode exposes format fix argument"
 assert_jq_line "$DRY_RUN_OUTPUT" 3 '.result.structuredContent.dry_run == true and (.result.structuredContent.diffs | length) >= 1' "dry-run mutation returns diffs without execution"
@@ -951,7 +951,7 @@ jq -r '.result.tools[].name' "$TEST_DIR/output/mcp-http-mutation-tools.json" > "
 if ! diff -u "$TEST_SCRIPT_DIR/expected/http-mutation-tools.txt" "$TEST_DIR/output/mcp-http-mutation-tools.txt"; then
   fail "HTTP mutation tools/list does not match expected mutation tool set"
 fi
-jq -e '[.result.tools[].name] | index("reqvire.add_element") != null and index("reqvire.link") != null' "$TEST_DIR/output/mcp-http-mutation-tools.json" >/dev/null \
+jq -e '[.result.tools[].name] | index("reqvire.add_element") != null and index("reqvire.link") != null and index("reqvire.move_folder") != null' "$TEST_DIR/output/mcp-http-mutation-tools.json" >/dev/null \
   || fail "HTTP mutation mode should advertise mutation tools" "$TEST_DIR/output/mcp-http-mutation-tools.json"
 
 HTTP_CONCURRENT_CONTENT_A="$(< "$TEST_SCRIPT_DIR/fixtures/http-concurrent-requirement-a.md")"
