@@ -18,29 +18,29 @@ This objective groups verification that the Reqvire command-line interface expos
 
 ### CLI Git Commit Hash Flag Test
 
-This test verifies that the system properly handles the git commit hash flag for change impact analysis.
+This test verifies that the system properly handles the source-control commit reference flag for change impact analysis.
 
 #### Details
 
 ##### Acceptance Criteria
 - System shall support --git-commit flag for change impact analysis
-- System shall use specified commit hash as base for comparison
-- System shall default to HEAD when flag is not specified
-- System shall handle relative commit references (HEAD~1, etc.)
+- System shall use the specified commit reference to materialize the base workspace snapshot in the current single-worktree comparison mode
+- System shall default to the current eligible worktree HEAD when the flag is not specified and Git metadata is available
+- System shall handle relative commit references (HEAD~1, etc.) without changing the workspace-root-relative identifier namespace
 
 ##### Test Criteria
 - Command with explicit --git-commit flag runs successfully
-- Command without flag defaults to HEAD commit
+- Command without flag defaults to the current eligible worktree HEAD when Git metadata is available
 - Relative commit references are correctly resolved
 - Invalid commit references are reported appropriately
-- Change impact analysis correctly uses specified commit as baseline
+- Change impact analysis correctly uses the specified commit as the base snapshot while reporting workspace-root-relative paths
 
 ##### Test Procedure
-1. Create test fixtures with git repository containing multiple commits
+1. Create test fixtures with a workspace containing an eligible Git worktree with multiple commits
 2. Run Reqvire with --change-impact --git-commit=HEAD~1
 3. Verify that the specified commit is used as baseline
 4. Run Reqvire with --change-impact (no git-commit flag)
-5. Verify that HEAD is used as default baseline
+5. Verify that the current eligible worktree HEAD is used as the default baseline
 6. Run with invalid commit reference and verify appropriate error
 
 #### Metadata
@@ -118,7 +118,7 @@ Expected checks:
 - Run `reqvire validate` on a fixture with legacy contract relations and verify migration candidates are reported.
 - Run `reqvire migrate` and verify the dry-run preview reports legacy contract relation rewrites without changing source files.
 - Run `reqvire migrate --fix` and verify legacy `refinedBy` and `refine` relations are rewritten to `definedBy` and `define`.
-- Run `reqvire migrate --fix` from a repository subdirectory and verify changed files are written to the git-root-relative source path rather than a duplicated subdirectory path.
+- Run `reqvire migrate --fix` from an effective workspace root below a parent repository and verify changed files are written to the workspace-root-relative source path rather than a duplicated caller launch-directory path.
 - Run `reqvire validate` after migration and verify the migrated model passes.
 
 #### Metadata
@@ -181,11 +181,11 @@ This verification shall prove that Reqvire commands can be launched outside a pr
 
 #### Details
 Expected checks:
-- Run a normal CLI report command from outside the target repository using `--workspace <DIR>` and verify it reads the selected workspace model.
-- Run model mutation commands from outside the target repository using `--workspace <DIR>` and verify changed files are written inside the selected workspace.
-- Run file move mutation from outside the target repository using `--workspace <DIR>` and verify the moved file and updated model references remain inside the selected workspace.
-- Run change-impact from outside the target repository using `--workspace <DIR>` and verify git comparison is computed against the selected workspace repository.
-- Run MCP stdio startup from outside the target repository using `--workspace <DIR>` and verify workspace status reports the selected workspace.
+- Run a normal CLI report command from outside the target workspace using `--workspace <DIR>` and verify it reads the selected workspace model.
+- Run model mutation commands from outside the target workspace using `--workspace <DIR>` and verify changed files are written inside the selected workspace.
+- Run file move mutation from outside the target workspace using `--workspace <DIR>` and verify the moved file and updated model references remain inside the selected workspace.
+- Run change-impact from outside the target workspace using `--workspace <DIR>` and verify source-control comparison is computed against the selected workspace context.
+- Run MCP stdio startup from outside the target workspace using `--workspace <DIR>` and verify workspace status reports the selected workspace.
 - Verify workspace selection is applied before ignore-pattern loading and model validation.
 - Verify invalid workspace paths fail before command execution.
 - Verify omitting `--workspace` preserves current working directory behavior.

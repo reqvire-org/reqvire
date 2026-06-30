@@ -184,6 +184,12 @@ reqvire:RuntimeOntologyArtifact a owl:Class ;
   rdfs:subClassOf reqvire:Artifact ;
   reqvire:mapsToConcept concept:RuntimeOntologyArtifact ;
   rdfs:comment "Generated runtime ontology snapshot embedded by Reqvire core and derived from authored ontology source." .
+reqvire:WorkspaceRoot a owl:Class ;
+  reqvire:mapsToConcept concept:WorkspaceRoot ;
+  rdfs:comment "Effective Reqvire process root used for SOI model path normalization, identifier storage, diagnostics, exported paths, and mutation target resolution." .
+reqvire:GitWorktree a owl:Class ;
+  reqvire:mapsToConcept concept:GitWorktree ;
+  rdfs:comment "Local Git worktree whose membership makes workspace-contained files and artifacts eligible for SOI model processing; Git worktree identity is source-control metadata, not an identifier namespace." .
 reqvire:RuntimeOntologyNamespace a owl:Class ;
   reqvire:mapsToConcept concept:RuntimeOntologyNamespace ;
   rdfs:comment "Term namespace selected as the Reqvire runtime vocabulary boundary for generated runtime ontology artifacts." .
@@ -198,7 +204,7 @@ reqvire:OntologyDocument a owl:Class ;
   rdfs:comment "Generated or authored ontology document identified by ontology base IRI and containing contributed ontology terms." .
 reqvire:File a owl:Class ;
   rdfs:subClassOf reqvire:Artifact ;
-  rdfs:comment "Repository-internal file artifact referenced by Reqvire relations, contract_bindings, or evidence links." .
+  rdfs:comment "Workspace-local file artifact inside an eligible Git worktree and referenced by Reqvire relations, contract_bindings, or evidence links." .
 reqvire:CustomElement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   rdfs:comment "Custom model extension element whose authored metadata type follows other-TYPENAME and cannot author canonical semantic relations." .
@@ -243,7 +249,7 @@ reqvire:ElementIdentifierTarget a owl:Class ;
   rdfs:comment "Reference target category that resolves to a specific model element." .
 reqvire:InternalPathTarget a owl:Class ;
   rdfs:subClassOf reqvire:ReferenceTargetKind ;
-  rdfs:comment "Reference target category that resolves to a repository-internal file path." .
+  rdfs:comment "Reference target category that resolves to a workspace-root-relative file path inside an eligible Git worktree." .
 reqvire:ExternalUrlTarget a owl:Class ;
   rdfs:subClassOf reqvire:ReferenceTargetKind ;
   rdfs:comment "Reference target category that resolves to an external URL." .
@@ -274,7 +280,7 @@ reqvire:elementType a owl:DatatypeProperty ;
 reqvire:filePath a owl:DatatypeProperty ;
   rdfs:domain reqvire:Element ;
   rdfs:range xsd:string ;
-  rdfs:comment "Repository-relative file path containing the element." .
+  rdfs:comment "Workspace-root-relative file path containing the element." .
 reqvire:externalUrl a owl:DatatypeProperty ;
   rdfs:domain reqvire:Artifact ;
   rdfs:range xsd:anyURI ;
@@ -358,7 +364,7 @@ reqvire:elementIdConcept a reqvire:ElementId ;
   reqvire:identitySource "element-name" ;
   reqvire:identityStability "stable-across-relocation" .
 reqvire:elementIdentifierConcept a reqvire:ElementIdentifier ;
-  reqvire:identitySource "file-path-and-fragment" ;
+  reqvire:identitySource "workspace-root-relative-file-path-and-fragment" ;
   reqvire:identityStability "changes-when-file-location-changes" .
 
 reqvire:elementIdentifierReferenceTargetKind a reqvire:ElementIdentifierTarget ;
@@ -366,7 +372,7 @@ reqvire:elementIdentifierReferenceTargetKind a reqvire:ElementIdentifierTarget ;
   rdfs:comment "Target resolves to a specific Reqvire model element by location-based identifier." .
 reqvire:internalPathReferenceTargetKind a reqvire:InternalPathTarget ;
   reqvire:referenceTargetKindName "internal-path" ;
-  rdfs:comment "Target resolves to a repository-internal path without an element fragment." .
+  rdfs:comment "Target resolves to a workspace-root-relative path without an element fragment." .
 reqvire:externalUrlReferenceTargetKind a reqvire:ExternalUrlTarget ;
   reqvire:referenceTargetKindName "external-url" ;
   rdfs:comment "Target resolves to an external URL resource." .

@@ -268,7 +268,7 @@ This test verifies that the system correctly extracts the physical containment h
 5. **Data structure validation:**
    - Verify tree structure: Folder → [Subfolders, Files]
    - Verify File → [Elements] relationship
-   - Verify all paths are relative to git root
+   - Verify all paths are relative to the effective workspace root
    - Test with empty folders and files without elements
 
 6. **Intermediate folders without files:**
@@ -303,13 +303,13 @@ This test verifies that design documents (files in DesignDocuments folders) are 
 2. Run `reqvire containment` command
 3. Verify design documents appear in output grouped by folder
 4. Verify design documents are visually distinguished from elements
-5. Verify design document entries include stable source paths for Explorer navigation
+5. Verify design document entries include stable workspace-root-relative source paths for downstream navigation consumers
 
 #### Expected Results
 - Design documents are shown under their parent folder
 - Design documents display filename
 - Design documents are styled differently from specification elements
-- Click handlers navigate to document files
+- Output includes enough stable source metadata for consuming interfaces to resolve document targets
 
 #### Metadata
   * type: test-verification
@@ -548,7 +548,7 @@ Comprehensive test verifying model command generates model-centric nested output
 
 ### Model Containment Report Integration Test
 
-This test verifies that containment report generation exposes deterministic folder, file, and element hierarchy data for the Explorer model view.
+This test verifies that containment report generation exposes deterministic folder, file, and element hierarchy data for downstream model views.
 
 #### Details
 
@@ -642,12 +642,9 @@ Expected checks:
   * verify: [External Vocabulary Exposure Policy](../../../Reports/ModelReports/ReportingRequirements.md#external-vocabulary-exposure-policy)
   * verify: [Ontology Collection Output](../../../Reports/ModelReports/ReportingRequirements.md#ontology-collection-output)
   * verify: [Ontology Projection Subgraph Materialization](../../../Reports/ModelReports/ReportingRequirements.md#ontology-projection-subgraph-materialization)
-  * verify: [Built-In External Ontology Source Resolution](../../../Semantics/SemanticModelRequirements.md#built-in-external-ontology-source-resolution)
   * verify: [External Vocabulary Description Construction](../../../Semantics/SemanticModelRequirements.md#external-vocabulary-description-construction)
-  * verify: [Ontology and Shapes Collection](../../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
   * verify: [Ontology Term Definition Link Materialization](../../../Semantics/SemanticModelRequirements.md#ontology-term-definition-link-materialization)
   * verify: [OWL Reserved Vocabulary Recognition](../../../Semantics/SemanticModelRequirements.md#owl-reserved-vocabulary-recognition)
-  * verify: [Used External Vocabulary Selection](../../../Semantics/SemanticModelRequirements.md#used-external-vocabulary-selection)
 ---
 
 ### Resources Report Verification
@@ -675,10 +672,6 @@ This test verifies that the resources command correctly generates reports showin
 
 **Output Format:**
 - JSON output provides structured data with relations, contract_bindings, and summary
-
-**Explorer Integration:**
-- Resources view is available as a supporting SPA route in the served Explorer
-- Supporting report routes are reachable through canonical route links or source/report affordances, not a shared top header
 
 ##### Test Criteria
 1. **Basic JSON output**
@@ -868,7 +861,7 @@ This test verifies that the system provides a unified `search` command functiona
     - Contract Bindings is an array of contract element identifier strings
     - Element identifier contract_bindings displayed as full identifiers (e.g., `"specifications/File.md#contract-element"`)
     - Elements without contract_bindings have empty array `[]`
-    - Contract Bindings identifiers are normalized to git-root-relative identifier format
+    - Contract Bindings identifiers are normalized to workspace-root-relative identifier format
 
 17. **Contract Bindings omitted in short mode**
     Command: `reqvire search --short --json`

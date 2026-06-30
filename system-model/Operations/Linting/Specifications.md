@@ -23,25 +23,6 @@
   * define: [Cross-Submodel Hierarchical Relation Detection](LintingRequirements.md#cross-submodel-hierarchical-relation-detection)
 ---
 
-### Rust Workspace Lint Policy Specification
-
-The Rust workspace lint policy is expected to provide a common clippy baseline for all workspace crates.
-
-#### Details
-Policy requirements:
-- The root `Cargo.toml` owns `[workspace.lints.clippy]` so lint levels are centralized.
-- `clippy::all`, `clippy::nursery`, `clippy::unwrap_used`, and `clippy::clone_on_ref_ptr` are warning-level checks.
-- `clippy::pedantic` may remain staged until the warning baseline is clean and documented.
-- The `Makefile` exposes a `clippy` target that runs `cargo clippy --workspace --all-targets`.
-- The `Makefile` exposes formatting and e2e targets so implementation quality checks can be run consistently with tests.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Rust Workspace Lint Policy](LintingRequirements.md#rust-workspace-lint-policy)
----
-
 ### Lint Auto-fix Capability Contract Specification
 
 #### Details
@@ -219,4 +200,23 @@ Redundant verify relation detection behavior:
 
 #### Relations
   * define: [Redundant Verify Relations Detection](LintingRequirements.md#redundant-verify-relations-detection)
+---
+
+### Rust Workspace Lint Policy Specification
+
+The Rust workspace lint policy is expected to provide a common clippy baseline for all workspace crates.
+
+#### Details
+Policy requirements:
+- The root `Cargo.toml` owns `[workspace.lints.clippy]` so lint levels are centralized.
+- `clippy::all`, `clippy::nursery`, `clippy::unwrap_used`, and `clippy::clone_on_ref_ptr` are warning-level checks.
+- `clippy::pedantic` may remain staged until the warning baseline is clean and documented.
+- The `Makefile` exposes a `clippy` target that runs `cargo clippy --workspace --all-targets`.
+- The `Makefile` exposes formatting and e2e targets so implementation quality checks can be run consistently with tests.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Rust Workspace Lint Policy](LintingRequirements.md#rust-workspace-lint-policy)
 ---

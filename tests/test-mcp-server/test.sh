@@ -986,6 +986,11 @@ trap - EXIT
 
 INVALID_DIR="$(mktemp -d -t reqvire-mcp-invalid-XXXXXX)"
 cp -a "$TEST_SCRIPT_DIR/fixtures/invalid-startup/." "$INVALID_DIR/"
+(cd "$INVALID_DIR" && git init >/dev/null 2>&1)
+(cd "$INVALID_DIR" && git config --local user.email "test@example.com" >/dev/null 2>&1)
+(cd "$INVALID_DIR" && git config --local user.name "Test User" >/dev/null 2>&1)
+(cd "$INVALID_DIR" && git add . >/dev/null 2>&1)
+(cd "$INVALID_DIR" && git commit -m "Initial invalid model" >/dev/null 2>&1)
 
 set +e
 INVALID_PORT="$(pick_port)"

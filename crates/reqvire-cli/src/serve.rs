@@ -232,6 +232,12 @@ fn workspace_file_response(method: Method, request_path: &str) -> Option<Respons
     }
 
     let absolute_path = PathBuf::from(".").join(path);
+    let eligible = reqvire::workspace::WorkspaceScope::discover()
+        .map(|scope| scope.is_eligible_path(&absolute_path))
+        .unwrap_or(false);
+    if !eligible {
+        return None;
+    }
     if !absolute_path.is_file() {
         return None;
     }

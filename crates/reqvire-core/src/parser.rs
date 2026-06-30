@@ -160,7 +160,7 @@ pub fn normalize_concept_reference_target(
         return Ok(format!("{}{}", source_file_path, target));
     }
 
-    let git_root = crate::git_commands::get_git_root_dir()?;
+    let git_root = crate::workspace::workspace_root()?;
     let file_parent = Path::new(source_file_path).parent().ok_or_else(|| {
         ReqvireError::PathError(format!(
             "Cannot determine parent directory of '{}'",
@@ -467,7 +467,7 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
 
                     // Normalize relation target
                     // file_path is already relative to git root (e.g., "system-model/NewFile.md")
-                    let git_root = crate::git_commands::get_git_root_dir()?;
+                    let git_root = crate::workspace::workspace_root()?;
 
                     let normalized_target = if link.starts_with('#') {
                         // Same-file reference: just prepend file_path (already git-root-relative)
@@ -522,7 +522,7 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                             }
 
                             // Element identifier - use same normalization as relations
-                            let git_root = crate::git_commands::get_git_root_dir()?;
+                            let git_root = crate::workspace::workspace_root()?;
                             let normalized = if href.starts_with('#') {
                                 // Same-file reference: just prepend file_path
                                 format!("{}{}", file_path, href)

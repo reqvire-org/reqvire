@@ -2,13 +2,16 @@
 
 ### Export Command
 
-The system SHALL provide an export command that writes the embedded Explorer SPA bundle, generated model data, and repository-local static assets referenced by rendered workspace content to a local output directory, producing a self-contained static site suitable for deployment to GitHub Pages or any static file host.
+The system SHALL provide an export command that writes the embedded Explorer SPA bundle, generated model data, and eligible Git-worktree static assets referenced by rendered workspace content to a local output directory, producing a self-contained static site suitable for deployment to GitHub Pages or any static file host.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
+
+#### Contract Bindings
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
 
 #### Relations
   * definedBy: [Export Command Contract Specification](Specifications.md#export-command-contract-specification)
@@ -20,7 +23,7 @@ Implementation details shall follow the associated contract specifications.
 
 ### Serve Command
 
-The system SHALL provide a serve command that launches a local Explorer HTTP server for browsing the current workspace model and repository-local static assets referenced by rendered workspace content.
+The system SHALL provide a serve command that launches a local Explorer HTTP server for browsing the current workspace model and eligible Git-worktree static assets referenced by rendered workspace content.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -29,13 +32,13 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Contract Bindings
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [Two-Pass Validation Behavior](../../Operations/Validation/Behaviors.md#two-pass-validation-behavior)
   * [Validation Error Reporting Behavior](../../Operations/Validation/Behaviors.md#validation-error-reporting-behavior)
   * [Explorer Serve Pipeline Specification](Specifications.md#explorer-serve-pipeline-specification)
 
 #### Relations
   * definedBy: [Serve Command Contract Specification](Specifications.md#serve-command-contract-specification)
-  * derive: [Serve Command Embedded MCP Endpoint](#serve-command-embedded-mcp-endpoint)
   * derivedFrom: [Web Interface](../InterfacesRequirements.md#web-interface)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
@@ -52,9 +55,11 @@ Detailed embedded endpoint, registry reuse, transport, mutation gating, route pr
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Serve Command Contract Specification](Specifications.md#serve-command-contract-specification)
+
 #### Relations
   * definedBy: [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
-  * derivedFrom: [Serve Command](#serve-command)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
@@ -331,7 +336,7 @@ The system shall provide `index.html` as the single-page Reqvire Explorer shell 
 The SPA Explorer shell shall:
 - Be a native single-page application built with Vite, TypeScript, and React, using the Reqvire Explorer design system and compiled CSS, served as `index.html` plus deterministic `assets/explorer.js` and `assets/explorer.css` bundles with no CDN-loaded framework or stylesheet and no runtime CSS compiler.
 - Treat `index.html` as the primary browser entry point and central Project Store host.
-- Expose project identity metadata in the Project Store, including repository name and current branch when Git metadata is available, so Explorer navigation roots identify the served repository snapshot instead of showing a generic project label.
+- Expose project identity metadata in the Project Store, including effective workspace root label and eligible Git worktree names, paths, and source-control metadata when available, so Explorer navigation roots identify the served workspace snapshot instead of showing a generic project label.
 - Render the primary Model route as a native SPA view module reading from the Project Store. The Model route shall host List, Grid, and Graph modes over the Project Store filesystem/model and knowledge-graph projections.
 - Keep Model project-tree selection shared across List, Grid, and Graph modes so selecting a folder, file, or modeled element in the left Explorer tree updates the active Model workspace instead of opening a disconnected Filesystem view.
 - Render Graph as a Model mode over the Project Store knowledge-graph projection, render specialist Ontologies and Traces routed views from top navigation and tool actions, and render supporting Search, file deep links, Coverage, Resources, and element-detail workflows from the same Project Store without making them primary left-pane navigation modes.
@@ -343,12 +348,15 @@ The SPA Explorer shell shall:
 - Open inline concept-reference links to the native `concept` element modal. Concept references shall not route to ontology-node modals because authored model concept references resolve to native concept elements.
 - Suppress the reserved `#### Concept References` source subsection from regular element-detail modal body rendering and source-page rendering; the subsection is authoring metadata and must not appear as a separate visible content block.
 - Do not generate separate Explorer/report document entry points.
-- Seed a normalized project snapshot that distinguishes modeled source-file containers from modeled resource and evidence-file targets. The Model tree shall contain modeled element files plus existing repository-relative local implementation/evidence/resource files referenced by graph-registry facts, while unrelated repository files remain absent.
+- Seed a normalized project snapshot that distinguishes modeled source-file containers from modeled resource and evidence-file targets. The Model tree shall contain modeled element files plus existing workspace-root-relative implementation/evidence/resource files that are inside eligible Git worktrees and referenced by graph-registry facts, while unrelated Git-worktree files and all non-Git workspace files remain absent.
 - Keep containment, model, knowledge graph, verification traces, coverage, resources, ontology, search, summaries, and route state as view-neutral store projections rather than separate page-local data models.
 - Preserve the current relation model: capabilities may author concept references and are specified by requirements; requirements own contracts, satisfaction evidence, verification evidence, reusable contract contract_bindings, and concept references. Capability coverage is computed from verified requirements.
 
 #### Metadata
   * type: requirement
+
+#### Contract Bindings
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
 
 #### Relations
   * definedBy: [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
@@ -398,7 +406,7 @@ Detailed route data, left-pane behavior, flow/row rendering, Mermaid roll-up dia
   * type: requirement
 
 #### Contract Bindings
-  * [Browser Trace Diagram Generation Contract Specification](../../Reports/ModelReports/Specifications.md#browser-trace-diagram-generation-contract-specification)
+  * [Trace Diagram Projection Data Contract Specification](../../Reports/ModelReports/Specifications.md#trace-diagram-projection-data-contract-specification)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations

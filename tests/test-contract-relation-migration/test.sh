@@ -30,7 +30,7 @@ cp specifications/Requirements.md submodule/specifications/Requirements.md
 (cd submodule && $REQVIRE migrate --fix > ../migrate-submodule-fix.out 2>&1)
 
 if grep -q "refinedBy\\|refine:" submodule/specifications/Requirements.md; then
-  echo "FAILED: migrate --fix from a subdirectory should rewrite the git-root-relative source file"
+  echo "FAILED: migrate --fix from a subdirectory should rewrite the workspace-root-relative source file"
   cat submodule/specifications/Requirements.md
   exit 1
 fi

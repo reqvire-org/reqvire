@@ -50,9 +50,9 @@ if [ $EXIT_CODE -eq 0 ]; then
   exit 1
 fi
 
-# Check that validation error mentions missing relation target (due to parent directory reference)
-if ! echo "$OUTPUT" | grep -q "Missing relation target.*specifications/MainRequirements.md"; then
-  echo "❌ FAILED: Validation error should mention missing target for parent directory reference"
+# Check that validation error explains the parent directory reference escapes the workspace.
+if ! echo "$OUTPUT" | grep -q "not inside workspace root"; then
+  echo "❌ FAILED: Validation error should mention outside-workspace parent directory reference"
   echo "Output: $OUTPUT"
   exit 1
 fi
@@ -123,14 +123,14 @@ fi
 # According to requirement: "CRUD commands resolve paths relative to current working directory"
 # When running from submodule/, the path "specifications/OtherRequirements.md" should be resolved
 # relative to current working directory (submodule/), so it should resolve to:
-# submodule/specifications/OtherRequirements.md (relative to git root)
+# submodule/specifications/OtherRequirements.md (relative to workspace root)
 # Verify element was moved to the file within submodule directory
 if ! grep -q "### Submodule System" "${TMP_DIR}/project-root/submodule/specifications/OtherRequirements.md"; then
   echo "❌ FAILED: Element was not moved to the correct file (should be submodule/specifications/OtherRequirements.md)"
   # Debug: show where file was actually created
-  echo "Checking if file was incorrectly created at git root:"
+  echo "Checking if file was incorrectly created at parent workspace:"
   if [ -f "${TMP_DIR}/project-root/specifications/OtherRequirements.md" ]; then
-    echo "  File exists at git root (WRONG): specifications/OtherRequirements.md"
+    echo "  File exists at parent workspace (WRONG): specifications/OtherRequirements.md"
     grep "### Submodule System" "${TMP_DIR}/project-root/specifications/OtherRequirements.md" || true
   fi
   exit 1
@@ -176,9 +176,9 @@ fi
 # Verify target file was created in subdirectory
 if [ ! -f "${TMP_DIR}/project-root/submodule/specs/Renamed.md" ]; then
   echo "❌ FAILED: Target file was not created by mv-file at submodule/specs/Renamed.md"
-  # Debug: check if file was incorrectly created at git root
+  # Debug: check if file was incorrectly created at parent workspace
   if [ -f "${TMP_DIR}/project-root/specs/Renamed.md" ]; then
-    echo "  File exists at git root (WRONG): specs/Renamed.md"
+    echo "  File exists at parent workspace (WRONG): specs/Renamed.md"
   fi
   exit 1
 fi

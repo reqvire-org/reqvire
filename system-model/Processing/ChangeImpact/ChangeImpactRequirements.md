@@ -13,12 +13,17 @@ Change impact detection encompasses:
 
 When generating a change impact report, the system shall compute and display the per-branch lowest common ancestors of all impacted, added, and deleted requirements through the derivedFrom hierarchy, providing reviewers with a summary of affected model areas.
 
+Change impact compares a base workspace snapshot with the current workspace snapshot. The current single-repository Git commit option is a convenience for materializing the base snapshot from one repository; it does not make Git root the identifier root. All detected paths, relocations, relation targets, contract_bindings targets, evidence paths, and impact report links are interpreted as workspace-root-relative paths.
+
 **Contract Element Changes:**
 - Contract element content changes (hash changes) shall propagate change impact through the model via their contract_bindings relationships
 - Contract Bindings identifier location changes (moved/renamed Contract elements) shall be reported but do NOT propagate impact (same behavior as relation relocations)
 
 #### Metadata
   * type: requirement
+
+#### Contract Bindings
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
 
 #### Relations
   * definedBy: [Impact Scope Computation Specification](Specifications.md#impact-scope-computation-specification)

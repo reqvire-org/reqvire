@@ -36,6 +36,7 @@ The system shall document MCP, coding-assistant integrations, prompt workflows, 
   * type: requirement
 
 #### Contract Bindings
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [MCP Prompt Guidance Specification](../MCP/Specifications.md#mcp-prompt-guidance-specification)
   * [MCP Protocol Standard Conformance Specification](../MCP/Specifications.md#mcp-protocol-standard-conformance-specification)
   * [MCP Semantic Query Tools Specification](../MCP/Specifications.md#mcp-semantic-query-tools-specification)
@@ -56,6 +57,7 @@ The system shall document everyday CLI workflows, model commands, report command
   * type: requirement
 
 #### Contract Bindings
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [CLI Interface Structure Contract Specification](../CLI/Specifications.md#cli-interface-structure-contract-specification)
   * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
   * [Report Command Catalog Specification](../../Reports/ModelReports/Specifications.md#report-command-catalog-specification)

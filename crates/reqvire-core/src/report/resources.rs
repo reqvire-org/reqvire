@@ -45,6 +45,7 @@ impl ResourcesReport {
 
 /// Generate the resources report from the graph registry
 pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
+    let workspace_scope = crate::workspace::WorkspaceScope::discover().ok();
     // Collect InternalPath relations: file_path -> Vec<(relation_type, element_id, element_name)>
     let mut relation_map: FxHashMap<PathBuf, Vec<(String, String, String)>> = FxHashMap::default();
 
@@ -59,6 +60,9 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
         // Process relations with InternalPath targets
         for relation in &element.relations {
             if let LinkType::InternalPath(path) = &relation.target.link {
+                if !is_existing_eligible_file(path, workspace_scope.as_ref()) {
+                    continue;
+                }
                 let rel_type = relation.relation_type.name.to_string();
                 relation_map.entry(path.clone()).or_default().push((
                     rel_type,
@@ -71,6 +75,9 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
         // Process contract_bindings with FilePath targets
         for contract_bindings in &element.contract_bindings {
             if let ContractBindingTarget::FilePath(path) = &contract_bindings.target {
+                if !is_existing_eligible_file(path, workspace_scope.as_ref()) {
+                    continue;
+                }
                 contract_bindings_map
                     .entry(path.clone())
                     .or_default()
@@ -147,4 +154,18 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
         relations,
         contract_bindings,
     }
+}
+
+fn is_existing_eligible_file(
+    path: &std::path::Path,
+    workspace_scope: Option<&crate::workspace::WorkspaceScope>,
+) -> bool {
+    let Some(scope) = workspace_scope else {
+        return false;
+    };
+    let absolute_path = scope.root.join(path);
+    scope.is_eligible_path(&absolute_path)
+        && std::fs::metadata(absolute_path)
+            .map(|metadata| metadata.is_file())
+            .unwrap_or(false)
 }

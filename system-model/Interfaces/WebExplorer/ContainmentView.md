@@ -205,7 +205,7 @@ The Model workspace consumes Project Store records directly:
 
 **Processing:**
 1. Files, folders, elements, resources, and graph edges are normalized during serve runtime generation
-2. JSON data preserves repository-relative source paths and canonical element identifiers
+2. JSON data preserves workspace-root-relative source paths and canonical element identifiers
 3. The compiled Explorer bundle renders List, Grid, and Graph modes from the shared Project Store
 4. The served Explorer shall not depend on route-local Markdown code blocks or CDN-loaded visualization scripts for native Model modes
 

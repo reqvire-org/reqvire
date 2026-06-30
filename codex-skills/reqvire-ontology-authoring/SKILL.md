@@ -18,7 +18,7 @@ not replace the system-engineering workflow for changing their behavior.
 Use Reqvire as the source-of-truth runtime when authoring or changing OWL/RDFS
 ontology elements and SHACL semantic contracts.
 
-- Work from the repository root unless the user gives a different workspace.
+- Work from the intended effective workspace root unless the user gives a different workspace; the workspace must contain at least one eligible Git worktree.
 - Default CLI form: `npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" <command>`.
 - Inside the Reqvire source repository, `cargo run -- <command>` is also acceptable when the local binary is the intended target.
 - Inspect authored ontology content with `search --filter-type ontology --json`, `search --filter-type semantic-contract --json`, `model --filter-type ontology --json`, `semantic export --layer ontologies`, `semantic export --layer shapes`, and `semantic export --layer model`.

@@ -122,7 +122,7 @@ LINT OPTIONS:
       --output <FILE>           Save JSON output to file (requires --json)
 
 ADD OPTIONS:
-       <FILE>                   Target file path (relative to git repository root)
+       <FILE>                   Target file path (relative to workspace root)
       --content <MARKDOWN>      Element markdown content (alternative to stdin)
       --override                Replace existing element with same name
       --dry-run                 Preview changes without applying
@@ -137,7 +137,7 @@ RM OPTIONS:
 
 MV OPTIONS:
        <ELEMENT_NAME>           Element name
-       <FILE>                   Target file path (relative to git repository root)
+       <FILE>                   Target file path (relative to workspace root)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)

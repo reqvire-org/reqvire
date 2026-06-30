@@ -68,12 +68,13 @@ When a requirement changes, impact analysis must be conducted based on its relat
 
 2. **Relocation Detection**:
    - For each element present in both versions (matched by Element ID):
-     - Compare file_path field (implicit file containment)
+     - Compare file_path field (implicit file containment, stored relative to the effective workspace root)
      - Compare section field (implicit section containment)
      - If either differs -> classify as relocation
      - Track old location and new location for reporting
    - Relocations without content changes do NOT propagate impact
    - Relocations WITH content changes propagate based on content change only
+   - Moving the effective workspace root is not a model relocation; the same workspace-root-relative paths must compare equal across snapshots
 
 3. **Impact Determination**:
    - For each changed element, identify all relations from the element

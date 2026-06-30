@@ -21,7 +21,7 @@ concept references on those elements only as part of concept-authoring work.
 Use Reqvire as the source-of-truth runtime when authoring or changing native
 concept schemes and concepts.
 
-- Work from the repository root unless the user gives a different workspace.
+- Work from the intended effective workspace root unless the user gives a different workspace; the workspace must contain at least one eligible Git worktree.
 - Default CLI form: `npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" <command>`.
 - Inside the Reqvire source repository, `cargo run -- <command>` is also acceptable when the local binary is the intended target.
 - Inspect authored concepts with `search --filter-type concept-scheme --json`, `search --filter-type concept --json`, `model --filter-type concept-scheme --json`, `semantic export --layer concepts`, `concepts export`, and `concepts validate`.

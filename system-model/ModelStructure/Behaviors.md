@@ -73,19 +73,37 @@ Formatting and rewrite operations shall not insert inherited or default values i
 
 ### Subdirectory Auto-Detection Behavior
 
-Describes how subdirectory scope detection and enforcement works.
+Describes how workspace scope detection and enforcement works when Reqvire starts from a directory that may be a Git root, a child of a Git root, or a parent of Git repositories.
 
 #### Details
 **Detection Steps:**
 
-1. **Detect git root**: Run `git rev-parse --show-toplevel` to find repository root
-2. **Determine relative scope**: Calculate current working directory path relative to git root
-3. **Limit file processing**: Only process specification files within the current subdirectory
-4. **Validate references**: References to elements outside the subdirectory scope generate missing target errors
+1. **Establish effective workspace root**: Use the process working directory after startup workspace selection has been applied.
+2. **Discover eligible Git worktrees**: Detect the containing Git worktree when the workspace root is inside one, and detect descendant Git worktrees under the workspace root.
+3. **Collect Git metadata**: Record revision, branch, remote, dirty-state, and source-control metadata for eligible worktrees.
+4. **Limit file processing**: Only process specification files, local assets, implementation files, and evidence artifacts that are both inside the effective workspace root and inside an eligible Git worktree.
+5. **Ignore non-Git folders**: Ignore every workspace-root descendant folder that is outside all eligible Git worktrees.
+6. **Normalize paths**: Store identifiers, InternalPath targets, diagnostics, reports, exports, and consumer records as workspace-root-relative paths.
+7. **Validate references**: References to elements outside the workspace root or outside all eligible Git worktrees generate missing target errors.
 
-**When run from git root:**
-- Process all files in the repository
-- No scope limitations apply
+**When run from a Git root:**
+- Process files under that directory.
+- Workspace-relative identifiers match the legacy single-repository path shape.
+
+**When run from a child of a Git root:**
+- Process files under the child directory only.
+- Parent repository content is outside the Reqvire workspace unless the process is started from a higher directory.
+- Identifiers do not include the child directory prefix because the child directory is the workspace root.
+
+**When run from a parent of one or more Git repositories:**
+- Process files under descendant Git repositories only.
+- Ignore non-Git folders under the parent workspace root.
+- Nested repository directories are ordinary workspace subdirectories for Reqvire addressing.
+- Git metadata for nested repositories may be reported separately, but it does not change identifier roots.
+
+**When run from a non-Git directory with no descendant Git repositories:**
+- No files are eligible for model parsing or local artifact inclusion.
+- Commands that require a model report an empty or missing model according to their normal diagnostics.
 
 This behavior enables focused work on specific areas of large models while maintaining reference integrity.
 

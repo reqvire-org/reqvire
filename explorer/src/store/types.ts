@@ -14,13 +14,22 @@
  */
 
 /** Must match `SCHEMA_VERSION` in crates/reqvire-core/src/html/store.rs. */
-export const EXPECTED_SCHEMA_VERSION = "2026-06-23.project-store.v3";
+export const EXPECTED_SCHEMA_VERSION = "2026-06-30.project-store.v4";
 
 export interface ProjectStoreProject {
   name: string;
   root_label: string;
+  workspace_root: string;
+  eligible_git_worktrees: ProjectStoreGitWorktree[];
   repository?: string | null;
   branch?: string | null;
+}
+
+export interface ProjectStoreGitWorktree {
+  root: string;
+  workspace_relative_root: string;
+  head?: string | null;
+  dirty: boolean;
 }
 
 export interface ProjectStoreFolder {

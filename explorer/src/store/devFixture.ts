@@ -14,6 +14,15 @@ export const devFixture: ExplorerProjectStore = {
   project: {
     name: "reqvire",
     root_label: "reqvire @ dev-fixture",
+    workspace_root: "/workspace/reqvire",
+    eligible_git_worktrees: [
+      {
+        root: "/workspace/reqvire",
+        workspace_relative_root: ".",
+        head: "0000000000000000000000000000000000000000",
+        dirty: false,
+      },
+    ],
     repository: "reqvire",
     branch: "dev-fixture",
   },

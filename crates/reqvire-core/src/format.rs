@@ -7,8 +7,8 @@
 
 use crate::diff::{generate_file_diff, render_file_diffs, FileDiff};
 use crate::error::ReqvireError;
-use crate::git_commands;
 use crate::graph_registry::GraphRegistry;
+use crate::workspace;
 use log::debug;
 use std::fs;
 
@@ -27,10 +27,7 @@ pub fn format_files(
     dry_run: bool,
     with_full_relations: bool,
 ) -> Result<FormatResult, ReqvireError> {
-    let base_dir = git_commands::get_git_root_dir().or_else(|_| {
-        std::env::current_dir()
-            .map_err(|e| ReqvireError::PathError(format!("Failed to get current directory: {}", e)))
-    })?;
+    let base_dir = workspace::workspace_root()?;
 
     let grouped_elements = registry.group_elements_by_location();
     let mut files_changed = 0;

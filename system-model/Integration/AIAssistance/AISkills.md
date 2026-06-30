@@ -14,10 +14,95 @@ The system shall define a dedicated AI-assistant skills submodel that provides i
   * [Traceability Reporting Specification](../../Reports/ModelReports/Specifications.md#traceability-reporting-specification)
 
 #### Relations
+  * derive: [AI Skill Installer Distribution](#ai-skill-installer-distribution)
   * derive: [AI Skills Instruction Contracts](#ai-skills-instruction-contracts)
   * derive: [AI Skills Markdown Implementation Artifacts](#ai-skills-markdown-implementation-artifacts)
-  * derive: [AI Skill Installer Distribution](#ai-skill-installer-distribution)
   * specify: [AI-Assisted System Model Management](../IntegrationFeature.md#ai-assisted-system-model-management)
+---
+
+### AI Skill Installer Distribution
+
+The system shall provide remote, no-clone skill installers whose downloadable manifests stay synchronized with the supported Claude and Codex skill artifact files.
+
+#### Details
+Remote installer distribution details shall follow the associated contract specification.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [AI Skill Installer Distribution Specification](#ai-skill-installer-distribution-specification)
+  * derivedFrom: [AI Assistant Skill-Guided Reqvire Modeling](#ai-assistant-skill-guided-reqvire-modeling)
+  * satisfiedBy: [README.md](../../../README.md)
+  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/audit/SKILL.md)
+  * satisfiedBy: [AnalyzeCoverage.md](../../../claude-plugins/skills/audit/reference/AnalyzeCoverage.md)
+  * satisfiedBy: [AnalyzeModel.md](../../../claude-plugins/skills/audit/reference/AnalyzeModel.md)
+  * satisfiedBy: [ChangeImpact.md](../../../claude-plugins/skills/audit/reference/ChangeImpact.md)
+  * satisfiedBy: [Lint.md](../../../claude-plugins/skills/audit/reference/Lint.md)
+  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/concept-authoring/SKILL.md)
+  * satisfiedBy: [ConceptAuthoring.md](../../../claude-plugins/skills/concept-authoring/reference/ConceptAuthoring.md)
+  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/ontology-authoring/SKILL.md)
+  * satisfiedBy: [OntologyAuthoring.md](../../../claude-plugins/skills/ontology-authoring/reference/OntologyAuthoring.md)
+  * satisfiedBy: [OntologyRefactoring.md](../../../claude-plugins/skills/ontology-authoring/reference/OntologyRefactoring.md)
+  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/syseng/SKILL.md)
+  * satisfiedBy: [AddCapability.md](../../../claude-plugins/skills/syseng/reference/AddCapability.md)
+  * satisfiedBy: [AddRequirement.md](../../../claude-plugins/skills/syseng/reference/AddRequirement.md)
+  * satisfiedBy: [AddVerification.md](../../../claude-plugins/skills/syseng/reference/AddVerification.md)
+  * satisfiedBy: [CapabilitySemanticContractRefactor.md](../../../claude-plugins/skills/syseng/reference/CapabilitySemanticContractRefactor.md)
+  * satisfiedBy: [Collect.md](../../../claude-plugins/skills/syseng/reference/Collect.md)
+  * satisfiedBy: [ConsolidateRequirements.md](../../../claude-plugins/skills/syseng/reference/ConsolidateRequirements.md)
+  * satisfiedBy: [Containment.md](../../../claude-plugins/skills/syseng/reference/Containment.md)
+  * satisfiedBy: [ContainmentStructureRefactor.md](../../../claude-plugins/skills/syseng/reference/ContainmentStructureRefactor.md)
+  * satisfiedBy: [CreatingTasks.md](../../../claude-plugins/skills/syseng/reference/CreatingTasks.md)
+  * satisfiedBy: [DesignDocOwnership.md](../../../claude-plugins/skills/syseng/reference/DesignDocOwnership.md)
+  * satisfiedBy: [Link.md](../../../claude-plugins/skills/syseng/reference/Link.md)
+  * satisfiedBy: [Move.md](../../../claude-plugins/skills/syseng/reference/Move.md)
+  * satisfiedBy: [Remove.md](../../../claude-plugins/skills/syseng/reference/Remove.md)
+  * satisfiedBy: [RenameElement.md](../../../claude-plugins/skills/syseng/reference/RenameElement.md)
+  * satisfiedBy: [Setup.md](../../../claude-plugins/skills/syseng/reference/Setup.md)
+  * satisfiedBy: [SpecificationLanguageCleanup.md](../../../claude-plugins/skills/syseng/reference/SpecificationLanguageCleanup.md)
+  * satisfiedBy: [SpecificationsExtractionLogic.md](../../../claude-plugins/skills/syseng/reference/SpecificationsExtractionLogic.md)
+  * satisfiedBy: [SubmodelRefactor.md](../../../claude-plugins/skills/syseng/reference/SubmodelRefactor.md)
+  * satisfiedBy: [VerificationAlignment.md](../../../claude-plugins/skills/syseng/reference/VerificationAlignment.md)
+  * satisfiedBy: [explore.md](../../../claude-plugins/skills/syseng/reference/explore.md)
+  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-audit/SKILL.md)
+  * satisfiedBy: [AnalyzeCoverage.md](../../../codex-skills/reqvire-audit/references/AnalyzeCoverage.md)
+  * satisfiedBy: [AnalyzeModel.md](../../../codex-skills/reqvire-audit/references/AnalyzeModel.md)
+  * satisfiedBy: [ChangeImpact.md](../../../codex-skills/reqvire-audit/references/ChangeImpact.md)
+  * satisfiedBy: [Lint.md](../../../codex-skills/reqvire-audit/references/Lint.md)
+  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-concept-authoring/SKILL.md)
+  * satisfiedBy: [openai.yaml](../../../codex-skills/reqvire-concept-authoring/agents/openai.yaml)
+  * satisfiedBy: [ConceptAuthoring.md](../../../codex-skills/reqvire-concept-authoring/references/ConceptAuthoring.md)
+  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-ontology-authoring/SKILL.md)
+  * satisfiedBy: [openai.yaml](../../../codex-skills/reqvire-ontology-authoring/agents/openai.yaml)
+  * satisfiedBy: [OntologyAuthoring.md](../../../codex-skills/reqvire-ontology-authoring/references/OntologyAuthoring.md)
+  * satisfiedBy: [OntologyRefactoring.md](../../../codex-skills/reqvire-ontology-authoring/references/OntologyRefactoring.md)
+  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-syseng/SKILL.md)
+  * satisfiedBy: [AddCapability.md](../../../codex-skills/reqvire-syseng/references/AddCapability.md)
+  * satisfiedBy: [AddRequirement.md](../../../codex-skills/reqvire-syseng/references/AddRequirement.md)
+  * satisfiedBy: [AddVerification.md](../../../codex-skills/reqvire-syseng/references/AddVerification.md)
+  * satisfiedBy: [CapabilitySemanticContractRefactor.md](../../../codex-skills/reqvire-syseng/references/CapabilitySemanticContractRefactor.md)
+  * satisfiedBy: [Collect.md](../../../codex-skills/reqvire-syseng/references/Collect.md)
+  * satisfiedBy: [ConsolidateRequirements.md](../../../codex-skills/reqvire-syseng/references/ConsolidateRequirements.md)
+  * satisfiedBy: [Containment.md](../../../codex-skills/reqvire-syseng/references/Containment.md)
+  * satisfiedBy: [ContainmentStructureRefactor.md](../../../codex-skills/reqvire-syseng/references/ContainmentStructureRefactor.md)
+  * satisfiedBy: [CreatingTasks.md](../../../codex-skills/reqvire-syseng/references/CreatingTasks.md)
+  * satisfiedBy: [DesignDocOwnership.md](../../../codex-skills/reqvire-syseng/references/DesignDocOwnership.md)
+  * satisfiedBy: [Link.md](../../../codex-skills/reqvire-syseng/references/Link.md)
+  * satisfiedBy: [Move.md](../../../codex-skills/reqvire-syseng/references/Move.md)
+  * satisfiedBy: [Remove.md](../../../codex-skills/reqvire-syseng/references/Remove.md)
+  * satisfiedBy: [RenameElement.md](../../../codex-skills/reqvire-syseng/references/RenameElement.md)
+  * satisfiedBy: [Setup.md](../../../codex-skills/reqvire-syseng/references/Setup.md)
+  * satisfiedBy: [SpecificationLanguageCleanup.md](../../../codex-skills/reqvire-syseng/references/SpecificationLanguageCleanup.md)
+  * satisfiedBy: [SpecificationsExtractionLogic.md](../../../codex-skills/reqvire-syseng/references/SpecificationsExtractionLogic.md)
+  * satisfiedBy: [SubmodelRefactor.md](../../../codex-skills/reqvire-syseng/references/SubmodelRefactor.md)
+  * satisfiedBy: [VerificationAlignment.md](../../../codex-skills/reqvire-syseng/references/VerificationAlignment.md)
+  * satisfiedBy: [explore.md](../../../codex-skills/reqvire-syseng/references/explore.md)
+  * satisfiedBy: [CODEX_SKILLS.md](../../../doc/CODEX_SKILLS.md)
+  * satisfiedBy: [install-claude-skill.sh](../../../scripts/install-claude-skill.sh)
+  * satisfiedBy: [install-codex-skill.sh](../../../scripts/install-codex-skill.sh)
+  * satisfiedBy: [CodingAssistants.tsx](../../../website/src/pages/CodingAssistants.tsx)
+  * verifiedBy: [AI Skill Installer Manifest Verification](../../Verifications/Integration/AIAssistance/AISkillVerifications.md#ai-skill-installer-manifest-verification)
 ---
 
 ### AI Skills Instruction Contracts
@@ -51,99 +136,36 @@ Artifact contract details shall follow the associated contract specification.
 #### Relations
   * definedBy: [AI Skills Markdown Artifact Specification](#ai-skills-markdown-artifact-specification)
   * derivedFrom: [AI Assistant Skill-Guided Reqvire Modeling](#ai-assistant-skill-guided-reqvire-modeling)
+  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/audit/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/concept-authoring/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/ontology-authoring/SKILL.md)
-  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/audit/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/syseng/SKILL.md)
+  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-audit/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-concept-authoring/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-ontology-authoring/SKILL.md)
-  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-audit/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-syseng/SKILL.md)
 ---
 
-### AI Skill Installer Distribution
+### AI Skill Installer Distribution Specification
 
-The system shall provide remote, no-clone skill installers whose downloadable manifests stay synchronized with the supported Claude and Codex skill artifact files.
+AI skill installer distribution defines the supported no-clone installer behavior for assistant skill packages.
 
 #### Details
-Remote installer distribution details shall follow the associated contract specification.
+Installer distribution rules:
+- Claude Code marketplace installation remains the default Claude Code installation path.
+- The Claude direct installer shall install the checked-in Claude skill package into `$CLAUDE_HOME/skills`, defaulting to `~/.claude/skills` when `CLAUDE_HOME` is unset.
+- The Codex direct installer shall install the checked-in Codex skill package into `$CODEX_HOME/skills`, defaulting to `~/.codex/skills` when `CODEX_HOME` is unset.
+- Direct installers shall support local checkout execution by copying local skill directories.
+- Direct installers shall support remote `curl ... | bash` execution by downloading from `REQVIRE_REPO_RAW`, defaulting to the Reqvire GitHub raw URL.
+- Remote installers shall stage downloads in a temporary directory and replace a target skill directory only after that skill has been fully staged.
+- Installer manifests shall list every file that belongs to the corresponding remote skill package, including reference documents and assistant-specific metadata files.
+- Any addition, removal, or rename under `claude-plugins/skills` or `codex-skills` shall be treated as a change-impact trigger for the direct installer manifests.
 
 #### Metadata
-  * type: requirement
+  * type: specification
 
 #### Relations
-  * definedBy: [AI Skill Installer Distribution Specification](#ai-skill-installer-distribution-specification)
-  * derivedFrom: [AI Assistant Skill-Guided Reqvire Modeling](#ai-assistant-skill-guided-reqvire-modeling)
-  * verifiedBy: [AI Skill Installer Manifest Verification](../../Verifications/Integration/AIAssistance/AISkillVerifications.md#ai-skill-installer-manifest-verification)
-  * satisfiedBy: [install-claude-skill.sh](../../../scripts/install-claude-skill.sh)
-  * satisfiedBy: [install-codex-skill.sh](../../../scripts/install-codex-skill.sh)
-  * satisfiedBy: [CodingAssistants.tsx](../../../website/src/pages/CodingAssistants.tsx)
-  * satisfiedBy: [README.md](../../../README.md)
-  * satisfiedBy: [CODEX_SKILLS.md](../../../doc/CODEX_SKILLS.md)
-  * satisfiedBy: [Claude audit SKILL.md](../../../claude-plugins/skills/audit/SKILL.md)
-  * satisfiedBy: [Claude AnalyzeCoverage.md](../../../claude-plugins/skills/audit/reference/AnalyzeCoverage.md)
-  * satisfiedBy: [Claude AnalyzeModel.md](../../../claude-plugins/skills/audit/reference/AnalyzeModel.md)
-  * satisfiedBy: [Claude ChangeImpact.md](../../../claude-plugins/skills/audit/reference/ChangeImpact.md)
-  * satisfiedBy: [Claude Lint.md](../../../claude-plugins/skills/audit/reference/Lint.md)
-  * satisfiedBy: [Claude concept-authoring SKILL.md](../../../claude-plugins/skills/concept-authoring/SKILL.md)
-  * satisfiedBy: [Claude ConceptAuthoring.md](../../../claude-plugins/skills/concept-authoring/reference/ConceptAuthoring.md)
-  * satisfiedBy: [Claude ontology-authoring SKILL.md](../../../claude-plugins/skills/ontology-authoring/SKILL.md)
-  * satisfiedBy: [Claude OntologyAuthoring.md](../../../claude-plugins/skills/ontology-authoring/reference/OntologyAuthoring.md)
-  * satisfiedBy: [Claude OntologyRefactoring.md](../../../claude-plugins/skills/ontology-authoring/reference/OntologyRefactoring.md)
-  * satisfiedBy: [Claude syseng SKILL.md](../../../claude-plugins/skills/syseng/SKILL.md)
-  * satisfiedBy: [Claude AddCapability.md](../../../claude-plugins/skills/syseng/reference/AddCapability.md)
-  * satisfiedBy: [Claude AddRequirement.md](../../../claude-plugins/skills/syseng/reference/AddRequirement.md)
-  * satisfiedBy: [Claude AddVerification.md](../../../claude-plugins/skills/syseng/reference/AddVerification.md)
-  * satisfiedBy: [Claude CapabilitySemanticContractRefactor.md](../../../claude-plugins/skills/syseng/reference/CapabilitySemanticContractRefactor.md)
-  * satisfiedBy: [Claude Collect.md](../../../claude-plugins/skills/syseng/reference/Collect.md)
-  * satisfiedBy: [Claude ConsolidateRequirements.md](../../../claude-plugins/skills/syseng/reference/ConsolidateRequirements.md)
-  * satisfiedBy: [Claude Containment.md](../../../claude-plugins/skills/syseng/reference/Containment.md)
-  * satisfiedBy: [Claude ContainmentStructureRefactor.md](../../../claude-plugins/skills/syseng/reference/ContainmentStructureRefactor.md)
-  * satisfiedBy: [Claude CreatingTasks.md](../../../claude-plugins/skills/syseng/reference/CreatingTasks.md)
-  * satisfiedBy: [Claude DesignDocOwnership.md](../../../claude-plugins/skills/syseng/reference/DesignDocOwnership.md)
-  * satisfiedBy: [Claude Link.md](../../../claude-plugins/skills/syseng/reference/Link.md)
-  * satisfiedBy: [Claude Move.md](../../../claude-plugins/skills/syseng/reference/Move.md)
-  * satisfiedBy: [Claude Remove.md](../../../claude-plugins/skills/syseng/reference/Remove.md)
-  * satisfiedBy: [Claude RenameElement.md](../../../claude-plugins/skills/syseng/reference/RenameElement.md)
-  * satisfiedBy: [Claude Setup.md](../../../claude-plugins/skills/syseng/reference/Setup.md)
-  * satisfiedBy: [Claude SpecificationLanguageCleanup.md](../../../claude-plugins/skills/syseng/reference/SpecificationLanguageCleanup.md)
-  * satisfiedBy: [Claude SpecificationsExtractionLogic.md](../../../claude-plugins/skills/syseng/reference/SpecificationsExtractionLogic.md)
-  * satisfiedBy: [Claude SubmodelRefactor.md](../../../claude-plugins/skills/syseng/reference/SubmodelRefactor.md)
-  * satisfiedBy: [Claude VerificationAlignment.md](../../../claude-plugins/skills/syseng/reference/VerificationAlignment.md)
-  * satisfiedBy: [Claude explore.md](../../../claude-plugins/skills/syseng/reference/explore.md)
-  * satisfiedBy: [Codex audit SKILL.md](../../../codex-skills/reqvire-audit/SKILL.md)
-  * satisfiedBy: [Codex AnalyzeCoverage.md](../../../codex-skills/reqvire-audit/references/AnalyzeCoverage.md)
-  * satisfiedBy: [Codex AnalyzeModel.md](../../../codex-skills/reqvire-audit/references/AnalyzeModel.md)
-  * satisfiedBy: [Codex ChangeImpact.md](../../../codex-skills/reqvire-audit/references/ChangeImpact.md)
-  * satisfiedBy: [Codex Lint.md](../../../codex-skills/reqvire-audit/references/Lint.md)
-  * satisfiedBy: [Codex concept-authoring SKILL.md](../../../codex-skills/reqvire-concept-authoring/SKILL.md)
-  * satisfiedBy: [Codex concept-authoring openai.yaml](../../../codex-skills/reqvire-concept-authoring/agents/openai.yaml)
-  * satisfiedBy: [Codex ConceptAuthoring.md](../../../codex-skills/reqvire-concept-authoring/references/ConceptAuthoring.md)
-  * satisfiedBy: [Codex ontology-authoring SKILL.md](../../../codex-skills/reqvire-ontology-authoring/SKILL.md)
-  * satisfiedBy: [Codex ontology-authoring openai.yaml](../../../codex-skills/reqvire-ontology-authoring/agents/openai.yaml)
-  * satisfiedBy: [Codex OntologyAuthoring.md](../../../codex-skills/reqvire-ontology-authoring/references/OntologyAuthoring.md)
-  * satisfiedBy: [Codex OntologyRefactoring.md](../../../codex-skills/reqvire-ontology-authoring/references/OntologyRefactoring.md)
-  * satisfiedBy: [Codex syseng SKILL.md](../../../codex-skills/reqvire-syseng/SKILL.md)
-  * satisfiedBy: [Codex AddCapability.md](../../../codex-skills/reqvire-syseng/references/AddCapability.md)
-  * satisfiedBy: [Codex AddRequirement.md](../../../codex-skills/reqvire-syseng/references/AddRequirement.md)
-  * satisfiedBy: [Codex AddVerification.md](../../../codex-skills/reqvire-syseng/references/AddVerification.md)
-  * satisfiedBy: [Codex CapabilitySemanticContractRefactor.md](../../../codex-skills/reqvire-syseng/references/CapabilitySemanticContractRefactor.md)
-  * satisfiedBy: [Codex Collect.md](../../../codex-skills/reqvire-syseng/references/Collect.md)
-  * satisfiedBy: [Codex ConsolidateRequirements.md](../../../codex-skills/reqvire-syseng/references/ConsolidateRequirements.md)
-  * satisfiedBy: [Codex Containment.md](../../../codex-skills/reqvire-syseng/references/Containment.md)
-  * satisfiedBy: [Codex ContainmentStructureRefactor.md](../../../codex-skills/reqvire-syseng/references/ContainmentStructureRefactor.md)
-  * satisfiedBy: [Codex CreatingTasks.md](../../../codex-skills/reqvire-syseng/references/CreatingTasks.md)
-  * satisfiedBy: [Codex DesignDocOwnership.md](../../../codex-skills/reqvire-syseng/references/DesignDocOwnership.md)
-  * satisfiedBy: [Codex Link.md](../../../codex-skills/reqvire-syseng/references/Link.md)
-  * satisfiedBy: [Codex Move.md](../../../codex-skills/reqvire-syseng/references/Move.md)
-  * satisfiedBy: [Codex Remove.md](../../../codex-skills/reqvire-syseng/references/Remove.md)
-  * satisfiedBy: [Codex RenameElement.md](../../../codex-skills/reqvire-syseng/references/RenameElement.md)
-  * satisfiedBy: [Codex Setup.md](../../../codex-skills/reqvire-syseng/references/Setup.md)
-  * satisfiedBy: [Codex SpecificationLanguageCleanup.md](../../../codex-skills/reqvire-syseng/references/SpecificationLanguageCleanup.md)
-  * satisfiedBy: [Codex SpecificationsExtractionLogic.md](../../../codex-skills/reqvire-syseng/references/SpecificationsExtractionLogic.md)
-  * satisfiedBy: [Codex SubmodelRefactor.md](../../../codex-skills/reqvire-syseng/references/SubmodelRefactor.md)
-  * satisfiedBy: [Codex VerificationAlignment.md](../../../codex-skills/reqvire-syseng/references/VerificationAlignment.md)
-  * satisfiedBy: [Codex explore.md](../../../codex-skills/reqvire-syseng/references/explore.md)
+  * define: [AI Skill Installer Distribution](#ai-skill-installer-distribution)
 ---
 
 ### AI Skills Instruction Contract Specification
@@ -193,26 +215,4 @@ Artifact contract rules:
 
 #### Relations
   * define: [AI Skills Markdown Implementation Artifacts](#ai-skills-markdown-implementation-artifacts)
----
-
-### AI Skill Installer Distribution Specification
-
-AI skill installer distribution defines the supported no-clone installer behavior for assistant skill packages.
-
-#### Details
-Installer distribution rules:
-- Claude Code marketplace installation remains the default Claude Code installation path.
-- The Claude direct installer shall install the checked-in Claude skill package into `$CLAUDE_HOME/skills`, defaulting to `~/.claude/skills` when `CLAUDE_HOME` is unset.
-- The Codex direct installer shall install the checked-in Codex skill package into `$CODEX_HOME/skills`, defaulting to `~/.codex/skills` when `CODEX_HOME` is unset.
-- Direct installers shall support local checkout execution by copying local skill directories.
-- Direct installers shall support remote `curl ... | bash` execution by downloading from `REQVIRE_REPO_RAW`, defaulting to the Reqvire GitHub raw URL.
-- Remote installers shall stage downloads in a temporary directory and replace a target skill directory only after that skill has been fully staged.
-- Installer manifests shall list every file that belongs to the corresponding remote skill package, including reference documents and assistant-specific metadata files.
-- Any addition, removal, or rename under `claude-plugins/skills` or `codex-skills` shall be treated as a change-impact trigger for the direct installer manifests.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [AI Skill Installer Distribution](#ai-skill-installer-distribution)
 ---

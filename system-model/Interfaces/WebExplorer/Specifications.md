@@ -202,7 +202,7 @@ For Model and file drill-in routes, below the Model controls, the left pane must
 
 The Model project tree must initialize with only the root project node expanded. First-level folders and files must be visible, but child folders and file element rows must remain collapsed until the user expands them or a later explicit selection workflow requires revealing a selected descendant.
 
-The Model tree root must identify the served Git repository and current branch when that metadata is available from the Project Store, using a compact label such as `repo @ branch`. It must not use a generic `Project` label when repository identity is known.
+The Model tree root must identify the served workspace and eligible Git worktree metadata when available from the Project Store, using a compact workspace/source-control label for single-worktree views and a workspace label plus eligible worktree metadata for multi-worktree views. It must not use a generic `Project` label when workspace or source-control identity is known.
 
 The Coverage route must define its own compact coverage explorer in the left pane rather than reusing the Model project tree or duplicating dashboard summaries and legends. The coverage explorer must list Overview, Capability coverage, Unverified requirements, Unimplemented requirements, Unsatisfied verifications, and Orphaned verifications with counts derived from Project Store coverage data. Coverage explorer rows must use the shared pane navigation row styling with hover and selected states. Selecting a coverage explorer item must scroll and mark the matching section in the central Coverage workspace, while coverage row/item clicks continue to open the shared element-detail modal when they target a modeled element.
 
@@ -265,7 +265,7 @@ Technical specification for the Explorer serve runtime pipeline.
 - Keep generated Explorer artifacts in memory for the HTTP runtime.
 
 **Source Protection:**
-- Never modify original repository files
+- Never modify original workspace source files
 - Browser runtime data generation happens in memory
 
 **Related System Elements:**
@@ -282,10 +282,10 @@ Explorer serve runtime generation must emit a normalized browser-local Project S
 #### Details
 The seed output must:
 - Be generated from the validated graph registry, semantic index, report projections, and graph-referenced local resources during Explorer runtime generation.
-- Seed source-file content directly from the in-memory graph registry and graph-referenced local resources: files with modeled elements use normalized registry-generated Markdown, while existing local implementation/evidence/resource files use captured raw source content when available.
-- Keep implementation files, evidence files, scripts, images, and other local relation targets as Project Store `resources` for relation semantics, and include them in Project Store `files`/`folders` only when they are existing repository-relative local files referenced by the graph registry.
-- Build the Project Store `files` and `folders` sections only from modeled element source files and existing graph-referenced local resource/evidence files. Unrelated git-tree files, unsupported parsed pages, nonexistent local targets, and external URLs must not become Explorer file-tree or file-search records.
-- Preserve full repository-relative hierarchy for every Project Store file path so the Model tree renders folders, files, and file-owned elements without flattening single-element files or registry-linked resource files.
+- Seed source-file content directly from the in-memory graph registry and graph-referenced local resources: files with modeled elements use normalized registry-generated Markdown, while existing eligible Git-worktree implementation/evidence/resource files use captured raw source content when available.
+- Keep implementation files, evidence files, scripts, images, and other local relation targets as Project Store `resources` for relation semantics, and include them in Project Store `files`/`folders` only when they are existing workspace-root-relative files inside eligible Git worktrees and referenced by the graph registry.
+- Build the Project Store `files` and `folders` sections only from modeled element source files and existing graph-referenced eligible Git-worktree resource/evidence files. Unrelated Git-worktree files, non-Git workspace files, unsupported parsed pages, nonexistent local targets, and external URLs must not become Explorer file-tree or file-search records.
+- Preserve full workspace-root-relative hierarchy for every Project Store file path so the Model tree renders folders, files, and file-owned elements without flattening single-element files or registry-linked resource files.
 - Be deterministic for unchanged model input, excluding explicitly documented volatile metadata.
 - Be available to the native SPA view modules in `index.html` before any Explorer view attempts to render, and be consumable from local static assets without a CDN-loaded framework or stylesheet.
 - Contain required top-level sections for `project`, `folders`, `files`, `resources`, `elements`, `relations`, `contract_bindings`, `concept_refs`, `thesaurus`, `submodels`, `traces`, `coverage`, `ontology`, `knowledge_graph`, `search`, `summaries`, and `routes`.
@@ -334,8 +334,8 @@ Trace rendering behavior:
 #### Details
 Export command behavior:
 - Write the embedded Explorer shell, generated Project Store data, and ontology artifact to the requested output directory.
-- Preserve repository-relative path layout for copied workspace static assets so Markdown image and document links rewritten by the Explorer resolve from the exported static site.
-- Copy local static asset file types used by rendered workspace content, including PNG, JPEG, GIF, WebP, SVG, PDF, text, CSV, JSON, JSON-LD, Turtle, and TTL files.
+- Preserve workspace-root-relative path layout for copied eligible Git-worktree static assets so Markdown image and document links rewritten by the Explorer resolve from the exported static site.
+- Copy eligible Git-worktree static asset file types used by rendered workspace content, including PNG, JPEG, GIF, WebP, SVG, PDF, text, CSV, JSON, JSON-LD, Turtle, and TTL files.
 - Skip generated, dependency, VCS, and transient directories such as `.git`, `.index`, `node_modules`, `target`, `tmp`, and the output directory itself.
 - Do not copy Markdown model source files as static assets; source Markdown content remains represented through the Project Store.
 
@@ -685,15 +685,15 @@ Breakpoints:
 
 **Project Store Host**
 - The served `index.html` must contain or load the authoritative browser-local Project Store seed for the loaded project.
-- The Project Store `project` section must include the repository name and current branch when Git metadata is available. Its root display label must combine those values, for example `repo @ branch`, so file-tree and trace-tree roots identify the served repository snapshot.
+- The Project Store `project` section must include effective workspace root identity and eligible Git worktree metadata when Git metadata is available. Its root display label must identify the served workspace snapshot, using compact workspace/source-control metadata for single-worktree views and a workspace label plus worktree metadata for multi-worktree views.
 - The Project Store is an immutable generated snapshot for the served project unless a future requirement explicitly adds browser mutation.
 - Browser interactions may keep ephemeral UI state, filters, focus, layout, and route parameters separately from the generated model snapshot.
 - The Project Store must be view-neutral: the primary Model view and its Graph mode, specialist Ontologies and Traces views, plus supporting Coverage, Resources, Search, Summary, File deep-link, and Element Detail workflows read from the same normalized records instead of from page-local ad hoc JSON islands.
 - Store identifiers must be stable within one served project snapshot and deterministic across repeated serve runtime generations for unchanged model content.
 
 **Required Store Schema Sections**
-- `project`: project identity, repository name when available, current branch when available, Reqvire version when available, generation timestamp policy, workspace-relative root label, and aggregate counts.
-- `files`: source/document file containers keyed by repository-relative path, with display path, source route path, parent folder, child element ids, local asset links, and containment metadata.
+- `project`: project identity, effective workspace root label, eligible Git worktree metadata when available, Reqvire version when available, generation timestamp policy, workspace-relative root label, and aggregate counts.
+- `files`: source/document file containers keyed by workspace-root-relative path, with display path, source route path, parent folder, child element ids, local asset links, and containment metadata.
 - `folders`: virtual filesystem folder containers used by containment and file navigation.
 - `resources`: modeled resource and evidence-file targets referenced by relations or contract_bindings, keyed separately from `files`.
 - `elements`: normalized Reqvire elements keyed by full identifier, including name, type, canonical type family, source file path, line number when available, content summary, governance metadata, authored metadata, and source anchor.
@@ -714,7 +714,7 @@ Breakpoints:
 - `files` are browser-local filesystem/source containers. They represent Markdown/source documents that contain model elements and are used for containment, file navigation, source links, and breadcrumbs.
 - `resources` are modeled or evidence targets referenced by the model, such as implementation files, proof artifacts, linked evidence documents, external URLs, or local non-Markdown files.
 - A path may appear as a `file` only when it is included as a Project Store source/document container for browsing. A path appears as a `resource` when it is referenced as evidence or a modeled target by relation, contract_bindings, or resource-report facts.
-- When the same repository-relative path is both browsable and referenced as evidence, the store must preserve both identities and link them through an explicit cross-reference instead of collapsing the resource into the file container.
+- When the same workspace-root-relative path is both browsable and referenced as evidence, the store must preserve both identities and link them through an explicit cross-reference instead of collapsing the resource into the file container.
 - Resources must retain relation evidence, referring elements, relation types, external/local classification, and availability/copy status when known.
 
 **Relation and Trace Semantics**
@@ -762,8 +762,8 @@ Breakpoints:
 
 **Browser-Local Virtual Filesystem Semantics**
 - The store must expose a virtual filesystem tree built from `folders` and `files` records.
-- The virtual filesystem root must use the Project Store root label, preferring `repository @ branch` when Git metadata is available.
-- Folder/file containment is physical repository/source organization only; it does not define logical capability, requirement, ontology, or verification ownership.
+- The virtual filesystem root must use the Project Store root label, preferring a compact workspace/source-control label for single-worktree views and a workspace label with eligible worktree metadata for multi-worktree views when Git metadata is available.
+- Folder/file containment is physical workspace source organization only; it does not define logical capability, requirement, ontology, or verification ownership.
 - Element detail views must resolve source file containers through element source metadata, not by inferring model ownership from folders.
 - Resource navigation must use `resources` records and referring facts; it must not imply that evidence files contain model elements unless a corresponding `files` record exists.
 - The Model view's List and Grid modes must render native read-only file-manager/model-browser views from the Project Store virtual filesystem, including breadcrumb navigation, sortable list columns, grid cards, search across folders/files/modeled elements, color/icon legends, file selection, source-page secondary actions, and modeled-element rows that open the shared Explorer element-detail modal. In Grid mode, the full folder/file card surface must be the primary open/select target; opening must not be limited to the title text.
@@ -799,10 +799,10 @@ Serve command behavior:
 - Serve `assets/project-store.js` and `ontologies.ttl` from the materialized in-memory runtime assets. Browser refreshes and direct HTTP GET/HEAD requests for those assets must not parse, validate, or regenerate model data from disk.
 - Refresh the materialized runtime Project Store data and ontology artifact after successful embedded MCP write mutations, so subsequent Explorer reloads observe MCP-authored model changes without making ordinary browser refresh the regeneration trigger.
 - Serialize embedded MCP write mutation execution and runtime asset refresh so the served runtime store is refreshed only after the mutation has completed and never from a partial filesystem update.
-- Populate Project Store source-file records from modeled element source files and existing graph-referenced local implementation/evidence/resource files, without using generated Markdown files on disk as an intermediate runtime artifact
-- Keep relation-backed implementation/evidence/source targets as Project Store resources for relation semantics, and include only existing repository-relative local targets in the Model tree file hierarchy
+- Populate Project Store source-file records from modeled element source files and existing graph-referenced eligible Git-worktree implementation/evidence/resource files, without using generated Markdown files on disk as an intermediate runtime artifact
+- Keep relation-backed implementation/evidence/source targets as Project Store resources for relation semantics, and include only existing workspace-root-relative targets inside eligible Git worktrees in the Model tree file hierarchy
 - Start an HTTP server serving embedded Explorer assets and generated runtime data
-- Serve existing repository-relative local static asset files, including images and documents referenced from Markdown content, from their repository-relative request paths while rejecting absolute paths, parent-directory traversal, and unsupported asset extensions
+- Serve existing workspace-root-relative static asset files inside eligible Git worktrees, including images and documents referenced from Markdown content, from their workspace-root-relative request paths while rejecting absolute paths, parent-directory traversal, non-Git workspace paths, and unsupported asset extensions
 - Serve `index.html` for the root URL so the SPA Explorer shell is the default entry point
 - Return `index.html` for non-asset browser routes so SPA navigation can handle deep links
 - Preserve `/mcp` as an MCP endpoint when embedded MCP is enabled; SPA fallback routing must not intercept MCP protocol requests.

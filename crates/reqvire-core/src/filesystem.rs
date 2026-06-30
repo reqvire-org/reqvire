@@ -33,19 +33,14 @@ impl Iterator for FileReaderIterator<'_> {
 
             match self.git_commit_hash {
                 Some(commit) => {
-                    // Get git root directory
-                    let git_root = match git_commands::get_git_root_dir() {
-                        Ok(dir) => dir,
-                        Err(_) => {
-                            return Err(ReqvireError::GitCommandError(
-                                "Failed to get git root directory".to_string(),
-                            ));
-                        }
-                    };
+                    let lookup_folder = file
+                        .parent()
+                        .map(PathBuf::from)
+                        .unwrap_or_else(|| PathBuf::from("."));
 
                     match git_commands::get_file_at_commit(
                         &file.to_string_lossy(),
-                        &git_root,
+                        &lookup_folder,
                         commit,
                     ) {
                         Ok(content) => Ok((file, filename_str, content)),

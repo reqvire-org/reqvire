@@ -19,6 +19,7 @@ pub(crate) fn workspace_status(
     Ok(json!({
         "workspace_root": current_dir_string(),
         "git": git_state(),
+        "eligible_git_worktrees": eligible_git_worktrees_state(),
         "reqvire_version": env!("CARGO_PKG_VERSION"),
         "mcp_protocol_version": MCP_PROTOCOL_VERSION,
         "tool_contract_version": TOOL_CONTRACT_VERSION,
@@ -43,6 +44,7 @@ pub(crate) fn model_revision(
     Ok(json!({
         "workspace_root": current_dir_string(),
         "git": git_state(),
+        "eligible_git_worktrees": eligible_git_worktrees_state(),
         "reqvire_version": env!("CARGO_PKG_VERSION"),
         "mcp_protocol_version": MCP_PROTOCOL_VERSION,
         "tool_contract_version": TOOL_CONTRACT_VERSION,

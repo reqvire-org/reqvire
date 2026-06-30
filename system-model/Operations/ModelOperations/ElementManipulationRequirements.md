@@ -58,7 +58,6 @@ The system shall provide the capability to create new model elements by acceptin
   * definedBy: [Create Element Workflow Specification](Specifications.md#create-element-workflow-specification)
   * definedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
   * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
@@ -78,7 +77,6 @@ The system shall provide the capability to delete existing model elements while 
   * definedBy: [Delete Element Workflow Specification](Specifications.md#delete-element-workflow-specification)
   * definedBy: [Orphaned Children Error Message Specification](Specifications.md#orphaned-children-error-message-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
   * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
@@ -146,7 +144,6 @@ The operation shall reject moves into an existing `# Element` file when that mov
 #### Relations
   * definedBy: [Move Element Workflow Specification](Specifications.md#move-element-workflow-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
   * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
@@ -170,7 +167,6 @@ Detailed file-move, relation-update, squash-mode, target-validation, and error b
 #### Relations
   * definedBy: [Move File Operation Contract Specification](Specifications.md#move-file-operation-contract-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
   * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
@@ -246,7 +242,7 @@ The system shall define target location validation constraints.
 
 #### Contract Bindings
   * [Ignore Files Specification](../../ModelStructure/Specifications.md#ignore-files-specification)
-  * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
 
 #### Relations
   * definedBy: [Target Location Constraint](Constraints.md#target-location-constraint)

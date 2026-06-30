@@ -1,0 +1,1 @@
+This file exists under the workspace, but it is outside eligible Git worktrees.

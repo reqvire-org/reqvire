@@ -20,6 +20,6 @@ The verification shall run the Codex and Claude installers in local-copy mode an
 
 #### Relations
   * derivedFrom: [AI Skill Installer Verification Objective](#ai-skill-installer-verification-objective)
-  * verify: [AI Skill Installer Distribution](../../../Integration/AIAssistance/AISkills.md#ai-skill-installer-distribution)
   * satisfiedBy: [test.sh](../../../../tests/test-ai-skill-installers/test.sh)
+  * verify: [AI Skill Installer Distribution](../../../Integration/AIAssistance/AISkills.md#ai-skill-installer-distribution)
 ---

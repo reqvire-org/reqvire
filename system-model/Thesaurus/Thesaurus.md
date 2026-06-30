@@ -192,7 +192,7 @@ Local or built-in ontology dependency used for term resolution and validation wi
 
 ### External Ontology Source Path
 
-Repository-local path to an external ontology source file.
+Workspace-root-relative path to an external ontology source file inside an eligible Git worktree.
 
 #### Metadata
   * type: concept
@@ -212,6 +212,19 @@ Construct-query pattern that selects and describes the used subset of an externa
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
   * broader: [Ontology Projection](#ontology-projection)
+---
+
+### Git Worktree
+
+Local Git worktree whose files may participate in the SOI model when they are inside the effective workspace root.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Model Structure](#model-structure)
+  * related: [Workspace Root](#workspace-root)
 ---
 
 ### Governance
@@ -261,6 +274,20 @@ MCP tool, resource, prompt, and payload interface used by AI assistants to acces
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
   * broader: [Interface](#interface)
+---
+
+### Model Eligibility Boundary
+
+Rule that only workspace-contained files and artifacts inside Git worktrees participate in SOI model parsing, references, reports, and consumer file trees.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Model Structure](#model-structure)
+  * related: [Git Worktree](#git-worktree)
+  * related: [Workspace Root](#workspace-root)
 ---
 
 ### Model Relation
@@ -687,4 +714,18 @@ Planning concept that groups verification intent before concrete verification ev
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
   * broader: [Verification](#verification)
+---
+
+### Workspace Root
+
+Effective Reqvire process root used as the SOI model path, identifier, diagnostic, export, and mutation target base.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Model Structure](#model-structure)
+  * related: [Git Worktree](#git-worktree)
+  * related: [Model Eligibility Boundary](#model-eligibility-boundary)
 ---

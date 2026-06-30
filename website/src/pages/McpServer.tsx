@@ -13,17 +13,18 @@ export default function McpServer() {
 
       <Section title="Startup">
         <p className="text-zinc-600 mb-4">
-          Start the server from the repository that contains the Reqvire model,
-          or pass a workspace from another directory. Reqvire validates the
-          model before the MCP server starts.
+          Start the server from the effective workspace root, or pass a
+          workspace from another directory. The workspace must contain at least
+          one eligible Git worktree; non-Git workspace folders are ignored.
+          Reqvire validates the model before the MCP server starts.
         </p>
         <CodeBlock>{`reqvire mcp
-reqvire --workspace /path/to/repository mcp
+reqvire --workspace /path/to/workspace mcp
 reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
           Convenience no-install form:
         </p>
-        <CodeBlock>{`npx -y @reqvire-org/reqvire@latest --workspace /path/to/repository mcp`}</CodeBlock>
+        <CodeBlock>{`npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlock>
       </Section>
 
       <Section title="HTTP Transport">

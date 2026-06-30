@@ -23,18 +23,23 @@ export default function UserGuide() {
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             --workspace
           </code>{" "}
-          option when running Reqvire from outside the model repository. The
-          option applies to normal CLI commands and the MCP server.
+          option when running Reqvire from outside the effective workspace. The
+          option applies to normal CLI commands and the MCP server. A workspace
+          must contain at least one eligible Git worktree; files in non-Git
+          workspace folders are ignored, and model paths remain relative to the
+          workspace root. Mutating commands may operate across eligible
+          worktrees in the same workspace, but they reject targets in non-Git
+          workspace folders.
         </p>
-        <CodeBlock>{`reqvire --workspace /path/to/repository validate
-reqvire --workspace /path/to/repository search --filter-type requirement
-reqvire --workspace /path/to/repository mcp`}</CodeBlock>
+        <CodeBlock>{`reqvire --workspace /path/to/workspace validate
+reqvire --workspace /path/to/workspace search --filter-type requirement
+reqvire --workspace /path/to/workspace mcp`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
           Convenience no-install command form:
         </p>
-        <CodeBlock>{`npx -y @reqvire-org/reqvire@latest --workspace /path/to/repository validate
-npx -y @reqvire-org/reqvire@latest --workspace /path/to/repository search --filter-type requirement
-npx -y @reqvire-org/reqvire@latest --workspace /path/to/repository mcp`}</CodeBlock>
+        <CodeBlock>{`npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace validate
+npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace search --filter-type requirement
+npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlock>
       </Section>
 
       <Section title="Core Commands">
@@ -91,6 +96,12 @@ reqvire semantic export --jsonld --output semantic-graph.jsonld`}</CodeBlock>
             { cmd: "reqvire rm-asset <path>", desc: "Remove a referenced asset from the model." },
           ]}
         />
+        <p className="text-zinc-600 mt-4">
+          Element, file, folder, and asset paths are workspace-root-relative.
+          In a parent workspace, move and add commands can target any eligible
+          Git worktree under that root while rejecting non-Git workspace
+          folders.
+        </p>
         <div className="mt-5">
           <CodeBlock>{`reqvire add system-model/Auth.md --content '### Token Expiry Requirement
 
@@ -200,10 +211,13 @@ reqvire submodels --json --output reports/submodels.json`}</CodeBlock>
 
       <Section title="Change Impact Workflow">
         <p className="text-zinc-600 mb-4">
-          Change impact turns repository diffs into a review queue. Use it to
-          find changed requirements, affected descendants, linked verifications,
-          bound contracts, satisfied implementation artifacts, and governance
-          context that should guide review order.
+          Change impact compares a base workspace snapshot with the current
+          workspace snapshot and turns the difference into a review queue. The
+          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded mx-1">
+            --git-commit
+          </code>
+          option materializes the base snapshot from the current eligible Git
+          worktree; it is not a multi-repository commit selector.
         </p>
         <CodeBlock>{`reqvire change-impact
 reqvire change-impact --git-commit origin/main
@@ -258,8 +272,8 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           This pattern validates the model, surfaces lint findings, writes JSON
           reports, and uploads the report folder as an artifact. Fetch full git
-          history when change-impact needs to compare against the pull request
-          base branch.
+          history when change-impact needs to compare the workspace against the
+          pull request base branch in the eligible Git worktree.
         </p>
         <CodeBlock>{`name: Reqvire PR Checks
 

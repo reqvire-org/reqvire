@@ -1,41 +1,24 @@
 # Elements
 
-### Browser Trace Diagram Generation
+### Trace Diagram Projection Data
 
-When displaying Explorer trace views, the browser client shall generate per-verification Mermaid roll-up diagrams from Project Store trace data without requiring CLI Markdown or Mermaid report output.
+The system shall provide per-verification trace diagram projection data derived from report trace trees without requiring human-readable Markdown or Mermaid report output.
 
 #### Details
-Trace diagrams define the report-owned trace diagram data and roll-up behavior. WebExplorer trace rendering reuses this behavior through contract bindings from the Traces view requirement.
+Trace diagrams define report-owned trace diagram data, roll-up semantics, relation direction, and node target metadata. Browser rendering reuses this behavior through contract bindings from the consuming interface requirement.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * definedBy: [Browser Trace Diagram Generation Contract Specification](Specifications.md#browser-trace-diagram-generation-contract-specification)
-  * derive: [Interactive Mermaid Diagram Node Behavior](#interactive-mermaid-diagram-node-behavior)
+  * definedBy: [Trace Diagram Projection Data Contract Specification](Specifications.md#trace-diagram-projection-data-contract-specification)
+  * derive: [Trace Diagram Node Target Data](#trace-diagram-node-target-data)
   * derivedFrom: [Model Reports](ReportingRequirements.md#model-reports)
-  * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
 ---
 
-### Interactive Mermaid Diagram Node Behavior
+### Relation Diagram Semantics
 
-The Explorer trace view shall implement interactive click behavior for Mermaid diagram nodes rendered from browser-generated trace roll-up diagrams.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Interactive Mermaid Diagram Node Behavior Contract Specification](Specifications.md#interactive-mermaid-diagram-node-behavior-contract-specification)
-  * derivedFrom: [Browser Trace Diagram Generation](#browser-trace-diagram-generation)
-  * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
----
-
-### Reqvire Relationship Rendering
-
-The system shall implement a relationship rendering engine that uses Reqvire relation names and consistent visual conventions, ensuring diagram consistency and relation semantics remain clear.
+The system shall provide relation diagram semantics that use Reqvire relation names and consistent visual conventions, ensuring diagram consistency and relation semantics remain clear for downstream renderers.
 
 #### Details
 The system shall render relationships using:
@@ -51,6 +34,20 @@ Each relation type has specific visual properties and directional semantics defi
 
 #### Relations
   * definedBy: [Reqvire Relation Rendering Specification](Specifications.md#reqvire-relation-rendering-specification)
-  * derivedFrom: [Browser Trace Diagram Generation](#browser-trace-diagram-generation)
-  * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
+  * derivedFrom: [Trace Diagram Projection Data](#trace-diagram-projection-data)
+---
+
+### Trace Diagram Node Target Data
+
+The system shall include stable model element identifiers, source-relative paths, or route-neutral target metadata for trace diagram nodes so consuming interfaces can resolve node activation consistently.
+
+#### Details
+Implementation details shall follow the associated contract specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Trace Diagram Node Target Data Contract Specification](Specifications.md#trace-diagram-node-target-data-contract-specification)
+  * derivedFrom: [Trace Diagram Projection Data](#trace-diagram-projection-data)
 ---

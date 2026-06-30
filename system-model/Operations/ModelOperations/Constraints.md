@@ -47,6 +47,10 @@ Ontology elements are merge-compatible only with ontology elements, and merge sh
 Validation rules for target paths in element operations.
 
 **Path Validation:**
+- Path must resolve under the effective workspace root
+- Path must be inside an eligible Git worktree
+- In a parent workspace containing multiple eligible Git worktrees, target paths may resolve to any eligible Git worktree under the effective workspace root
+- Target paths in workspace folders outside all eligible Git worktrees are invalid even when the parent workspace folder exists
 - Path not excluded by .gitignore/.reqvireignore
 - Maximum 10 subdirectory nesting depth
 - Path must be accessible and writable

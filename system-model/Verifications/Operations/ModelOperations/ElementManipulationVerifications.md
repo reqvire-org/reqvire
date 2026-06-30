@@ -19,6 +19,7 @@ This objective groups verification that element creation, removal, movement, ren
   * derive: [CLI Rename Element Test](#cli-rename-element-test)
   * derive: [Create Element Override Test](#create-element-override-test)
   * derive: [Create Element Test](#create-element-test)
+  * derive: [Cross-Repository Workspace CRUD Test](#cross-repository-workspace-crud-test)
   * derive: [Delete Element Test](#delete-element-test)
   * derive: [File Persistence Test](#file-persistence-test)
   * derive: [Link Command Cross-Section Detection Test](#link-command-cross-section-detection-test)
@@ -215,6 +216,58 @@ The test shall verify that the `add` command creates new elements from stdin or 
   * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
 ---
 
+### Cross-Repository Workspace CRUD Test
+
+This test verifies that graph-backed CRUD commands work across multiple eligible Git worktrees under one effective workspace root while rejecting create, move, and asset targets in non-Git workspace folders.
+
+#### Details
+**Test Setup:**
+- Create a temporary effective workspace root that is not itself a Git repository.
+- Create `repo-a` and `repo-b` as descendant eligible Git worktrees.
+- Create an ordinary `not-a-repo` folder under the same workspace root.
+- Store all model and element fixture content in fixture files, not inline shell heredocs.
+
+**Success Criteria - Cross-Repository CRUD:**
+1. `add` creates a new element in `repo-b` from fixture content and indexes it with a workspace-root-relative identifier.
+2. `mv` moves an element from `repo-a` to a target file in `repo-b` and indexes the moved element under `repo-b`.
+3. `rename` renames an element in `repo-b` and removes the old name from search results.
+4. `link` adds a relation from a `repo-b` element to a `repo-a` InternalPath target normalized as `repo-a/...`.
+5. `unlink` removes that cross-repo relation and leaves no satisfiedBy relation on the source element.
+6. `relink` replaces a `repo-b` InternalPath target with a `repo-a` InternalPath target.
+7. `merge` merges a source requirement stored in `repo-a` into a target requirement stored in `repo-b`, removes the source element, and preserves merged content on the target.
+8. `mv-file` moves a model file from `repo-a` to `repo-b`, removes the source file, creates the target file, and keeps the model valid.
+9. `mv-folder` moves a model folder subtree from `repo-a` to `repo-b`, removes the source folder, creates the target folder, and keeps the model valid.
+10. `mv-asset` moves an InternalPath asset from `repo-a` to `repo-b` and rewrites affected model references to the new workspace-root-relative path.
+11. `rm-asset` removes an InternalPath asset in `repo-b` and removes affected model references.
+12. `rm` removes an element from `repo-a` and leaves no stale indexed element.
+13. The workspace validates after the full cross-repo CRUD sequence.
+
+**Success Criteria - Non-Git Workspace Rejection:**
+1. `add` rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
+2. `mv` rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
+3. `mv-file` rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
+4. `mv-folder` rejects a target folder under `not-a-repo` with an error mentioning eligible Git worktrees.
+5. `mv-asset` rejects a target asset path under `not-a-repo` with an error mentioning eligible Git worktrees.
+6. Each rejected operation exits non-zero and does not create the requested target under `not-a-repo`.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-multi-workspace-crud/test.sh)
+  * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
+  * verify: [CLI Move Element Command](../../../Interfaces/CLI/Commands.md#cli-move-element-command)
+  * verify: [CLI Move File Command](../../../Interfaces/CLI/Commands.md#cli-move-file-command)
+  * verify: [CLI Move Folder Command](../../../Interfaces/CLI/Commands.md#cli-move-folder-command)
+  * verify: [CLI Rename Element Command](../../../Interfaces/CLI/Commands.md#cli-rename-element-command)
+  * verify: [CLI Merge Element Command](../../../Interfaces/CLI/Commands.md#cli-merge-element-command)
+  * verify: [Relation Commands](../../../Interfaces/CLI/Commands.md#relation-commands)
+  * verify: [CLI Relink Command](../../../Interfaces/CLI/Commands.md#cli-relink-command)
+  * verify: [CLI Move Asset Command](../../../Interfaces/CLI/Commands.md#cli-move-asset-command)
+  * verify: [CLI Remove Asset Command](../../../Interfaces/CLI/Commands.md#cli-remove-asset-command)
+  * verify: [Target Location Validation and Auto-Creation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#target-location-validation-and-auto-creation)
+---
+
 ### CLI Move Element Test
 
 The test shall verify that the `mv` command relocates elements, updates all relations, inserts following Element Ordering Behavior, and outputs git-style diffs.
@@ -311,9 +364,9 @@ The test shall verify that the `mv-file` command moves entire specification file
 **Test Steps - Subdirectory Execution:**
 1. Navigate to a subdirectory of the git repository
 2. Run `reqvire mv-file specifications/File.md specifications/NewFile.md`
-3. Verify paths are resolved relative to current working directory
-4. Verify target file is created at `<cwd>/specifications/NewFile.md`
-5. Verify source file at `<cwd>/specifications/File.md` is removed
+3. Verify paths are resolved relative to the effective workspace root selected for the invocation
+4. Verify target file is created at `<workspace-root>/specifications/NewFile.md`
+5. Verify source file at `<workspace-root>/specifications/File.md` is removed
 6. Verify all relations are updated correctly
 
 **Test Steps - Dry Run:**
@@ -345,7 +398,7 @@ The test shall verify that the `mv-file` command moves entire specification file
 - All incoming relations are updated to new file location
 - Element identifiers are updated (file path component changes)
 - Shows git-style diff for source deletion, target creation, and all affected files
-- Paths are resolved relative to current working directory
+- Paths are resolved relative to the effective workspace root selected for the invocation
 - Supports --dry-run preview
 - Supports --json output with element mappings
 - Reports errors for non-existent files and existing targets
@@ -358,7 +411,7 @@ The test shall verify that the `mv-file` command moves entire specification file
 - Move file with elements that have incoming relations from other files
 - Move file with elements that have outgoing relations to other files
 - Move file with bidirectional relations (verify/verifiedBy, derive/derivedFrom)
-- Execute from git repository root
+- Execute from an effective workspace root
 - Execute from subdirectory (relative path resolution)
 - Dry run mode
 - JSON output mode
@@ -411,7 +464,7 @@ The test shall verify that the `mv-folder` command recursively moves or renames 
 2. Try to move a source path that is a file.
 3. Try to move to a target folder that already exists.
 4. Try to move a folder into one of its own descendants.
-5. Try to move outside the selected workspace scope.
+5. Try to move outside the effective workspace root or outside all eligible Git worktrees.
 6. Verify errors are reported clearly, exit status is non-zero, and no files are changed.
 
 **Success Criteria:**
@@ -590,7 +643,7 @@ The test shall verify that new model elements can be created from a full Markdow
 
 **Test Steps for Relation Validation:**
 1. Create element with valid relations (targets exist in model)
-2. Verify relations are normalized to git-root-relative format
+2. Verify relations are normalized to workspace-root-relative format
 3. Verify element is created successfully
 4. Attempt to create element with non-existent relation target
 5. Verify operation is rejected with clear error message
@@ -619,7 +672,7 @@ The test shall verify that new model elements can be created from a full Markdow
 - **Valid element with relations to existing elements**
 - **Invalid element with relation to non-existent element**
 - **Relations specified as relative paths (../File.md#element)**
-- **Relations specified as repo-relative paths (specifications/File.md#element)**
+- **Relations specified as workspace-root-relative paths (specifications/File.md#element)**
 - **Relations specified as same-file references (#element)**
 - **External link relations (http://, https://) are allowed**
 - **Element ordering after creation (parent before children)**
@@ -636,7 +689,7 @@ The test shall verify that new model elements can be created from a full Markdow
 - Model validation passes after successful creation
 - **Relation targets are validated to exist in the model**
 - **Non-existent relation targets cause rejection**
-- **Relation paths are normalized to git-root-relative format**
+- **Relation paths are normalized to workspace-root-relative format**
 - **External links (http://, https://) bypass validation**
 - Override of parent elements with orphaned children is rejected
 - Error message clearly lists orphaned children with resolution guidance

@@ -112,7 +112,7 @@ Put content in a semantic contract when:
 
 ## Audit Commands
 
-Run from the repository root.
+Run from the intended effective workspace root, or pass that root with `--workspace`.
 
 ```bash
 reqvire validate

@@ -153,8 +153,8 @@ reqvire:InputOutputShape
 
 #### Relations
   * constrain: [Contract Element Structure Constraints](../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
-  * use: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
   * use: [Reqvire Requirement Ontology](#reqvire-requirement-ontology)
+  * use: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
 

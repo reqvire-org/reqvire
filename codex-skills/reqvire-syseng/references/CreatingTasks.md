@@ -35,6 +35,8 @@ reqvire change-impact --git-commit=<commit-hash>
 reqvire change-impact --git-commit=HEAD~1
 ```
 
+`--git-commit` materializes the base snapshot from the current eligible Git worktree inside the effective workspace. It is not a multi-repository commit selector; paths and identifiers remain workspace-root-relative.
+
 The change-impact command identifies:
 - `added[]` - New capabilities/requirements/contracts/verifications
 - `changed[]` - Changed capabilities/requirements/contracts/verifications

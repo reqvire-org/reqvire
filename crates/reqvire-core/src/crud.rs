@@ -11,7 +11,7 @@ use crate::relation::LinkType;
 use globset::GlobSet;
 use rustc_hash::{FxHashMap, FxHashSet};
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::Path;
+use std::path::{Component, Path, PathBuf};
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct OntologyTermKey {
@@ -897,15 +897,48 @@ fn enforce_single_root_after_mutation(model_manager: &ModelManager) -> Result<()
     }
 }
 
+fn resolve_workspace_relative_arg(
+    path_arg: &str,
+    workspace_root: &Path,
+) -> Result<(String, PathBuf), ReqvireError> {
+    let path = Path::new(path_arg);
+    if path.is_absolute()
+        || path
+            .components()
+            .any(|component| matches!(component, Component::ParentDir))
+    {
+        return Err(ReqvireError::PathError(format!(
+            "Path '{}' must be relative to the workspace root and must not contain '..'",
+            path_arg
+        )));
+    }
+
+    let absolute = crate::workspace::absolute_logical_path(&workspace_root.join(path));
+    if !absolute.starts_with(workspace_root) {
+        return Err(ReqvireError::PathError(format!(
+            "Path '{}' is outside the workspace root",
+            path_arg
+        )));
+    }
+
+    let relative = absolute
+        .strip_prefix(workspace_root)
+        .map_err(|error| ReqvireError::PathError(error.to_string()))?
+        .to_string_lossy()
+        .replace('\\', "/");
+
+    Ok((relative, absolute))
+}
+
 /// Add a new element to the model
 ///
 /// # Arguments
 /// * `model_manager` - The model manager
 /// * `element_markdown` - The markdown content for the element
-/// * `target_file` - Target file path (relative to current working directory)
+/// * `target_file` - Target file path (relative to workspace root)
 /// * `excluded_patterns` - Patterns to exclude from path validation
 /// * `current_dir` - Current working directory (where command was invoked)
-/// * `git_root` - Git root directory
+/// * `git_root` - Workspace root directory
 /// * `dry_run` - If true, don't write changes to disk
 /// * `override_existing` - If true, replace existing element with same name
 #[allow(clippy::too_many_arguments)]
@@ -914,17 +947,12 @@ pub fn add_element(
     element_markdown: &str,
     target_file: &str,
     excluded_patterns: &GlobSet,
-    current_dir: &Path,
+    _current_dir: &Path,
     git_root: &Path,
     dry_run: bool,
     override_existing: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    // Normalize target_file: convert from CWD-relative to git-root-relative
-    use crate::utils;
-    let absolute_target = current_dir.join(target_file);
-    let target_file_normalized = utils::get_relative_path(&absolute_target)?
-        .to_string_lossy()
-        .to_string();
+    let (target_file_normalized, _) = resolve_workspace_relative_arg(target_file, git_root)?;
 
     // Track which files were modified before the operation
     // IMPORTANT: Must track BEFORE any modifications (including override removal)
@@ -1209,12 +1237,13 @@ pub fn move_file(
     model_manager: &mut ModelManager,
     source_file: &str,
     target_file: &str,
+    excluded_patterns: &GlobSet,
     current_dir: &Path,
-    git_root: &Path,
+    workspace_root: &Path,
     dry_run: bool,
     squash: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    // Normalize file paths: convert from CWD-relative to git-root-relative
+    // Normalize file paths: convert from CWD-relative to workspace-root-relative
     use crate::utils;
     let absolute_source = current_dir.join(source_file);
     let source_file_normalized = utils::get_relative_path(&absolute_source)?
@@ -1225,6 +1254,14 @@ pub fn move_file(
     let target_file_normalized = utils::get_relative_path(&absolute_target)?
         .to_string_lossy()
         .to_string();
+    let validation = utils::validate_target_path(&target_file_normalized, None, excluded_patterns)?;
+    if !validation.is_valid {
+        return Err(ReqvireError::InvalidOperation(
+            validation
+                .error_message
+                .unwrap_or_else(|| format!("Invalid target path '{}'", target_file)),
+        ));
+    }
 
     // Track which files were modified before the operation
     let modified_before = snapshot_modified_files(model_manager);
@@ -1241,7 +1278,7 @@ pub fn move_file(
     let diffs = match finalize_crud_operation(
         model_manager,
         &modified_before,
-        git_root,
+        workspace_root,
         dry_run,
         None,
         Some(&ontology_before),
@@ -1255,7 +1292,7 @@ pub fn move_file(
 
     if !dry_run {
         // Delete the source file from disk
-        let source_path = git_root.join(&source_file_normalized);
+        let source_path = workspace_root.join(&source_file_normalized);
         if source_path.exists() {
             std::fs::remove_file(&source_path).map_err(ReqvireError::IoError)?;
         }
@@ -1286,7 +1323,7 @@ pub fn move_folder(
     source_folder: &str,
     target_folder: &str,
     current_dir: &Path,
-    git_root: &Path,
+    workspace_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     use crate::utils;
@@ -1323,7 +1360,14 @@ pub fn move_folder(
         )));
     }
 
-    let source_abs = git_root.join(&source_folder_normalized);
+    let workspace_scope = crate::workspace::WorkspaceScope::discover()?;
+    let source_abs = workspace_root.join(&source_folder_normalized);
+    if !workspace_scope.is_eligible_path(&source_abs) {
+        return Err(ReqvireError::InvalidOperation(format!(
+            "Source folder '{}' is outside eligible Git worktrees",
+            source_folder
+        )));
+    }
     if !source_abs.exists() {
         return Err(ReqvireError::LocationNotFound(format!(
             "Source folder '{}' does not exist",
@@ -1337,7 +1381,13 @@ pub fn move_folder(
         )));
     }
 
-    let target_abs = git_root.join(&target_folder_normalized);
+    let target_abs = workspace_root.join(&target_folder_normalized);
+    if !workspace_scope.is_eligible_path(&target_abs) {
+        return Err(ReqvireError::InvalidOperation(format!(
+            "Target folder '{}' is outside eligible Git worktrees",
+            target_folder
+        )));
+    }
     if target_abs.exists() {
         return Err(ReqvireError::DuplicateElement(format!(
             "Target folder '{}' already exists",
@@ -1366,7 +1416,7 @@ pub fn move_folder(
     let diffs = match finalize_crud_operation(
         model_manager,
         &modified_before,
-        git_root,
+        workspace_root,
         dry_run,
         None,
         Some(&ontology_before),
@@ -1386,7 +1436,7 @@ pub fn move_folder(
         {
             let old_abs = entry.path();
             let old_relative = old_abs
-                .strip_prefix(git_root)
+                .strip_prefix(workspace_root)
                 .map_err(|err| ReqvireError::PathError(err.to_string()))?
                 .to_string_lossy()
                 .replace('\\', "/");
@@ -1399,7 +1449,7 @@ pub fn move_folder(
                 &source_folder_normalized,
                 &target_folder_normalized,
             );
-            let new_abs = git_root.join(&new_relative);
+            let new_abs = workspace_root.join(&new_relative);
             if let Some(parent) = new_abs.parent() {
                 fs::create_dir_all(parent).map_err(ReqvireError::IoError)?;
             }
@@ -1411,8 +1461,8 @@ pub fn move_folder(
         }
 
         prune_empty_parent_dirs(
-            source_abs.parent().unwrap_or(git_root),
-            git_root,
+            source_abs.parent().unwrap_or(workspace_root),
+            workspace_root,
             &target_abs,
         )?;
     }
@@ -2016,14 +2066,29 @@ pub fn mv_asset(
     model_manager: &mut ModelManager,
     old_path: &str,
     new_path: &str,
-    git_root: &Path,
+    workspace_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     use std::fs;
-    use std::path::PathBuf;
 
-    let old_path_buf = PathBuf::from(old_path);
-    let references = find_asset_references(model_manager, old_path);
+    let (old_path_normalized, old_abs) = resolve_workspace_relative_arg(old_path, workspace_root)?;
+    let (new_path_normalized, new_abs) = resolve_workspace_relative_arg(new_path, workspace_root)?;
+    let workspace_scope = crate::workspace::WorkspaceScope::discover()?;
+    if !workspace_scope.is_eligible_path(&old_abs) {
+        return Err(ReqvireError::InvalidOperation(format!(
+            "Asset path '{}' is outside eligible Git worktrees",
+            old_path
+        )));
+    }
+    if !workspace_scope.is_eligible_path(&new_abs) {
+        return Err(ReqvireError::InvalidOperation(format!(
+            "Asset path '{}' is outside eligible Git worktrees",
+            new_path
+        )));
+    }
+
+    let old_path_buf = PathBuf::from(&old_path_normalized);
+    let references = find_asset_references(model_manager, &old_path_normalized);
 
     if references.affected_files.is_empty() {
         return Err(ReqvireError::MissingContractBindingTarget(format!(
@@ -2036,7 +2101,7 @@ pub fn mv_asset(
 
     // Update references in each affected file
     for file_path in &references.affected_files {
-        let absolute_file_path = git_root.join(file_path);
+        let absolute_file_path = workspace_root.join(file_path);
         let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
         let mut new_content = content.clone();
@@ -2048,8 +2113,8 @@ pub fn mv_asset(
         // Calculate old and new file-relative paths
         let old_relative =
             pathdiff::diff_paths(&old_path_buf, &file_dir).unwrap_or_else(|| old_path_buf.clone());
-        let new_relative =
-            pathdiff::diff_paths(new_path, &file_dir).unwrap_or_else(|| PathBuf::from(new_path));
+        let new_relative = pathdiff::diff_paths(&new_path_normalized, &file_dir)
+            .unwrap_or_else(|| PathBuf::from(&new_path_normalized));
 
         let old_relative_str = old_relative.to_string_lossy();
         let new_relative_str = new_relative.to_string_lossy();
@@ -2082,9 +2147,6 @@ pub fn mv_asset(
 
     // Move the actual file
     if !dry_run {
-        let old_abs = git_root.join(old_path);
-        let new_abs = git_root.join(new_path);
-
         // Create parent directory if needed
         if let Some(parent) = new_abs.parent() {
             fs::create_dir_all(parent).map_err(ReqvireError::IoError)?;
@@ -2095,7 +2157,7 @@ pub fn mv_asset(
 
     Ok(CrudResult {
         operation: CrudOperation::Move,
-        element_id: old_path.to_string(),
+        element_id: old_path_normalized,
         element_name: format!(
             "Moved {} → {} ({} contract_bindings(s), {} relation(s) in {} file(s))",
             old_path,
@@ -2113,20 +2175,29 @@ pub fn mv_asset(
 pub fn rm_asset(
     model_manager: &mut ModelManager,
     file_path_arg: &str,
-    git_root: &Path,
+    workspace_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     use std::fs;
-    use std::path::PathBuf;
 
-    let references = find_asset_references(model_manager, file_path_arg);
+    let (file_path_normalized, abs_path) =
+        resolve_workspace_relative_arg(file_path_arg, workspace_root)?;
+    let workspace_scope = crate::workspace::WorkspaceScope::discover()?;
+    if !workspace_scope.is_eligible_path(&abs_path) {
+        return Err(ReqvireError::InvalidOperation(format!(
+            "Asset path '{}' is outside eligible Git worktrees",
+            file_path_arg
+        )));
+    }
+
+    let references = find_asset_references(model_manager, &file_path_normalized);
 
     let mut all_diffs = vec![];
-    let file_path_buf = PathBuf::from(file_path_arg);
+    let file_path_buf = PathBuf::from(&file_path_normalized);
 
     // Remove references from each affected file
     for spec_file_path in &references.affected_files {
-        let absolute_file_path = git_root.join(spec_file_path);
+        let absolute_file_path = workspace_root.join(spec_file_path);
         let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
         // Paths in markdown are file-relative, calculate the relative path from this file
@@ -2158,7 +2229,6 @@ pub fn rm_asset(
 
     // Delete the actual file
     if !dry_run {
-        let abs_path = git_root.join(file_path_arg);
         if abs_path.exists() {
             fs::remove_file(&abs_path).map_err(ReqvireError::IoError)?;
         }
@@ -2166,7 +2236,7 @@ pub fn rm_asset(
 
     Ok(CrudResult {
         operation: CrudOperation::Remove,
-        element_id: file_path_arg.to_string(),
+        element_id: file_path_normalized,
         element_name: format!(
             "Removed {} ({} contract_bindings(s), {} relation(s) from {} file(s))",
             file_path_arg,

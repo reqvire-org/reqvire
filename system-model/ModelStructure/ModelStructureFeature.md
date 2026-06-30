@@ -2,7 +2,7 @@
 
 ### Defining Model Structure
 
-As a **System Engineer**, I want a well-defined Reqvire model structure and addressing language, so that I can organize capabilities, requirements, contracts, semantic contracts, verifications, and traceability links consistently across a repository.
+As a **System Engineer**, I want a well-defined Reqvire model structure and addressing language, so that I can organize capabilities, requirements, contracts, semantic contracts, verifications, and traceability links consistently across an effective workspace.
 
 #### Details
 Defining model structure is the capability root for the Reqvire model vocabulary. It defines how elements use explicit concept references for element semantics, capability abilities, requirement obligations, reusable semantic contracts, contracts, governance metadata, and traceability relations.
@@ -19,7 +19,7 @@ This capability also includes ontology rebasing support for the owned ontology c
 
 #### Relations
   * specifiedBy: [Coexistence of Structured and Unstructured Documents](Configuration.md#coexistence-of-structured-and-unstructured-documents)
-  * specifiedBy: [Git Repository as Project Root](ModelManagement.md#git-repository-as-project-root)
+  * specifiedBy: [Workspace Root Path Authority](ModelManagement.md#workspace-root-path-authority)
   * specifiedBy: [Specification File Identification](StructureAndParsing.md#specification-file-identification)
   * specifiedBy: [Structure and Addressing in Markdown Documents](StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
 ---

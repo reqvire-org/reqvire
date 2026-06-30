@@ -93,7 +93,7 @@ This test verifies that the system correctly implements change impact detection,
 - System properly constructs a change impact report based on relationships between elements
 - Relations are compared semantically by element name, not by identifier (prevents false positives when children relocate)
 - Relocated parent with new relation to relocated+changed child is detected correctly
-- Default git commit is HEAD when --git-commit parameter is not provided
+- Default base snapshot is the current eligible worktree HEAD when --git-commit is not provided and Git metadata is available
 - System provides output in both human-readable text and JSON formats
 - Smart filtering removes redundant elements that appear in other elements' relations
 
@@ -111,7 +111,8 @@ This test verifies that the system correctly implements change impact detection,
 - Summary statistics include count of relocated elements
 - Element IDs remain stable when elements are relocated between files
 - Output format matches requested format (text or JSON)
-- Both explicit and implicit git commit parameters work properly
+- Both explicit and implicit base snapshot parameters work properly
+- Source paths, relation targets, contract_bindings targets, evidence paths, and relocation paths remain workspace-root-relative in output
 - JSON output is valid and contains all necessary information
 - GitHub-style blob URLs are included in the output
 

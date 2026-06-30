@@ -6,7 +6,7 @@ The built-in external ontology source contract defines Reqvire-shipped RDF vocab
 
 #### Details
 Ownership:
-- Reqvire core owns the built-in external source registry because Reqvire core already owns external-source policy, diagnostics, semantic index assembly, `include_external` behavior, MCP payloads, and Explorer visibility.
+- Reqvire core owns the built-in external source registry because Reqvire core already owns external-source policy, diagnostics, semantic index assembly, `include_external` behavior, API payloads, and semantic visibility.
 - `o-kernel` remains generic RDF/OWL/SHACL infrastructure. It consumes parsed RDF quads, builds ontology indexes, parses SHACL, aligns SHACL against supplied ontology graphs, and does not decide which vocabularies Reqvire ships as built-in dependencies.
 
 Built-in source registry:
@@ -31,7 +31,7 @@ Behavior:
 - Built-in source terms are available for ontology Turtle validation, semantic-contract SHACL alignment, and native concept RDF generation.
 - Authored ontology resources typed by a class declared in a built-in source are treated as authored named individuals for structural ontology validation, but they are not valid concept-reference targets unless they are generated from native `concept` elements.
 - Authored Turtle must still explicitly declare `@prefix skos: <http://www.w3.org/2004/02/skos/core#> .`; the built-in source does not inject hidden Turtle prefixes.
-- `reqvire semantic export --layer ontologies --layer external-used`, `reqvire semantic export --layer external-used`, and MCP `reqvire.semantic.export` with the `external-used` layer materialize only the used subset of built-in external source triples, following the same used-subset policy as local external ontology sources. MCP helper-tool `include_external: true` provides query-time visibility into the same used subset.
+- `reqvire semantic export --layer ontologies --layer external-used`, `reqvire semantic export --layer external-used`, and semantic export APIs with the `external-used` layer materialize only the used subset of built-in external source triples, following the same used-subset policy as local external ontology sources. Query helpers with `include_external: true` provide query-time visibility into the same used subset.
 - Invalid SKOS terms that are not present in the pinned RDF source do not become valid merely because they share the SKOS namespace.
 
 Conceptual/structural layer separation:
@@ -113,7 +113,7 @@ Rules:
 - `format` is optional and defaults to Turtle. Supported source formats are `turtle`, `ttl`, `rdf`, `rdfxml`, `rdf+xml`, and `jsonld`.
 - Markdown subsection grammar, bullet parsing, required-field extraction, defaults, and source line numbers are parser-owned. Semantic model construction consumes parsed external-source records and must not duplicate markdown list parsing for this section.
 - `source` must be a local path. `http://` and `https://` source paths are rejected; network ontology fetches are not part of validation or export.
-- Source paths are resolved as model paths using the repository root, with file-relative resolution as a fallback for local fixture and authoring ergonomics.
+- Source paths are resolved as model paths using the effective workspace root, with file-relative resolution as a fallback for local fixture and authoring ergonomics. The resolved source must remain inside an eligible Git worktree.
 - Turtle/TTL sources must explicitly declare the configured prefix/namespace pair.
 - RDF/XML sources must use RDF/XML syntax; `format: rdf` is treated as RDF/XML for local `.rdf` ontology files.
 - JSON-LD sources must define equivalent local context mappings or expanded IRIs so the parsed RDF graph mentions the configured namespace.
@@ -171,7 +171,7 @@ Semantic-contract shape reference validation must skip standard reserved vocabul
 
 A non-reserved IRI must resolve through authored ontology terms, local external ontology sources, or built-in external ontology sources when term existence validation applies.
 
-OWL reserved vocabulary recognition is a semantic validation rule. It does not make standard namespaces authored ontology namespaces, does not synthesize external source triples, and does not require standard reserved prefixes to appear as External Sources in Explorer.
+OWL reserved vocabulary recognition is a semantic validation rule. It does not make standard namespaces authored ontology namespaces, does not synthesize external source triples, and does not require standard reserved prefixes to appear as external source records in consumer outputs.
 
 Core SHACL vocabulary used to parse and validate `#### Shapes` blocks is handled through the o-kernel SHACL services and Reqvire semantic-contract adapter. It is not modeled as a local or built-in external ontology source. External ontology sources are reserved for additional RDF vocabularies outside the Reqvire authored model, such as SKOS or project-specific exported vocabularies.
 
@@ -190,9 +190,9 @@ Runtime materialization:
 - For each authored named subject collected from a `#### Ontology` block whose IRI is inside the generated ontology document term namespace, emit one generated triple: `<term> rdfs:isDefinedBy <ontology-document-iri>`.
 - Resolve `<ontology-document-iri>` from the same `ontology_base` used for the generated `owl:Ontology` declaration.
 - Exclude the ontology document IRI itself from generated term definition links.
-- Include generated definition links in default Turtle output, JSON-LD output, default semantic export, MCP semantic ontology output, and any semantic store built from the same semantic index.
+- Include generated definition links in default Turtle output, JSON-LD output, default semantic export, semantic ontology API output, and any semantic store built from the same semantic index.
 - Declare the prefixes used by the generated definition-link section itself, at minimum `rdfs:` and `owl:` when those terms appear in that serialized section.
-- Expose the resolved ontology document as metadata that MCP vocabulary and Explorer graph projections can use for grouping, exact filtering, and modal evidence.
+- Expose the resolved ontology document as metadata that vocabulary APIs and graph projections can use for grouping, exact filtering, and evidence views.
 - Do not generate definition links for imported external ontology terms or named subjects outside the owning document term namespace.
 - Do not mutate authored Markdown ontology blocks.
 
@@ -200,7 +200,7 @@ Deduplication and validation:
 - If an authored ontology block already includes the matching `rdfs:isDefinedBy` triple for an authored named ontology resource, semantic output must emit the fact once.
 - If an authored ontology block gives an authored named ontology resource an explicit `rdfs:isDefinedBy` object that differs from the generated ontology document IRI, semantic validation must fail.
 - `rdfs:isDefinedBy` statements for non-authored external terms are outside this generation rule and, when present, must originate from external source parsing rather than Reqvire ownership materialization.
-- Explorer ontology graph projection must not render `rdfs:isDefinedBy` as a canvas edge or render generated `owl:Ontology` document IRIs as primary graph nodes.
+- Ontology graph projections must treat generated `rdfs:isDefinedBy` and generated `owl:Ontology` document IRIs as ownership metadata rather than authored relationship edges or primary authored graph nodes.
 
 #### Metadata
   * type: specification
@@ -315,7 +315,7 @@ Synchronization behavior:
 - The regenerated temporary outputs shall be compared with `crates/reqvire-core/src/runtime_ontology/reqvire.ttl` and `crates/reqvire-core/src/runtime_ontology/reqvire-shacl.ttl` after deterministic blank-node label normalization.
 - Blank-node labels are serializer-local and do not represent semantic drift; all non-blank-node textual differences remain test failures.
 - A mismatch shall fail the test suite with guidance to regenerate the artifacts through the update script.
-- The comparison shall run against the real repository root, not a copied e2e fixture workspace.
+- The comparison shall run against the real Reqvire repository workspace, not a copied e2e fixture workspace.
 - The comparison is intentionally strict so authored ontology and semantic-contract changes propagate to the runtime artifact through normal change impact and test failure.
 
 Regeneration command:

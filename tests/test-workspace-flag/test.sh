@@ -40,74 +40,23 @@ s.close()
 PY
 }
 
+init_multi_workspace_repos() {
+  local workspace="$1"
+
+  for repo in "$workspace/repo-a" "$workspace/repo-b"; do
+    (cd "$repo" && git init >/dev/null 2>&1)
+    (cd "$repo" && git config --local user.email "test@example.com" >/dev/null 2>&1)
+    (cd "$repo" && git config --local user.name "Test User" >/dev/null 2>&1)
+    (cd "$repo" && git add . >/dev/null 2>&1)
+    (cd "$repo" && git commit -m "Initial commit" >/dev/null 2>&1)
+  done
+}
+
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUTSIDE_DIR="$(mktemp -d -t reqvire-workspace-outside-XXXXXX)"
 
-mkdir -p "$TEST_DIR/specifications" "$TEST_DIR/output"
-cat > "$TEST_DIR/.reqvireignore" <<'EOF'
-ignored/**
-output/**
-EOF
-
-cat > "$TEST_DIR/specifications/Requirements.md" <<'EOF'
-# Elements
-
-### Workspace Flag Capability
-
-Capability root for workspace flag tests.
-
-#### Metadata
-  * type: capability
-
----
-
-### Workspace Flag Root
-
-Root requirement for explicit workspace selection.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derive: [Workspace Flag Child](#workspace-flag-child)
-  * derive: [Workspace Flag Sibling](#workspace-flag-sibling)
-  * specify: [Workspace Flag Capability](#workspace-flag-capability)
-
----
-
-### Workspace Flag Child
-
-Requirement used to verify explicit workspace selection.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Workspace Flag Root](#workspace-flag-root)
-
----
-
-### Workspace Flag Sibling
-
-Requirement used to verify workspace-selected file moves.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Workspace Flag Root](#workspace-flag-root)
-
----
-EOF
-
-mkdir -p "$TEST_DIR/ignored"
-cat > "$TEST_DIR/ignored/Invalid.md" <<'EOF'
-# Elements
-
-### Ignored Broken Element
-
-This file is ignored by workspace .reqvireignore and must not affect validation.
-EOF
+cp -a "$TEST_SCRIPT_DIR/fixtures/single-workspace/." "$TEST_DIR/"
+mkdir -p "$TEST_DIR/output"
 
 set +e
 (cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$TEST_DIR" validate) > "$TEST_DIR/output/validate.txt" 2>&1
@@ -220,11 +169,56 @@ set +e
 (cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" search --short --filter-name "Workspace Flag Child") > "$TEST_DIR/output/no-workspace.txt" 2>&1
 NO_WORKSPACE_EXIT=$?
 set -e
-if [ "$NO_WORKSPACE_EXIT" -ne 0 ]; then
-  fail "omitting workspace outside a model should preserve cwd behavior without crashing" "$TEST_DIR/output/no-workspace.txt"
+if [ "$NO_WORKSPACE_EXIT" -eq 0 ]; then
+  fail "omitting workspace outside an eligible Git worktree should fail before model processing" "$TEST_DIR/output/no-workspace.txt"
 fi
-if grep -q "Workspace Flag Child" "$TEST_DIR/output/no-workspace.txt"; then
-  fail "omitting workspace should not read the explicit workspace model from outside cwd" "$TEST_DIR/output/no-workspace.txt"
+if ! grep -q "eligible Git worktree" "$TEST_DIR/output/no-workspace.txt"; then
+  fail "no-workspace error should explain missing eligible Git worktree" "$TEST_DIR/output/no-workspace.txt"
+fi
+
+MULTI_WORKSPACE="$(mktemp -d -t reqvire-multi-workspace-XXXXXX)"
+cp -a "$TEST_SCRIPT_DIR/fixtures/multi-workspace/." "$MULTI_WORKSPACE/"
+
+init_multi_workspace_repos "$MULTI_WORKSPACE"
+
+(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$MULTI_WORKSPACE" validate) > "$TEST_DIR/output/multi-workspace-validate.txt" 2>&1 \
+  || fail "validate should accept a non-Git workspace root with descendant Git worktrees" "$TEST_DIR/output/multi-workspace-validate.txt"
+
+(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$MULTI_WORKSPACE" search --json) > "$TEST_DIR/output/multi-workspace-search.json" 2>&1 \
+  || fail "search should run over descendant Git worktrees only" "$TEST_DIR/output/multi-workspace-search.json"
+
+jq -e '.files[].elements[] | select(.identifier == "repo-a/specifications/A.md#repo-a-requirement")' "$TEST_DIR/output/multi-workspace-search.json" >/dev/null \
+  || fail "repo A identifier should be workspace-root-relative" "$TEST_DIR/output/multi-workspace-search.json"
+jq -e '.files[].elements[] | select(.identifier == "repo-b/specifications/B.md#repo-b-requirement")' "$TEST_DIR/output/multi-workspace-search.json" >/dev/null \
+  || fail "repo B identifier should be workspace-root-relative" "$TEST_DIR/output/multi-workspace-search.json"
+if jq -e '.files[].elements[] | select(.name | test("Ignored|Non Git"))' "$TEST_DIR/output/multi-workspace-search.json" >/dev/null; then
+  fail "non-Git and ignored workspace files should not be parsed" "$TEST_DIR/output/multi-workspace-search.json"
+fi
+jq -e '.files[].elements[] | select(.identifier == "repo-b/specifications/B.md#repo-b-requirement") | .relations[]? | select(.relation_type == "satisfiedBy" and .target.target == "repo-a/docs/evidence.txt")' "$TEST_DIR/output/multi-workspace-search.json" >/dev/null \
+  || fail "root-relative links should resolve against the effective workspace root" "$TEST_DIR/output/multi-workspace-search.json"
+
+cp "$MULTI_WORKSPACE/repo-b/specifications/InvalidNonGitEvidence.md.fixture" "$MULTI_WORKSPACE/repo-b/specifications/InvalidNonGitEvidence.md"
+set +e
+(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$MULTI_WORKSPACE" validate) > "$TEST_DIR/output/multi-workspace-non-git-evidence.txt" 2>&1
+NON_GIT_EVIDENCE_EXIT=$?
+set -e
+rm -f "$MULTI_WORKSPACE/repo-b/specifications/InvalidNonGitEvidence.md"
+if [ "$NON_GIT_EVIDENCE_EXIT" -eq 0 ]; then
+  fail "non-Git evidence file should not satisfy an InternalPath relation" "$TEST_DIR/output/multi-workspace-non-git-evidence.txt"
+fi
+if ! grep -q "outside eligible Git worktrees" "$TEST_DIR/output/multi-workspace-non-git-evidence.txt"; then
+  fail "non-Git evidence validation error should mention eligible Git worktrees" "$TEST_DIR/output/multi-workspace-non-git-evidence.txt"
+fi
+
+set +e
+(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$MULTI_WORKSPACE" change-impact --git-commit HEAD) > "$TEST_DIR/output/multi-workspace-change-impact-commit.txt" 2>&1
+CHANGE_IMPACT_MULTI_EXIT=$?
+set -e
+if [ "$CHANGE_IMPACT_MULTI_EXIT" -eq 0 ]; then
+  fail "change-impact --git-commit should reject ambiguous multi-worktree workspaces" "$TEST_DIR/output/multi-workspace-change-impact-commit.txt"
+fi
+if ! grep -q "requires exactly one eligible Git worktree" "$TEST_DIR/output/multi-workspace-change-impact-commit.txt"; then
+  fail "multi-worktree change-impact error should explain single-worktree commit adapter limit" "$TEST_DIR/output/multi-workspace-change-impact-commit.txt"
 fi
 
 exit 0

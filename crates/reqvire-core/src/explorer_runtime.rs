@@ -82,10 +82,15 @@ fn copy_workspace_assets(output_dir: &std::path::Path) -> Result<(), ReqvireErro
     let output_dir = output_dir
         .canonicalize()
         .unwrap_or_else(|_| output_dir.to_path_buf());
-    copy_workspace_assets_from_dir(Path::new("."), Path::new("."), &output_dir)
+    let scope = crate::workspace::WorkspaceScope::discover()?;
+    for scan_root in scope.scan_roots() {
+        copy_workspace_assets_from_dir(&scope, Path::new("."), &scan_root, &output_dir)?;
+    }
+    Ok(())
 }
 
 fn copy_workspace_assets_from_dir(
+    scope: &crate::workspace::WorkspaceScope,
     root: &std::path::Path,
     dir: &std::path::Path,
     output_dir: &std::path::Path,
@@ -111,15 +116,15 @@ fn copy_workspace_assets_from_dir(
             if should_skip_workspace_asset_dir(&name) {
                 continue;
             }
-            copy_workspace_assets_from_dir(root, &path, output_dir)?;
+            copy_workspace_assets_from_dir(scope, root, &path, output_dir)?;
             continue;
         }
 
-        if !path.is_file() || !is_workspace_asset_path(&path) {
+        if !path.is_file() || !scope.is_eligible_path(&path) || !is_workspace_asset_path(&path) {
             continue;
         }
 
-        let rel = path.strip_prefix(root).map_err(|e| {
+        let rel = path.strip_prefix(&scope.root).map_err(|e| {
             ReqvireError::ProcessError(format!(
                 "Failed to relativize asset path {}: {}",
                 path.display(),

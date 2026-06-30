@@ -28,6 +28,7 @@ This objective groups verification that Reqvire validation enforces element typi
   * derive: [Subdirectory Processing Verification](#subdirectory-processing-verification)
   * derive: [Type Validation Errors Test](#type-validation-errors-test)
   * derive: [Unstructured Documents Test](#unstructured-documents-test)
+  * derive: [Workspace Git Worktree Eligibility Verification](#workspace-git-worktree-eligibility-verification)
 ---
 
 ### Capability Element Relation Compatibility Test
@@ -214,31 +215,31 @@ This test verifies that the system correctly validates relation types based on e
 
 ### File Exclusion Test
 
-This test verifies that Reqvire correctly reads and applies exclusion patterns from the repository root .gitignore file and .reqvireignore file.
+This test verifies that Reqvire correctly reads and applies exclusion patterns from eligible Git-worktree root .gitignore files and the effective-workspace-root .reqvireignore file.
 
 #### Details
 
 ##### Acceptance Criteria
-- System shall read exclusion patterns from root .gitignore file
-- System shall read exclusion patterns from root .reqvireignore file
+- System shall read exclusion patterns from each eligible Git-worktree root .gitignore file
+- System shall read exclusion patterns from the effective-workspace-root .reqvireignore file
 - System shall combine patterns from .gitignore and .reqvireignore
 - Files matching patterns from any source shall be excluded from processing
-- System shall use ONLY root .gitignore file, not nested .gitignore files
-- System shall use ONLY root .reqvireignore file, not nested .reqvireignore files
+- System shall use ONLY Git-worktree root .gitignore files, not nested .gitignore files
+- System shall use ONLY the effective-workspace-root .reqvireignore file, not nested .reqvireignore files
 - System shall correctly process files when .gitignore is absent
 - System shall correctly process files when .reqvireignore is absent
 - Exclusion shall work across all commands (validate, summary, format, traces, etc.)
 
 ##### Test Criteria
 1. **Gitignore pattern exclusion:**
-   - Create test environment with root .gitignore containing patterns (e.g., "**/build/**", "temp-*.md")
+   - Create test environment with the Git-worktree root .gitignore containing patterns (e.g., "**/build/**", "temp-*.md")
    - Create files matching those patterns in specifications folder
    - Run reqvire summary command
    - Verify files matching .gitignore patterns are NOT processed
    - Verify files NOT matching patterns ARE processed
 
 2. **Reqvireignore pattern exclusion:**
-   - Create test environment with root .reqvireignore containing patterns (e.g., "**/draft-*.md", "examples/**")
+   - Create test environment with effective-workspace-root .reqvireignore containing patterns (e.g., "**/draft-*.md", "examples/**")
    - Create files matching those patterns in specifications folder (files that ARE in Git)
    - Run reqvire summary command
    - Verify files matching .reqvireignore patterns are NOT processed
@@ -270,7 +271,7 @@ This test verifies that Reqvire correctly reads and applies exclusion patterns f
    - Create nested .gitignore in subdirectory with different patterns
    - Create nested .reqvireignore in subdirectory with different patterns
    - Verify patterns from nested files are NOT applied
-   - Verify only root file patterns are used
+   - Verify only Git-worktree root .gitignore and effective-workspace-root .reqvireignore patterns are used
 
 #### Metadata
   * type: test-verification
@@ -544,7 +545,6 @@ Test cases:
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-semantic-contract-sanity/test.sh)
-  * verify: [Ontology and Semantic Contract Model](../../../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
 ---
 
 ### Semantic Contract Section Validation Test
@@ -650,27 +650,27 @@ This test verifies that each requirement hierarchy element resolves to exactly o
 
 ### Subdirectory Processing Verification
 
-This test verifies that the system correctly processes only files within the current directory when run from a subfolder of a git repository and generates missing relation target errors for references to parent directories.
+This test verifies that the system treats the effective process working directory as the workspace root when run from a subfolder of a Git repository and generates missing relation target errors for references outside that workspace root.
 
 #### Details
 
 ##### Acceptance Criteria
-- System shall process only files within the current directory when run from a subfolder
-- System shall handle identifier normalization correctly within subdirectory context
-- System shall generate missing relation target errors for references to elements or files outside the current subdirectory scope
+- System shall process only eligible Git-worktree files within the effective workspace root when run from a subfolder
+- System shall handle identifier normalization correctly relative to the effective workspace root
+- System shall generate missing relation target errors for references to elements or files outside the effective workspace root
 - System shall work with model, serve, format, traces, and CRUD commands (validation is automatic)
-- System shall ignore files outside the current directory scope
+- System shall ignore files outside the effective workspace root
 - System shall provide meaningful missing relation target error messages for parent directory references
-- CRUD commands (add, rm, mv, mv-file) shall resolve paths relative to current working directory
+- CRUD commands (add, rm, mv, mv-file) shall resolve paths relative to the effective workspace root
 
 ##### Test Criteria
-- Commands run from subdirectory process only files within that subdirectory
-- Files outside the current directory are not included in processing or output
-- Identifier normalization works correctly for paths within subdirectory
+- Commands run from subdirectory process only eligible Git-worktree files within that subdirectory workspace root
+- Files outside the effective workspace root are not included in processing or output
+- Identifier normalization works correctly for paths within the effective workspace root
 - References to parent directories generate missing relation target errors with clear error messages
 - Missing relation target errors specifically identify the unreachable parent directory reference
 - All major commands (model, serve, format, traces) work from subdirectories with automatic validation
-- CRUD commands (add, rm, mv, mv-file) resolve file paths relative to current working directory
+- CRUD commands (add, rm, mv, mv-file) resolve file paths relative to the effective workspace root
 - CRUD mv command successfully moves elements within subdirectory scope
 - CRUD mv-file command successfully moves entire files within subdirectory scope
 - Commands exit with validation error code when parent directory references cannot be resolved
@@ -736,4 +736,25 @@ This test verifies that the system correctly validates relations to excluded fil
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-valid-relations/test.sh)
   * verify: [Excluded File Relation Validation](../../../Operations/Validation/ValidationRequirements.md#excluded-file-relation-validation)
+---
+
+### Workspace Git Worktree Eligibility Verification
+
+This verification shall prove that Reqvire uses one workspace-root-relative identifier namespace while only admitting files and artifacts that are inside eligible Git worktrees.
+
+#### Details
+Expected checks:
+- Start Reqvire from a Git repository root and verify identifiers are emitted relative to that root.
+- Start Reqvire from a child directory of a Git repository and verify identifiers are emitted relative to the child workspace root while parent-repository files outside the child root are not parsed.
+- Start Reqvire from a parent directory containing two Git repositories and one ordinary non-Git folder.
+- Verify model elements, InternalPath resources, consumer store files, static export assets, tool evidence, and reports include eligible files from the Git repositories with workspace-root-relative paths such as `repo-a/system-model/File.md#element`.
+- Verify Markdown files, assets, implementation files, and evidence artifacts under the ordinary non-Git folder are ignored and cannot satisfy relations, appear as resources, appear in consumer file views, or participate in change impact.
+- Verify root-relative Markdown links beginning with `/` resolve against the effective workspace root, not against any containing or nested Git repository root.
+- Verify nested Git repository roots do not reset identifiers or create separate identifier namespaces.
+
+#### Metadata
+  * type: analysis-verification
+
+#### Relations
+  * verify: [Workspace Root Path Authority](../../../ModelStructure/ModelManagement.md#workspace-root-path-authority)
 ---

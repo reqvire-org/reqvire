@@ -1,5 +1,6 @@
 use crate::error::ReqvireError;
 use crate::git_commands;
+use crate::workspace;
 use globset::{Glob, GlobMatcher, GlobSet};
 use log::debug;
 use pathdiff::diff_paths;
@@ -129,7 +130,7 @@ pub fn is_to_be_ignored(path: &Path, excluded_filename_patterns: &GlobSet) -> bo
 pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet) -> bool {
     let filename = path.file_name().and_then(|s| s.to_str()).unwrap_or("");
 
-    // Convert absolute path to relative path from git root for pattern matching
+    // Convert absolute path to workspace-relative path for pattern matching
     // This ensures patterns like "external/**/*.md" work correctly regardless of working directory
     let relative_path = match get_relative_path(path) {
         Ok(rel_path) => rel_path,
@@ -178,12 +179,13 @@ pub struct PathValidation {
 ///
 /// Checks:
 /// - Path is not excluded by gitignore or reqvireignore patterns
-/// - Path depth does not exceed 10 subdirectories from git root
+/// - Path is inside the effective workspace root and an eligible Git worktree
+/// - Path depth does not exceed 10 subdirectories from the workspace root
 /// - Returns whether file/section need to be created
 ///
 /// # Arguments
 ///
-/// * `path` - Target file path (relative to git root or absolute)
+/// * `path` - Target file path (relative to workspace root or absolute)
 /// * `section` - Target section name (optional)
 /// * `excluded_patterns` - Glob patterns for exclusion (gitignore + reqvireignore)
 ///
@@ -195,17 +197,42 @@ pub fn validate_target_path(
     section: Option<&str>,
     excluded_patterns: &GlobSet,
 ) -> Result<PathValidation, ReqvireError> {
-    let git_root = git_commands::get_git_root_dir()?;
+    let workspace_scope = workspace::WorkspaceScope::discover()?;
+    let workspace_root = workspace_scope.root.clone();
 
     // Convert to PathBuf
     let target_path = PathBuf::from(path);
 
     // Make absolute if relative
     let absolute_path = if target_path.is_absolute() {
-        target_path.clone()
+        workspace::absolute_logical_path(&target_path)
     } else {
-        git_root.join(&target_path)
+        workspace::absolute_logical_path(&workspace_root.join(&target_path))
     };
+
+    if !absolute_path.starts_with(&workspace_root) {
+        return Ok(PathValidation {
+            is_valid: false,
+            error_message: Some(format!(
+                "Target path '{}' is outside the workspace root",
+                path
+            )),
+            needs_file_creation: false,
+            needs_section_creation: false,
+        });
+    }
+
+    if !workspace_scope.is_eligible_path(&absolute_path) {
+        return Ok(PathValidation {
+            is_valid: false,
+            error_message: Some(format!(
+                "Target path '{}' is outside eligible Git worktrees",
+                path
+            )),
+            needs_file_creation: false,
+            needs_section_creation: false,
+        });
+    }
 
     // Check if path is excluded by patterns
     if is_excluded_by_patterns(&absolute_path, excluded_patterns) {
@@ -220,14 +247,14 @@ pub fn validate_target_path(
         });
     }
 
-    // Check path depth (max 10 subdirectories from git root)
+    // Check path depth (max 10 subdirectories from workspace root)
     // Count only directories, excluding the filename
-    if let Ok(rel_path) = absolute_path.strip_prefix(&git_root) {
+    if let Ok(rel_path) = absolute_path.strip_prefix(&workspace_root) {
         // Get parent path (directories only) and count components
         let dir_depth = if let Some(parent) = rel_path.parent() {
             parent.components().count()
         } else {
-            0 // File at git root
+            0 // File at workspace root
         };
 
         if dir_depth > 10 {
@@ -257,8 +284,8 @@ pub fn validate_target_path(
     })
 }
 
-/// Scans the git root folder for markdown files, excluding files based on patterns.
-/// If the current working directory is a subfolder of the git root, only scans within that subfolder.
+/// Scans eligible Git worktree Markdown files under the effective workspace root,
+/// excluding files based on patterns.
 ///
 /// # Arguments
 ///
@@ -271,49 +298,34 @@ pub fn validate_target_path(
 pub fn scan_markdown_files(
     commit: Option<&str>,
     excluded_filename_patterns: &GlobSet,
-) -> Vec<PathBuf> {
+) -> Result<Vec<PathBuf>, ReqvireError> {
     match commit {
         Some(commit_id) => scan_markdown_files_from_commit(commit_id, excluded_filename_patterns),
         None => {
             let mut files = Vec::new();
+            let workspace_scope = workspace::WorkspaceScope::discover()?;
 
-            // Get git root directory
-            let git_root = match git_commands::get_git_root_dir() {
-                Ok(dir) => dir,
-                Err(_) => {
-                    debug!("Not in a git repository, using current directory");
-                    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+            for scan_dir in workspace_scope.scan_roots() {
+                debug!("Scanning for markdown files in: {}", scan_dir.display());
+
+                for entry in WalkDir::new(&scan_dir)
+                    .into_iter()
+                    .filter_entry(|entry| entry.file_name() != ".git")
+                    .filter_map(Result::ok)
+                    .filter(|e| {
+                        e.path().is_file() && e.path().extension().is_some_and(|ext| ext == "md")
+                    })
+                    .filter(|e| workspace_scope.is_eligible_path(e.path()))
+                    .filter(|e| !is_to_be_ignored(e.path(), excluded_filename_patterns))
+                {
+                    files.push(entry.path().to_path_buf());
                 }
-            };
-
-            // Get current working directory
-            let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-
-            // Determine scan directory - if current directory is within git root but not at git root,
-            // scan only within the current directory subtree
-            let scan_dir = if current_dir.starts_with(&git_root) && current_dir != git_root {
-                current_dir
-            } else {
-                git_root
-            };
-
-            debug!("Scanning for markdown files in: {}", scan_dir.display());
-
-            // Scan all markdown files in the repository or specified subdirectory
-            // Filter out files that are ignored by gitignore or reqvireignore
-            for entry in WalkDir::new(&scan_dir)
-                .into_iter()
-                .filter_map(Result::ok)
-                .filter(|e| {
-                    e.path().is_file() && e.path().extension().is_some_and(|ext| ext == "md")
-                })
-                .filter(|e| !is_to_be_ignored(e.path(), excluded_filename_patterns))
-            {
-                files.push(entry.path().to_path_buf());
             }
 
+            files.sort();
+            files.dedup();
             debug!("Scanned {} markdown files.", files.len());
-            files
+            Ok(files)
         }
     }
 }
@@ -326,20 +338,20 @@ pub fn scan_markdown_files(
 pub fn scan_markdown_files_from_commit(
     commit: &str,
     excluded_filename_patterns: &GlobSet,
-) -> Vec<PathBuf> {
+) -> Result<Vec<PathBuf>, ReqvireError> {
     let mut files = Vec::new();
+    let workspace_scope = workspace::WorkspaceScope::discover()?;
 
-    // Get git root directory
-    let git_root = match git_commands::get_git_root_dir() {
-        Ok(dir) => dir,
-        Err(_) => {
-            debug!("Not in a git repository, using current directory");
-            std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
-        }
-    };
+    if workspace_scope.git_worktrees.len() != 1 {
+        return Err(ReqvireError::GitCommandError(format!(
+            "Git commit comparison requires exactly one eligible Git worktree; found {}",
+            workspace_scope.git_worktrees.len()
+        )));
+    }
+    let git_root = &workspace_scope.git_worktrees[0];
 
     // Run git ls-tree command to get all files in the commit
-    let result = git_commands::ls_tree_commit(commit);
+    let result = git_commands::ls_tree_commit_in_folder(commit, git_root);
     let documents_vec = match result {
         Err(e) => {
             eprintln!("Error listing files in commit: {}", e);
@@ -352,32 +364,18 @@ pub fn scan_markdown_files_from_commit(
         .into_iter()
         .map(|p| git_root.join(p))
         .filter(|p| p.extension().is_some_and(|ext| ext == "md"))
+        .filter(|p| workspace_scope.is_eligible_path(p))
         .filter(|p| !is_to_be_ignored(p, excluded_filename_patterns))
         .collect::<Vec<PathBuf>>();
 
     files.extend(matching_paths);
 
-    files
+    Ok(files)
 }
 
-/// Gets the relative path of a file from the git repository root
+/// Gets the relative path of a file from the effective workspace root.
 pub fn get_relative_path(path: &Path) -> Result<PathBuf, ReqvireError> {
-    let git_root = match git_commands::get_git_root_dir() {
-        Ok(dir) => dir,
-        Err(_) => {
-            debug!("Not in a git repository, using current directory");
-            std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
-        }
-    };
-
-    if let Ok(relative) = path.strip_prefix(&git_root) {
-        return Ok(relative.to_path_buf());
-    }
-
-    Err(ReqvireError::PathError(format!(
-        "Failed to determine relative path: {}",
-        path.display()
-    )))
+    workspace::workspace_relative_path(path)
 }
 
 /// Splits an identifier into (file_part, Option(fragment)) following these rules:
@@ -455,10 +453,10 @@ pub fn is_external_url(s: &str) -> bool {
     EXTERNAL_SCHEMES.iter().any(|scheme| s.starts_with(scheme))
 }
 
-/// Unified path resolution function that handles git-root-relative paths consistently
+/// Unified path resolution function that handles workspace-root-relative paths consistently
 ///
 /// Rules:
-/// - Paths starting with '/' are treated as relative to git repository root
+/// - Paths starting with '/' are treated as relative to the effective workspace root
 /// - Other paths are treated as relative to base_path
 /// - External URLs are passed through unchanged
 fn resolve_path_to_absolute(path_part: &str, base_path: &Path) -> Result<PathBuf, ReqvireError> {
@@ -475,11 +473,10 @@ fn resolve_path_to_absolute(path_part: &str, base_path: &Path) -> Result<PathBuf
     let p = Path::new(path_part);
 
     if p.is_absolute() {
-        // For paths starting with '/', treat them as relative to git root
-        let git_root = crate::git_commands::get_git_root_dir()
-            .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?;
+        // For paths starting with '/', treat them as relative to workspace root
+        let workspace_root = crate::workspace::workspace_root()?;
         let relative_part = p.strip_prefix("/").unwrap_or(p);
-        Ok(git_root.join(relative_part))
+        Ok(workspace_root.join(relative_part))
     } else {
         // For relative paths, resolve relative to base_path
         let joined_path = base_path.join(p);
@@ -526,20 +523,17 @@ pub fn normalize_identifier(identifier: &str, base_path: &Path) -> Result<String
     // 2) Use unified path resolution
     let full_path = resolve_path_to_absolute(path_part, base_path)?;
 
-    // 3) Get git root for normalization
-    let git_root = crate::git_commands::get_git_root_dir()
-        .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?
-        .canonicalize()
-        .map_err(|e| ReqvireError::PathError(format!("Failed to canonicalize git root: {}", e)))?;
+    // 3) Get workspace root for normalization
+    let workspace_root = crate::workspace::workspace_root()?;
 
-    // 4) Strip the Git‐root prefix to get relative path
+    // 4) Strip the workspace-root prefix to get relative path
     let rel = full_path
-        .strip_prefix(&git_root)
+        .strip_prefix(&workspace_root)
         .map_err(|_| {
             ReqvireError::PathError(format!(
-                "`{}` is not inside git root `{}`",
+                "`{}` is not inside workspace root `{}`",
                 full_path.display(),
-                git_root.display()
+                workspace_root.display()
             ))
         })?
         .to_string_lossy()
@@ -588,14 +582,13 @@ pub fn to_relative_identifier(
         return Ok(identifier.to_string());
     }
 
-    let git_root = crate::git_commands::get_git_root_dir()
-        .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?;
+    let workspace_root = crate::workspace::workspace_root()?;
 
     let is_absolute = path.starts_with('/');
     let stripped = if is_absolute { &path[1..] } else { path };
 
     let resolved_path = if is_absolute {
-        git_root.join(stripped)
+        workspace_root.join(stripped)
     } else {
         // Relative path - resolve against base_path
         base_path.join(stripped)
@@ -611,7 +604,7 @@ pub fn to_relative_identifier(
         // Both exist - use canonical paths
         diff_paths(normalized, base).map(|p| p.to_string_lossy().into_owned())
     } else if let Some(ref base) = canonical_base {
-        // Base exists but target doesn't - compute from git-root-relative paths
+        // Base exists but target doesn't - compute from workspace-root-relative paths
         let base_relative = get_relative_path(base).unwrap_or_else(|_| base_path.to_path_buf());
         diff_paths(Path::new(stripped), &base_relative).map(|p| p.to_string_lossy().into_owned())
     } else {
@@ -888,7 +881,7 @@ mod tests {
                 &base_path,
                 "File1.md#some-fragment",
             ),
-            // Absolute path at git root
+            // Absolute path at workspace root
             (
                 "/File4.md#Title: Example",
                 &base_path,
@@ -1242,13 +1235,13 @@ mod tests {
             .expect("Should return external URL as-is");
         assert_eq!(result, external_url, "Failed external URL check");
 
-        // 2. Absolute identifier path resolved relative to Git root
+        // 2. Absolute identifier path resolved relative to workspace root
         let spec_identifier = "/subfolder/file.yaml";
         let result = to_relative_identifier(&spec_identifier, &base_path, false)
             .expect("Should return relative path inside specifications folder");
         assert_eq!(
             result, "../../subfolder/file.yaml",
-            "Failed Git-root-based absolute path check"
+            "Failed workspace-root-based absolute path check"
         );
 
         // 3. Same-folder file path

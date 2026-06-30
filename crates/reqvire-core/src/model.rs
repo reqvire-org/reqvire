@@ -129,7 +129,7 @@ impl ModelManager {
         // Track all element locations for global uniqueness checking
         let mut all_element_locations: Vec<(String, String, usize)> = Vec::new(); // (name, file_path, line_number)
 
-        let files = utils::scan_markdown_files(git_commit_hash, excluded_filename_patterns);
+        let files = utils::scan_markdown_files(git_commit_hash, excluded_filename_patterns)?;
         debug!("Pass 1: Found {} markdown files.", files.len());
 
         let file_iterator = filesystem::FileReaderIterator::new(git_commit_hash, files);

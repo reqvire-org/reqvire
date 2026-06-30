@@ -35,7 +35,6 @@ Implementation details shall follow the associated contract specifications.
   * derive: [CLI Size Estimate JSON Option](#cli-size-estimate-json-option)
   * derive: [CLI Submodels Command](#cli-submodels-command)
   * derive: [CLI Traces Command](#cli-traces-command)
-  * derive: [Contract Bindings Commands](#contract-bindings-commands)
   * derive: [Explicit Workspace Selection](#explicit-workspace-selection)
   * derive: [Format Command](#format-command)
   * derive: [Validate Command](#validate-command)
@@ -54,7 +53,7 @@ Implementation details shall follow the associated contract specifications. Onto
   * type: requirement
 
 #### Contract Bindings
-  * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
@@ -80,8 +79,8 @@ The system shall provide a command-line interface for initiating change impact a
 Command invocation: `reqvire change-impact [OPTIONS]`
 
 **Analysis Options**:
-- `--git-commit <hash>`: Specify git commit hash for comparing changes
-- Support analyzing changes between git commits
+- `--git-commit <hash>`: Specify a source-control commit reference used to materialize the base workspace snapshot for the current single-worktree comparison mode
+- Support analyzing changes between a base workspace snapshot and the current workspace snapshot
 - Enable specifying elements to analyze by ID or pattern
 - Allow limiting analysis to specific relation types
 - Support depth limitations for large models
@@ -89,7 +88,7 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 **Output Options**:
 - `--json`: Output structured JSON impact data
 - Default to formatted text reports
-- Integrate with text, JSON, and Explorer-supported reporting workflows
+- Integrate with text, JSON, and downstream reporting workflows
 
 **Integration Support**:
 - Support integration with CI/CD pipelines
@@ -101,6 +100,7 @@ Command invocation: `reqvire change-impact [OPTIONS]`
   * type: requirement
 
 #### Contract Bindings
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Text Output Formatting](../../Reports/ModelReports/Specifications.md#text-output-formatting)
 
@@ -353,7 +353,7 @@ The command shall reject moving an element into an existing `# Element` file whe
   * type: requirement
 
 #### Contract Bindings
-  * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
@@ -537,7 +537,7 @@ Implementation details shall follow the associated contract specifications.
 
 ### CLI Resources Command
 
-The system shall provide a `resources` command that generates a report showing all files referenced by the model through relations and contract_bindings.
+The system shall provide a `resources` command that generates the resources report for InternalPath relation targets and contract_bindings targets.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -646,30 +646,6 @@ Implementation details shall follow the associated contract specifications.
   * verifiedBy: [Verification Traces Filter Options Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#verification-traces-filter-options-test)
 ---
 
-### Contract Bindings Commands
-
-The system shall provide contract_bindings management through the unified link/unlink commands using the 'bindContract' keyword.
-
-#### Details
-Contract Bindings management is a specialization of the unified relation command surface. Detailed `bindContract`, auto-detection, dry-run, JSON, persistence, idempotency, and cleanup behavior shall follow the relation command contract and contract_bindings behavior contracts.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
-  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
-
-#### Relations
-  * definedBy: [Contract Bindings Input Auto-Detection Behavior](Behaviors.md#contract-bindings-input-auto-detection-behavior)
-  * derivedFrom: [Relation Commands](#relation-commands)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
-  * verifiedBy: [Bind Contract Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#bind-contract-command-verification)
-  * verifiedBy: [Remove Contract Binding Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#remove-contract-binding-command-verification)
----
-
 ### Detailed Error Handling and Logging
 
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
@@ -686,8 +662,8 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Detailed Error Handling and Logging Contract Specification](Specifications.md#detailed-error-handling-and-logging-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
   * satisfiedBy: [main.rs](../../../crates/reqvire-cli/src/main.rs)
+  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
 ---
 
 ### Explicit Workspace Selection
@@ -701,7 +677,7 @@ Detailed global option, startup ordering, normal/MCP command behavior, fallback 
   * type: requirement
 
 #### Contract Bindings
-  * [Git Repository Scope Specification](../../ModelStructure/Specifications.md#git-repository-scope-specification)
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
 
 #### Relations
   * definedBy: [Explicit Workspace Selection Specification](Specifications.md#explicit-workspace-selection-specification)
@@ -757,6 +733,30 @@ Implementation details shall follow the associated contract specifications.
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [Link Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#unlink-command-verification)
+---
+
+### Contract Bindings Commands
+
+The system shall provide contract_bindings management through the unified link/unlink commands using the 'bindContract' keyword.
+
+#### Details
+Contract Bindings management is a specialization of the unified relation command surface. Detailed `bindContract`, auto-detection, dry-run, JSON, persistence, idempotency, and cleanup behavior shall follow the relation command contract and contract_bindings behavior contracts.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
+
+#### Relations
+  * definedBy: [Contract Bindings Input Auto-Detection Behavior](Behaviors.md#contract-bindings-input-auto-detection-behavior)
+  * derivedFrom: [Relation Commands](#relation-commands)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
+  * verifiedBy: [Bind Contract Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#bind-contract-command-verification)
+  * verifiedBy: [Remove Contract Binding Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#remove-contract-binding-command-verification)
 ---
 
 ### Validate Command

@@ -133,7 +133,6 @@ The system shall expose MCP prompts that guide regular Reqvire workflows and sem
 
 #### Relations
   * definedBy: [MCP Prompt Guidance Specification](Specifications.md#mcp-prompt-guidance-specification)
-  * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * derivedFrom: [MCP Semantic Query Tools](#mcp-semantic-query-tools)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [mcp_prompts.rs](../../../crates/reqvire-core/src/mcp_prompts.rs)
@@ -401,6 +400,9 @@ The system shall provide `reqvire mcp` as the command that starts the Reqvire MC
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+
 #### Relations
   * definedBy: [MCP Server Command Specification](Specifications.md#mcp-server-command-specification)
   * definedBy: [MCP Size Estimate Startup Specification](Specifications.md#mcp-size-estimate-startup-specification)
@@ -429,9 +431,9 @@ The system shall keep MCP server cached model state subordinate to Reqvire sourc
 #### Relations
   * definedBy: [MCP Server State and Cache Specification](Specifications.md#mcp-server-state-and-cache-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * satisfiedBy: [arg_helpers.rs](../../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
-  * satisfiedBy: [model_cache.rs](../../../crates/reqvire-core/src/model_cache.rs)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [model_cache.rs](../../../crates/reqvire-core/src/model_cache.rs)
+  * satisfiedBy: [arg_helpers.rs](../../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
   * verifiedBy: [MCP Server State and Cache Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-server-state-and-cache-verification)
 ---
 
@@ -453,11 +455,11 @@ Detailed request/result types, shared operation semantics, adapter boundary, dis
   * definedBy: [MCP Tool Call Contracts Specification](Specifications.md#mcp-tool-call-contracts-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [operations.rs](../../../crates/reqvire-core/src/operations/mod.rs)
-  * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/operations/mod.rs)
   * satisfiedBy: [definitions.rs](../../../crates/reqvire-core/src/tool_interface/definitions.rs)
   * satisfiedBy: [dispatch.rs](../../../crates/reqvire-core/src/tool_interface/dispatch.rs)
   * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/tool_interface/mod.rs)
+  * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
   * verifiedBy: [MCP Shared Operation Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-shared-operation-contracts-verification)
   * verifiedBy: [MCP Tool Call Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-call-contracts-verification)
 ---
@@ -570,6 +572,9 @@ The system shall expose MCP-only workspace/session tools for workspace status, t
 
 #### Metadata
   * type: requirement
+
+#### Contract Bindings
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
 
 #### Relations
   * definedBy: [MCP Workspace Session Tools Specification](Specifications.md#mcp-workspace-session-tools-specification)

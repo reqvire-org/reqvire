@@ -72,8 +72,57 @@ pub(crate) fn git_state() -> Value {
     })
 }
 
+pub(crate) fn eligible_git_worktrees_state() -> Value {
+    let Ok(scope) = crate::workspace::WorkspaceScope::discover() else {
+        return json!([]);
+    };
+
+    let worktrees = scope
+        .git_worktrees
+        .iter()
+        .map(|root| {
+            let workspace_relative_root = root
+                .strip_prefix(&scope.root)
+                .ok()
+                .map(|path| {
+                    if path.as_os_str().is_empty() {
+                        ".".to_string()
+                    } else {
+                        path.to_string_lossy().to_string()
+                    }
+                })
+                .unwrap_or_else(|| root.to_string_lossy().to_string());
+            let head = git_output_in_dir(root, ["rev-parse", "HEAD"]);
+            let status = git_output_in_dir(root, ["status", "--porcelain"]);
+            json!({
+                "root": root.to_string_lossy().to_string(),
+                "workspace_relative_root": workspace_relative_root,
+                "head": head,
+                "dirty": status.as_ref().is_some_and(|s| !s.trim().is_empty())
+            })
+        })
+        .collect::<Vec<_>>();
+
+    json!(worktrees)
+}
+
 pub(crate) fn git_output<const N: usize>(args: [&str; N]) -> Option<String> {
     let output = Command::new("git").args(args).output().ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    Some(String::from_utf8_lossy(&output.stdout).trim().to_string())
+}
+
+fn git_output_in_dir<const N: usize>(
+    directory: &std::path::Path,
+    args: [&str; N],
+) -> Option<String> {
+    let output = Command::new("git")
+        .args(args)
+        .current_dir(directory)
+        .output()
+        .ok()?;
     if !output.status.success() {
         return None;
     }

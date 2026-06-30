@@ -4,6 +4,15 @@ Move individual model elements or entire specification files to different locati
 
 ---
 
+## Workspace and Git Worktree Boundaries
+
+- Path arguments are relative to the effective workspace root, not any Git repository root.
+- In a parent workspace containing multiple eligible Git worktrees, `mv`, `mv-file`, `mv-folder`, and `mv-asset` may move model files or assets from one eligible worktree path to another using workspace-root-relative paths.
+- Targets under workspace folders outside all eligible Git worktrees must be rejected; do not use Reqvire move or add mutations to create files in non-Git workspace folders.
+- `--workspace` only selects the effective workspace root before command execution; cross-repo CRUD behavior belongs to workspace-scope mutation semantics, not to the workspace flag itself.
+
+---
+
 ## Move Element
 
 Move an existing model element to a different file or position within the model.
@@ -47,7 +56,7 @@ Move an existing model element to a different file or position within the model.
 ### Important Notes
 
 - **Global uniqueness**: Element names are globally unique, so you only need the element name
-- **Path resolution**: File paths are resolved relative to current working directory
+- **Path resolution**: File paths are resolved relative to the effective workspace root
 - **Automatic relation updates**: All relations throughout the model are automatically updated
 - **Identifier update**: Element identifier changes from `<old-file>#<slug>` to `<new-file>#<slug>`
 

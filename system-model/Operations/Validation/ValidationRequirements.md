@@ -200,7 +200,6 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Integrated Validation Contract Specification](Specifications.md#integrated-validation-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
 ---
 
 ### Internal Consistency Validator
@@ -349,14 +348,14 @@ This ensures users see all relevant errors at once rather than fixing issues one
 
 ### Structured Validation Diagnostics
 
-The system shall preserve validation diagnostics as structured data before rendering them for CLI, JSON, or MCP consumers.
+The system shall preserve validation diagnostics as structured data before rendering them for text or machine-readable consumers.
 
 #### Details
 - Diagnostics shall carry a stable diagnostic code when one is known.
 - Diagnostics shall carry a human-readable message compatible with existing text output expectations.
 - Diagnostics shall carry source context when known, including file, line, column, and element identifier.
-- CLI text output shall render diagnostics for humans without requiring JSON parsing.
-- JSON and MCP consumers shall be able to consume structured diagnostic fields without scraping terminal text.
+- Text output shall render diagnostics for humans without requiring JSON parsing.
+- Machine-readable consumers shall be able to consume structured diagnostic fields without scraping terminal text.
 
 #### Metadata
   * type: requirement

@@ -4,12 +4,15 @@ Analyze how changes to requirements propagate through the model.
 
 ## Steps
 
-1. **Check git context:**
+1. **Check workspace and Git context:**
    ```bash
+   git rev-parse --show-toplevel
    git branch --show-current
    git log --oneline -5
    git merge-base main HEAD 2>/dev/null || echo "N/A"
    ```
+
+   Run from the intended effective workspace root, or pass it with `--workspace`. The workspace must contain at least one eligible Git worktree. Reqvire ignores non-Git folders under the workspace.
 
 2. **Get base commit:**
 
@@ -29,6 +32,8 @@ Analyze how changes to requirements propagate through the model.
    npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact --git-commit=${BASE_COMMIT}
    npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact --git-commit=${BASE_COMMIT} --json --output /tmp/impact.json
    ```
+
+   `--git-commit` materializes the base snapshot from the current eligible Git worktree. It is not a multi-repository commit selector; reported paths and identifiers remain relative to the effective workspace root.
 
 4. **Analyze the results:**
 

@@ -41,7 +41,7 @@ Reference target kind vocabulary is defined by the Reqvire core element ontology
 
 ### Identifier Path Resolution Rules
 
-- If an identifier **starts with `/`**, it is considered relative to the **git repository root folder**.
+- If an identifier **starts with `/`**, it is considered relative to the **effective Reqvire workspace root**.
 - If an identifier **does not start with `/`**, it is considered **relative** to the path of the document in which it appears.
 
 Each **identifier** must uniquely reference either:
@@ -50,14 +50,14 @@ Each **identifier** must uniquely reference either:
 
 #### Identifier Path Resolution Examples
 
-Assuming the **<git repository root> folder** is `project` and a file exists at `/path/to/project/documents/File1.md`:
+Assuming the **<workspace root> folder** is `project` and a file exists at `/path/to/project/documents/File1.md`:
 
 | Identifier | Resolves to | Type  |
 |------------|------------|-----------|
 | `File2.md` | `project/documents/File2.md` | InternalPath |
 | `subfolder/File3.md` | `project/documents/subfolder/File3.md` | InternalPath |
 | `../File4.md` | `project/File4.md` | InternalPath |
-| `/project/File4.md` | `project/File4.md` | InternalPath |
+| `/File4.md` | `project/File4.md` | InternalPath |
 | `https://example.com` | `https://example.com` | ExternalUrl |
 | `../Requirments#element-name` | `project/Requirments#element-name` | Identifier |
 
@@ -89,43 +89,43 @@ Plain file or element references, following the path resolution rules.
 
 Examples:
 
-- File only identifier found in the document '<git repository root>/path/to/document.md'
+- File only identifier found in the document '<workspace root>/path/to/document.md'
 ```
 file.md
 ```
-  - Normalized to '<git repository root>/path/to/file.md'
+  - Normalized to '<workspace root>/path/to/file.md'
 
-- File with an element fragment in the document '<git repository root>/path/to/document.md':
+- File with an element fragment in the document '<workspace root>/path/to/document.md':
 ```
 file.md#element name
 ```
-  - Normalized to '<git repository root>/path/to/file.md#element-name'
+  - Normalized to '<workspace root>/path/to/file.md#element-name'
 
-- Relative path with an element fragment in the document '<git repository root>/path/to/document.md':
+- Relative path with an element fragment in the document '<workspace root>/path/to/document.md':
 ```
 ../relative_path/file.md#element name
 ```
-  - Normalized to '<git repository root>/path/file.md#element-name'
+  - Normalized to '<workspace root>/path/file.md#element-name'
 
-- Element name fragment only (within the same file) in the document '<git repository root>/path/to/document.md':
+- Element name fragment only (within the same file) in the document '<workspace root>/path/to/document.md':
 ```
 #element name
 ```
-  - Normalized to '<git repository root>/path/to/document.md#element-name'
+  - Normalized to '<workspace root>/path/to/document.md#element-name'
 
 
-- Relative path with the element fragment with special characters in the document '<git repository root>/path/to/document.md':
+- Relative path with the element fragment with special characters in the document '<workspace root>/path/to/document.md':
 ```
 path/file.md#My Element (Draft)
 ```
-  - Normalized to '<git repository root>/path/to/path/file.md##my-element-draft'
+  - Normalized to '<workspace root>/path/to/path/file.md##my-element-draft'
 
 
 - Absolute path with the element fragment in any document:
 ```
 /path/file.md#Elements
 ```
-  - Normalized to '<git repository root>/path/file.md#elements'
+  - Normalized to '<workspace root>/path/file.md#elements'
 
 
 #### 2. GitHub-style Markdown Link Identifiers
@@ -137,17 +137,17 @@ Once link part is obtained from GitHub-style Markdown link, it is following same
 
 Examples:
 
-- File link in '<git repository root>/path/to/document.md':
+- File link in '<workspace root>/path/to/document.md':
 ```
 [Specification](documents/specification.md)
 ```
-  - Normalized to '<git repository root>/path/to/path/documents/specification.md'
+  - Normalized to '<workspace root>/path/to/path/documents/specification.md'
 
-- Fragment link in '<git repository root>/path/to/document.md':  :
+- Fragment link in '<workspace root>/path/to/document.md':  :
 ```
 [My Element](documents/specification.md#my-element)
 ```
-  - Normalized to '<git repository root>/path/to/path/documents/specification.md#my-element'
+  - Normalized to '<workspace root>/path/to/path/documents/specification.md#my-element'
 
 ---
 
@@ -248,7 +248,7 @@ If the referenced file is located in a subfolder relative to the current documen
 
 #### 5. **Absolute Path Relations**
 
-If the reference starts with /, it points to a file or element relative to the git repository root folder.
+If the reference starts with /, it points to a file or element relative to the effective workspace root.
 
 ```markdown
 

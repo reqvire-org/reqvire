@@ -2,12 +2,12 @@
 
 ### Semantic Model Core
 
-As a **system engineer**, I want Reqvire to manage ontology, semantic-contract, and external vocabulary context as a core semantic model capability, so that validation, export, Explorer, MCP, and assistant workflows all depend on one authoritative semantic source layer.
+As a **system engineer**, I want Reqvire to manage ontology, semantic-contract, and external vocabulary context as a core semantic model capability, so that validation, export, interface, and assistant workflows all depend on one authoritative semantic source layer.
 
 #### Details
 Semantic Model Core is the root capability for Reqvire-owned semantic model behavior. It owns ontology source resolution, semantic-contract vocabulary context, local and built-in external ontology source handling, used external vocabulary selection, prefixed Turtle serialization policy, and source provenance before any reporting or presentation surface consumes those facts.
 
-Reports, Explorer views, MCP tools, website docs, and assistant skills consume this capability through requirements and contracts. They do not own the semantic source policy.
+Report, interface, website, and assistant consumers depend on this capability through requirements and contracts. They do not own the semantic source policy.
 
 #### Metadata
   * type: capability

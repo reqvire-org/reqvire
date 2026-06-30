@@ -1,0 +1,1 @@
+Repo B asset removed by cross-repo rm-asset coverage.

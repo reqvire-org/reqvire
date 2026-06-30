@@ -36,6 +36,7 @@ pub mod tool_interface;
 pub mod trace_tree_builder;
 pub mod utils;
 pub mod verification_trace;
+pub mod workspace;
 
 // Re-export commonly used modules
 pub use crate::element::Element;

@@ -96,7 +96,7 @@ reqvire mcp --enable-mutations`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
           Convenience no-install form:
         </p>
-        <CodeBlock>{`npx -y @reqvire-org/reqvire@latest --workspace /path/to/repository mcp`}</CodeBlock>
+        <CodeBlock>{`npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
           Use{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">

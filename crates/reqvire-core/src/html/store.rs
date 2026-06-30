@@ -12,7 +12,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 
-const SCHEMA_VERSION: &str = "2026-06-23.project-store.v3";
+const SCHEMA_VERSION: &str = "2026-06-30.project-store.v4";
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ExplorerProjectStore {
@@ -40,8 +40,18 @@ pub struct ExplorerProjectStore {
 pub struct ProjectStoreProject {
     pub name: String,
     pub root_label: String,
+    pub workspace_root: String,
+    pub eligible_git_worktrees: Vec<ProjectStoreGitWorktree>,
     pub repository: Option<String>,
     pub branch: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ProjectStoreGitWorktree {
+    pub root: String,
+    pub workspace_relative_root: String,
+    pub head: Option<String>,
+    pub dirty: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -289,6 +299,10 @@ pub fn build_project_store(
 }
 
 fn build_project_metadata() -> ProjectStoreProject {
+    let workspace_root = crate::workspace::workspace_root()
+        .map(|root| root.to_string_lossy().to_string())
+        .unwrap_or_else(|_| ".".to_string());
+    let eligible_git_worktrees = project_store_git_worktrees();
     let repository = resolve_repository_name();
     let branch = git_commands::get_branch_name().ok();
     let name = repository
@@ -304,9 +318,58 @@ fn build_project_metadata() -> ProjectStoreProject {
     ProjectStoreProject {
         name,
         root_label,
+        workspace_root,
+        eligible_git_worktrees,
         repository,
         branch,
     }
+}
+
+fn project_store_git_worktrees() -> Vec<ProjectStoreGitWorktree> {
+    let Ok(scope) = crate::workspace::WorkspaceScope::discover() else {
+        return Vec::new();
+    };
+
+    scope
+        .git_worktrees
+        .iter()
+        .map(|root| {
+            let workspace_relative_root = root
+                .strip_prefix(&scope.root)
+                .ok()
+                .map(|path| {
+                    if path.as_os_str().is_empty() {
+                        ".".to_string()
+                    } else {
+                        path.to_string_lossy().to_string()
+                    }
+                })
+                .unwrap_or_else(|| root.to_string_lossy().to_string());
+            let head = git_output_in_dir(root, ["rev-parse", "HEAD"]);
+            let status = git_output_in_dir(root, ["status", "--porcelain"]);
+
+            ProjectStoreGitWorktree {
+                root: root.to_string_lossy().to_string(),
+                workspace_relative_root,
+                head,
+                dirty: status
+                    .as_ref()
+                    .is_some_and(|value| !value.trim().is_empty()),
+            }
+        })
+        .collect()
+}
+
+fn git_output_in_dir<const N: usize>(dir: &Path, args: [&str; N]) -> Option<String> {
+    let output = std::process::Command::new("git")
+        .current_dir(dir)
+        .args(args)
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    Some(String::from_utf8_lossy(&output.stdout).trim().to_string())
 }
 
 fn resolve_repository_name() -> Option<String> {
@@ -966,7 +1029,14 @@ fn is_existing_local_project_file_path(path: &str) -> bool {
     let Some(project_root) = project_root_dir() else {
         return false;
     };
-    fs::metadata(project_root.join(path))
+    let candidate = project_root.join(path);
+    let eligible = crate::workspace::WorkspaceScope::discover_from(project_root.clone())
+        .map(|scope| scope.is_eligible_path(&candidate))
+        .unwrap_or(false);
+    if !eligible {
+        return false;
+    }
+    fs::metadata(candidate)
         .map(|metadata| metadata.is_file())
         .unwrap_or(false)
 }
@@ -974,11 +1044,11 @@ fn is_existing_local_project_file_path(path: &str) -> bool {
 fn project_root_dir() -> Option<PathBuf> {
     #[cfg(test)]
     {
-        project_root_dir_from_manifest().or_else(|| crate::git_commands::get_git_root_dir().ok())
+        project_root_dir_from_manifest().or_else(|| crate::workspace::workspace_root().ok())
     }
     #[cfg(not(test))]
     {
-        crate::git_commands::get_git_root_dir()
+        crate::workspace::workspace_root()
             .ok()
             .or_else(project_root_dir_from_manifest)
     }

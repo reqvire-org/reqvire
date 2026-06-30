@@ -11,6 +11,6 @@
 
   5. Invalid markdown structure: Invalid header level in element 'Requirement with Invalid Header Structure': Level 5+ headers (#####+) can only appear inside '#### Details' subsection (file: pass1-errors/specifications/Requirements.md, line 93)
 
-  6. Duplicate element: 'Valid Requirement' found in pass1-errors/specifications/Requirements.md:15 and pass1-errors/specifications/Requirements.md:27
+  6. Duplicate element: 'Valid Requirement' found in specifications/Requirements.md:15 and specifications/Requirements.md:27
 
-  7. Duplicate element: 'Valid Requirement' found in pass1-errors/specifications/Requirements.md:15 and pass1-errors/specifications/SecondFile.md:15
+  7. Duplicate element: 'Valid Requirement' found in specifications/Requirements.md:15 and specifications/SecondFile.md:15

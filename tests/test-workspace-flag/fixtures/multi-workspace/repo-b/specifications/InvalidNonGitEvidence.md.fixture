@@ -1,0 +1,14 @@
+# Elements
+
+### Non Git Evidence Requirement
+
+The system shall reject non-Git evidence targets.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Repo B Capability](B.md#repo-b-capability)
+  * satisfiedBy: [Non Git Evidence](/not-a-repo/evidence.txt)
+
+---

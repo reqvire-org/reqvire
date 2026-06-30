@@ -1,0 +1,1 @@
+Repo A asset that cross-repo mv-asset moves into repo B.

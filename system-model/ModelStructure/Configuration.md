@@ -53,7 +53,7 @@ Detailed source-file, pattern, parsing exclusion, complete exclusion, fallback, 
 
 ### Requirements Processing
 
-The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.
+The system shall parse eligible files under the effective workspace root when they are inside Git worktrees and are not explicitly excluded using applicable .gitignore and .reqvireignore files.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -73,7 +73,7 @@ Implementation details shall follow the associated contract specifications.
 
 ### Structured Markdown Files Search and Detection
 
-The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the git repository root based on predefined rules.
+The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the effective workspace root based on predefined rules.
 
 #### Details
 Implementation details shall follow the associated contract specifications.

@@ -80,7 +80,7 @@ Reqvire implements containment hierarchy through filesystem structure.
   * type: specification
 
 #### Relations
-  * define: [Git Repository as Project Root](ModelManagement.md#git-repository-as-project-root)
+  * define: [Workspace Root Path Authority](ModelManagement.md#workspace-root-path-authority)
 ---
 
 ### Contract Element Structure Constraints Specification
@@ -132,7 +132,7 @@ Reqvire implements requirement contracts through explicit contract elements link
 #### Details
 When an element does not have a `#### Metadata` subsection with a `type` property, the system assigns the default type `requirement`.
 
-This behavior is location-independent: all elements default to type `requirement` regardless of their folder location within the Git repository.
+This behavior is location-independent: all elements default to type `requirement` regardless of their folder location within the effective workspace.
 
 To use other element types, users must explicitly specify the type in the element's Metadata subsection, for example: `type: capability`.
 
@@ -182,38 +182,6 @@ Element types are identified through a reserved `type` metadata property in the 
   * type: specification
 ---
 
-### Git Repository Scope Specification
-
-Path resolution and scope validation rules for Git repository-based project management.
-
-#### Details
-Git repository scope defines source-file discovery and path normalization. It does not define logical model ownership and does not by itself classify a referenced path as a modeled resource or evidence file.
-
-**Git Root Detection:**
-- Git root is detected via `git rev-parse --show-toplevel`
-- All internal paths are normalized to git-root-relative format for storage
-
-**Path Resolution Rules:**
-- All paths are resolved relative to the current working directory
-- When run from the git repository root: paths are relative to the git root
-- When run from a subdirectory: paths are relative to that subdirectory
-
-**Processing Scope:**
-- When run from git root: all files in the repository are processed
-- When run from a subdirectory: processing is limited to files within that subdirectory scope
-- Markdown files parsed as model documents become source file containers in the Explorer Project Store when the served Explorer runtime data is generated
-- Relation and contract_bindings targets outside parsed model documents remain modeled resources or evidence targets, not source file containers
-
-**Scope Boundary Validation:**
-- Relations referencing elements outside the subdirectory scope report missing relation target errors
-- References using relative paths (e.g., `../ParentFile.md#element`) that escape the subdirectory result in missing relation target errors
-- Absolute paths pointing outside the subdirectory scope generate missing relation target errors
-- Missing relation target errors clearly identify the unreachable reference due to subdirectory scope limitations
-
-#### Metadata
-  * type: specification
----
-
 ### Ignore Files Specification
 
 Rules for processing .gitignore and .reqvireignore exclusion patterns.
@@ -224,8 +192,8 @@ Rules for processing .gitignore and .reqvireignore exclusion patterns.
 - `.reqvireignore` - Reqvire-specific exclusions (files tracked by Git but excluded from requirements processing)
 
 **Processing Rules:**
-- ONLY the root .gitignore file is expected to be used (not nested .gitignore files in subdirectories)
-- ONLY the root .reqvireignore file is expected to be used (not nested .reqvireignore files in subdirectories)
+- For each eligible Git worktree, ONLY the worktree-root .gitignore file is expected to be used (not nested .gitignore files in subdirectories)
+- ONLY the effective-workspace-root .reqvireignore file is expected to be used (not nested .reqvireignore files in subdirectories)
 - .reqvireignore is expected to use the same format and syntax as .gitignore
 - Patterns from .gitignore and .reqvireignore is expected to be combined
 - Files matching ANY exclusion pattern is expected to be excluded from parsing as requirements
@@ -235,8 +203,8 @@ Rules for processing .gitignore and .reqvireignore exclusion patterns.
 - Files excluded by `.reqvireignore`: excluded from parsing BUT can still be referenced in file relations (useful for design documents, diagrams)
 
 **Fallback Behavior:**
-- If .reqvireignore does not exist, process normally using only .gitignore patterns
-- If .gitignore does not exist, process normally using only .reqvireignore patterns
+- If .reqvireignore does not exist at the effective workspace root, process normally using only eligible Git-worktree .gitignore patterns
+- If an eligible Git worktree has no root .gitignore, process normally using only .reqvireignore patterns for that worktree
 
 #### Metadata
   * type: specification
@@ -246,7 +214,7 @@ Rules for processing .gitignore and .reqvireignore exclusion patterns.
 
 #### Details
 Unstructured document exclusion behavior:
-- Uses `.reqvireignore` at repository root with `.gitignore`-compatible syntax.
+- Uses `.reqvireignore` at the effective workspace root with `.gitignore`-compatible syntax.
 - Supports glob patterns for structured-document processing exclusions.
 - Keeps excluded files in repository scope while excluding them from structured parsing flow.
 - Provides Reqvire-specific exclusions distinct from Git tracking behavior.
@@ -265,6 +233,38 @@ examples/**
 
 #### Relations
   * define: [Ignoring Unstructured Documents](Configuration.md#ignoring-unstructured-documents)
+---
+
+### In-Memory Model Build Cache Specification
+
+#### Details
+The cache is a static `Mutex<Option<CachedModel>>` global holding the most recently built `ModelManager` together with the `CacheKey` that produced it.
+
+**Cache key:**
+- `options: ModelBuildOptions` — the full build-option struct (including `lenient` and `with_size_estimates`). Two different option sets always produce different keys.
+- `files: BTreeMap<PathBuf, FileFingerprint>` — a sorted map of every scanned markdown file to its content fingerprint.
+- `FileFingerprint = { len: u64, content_hash: String }` — file byte length plus a content hash of the file contents.
+
+**Fingerprint computation:**
+- Files are discovered by scanning the same markdown files the parser would consider (`utils::scan_markdown_files`), using the same exclusion patterns.
+- For each file, contents are read and hashed. Added, removed, or modified files change the fingerprint and force a rebuild.
+
+**Load path (`load_cached_model`):**
+1. Compute the fingerprint and key.
+2. Lock the cache and compare keys. On a match, clone and return the stored model without re-parsing.
+3. On a miss, release the lock, rebuild via `ModelManager::parse_and_validate_with_options`, then store a clone of the rebuilt model under the new key and return the clone.
+
+**Invalidation (`invalidate`):**
+- Clears the stored entry, forcing the next `load_cached_model` call to rebuild. Called after every CRUD write in `tool_interface.rs` (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-folder, mv-asset, rm-asset).
+
+**Scope:**
+- Only the current working tree is cached. Git-commit history scans (`parse_and_validate`) bypass the cache entirely.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [In-Memory Model Build Cache](ModelManagement.md#in-memory-model-build-cache)
 ---
 
 ### Ontology Annotation Convention Specification
@@ -400,14 +400,15 @@ Risk represents requirement realization risk in the systems engineering sense: u
 
 #### Details
 Requirements-processing scope behavior:
-- Discovery starts at the git repository root and walks folders and subfolders deterministically.
+- Discovery starts at the effective workspace root and walks folders and subfolders deterministically.
 - Only supported structured Markdown files remain eligible for model parsing after document-type detection.
-- Root `.gitignore` exclusions remove files from structured parsing and model relation target eligibility.
-- Root `.reqvireignore` exclusions remove files from structured parsing while preserving file-reference eligibility where the relation contracts allow it.
+- Applicable Git-worktree-root `.gitignore` exclusions remove files from structured parsing and model relation target eligibility when that file exists.
+- Workspace-root `.reqvireignore` exclusions remove files from structured parsing while preserving file-reference eligibility where the relation contracts allow it.
+- Git ignore metadata from discovered repositories must not change the workspace-root-relative identity of any remaining path.
 - Remaining in-scope files are parsed through the structured model pipeline.
 - Pass 1 collects elements and local document structure.
 - Pass 2 builds graph registry relations and validates target existence, type compatibility, and model-level consistency.
-- Processing diagnostics must report git-root-relative paths.
+- Processing diagnostics must report workspace-root-relative paths.
 
 #### Metadata
   * type: specification
@@ -471,7 +472,7 @@ This contract delegates the canonical Markdown grammar to `MarkdownStructure` an
 Consumers of this contract must treat the following as one structure contract:
 - Supported document forms are the parser-recognized `# Elements` multi-element document and `# Element` single-element document.
 - Element headings, reserved subsections, metadata blocks, relation lists, Contract Bindings, Concept References, ontology blocks, and SHACL shape blocks are interpreted according to the Markdown structure model.
-- Element IDs are derived from element names; element identifiers are repository-relative file paths plus element fragments.
+- Element IDs are derived from element names; element identifiers are workspace-root-relative file paths plus element fragments.
 - Relation targets and Contract Bindings targets use the same identifier resolution, normalization, and validation rules as model parsing.
 - Presentation or documentation consumers must not invent a parallel Markdown grammar or alternative identifier scheme.
 
@@ -486,7 +487,7 @@ Consumers of this contract must treat the following as one structure contract:
 
 #### Details
 Structured markdown detection behavior:
-1. Scans files in repository root and subfolders.
+1. Scans eligible Git-worktree files under the effective workspace root and its subfolders.
 2. Marks files matching configured exclusion patterns as non-structured targets.
 3. Marks non-`.md` files as non-structured targets.
 4. Retains only eligible markdown files for structured parsing passes.
@@ -547,33 +548,60 @@ Usage guidelines for selecting appropriate verification types.
   * type: specification
 ---
 
-### In-Memory Model Build Cache Specification
+### Workspace Scope Specification
+
+Path resolution, Git worktree eligibility, and scope validation rules for workspace-root-based project management.
 
 #### Details
-The cache is a static `Mutex<Option<CachedModel>>` global holding the most recently built `ModelManager` together with the `CacheKey` that produced it.
+The effective Reqvire workspace root defines path normalization, identifier storage, diagnostic paths, export paths, and consumer-visible model paths. The workspace root is the process working directory after startup workspace selection has been applied. Git worktree membership defines which files and artifacts under that workspace root are eligible to participate in the SOI model. Git repository roots, branches, remotes, and commits do not define Reqvire identifier roots.
 
-**Cache key:**
-- `options: ModelBuildOptions` — the full build-option struct (including `lenient` and `with_size_estimates`). Two different option sets always produce different keys.
-- `files: BTreeMap<PathBuf, FileFingerprint>` — a sorted map of every scanned markdown file to its content fingerprint.
-- `FileFingerprint = { len: u64, content_hash: String }` — file byte length plus a content hash of the file contents.
+**Workspace Root Detection:**
+- When a caller provides explicit workspace selection, Reqvire enters that directory before executing the requested command.
+- When no explicit workspace selection is provided, the current process working directory is the effective workspace root.
+- The effective workspace root may be a Git repository root, a child of a Git repository root, or a parent directory containing one or more Git repositories.
+- A non-Git workspace root is allowed only as a container for one or more descendant Git worktrees; files outside those descendant worktrees are ignored.
+- Git root detection is used to classify eligible files and artifacts by Git worktree membership and to collect revision, branch, remote, and dirty-state metadata; it must not change path normalization.
+- All internal paths are normalized to workspace-root-relative format for storage.
 
-**Fingerprint computation:**
-- Files are discovered by scanning the same markdown files the parser would consider (`utils::scan_markdown_files`), using the same exclusion patterns.
-- For each file, contents are read and hashed. Added, removed, or modified files change the fingerprint and force a rebuild.
+**Git Worktree Eligibility Rules:**
+- A file or artifact is eligible for SOI model processing only when it is inside the effective workspace root and inside a Git worktree.
+- A workspace-root descendant folder that is not inside any Git worktree is ignored, including Markdown files, local assets, implementation files, and evidence artifacts under that folder.
+- When the workspace root is a child of a Git worktree, files under the workspace root remain eligible because they are inside that parent Git worktree; files outside the workspace root remain out of scope.
+- When the workspace root is a parent of multiple Git repositories, only files under discovered descendant Git worktrees are eligible.
+- Nested Git worktrees remain ordinary workspace subdirectories for addressing; their repository identity may be reported as metadata but does not alter the workspace-root-relative identifier.
+- Local InternalPath evidence, static assets, implementation files, and resource targets must also be inside an eligible Git worktree before they are included in resources reports, exports, semantic model facts, or other consumer-facing evidence/resource views.
 
-**Load path (`load_cached_model`):**
-1. Compute the fingerprint and key.
-2. Lock the cache and compare keys. On a match, clone and return the stored model without re-parsing.
-3. On a miss, release the lock, rebuild via `ModelManager::parse_and_validate_with_options`, then store a clone of the rebuilt model under the new key and return the clone.
+**Path Resolution Rules:**
+- Operation path arguments are resolved relative to the effective workspace root because workspace selection is applied as a startup directory change before operation execution.
+- Markdown links without a leading slash are resolved relative to the source document that contains the link.
+- Markdown links that start with `/` are resolved relative to the effective workspace root, not relative to any Git repository root.
+- Source, target, diagnostic, report, diff, export, semantic-export, and consumer-visible paths are emitted in workspace-root-relative form.
 
-**Invalidation (`invalidate`):**
-- Clears the stored entry, forcing the next `load_cached_model` call to rebuild. Called after every CRUD write in `tool_interface.rs` (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-folder, mv-asset, rm-asset).
+**Processing Scope:**
+- Reqvire processes eligible Git-worktree files under the effective workspace root, subject to supported ignore and exclusion rules.
+- Content outside the effective workspace root is out of scope even when it belongs to a parent Git repository.
+- Content inside the effective workspace root but outside all Git worktrees is ignored rather than parsed as model source or included as local evidence/resource content.
+- Nested Git repositories under the effective workspace root do not reset Reqvire path roots; their files remain addressed by workspace-root-relative paths such as `repo-a/system-model/File.md#element`.
+- Markdown files parsed as model documents become source file containers for consumer views that expose source navigation.
+- Relation and contract_bindings targets outside parsed model documents remain modeled resources or evidence targets, not source file containers
 
-**Scope:**
-- Only the current working tree is cached. Git-commit history scans (`parse_and_validate`) bypass the cache entirely.
+**Scope Boundary Validation:**
+- Relations referencing elements outside the effective workspace root report missing relation target errors.
+- References using relative paths (for example `../ParentFile.md#element`) that escape the workspace root result in missing relation target errors.
+- Root-relative links are constrained to the effective workspace root; they cannot address parent directories or sibling workspaces.
+- Absolute operating-system paths are not internal Reqvire identifiers. If accepted as command input, they must resolve under the effective workspace root before being stored as workspace-relative paths.
+- Missing relation target errors clearly identify unreachable references due to workspace scope limitations.
+- Model mutations must not persist files outside the effective workspace root or into workspace folders that are outside all eligible Git worktrees.
+
+**Workspace-Root Consumer Rules:**
+- `format --fix` may rewrite authored links to canonical source-relative Markdown links for readability, but the resolved targets must remain workspace-root-relative identifiers internally.
+- Migration and mutation commands must write changed files by resolving registry paths against the effective workspace root; they must not prepend the caller's pre-startup directory, a parent Git path, or a nested Git repository path.
+- `change-impact` compares workspace-root-relative model snapshots built from eligible Git-worktree files and artifacts. A Git commit argument is a single-repository convenience adapter for materializing a base workspace snapshot; it must not redefine identifier roots.
+- Semantic export, model JSON, coverage, resources, traces, search, diagnostics, and diff output must expose workspace-root-relative file paths and element identifiers.
+- Consumer records, static export manifests, source target metadata, and element target metadata must use workspace-root-relative paths for eligible Git-worktree content only.
+- Tooling workspace state may include Git metadata for eligible worktrees, but tool inputs, outputs, evidence references, mutation diffs, and resources must use workspace-root-relative paths.
+- Nested repositories may provide revision metadata in future integrations, but model relations and identifiers continue to use one workspace-root-relative path namespace.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * define: [In-Memory Model Build Cache](ModelManagement.md#in-memory-model-build-cache)
+---

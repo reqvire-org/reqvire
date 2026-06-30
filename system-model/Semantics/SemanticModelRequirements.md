@@ -20,7 +20,6 @@ Detailed declaration grammar, supported formats, path resolution, parser ownersh
 
 #### Relations
   * definedBy: [Local External Ontology Source Specification](SemanticModelSpecifications.md#local-external-ontology-source-specification)
-  * derive: [External Vocabulary Reference Resolution](#external-vocabulary-reference-resolution)
   * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
   * satisfiedBy: [mod.rs](../../crates/reqvire-core/src/semantic_contract/mod.rs)
   * specify: [External Ontology Source Management](SemanticModelFeature.md#external-ontology-source-management)
@@ -56,10 +55,8 @@ Built-in external ontology sources shall not be treated as RDF/OWL/SHACL languag
 #### Relations
   * definedBy: [Built-In External Ontology Source Specification](SemanticModelSpecifications.md#built-in-external-ontology-source-specification)
   * derive: [External Vocabulary Reference Resolution](#external-vocabulary-reference-resolution)
-  * derive: [Used External Vocabulary Selection](#used-external-vocabulary-selection)
   * derivedFrom: [Local External Ontology Sources](#local-external-ontology-sources)
   * specify: [Built-In External Ontology Sources](SemanticModelFeature.md#built-in-external-ontology-sources)
-  * verifiedBy: [Ontology Semantic Export Verification](../Verifications/Reports/ModelReports/ReportingVerifications.md#ontology-semantic-export-verification)
 ---
 
 ### External Vocabulary Reference Resolution
@@ -79,7 +76,6 @@ Detailed local/built-in visibility, non-promotion, concept-reference, and duplic
   * definedBy: [External Vocabulary Reference Resolution Specification](SemanticModelSpecifications.md#external-vocabulary-reference-resolution-specification)
   * derive: [Used External Vocabulary Selection](#used-external-vocabulary-selection)
   * derivedFrom: [Built-In External Ontology Source Resolution](#built-in-external-ontology-source-resolution)
-  * derivedFrom: [Local External Ontology Sources](#local-external-ontology-sources)
   * specify: [External Ontology Source Management](SemanticModelFeature.md#external-ontology-source-management)
 ---
 
@@ -103,8 +99,6 @@ The selection contract is intentionally separate from external source declaratio
   * derive: [External Vocabulary Description Construction](#external-vocabulary-description-construction)
   * derivedFrom: [External Vocabulary Reference Resolution](#external-vocabulary-reference-resolution)
   * specify: [External Ontology Source Management](SemanticModelFeature.md#external-ontology-source-management)
-  * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
-  * verifiedBy: [MCP Model Evidence Tools Verification](../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
 ---
 
 ### External Vocabulary Description Construction
@@ -153,13 +147,72 @@ Detailed block collection, model-layer projection, provenance, parser ownership,
   * definedBy: [Ontology and Shapes Collection Specification](SemanticModelSpecifications.md#ontology-and-shapes-collection-specification)
   * derive: [Ontology Term Definition Link Materialization](#ontology-term-definition-link-materialization)
   * derive: [OWL Reserved Vocabulary Recognition](#owl-reserved-vocabulary-recognition)
-  * satisfiedBy: [explorer_runtime.rs](../../crates/reqvire-core/src/explorer_runtime.rs)
   * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
   * satisfiedBy: [index.rs](../../crates/reqvire-core/src/semantic_contract/index.rs)
   * satisfiedBy: [prefixes.rs](../../crates/reqvire-core/src/semantic_contract/prefixes.rs)
   * satisfiedBy: [vocabulary.rs](../../crates/reqvire-core/src/semantic_contract/vocabulary.rs)
   * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
+---
+
+### OWL Reserved Vocabulary Recognition
+
+The system shall apply the o-kernel standards reserved vocabulary registry when validating and exporting Reqvire ontology and semantic-contract RDF.
+
+#### Details
+Detailed validation, export, datatype-position, registry delegation, and non-reserved IRI handling rules shall follow the associated specification and o-kernel contract binding.
+
+#### Concept References
+  * [OWL reserved vocabulary registry](../Thesaurus/Thesaurus.md#owl-reserved-vocabulary-registry)
+  * [OWL reserved vocabulary term](../Thesaurus/Thesaurus.md#owl-reserved-vocabulary-term)
+  * [OWL built-in datatype](../Thesaurus/Thesaurus.md#owl-built-in-datatype)
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Standards Reserved Vocabulary Recognition Specification](../Architecture/OntologyKernelSpecifications.md#standards-reserved-vocabulary-recognition-specification)
+
+#### Relations
+  * definedBy: [OWL Reserved Vocabulary Recognition Specification](SemanticModelSpecifications.md#owl-reserved-vocabulary-recognition-specification)
+  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
+  * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
   * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+---
+
+### Ontology Term Definition Link Materialization
+
+The system shall materialize standard `rdfs:isDefinedBy` links from authored named ontology resources to the generated ontology document IRI resolved from the owning Reqvire ontology element metadata.
+
+#### Details
+Reqvire already owns the generated `owl:Ontology` document declaration for authored ontology elements through `ontology_base` and `ontology_prefix`. Runtime semantic context shall therefore add `rdfs:isDefinedBy <ontology_base>` facts for authored named ontology resources in `#### Ontology` blocks without requiring authors to repeat that statement manually.
+
+The intermediate generated `rdfs:isDefinedBy` section may declare the prefixes it uses, including `rdfs:` for the ownership predicate and `owl:` when ontology-document declarations are present, so the generated fragment remains parseable before final export assembly. Final Turtle artifacts shall still use the shared top-level prefixed Turtle export contract.
+
+The materialization shall:
+- Apply to authored named subjects collected from `#### Ontology` blocks when the subject IRI is inside the generated ontology document term namespace.
+- Use the generated ontology document IRI resolved from the ontology element's `ontology_base`.
+- Appear in Turtle, JSON-LD, semantic ontology API output, full semantic export, and the model-owned semantic store used by semantic query APIs.
+- Be available to semantic tooling as ontology-document ownership metadata for query filtering, vocabulary grouping, and consumer evidence views.
+- Avoid writing generated triples back into Markdown source.
+- Deduplicate an authored matching `rdfs:isDefinedBy` triple when it is already present.
+- Reject an authored named ontology resource whose explicit `rdfs:isDefinedBy` target conflicts with the generated ontology document IRI.
+- Not generate `rdfs:isDefinedBy` links for imported external ontology terms; external terms use External Ontology source metadata for Reqvire ownership/provenance.
+
+Imported external ontology terms remain governed by local and built-in external ontology source materialization and shall not be promoted to authored Reqvire ontology terms by this rule. If a used external source contains its own `rdfs:isDefinedBy` triples, those triples are source data rather than Reqvire-generated ownership facts.
+
+Downstream ontology graph consumers shall be able to use the ownership metadata for grouping, filtering, search, and evidence while treating generated `rdfs:isDefinedBy` facts and generated `owl:Ontology` document IRIs as metadata rather than primary authored ontology relationships.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Ontology Term Definition Link Materialization Specification](SemanticModelSpecifications.md#ontology-term-definition-link-materialization-specification)
+  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
+  * satisfiedBy: [index.rs](../../crates/reqvire-core/src/semantic_contract/index.rs)
+  * satisfiedBy: [prefixes.rs](../../crates/reqvire-core/src/semantic_contract/prefixes.rs)
+  * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
+  * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
+  * verifiedBy: [MCP Model Evidence Tools Verification](../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
 ---
 
 ### Prefixed Turtle Semantic Export
@@ -180,8 +233,8 @@ Detailed Turtle syntax, prefix-map construction, ontology-document preservation,
 #### Relations
   * constrainedBy: [Semantic Export Projection Shape](../Ontologies/SemanticExport.md#semantic-export-projection-shape)
   * definedBy: [Prefixed Turtle Semantic Export Specification](SemanticModelSpecifications.md#prefixed-turtle-semantic-export-specification)
-  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
   * derive: [Namespace-Scoped Ontology Export](#namespace-scoped-ontology-export)
+  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
   * satisfiedBy: [export.rs](../../crates/reqvire-core/src/semantic_contract/export.rs)
   * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
   * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
@@ -193,7 +246,7 @@ Detailed Turtle syntax, prefix-map construction, ontology-document preservation,
 The system shall filter clean authored ontology exports to a requested ontology base or term namespace.
 
 #### Details
-Detailed namespace normalization, clean-export scope, runtime artifact use, layer compatibility, and CLI behavior shall follow the associated specification.
+Detailed namespace normalization, clean-export scope, runtime artifact use, layer compatibility, and interface behavior shall follow the associated specification.
 
 #### Concept References
   * [Runtime ontology namespace](../Thesaurus/Thesaurus.md#runtime-ontology-namespace)
@@ -207,7 +260,6 @@ Detailed namespace normalization, clean-export scope, runtime artifact use, laye
   * derivedFrom: [Prefixed Turtle Semantic Export](#prefixed-turtle-semantic-export)
   * satisfiedBy: [export.rs](../../crates/reqvire-core/src/semantic_contract/export.rs)
   * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
-  * verifiedBy: [Runtime Reqvire Ontology Artifact Verification](../Verifications/Semantics/SemanticModelVerifications.md#runtime-reqvire-ontology-artifact-verification)
 ---
 
 ### Runtime Reqvire Ontology Artifact
@@ -248,11 +300,12 @@ Detailed export commands, artifact split, deterministic comparison, validation-g
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Runtime Reqvire SHACL Artifact Specification](SemanticModelSpecifications.md#runtime-reqvire-shacl-artifact-specification)
+
 #### Relations
   * definedBy: [Runtime Reqvire Ontology Synchronization Specification](SemanticModelSpecifications.md#runtime-reqvire-ontology-synchronization-specification)
-  * derivedFrom: [Namespace-Scoped Ontology Export](#namespace-scoped-ontology-export)
   * derivedFrom: [Runtime Reqvire Ontology Artifact](#runtime-reqvire-ontology-artifact)
-  * derivedFrom: [Runtime Reqvire SHACL Artifact](#runtime-reqvire-shacl-artifact)
   * satisfiedBy: [update-runtime-ontology-artifacts.sh](../../scripts/update-runtime-ontology-artifacts.sh)
   * satisfiedBy: [test.sh](../../tests/test-runtime-ontology-artifact/test.sh)
   * specify: [Runtime Reqvire Ontology Vocabulary](SemanticModelFeature.md#runtime-reqvire-ontology-vocabulary)
@@ -271,71 +324,9 @@ The artifact is an implementation snapshot for runtime/bootstrap shape-rule need
 
 #### Relations
   * definedBy: [Runtime Reqvire SHACL Artifact Specification](SemanticModelSpecifications.md#runtime-reqvire-shacl-artifact-specification)
-  * derive: [Runtime Reqvire Ontology Synchronization](#runtime-reqvire-ontology-synchronization)
   * derivedFrom: [Namespace-Scoped Ontology Export](#namespace-scoped-ontology-export)
   * satisfiedBy: [runtime_ontology.rs](../../crates/reqvire-core/src/runtime_ontology.rs)
   * satisfiedBy: [reqvire-shacl.ttl](../../crates/reqvire-core/src/runtime_ontology/reqvire-shacl.ttl)
   * specify: [Runtime Reqvire Ontology Vocabulary](SemanticModelFeature.md#runtime-reqvire-ontology-vocabulary)
   * verifiedBy: [Runtime Reqvire Ontology Artifact Verification](../Verifications/Semantics/SemanticModelVerifications.md#runtime-reqvire-ontology-artifact-verification)
----
-
-### OWL Reserved Vocabulary Recognition
-
-The system shall apply the o-kernel standards reserved vocabulary registry when validating and exporting Reqvire ontology and semantic-contract RDF.
-
-#### Details
-Detailed validation, export, datatype-position, registry delegation, and non-reserved IRI handling rules shall follow the associated specification and o-kernel contract binding.
-
-#### Concept References
-  * [OWL reserved vocabulary registry](../Thesaurus/Thesaurus.md#owl-reserved-vocabulary-registry)
-  * [OWL reserved vocabulary term](../Thesaurus/Thesaurus.md#owl-reserved-vocabulary-term)
-  * [OWL built-in datatype](../Thesaurus/Thesaurus.md#owl-built-in-datatype)
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Standards Reserved Vocabulary Recognition Specification](../Architecture/OntologyKernelSpecifications.md#standards-reserved-vocabulary-recognition-specification)
-
-#### Relations
-  * definedBy: [OWL Reserved Vocabulary Recognition Specification](SemanticModelSpecifications.md#owl-reserved-vocabulary-recognition-specification)
-  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
-  * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
-  * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
----
-
-### Ontology Term Definition Link Materialization
-
-The system shall materialize standard `rdfs:isDefinedBy` links from authored named ontology resources to the generated ontology document IRI resolved from the owning Reqvire ontology element metadata.
-
-#### Details
-Reqvire already owns the generated `owl:Ontology` document declaration for authored ontology elements through `ontology_base` and `ontology_prefix`. Runtime semantic context shall therefore add `rdfs:isDefinedBy <ontology_base>` facts for authored named ontology resources in `#### Ontology` blocks without requiring authors to repeat that statement manually.
-
-The intermediate generated `rdfs:isDefinedBy` section may declare the prefixes it uses, including `rdfs:` for the ownership predicate and `owl:` when ontology-document declarations are present, so the generated fragment remains parseable before final export assembly. Final Turtle artifacts shall still use the shared top-level prefixed Turtle export contract.
-
-The materialization shall:
-- Apply to authored named subjects collected from `#### Ontology` blocks when the subject IRI is inside the generated ontology document term namespace.
-- Use the generated ontology document IRI resolved from the ontology element's `ontology_base`.
-- Appear in Turtle, JSON-LD, MCP semantic ontology output, full semantic export, and the model-owned semantic store used by MCP SPARQL.
-- Be available to semantic tooling as ontology-document ownership metadata for query filtering, vocabulary grouping, and Explorer modal evidence.
-- Avoid writing generated triples back into Markdown source.
-- Deduplicate an authored matching `rdfs:isDefinedBy` triple when it is already present.
-- Reject an authored named ontology resource whose explicit `rdfs:isDefinedBy` target conflicts with the generated ontology document IRI.
-- Not generate `rdfs:isDefinedBy` links for imported external ontology terms; external terms use External Ontology source metadata for Reqvire ownership/provenance.
-
-Imported external ontology terms remain governed by local and built-in external ontology source materialization and shall not be promoted to authored Reqvire ontology terms by this rule. If a used external source contains its own `rdfs:isDefinedBy` triples, those triples are source data rather than Reqvire-generated ownership facts.
-
-Explorer ontology graph rendering shall use the ownership metadata for grouping, filtering, search, and modal evidence, and shall not render generated `rdfs:isDefinedBy` facts as canvas edges or generated `owl:Ontology` document IRIs as primary ontology graph nodes.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Ontology Term Definition Link Materialization Specification](SemanticModelSpecifications.md#ontology-term-definition-link-materialization-specification)
-  * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
-  * satisfiedBy: [index.rs](../../crates/reqvire-core/src/semantic_contract/index.rs)
-  * satisfiedBy: [prefixes.rs](../../crates/reqvire-core/src/semantic_contract/prefixes.rs)
-  * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
-  * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
-  * verifiedBy: [MCP Model Evidence Tools Verification](../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
 ---

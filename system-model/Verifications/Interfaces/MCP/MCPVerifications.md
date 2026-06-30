@@ -272,7 +272,7 @@ Expected checks:
 - JSON-LD responses remain JSON-LD RDF serializations and do not emit Turtle `@prefix` syntax.
 - Semantic graph tool supports `full: true` and returns Reqvire model context triples and ontology projection facts alongside authored semantic content.
 - Startup validation failures are returned before the MCP server starts.
-- Git comparison tools include compared commit and current `HEAD` metadata.
+- Git comparison tools require an eligible Git worktree and include compared commit metadata plus current eligible worktree `HEAD` metadata.
 - Diagnostics are structured and machine-actionable.
 - Tools do not require clients to parse human-oriented terminal output.
 
@@ -427,12 +427,12 @@ This verification shall prove that MCP cached state is subordinate to Reqvire so
 
 #### Details
 Expected checks:
-- Verify workspace status reports workspace root, git `HEAD`, dirty state, Reqvire version, MCP protocol revision, Reqvire tool contract version, model fingerprint, and last diagnostics.
-- Verify source file, git state, excluded-pattern, Reqvire version, or Reqvire tool contract changes invalidate cached model state.
+- Verify workspace status reports workspace root, source-control `HEAD` and dirty state when available, Reqvire version, MCP protocol revision, Reqvire tool contract version, model fingerprint, and last diagnostics.
+- Verify source file, available source-control state, excluded-pattern, Reqvire version, or Reqvire tool contract changes invalidate cached model state.
 - Verify markdown content changes invalidate cached model state even when filesystem modification time is preserved.
 - Verify controlled MCP mutations refresh MCP internal state from the updated Reqvire core graph.
 - Verify external filesystem drift triggers invalidation/reparse before serving stale model data.
-- Verify dirty worktree state is reported in metadata and does not block tools when the equivalent Reqvire core operation can run.
+- Verify dirty worktree state is reported in metadata when available and does not block tools when the equivalent Reqvire core operation can run.
 
 #### Metadata
   * type: test-verification
@@ -583,7 +583,7 @@ This verification shall prove that workspace/session tools return correct read-o
 
 #### Details
 Expected checks:
-- `reqvire.workspace_status` reports workspace root, `HEAD`, dirty state, Reqvire version, supported MCP protocol revision, and Reqvire tool contract version.
+- `reqvire.workspace_status` reports workspace root, eligible worktree `HEAD` and dirty state when available, Reqvire version, supported MCP protocol revision, and Reqvire tool contract version.
 - `reqvire.tool_contract` reports supported tools and schema versions for the current startup mode.
 - `reqvire.model_revision` changes when model source files change.
 - Workspace/session tools do not modify the filesystem.

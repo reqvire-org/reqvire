@@ -104,15 +104,30 @@ impl GraphRegistry {
                                 )));
                             }
 
-                            // Validate file existence for InternalPath targets
-                            // InternalPath contains normalized paths from normalize_identifier which are git-root-relative
-                            let git_root = match crate::git_commands::get_git_root_dir() {
-                                Ok(root) => root,
-                                Err(_) => {
-                                    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+                            // Validate file existence and workspace eligibility for InternalPath targets.
+                            // InternalPath contains normalized workspace-root-relative paths.
+                            let workspace_scope = match crate::workspace::WorkspaceScope::discover()
+                            {
+                                Ok(scope) => scope,
+                                Err(error) => {
+                                    errors.push(ReqvireError::MissingRelationTarget(format!(
+                                        "Element '{}' references target '{}' but workspace scope is invalid: {}",
+                                        source_node.element.identifier,
+                                        file_path.to_string_lossy(),
+                                        error
+                                    )));
+                                    continue;
                                 }
                             };
-                            let absolute_path = git_root.join(file_path);
+                            let absolute_path = workspace_scope.root.join(file_path);
+                            if !workspace_scope.is_eligible_path(&absolute_path) {
+                                errors.push(ReqvireError::MissingRelationTarget(format!(
+                                    "Element '{}' references target '{}' outside eligible Git worktrees",
+                                    source_node.element.identifier,
+                                    file_path.to_string_lossy()
+                                )));
+                                continue;
+                            }
                             if !absolute_path.exists() {
                                 errors.push(ReqvireError::MissingRelationTarget(format!(
                                     "Element '{}' references missing target '{}'",

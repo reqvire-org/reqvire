@@ -2,7 +2,7 @@
 
 ### Concept Relation Projection Materialization
 
-The system shall materialize normalized SKOS concept-relation facts from native concept Markdown relations so concept exports, default semantic export output, Project Store thesaurus data, Ontologies Concepts-layer rendering, and MCP concept tools consume the same concept-relation projection.
+The system shall materialize normalized SKOS concept-relation facts from native concept Markdown relations so semantic exports and downstream concept consumers use the same concept-relation projection.
 
 #### Details
 Detailed inverse, symmetric, reciprocal, non-mutation, consumer, and ontology-projection separation rules shall follow the associated specification.
@@ -21,7 +21,7 @@ Detailed inverse, symmetric, reciprocal, non-mutation, consumer, and ontology-pr
 The system shall expose only constructed used external vocabulary content through external-inclusive semantic output surfaces.
 
 #### Details
-Detailed raw-source exclusion, used-subset exposure, layer behavior, MCP visibility, metadata, and no-full-dump rules shall follow the associated specification.
+Detailed raw-source exclusion, used-subset exposure, layer behavior, API visibility, metadata, and no-full-dump rules shall follow the associated specification.
 
 #### Concept References
   * [Used external ontology subset](../../Thesaurus/Thesaurus.md#used-external-ontology-subset)
@@ -51,7 +51,7 @@ When requested the system shall provide human readable and machine readable Syst
   * definedBy: [Report Command Catalog Specification](Specifications.md#report-command-catalog-specification)
   * definedBy: [Text Output Formatting](Specifications.md#text-output-formatting)
   * definedBy: [Traceability Reporting Specification](Specifications.md#traceability-reporting-specification)
-  * derive: [Browser Trace Diagram Generation](DiagramGeneration.md#browser-trace-diagram-generation)
+  * derive: [Trace Diagram Projection Data](DiagramGeneration.md#trace-diagram-projection-data)
   * derive: [Collect Capability and Requirement Context](#collect-capability-and-requirement-context)
   * derive: [JSON Element Size Estimate Exposure](#json-element-size-estimate-exposure)
   * derive: [Model Structure and Summaries](#model-structure-and-summaries)
@@ -287,7 +287,6 @@ Implementation details shall follow the associated contract specifications.
 #### Relations
   * definedBy: [Comma-Separated Type Filter Parsing Contract Specification](Specifications.md#comma-separated-type-filter-parsing-contract-specification)
   * derivedFrom: [Flexible Search Type Filtering](#flexible-search-type-filtering)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [search.rs](../../../crates/reqvire-core/src/search.rs)
 ---
 
@@ -337,7 +336,7 @@ Detailed scope, source classification, evidence, output, grouping, and percentag
 
 ### Resources Report
 
-The system shall provide a resources report showing all files referenced by the model through relations and contract_bindings in JSON and Explorer views.
+The system shall provide a resources report inventorying InternalPath relation targets that resolve to existing workspace-root-relative eligible Git-worktree files and contract_bindings targets that resolve to model element identifiers.
 
 #### Metadata
   * type: requirement
@@ -369,9 +368,9 @@ Detailed leaf-requirement scope, verification artifact handling, objective exclu
   * derivedFrom: [Model Reports](#model-reports)
 ---
 
-### Traces View Report Generation
+### Trace Projection Data Generation
 
-The system shall seed Explorer Traces SPA route data showing verification traceability from concrete verifications through verified requirements and owning capability context. The routed view displays grouped trace rows and per-verification Mermaid roll-up diagrams from served Project Store state.
+The system shall materialize trace projection data showing verification traceability from concrete verifications through verified requirements and owning capability context, including grouped trace rows and per-verification roll-up diagram data for downstream report consumers.
 
 #### Metadata
   * type: requirement
@@ -381,22 +380,20 @@ The system shall seed Explorer Traces SPA route data showing verification tracea
 
 #### Relations
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
-  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
 ---
 
 ### Ontology Collection Output
 
-The system shall expose the semantic model core context as CLI, MCP, serve-time, and Explorer ontology output without making reporting the owner of ontology or semantic-contract source semantics.
+The system shall expose semantic model core context as reusable ontology output for command, API, served-artifact, and interactive consumers without making reporting the owner of ontology or semantic-contract source semantics.
 
 #### Details
-Detailed semantic context consumption, serialization choices, command/API flags, Project Store payload shape, Explorer artifact inclusion, and source-semantics boundaries shall follow the associated specification.
+Detailed semantic context consumption, serialization choices, command/API flags, consumer payload shape, artifact inclusion, and source-semantics boundaries shall follow the associated specification.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * definedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
-  * derivedFrom: [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
   * derivedFrom: [Prefixed Turtle Semantic Export](../../Semantics/SemanticModelRequirements.md#prefixed-turtle-semantic-export)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
@@ -405,10 +402,10 @@ Detailed semantic context consumption, serialization choices, command/API flags,
 
 ### Ontology Projection Subgraph Materialization
 
-The system shall materialize generated ontology construct facts as a subgraph of the existing in-memory RDF projection so semantic exports and the Ontologies Explorer consume the same ontology construct facts.
+The system shall materialize generated ontology construct facts as a subgraph of the existing in-memory RDF projection so semantic exports and downstream ontology consumers use the same ontology construct facts.
 
 #### Details
-Detailed projection storage, generation timing, source/provenance fields, SHACL slot/facet records, direct-authored scope, identifier namespace ownership, and export/Explorer consumer rules shall follow the associated specification.
+Detailed projection storage, generation timing, source/provenance fields, SHACL slot/facet records, direct-authored scope, identifier namespace ownership, and export/consumer rules shall follow the associated specification.
 
 #### Metadata
   * type: requirement

@@ -37,8 +37,8 @@ The o-kernel unit tests in `crates/o-kernel/src/constructs/classify.rs` cover on
   * type: test-verification
 
 #### Relations
-  * verify: [Ontology Construct Classification](../../Architecture/OntologyKernelRequirements.md#ontology-construct-classification)
   * satisfiedBy: [classify.rs](../../../crates/o-kernel/src/constructs/classify.rs)
+  * verify: [Ontology Construct Classification](../../Architecture/OntologyKernelRequirements.md#ontology-construct-classification)
 ---
 
 ### O-Kernel Physical Module Unit Test Verification

@@ -1,7 +1,6 @@
 use crate::crud;
 use crate::diff::render_crud_json;
 use crate::error::ReqvireError;
-use crate::git_commands;
 use crate::report;
 use crate::search;
 use crate::semantic_contract::{self, SemanticExportFormat, SemanticExportLayer};
@@ -21,9 +20,9 @@ use std::process::Command;
 
 mod arg_helpers;
 use arg_helpers::{
-    bool_arg, current_dir_path, current_dir_string, git_state, load_model, load_model_with_options,
-    model_fingerprint, parse_json_string, required_string_arg, string_arg, string_array_arg,
-    usize_arg,
+    bool_arg, current_dir_path, current_dir_string, eligible_git_worktrees_state, git_state,
+    load_model, load_model_with_options, model_fingerprint, parse_json_string, required_string_arg,
+    string_arg, string_array_arg, usize_arg,
 };
 
 mod definitions;

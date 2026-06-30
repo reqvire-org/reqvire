@@ -7,6 +7,7 @@ The `add` command accepts element content from stdin or `--content`, validates t
 
 Command-specific rules:
 - It must invoke the shared create-element workflow for parsing, relation validation, ordering, persistence, dry-run diff output, and JSON output.
+- The target file may be in any eligible Git worktree under the effective workspace root and must be rejected when it resolves to a non-Git workspace folder.
 - Override mode must reuse Create Element Override Behavior, including ontology-aware rebasing when the replaced element is an ontology element.
 - It must not implement a separate relation or ontology mutation path outside the shared model-operation contracts.
 
@@ -178,7 +179,7 @@ Migrate command behavior:
 - Support `--json` for structured migration summary and diff output.
 - Support `--output <FILE>` only with `--json`.
 - Parse the model in lenient mode so known migration-triggering validation errors can be repaired.
-- When launched from a repository subdirectory, apply source rewrites to the model files identified by git-root-relative registry paths without duplicating the subdirectory prefix in the write location.
+- After startup workspace selection has entered the effective workspace root, apply source rewrites to model files identified by workspace-root-relative registry paths without duplicating any caller launch-directory prefix in the write location.
 - Implement the `v0.15-documents-to-element-header` migration by rewriting legacy single-element file headers from `# Documents` to `# Element`.
 - Implement the `v0.16-verification-objective` migration by creating one shared holder `verification-objective` element in the repository-root `VerificationObjectiveMigration.md` file and adding holder-owned `derive` relations from that objective to standalone concrete verification elements.
 - Implement the `v1.2-concept-reference-links` migration by rewriting legacy `#### Concept References` entries from `* Label: IRI` syntax to `* [Label](concept-element-link)` syntax only when the IRI resolves to exactly one generated native concept element.
@@ -213,7 +214,8 @@ The `model` command behavior is governed by the reused model JSON output contrac
 The `mv-asset` command moves or renames internal-path assets and updates model references through shared mutation contracts.
 
 Command-specific rules:
-- It must resolve asset paths relative to the selected workspace/git root.
+- It must resolve asset paths relative to the effective workspace root.
+- It may move assets between eligible Git worktrees under the same effective workspace root and must reject non-Git workspace targets.
 - It must update all InternalPath references that point to the moved asset.
 - It must support dry-run diff, JSON mutation output, and file persistence behavior through shared contracts.
 
@@ -239,7 +241,8 @@ The `mv` command behavior is governed by the reused move workflow and target-loc
 The `mv-file` command exposes the shared file-move operation through the CLI.
 
 Command-specific rules:
-- It must accept source and target paths relative to the selected workspace/git root.
+- It must accept source and target paths relative to the effective workspace root.
+- It may move files between eligible Git worktrees under the same effective workspace root and must reject non-Git workspace targets.
 - It must support dry-run diff and JSON mutation output through shared output contracts.
 - It must delegate relation reference updates, squash behavior, target validation, and `# Element` rejection rules to Move File Operation Contract Specification and target-location constraints.
 
@@ -253,7 +256,8 @@ Command-specific rules:
 The `mv-folder` command exposes the shared folder-move operation through the CLI.
 
 Command-specific rules:
-- It must accept source and target folder paths relative to the selected workspace scope.
+- It must accept source and target folder paths relative to the effective workspace root.
+- It may move folder subtrees between eligible Git worktrees under the same effective workspace root and must reject non-Git workspace targets.
 - It must support dry-run diff and JSON mutation output through shared output contracts.
 - It must delegate recursive file relocation, moved-element identifier rewrites, relation reference updates, contract_bindings updates, concept-reference updates, InternalPath reference updates, target validation, collision rejection, and candidate validation to Move Folder Operation Contract Specification and target-location constraints.
 - It must not implement command-local folder mutation semantics outside the shared graph-backed model-operation contracts.
@@ -319,7 +323,7 @@ Command-specific rules:
 The `rm-asset` command removes internal-path assets and removes model references through shared mutation contracts.
 
 Command-specific rules:
-- It must resolve the asset path relative to the selected workspace/git root.
+- It must resolve the asset path relative to the effective workspace root.
 - It must remove all InternalPath references that point to the removed asset.
 - It must support dry-run diff, JSON mutation output, and file persistence behavior through shared contracts.
 
@@ -492,7 +496,7 @@ Structure for error and warning messages.
 ```
 
 **Fields:**
-- `file_path`: Git-root-relative path
+- `file_path`: Workspace-root-relative path
 - `line_number`: 1-based line number
 - `level`: error | warning | info
 - `message`: Concise description
@@ -519,7 +523,7 @@ The `--workspace` behavior is governed by the reused workspace-selection and sta
 
 Option rules:
 - The CLI provides a global workspace selection option.
-- Workspace selection applies before model parsing, ignore-pattern loading, git root discovery, reporting, and mutation execution.
+- Workspace selection is applied as a startup directory change before Git worktree discovery, model parsing, ignore-pattern loading, Git metadata collection, reporting, and mutation execution.
 - Workspace selection preserves existing current-directory behavior when the option is omitted.
 - Workspace selection applies consistently to normal CLI commands and MCP server startup.
 - Invalid workspace directories are rejected before command execution.

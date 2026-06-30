@@ -185,9 +185,9 @@ Generated SKOS facts:
 Projection surface contract:
 - `reqvire semantic export --layer concepts` and `reqvire semantic export` consume the normalized concept-relation projection, not only direct-authored concept relation fields.
 - Full JSON-LD output must be equivalent to the normalized Turtle output.
-- Project Store `thesaurus` rows must derive `parent_id`, child/narrower lists, `related_ids`, `exact_match_ids`, and `close_match_ids` from the same normalized concept-relation projection.
-- Ontologies Concepts-layer graph data may keep directional SKOS taxonomy edges visible, but must canonicalize symmetric reciprocal concept edges to one visual edge.
-- MCP concept/thesaurus tools must expose normalized concept neighborhoods rather than requiring clients to infer inverse or symmetric links.
+- Consumer thesaurus rows must derive `parent_id`, child/narrower lists, `related_ids`, `exact_match_ids`, and `close_match_ids` from the same normalized concept-relation projection.
+- Ontology concept graph data may keep directional SKOS taxonomy edges visible, but must canonicalize symmetric reciprocal concept edges to one visual edge.
+- API concept/thesaurus consumers must expose normalized concept neighborhoods rather than requiring clients to infer inverse or symmetric links.
 - The normalized concept-relation projection is independent from ontology construct projection. It is not an o-kernel OWL/RDFS/SHACL construct classification.
 - Semantic projection SHACL may use reserved RDF/RDFS/OWL/XSD/SHACL vocabulary such as `rdf:type` in shape paths; runtime validation resolves those terms through the o-kernel reserved vocabulary registry, not through authored Reqvire ontology declarations.
 
@@ -201,20 +201,20 @@ Projection surface contract:
 ### Containment View Report Contract Specification
 
 #### Details
-The containment report and Model containment modes show the physical organization of the model:
+The containment report and model containment modes expose the physical organization of the model:
 - Root folder → Subfolders → Files → Elements
 - Sections skipped (elements shown directly under files)
 
 The system is expected to generate containment data in canonical structured formats:
 - JSON for CLI and programmatic access
-- Project Store data for WebInterface Explorer integration
+- Structured consumer data for downstream interfaces
 
 The system is expected to include design documents:
-- Files in DesignDocuments folders displayed alongside specifications
-- Design documents visually distinguished from specification elements
-- Clickable navigation to document files
+- Files in DesignDocuments folders represented alongside specifications
+- Design documents identified as document entries rather than model elements
+- Stable source target metadata for document files
 
-Explorer presentation, layout, mode controls, graph rendering, and shell integration are owned by the WebInterface specifications. Functional Output owns the deterministic report and Project Store data consumed by those views.
+Browser presentation, layout, mode controls, graph rendering, and shell integration are owned by the WebInterface specifications. Functional Output owns the deterministic report and structured store data consumed by those views.
 
 #### Metadata
   * type: specification
@@ -252,28 +252,6 @@ All report outputs are expected to use deterministic ordering to enable reliable
   * type: specification
 ---
 
-### Model Relation Traversal Filtering Specification
-
-Technical specification for relation filtering in model JSON traversal to include one canonical forward relation from each inverse relation pair while preserving complete element hierarchy representation.
-
-#### Details
-**Model Relation Traversal Filtering Rules:**
-When generating model JSON, the system is expected to apply the following relation filtering rules:
-
-1. **Canonical Relation Filtering**: Only relations specified in the `MODEL_TRAVERSAL_RELATIONS` list are expected to be traversed to prevent duplicate edges representing the same logical relationship
-2. **Complete Hierarchy Inclusion**: Include reachable child elements needed by the requested report scope
-3. **List-Based Traversal**: Relations are expected to be traversed according to the `MODEL_TRAVERSAL_RELATIONS` list, which defines which relation from each opposite pair should be used
-
-**Filtering Benefits:**
-The filtering ensures that:
-- Bidirectional relationships (e.g., `derivedFrom`/`derive`) appear once in structured output using the relation specified in `MODEL_TRAVERSAL_RELATIONS`
-- Hierarchical context is preserved by showing derived children relevant to the requested report scope
-- JSON output remains readable while accurately representing the complete model structure
-
-#### Metadata
-  * type: specification
----
-
 ### External Vocabulary Exposure Policy Specification
 
 The external vocabulary exposure policy contract defines what Reqvire public semantic surfaces expose when external ontology inclusion is requested.
@@ -282,7 +260,7 @@ The external vocabulary exposure policy contract defines what Reqvire public sem
 Exposure rules:
 - Public semantic output surfaces must expose only the used external subset selected and constructed from internal dependencies.
 - Unused external dependency facts are not Reqvire semantic output.
-- CLI, MCP, Explorer, website, and assistant-facing contracts must not specify a public full third-party ontology dump mode.
+- Command, API, browser, website, and assistant-facing contracts must not specify a public full third-party ontology dump mode.
 
 Export modes:
 - `reqvire semantic export --layer ontologies` emits generated ontology document declarations plus authored ontology vocabulary only.
@@ -293,9 +271,9 @@ Export modes:
 - `reqvire semantic export --layer external-used` emits only the used external subset.
 - `reqvire semantic export --layer prefixes` emits generated Turtle prefix projection facts.
 - `reqvire semantic export` emits all public semantic export layers by default.
-- MCP semantic export exposes used external subset RDF through the `external-used` layer; MCP vocabulary, prefix, and SPARQL helper tools keep external source declarations and triples hidden by default and expose only the used external subset when `include_external` is true.
+- Semantic export APIs expose used external subset RDF through the `external-used` layer; vocabulary, prefix, and SPARQL helper APIs keep external source declarations and triples hidden by default and expose only the used external subset when `include_external` is true.
 - Vocabulary and source-map entries for imported terms must carry an explicit external marker and source metadata.
-- Export and MCP metadata for external materialization must identify `external_materialization: "used_subset"` and include available counts for external sources, used external terms, and materialized external triples.
+- Export and API metadata for external materialization must identify `external_materialization: "used_subset"` and include available counts for external sources, used external terms, and materialized external triples.
 
 #### Concept References
   * [Used external ontology subset](../../Thesaurus/Thesaurus.md#used-external-ontology-subset)
@@ -353,33 +331,6 @@ Technical specification for implementation coverage report output structure.
   * define: [Requirement Implementation Coverage Report](ReportingRequirements.md#requirement-implementation-coverage-report)
 ---
 
-### Interactive Mermaid Diagram Node Behavior Contract Specification
-
-#### Details
-Clickable Mermaid diagram nodes rendered by the Explorer trace view must resolve to model element identifiers, source-relative paths, or stable Explorer routes according to trace view context.
-
-Generated CLI report output for `model`, `containment`, `resources`, and `traces` is JSON-only. Those commands do not emit Mermaid click directives or Markdown link output.
-
-The `change-impact` command is expected to continue to use GitHub blob URLs by default where its report contract requires stable source links.
-
-#### Metadata
-  * type: specification
----
-
-### Browser Trace Diagram Generation Contract Specification
-
-#### Details
-Browser trace diagram generation consumes Project Store trace data derived from report trace trees and produces per-verification Mermaid roll-up diagram source in the Explorer Traces view. CLI report commands remain JSON-only and do not emit Markdown or Mermaid output.
-
-The contract defines the report-owned trace diagram behavior that WebExplorer trace rendering may reuse through contract bindings without creating a cross-domain hierarchy relation.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Browser Trace Diagram Generation](DiagramGeneration.md#browser-trace-diagram-generation)
----
-
 ### JSON Element Size Estimate Output Specification
 
 JSON report outputs are expected to preserve element size-estimate metadata when the parsed model contains it.
@@ -416,7 +367,7 @@ JSON output conventions:
 - `identifier`: Full element identifier (file#fragment)
 - `name`: Display name of element
 - `type`: Element type string
-- `file_path`: Relative path from git root
+- `file_path`: Relative path from the effective workspace root
 - `relations`: Array of relation objects with `type` and `target` fields
 - `contract_bindings`: Array of contract element identifier strings
 
@@ -490,18 +441,40 @@ Model output format rules:
   * define: [Model JSON Output Format](ReportingRequirements.md#model-json-output-format)
 ---
 
+### Model Relation Traversal Filtering Specification
+
+Technical specification for relation filtering in model JSON traversal to include one canonical forward relation from each inverse relation pair while preserving complete element hierarchy representation.
+
+#### Details
+**Model Relation Traversal Filtering Rules:**
+When generating model JSON, the system is expected to apply the following relation filtering rules:
+
+1. **Canonical Relation Filtering**: Only relations specified in the `MODEL_TRAVERSAL_RELATIONS` list are expected to be traversed to prevent duplicate edges representing the same logical relationship
+2. **Complete Hierarchy Inclusion**: Include reachable child elements needed by the requested report scope
+3. **List-Based Traversal**: Relations are expected to be traversed according to the `MODEL_TRAVERSAL_RELATIONS` list, which defines which relation from each opposite pair should be used
+
+**Filtering Benefits:**
+The filtering ensures that:
+- Bidirectional relationships (e.g., `derivedFrom`/`derive`) appear once in structured output using the relation specified in `MODEL_TRAVERSAL_RELATIONS`
+- Hierarchical context is preserved by showing derived children relevant to the requested report scope
+- JSON output remains readable while accurately representing the complete model structure
+
+#### Metadata
+  * type: specification
+---
+
 ### Ontology Collection Output Specification
 
-The ontology collection output defines how Reqvire exposes semantic model core context for serve-time Explorer rendering and downstream semantic tooling.
+The ontology collection output defines how Reqvire exposes semantic model core context for served artifacts and downstream semantic tooling.
 
 #### Details
 The output must:
 - Consume the reusable semantic context built by [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection).
 - Emit RDF/Turtle by default, preserving collected RDF graph content with source comments while using one deterministic top-level `@prefix` declaration block and compact prefixed names where the prefixed name is Turtle-safe.
-- Emit JSON-LD when requested by the CLI `--jsonld` option.
+- Emit JSON-LD when requested by the selected output mode.
 - Include generated `rdfs:isDefinedBy` links from authored named ontology resources to their generated ontology document IRI as part of the default semantic export.
 - Preserve multiple authored `owl:Ontology` document subjects, `owl:imports` triples, generated ontology document declarations, generated definition links, and authored ontology-document metadata as RDF graph facts; exact duplicate triples may be emitted once.
-- Support full semantic model export when requested by the CLI `model` layer or MCP `full: true` argument.
+- Support full semantic model export when requested by the model layer or a full-output API argument.
 - In full semantic model export mode, append RDF triples for Reqvire model context:
   - all parsed capability, requirement, ontology, semantic-contract, verification, and contract elements
   - element id, identifier, name, type, file path, and source line
@@ -514,11 +487,11 @@ The output must:
   - semantic-contract shape reference edges from semantic contracts to referenced ontology terms
   - generated ontology projection facts derived from o-kernel construct classifications over direct-authored OWL/RDFS/SHACL RDF
 - Include source element identifier, source name, file path, section kind, and line number in the semantic index used by rendering and semantic output.
-- Avoid requiring a persistent RDF store for this collection path; full semantic output uses the existing in-memory RDF projection over the graph registry and semantic index, extended with generated relation-family and ontology construct subprojections. MCP semantic query execution may load this projection into the model-owned in-memory Oxigraph store. Persistent RDF stores and inferred reasoning are reserved for later requirements.
+- Avoid requiring a persistent RDF store for this collection path; full semantic output uses the existing in-memory RDF projection over the graph registry and semantic index, extended with generated relation-family and ontology construct subprojections. Semantic query execution may load this projection into the model-owned in-memory Oxigraph store. Persistent RDF stores and inferred reasoning are reserved for later requirements.
 
-**Explorer Serve:**
-- Explorer serve must include `ontologies.ttl`.
-- Explorer serve must include ontology collection and projection data in the Project Store so the WebInterface Ontologies route can render the ontology model viewer, source citations, search, modal evidence, and `ontologies.ttl` download action from one semantic projection.
+**Served Artifact Output:**
+- Served artifact generation must include `ontologies.ttl`.
+- Served artifact generation must include ontology collection and projection data in the structured consumer store so downstream ontology consumers can access model-view data, source citations, search data, evidence details, and the `ontologies.ttl` artifact from one semantic projection.
 - Browser presentation details such as canvas layout, visibility controls, legends, graph colors, modal sections, and construct rendering are owned by the WebInterface Ontologies view specifications.
 
 #### Metadata
@@ -533,7 +506,7 @@ The output must:
 #### Details
 Projection subgraph generation behavior:
 - Extend the existing full semantic export in-memory RDF projection with a generated `reqvire:OntologyProjectionGraph` subprojection after RDF/Turtle and SHACL parsing has produced semantic-index quads.
-- Reuse generated projection data to `SemanticIndex` as structured Rust data, not as a renderer-local object. The `SemanticIndex` projection data is the authoritative in-process source for full Turtle output, full JSON-LD output, and Ontologies Explorer rendering.
+- Reuse generated projection data to `SemanticIndex` as structured Rust data, not as a renderer-local object. The `SemanticIndex` projection data is the authoritative in-process source for full Turtle output, full JSON-LD output, and downstream ontology rendering data.
 - Store generated construct facts in the existing semantic export context as in-memory RDF statements derived from o-kernel construct classification records enriched with Reqvire source and provenance metadata. Generated facts are not written back to authored Markdown ontology or semantic-contract blocks.
 - Keep projection data deterministic and serializable from `SemanticIndex` without reparsing raw Turtle in the Ontologies renderer.
 - Use stable generated IRIs or blank-node identifiers derived from canonical source evidence and construct membership so repeated exports remain deterministic.
@@ -541,12 +514,12 @@ Projection subgraph generation behavior:
 - Materialize one `reqvire:OntologyConstructProjection` record per projection pass or construct family and one or more `reqvire:OntologyConstruct` records for extracted constructs.
 - Record `reqvire:projectionDerivationMode "direct-authored"` for facts derived only from authored quads without reasoning.
 - Record `reqvire:constructSourceBlock`, source element metadata, source line, construct subject, construct object, construct property, construct member, and `reqvire:constructSequenceIndex` where order matters.
-- Keep rendered symbol metadata as structured Project Store/UI data rather than semantic RDF projection facts. Ontology projection RDF records model constructs, provenance, terms, and source evidence only.
+- Keep rendered symbol metadata as structured consumer-store/UI data rather than semantic RDF projection facts. Ontology projection RDF records model constructs, provenance, terms, and source evidence only.
 
 Consumer behavior:
 - `reqvire semantic export` and `reqvire semantic export --jsonld` include generated ontology projection subgraph facts.
 - Served `ontologies.ttl` includes generated ontology document declarations plus authored ontology and SHACL blocks, without generated ontology projection subgraph facts. Generated ontology document declarations use the resolved `ontology_base` as the `owl:Ontology` IRI; ontology elements in the same base are contributors to that document.
-- The Ontologies SPA route must build from the same generated projection facts used by full semantic export instead of maintaining a separate route-local construct model.
+- Downstream ontology views must build from the same generated projection facts used by full semantic export instead of maintaining separate view-local construct models.
 - The projection subgraph is a reusable semantic data product for later SPARQL-backed search, semantic validation, or inferred-materialization work, but those later features require their own execution requirements.
 
 #### Metadata
@@ -573,7 +546,6 @@ Report commands:
 - `lint`: model quality findings grouped for auto-fix or manual review.
 - `change-impact`: changed, added, removed, relocated, and impacted model elements with propagation evidence.
 - `containment`: folder, file, and element containment.
-- `serve`: local Explorer server.
 
 #### Metadata
   * type: specification
@@ -587,7 +559,7 @@ Report commands:
 Structured model evidence outputs are expected to expose effective requirement governance metadata with stable source information.
 
 #### Details
-- Full search JSON output and equivalent MCP structured search results must include `governance_metadata` for governance-bearing element payloads (`capability` and `requirement`).
+- Full search JSON output and equivalent structured API search results must include `governance_metadata` for governance-bearing element payloads (`capability` and `requirement`).
 - Non-governance-bearing element payloads must omit `governance_metadata`.
 - The `governance_metadata` object must contain `status`, `priority`, `risk`, and `owner` entries.
 - Each entry must contain:
@@ -804,7 +776,7 @@ The resources report is expected to consist of two sections:
 2. Contract Bindings section
 
 **Relations Section:**
-- Files from internal path relation targets such as `satisfiedBy`
+- Existing workspace-root-relative eligible Git-worktree files from internal path relation targets such as `satisfiedBy`
 - Shows relation type and source element for each reference
 - Sorted by relation type, then by element identifier
 - Each file lists all elements that reference it with their relation types
@@ -819,14 +791,8 @@ The resources report is expected to consist of two sections:
 
 *JSON Format:*
 - Structured data for programmatic use
-- Includes file paths, element identifiers, relation types
+- Includes workspace-root-relative file paths, element identifiers, relation types
 - Suitable for automated processing and integration
-
-**Explorer Serve:**
-- Resources report data available in the Explorer as a supporting route or report link, not as a primary left Explorer view link
-- Shows complete list of referenced files with element traceability
-- Maintains same logical structure as JSON output
-- Provides clickable navigation between resources and elements
 
 #### Metadata
   * type: specification
@@ -920,6 +886,33 @@ Default text output (when neither `--json` nor other format flags specified):
 
 #### Metadata
   * type: specification
+---
+
+### Trace Diagram Node Target Data Contract Specification
+
+#### Details
+Trace diagram node target metadata must resolve to model element identifiers, source-relative paths, or stable route-neutral target descriptors according to trace context.
+
+Generated CLI report output for `model`, `containment`, `resources`, and `traces` is JSON-only. Those commands do not emit Mermaid click directives or Markdown link output.
+
+The `change-impact` command is expected to continue to use GitHub blob URLs by default where its report contract requires stable source links and Git metadata is available. The path component used to construct those URLs is the workspace-root-relative source path mapped through the relevant repository metadata, not an alternative Reqvire identifier root.
+
+#### Metadata
+  * type: specification
+---
+
+### Trace Diagram Projection Data Contract Specification
+
+#### Details
+Trace diagram projection consumes trace data derived from report trace trees and produces per-verification roll-up diagram data for downstream renderers. CLI report commands remain JSON-only and do not emit Markdown or Mermaid output.
+
+The contract defines report-owned trace diagram data semantics that interface renderers may reuse through contract bindings without creating a cross-domain hierarchy relation.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Trace Diagram Projection Data](DiagramGeneration.md#trace-diagram-projection-data)
 ---
 
 ### Traceability Reporting Specification

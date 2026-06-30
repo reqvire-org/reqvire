@@ -64,31 +64,6 @@ Integrated validation execution behavior:
   * define: [Integrated Validation](ValidationRequirements.md#integrated-validation)
 ---
 
-### Structured Validation Diagnostic Contract Specification
-
-Validation failures are expected to retain machine-readable diagnostic context until the final interface rendering boundary.
-
-#### Details
-Diagnostic data contract:
-- `code`: stable diagnostic token when the validator can classify the failure.
-- `message`: human-readable summary suitable for existing terminal output.
-- `context.file`: git-root-relative file path when the failure is tied to a source file.
-- `context.line` and `context.column`: one-based source location values when known.
-- `context.element_id`: full Reqvire element identifier when the failure is tied to a model element.
-
-Rendering rules:
-- Text output may preserve the existing message format while sourcing fields from structured diagnostics.
-- JSON and MCP output should expose the structured fields directly.
-- Missing context fields must be omitted or null rather than replaced with misleading placeholder values.
-- Diagnostic codes should be additive and stable once exposed to machine consumers.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Structured Validation Diagnostics](ValidationRequirements.md#structured-validation-diagnostics)
----
-
 ### Internal Consistency Validator Contract Specification
 
 #### Details
@@ -154,7 +129,7 @@ Specification for how requirements files are discovered and processed.
 
 #### Details
 **File Discovery:**
-- Parse all .md files from git repository root
+- Parse all eligible `.md` files from the effective workspace root
 - Apply .gitignore and .reqvireignore exclusions
 
 **Processing Pipeline:**
@@ -227,11 +202,36 @@ The SHACL structural parser and ontology aligner must operate as a validation-ti
    - Cross-reference parsed recursive property paths to verify every referenced schema predicate exists in the supplied domain ontology subset.
    - Cross-reference class parameters (`sh:class`) and datatype restrictions (`sh:datatype`) against valid ontology definitions or built-in datatype vocabulary.
    - Preserve value constraints such as `sh:hasValue` and `sh:in` without requiring every value IRI to be a declared ontology term.
-   - Deliver and store a compiled static SHACL AST layout safely inside the semantic validation registry for reuse by diagnostics, ontology projection, export, and Explorer rendering.
+   - Deliver and store a compiled static SHACL AST layout safely inside the semantic validation registry for reuse by diagnostics, ontology projection, export, and downstream rendering data.
 
 #### Metadata
   * type: specification
 
 #### Relations
   * define: [Semantic Contract Shape Validation](ValidationRequirements.md#semantic-contract-shape-validation)
+---
+
+### Structured Validation Diagnostic Contract Specification
+
+Validation failures are expected to retain machine-readable diagnostic context until the final interface rendering boundary.
+
+#### Details
+Diagnostic data contract:
+- `code`: stable diagnostic token when the validator can classify the failure.
+- `message`: human-readable summary suitable for existing terminal output.
+- `context.file`: workspace-root-relative file path when the failure is tied to a source file.
+- `context.line` and `context.column`: one-based source location values when known.
+- `context.element_id`: full Reqvire element identifier when the failure is tied to a model element.
+
+Rendering rules:
+- Text output may preserve the existing message format while sourcing fields from structured diagnostics.
+- Structured machine-readable outputs should expose the structured fields directly.
+- Missing context fields must be omitted or null rather than replaced with misleading placeholder values.
+- Diagnostic codes should be additive and stable once exposed to machine consumers.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Structured Validation Diagnostics](ValidationRequirements.md#structured-validation-diagnostics)
 ---

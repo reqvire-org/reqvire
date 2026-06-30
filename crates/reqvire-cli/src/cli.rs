@@ -351,10 +351,10 @@ pub enum Commands {
 
     /// Add new element to model from Markdown definition
     #[clap(
-        override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --content <MARKDOWN>       Element markdown content (alternative to stdin)\n      --override                 Replace existing element with same name\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire add <file>                          # reads from stdin\n    reqvire add <file> --content \"### Name...\"   # reads from argument"
+        override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to workspace root)\n      --content <MARKDOWN>       Element markdown content (alternative to stdin)\n      --override                 Replace existing element with same name\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire add <file>                          # reads from stdin\n    reqvire add <file> --content \"### Name...\"   # reads from argument"
     )]
     Add {
-        /// Target file path (relative to git repository root)
+        /// Target file path (relative to workspace root)
         file: String,
 
         /// Element markdown content (alternative to stdin)
@@ -401,13 +401,13 @@ pub enum Commands {
 
     /// Move element to different location
     #[clap(
-        override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n       <FILE>                   Target file path (relative to git repository root)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv <element-name> <file>"
+        override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n       <FILE>                   Target file path (relative to workspace root)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv <element-name> <file>"
     )]
     Mv {
         /// Element name
         element_name: String,
 
-        /// Target file path (relative to git repository root)
+        /// Target file path (relative to workspace root)
         file: String,
 
         /// Preview changes without applying
@@ -1705,14 +1705,14 @@ pub async fn handle_command(
             }
 
             // Call CRUD operation
-            let git_root = git_commands::get_git_root_dir()?;
+            let workspace_root = current_dir.clone();
             let result = crud::add_element(
                 &mut model_manager,
                 &element_markdown,
                 &file,
                 excluded_filename_patterns,
                 &current_dir,
-                &git_root,
+                &workspace_root,
                 dry_run,
                 override_existing,
             )?;
@@ -1738,8 +1738,9 @@ pub async fn handle_command(
                 .find_element_by_name(&element_name)?;
 
             // Call CRUD operation
-            let git_root = git_commands::get_git_root_dir()?;
-            let result = crud::remove_element(&mut model_manager, &element_id, &git_root, dry_run)?;
+            let workspace_root = current_dir.clone();
+            let result =
+                crud::remove_element(&mut model_manager, &element_id, &workspace_root, dry_run)?;
 
             // Output result
             if json {
@@ -1763,14 +1764,14 @@ pub async fn handle_command(
                 .find_element_by_name(&element_name)?;
 
             // Call CRUD operation
-            let git_root = git_commands::get_git_root_dir()?;
+            let workspace_root = current_dir.clone();
             let result = crud::move_element(
                 &mut model_manager,
                 &element_id,
                 &file,
                 excluded_filename_patterns,
                 &current_dir,
-                &git_root,
+                &workspace_root,
                 dry_run,
             )?;
 
@@ -1796,12 +1797,12 @@ pub async fn handle_command(
                 .find_element_by_name(&element_name)?;
 
             // Call CRUD operation
-            let git_root = git_commands::get_git_root_dir()?;
+            let workspace_root = current_dir.clone();
             let result = crud::rename_element(
                 &mut model_manager,
                 &element_id,
                 &new_name,
-                &git_root,
+                &workspace_root,
                 dry_run,
             )?;
 
@@ -1822,9 +1823,14 @@ pub async fn handle_command(
             output,
         }) => {
             // Call CRUD operation
-            let git_root = git_commands::get_git_root_dir()?;
-            let result =
-                crud::merge_elements(&mut model_manager, &target, &sources, &git_root, dry_run)?;
+            let workspace_root = current_dir.clone();
+            let result = crud::merge_elements(
+                &mut model_manager,
+                &target,
+                &sources,
+                &workspace_root,
+                dry_run,
+            )?;
 
             // Output result
             if json {
@@ -1844,13 +1850,14 @@ pub async fn handle_command(
             output,
         }) => {
             // Call CRUD operation
-            let git_root = git_commands::get_git_root_dir()?;
+            let workspace_root = current_dir.clone();
             let result = crud::move_file(
                 &mut model_manager,
                 &source_file,
                 &target_file,
+                excluded_filename_patterns,
                 &current_dir,
-                &git_root,
+                &workspace_root,
                 dry_run,
                 squash,
             )?;
@@ -1872,13 +1879,13 @@ pub async fn handle_command(
             output,
         }) => {
             // Call CRUD operation
-            let git_root = git_commands::get_git_root_dir()?;
+            let workspace_root = current_dir.clone();
             let result = crud::move_folder(
                 &mut model_manager,
                 &source_folder,
                 &target_folder,
                 &current_dir,
-                &git_root,
+                &workspace_root,
                 dry_run,
             )?;
 
@@ -1899,7 +1906,7 @@ pub async fn handle_command(
             json,
             output,
         }) => {
-            let git_root = git_commands::get_git_root_dir()?;
+            let workspace_root = current_dir.clone();
 
             // Check if relation_type is 'bindContract' - special keyword for contract_bindings
             let result = if relation_type == "bindContract" {
@@ -1915,7 +1922,7 @@ pub async fn handle_command(
                     &mut model_manager,
                     &source,
                     &target,
-                    &git_root,
+                    &workspace_root,
                     dry_run,
                 )?
             } else {
@@ -1925,7 +1932,7 @@ pub async fn handle_command(
                     &source,
                     &relation_type,
                     &target,
-                    &git_root,
+                    &workspace_root,
                     dry_run,
                 )?
             };
@@ -1944,9 +1951,14 @@ pub async fn handle_command(
             json,
             output,
         }) => {
-            let git_root = git_commands::get_git_root_dir()?;
-            let result =
-                reqvire::crud::unlink(&mut model_manager, &source, &target, &git_root, dry_run)?;
+            let workspace_root = current_dir.clone();
+            let result = reqvire::crud::unlink(
+                &mut model_manager,
+                &source,
+                &target,
+                &workspace_root,
+                dry_run,
+            )?;
             if json {
                 handle_json_output(&render_crud_json(&result), &output)?;
             } else {
@@ -1963,14 +1975,14 @@ pub async fn handle_command(
             json,
             output,
         }) => {
-            let git_root = git_commands::get_git_root_dir()?;
+            let workspace_root = current_dir.clone();
             let result = reqvire::crud::relink(
                 &mut model_manager,
                 &source,
                 &relation_type,
                 &from_target,
                 &to_target,
-                &git_root,
+                &workspace_root,
                 dry_run,
             )?;
             if json {
@@ -1987,12 +1999,12 @@ pub async fn handle_command(
             json,
             output,
         }) => {
-            let git_root = git_commands::get_git_root_dir()?;
+            let workspace_root = current_dir.clone();
             let result = reqvire::crud::mv_asset(
                 &mut model_manager,
                 &old_path,
                 &new_path,
-                &git_root,
+                &workspace_root,
                 dry_run,
             )?;
 
@@ -2009,9 +2021,9 @@ pub async fn handle_command(
             json,
             output,
         }) => {
-            let git_root = git_commands::get_git_root_dir()?;
+            let workspace_root = current_dir.clone();
             let result =
-                reqvire::crud::rm_asset(&mut model_manager, &file_path, &git_root, dry_run)?;
+                reqvire::crud::rm_asset(&mut model_manager, &file_path, &workspace_root, dry_run)?;
 
             if json {
                 handle_json_output(&render_crud_json(&result), &output)?;

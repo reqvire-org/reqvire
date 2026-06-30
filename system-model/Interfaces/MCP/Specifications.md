@@ -316,7 +316,7 @@ Protocol conformance rules:
 The MCP interface is expected to expose read-only quality and traceability tools grounded in Reqvire core reports.
 
 #### Details
-Quality and traceability tool behavior is inherited from reused Reqvire lint, coverage, traces, resources, and change-impact contracts. These tools return structured diagnostics and evidence after server startup validation has passed. Validation is not exposed as an MCP tool because validation is the prerequisite for starting the MCP server, matching normal Reqvire command execution behavior. Tools that compare against git commits include the compared commit and current `HEAD` in result metadata.
+Quality and traceability tool behavior is inherited from reused Reqvire lint, coverage, traces, resources, and change-impact contracts. These tools return structured diagnostics and evidence after server startup validation has passed. Validation is not exposed as an MCP tool because validation is the prerequisite for starting the MCP server, matching normal Reqvire command execution behavior. Tools that compare against source-control commits require an eligible Git worktree and include the compared commit and current eligible worktree `HEAD` in result metadata.
 
 #### Metadata
   * type: specification
@@ -483,7 +483,7 @@ Command behavior:
 - `reqvire mcp` starts MCP protocol service mode with read/report tools only, and MCP `tools/list` does not include mutation tools.
 - `reqvire mcp --enable-mutations` starts MCP protocol service mode with mutation mode enabled, and MCP `tools/list` includes mutation tools.
 - `reqvire mcp` is not exposed back through MCP as a tool.
-- The server resolves the workspace root using the same workspace assumptions as Reqvire core commands.
+- The server resolves the workspace root using the Workspace Scope Specification shared with Reqvire core commands.
 - Startup validates the model before the server accepts protocol requests.
 - Startup validation failures are forwarded from Reqvire validation diagnostics and prevent the MCP server from starting.
 - Startup diagnostics include Reqvire version and supported MCP protocol revision.
@@ -503,23 +503,23 @@ The MCP server is expected to cache parsed model state only as a performance opt
 #### Details
 Server state includes:
 - Workspace root.
-- Current git `HEAD`.
-- Dirty/clean worktree status.
+- Eligible Git worktree roots and their current `HEAD` values when available.
+- Dirty/clean worktree status for eligible Git worktrees when available.
 - Reqvire binary version.
 - Supported MCP protocol revision.
 - Reqvire tool contract version.
-- Parsed model cache source fingerprints.
+- Parsed model cache source fingerprints for eligible Git-worktree model files.
 - Excluded-pattern metadata.
 - Last parse and validation diagnostics.
 
 Cache rules:
-- Reqvire markdown files remain the durable source of truth.
+- Eligible Git-worktree Reqvire markdown files remain the durable source of truth.
 - Reqvire core parsing remains authoritative for model semantics.
-- Parsed model cache fingerprints are based on the scanned markdown file set, each file path, file size, file content hash, and active model build options.
+- Parsed model cache fingerprints are based on the scanned eligible Git-worktree markdown file set, each workspace-root-relative file path, file size, file content hash, and active model build options.
 - Cache freshness must not depend only on filesystem modification timestamps.
-- Cached state is invalidated when source files, git state, excluded patterns, Reqvire version, or Reqvire tool contract version changes.
+- Cached state is invalidated when eligible source files, eligible Git worktree metadata state, excluded patterns, Reqvire version, or Reqvire tool contract version changes.
 - Controlled MCP mutations sync MCP internal state from the updated Reqvire core graph after successful core mutation.
-- External filesystem drift triggers cache invalidation and reparse before serving stale model data.
+- External filesystem drift in eligible Git-worktree model files triggers cache invalidation and reparse before serving stale model data.
 - Dirty worktree state is reported in metadata and is not a default execution blocker when the equivalent Reqvire core operation can run.
 
 #### Metadata
@@ -682,7 +682,7 @@ All tools returned by MCP `tools/list` follow this contract:
 - `annotations`: MCP tool annotations describing side effects.
 
 Common output envelope fields:
-- `workspace`: workspace root, git `HEAD`, and dirty state.
+- `workspace`: effective workspace root plus eligible Git worktree revision and dirty-state metadata when available.
 - `reqvire_version`: Reqvire binary version.
 - `mcp_protocol_revision`: negotiated MCP protocol revision.
 - `reqvire_tool_contract_version`: Reqvire MCP tool contract version.
@@ -833,7 +833,7 @@ The MCP interface is expected to expose workspace/session tools that have no dir
 
 #### Details
 Required workspace/session tools:
-- `reqvire.workspace_status`: reports workspace root, git `HEAD`, dirty state, Reqvire version, supported MCP protocol revision, Reqvire tool contract version, and last diagnostics summary.
+- `reqvire.workspace_status`: reports effective workspace root, eligible Git worktree roots, eligible Git `HEAD` values, dirty state when available, Reqvire version, supported MCP protocol revision, Reqvire tool contract version, and last diagnostics summary.
 - `reqvire.tool_contract`: reports supported tool names, request schemas, result schemas, versions, and Reqvire capability flags for the current startup mode.
 - `reqvire.model_revision`: reports model fingerprint, source file metadata, excluded-pattern metadata, and cache freshness.
 

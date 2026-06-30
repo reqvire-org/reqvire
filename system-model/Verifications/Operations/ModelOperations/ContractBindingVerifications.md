@@ -106,7 +106,7 @@ Verify contract_bindings render correctly in all output formats.
 #### Details
 Test cases for identifier contract_bindings:
 - Markdown output preserves format
-- Explorer content renders clickable links
+- Structured output includes stable identifiers for downstream link rendering
 - JSON includes contract_bindings array
 - JSON includes element identifiers in contract_bindings array as strings
 - Element identifier format: `"file.md#element-name"`

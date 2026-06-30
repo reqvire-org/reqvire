@@ -1,46 +1,55 @@
 use globset::{Glob, GlobSet, GlobSetBuilder};
 use log::{debug, warn};
-use std::env;
 use std::fs;
-use std::path::PathBuf;
-
-/// Finds the root of the git repository.
-fn find_git_root() -> Option<PathBuf> {
-    let current_dir = env::current_dir().ok()?;
-    let mut dir = current_dir.as_path();
-
-    loop {
-        if dir.join(".git").exists() {
-            return Some(dir.to_path_buf());
-        }
-
-        dir = dir.parent()?;
-    }
-}
+use std::path::{Path, PathBuf};
 
 /// Reads gitignore patterns from the repository root .gitignore file.
 fn read_gitignore_patterns() -> Vec<String> {
-    read_root_ignore_patterns(".gitignore")
-}
-
-/// Reads reqvireignore patterns from the repository root .reqvireignore file.
-fn read_reqvireignore_patterns() -> Vec<String> {
-    read_root_ignore_patterns(".reqvireignore")
-}
-
-fn read_root_ignore_patterns(filename: &str) -> Vec<String> {
-    let git_root = match find_git_root() {
-        Some(root) => root,
-        None => {
-            debug!("No git repository found, skipping {}", filename);
+    let scope = match crate::workspace::WorkspaceScope::discover() {
+        Ok(scope) => scope,
+        Err(error) => {
+            debug!(
+                "No eligible Git worktree found, skipping .gitignore: {}",
+                error
+            );
             return vec![];
         }
     };
 
-    let ignore_path = git_root.join(filename);
+    scope
+        .git_worktrees
+        .iter()
+        .flat_map(|git_root| {
+            let prefix = git_root
+                .strip_prefix(&scope.root)
+                .ok()
+                .filter(|path| !path.as_os_str().is_empty())
+                .map(PathBuf::from);
+            read_root_ignore_patterns(git_root, ".gitignore", prefix.as_deref())
+        })
+        .collect()
+}
+
+/// Reads reqvireignore patterns from the effective workspace root .reqvireignore file.
+fn read_reqvireignore_patterns() -> Vec<String> {
+    let workspace_root = match crate::workspace::workspace_root() {
+        Ok(root) => root,
+        Err(error) => {
+            debug!(
+                "No workspace root found, skipping .reqvireignore: {}",
+                error
+            );
+            return vec![];
+        }
+    };
+    read_root_ignore_patterns(&workspace_root, ".reqvireignore", None)
+}
+
+fn read_root_ignore_patterns(root: &Path, filename: &str, prefix: Option<&Path>) -> Vec<String> {
+    let ignore_path = root.join(filename);
 
     if !ignore_path.exists() {
-        debug!("No {} file found at repository root", filename);
+        debug!("No {} file found at {}", filename, root.display());
         return vec![];
     }
 
@@ -48,7 +57,7 @@ fn read_root_ignore_patterns(filename: &str) -> Vec<String> {
         Ok(content) => content
             .lines()
             .filter(|line| !line.trim().is_empty() && !line.trim().starts_with('#'))
-            .map(gitignore_pattern_to_glob)
+            .map(|line| gitignore_pattern_to_glob(line, prefix))
             .collect(),
         Err(e) => {
             warn!("Failed to read {} content: {}", filename, e);
@@ -57,10 +66,10 @@ fn read_root_ignore_patterns(filename: &str) -> Vec<String> {
     }
 }
 
-fn gitignore_pattern_to_glob(line: &str) -> String {
+fn gitignore_pattern_to_glob(line: &str, prefix: Option<&Path>) -> String {
     let pattern = line.trim();
 
-    if pattern.starts_with("**/") || pattern.starts_with("**") {
+    let glob = if pattern.starts_with("**/") || pattern.starts_with("**") {
         pattern.to_string()
     } else if pattern.ends_with('/') {
         let dir_name = pattern.trim_end_matches('/');
@@ -73,6 +82,17 @@ fn gitignore_pattern_to_glob(line: &str) -> String {
         }
     } else {
         format!("**/{}", pattern)
+    };
+
+    if let Some(prefix) = prefix {
+        let prefix = prefix.to_string_lossy();
+        if glob.starts_with("**/") {
+            format!("{}/{}", prefix, glob.trim_start_matches("**/"))
+        } else {
+            format!("{}/{}", prefix, glob)
+        }
+    } else {
+        glob
     }
 }
 

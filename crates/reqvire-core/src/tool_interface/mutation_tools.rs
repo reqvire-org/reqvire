@@ -5,13 +5,14 @@ pub(crate) fn add_element_tool(
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
     let mut model = load_model(excluded_filename_patterns)?;
+    let workspace_root = current_dir_path();
     let result = crud::add_element(
         &mut model,
         &required_string_arg(args, "content")?,
         &required_string_arg(args, "file")?,
         excluded_filename_patterns,
-        &current_dir_path(),
-        &git_commands::get_git_root_dir()?,
+        &workspace_root,
+        &workspace_root,
         bool_arg(args, "dry_run", false),
         bool_arg(args, "override_existing", false),
     )?;
@@ -29,10 +30,11 @@ pub(crate) fn remove_element_tool(
     let element_id = model
         .graph_registry
         .find_element_by_name(&required_string_arg(args, "element_name")?)?;
+    let workspace_root = current_dir_path();
     let result = crud::remove_element(
         &mut model,
         &element_id,
-        &git_commands::get_git_root_dir()?,
+        &workspace_root,
         bool_arg(args, "dry_run", false),
     )?;
     if !bool_arg(args, "dry_run", false) {
@@ -49,13 +51,14 @@ pub(crate) fn move_element_tool(
     let element_id = model
         .graph_registry
         .find_element_by_name(&required_string_arg(args, "element_name")?)?;
+    let workspace_root = current_dir_path();
     let result = crud::move_element(
         &mut model,
         &element_id,
         &required_string_arg(args, "file")?,
         excluded_filename_patterns,
-        &current_dir_path(),
-        &git_commands::get_git_root_dir()?,
+        &workspace_root,
+        &workspace_root,
         bool_arg(args, "dry_run", false),
     )?;
     if !bool_arg(args, "dry_run", false) {
@@ -72,11 +75,12 @@ pub(crate) fn rename_element_tool(
     let element_id = model
         .graph_registry
         .find_element_by_name(&required_string_arg(args, "element_name")?)?;
+    let workspace_root = current_dir_path();
     let result = crud::rename_element(
         &mut model,
         &element_id,
         &required_string_arg(args, "new_name")?,
-        &git_commands::get_git_root_dir()?,
+        &workspace_root,
         bool_arg(args, "dry_run", false),
     )?;
     if !bool_arg(args, "dry_run", false) {
@@ -90,11 +94,12 @@ pub(crate) fn merge_elements_tool(
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
     let mut model = load_model(excluded_filename_patterns)?;
+    let workspace_root = current_dir_path();
     let result = crud::merge_elements(
         &mut model,
         &required_string_arg(args, "target")?,
         &string_array_arg(args, "sources")?,
-        &git_commands::get_git_root_dir()?,
+        &workspace_root,
         bool_arg(args, "dry_run", false),
     )?;
     if !bool_arg(args, "dry_run", false) {
@@ -108,12 +113,14 @@ pub(crate) fn move_file_tool(
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
     let mut model = load_model(excluded_filename_patterns)?;
+    let workspace_root = current_dir_path();
     let result = crud::move_file(
         &mut model,
         &required_string_arg(args, "source_file")?,
         &required_string_arg(args, "target_file")?,
-        &current_dir_path(),
-        &git_commands::get_git_root_dir()?,
+        excluded_filename_patterns,
+        &workspace_root,
+        &workspace_root,
         bool_arg(args, "dry_run", false),
         bool_arg(args, "squash", false),
     )?;
@@ -128,12 +135,13 @@ pub(crate) fn move_folder_tool(
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
     let mut model = load_model(excluded_filename_patterns)?;
+    let workspace_root = current_dir_path();
     let result = crud::move_folder(
         &mut model,
         &required_string_arg(args, "source_folder")?,
         &required_string_arg(args, "target_folder")?,
-        &current_dir_path(),
-        &git_commands::get_git_root_dir()?,
+        &workspace_root,
+        &workspace_root,
         bool_arg(args, "dry_run", false),
     )?;
     if !bool_arg(args, "dry_run", false) {
@@ -150,7 +158,7 @@ pub(crate) fn link_tool(
     let source = required_string_arg(args, "source")?;
     let relation_type = required_string_arg(args, "relation_type")?;
     let target = required_string_arg(args, "target")?;
-    let git_root = git_commands::get_git_root_dir()?;
+    let workspace_root = current_dir_path();
     let result = if relation_type == "bindContract" {
         if crate::utils::is_external_url(&target) {
             return Err(ReqvireError::ProcessError(
@@ -162,7 +170,7 @@ pub(crate) fn link_tool(
             &mut model,
             &source,
             &target,
-            &git_root,
+            &workspace_root,
             bool_arg(args, "dry_run", false),
         )?
     } else {
@@ -171,7 +179,7 @@ pub(crate) fn link_tool(
             &source,
             &relation_type,
             &target,
-            &git_root,
+            &workspace_root,
             bool_arg(args, "dry_run", false),
         )?
     };
@@ -190,7 +198,7 @@ pub(crate) fn unlink_tool(
         &mut model,
         &required_string_arg(args, "source")?,
         &required_string_arg(args, "target")?,
-        &git_commands::get_git_root_dir()?,
+        &current_dir_path(),
         bool_arg(args, "dry_run", false),
     )?;
     if !bool_arg(args, "dry_run", false) {
@@ -210,7 +218,7 @@ pub(crate) fn relink_tool(
         &required_string_arg(args, "relation_type")?,
         &required_string_arg(args, "from_target")?,
         &required_string_arg(args, "to_target")?,
-        &git_commands::get_git_root_dir()?,
+        &current_dir_path(),
         bool_arg(args, "dry_run", false),
     )?;
     if !bool_arg(args, "dry_run", false) {
@@ -228,7 +236,7 @@ pub(crate) fn move_asset_tool(
         &mut model,
         &required_string_arg(args, "old_path")?,
         &required_string_arg(args, "new_path")?,
-        &git_commands::get_git_root_dir()?,
+        &current_dir_path(),
         bool_arg(args, "dry_run", false),
     )?;
     if !bool_arg(args, "dry_run", false) {
@@ -245,7 +253,7 @@ pub(crate) fn remove_asset_tool(
     let result = crud::rm_asset(
         &mut model,
         &required_string_arg(args, "file_path")?,
-        &git_commands::get_git_root_dir()?,
+        &current_dir_path(),
         bool_arg(args, "dry_run", false),
     )?;
     if !bool_arg(args, "dry_run", false) {

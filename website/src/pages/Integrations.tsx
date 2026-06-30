@@ -79,7 +79,7 @@ reqvire change-impact --json --output reports/impact.json`}</CodeBlock>
       <Section title="Integration Guardrails">
         <BulletList
           items={[
-            "Run integrations from the repository root or pass --workspace explicitly.",
+            "Run integrations from the effective workspace root or pass --workspace explicitly; the workspace must contain at least one eligible Git worktree.",
             "Keep MCP mutation mode disabled unless the client is trusted to write model files.",
             "Use JSON output for CI and assistant workflows that need stable machine-readable data.",
             "Use ontology and collect outputs when the assistant needs semantic context before editing.",

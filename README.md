@@ -79,6 +79,10 @@ No-install npm form:
 npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace serve
 ```
 
+The effective workspace root is the path used for Reqvire identifiers and
+relative paths. It must contain at least one eligible Git worktree; files under
+the workspace but outside Git worktrees are ignored by model processing.
+
 The Explorer UI is embedded in release/npm binaries. Source builds are for
 development and must build the Explorer bundle before compiling Rust.
 

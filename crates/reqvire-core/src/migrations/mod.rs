@@ -376,7 +376,7 @@ fn apply_content_rewrite_migration(
     let mut affected_files = Vec::new();
     let mut diffs = Vec::new();
 
-    for path in utils::scan_markdown_files(None, excluded_filename_patterns) {
+    for path in utils::scan_markdown_files(None, excluded_filename_patterns)? {
         let current = filesystem::read_file(&path)?;
         let Some(next) = rewrite(&current) else {
             continue;
@@ -409,7 +409,7 @@ pub fn apply_concept_reference_link_migration(
     let mut diffs = Vec::new();
     let mut references_rewritten = 0;
 
-    for path in utils::scan_markdown_files(None, excluded_filename_patterns) {
+    for path in utils::scan_markdown_files(None, excluded_filename_patterns)? {
         let current = filesystem::read_file(&path)?;
         let relative = utils::get_relative_path(&path)
             .map(|path| path.to_string_lossy().to_string())

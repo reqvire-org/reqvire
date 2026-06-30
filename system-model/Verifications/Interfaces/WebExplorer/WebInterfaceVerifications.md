@@ -141,8 +141,8 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 - Old Explorer page URLs shall not be generated; equivalent content shall be reachable through SPA routes and source-document links.
 - Links in diagrams and text shall resolve through Explorer content routes or Project Store source-content records
 - Paths in served content shall maintain the original relative structure
-- Project Store file records shall expose source content generated directly from modeled element source files and existing graph-referenced local implementation/evidence/resource files, without depending on generated Markdown files on disk.
-- Relation-backed implementation files, evidence files, scripts, images, and other local resource targets shall remain Project Store resources for relation semantics, and existing repository-relative local targets shall appear in the Model tree under their full path.
+- Project Store file records shall expose source content generated directly from modeled element source files and existing graph-referenced eligible Git-worktree implementation/evidence/resource files, without depending on generated Markdown files on disk.
+- Relation-backed implementation files, evidence files, scripts, images, and other local resource targets shall remain Project Store resources for relation semantics, and existing workspace-root-relative targets inside eligible Git worktrees shall appear in the Model tree under their full path.
 - System should work in environments without Git repositories
 
 ##### Test Criteria:
@@ -152,7 +152,7 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 - The Project Store seed includes required sections for files, resources, elements, relations, contract_bindings, concept references, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes
 - The Project Store seed distinguishes modeled file containers from modeled resources/evidence files
 - Project Store file records include normalized source Markdown content derived from the registry for modeled files and raw source-preview content for existing registry-linked local resources
-- Relation-backed local resource targets are present as resources with source-preview content when the local file exists, and existing resource-only paths appear in the Project Store `files` and `folders` hierarchy under their full repository-relative path
+- Relation-backed local resource targets are present as resources with source-preview content when the local file exists, and existing resource-only paths appear in the Project Store `files` and `folders` hierarchy under their full workspace-root-relative path
 - Nonexistent local targets, unsupported parsed pages, unrelated repository files, and external URLs are absent from the Project Store file-tree hierarchy
 - A plain `assets/project-store.js` request after a direct filesystem edit returns the already-materialized runtime store and does not regenerate model data from disk
 - Hash routes for primary Model, file deep links, Ontologies, and Traces views plus supporting Coverage, Resources, Elements, and Search workflows are declared; the project Knowledge Graph is not a separate hash route
@@ -164,7 +164,7 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 - Both GitHub-style URLs and direct file paths in mermaid click links are handled correctly
 - Paths should not have duplicated folder names (e.g., specifications/specifications)
 - Missing embedded asset paths return 404 while non-asset browser routes return the SPA shell for client-side routing
-- Existing repository-relative static assets referenced by Markdown image or document links return the file bytes with an appropriate content type
+- Existing workspace-root-relative static assets referenced by Markdown image or document links return the file bytes with an appropriate content type
 - Repository asset requests reject parent-directory traversal and unsupported static asset extensions
 
 #### Metadata
@@ -186,7 +186,7 @@ This test verifies that the export command writes a complete self-contained stat
 - System shall write `assets/project-store.js` containing `window.reqvireProjectStore`
 - System shall write `ontologies.ttl` to the output directory
 - System shall write all other embedded SPA bundle assets to the output directory
-- System shall copy repository-local static assets referenced by rendered workspace content using their repository-relative output paths
+- System shall copy eligible Git-worktree static assets referenced by rendered workspace content using their workspace-root-relative output paths
 - Output directory shall be self-contained and serve correctly from a static file host
 
 ##### Test Criteria:
@@ -372,7 +372,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - `index.html` shall be the primary Explorer shell and Project Store host, served as a native SPA built with Vite/TypeScript/React and the Reqvire Explorer design system.
 - The served shell shall reference local compiled bundle, stylesheet, design-system, and font assets with no CDN-loaded framework, no CDN-loaded styling runtime, and no runtime CSS compiler.
 - The Project Store seed shall be present before view rendering and shall include a schema/version marker.
-- The Project Store `project` section shall include repository and branch metadata when Git metadata is available, and the Model tree root shall render that identity instead of a generic `Project` label.
+- The Project Store `project` section shall include effective workspace root identity and eligible Git worktree metadata when Git metadata is available, and the Model tree root shall render that identity instead of a generic `Project` label.
 - The store shall expose normalized top-level sections for project, folders, files, resources, elements, relations, contract_bindings, concept references, thesaurus, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes.
 - File containers and modeled resources shall be represented as separate record families with explicit cross-references when the same path appears in both roles.
 - Route definitions shall include canonical hash routes for current views and element/file/search detail workflows.
@@ -391,7 +391,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - Run the Explorer component/unit tests that cover element-detail modal back context rendering, inline native concept-reference modal routing, alternative-label concept-reference matching, hidden authored concept-reference subsection rendering, and exclusion of self-referential concept relation rows from the modal.
 - Parse the generated store seed from `index.html` or its referenced static asset.
 - Assert all required top-level store sections exist.
-- Assert the `project` section exposes repository and branch metadata when running from a Git repository, and that Explorer tree roots render the combined repository/branch label.
+- Assert the `project` section exposes effective workspace identity and available Git worktree metadata when running with source-control metadata, and that Explorer tree roots render the workspace identity consistently.
 - Assert at least one Markdown source path appears in `files`.
 - Assert at least one implementation or evidence path referenced by `satisfiedBy` or contract_bindings appears in `resources`.
 - Assert `files` records carry source navigation metadata while `resources` records carry referring-fact evidence.

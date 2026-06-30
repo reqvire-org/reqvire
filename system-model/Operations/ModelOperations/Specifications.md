@@ -215,8 +215,9 @@ Document format rule:
 
 #### Details
 When moving a file, the system is expected to:
-- Accept source file path (relative to git repository root)
-- Accept target file path (relative to git repository root)
+- Accept source file path (relative to the effective workspace root)
+- Accept target file path (relative to the effective workspace root)
+- Allow source and target files to be in different eligible Git worktrees under the same effective workspace root
 - Accept optional squashing flag
 - Validate both source and target paths
 - Move the physical file from source to target location
@@ -229,6 +230,7 @@ The system is expected to reject the operation with a clear error message if:
 - The source file does not exist
 - The target file already exists (unless --squash flag is provided)
 - The source or target paths fail validation
+- The target file resolves to a workspace folder outside all eligible Git worktrees
 - `--squash` is used with a target that is an existing `# Element` file
 
 **Squash Mode Behavior:**
@@ -246,9 +248,10 @@ When the --squash flag is provided and the target file already exists, the syste
 
 #### Details
 When moving a folder, the system is expected to:
-- Accept a source folder path and target folder path relative to the selected workspace scope.
+- Accept a source folder path and target folder path relative to the effective workspace root.
+- Allow source and target folders to be in different eligible Git worktrees under the same effective workspace root.
 - Validate both source and target paths using target-location safety rules.
-- Reject moves where the source folder does not exist, is not a directory, is outside the selected workspace scope, or is excluded from model processing.
+- Reject moves where the source folder does not exist, is not a directory, is outside the effective workspace root or all eligible Git worktrees, or is excluded from model processing.
 - Reject moves where the target path already exists.
 - Reject moves that would place the folder inside itself or otherwise create recursive path ancestry.
 - Recursively move all files and subfolders from the source folder to the target folder.
@@ -256,10 +259,10 @@ When moving a folder, the system is expected to:
 - Update all relation references throughout the model that point to any moved element.
 - Update all contract_bindings throughout the model that point to any moved contract element.
 - Update all concept references throughout the model that point to any moved concept element.
-- Update InternalPath references covered by Reqvire model semantics when the target path is inside the moved folder.
+- Update InternalPath references covered by SOI model semantics when the target path is inside the moved folder.
 - Preserve file content, document structure, element ordering, metadata, ontology blocks, semantic-contract shapes, and non-model files in the moved subtree.
 - Remove the source folder after successful relocation.
-- Remove empty parent directories only when they become empty as a direct result of the move and are still inside the selected workspace scope.
+- Remove empty parent directories only when they become empty as a direct result of the move and are still inside the effective workspace root and an eligible Git worktree.
 - Validate the candidate model before persistence, including relation integrity, contract_bindings compatibility, concept-reference resolution, semantic-contract SHACL reference reachability, and ontology-root validation.
 - Provide updates report following Diff Output Format Specification.
 
@@ -268,6 +271,7 @@ The system is expected to reject the operation with a clear error message if:
 - The source path is a file rather than a directory.
 - The target folder already exists.
 - The source or target path fails validation.
+- The target folder resolves to a workspace folder outside all eligible Git worktrees.
 - The target is inside the source folder.
 - A moved file would overwrite an existing file.
 - Candidate validation fails after the folder move.
@@ -331,17 +335,17 @@ Rules for validating and normalizing relation targets during element creation an
 #### Details
 **Target Format Support:**
 - Relative paths from the target file location (e.g., `../UserReqs.md#requirement`)
-- Paths relative to git repository root (e.g., `specifications/UserReqs.md#requirement`)
+- Paths relative to the effective workspace root (e.g., `specifications/UserReqs.md#requirement`)
 - Same-file references (e.g., `#other-requirement`)
 
 **Normalization Rules:**
-- All relation targets must be normalized to git repository root relative format before insertion
+- All relation targets must be normalized to workspace-root-relative format before insertion
 - All relation targets must reference existing elements in the model
 - External links (http://, https://, etc.) are allowed and not validated
 
 **Validation Behavior:**
 - Parse relation targets from the markdown
-- Normalize relation targets to be relative to the git repository root
+- Normalize relation targets to be relative to the effective workspace root
 - Validate that each relation target element exists in the model
 - Reject the operation if any relation target does not exist
 - Provide clear error messages indicating which relation target was not found

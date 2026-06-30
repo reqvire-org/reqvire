@@ -28,6 +28,12 @@ Default command form:
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" <command>
 ```
 
+Workspace policy:
+- Run commands from the intended effective workspace root, or pass that root with `--workspace`.
+- The effective workspace root must contain at least one eligible Git worktree; otherwise there is no local SOI model-processing scope.
+- Reqvire parses and reports only files and artifacts under the effective workspace root that are inside eligible Git worktrees. Non-Git workspace folders are ignored.
+- Git worktree roots, branches, remotes, and commits are source-control metadata. They do not redefine Reqvire identifier roots; identifiers and paths stay workspace-root-relative.
+
 To check:
 
 ```bash
@@ -330,7 +336,7 @@ Requirements should contain EARS statements only (body + `#### Details`). Techni
 
 ## Core Rules
 
-1. Always run commands from the git root folder
+1. Always run commands from the intended effective workspace root, or pass that root with `--workspace`
 2. Use full paths starting with `system-model/` (if other content root, ask user)
 3. Never guess — read files before making changes
 4. Validate after each significant change
@@ -448,6 +454,8 @@ rm-asset "path"
 
 serve [--port 8080]
 ```
+
+`change-impact --git-commit=<hash>` compares the current workspace snapshot to a base snapshot materialized from the current eligible Git worktree. It is not a multi-repository commit selector; paths and identifiers remain workspace-root-relative.
 
 **Common flags:** `--json`, `--short`, `--dry-run`, `--output <file>` (requires `--json`)
 

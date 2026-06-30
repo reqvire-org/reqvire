@@ -32,29 +32,6 @@ The system shall process structured documents and relations to extract model-rel
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
 ---
 
-### Opt-In Element Size Estimate Model Build
-
-The system shall support an opt-in model build mode that computes canonical size estimates for parsed model elements.
-
-#### Details
-- Element size estimates shall be model evidence metadata derived during model build when explicitly enabled.
-- Normal model loading shall not compute size estimates by default.
-- Size estimates shall not be written to source Markdown files.
-- The model build option shall be reusable by CLI JSON commands and MCP server startup.
-- Size estimates shall be element-level metadata; report-level aggregate estimates are out of scope for this requirement.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Element Size Estimate Model Build Specification](Specifications.md#element-size-estimate-model-build-specification)
-  * derivedFrom: [Efficient Processing](#efficient-processing)
-  * satisfiedBy: [element.rs](../../crates/reqvire-core/src/element.rs)
-  * satisfiedBy: [registration.rs](../../crates/reqvire-core/src/graph_registry/registration.rs)
-  * satisfiedBy: [model.rs](../../crates/reqvire-core/src/model.rs)
-  * verifiedBy: [Element Size Estimate Model Build Verification](../Verifications/ModelStructure/ParsingVerifications.md#element-size-estimate-model-build-verification)
----
-
 ### In-Memory Model Build Cache
 
 The system shall cache parsed `ModelManager` instances keyed by a fingerprint of the scanned workspace markdown files and the active model build options, so that repeated tool dispatches over an unchanged workspace return a cached model without re-parsing.
@@ -76,7 +53,29 @@ The system shall cache parsed `ModelManager` instances keyed by a fingerprint of
   * satisfiedBy: [model_cache.rs](../../crates/reqvire-core/src/model_cache.rs)
   * satisfiedBy: [arg_helpers.rs](../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
   * verifiedBy: [In-Memory Model Build Cache Verification](../Verifications/ModelStructure/ParsingVerifications.md#in-memory-model-build-cache-verification)
+---
 
+### Opt-In Element Size Estimate Model Build
+
+The system shall support an opt-in model build mode that computes canonical size estimates for parsed model elements.
+
+#### Details
+- Element size estimates shall be model evidence metadata derived during model build when explicitly enabled.
+- Normal model loading shall not compute size estimates by default.
+- Size estimates shall not be written to source Markdown files.
+- The model build option shall be reusable by command, JSON, and API consumers.
+- Size estimates shall be element-level metadata; report-level aggregate estimates are out of scope for this requirement.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Element Size Estimate Model Build Specification](Specifications.md#element-size-estimate-model-build-specification)
+  * derivedFrom: [Efficient Processing](#efficient-processing)
+  * satisfiedBy: [element.rs](../../crates/reqvire-core/src/element.rs)
+  * satisfiedBy: [registration.rs](../../crates/reqvire-core/src/graph_registry/registration.rs)
+  * satisfiedBy: [model.rs](../../crates/reqvire-core/src/model.rs)
+  * verifiedBy: [Element Size Estimate Model Build Verification](../Verifications/ModelStructure/ParsingVerifications.md#element-size-estimate-model-build-verification)
 ---
 
 ### Element Manipulation Operations
@@ -129,28 +128,6 @@ This requirement ensures consistency between relation updates and contract_bindi
   * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../crates/reqvire-core/src/crud.rs)
   * verifiedBy: [Contract Bindings Identifier CRUD Verification](../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-identifier-crud-verification)
----
-
-### Git Repository as Project Root
-
-The system shall use the Git repository root as the project base for path resolution and scope management.
-
-#### Details
-- The system shall treat the root directory of the Git repository as the project's base for all file and folder references
-- The system shall implement path resolution following clearly defined specifications
-- When run from git root, the system shall process all files with paths resolved relative to git root
-- When run from a subdirectory, the system shall automatically detect the subdirectory context and limit processing scope
-- When run from a subdirectory, the system shall validate that all references stay within scope boundaries following clearly defined specifications
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
-  * definedBy: [Containment Specification](Specifications.md#containment-specification)
-  * definedBy: [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
-  * specify: [Defining Model Structure](ModelStructureFeature.md#defining-model-structure)
-  * verifiedBy: [Subdirectory Processing Verification](../Verifications/Operations/Validation/ValidationVerifications.md#subdirectory-processing-verification)
 ---
 
 ### Relation Types and behaviors
@@ -241,7 +218,6 @@ Detailed ontology metadata, inheritance, OWL document, semantic-contract, concep
   * verifiedBy: [Semantic Contract Ontology Declaration Validation Test](../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-ontology-declaration-validation-test)
   * verifiedBy: [Semantic Contract Relation Validation Test](../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-relation-validation-test)
   * verifiedBy: [Semantic Contract Section Validation Test](../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-section-validation-test)
-  * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](../Verifications/Operations/Validation/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
 ---
 
 ### Contract Element Structure Constraints
@@ -397,4 +373,29 @@ The system shall support defined verification categories following clearly defin
 
 #### Relations
   * definedBy: [Verification Type Selection Guidelines](Specifications.md#verification-type-selection-guidelines)
+---
+
+### Workspace Root Path Authority
+
+The system shall use the effective Reqvire workspace root as the project base for path resolution and use Git worktree membership as the file eligibility boundary, regardless of whether the workspace root is a Git repository root, a child of a Git repository root, or a parent of one or more Git repositories.
+
+#### Details
+- The system shall treat the process working directory after startup workspace selection as the project's base for all file and folder references
+- The system shall implement path resolution following clearly defined specifications
+- The system shall normalize element identifiers, file paths, relation targets, contract_bindings, concept references, InternalPath targets, diagnostics, reports, exports, and consumer-visible model paths relative to the effective workspace root
+- Git repository roots shall determine which files and artifacts are eligible for SOI model processing, but shall not become path-resolution or identifier roots
+- Files and artifacts that are under the effective workspace root but are not inside any Git worktree shall be ignored by SOI model parsing, model resources, evidence collection, exports, consumer-visible model views, and change-impact inputs
+- Git repository revisions shall be treated as source-control metadata for eligible files and artifacts
+- When the effective workspace root is a child of a Git repository, parent repository content outside the workspace root shall be outside the Reqvire processing scope
+- When the effective workspace root is a parent of one or more Git repositories, nested repository roots shall not reset or namespace Reqvire identifiers; paths shall remain workspace-root-relative
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
+  * definedBy: [Containment Specification](Specifications.md#containment-specification)
+  * definedBy: [Workspace Scope Specification](Specifications.md#workspace-scope-specification)
+  * specify: [Defining Model Structure](ModelStructureFeature.md#defining-model-structure)
+  * verifiedBy: [Subdirectory Processing Verification](../Verifications/Operations/Validation/ValidationVerifications.md#subdirectory-processing-verification)
 ---
