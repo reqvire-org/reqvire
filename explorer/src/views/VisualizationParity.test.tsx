@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { useEffect, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { ExplorerSidePane } from "../components/ExplorerSidePane";
@@ -14,11 +14,23 @@ import { ThesaurusView } from "./ThesaurusView";
 
 const mockSigmaConstruct = vi.hoisted(() => vi.fn());
 const mockSigmaKill = vi.hoisted(() => vi.fn());
+const mockSigmaHandlers = vi.hoisted(() => new Map<string, (event: { node: string }) => void>());
+const mockAnimateNodes = vi.hoisted(() => vi.fn());
+const mockNoverlapAssign = vi.hoisted(() => vi.fn());
+const mockForceAtlasAssign = vi.hoisted(() => vi.fn());
+const mockCameraAnimate = vi.hoisted(() => vi.fn());
+const mockCameraReset = vi.hoisted(() => vi.fn());
 
 vi.mock("graphology-layout-forceatlas2", () => ({
   default: {
     inferSettings: () => ({}),
-    assign: vi.fn(),
+    assign: mockForceAtlasAssign,
+  },
+}));
+
+vi.mock("graphology-layout-noverlap", () => ({
+  default: {
+    assign: mockNoverlapAssign,
   },
 }));
 
@@ -31,22 +43,28 @@ vi.mock("sigma", () => ({
       container.appendChild(canvas);
     }
 
-    on() {}
+    on(event: string, handler: (event: { node: string }) => void) {
+      mockSigmaHandlers.set(event, handler);
+    }
     refresh() {}
     kill() {
       mockSigmaKill();
     }
     getNodeDisplayData() {
-      return { x: 0, y: 0 };
+      return { x: 12, y: -8 };
     }
     getCamera() {
       return {
-        animatedReset: vi.fn(),
-        animate: vi.fn(),
+        animatedReset: mockCameraReset,
+        animate: mockCameraAnimate,
         getState: () => ({ ratio: 1 }),
       };
     }
   },
+}));
+
+vi.mock("sigma/utils", () => ({
+  animateNodes: mockAnimateNodes,
 }));
 
 function renderWithStore(view: React.ReactElement, store = devFixture) {
@@ -61,6 +79,13 @@ describe("native visualization parity views", () => {
   beforeEach(() => {
     mockSigmaConstruct.mockClear();
     mockSigmaKill.mockClear();
+    mockSigmaHandlers.clear();
+    mockNoverlapAssign.mockClear();
+    mockForceAtlasAssign.mockClear();
+    mockAnimateNodes.mockReset();
+    mockAnimateNodes.mockReturnValue(vi.fn());
+    mockCameraAnimate.mockClear();
+    mockCameraReset.mockClear();
   });
 
   it("renders Graph as the native Sigma/Graphology project graph", async () => {
@@ -73,6 +98,50 @@ describe("native visualization parity views", () => {
     await waitFor(() => expect(screen.getByTestId("mock-sigma-renderer")).toBeTruthy());
     expect(screen.getByRole("img", { name: "Actual project elements and facts graph" })).toBeTruthy();
     expect(container.querySelector("iframe")).toBeNull();
+  });
+
+  it("uses visible graph size and density to tune full graph ForceAtlas spacing", async () => {
+    const buildGraphStore = (nodeCount: number, edgeModulo: number) => ({
+      ...devFixture,
+      knowledge_graph: {
+        nodes: Array.from({ length: nodeCount }, (_item, index) => ({
+          id: `system-model/Specifications.md#requirement-${index}`,
+          identifier: `system-model/Specifications.md#requirement-${index}`,
+          label: `Requirement ${index}`,
+          type: "requirement",
+          node_type: "requirement",
+          element_type: "requirement",
+          file_path: "system-model/Specifications.md",
+        })),
+        edges: Array.from({ length: Math.max(0, nodeCount - 1) }, (_item, index) => ({
+          source: `system-model/Specifications.md#requirement-${index}`,
+          target: `system-model/Specifications.md#requirement-${(index + edgeModulo) % nodeCount}`,
+          label: "derivedFrom",
+          kind: "derived_from",
+        })),
+      },
+    });
+
+    const sparse = renderWithStore(
+      <KnowledgeGraphView frameTestId="model-graph" onOpenElement={vi.fn()} />,
+      buildGraphStore(18, 1),
+    );
+    await waitFor(() => expect(mockForceAtlasAssign).toHaveBeenCalled());
+    const sparseSettings = mockForceAtlasAssign.mock.calls.at(-1)?.[1]?.settings;
+    sparse.unmount();
+
+    mockForceAtlasAssign.mockClear();
+    renderWithStore(
+      <KnowledgeGraphView frameTestId="model-graph" onOpenElement={vi.fn()} />,
+      buildGraphStore(120, 7),
+    );
+    await waitFor(() => expect(mockForceAtlasAssign).toHaveBeenCalled());
+    const largerSettings = mockForceAtlasAssign.mock.calls.at(-1)?.[1]?.settings;
+
+    expect(sparseSettings.scalingRatio).not.toBe(18);
+    expect(largerSettings.scalingRatio).not.toBe(18);
+    expect(largerSettings.scalingRatio).toBeGreaterThan(sparseSettings.scalingRatio);
+    expect(largerSettings.gravity).toBeGreaterThan(sparseSettings.gravity);
   });
 
   it("keeps the project graph mounted when modal route handlers change", async () => {
@@ -100,6 +169,31 @@ describe("native visualization parity views", () => {
 
     expect(mockSigmaKill).not.toHaveBeenCalled();
     expect(mockSigmaConstruct).toHaveBeenCalledTimes(1);
+  });
+
+  it("relayouts selected graph neighborhoods with noverlap and animated node positions", async () => {
+    renderWithStore(
+      <KnowledgeGraphView frameTestId="model-graph" onOpenElement={vi.fn()} />,
+    );
+
+    await waitFor(() => expect(mockSigmaConstruct).toHaveBeenCalledTimes(1));
+    const clickNode = mockSigmaHandlers.get("clickNode");
+    expect(clickNode).toBeTruthy();
+    act(() => {
+      clickNode?.({ node: "system-model/Specifications.md#example-requirement" });
+    });
+
+    await waitFor(() => expect(mockNoverlapAssign).toHaveBeenCalled());
+    expect(mockAnimateNodes).toHaveBeenCalled();
+    const animateCall = mockAnimateNodes.mock.calls.at(-1);
+    const targets = animateCall?.[1] as Record<string, { x: number; y: number }>;
+    expect(targets["system-model/Specifications.md#example-requirement"]).toBeTruthy();
+    expect(animateCall?.[2]).toMatchObject({ duration: 250, easing: "quadraticOut" });
+    expect(typeof animateCall?.[3]).toBe("function");
+    expect(mockCameraAnimate).toHaveBeenCalledWith(
+      expect.objectContaining({ x: 12, y: -8, ratio: 1 }),
+      { duration: 250, easing: "quadraticOut" },
+    );
   });
 
   it("opens selected concept-reference targets as native model elements", () => {
@@ -343,6 +437,21 @@ describe("native visualization parity views", () => {
 
     expect(filterOntologyGraph).toHaveBeenCalledWith("shape");
     delete window.filterOntologyGraph;
+  });
+
+  it("renders the ontology relation legend with a compact line marker", () => {
+    renderWithStore(
+      <ExplorerSidePane
+        activeView="ontologies"
+        open
+        onToggle={vi.fn()}
+        onNavigate={vi.fn()}
+        onOpenElement={vi.fn()}
+        onOpenOntologyNode={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Relation" }).getAttribute("class")).toContain("togglerow--line");
   });
 
   it("shows selected ontology node link in the Explorer pane", () => {

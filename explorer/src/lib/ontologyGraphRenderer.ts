@@ -5,7 +5,8 @@ import forceAtlas2 from "graphology-layout-forceatlas2";
 import { createDrawCurvedEdgeLabel, createEdgeCurveProgram, indexParallelEdgesIndex } from "@sigma/edge-curve";
 import { createNodeImageProgram } from "@sigma/node-image";
 import { EdgeProgram } from "sigma/rendering";
-import { floatColor } from "sigma/utils";
+import { animateNodes, floatColor } from "sigma/utils";
+import noverlap from "graphology-layout-noverlap";
 import type { OntologyGraphData, OntologyGraphNode } from "../store/types";
 import { cssVar } from "@ds";
 
@@ -485,6 +486,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
     let graphFilterRevision = 0;
     let focusNeighborhoodCacheKey = '';
     let focusNeighborhoodCache = new Set();
+    let focusedLayoutAnimationCancel = null;
 
     function setGraphCursor(cursor) {
         container.style.cursor = cursor;
@@ -539,6 +541,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         });
         applySigmaParallelEdgeCurvature();
         applyOntologyLayout();
+        recordOntologyLayoutBaseline();
         renderer = new Sigma(graph, container, {
             allowInvalidContainer: true,
             defaultEdgeType: 'curvedArrow',
@@ -825,24 +828,249 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         }
     }
 
+    function clampLayoutValue(value, minimum, maximum) {
+        return Math.max(minimum, Math.min(maximum, value));
+    }
+
+    function forceAtlasProfile(nodeCount, edgeCount, averageNodeSize) {
+        const nodes = Math.max(1, nodeCount);
+        const density = edgeCount / nodes;
+        const sizePressure = clampLayoutValue((averageNodeSize - 6) / 10, 0, 1.4);
+        return {
+            iterations: nodes > 650 ? 170 : nodes > 350 ? 180 : 200,
+            gravity: clampLayoutValue(
+                1.45 + Math.log10(Math.max(10, nodes)) * 0.48 + Math.min(density, 8) * 0.04,
+                1.5,
+                3.2
+            ),
+            scalingRatio: clampLayoutValue(
+                5 + Math.sqrt(nodes) * 0.14 + sizePressure * 1.5 - Math.min(density, 8) * 0.35,
+                5,
+                13
+            ),
+            slowDown: nodes > 650 ? 2.3 : 2
+        };
+    }
+
     function applyOntologyLayout() {
         try {
-            const settings = forceAtlas2.inferSettings(graph);
-            forceAtlas2.assign(graph, {
-                iterations: graph.order > 650 ? 90 : graph.order > 350 ? 130 : 190,
+            const layoutGraph = new Graph({ type: 'directed', multi: true, allowSelfLoops: true });
+            let totalNodeSize = 0;
+            nodes.forEach(nodeData => {
+                if (!visibleNodeIds.has(nodeData.id) || !graph.hasNode(nodeData.id)) return;
+                const attributes = graph.getNodeAttributes(nodeData.id);
+                const size = numericAttribute(attributes.size, sigmaNodeSize(nodeData));
+                totalNodeSize += size;
+                layoutGraph.addNode(nodeData.id, {
+                    x: numericAttribute(attributes.x, nodeData.x || 0),
+                    y: numericAttribute(attributes.y, nodeData.y || 0),
+                    size
+                });
+            });
+            links.forEach((linkData, index) => {
+                if (!isEdgeVisible(linkData)) return;
+                const sourceId = endpointId(linkData.source);
+                const targetId = endpointId(linkData.target);
+                if (!layoutGraph.hasNode(sourceId) || !layoutGraph.hasNode(targetId)) return;
+                layoutGraph.addDirectedEdgeWithKey(`l${index}`, sourceId, targetId);
+            });
+            const profile = forceAtlasProfile(
+                layoutGraph.order,
+                layoutGraph.size,
+                layoutGraph.order ? totalNodeSize / layoutGraph.order : 0
+            );
+            const settings = forceAtlas2.inferSettings(layoutGraph);
+            forceAtlas2.assign(layoutGraph, {
+                iterations: profile.iterations,
                 settings: {
                     ...settings,
                     adjustSizes: true,
                     barnesHutOptimize: true,
-                    gravity: 1.45,
-                    scalingRatio: 16,
-                    slowDown: 2
+                    gravity: profile.gravity,
+                    scalingRatio: profile.scalingRatio,
+                    slowDown: profile.slowDown
                 }
+            });
+            layoutGraph.forEachNode((nodeId, attributes) => {
+                graph.mergeNodeAttributes(nodeId, {
+                    x: numericAttribute(attributes.x, 0),
+                    y: numericAttribute(attributes.y, 0)
+                });
             });
             separateOverlappingSigmaNodes();
         } catch {
             // Keep deterministic initial positions if layout cannot run.
         }
+    }
+
+    function recordOntologyLayoutBaseline() {
+        if (!graph) return;
+        graph.forEachNode((nodeId, attributes) => {
+            graph.mergeNodeAttributes(nodeId, {
+                baseX: numericAttribute(attributes.x, 0),
+                baseY: numericAttribute(attributes.y, 0)
+            });
+        });
+    }
+
+    function numericAttribute(value, fallback) {
+        return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+    }
+
+    function stableOntologyNodePosition(nodeId) {
+        if (!graph || !graph.hasNode(nodeId)) return null;
+        const attributes = graph.getNodeAttributes(nodeId);
+        return {
+            x: numericAttribute(attributes.baseX, numericAttribute(attributes.x, 0)),
+            y: numericAttribute(attributes.baseY, numericAttribute(attributes.y, 0))
+        };
+    }
+
+    function ontologyNodeCollisionSize(attributes) {
+        const size = numericAttribute(attributes.size, 6);
+        const label = String(attributes.fullLabel || attributes.label || '');
+        return Math.max(3, Math.min(20, size * 0.45 + label.length * 0.14));
+    }
+
+    function cancelFocusedOntologyLayoutAnimation() {
+        if (focusedLayoutAnimationCancel) {
+            focusedLayoutAnimationCancel();
+            focusedLayoutAnimationCancel = null;
+        }
+    }
+
+    function animateOntologyNodesToStablePositions(nodeIds, onComplete) {
+        if (!graph) return null;
+        const targets = {};
+        nodeIds.forEach(nodeId => {
+            const target = stableOntologyNodePosition(nodeId);
+            if (target) targets[nodeId] = target;
+        });
+        if (!Object.keys(targets).length) return null;
+        return animateNodes(graph, targets, {
+            duration: 250,
+            easing: 'quadraticOut'
+        }, onComplete);
+    }
+
+    function allOntologyGraphNodeIds() {
+        return graph ? new Set(graph.nodes()) : new Set();
+    }
+
+    function relayoutFocusedOntologyNeighborhood(nodeId, restoreNodeIds, onComplete) {
+        if (!graph || !graph.hasNode(nodeId) || !visibleNodeIds.has(nodeId)) {
+            return animateOntologyNodesToStablePositions(restoreNodeIds, onComplete);
+        }
+        const ids = [...computeFocusNeighborhoodIds([nodeId])]
+            .filter(id => visibleNodeIds.has(id) && graph.hasNode(id));
+        const focusedIds = new Set(ids);
+        const targets = {};
+        restoreNodeIds.forEach(id => {
+            if (focusedIds.has(id)) return;
+            const target = stableOntologyNodePosition(id);
+            if (target) targets[id] = target;
+        });
+        const animateTargets = () => {
+            if (!Object.keys(targets).length) return null;
+            return animateNodes(graph, targets, {
+                duration: 250,
+                easing: 'quadraticOut'
+            }, onComplete);
+        };
+        if (ids.length < 2 || ids.length > 120) {
+            return animateTargets();
+        }
+
+        const selectedAttributes = graph.getNodeAttributes(nodeId);
+        const center = stableOntologyNodePosition(nodeId) || {
+            x: numericAttribute(selectedAttributes.x, 0),
+            y: numericAttribute(selectedAttributes.y, 0)
+        };
+        const focusGraph = new Graph({ type: 'undirected', multi: false, allowSelfLoops: false });
+        const neighbors = ids.filter(id => id !== nodeId).sort();
+        const densityStep = Math.min(3, Math.floor(neighbors.length / 12));
+        const radius = Math.max(28, Math.sqrt(neighbors.length) * 12);
+
+        focusGraph.addNode(nodeId, {
+            x: center.x,
+            y: center.y,
+            size: ontologyNodeCollisionSize(selectedAttributes)
+        });
+        neighbors.forEach((id, index) => {
+            const attributes = graph.getNodeAttributes(id);
+            const angle = (index / Math.max(neighbors.length, 1)) * Math.PI * 2;
+            const ring = radius * (1 + Math.floor(index / 10) * 0.75);
+            focusGraph.addNode(id, {
+                x: center.x + Math.cos(angle) * ring * 1.75,
+                y: center.y + Math.sin(angle) * ring * 1.1,
+                size: ontologyNodeCollisionSize(attributes)
+            });
+        });
+
+        ids.forEach(id => {
+            (linkAdjacency.get(id) || []).forEach(linkData => {
+                if (!isEdgeVisible(linkData)) return;
+                const sourceId = endpointId(linkData.source);
+                const targetId = endpointId(linkData.target);
+                if (!focusGraph.hasNode(sourceId) || !focusGraph.hasNode(targetId)) return;
+                if (sourceId === targetId || focusGraph.hasEdge(sourceId, targetId)) return;
+                focusGraph.addUndirectedEdge(sourceId, targetId);
+            });
+        });
+
+        try {
+            noverlap.assign(focusGraph, {
+                maxIterations: 120,
+                settings: {
+                    gridSize: Math.max(1, Math.ceil(Math.sqrt(ids.length))),
+                    margin: 2.4 + densityStep * 0.8,
+                    expansion: 1.45 + densityStep * 0.12,
+                    ratio: 1,
+                    speed: 2
+                }
+            });
+        } catch {
+            return animateTargets();
+        }
+
+        const shiftedSelected = focusGraph.getNodeAttributes(nodeId);
+        const shift = {
+            x: center.x - shiftedSelected.x,
+            y: center.y - shiftedSelected.y
+        };
+        focusGraph.forEachNode((id, attributes) => {
+            const x = attributes.x + shift.x;
+            const y = attributes.y + shift.y;
+            const edgeStretch = id === nodeId ? 1 : 1.35;
+            targets[id] = {
+                x: center.x + (x - center.x) * edgeStretch,
+                y: center.y + (y - center.y) * edgeStretch
+            };
+        });
+        return animateTargets();
+    }
+
+    function runFocusedOntologyLayout({ centerSelection = false } = {}) {
+        if (!graph || !renderer) return;
+        cancelFocusedOntologyLayoutAnimation();
+        if (!selectedNodeId || !graph.hasNode(selectedNodeId) || !visibleNodeIds.has(selectedNodeId)) {
+            focusedLayoutAnimationCancel = animateOntologyNodesToStablePositions(
+                allOntologyGraphNodeIds(),
+                () => refreshOntologyRenderer()
+            );
+            refreshOntologyRenderer();
+            return;
+        }
+        focusedLayoutAnimationCancel = relayoutFocusedOntologyNeighborhood(
+            selectedNodeId,
+            allOntologyGraphNodeIds(),
+            () => {
+                refreshOntologyRenderer();
+                if (centerSelection) centerOnOntologyNode(selectedNodeId);
+            }
+        );
+        if (centerSelection) centerOnOntologyNode(selectedNodeId);
+        refreshOntologyRenderer();
     }
 
     function separateOverlappingSigmaNodes() {
@@ -2228,6 +2456,7 @@ ${body}
         if (selectedNodeId && nodeById.has(selectedNodeId)) {
             renderInspector(nodeById.get(selectedNodeId));
         }
+        runFocusedOntologyLayout();
         refreshOntologyRenderer();
     }
 
@@ -2307,7 +2536,7 @@ ${body}
         if (results) results.style.display = 'none';
         if (search) search.value = '';
         renderInspector(selected);
-        centerOnOntologyNode(nodeId);
+        runFocusedOntologyLayout({ centerSelection: true });
         refreshOntologyRenderer();
     };
 
@@ -2321,6 +2550,7 @@ ${body}
         if (clear) clear.style.display = 'none';
         if (title) title.textContent = 'Node Inspector';
         if (body) renderOntologyEmptyState(body);
+        runFocusedOntologyLayout();
         refreshOntologyRenderer();
     };
 
@@ -2338,6 +2568,8 @@ ${body}
             }
         });
         applyOntologyLayout();
+        recordOntologyLayoutBaseline();
+        cancelFocusedOntologyLayoutAnimation();
         refreshOntologyRenderer();
         window.fitOntologyGraph();
     };
@@ -2350,13 +2582,13 @@ ${body}
 
     function activeOntologyFocusIds() {
         const ids = [];
-        if (selectedNodeId) ids.push(selectedNodeId);
+        if (selectedNodeId && visibleNodeIds.has(selectedNodeId)) ids.push(selectedNodeId);
         return ids;
     }
 
     function activeOntologyHoverIds() {
         const ids = [];
-        if (hoveredNodeId && hoveredNodeId !== selectedNodeId) ids.push(hoveredNodeId);
+        if (hoveredNodeId && hoveredNodeId !== selectedNodeId && visibleNodeIds.has(hoveredNodeId)) ids.push(hoveredNodeId);
         return ids;
     }
 
@@ -2531,6 +2763,7 @@ ${body}
                 window.clearTimeout(suppressStageClearTimer);
                 suppressStageClearTimer = null;
             }
+            cancelFocusedOntologyLayoutAnimation();
             window.removeEventListener('resize', resizeHandler);
             if (renderer) {
                 setGraphCursor('');

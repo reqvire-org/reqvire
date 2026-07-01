@@ -213,6 +213,8 @@ The Ontologies view shall:
 - Use ontology-document ownership metadata from generated `rdfs:isDefinedBy`/ontology term declarations for term grouping, search, and modal evidence, while not rendering ontology document IRIs as graph nodes or definition links as canvas edges.
 - Expose ontology graph layers so users can inspect authored structural semantic content by default, optionally show curated SKOS Concepts and their structural bridges, optionally overlay semantic context for model-to-term declaration/reference provenance, and separately enable only the used external source vocabulary subset when external ontology dependencies are present.
 - Prioritize graph canvas space by using a dense full-height viewer layout, left-pane ontology controls, and modal detail for selected ontology nodes.
+- Compute full-graph layout from currently visible ontology nodes and edges using bounded data-dependent layout settings so hidden layers do not distort visible ontology structure.
+- Reorganize the selected ontology focus tree locally to reduce node and label overlap while preserving the stable full-graph layout outside the focused tree.
 - Separate normalized ontology constructs and SHACL-derived slots/facets from optional raw SHACL evidence; empty raw-evidence sections shall not be shown.
 - Apply viewer filters as explicit canvas visibility contracts: authored structural ontology semantics are enabled by default, Concepts, semantic context, and external source layers are independently controlled overlays, ontology terms and class-membership context stay available, role controls govern optional SHACL, resource, and external-reference visibility, and construct notation remains available as passive legend and modal evidence.
 - Keep linked source citations in the viewer and the served `ontologies.ttl` artifact available for traceability and downstream tooling without rendering raw Turtle blocks as the primary page content.
@@ -232,6 +234,8 @@ The Ontologies view shall:
   * derive: [Ontology Symbol and Badge Vocabulary](#ontology-symbol-and-badge-vocabulary)
   * derive: [OWL Semantic Ontology Projection](#owl-semantic-ontology-projection)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
+  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
+  * satisfiedBy: [OntologiesView.tsx](../../../explorer/src/views/OntologiesView.tsx)
 ---
 
 ### OWL Semantic Ontology Projection
@@ -313,6 +317,8 @@ The Knowledge Graph view shall:
 - Render actual relation facts, contract_bindings facts, concept-reference facts, file targets, and external targets as graph edges or resource nodes. Concept-reference facts target SKOS concept nodes and must not create a separate concept-reference node type.
 - Use Reqvire capability-root submodels as the structural graph partitioning contract; contract_bindings, concept references, verification/satisfaction, and trace facts are overlays rather than submodel boundaries.
 - Treat structural ownership/backbone relations separately from cross-layer evidence relations: `derive` and `specify` organize the capability/requirement submodel backbone, while requirement-owned `define`, `reuse`, `satisfiedBy`, `verifiedBy`, and concept-reference facts connect subordinate details or layers as inspectable overlays.
+- Compute the full graph baseline from currently visible nodes and edges using bounded data-dependent layout settings so hidden filters and overlays do not distort visible project graph structure.
+- Reorganize the clicked node's visible neighborhood during pinned focus from a stable full-graph baseline so selected-node exploration reduces local overlap, restores the previous focus when it leaves scope, and does not rebuild the full graph or lose the global layout.
 - Reuse the dense Explorer graph and modal-detail interaction pattern used by the ontology viewer, while focusing on project instances rather than ontology vocabulary definitions.
 - Provide modal detail evidence for element type, identifier, source location, governance, metadata, incoming facts, outgoing facts, contract_bindings, and concept references.
 - Keep ontology vocabulary exploration in the Ontologies view; the Knowledge Graph view may show ontology terms only when they are referenced by actual project elements.

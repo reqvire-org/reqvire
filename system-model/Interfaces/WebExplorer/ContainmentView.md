@@ -98,6 +98,8 @@ The Graph view renders the project knowledge graph inside the Model workspace.
 - Clicking a node pins it as the current graph selection
 - Clicking empty canvas clears the pinned graph selection
 - Selected graph nodes expose an element link in the left Explorer pane that opens the shared element-detail modal
+- Full-graph layout is computed from currently visible nodes and edges with bounded data-dependent ForceAtlas settings so hidden filters and overlays do not distort the visible graph baseline
+- Selected-node centering uses Sigma's display-coordinate mapping after focus layout updates so camera movement and focus animation converge without using raw Graphology coordinates as camera state
 - Graph labels, hover tooltips, and focused-neighborhood highlighting follow the shared Knowledge Graph behavior
 
 ---
@@ -138,7 +140,7 @@ The Model route includes compact mode controls in the shared left Explorer pane:
 
 **Technical Implementation:**
 - Model List, Grid, and Graph render as native Explorer mode states over the Project Store filesystem and knowledge-graph projections.
-- Graph uses the shared Sigma/Graphology knowledge-graph renderer behavior inside the Model workspace.
+- Graph uses the shared Sigma/Graphology knowledge-graph renderer behavior inside the Model workspace, including visible-graph ForceAtlas layout and focused-neighborhood no-overlap animation.
 - Model mode changes are handled by React Explorer UI state inside the canonical `index.html#/model` route, with no separate containment route.
 - The route uses the shared headerless Explorer shell with vertical `Explorer` edge strip, expanded left-pane Model mode controls, central workspace, selected-item modal detail, and right tool rail.
 

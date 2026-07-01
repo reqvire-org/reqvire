@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Graph from "graphology";
 import Sigma from "sigma";
+import { animateNodes } from "sigma/utils";
 import forceAtlas2 from "graphology-layout-forceatlas2";
+import noverlap from "graphology-layout-noverlap";
 import { useStore } from "../store/StoreContext";
 import type { ExplorerViewProps } from "./types/ExplorerViewProps";
 import { useExplorerUiState } from "../state/ExplorerUiState";
@@ -28,6 +30,24 @@ type GraphData = {
   edges: GraphEdge[];
   degreeByNode: Map<string, number>;
   edgeAdjacency: Map<string, GraphEdge[]>;
+};
+
+type GraphNodeAttributes = {
+  x?: unknown;
+  y?: unknown;
+  baseX?: unknown;
+  baseY?: unknown;
+  size?: unknown;
+  label?: unknown;
+  fullLabel?: unknown;
+  hidden?: unknown;
+};
+
+type ForceAtlasProfile = {
+  iterations: number;
+  gravity: number;
+  scalingRatio: number;
+  slowDown: number;
 };
 
 type RelationCategory =
@@ -99,6 +119,22 @@ function nodeLabelLimit(node: KnowledgeGraphNode) {
 function nodeSize(node: KnowledgeGraphNode, degreeByNode: Map<string, number>) {
   const degree = degreeByNode.get(node.id) ?? 0;
   return Math.min(16, 4 + Math.sqrt(degree + 1) * 1.6);
+}
+
+function clamp(value: number, minimum: number, maximum: number) {
+  return Math.max(minimum, Math.min(maximum, value));
+}
+
+function forceAtlasProfile(nodeCount: number, edgeCount: number, averageNodeSize: number): ForceAtlasProfile {
+  const nodes = Math.max(1, nodeCount);
+  const density = edgeCount / nodes;
+  const sizePressure = clamp((averageNodeSize - 6) / 10, 0, 1.4);
+  return {
+    iterations: nodes > 650 ? 170 : nodes > 350 ? 180 : 200,
+    gravity: clamp(1.45 + Math.log10(Math.max(10, nodes)) * 0.48 + Math.min(density, 8) * 0.04, 1.5, 3.2),
+    scalingRatio: clamp(5 + Math.sqrt(nodes) * 0.14 + sizePressure * 1.5 - Math.min(density, 8) * 0.35, 5, 13),
+    slowDown: nodes > 650 ? 2.3 : 2,
+  };
 }
 
 function dimNodeColor(color: string, alpha: number) {
@@ -204,6 +240,167 @@ function assignInitialPositions(nodes: KnowledgeGraphNode[]) {
   });
 }
 
+function numericAttribute(value: unknown, fallback: number) {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function stableNodePosition(attributes: GraphNodeAttributes) {
+  return {
+    x: numericAttribute(attributes.baseX, numericAttribute(attributes.x, 0)),
+    y: numericAttribute(attributes.baseY, numericAttribute(attributes.y, 0)),
+  };
+}
+
+function stableNodeTarget(graph: Graph, nodeId: string) {
+  if (!graph.hasNode(nodeId)) return null;
+  return stableNodePosition(graph.getNodeAttributes(nodeId) as GraphNodeAttributes);
+}
+
+function animateGraphNodesToStablePositions(
+  graph: Graph,
+  nodeIds: Iterable<string>,
+  onComplete?: () => void,
+) {
+  const targets: Record<string, { x: number; y: number }> = {};
+  for (const id of nodeIds) {
+    const target = stableNodeTarget(graph, id);
+    if (target) targets[id] = target;
+  }
+  if (Object.keys(targets).length === 0) return null;
+  return animateNodes(graph, targets, {
+    duration: 250,
+    easing: "quadraticOut",
+  }, onComplete);
+}
+
+function graphNodeCollisionSize(attributes: GraphNodeAttributes) {
+  const size = numericAttribute(attributes.size, 6);
+  const label = String(attributes.fullLabel || attributes.label || "");
+  return Math.max(3, Math.min(18, size * 0.45 + label.length * 0.14));
+}
+
+function focusedNeighborhoodIds(
+  selectedId: string,
+  graph: Graph,
+  edgeAdjacency: Map<string, GraphEdge[]>,
+  visibleEdge: (edge: GraphEdge) => boolean,
+) {
+  const ids = new Set<string>([selectedId]);
+  for (const edge of edgeAdjacency.get(selectedId) ?? []) {
+    if (!visibleEdge(edge)) continue;
+    if (graph.hasNode(edge.source)) ids.add(edge.source);
+    if (graph.hasNode(edge.target)) ids.add(edge.target);
+  }
+  return [...ids].filter((id) => {
+    if (!graph.hasNode(id)) return false;
+    const attributes = graph.getNodeAttributes(id) as GraphNodeAttributes;
+    return attributes.hidden !== true;
+  });
+}
+
+function relayoutFocusedNeighborhood(
+  graph: Graph,
+  selectedId: string,
+  edgeAdjacency: Map<string, GraphEdge[]>,
+  visibleEdge: (edge: GraphEdge) => boolean,
+  restoreNodeIds: Iterable<string>,
+  onComplete?: () => void,
+) {
+  const ids = focusedNeighborhoodIds(selectedId, graph, edgeAdjacency, visibleEdge);
+  const focusedIds = new Set(ids);
+  const targets: Record<string, { x: number; y: number }> = {};
+  for (const id of restoreNodeIds) {
+    if (focusedIds.has(id)) continue;
+    const target = stableNodeTarget(graph, id);
+    if (target) targets[id] = target;
+  }
+  const animateTargets = () => {
+    if (Object.keys(targets).length === 0) return null;
+    return animateNodes(graph, targets, {
+      duration: 250,
+      easing: "quadraticOut",
+    }, onComplete);
+  };
+  if (ids.length < 2 || ids.length > 90) return animateTargets();
+
+  const selectedAttributes = graph.getNodeAttributes(selectedId) as GraphNodeAttributes;
+  const center = stableNodePosition(selectedAttributes);
+  const focusGraph = new Graph({ type: "undirected", multi: false, allowSelfLoops: false });
+  const neighbors = ids.filter((id) => id !== selectedId).sort();
+  const densityStep = Math.min(3, Math.floor(neighbors.length / 12));
+  const radius = Math.max(28, Math.sqrt(neighbors.length) * 12);
+
+  focusGraph.addNode(selectedId, {
+    x: center.x,
+    y: center.y,
+    size: graphNodeCollisionSize(selectedAttributes),
+  });
+  neighbors.forEach((id, index) => {
+    const attributes = graph.getNodeAttributes(id) as GraphNodeAttributes;
+    const angle = (index / Math.max(neighbors.length, 1)) * Math.PI * 2;
+    const ring = radius * (1 + Math.floor(index / 10) * 0.75);
+    focusGraph.addNode(id, {
+      x: center.x + Math.cos(angle) * ring * 1.75,
+      y: center.y + Math.sin(angle) * ring * 1.1,
+      size: graphNodeCollisionSize(attributes),
+    });
+  });
+
+  for (const edge of edgeAdjacency.get(selectedId) ?? []) {
+    if (!visibleEdge(edge) || !focusGraph.hasNode(edge.source) || !focusGraph.hasNode(edge.target)) continue;
+    if (edge.source === edge.target || focusGraph.hasEdge(edge.source, edge.target)) continue;
+    focusGraph.addUndirectedEdge(edge.source, edge.target);
+  }
+
+  try {
+    noverlap.assign(focusGraph, {
+      maxIterations: 120,
+      settings: {
+        gridSize: Math.max(1, Math.ceil(Math.sqrt(ids.length))),
+        margin: 2.4 + densityStep * 0.8,
+        expansion: 1.45 + densityStep * 0.12,
+        ratio: 1,
+        speed: 2,
+      },
+    });
+  } catch {
+    return null;
+  }
+
+  const shiftedSelected = focusGraph.getNodeAttributes(selectedId) as { x: number; y: number };
+  const shift = {
+    x: center.x - shiftedSelected.x,
+    y: center.y - shiftedSelected.y,
+  };
+  focusGraph.forEachNode((id, attributes) => {
+    const position = attributes as { x: number; y: number };
+    const x = position.x + shift.x;
+    const y = position.y + shift.y;
+    const edgeStretch = id === selectedId ? 1 : 1.35;
+    targets[id] = {
+      x: center.x + (x - center.x) * edgeStretch,
+      y: center.y + (y - center.y) * edgeStretch,
+    };
+  });
+
+  return animateTargets();
+}
+
+function centerCameraOnNode(renderer: Sigma, graph: Graph, nodeId: string) {
+  if (!graph.hasNode(nodeId)) return;
+  const display = renderer.getNodeDisplayData(nodeId);
+  if (!display) return;
+  const camera = renderer.getCamera();
+  camera.animate({
+    x: display.x,
+    y: display.y,
+    ratio: camera.getState().ratio,
+  }, {
+    duration: 250,
+    easing: "quadraticOut",
+  });
+}
+
 export function KnowledgeGraphView({
   frameTestId = "model-graph",
   embedded = false,
@@ -229,6 +426,8 @@ export function KnowledgeGraphView({
   const rendererRef = useRef<Sigma | null>(null);
   const selectedRef = useRef<string | null>(null);
   const hoveredRef = useRef<string | null>(null);
+  const layoutAnimationRef = useRef<(() => void) | null>(null);
+  const focusedLayoutNodeIdsRef = useRef<Set<string>>(new Set());
   const onOpenElementRef = useLatestRef(onOpenElement);
   const activeTypesRef = useRef(activeTypes);
   const activeOverlaysRef = useRef(activeOverlays);
@@ -249,6 +448,46 @@ export function KnowledgeGraphView({
       overlayVisible(edge.relCategory ?? relationCategory(edge), activeOverlaysRef.current)
     );
   };
+  const cancelFocusedLayoutAnimation = () => {
+    layoutAnimationRef.current?.();
+    layoutAnimationRef.current = null;
+  };
+  const runFocusedLayout = ({ centerSelection = false }: { centerSelection?: boolean } = {}) => {
+    const graph = graphRef.current;
+    const renderer = rendererRef.current;
+    const selected = selectedRef.current;
+    cancelFocusedLayoutAnimation();
+    if (!graph || !renderer || !selected || !graph.hasNode(selected)) {
+      layoutAnimationRef.current = graph && renderer
+        ? animateGraphNodesToStablePositions(
+          graph,
+          focusedLayoutNodeIdsRef.current,
+          () => renderer.refresh(),
+        )
+        : null;
+      focusedLayoutNodeIdsRef.current = new Set();
+      renderer?.refresh();
+      return;
+    }
+    const focusedNodeIds = new Set(focusedNeighborhoodIds(selected, graph, edgeAdjacency, visibleEdge));
+    const onFocusedLayoutComplete = () => {
+      renderer.refresh();
+      if (centerSelection) centerCameraOnNode(renderer, graph, selected);
+    };
+    layoutAnimationRef.current = relayoutFocusedNeighborhood(
+      graph,
+      selected,
+      edgeAdjacency,
+      visibleEdge,
+      focusedLayoutNodeIdsRef.current,
+      onFocusedLayoutComplete,
+    );
+    focusedLayoutNodeIdsRef.current = focusedNodeIds.size >= 2 && focusedNodeIds.size <= 90
+      ? focusedNodeIds
+      : new Set();
+    if (centerSelection) centerCameraOnNode(renderer, graph, selected);
+    renderer.refresh();
+  };
   useEffect(() => {
     activeTypesRef.current = activeTypes;
     activeOverlaysRef.current = activeOverlays;
@@ -257,7 +496,7 @@ export function KnowledgeGraphView({
 
   useEffect(() => {
     selectedRef.current = selectedId;
-    rendererRef.current?.refresh();
+    runFocusedLayout({ centerSelection: Boolean(selectedId) });
   }, [selectedId]);
 
   useEffect(() => {
@@ -271,6 +510,7 @@ export function KnowledgeGraphView({
       const key = `e${index}`;
       if (graph.hasEdge(key)) graph.setEdgeAttribute(key, "hidden", !visibleEdge(edge));
     });
+    runFocusedLayout();
     renderer?.refresh();
   }, [activeTypes, activeOverlays, edges, nodes]);
 
@@ -341,21 +581,57 @@ export function KnowledgeGraphView({
         });
       });
       try {
-        const settings = forceAtlas2.inferSettings(graph);
-        forceAtlas2.assign(graph, {
-          iterations: graph.order > 650 ? 120 : graph.order > 350 ? 150 : 180,
+        const layoutGraph = new Graph({ type: "directed", multi: true, allowSelfLoops: true });
+        let totalNodeSize = 0;
+        positionedNodes.forEach((node) => {
+          if (!visibleNode(node)) return;
+          const positioned = node as KnowledgeGraphNode & { x: number; y: number };
+          const size = nodeSize(node, degreeByNode);
+          totalNodeSize += size;
+          layoutGraph.addNode(node.id, {
+            x: positioned.x,
+            y: positioned.y,
+            size,
+          });
+        });
+        edges.forEach((edge, index) => {
+          if (!visibleEdge(edge) || !layoutGraph.hasNode(edge.source) || !layoutGraph.hasNode(edge.target)) {
+            return;
+          }
+          layoutGraph.addDirectedEdgeWithKey(`e${index}`, edge.source, edge.target);
+        });
+        const profile = forceAtlasProfile(
+          layoutGraph.order,
+          layoutGraph.size,
+          layoutGraph.order ? totalNodeSize / layoutGraph.order : 0,
+        );
+        const settings = forceAtlas2.inferSettings(layoutGraph);
+        forceAtlas2.assign(layoutGraph, {
+          iterations: profile.iterations,
           settings: {
             ...settings,
             adjustSizes: true,
             barnesHutOptimize: true,
-            gravity: 1.6,
-            scalingRatio: 18,
-            slowDown: 2,
+            gravity: profile.gravity,
+            scalingRatio: profile.scalingRatio,
+            slowDown: profile.slowDown,
           },
+        });
+        layoutGraph.forEachNode((nodeId, attributes) => {
+          graph?.mergeNodeAttributes(nodeId, {
+            x: numericAttribute(attributes.x, 0),
+            y: numericAttribute(attributes.y, 0),
+          });
         });
       } catch (error) {
         console.warn("[Reqvire KG] ForceAtlas2 layout failed", error);
       }
+      graph.forEachNode((id, attributes) => {
+        graph?.mergeNodeAttributes(id, {
+          baseX: numericAttribute(attributes.x, 0),
+          baseY: numericAttribute(attributes.y, 0),
+        });
+      });
       const computeFocusNeighborhoodIds = (focusIds: readonly string[]) => {
         const cacheKey = `${graphFilterRevisionRef.current}|${[...focusIds].sort().join("\u001f")}`;
         const cached = neighborhoodCache.get(cacheKey);
@@ -632,6 +908,7 @@ export function KnowledgeGraphView({
         window.clearTimeout(suppressStageClearTimer);
         suppressStageClearTimer = null;
       }
+      cancelFocusedLayoutAnimation();
       setGraphCursor("");
       renderer?.kill();
       graphRef.current = null;

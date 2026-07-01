@@ -112,7 +112,7 @@ They should not appear on ordinary named classes such as `RdfProjection` unless 
 The browser renderer uses Sigma 3 with Graphology:
 - The base graph is a directed multi-graph.
 - `@sigma/edge-curve` supplies curved arrow edge programs and parallel-edge indexing.
-- ForceAtlas2 assigns the main layout.
+- ForceAtlas2 assigns the main visible-graph layout using bounded settings derived from visible node count, visible edge density, and average rendered node size. Hidden layers and hidden relation categories must not contribute repulsion to the visible baseline layout.
 - Sigma default node-label and hover rendering handles ordinary node labels.
 - Normal node labels may be truncated for density; selected or hovered ordinary node labels switch to the full term label.
 - Construct nodes use Sigma labels for their construct kind, such as `Union`, `Intersection`, `Complement`, or `Restriction`, while drawing the compact symbol through Sigma `nodeProgramClasses` with `@sigma/node-image`; no custom construct-node hover or overlay canvas is used.
@@ -145,7 +145,7 @@ The `Overlays` controls expose graph layers. Core is the authored structural ont
 
 The single `SHACL shapes` role filter controls both SHACL shape nodes and their SHACL overlay relations. The renderer must not expose a second SHACL slot-overlay checkbox that can hide overlay relations while leaving SHACL shape nodes visible, or vice versa.
 
-When no node is pinned, hovering a node computes its focused neighborhood from currently visible relations and fades unrelated visible nodes. When a node is selected, the selected node and its focused neighborhood become the pinned selection tree; nodes outside that tree are hidden from the canvas. Rolling over a visible node inside the pinned selection tree opens that node's own focused neighborhood as a temporary rollover tree. Nodes from the pinned selection tree that are outside the rollover tree stay visible but use the low-strength dimmed treatment; nodes outside both trees remain hidden. Disabling a relation filter removes neighbors that were reachable only through that relation from the selected or rollover focus tree, while ontology terms remain available as the graph backbone.
+When no node is pinned, hovering a node computes its focused neighborhood from currently visible relations and fades unrelated visible nodes. When a node is selected, the selected node and its focused neighborhood become the pinned selection tree; nodes outside that tree are hidden from the canvas. The selected focus tree is locally reorganized from stable post-ForceAtlas baseline coordinates with bounded Graphology no-overlap layout, selected-node anchoring, neighborhood-size-aware spacing, and Sigma node animation. The camera centers through Sigma's display-coordinate mapping after the selected layout target is applied, so viewport centering and node animation converge without moving the camera into raw Graphology coordinate space. Every graph node outside the current focus tree is restored to the stable baseline, and clearing selection or hiding the selected node through filters restores the full graph to that baseline, preventing cumulative coordinate drift. Rolling over a visible node inside the pinned selection tree opens that node's own focused neighborhood as a temporary rollover tree. Nodes from the pinned selection tree that are outside the rollover tree stay visible but use the low-strength dimmed treatment; nodes outside both trees remain hidden. Disabling a relation filter removes neighbors that were reachable only through that relation from the selected or rollover focus tree, while ontology terms remain available as the graph backbone.
 
 If the focused neighborhood reaches a visible construct-only node, the renderer expands through that construct node to include its currently visible member/filler links. This keeps OWL unions, intersections, complements, and restrictions readable from the selected class or property context without expanding through ordinary neighbor nodes.
 
@@ -166,10 +166,10 @@ This rule prevents graph decluttering from becoming accidental semantic data los
 
 #### Reset, Drag, Hover, And Selection
 The viewer distinguishes view operations:
-- `Reset` reruns the layout and then fits the current graph view.
+- `Reset` reruns the layout, refreshes the stable layout baseline used by focused no-overlap animation, and then fits the current graph view.
 - Dragging a node updates its in-memory Graphology coordinates and refreshes the renderer, letting users uncover relation lines or labels hidden behind nodes or labels.
 - Hover sets a temporary focus node and reveals its incident eligible edges.
-- Click selection persists focus, centers the selected node, and opens a selected-node link in the left pane that launches the ontology node modal.
+- Click selection persists focus, centers the selected node through Sigma's display-coordinate mapping without changing the user's zoom ratio, reorganizes the selected focus tree locally, and opens a selected-node link in the left pane that launches the ontology node modal.
 - Hover and selection can coexist through rollover refinement: selection pins the selected focus tree, and hovering a visible node inside that tree temporarily makes the hovered node's focus tree active while dimming selected-tree context outside the rollover tree.
 
 Focused graph items use Sigma z-index, highlighted-node rendering, and native edge reducers rather than separate focus overlay canvases.

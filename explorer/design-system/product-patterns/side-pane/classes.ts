@@ -698,7 +698,7 @@ export const baseUX = css`
     --ds-togglerow-line-h: var(--control-sm);
     --ds-togglerow-line-min-h: var(--control-sm);
     --ds-togglerow-line-p: 0 var(--side-pane-content-inset-inline);
-    --ds-togglerow-line-swatch-w: var(--icon-xs);
+    --ds-togglerow-line-swatch-w: var(--space-6);
     --ds-togglerow-line-color: var(--text-muted);
     display: flex;
     flex-direction: column;
