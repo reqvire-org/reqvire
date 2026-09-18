@@ -1,14 +1,12 @@
 import {
   useEffect,
-  useMemo,
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { AppShell, type ShellActionItem, type ShellNavigationItem } from "@ds";
-import { loadStore } from "./store/loadStore";
-import { devFixture } from "./store/devFixture";
+import { useLiveStore } from "./store/useLiveStore";
 import { StoreProvider } from "./store/StoreContext";
 import { MissingStoreNotice } from "./components/MissingStoreNotice";
 import { HelpModal } from "./components/HelpModal";
@@ -46,8 +44,7 @@ const SHELL_NAVIGATION_ITEMS: ShellNavigationItem[] = [
 ];
 
 export function App() {
-  // Load once: the seed is an immutable generated snapshot for the served workspace.
-  const result = useMemo(() => loadStore(devFixture), []);
+  const { result, refreshError } = useLiveStore();
 
   if (!result.ok) {
     return <MissingStoreNotice reason={result.reason} detail={result.detail} />;
@@ -57,14 +54,20 @@ export function App() {
     <StoreProvider store={result.store} schemaMismatch={result.schemaMismatch}>
       <SearchIndexProvider>
         <ExplorerUiStateProvider>
-          <ExplorerShell schemaMismatch={result.schemaMismatch} />
+          <ExplorerShell
+            schemaMismatch={result.schemaMismatch}
+            refreshError={refreshError}
+          />
         </ExplorerUiStateProvider>
       </SearchIndexProvider>
     </StoreProvider>
   );
 }
 
-function ExplorerShell({ schemaMismatch }: { schemaMismatch: string | null }) {
+function ExplorerShell({ schemaMismatch, refreshError }: {
+  schemaMismatch: string | null;
+  refreshError: string | null;
+}) {
   const { route, navigateView, openElement, closeElement } = useHashRoute();
   const [helpOpen, setHelpOpen] = useState(false);
   const [leftPaneOpen, setLeftPaneOpen] = useState(true);
@@ -221,7 +224,9 @@ function ExplorerShell({ schemaMismatch }: { schemaMismatch: string | null }) {
       onToggleLeftPane={toggleLeftPane}
       onLeftPaneResizePointerDown={handleLeftPaneResizePointerDown}
       onLeftPaneResizeKeyDown={handleLeftPaneResizeKeyDown}
-      mainWarning={schemaMismatch ? `Store schema mismatch: ${schemaMismatch}` : null}
+      mainWarning={refreshError
+        ? `Refresh failed: ${refreshError}. Keeping the last valid view; will retry automatically.`
+        : schemaMismatch ? `Store schema mismatch: ${schemaMismatch}` : null}
       sidePane={
         <ExplorerSidePane
           activeView={sidePaneView}

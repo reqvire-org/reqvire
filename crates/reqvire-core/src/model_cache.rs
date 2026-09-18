@@ -3,8 +3,8 @@
 //!
 //! Every MCP tool dispatch and many CLI commands call a `load_model*` variant
 //! that re-parses the whole workspace from disk. This module memoizes the
-//! result so that repeated calls within an unchanged workspace return a clone
-//! of the cached model instead of re-reading and re-validating every file.
+//! result so that repeated calls within an unchanged workspace avoid parsing
+//! and validation. Freshness checks still read source contents to hash them.
 //!
 //! The fingerprint is the set of `(relative_path, size, content hash)` for
 //! every `.md` file the scanner would consider, plus the [`ModelBuildOptions`].

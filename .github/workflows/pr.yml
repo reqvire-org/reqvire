@@ -1,4 +1,4 @@
-name: Rust Tests on PR
+name: Rust and End-to-End Tests on PR
 
 on:
   pull_request:
@@ -7,8 +7,9 @@ on:
 
 jobs:
   test:
+    # Keep this name: the main branch ruleset requires this exact check.
     name: Run Rust Tests
-    runs-on: ubuntu-latest  # Runs on an Ubuntu machine
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Repository
@@ -25,11 +26,19 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Install shell test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ripgrep
+
       - name: Install Explorer dependencies
         run: cd explorer && npm ci
 
       - name: Lint Explorer SPA
         run: cd explorer && npm run lint
+
+      - name: Test Explorer store and refresh behavior
+        run: cd explorer && npm test
 
       - name: Build Explorer SPA bundle
         # crates/reqvire-core/build.rs embeds explorer/dist into the binary at compile time,
@@ -38,6 +47,29 @@ jobs:
 
       - name: Run Tests
         run: cargo test --verbose
+
+      - name: Build CLI for end-to-end tests
+        run: cargo build --bin reqvire
+
+      - name: Install headless Chromium for end-to-end tests
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/reqvire-browser
+        run: npx --yes playwright@1.60.0 install --with-deps chromium --only-shell
+
+      - name: Run shell end-to-end tests
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/reqvire-browser
+        run: |
+          browser=$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f \( -name chrome-headless-shell -o -name headless_shell \) -print -quit)
+          test -n "$browser"
+          REQVIRE_TEST_BROWSER="$browser" ./tests/run_all.sh
+
+      - name: Upload end-to-end logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: end-to-end-test-logs
+          path: /tmp/reqvire-test-logs
 
   validate:
     name: Validate Requirements

@@ -2,8 +2,6 @@
 
 # Test: Serve Command Functionality
 # --------------------------------------
-# Satisfies: specifications/Verifications/Misc.md#serve-command-verification
-#
 # Acceptance Criteria:
 # - System starts HTTP server on specified host and port
 # - System displays clickable terminal link to server URL
@@ -15,6 +13,11 @@
 # - System sets correct Content-Type headers for different file types
 # - System runs in quiet mode without verbose runtime-generation output
 # - System displays instructions for Ctrl-C
+# - Open browser views adopt embedded MCP writes without page reloads
+# - Manifest refresh downloads only missing immutable chunks
+# - Missed mutations, deletion, and concurrent mutation produce a coherent store
+# - Missing or corrupt chunk responses preserve valid data and recover
+# - Static exports remain self-contained and MCP remains available
 #
 # Test Criteria:
 # - Command exits with success (0) return code
@@ -25,24 +28,30 @@
 # - Missing embedded asset paths return 404 status
 # - Non-asset browser routes return index.html for SPA fallback
 # - Runtime-generation verbose output is suppressed (quiet mode active)
+# - Named headless route and refresh checks match their expected output files
 
 set -e
 
 # Use non-default host and random port to test custom options
 TEST_HOST="127.0.0.1"
 TEST_PORT=$((8000 + RANDOM % 1000))
+SERVER_BIN="${REAL_REQVIRE_BIN:-$REQVIRE_BIN}"
 
 # Start serve command in background with non-default host and port
 cd "$TEST_DIR"
-"$REQVIRE_BIN" serve --host "$TEST_HOST" --port "$TEST_PORT" > "${TEST_DIR}/serve_output.log" 2>&1 &
+"$SERVER_BIN" serve --host "$TEST_HOST" --port "$TEST_PORT" > "${TEST_DIR}/serve_output.log" 2>&1 &
 SERVE_PID=$!
 
 stop_server() {
-    if [ -n "${SERVE_PID:-}" ]; then
-        kill "$SERVE_PID" 2>/dev/null || true
-        wait "$SERVE_PID" 2>/dev/null || true
-        SERVE_PID=""
-    fi
+    for server_pid in "${SERVE_PID:-}" "${PLAIN_PID:-}" "${READ_ONLY_PID:-}"; do
+        if [ -n "$server_pid" ]; then
+            kill "$server_pid" 2>/dev/null || true
+            wait "$server_pid" 2>/dev/null || true
+        fi
+    done
+    SERVE_PID=""
+    PLAIN_PID=""
+    READ_ONLY_PID=""
 }
 
 # Function to cleanup server on exit
@@ -118,6 +127,36 @@ if ! echo "$STORE_CONTENT" | grep -q '"path": "specifications/Requirements.md"';
     exit 1
 fi
 
+# Exercise the compiled bundle and its real browser URL serialization, using
+# the same temporary Git workspace and golden-file comparisons as other E2Es.
+BROWSER_BIN="${REQVIRE_TEST_BROWSER:-}"
+if [ -z "$BROWSER_BIN" ]; then
+    for candidate in chromium chromium-browser google-chrome; do
+        if command -v "$candidate" >/dev/null 2>&1; then
+            BROWSER_BIN=$(command -v "$candidate")
+            break
+        fi
+    done
+fi
+if [ -z "$BROWSER_BIN" ]; then
+    echo "FAILED: Browser route E2E requires Chrome/Chromium; set REQVIRE_TEST_BROWSER to its executable"
+    exit 1
+fi
+
+if ! timeout -k 5s 45s node "$TEST_DIR/scripts/route-check.mjs" "$BROWSER_BIN" \
+    "http://$TEST_HOST:$TEST_PORT" "$TEST_DIR/browser-profile" \
+    > "$TEST_DIR/browser-routes.txt" 2> "$TEST_DIR/browser-routes.log"; then
+    echo "FAILED: Served Explorer browser route checks failed"
+    cat "$TEST_DIR/browser-routes.txt" "$TEST_DIR/browser-routes.log"
+    exit 1
+fi
+
+if ! diff -u "$TEST_DIR/expected/browser-routes.txt" "$TEST_DIR/browser-routes.txt"; then
+    echo "FAILED: Served Explorer browser route results do not match expected"
+    cat "$TEST_DIR/browser-routes.log"
+    exit 1
+fi
+
 if echo "$STORE_CONTENT" | grep -q '"path": "scripts/evidence.sh"'; then
     echo "❌ FAILED: Project Store included a resource-only evidence file in the model tree"
     exit 1
@@ -132,22 +171,6 @@ fi
 
 if echo "$STORE_CONTENT" | grep -q '"path": "notes/unrelated.md"'; then
     echo "❌ FAILED: Project Store included an unrelated repository file in the model tree"
-    exit 1
-fi
-
-printf '\n' >> "$TEST_DIR/specifications/Requirements.md"
-cat "$TEST_DIR/fixtures/direct-filesystem-store-regeneration-sentinel.md.txt" >> "$TEST_DIR/specifications/Requirements.md"
-
-REFRESH_RESPONSE=$(curl -s -w "\n%{http_code}" "http://$TEST_HOST:$TEST_PORT/assets/project-store.js")
-REFRESH_CODE=$(echo "$REFRESH_RESPONSE" | tail -n1)
-REFRESH_CONTENT=$(echo "$REFRESH_RESPONSE" | sed '$d')
-if [ "$REFRESH_CODE" != "200" ]; then
-    echo "❌ FAILED: Project Store refresh request returned HTTP $REFRESH_CODE"
-    exit 1
-fi
-
-if echo "$REFRESH_CONTENT" | grep -q "Direct Filesystem Store Regeneration Sentinel"; then
-    echo "❌ FAILED: Project Store GET regenerated from disk instead of serving the cached runtime store"
     exit 1
 fi
 
@@ -207,14 +230,14 @@ if grep -q "Updated diagrams" "${TEST_DIR}/serve_output.log"; then
     exit 1
 fi
 
-stop_server
+PLAIN_PID="$SERVE_PID"
 
 # Test 8: Embedded MCP endpoint can mutate the workspace and the served datastore refreshes.
 MCP_PORT=$((9000 + RANDOM % 1000))
 MCP_PROTOCOL_VERSION="2025-11-25"
 MCP_CONTENT="$(cat "${TEST_DIR}/fixtures/serve-embedded-mcp-added-requirement.md.txt")"
 
-"$REQVIRE_BIN" serve --host "$TEST_HOST" --port "$MCP_PORT" --enable-mcp --enable-mutations > "${TEST_DIR}/serve_mcp_output.log" 2>&1 &
+"$SERVER_BIN" serve --host "$TEST_HOST" --port "$MCP_PORT" --enable-mcp --enable-mutations > "${TEST_DIR}/serve_mcp_output.log" 2>&1 &
 SERVE_PID=$!
 
 echo "Waiting for embedded MCP server to start on $TEST_HOST:$MCP_PORT..."
@@ -300,6 +323,54 @@ if ! grep -q "Serve Embedded MCP Added Requirement" "${TEST_DIR}/serve_mcp_proje
     echo "❌ FAILED: Project Store did not refresh after embedded MCP mutation"
     exit 1
 fi
+
+# Test 9: Embedded MCP browser freshness, conditional revisions, and visibility.
+if ! timeout -k 5s 240s node "$TEST_DIR/scripts/refresh-check.mjs" "$BROWSER_BIN" \
+    "http://$TEST_HOST:$TEST_PORT" "http://$TEST_HOST:$MCP_PORT" "$TEST_DIR" "$SERVER_BIN" \
+    > "$TEST_DIR/browser-refresh.txt" 2> "$TEST_DIR/browser-refresh.log"; then
+    echo "FAILED: Served Explorer live refresh checks failed"
+    cat "$TEST_DIR/browser-refresh.txt" "$TEST_DIR/browser-refresh.log"
+    exit 1
+fi
+if ! diff -u "$TEST_DIR/expected/browser-refresh.txt" "$TEST_DIR/browser-refresh.txt"; then
+    echo "FAILED: Served Explorer refresh results do not match expected"
+    cat "$TEST_DIR/browser-refresh.log"
+    exit 1
+fi
+cat "$TEST_DIR/browser-refresh.txt"
+kill -0 "$SERVE_PID" "$PLAIN_PID" || {
+    echo "FAILED: A serve process exited during live refresh"
+    exit 1
+}
+
+# Test 10: Embedded MCP without mutation authorization advertises no live API.
+READ_ONLY_PORT=$((11000 + RANDOM % 1000))
+"$SERVER_BIN" serve --host "$TEST_HOST" --port "$READ_ONLY_PORT" --enable-mcp \
+    > "$TEST_DIR/serve_read_only_output.log" 2>&1 &
+READ_ONLY_PID=$!
+for i in {1..20}; do
+    if curl -s "http://$TEST_HOST:$READ_ONLY_PORT/" >/dev/null 2>&1; then
+        break
+    fi
+    if [ "$i" -eq 20 ]; then
+        echo "FAILED: Read-only embedded MCP server did not start"
+        cat "$TEST_DIR/serve_read_only_output.log"
+        exit 1
+    fi
+    sleep 0.5
+done
+curl -sS "http://$TEST_HOST:$READ_ONLY_PORT/assets/project-store.js" > "$TEST_DIR/read_only_store.js"
+if grep -q 'window.reqvireLiveRefresh' "$TEST_DIR/read_only_store.js"; then
+    echo "FAILED: Read-only embedded MCP advertised mutation-only refresh"
+    exit 1
+fi
+for api_path in project-store project-store/manifest project-store/chunks; do
+    HTTP_CODE=$(curl -sS -o /dev/null -w '%{http_code}' "http://$TEST_HOST:$READ_ONLY_PORT/api/$api_path")
+    if [ "$HTTP_CODE" != "404" ]; then
+        echo "FAILED: Read-only embedded MCP exposed /api/$api_path"
+        exit 1
+    fi
+done
 
 # Clean up
 cleanup

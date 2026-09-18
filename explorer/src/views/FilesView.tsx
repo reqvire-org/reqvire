@@ -9,7 +9,7 @@ import type {
 import { ViewFrame } from "./ViewFrame";
 import { useOptionalExplorerUiState, type ModelMode } from "../state/ExplorerUiState";
 import { SourceCodePreview } from "../rendering/SourceCodePreview";
-import { routeForContent } from "../router/routes";
+import { routeForContent, routeForFile } from "../router/routes";
 import {
   FileBrowserElementsPanel,
   FileBrowserEmptyState,
@@ -156,7 +156,7 @@ export function FilesView({
         childCount: item.childCount,
         selected: isSelectedFileItem(item, selectedFile),
         emptyFile: item.kind === "file" && item.elementCount === 0,
-        href: item.kind === "file" ? `#/files/${item.path}` : undefined,
+        href: item.kind === "file" ? routeForFile(item.path) : undefined,
         contentHref: item.kind === "file" ? routeForContent(item.path) : undefined,
       })),
     [items, selectedFile],

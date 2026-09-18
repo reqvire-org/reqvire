@@ -1,3 +1,4 @@
+use crate::live_store::{ChunkRequest, LiveStore};
 use crate::mcp;
 use globset::GlobSet;
 use std::path::{Path, PathBuf};
@@ -7,8 +8,9 @@ use tokio::sync::Mutex;
 
 use axum::body::Body;
 use axum::extract::State;
-use axum::http::{header, Method, Response, StatusCode, Uri};
-use axum::routing::any;
+use axum::http::{header, HeaderMap, Method, Response, StatusCode, Uri};
+use axum::routing::{any, get, post};
+use axum::Json;
 use axum::Router;
 use percent_encoding::percent_decode_str;
 use reqvire::error::ReqvireError;
@@ -18,10 +20,28 @@ use reqvire::explorer_runtime::{
 };
 use reqvire::{model_cache, ModelBuildOptions};
 
+struct RuntimeSnapshot {
+    assets: ExplorerRuntimeAssets,
+    live: LiveStore,
+}
+
+impl RuntimeSnapshot {
+    fn new(assets: ExplorerRuntimeAssets) -> Result<Self, ReqvireError> {
+        let live = LiveStore::new(&assets)?;
+        Ok(Self { assets, live })
+    }
+}
+
+struct RuntimeState {
+    snapshot: Arc<RuntimeSnapshot>,
+    refresh_error: Option<String>,
+}
+
 #[derive(Clone)]
 pub(crate) struct ServeState {
     excluded_filename_patterns: Arc<GlobSet>,
-    runtime_assets: Arc<Mutex<ExplorerRuntimeAssets>>,
+    runtime_assets: Arc<Mutex<RuntimeState>>,
+    live_refresh: bool,
     write_lock: Arc<Mutex<()>>,
 }
 
@@ -41,12 +61,14 @@ pub async fn serve_explorer(
 
     let state = ServeState {
         excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
-        runtime_assets: Arc::new(Mutex::new(assets)),
+        runtime_assets: Arc::new(Mutex::new(RuntimeState {
+            snapshot: Arc::new(RuntimeSnapshot::new(assets)?),
+            refresh_error: None,
+        })),
+        live_refresh: enable_mcp && mcp_enable_mutations,
         write_lock: Arc::new(Mutex::new(())),
     };
-    let mut app = Router::new()
-        .route("/", any(serve_static))
-        .fallback(serve_static);
+    let mut app = explorer_routes(state.live_refresh);
 
     if enable_mcp {
         let refresh_state = state.clone();
@@ -61,7 +83,7 @@ pub async fn serve_explorer(
             false,
             excluded_filename_patterns,
             Arc::clone(&state.write_lock),
-            Some(post_write_hook),
+            state.live_refresh.then_some(post_write_hook),
         );
     }
     let app = app.with_state(state);
@@ -90,15 +112,31 @@ pub async fn serve_explorer(
     Ok(())
 }
 
-async fn serve_static(State(state): State<ServeState>, method: Method, uri: Uri) -> Response<Body> {
-    if method != Method::GET && method != Method::HEAD {
-        return response_with_status(StatusCode::METHOD_NOT_ALLOWED);
+fn explorer_routes(live_refresh: bool) -> Router<ServeState> {
+    let app = Router::new()
+        .route("/", any(serve_static))
+        .fallback(serve_static);
+    if live_refresh {
+        app.route("/api/project-store", get(serve_live_store))
+            .route("/api/project-store/manifest", get(serve_manifest))
+            .route("/api/project-store/chunks", post(serve_chunks))
+    } else {
+        app
     }
+}
 
+async fn serve_static(State(state): State<ServeState>, method: Method, uri: Uri) -> Response<Body> {
     let request_path = match resolve_request_path(uri.path()) {
         Ok(path) => path,
         Err(status) => return response_with_status(status),
     };
+
+    if request_path == "api" || request_path.starts_with("api/") {
+        return response_with_status(StatusCode::NOT_FOUND);
+    }
+    if method != Method::GET && method != Method::HEAD {
+        return response_with_status(StatusCode::METHOD_NOT_ALLOWED);
+    }
 
     if request_path == "assets/project-store.js" {
         return runtime_asset_response(state, method, RuntimeAssetKind::ProjectStore).await;
@@ -166,32 +204,162 @@ async fn runtime_asset_response(
         });
     }
 
-    let assets = state.runtime_assets.lock().await;
+    let snapshot = Arc::clone(&state.runtime_assets.lock().await.snapshot);
 
     match kind {
         RuntimeAssetKind::ProjectStore => runtime_bytes_response(
             "application/javascript",
-            assets.project_store_js.clone().into_bytes(),
+            if state.live_refresh {
+                format!(
+                    "{}window.reqvireLiveRefresh = {{\"revision\":\"{}\",\"manifest\":{}}};\n",
+                    snapshot.assets.project_store_js,
+                    snapshot.live.revision,
+                    snapshot.live.manifest_json
+                )
+            } else {
+                snapshot.assets.project_store_js.clone()
+            }
+            .into_bytes(),
         ),
         RuntimeAssetKind::Ontologies => runtime_bytes_response(
             "text/turtle; charset=utf-8",
-            assets.ontologies_ttl.clone().into_bytes(),
+            snapshot.assets.ontologies_ttl.clone().into_bytes(),
         ),
     }
 }
 
+/// Called only after an embedded MCP write, while the MCP workspace write gate
+/// is held. Browser requests read the published snapshot without model I/O.
 async fn refresh_runtime_assets(state: &ServeState) -> Result<(), ReqvireError> {
-    let model = model_cache::load_cached_model(
-        state.excluded_filename_patterns.as_ref(),
-        ModelBuildOptions {
-            lenient: false,
-            with_size_estimates: false,
-        },
-    )?;
-    let assets = build_runtime_assets(&model.graph_registry)?;
-    let mut runtime_assets = state.runtime_assets.lock().await;
-    *runtime_assets = assets;
-    Ok(())
+    let exclusions = Arc::clone(&state.excluded_filename_patterns);
+    let result = tokio::task::spawn_blocking(move || {
+        let model = model_cache::load_cached_model(
+            exclusions.as_ref(),
+            ModelBuildOptions {
+                lenient: false,
+                with_size_estimates: false,
+            },
+        )?;
+        let assets = build_runtime_assets(&model.graph_registry)?;
+        RuntimeSnapshot::new(assets).map(Arc::new)
+    })
+    .await
+    .map_err(|error| ReqvireError::ProcessError(format!("Runtime refresh task failed: {error}")))
+    .and_then(|result| result);
+
+    let mut published = state.runtime_assets.lock().await;
+    match result {
+        Ok(snapshot) => {
+            published.snapshot = snapshot;
+            published.refresh_error = None;
+            Ok(())
+        }
+        Err(error) => {
+            published.refresh_error = Some(error.to_string());
+            Err(error)
+        }
+    }
+}
+
+async fn serve_live_store(
+    State(state): State<ServeState>,
+    method: Method,
+    headers: HeaderMap,
+) -> Response<Body> {
+    live_response(state, method, headers, false).await
+}
+
+async fn serve_manifest(
+    State(state): State<ServeState>,
+    method: Method,
+    headers: HeaderMap,
+) -> Response<Body> {
+    live_response(state, method, headers, true).await
+}
+
+async fn live_response(
+    state: ServeState,
+    method: Method,
+    headers: HeaderMap,
+    manifest: bool,
+) -> Response<Body> {
+    let (snapshot, error) = {
+        let published = state.runtime_assets.lock().await;
+        (
+            Arc::clone(&published.snapshot),
+            published.refresh_error.clone(),
+        )
+    };
+    let revision = &snapshot.live.revision;
+    let etag = format!("\"{revision}\"");
+    let (status, body) = if let Some(error) = error {
+        (
+            StatusCode::SERVICE_UNAVAILABLE,
+            serde_json::json!({ "revision": revision, "error": error }).to_string(),
+        )
+    } else if headers
+        .get(header::IF_NONE_MATCH)
+        .and_then(|value| value.to_str().ok())
+        .is_some_and(|value| {
+            value.split(',').any(|candidate| {
+                let candidate = candidate
+                    .trim()
+                    .strip_prefix("W/")
+                    .unwrap_or(candidate.trim());
+                candidate == etag || candidate == "*"
+            })
+        })
+    {
+        (StatusCode::NOT_MODIFIED, String::new())
+    } else if method == Method::HEAD {
+        (StatusCode::OK, String::new())
+    } else if manifest {
+        (StatusCode::OK, snapshot.live.manifest_json.clone())
+    } else {
+        (
+            StatusCode::OK,
+            format!(
+                "{{\"revision\":\"{revision}\",\"store\":{}}}",
+                snapshot.assets.project_store_json
+            ),
+        )
+    };
+    Response::builder()
+        .status(status)
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::CACHE_CONTROL, "no-store")
+        .header(header::ETAG, etag)
+        .body(if method == Method::HEAD {
+            Body::empty()
+        } else {
+            Body::from(body)
+        })
+        .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR))
+}
+
+async fn serve_chunks(
+    State(state): State<ServeState>,
+    Json(request): Json<ChunkRequest>,
+) -> Response<Body> {
+    let snapshot = Arc::clone(&state.runtime_assets.lock().await.snapshot);
+    match snapshot.live.chunks_json(&request) {
+        Ok(body) => runtime_bytes_response("application/json", body.into_bytes()),
+        Err(status) => Response::builder()
+            .status(status)
+            .header(header::CONTENT_TYPE, "application/json")
+            .header(header::CACHE_CONTROL, "no-store")
+            .body(Body::from(
+                serde_json::json!({
+                    "error": if status == StatusCode::CONFLICT {
+                        "The published snapshot changed; request the latest manifest."
+                    } else {
+                        "Invalid or unavailable chunk request."
+                    },
+                })
+                .to_string(),
+            ))
+            .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR)),
+    }
 }
 
 fn runtime_bytes_response(content_type: &'static str, content: Vec<u8>) -> Response<Body> {
@@ -304,5 +472,245 @@ fn content_type_for_path(path: &str) -> &'static str {
         Some("ttl") | Some("turtle") => "text/turtle; charset=utf-8",
         Some("jsonld") => "application/ld+json",
         _ => "text/plain",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::body::to_bytes;
+    use axum::http::Request;
+    use serde_json::{json, Value};
+    use tower::ServiceExt;
+
+    fn snapshot(name: &str) -> Arc<RuntimeSnapshot> {
+        let json = json!({"elements": [{"id": "aster", "name": name}]}).to_string();
+        Arc::new(
+            RuntimeSnapshot::new(ExplorerRuntimeAssets {
+                project_store_js: format!("window.reqvireProjectStore = {json};\n"),
+                project_store_json: json,
+                ontologies_ttl: "@prefix : <urn:test:> .".into(),
+            })
+            .unwrap(),
+        )
+    }
+
+    fn state(live_refresh: bool) -> ServeState {
+        ServeState {
+            excluded_filename_patterns: Arc::new(globset::GlobSetBuilder::new().build().unwrap()),
+            runtime_assets: Arc::new(Mutex::new(RuntimeState {
+                snapshot: snapshot("initial"),
+                refresh_error: None,
+            })),
+            live_refresh,
+            write_lock: Arc::new(Mutex::new(())),
+        }
+    }
+
+    async fn body(response: Response<Body>) -> String {
+        String::from_utf8(
+            to_bytes(response.into_body(), usize::MAX)
+                .await
+                .unwrap()
+                .to_vec(),
+        )
+        .unwrap()
+    }
+
+    #[tokio::test]
+    async fn manifest_headers_conditional_variants_and_head_are_consistent() {
+        let state = state(true);
+        let expected = Arc::clone(&state.runtime_assets.lock().await.snapshot);
+        let app = explorer_routes(true).with_state(state);
+        let etag = format!("\"{}\"", expected.live.revision);
+        for (condition, status) in [
+            (etag.clone(), 304),
+            (format!("W/{etag}"), 304),
+            (format!("\"old\", {etag}"), 304),
+            ("*".into(), 304),
+            ("\"old\"".into(), 200),
+        ] {
+            let response = app
+                .clone()
+                .oneshot(
+                    Request::builder()
+                        .uri("/api/project-store/manifest")
+                        .header(header::IF_NONE_MATCH, condition)
+                        .body(Body::empty())
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+            assert_eq!(response.status().as_u16(), status);
+            assert_eq!(response.headers()[header::ETAG], etag);
+            assert_eq!(response.headers()[header::CACHE_CONTROL], "no-store");
+            let text = body(response).await;
+            assert_eq!(
+                text,
+                if status == 304 {
+                    ""
+                } else {
+                    &expected.live.manifest_json
+                }
+            );
+        }
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::HEAD)
+                    .uri("/api/project-store/manifest")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(response.headers()[header::ETAG], etag);
+        assert!(body(response).await.is_empty());
+    }
+
+    #[tokio::test]
+    async fn revision_reads_do_not_wait_for_the_mcp_write_gate() {
+        let state = state(true);
+        let _write_guard = state.write_lock.lock().await;
+        let app = explorer_routes(true).with_state(state.clone());
+        let response = tokio::time::timeout(
+            std::time::Duration::from_millis(500),
+            app.oneshot(
+                Request::builder()
+                    .uri("/api/project-store/manifest")
+                    .body(Body::empty())
+                    .unwrap(),
+            ),
+        )
+        .await
+        .unwrap()
+        .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn disabled_serving_has_no_manifest_chunks_or_seed_advertisement() {
+        let state = state(false);
+        let app = explorer_routes(false).with_state(state);
+        for (url, method) in [
+            ("/api/project-store", Method::GET),
+            ("/api/project-store/manifest", Method::GET),
+            ("/api/project-store/chunks", Method::POST),
+        ] {
+            let response = app
+                .clone()
+                .oneshot(
+                    Request::builder()
+                        .method(method)
+                        .uri(url)
+                        .body(Body::empty())
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+            assert_eq!(response.status(), StatusCode::NOT_FOUND);
+        }
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/assets/project-store.js")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert!(!body(response).await.contains("reqvireLiveRefresh"));
+    }
+
+    #[tokio::test]
+    async fn superseded_manifest_conflicts_but_captured_snapshot_remains_immutable() {
+        let state = state(true);
+        let captured = Arc::clone(&state.runtime_assets.lock().await.snapshot);
+        let manifest: Value = serde_json::from_str(&captured.live.manifest_json).unwrap();
+        let hash = manifest["sections"]["elements"]["hashes"][0]
+            .as_str()
+            .unwrap()
+            .to_string();
+        let request = ChunkRequest {
+            revision: captured.live.revision.clone(),
+            hashes: vec![hash.clone()],
+        };
+        state.runtime_assets.lock().await.snapshot = snapshot("updated");
+        let captured_response: Value =
+            serde_json::from_str(&captured.live.chunks_json(&request).unwrap()).unwrap();
+        assert!(captured_response["chunks"][&hash]
+            .as_str()
+            .unwrap()
+            .contains("initial"));
+        let app = explorer_routes(true).with_state(state);
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::POST)
+                    .uri("/api/project-store/chunks")
+                    .header(header::CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        json!({"revision": request.revision, "hashes": request.hashes}).to_string(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        assert_eq!(response.headers()[header::CACHE_CONTROL], "no-store");
+        assert!(body(response).await.contains("latest manifest"));
+    }
+
+    #[tokio::test]
+    async fn refresh_diagnostics_preserve_assets_and_clear_without_advancing_revision() {
+        let state = state(true);
+        let revision = state
+            .runtime_assets
+            .lock()
+            .await
+            .snapshot
+            .live
+            .revision
+            .clone();
+        state.runtime_assets.lock().await.refresh_error = Some("Failed runtime generation".into());
+        let app = explorer_routes(true).with_state(state.clone());
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri("/api/project-store/manifest")
+                    .header(header::IF_NONE_MATCH, format!("\"{revision}\""))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+        let diagnostic: Value = serde_json::from_str(&body(response).await).unwrap();
+        assert_eq!(diagnostic["revision"], revision);
+        let seed = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri("/assets/project-store.js")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert!(body(seed).await.contains("initial"));
+        state.runtime_assets.lock().await.refresh_error = None;
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/project-store/manifest")
+                    .header(header::IF_NONE_MATCH, format!("\"{revision}\""))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::NOT_MODIFIED);
     }
 }

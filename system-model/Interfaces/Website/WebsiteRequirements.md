@@ -61,6 +61,9 @@ The system shall document everyday CLI workflows, model commands, report command
   * [CLI Interface Structure Contract Specification](../CLI/Specifications.md#cli-interface-structure-contract-specification)
   * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
   * [Report Command Catalog Specification](../../Reports/ModelReports/Specifications.md#report-command-catalog-specification)
+  * [Serve Command Contract Specification](../WebExplorer/Specifications.md#serve-command-contract-specification)
+  * [Explorer Live Store Refresh Input Output](../WebExplorer/Specifications.md#explorer-live-store-refresh-input-output)
+  * [Explorer Automatic Store Refresh Specification](../WebExplorer/Specifications.md#explorer-automatic-store-refresh-specification)
 
 #### Relations
   * definedBy: [Website Command and Workflow Documentation Specification](WebsiteSpecifications.md#website-command-and-workflow-documentation-specification)

@@ -237,7 +237,7 @@ When adding or moving model content:
 ## Refactor Workflow
 
 1. Inspect current physical containment:
-   - `reqvire containment --json`
+   - `reqvire containment`
    - `reqvire search --json`
 2. Inspect logical roots and boundaries:
    - `reqvire submodels --json`

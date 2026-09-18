@@ -1,0 +1,13 @@
+embedded MCP updates open tabs: PASS
+manifest transfers only changed chunks: PASS
+refreshed immutable store renders reports and graphs: PASS
+unchanged conditional revision: PASS
+MCP edit preserves context: PASS
+refreshed source and search: PASS
+mutation during refresh retries the latest manifest: PASS
+missing chunks retain the valid store and recover: PASS
+corrupt chunks retain the valid store and recover: PASS
+visibility pauses and resumes refresh: PASS
+static export has no live refresh: PASS
+MCP remains available without reinitialization: PASS
+completed

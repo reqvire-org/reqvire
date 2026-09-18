@@ -1,0 +1,15 @@
+ASCII element: PASS
+elements Unicode raw: PASS
+files Unicode raw: PASS
+content Unicode raw: PASS
+resources Unicode raw: PASS
+elements Unicode encoded: PASS
+files Unicode encoded: PASS
+content Unicode encoded: PASS
+resources Unicode encoded: PASS
+elements literal percent: PASS
+content literal percent: PASS
+resources literal percent: PASS
+literal percent generated navigation: PASS
+malformed percent fallback: PASS
+completed

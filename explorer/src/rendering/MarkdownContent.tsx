@@ -15,6 +15,7 @@ import ReactMarkdown, {
   type Components,
 } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { decodeRouteParameter, routeForContent } from "../router/routes";
 import {
   DiagramBlockFrame,
   InlineConceptReference,
@@ -176,11 +177,11 @@ export function sourceUrlTransform(
     return `${sourceRoute}${suffix}`;
   }
 
-  const resolved = resolveRelativePath(dirname(context.sourceFilePath), path);
+  const resolved = resolveRelativePath(dirname(context.sourceFilePath), decodeRouteParameter(path));
   if (resolved.toLowerCase().endsWith(".md")) {
     return `${spaRouteForFile(resolved)}${suffix}`;
   }
-  return `${resolved}${suffix}`;
+  return `${resolveRelativePath(dirname(context.sourceFilePath), path)}${suffix}`;
 }
 
 function markdownPreview(markdown: string): string {
@@ -199,7 +200,7 @@ function stripReqvireDocumentHeading(markdown: string): string {
 }
 
 function spaRouteForFile(path: string): string {
-  return `#/content/${path}`;
+  return routeForContent(path);
 }
 
 function isExternalOrAbsoluteUrl(url: string): boolean {

@@ -84,7 +84,7 @@ export function SearchView({
     const element = d.kind === "element" ? elementById(d.id) : undefined;
     const resource = displayResourceForFile(d, resourceByTarget, filesWithElements);
     const displayKind = displaySearchKind(d, resourceByTarget, filesWithElements);
-    const route = element?.source_anchor ?? (resource ? `#/resources/${resource.id}` : d.route);
+    const route = element?.source_anchor ?? encodeURI(resource ? `#/resources/${resource.id}` : d.route);
     const displayRoute = displaySearchRoute(route);
     const displayPreview = element ? null : uniqueSearchPreview(d.text, [d.title, displayRoute, route]);
 

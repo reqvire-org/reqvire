@@ -246,14 +246,14 @@ export function cleanGovernanceValue(raw: string): Pick<DetailMetaBadge, "value"
 }
 
 export function sourceAnchorRoute(sourceAnchor: string, filePath: string): string {
-  if (sourceAnchor.startsWith("#/content/")) return sourceAnchor;
-  if (sourceAnchor.startsWith("#")) return `${routeForContent(filePath)}${sourceAnchor}`;
+  if (sourceAnchor.startsWith("#/content/")) return routeForContent(sourceAnchor.slice("#/content/".length));
+  if (sourceAnchor.startsWith("#")) return routeForContent(`${filePath}${sourceAnchor}`);
 
   const hashIndex = sourceAnchor.indexOf("#");
   const path = hashIndex === -1 ? sourceAnchor : sourceAnchor.slice(0, hashIndex);
   const fragment = hashIndex === -1 ? "" : sourceAnchor.slice(hashIndex);
   const markdownPath = path.endsWith(".html") ? `${path.slice(0, -".html".length)}.md` : path;
-  return `${routeForContent(markdownPath || filePath)}${fragment}`;
+  return routeForContent(`${markdownPath || filePath}${fragment}`);
 }
 
 function isString(value: string | undefined): value is string {

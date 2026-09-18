@@ -1,5 +1,6 @@
 pub mod cli;
 pub mod config;
+mod live_store;
 mod mcp;
 mod serve;
 
