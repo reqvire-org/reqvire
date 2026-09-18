@@ -8,6 +8,9 @@ cargo build --bin reqvire
 ./tests/run_all.sh test-serve-command
 ```
 
+Install ripgrep (`rg`) before running the suites; ontology hygiene checks use it.
+The pull-request workflow installs it explicitly.
+
 The runner copies each suite into a temporary Git workspace. Keep fixtures and
 expected output in the suite directory, and link its `test.sh` from the owning
 system-model verification using `satisfiedBy`.

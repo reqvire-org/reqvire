@@ -7,7 +7,8 @@ on:
 
 jobs:
   test:
-    name: Run Rust and End-to-End Tests
+    # Keep this name: the main branch ruleset requires this exact check.
+    name: Run Rust Tests
     runs-on: ubuntu-24.04
 
     steps:
@@ -24,6 +25,11 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "24"
+
+      - name: Install shell test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ripgrep
 
       - name: Install Explorer dependencies
         run: cd explorer && npm ci
