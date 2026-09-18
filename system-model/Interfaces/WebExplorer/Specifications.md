@@ -239,6 +239,25 @@ Primary Explorer routes must not spend first-viewport space on static view title
   * type: specification
 ---
 
+### Explorer Route Identifier Resolution Specification
+
+Explorer route parameters carry authored Project Store identifiers through browser URL serialization.
+
+#### Details
+- Decode the parameters of `elements/`, `files/`, `content/`, and `resources/` routes exactly once before Project Store lookup.
+- Preserve non-ASCII characters, spaces, nested paths, and element fragments in the resolved identifier.
+- Encode authored parameters when constructing routes so literal percent sequences such as `%20` remain literal after decoding.
+- If a route parameter contains malformed percent escapes, preserve the raw parameter and render the normal missing-record state without throwing a routing exception.
+- Preserve the underlying file, content, or resource route when opening and closing an element-detail overlay.
+- Apply these rules to browser navigation and direct deep links in the compiled, served Explorer.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Explorer Route Identifier Resolution](Capabilities.md#explorer-route-identifier-resolution)
+---
+
 ### Explorer Serve Pipeline Specification
 
 Technical specification for the Explorer serve runtime pipeline.

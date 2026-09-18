@@ -1019,9 +1019,9 @@ function TreeFileNode({
 }
 
 function sourceRouteForElement(element: ProjectStoreElement) {
-  if (element.source_anchor.startsWith("#/content/")) return element.source_anchor;
+  if (element.source_anchor.startsWith("#/content/")) return routeForContent(element.source_anchor.slice("#/content/".length));
   if (element.source_anchor.startsWith("#")) {
-    return `${routeForContent(element.file_path)}${element.source_anchor}`;
+    return routeForContent(`${element.file_path}${element.source_anchor}`);
   }
   return element.source_anchor;
 }

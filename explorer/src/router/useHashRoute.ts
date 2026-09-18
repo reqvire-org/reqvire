@@ -4,6 +4,8 @@ import {
   parseHash,
   routeForContent,
   routeForElement,
+  routeForFile,
+  routeForResource,
   routeForView,
   type ParsedRoute,
   type ViewId,
@@ -74,8 +76,8 @@ export function useHashRoute() {
 
 function routeForBase(route: Pick<ParsedRoute, "view" | "param">) {
   if (route.view === "content" && route.param) return routeForContent(route.param);
-  if (route.view === "files" && route.param) return `#/files/${route.param}`;
-  if (route.view === "resources" && route.param) return `#/resources/${route.param}`;
+  if (route.view === "files" && route.param) return routeForFile(route.param);
+  if (route.view === "resources" && route.param) return routeForResource(route.param);
   if (route.view === "search" && route.param) return `#/search/${encodeURIComponent(route.param)}`;
   return routeForView(route.view);
 }

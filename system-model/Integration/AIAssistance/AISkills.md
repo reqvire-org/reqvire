@@ -144,6 +144,7 @@ Artifact contract details shall follow the associated contract specification.
   * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-concept-authoring/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-ontology-authoring/SKILL.md)
   * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-syseng/SKILL.md)
+  * verifiedBy: [AI Skill CLI Command Reference Verification](../../Verifications/Integration/AIAssistance/AISkillVerifications.md#ai-skill-cli-command-reference-verification)
 ---
 
 ### AI Skill Installer Distribution Specification
@@ -204,6 +205,7 @@ Artifact contract rules:
 - Codex concept-authoring skill artifacts live under `codex-skills/reqvire-concept-authoring`.
 - Claude concept-authoring skill artifacts live under `claude-plugins/skills/concept-authoring`.
 - Equivalent guidance should stay synchronized between Codex and Claude skill artifacts.
+- CLI command references shall match supported report output modes. JSON-only `model`, `containment`, `resources`, and `traces` commands emit JSON to stdout without `--json` and accept `--output <file>` directly. Shared flag guidance shall distinguish these commands from commands whose file output requires `--json`.
 - Assistant artifact changes should preserve MBSE workflow guidance and verification-aligned change sequencing.
 - Ontology-authoring guidance should distinguish generic labels/descriptions from ontology slots: `rdfs:label` and `rdfs:comment` are appropriate for optional presentation metadata, while true domain concepts, canonical authored tokens, parser fields, interface enum values, report kinds, controlled-vocabulary payloads, and queryable domain meanings remain declared ontology properties even when their local names end with `Name` or `Meaning`.
 - Ontology-authoring guidance should use canonical Reqvire ontology identity: the top parent ontology element in an ontology subgraph defines `ontology_base` and `ontology_prefix` metadata, authored Turtle uses the corresponding hash namespace for terms such as classes/properties/individuals, and export emits one generated `owl:Ontology` document declaration per resolved `ontology_base`. Guidance should state that child ontology elements with the same inherited base contribute vocabulary to that same ontology document, that cross-base ontology hierarchy can become `owl:imports`, that authored Turtle using the inherited prefix must explicitly declare it to `<ontology_base>#`, and that missing or conflicting declarations are invalid.

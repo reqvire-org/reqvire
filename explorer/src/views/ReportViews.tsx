@@ -15,6 +15,7 @@ import type {
   TraceRequirementNode,
 } from "../store/types";
 import { ViewFrame } from "./ViewFrame";
+import { routeForContent } from "../router/routes";
 import { MermaidBlock } from "../rendering/MarkdownContent";
 import {
   CoverageBarFrame,
@@ -555,8 +556,7 @@ function escapeMermaidLabel(label: string): string {
 }
 
 function spaRouteForElement(id: string): string {
-  const [file, anchor] = id.split("#");
-  return anchor ? `#/content/${file}#${anchor}` : `#/content/${file}`;
+  return routeForContent(id);
 }
 
 export function __testBuildTraceRollupMermaid(

@@ -74,20 +74,32 @@ export function routeForView(view: ViewId): string {
 }
 
 export function routeForElement(identifier: string): string {
-  return `#/elements/${identifier}`;
+  return `#/elements/${encodeURI(identifier)}`;
+}
+
+export function routeForFile(path: string): string {
+  return `#/files/${encodeURI(path)}`;
 }
 
 export function routeForContent(path: string): string {
-  return `#/content/${path}`;
+  return `#/content/${encodeURI(path)}`;
 }
 
 export function routeForResource(identifier: string): string {
-  return `#/resources/${identifier}`;
+  return `#/resources/${encodeURI(identifier)}`;
 }
 
 export function routeForSearch(query: string): string {
   const trimmed = query.trim();
   return trimmed ? `#/search/${encodeURIComponent(trimmed)}` : "#/search";
+}
+
+export function decodeRouteParameter(parameter: string): string {
+  try {
+    return decodeURIComponent(parameter);
+  } catch {
+    return parameter;
+  }
 }
 
 /**
@@ -108,7 +120,7 @@ export function parseHash(rawHash: string, previousRoute: PreviousRoute): Parsed
   }
 
   if (hash.startsWith("elements/")) {
-    const identifier = hash.slice("elements/".length);
+    const identifier = decodeRouteParameter(hash.slice("elements/".length));
     return {
       view: previous.view,
       param: previous.param,
@@ -117,15 +129,15 @@ export function parseHash(rawHash: string, previousRoute: PreviousRoute): Parsed
   }
 
   if (hash.startsWith("files/")) {
-    return { view: "files", param: hash.slice("files/".length), elementId: null };
+    return { view: "files", param: decodeRouteParameter(hash.slice("files/".length)), elementId: null };
   }
 
   if (hash.startsWith("content/")) {
-    return { view: "content", param: hash.slice("content/".length), elementId: null };
+    return { view: "content", param: decodeRouteParameter(hash.slice("content/".length)), elementId: null };
   }
 
   if (hash.startsWith("resources/")) {
-    return { view: "resources", param: hash.slice("resources/".length), elementId: null };
+    return { view: "resources", param: decodeRouteParameter(hash.slice("resources/".length)), elementId: null };
   }
 
   if (hash === "search" || hash.startsWith("search/") || hash.startsWith("search?")) {
@@ -134,12 +146,7 @@ export function parseHash(rawHash: string, previousRoute: PreviousRoute): Parsed
       : hash.startsWith("search?")
         ? hash.slice("search?".length)
         : "";
-    let q = rawQuery;
-    try {
-      q = decodeURIComponent(rawQuery);
-    } catch {
-      q = rawQuery;
-    }
+    const q = decodeRouteParameter(rawQuery);
     return { view: "search", param: q || null, elementId: null };
   }
 

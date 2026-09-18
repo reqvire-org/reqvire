@@ -25,8 +25,8 @@ reqvire coverage
 For a deeper understanding of how requirements connect, use the model-centric view:
 
 ```bash
-# Show all capability-rooted model structures with nested relations
-reqvire model [--json]
+# Show model structures with nested relations as JSON
+reqvire model [--output <file>]
 
 # Start from specific element to see its subtree
 reqvire model --from "Element Name"
@@ -138,17 +138,14 @@ To understand how verifications trace to requirements, use the traces command:
 
 ```bash
 # Show verification traces (upward from verifications to owning capability roots)
-reqvire traces [--json] [--filter-*]
+reqvire traces [--output <file>] [--filter-*]
 
 # Filter by specific element patterns
 reqvire traces --filter-name=".*Auth.*"
 reqvire traces --filter-type="test-verification"
 
-# Generate with GitHub blob links for stable references
-reqvire traces --links-with-blobs
-
-# Generate relative links from specific folder
-reqvire traces --from-folder="docs/specs"
+# Save the JSON report to a file
+reqvire traces --output traces.json
 
 # See verification coverage report
 reqvire coverage [--json]
@@ -203,8 +200,8 @@ reqvire containment
 # Compact view without element details
 reqvire containment --short
 
-# JSON format for programmatic analysis
-reqvire containment --json
+# Save the JSON report for programmatic analysis
+reqvire containment --output containment.json
 ```
 
 ## Common Analysis Patterns

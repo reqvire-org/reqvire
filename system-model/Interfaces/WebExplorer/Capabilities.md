@@ -380,6 +380,20 @@ The SPA Explorer shell shall:
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
 ---
 
+### Explorer Route Identifier Resolution
+
+When an Explorer route identifies a model element, file, source page, or resource, the system shall resolve the route to the corresponding Project Store record while preserving the authored identifier.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Explorer Route Identifier Resolution Specification](Specifications.md#explorer-route-identifier-resolution-specification)
+  * derivedFrom: [SPA Explorer Shell and Project Store](#spa-explorer-shell-and-project-store)
+  * satisfiedBy: [routes.ts](../../../explorer/src/router/routes.ts)
+  * verifiedBy: [Explorer Route Identifier Resolution Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#explorer-route-identifier-resolution-verification)
+---
+
 ### Thesaurus View Generation
 
 The system shall expose a Thesaurus Explorer view during serve workflows that presents standalone native concept schemes and concepts as curated SKOS terminology instead of as ontology children or filesystem folders.

@@ -114,7 +114,7 @@ For each requirement, identify what needs to be tested:
 
 ```bash
 # Get verifications for a requirement
-reqvire traces --filter-id="<requirement-id>" --json
+reqvire traces --filter-id="<requirement-id>"
 
 # Get test file paths from verification
 reqvire search --filter-id="<verification-id>" --json
@@ -249,7 +249,7 @@ When analyzing capability-scoped changes for task generation:
 | High-priority work | `reqvire search --filter-priority="high,critical" --json` |
 | High-risk work | `reqvire search --filter-risk="high,critical" --json` |
 | Elements by lifecycle status | `reqvire search --filter-status="draft,review,approved" --json` |
-| What verifies a capability or requirement | `reqvire traces --filter-id="<id>" --json` |
+| What verifies a capability or requirement | `reqvire traces --filter-id="<id>"` |
 | Which tests to run | Extract `satisfiedBy` from verification via `reqvire search` |
 | Implementation status | Check `satisfiedBy` relations on specifying requirements |
 | Trace hierarchy (up) | `reqvire collect "<name>"` shows upstream capability and requirement context |
@@ -305,7 +305,7 @@ reqvire collect "Authentication Capability" > /tmp/trace_context_auth_capability
 reqvire search --filter-id="system-model/Auth.md#authentication-capability" --json
 
 # 5. Get verification and test paths
-reqvire traces --filter-id="system-model/Auth.md#authentication-capability" --json
+reqvire traces --filter-id="system-model/Auth.md#authentication-capability"
 reqvire search --filter-id="system-model/Verifications/AuthTests.md#auth-test" --json
 
 # 6. Generate git blob URL

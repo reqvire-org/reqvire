@@ -13,7 +13,7 @@ This reference is for **read-only inspection**. For executing a containment refa
 
 2. **Get containment structure in JSON format:**
    ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" containment --json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" containment
    ```
 
    This provides the hierarchical structure showing:

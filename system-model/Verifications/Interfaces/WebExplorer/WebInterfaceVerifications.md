@@ -123,6 +123,32 @@ This component test verifies that regular element-detail modals render authored 
   * verify: [SPA Explorer Shell and Project Store](../../../Interfaces/WebExplorer/Capabilities.md#spa-explorer-shell-and-project-store)
 ---
 
+### Explorer Route Identifier Resolution Verification
+
+Verify authored identifiers through the compiled Explorer served by the CLI in a real browser.
+
+#### Details
+
+##### Acceptance Criteria
+- Raw and percent-encoded Unicode element, file, source-content, and resource routes resolve to the fixture records.
+- Encoded literal percent sequences are decoded once and retain the authored filename.
+- Clicking a modeled element, closing its modal, and opening its source page preserve the literal percent filename and underlying file context.
+- Malformed percent escapes render a missing-record state within the Explorer without crashing.
+
+##### Test Criteria
+- Run the standard serve E2E suite against a temporary Git workspace containing Unicode and literal percent filenames and evidence resources.
+- Load the served bundle in headless Chrome or Chromium and exercise the four route families and generated navigation controls.
+- Compare normalized browser results with the checked-in expected fixture; any failed route or missing completion result fails the suite.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
+  * verify: [Explorer Route Identifier Resolution](../../../Interfaces/WebExplorer/Capabilities.md#explorer-route-identifier-resolution)
+---
+
 ### Explorer Serve Verification
 
 This test verifies that the system serves the native SPA Explorer shell with Model route containment modes and Project Store data.

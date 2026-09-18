@@ -2,8 +2,6 @@
 
 # Test: Serve Command Functionality
 # --------------------------------------
-# Satisfies: specifications/Verifications/Misc.md#serve-command-verification
-#
 # Acceptance Criteria:
 # - System starts HTTP server on specified host and port
 # - System displays clickable terminal link to server URL
@@ -31,10 +29,11 @@ set -e
 # Use non-default host and random port to test custom options
 TEST_HOST="127.0.0.1"
 TEST_PORT=$((8000 + RANDOM % 1000))
+SERVER_BIN="${REAL_REQVIRE_BIN:-$REQVIRE_BIN}"
 
 # Start serve command in background with non-default host and port
 cd "$TEST_DIR"
-"$REQVIRE_BIN" serve --host "$TEST_HOST" --port "$TEST_PORT" > "${TEST_DIR}/serve_output.log" 2>&1 &
+"$SERVER_BIN" serve --host "$TEST_HOST" --port "$TEST_PORT" > "${TEST_DIR}/serve_output.log" 2>&1 &
 SERVE_PID=$!
 
 stop_server() {
@@ -115,6 +114,36 @@ fi
 
 if ! echo "$STORE_CONTENT" | grep -q '"path": "specifications/Requirements.md"'; then
     echo "❌ FAILED: Project Store is missing modeled source file records"
+    exit 1
+fi
+
+# Exercise the compiled bundle and its real browser URL serialization, using
+# the same temporary Git workspace and golden-file comparisons as other E2Es.
+BROWSER_BIN="${REQVIRE_TEST_BROWSER:-}"
+if [ -z "$BROWSER_BIN" ]; then
+    for candidate in chromium chromium-browser google-chrome; do
+        if command -v "$candidate" >/dev/null 2>&1; then
+            BROWSER_BIN=$(command -v "$candidate")
+            break
+        fi
+    done
+fi
+if [ -z "$BROWSER_BIN" ]; then
+    echo "FAILED: Browser route E2E requires Chrome/Chromium; set REQVIRE_TEST_BROWSER to its executable"
+    exit 1
+fi
+
+if ! timeout -k 5s 45s node "$TEST_DIR/scripts/route-check.mjs" "$BROWSER_BIN" \
+    "http://$TEST_HOST:$TEST_PORT" "$TEST_DIR/browser-profile" \
+    > "$TEST_DIR/browser-routes.txt" 2> "$TEST_DIR/browser-routes.log"; then
+    echo "FAILED: Served Explorer browser route checks failed"
+    cat "$TEST_DIR/browser-routes.txt" "$TEST_DIR/browser-routes.log"
+    exit 1
+fi
+
+if ! diff -u "$TEST_DIR/expected/browser-routes.txt" "$TEST_DIR/browser-routes.txt"; then
+    echo "FAILED: Served Explorer browser route results do not match expected"
+    cat "$TEST_DIR/browser-routes.log"
     exit 1
 fi
 
@@ -214,7 +243,7 @@ MCP_PORT=$((9000 + RANDOM % 1000))
 MCP_PROTOCOL_VERSION="2025-11-25"
 MCP_CONTENT="$(cat "${TEST_DIR}/fixtures/serve-embedded-mcp-added-requirement.md.txt")"
 
-"$REQVIRE_BIN" serve --host "$TEST_HOST" --port "$MCP_PORT" --enable-mcp --enable-mutations > "${TEST_DIR}/serve_mcp_output.log" 2>&1 &
+"$SERVER_BIN" serve --host "$TEST_HOST" --port "$MCP_PORT" --enable-mcp --enable-mutations > "${TEST_DIR}/serve_mcp_output.log" 2>&1 &
 SERVE_PID=$!
 
 echo "Waiting for embedded MCP server to start on $TEST_HOST:$MCP_PORT..."

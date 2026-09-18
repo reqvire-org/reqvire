@@ -1,4 +1,4 @@
-name: Rust Tests on PR
+name: Rust and End-to-End Tests on PR
 
 on:
   pull_request:
@@ -7,8 +7,8 @@ on:
 
 jobs:
   test:
-    name: Run Rust Tests
-    runs-on: ubuntu-latest  # Runs on an Ubuntu machine
+    name: Run Rust and End-to-End Tests
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Repository
@@ -38,6 +38,29 @@ jobs:
 
       - name: Run Tests
         run: cargo test --verbose
+
+      - name: Build CLI for end-to-end tests
+        run: cargo build --bin reqvire
+
+      - name: Install headless Chromium for end-to-end tests
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/reqvire-browser
+        run: npx --yes playwright@1.60.0 install --with-deps chromium --only-shell
+
+      - name: Run shell end-to-end tests
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/reqvire-browser
+        run: |
+          browser=$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f \( -name chrome-headless-shell -o -name headless_shell \) -print -quit)
+          test -n "$browser"
+          REQVIRE_TEST_BROWSER="$browser" ./tests/run_all.sh
+
+      - name: Upload end-to-end logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: end-to-end-test-logs
+          path: /tmp/reqvire-test-logs
 
   validate:
     name: Validate Requirements

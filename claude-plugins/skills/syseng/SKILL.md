@@ -169,12 +169,11 @@ Ontology elements are first-class mutation targets and need boundary-safe rewrit
 
 ## Model Commands
 
-Use the model command when a shell workflow needs a structural model view. Without `--from` or `--filter-type`, `model` starts from ontology roots, concept roots, and capability roots. Use `--mmd` when a downstream tool expects pure Mermaid text instead of Markdown.
+Use the model command when a shell workflow needs a structural model view. Without `--from` or `--filter-type`, `model` starts from ontology roots, concept roots, and capability roots. The command emits JSON to stdout by default; use `--output <file>` to save the report.
 
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" model
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" model --mmd
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" model --json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" model --output model.json
 ```
 
 ## Relation Types
@@ -409,7 +408,7 @@ search --filter-status="review" --short
 search --filter-priority="high,critical" --short
 search --filter-risk="high,critical" --json
 search --filter-owner="Platform|Safety" --json
-model [--from "Element"] [--reverse] [--filter-type="requirement"] [--mmd]
+model [--from "Element"] [--reverse] [--filter-type="requirement"] [--output <file>]
 collect "Element" [--direction DOWNSTREAM] [--json]
 submodels [--from "Root"]
 
@@ -440,9 +439,9 @@ migrate [--fix] [--json]
 
 # Analysis
 change-impact --git-commit=<hash> [--json]
-traces [--json] [--filter-name=".*Pattern.*"]
-resources
-containment [--short] [--json]
+traces [--output <file>] [--filter-name=".*Pattern.*"]
+resources [--output <file>]
+containment [--short] [--output <file>]
 
 # Assets
 mv-asset "old-path" "new-path"
@@ -453,7 +452,7 @@ serve [--port 8080]
 
 `change-impact --git-commit=<hash>` compares the current workspace snapshot to a base snapshot materialized from the current eligible Git worktree. It is not a multi-repository commit selector; paths and identifiers remain workspace-root-relative.
 
-**Common flags:** `--json`, `--short`, `--dry-run`, `--output <file>` (requires `--json`)
+**Common flags:** Availability depends on the command. Commands with text and JSON output require `--json` with `--output <file>`. JSON-only `model`, `containment`, `resources`, and `traces` emit JSON to stdout by default and accept `--output <file>` directly. Use `--short` and `--dry-run` only where supported.
 
 Use `--dry-run` for destructive operations. Use `<<'EOF'` (single-quoted) to prevent shell expansion in heredocs.
 
