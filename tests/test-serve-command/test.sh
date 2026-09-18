@@ -13,6 +13,9 @@
 # - System sets correct Content-Type headers for different file types
 # - System runs in quiet mode without verbose runtime-generation output
 # - System displays instructions for Ctrl-C
+# - Open browser views adopt embedded MCP writes and external model edits
+# - Runtime refresh preserves valid data after invalid edits and recovers
+# - Static exports remain self-contained and MCP remains available
 #
 # Test Criteria:
 # - Command exits with success (0) return code
@@ -23,6 +26,7 @@
 # - Missing embedded asset paths return 404 status
 # - Non-asset browser routes return index.html for SPA fallback
 # - Runtime-generation verbose output is suppressed (quiet mode active)
+# - Named headless route and refresh checks match their expected output files
 
 set -e
 
@@ -37,11 +41,14 @@ cd "$TEST_DIR"
 SERVE_PID=$!
 
 stop_server() {
-    if [ -n "${SERVE_PID:-}" ]; then
-        kill "$SERVE_PID" 2>/dev/null || true
-        wait "$SERVE_PID" 2>/dev/null || true
-        SERVE_PID=""
-    fi
+    for server_pid in "${SERVE_PID:-}" "${PLAIN_PID:-}"; do
+        if [ -n "$server_pid" ]; then
+            kill "$server_pid" 2>/dev/null || true
+            wait "$server_pid" 2>/dev/null || true
+        fi
+    done
+    SERVE_PID=""
+    PLAIN_PID=""
 }
 
 # Function to cleanup server on exit
@@ -164,22 +171,6 @@ if echo "$STORE_CONTENT" | grep -q '"path": "notes/unrelated.md"'; then
     exit 1
 fi
 
-printf '\n' >> "$TEST_DIR/specifications/Requirements.md"
-cat "$TEST_DIR/fixtures/direct-filesystem-store-regeneration-sentinel.md.txt" >> "$TEST_DIR/specifications/Requirements.md"
-
-REFRESH_RESPONSE=$(curl -s -w "\n%{http_code}" "http://$TEST_HOST:$TEST_PORT/assets/project-store.js")
-REFRESH_CODE=$(echo "$REFRESH_RESPONSE" | tail -n1)
-REFRESH_CONTENT=$(echo "$REFRESH_RESPONSE" | sed '$d')
-if [ "$REFRESH_CODE" != "200" ]; then
-    echo "❌ FAILED: Project Store refresh request returned HTTP $REFRESH_CODE"
-    exit 1
-fi
-
-if echo "$REFRESH_CONTENT" | grep -q "Direct Filesystem Store Regeneration Sentinel"; then
-    echo "❌ FAILED: Project Store GET regenerated from disk instead of serving the cached runtime store"
-    exit 1
-fi
-
 # Test 3: Check Content-Type for HTML files
 CONTENT_TYPE=$(curl -s -I "http://$TEST_HOST:$TEST_PORT/" | grep -i "content-type" | cut -d: -f2 | tr -d ' \r')
 if [[ ! "$CONTENT_TYPE" =~ ^text/html ]]; then
@@ -236,7 +227,7 @@ if grep -q "Updated diagrams" "${TEST_DIR}/serve_output.log"; then
     exit 1
 fi
 
-stop_server
+PLAIN_PID="$SERVE_PID"
 
 # Test 8: Embedded MCP endpoint can mutate the workspace and the served datastore refreshes.
 MCP_PORT=$((9000 + RANDOM % 1000))
@@ -329,6 +320,24 @@ if ! grep -q "Serve Embedded MCP Added Requirement" "${TEST_DIR}/serve_mcp_proje
     echo "❌ FAILED: Project Store did not refresh after embedded MCP mutation"
     exit 1
 fi
+
+# Test 9: Live browser freshness, external edits, revision protocol, and recovery.
+if ! timeout -k 5s 180s node "$TEST_DIR/scripts/refresh-check.mjs" "$BROWSER_BIN" \
+    "http://$TEST_HOST:$TEST_PORT" "http://$TEST_HOST:$MCP_PORT" "$TEST_DIR" "$SERVER_BIN" \
+    > "$TEST_DIR/browser-refresh.txt" 2> "$TEST_DIR/browser-refresh.log"; then
+    echo "FAILED: Served Explorer live refresh checks failed"
+    cat "$TEST_DIR/browser-refresh.txt" "$TEST_DIR/browser-refresh.log"
+    exit 1
+fi
+if ! diff -u "$TEST_DIR/expected/browser-refresh.txt" "$TEST_DIR/browser-refresh.txt"; then
+    echo "FAILED: Served Explorer refresh results do not match expected"
+    cat "$TEST_DIR/browser-refresh.log"
+    exit 1
+fi
+kill -0 "$SERVE_PID" "$PLAIN_PID" || {
+    echo "FAILED: A serve process exited during live refresh"
+    exit 1
+}
 
 # Clean up
 cleanup

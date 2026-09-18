@@ -3,12 +3,13 @@ use globset::GlobSet;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
 use std::sync::Arc;
+use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
 
 use axum::body::Body;
-use axum::extract::State;
-use axum::http::{header, Method, Response, StatusCode, Uri};
-use axum::routing::any;
+use axum::extract::{Query, State};
+use axum::http::{header, HeaderMap, Method, Response, StatusCode, Uri};
+use axum::routing::{any, get};
 use axum::Router;
 use percent_encoding::percent_decode_str;
 use reqvire::error::ReqvireError;
@@ -17,11 +18,30 @@ use reqvire::explorer_runtime::{
     ExplorerRuntimeAssets,
 };
 use reqvire::{model_cache, ModelBuildOptions};
+use serde::Deserialize;
+
+const REFRESH_CHECK_INTERVAL: Duration = Duration::from_secs(1);
+
+struct RuntimeSnapshot {
+    assets: ExplorerRuntimeAssets,
+    revision: String,
+    fingerprint: Option<model_cache::ModelFingerprint>,
+    last_checked: Option<Instant>,
+    refresh_error: Option<String>,
+}
+
+fn runtime_revision(assets: &ExplorerRuntimeAssets) -> String {
+    reqvire::utils::hash_content(&format!(
+        "{}\0{}",
+        assets.project_store_json, assets.ontologies_ttl
+    ))
+}
 
 #[derive(Clone)]
 pub(crate) struct ServeState {
     excluded_filename_patterns: Arc<GlobSet>,
-    runtime_assets: Arc<Mutex<ExplorerRuntimeAssets>>,
+    runtime_assets: Arc<Mutex<RuntimeSnapshot>>,
+    refresh_lock: Arc<Mutex<()>>,
     write_lock: Arc<Mutex<()>>,
 }
 
@@ -41,10 +61,18 @@ pub async fn serve_explorer(
 
     let state = ServeState {
         excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
-        runtime_assets: Arc::new(Mutex::new(assets)),
+        runtime_assets: Arc::new(Mutex::new(RuntimeSnapshot {
+            revision: runtime_revision(&assets),
+            assets,
+            fingerprint: None,
+            last_checked: None,
+            refresh_error: None,
+        })),
+        refresh_lock: Arc::new(Mutex::new(())),
         write_lock: Arc::new(Mutex::new(())),
     };
     let mut app = Router::new()
+        .route("/api/project-store", get(serve_live_store))
         .route("/", any(serve_static))
         .fallback(serve_static);
 
@@ -52,7 +80,7 @@ pub async fn serve_explorer(
         let refresh_state = state.clone();
         let post_write_hook: mcp::PostWriteHook = Arc::new(move || {
             let refresh_state = refresh_state.clone();
-            Box::pin(async move { refresh_runtime_assets(&refresh_state).await })
+            Box::pin(async move { refresh_runtime_assets(&refresh_state, true).await })
                 as Pin<Box<dyn std::future::Future<Output = Result<(), ReqvireError>> + Send>>
         });
         app = mcp::mount_service_with_post_write_hook(
@@ -120,6 +148,10 @@ async fn serve_static(State(state): State<ServeState>, method: Method, uri: Uri)
         return response_with_status(StatusCode::NOT_FOUND);
     }
 
+    if request_path == "api" || request_path.starts_with("api/") {
+        return response_with_status(StatusCode::NOT_FOUND);
+    }
+
     static_response(method, "text/html; charset=utf-8", index_html())
 }
 
@@ -159,6 +191,14 @@ async fn runtime_asset_response(
     method: Method,
     kind: RuntimeAssetKind,
 ) -> Response<Body> {
+    {
+        // The MCP post-write hook already holds this gate. Ordinary runtime
+        // requests acquire it here to avoid reading partially written sources.
+        let _write_guard = state.write_lock.lock().await;
+        // A failed external edit keeps the last valid static snapshot available;
+        // the live API reports the failure to mounted Explorer clients.
+        let _ = refresh_runtime_assets(&state, false).await;
+    }
     if method == Method::HEAD {
         return no_store_response(match kind {
             RuntimeAssetKind::ProjectStore => "application/javascript",
@@ -166,32 +206,139 @@ async fn runtime_asset_response(
         });
     }
 
-    let assets = state.runtime_assets.lock().await;
+    let snapshot = state.runtime_assets.lock().await;
 
     match kind {
         RuntimeAssetKind::ProjectStore => runtime_bytes_response(
             "application/javascript",
-            assets.project_store_js.clone().into_bytes(),
+            format!(
+                "{}window.reqvireLiveRefresh = {{\"revision\":\"{}\"}};\n",
+                snapshot.assets.project_store_js, snapshot.revision
+            )
+            .into_bytes(),
         ),
         RuntimeAssetKind::Ontologies => runtime_bytes_response(
             "text/turtle; charset=utf-8",
-            assets.ontologies_ttl.clone().into_bytes(),
+            snapshot.assets.ontologies_ttl.clone().into_bytes(),
         ),
     }
 }
 
-async fn refresh_runtime_assets(state: &ServeState) -> Result<(), ReqvireError> {
-    let model = model_cache::load_cached_model(
-        state.excluded_filename_patterns.as_ref(),
-        ModelBuildOptions {
-            lenient: false,
-            with_size_estimates: false,
-        },
-    )?;
-    let assets = build_runtime_assets(&model.graph_registry)?;
-    let mut runtime_assets = state.runtime_assets.lock().await;
-    *runtime_assets = assets;
-    Ok(())
+async fn refresh_runtime_assets(state: &ServeState, force: bool) -> Result<(), ReqvireError> {
+    let _refresh_guard = state.refresh_lock.lock().await;
+    let fingerprint = {
+        let snapshot = state.runtime_assets.lock().await;
+        if !force
+            && snapshot
+                .last_checked
+                .is_some_and(|checked| checked.elapsed() < REFRESH_CHECK_INTERVAL)
+        {
+            return match &snapshot.refresh_error {
+                Some(error) => Err(ReqvireError::ProcessError(error.clone())),
+                None => Ok(()),
+            };
+        }
+        snapshot.fingerprint.clone()
+    };
+    let exclusions = Arc::clone(&state.excluded_filename_patterns);
+    let result = tokio::task::spawn_blocking(move || {
+        let changed = model_cache::load_cached_model_if_changed(
+            exclusions.as_ref(),
+            ModelBuildOptions {
+                lenient: false,
+                with_size_estimates: false,
+            },
+            fingerprint.as_ref(),
+        )?;
+        changed
+            .map(|(fingerprint, model)| {
+                build_runtime_assets(&model.graph_registry).map(|assets| (fingerprint, assets))
+            })
+            .transpose()
+    })
+    .await
+    .map_err(|error| ReqvireError::ProcessError(format!("Runtime refresh task failed: {error}")))
+    .and_then(|result| result);
+
+    let mut snapshot = state.runtime_assets.lock().await;
+    snapshot.last_checked = Some(Instant::now());
+    match result {
+        Ok(changed) => {
+            if let Some((fingerprint, assets)) = changed {
+                snapshot.revision = runtime_revision(&assets);
+                snapshot.assets = assets;
+                snapshot.fingerprint = Some(fingerprint);
+            }
+            snapshot.refresh_error = None;
+            Ok(())
+        }
+        Err(error) => {
+            snapshot.refresh_error = Some(error.to_string());
+            Err(error)
+        }
+    }
+}
+
+#[derive(Default, Deserialize)]
+struct LiveStoreQuery {
+    #[serde(default)]
+    refresh: bool,
+}
+
+async fn serve_live_store(
+    State(state): State<ServeState>,
+    Query(query): Query<LiveStoreQuery>,
+    method: Method,
+    headers: HeaderMap,
+) -> Response<Body> {
+    {
+        let _write_guard = state.write_lock.lock().await;
+        let _ = refresh_runtime_assets(&state, query.refresh).await;
+    }
+    let snapshot = state.runtime_assets.lock().await;
+    let etag = format!("\"{}\"", snapshot.revision);
+    let (status, body) = if let Some(error) = &snapshot.refresh_error {
+        (
+            StatusCode::SERVICE_UNAVAILABLE,
+            serde_json::json!({
+                "revision": snapshot.revision, "error": error,
+            })
+            .to_string(),
+        )
+    } else if headers
+        .get(header::IF_NONE_MATCH)
+        .and_then(|value| value.to_str().ok())
+        .is_some_and(|value| {
+            value.split(',').any(|candidate| {
+                let candidate = candidate
+                    .trim()
+                    .strip_prefix("W/")
+                    .unwrap_or(candidate.trim());
+                candidate == etag || candidate == "*"
+            })
+        })
+    {
+        (StatusCode::NOT_MODIFIED, String::new())
+    } else {
+        (
+            StatusCode::OK,
+            format!(
+                "{{\"revision\":\"{}\",\"store\":{}}}",
+                snapshot.revision, snapshot.assets.project_store_json
+            ),
+        )
+    };
+    Response::builder()
+        .status(status)
+        .header(header::CONTENT_TYPE, "application/json")
+        .header(header::CACHE_CONTROL, "no-store")
+        .header(header::ETAG, etag)
+        .body(if method == Method::HEAD {
+            Body::empty()
+        } else {
+            Body::from(body)
+        })
+        .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR))
 }
 
 fn runtime_bytes_response(content_type: &'static str, content: Vec<u8>) -> Response<Body> {

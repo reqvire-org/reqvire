@@ -1,0 +1,9 @@
+### Live Refresh Requirement
+
+Live source marker alpha.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Parent Requirement](#parent-requirement)

@@ -14,6 +14,7 @@ include!(concat!(env!("OUT_DIR"), "/explorer_bundle_manifest.rs"));
 #[derive(Clone)]
 pub struct ExplorerRuntimeAssets {
     pub project_store_js: String,
+    pub project_store_json: String,
     pub ontologies_ttl: String,
 }
 
@@ -23,10 +24,12 @@ pub fn build_runtime_assets(
     let semantic_index = build_semantic_index(registry);
     let project_store = build_project_store(registry, &semantic_index);
     let project_store_js = project_store_javascript(&project_store)?;
+    let project_store_json = serde_json::to_string(&project_store)?;
     let ontologies_ttl = semantic_index.to_turtle_string()?;
 
     Ok(ExplorerRuntimeAssets {
         project_store_js,
+        project_store_json,
         ontologies_ttl,
     })
 }

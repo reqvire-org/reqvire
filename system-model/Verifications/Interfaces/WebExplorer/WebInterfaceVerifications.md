@@ -20,6 +20,8 @@ This objective groups verification that the served Web Explorer renders model da
   * derive: [Ontology Model Viewer Analysis Verification](#ontology-model-viewer-analysis-verification)
   * derive: [Responsive Design Verification](#responsive-design-verification)
   * derive: [Serve Command Verification](#serve-command-verification)
+  * derive: [Served Explorer Runtime Freshness Verification](#served-explorer-runtime-freshness-verification)
+  * derive: [Explorer Automatic Store Refresh Verification](#explorer-automatic-store-refresh-verification)
   * derive: [SPA Explorer Store Contract Verification](#spa-explorer-store-contract-verification)
   * derive: [Thesaurus Project Store Projection Verification](#thesaurus-project-store-projection-verification)
 ---
@@ -149,6 +151,70 @@ Verify authored identifiers through the compiled Explorer served by the CLI in a
   * verify: [Explorer Route Identifier Resolution](../../../Interfaces/WebExplorer/Capabilities.md#explorer-route-identifier-resolution)
 ---
 
+### Served Explorer Runtime Freshness Verification
+
+Verify that served runtime data adopts embedded and external model changes while preserving the running server and recovering from invalid input.
+
+#### Details
+
+##### Acceptance Criteria
+
+- Both plain serving and MCP-enabled serving expose changed model records after external additions, edits, and deletions.
+- A same-length source edit with its original timestamp restored changes the published revision and displayed data.
+- Unchanged inputs return `304` for the current ETag; forced unchanged refresh retains the revision.
+- Live HEAD responses have no body, unsupported POST requests return `405`, and missing API paths return `404`.
+- Generated seed data and the live JSON store agree after refresh, and generated ontology data remains available.
+- Invalid edits return a refresh diagnostic without replacing the last valid snapshot; valid recovery publishes new data.
+- The same server processes remain alive and one initialized MCP client can issue successful reads after each valid refresh without reinitialization.
+
+##### Test Criteria
+
+- Extend the standard serve shell suite using its temporary Git workspace, fixture files, expected output, and real headless browser driver.
+- Keep plain and MCP-enabled servers running together. Mutate through embedded MCP, then modify sources directly and check both endpoints.
+- Compare conditional live responses and revisions, check the served seed against the JSON store, and verify diagnostic/recovery responses and continued MCP reads.
+- Require exact equality with the expected refresh result file; preserve browser and request diagnostics on failure.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [Served Explorer Runtime Freshness](../../../Interfaces/WebExplorer/Capabilities.md#served-explorer-runtime-freshness)
+  * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
+---
+
+### Explorer Automatic Store Refresh Verification
+
+Verify automatic and manual refresh through the compiled Explorer in a real browser rather than only inspecting server responses.
+
+#### Details
+
+##### Acceptance Criteria
+
+- An already-open file view adopts embedded MCP additions and external additions, edits, and deletions without a page reload.
+- Refresh retains the current hash route, open element modal, shell layout state, and authored model-tree filter when their targets still exist.
+- Refresh updates source content and search results for changed records.
+- The accessible Refresh action sends a forced workspace check and updates current data without navigation.
+- Invalid external edits show a visible refresh diagnostic while the last valid records remain displayed; valid recovery clears it.
+- Hidden documents suspend automatic refresh and check again when visible.
+- Static exports show no live Refresh action and issue no live API requests.
+
+##### Test Criteria
+
+- Use the existing suite's headless Chromium/CDP conventions and the served compiled bundle.
+- Wait for observable UI changes with bounded deadlines, assert the existing document remains loaded, and exercise the actual manual Refresh control.
+- Assert route, modal content, shell state, source view, search results, diagnostic recovery, visibility transitions, and static export behavior explicitly.
+- Compare all named checks with the expected refresh output file.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [Explorer Automatic Store Refresh](../../../Interfaces/WebExplorer/Capabilities.md#explorer-automatic-store-refresh)
+  * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
+---
+
 ### Explorer Serve Verification
 
 This test verifies that the system serves the native SPA Explorer shell with Model route containment modes and Project Store data.
@@ -180,7 +246,7 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 - Project Store file records include normalized source Markdown content derived from the registry for modeled files.
 - Relation-backed local resource targets are present as resources with source-preview content when the local file exists, are reachable through Explorer resource/evidence navigation with folder structure under the `Resources` branch, and resource-only paths are absent from the Project Store `files` and `folders` hierarchy.
 - Nonexistent local targets, unsupported parsed pages, unrelated repository files, and external URLs are absent from the Project Store file-tree hierarchy
-- A plain `assets/project-store.js` request after a direct filesystem edit returns the already-materialized runtime store and does not regenerate model data from disk
+- Runtime change checks adopt valid external model edits, and the served seed and live JSON reflect the updated records under the owning Served Explorer Runtime Freshness Verification.
 - Hash routes for primary Model, file deep links, Ontologies, and Traces views plus supporting Coverage, Resources, Elements, and Search workflows are declared; the project Knowledge Graph is not a separate hash route
 - Retired Explorer page URLs are absent from generated output and canonical route mappings
 - Explorer content preserves the structure and information from the source files

@@ -1,0 +1,13 @@
+embedded MCP updates open tabs: PASS
+unchanged conditional revision: PASS
+external file addition: PASS
+same length and timestamp edit preserves context: PASS
+refreshed source and search: PASS
+manual refresh without navigation: PASS
+invalid edit retains valid data: PASS
+valid edit recovers: PASS
+external file deletion: PASS
+visibility pauses and resumes refresh: PASS
+static export has no live refresh: PASS
+MCP remains available without reinitialization: PASS
+completed

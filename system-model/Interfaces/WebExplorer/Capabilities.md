@@ -57,6 +57,8 @@ Detailed embedded endpoint, registry reuse, transport, mutation gating, route pr
 
 #### Contract Bindings
   * [Serve Command Contract Specification](Specifications.md#serve-command-contract-specification)
+  * [Served Explorer Runtime Freshness Specification](Specifications.md#served-explorer-runtime-freshness-specification)
+  * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
 
 #### Relations
   * definedBy: [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
@@ -65,6 +67,30 @@ Detailed embedded endpoint, registry reuse, transport, mutation gating, route pr
   * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
   * verifiedBy: [Embedded MCP Serve Endpoint Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#embedded-mcp-serve-endpoint-verification)
   * verifiedBy: [Serve Command Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#serve-command-verification)
+---
+
+### Served Explorer Runtime Freshness
+
+When eligible model sources change during serving, the system shall make the updated valid model available to Explorer clients without restarting the server or interrupting embedded MCP access.
+
+If a changed model cannot be validated, the system shall retain the last valid runtime snapshot and report the refresh failure until valid model sources are available again.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [MCP Server State and Cache Specification](../MCP/Specifications.md#mcp-server-state-and-cache-specification)
+  * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
+  * [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
+
+#### Relations
+  * definedBy: [Served Explorer Runtime Freshness Specification](Specifications.md#served-explorer-runtime-freshness-specification)
+  * definedBy: [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
+  * derivedFrom: [Serve Command](#serve-command)
+  * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
+  * satisfiedBy: [model_cache.rs](../../../crates/reqvire-core/src/model_cache.rs)
+  * satisfiedBy: [explorer_runtime.rs](../../../crates/reqvire-core/src/explorer_runtime.rs)
+  * verifiedBy: [Served Explorer Runtime Freshness Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#served-explorer-runtime-freshness-verification)
 ---
 
 ### Served Explorer Browser Interface
@@ -392,6 +418,29 @@ When an Explorer route identifies a model element, file, source page, or resourc
   * derivedFrom: [SPA Explorer Shell and Project Store](#spa-explorer-shell-and-project-store)
   * satisfiedBy: [routes.ts](../../../explorer/src/router/routes.ts)
   * verifiedBy: [Explorer Route Identifier Resolution Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#explorer-route-identifier-resolution-verification)
+---
+
+### Explorer Automatic Store Refresh
+
+While the served Explorer is visible, the system shall automatically adopt newer valid model snapshots while preserving the current navigation and available selection context.
+
+When a user requests a refresh, the system shall check for current model data without reloading the page.
+
+If a refresh fails, the system shall preserve the displayed valid snapshot, expose the failure, and recover when a subsequent refresh succeeds.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
+  * [Served Explorer Runtime Freshness Specification](Specifications.md#served-explorer-runtime-freshness-specification)
+
+#### Relations
+  * definedBy: [Explorer Automatic Store Refresh Specification](Specifications.md#explorer-automatic-store-refresh-specification)
+  * derivedFrom: [SPA Explorer Shell and Project Store](#spa-explorer-shell-and-project-store)
+  * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
+  * verifiedBy: [Explorer Automatic Store Refresh Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#explorer-automatic-store-refresh-verification)
+  * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
 ---
 
 ### Thesaurus View Generation

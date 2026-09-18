@@ -246,6 +246,13 @@ reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
         </p>
         <CodeBlock>{`reqvire serve
 reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          Open tabs automatically refresh while visible after model changes,
+          including external edits and embedded MCP mutations. Use Refresh to
+          check immediately. If an edit makes the model invalid, the Explorer
+          keeps the last valid view and shows the error until the model recovers.
+          Refreshing does not restart the server or interrupt MCP access.
+        </p>
       </Section>
 
       <Section title="Ignore Files">

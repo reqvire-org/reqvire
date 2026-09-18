@@ -22,3 +22,9 @@ The pull-request workflow installs headless Chromium with Playwright and passes
 its executable to the same shell runner. Browser checks are required; an absent
 browser fails the serve suite. Failure logs are retained in
 `/tmp/reqvire-test-logs` and uploaded by the workflow.
+
+Live-refresh checks keep plain and MCP-enabled servers running together and
+assert browser updates, conditional revisions, external additions/edits/deletions,
+same-length changes with preserved timestamps, invalid-model recovery, manual
+refresh, visibility changes, static-export behavior, and continued MCP access.
+The suite compares named browser checks with its expected output files.

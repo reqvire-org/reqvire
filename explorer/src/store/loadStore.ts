@@ -104,6 +104,11 @@ export function loadStore(devFixture?: ExplorerProjectStore): StoreLoadResult {
     }
   }
 
+  return loadStoreCandidate(seed);
+}
+
+/** Validate an initial seed or a newly fetched snapshot using the same contract. */
+export function loadStoreCandidate(seed: unknown): StoreLoadResult {
   const problems = validateStore(seed);
   if (problems.length > 0) {
     return {

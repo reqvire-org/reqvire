@@ -3,8 +3,8 @@
 //!
 //! Every MCP tool dispatch and many CLI commands call a `load_model*` variant
 //! that re-parses the whole workspace from disk. This module memoizes the
-//! result so that repeated calls within an unchanged workspace return a clone
-//! of the cached model instead of re-reading and re-validating every file.
+//! result so that repeated calls within an unchanged workspace avoid parsing
+//! and validation. Freshness checks still read source contents to hash them.
 //!
 //! The fingerprint is the set of `(relative_path, size, content hash)` for
 //! every `.md` file the scanner would consider, plus the [`ModelBuildOptions`].
@@ -42,6 +42,11 @@ struct CacheKey {
     files: BTreeMap<PathBuf, FileFingerprint>,
 }
 
+/// Opaque input identity shared by consumers that materialize model projections.
+/// Equality covers the same source content and scope as the parsed-model cache.
+#[derive(Clone, Eq, PartialEq)]
+pub struct ModelFingerprint(CacheKey);
+
 #[derive(Clone, Eq, PartialEq)]
 struct GitWorktreeFingerprint {
     workspace_relative_root: PathBuf,
@@ -69,6 +74,19 @@ pub fn load_cached_model(
     excluded_filename_patterns: &GlobSet,
     options: ModelBuildOptions,
 ) -> Result<ModelManager, ReqvireError> {
+    load_cached_model_if_changed(excluded_filename_patterns, options, None)?
+        .map(|(_, model)| model)
+        .ok_or_else(|| ReqvireError::ProcessError("Initial model load returned no model".into()))
+}
+
+/// Checks current inputs and returns a model only if they differ from the
+/// consumer's last successfully published fingerprint. Unchanged projections
+/// avoid both a model clone and runtime generation.
+pub fn load_cached_model_if_changed(
+    excluded_filename_patterns: &GlobSet,
+    options: ModelBuildOptions,
+    previous: Option<&ModelFingerprint>,
+) -> Result<Option<(ModelFingerprint, ModelManager)>, ReqvireError> {
     let workspace_scope = crate::workspace::WorkspaceScope::discover()?;
     // Compute the fingerprint by scanning the same files the parser would.
     let files = utils::scan_markdown_files(None, excluded_filename_patterns)?;
@@ -94,6 +112,10 @@ pub fn load_cached_model(
         files: fingerprint,
     };
 
+    if previous.is_some_and(|previous| previous.0 == key) {
+        return Ok(None);
+    }
+
     // Cache hit: return a clone without re-parsing.
     {
         let cache = MODEL_CACHE.lock().expect("model cache mutex poisoned");
@@ -105,7 +127,7 @@ pub fn load_cached_model(
                     options.lenient,
                     options.with_size_estimates
                 );
-                return Ok(cached.model.clone());
+                return Ok(Some((ModelFingerprint(key), cached.model.clone())));
             }
         }
     }
@@ -121,12 +143,12 @@ pub fn load_cached_model(
     let mut model = ModelManager::new();
     model.parse_and_validate_with_options(None, excluded_filename_patterns, options)?;
     let entry = CachedModel {
-        key,
+        key: key.clone(),
         model: model.clone(),
     };
     let mut cache = MODEL_CACHE.lock().expect("model cache mutex poisoned");
     *cache = Some(entry);
-    Ok(model)
+    Ok(Some((ModelFingerprint(key), model)))
 }
 
 fn git_worktree_fingerprints(

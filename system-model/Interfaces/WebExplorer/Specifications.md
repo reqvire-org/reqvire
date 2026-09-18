@@ -708,7 +708,7 @@ Breakpoints:
 **Project Store Host**
 - The served `index.html` must contain or load the authoritative browser-local Project Store seed for the loaded project.
 - The Project Store `project` section must include effective workspace root identity and eligible Git worktree metadata when Git metadata is available. The visible Model tree uses this metadata to group files and resources by Git worktree identity rather than rendering the workspace root as a visible tree row.
-- The Project Store is an immutable generated snapshot for the served project unless a future requirement explicitly adds browser mutation.
+- Each Project Store is an immutable generated snapshot. Live serving may replace that snapshot under the Explorer Automatic Store Refresh contract while retaining separate browser UI state; static exports keep their initial snapshot.
 - Browser interactions may keep ephemeral UI state, filters, focus, layout, and route parameters separately from the generated model snapshot.
 - The Project Store must be view-neutral: the primary Model view and its Graph mode, specialist Ontologies and Traces views, plus supporting Coverage, Resources, Search, Summary, File deep-link, and Element Detail workflows read from the same normalized records instead of from page-local ad hoc JSON islands.
 - Store identifiers must be stable within one served project snapshot and deterministic across repeated serve runtime generations for unchanged model content.
@@ -819,8 +819,8 @@ Serve command behavior:
 - Accept `--enable-mcp` to also expose the Reqvire MCP Streamable HTTP endpoint at `/mcp` on the same HTTP listener.
 - Accept `--enable-mutations` only when `--enable-mcp` is present, and use it to enable mutation tools for the embedded MCP endpoint.
 - Assemble the embedded Explorer shell, Project Store data, and ontology artifact in memory
-- Serve `assets/project-store.js` and `ontologies.ttl` from the materialized in-memory runtime assets. Browser refreshes and direct HTTP GET/HEAD requests for those assets must not parse, validate, or regenerate model data from disk.
-- Refresh the materialized runtime Project Store data and ontology artifact after successful embedded MCP write mutations, so subsequent Explorer reloads observe MCP-authored model changes without making ordinary browser refresh the regeneration trigger.
+- Serve `assets/project-store.js`, `ontologies.ttl`, and live Project Store responses from one materialized runtime snapshot, checking external model changes under the Served Explorer Runtime Freshness contract.
+- Refresh the materialized runtime Project Store data and ontology artifact immediately after successful embedded MCP write mutations, and allow open Explorer tabs to adopt the updated snapshot without a page reload.
 - Serialize embedded MCP write mutation execution and runtime asset refresh so the served runtime store is refreshed only after the mutation has completed and never from a partial filesystem update.
 - Populate Project Store source-file records from modeled element source files, without using generated Markdown files on disk as an intermediate runtime artifact
 - Keep relation-backed implementation/evidence/source targets as Project Store resources for relation semantics, expose them through resource/evidence navigation, and keep resource-only paths out of the Model tree file-container hierarchy
@@ -839,6 +839,63 @@ Serve command behavior:
 
 #### Relations
   * define: [Serve Command](Capabilities.md#serve-command)
+---
+
+### Served Explorer Runtime Freshness Specification
+
+#### Details
+
+- Reuse the model cache's fingerprint of eligible model source paths and content hashes, active build options, workspace scope, exclusions, and relevant Git metadata. Additions, deletions, and same-length content changes must be detectable without relying on timestamps or filesystem notifications.
+- Runtime data requests check for changed inputs. Share and serialize checks within the server and throttle automatic checks to at most once per second. A requested manual refresh bypasses this interval.
+- Unchanged inputs retain the generated runtime assets and published revision rather than parsing and generating them again.
+- Embedded MCP mutations retain their immediate post-write refresh. Model refresh and embedded MCP writes share the workspace write gate; synchronous model loading and runtime generation run outside the asynchronous request executor.
+- Publish the Project Store JavaScript, live JSON store, ontology artifact, successful input fingerprint, and content-derived revision together after successful validation and generation.
+- Invalid external edits leave the last valid assets and revision available. Live refresh responses report the validation error, and later valid input is checked again and can recover without restarting.
+- Refresh is read-only with respect to workspace files and does not restart the listener, reinitialize MCP, or change mutation authorization.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Served Explorer Runtime Freshness](Capabilities.md#served-explorer-runtime-freshness)
+---
+
+### Explorer Live Store Refresh Input Output
+
+#### Details
+
+- `reqvire serve` exposes `GET /api/project-store` with JSON `{ "revision": "<opaque content-derived revision>", "store": <Project Store> }` and `Cache-Control: no-store`.
+- The response carries an `ETag` for its published revision. A matching `If-None-Match` returns `304` with an empty body after the due change check.
+- `GET /api/project-store?refresh=true` forces a current workspace check for the manual Refresh action.
+- If refresh fails, return `503` and JSON `{ "revision": "<last valid revision>", "error": "<diagnostic>" }`; retain the last valid generated assets.
+- Served `assets/project-store.js` advertises live refresh and its initial revision. The exported static seed does not advertise a live endpoint.
+- Runtime data uses ordinary GET/HEAD method semantics and does not execute client-provided code. Missing API routes return `404` rather than the SPA fallback shell.
+
+#### Metadata
+  * type: input-output
+
+#### Relations
+  * define: [Served Explorer Runtime Freshness](Capabilities.md#served-explorer-runtime-freshness)
+---
+
+### Explorer Automatic Store Refresh Specification
+
+#### Details
+
+- Enable live refresh only when the served seed advertises it. Static exports and development fixtures do not poll a live API or show live-only refresh controls.
+- While the document is visible, request the live store every three seconds using the current revision in `If-None-Match`. Check immediately when visibility returns. Suspend periodic requests while hidden and prevent overlapping requests.
+- Provide an accessible `Refresh` action in the shell that forces a workspace check and disables duplicate manual requests while one is pending.
+- Validate refreshed store shape and schema before replacing the browser-local store. A `304` retains the existing object and derived indexes.
+- A successful changed store replaces the current snapshot without remounting the shell or UI-state provider, reloading the page, or changing the hash route. Existing selection, modal context, filters, and layout remain available where their targets still exist; deleted targets use the existing missing-record behavior.
+- Derived element lookups, search indexes, file views, and other store consumers adopt the new snapshot.
+- Failed requests, incompatible stores, and server refresh errors retain the valid view and show an actionable refresh diagnostic. Subsequent automatic or manual success clears the diagnostic.
+- Cancel requests and timers when the live consumer unmounts.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Explorer Automatic Store Refresh](Capabilities.md#explorer-automatic-store-refresh)
 ---
 
 ### Thesaurus View Generation Contract Specification
