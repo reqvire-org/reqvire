@@ -49,6 +49,7 @@ export async function openBrowser(browser, profile) {
       if (message.id) {
         const request = pending.get(message.id);
         pending.delete(message.id);
+        clearTimeout(request?.timer);
         if (message.error) request?.reject(new Error(message.error.message));
         else request?.resolve(message.result);
       } else if (events.has(message.method)) {
@@ -56,10 +57,25 @@ export async function openBrowser(browser, profile) {
         events.delete(message.method);
       }
     });
+    socket.addEventListener("close", () => {
+      for (const request of pending.values()) {
+        clearTimeout(request.timer);
+        request.reject(new Error("Browser debugging connection closed"));
+      }
+      pending.clear();
+    });
     function rpc(method, params = {}) {
       return new Promise((resolve, reject) => {
+        if (socket.readyState !== WebSocket.OPEN) {
+          reject(new Error("Browser debugging connection is not open"));
+          return;
+        }
         const id = ++nextId;
-        pending.set(id, { resolve, reject });
+        const timer = setTimeout(() => {
+          pending.delete(id);
+          reject(new Error(`Browser command timed out: ${method}`));
+        }, 15000);
+        pending.set(id, { resolve, reject, timer });
         socket.send(JSON.stringify({ id, method, params }));
       });
     }
@@ -74,9 +90,18 @@ export async function openBrowser(browser, profile) {
     }
     await rpc("Page.enable");
     async function navigate(url) {
-      const loaded = new Promise(resolve => events.set("Page.loadEventFired", resolve));
-      await rpc("Page.navigate", { url });
-      await loaded;
+      let timer;
+      const loaded = new Promise((resolve, reject) => {
+        timer = setTimeout(() => reject(new Error("Browser navigation timed out")), 20000);
+        events.set("Page.loadEventFired", () => { clearTimeout(timer); resolve(); });
+      });
+      try {
+        await rpc("Page.navigate", { url });
+        await loaded;
+      } finally {
+        clearTimeout(timer);
+        events.delete("Page.loadEventFired");
+      }
       await waitFor(async () => evaluate(() => Boolean(document.querySelector('[data-product-pattern="app-shell"]'))));
     }
     return { rpc, evaluate, navigate, close };

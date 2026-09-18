@@ -33,7 +33,8 @@ env_logger = { workspace = true }
 
 # Serialization
 serde = { workspace = true }
-serde_json = { workspace = true }
+serde_json = { workspace = true, features = ["unbounded_depth"] }
+sha2 = "0.11"
 
 # File handling
 globset = { workspace = true }
@@ -51,3 +52,5 @@ rmcp = { version = "1.8.0", features = ["server", "macros", "schemars", "transpo
 assert_fs = { workspace = true }
 predicates = { workspace = true }
 tempfile = { workspace = true }
+tokio = { workspace = true, features = ["time"] }
+tower = { version = "0.5", features = ["util"] }

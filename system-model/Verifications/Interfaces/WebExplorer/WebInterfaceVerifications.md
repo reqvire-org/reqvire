@@ -153,25 +153,30 @@ Verify authored identifiers through the compiled Explorer served by the CLI in a
 
 ### Served Explorer Runtime Freshness Verification
 
-Verify that served runtime data adopts embedded and external model changes while preserving the running server and recovering from invalid input.
+Verify that immutable published runtime data and its manifest adopt embedded MCP mutations while preserving the running server.
 
 #### Details
 
 ##### Acceptance Criteria
 
-- Both plain serving and MCP-enabled serving expose changed model records after external additions, edits, and deletions.
-- A same-length source edit with its original timestamp restored changes the published revision and displayed data.
-- Unchanged inputs return `304` for the current ETag; forced unchanged refresh retains the revision.
-- Live HEAD responses have no body, unsupported POST requests return `405`, and missing API paths return `404`.
-- Generated seed data and the live JSON store agree after refresh, and generated ontology data remains available.
-- Invalid edits return a refresh diagnostic without replacing the last valid snapshot; valid recovery publishes new data.
-- The same server processes remain alive and one initialized MCP client can issue successful reads after each valid refresh without reinitialization.
+- Mutation-enabled embedded MCP serving exposes changed model records after successful MCP additions and edits.
+- Changed model content changes the published manifest revision; unchanged conditional requests return `304` with an empty body and retain the revision.
+- The manifest revision and chunk hashes match independent SHA-256 calculations over the exact transferred UTF-8 JSON text. Array order, repeated references, empty arrays, Unicode, numeric representations, unknown sections, and deletions survive manifest reconstruction.
+- Chunk batches contain only requested chunks and deduplicate repeated requests. Invalid hashes, oversized requests, absent chunks, and superseded revisions return their specified errors.
+- A captured snapshot retains its original chunks after a newer snapshot is published; an HTTP request using the superseded revision returns `409`.
+- Manifest reads return the cached snapshot while the MCP workspace write gate is held. Valid deeply nested generated JSON does not gain an additional manifest-construction depth limit.
+- Manifest HEAD responses have no body and retain revision headers. Strong, weak, list, and wildcard conditional tags return the expected statuses; unsupported methods on the full-store route return `405`, and missing API paths return `404`.
+- Generated seed data, the full JSON store, and the manifest revision agree after mutations, and generated ontology data remains available.
+- Cached refresh diagnostics return `503` while retaining the valid seed and revision; clearing a diagnostic permits a matching conditional `304` without advancing that revision.
+- Plain serving and read-only embedded MCP do not advertise live refresh or expose the manifest, chunk, or full-store APIs.
+- The same server processes remain alive and one initialized MCP client can issue successful reads after each runtime refresh without reinitialization.
 
 ##### Test Criteria
 
-- Extend the standard serve shell suite using its temporary Git workspace, fixture files, expected output, and real headless browser driver.
-- Keep plain and MCP-enabled servers running together. Mutate through embedded MCP, then modify sources directly and check both endpoints.
-- Compare conditional live responses and revisions, check the served seed against the JSON store, and verify diagnostic/recovery responses and continued MCP reads.
+- Use the standard serve shell suite's temporary Git workspace, fixture files, expected output, and real headless browser driver.
+- Exercise updates through mutation-enabled embedded MCP and use plain and read-only embedded MCP servers to check refresh gating.
+- Compare conditional live responses and revisions, independently hash a manifest and returned raw chunk text, check the served seed against the full JSON store, and verify continued MCP reads.
+- Run the `live_store::tests` and `serve::tests` modules in the CLI Rust unit suite for reconstruction, deduplication, request errors, immutable captured snapshots, held-write-gate reads, deeply nested generated JSON, and cached-error recovery.
 - Require exact equality with the expected refresh result file; preserve browser and request diagnostics on failure.
 
 #### Metadata
@@ -181,29 +186,43 @@ Verify that served runtime data adopts embedded and external model changes while
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * verify: [Served Explorer Runtime Freshness](../../../Interfaces/WebExplorer/Capabilities.md#served-explorer-runtime-freshness)
   * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
+  * satisfiedBy: [live_store.rs](../../../../crates/reqvire-cli/src/live_store.rs)
+  * satisfiedBy: [serve.rs](../../../../crates/reqvire-cli/src/serve.rs)
 ---
 
 ### Explorer Automatic Store Refresh Verification
 
-Verify automatic and manual refresh through the compiled Explorer in a real browser rather than only inspecting server responses.
+Verify automatic refresh through the compiled Explorer in a real browser rather than only inspecting server responses.
 
 #### Details
 
 ##### Acceptance Criteria
 
-- An already-open file view adopts embedded MCP additions and external additions, edits, and deletions without a page reload.
-- Refresh retains the current hash route, open element modal, shell layout state, and authored model-tree filter when their targets still exist.
-- Refresh updates source content and search results for changed records.
-- The accessible Refresh action sends a forced workspace check and updates current data without navigation.
-- Invalid external edits show a visible refresh diagnostic while the last valid records remain displayed; valid recovery clears it.
-- Hidden documents suspend automatic refresh and check again when visible.
-- Static exports show no live Refresh action and issue no live API requests.
+- An already-open file view served by mutation-enabled embedded MCP adopts successful MCP additions and edits without a page reload.
+- Automatic refresh retains the current hash route, open element modal, shell layout state, and authored model-tree filter when their targets still exist.
+- Automatic refresh updates source content and search results for changed records.
+- The compiled browser downloads exactly the missing chunk hashes after a mutation and publishes a complete store equal to the server snapshot without requesting the full-store API.
+- Refreshed immutable stores render Coverage, Traces, Ontologies, and Model Graph views without modifying their cached records or reloading the document.
+- A real MCP mutation between manifest and chunk retrieval produces `409`, followed by recovery to the latest complete snapshot.
+- Missing and corrupt chunk responses leave the prior displayed content and committed revision intact, show a failure diagnostic, and recover automatically when valid responses resume.
+- The shell has no manual Refresh action.
+- Hidden documents suspend automatic refresh and check again when visible, catching up across several missed MCP mutations and a deletion.
+- Plain serving and static exports issue no live API requests.
+- Unit checks enforce an immediate visible check and the five-second interval, prevent overlapping checks, release timed-out checks for automatic retry, and discard late responses after hiding, unmount, or StrictMode cleanup.
+- Client transactions preserve unchanged object identity, ordered current arrays, and unknown sections; deletion-only refreshes require no new chunks and remove obsolete cache entries.
+- Malformed or unsupported manifests/stores, incorrect chunk hashes or response membership/revisions, exhausted conflicts, and interrupted multi-batch downloads cannot advance the committed cursor or publish partial data. Subsequent valid responses recover from the last committed revision.
+- Invalid seed advertisements trigger complete chunk retrieval, and content verification succeeds without Web Crypto.
 
 ##### Test Criteria
 
 - Use the existing suite's headless Chromium/CDP conventions and the served compiled bundle.
-- Wait for observable UI changes with bounded deadlines, assert the existing document remains loaded, and exercise the actual manual Refresh control.
-- Assert route, modal content, shell state, source view, search results, diagnostic recovery, visibility transitions, and static export behavior explicitly.
+- Wait for observable UI changes with bounded deadlines and assert the existing document remains loaded.
+- Assert route, modal content, shell state, source view, search results, visibility transitions, and static export behavior explicitly.
+- Record the compiled browser's real manifest/chunk requests and compare requested hashes with the complete manifest's missing hashes; compare its published store and revision with the server's full snapshot.
+- Hold a chunk request at the transport boundary while a second real MCP mutation completes, then require the actual server `409` and latest-store recovery.
+- Inject one missing or corrupted chunk response through the browser transport wrapper and assert retained content/revision, visible diagnostics, and the later complete valid store. Keep production assembly and UI recovery in the compiled bundle.
+- While hidden, execute several MCP edits and a deletion, wait through periodic checks, and assert no live requests until the actual visibility transition resumes refresh.
+- Run `manifestRefresh.test.ts` and `useLiveStore.test.ts` with Vitest for five-second timing, timeout/cancellation ownership, immutable cache reuse and pruning, validation failures, multi-batch interruption/conflicts, and cursor rollback. GitHub Actions runs this same Explorer unit suite and the standard headless shell E2E suite.
 - Compare all named checks with the expected refresh output file.
 
 #### Metadata
@@ -213,6 +232,8 @@ Verify automatic and manual refresh through the compiled Explorer in a real brow
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * verify: [Explorer Automatic Store Refresh](../../../Interfaces/WebExplorer/Capabilities.md#explorer-automatic-store-refresh)
   * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
+  * satisfiedBy: [manifestRefresh.test.ts](../../../../explorer/src/store/manifestRefresh.test.ts)
+  * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
 ---
 
 ### Explorer Serve Verification
@@ -246,7 +267,7 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 - Project Store file records include normalized source Markdown content derived from the registry for modeled files.
 - Relation-backed local resource targets are present as resources with source-preview content when the local file exists, are reachable through Explorer resource/evidence navigation with folder structure under the `Resources` branch, and resource-only paths are absent from the Project Store `files` and `folders` hierarchy.
 - Nonexistent local targets, unsupported parsed pages, unrelated repository files, and external URLs are absent from the Project Store file-tree hierarchy
-- Runtime change checks adopt valid external model edits, and the served seed and live JSON reflect the updated records under the owning Served Explorer Runtime Freshness Verification.
+- Embedded MCP mutations refresh the runtime snapshot, and the served seed and live JSON reflect the updated records under the owning Served Explorer Runtime Freshness Verification.
 - Hash routes for primary Model, file deep links, Ontologies, and Traces views plus supporting Coverage, Resources, Elements, and Search workflows are declared; the project Knowledge Graph is not a separate hash route
 - Retired Explorer page URLs are absent from generated output and canonical route mappings
 - Explorer content preserves the structure and information from the source files

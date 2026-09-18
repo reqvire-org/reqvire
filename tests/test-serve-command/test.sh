@@ -13,8 +13,10 @@
 # - System sets correct Content-Type headers for different file types
 # - System runs in quiet mode without verbose runtime-generation output
 # - System displays instructions for Ctrl-C
-# - Open browser views adopt embedded MCP writes and external model edits
-# - Runtime refresh preserves valid data after invalid edits and recovers
+# - Open browser views adopt embedded MCP writes without page reloads
+# - Manifest refresh downloads only missing immutable chunks
+# - Missed mutations, deletion, and concurrent mutation produce a coherent store
+# - Missing or corrupt chunk responses preserve valid data and recover
 # - Static exports remain self-contained and MCP remains available
 #
 # Test Criteria:
@@ -41,7 +43,7 @@ cd "$TEST_DIR"
 SERVE_PID=$!
 
 stop_server() {
-    for server_pid in "${SERVE_PID:-}" "${PLAIN_PID:-}"; do
+    for server_pid in "${SERVE_PID:-}" "${PLAIN_PID:-}" "${READ_ONLY_PID:-}"; do
         if [ -n "$server_pid" ]; then
             kill "$server_pid" 2>/dev/null || true
             wait "$server_pid" 2>/dev/null || true
@@ -49,6 +51,7 @@ stop_server() {
     done
     SERVE_PID=""
     PLAIN_PID=""
+    READ_ONLY_PID=""
 }
 
 # Function to cleanup server on exit
@@ -321,8 +324,8 @@ if ! grep -q "Serve Embedded MCP Added Requirement" "${TEST_DIR}/serve_mcp_proje
     exit 1
 fi
 
-# Test 9: Live browser freshness, external edits, revision protocol, and recovery.
-if ! timeout -k 5s 180s node "$TEST_DIR/scripts/refresh-check.mjs" "$BROWSER_BIN" \
+# Test 9: Embedded MCP browser freshness, conditional revisions, and visibility.
+if ! timeout -k 5s 240s node "$TEST_DIR/scripts/refresh-check.mjs" "$BROWSER_BIN" \
     "http://$TEST_HOST:$TEST_PORT" "http://$TEST_HOST:$MCP_PORT" "$TEST_DIR" "$SERVER_BIN" \
     > "$TEST_DIR/browser-refresh.txt" 2> "$TEST_DIR/browser-refresh.log"; then
     echo "FAILED: Served Explorer live refresh checks failed"
@@ -334,10 +337,40 @@ if ! diff -u "$TEST_DIR/expected/browser-refresh.txt" "$TEST_DIR/browser-refresh
     cat "$TEST_DIR/browser-refresh.log"
     exit 1
 fi
+cat "$TEST_DIR/browser-refresh.txt"
 kill -0 "$SERVE_PID" "$PLAIN_PID" || {
     echo "FAILED: A serve process exited during live refresh"
     exit 1
 }
+
+# Test 10: Embedded MCP without mutation authorization advertises no live API.
+READ_ONLY_PORT=$((11000 + RANDOM % 1000))
+"$SERVER_BIN" serve --host "$TEST_HOST" --port "$READ_ONLY_PORT" --enable-mcp \
+    > "$TEST_DIR/serve_read_only_output.log" 2>&1 &
+READ_ONLY_PID=$!
+for i in {1..20}; do
+    if curl -s "http://$TEST_HOST:$READ_ONLY_PORT/" >/dev/null 2>&1; then
+        break
+    fi
+    if [ "$i" -eq 20 ]; then
+        echo "FAILED: Read-only embedded MCP server did not start"
+        cat "$TEST_DIR/serve_read_only_output.log"
+        exit 1
+    fi
+    sleep 0.5
+done
+curl -sS "http://$TEST_HOST:$READ_ONLY_PORT/assets/project-store.js" > "$TEST_DIR/read_only_store.js"
+if grep -q 'window.reqvireLiveRefresh' "$TEST_DIR/read_only_store.js"; then
+    echo "FAILED: Read-only embedded MCP advertised mutation-only refresh"
+    exit 1
+fi
+for api_path in project-store project-store/manifest project-store/chunks; do
+    HTTP_CODE=$(curl -sS -o /dev/null -w '%{http_code}' "http://$TEST_HOST:$READ_ONLY_PORT/api/$api_path")
+    if [ "$HTTP_CODE" != "404" ]; then
+        echo "FAILED: Read-only embedded MCP exposed /api/$api_path"
+        exit 1
+    fi
+done
 
 # Clean up
 cleanup

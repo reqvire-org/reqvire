@@ -533,7 +533,7 @@ export interface ExplorerProjectStore {
 declare global {
   interface Window {
     reqvireProjectStore?: unknown;
-    /** Advertised only by reqvire serve, never by a static export. */
-    reqvireLiveRefresh?: { revision: string };
+    /** Advertised only by serve with embedded MCP mutations enabled. */
+    reqvireLiveRefresh?: { revision: string; manifest: unknown };
   }
 }

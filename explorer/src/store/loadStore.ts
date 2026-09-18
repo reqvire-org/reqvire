@@ -50,6 +50,11 @@ const ARRAY_SECTIONS = [
   "search",
 ] as const;
 
+const OBJECT_SECTIONS = [
+  "project", "submodels", "traces", "coverage", "ontology",
+  "knowledge_graph", "summaries", "routes", "thesaurus",
+] as const;
+
 function readInjectedSeed(): unknown {
   if (typeof window !== "undefined" && window.reqvireProjectStore !== undefined) {
     return window.reqvireProjectStore;
@@ -64,7 +69,7 @@ function readInjectedSeed(): unknown {
  */
 export function validateStore(candidate: unknown): string[] {
   const problems: string[] = [];
-  if (typeof candidate !== "object" || candidate === null) {
+  if (typeof candidate !== "object" || candidate === null || Array.isArray(candidate)) {
     return ["seed is not an object"];
   }
   const seed = candidate as Record<string, unknown>;
@@ -74,14 +79,23 @@ export function validateStore(candidate: unknown): string[] {
     }
   }
   for (const section of ARRAY_SECTIONS) {
-    if (section in seed && !Array.isArray(seed[section])) {
+    if (!(section in seed)) continue;
+    const records = seed[section];
+    if (!Array.isArray(records)) {
       problems.push(`section "${section}" must be an array`);
+      continue;
+    }
+    const identifier = section === "folders" || section === "files" ? "path" : "id";
+    if (records.some(record => typeof record !== "object" || record === null || Array.isArray(record)
+      || typeof record[identifier] !== "string")) {
+      problems.push(`section "${section}" must contain records with string "${identifier}" identifiers`);
     }
   }
-  if ("project" in seed) {
-    const project = seed.project;
-    if (typeof project !== "object" || project === null) {
-      problems.push(`section "project" must be an object`);
+  for (const section of OBJECT_SECTIONS) {
+    if (!(section in seed)) continue;
+    const value = seed[section];
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+      problems.push(`section "${section}" must be an object`);
     }
   }
   return problems;

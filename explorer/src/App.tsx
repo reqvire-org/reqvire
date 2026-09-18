@@ -44,7 +44,7 @@ const SHELL_NAVIGATION_ITEMS: ShellNavigationItem[] = [
 ];
 
 export function App() {
-  const { result, live, refresh, refreshing, refreshError } = useLiveStore();
+  const { result, refreshError } = useLiveStore();
 
   if (!result.ok) {
     return <MissingStoreNotice reason={result.reason} detail={result.detail} />;
@@ -56,9 +56,6 @@ export function App() {
         <ExplorerUiStateProvider>
           <ExplorerShell
             schemaMismatch={result.schemaMismatch}
-            live={live}
-            onRefresh={() => { void refresh(true); }}
-            refreshing={refreshing}
             refreshError={refreshError}
           />
         </ExplorerUiStateProvider>
@@ -67,11 +64,8 @@ export function App() {
   );
 }
 
-function ExplorerShell({ schemaMismatch, live, onRefresh, refreshing, refreshError }: {
+function ExplorerShell({ schemaMismatch, refreshError }: {
   schemaMismatch: string | null;
-  live: boolean;
-  onRefresh: () => void;
-  refreshing: boolean;
   refreshError: string | null;
 }) {
   const { route, navigateView, openElement, closeElement } = useHashRoute();
@@ -192,13 +186,6 @@ function ExplorerShell({ schemaMismatch, live, onRefresh, refreshing, refreshErr
   }
 
   const headerActions: ShellActionItem[] = [
-    ...(live ? [{
-      id: "refresh",
-      label: "Refresh",
-      icon: "rotate-ccw" as const,
-      onClick: onRefresh,
-      disabled: refreshing,
-    }] : []),
     {
       id: "search",
       label: "Search",
@@ -238,7 +225,7 @@ function ExplorerShell({ schemaMismatch, live, onRefresh, refreshing, refreshErr
       onLeftPaneResizePointerDown={handleLeftPaneResizePointerDown}
       onLeftPaneResizeKeyDown={handleLeftPaneResizeKeyDown}
       mainWarning={refreshError
-        ? `Refresh failed: ${refreshError}. Keeping the last valid view; retry with Refresh.`
+        ? `Refresh failed: ${refreshError}. Keeping the last valid view; will retry automatically.`
         : schemaMismatch ? `Store schema mismatch: ${schemaMismatch}` : null}
       sidePane={
         <ExplorerSidePane

@@ -36,6 +36,7 @@ Implementation details shall follow the associated contract specifications.
   * [Two-Pass Validation Behavior](../../Operations/Validation/Behaviors.md#two-pass-validation-behavior)
   * [Validation Error Reporting Behavior](../../Operations/Validation/Behaviors.md#validation-error-reporting-behavior)
   * [Explorer Serve Pipeline Specification](Specifications.md#explorer-serve-pipeline-specification)
+  * [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
 
 #### Relations
   * definedBy: [Serve Command Contract Specification](Specifications.md#serve-command-contract-specification)
@@ -59,6 +60,8 @@ Detailed embedded endpoint, registry reuse, transport, mutation gating, route pr
   * [Serve Command Contract Specification](Specifications.md#serve-command-contract-specification)
   * [Served Explorer Runtime Freshness Specification](Specifications.md#served-explorer-runtime-freshness-specification)
   * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
+  * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
+  * [MCP Mutation Execution Flow Specification](../MCP/Specifications.md#mcp-mutation-execution-flow-specification)
 
 #### Relations
   * definedBy: [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
@@ -71,9 +74,13 @@ Detailed embedded endpoint, registry reuse, transport, mutation gating, route pr
 
 ### Served Explorer Runtime Freshness
 
-When eligible model sources change during serving, the system shall make the updated valid model available to Explorer clients without restarting the server or interrupting embedded MCP access.
+When an embedded MCP mutation succeeds during serving with mutations enabled, the system shall publish the updated valid model to Explorer clients without restarting the server or interrupting MCP access.
 
-If a changed model cannot be validated, the system shall retain the last valid runtime snapshot and report the refresh failure until valid model sources are available again.
+While the mutation's runtime snapshot is being rebuilt, the system shall serve the last valid published snapshot without waiting for model validation or generation.
+
+When an Explorer client requests updated model content, the system shall provide a complete current manifest and immutable content-addressed chunks so the client can catch up across missed revisions without requiring intermediate updates.
+
+If runtime generation fails after a mutation, the system shall retain the last valid snapshot and report the failure until a subsequent successful mutation refreshes the runtime.
 
 #### Metadata
   * type: requirement
@@ -81,6 +88,7 @@ If a changed model cannot be validated, the system shall retain the last valid r
 #### Contract Bindings
   * [MCP Server State and Cache Specification](../MCP/Specifications.md#mcp-server-state-and-cache-specification)
   * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
+  * [MCP Mutation Execution Flow Specification](../MCP/Specifications.md#mcp-mutation-execution-flow-specification)
   * [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
 
 #### Relations
@@ -88,6 +96,7 @@ If a changed model cannot be validated, the system shall retain the last valid r
   * definedBy: [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
   * derivedFrom: [Serve Command](#serve-command)
   * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
+  * satisfiedBy: [live_store.rs](../../../crates/reqvire-cli/src/live_store.rs)
   * satisfiedBy: [model_cache.rs](../../../crates/reqvire-core/src/model_cache.rs)
   * satisfiedBy: [explorer_runtime.rs](../../../crates/reqvire-core/src/explorer_runtime.rs)
   * verifiedBy: [Served Explorer Runtime Freshness Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#served-explorer-runtime-freshness-verification)
@@ -422,11 +431,11 @@ When an Explorer route identifies a model element, file, source page, or resourc
 
 ### Explorer Automatic Store Refresh
 
-While the served Explorer is visible, the system shall automatically adopt newer valid model snapshots while preserving the current navigation and available selection context.
+While Explorer served by an embedded MCP server with mutations enabled is visible, the system shall check the server's published revision every five seconds and automatically adopt newer valid snapshots while preserving current navigation and available selection context.
 
-When a user requests a refresh, the system shall check for current model data without reloading the page.
+When a newer manifest is available, the system shall download only missing chunks, verify their content integrity, and adopt the complete compatible snapshot atomically with its revision.
 
-If a refresh fails, the system shall preserve the displayed valid snapshot, expose the failure, and recover when a subsequent refresh succeeds.
+If a refresh request fails, the system shall preserve the displayed valid snapshot, expose the failure, and recover when a subsequent automatic request succeeds.
 
 #### Metadata
   * type: requirement
@@ -441,6 +450,8 @@ If a refresh fails, the system shall preserve the displayed valid snapshot, expo
   * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
   * verifiedBy: [Explorer Automatic Store Refresh Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#explorer-automatic-store-refresh-verification)
   * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
+  * satisfiedBy: [manifestRefresh.ts](../../../explorer/src/store/manifestRefresh.ts)
+  * satisfiedBy: [loadStore.ts](../../../explorer/src/store/loadStore.ts)
 ---
 
 ### Thesaurus View Generation

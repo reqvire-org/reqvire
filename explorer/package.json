@@ -26,6 +26,7 @@
     "@linaria/atomic": "^8.0.0",
     "@linaria/core": "^7.0.0",
     "@linaria/react": "^7.0.1",
+    "@noble/hashes": "^2.4.0",
     "@sigma/edge-curve": "^3.1.0",
     "@sigma/node-image": "^3.0.0",
     "@types/d3": "^7.4.3",
@@ -35,7 +36,7 @@
     "graphology": "^0.25.4",
     "graphology-layout-forceatlas2": "^0.10.1",
     "graphology-layout-noverlap": "^0.4.2",
-    "mermaid": "^11.15.0",
+    "mermaid": "^11.16.1",
     "minisearch": "^7.2.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
@@ -56,10 +57,10 @@
     "@wyw-in-js/vite": "^2.0.1",
     "jsdom": "^25.0.1",
     "oxlint": "^1.69.0",
-    "sharp": "^0.35.1",
+    "sharp": "^0.35.4",
     "stylelint": "^17.13.0",
     "typescript": "^5.6.3",
     "vite": "^6.0.7",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.11"
   }
 }

@@ -31,6 +31,9 @@ jobs:
       - name: Lint Explorer SPA
         run: cd explorer && npm run lint
 
+      - name: Test Explorer store and refresh behavior
+        run: cd explorer && npm test
+
       - name: Build Explorer SPA bundle
         # crates/reqvire-core/build.rs embeds explorer/dist into the binary at compile time,
         # so the bundle must be built before cargo build/test.
