@@ -138,9 +138,13 @@ Concurrency rules:
 - Mutation requests queue deterministically behind the per-workspace write gate.
 - Read-only tools may run concurrently with other reads.
 - Read-only tools may run concurrently with mutations only if each read result includes the model revision or fingerprint it observed.
+- Each concurrent read uses one completed core model throughout result construction. A read already using a pre-write snapshot may finish under the rule above; dependent reads begun after mutation completion use the completed post-write state. The parsed-element revision alone cannot establish freshness of page content, external dependencies, or configuration.
+- Source capture and cache publication coordinate with the workspace write gate so a reader cannot publish a model built from partially persisted controlled writes. Tools that cannot satisfy the concurrent-read snapshot rule wait for the mutation gate.
+- Core cache invalidation supersedes older in-progress builds. Such a build cannot overwrite state published after a mutation or let waiting requests accept the superseded state as current.
 - If stronger consistency is required for a tool, that read tool may take the same workspace read/write gate and wait for active mutation completion.
 - Mutation results include changed files, diffs or equivalent change descriptions, and refreshed model revision/fingerprint after execution.
 - Failed mutations must not leave MCP-visible cached state ahead of the filesystem.
+- If an error follows persisted changes, invalidate affected cache state before releasing the gate and preserve the operation's error; do not treat transport-level success as proof of tool success.
 
 Mutation critical section:
 - Acquire the workspace mutation gate.
@@ -149,6 +153,7 @@ Mutation critical section:
 - Flush filesystem changes using the same persistence guarantees as Reqvire CLI/core.
 - Run required formatting, validation, or affected-scope diagnostics.
 - Refresh MCP-visible model state from the updated Reqvire core graph or reparsed filesystem state.
+- Publish only a complete graph/page/semantic state under the bound core cache contract. A cold rebuild remains an allowed correctness fallback when the updated core graph does not yet contain complete derived state.
 - Release the workspace mutation gate.
 
 #### Metadata
@@ -188,6 +193,8 @@ Mutation flow constraints:
 - Arbitrary file writes are not exposed as model mutation tools.
 - Single-root ownership, relation type compatibility, contract bindings, and file persistence guarantees are inherited from Reqvire core operation contracts.
 - Operation-specific preview requests for mutation-class tools are available only when mutation tools are advertised, except for conditional mutation tools such as `reqvire.format` where the read-only preview form may be advertised by default.
+- Post-write success handling requires a successful tool result and a persisted execution request. An MCP result with `isError: true`, a JSON-RPC error, or a preview response does not trigger a successful-mutation Explorer refresh.
+- A refresh failure after a committed mutation remains distinguishable from rejection before persistence; preserve the existing runtime failure diagnostic and last valid published snapshot.
 
 #### Metadata
   * type: specification
@@ -210,7 +217,7 @@ Mutation exposure and safety rules:
 - Folder mutation tools inherit the `mv-folder` contract and report moved folders, moved files, moved elements, changed referencing files, validation status, and affected scope in preview and execution results.
 - Durable writes flush modified files to the filesystem with the same guarantees as reused file persistence behavior.
 - The MCP server keeps its internal graph synchronized from the updated core graph after each successful mutation before serving subsequent model reads.
-- The MCP server avoids mandatory full reparse after controlled mutations; full reparse is reserved for external filesystem drift, changed source fingerprints, or operations that require it.
+- A complete updated core model may be adopted after a controlled mutation only when its graph, pages, semantic state, and persisted-input identity agree under the bound cache contract. If that complete state is unavailable, invalidate and rebuild before dependent model reads; avoiding reparse is a later optimization, not grounds to serve stale derived state.
 - MCP mutation results add protocol metadata, refreshed model revision metadata, and affected scope metadata.
 
 #### Metadata
@@ -511,19 +518,21 @@ Server state includes:
 - Reqvire binary version.
 - Supported MCP protocol revision.
 - Reqvire tool contract version.
-- Parsed model cache source fingerprints for eligible Git-worktree model files.
-- Excluded-pattern metadata.
+- Parsed model cache identity and dependency observations under the bound In-Memory Model Build Cache Specification.
+- Active exclusion configuration and its matching policy.
 - Last parse and validation diagnostics.
 
 Cache rules:
 - Eligible Git-worktree Reqvire markdown files remain the durable source of truth.
 - Reqvire core parsing remains authoritative for model semantics.
-- Parsed model cache fingerprints are based on the scanned eligible Git-worktree markdown file set, each workspace-root-relative file path, file size, file content hash, and active model build options.
-- Cache freshness must not depend only on filesystem modification timestamps.
+- Model-loading tools and resources use the bound core cache construction identity, dependency freshness, build coordination, and publication contract; MCP does not maintain a second parsed-model cache.
+- Changes to applicable root ignore files are observed before the next model read and update the actual matcher and selected inventory without restarting MCP. Unchanged effective rules remain stable across regex use and worker threads.
+- Local external ontology bytes and other construction/validation dependencies participate in freshness under the core contract. Semantic prefixes, vocabulary, exports, and SPARQL use derived state from the same completed model as the graph. Missing or invalid current inputs follow the owning strict/lenient operation's error behavior instead of silently returning older semantic data.
 - Public model revisions follow the bound Model Revision Hash Specification. They do not replace the parsed-model cache key: source bytes, build options, excluded patterns, and source-control metadata retain their existing invalidation responsibilities. Migrating model revisions does not migrate the existing file-content hash algorithm.
-- Cached state is invalidated when eligible source files, eligible Git worktree metadata state, excluded patterns, Reqvire version, or Reqvire tool contract version changes.
+- Cached state is invalidated when relevant source/dependency observations, eligible Git worktree metadata state, effective exclusions, Reqvire version, or Reqvire tool contract version changes. Source changes can require refresh while the public parsed-element revision remains unchanged.
 - Controlled MCP mutations sync MCP internal state from the updated Reqvire core graph after successful core mutation.
-- External filesystem drift in eligible Git-worktree model files triggers cache invalidation and reparse before serving stale model data.
+- Each response is constructed from one completed model; any exposed model fingerprint describes that response's parsed elements. The source-cache generation is internal and is not inferred from the public model fingerprint.
+- The cache correctness change preserves existing tool names, request arguments, structured-result field names, and public SHA-256 revision encoding. It requires no new public cache-status field.
 - Dirty worktree state is reported in metadata and is not a default execution blocker when the equivalent Reqvire core operation can run.
 
 #### Metadata

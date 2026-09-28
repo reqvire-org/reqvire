@@ -565,6 +565,9 @@ Verify that immutable published runtime data and its manifest adopt embedded MCP
 - The existing `live_store::tests` module pins an independently calculated complete manifest and revision, including hashes for Unicode/numeric chunks and ontology bytes. The existing serve and browser refresh suites verify the shared primitive's wire compatibility through the same runtime and protocol.
 - Require exact equality with the expected refresh result file; preserve browser and request diagnostics on failure.
 
+##### Cache Correctness Regression Scope
+MCP Cache and Runtime Coherence Verification owns the additional rejected-mutation/preview refresh gating and superseded-build publication cases. Its cache integration and adapter regressions pass. Existing live-store and browser evidence establishes wire/snapshot behavior; the dedicated cache and adapter assertions establish source-cache/publication guarantees.
+
 #### Metadata
   * type: test-verification
 

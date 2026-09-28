@@ -5,7 +5,7 @@
 This objective groups verification of the shared SHA-256 primitive and versioned model revision encoding before their implementation is accepted.
 
 #### Details
-Concrete test verifications define required evidence and link executable tests as they become available. An evidence link identifies a test artifact; acceptance requires its assertions to pass. Do not link planned modules or unimplemented assertions as evidence. Existing Explorer runtime and browser refresh verifications remain in their interface objective and own wire-format compatibility and client/server integration checks.
+Concrete test verifications define required evidence and relate executable artifacts through satisfiedBy. An evidence relation identifies a test artifact; acceptance requires its assertions to pass. Consumer-specific wire-format compatibility and integration checks belong to the consuming subsystem's verification hierarchy.
 
 #### Metadata
   * type: verification-objective
@@ -13,7 +13,7 @@ Concrete test verifications define required evidence and link executable tests a
 
 ### Model Revision Hash Stability Verification
 
-Verify the complete versioned canonical encoding and model revision migration contract.
+Verify the complete versioned canonical encoding and model revision stability contract.
 
 #### Details
 
@@ -26,13 +26,13 @@ Verify the complete versioned canonical encoding and model revision migration co
 - Length and count framing distinguish ambiguous concatenations, empty values, and different tuple boundaries.
 - Changes to meaningful whitespace, including inside literals, are retained. Excluded runtime fields, parser bookkeeping, page frontmatter, and referenced external-file bytes do not change the revision by themselves.
 - Resolved internal paths use workspace-relative `/` separators; non-UTF-8 paths are rejected without lossy hashing. External URL text is preserved.
-- Existing affected tool responses retain their field names and shapes, carry 64 lowercase hexadecimal characters, and agree for the same snapshot. Clients cannot expect old 16-character values to map to new revisions.
-- The model encoder and existing Explorer wire hashing use the same core primitive while retaining their distinct input bytes. Existing impact-analysis, model-cache file, and identifier hash behavior is unchanged.
+- The returned model revision carries 64 lowercase hexadecimal characters with no prefix and agrees across consumers for identical canonical inputs.
+- The model encoder uses the shared primitive over the specified canonical bytes. Generated-artifact equality, source-cache freshness, and other hash policies remain outside the parsed-element projection.
 
 ##### Required Evidence
-The linked `test-model-revision-hashing` E2E suite exercises the real HTTP MCP server with fixed canonical bytes and independently calculated digests for empty, Unicode, and multi-element models. It checks governance and namespace metadata edits, content and literal whitespace, element addition/removal/rename/movement, element/metadata/relation/binding order, equivalent forward/inverse authoring, relation labels and removal, binding target changes, and excluded page annotations, artifact bytes, size estimates, and absolute workspace location. Repeated calls and a new server process must agree. The existing fingerprint fields in workspace and semantic tool responses, including vocabulary summary/items and SELECT/ASK/CONSTRUCT results, must agree with the revision for the same snapshot. A page-only source edit with unchanged length and modification time must become visible in MCP search while leaving the model revision unchanged.
+Use independently established canonical byte and digest fixtures for empty, Unicode, and multi-element models, all target kinds, nonempty relations and bindings, and empty metadata values. Compare repeated requests and separate processes over identical snapshots. Isolate each included field and each exclusion so an unrelated change cannot supply the expected digest difference.
 
-The linked Rust encoder tests pin canonical bytes and independent digests, including a record with all target kinds, nonempty relations and bindings, Unicode, and an empty metadata value. They check individual field changes, target-kind distinctions, ambiguous concatenations, empty values and tuple boundaries, deduplication of effective tuples, parser bookkeeping and runtime-field exclusions, generated inverse edges, exact URL text, and rejection of absolute, unresolved, and non-UTF-8 paths. Duplicate authored relations are rejected before the E2E hashing path, so encoder deduplication is exercised directly in Rust. The ontology-base E2E mutation also selects an already-declared matching prefix, keeping content unchanged; Rust tests isolate each metadata field. The E2E suite additionally checks the advertised fingerprint schemas and rejection of non-UTF-8 source paths before parsing loses their original bytes. The shared primitive's known-answer verification and existing Explorer runtime verification own primitive correctness and wire-hash compatibility respectively.
+Exercise both direct record encoding and parsed-model construction. Direct encoding establishes tuple deduplication and invalid-path rejection independently of parser rules. Parsed-model cases establish resolved identifiers, generated inverse edges, metadata/content boundaries, workspace relocation, and rejection of non-UTF-8 source paths before information can be lost. Consumer interface compatibility and source-cache visibility are verified under their own requirements.
 
 #### Metadata
   * type: test-verification
@@ -57,7 +57,7 @@ Verify the exact-byte digest contract of the shared core hashing primitive.
 - Every output is exactly 64 lowercase hexadecimal characters with no prefix.
 
 ##### Required Evidence
-The linked core hashing module contains fixed known-answer vectors for empty input, `abc`, binary input with zero bytes, Unicode, spaces, and LF/CRLF line endings. Assertions check exact digests, lowercase hexadecimal width, and unchanged input buffers. The existing Explorer `abc` test checks caller compatibility and complements the shared primitive tests.
+Use fixed known-answer vectors for empty input, `abc`, binary input with zero bytes, Unicode, spaces, and LF/CRLF line endings. Assert exact digests, lowercase hexadecimal width, and unchanged input buffers. Consumer integration checks remain owned by the consuming subsystem's verifications.
 
 #### Metadata
   * type: test-verification

@@ -128,7 +128,7 @@ impl GraphRegistry {
                                 )));
                                 continue;
                             }
-                            if !absolute_path.exists() {
+                            if !crate::model_inputs::exists(&absolute_path) {
                                 errors.push(ReqvireError::MissingRelationTarget(format!(
                                     "Element '{}' references missing target '{}'",
                                     source_node.element.identifier,
@@ -2007,7 +2007,7 @@ mod tests {
             .expect("element B should register");
         registry.build_relation_graph();
 
-        let excluded = globset::GlobSetBuilder::new()
+        let excluded = crate::exclusions::ExclusionSetBuilder::new()
             .build()
             .expect("empty globset");
         let errors = registry
@@ -2031,7 +2031,7 @@ mod tests {
             .expect("element A should register");
         registry.build_relation_graph();
 
-        let excluded = globset::GlobSetBuilder::new()
+        let excluded = crate::exclusions::ExclusionSetBuilder::new()
             .build()
             .expect("empty globset");
         let errors = registry
@@ -2065,7 +2065,7 @@ mod tests {
             .expect("requirement should register");
         registry.build_relation_graph();
 
-        let excluded = globset::GlobSetBuilder::new()
+        let excluded = crate::exclusions::ExclusionSetBuilder::new()
             .build()
             .expect("empty globset");
         let errors = registry

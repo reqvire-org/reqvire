@@ -1,0 +1,12 @@
+# Elements
+
+### Broken Requirement
+
+The system shall reject a dangling relation.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Missing Requirement](#missing-requirement)
+---

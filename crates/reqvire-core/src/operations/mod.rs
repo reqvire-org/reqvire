@@ -4,6 +4,7 @@ use crate::change_impact;
 use crate::containment::ContainmentHierarchy;
 use crate::element::Element;
 use crate::error::ReqvireError;
+use crate::exclusions::ExclusionSet as GlobSet;
 use crate::format::{format_files, render_diff_json, FormatResult};
 use crate::git_commands;
 use crate::graph_registry::GraphRegistry;
@@ -13,7 +14,6 @@ use crate::report;
 use crate::search;
 use crate::verification_trace::{self, VerificationTracesReport};
 use crate::{ModelBuildOptions, ModelManager};
-use globset::GlobSet;
 use serde_json::Value;
 
 pub fn load_model(excluded_filename_patterns: &GlobSet) -> Result<ModelManager, ReqvireError> {

@@ -32,7 +32,7 @@ Canonical encoding and compatibility contract for the parsed-element model revis
 - Relations include both authored edges and generated inverse edges. Exclude `user_created`, display labels, and cached target IDs. Identical effective tuples contribute once. An edge change can therefore change both endpoint records.
 - Contract bindings encode targets and exclude cached referenced-file content hashes.
 - Preserve the parser's stored content, including ontology/shapes blocks and concept-reference content. Apply no further whitespace removal, trimming, Markdown rewriting, or RDF canonicalization.
-- Do not reuse the whitespace-stripped `hash_impact_content`: `"a b"` and `"ab"` remain distinct content. Formatting retained by the parser affects the revision; formatting discarded during parsing does not.
+- Content comparison policies that strip whitespace do not define this projection: `"a b"` and `"ab"` remain distinct content. Formatting retained by the parser affects the revision; formatting discarded during parsing does not.
 
 ##### Projection boundary
 - The revision covers the complete selected parsed-element collection. It excludes page frontmatter, line numbers, within-file element order, Git state, absolute workspace location, size estimates, change-impact flags and hashes, inherited governance projections, external referenced-file contents, and generated output bytes.
@@ -40,16 +40,15 @@ Canonical encoding and compatibility contract for the parsed-element model revis
 - Added or removed elements change the encoded collection. Moves and renames change identifiers or paths. Relocating the unchanged workspace preserves the revision when canonical relative paths and other inputs are identical.
 - A parent's authored governance change changes the model revision even though the child's own canonical record may stay unchanged. This model revision does not define a dependency-aware per-element cache key.
 
-##### Consumer migration and compatibility
-- Replace the `DefaultHasher` accumulation used by `model_fingerprint` in `tool_interface/arg_helpers.rs` with this one shared model revision computation. All existing callers use the same projection and encoder.
-- Retain existing `model_fingerprint` and `fingerprint` field names and response shapes. The digest changes from 16 to 64 lowercase hexadecimal characters; there is no old-to-new mapping.
-- Update shared interface contracts, output schemas, examples, and fixtures for affected workspace and semantic tools. The commit body and pull request description identify the new encoding version, metadata coverage, exclusions, and one-time cache invalidation.
+##### Consumer responsibilities and compatibility
+- Subsystems comparing or identifying parsed-element snapshots shall use this complete versioned projection and shared encoder. Their requirements bind this specification and own the field names, messages, storage, and invalidation behavior through which revisions are exposed.
+- Returned revisions use the digest representation defined by the bound SHA-256 contract. Consumers treat them as opaque equality tokens for this projection; revisions from a different encoding are not interchangeable without an explicit compatibility contract.
 - Format markers belong to the hashed bytes; returned digests remain unprefixed. Pin the canonical bytes and digests with fixed fixtures. A change to field selection, encoding, or canonicalization requires a new encoding version and documented cache invalidation.
 - Parser changes that alter canonical inputs can change the revision. Cross-version stability applies when the encoding version and canonical inputs remain identical.
-- Explorer's manifest revision retains its existing exact-wire-byte input and is not required to equal the model revision. Model-source equality and generated-artifact equality have separate input contracts and share only the hashing primitive.
+- Subsystems identifying generated artifacts or transmitted payloads define their own exact-byte input contracts. Equality of a parsed-element projection does not imply equality of those outputs, and their digests need not equal the model revision.
 
 ##### Deferred consumers
-Per-element fingerprinting is a designated future consumer of the same complete versioned element record and SHA-256 primitive. Public exposure, identity matching across moves or federated copies, snapshot-consistent manifests, dependency-aware invalidation, and hash fields in model/search/read responses are outside this implementation slice. Fingerprints are not persisted in authored Markdown. Incremental generation also needs generator, configuration, and dependency tracking beyond this revision contract.
+Subsystems requiring per-element comparison shall reuse the complete versioned element record and SHA-256 primitive. Public exposure, identity matching across moves or federated copies, snapshot-consistent collections, and dependency-aware invalidation require separate consumer contracts. This specification introduces no per-element interface field and does not persist fingerprints in authored Markdown. Incremental generation also needs generator, configuration, and dependency tracking beyond this revision contract.
 
 #### Metadata
   * type: specification
@@ -60,7 +59,7 @@ Per-element fingerprinting is a designated future consumer of the same complete 
 
 ### SHA-256 Hash Encoding Specification
 
-Shared byte hashing and integration boundary for model revision and generated artifact consumers.
+Shared exact-byte hashing contract for content comparison, addressing, and integrity verification.
 
 #### Details
 
@@ -70,20 +69,20 @@ Shared byte hashing and integration boundary for model revision and generated ar
 - Output: 64 lowercase hexadecimal characters with no prefix.
 - Identical bytes produce identical digests across platforms, locales, absolute workspace locations, and Rust compiler versions.
 - The primitive does not mutate, trim, normalize, canonicalize, or interpret its input. Consumer-specific serialization occurs before the primitive is called.
-- Public core API: `pub fn sha256_hex(bytes: &[u8]) -> String`, owned by `reqvire-core` in `crates/reqvire-core/src/hashing.rs` and exported through the core library.
+- Shared native-library API: `pub fn sha256_hex(bytes: &[u8]) -> String`.
 
-##### Existing Explorer implementation consolidation
-- Extract the existing SHA-256 implementation in `crates/reqvire-cli/src/live_store.rs` into the shared core primitive. All Rust SHA-256 content consumers, including existing Explorer chunks, ontology output, and manifest revision generation, call that primitive.
-- Declare `sha2` once in workspace dependencies and consume it from `reqvire-core`. Remove the CLI's direct SHA-256 implementation and unused direct dependency when migrating its caller. Consumer adapters may select input bytes but must not implement a second digest or hexadecimal encoder.
-- Explorer keeps responsibility for JSON serialization, manifest assembly, chunk storage, and published snapshot lifecycle. Those behaviors remain owned by its existing runtime and live-store contracts.
-- For identical serialized JSON, ontology, and manifest bytes, Explorer emits exactly the same hashes, manifest protocol, and ETags as before primitive extraction. The model revision encoder does not replace Explorer wire-byte hashing.
-- The existing browser SHA-256 verifier remains an independent implementation of the same byte contract in the browser runtime; it verifies received bytes before parsing and does not need to execute Rust code.
-- Model revision and future artifact consumers reuse this same core function. Each consumer documents its input projection and encoding separately.
+##### Consumer responsibilities
+- Native subsystems producing SHA-256 content fingerprints shall reuse this shared primitive. This includes subsystems for state comparison, content-addressed storage or transfer, generated-artifact identification, and content-integrity verification.
+- Consuming requirements bind this specification. Each consumer separately defines its input projection, serialization, and compatibility policy in contracts that it owns.
+- The shared implementation owns the digest algorithm, hexadecimal encoding, and native hashing dependency. Consumer adapters select input bytes and do not implement a second native digest or hexadecimal encoder.
+- A semantic-state consumer defines a versioned canonical encoding before hashing. An exact-content or transmitted-payload consumer hashes the authoritative serialized bytes; parsing and reserialization are not substitutes for those bytes.
+- Verifiers in independent execution environments may use their platform's SHA-256 implementation while conforming to the same exact-byte and output-encoding contract.
+- Adopting the shared primitive preserves existing digest values when the supplied bytes are unchanged. Changes to consumer serialization, identifiers, transport fields, storage, publication, or refresh policies require the consumer's own contract changes.
 
 ##### Scope
-- Existing FxHasher-based impact-content, model-cache file, and identifier hashes retain their existing contracts in this implementation slice.
-- Hashes remain derived values. No SHA-256 field is persisted in authored Markdown, and no artifact header stamping or signature behavior is added.
-- This contract adds no command, flag, or per-element API field. Managed SPARQL construct export and additional artifact drift workflows are later consumers.
+- This contract governs consumers that require SHA-256 content fingerprints; it does not redefine other hash algorithms or equality policies.
+- Hashes are derived values. Persisting, exposing, or embedding a digest requires a separate consumer contract; the primitive does not modify authored content or generated artifacts.
+- Command surfaces, interface fields, artifact annotations, signatures, and automatic regeneration are consumer responsibilities outside this primitive contract.
 
 #### Metadata
   * type: specification

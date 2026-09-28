@@ -228,6 +228,9 @@ The system shall serialize mutation execution per workspace when the MCP transpo
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
+
 #### Relations
   * definedBy: [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
@@ -245,12 +248,16 @@ Detailed preview, execution, diagnostics, changed-file reporting, affected-scope
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
+
 #### Relations
   * definedBy: [MCP Mutation Execution Flow Specification](Specifications.md#mcp-mutation-execution-flow-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/tool_interface/mod.rs)
   * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
   * verifiedBy: [MCP Mutation Execution Flow Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-mutation-execution-flow-verification)
 ---
@@ -284,6 +291,7 @@ The system shall expose mutation tools only through typed Reqvire core operation
   * [Relation Operations Specification](../../ModelStructure/Specifications.md#relation-operations-specification)
   * [Atomic Relation Relink Workflow Specification](../../Operations/ModelOperations/Specifications.md#atomic-relation-relink-workflow-specification)
   * [Relation Consistency Maintenance Contract Specification](../../Operations/ModelOperations/Specifications.md#relation-consistency-maintenance-contract-specification)
+  * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
 
 #### Relations
   * definedBy: [MCP Mutation Tool Safety Specification](Specifications.md#mcp-mutation-tool-safety-specification)
@@ -425,12 +433,15 @@ The system shall keep MCP server cached model state subordinate to Reqvire sourc
 - The MCP server shall keep cached model state subordinate to Reqvire core parsing.
 - The MCP server shall report enough revision state for clients to reason about cache freshness.
 - The MCP server shall refresh stale model state before returning authoritative model evidence.
+- When active exclusion configuration or a model construction dependency changes, the MCP server shall apply the updated inputs on subsequent model reads without requiring a server restart.
+- The MCP server shall use the shared core cache correctness and publication guarantees for model reads and post-mutation synchronization.
 
 #### Metadata
   * type: requirement
 
 #### Contract Bindings
   * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
+  * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
 
 #### Relations
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)

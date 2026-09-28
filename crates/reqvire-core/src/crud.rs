@@ -5,10 +5,10 @@
 use crate::diff::{generate_crud_diffs, generate_file_diff, CrudOperation, CrudResult, FileDiff};
 use crate::element::{ContractBindingEntry, ContractBindingTarget};
 use crate::error::ReqvireError;
+use crate::exclusions::ExclusionSet as GlobSet;
 use crate::graph_registry::GraphRegistry;
 use crate::model::ModelManager;
 use crate::relation::LinkType;
-use globset::GlobSet;
 use rustc_hash::{FxHashMap, FxHashSet};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Component, Path, PathBuf};

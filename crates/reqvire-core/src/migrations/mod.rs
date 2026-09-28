@@ -1,11 +1,11 @@
 use crate::diff::{generate_file_diff, FileDiff};
 use crate::element::{Element, ElementType, CONTRACT_BINDINGS_SECTION};
 use crate::error::ReqvireError;
+use crate::exclusions::ExclusionSet as GlobSet;
 use crate::filesystem;
 use crate::graph_registry::{ElementNode, GraphRegistry};
 use crate::relation::{LinkType, Relation, RELATION_TYPES};
 use crate::utils;
-use globset::GlobSet;
 use serde::Serialize;
 use std::collections::BTreeMap;
 

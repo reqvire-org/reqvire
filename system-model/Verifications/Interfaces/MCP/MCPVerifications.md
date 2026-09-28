@@ -70,6 +70,44 @@ This verification shall prove that MCP does not expose arbitrary shell execution
   * verify: [MCP Access Control Baseline](../../../Interfaces/MCP/Tools.md#mcp-access-control-baseline)
 ---
 
+### MCP Cache and Runtime Coherence Verification
+
+Verify that long-lived MCP tools apply the core cache freshness/publication contract and that embedded Explorer refresh follows completed successful writes.
+
+#### Details
+
+##### Acceptance Criteria
+- In one running MCP process, changing applicable root exclusions changes subsequent search/read results without restart. Editing only a used external ontology updates vocabulary and SPARQL results; their public parsed-element revision may remain unchanged. Invalid current inputs produce the applicable tool error or lenient diagnostics instead of stale success, and repaired inputs recover.
+- Run equivalent model-read scenarios through standalone MCP and the embedded MCP endpoint so both adapters apply the same core cache contract.
+- Coordinate a read/rebuild with a real persisted MCP write. Reads that already captured an allowed pre-write snapshot remain internally consistent; dependent reads after successful mutation completion observe the post-write graph and semantic state. Tools that cannot expose the required concurrent-read context wait for the write gate.
+- A superseded pre-write build cannot replace the model used for post-write MCP evidence or Explorer runtime generation. Generated store and ontology artifacts agree with the accepted post-write model under the existing runtime projection.
+- Successful persisted mutations invoke the existing post-write runtime refresh lifecycle. Preview requests, JSON-RPC errors, and tool results with `isError: true` do not invoke it, change published assets/revision, or clear a previous runtime-refresh diagnostic.
+- A runtime-generation failure after a successful persisted mutation preserves the last valid Explorer snapshot and the existing diagnostic behavior; it remains distinct from a rejected mutation with no write.
+- Ordinary manifest/chunk requests keep reading the published snapshot without triggering source scans or builds. External edits become visible to MCP model reads under the core contract; this change does not add external-edit polling to Explorer's publication lifecycle.
+- Tool names, request arguments, structured-result field names, SHA-256 model revision encoding, and Explorer manifest/chunk/ETag contracts remain compatible with the existing interface specifications.
+
+##### Required Evidence
+- Extend the existing cache/MCP/serve suites with real server requests and committed expected results. Observe cache builds through internal test instrumentation or logs, and observe post-write hook invocation directly; unchanged assets alone cannot prove that an unnecessary rebuild did not run.
+- Use controlled barriers for read/write races and a mutation rejected by core validation that returns an MCP tool error inside a successful JSON-RPC response.
+- Compare MCP graph/query results and generated Explorer artifacts from the accepted model while preserving existing last-valid-snapshot and browser refresh assertions. Keep the existing browser wire-hash verification unchanged.
+
+##### Evidence Status
+All 190 shared HTTP regression checks pass, including freshness in standalone and embedded MCP and preservation of Explorer publication after rejected mutations. All eight adapter regressions pass: rejected writes and previews do not invoke refresh, prior refresh diagnostics and original tool errors remain intact, successful writes refresh once, and reads wait through controlled persistence. Core barriers establish superseded-build behavior and consistent captured semantic state; HTTP requests establish transport-visible outcomes.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
+  * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [model_cache_tests.rs](../../../../crates/reqvire-core/src/model_cache_tests.rs)
+  * satisfiedBy: [test.sh](../../../../tests/test-cache-integration/test.sh)
+  * verify: [MCP Mutation Concurrency Control](../../../Interfaces/MCP/Tools.md#mcp-mutation-concurrency-control)
+  * verify: [MCP Mutation Execution Flow](../../../Interfaces/MCP/Tools.md#mcp-mutation-execution-flow)
+  * verify: [MCP Server State and Cache](../../../Interfaces/MCP/Tools.md#mcp-server-state-and-cache)
+  * verify: [Served Explorer Runtime Freshness](../../../Interfaces/WebExplorer/Capabilities.md#served-explorer-runtime-freshness)
+---
+
 ### MCP Contract Layer Boundary Verification
 
 This verification shall prove that shared Reqvire MCP contracts are protocol-neutral below the MCP adapter.
@@ -118,6 +156,8 @@ Expected checks:
 - Verify concurrent HTTP mutation requests for the same workspace are serialized so filesystem writes and post-mutation model refresh cannot interleave.
 - Verify a read after an HTTP mutation observes the refreshed model state and reports the observed model revision or fingerprint.
 - Verify HTTP transport behavior is provided by RMCP rather than a Reqvire-owned HTTP JSON-RPC parser.
+
+Cache rebuild races and post-write model/runtime coherence are additionally covered by MCP Cache and Runtime Coherence Verification. Existing transport assertions alone do not establish those guarantees.
 
 #### Metadata
   * type: test-verification
@@ -441,6 +481,9 @@ Expected checks:
 - Verify controlled MCP mutations refresh MCP internal state from the updated Reqvire core graph.
 - Verify external filesystem drift triggers invalidation/reparse before serving stale model data.
 - Verify dirty worktree state is reported in metadata when available and does not block tools when the equivalent Reqvire core operation can run.
+
+##### Evidence Scope
+The linked hashing suite proves the unchanged-public-revision page-content freshness case. Model Cache Input Freshness Verification owns actual cache reuse and complete dependency invalidation; MCP Cache and Runtime Coherence Verification owns live configuration/dependency visibility across MCP tools and the embedded runtime boundary. Their passing regression assertions establish those guarantees independently of equal model revisions.
 
 #### Metadata
   * type: test-verification

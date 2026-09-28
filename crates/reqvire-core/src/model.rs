@@ -4,9 +4,9 @@ use crate::graph_registry::GraphRegistry;
 use crate::semantic_store::SemanticModelStore;
 use log::debug;
 
+use crate::exclusions::ExclusionSet as GlobSet;
 use crate::parser;
 use crate::utils;
-use globset::GlobSet;
 
 #[derive(Debug, Clone)]
 pub struct ModelManager {

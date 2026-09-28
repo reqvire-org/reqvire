@@ -1,0 +1,21 @@
+# Elements
+
+### Evidence Capability
+
+Evidence management.
+
+#### Metadata
+  * type: capability
+---
+
+### Evidence Requirement
+
+The system shall retain valid evidence references.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Evidence Capability](#evidence-capability)
+  * satisfiedBy: [Evidence](evidence.txt)
+---

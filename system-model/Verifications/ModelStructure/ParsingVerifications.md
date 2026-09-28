@@ -2,7 +2,7 @@
 
 ### Model Parsing and Structure Verification Objective
 
-This objective groups verification that Reqvire parses element structure, subsections, fragments, governance metadata, contracts, and specification files consistently.
+This objective groups verification that Reqvire parses element structure, subsections, fragments, governance metadata, contracts, and specification files consistently, and reuses completed model builds with correct source freshness and publication.
 
 #### Metadata
   * type: verification-objective
@@ -258,30 +258,103 @@ This test verifies that the system correctly normalizes element name fragments a
 
 ### In-Memory Model Build Cache Verification
 
-This verification shall prove that the in-memory model build cache returns cached models on unchanged workspaces and rebuilds after content changes or CRUD invalidation.
+This verification checks read-result consistency and mutation visibility through the cached model-loading path. The dedicated cache input/freshness and publication verifications establish whether reuse and rebuild coordination actually occurred.
 
 #### Details
 
 ##### Acceptance Criteria
-- Two consecutive `reqvire.read_element` (or `reqvire.search`) calls over an unchanged workspace return equal results, demonstrating a cache hit without re-parsing.
-- Modifying, adding, or removing a `.md` file changes the workspace fingerprint and triggers a rebuild so the new content is reflected.
-- After a CRUD write (e.g. `reqvire.add_element`), the cache is invalidated and the next read reflects the newly added element.
-- Changing `with_size_estimates` or `lenient` build options produces a different cache key and an appropriately different model.
-- Git-commit scan paths (`--git-commit`) do not use the cache.
+- Two consecutive `reqvire.read_element` calls over an unchanged workspace return the same requested element. Equal payloads establish result consistency only, not a cache hit or absence of parsing.
+- After a successful persisted `reqvire.add_element`, a subsequent search exposes the added element.
+- After a direct Markdown edit adds an element, a subsequent search exposes that element.
+- A standalone `change-impact --git-commit` invocation completes against the fixture history. A separate instrumented core check establishes actual cache bypass.
 
 ##### Test Criteria
 1. Start a `reqvire mcp` server against a fixture workspace.
-2. Issue two identical `reqvire.read_element` (or `reqvire.search`) calls back-to-back; assert both return the same element set (cache hit, no re-parse).
+2. Issue two identical `reqvire.read_element` calls back-to-back; assert both resolve the requested element and return equal structured content.
 3. Issue a `reqvire.add_element` CRUD call to add a new element; assert the call succeeds.
-4. Issue another `reqvire.search`; assert the newly added element is present, proving `invalidate()` cleared the cache and forced a rebuild.
-5. Modify, add, or remove a `.md` file and issue a read; assert the result reflects the change (fingerprint change forces rebuild).
-6. Run a `reqvire change-impact --git-commit=<hash>` scan and confirm it does not consult the cache.
+4. Issue another `reqvire.search`; assert the newly added element is present.
+5. Append another element directly to a Markdown source and issue a read; assert the result reflects the change.
+6. Run a standalone `reqvire change-impact --git-commit=<hash>` invocation and check its exit status.
+
+##### Evidence Scope
+The satisfiedBy evidence supplies these response and mutation assertions. Response equality and standalone command completion do not prove internal reuse or bypass. The dedicated input-freshness and publication verifications own the instrumented correctness assertions and their execution status.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../tests/test-cache-integration/test.sh)
+  * verify: [In-Memory Model Build Cache](../../ModelStructure/ModelManagement.md#in-memory-model-build-cache)
+---
+
+### Model Cache Input Freshness Verification
+
+Verify stable model construction identity, complete input invalidation, and recovery while preserving the authoritative parser's workspace and dependency semantics.
+
+#### Details
+
+##### Acceptance Criteria
+- After one completed build, repeated unchanged reads reuse that model without another parse, validation, or semantic-store build. Exercise a regex-backed exclusion pattern that executes matching, multiple worker threads, and reconstruction of an equivalent matcher; response equality alone is insufficient evidence.
+- Effective pattern identity distinguishes different rules and matching options even when pattern counts and the selected Markdown inventory are equal. Reordering or repeating any-match rules without changing their effective meaning preserves identity.
+- Creating, editing, and removing applicable root `.gitignore` and `.reqvireignore` files changes the actual active matcher and selected model inventory on the next load without restart. Equivalent policy edits do not force construction solely because of matcher runtime state. Nested ignore files do not change the root-only policy.
+- Source edits, additions, removals, and moves become visible. Equal-length content edits with preserved modification time remain detectable, including page-only changes excluded from the public parsed-element revision.
+- Editing a consumed local external ontology in Turtle/TTL, RDF/XML, or JSON-LD refreshes its derived semantic state even when Markdown, public model revision, file length, modification time, and dirty/clean status are unchanged.
+- Removing, making unreadable, or invalidating a consumed dependency produces the authoritative builder's applicable failure or diagnostics; restoring it allows recovery. Creation/removal of a higher-priority external-source resolution candidate replaces a previously used fallback under the existing resolution rules.
+- Removal or eligibility changes of referenced evidence/resource targets trigger applicable validation rather than reuse of a previously valid model. Inputs used only for existence validation are distinguished from files whose contents contribute to cached semantic state.
+- Workspace root/worktree scope, available Git metadata, effective exclusions, version context, and build-mode changes cannot reuse an incompatible model. Lenient results never satisfy strict requests; size-estimate modes retain their own output semantics.
+- Historical Git-commit construction does not consume or populate the current-workspace cache.
+
+##### Required Evidence
+- Extend the existing cache integration suite with real long-lived MCP requests, committed fixtures/expected outputs, and explicit build/reuse observations. Use ignored files and at least one exclusion such as `**/*[0-9]*.md` that exercises mutable regex state while preserving the selected fixture sources.
+- Use core-level tests for matching-option distinctions, equivalent matcher reconstruction, mode separation, historical-build bypass, and referenced-target worktree eligibility transitions where controlled workspace setup or internal observations are needed.
+- Record parser/build invocation counts or equivalent structured test instrumentation; neither latency thresholds nor equal payloads prove reuse. Establish input changes independently and assert visible results against a fresh authoritative build. Keep server logs outside the fixture's scanned source/Git state.
+- Keep fixtures continuously dirty or explicitly preserve Git metadata when isolating dependency freshness, so a dirty-state transition cannot accidentally supply the invalidation being tested.
+
+##### Evidence Status
+Regression execution passes for worker-independent exclusion identity, equivalent policy ordering, live exclusion reloads, external dependency freshness, source-resolution precedence, evidence removal, and recovery. Controls also pass for ordinary source edits, build-mode separation, workspace/Git context, historical-cache isolation, and referenced-target eligibility loss and recovery. The shared HTTP suite passes all 190 checks; instrumented core tests establish actual reuse rather than only equal responses.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
+  * satisfiedBy: [model_cache_tests.rs](../../../crates/reqvire-core/src/model_cache_tests.rs)
+  * satisfiedBy: [test.sh](../../../tests/test-cache-integration/test.sh)
+  * verify: [In-Memory Model Build Cache](../../ModelStructure/ModelManagement.md#in-memory-model-build-cache)
+---
+
+### Model Cache Publication Verification
+
+Verify coordinated model construction and publication of complete current state across concurrent loads, invalidation, and controlled writes.
+
+#### Details
+
+##### Acceptance Criteria
+- Concurrent cold requests for identical workspace inputs and build mode perform one model build and receive its completed result. Distinct build modes cannot share incompatible graph, diagnostics, or size-estimate state.
+- While a build is paused before publication, invalidate its workspace and complete a newer persisted update/build. Releasing the older build cannot replace the newer cached state; waiting dependent reads resolve current state or an explicit applicable error.
+- A relevant source, configuration, or dependency change during construction supersedes the candidate. The published identity and model reflect the inputs actually consumed; a candidate cannot be tagged with one input observation while containing another.
+- A read that has captured a completed model retains consistent graph, page, and semantic query state while later publication occurs. Subsequent dependent reads after a successful write use the completed new state.
+- Controlled writes cannot expose partially persisted files to a newly published model. Reuse of a post-write model requires its semantic state and persisted-input identity to agree with its graph; invalidation and rebuild remain a valid fallback.
+- Failed construction or superseded attempts release all waiting requests and permit retry/recovery. Continuous external changes produce a bounded retry outcome rather than an endless wait or stale success. Old valid data is not reported as current for invalid new inputs.
+- Rejected/previews with unchanged sources do not publish mutation candidates. If a failure occurs after any persistence, affected cache state is invalidated and the operation error remains visible.
+
+##### Required Evidence
+- Add deterministic core tests using barriers or controlled build hooks to hold input capture, build completion, invalidation, and publication at known points. Assert build counts and the actual retained/resulting model, not scheduling delays.
+- Exercise both successful and failing shared builds and assert every waiter completes under a bounded test deadline. Verify the next valid load recovers.
+- Inject a persistence failure only after observing changed bytes successfully written to the first affected file. Assert the operation error remains visible, affected cached state is invalidated, subsequent reads follow authoritative validation, and repaired sources recover.
+- Compare graph/page data and SPARQL-visible triples for the accepted generation; verify a captured older result remains internally consistent. Generation instrumentation is internal and does not require new public interface fields.
+- Consumer-owned verifications establish transport write gating and derived-artifact integration; this verification owns the core construction/publication invariants.
+
+##### Evidence Status
+Regression execution passes for coordinated construction, superseded publication, input rechecks, bounded failure under continuous edits, and invalidation after partial persistence. All 19 core cache tests pass, including a contender arriving between cache lookup and build registration. Captured graph/page/SPARQL state and derived semantic artifacts remain consistent across later changes. The consumer adapter tests establish read isolation during controlled persistence. Persistence errors remain visible, partial inputs receive authoritative validation, and repaired inputs recover.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
+  * satisfiedBy: [mcp_cache_tests.rs](../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [model_cache_tests.rs](../../../crates/reqvire-core/src/model_cache_tests.rs)
   * verify: [In-Memory Model Build Cache](../../ModelStructure/ModelManagement.md#in-memory-model-build-cache)
 ---
 

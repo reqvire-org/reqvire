@@ -1,6 +1,6 @@
-use globset::{Glob, GlobSet, GlobSetBuilder};
+use crate::exclusions::{ExclusionSet as GlobSet, ExclusionSetBuilder as GlobSetBuilder};
+use globset::Glob;
 use log::{debug, warn};
-use std::fs;
 use std::path::{Path, PathBuf};
 
 /// Reads gitignore patterns from the repository root .gitignore file.
@@ -48,12 +48,12 @@ fn read_reqvireignore_patterns() -> Vec<String> {
 fn read_root_ignore_patterns(root: &Path, filename: &str, prefix: Option<&Path>) -> Vec<String> {
     let ignore_path = root.join(filename);
 
-    if !ignore_path.exists() {
+    if !crate::model_inputs::exists(&ignore_path) {
         debug!("No {} file found at {}", filename, root.display());
         return vec![];
     }
 
-    match fs::read_to_string(&ignore_path) {
+    match crate::model_inputs::read_to_string(&ignore_path) {
         Ok(content) => content
             .lines()
             .filter(|line| !line.trim().is_empty() && !line.trim().starts_with('#'))
@@ -119,7 +119,10 @@ pub fn get_excluded_filename_patterns_glob_set() -> GlobSet {
         }
     }
 
-    builder.build().expect("Failed to build glob set")
+    builder
+        .build()
+        .expect("Failed to build glob set")
+        .workspace_policy()
 }
 
 #[cfg(test)]

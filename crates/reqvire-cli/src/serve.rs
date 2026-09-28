@@ -1,6 +1,6 @@
 use crate::live_store::{ChunkRequest, LiveStore};
 use crate::mcp;
-use globset::GlobSet;
+use reqvire::exclusions::ExclusionSet as GlobSet;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
 use std::sync::Arc;
@@ -240,7 +240,7 @@ async fn refresh_runtime_assets(state: &ServeState) -> Result<(), ReqvireError> 
                 with_size_estimates: false,
             },
         )?;
-        let assets = build_runtime_assets(&model.graph_registry)?;
+        let assets = build_runtime_assets(&model)?;
         RuntimeSnapshot::new(assets).map(Arc::new)
     })
     .await
@@ -497,7 +497,11 @@ mod tests {
 
     fn state(live_refresh: bool) -> ServeState {
         ServeState {
-            excluded_filename_patterns: Arc::new(globset::GlobSetBuilder::new().build().unwrap()),
+            excluded_filename_patterns: Arc::new(
+                reqvire::exclusions::ExclusionSetBuilder::new()
+                    .build()
+                    .unwrap(),
+            ),
             runtime_assets: Arc::new(Mutex::new(RuntimeState {
                 snapshot: snapshot("initial"),
                 refresh_error: None,

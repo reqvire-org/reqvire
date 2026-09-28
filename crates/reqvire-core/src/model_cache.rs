@@ -1,45 +1,34 @@
-//! In-memory cache for the parsed [`ModelManager`], keyed by a fingerprint of
-//! the scanned markdown files and the active build options.
+//! Shared current-workspace model cache.
 //!
-//! Every MCP tool dispatch and many CLI commands call a `load_model*` variant
-//! that re-parses the whole workspace from disk. This module memoizes the
-//! result so that repeated calls within an unchanged workspace avoid parsing
-//! and validation. Freshness checks still read source contents to hash them.
-//!
-//! The fingerprint is the set of `(relative_path, size, content hash)` for
-//! every `.md` file the scanner would consider, plus the [`ModelBuildOptions`].
-//! If any file changes, is added, or is removed, the fingerprint changes and the
-//! model is rebuilt. This mirrors the recommendation in `CodeReview.md` (item
-//! 2).
+//! Source identity includes matching policy, workspace context, Markdown bytes and dependencies
+//! consumed by validation. It is distinct from public semantic model revisions.
 
 use crate::error::ReqvireError;
+use crate::exclusions::ExclusionSet as GlobSet;
 use crate::model::{ModelBuildOptions, ModelManager};
+use crate::model_inputs::{InputObservationGuard, Inputs};
 use crate::{tool_interface, utils};
-use globset::GlobSet;
 use log::debug;
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::process::Command;
-use std::sync::Mutex;
+use std::sync::{Arc, Condvar, Mutex};
 
-/// The cached model together with the fingerprint that produced it.
 struct CachedModel {
     key: CacheKey,
+    inputs: Inputs,
     model: ModelManager,
 }
 
-/// Cache key: build options plus a sorted map of every scanned file path to a
-/// content fingerprint. Two keys are equal only when the same set of files with
-/// the same content is observed and the build options match.
 #[derive(Clone, Eq, PartialEq)]
 struct CacheKey {
     options: ModelBuildOptions,
     workspace_root: PathBuf,
     git_worktrees: Vec<GitWorktreeFingerprint>,
-    excluded_patterns: String,
+    excluded_patterns: Vec<(String, String)>,
     reqvire_version: &'static str,
     tool_contract_version: &'static str,
-    files: BTreeMap<PathBuf, FileFingerprint>,
+    files: BTreeMap<PathBuf, String>,
 }
 
 #[derive(Clone, Eq, PartialEq)]
@@ -49,84 +38,220 @@ struct GitWorktreeFingerprint {
     dirty: bool,
 }
 
-#[derive(Clone, Eq, PartialEq)]
-struct FileFingerprint {
-    len: u64,
-    content_hash: String,
+struct CacheState {
+    entry: Option<Arc<CachedModel>>,
+    generation: u64,
+    flights: Vec<Arc<Flight>>,
 }
 
-static MODEL_CACHE: Mutex<Option<CachedModel>> = Mutex::new(None);
+struct Flight {
+    key: CacheKey,
+    generation: u64,
+    outcome: Mutex<Option<Outcome>>,
+    ready: Condvar,
+}
 
-/// Builds (or reuses) a [`ModelManager`] for the current workspace.
-///
-/// On a cache hit the stored model is cloned and returned, avoiding a full
-/// re-parse. On a miss the workspace is parsed and validated with the supplied
-/// `options`, the result is cached, and a clone is returned.
-///
-/// This cache only covers the current working tree. Git-commit scans still use
-/// [`crate::model::ModelManager::parse_and_validate`] directly.
-pub fn load_cached_model(
-    excluded_filename_patterns: &GlobSet,
+#[derive(Clone)]
+enum Outcome {
+    Complete(Arc<Result<ModelManager, ReqvireError>>),
+    Retry,
+}
+
+// Ensure waiters are released even if a builder unwinds before completing.
+struct FlightGuard(Arc<Flight>);
+impl Drop for FlightGuard {
+    fn drop(&mut self) {
+        let mut state = MODEL_CACHE.lock().expect("model cache mutex poisoned");
+        let mut outcome = self.0.outcome.lock().expect("model flight mutex poisoned");
+        if outcome.is_none() {
+            *outcome = Some(Outcome::Retry);
+        }
+        drop(outcome);
+        state.flights.retain(|other| !Arc::ptr_eq(other, &self.0));
+        drop(state);
+        self.0.ready.notify_all();
+    }
+}
+
+static MODEL_CACHE: Mutex<CacheState> = Mutex::new(CacheState {
+    entry: None,
+    generation: 0,
+    flights: Vec::new(),
+});
+const MAX_BUILD_ATTEMPTS: usize = 3;
+
+fn capture(
+    supplied: &GlobSet,
     options: ModelBuildOptions,
-) -> Result<ModelManager, ReqvireError> {
-    let workspace_scope = crate::workspace::WorkspaceScope::discover()?;
-    // Compute the fingerprint by scanning the same files the parser would.
-    let files = utils::scan_markdown_files(None, excluded_filename_patterns)?;
-    let mut fingerprint = BTreeMap::new();
-    for path in &files {
-        let content = std::fs::read_to_string(path)?;
-        let relative_path = utils::get_relative_path(path)?;
-        fingerprint.insert(
-            relative_path,
-            FileFingerprint {
-                len: content.len() as u64,
-                content_hash: utils::hash_content(&content),
-            },
+) -> Result<(GlobSet, CacheKey), ReqvireError> {
+    let exclusions = supplied.refreshed();
+    let scope = crate::workspace::WorkspaceScope::discover()?;
+    let mut files = BTreeMap::new();
+    for path in utils::scan_markdown_files(None, &exclusions)? {
+        let content = crate::model_inputs::read_to_string(&path)?;
+        files.insert(
+            utils::get_relative_path(&path)?,
+            crate::utils::hash_content(&content),
         );
     }
     let key = CacheKey {
         options,
-        workspace_root: workspace_scope.root.clone(),
-        git_worktrees: git_worktree_fingerprints(&workspace_scope),
-        excluded_patterns: format!("{:?}", excluded_filename_patterns),
+        workspace_root: scope.root.clone(),
+        git_worktrees: git_worktree_fingerprints(&scope),
+        excluded_patterns: exclusions.identity(),
         reqvire_version: env!("CARGO_PKG_VERSION"),
         tool_contract_version: tool_interface::TOOL_CONTRACT_VERSION,
-        files: fingerprint,
+        files,
     };
+    Ok((exclusions, key))
+}
 
-    // Cache hit: return a clone without re-parsing.
-    {
-        let cache = MODEL_CACHE.lock().expect("model cache mutex poisoned");
-        if let Some(cached) = cache.as_ref() {
-            if cached.key == key {
-                debug!(
-                    "model cache hit ({} files, lenient={}, size_estimates={})",
-                    cached.key.files.len(),
-                    options.lenient,
-                    options.with_size_estimates
-                );
-                return Ok(cached.model.clone());
+/// Load a complete graph, pages and semantic store.
+///
+/// Identical concurrent misses share one result, including validation failures. Historical builds bypass
+/// this cache. External changes are checked on each load, without a watcher.
+pub fn load_cached_model(
+    excluded_filename_patterns: &GlobSet,
+    options: ModelBuildOptions,
+) -> Result<ModelManager, ReqvireError> {
+    for _ in 0..MAX_BUILD_ATTEMPTS {
+        let generation = MODEL_CACHE
+            .lock()
+            .expect("model cache mutex poisoned")
+            .generation;
+        let observation_guard = InputObservationGuard::start();
+        let (exclusions, key) = capture(excluded_filename_patterns, options)?;
+        #[cfg(test)]
+        tests::checkpoint("captured");
+
+        let cached = MODEL_CACHE
+            .lock()
+            .expect("model cache mutex poisoned")
+            .entry
+            .clone();
+        if let Some(cached) = &cached {
+            if cached.key == key && cached.inputs.is_current() {
+                let observed = observation_guard.finish();
+                if observed.is_current()
+                    && MODEL_CACHE
+                        .lock()
+                        .expect("model cache mutex poisoned")
+                        .generation
+                        == generation
+                {
+                    debug!(
+                        "model cache hit ({} files, lenient={}, size_estimates={})",
+                        key.files.len(),
+                        options.lenient,
+                        options.with_size_estimates
+                    );
+                    return Ok(cached.model.clone());
+                }
+                continue;
             }
         }
+
+        #[cfg(test)]
+        tests::checkpoint("lookup-miss");
+        let (flight, builder) = {
+            let mut state = MODEL_CACHE.lock().expect("model cache mutex poisoned");
+            if state.generation != generation {
+                continue;
+            }
+            // A build may have completed while this caller checked dependency
+            // freshness outside the lock. Reconsider that entry before starting
+            // another build for the same observation.
+            if state.entry.as_ref().is_some_and(|entry| {
+                entry.key == key && !cached.as_ref().is_some_and(|old| Arc::ptr_eq(old, entry))
+            }) {
+                continue;
+            }
+            let existing = state
+                .flights
+                .iter()
+                .find(|flight| flight.generation == generation && flight.key == key)
+                .cloned();
+            let registration = existing.map_or_else(
+                || {
+                    let flight = Arc::new(Flight {
+                        key: key.clone(),
+                        generation,
+                        outcome: Mutex::new(None),
+                        ready: Condvar::new(),
+                    });
+                    state.flights.push(Arc::clone(&flight));
+                    (flight, true)
+                },
+                |flight| (flight, false),
+            );
+            drop(state);
+            registration
+        };
+        if !builder {
+            drop(observation_guard);
+            #[cfg(test)]
+            tests::checkpoint("waiting");
+            let mut outcome = flight.outcome.lock().expect("model flight mutex poisoned");
+            while outcome.is_none() {
+                outcome = flight
+                    .ready
+                    .wait(outcome)
+                    .expect("model flight mutex poisoned");
+            }
+            let completed = outcome.as_ref().expect("completed model flight").clone();
+            drop(outcome);
+            match completed {
+                Outcome::Complete(result) => return result.as_ref().clone(),
+                Outcome::Retry => continue,
+            }
+        }
+
+        let _flight_guard = FlightGuard(Arc::clone(&flight));
+        debug!(
+            "model cache miss ({} files, lenient={}, size_estimates={})",
+            key.files.len(),
+            options.lenient,
+            options.with_size_estimates
+        );
+        #[cfg(test)]
+        tests::checkpoint("build-start");
+        let mut model = ModelManager::new();
+        let result = model
+            .parse_and_validate_with_options(None, &exclusions, options)
+            .map(|_| model);
+        #[cfg(test)]
+        tests::checkpoint("built");
+        let inputs = observation_guard.finish();
+        // Compare both the inventory/policy/context and every value consumed by
+        // the build. Repeated inconsistent reads also reject the candidate (ABA).
+        let current = capture(excluded_filename_patterns, options)
+            .is_ok_and(|(_, after)| after == key)
+            && inputs.is_current();
+        let mut state = MODEL_CACHE.lock().expect("model cache mutex poisoned");
+        let outcome = if current && state.generation == generation {
+            if let Ok(model) = &result {
+                state.entry = Some(Arc::new(CachedModel {
+                    key,
+                    inputs,
+                    model: model.clone(),
+                }));
+            }
+            Outcome::Complete(Arc::new(result))
+        } else {
+            Outcome::Retry
+        };
+        *flight.outcome.lock().expect("model flight mutex poisoned") = Some(outcome.clone());
+        state.flights.retain(|other| !Arc::ptr_eq(other, &flight));
+        flight.ready.notify_all();
+        drop(state);
+        match outcome {
+            Outcome::Complete(result) => return result.as_ref().clone(),
+            Outcome::Retry => continue,
+        }
     }
-
-    debug!(
-        "model cache miss ({} files, lenient={}, size_estimates={})",
-        key.files.len(),
-        options.lenient,
-        options.with_size_estimates,
-    );
-
-    // Cache miss: rebuild outside the lock to avoid holding it during I/O.
-    let mut model = ModelManager::new();
-    model.parse_and_validate_with_options(None, excluded_filename_patterns, options)?;
-    let entry = CachedModel {
-        key,
-        model: model.clone(),
-    };
-    let mut cache = MODEL_CACHE.lock().expect("model cache mutex poisoned");
-    *cache = Some(entry);
-    Ok(model)
+    Err(ReqvireError::ProcessError(
+        "Model inputs changed during construction; retry once the workspace is stable".to_owned(),
+    ))
 }
 
 fn git_worktree_fingerprints(
@@ -170,10 +295,29 @@ fn git_output_in_dir<const N: usize>(
     Some(String::from_utf8_lossy(&output.stdout).trim().to_string())
 }
 
-/// Clears any cached model, forcing the next `load_cached_model` call to
-/// rebuild. Useful when an external mutation may have invalidated the cache
-/// outside of the mtime fingerprint (for example after a CRUD write).
-pub fn invalidate() {
-    let mut cache = MODEL_CACHE.lock().expect("model cache mutex poisoned");
-    *cache = None;
+/// Supersede in-flight reads before a controlled write acquires its working
+/// model. An already completed snapshot remains reusable until persistence.
+pub(crate) fn begin_write() {
+    let mut state = MODEL_CACHE.lock().expect("model cache mutex poisoned");
+    supersede(&mut state);
 }
+
+/// Invalidation is a publication barrier as well as eviction: an older build
+/// cannot put its result back after a persisted or partially persisted write.
+pub fn invalidate() {
+    let mut state = MODEL_CACHE.lock().expect("model cache mutex poisoned");
+    supersede(&mut state);
+    state.entry = None;
+}
+
+fn supersede(state: &mut CacheState) {
+    state.generation += 1;
+    for flight in state.flights.drain(..) {
+        *flight.outcome.lock().expect("model flight mutex poisoned") = Some(Outcome::Retry);
+        flight.ready.notify_all();
+    }
+}
+
+#[cfg(test)]
+#[path = "model_cache_tests.rs"]
+mod tests;

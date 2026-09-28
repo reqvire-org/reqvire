@@ -56,6 +56,8 @@ When an Explorer client requests updated model content, the system shall provide
 
 If runtime generation fails after a mutation, the system shall retain the last valid snapshot and report the failure until a subsequent successful mutation refreshes the runtime.
 
+When an embedded MCP request is a preview or a rejected mutation, the system shall preserve the published runtime without invoking the successful-write refresh lifecycle.
+
 #### Metadata
   * type: requirement
 
@@ -65,6 +67,7 @@ If runtime generation fails after a mutation, the system shall retain the last v
   * [MCP Mutation Execution Flow Specification](../MCP/Specifications.md#mcp-mutation-execution-flow-specification)
   * [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
   * [SHA-256 Hash Encoding Specification](../../Processing/ContentHashing/Specifications.md#sha-256-hash-encoding-specification)
+  * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
 
 #### Relations
   * definedBy: [Served Explorer Runtime Freshness Specification](Specifications.md#served-explorer-runtime-freshness-specification)
@@ -428,6 +431,7 @@ If a refresh request fails, the system shall preserve the displayed valid snapsh
 #### Contract Bindings
   * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
   * [Served Explorer Runtime Freshness Specification](Specifications.md#served-explorer-runtime-freshness-specification)
+  * [SHA-256 Hash Encoding Specification](../../Processing/ContentHashing/Specifications.md#sha-256-hash-encoding-specification)
 
 #### Relations
   * definedBy: [Explorer Automatic Store Refresh Specification](Specifications.md#explorer-automatic-store-refresh-specification)

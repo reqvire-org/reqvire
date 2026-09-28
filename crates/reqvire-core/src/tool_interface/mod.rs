@@ -1,12 +1,12 @@
 use crate::crud;
 use crate::diff::render_crud_json;
 use crate::error::ReqvireError;
+use crate::exclusions::ExclusionSet as GlobSet;
 use crate::report;
 use crate::search;
 use crate::semantic_contract::{self, SemanticExportFormat, SemanticExportLayer};
 use crate::semantic_store;
 use crate::{ModelBuildOptions, ModelManager};
-use globset::GlobSet;
 use o_kernel::rdf::{subject_iri, term_iri};
 use o_kernel::vocab;
 use o_kernel::vocab::reserved;
@@ -108,13 +108,30 @@ impl<'a> ReqvireToolRegistry<'a> {
     }
 
     pub fn call_tool(&self, name: &str, args: &Value) -> Result<Value, ReqvireError> {
-        dispatch_tool(
+        let persists = self.enable_mutations
+            && request_requires_write_tool(name, Some(args))
+            && !args
+                .get("dry_run")
+                .and_then(Value::as_bool)
+                .unwrap_or(false);
+        if persists {
+            crate::model_cache::begin_write();
+        }
+        let exclusions = self.excluded_filename_patterns.refreshed();
+        let result = dispatch_tool(
             name,
             args,
             self.enable_mutations,
             self.with_size_estimates,
-            self.excluded_filename_patterns,
-        )
+            &exclusions,
+        );
+        // Both successful writes and failed multi-file operations may persist
+        // changes. Centralize eviction here, including format fixes, without
+        // replacing the original operation result.
+        if persists {
+            crate::model_cache::invalidate();
+        }
+        result
     }
 
     pub fn read_resource(&self, uri: &str) -> Result<Value, ReqvireError> {
@@ -214,7 +231,8 @@ pub fn request_requires_write_tool(tool_name: &str, arguments: Option<&Value>) -
 #[cfg(test)]
 mod tests {
     use super::*;
-    use globset::{Glob, GlobSetBuilder};
+    use crate::exclusions::ExclusionSetBuilder as GlobSetBuilder;
+    use globset::Glob;
     use serde_json::json;
 
     #[test]
@@ -239,7 +257,7 @@ mod tests {
             .any(|tool| tool["name"] == "reqvire.search"));
     }
 
-    fn ignored_patterns() -> globset::GlobSet {
+    fn ignored_patterns() -> crate::exclusions::ExclusionSet {
         let mut builder = GlobSetBuilder::new();
         for pattern in ["output/**", "fixtures/**", "expected/**"] {
             builder.add(Glob::new(pattern).expect("valid ignore glob"));
