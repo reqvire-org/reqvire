@@ -1,0 +1,34 @@
+# Elements
+
+### Hash Ontology
+
+Vocabulary namespace fixture.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/hashing
+  * ontology_prefix: hash
+
+#### Ontology
+
+```turtle
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix hash: <https://example.test/hashing#> .
+@prefix hashv2: <https://example.test/hashing#> .
+@prefix relocated: <https://example.test/hashing-v2#> .
+
+# Both declarations keep metadata-only edits valid without changing this block.
+<https://example.test/hashing> a owl:Ontology .
+<https://example.test/hashing-v2> a owl:Ontology .
+```
+---
+
+### Hash Scheme
+
+Concept namespace fixture.
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/concepts
+  * concept_prefix: concepts
+---

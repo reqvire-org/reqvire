@@ -1,0 +1,78 @@
+# Elements
+
+### Hash Feature
+
+Consumer capability.
+
+#### Metadata
+  * type: capability
+---
+
+### Contract Library
+
+Provider capability.
+
+#### Metadata
+  * type: capability
+---
+
+### Hash Requirement
+
+The system shall preserve the literal `a b`.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Spec A](#spec-a)
+  * [Spec B](#spec-b)
+
+#### Relations
+  * specify: [Hash Feature](#hash-feature)
+  * satisfiedBy: [First evidence](artifact-a.txt)
+  * satisfiedBy: [Second evidence](artifact-b.txt)
+---
+
+### Contract Owner
+
+The system shall own the reusable contracts.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Contract Library](#contract-library)
+---
+
+### Spec A
+
+First contract.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Contract Owner](#contract-owner)
+---
+
+### Spec B
+
+Second contract.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Contract Owner](#contract-owner)
+---
+
+### Spec C
+
+Third contract.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Contract Owner](#contract-owner)
+---

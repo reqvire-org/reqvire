@@ -106,6 +106,7 @@ Detailed engine, graph composition, graph-role metadata, query-form result shape
 
 #### Contract Bindings
   * [Semantic Relation Family Projection Specification](../../Reports/ModelReports/Specifications.md#semantic-relation-family-projection-specification)
+  * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
 
 #### Relations
   * definedBy: [MCP Semantic Query Tools Specification](Specifications.md#mcp-semantic-query-tools-specification)
@@ -428,13 +429,14 @@ The system shall keep MCP server cached model state subordinate to Reqvire sourc
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
+
 #### Relations
-  * definedBy: [MCP Server State and Cache Specification](Specifications.md#mcp-server-state-and-cache-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [model_cache.rs](../../../crates/reqvire-core/src/model_cache.rs)
   * satisfiedBy: [arg_helpers.rs](../../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
-  * verifiedBy: [MCP Server State and Cache Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-server-state-and-cache-verification)
 ---
 
 ### MCP Shared Operation Interfaces
@@ -516,8 +518,10 @@ Detailed schema-source, semantic evidence, mutation/error result, versioning, an
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
+
 #### Relations
-  * definedBy: [MCP Structured Payload Contracts Specification](Specifications.md#mcp-structured-payload-contracts-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * verifiedBy: [MCP Structured Payload Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-structured-payload-contracts-verification)
@@ -575,10 +579,9 @@ The system shall expose MCP-only workspace/session tools for workspace status, t
 
 #### Contract Bindings
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+  * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
 
 #### Relations
-  * definedBy: [MCP Workspace Session Tools Specification](Specifications.md#mcp-workspace-session-tools-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * verifiedBy: [MCP Workspace Session Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-workspace-session-tools-verification)
 ---

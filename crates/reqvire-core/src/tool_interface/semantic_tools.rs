@@ -696,7 +696,7 @@ pub(crate) fn semantic_prefixes_tool(
         "external_counts": external_metadata["external_counts"].clone(),
         "graph_layers": graph_layers,
         "diagnostics": semantic_store.index.diagnostics,
-        "model_fingerprint": model_fingerprint(&model)
+        "model_fingerprint": model_fingerprint(&model)?
     }))
 }
 
@@ -987,7 +987,7 @@ pub(crate) fn semantic_vocabulary_tool(
             "external_materialization": external_metadata["external_materialization"].clone(),
             "external_counts": external_metadata["external_counts"].clone(),
             "graph_layers": graph_layers.clone(),
-            "model_fingerprint": model_fingerprint(&model)
+            "model_fingerprint": model_fingerprint(&model)?
         }));
     }
 
@@ -1026,7 +1026,7 @@ pub(crate) fn semantic_vocabulary_tool(
         "external_materialization": external_metadata["external_materialization"].clone(),
         "external_counts": external_metadata["external_counts"].clone(),
         "graph_layers": graph_layers,
-        "model_fingerprint": model_fingerprint(&model)
+        "model_fingerprint": model_fingerprint(&model)?
     }))
 }
 

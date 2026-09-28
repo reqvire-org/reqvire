@@ -25,14 +25,12 @@ This objective groups verification that Reqvire MCP servers, tools, resources, p
   * derive: [MCP Semantic Vocabulary Tools Verification](#mcp-semantic-vocabulary-tools-verification)
   * derive: [MCP Server Command Verification](#mcp-server-command-verification)
   * derive: [MCP Server End-to-End Verification](#mcp-server-end-to-end-verification)
-  * derive: [MCP Server State and Cache Verification](#mcp-server-state-and-cache-verification)
   * derive: [MCP Shared Operation Contracts Verification](#mcp-shared-operation-contracts-verification)
   * derive: [MCP Size Estimate Startup Verification](#mcp-size-estimate-startup-verification)
   * derive: [MCP Structured Payload Contracts Verification](#mcp-structured-payload-contracts-verification)
   * derive: [MCP Tool Call Contracts Verification](#mcp-tool-call-contracts-verification)
   * derive: [MCP Tool Exposure Scope Verification](#mcp-tool-exposure-scope-verification)
   * derive: [MCP Tool Side Effect Classification Verification](#mcp-tool-side-effect-classification-verification)
-  * derive: [MCP Workspace Session Tools Verification](#mcp-workspace-session-tools-verification)
 ---
 
 ### Embedded MCP Serve Endpoint Verification
@@ -57,8 +55,8 @@ Expected checks:
   * type: test-verification
 
 #### Relations
-  * verify: [Serve Command Embedded MCP Endpoint](../../../Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
   * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
+  * verify: [Serve Command Embedded MCP Endpoint](../../../Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
 ---
 
 ### MCP Access Control Baseline Verification
@@ -432,6 +430,7 @@ Expected checks:
 - Verify workspace status reports workspace root, source-control `HEAD` and dirty state when available, Reqvire version, MCP protocol revision, Reqvire tool contract version, model fingerprint, and last diagnostics.
 - Verify source file, available source-control state, excluded-pattern, Reqvire version, or Reqvire tool contract changes invalidate cached model state.
 - Verify markdown content changes invalidate cached model state even when filesystem modification time is preserved.
+- Verify changes to source-file inputs excluded from model revision encoding can invalidate/rebuild cached state while leaving the public model revision unchanged; the SHA-256 model revision must not replace the existing source cache key.
 - Verify controlled MCP mutations refresh MCP internal state from the updated Reqvire core graph.
 - Verify external filesystem drift triggers invalidation/reparse before serving stale model data.
 - Verify dirty worktree state is reported in metadata when available and does not block tools when the equivalent Reqvire core operation can run.
@@ -440,6 +439,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * verify: [MCP Server State and Cache](../../../Interfaces/MCP/Tools.md#mcp-server-state-and-cache)
 ---
 
@@ -587,12 +587,21 @@ This verification shall prove that workspace/session tools return correct read-o
 Expected checks:
 - `reqvire.workspace_status` reports workspace root, eligible worktree `HEAD` and dirty state when available, Reqvire version, supported MCP protocol revision, and Reqvire tool contract version.
 - `reqvire.tool_contract` reports supported tools and schema versions for the current startup mode.
-- `reqvire.model_revision` changes when model source files change.
+- `reqvire.model_revision` changes when included parsed-element fields change, including governance and ontology/concept namespace metadata, additions, removals, moves, and renames.
+- Existing model-fingerprint fields in workspace status, model revision, semantic prefixes, semantic vocabulary, and SPARQL responses contain the same 64-character lowercase hexadecimal revision for the same snapshot.
+- Reordering unordered relations, bindings, or metadata preserves the revision. Copying identical canonical inputs to another absolute workspace directory preserves it.
+- Changes confined to excluded inputs such as page frontmatter, Git state, or referenced external-file bytes need not change the model revision. Applicable source-cache invalidation still occurs under its own contract.
+- Field names and response shapes remain unchanged, with no per-element fingerprint additions. Schemas/examples and release notes document the digest migration and encoding version.
 - Workspace/session tools do not modify the filesystem.
+
+The linked MCP server suite covers workspace and tool-contract metadata. The model-revision hashing suite exercises the shared revision through real HTTP calls, fixed canonical fixtures, metadata and ordering mutations, and output-schema assertions.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-model-revision-hashing/test.sh)
   * verify: [MCP Workspace Session Tools](../../../Interfaces/MCP/Tools.md#mcp-workspace-session-tools)
 ---

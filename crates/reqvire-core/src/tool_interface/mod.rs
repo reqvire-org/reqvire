@@ -14,7 +14,6 @@ use oxigraph::model::{NamedOrBlankNode, Term, Triple};
 use oxigraph::sparql::{QueryResults, SparqlEvaluator};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
-use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
 use std::process::Command;
 

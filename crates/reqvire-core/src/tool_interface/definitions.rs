@@ -14,7 +14,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.model_revision",
-            "Report the current workspace and model revision.",
+            "Report the current workspace and canonical v1 SHA-256 model revision (64 lowercase hexadecimal characters).",
             object_schema(vec![]),
         ),
         read_tool(
@@ -614,7 +614,7 @@ fn tool(
         "name": name,
         "description": description,
         "inputSchema": input_schema,
-        "outputSchema": generic_output_schema(),
+        "outputSchema": output_schema(name),
         "annotations": {
             "title": name,
             "readOnlyHint": read_only,
@@ -641,11 +641,31 @@ fn required_object_schema(properties: Vec<(&str, Value)>, required: Vec<&str>) -
     })
 }
 
-fn generic_output_schema() -> Value {
-    json!({
+fn output_schema(name: &str) -> Value {
+    let mut schema = json!({
         "type": "object",
         "additionalProperties": true
-    })
+    });
+    let fingerprint = json!({
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$",
+        "description": "SHA-256 of canonical parsed-element model encoding reqvire.model-revision.v1. Excludes Git state and external file contents."
+    });
+    match name {
+        "reqvire.workspace_status" => {
+            schema["properties"] = json!({
+                "model": {"type": "object", "properties": {"fingerprint": fingerprint}, "additionalProperties": true}
+            })
+        }
+        "reqvire.model_revision"
+        | "reqvire.semantic.prefixes"
+        | "reqvire.semantic.vocabulary"
+        | "reqvire.semantic.sparql" => {
+            schema["properties"] = json!({"model_fingerprint": fingerprint});
+        }
+        _ => {}
+    }
+    schema
 }
 
 pub(crate) fn resource_contents(uri: &str, value: Value) -> Value {

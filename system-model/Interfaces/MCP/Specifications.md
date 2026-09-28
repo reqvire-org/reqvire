@@ -517,6 +517,7 @@ Cache rules:
 - Reqvire core parsing remains authoritative for model semantics.
 - Parsed model cache fingerprints are based on the scanned eligible Git-worktree markdown file set, each workspace-root-relative file path, file size, file content hash, and active model build options.
 - Cache freshness must not depend only on filesystem modification timestamps.
+- Public model revisions follow the bound Model Revision Hash Specification. They do not replace the parsed-model cache key: source bytes, build options, excluded patterns, and source-control metadata retain their existing invalidation responsibilities. Migrating model revisions does not migrate the existing file-content hash algorithm.
 - Cached state is invalidated when eligible source files, eligible Git worktree metadata state, excluded patterns, Reqvire version, or Reqvire tool contract version changes.
 - Controlled MCP mutations sync MCP internal state from the updated Reqvire core graph after successful core mutation.
 - External filesystem drift in eligible Git-worktree model files triggers cache invalidation and reparse before serving stale model data.
@@ -647,6 +648,7 @@ Schema source rules:
 Common semantic obligations:
 - Results identify the Reqvire operation/tool that produced them.
 - Results identify the relevant workspace/model revision when the operation depends on model state.
+- Existing `model_fingerprint` and workspace `model.fingerprint` values use the bound Model Revision Hash Specification through shared core computation. Changing from 16 to 64 hexadecimal characters preserves field names and response shapes; schemas and examples accept the new format. This migration does not add per-element fingerprint fields or redefine Explorer manifest revisions.
 - Results indicate dirty/clean workspace state when that affects interpretation.
 - Results expose evidence references to the files, elements, relations, contract_bindings, reports, or diffs used to produce the result when those concepts are relevant.
 - Element-shaped results expose stable element identity, element type, source location, and requested relation/contract_bindings/content views when those concepts are relevant.
@@ -835,7 +837,11 @@ The MCP interface is expected to expose workspace/session tools that have no dir
 Required workspace/session tools:
 - `reqvire.workspace_status`: reports effective workspace root, eligible Git worktree roots, eligible Git `HEAD` values, dirty state when available, Reqvire version, supported MCP protocol revision, Reqvire tool contract version, and last diagnostics summary.
 - `reqvire.tool_contract`: reports supported tool names, request schemas, result schemas, versions, and Reqvire capability flags for the current startup mode.
-- `reqvire.model_revision`: reports model fingerprint, source file metadata, excluded-pattern metadata, and cache freshness.
+- `reqvire.model_revision`: reports the parsed-element fingerprint defined by the bound Model Revision Hash Specification, source file metadata, excluded-pattern metadata, and cache freshness. Cache freshness is determined separately from the parsed-element fingerprint.
+- `reqvire.model_revision.model_fingerprint`, `reqvire.workspace_status.model.fingerprint`, and existing semantic-tool `model_fingerprint` fields use the same shared model revision computation for the same snapshot.
+- Preserve existing field names and output shapes while migrating digest values from 16 to 64 lowercase hexadecimal characters. Clients discard cached 16-character revisions once when upgrading to canonical encoding `reqvire.model-revision.v1`; there is no old-to-new value mapping. The bound Model Revision Hash Specification defines the newly covered authored metadata and exclusions.
+- The revision identifies the defined parsed-element projection. Page frontmatter, external referenced-file contents, Git state, and other excluded inputs may change without changing it; source cache freshness continues to follow the MCP Server State and Cache Specification.
+- This migration adds no per-element hash field, command, or argument. Explorer's manifest-derived revision keeps its existing wire-byte contract.
 
 These tools are read-only and must not mutate the model.
 

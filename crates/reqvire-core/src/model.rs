@@ -139,8 +139,16 @@ impl ModelManager {
                 Ok((path, file_name, file_content)) => {
                     debug!("Pass 1: Processing file: {}", file_name);
 
-                    let relative_path_str = utils::get_relative_path(&path)?
-                        .to_string_lossy()
+                    // Reject unrepresentable source paths before the parser can
+                    // turn them into lossy element identifiers or revision inputs.
+                    let relative_path = utils::get_relative_path(&path)?;
+                    let relative_path_str = relative_path
+                        .to_str()
+                        .ok_or_else(|| {
+                            ReqvireError::PathError(format!(
+                                "Model source path is not UTF-8: {relative_path:?}"
+                            ))
+                        })?
                         .to_string();
 
                     // Parse Elements and page content

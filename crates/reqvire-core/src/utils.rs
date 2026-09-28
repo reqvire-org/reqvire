@@ -536,8 +536,11 @@ pub fn normalize_identifier(identifier: &str, base_path: &Path) -> Result<String
                 workspace_root.display()
             ))
         })?
-        .to_string_lossy()
-        .into_owned();
+        .to_str()
+        .ok_or_else(|| {
+            ReqvireError::PathError(format!("Identifier path is not UTF-8: {full_path:?}"))
+        })?
+        .to_owned();
 
     // 5) Re-reuse the fragment, if present
     let final_result = match fragment_opt {
