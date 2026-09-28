@@ -43,7 +43,7 @@ Canonical encoding and compatibility contract for the parsed-element model revis
 ##### Consumer migration and compatibility
 - Replace the `DefaultHasher` accumulation used by `model_fingerprint` in `tool_interface/arg_helpers.rs` with this one shared model revision computation. All existing callers use the same projection and encoder.
 - Retain existing `model_fingerprint` and `fingerprint` field names and response shapes. The digest changes from 16 to 64 lowercase hexadecimal characters; there is no old-to-new mapping.
-- Update shared interface contracts, output schemas, examples, and fixtures for affected workspace and semantic tools. Release notes identify the new encoding version, metadata coverage, exclusions, and one-time cache invalidation.
+- Update shared interface contracts, output schemas, examples, and fixtures for affected workspace and semantic tools. The commit body and pull request description identify the new encoding version, metadata coverage, exclusions, and one-time cache invalidation.
 - Format markers belong to the hashed bytes; returned digests remain unprefixed. Pin the canonical bytes and digests with fixed fixtures. A change to field selection, encoding, or canonicalization requires a new encoding version and documented cache invalidation.
 - Parser changes that alter canonical inputs can change the revision. Cross-version stability applies when the encoding version and canonical inputs remain identical.
 - Explorer's manifest revision retains its existing exact-wire-byte input and is not required to equal the model revision. Model-source equality and generated-artifact equality have separate input contracts and share only the hashing primitive.

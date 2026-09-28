@@ -11,6 +11,9 @@ PASS same-snapshot-workspace_status
 PASS same-snapshot-semantic.prefixes
 PASS same-snapshot-semantic.vocabulary
 PASS same-snapshot-semantic.sparql
+PASS same-snapshot-vocabulary-items
+PASS same-snapshot-sparql-select
+PASS same-snapshot-sparql-construct
 PASS metadata-owner
 PASS metadata-status
 PASS metadata-priority
@@ -18,6 +21,7 @@ PASS metadata-risk
 PASS metadata-order
 PASS content-whitespace
 PASS page-frontmatter
+PASS page-source-cache-freshness
 PASS element-rename
 PASS element-move
 PASS absolute-workspace-location

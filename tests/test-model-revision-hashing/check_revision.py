@@ -182,6 +182,13 @@ def main():
             for tool, arguments, fingerprint in tools:
                 actual = fingerprint(server.tool(tool, **arguments))
                 check(f"same-snapshot-{tool.removeprefix('reqvire.')}", actual == baseline, actual, baseline)
+            for name, tool, arguments in [
+                ("vocabulary-items", "reqvire.semantic.vocabulary", {"section": "classes"}),
+                ("sparql-select", "reqvire.semantic.sparql", {"query": "SELECT ?s WHERE { ?s ?p ?o } LIMIT 1"}),
+                ("sparql-construct", "reqvire.semantic.sparql", {"query": "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o } LIMIT 1"}),
+            ]:
+                actual = server.tool(tool, **arguments)["model_fingerprint"]
+                check(f"same-snapshot-{name}", actual == baseline, actual, baseline)
 
             for key, before, after in [
                 ("owner", "team-a", "team-b"), ("status", "draft", "approved"),
@@ -194,8 +201,24 @@ def main():
                     minimal.replace(metadata, "".join(reversed(metadata.splitlines(keepends=True)))),
                     baseline, equal=True)
             changed(server, "content-whitespace", minimal, minimal.replace("Café 測定.", "Café  測定."), baseline)
-            changed(server, "page-frontmatter", minimal,
-                    minimal.replace("# Elements\n", "# Elements\n\nPage annotation.\n"), baseline, equal=True)
+            page_before = minimal.replace("# Elements\n", "# Elements\n\nPage alpha.\n")
+            page_after = page_before.replace("Page alpha.", "Page omega.")
+            write(page_before)
+            before_page = server.tool("reqvire.search")["files"]["Model.md"]["page_content"]
+            before_revision = server.revision()
+            before_stat = model_file.stat()
+            write(page_after)
+            os.utime(model_file, ns=(before_stat.st_atime_ns, before_stat.st_mtime_ns))
+            after_stat = model_file.stat()
+            if (after_stat.st_size, after_stat.st_mtime_ns) != (before_stat.st_size, before_stat.st_mtime_ns):
+                raise RuntimeError("Page-only edit must preserve source size and mtime")
+            actual = server.revision()
+            check("page-frontmatter", before_revision == baseline and actual == baseline, actual, baseline)
+            after_page = server.tool("reqvire.search")["files"]["Model.md"]["page_content"]
+            check("page-source-cache-freshness", "Page alpha." in before_page
+                  and "Page omega." in after_page and "Page alpha." not in after_page,
+                  after_page, "new page content despite unchanged revision, source size, and mtime")
+            write(minimal)
             changed(server, "element-rename", minimal, minimal.replace("Hash Subject", "Renamed Subject"), baseline)
             model_file.rename(workspace / "Moved.md")
             moved = server.revision()

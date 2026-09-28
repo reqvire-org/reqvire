@@ -315,6 +315,7 @@ Expected checks:
 - Verify prefix source context includes element identifier, name, file path, line number, and ontology element prose content.
 - Verify source content excludes authored Turtle prefix blocks.
 - Verify the response includes a SPARQL prefix block suitable for query construction.
+- Verify `model_fingerprint` agrees with `reqvire.model_revision` for the same snapshot and its schema advertises the shared 64-character SHA-256 format.
 
 #### Metadata
   * type: test-verification
@@ -322,6 +323,7 @@ Expected checks:
 #### Relations
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-model-revision-hashing/test.sh)
   * verify: [MCP Semantic Prefix Registry Tools](../../../Interfaces/MCP/Tools.md#mcp-semantic-prefix-registry-tools)
 ---
 
@@ -337,6 +339,7 @@ Expected checks:
 - Verify local external ontology dependency triples are outside the default queried graph and only used external subset triples become queryable when `include_external` is true.
 - Verify the full semantic graph materializes relation-family normalized predicates equivalent to the relation-family CONSTRUCT query specification.
 - Verify SELECT results include ordered variables, bindings, RDF term metadata, row count, semantic index summary, diagnostics, and model fingerprint.
+- Verify SELECT, ASK, and CONSTRUCT responses retain the same 64-character `model_fingerprint` for the same parsed snapshot, matching `reqvire.model_revision` and the advertised schema.
 - Verify invalid SPARQL returns an MCP tool error rather than mutating files.
 
 #### Metadata
@@ -345,6 +348,7 @@ Expected checks:
 #### Relations
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-model-revision-hashing/test.sh)
   * verify: [MCP Semantic Query Tools](../../../Interfaces/MCP/Tools.md#mcp-semantic-query-tools)
 ---
 
@@ -356,6 +360,7 @@ This verification shall prove that MCP vocabulary discovery exposes compact page
 Expected checks:
 - Verify `tools/list` advertises `reqvire.semantic.vocabulary` as a read-only tool.
 - Verify `reqvire.semantic.vocabulary` with `section: "all"` returns section counts, prefixes, a SPARQL prefix block, diagnostics, and model fingerprint.
+- Verify summary and item-section responses agree with `reqvire.model_revision` for the same snapshot and their fingerprint schema advertises the shared 64-character SHA-256 format.
 - Verify imported external vocabulary is omitted by default and only used external subset vocabulary is included with `external: true` plus external source metadata when `include_external` is true.
 - Verify authored vocabulary items expose `ontology_document` and can be filtered by exact `ontology_document` or `ontology_base`.
 - Verify used external subset vocabulary items expose `ontology_document` from the declared external source resource or namespace fallback and can be filtered by exact document only when `include_external` is true.
@@ -369,6 +374,7 @@ Expected checks:
 #### Relations
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-model-revision-hashing/test.sh)
   * verify: [MCP Semantic Vocabulary Tools](../../../Interfaces/MCP/Tools.md#mcp-semantic-vocabulary-tools)
 ---
 
@@ -431,6 +437,7 @@ Expected checks:
 - Verify source file, available source-control state, excluded-pattern, Reqvire version, or Reqvire tool contract changes invalidate cached model state.
 - Verify markdown content changes invalidate cached model state even when filesystem modification time is preserved.
 - Verify changes to source-file inputs excluded from model revision encoding can invalidate/rebuild cached state while leaving the public model revision unchanged; the SHA-256 model revision must not replace the existing source cache key.
+- Change page-only content while preserving file length and modification time; verify the next MCP search exposes the updated page content while `model_fingerprint` remains unchanged.
 - Verify controlled MCP mutations refresh MCP internal state from the updated Reqvire core graph.
 - Verify external filesystem drift triggers invalidation/reparse before serving stale model data.
 - Verify dirty worktree state is reported in metadata when available and does not block tools when the equivalent Reqvire core operation can run.
@@ -440,6 +447,7 @@ Expected checks:
 
 #### Relations
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-model-revision-hashing/test.sh)
   * verify: [MCP Server State and Cache](../../../Interfaces/MCP/Tools.md#mcp-server-state-and-cache)
 ---
 
@@ -496,6 +504,7 @@ This verification shall prove that MCP structured payloads are consistent with s
 Expected checks:
 - Verify each MCP `outputSchema` is generated from or explicitly checked against its shared Reqvire operation result contract.
 - Verify successful tool calls return `structuredContent` conforming to the declared `outputSchema`.
+- Verify model revision, workspace status, semantic prefixes, vocabulary, and SPARQL keep their existing fingerprint field names and advertise and return the shared 64-character SHA-256 format.
 - Verify structured results identify relevant workspace/model revision and dirty state when model state affects interpretation.
 - Verify structured results expose evidence references when the underlying Reqvire operation produces file, element, relation, contract_bindings, report, or diff evidence.
 - Verify element-shaped results preserve semantic model ADT fields when present, including `ontology`, `semantic_contract`, and `concept_references`.
@@ -506,6 +515,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-model-revision-hashing/test.sh)
   * verify: [MCP Structured Payload Interfaces](../../../Interfaces/MCP/Tools.md#mcp-structured-payload-interfaces)
 ---
 
@@ -591,7 +601,7 @@ Expected checks:
 - Existing model-fingerprint fields in workspace status, model revision, semantic prefixes, semantic vocabulary, and SPARQL responses contain the same 64-character lowercase hexadecimal revision for the same snapshot.
 - Reordering unordered relations, bindings, or metadata preserves the revision. Copying identical canonical inputs to another absolute workspace directory preserves it.
 - Changes confined to excluded inputs such as page frontmatter, Git state, or referenced external-file bytes need not change the model revision. Applicable source-cache invalidation still occurs under its own contract.
-- Field names and response shapes remain unchanged, with no per-element fingerprint additions. Schemas/examples and release notes document the digest migration and encoding version.
+- Field names and response shapes remain unchanged, with no per-element fingerprint additions. Schemas/examples reflect the digest migration, and the commit body and pull request description document the encoding version and compatibility guidance.
 - Workspace/session tools do not modify the filesystem.
 
 The linked MCP server suite covers workspace and tool-contract metadata. The model-revision hashing suite exercises the shared revision through real HTTP calls, fixed canonical fixtures, metadata and ordering mutations, and output-schema assertions.

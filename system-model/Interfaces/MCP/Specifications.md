@@ -363,6 +363,7 @@ Prefix registry request:
 
 Result behavior:
 - Result payloads include `prefixes`, `sparql_prefix_block`, `conflicts`, `summary`, semantic `diagnostics`, and `model_fingerprint`.
+- `model_fingerprint` follows the shared Model Revision Hash Specification and agrees with `reqvire.model_revision` for the same parsed snapshot.
 - Each prefix entry includes `prefix`, `namespace`, `ontology_base`, `term_namespace`, `ontology_document_iri`, source element provenance, and contributors.
 - Authored prefix entries are marked `external: false`; imported external ontology prefix entries are returned only when `include_external` is true, are marked `external: true`, and identify `external_materialization: "used_subset"`.
 - `source` includes `element_identifier`, `element_name`, `file_path`, `line_number`, and ontology element prose `content`.
@@ -405,6 +406,7 @@ Result behavior:
 - ASK results return a boolean.
 - CONSTRUCT and DESCRIBE results return graph triples with RDF term metadata and `triple_count`.
 - Result payloads include `format: "sparql"`, the effective `full` value, the effective `include_external` value, semantic index `summary`, semantic `diagnostics`, and `model_fingerprint`.
+- SELECT, ASK, and graph results use the shared Model Revision Hash Specification. The fingerprint identifies the parsed snapshot and is independent of query text and result shape.
 - Invalid SPARQL or RDF load failures return MCP tool errors without mutating workspace state.
 
 #### Metadata
@@ -453,6 +455,7 @@ Result behavior:
 - Every response includes `prefixes` and `sparql_prefix_block`.
 - `section: "all"` returns section counts, section cursors, summary, prefixes, diagnostics, and model fingerprint instead of dumping every vocabulary item.
 - Item section responses return `items`, `paging`, prefixes, diagnostics, and model fingerprint.
+- Both summary and item-section `model_fingerprint` values follow the shared Model Revision Hash Specification and agree with `reqvire.model_revision` for the same parsed snapshot.
 - `relation_families` items include family name, IRI/CURIE, meaning, normalized forward property, normalized inverse property, raw relation rules, and transitive flag.
 - `classes` and `properties` items include IRI/CURIE, role, external marker, label/comment where available, source when requested, and domain/range when available.
 - Authored `classes` and `properties` items include `ontology_document` when Reqvire can resolve the owning OWL document.
