@@ -39,13 +39,13 @@ fn rewrite_moved_concept_reference_targets(
     let mut in_section = false;
 
     for line in element.content.split_inclusive('\n') {
-        let (body, suffix) = if let Some(body) = line.strip_suffix("\r\n") {
-            (body, "\r\n")
-        } else if let Some(body) = line.strip_suffix('\n') {
-            (body, "\n")
-        } else {
-            (line, "")
-        };
+        let (body, suffix) = line.strip_suffix("\r\n").map_or_else(
+            || {
+                line.strip_suffix('\n')
+                    .map_or((line, ""), |body| (body, "\n"))
+            },
+            |body| (body, "\r\n"),
+        );
 
         let trimmed = body.trim();
         if trimmed.starts_with("#### ") {
@@ -429,32 +429,32 @@ impl GraphRegistry {
         &self,
         element: &Element,
     ) -> Vec<(String, Vec<crate::relation::Relation>)> {
-        if let Some(node) = self.nodes.get(&element.identifier) {
-            // Group original relations by target ID using BTreeMap for deterministic ordering
-            let mut relations_by_target: std::collections::BTreeMap<
-                String,
-                Vec<crate::relation::Relation>,
-            > = std::collections::BTreeMap::new();
+        self.nodes
+            .get(&element.identifier)
+            .map_or_else(Vec::new, |node| {
+                // Group original relations by target ID using BTreeMap for deterministic ordering
+                let mut relations_by_target: std::collections::BTreeMap<
+                    String,
+                    Vec<crate::relation::Relation>,
+                > = std::collections::BTreeMap::new();
 
-            for relation in &node.element.relations {
-                let target_id = match &relation.target.link {
-                    crate::relation::LinkType::Identifier(ref target_id) => target_id.clone(),
-                    crate::relation::LinkType::InternalPath(ref path) => {
-                        path.to_string_lossy().to_string()
-                    }
-                    crate::relation::LinkType::ExternalUrl(_) => continue, // Skip external URLs for change impact
-                };
+                for relation in &node.element.relations {
+                    let target_id = match &relation.target.link {
+                        crate::relation::LinkType::Identifier(ref target_id) => target_id.clone(),
+                        crate::relation::LinkType::InternalPath(ref path) => {
+                            path.to_string_lossy().to_string()
+                        }
+                        crate::relation::LinkType::ExternalUrl(_) => continue, // Skip external URLs for change impact
+                    };
 
-                relations_by_target
-                    .entry(target_id)
-                    .or_default()
-                    .push(relation.clone());
-            }
+                    relations_by_target
+                        .entry(target_id)
+                        .or_default()
+                        .push(relation.clone());
+                }
 
-            relations_by_target.into_iter().collect()
-        } else {
-            Vec::new()
-        }
+                relations_by_target.into_iter().collect()
+            })
     }
 
     /// Gets a specific element by ID
@@ -510,10 +510,7 @@ impl GraphRegistry {
         markdown.push('\n');
     }
 
-    fn sorted_relations_for_format<'a>(
-        element: &'a Element,
-        with_full_relations: bool,
-    ) -> Vec<&'a Relation> {
+    fn sorted_relations_for_format(element: &Element, with_full_relations: bool) -> Vec<&Relation> {
         let mut relations_to_include: Vec<_> = if with_full_relations {
             element.relations.iter().collect()
         } else {
@@ -557,81 +554,103 @@ impl GraphRegistry {
         // Always include metadata to preserve structure during CRUD operations.
         Self::append_element_metadata(&mut markdown, element, "#### Metadata");
 
-        // Add contract_bindings subsection if there are contract_bindings
-        // Deduplicate contract_bindings by target, keeping first occurrence
-        let mut seen_contract_bindings: rustc_hash::FxHashSet<String> =
-            rustc_hash::FxHashSet::default();
-        let unique_contract_bindings: Vec<_> = element
-            .contract_bindings
-            .iter()
-            .filter(|a| seen_contract_bindings.insert(a.target.as_str()))
-            .collect();
+        for (section, entries) in [
+            (CONTRACT_BINDINGS_SECTION, &element.contract_bindings),
+            (CONTRACT_REFERENCES_SECTION, &element.contract_references),
+        ] {
+            // Add contract_bindings subsection if there are contract_bindings
+            // Deduplicate contract_bindings by target, keeping first occurrence
+            let mut seen_contract_bindings: rustc_hash::FxHashSet<String> =
+                rustc_hash::FxHashSet::default();
+            let mut unique_contract_bindings: Vec<_> = entries
+                .iter()
+                .filter(|a| seen_contract_bindings.insert(a.target.as_str()))
+                .collect();
 
-        if !unique_contract_bindings.is_empty() {
-            markdown.push_str("#### ");
-            markdown.push_str(CONTRACT_BINDINGS_SECTION);
-            markdown.push('\n');
-            for contract_bindings in unique_contract_bindings {
-                match &contract_bindings.target {
-                    crate::element::ContractBindingTarget::FilePath(file_path) => {
-                        // ContractBindingEntry paths are stored as git-root-relative paths
-                        let contract_binding_path = file_path.to_string_lossy().to_string();
+            if section == CONTRACT_REFERENCES_SECTION {
+                unique_contract_bindings.sort_by_key(|entry| entry.target.as_str());
+            }
+            if !unique_contract_bindings.is_empty() {
+                markdown.push_str("#### ");
+                markdown.push_str(section);
+                markdown.push('\n');
+                for contract_bindings in unique_contract_bindings {
+                    match &contract_bindings.target {
+                        crate::element::ContractBindingTarget::FilePath(file_path) => {
+                            // ContractBindingEntry paths are stored as git-root-relative paths
+                            let contract_binding_path = file_path.to_string_lossy().to_string();
 
-                        // Make the path relative to the current file's directory (same as relations)
-                        let current_file_path = std::path::PathBuf::from(_current_file);
-                        let current_folder = current_file_path
-                            .parent()
-                            .unwrap_or_else(|| std::path::Path::new("."))
-                            .to_path_buf();
+                            // Make the path relative to the current file's directory (same as relations)
+                            let current_file_path = std::path::PathBuf::from(_current_file);
+                            let current_folder = current_file_path
+                                .parent()
+                                .unwrap_or_else(|| std::path::Path::new("."))
+                                .to_path_buf();
 
-                        // Use to_relative_identifier like we do for InternalPath relations
-                        // Prepend "/" to indicate git-root-relative path
-                        let absolute_path = format!("/{}", contract_binding_path);
-                        let relative_path = crate::utils::to_relative_identifier(
-                            &absolute_path,
-                            &current_folder,
-                            false,
-                        )
-                        .unwrap_or_else(|_| contract_binding_path.clone());
+                            // Use to_relative_identifier like we do for InternalPath relations
+                            // Prepend "/" to indicate git-root-relative path
+                            let absolute_path = format!("/{}", contract_binding_path);
+                            let relative_path = crate::utils::to_relative_identifier(
+                                &absolute_path,
+                                &current_folder,
+                                false,
+                            )
+                            .unwrap_or_else(|_| contract_binding_path.clone());
 
-                        // Use filename as display text for cleaner markdown
-                        let display_name = file_path
-                            .file_name()
-                            .and_then(|name| name.to_str())
-                            .unwrap_or(&contract_binding_path);
+                            // Use filename as display text for cleaner markdown
+                            let display_name = file_path
+                                .file_name()
+                                .and_then(|name| name.to_str())
+                                .unwrap_or(&contract_binding_path);
 
-                        markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_path));
-                    }
-                    crate::element::ContractBindingTarget::ElementIdentifier(identifier) => {
-                        // Element identifier contract_bindings - format as markdown link
-                        let current_file_path = std::path::PathBuf::from(_current_file);
-                        let current_folder = current_file_path
-                            .parent()
-                            .unwrap_or_else(|| std::path::Path::new("."))
-                            .to_path_buf();
+                            markdown
+                                .push_str(&format!("  * [{}]({})\n", display_name, relative_path));
+                        }
+                        crate::element::ContractBindingTarget::ElementIdentifier(identifier) => {
+                            // Element identifier contract_bindings - format as markdown link
+                            let current_file_path = std::path::PathBuf::from(_current_file);
+                            let current_folder = current_file_path
+                                .parent()
+                                .unwrap_or_else(|| std::path::Path::new("."))
+                                .to_path_buf();
 
-                        // Use to_relative_identifier to make identifier relative to current file
-                        let relative_id =
-                            crate::utils::to_relative_identifier(identifier, &current_folder, true)
-                                .unwrap_or_else(|_| identifier.clone());
+                            // Use to_relative_identifier to make identifier relative to current file
+                            let relative_id = crate::utils::to_relative_identifier(
+                                identifier,
+                                &current_folder,
+                                true,
+                            )
+                            .unwrap_or_else(|_| identifier.clone());
 
-                        // Look up actual element name from registry for human-readable display
-                        let display_name = self
-                            .get_element(identifier)
-                            .map(|e| e.name.clone())
-                            .unwrap_or_else(|| {
-                                // Fallback to identifier fragment if element not found
-                                identifier
-                                    .split('#')
-                                    .next_back()
-                                    .unwrap_or(identifier)
-                                    .to_string()
-                            });
-                        markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_id));
+                            let relative_id = if section == CONTRACT_REFERENCES_SECTION {
+                                crate::utils::concept_reference_relative_link(
+                                    _current_file,
+                                    identifier,
+                                )
+                                .unwrap_or(relative_id)
+                            } else {
+                                relative_id
+                            };
+
+                            // Look up actual element name from registry for human-readable display
+                            let display_name = self
+                                .get_element(identifier)
+                                .map(|e| e.name.clone())
+                                .unwrap_or_else(|| {
+                                    // Fallback to identifier fragment if element not found
+                                    identifier
+                                        .split('#')
+                                        .next_back()
+                                        .unwrap_or(identifier)
+                                        .to_string()
+                                });
+                            markdown
+                                .push_str(&format!("  * [{}]({})\n", display_name, relative_id));
+                        }
                     }
                 }
+                markdown.push('\n');
             }
-            markdown.push('\n');
         }
 
         let relations_to_include = Self::sorted_relations_for_format(element, with_full_relations);
@@ -647,43 +666,41 @@ impl GraphRegistry {
                     }
                     LinkType::Identifier(target_id) => {
                         // Extract fragment to look up the target element
-                        let fragment = if let Some(fragment_pos) = target_id.find('#') {
-                            &target_id[fragment_pos + 1..]
-                        } else {
-                            target_id
-                        };
+                        let fragment = target_id
+                            .find('#')
+                            .map_or(target_id.as_str(), |fragment_pos| {
+                                &target_id[fragment_pos + 1..]
+                            });
 
                         // Use actual element name if available, otherwise fallback to fragment conversion
                         // First try to lookup by full target_id, then by fragment only
-                        let display_name = if let Some(target_node) = self.nodes.get(target_id) {
-                            target_node.element.name.clone()
-                        } else if let Some(target_node) = self.nodes.get(fragment) {
-                            target_node.element.name.clone()
-                        } else {
-                            // Fallback: convert fragment to title case
-                            fragment
-                                .replace('-', " ")
-                                .split_whitespace()
-                                .map(|word| {
-                                    let mut chars = word.chars();
-                                    match chars.next() {
-                                        None => String::new(),
-                                        Some(first) => {
-                                            first.to_uppercase().collect::<String>()
-                                                + chars.as_str()
-                                        }
-                                    }
-                                })
-                                .collect::<Vec<String>>()
-                                .join(" ")
-                        };
+                        let display_name = self
+                            .nodes
+                            .get(target_id)
+                            .or_else(|| self.nodes.get(fragment))
+                            .map_or_else(
+                                || {
+                                    // Fallback: convert fragment to title case.
+                                    fragment
+                                        .replace('-', " ")
+                                        .split_whitespace()
+                                        .map(|word| {
+                                            let mut chars = word.chars();
+                                            chars.next().map_or_else(String::new, |first| {
+                                                first.to_uppercase().collect::<String>()
+                                                    + chars.as_str()
+                                            })
+                                        })
+                                        .collect::<Vec<String>>()
+                                        .join(" ")
+                                },
+                                |target_node| target_node.element.name.clone(),
+                            );
 
                         // Check if target is in the same file
-                        let target_file = if let Some(file_pos) = target_id.find('#') {
-                            &target_id[..file_pos]
-                        } else {
-                            target_id
-                        };
+                        let target_file = target_id
+                            .find('#')
+                            .map_or(target_id.as_str(), |file_pos| &target_id[..file_pos]);
 
                         // Get current file path for comparison
                         let current_file_path = std::path::PathBuf::from(_current_file);
@@ -759,13 +776,13 @@ impl GraphRegistry {
         let mut in_section = false;
 
         for line in element.content.split_inclusive('\n') {
-            let (body, suffix) = if let Some(body) = line.strip_suffix("\r\n") {
-                (body, "\r\n")
-            } else if let Some(body) = line.strip_suffix('\n') {
-                (body, "\n")
-            } else {
-                (line, "")
-            };
+            let (body, suffix) = line.strip_suffix("\r\n").map_or_else(
+                || {
+                    line.strip_suffix('\n')
+                        .map_or((line, ""), |body| (body, "\n"))
+                },
+                |body| (body, "\r\n"),
+            );
             let trimmed = body.trim();
             if trimmed.starts_with("#### ") {
                 in_section = trimmed == "#### Concept References";
@@ -1038,7 +1055,7 @@ impl GraphRegistry {
                             &current_folder,
                             false,
                         )
-                        .unwrap_or(path_str.clone());
+                        .unwrap_or_else(|_| path_str.clone());
                         let display_name = path
                             .file_name()
                             .and_then(|n| n.to_str())
@@ -1239,7 +1256,7 @@ impl GraphRegistry {
         }
 
         // Find all files with relations to this element
-        let mut modified_files = vec![file_path.clone()];
+        let mut modified_files = vec![file_path];
         for node in self.nodes.values() {
             let has_relation = node.element.relations.iter().any(
                 |rel| matches!(&rel.target.link, LinkType::Identifier(id) if id == element_id),
@@ -1583,7 +1600,12 @@ impl GraphRegistry {
                 }
             }
 
-            for contract_binding in &mut node.element.contract_bindings {
+            for contract_binding in node
+                .element
+                .contract_bindings
+                .iter_mut()
+                .chain(&mut node.element.contract_references)
+            {
                 match &mut contract_binding.target {
                     crate::element::ContractBindingTarget::ElementIdentifier(target_id) => {
                         if let Some(new_id) = identifier_map.get(target_id) {
@@ -1859,13 +1881,24 @@ impl GraphRegistry {
     fn update_contract_bindings_identifiers(&mut self, old_identifier: &str, new_identifier: &str) {
         // Find and update all contract_bindings identifiers pointing to the old identifier
         for node in self.nodes.values_mut() {
-            for contract_bindings in &mut node.element.contract_bindings {
-                if let crate::element::ContractBindingTarget::ElementIdentifier(ref mut id) =
-                    contract_bindings.target
-                {
-                    if id == old_identifier {
-                        *id = new_identifier.to_string();
+            for entries in [
+                &mut node.element.contract_bindings,
+                &mut node.element.contract_references,
+            ] {
+                let mut changed = false;
+                for entry in entries.iter_mut() {
+                    if let crate::element::ContractBindingTarget::ElementIdentifier(id) =
+                        &mut entry.target
+                    {
+                        if id == old_identifier {
+                            *id = new_identifier.to_string();
+                            changed = true;
+                        }
                     }
+                }
+                if changed {
+                    let mut seen = FxHashSet::default();
+                    entries.retain(|entry| seen.insert(entry.target.as_str()));
                 }
             }
         }
@@ -1875,7 +1908,7 @@ impl GraphRegistry {
     fn find_files_with_contract_bindings_to(&self, element_id: &str) -> Vec<String> {
         let mut files = Vec::new();
         for node in self.nodes.values() {
-            let has_contract_bindings = node.element.contract_bindings.iter().any(|att| {
+            let has_contract_bindings = node.element.contract_bindings.iter().chain(&node.element.contract_references).any(|att| {
                 matches!(&att.target, crate::element::ContractBindingTarget::ElementIdentifier(id) if id == element_id)
             });
             if has_contract_bindings {
@@ -1922,6 +1955,17 @@ impl GraphRegistry {
         // Remove the element itself
         self.nodes.remove(element_id);
 
+        // Remove incoming review dependencies together with the target.
+        for node in self.nodes.values_mut() {
+            let before = node.element.contract_references.len();
+            node.element
+                .contract_references
+                .retain(|entry| entry.target.as_str() != element_id);
+            if node.element.contract_references.len() != before {
+                self.modified_files.insert(node.element.file_path.clone());
+            }
+        }
+
         // Remove all relations pointing to this element from graph structure
         for node in self.nodes.values_mut() {
             node.relations
@@ -1929,13 +1973,13 @@ impl GraphRegistry {
         }
 
         // Remove all relations pointing to this element from element's own relations list
-        let mut node_ids: Vec<String> = self.nodes.keys().cloned().collect();
-        for node_id in node_ids.drain(..) {
+        let node_ids: Vec<String> = self.nodes.keys().cloned().collect();
+        for node_id in node_ids {
             let source_file_path = self
                 .nodes
                 .get(&node_id)
                 .map(|node| node.element.file_path.clone());
-            let mut relations = self
+            let relations = self
                 .nodes
                 .get(&node_id)
                 .map(|node| node.element.relations.clone())
@@ -1946,7 +1990,7 @@ impl GraphRegistry {
             };
 
             let mut filtered = Vec::new();
-            for relation in relations.drain(..) {
+            for relation in relations {
                 let keep = match &relation.target.link {
                     crate::relation::LinkType::Identifier(target) => !self
                         .relation_targets_same_identifier(&source_file_path, target, element_id),
@@ -2591,7 +2635,7 @@ impl GraphRegistry {
         }
 
         // Set file_order_index: append to end of file
-        let mut new_element = element.clone();
+        let mut new_element = element;
         let max_index = self
             .nodes
             .values()
@@ -2708,7 +2752,7 @@ impl GraphRegistry {
         }
 
         // Track all files that will be modified
-        let mut modified_files = vec![file_path.clone()];
+        let mut modified_files = vec![file_path];
 
         // Find all elements with relations pointing to this element
         for (other_id, node) in self.nodes.iter() {
@@ -2980,6 +3024,7 @@ impl GraphRegistry {
             .collect();
         let mut merged_contract_bindings: Vec<crate::element::ContractBindingEntry> =
             target_node.element.contract_bindings.clone();
+        let mut merged_contract_references = target_node.element.contract_references.clone();
         let target_is_ontology = target_type.is_ontology();
         let target_element_for_merge = target_node.element.clone();
         let mut merged_source_ids: FxHashSet<String> = source_ids.iter().cloned().collect();
@@ -3032,6 +3077,8 @@ impl GraphRegistry {
                 }
             }
 
+            merged_contract_references.extend(source_element.contract_references.iter().cloned());
+
             // Collect contract_bindings
             for att in source_contract_bindings {
                 merged_contract_bindings.push(att.clone());
@@ -3066,7 +3113,7 @@ impl GraphRegistry {
         // Deduplicate contract_bindings by target
         let mut seen_contract_bindings: FxHashSet<String> = FxHashSet::default();
         merged_contract_bindings.retain(|a| {
-            let key = a.target.as_str().to_string();
+            let key = a.target.as_str();
             if seen_contract_bindings.contains(&key) {
                 false
             } else {
@@ -3074,6 +3121,15 @@ impl GraphRegistry {
                 true
             }
         });
+
+        let mut seen_references = FxHashSet::default();
+        merged_contract_references.retain(|entry| seen_references.insert(entry.target.as_str()));
+        if !merged_contract_references.is_empty() && !merged_contract_bindings.is_empty() {
+            return Err(ReqvireError::InvalidContractReference(
+                "Contract Bindings and Contract References cannot coexist on the merged element"
+                    .into(),
+            ));
+        }
 
         // Validate contract_bindings scope constraints for target element
         for contract_bindings in &merged_contract_bindings {
@@ -3173,6 +3229,7 @@ impl GraphRegistry {
 
             target_element.relations = merged_relations;
             target_element.contract_bindings = merged_contract_bindings;
+            target_element.contract_references = merged_contract_references;
         }
 
         self.modified_files.insert(target_file_path);
@@ -3187,6 +3244,10 @@ impl GraphRegistry {
         let target_element_id = target_node.element.id.clone();
 
         for (source_id, _, _, _, _, _) in &source_data {
+            for file in self.find_files_with_contract_bindings_to(source_id) {
+                self.modified_files.insert(file);
+            }
+            self.update_contract_bindings_identifiers(source_id, target_id);
             // Find all elements that have user_created relations pointing TO this source
             let elements_with_relations_to_source: Vec<(String, Vec<Relation>)> = self.nodes.iter()
                 .filter(|(id, _)| *id != source_id && *id != target_id)
@@ -3237,6 +3298,20 @@ impl GraphRegistry {
         // Remove source elements (this also removes them from the graph)
         for (source_id, _, _, _, _, _) in &source_data {
             self.remove_element(source_id)?;
+        }
+
+        // Rewriting incoming edges can converge on an existing owner-contract
+        // pair. Consolidate both authored and generated relation records.
+        for (id, node) in &mut self.nodes {
+            let mut seen = FxHashSet::default();
+            node.element.relations.retain(|relation| {
+                id != target_id && relation.target.link.as_str() != target_id
+                    || seen.insert((
+                        relation.relation_type.name,
+                        relation.target.link.as_str().to_string(),
+                        relation.user_created,
+                    ))
+            });
         }
 
         Ok(())
@@ -3312,7 +3387,9 @@ impl GraphRegistry {
         };
 
         // Find and update opposite relations pointing to source
-        for node_id in self.nodes.keys().cloned().collect::<Vec<_>>() {
+        // Snapshot keys before updating relations in the same node map.
+        let node_ids: Vec<_> = self.nodes.keys().cloned().collect();
+        for node_id in node_ids {
             if node_id == source_id || node_id == target_id {
                 continue;
             }

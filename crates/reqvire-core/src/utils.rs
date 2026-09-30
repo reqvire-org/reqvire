@@ -120,6 +120,7 @@ macro_rules! info_println {
 }
 
 /// Checks if a file should be ignored based on gitignore and reqvireignore patterns.
+///
 /// Returns true if the file should be IGNORED (not processed).
 /// Note: This only checks ignore patterns. The `# Elements` header check
 /// happens later when reading file content (in parser.rs).
@@ -252,11 +253,9 @@ pub fn validate_target_path(
     // Count only directories, excluding the filename
     if let Ok(rel_path) = absolute_path.strip_prefix(&workspace_root) {
         // Get parent path (directories only) and count components
-        let dir_depth = if let Some(parent) = rel_path.parent() {
-            parent.components().count()
-        } else {
-            0 // File at workspace root
-        };
+        let dir_depth = rel_path
+            .parent()
+            .map_or(0, |parent| parent.components().count());
 
         if dir_depth > 10 {
             return Ok(PathValidation {
@@ -395,13 +394,11 @@ pub fn extract_path_and_fragment(identifier: &str) -> (&str, Option<&str>) {
     }
     // If identifier contains a '/' or a '.', assume it's a file reference.
     if identifier.contains('/') || identifier.contains('.') {
-        if let Some(idx) = identifier.find('#') {
+        identifier.find('#').map_or((identifier, None), |idx| {
             let file_part = &identifier[..idx];
             let frag = &identifier[idx + 1..];
             (file_part, Some(frag))
-        } else {
-            (identifier, None)
-        }
+        })
     } else {
         // Otherwise, treat as fragment-only.
         ("", Some(identifier))
@@ -409,6 +406,7 @@ pub fn extract_path_and_fragment(identifier: &str) -> (&str, Option<&str>) {
 }
 
 /// Gets the parent directory of a file path.
+///
 /// Returns the parent directory as a PathBuf, or an empty PathBuf if the path has no parent.
 /// This is commonly used when calculating file-relative paths in markdown.
 pub fn get_parent_dir(file_path: &str) -> PathBuf {
@@ -482,9 +480,8 @@ fn resolve_path_to_absolute(path_part: &str, base_path: &Path) -> Result<PathBuf
         // For relative paths, resolve relative to base_path
         let joined_path = base_path.join(p);
         // Try to canonicalize, fall back to logical resolution if it fails
-        match joined_path.canonicalize() {
-            Ok(canonical) => Ok(canonical),
-            Err(_) => {
+        joined_path.canonicalize().map_or_else(
+            |_| {
                 // Logical path resolution for non-existent files
                 let mut resolved_path = base_path.to_path_buf();
                 for component in p.components() {
@@ -504,8 +501,9 @@ fn resolve_path_to_absolute(path_part: &str, base_path: &Path) -> Result<PathBuf
                     }
                 }
                 Ok(resolved_path)
-            }
-        }
+            },
+            Ok,
+        )
     }
 }
 
@@ -693,17 +691,18 @@ fn normalize_nonlink_identifier(input: &str) -> (String, String) {
     let (file_part, fragment_opt) = extract_path_and_fragment(input);
 
     // Normalize the fragment if present
-    let normalized_link = if let Some(frag) = fragment_opt {
-        let norm_frag = normalize_fragment(frag);
-        if file_part.is_empty() {
-            // For fragment-only references, always include a leading '#' in the target
-            format!("#{}", norm_frag)
-        } else {
-            format!("{}#{}", file_part, norm_frag)
-        }
-    } else {
-        file_part.to_string()
-    };
+    let normalized_link = fragment_opt.map_or_else(
+        || file_part.to_string(),
+        |frag| {
+            let norm_frag = normalize_fragment(frag);
+            if file_part.is_empty() {
+                // For fragment-only references, always include a leading '#' in the target
+                format!("#{}", norm_frag)
+            } else {
+                format!("{}#{}", file_part, norm_frag)
+            }
+        },
+    );
 
     // For display text: if it's a fragment-only reference, display it without the leading '#'
     let display_text = if file_part.is_empty() {
@@ -747,10 +746,11 @@ pub fn hash_content(content: &str) -> String {
 fn hash_string(value: &str) -> String {
     let mut hasher = FxHasher::default();
     hasher.write(value.as_bytes());
-    format!("{:x}", hasher.finish()).to_string()
+    format!("{:x}", hasher.finish())
 }
 
 /// Parses a contract binding line from the Contract Bindings subsection.
+///
 /// Format: * [display-text](path) - display text can be filename or full path
 /// Returns the path (href) if valid, or an error if format is invalid.
 pub fn parse_contract_bindings_line(line: &str) -> Result<String, ReqvireError> {
@@ -855,17 +855,17 @@ mod tests {
         git_commands::clear_git_cache();
 
         // Save original directory to restore at the end
-        let original_dir = std::env::current_dir().unwrap();
+        let original_dir = std::env::current_dir().expect("read test working directory");
 
         let temp_dir = TempDir::new().expect("Failed to create temp dir");
         let temp_path = temp_dir.path();
 
-        std::env::set_current_dir(&temp_path).expect("Failed to set current directory");
+        std::env::set_current_dir(temp_path).expect("Failed to set current directory");
 
         // Initialize Git repository
         Command::new("git")
             .arg("init")
-            .current_dir(&temp_path)
+            .current_dir(temp_path)
             .output()
             .expect("Failed to initialize git repo");
 
@@ -873,7 +873,12 @@ mod tests {
         fs::create_dir_all(&base_path).expect("Failed to create base path");
 
         let file_path = temp_path.join("File4.md");
-        fs::create_dir_all(file_path.parent().unwrap()).unwrap();
+        fs::create_dir_all(
+            file_path
+                .parent()
+                .expect("expected test path to have a parent directory"),
+        )
+        .expect("create test directory");
         fs::write(&file_path, "dummy").expect("Failed to create File4.md");
         assert!(file_path.exists(), "File4.md should exist");
 
@@ -941,10 +946,10 @@ mod tests {
             };
 
             if let Some(parent) = full_path.parent() {
-                fs::create_dir_all(parent).unwrap();
+                fs::create_dir_all(parent).expect("create test directory");
             }
 
-            fs::write(&full_path, "test").unwrap();
+            fs::write(&full_path, "test").expect("write test fixture");
 
             let result = to_relative_identifier(identifier, base_path, true)
                 .expect("Failed to to relative identifier");
@@ -957,7 +962,7 @@ mod tests {
         }
 
         // Restore original directory
-        std::env::set_current_dir(&original_dir).unwrap();
+        std::env::set_current_dir(&original_dir).expect("change test working directory");
         git_commands::clear_git_cache();
     }
 
@@ -1203,7 +1208,7 @@ mod tests {
         git_commands::clear_git_cache();
 
         // Save original directory to restore at the end
-        let original_dir = std::env::current_dir().unwrap();
+        let original_dir = std::env::current_dir().expect("read test working directory");
 
         let temp_spec_folder = TempDir::new().expect("Failed to create temp dir");
         let specifications_folder = temp_spec_folder.path().to_path_buf();
@@ -1241,7 +1246,7 @@ mod tests {
 
         // 2. Absolute identifier path resolved relative to workspace root
         let spec_identifier = "/subfolder/file.yaml";
-        let result = to_relative_identifier(&spec_identifier, &base_path, false)
+        let result = to_relative_identifier(spec_identifier, &base_path, false)
             .expect("Should return relative path inside specifications folder");
         assert_eq!(
             result, "../../subfolder/file.yaml",
@@ -1251,12 +1256,12 @@ mod tests {
         // 3. Same-folder file path
         let spec_identifier = "/file.yaml";
 
-        let result = to_relative_identifier(&spec_identifier, &specifications_folder, false)
+        let result = to_relative_identifier(spec_identifier, &specifications_folder, false)
             .expect("Should return relative path inside specifications folder");
         assert_eq!(result, "file.yaml", "Failed same-folder file check");
 
         // Restore original directory
-        std::env::set_current_dir(&original_dir).unwrap();
+        std::env::set_current_dir(&original_dir).expect("change test working directory");
         git_commands::clear_git_cache();
     }
 }

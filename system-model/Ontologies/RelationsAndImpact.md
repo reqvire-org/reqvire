@@ -115,6 +115,7 @@ reqvire:ChangePropagationRuleShape
       "maps-to-concept-impact"
       "requirement-to-semantic-contract-review"
       "contract-bindings-content-impact"
+      "contract-references-content-impact"
       "semantic-reference-reachability"
       "relocation-without-content-change"
     ) ;
@@ -340,6 +341,49 @@ reqvire:NonContractBindingElementShape
     sh:maxCount 0 ;
   ] .
 
+reqvire:ContractReferenceSourceShape
+  a sh:NodeShape ;
+  sh:targetSubjectsOf reqvire:referencesContract ;
+  sh:class reqvire:Requirement ;
+  sh:property [
+    sh:path reqvire:referencesContract ;
+    sh:nodeKind sh:IRI ;
+    sh:node reqvire:ReferencedContractShape ;
+  ] ;
+  sh:property [
+    sh:path reqvire:bindsContract ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:sparql [
+    sh:message "Contract References must not participate in circular requirement dependencies." ;
+    sh:select """
+      PREFIX reqvire: <https://www.reqvire.org/ontology#>
+      SELECT $this ?contract ?owner WHERE {
+        $this reqvire:referencesContract ?contract .
+        ?contract reqvire:define ?owner .
+        ?owner (reqvire:derivedFrom | (reqvire:referencesContract / reqvire:define) | (reqvire:bindsContract / reqvire:define))* $this .
+      }
+    """ ;
+  ] .
+
+reqvire:ReferencedContractShape
+  a sh:NodeShape ;
+  sh:targetObjectsOf reqvire:referencesContract ;
+  sh:or (
+    [ sh:class reqvire:Source ]
+    [ sh:class reqvire:Constraint ]
+    [ sh:class reqvire:Behavior ]
+    [ sh:class reqvire:Specification ]
+    [ sh:class reqvire:State ]
+    [ sh:class reqvire:InputOutput ]
+  ) ;
+  sh:property [
+    sh:path reqvire:define ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:Requirement ;
+  ] .
+
 reqvire:RelationPredicateLayerAssignmentShape
   a sh:NodeShape ;
   sh:targetSubjectsOf reqvire:relationPredicateLayer ;
@@ -378,7 +422,7 @@ reqvire:RelationRuleShape
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "definedBy" "define" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "contract_bindings") ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "definedBy" "define" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "contract_bindings" "contract_references") ;
   ] ;
   sh:property [
     sh:path reqvire:allowedSourceType ;
@@ -510,7 +554,7 @@ reqvire:RelationUsageCategoryShape
     sh:path reqvire:usageCategoryRelationName ;
     sh:minCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "definedBy" "define" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "contract_bindings") ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "definedBy" "define" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "contract_bindings" "contract_references") ;
   ] ;
   sh:property [
     sh:path reqvire:usageCategoryMeaning ;
@@ -527,13 +571,13 @@ reqvire:RelationSemanticCategoryShape
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("hierarchy" "capability-specification" "satisfaction" "contract-ownership" "semantic-contract-constraint" "semantic-contract-ontology-use" "verification" "contract-binding") ;
+    sh:in ("hierarchy" "capability-specification" "satisfaction" "contract-ownership" "semantic-contract-constraint" "semantic-contract-ontology-use" "verification" "contract-binding" "contract-reference") ;
   ] ;
   sh:property [
     sh:path reqvire:semanticCategoryRelationName ;
     sh:minCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "definedBy" "define" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "contract_bindings") ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "definedBy" "define" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "contract_bindings" "contract_references") ;
   ] ;
   sh:property [
     sh:path reqvire:semanticCategoryMeaning ;
@@ -550,7 +594,7 @@ reqvire:RelationSemanticPatternShape
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("hierarchy" "bridge" "ownership" "constraint" "dependency" "verification" "satisfaction" "contract-binding") ;
+    sh:in ("hierarchy" "bridge" "ownership" "constraint" "dependency" "verification" "satisfaction" "contract-binding" "contract-reference") ;
   ] .
 
 reqvire:RelationFamilyShape
@@ -563,7 +607,7 @@ reqvire:RelationFamilyShape
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("hierarchy" "capability-specification" "contract-ownership" "semantic-contract-constraint" "semantic-contract-ontology-use" "verification" "satisfaction" "contract-binding") ;
+    sh:in ("hierarchy" "capability-specification" "contract-ownership" "semantic-contract-constraint" "semantic-contract-ontology-use" "verification" "satisfaction" "contract-binding" "contract-reference") ;
   ] ;
   sh:property [
     sh:path reqvire:relationFamilyMeaning ;
@@ -886,6 +930,16 @@ reqvire:contractBindingsContentImpactRule a reqvire:ChangePropagationRule ;
   reqvire:propagationMode "review-required" ;
   reqvire:impactReason "Contract Bindings content changes affect explicit cross-subgraph contract consumers." .
 
+reqvire:contractReferencesContentImpactRule a reqvire:ChangePropagationRule ;
+  rdfs:label "Contract reference content impact" ;
+  reqvire:changeRuleName "contract-references-content-impact" ;
+  reqvire:changedThing "referenced-contract-content" ;
+  reqvire:impactRelation "contract_references" ;
+  reqvire:impactDirection "downstream" ;
+  reqvire:propagationTarget "referencing-requirement" ;
+  reqvire:propagationMode "review-required" ;
+  reqvire:impactReason "Contract changes require review of referencing requirements and their downstream implementation and verification context." .
+
 reqvire:semanticReferenceReachabilityRule a reqvire:ChangePropagationRule ;
   rdfs:label "Semantic reference reachability" ;
   reqvire:changeRuleName "semantic-reference-reachability" ;
@@ -945,7 +999,9 @@ Relation endpoint compatibility is semantic:
 - Semantic contracts constrain requirements through `constrain` and `constrainedBy`, and use ontology vocabulary through `use` and `usedBy`.
 - Requirements are verified by concrete verification elements through `verifiedBy` and `verify`; capability verification coverage is computed from verified requirements that specify each capability. Verification objectives organize verification hierarchy but are not concrete verification evidence.
 - Requirements and evidence-backed verifications are satisfied by implementation or evidence artifacts through `satisfiedBy` and `satisfy`.
-- Contract Bindings expresses a requirement dependency on compatible requirement-owned contract context from another subgraph without transferring ownership.
+- Contract dependencies comprise Contract Bindings and Contract References. Both preserve contract context and propagate change impact.
+- Contract Bindings express shared implementation obligations whose consumers contribute to the contract owner's implementation fulfillment.
+- Contract References express content dependencies that propagate change impact without contributing to the contract owner's implementation fulfillment.
 - Explicit `other` elements cannot author semantic relations; model meaning should be expressed with a specific supported element type or ontology concept references.
 
 #### Ontology
@@ -1025,8 +1081,8 @@ reqvire:SatisfactionRelationPattern a owl:Class ;
   rdfs:comment "Relation pattern connecting requirements or evidence-backed verifications to implementation or evidence artifacts." .
 reqvire:ContractBindingPattern a owl:Class ;
   rdfs:subClassOf reqvire:RelationSemanticPattern ;
-  rdfs:label "Cross-subgraph contract dependency pattern" ;
-  rdfs:comment "Relation pattern for a requirement using reusable requirement-owned contract context from another subgraph without transferring ownership." .
+  rdfs:label "Contract binding pattern" ;
+  rdfs:comment "Contract dependency pattern assigning a shared implementation obligation to a requirement in another subgraph without transferring ownership." .
 
 reqvire:authoredRelationLayer a owl:NamedIndividual, reqvire:RelationPredicateLayer ;
   rdfs:label "Authored relation layer" ;
@@ -1060,7 +1116,7 @@ reqvire:satisfactionRelationPattern a owl:NamedIndividual, reqvire:RelationSeman
   rdfs:comment "Direct implementation or evidence satisfaction relationship." .
 reqvire:contractBindingPattern a owl:NamedIndividual, reqvire:RelationSemanticPattern, reqvire:ContractBindingPattern ;
   reqvire:semanticPatternName "contract-binding" ;
-  rdfs:comment "Direct cross-subgraph dependency from a requirement to reusable requirement-owned contract context declared through the contract_bindings authoring mechanism." .
+  rdfs:comment "Contract dependency assigning a shared implementation obligation through Contract Bindings; consumer fulfillment contributes to the contract owner's implementation coverage." .
 
 reqvire:hierarchyRelationFamily a owl:NamedIndividual, reqvire:RelationFamily ;
   rdfs:label "Hierarchy relation family" ;
@@ -1105,11 +1161,18 @@ reqvire:satisfactionRelationFamily a owl:NamedIndividual, reqvire:RelationFamily
   reqvire:relationFamilyForwardProperty reqvire:elementSatisfiedByArtifact ;
   reqvire:relationFamilyInverseProperty reqvire:artifactSatisfiesElement .
 reqvire:contractBindingRelationFamily a owl:NamedIndividual, reqvire:RelationFamily ;
-  rdfs:label "Cross-subgraph contract dependency relation family" ;
+  rdfs:label "Contract binding relation family" ;
   reqvire:relationFamilyName "contract-binding" ;
-  reqvire:relationFamilyMeaning "Dependency from a requirement to reusable requirement-owned contract context in another subgraph." ;
+  reqvire:relationFamilyMeaning "Contract dependency assigning a shared implementation obligation whose consumer contributes to the contract owner's implementation fulfillment." ;
   reqvire:relationFamilyForwardProperty reqvire:bindsContract ;
   reqvire:relationFamilyInverseProperty reqvire:boundByContract .
+
+reqvire:contractReferenceRelationFamily a owl:NamedIndividual, reqvire:RelationFamily ;
+  rdfs:label "Contract reference relation family" ;
+  reqvire:relationFamilyName "contract-reference" ;
+  reqvire:relationFamilyMeaning "Contract dependency on content that propagates change impact without contributing to the contract owner's implementation fulfillment." ;
+  reqvire:relationFamilyForwardProperty reqvire:referencesContract ;
+  reqvire:relationFamilyInverseProperty reqvire:contractReferencedBy .
 
 reqvire:derive a owl:ObjectProperty ;
   rdfs:domain reqvire:Element ;
@@ -1358,20 +1421,35 @@ reqvire:artifactSatisfiesElement a owl:ObjectProperty ;
   owl:inverseOf reqvire:elementSatisfiedByArtifact ;
   rdfs:comment "Normalized direct satisfaction relation from an implementation or evidence artifact to the element it satisfies." .
 reqvire:bindsContract a owl:ObjectProperty ;
+  reqvire:mapsToConcept concept:ContractBinding ;
   rdfs:domain reqvire:Requirement ;
   rdfs:range reqvire:Contract ;
   owl:inverseOf reqvire:boundByContract ;
-  rdfs:comment "Forward contract_bindings projection from a requirement to explicit reusable requirement-owned contract context." .
+  rdfs:comment "Implementation obligation from a requirement to a shared requirement-owned contract. The binding requirement contributes to the owner's implementation roll-up; contract changes require consumer review." .
 reqvire:boundByContract a owl:ObjectProperty ;
   rdfs:domain reqvire:Contract ;
   rdfs:range reqvire:Requirement ;
   owl:inverseOf reqvire:bindsContract ;
   rdfs:comment "Inverse contract_bindings projection from reusable contract context to requirements in other subgraphs that bind it." .
+reqvire:referencesContract a owl:ObjectProperty ;
+  rdfs:domain reqvire:Requirement ;
+  rdfs:range reqvire:Contract ;
+  owl:inverseOf reqvire:contractReferencedBy ;
+  reqvire:mapsToConcept concept:ContractReference ;
+  rdfs:comment "Acyclic content dependency from a requirement to a requirement-owned contract for change-impact review, without implementation contribution." .
+reqvire:contractReferencedBy a owl:ObjectProperty ;
+  rdfs:domain reqvire:Contract ;
+  rdfs:range reqvire:Requirement ;
+  owl:inverseOf reqvire:referencesContract ;
+  rdfs:comment "Requirements whose content depends on this contract and needs review when it changes." .
+reqvire:referencesContract reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+reqvire:contractReferencedBy reqvire:relationPredicateLayer reqvire:normalizedRelationLayer .
+
 reqvire:implementedByArtifact a owl:ObjectProperty ;
   rdfs:domain reqvire:Capability ;
   rdfs:range reqvire:Artifact ;
   owl:propertyChainAxiom (reqvire:specifiedBy reqvire:satisfiedBy) ;
-  rdfs:comment "Inferred capability-to-artifact trace when a capability is specified by a requirement satisfied by an artifact." .
+  rdfs:comment "Inferred capability-to-artifact evidence trace when a specifying requirement has direct satisfaction. This trace alone does not establish complete capability implementation coverage." .
 
 reqvire:derive reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
 reqvire:derivedFrom reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
@@ -1857,7 +1935,21 @@ reqvire:contractBindingsRelationRule a reqvire:RelationRule ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Contract Bindings is the authoring mechanism for a requirement using compatible requirement-owned contract context from another subgraph." .
+  reqvire:relationRuleDescription "Contract Bindings declare shared implementation obligations on compatible requirement-owned contracts in another subgraph. Binding consumers contribute to the contract owner's implementation fulfillment and require review when the contract changes." .
+
+reqvire:contractReferencesRelationRule a reqvire:RelationRule ;
+  rdfs:label "contract_references" ;
+  reqvire:relationName "contract_references" ;
+  reqvire:relationPattern reqvire:dependencyRelationPattern ;
+  reqvire:relationFamily reqvire:contractReferenceRelationFamily ;
+  reqvire:normalizedForwardProperty reqvire:referencesContract ;
+  reqvire:normalizedInverseProperty reqvire:contractReferencedBy ;
+  reqvire:allowedSourceType "requirement" ;
+  reqvire:allowedTargetType "requirement-owned-contract" ;
+  reqvire:relationDirection "forward" ;
+  reqvire:createsOwnership false ;
+  reqvire:propagatesChangeImpact true ;
+  reqvire:relationRuleDescription "Contract References records an acyclic content dependency for change-impact review. Requirement dependencies follow parent requirements and owners of referenced or bound contracts; a reference cannot close a path back to its source. References do not participate in implementation fulfillment." .
 
 reqvire:requirementContractBindingCompatibilityRule a reqvire:ContractBindingCompatibilityRule ;
   rdfs:label "Requirement contract_bindings compatibility" ;

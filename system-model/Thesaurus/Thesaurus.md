@@ -89,6 +89,59 @@ Human-readable binding from non-ontology model prose to curated SKOS concepts.
   * related: [Traceability](#traceability)
 ---
 
+### Contract Binding
+
+An implementation obligation linking a requirement to a shared requirement-owned contract. Fulfillment of the binding requirement contributes to the contract owner's implementation coverage.
+
+#### Scope Note
+Use when the requirement is responsible for implementing the shared obligation. Changes to the contract also require review of the binding requirement.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Contract Dependency](#contract-dependency)
+  * related: [Contract Reference](#contract-reference)
+  * related: [Implementation Coverage](#implementation-coverage)
+---
+
+### Contract Dependency
+
+A requirement's reliance on a requirement-owned contract, expressed through a Contract Binding for a shared implementation obligation or a Contract Reference for a content dependency.
+
+#### Scope Note
+Contract dependency is the umbrella term for both kinds. Both retain contract context and propagate change impact; only binding consumers contribute to the contract owner's implementation fulfillment.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Change Impact](#change-impact)
+  * related: [Implementation Coverage](#implementation-coverage)
+---
+
+### Contract Reference
+
+A content dependency that propagates change impact without contributing to the contract owner's implementation fulfillment.
+
+#### Scope Note
+Contract reference dependencies are acyclic. A requirement depends on the owner of each referenced contract; circular chains remain invalid when they include contract bindings or requirement ancestry.
+
+#### Examples
+Documentation references an error-response specification so that schema changes prompt documentation review. An endpoint implementing the shared schema binds that specification.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Contract Dependency](#contract-dependency)
+  * related: [Change Impact](#change-impact)
+  * related: [Contract Binding](#contract-binding)
+---
+
 ### Concrete Verification
 
 Executable, inspectable, demonstrable, analytical, or formal verification method.
@@ -236,6 +289,24 @@ Conceptual area covering ownership, status, priority, risk, review readiness, an
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+---
+
+### Implementation Coverage
+
+Computed assessment of whether requirement implementation obligations are supported by direct artifact evidence or completely fulfilled through required child and shared-contract consumer contributions, with capability coverage aggregated from those assessments.
+
+#### Scope Note
+Implementation coverage describes modeled implementation evidence, not proof that the implementation is correct. Percentages count terminal requirements; verification coverage remains a separate assessment.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Requirement](#requirement)
+  * related: [Requirement Contract](#requirement-contract)
+  * related: [Traceability](#traceability)
+  * related: [Verification Coverage](#verification-coverage)
 ---
 
 ### Integration
@@ -649,6 +720,22 @@ Scoped model region rooted in capability, ontology, or another supported model b
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
   * broader: [Model Structure](#model-structure)
+---
+
+### Terminal Requirement
+
+Requirement with no immediate requirement children and no requirements binding any of its owned contracts in the complete validated model. Its implementation coverage depends on direct satisfaction evidence.
+
+#### Scope Note
+Terminal status is specific to implementation coverage. A verification leaf has no requirement children but may still have contract consumers. Merely owning an unused contract does not make a requirement nonterminal.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Requirement](#requirement)
+  * related: [Implementation Coverage](#implementation-coverage)
 ---
 
 ### Traceability

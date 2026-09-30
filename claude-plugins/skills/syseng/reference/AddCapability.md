@@ -12,7 +12,7 @@
 3. Requirements        → Define what the system shall do (never skip implementable obligations)
 4. Contracts         → Add specifications, constraints, behaviors, state, and input-output contracts as needed
    Semantic contracts  → Add reusable SHACL contracts with explicit ontology use when closed-world checks are needed
-5. Verifications       → Add verification elements for capabilities or leaf requirements
+5. Verifications       → Add verification elements for leaf requirements; capabilities receive roll-up coverage
 6. Implementation      → Connect `requirement` elements and evidence-backed verifications to code/evidence via `satisfiedBy`
 ```
 
@@ -27,7 +27,7 @@ When constructing or refactoring a system model, work from model boundaries inwa
 5. Put shared vocabulary and stable semantic relationships in ontology; bind capability, requirement, contract, and verification prose to SKOS concepts with `#### Concept References`.
 6. Put implementable obligations in requirements that `specify` the local capability.
 7. Put local details in compatible contracts owned by the relevant requirement.
-8. Use contract_bindings, not hierarchy, when another requirement root needs reusable requirement-owned contracts. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
+8. Use Contract Bindings for shared implementation obligations and Contract References for content dependencies when another requirement root needs a requirement-owned contract. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
 9. Validate `submodels`, `collect`, and change-impact paths after each boundary slice.
 
 ## Capability Design Rules
@@ -144,7 +144,7 @@ Keep domain definitions and reusable vocabulary in ontology when they are stable
 When splitting existing prose, do not lose meaning:
 - Capability prose keeps capability scope and why the area exists.
 - Ontology keeps reusable terms and relationships.
-- Capability and requirement contracts keep exact command behavior, payload fields, outputs, state behavior, validation messages, file paths, and workflow steps.
+- Requirement-owned contracts keep exact command behavior, payload fields, outputs, state behavior, validation messages, file paths, and workflow steps.
 - Verifications keep evidence expectations and test assertions.
 
 ### Adding Requirements
@@ -280,7 +280,7 @@ When an error occurs, the system shall log the error, notify the user, and attem
 EOF
 ```
 
-Link contracts to requirements using relations or contract_bindings:
+Link the owner with `definedBy`; use bindings for shared implementation obligations and references for content dependencies:
 
 ```bash
 # Link contract to requirement using definedBy relation (owner defines it)
@@ -294,19 +294,20 @@ reqvire link "Other Capability Requirement" bindContract "Performance Constraint
 reqvire link "Requirement Shape Contract" "constrain" "Other Capability Requirement"
 reqvire link "Requirement Shape Contract" "use" "Capability Ontology"
 
-# Reuse file (design document, specification document)
-reqvire link "Architecture Requirement" bindContract "docs/architecture.pdf"
+# Reference a requirement-owned contract for documentation/change review
+reqvire link "Architecture Documentation" referenceContract "Performance Constraint"
 
-# Link to implementation file or external URL
+# Link to an implementation artifact
 # Note: capability must not use satisfiedBy/satisfy.
 reqvire link "System Requirement" "satisfiedBy" "src/auth/login.rs"
-reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
 ```
 
-**Contract Bindings constraints:**
+**Contract dependency constraints:**
 - Contracts must have a `define` relation before being reused
-- Capabilities do not author contract_bindings; use `#### Concept References` for SKOS concept bindings
-- Requirements may reuse only requirement-owned `specification`, `constraint`, `behavior`, `state`, or `input-output` contracts
+- Only requirements author Contract Bindings or Contract References; use `#### Concept References` for SKOS concept dependencies
+- Requirements may reuse only compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, or `input-output` contracts
+- A requirement cannot contain both Contract Bindings and Contract References
+- Bindings cross requirement hierarchies and impose implementation obligations; references preserve content dependencies and must remain acyclic through contract owners, bindings, and requirement ancestry
 - Semantic contracts must not author `#### Concept References`; they depend on ontology through `use`
 
 ## Step 4: Add Verifications
@@ -383,7 +384,7 @@ After adding requirements and verifications, follow the standard validation work
 3. `reqvire coverage` - Verify leaf verification coverage and requirement-only implementation coverage
 4. `reqvire format --fix` - Normalize formatting
 
-Additionally, use `reqvire resources` to see all files referenced by the model through `satisfiedBy` relations and contract_bindings.
+Additionally, use `reqvire resources` to see all files referenced by the model through `satisfiedBy` relations. Bound and referenced contracts are model elements, not file artifacts.
 
 ## Complete Example
 
@@ -395,9 +396,6 @@ Authentication capability for access-controlled product areas.
 
 #### Metadata
   * type: capability
-
-#### Contract Bindings
-  * [Authentication Ontology](Ontologies/Auth.md#authentication-ontology)
 
 #### Relations
   * specifiedBy: [Password Authentication](System/Auth.md#password-authentication)

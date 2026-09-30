@@ -31,7 +31,7 @@ const SH_NODE_KINDS: &[(&str, NodeKindVariant)] = &[
     ),
 ];
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Shape {
     Node(NodeShape),
     Property(PropertyShape),
@@ -47,24 +47,24 @@ pub enum TargetIdentifier {
     ImplicitClass(NamedOrBlankNode),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AstPath {
     Iri(NamedNode),
     Inverse(NamedNode),
-    Sequence(Vec<AstPath>),
-    Alternative(Vec<AstPath>),
-    ZeroOrMore(Box<AstPath>),
-    OneOrMore(Box<AstPath>),
-    ZeroOrOne(Box<AstPath>),
+    Sequence(Vec<Self>),
+    Alternative(Vec<Self>),
+    ZeroOrMore(Box<Self>),
+    OneOrMore(Box<Self>),
+    ZeroOrOne(Box<Self>),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AstConstraint {
     pub predicate: NamedNode,
     pub value: Term,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NodeShape {
     pub id: NamedOrBlankNode,
     pub targets: Vec<TargetIdentifier>,
@@ -75,7 +75,7 @@ pub struct NodeShape {
     pub ignored_properties: Vec<NamedNode>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PropertyShape {
     pub id: NamedOrBlankNode,
     pub path: Option<AstPath>,
@@ -97,7 +97,7 @@ impl ReferencedIri {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SyntaxConstraint {
     Class {
         class_node: NamedOrBlankNode,
@@ -311,7 +311,7 @@ pub struct OntologyAligner<'a> {
 }
 
 impl<'a> OntologyAligner<'a> {
-    pub fn new(ontology: &'a DomainOntologyIndex) -> Self {
+    pub const fn new(ontology: &'a DomainOntologyIndex) -> Self {
         Self { ontology }
     }
 
@@ -527,7 +527,7 @@ struct ShaclParser<'a> {
 }
 
 impl<'a> ShaclParser<'a> {
-    fn new(quads: &'a [Quad]) -> Self {
+    const fn new(quads: &'a [Quad]) -> Self {
         Self {
             quads,
             diagnostics: Vec::new(),
@@ -971,7 +971,7 @@ impl<'a> ShaclParser<'a> {
     }
 
     fn push_term(
-        &mut self,
+        &self,
         id: &NamedOrBlankNode,
         constraints: &mut Vec<SyntaxConstraint>,
         predicate: &'static str,
@@ -1429,7 +1429,8 @@ ex:InvoiceNumberShape
             .raw_constraints
             .iter()
             .any(|constraint| constraint.predicate.as_str() == SH_DATATYPE
-                && constraint.value == Term::NamedNode(NamedNode::new(XSD_STRING).unwrap())));
+                && constraint.value
+                    == Term::NamedNode(NamedNode::new(XSD_STRING).expect("valid XSD string IRI"))));
         assert!(number_shape
             .raw_constraints
             .iter()
@@ -1437,7 +1438,7 @@ ex:InvoiceNumberShape
         assert!(number_shape
             .constraints
             .contains(&SyntaxConstraint::Datatype {
-                datatype_iri: NamedNode::new(XSD_STRING).unwrap(),
+                datatype_iri: NamedNode::new(XSD_STRING).expect("valid XSD string IRI"),
             }));
         assert!(number_shape
             .constraints

@@ -51,7 +51,7 @@ impl SemanticModelStore {
         })
     }
 
-    pub fn store(&self, full: bool, include_external: bool) -> &Store {
+    pub const fn store(&self, full: bool, include_external: bool) -> &Store {
         match (full, include_external) {
             (false, false) => &self.authored_store,
             (false, true) => &self.authored_external_store,
@@ -61,7 +61,7 @@ impl SemanticModelStore {
     }
 
     #[allow(dead_code)]
-    pub(crate) fn derivation_store(&self) -> &Store {
+    pub(crate) const fn derivation_store(&self) -> &Store {
         &self.derivation_store
     }
 }

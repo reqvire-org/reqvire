@@ -1,6 +1,6 @@
-PASS canonical-v1-empty
+PASS canonical-v2-empty
 PASS digest-format
-PASS canonical-v1-minimal
+PASS canonical-v2-minimal
 PASS unchanged-repeat
 PASS schema-workspace_status
 PASS schema-model_revision
@@ -27,7 +27,7 @@ PASS element-move
 PASS absolute-workspace-location
 PASS process-restart
 PASS excluded-size-estimates
-PASS canonical-v1-multiple
+PASS canonical-v2-multiple
 PASS element-order
 PASS element-removal
 PASS element-addition-restores-revision

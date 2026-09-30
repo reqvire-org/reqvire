@@ -46,6 +46,25 @@ Command-specific rules:
   * define: [CLI Coverage Command](Commands.md#cli-coverage-command)
 ---
 
+### CLI Coverage Scope Selection Specification
+
+Command-line mapping of the shared coverage scope contract.
+
+#### Details
+- `coverage --from <NAME>` selects a capability by its exact model element name, following the existing `--from` naming convention.
+- Accept both root and nested capabilities. Requirement, contract, verification, and unknown names MUST fail with a clear diagnostic and a nonzero exit status; never silently fall back to the whole model.
+- Omission of `--from` preserves whole-model coverage behavior and existing text and JSON report sections.
+- The command MUST delegate scope resolution and coverage projection to the shared reporting operation. CLI code only parses the selector and renders the result.
+- Text and `--json` output MUST report the same scope, counts, classifications, gap membership, and supporting evidence. Scoped text MUST identify the selected capability and explain that orphan diagnostics are available in whole-model coverage.
+- The normal command help MUST document the optional selector and capability-only scope.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [CLI Coverage Scope Selection](Commands.md#cli-coverage-scope-selection)
+---
+
 ### CLI Interface Structure Contract Specification
 
 #### Details
@@ -381,7 +400,7 @@ The command emits JSON by default and does not expose a separate output-format f
 The `search` command exposes model search, filtering, and evidence serialization.
 
 Command-specific rules:
-- It must delegate file, element, type, governance, relation, contract_bindings, short/full, and content filtering to the report search contracts.
+- It MUST delegate file, element, type, governance, relation, Contract Bindings, Contract References, short/full, and content filtering to the report search contracts.
 - Full JSON results must expose parsed semantic ADT fields for ontology and semantic-contract elements when present.
 - It must not define a separate CLI-only search schema outside the shared JSON output and search-filtering contracts.
 
@@ -424,7 +443,16 @@ The `submodels` command behavior is governed by the reused submodel analysis and
 ### CLI Traces Command Contract Specification
 
 #### Details
-The `traces` command behavior is governed by the reused verification trace and link-format contracts.
+The `traces` command MUST obtain its report and filter diagnostics from the shared trace operation according to the referenced trace-construction and type-validation contracts. These dependencies describe consumed core behavior. JSON presentation is allocated to the CLI Traces Result Presentation child requirement.
+
+#### Metadata
+  * type: specification
+---
+
+### CLI Traces Result Presentation Specification
+
+#### Details
+The CLI MUST serialize the returned report according to the bound JSON Output Structure. With no `--output` argument, the JSON MUST be written to stdout. With `--output <FILE>`, the JSON MUST be written to that file. The file's parsed content MUST equal the report emitted on stdout for the same invocation and model.
 
 #### Metadata
   * type: specification
@@ -562,9 +590,10 @@ Mutating command hierarchy safety is governed by the reused validation and atomi
 Relation command behavior is governed by the reused relation, contract_bindings, and atomicity contracts.
 
 Command-specific rules:
-- `reqvire link <element-name> <relation> <target>` adds an authored relation unless the relation keyword is the contract binding keyword.
+- `reqvire link <element-name> <relation> <target>` adds an authored relation unless the keyword is `bindContract` or `referenceContract`.
+- `reqvire link <element-name> referenceContract <target>` MUST add a content dependency under Contract References.
 - `reqvire link <element-name> bindContract <target>` adds a Contract Bindings entry to a reusable requirement-owned contract target and creates the subsection when needed.
-- `reqvire unlink <element-name> <target>` auto-detects whether the target is an authored relation target or a Contract Bindings target and removes the matching entry.
+- `reqvire unlink <element-name> <target>` auto-detects whether the target is an authored relation target, a Contract Bindings target, or a Contract References target and removes the matching entry.
 - Contract Bindings removal removes the subsection when no entries remain.
 - The commands must preserve dry-run preview, JSON mutation output, file persistence, relation validation, contract_bindings scope validation, idempotency, and atomic failure behavior from the reused contracts.
 

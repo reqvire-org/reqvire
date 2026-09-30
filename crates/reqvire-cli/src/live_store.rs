@@ -127,7 +127,7 @@ mod tests {
             project_store_json: store.to_string(),
             ontologies_ttl: ontology.into(),
         })
-        .unwrap()
+        .expect("build test live store")
     }
 
     #[test]
@@ -171,24 +171,35 @@ mod tests {
             "c93e908d4702c6c90e66f936b9dfbcd128e97ee5175554f1aae1c0782e519cf0"
         );
         assert_eq!(live.revision, content_hash(&live.manifest_json));
-        let manifest: Value = serde_json::from_str(&live.manifest_json).unwrap();
+        let manifest: Value =
+            serde_json::from_str(&live.manifest_json).expect("parse generated JSON");
         let mut recovered = serde_json::Map::new();
-        for (name, section) in manifest["sections"].as_object().unwrap() {
+        for (name, section) in manifest["sections"]
+            .as_object()
+            .expect("expected a JSON object")
+        {
             let value = if section["kind"] == "array" {
                 Value::Array(
                     section["hashes"]
                         .as_array()
-                        .unwrap()
+                        .expect("expected a JSON array")
                         .iter()
                         .map(|hash| {
-                            let content = &live.chunks[hash.as_str().unwrap()];
-                            assert_eq!(content_hash(content), hash.as_str().unwrap());
-                            serde_json::from_str(content).unwrap()
+                            let content =
+                                &live.chunks[hash.as_str().expect("expected a JSON string")];
+                            assert_eq!(
+                                content_hash(content),
+                                hash.as_str().expect("expected a JSON string")
+                            );
+                            serde_json::from_str(content).expect("parse generated JSON")
                         })
                         .collect(),
                 )
             } else {
-                serde_json::from_str(&live.chunks[section["hash"].as_str().unwrap()]).unwrap()
+                serde_json::from_str(
+                    &live.chunks[section["hash"].as_str().expect("expected a JSON string")],
+                )
+                .expect("parse generated JSON")
             };
             recovered.insert(name.clone(), value);
         }
@@ -234,9 +245,20 @@ mod tests {
             revision: live.revision.clone(),
             hashes: vec![hash.clone(), hash.clone()],
         };
-        let response: Value = serde_json::from_str(&live.chunks_json(&request).unwrap()).unwrap();
+        let response: Value = serde_json::from_str(
+            &live
+                .chunks_json(&request)
+                .expect("retrieve requested test chunks"),
+        )
+        .expect("parse generated JSON");
         assert_eq!(response["revision"], live.revision);
-        assert_eq!(response["chunks"].as_object().unwrap().len(), 1);
+        assert_eq!(
+            response["chunks"]
+                .as_object()
+                .expect("expected a JSON object")
+                .len(),
+            1
+        );
         assert_eq!(response["chunks"][&hash], "{\"id\":\"first\"}");
     }
 

@@ -141,7 +141,7 @@ Explorer palette behavior:
 - Use one role palette across the Model tree, List/Grid rows, Graph mode, Search results, Ontologies, Traces, source content, and element modals.
 - Render semantic-contract elements with their own SHACL-profile role token as a plain square with no glyph. Render contract-family subtypes with one shared contract hue and distinct type glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
 - Render capability elements as a plain capability-colored square with no dark hub wrapper or inner pip, matching the simple square treatment used by other non-contract element types.
-- Render `verification-objective` elements with their own darker green verification-objective role token as a plain square with no glyph, distinct from concrete verification elements that verify requirements or capabilities.
+- Render `verification-objective` elements with their own darker green verification-objective role token as a plain square with no glyph, distinct from concrete verification elements that verify requirements.
 - Render model element concept references inline in element-detail modal prose and source-page prose when the referenced native SKOS concept preferred label, alternative label, or authored reference label appears in the content. Inline concept-reference links use normal text color at rest with a dotted underline, no resting background, no glyph, no badge, and no pill; on hover or focus both text and underline use the standard Explorer link color. Activating the link opens the native concept element modal. The authored `#### Concept References` source subsection must be hidden from regular element modal content rendering and source-page rendering. Concept-reference links must not open ontology-node modals. Evidence-file and artifact targets use the neutral/default role treatment and must not share the concept-reference color.
 - Relation and contract_bindings endpoints must use the shared `ElementIcon` marker contract for both element targets and non-element resource/artifact targets; they must not use ad hoc tiny pips with local color mappings.
 - In element-detail modal headers, render only the actual element type badge. Type family remains available to design-system components for color/glyph semantics but must not appear as a redundant visible kind badge next to the actual type.
@@ -168,6 +168,62 @@ Raw hexadecimal values belong in design-system token files or generated assets, 
 
 #### Relations
   * define: [Web Interface Color Scheme](Capabilities.md#web-interface-color-scheme)
+---
+
+### Explorer Coverage Scope and Display Specification
+
+Coverage interaction and presentation over the shared Project Store coverage projection.
+
+#### Details
+**Scope and ranked hierarchy**
+- Scope offers Whole model and selection of any capability subtree, including root submodels and nested capabilities. Default scope is Whole model. The Scope control MUST occupy the right side of the Coverage title row, stacking only when the available width requires it.
+- Capability presentation MUST use a parent-before-child hierarchy with depth indentation. There is no separate root-summary or flat-ranked display selector.
+- Root rows and each sibling group MUST be ordered by ascending verification coverage percentage, then ascending implementation coverage percentage, then name and identifier. Ranking MUST keep each parent's displayed descendants together beneath that parent.
+- All model parent relationships remain in store data. When a capability has multiple in-scope parents, choose one display parent deterministically by identifier and retain access to the other parents through element details. Each capability appears once; display-parent choices MUST NOT change scope membership or ownership.
+- Changing scope updates every coverage summary card, chart, legend count, verification-type breakdown, implementation-source breakdown, gap list, evidence-satisfaction list, and sidebar count from the same scope projection.
+- Capability aggregates are roll-ups, so parent and descendant rows MUST NOT be summed to obtain report totals. Shared verifications are deduplicated under the shared scope contract.
+
+**Shared store and evidence**
+- The Coverage view MUST distinguish verification coverage from implementation coverage. Implementation percentages and their displayed denominators MUST use terminal requirements; capability implementation completeness MUST remain visible separately from those percentages.
+- Generated stores MUST extend the existing `coverage` projection with `scope_index`, keyed by capability identifier. Each entry contains the shared report's `scope` membership record and `summary` for that capability, including nested and empty capabilities.
+- Generate these entries with the shared coverage scope resolver and aggregation over the same validated snapshot as the whole-model coverage records. Store generation MUST not define separate ownership, classification, or evidence rules.
+- Read generated coverage classifications, source records, evidence identifiers, summaries, and scope memberships from the existing Project Store. One browser scope projection MUST serve both the Coverage view and its left pane; neither may implement an independent classification or ownership algorithm.
+- Compact scope summaries and membership indexes may reference shared whole-model records instead of duplicating full reports. Their semantics MUST match the shared reporting operation for the same snapshot.
+
+**Requirement drill-down**
+- Capability rows MUST retain the ranked capability hierarchy and coverage summaries. Capability rows and expanded requirement details MUST use the shared report surface. Element-type markers, indentation, and chevron disclosure controls MUST identify elements and communicate nesting.
+- Visible capability and requirement rows MUST alternate subtle surface tones in one display sequence, including siblings and nested descendants, using shared design-system theme tokens. Expanding and collapsing rows MUST preserve that alternation across the resulting visible rows. Row separation MUST use shading and spacing, with border-free hierarchy branches and dependency lists. Each dependency list MUST alternate the same surface tones between its rows.
+- Verification and implementation columns MUST align across capability and requirement rows at every hierarchy depth. Hierarchy indentation MUST apply to element identities and their dependency links while coverage columns retain shared horizontal positions. Contract dependency statuses MUST align with the report's right status edge. Responsive row layout MUST use the available coverage panel width, including changes caused by expanding or collapsing the Explorer pane. Within constrained panels, verification and implementation MUST remain aligned beneath the identity, and successive hierarchy levels MUST retain distinct indentation.
+- Attached requirement rows MUST initially be collapsed. Expanding a capability at any hierarchy depth MUST reveal the requirements attached through `specify`/`specifiedBy` and their derived hierarchy. An attached requirement whose parent is displayed under another capability MUST remain accessible within this capability's disclosure.
+- Expanding a requirement MUST reveal its immediate derived child rows directly beneath it, each initially collapsed so users can explore successive levels. The parent's additional dependencies MUST follow its child rows.
+- Disclosure controls MUST be available for requirement rows with child requirements or binding consumers to inspect. Terminal requirements MUST show their coverage bars, counts, status, element-detail link, and aligned element marker.
+- Collapsing a requirement row MUST hide its disclosed content. Collapsing a capability's requirement disclosure MUST hide its requirement rows while capability descendants remain visible in the ranked capability hierarchy.
+- Capability and requirement name links MUST open the existing element-detail workflow independently of the disclosure controls. Each requirement row MUST show its published implementation classification and available verification status. Child coverage MUST be communicated through these nested rows.
+- Within each capability's requirement disclosure, display parents MUST follow the reachable requirement hierarchy. Multiple valid parents MUST be resolved deterministically for display only, with each requirement appearing once within that disclosure. A requirement reachable from several capability disclosures MUST retain the same published status in each context; report counts MUST remain those of the shared report.
+- Every requirement row MUST use the same label, status, colored bar, percentage, and numerator/denominator layout as capability rows. Verification MUST display the published aggregate verified and total leaf counts; implementation MUST display the published aggregate covered and total terminal counts. Leaf and terminal metrics include `100% · 1 / 1` and `0% · 0 / 1`. Verification MUST use the shared requirement color and implementation the shared resource color. Parent rows MUST retain their published blocker status alongside their progress metrics.
+- Requirement implementation status MUST use the published covered/uncovered classification. Verification status labels MUST be `Verified` for complete coverage, `Partially verified` for nonzero incomplete coverage, and `Not verified` for zero coverage. These labels describe verification coverage from the shared report.
+- The implementation status on the right of the requirement row MUST include the number of recursively uncovered requirements from `blocking_requirements` when those dependencies block coverage.
+- Immediate implementation dependencies come from `contributing_requirements`. Dependencies already represented by nested child rows MUST use those rows as their presentation. Other immediate dependencies MUST appear as labelled links: contract consumers under `Binding consumers`, and shared hierarchy children displayed under another parent under `Additional child requirements`. Each link MUST retain its published implementation status and applicable outside-scope marker.
+- Recursively uncovered dependency counts and immediate dependency counts describe different sets. The requirement row status MUST retain the recursive gap count while users follow child rows and labelled dependency links to inspect the contributing requirements.
+- Selecting a requirement name MUST open the existing element-detail workflow, where its implementation evidence links provide access to the existing resource view.
+- Requirement and dependency links MUST reuse the existing endpoint styling and element-detail navigation. Long names MUST wrap within the available width while keeping dependency statuses aligned.
+- The showcase mock MUST render the real Explorer application and Coverage view with fixture Project Store data. It MUST NOT substitute a separate coverage page, component override, or coverage evaluator.
+- Binding consumer links MUST remain accessible across scope boundaries. Selecting a consumer MUST open its element details while preserving the selected coverage scope.
+- In a capability scope, the orphan section and sidebar entry explain that orphan diagnostics are whole-model-only and offer an explicit action to switch to Whole model and open that section. Do not present a scoped zero as a claim that the whole model has no orphans.
+- A capability with no requirements remains selectable and shows an explicit empty state with valid zero subject counts.
+
+**State and compatibility**
+- Keep scope as browser UI state outside the immutable generated snapshot. Persist it per project using the capability identifier. Previously stored display preferences MUST NOT override the ranked hierarchy.
+- Preserve a selected capability across reloads and valid live snapshot refreshes when its identifier remains available, and apply counts and evidence from one snapshot consistently.
+- If a stored or refreshed scope identifier is missing or no longer denotes a capability, reset scope to Whole model with a visible explanation.
+- Coverage data MUST include the scope index and per-requirement and capability aggregate metrics defined by the shared reporting contracts. Missing or malformed coverage fields MUST produce the existing store diagnostic before rendering.
+- Reuse the existing Explorer design-system controls, capability markers, row styling, navigation, and element-detail interaction.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Explorer Scoped Coverage](Capabilities.md#explorer-scoped-coverage)
 ---
 
 ### Explorer Design System Styling Contract Specification
@@ -784,6 +840,7 @@ Breakpoints:
 - `resources`: modeled resource and evidence-file targets referenced by relations or contract_bindings, keyed separately from `files`.
 - `elements`: normalized Reqvire elements keyed by full identifier, including name, type, canonical type family, source file path, line number when available, content summary, governance metadata, authored metadata, and source anchor.
 - `relations`: normalized relation facts with source id, target id or target resource id, canonical relation direction, authored relation token, generated/opposite provenance, source location evidence, and relation family.
+- `contract_references`: optional requirement-to-contract content dependency facts; omitted collections are interpreted as empty.
 - `contract_bindings`: contract_bindings facts for reusable requirement-owned contract contract_bindings, local file resources, and external resources.
 - `concept_refs`: concept-reference facts with source element id, target native concept element id, authored label, derived generated SKOS concept IRI, source evidence, and SKOS concept linkage.
 - `thesaurus`: native concept-scheme and concept projection rows for Thesaurus route identity, navigation, map layout, source links, SKOS properties, taxonomy, related concepts, exact/close mappings, model usage, and ontology mapping usage. Thesaurus rows keep SKOS resource ids separate from native Reqvire `element_id` values.
@@ -822,6 +879,7 @@ Breakpoints:
 - Route changes must update the document title and route metadata to match the active Explorer view.
 - The Thesaurus route must render selected SKOS concept details from Project Store semantic concept data, not from the ontology graph canvas state. The selected concept detail must expose source navigation as a selected-concept action using that concept's source route/link metadata; it must not use a page-level source button that only focuses an ontology graph node.
 - Routes must be deep-linkable: loading `index.html#/elements/<identifier>` must open the selected element inside the Explorer shell without leaving the current view family.
+- Element-detail dialogs and source-page element details MUST display navigable Contract References using the shared contract-link presentation and a distinct section label. Knowledge Graph reference edges MUST identify content dependencies in the cross-boundary overlay and link to the referenced contract. These views MUST consume the reference records defined by the Contract Reference Evidence Projection Specification referenced through the owning requirement's contract binding.
 - Element-detail routes must render as an in-shell, scrollable modal/dialog over the active Explorer view. The modal must use Project Store element records as the primary data source and must show at minimum element name, type, source file, source anchor, metadata, governance context, content, relations, contract_bindings, inline concept-reference links, and available verification/coverage/resource evidence.
 - Element-detail modal headers must show the actual element type as the single primary text badge. They must not show a second canonical family/kind badge, marker dot, shape, or glyph when the actual element type already carries the meaningful user-facing classification.
 - Element-detail modal titles must use the compact detail title scale so the type badge, title, back affordance, and close affordance fit comfortably without display-sized typography.

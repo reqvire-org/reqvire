@@ -22,8 +22,8 @@ Commands:
   merge             Merge multiple elements into target element
   mv-file           Move entire specification file with all its elements
   mv-folder         Move or rename an entire folder subtree
-  link              Add relation or contract_bindings between elements
-  unlink            Remove relation or contract_bindings between elements (auto-detects type)
+  link              Add relation, contract binding, or contract reference between elements
+  unlink            Remove relation, contract binding, or contract reference between elements (auto-detects type)
   relink            Replace an existing relation target with a new target in one operation
   mv-asset          Move/rename asset file and update all references (Contract Bindings and Relations)
   rm-asset          Remove asset file and remove all references (Contract Bindings and Relations)
@@ -91,6 +91,8 @@ SEARCH OPTIONS:
       --not-have-relations <LIST> Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
       --has-contract-bindings   Only include elements that have contract_bindings
       --filter-contract-bindings <GLOB> Only include elements with contract_bindings matching this glob pattern (e.g., "*.pdf", "docs/**/*")
+      --has-contract-references Only include elements that have Contract References
+      --filter-contract-references <GLOB> Only include elements with Contract Reference targets matching this glob (e.g., "*#error-response-specification")
 
 CHANGE IMPACT OPTIONS:
       --git-commit <GIT_COMMIT> Git commit hash to use when comparing models
@@ -104,6 +106,7 @@ TRACES OPTIONS:
       --filter-type <TYPE>      Only include verifications of the given type. Valid: test-verification, analysis-verification, inspection-verification, demonstration-verification
 
 COVERAGE OPTIONS:
+      --from <NAME>             Select a capability subtree by exact name
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
@@ -173,7 +176,7 @@ MV FOLDER OPTIONS:
 
 LINK OPTIONS:
        <SOURCE>                 Source element name
-       <RELATION_TYPE>          Relation type OR 'bindContract'. Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, broader, narrower, related, exactMatch, closeMatch, satisfiedBy, satisfy, verifiedBy, verify. Use 'bindContract' to reuse compatible requirement-owned contract elements
+       <RELATION_TYPE>          Relation type, 'bindContract', or 'referenceContract'. Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, broader, narrower, related, exactMatch, closeMatch, satisfiedBy, satisfy, verifiedBy, verify. Use 'bindContract' to reuse compatible requirement-owned contract elements
        <TARGET>                 Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement contract_bindings
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format

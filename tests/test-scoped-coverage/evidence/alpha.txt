@@ -1,0 +1,1 @@
+Synthetic implementation artifact for the alpha fixture.

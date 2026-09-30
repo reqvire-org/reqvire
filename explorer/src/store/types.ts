@@ -190,6 +190,9 @@ export interface CoverageSummary {
   total_leaf_requirements?: number;
   covered_requirements?: number;
   uncovered_requirements?: number;
+  total_terminal_requirements?: number;
+  covered_terminal_requirements?: number;
+  uncovered_terminal_requirements?: number;
   verified_leaf_requirements?: number;
   unverified_leaf_requirements?: number;
   leaf_requirements_coverage_percentage?: number;
@@ -207,7 +210,58 @@ export interface CoverageSummary {
 
 export interface CoverageProjection {
   summary?: CoverageSummary;
+  scope?: CoverageScope;
+  scope_index: Record<string, { scope: CoverageScope; summary: CoverageSummary }>;
+  capability_coverage: { capabilities: CapabilityCoverageDetails[] };
+  covered_requirements: { files: Record<string, RequirementCoverageDetails[]> };
+  uncovered_requirements: { files: Record<string, RequirementCoverageDetails[]> };
   [section: string]: unknown;
+}
+
+export interface CoverageScope {
+  kind: string;
+  capability_identifier: string;
+  capability_name: string;
+  capability_ids: string[];
+  requirement_ids: string[];
+  verification_ids: string[];
+  orphaned_verifications_scope: string;
+}
+
+export interface RequirementCoverageDetails {
+  identifier: string;
+  name: string;
+  coverage_source: string;
+  is_terminal: boolean;
+  aggregate_leaf_requirements: number;
+  aggregate_verified_leaf_requirements: number;
+  aggregate_terminal_requirements: number;
+  aggregate_covered_terminal_requirements: number;
+  direct_evidence: string[];
+  evidence: string[];
+  contributing_requirements: string[];
+  blocking_requirements: string[];
+}
+
+export interface CapabilityCoverageDetails {
+  identifier: string;
+  name: string;
+  local_leaf_requirements: number;
+  local_verified_leaf_requirements: number;
+  local_requirements: number;
+  local_covered_requirements: number;
+  aggregate_leaf_requirements: number;
+  aggregate_verified_leaf_requirements: number;
+  verification_coverage_percentage: number;
+  aggregate_requirements: number;
+  aggregate_covered_requirements: number;
+  local_terminal_requirements: number;
+  local_covered_terminal_requirements: number;
+  aggregate_terminal_requirements: number;
+  aggregate_covered_terminal_requirements: number;
+  implementation_covered: boolean;
+  implementation_coverage_percentage: number;
+  mark: string;
 }
 
 export interface TraceVerification {
@@ -512,6 +566,7 @@ export interface ExplorerProjectStore {
   elements: ProjectStoreElement[];
   relations: ProjectStoreRelation[];
   contract_bindings: ProjectStoreContractBindingEntry[];
+  contract_references?: ProjectStoreContractBindingEntry[];
   concept_refs: ProjectStoreConceptReference[];
   thesaurus: ProjectStoreThesaurus;
   /** Opaque: capability-rooted submodel report projection. */

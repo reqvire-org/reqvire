@@ -20,6 +20,7 @@ The system shall generate detailed change logs for pull requests, summarizing mo
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [change_impact.yml](../../../.github/workflows/change_impact.yml)
   * definedBy: [Pull Request Change Log Workflow Specification](Specifications.md#pull-request-change-log-workflow-specification)
   * specify: [GitHub Workflow Automation](../IntegrationFeature.md#github-workflow-automation)
 ---

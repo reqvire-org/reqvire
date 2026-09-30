@@ -56,15 +56,18 @@ pub fn read_element<'a>(
         ));
     }
 
-    if let Some(identifier) = identifier {
-        registry
-            .get_element(identifier)
-            .ok_or_else(|| ReqvireError::ElementNotFound("Element not found".to_string()))
-    } else {
-        registry
-            .get_element_by_name(name.expect("checked above"))
-            .ok_or_else(|| ReqvireError::ElementNotFound("Element not found".to_string()))
-    }
+    identifier.map_or_else(
+        || {
+            registry
+                .get_element_by_name(name.expect("checked above"))
+                .ok_or_else(|| ReqvireError::ElementNotFound("Element not found".to_string()))
+        },
+        |identifier| {
+            registry
+                .get_element(identifier)
+                .ok_or_else(|| ReqvireError::ElementNotFound("Element not found".to_string()))
+        },
+    )
 }
 
 pub fn search_report(
@@ -114,6 +117,13 @@ pub fn resources_report(registry: &GraphRegistry) -> report::resources::Resource
 
 pub fn coverage_report(registry: &GraphRegistry) -> report::coverage::CoverageReport {
     report::coverage::generate_coverage_report(registry)
+}
+
+pub fn scoped_coverage_report(
+    registry: &GraphRegistry,
+    from: Option<&str>,
+) -> Result<report::coverage::CoverageReport, ReqvireError> {
+    coverage_report(registry).with_scope(registry, from)
 }
 
 pub fn traces_report(

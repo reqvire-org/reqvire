@@ -156,6 +156,16 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
+### 9. Contract Dependency Filters
+
+Contract-reference presence and target filters MUST select elements through `Element.contract_references`. A presence filter requires at least one reference. A target filter requires at least one normalized contract identifier matching a case-sensitive glob; invalid globs MUST produce a descriptive error.
+
+The CLI exposes `--has-contract-references` and `--filter-contract-references GLOB`. MCP search exposes `has_contract_references` and `filter_contract_references` with the same semantics. Omitted filters MUST preserve existing search behavior.
+
+Contract Bindings retain their corresponding independent presence and target filters. Relation-type filters operate on ordinary Relations; `referenceContract` and `bindContract` are mutation keywords, so they MUST be rejected as relation-type filter values with valid alternatives reported.
+
+Dependency filters MUST compose conjunctively with the other search filters in text, JSON, and short output. They select reported elements; coverage and change-impact evaluation continue to use the validated full model.
+
 ## Filter Composition
 
 All filters are applied **conjunctively**. That is, an element is included in the search results **only if all active filters return `true`** for that element.

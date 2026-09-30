@@ -1,0 +1,424 @@
+{
+  "capability_coverage": {
+    "capabilities": [
+      {
+        "aggregate_covered_requirements": 3,
+        "aggregate_covered_terminal_requirements": 1,
+        "aggregate_leaf_requirements": 3,
+        "aggregate_requirements": 5,
+        "aggregate_terminal_requirements": 2,
+        "aggregate_verified_leaf_requirements": 3,
+        "identifier": "specifications/Capabilities.md#alpha-left",
+        "implementation_coverage_percentage": 50.0,
+        "implementation_covered": false,
+        "local_covered_requirements": 1,
+        "local_covered_terminal_requirements": 0,
+        "local_leaf_requirements": 1,
+        "local_requirements": 1,
+        "local_terminal_requirements": 0,
+        "local_verified_leaf_requirements": 1,
+        "mark": "partial",
+        "name": "Alpha Left",
+        "verification_coverage_percentage": 100.0
+      },
+      {
+        "aggregate_covered_requirements": 2,
+        "aggregate_covered_terminal_requirements": 1,
+        "aggregate_leaf_requirements": 2,
+        "aggregate_requirements": 4,
+        "aggregate_terminal_requirements": 2,
+        "aggregate_verified_leaf_requirements": 2,
+        "identifier": "specifications/Capabilities.md#alpha-right",
+        "implementation_coverage_percentage": 50.0,
+        "implementation_covered": false,
+        "local_covered_requirements": 0,
+        "local_covered_terminal_requirements": 0,
+        "local_leaf_requirements": 0,
+        "local_requirements": 0,
+        "local_terminal_requirements": 0,
+        "local_verified_leaf_requirements": 0,
+        "mark": "partial",
+        "name": "Alpha Right",
+        "verification_coverage_percentage": 100.0
+      },
+      {
+        "aggregate_covered_requirements": 3,
+        "aggregate_covered_terminal_requirements": 1,
+        "aggregate_leaf_requirements": 4,
+        "aggregate_requirements": 6,
+        "aggregate_terminal_requirements": 3,
+        "aggregate_verified_leaf_requirements": 3,
+        "identifier": "specifications/Capabilities.md#alpha-root",
+        "implementation_coverage_percentage": 33.33,
+        "implementation_covered": false,
+        "local_covered_requirements": 0,
+        "local_covered_terminal_requirements": 0,
+        "local_leaf_requirements": 1,
+        "local_requirements": 1,
+        "local_terminal_requirements": 1,
+        "local_verified_leaf_requirements": 0,
+        "mark": "partial",
+        "name": "Alpha Root",
+        "verification_coverage_percentage": 75.0
+      },
+      {
+        "aggregate_covered_requirements": 1,
+        "aggregate_covered_terminal_requirements": 1,
+        "aggregate_leaf_requirements": 2,
+        "aggregate_requirements": 2,
+        "aggregate_terminal_requirements": 2,
+        "aggregate_verified_leaf_requirements": 2,
+        "identifier": "specifications/Capabilities.md#beta-root",
+        "implementation_coverage_percentage": 50.0,
+        "implementation_covered": false,
+        "local_covered_requirements": 1,
+        "local_covered_terminal_requirements": 1,
+        "local_leaf_requirements": 2,
+        "local_requirements": 2,
+        "local_terminal_requirements": 2,
+        "local_verified_leaf_requirements": 2,
+        "mark": "partial",
+        "name": "Beta Root",
+        "verification_coverage_percentage": 100.0
+      },
+      {
+        "aggregate_covered_requirements": 0,
+        "aggregate_covered_terminal_requirements": 0,
+        "aggregate_leaf_requirements": 0,
+        "aggregate_requirements": 0,
+        "aggregate_terminal_requirements": 0,
+        "aggregate_verified_leaf_requirements": 0,
+        "identifier": "specifications/Capabilities.md#empty-branch",
+        "implementation_coverage_percentage": 0.0,
+        "implementation_covered": false,
+        "local_covered_requirements": 0,
+        "local_covered_terminal_requirements": 0,
+        "local_leaf_requirements": 0,
+        "local_requirements": 0,
+        "local_terminal_requirements": 0,
+        "local_verified_leaf_requirements": 0,
+        "mark": "not-applicable",
+        "name": "Empty Branch",
+        "verification_coverage_percentage": 0.0
+      },
+      {
+        "aggregate_covered_requirements": 2,
+        "aggregate_covered_terminal_requirements": 1,
+        "aggregate_leaf_requirements": 2,
+        "aggregate_requirements": 4,
+        "aggregate_terminal_requirements": 2,
+        "aggregate_verified_leaf_requirements": 2,
+        "identifier": "specifications/Capabilities.md#shared-branch",
+        "implementation_coverage_percentage": 50.0,
+        "implementation_covered": false,
+        "local_covered_requirements": 2,
+        "local_covered_terminal_requirements": 1,
+        "local_leaf_requirements": 2,
+        "local_requirements": 4,
+        "local_terminal_requirements": 2,
+        "local_verified_leaf_requirements": 2,
+        "mark": "partial",
+        "name": "Shared Branch",
+        "verification_coverage_percentage": 100.0
+      }
+    ]
+  },
+  "covered_requirements": {
+    "files": {
+      "specifications/Alpha.md": [
+        {
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 1,
+          "blocking_requirements": [],
+          "contributing_requirements": [
+            "specifications/Beta.md#beta-consumer"
+          ],
+          "coverage_source": "contract_consumer_rollup",
+          "direct_evidence": [],
+          "evidence": [
+            "evidence/beta.txt"
+          ],
+          "identifier": "specifications/Alpha.md#alpha-contract-owner",
+          "is_terminal": false,
+          "name": "Alpha Contract Owner"
+        },
+        {
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 1,
+          "blocking_requirements": [],
+          "contributing_requirements": [],
+          "coverage_source": "direct_satisfied",
+          "direct_evidence": [
+            "evidence/alpha.txt"
+          ],
+          "evidence": [
+            "evidence/alpha.txt"
+          ],
+          "identifier": "specifications/Alpha.md#alpha-implemented",
+          "is_terminal": true,
+          "name": "Alpha Implemented"
+        },
+        {
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 1,
+          "blocking_requirements": [],
+          "contributing_requirements": [
+            "specifications/Alpha.md#alpha-implemented"
+          ],
+          "coverage_source": "requirement_rollup",
+          "direct_evidence": [],
+          "evidence": [
+            "evidence/alpha.txt"
+          ],
+          "identifier": "specifications/Alpha.md#alpha-middle",
+          "is_terminal": false,
+          "name": "Alpha Middle"
+        }
+      ],
+      "specifications/Beta.md": [
+        {
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 1,
+          "blocking_requirements": [],
+          "contributing_requirements": [],
+          "coverage_source": "direct_satisfied",
+          "direct_evidence": [
+            "evidence/beta.txt"
+          ],
+          "evidence": [
+            "evidence/beta.txt"
+          ],
+          "identifier": "specifications/Beta.md#beta-consumer",
+          "is_terminal": true,
+          "name": "Beta Consumer"
+        }
+      ]
+    }
+  },
+  "orphaned_verifications": {
+    "files": {
+      "specifications/Verifications.md": [
+        {
+          "identifier": "specifications/Verifications.md#orphan-check",
+          "name": "Orphan Check",
+          "satisfied_by": [],
+          "verification_type": "test-verification"
+        }
+      ]
+    }
+  },
+  "satisfied_test_verifications": {
+    "files": {
+      "specifications/Verifications.md": [
+        {
+          "identifier": "specifications/Verifications.md#shared-check",
+          "name": "Shared Check",
+          "satisfied_by": [
+            "evidence/check.txt"
+          ],
+          "verification_type": "test-verification"
+        },
+        {
+          "identifier": "specifications/Verifications.md#shared-proof",
+          "name": "Shared Proof",
+          "satisfied_by": [
+            "evidence/proof.txt"
+          ],
+          "verification_type": "formal-proof-verification"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "coverage_sources": {
+      "combined_rollup": 0,
+      "contract_consumer_rollup": 1,
+      "direct_satisfied": 2,
+      "requirement_rollup": 1
+    },
+    "covered_requirements": 4,
+    "covered_terminal_requirements": 2,
+    "implementation_coverage_percentage": 40.0,
+    "leaf_requirements_coverage_percentage": 83.33,
+    "orphaned_verifications": 1,
+    "orphaned_verifications_percentage": 14.29,
+    "satisfied_test_verifications": 2,
+    "test_verifications_satisfaction_percentage": 50.0,
+    "total_leaf_requirements": 6,
+    "total_requirements_in_scope": 8,
+    "total_terminal_requirements": 5,
+    "total_test_verifications": 4,
+    "total_verifications": 7,
+    "uncovered_requirements": 4,
+    "uncovered_terminal_requirements": 3,
+    "unsatisfied_test_verifications": 2,
+    "unverified_leaf_requirements": 1,
+    "verification_types": {
+      "analysis": 1,
+      "demonstration": 1,
+      "formal_proof": 1,
+      "inspection": 1,
+      "test": 3
+    },
+    "verified_leaf_requirements": 5
+  },
+  "uncovered_requirements": {
+    "files": {
+      "specifications/Alpha.md": [
+        {
+          "aggregate_covered_terminal_requirements": 0,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 1,
+          "blocking_requirements": [
+            "specifications/Alpha.md#alpha-gap"
+          ],
+          "contributing_requirements": [],
+          "coverage_source": "uncovered",
+          "direct_evidence": [],
+          "evidence": [],
+          "identifier": "specifications/Alpha.md#alpha-gap",
+          "is_terminal": true,
+          "name": "Alpha Gap"
+        },
+        {
+          "aggregate_covered_terminal_requirements": 0,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 0,
+          "blocking_requirements": [
+            "specifications/Alpha.md#alpha-local"
+          ],
+          "contributing_requirements": [],
+          "coverage_source": "uncovered",
+          "direct_evidence": [],
+          "evidence": [],
+          "identifier": "specifications/Alpha.md#alpha-local",
+          "is_terminal": true,
+          "name": "Alpha Local"
+        },
+        {
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 2,
+          "aggregate_terminal_requirements": 2,
+          "aggregate_verified_leaf_requirements": 2,
+          "blocking_requirements": [
+            "specifications/Alpha.md#alpha-gap"
+          ],
+          "contributing_requirements": [
+            "specifications/Alpha.md#alpha-gap",
+            "specifications/Alpha.md#alpha-middle"
+          ],
+          "coverage_source": "uncovered",
+          "direct_evidence": [],
+          "evidence": [
+            "evidence/alpha.txt"
+          ],
+          "identifier": "specifications/Alpha.md#alpha-parent",
+          "is_terminal": false,
+          "name": "Alpha Parent"
+        }
+      ],
+      "specifications/Beta.md": [
+        {
+          "aggregate_covered_terminal_requirements": 0,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 1,
+          "blocking_requirements": [
+            "specifications/Beta.md#beta-gap"
+          ],
+          "contributing_requirements": [],
+          "coverage_source": "uncovered",
+          "direct_evidence": [],
+          "evidence": [],
+          "identifier": "specifications/Beta.md#beta-gap",
+          "is_terminal": true,
+          "name": "Beta Gap"
+        }
+      ]
+    }
+  },
+  "unsatisfied_test_verifications": {
+    "files": {
+      "specifications/Verifications.md": [
+        {
+          "identifier": "specifications/Verifications.md#gap-check",
+          "name": "Gap Check",
+          "satisfied_by": [],
+          "verification_type": "test-verification"
+        },
+        {
+          "identifier": "specifications/Verifications.md#orphan-check",
+          "name": "Orphan Check",
+          "satisfied_by": [],
+          "verification_type": "test-verification"
+        }
+      ]
+    }
+  },
+  "unverified_leaf_requirements": {
+    "files": {
+      "specifications/Alpha.md": [
+        {
+          "identifier": "specifications/Alpha.md#alpha-local",
+          "name": "Alpha Local",
+          "verified_by": []
+        }
+      ]
+    }
+  },
+  "verified_leaf_requirements": {
+    "files": {
+      "specifications/Alpha.md": [
+        {
+          "identifier": "specifications/Alpha.md#alpha-contract-owner",
+          "name": "Alpha Contract Owner",
+          "verified_by": [
+            "specifications/Verifications.md#shared-proof"
+          ]
+        },
+        {
+          "identifier": "specifications/Alpha.md#alpha-gap",
+          "name": "Alpha Gap",
+          "verified_by": [
+            "specifications/Verifications.md#shared-check",
+            "specifications/Verifications.md#gap-check"
+          ]
+        },
+        {
+          "identifier": "specifications/Alpha.md#alpha-implemented",
+          "name": "Alpha Implemented",
+          "verified_by": [
+            "specifications/Verifications.md#shared-check"
+          ]
+        }
+      ],
+      "specifications/Beta.md": [
+        {
+          "identifier": "specifications/Beta.md#beta-consumer",
+          "name": "Beta Consumer",
+          "verified_by": [
+            "specifications/Verifications.md#shared-check"
+          ]
+        },
+        {
+          "identifier": "specifications/Beta.md#beta-gap",
+          "name": "Beta Gap",
+          "verified_by": [
+            "specifications/Verifications.md#shared-proof",
+            "specifications/Verifications.md#beta-analysis"
+          ]
+        }
+      ]
+    }
+  }
+}

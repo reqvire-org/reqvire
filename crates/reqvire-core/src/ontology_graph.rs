@@ -1515,7 +1515,7 @@ fn add_construct_badge(node: &mut OntologyGraphNode, construct: &OntologyConstru
     }
 }
 
-fn mirrors_construct_badge_on_object(kind: OntologyConstructKind) -> bool {
+const fn mirrors_construct_badge_on_object(kind: OntologyConstructKind) -> bool {
     matches!(kind, OntologyConstructKind::Disjointness)
 }
 
@@ -1672,7 +1672,7 @@ fn projection_term_ref(term: &OntologyProjectionTerm) -> Option<OntologyGraphTer
     }
 }
 
-fn construct_family_name(family: OntologyConstructFamily) -> &'static str {
+const fn construct_family_name(family: OntologyConstructFamily) -> &'static str {
     match family {
         OntologyConstructFamily::PropertyDomainRange => "property-domain-range",
         OntologyConstructFamily::SubclassMembership => "subclass-membership",
@@ -1685,7 +1685,7 @@ fn construct_family_name(family: OntologyConstructFamily) -> &'static str {
     }
 }
 
-fn construct_kind_name(kind: OntologyConstructKind) -> &'static str {
+const fn construct_kind_name(kind: OntologyConstructKind) -> &'static str {
     match kind {
         OntologyConstructKind::PropertyDomain => "property-domain",
         OntologyConstructKind::PropertyRange => "property-range",
@@ -1735,7 +1735,9 @@ fn construct_label(construct: &OntologyConstruct) -> String {
     }
 }
 
-fn property_characteristic_label(characteristic: OntologyPropertyCharacteristic) -> &'static str {
+const fn property_characteristic_label(
+    characteristic: OntologyPropertyCharacteristic,
+) -> &'static str {
     match characteristic {
         OntologyPropertyCharacteristic::Functional => "Functional property",
         OntologyPropertyCharacteristic::InverseFunctional => "Inverse functional property",
@@ -1747,7 +1749,7 @@ fn property_characteristic_label(characteristic: OntologyPropertyCharacteristic)
     }
 }
 
-fn restriction_kind_name(kind: OntologyRestrictionKind) -> &'static str {
+const fn restriction_kind_name(kind: OntologyRestrictionKind) -> &'static str {
     match kind {
         OntologyRestrictionKind::Universal => "universal",
         OntologyRestrictionKind::Existential => "existential",
@@ -1763,7 +1765,7 @@ fn restriction_kind_name(kind: OntologyRestrictionKind) -> &'static str {
     }
 }
 
-fn restriction_kind_label(kind: OntologyRestrictionKind) -> &'static str {
+const fn restriction_kind_label(kind: OntologyRestrictionKind) -> &'static str {
     match kind {
         OntologyRestrictionKind::Universal => "Universal restriction",
         OntologyRestrictionKind::Existential => "Existential restriction",
@@ -1783,7 +1785,7 @@ fn restriction_kind_label(kind: OntologyRestrictionKind) -> &'static str {
     }
 }
 
-fn class_expression_kind_name(kind: OntologyClassExpressionKind) -> &'static str {
+const fn class_expression_kind_name(kind: OntologyClassExpressionKind) -> &'static str {
     match kind {
         OntologyClassExpressionKind::Intersection => "intersection",
         OntologyClassExpressionKind::Union => "union",
@@ -1791,7 +1793,7 @@ fn class_expression_kind_name(kind: OntologyClassExpressionKind) -> &'static str
     }
 }
 
-fn class_expression_kind_label(kind: OntologyClassExpressionKind) -> &'static str {
+const fn class_expression_kind_label(kind: OntologyClassExpressionKind) -> &'static str {
     match kind {
         OntologyClassExpressionKind::Intersection => "Intersection",
         OntologyClassExpressionKind::Union => "Union",
@@ -1799,14 +1801,14 @@ fn class_expression_kind_label(kind: OntologyClassExpressionKind) -> &'static st
     }
 }
 
-fn shape_overlay_kind_name(kind: OntologyShapeOverlayKind) -> &'static str {
+const fn shape_overlay_kind_name(kind: OntologyShapeOverlayKind) -> &'static str {
     match kind {
         OntologyShapeOverlayKind::NodeShape => "node-shape",
         OntologyShapeOverlayKind::PropertyShape => "property-shape",
     }
 }
 
-fn shape_overlay_kind_label(kind: OntologyShapeOverlayKind) -> &'static str {
+const fn shape_overlay_kind_label(kind: OntologyShapeOverlayKind) -> &'static str {
     match kind {
         OntologyShapeOverlayKind::NodeShape => "SHACL node shape overlay",
         OntologyShapeOverlayKind::PropertyShape => "SHACL property shape overlay",
@@ -1840,7 +1842,7 @@ fn ontology_graph_source_metadata(
     }
 }
 
-fn source_kind_for_block(block: &SemanticBlock) -> &'static str {
+const fn source_kind_for_block(block: &SemanticBlock) -> &'static str {
     match block.kind {
         SemanticBlockKind::Ontology => GRAPH_SOURCE_ONTOLOGY,
         SemanticBlockKind::Shapes => GRAPH_SOURCE_SHAPE,

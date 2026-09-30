@@ -262,8 +262,10 @@ Expected checks:
 - Verify `prompts/list` returns regular workflow prompts, semantic query prompts, authoring prompts, refactor prompts, task-generation prompts, and audit prompts.
 - Verify `prompts/get` for `reqvire.semantic.query` returns text that references semantic vocabulary, prefix, SPARQL tools, ontology-document vocabulary filtering, and states that `include_external` exposes only the used external subset.
 - Verify `prompts/get` for a regular workflow prompt returns text that references standard Reqvire model exploration tools.
-- Verify `prompts/get` for `reqvire.workflow.audit_change_impact` returns text that references change-impact analysis, direct changes, propagated impacts, structured impact buckets, impact-scope review, invalidated verifications, contract-binding consumers, documentation artifacts, and system-model update decisions.
+- Verify `prompts/get` for `reqvire.workflow.audit_change_impact` returns text that references change-impact analysis, direct changes, propagated impacts, structured impact buckets, impact-scope review, invalidated verifications, binding and reference consumers, documentation artifacts, and system-model update decisions.
 - Verify `prompts/get` for the new authoring and audit workflows returns text that references implementation task generation, governance metadata, Reqvire command evidence, EARS requirements, submodel inspection, verification objectives, evidence-backed satisfiedBy links, model refactor boundaries, dependency-preserving cross-subgraph replacements, ontology/semantic-contract layer decisions, ontology governance/satisfaction guardrails, native concept authoring, concept naming/identity guardrails, and model-quality audit categories.
+- Retrieve exploration, authoring, refactoring, task-generation, change-impact, semantic contract-context, model-quality, and coverage prompts. Each distinguishes Contract Bindings as shared implementation obligations from Contract References as content dependencies; both propagate change impact and only bindings contribute to the owner's implementation fulfillment.
+- Authoring and refactoring prompts identify `referenceContract`, element-wide section exclusivity, responsibility-based placement, and acyclic dependencies. Task and impact prompts include reference consumers in review work. Semantic context prompts include both normalized dependency predicates. Coverage prompts exclude references from fulfillment and distinguish terminal requirements from verification leaves.
 - Verify unknown prompt names return a protocol error.
 - Verify prompt retrieval does not mutate model source files.
 
@@ -273,6 +275,7 @@ Expected checks:
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Prompt Guidance](../../../Interfaces/MCP/Tools.md#mcp-prompt-guidance)
+  * satisfiedBy: [mcp_prompts.rs](../../../../crates/reqvire-core/src/mcp_prompts.rs)
 ---
 
 ### MCP Protocol Standard Conformance Verification
@@ -341,6 +344,28 @@ Expected checks:
 
 #### Relations
   * verify: [MCP Resource Interface](../../../Interfaces/MCP/Tools.md#mcp-resource-interface)
+---
+
+### MCP Scoped Coverage Verification
+
+This verification checks coverage scope discovery, request mapping, and shared result semantics through MCP.
+
+#### Details
+Expected checks:
+- Confirm discovery exposes optional string argument `from` on `reqvire.coverage`.
+- Compare a request without `from` against the existing whole-model response contract.
+- Request root, nested, and empty capability scopes and compare the report payload with CLI JSON for the same selector and validated model snapshot, excluding protocol envelope and transport-specific metadata.
+- Include cross-root contract evidence and a shared verification in the fixture; assert preserved evidence, deduplicated counts, selected membership, and the whole-model-only orphan marker.
+- Unknown and non-capability names must produce structured errors without a whole-model result.
+- After a model revision changes scoped membership or supporting evidence, repeat the request and assert that the result reflects the new validated snapshot under the existing freshness contract.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-scoped-coverage/test.sh)
+  * verify: [MCP Coverage Scope Selection](../../../Interfaces/MCP/Tools.md#mcp-coverage-scope-selection)
 ---
 
 ### MCP Semantic Prefix Registry Tools Verification
@@ -607,6 +632,8 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * satisfiedBy: [mcp.rs](../../../../crates/reqvire-cli/src/mcp.rs)
   * verify: [MCP Tool Exposure Scope](../../../Interfaces/MCP/Tools.md#mcp-tool-exposure-scope)
 ---
 

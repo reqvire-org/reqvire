@@ -733,6 +733,30 @@ Test cases:
   * verify: [Reverse Relation Traversal](../../../Reports/ModelReports/ReportingRequirements.md#reverse-relation-traversal)
 ---
 
+### Scoped Coverage Semantics Verification
+
+This verification establishes scope membership, evidence preservation, and aggregation correctness for coverage reports.
+
+#### Details
+Expected checks:
+- Use two independent capability roots, nested capabilities, and a capability reachable through multiple valid parent paths within one root. Resolve requirement membership through capability specification and requirement hierarchy; assert distinct identifiers, retention of all valid paths, and no reassignment across roots.
+- Compare omitted scope, each root scope, and a nested capability scope. Scoped subject sets must match the validated hierarchy, while omitted scope retains existing whole-model report behavior.
+- Include a requirement that owns a contract and has no direct satisfaction, plus a directly satisfied consumer in the other root. The owner's scoped classification, coverage source, and evidence identifiers must equal its whole-model result while excluding the consumer from scoped membership and totals. Removing the consumer's satisfaction must remove that evidence in both reports.
+- Compare every included requirement's verification status, implementation source, direct and supporting artifact identifiers, required contributions, blockers, verification leaf status, and implementation terminal status against the same snapshot's whole-model report. Include direct terminal satisfaction, complete child and consumer rollups, and incomplete parents retaining partial evidence.
+- Include one verification targeting requirements in both roots and several targets within one root. Count it once in each relevant scope and once globally. Exclude verification objectives, retain evidence-satisfaction classification, and preserve requirement-derived capability roll-up.
+- Include an orphaned concrete verification in report input. Whole-model diagnostics include it; capability-scoped membership excludes it and exposes the whole-model-only orphan marker.
+- Reconcile summaries, percentages, type/source counts, gaps, and capability roll-ups with distinct scoped subject sets. Implementation percentages count terminal requirements separately from all-requirement classifications and verification leaves. Multiple hierarchy paths and overlapping parent/child roll-ups must not inflate totals.
+- Check empty capabilities, deterministic membership ordering, invalid explicit selectors, and repeated report generation from an unchanged snapshot.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Reporting, Search, Coverage, and Model Export Verification Objective](#reporting-search-coverage-and-model-export-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-scoped-coverage/test.sh)
+  * verify: [Scoped Coverage Reporting](../../../Reports/ModelReports/ReportingRequirements.md#scoped-coverage-reporting)
+---
+
 ### Search Command Tests
 
 This test verifies that the system provides a unified `search` command functionality for searching and filtering model elements with comprehensive filter options and output modes.
@@ -1038,7 +1062,7 @@ This test verifies that the system correctly generates verification coverage rep
 - Coverage report shall list unverified leaf requirements with details
 - Coverage report shall list satisfied evidence-backed verifications (`test-verification` and `formal-proof-verification`) with `satisfiedBy` relations
 - Coverage report shall list unsatisfied evidence-backed verifications (`test-verification` and `formal-proof-verification`) without `satisfiedBy` relations
-- Coverage report shall list orphaned verifications (verifications without any verify relations to capabilities or requirements)
+- Coverage report shall list orphaned verifications (verifications without any `verify` relations to requirements)
 - Coverage report shall show orphaned verifications count and percentage in summary section
 - Non-evidence-backed verification elements (analysis, inspection, demonstration) are considered satisfied by default (no satisfiedBy required)
 - JSON output shall be valid and machine-readable

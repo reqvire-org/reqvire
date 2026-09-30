@@ -276,6 +276,10 @@ reqvire:contractBindingsTargetIdentifier a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
   rdfs:comment "Stable identifier of a contract binding target emitted by model RDF projection facts." .
+reqvire:contractReferencesTargetIdentifier a owl:DatatypeProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Stable identifier of a contract reference target emitted by model RDF projection facts." .
 reqvire:conceptLabel a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
@@ -738,6 +742,10 @@ reqvire:RdfProjectionShape
   ] ;
   sh:property [
     sh:path reqvire:contractBindingsTargetIdentifier ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:contractReferencesTargetIdentifier ;
     sh:datatype xsd:string ;
   ] ;
   sh:property [

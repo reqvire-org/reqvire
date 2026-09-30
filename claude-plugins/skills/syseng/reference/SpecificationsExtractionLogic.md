@@ -21,7 +21,7 @@ Extract technical specifications from requirement Details sections into separate
  - Main body has one more general statement and all other must be written in '#### Details' subsection
 - **Reusable Specifications**: Technical details in standalone elements
 - **Clear Ownership**: `definedBy` relations show which requirement owns the specification
-- **Cross-References**: Contract Bindings relations provide supporting context without ownership
+- **Cross-References**: Contract References preserve review context without ownership or implementation obligations; Contract Bindings assign shared implementation obligations
 
 ## Refactoring Methodology
 
@@ -111,7 +111,8 @@ Concise EARS-style statement (1 sentence).
 **Ownership vs Reference:**
 
 - **definedBy Relation**: Used by the requirement that OWNS the specification (one-to-one or one-to-many)
-- **Contract Bindings Relation**: Used by requirements OUTSIDE the owner's derivation hierarchy
+- **Contract Bindings**: Used by requirements outside the owner's derivation hierarchy that implement a shared obligation
+- **Contract References**: Used by requirements that depend on the contract content for review; acyclic references may occur within or across hierarchies
 
 **Contract Bindings Scope Constraints:**
 
@@ -281,7 +282,7 @@ Extract when ANY of these conditions are true:
 3. Content includes algorithms, workflows, or processing rules
 4. Content defines output formats or data structures
 5. Content describes technical constraints or ordering rules
-6. Multiple requirements could benefit from referencing (bindContract) this content
+6. Several requirements need this content; classify each dependency as an implementation binding or a review reference
 
 ### When NOT to Extract
 
@@ -310,7 +311,7 @@ Examples:
 
 Specifications MUST NOT use EARS statements as those are not requirements.
 
-### Contract Bindings vs definedBy
+### Ownership, Bindings, and References
 
 **Use definedBy when:**
 - Requirement OWNS the specification
@@ -318,15 +319,21 @@ Specifications MUST NOT use EARS statements as those are not requirements.
 - Requirement has primary responsibility for the technical content
 
 **Use Contract Bindings when:**
-- Requirement REFERENCES specification for context
-- Specification owned by a requirement in a DIFFERENT derivation hierarchy
-- Specification provides supporting technical details
-- Multiple requirements (from different hierarchies) benefit from this specification
+- The consuming requirement is responsible for implementing the shared obligation
+- The owner is in a different derivation branch and the binding satisfies the model's scope constraints
+- The owner's fulfillment is intentionally dependent on this consumer's implementation
+
+**Use Contract References when:**
+- The consumer needs the specification as input, documentation, or change-review context
+- It consumes an existing service or computed result rather than fulfilling the producer's obligation
+- The dependency must remain visible to collection and change impact without affecting implementation coverage
+
+A requirement cannot author both dependency sections. Decompose genuinely distinct responsibilities when necessary; do not change dependency meaning just to satisfy the section constraint. References must remain acyclic through contract owners, bindings, and requirement ancestry.
 
 **Contract Bindings Constraint:**
 - Requirements in the same hierarchy as the owner CANNOT reuse the contract
 - They access the contract through the hierarchy relationship instead
-- Cross-hierarchy contract_bindings enable requirements from separate branches to reference shared specs
+- Cross-hierarchy bindings allocate shared obligations; references retain review dependencies, including acyclic dependencies within a hierarchy
 
 ## Quality Metrics
 
@@ -345,7 +352,7 @@ After refactoring, verify:
 Track these metrics:
 - **Line Reduction**: Requirements should be reduced by 80-90%
 - **Specifications Created**: Typically 1-2 per complex requirement
-- **Cross-References**: Average 3-5 contract_bindings per specification
+- **Dependency Quality**: Each binding or reference has a clear responsibility; no target count is prescribed
 
 ### Example Metrics (Phase 2)
 
@@ -353,8 +360,8 @@ Track these metrics:
 Specifications Extracted:     5
 Requirements Refactored:      4
 Total Line Reduction:         ~179 → ~20 lines (88.8%)
-Cross-Reference Contract Bindings:  22 total
-Hierarchical Contract Bindings:     15 total
+Implementation Contract Bindings: 22 total
+Review Contract References:        15 total
 Validation Errors:            0
 ```
 
@@ -373,7 +380,7 @@ Validation Errors:            0
 ### Pitfall 3: Unclear Ownership
 
 **Problem**: Multiple requirements use definedBy for same specification
-**Solution**: Only owner uses definedBy, others use contract_bindings
+**Solution**: Only the owner uses `definedBy`; implementation consumers use bindings and content consumers use references
 
 ### Pitfall 4: Orphaned Specifications
 
@@ -401,10 +408,11 @@ reqvire search --filter-type="capability" --short
 # Find requirements in specific subsystem
 reqvire search --filter-type="requirement" --filter-file="system-model/System/**" --short
 
-# Find requirements with contract_bindings (may need conversion to satisfiedBy)
+# Review whether contract consumers implement obligations or only depend on their content
 reqvire search --filter-type="requirement" --has-contract-bindings --short
+reqvire search --filter-type="requirement" --has-contract-references --short
 
-# Find contracts without define relations (orphaned specifications, constraints, behaviors, state, input-output, sources, and )
+# Find requirement-owned contracts without define relations
 reqvire search --filter-type="specification,constraint,behavior,state,input-output,source" --not-have-relations="define" --short
 ```
 

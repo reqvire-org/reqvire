@@ -37,7 +37,7 @@ pub enum OntologyTermRole {
 }
 
 impl OntologyTermRole {
-    pub fn conflicts_with(self, other: Self) -> bool {
+    pub const fn conflicts_with(self, other: Self) -> bool {
         matches!(
             (self, other),
             (
@@ -128,7 +128,7 @@ pub enum SemanticBlockKind {
 }
 
 impl SemanticBlockKind {
-    pub fn as_str(&self) -> &'static str {
+    pub const fn as_str(&self) -> &'static str {
         match self {
             Self::Ontology => "ontology",
             Self::Shapes => "shapes",
@@ -231,7 +231,7 @@ pub enum OntologyProjectionDerivationMode {
 }
 
 impl OntologyProjectionDerivationMode {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::DirectAuthored => "direct-authored",
         }
@@ -252,7 +252,7 @@ pub enum OntologyConstructFamily {
 }
 
 impl OntologyConstructFamily {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::PropertyDomainRange => "property-domain-range",
             Self::SubclassMembership => "subclass-membership",
@@ -284,7 +284,7 @@ pub enum OntologyConstructKind {
 }
 
 impl OntologyConstructKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::PropertyDomain => "property-domain",
             Self::PropertyRange => "property-range",
@@ -311,7 +311,7 @@ pub enum OntologyProjectionTermKind {
 }
 
 impl OntologyProjectionTermKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::Iri => "iri",
             Self::BlankNode => "blank-node",
@@ -382,7 +382,7 @@ pub enum OntologyPropertyCharacteristic {
 }
 
 impl OntologyPropertyCharacteristic {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::Functional => "functional",
             Self::InverseFunctional => "inverse-functional",
@@ -412,7 +412,7 @@ pub enum OntologyRestrictionKind {
 }
 
 impl OntologyRestrictionKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::Universal => "universal",
             Self::Existential => "existential",
@@ -438,7 +438,7 @@ pub enum OntologyClassExpressionKind {
 }
 
 impl OntologyClassExpressionKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::Intersection => "intersection",
             Self::Union => "union",
@@ -455,7 +455,7 @@ pub enum OntologyShapeOverlayKind {
 }
 
 impl OntologyShapeOverlayKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::NodeShape => "node-shape",
             Self::PropertyShape => "property-shape",
@@ -582,7 +582,7 @@ impl SemanticExportLayer {
         ]
     }
 
-    pub fn as_str(&self) -> &'static str {
+    pub const fn as_str(&self) -> &'static str {
         match self {
             Self::Ontologies => "ontologies",
             Self::Shapes => "shapes",
@@ -611,7 +611,7 @@ impl ExternalOntologyFormat {
         }
     }
 
-    fn display_name(self) -> &'static str {
+    const fn display_name(self) -> &'static str {
         match self {
             Self::Turtle => "Turtle",
             Self::RdfXml => "RDF/XML",
@@ -619,7 +619,7 @@ impl ExternalOntologyFormat {
         }
     }
 
-    fn language(self) -> &'static str {
+    const fn language(self) -> &'static str {
         match self {
             Self::Turtle => "turtle",
             Self::RdfXml => "rdfxml",
@@ -646,7 +646,7 @@ struct TurtlePrefixMapBuilder {
 }
 
 impl TurtlePrefixMapBuilder {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             by_prefix: BTreeMap::new(),
             prefix_by_namespace: BTreeMap::new(),
@@ -987,13 +987,13 @@ impl SemanticIndex {
         for declaration in self.ontology_documents_for_context(&context) {
             prefixes
                 .entry(declaration.ontology_prefix.clone())
-                .or_insert(declaration.term_namespace.clone());
+                .or_insert_with(|| declaration.term_namespace.clone());
         }
 
         for source in self.external_sources_for_context(&context) {
             prefixes
                 .entry(source.prefix.clone())
-                .or_insert(source.namespace.clone());
+                .or_insert_with(|| source.namespace.clone());
         }
 
         prefixes
@@ -1975,16 +1975,20 @@ ext:UnusedTerm a owl:Class ;
     }
 
     fn materialized_triples(index: &SemanticIndex) -> BTreeSet<(String, String, String)> {
-        parse_test_quads(&index.to_used_external_subset_turtle_string().unwrap())
-            .into_iter()
-            .map(|quad| {
-                (
-                    quad.subject.to_string(),
-                    quad.predicate.to_string(),
-                    quad.object.to_string(),
-                )
-            })
-            .collect()
+        parse_test_quads(
+            &index
+                .to_used_external_subset_turtle_string()
+                .expect("materialized triples: expected success"),
+        )
+        .into_iter()
+        .map(|quad| {
+            (
+                quad.subject.to_string(),
+                quad.predicate.to_string(),
+                quad.object.to_string(),
+            )
+        })
+        .collect()
     }
 
     #[test]

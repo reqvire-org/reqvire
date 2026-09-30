@@ -296,12 +296,11 @@ pub fn generate_crud_diffs(
         };
 
         // Generate new content from registry
-        let new_content = if let Some(sections) = grouped_elements.get(file_path) {
-            registry.generate_file_markdown(file_path, sections, false)
-        } else {
-            // File was deleted or emptied
-            String::new()
-        };
+        let new_content = grouped_elements
+            .get(file_path)
+            .map_or_else(String::new, |sections| {
+                registry.generate_file_markdown(file_path, sections, false)
+            });
 
         // Generate diff
         let diff = generate_file_diff(file_path, &original_content, &new_content);

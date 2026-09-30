@@ -29,6 +29,7 @@ impl GraphRegistry {
                     if let LinkType::Identifier(target_id) = &relation.target.link {
                         if target_id == contract_id {
                             owners.push(element_id.clone());
+                            break;
                         }
                     }
                 }
@@ -245,7 +246,7 @@ impl GraphRegistry {
     /// Check if a contract element has at least one `define` relation.
     /// Returns true if the contract has a define relation, false otherwise.
     pub fn contract_has_define_relation(&self, contract_id: &str) -> bool {
-        if let Some(node) = self.nodes.get(contract_id) {
+        self.nodes.get(contract_id).is_some_and(|node| {
             node.element
                 .relations
                 .iter()
@@ -253,10 +254,8 @@ impl GraphRegistry {
                 .any(|r| {
                     relation::is_contract_relation(r.relation_type)
                         && r.relation_type.name == CONTRACT_RELATIONS[0]
-                }) // define
-        } else {
-            false
-        }
+                })
+        })
     }
 
     pub(super) fn concept_scheme_namespace_context(

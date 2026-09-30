@@ -60,7 +60,7 @@ fn decode_hex(text: &str) -> Vec<u8> {
 }
 
 #[test]
-fn canonical_bytes_and_digests_match_fixed_v1_fixtures() {
+fn canonical_bytes_and_digests_match_fixed_v2_fixtures() {
     // The same independent byte fixtures are checked through the real HTTP MCP
     // server by test-model-revision-hashing. No production encoder created them.
     macro_rules! golden {
@@ -351,4 +351,28 @@ fn non_utf8_relation_and_binding_paths_fail_without_lossy_hashing() {
         canonical_element_bytes(&bad),
         Err(ReqvireError::PathError(_))
     ));
+}
+
+#[test]
+fn references_are_a_distinct_canonical_dependency_set() {
+    let baseline = minimal();
+    let mut referenced = baseline.clone();
+    referenced.contract_references = vec![
+        binding(ContractBindingTarget::ElementIdentifier(
+            "Model.md#b".into(),
+        )),
+        binding(ContractBindingTarget::ElementIdentifier(
+            "Model.md#a".into(),
+        )),
+    ];
+    assert_changes(&baseline, &referenced);
+    let mut reordered = referenced.clone();
+    reordered.contract_references.reverse();
+    reordered
+        .contract_references
+        .push(referenced.contract_references[0].clone());
+    assert_eq!(bytes(&referenced), bytes(&reordered));
+    let mut bound = referenced.clone();
+    bound.contract_bindings = std::mem::take(&mut bound.contract_references);
+    assert_changes(&referenced, &bound);
 }

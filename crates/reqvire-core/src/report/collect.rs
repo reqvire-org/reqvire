@@ -7,8 +7,12 @@ use serde::Serialize;
 use std::fs;
 use std::path::Path;
 
+const fn is_zero(value: &usize) -> bool {
+    *value == 0
+}
+
 /// Direction of traversal for content collection
-#[derive(Debug, Clone, Copy, PartialEq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum CollectDirection {
     /// Traverse derivedFrom relations upward to ancestors (default)
@@ -20,8 +24,8 @@ pub enum CollectDirection {
 impl std::fmt::Display for CollectDirection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CollectDirection::Upstream => write!(f, "upstream"),
-            CollectDirection::Downstream => write!(f, "downstream"),
+            Self::Upstream => write!(f, "upstream"),
+            Self::Downstream => write!(f, "downstream"),
         }
     }
 }
@@ -40,6 +44,8 @@ pub enum SourceType {
     ContractBindingFile,
     /// Content from an bound contract element
     ContractBindingElement,
+    /// Content dependency authored under Contract References.
+    ContractReferenceElement,
     /// Authored concept references and reachable semantic context
     OntologyContext,
     /// Markdown-native generated concept context
@@ -66,6 +72,8 @@ pub struct CollectMetadata {
     pub element_count: usize,
     pub contract_count: usize,
     pub contract_bindings_count: usize,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub contract_references_count: usize,
     pub ontology_count: usize,
     pub concept_context_count: usize,
     pub total_items: usize,
@@ -137,6 +145,8 @@ pub fn generate_collect_report(
     let mut element_count = 0;
     let mut contract_count = 0;
     let mut contract_bindings_count = 0;
+    let mut contract_references_count = 0;
+    let mut pending_references = Vec::new();
     let mut ontology_count = 0;
     let mut concept_context_count = 0;
     let mut collected_ontology_context: FxHashSet<String> = FxHashSet::default();
@@ -201,6 +211,19 @@ pub fn generate_collect_report(
                 }
             }
 
+            for reference in &elem.contract_references {
+                if let Some(mut item) = collect_contract_bindings_content(
+                    registry,
+                    reference,
+                    &elem.identifier,
+                    depth,
+                    git_root,
+                ) {
+                    item.source_type = SourceType::ContractReferenceElement;
+                    pending_references.push(item);
+                }
+            }
+
             let ontology_context =
                 registry.build_concept_reference_ontology_context(&elem.identifier);
 
@@ -247,6 +270,14 @@ pub fn generate_collect_report(
         }
     }
 
+    let mut collected: FxHashSet<_> = items.iter().map(|item| item.identifier.clone()).collect();
+    for item in pending_references {
+        if collected.insert(item.identifier.clone()) {
+            contract_references_count += 1;
+            items.push(item);
+        }
+    }
+
     let report = CollectReport {
         starting_element: element_id,
         direction,
@@ -255,11 +286,13 @@ pub fn generate_collect_report(
             element_count,
             contract_count,
             contract_bindings_count,
+            contract_references_count,
             ontology_count,
             concept_context_count,
             total_items: element_count
                 + contract_count
                 + contract_bindings_count
+                + contract_references_count
                 + ontology_count
                 + concept_context_count,
         },
@@ -822,6 +855,17 @@ fn generate_text_output(report: &CollectReport) -> String {
                     output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
                 }
             }
+            SourceType::ContractReferenceElement => {
+                output.push_str(&format!("— Source: [{}]({})", item.name, item.identifier));
+                if let Some(parent) = &item.reused_by {
+                    output.push_str(&format!(
+                        " referenced by [{}]({})",
+                        extract_element_name(parent),
+                        parent
+                    ));
+                }
+                output.push('\n');
+            }
             SourceType::OntologyContext => {
                 if let Some(ref parent) = item.reused_by {
                     output.push_str(&format!(
@@ -859,23 +903,23 @@ fn generate_text_output(report: &CollectReport) -> String {
 
 /// Extract element name from identifier (text after #)
 fn extract_element_name(identifier: &str) -> String {
-    if let Some(pos) = identifier.rfind('#') {
-        // Convert fragment to title case
-        let fragment = &identifier[pos + 1..];
-        fragment
-            .split('-')
-            .map(|word| {
-                let mut chars = word.chars();
-                match chars.next() {
-                    Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
-                    None => String::new(),
-                }
-            })
-            .collect::<Vec<_>>()
-            .join(" ")
-    } else {
-        identifier.to_string()
-    }
+    identifier.rfind('#').map_or_else(
+        || identifier.to_string(),
+        |pos| {
+            // Convert fragment to title case
+            let fragment = &identifier[pos + 1..];
+            fragment
+                .split('-')
+                .map(|word| {
+                    let mut chars = word.chars();
+                    chars.next().map_or_else(String::new, |first| {
+                        first.to_uppercase().collect::<String>() + chars.as_str()
+                    })
+                })
+                .collect::<Vec<_>>()
+                .join(" ")
+        },
+    )
 }
 
 #[cfg(test)]

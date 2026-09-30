@@ -63,7 +63,7 @@ pub const CODE_SHACL_INVALID_CONSTRAINT: DiagnosticCode =
     DiagnosticCode("o-kernel.shacl.invalid_constraint");
 
 #[inline]
-pub fn is_false(value: &bool) -> bool {
+pub const fn is_false(value: &bool) -> bool {
     !*value
 }
 

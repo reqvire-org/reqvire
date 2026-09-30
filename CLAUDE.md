@@ -120,9 +120,11 @@ crates/reqvire-cli/src/
 
 The Reqvire system model has four first-class layers: ontology, capability, requirement, and verification-family. `verification-objective` elements are mandatory parents for concrete verification planning and hierarchy; concrete verification elements carry `verify`/`verifiedBy` and optional evidence. Refinements are requirement-owned subordinate details/contracts only, not a system-model layer.
 
-Capabilities may derive child capabilities, attach ontology, be specified by requirements, and be verified. Capabilities must not own `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, or `semantic-contract` elements through `refinedBy`/`refine`.
+Capabilities may derive child capabilities, author Concept References, be specified by requirements, and receive verification and implementation coverage through those requirements. Capabilities cannot be directly verified or satisfied and do not own contracts through `definedBy`/`define`.
 
 Requirement-owned refinement types are `source`, `constraint`, `behavior`, `specification`, `state`, and `input-output`. Semantic contracts are first-class ontology-plane elements, not requirement-owned refinements.
+
+Contract dependency is the umbrella term for Contract Bindings and Contract References. Use Contract Bindings on requirements responsible for shared implementation obligations. A Contract Reference declares a content dependency that propagates change impact without contributing to the contract owner's implementation fulfillment. Use references for documentation, report consumers, and adapters using existing services. Both kinds preserve contract context in collection. A requirement cannot author both sections, and contract dependencies must remain acyclic through contract owners and requirement ancestry.
 
 ## Important Notes
 

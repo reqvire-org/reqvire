@@ -72,7 +72,7 @@ The consistency validator is expected to verify:
 - **Duplicate Detection**: Detect and report when multiple elements in different files share the same name
 - **Location Reporting**: Report both file locations where duplicate element names occur
 - **Clear Error Messages**: Error messages clearly indicate that element names must be globally unique
-- **Circular Dependencies**: Detect and report circular dependency chains in requirements
+- **Circular Dependencies**: Detect and report circular dependency chains in requirements, including the combined fulfillment graph defined by the Relation Semantics Specification bound by the owning requirement. Diagnostics MUST identify a closed requirement path and distinguish hierarchy contributions from contract-consumer contributions. Cycle rejection MUST be independent of source declaration order and direct implementation evidence.
 - **Orphaned Elements**: Identify elements without proper traceability connections
 - **Inconsistent Patterns**: Detect relationship patterns that violate model constraints
 

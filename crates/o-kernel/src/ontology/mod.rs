@@ -115,34 +115,23 @@ ex:Shape
             .map(|reference| (reference.iri.as_str(), reference.predicate))
             .collect::<Vec<_>>();
 
-        assert_eq!(
-            values.contains(&("http://www.w3.org/2001/XMLSchema#string", SH_DATATYPE)),
-            false
-        );
-        assert_eq!(
-            values.contains(&("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", SH_PATH)),
-            false,
+        assert!(!values.contains(&("http://www.w3.org/2001/XMLSchema#string", SH_DATATYPE)));
+        assert!(
+            !values.contains(&("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", SH_PATH)),
             "standard RDF path should be filtered"
         );
-        assert_eq!(
-            values.contains(&(RDFS_LABEL, SH_PATH)),
-            false,
+        assert!(
+            !values.contains(&(RDFS_LABEL, SH_PATH)),
             "annotation path should be filtered"
         );
-        assert_eq!(
-            values.contains(&("https://example.org/model#Invoice", SH_CLASS)),
-            true
-        );
-        assert_eq!(
-            values.contains(&("https://example.org/model#validPath", SH_PATH)),
-            true
-        );
+        assert!(values.contains(&("https://example.org/model#Invoice", SH_CLASS)));
+        assert!(values.contains(&("https://example.org/model#validPath", SH_PATH)));
     }
 
     #[test]
     fn ontology_alignment_reference_exposes_iri_and_predicate() {
         let shape_id = NamedOrBlankNode::NamedNode(node("Shape"));
-        let errors = vec![
+        let errors = [
             super::shacl::AlignmentError::UndeclaredClass {
                 shape_id: shape_id.clone(),
                 class_node: NamedOrBlankNode::NamedNode(node("MissingClass")),

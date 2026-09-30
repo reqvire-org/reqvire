@@ -14,7 +14,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.model_revision",
-            "Report the current workspace and canonical v1 SHA-256 model revision (64 lowercase hexadecimal characters).",
+            "Report the current workspace and canonical v2 SHA-256 model revision (64 lowercase hexadecimal characters).",
             object_schema(vec![]),
         ),
         read_tool(
@@ -46,6 +46,8 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                     "filter_contract_bindings",
                     json!({ "type": "string" }),
                 ),
+                ("has_contract_references", json!({ "type": "boolean" })),
+                ("filter_contract_references", json!({ "type": "string", "description": "Glob matching normalized Contract Reference target identifiers." })),
             ]),
         ),
         read_tool(
@@ -277,7 +279,10 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         read_tool(
             "reqvire.coverage",
             "Generate verification and implementation coverage.",
-            object_schema(vec![]),
+            object_schema(vec![("from", json!({
+                "type": "string",
+                "description": "Exact capability name selecting its subtree; omitted selects the whole model."
+            }))]),
         ),
         read_tool(
             "reqvire.traces",
@@ -427,7 +432,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             ),
             mutation_tool(
                 "reqvire.link",
-                "Add a relation or contract_bindings.",
+                "Add a relation, bindContract implementation obligation, or referenceContract content dependency. A requirement cannot combine Contract Bindings and Contract References.",
                 required_object_schema(
                     vec![
                         ("source", json!({ "type": "string" })),
@@ -440,7 +445,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             ),
             mutation_tool(
                 "reqvire.unlink",
-                "Remove a relation or contract_bindings.",
+                "Remove a relation, contract binding, or contract reference by target.",
                 required_object_schema(
                     vec![
                         ("source", json!({ "type": "string" })),
@@ -452,7 +457,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             ),
             mutation_tool(
                 "reqvire.relink",
-                "Replace an existing relation target.",
+                "Replace an existing relation or referenceContract target atomically.",
                 required_object_schema(
                     vec![
                         ("source", json!({ "type": "string" })),
@@ -532,7 +537,7 @@ pub fn validate_tool_arguments(
     validate_object_schema(arguments, schema)
 }
 
-pub(crate) fn tool_exists(name: &str, enable_mutations: bool) -> bool {
+pub fn tool_exists(name: &str, enable_mutations: bool) -> bool {
     read_tool_names().contains(&name)
         || conditional_tool_names().contains(&name)
         || (enable_mutations && mutation_tool_names().contains(&name))
@@ -574,7 +579,7 @@ fn conditional_tool_names() -> Vec<&'static str> {
     vec!["reqvire.format"]
 }
 
-pub(crate) fn mutation_tool_names() -> Vec<&'static str> {
+pub fn mutation_tool_names() -> Vec<&'static str> {
     vec![
         "reqvire.add_element",
         "reqvire.remove_element",
@@ -649,7 +654,7 @@ fn output_schema(name: &str) -> Value {
     let fingerprint = json!({
         "type": "string",
         "pattern": "^[0-9a-f]{64}$",
-        "description": "SHA-256 of canonical parsed-element model encoding reqvire.model-revision.v1. Excludes Git state and external file contents."
+        "description": "SHA-256 of canonical parsed-element model encoding reqvire.model-revision.v2. Excludes Git state and external file contents."
     });
     match name {
         "reqvire.workspace_status" => {
@@ -668,7 +673,7 @@ fn output_schema(name: &str) -> Value {
     schema
 }
 
-pub(crate) fn resource_contents(uri: &str, value: Value) -> Value {
+pub fn resource_contents(uri: &str, value: Value) -> Value {
     let text = serde_json::to_string_pretty(&value).unwrap_or_else(|_| value.to_string());
     json!({
         "contents": [{

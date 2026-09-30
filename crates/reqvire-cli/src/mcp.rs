@@ -27,7 +27,7 @@ use std::pin::Pin;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
-pub(crate) type PostWriteHook =
+pub type PostWriteHook =
     Arc<dyn Fn() -> Pin<Box<dyn Future<Output = Result<(), ReqvireError>> + Send>> + Send + Sync>;
 
 #[derive(Debug, Deserialize)]
@@ -304,7 +304,7 @@ pub async fn serve_http(
     Ok(())
 }
 
-pub(crate) fn router(
+pub fn router(
     enable_mutations: bool,
     with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
@@ -317,7 +317,7 @@ pub(crate) fn router(
     )
 }
 
-pub(crate) fn router_with_write_lock(
+pub fn router_with_write_lock(
     enable_mutations: bool,
     with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
@@ -332,7 +332,7 @@ pub(crate) fn router_with_write_lock(
     )
 }
 
-pub(crate) fn mount_service<S>(
+pub fn mount_service<S>(
     router: axum::Router<S>,
     enable_mutations: bool,
     with_size_estimates: bool,
@@ -352,7 +352,7 @@ where
     )
 }
 
-pub(crate) fn mount_service_with_post_write_hook<S>(
+pub fn mount_service_with_post_write_hook<S>(
     router: axum::Router<S>,
     enable_mutations: bool,
     with_size_estimates: bool,
@@ -396,7 +396,7 @@ fn request_refreshes_runtime_after_write(params: &Value) -> bool {
             .unwrap_or(false)
 }
 
-fn loopback_allowed_origins() -> [&'static str; 6] {
+const fn loopback_allowed_origins() -> [&'static str; 6] {
     [
         "http://localhost",
         "https://localhost",
@@ -619,12 +619,7 @@ fn reqvire_error(tool_name: &str, err: ReqvireError) -> Value {
             diagnostics: diags,
             related_errors: errors,
         } => {
-            diagnostics = Some(
-                diags
-                    .iter()
-                    .map(|d| diagnostic_to_value(d))
-                    .collect::<Vec<_>>(),
-            );
+            diagnostics = Some(diags.iter().map(diagnostic_to_value).collect::<Vec<_>>());
             (
                 "validation_failed",
                 Some(errors.iter().map(ToString::to_string).collect::<Vec<_>>()),
@@ -768,20 +763,27 @@ mod tests {
             false,
             &reqvire::exclusions::ExclusionSetBuilder::new()
                 .build()
-                .unwrap(),
+                .expect("build test configuration"),
         )
-        .unwrap();
+        .expect("expected JSON-RPC response for invalid tool arguments");
 
-        assert_eq!(response.get("error").unwrap().get("code").unwrap(), -32602);
+        assert_eq!(
+            response
+                .get("error")
+                .expect("expected requested field in test response")
+                .get("code")
+                .expect("expected requested field in test response"),
+            -32602
+        );
         assert!(response
             .get("error")
-            .unwrap()
+            .expect("expected JSON-RPC error")
             .get("data")
-            .unwrap()
+            .expect("expected error diagnostic data")
             .get("message")
-            .unwrap()
+            .expect("expected requested field in test response")
             .as_str()
-            .unwrap()
+            .expect("expected a JSON string")
             .contains("element_name"));
     }
 }

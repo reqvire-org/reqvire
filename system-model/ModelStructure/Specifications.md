@@ -10,12 +10,12 @@ Default collection excludes implementation/evidence relations (`satisfiedBy`, `s
 When starting from a `requirement`:
 - UPSTREAM traverses requirement parents through `derivedFrom`, then crosses to the owning capability through `specify` or inherited capability ownership, then traverses parent capabilities through `derivedFrom`.
 - DOWNSTREAM traverses child requirements through `derive` only and does not cross to capabilities.
-- The collected content includes authored concept references, plus each traversed requirement's requirement-detail contracts and requirement-owned contract contract_bindings.
+- The collected content includes authored concept references, plus each traversed requirement's requirement-detail contracts and requirement-owned Contract Bindings and Contract References.
 
 When starting from a `capability`:
 - UPSTREAM traverses parent capabilities through `derivedFrom` only and does not include requirements that specify those capabilities.
 - DOWNSTREAM traverses child capabilities through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`.
-- The collected content includes authored concept references for capability, descendant capability, and requirement elements, requirement-detail contracts, and contract_bindings for requirement elements.
+- The collected content includes authored concept references for capability, descendant capability, and requirement elements, requirement-detail contracts, and both Contract Bindings and Contract References for requirement elements.
 
 When starting from an `ontology`:
 - UPSTREAM traverses parent ontology elements through `derivedFrom`.
@@ -88,7 +88,7 @@ Reqvire implements containment hierarchy through filesystem structure.
 #### Details
 Contract elements serve as requirement-owned subordinate details that drive implementation. Their relation usage is restricted because:
 - They represent atomic pieces of information focused on documenting requirements
-- They are primarily referenced through the Contract Bindings subsection of other elements
+- Other requirements reuse them through Contract Bindings for implementation obligations or Contract References for content and change-review dependencies
 - Their `define` relation links back to the requirement they define, establishing ownership
 - Each contract can only be owned by one compatible requirement according to its subtype
 - They do not define requirement governance metadata; governance context for a contract is obtained from its owning requirement
@@ -116,7 +116,7 @@ Reqvire implements requirement contracts through explicit contract elements link
 - Acceptance criteria and technical details reside in contract elements
 - Requirement text stays intent-focused (EARS-style), with concise detail pointers
 - Clarifying information and rationale are captured in linked contracts
-- Contract elements provide contract-bindings-ready specification contracts across submodels
+- Contract elements provide specification contracts across submodels through explicitly classified binding or reference dependencies
 - `state` contract elements capture lifecycle states, state machines, allowed transitions, terminal states, and state-dependent contract behavior.
 - `input-output` contract elements capture payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries.
 
@@ -318,7 +318,7 @@ Each graph-backed operation specification is expected to define:
 - whether the operation can persist source-file changes
 - validation gates that must pass before persistence
 - rollback behavior and error reporting when a candidate mutation is rejected
-- relation, contract_bindings, and semantic-contract consistency guarantees preserved by the operation
+- relation, contract_bindings, contract_references, and semantic-contract consistency guarantees preserved by the operation
 
 Concrete command names, flags, output fields, file paths, workflow steps, and persistence behavior belong in these operation specifications or behavior contracts.
 
@@ -361,7 +361,7 @@ Technical specification for relation link and unlink operations.
 
 ### Relation Semantics Specification
 
-Reqvire implements relation semantics for ownership, hierarchy, capability specification, semantic-contract constraint, semantic-contract ontology use, verification, implementation satisfaction, and contract_bindings.
+Reqvire implements relation semantics for ownership, hierarchy, capability specification, semantic-contract constraint, semantic-contract ontology use, verification, implementation satisfaction, Contract Bindings, and Contract References.
 
 #### Details
 - Relation names, inverse names, allowed source/target families, ownership semantics, and change-impact propagation are defined by the Reqvire relation ontology.
@@ -369,6 +369,9 @@ Reqvire implements relation semantics for ownership, hierarchy, capability speci
 - Each relation rule is expected to declare exactly one relation family and one semantic pattern. Only hierarchy-family relations have transitive closure properties; the other families are direct relation families unless a separate ontology rule defines derived behavior.
 - Implementation relation validators shall enforce the relation ontology together with element-type compatibility constraints.
 - Report and mutation code shall use the same relation direction and propagation semantics so validation, collect, submodels, coverage, and change impact remain consistent.
+- Requirement fulfillment dependencies MUST combine immediate requirement children through `derive` with every distinct requirement explicitly binding a contract owned through `definedBy`. The dependency direction is parent to child and contract owner to consumer; inverse relation records and repeated paths MUST NOT create duplicate contributions.
+- The combined fulfillment graph MUST be acyclic, including cycles within one capability root, cycles spanning several roots, and cycles combining hierarchy with bindings. Direct implementation artifacts MUST NOT exempt a cycle. Acyclic sharing and unused contracts remain valid.
+- Validation and implementation rollup MUST use the same fulfillment dependency definition. Cyclic models MUST be rejected before graph-dependent reports, and mutations MUST reject cyclic candidate graphs before persisting source changes.
 - Authored relation tokens must map to a declared semantic relation family. Generic semantic escape-hatch relations are not part of the canonical model; authors should use a semantically specific relation family or ontology concept references.
 
 #### Concept References
@@ -617,6 +620,63 @@ The effective Reqvire workspace root defines path normalization, identifier stor
 - Consumer records, static export manifests, source target metadata, and element target metadata must use workspace-root-relative paths for eligible Git-worktree content only.
 - Tooling workspace state may include Git metadata for eligible worktrees, but tool inputs, outputs, evidence references, mutation diffs, and resources must use workspace-root-relative paths.
 - Nested repositories may provide revision metadata in future integrations, but model relations and identifiers continue to use one workspace-root-relative path namespace.
+
+#### Metadata
+  * type: specification
+---
+
+### Contract Reference Semantics Specification
+
+Contract References declare content dependencies that propagate change impact without contributing to the contract owner's implementation fulfillment.
+
+#### Details
+Contract dependency is the umbrella term for Contract Bindings and Contract References. Bindings assign shared implementation obligations; references identify contract content needed for change-impact review. The authored subsection names MUST remain `Contract Bindings` and `Contract References`.
+
+A requirement MUST author references under `#### Contract References`, using Markdown-link list entries with the same workspace-relative identifier normalization as Contract Bindings. Same-file and cross-file identifiers MUST resolve to contracts authored in multi-element files or the existing single-element contract format.
+
+Fragment-only and file-qualified reference identifiers MUST use the shared relation-target fragment normalization before target lookup and duplicate detection. Within `Model.md`, `#Error-Response-Specification` and `Model.md#Error-Response-Specification` MUST resolve to the same canonical contract identifier as `#error-response-specification`. Parsing and mutation commands MUST apply the same normalization.
+
+A reference MUST target an existing `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` element owned by exactly one requirement through `define`/`definedBy`. Only requirements MAY author Contract References. File paths, external URLs, unowned contracts, and other element types MUST be rejected as reference targets.
+
+Ownership validation MUST check both the distinct owner count and the owner's requirement type in the candidate model. Editing a referenced contract's owner to another element type MUST fail before persistence, with a diagnostic identifying the invalid ownership and referenced contract.
+
+Contract Bindings and Contract References MUST be mutually exclusive on each element. An element containing entries in both sections MUST be rejected, including when the sections target different contracts. Duplicate normalized targets within Contract References MUST be rejected by validation. A target appearing in both Contract References and Relations MUST be rejected as a redundant declaration.
+
+Contract References MUST form acyclic requirement dependencies. For cycle validation, a requirement depends on its immediate parent requirements and on the owners of its explicitly referenced or bound contracts. Each authored dependency is considered in this direction; generated inverse relations MUST NOT create artificial cycles. A reference MUST be rejected if the referenced contract owner can reach the referencing requirement through these dependencies, including a reference to a contract owned by the source itself. This includes reciprocal references, longer reference chains, and cycles combining references with bindings or requirement ancestry. Diagnostics MUST identify the participating requirements and contract targets.
+
+Acyclic references within a requirement hierarchy and between capability roots MUST remain valid. Reference-cycle validation MUST run before publishing reports and before persisting any mutation, including link, relink, create, override, hierarchy or ownership edits, and merge. Invalid candidate models MUST leave authored files unchanged.
+
+Implementation assessment MUST exclude reference edges from required contributions, terminal classification, implementation evidence, blockers, and capability roll-up. A contract owner with only reference consumers remains terminal unless it has requirement children or binding consumers. An implemented documentation requirement referencing its contract MUST NOT make the owner implementation-covered.
+
+Formatting MUST preserve the reference section as structured data, render current target names, normalize relative links, and produce deterministic ordering. Reference entries MUST remain separate from bindings in canonical element records and model revision hashing.
+
+#### Concept References
+  * [Contract Binding](../Thesaurus/Thesaurus.md#contract-binding)
+  * [Contract Dependency](../Thesaurus/Thesaurus.md#contract-dependency)
+  * [Contract Reference](../Thesaurus/Thesaurus.md#contract-reference)
+
+#### Metadata
+  * type: specification
+---
+
+### Contract Reference Mutation Specification
+
+Contract Reference mutations preserve the distinction between review dependencies and implementation obligations.
+
+#### Details
+`link <requirement> referenceContract <target>` MUST add a Contract Reference, resolving a target name or contract identifier through the existing link command. `unlink <requirement> <target>` MUST detect and remove a matching Contract Reference and remove an empty subsection.
+
+Create, override, link, unlink, relink, move, rename, merge, and removal operations MUST validate resulting references before persistence. Invalid edits MUST preserve source files. Dry runs MUST return reviewable diffs without writing files.
+
+Overriding an element at the same identifier MUST preserve incoming references and externally authored relations, including ownership. Changes to its type or ownership MUST be validated against those retained dependencies. An invalid override MUST preserve the original model and authored files.
+
+Overriding a referenced contract into another file MUST transfer its incoming references and externally authored ownership relations to the replacement identifier. The replacement content and all rewritten dependencies MUST be validated and persisted atomically. Dry-run output MUST show the replacement and dependency rewrites while preserving authored files.
+
+Moving or renaming a contract, file, or folder MUST update incoming reference identifiers and display labels. Moving a referencing requirement MUST recalculate its relative links. Merging requirements MUST retain and deduplicate references; a merged element containing both bindings and references MUST fail atomically. Removing a target through a model operation MUST clean up incoming references. External deletion leaving unresolved references MUST fail validation.
+
+Merging compatible contracts owned by the same requirement MUST preserve one distinct owner of the surviving contract. Every incoming reference to a merged contract MUST resolve to the surviving identifier. References that converge on that identifier MUST be deduplicated per consumer, and ownership relations that converge on the same owner-contract pair MUST be deduplicated. The resulting model MUST validate before persistence.
+
+CLI and MCP mutations MUST share the same model operations and validation. The `referenceContract` token denotes subsection authoring; it MUST NOT be accepted as an ordinary Relations entry.
 
 #### Metadata
   * type: specification

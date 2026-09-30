@@ -115,7 +115,7 @@ Detailed graph-role identification, o-kernel subset construction, metadata prese
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Referenced Graph Subset Construction Specification](../Architecture/OntologyKernelSpecifications.md#referenced-graph-subset-construction-specification)
   * [RDF Term Description Construction Specification](../Architecture/OntologyKernelSpecifications.md#rdf-term-description-construction-specification)
 
@@ -132,12 +132,12 @@ Detailed graph-role identification, o-kernel subset construction, metadata prese
 The system shall collect ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry into a reusable semantic context, and shall optionally project Reqvire model context and generated ontology construct facts into the same RDF graph.
 
 #### Details
-Detailed block collection, model-layer projection, provenance, parser ownership, and clean-vs-full context rules shall follow the associated specification and contract bindings.
+The system SHALL follow its owned specification and referenced contracts for block collection, model-layer projection, provenance, parser ownership, and clean-vs-full context.
 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Semantic Contract Structure Specification](../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Ontology Kernel RDF Native Boundary Specification](../Architecture/OntologyKernelSpecifications.md#ontology-kernel-rdf-native-boundary-specification)
   * [Ontology Construct Classification Specification](../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
@@ -159,7 +159,7 @@ Detailed block collection, model-layer projection, provenance, parser ownership,
 The system shall apply the o-kernel standards reserved vocabulary registry when validating and exporting Reqvire ontology and semantic-contract RDF.
 
 #### Details
-Detailed validation, export, datatype-position, registry delegation, and non-reserved IRI handling rules shall follow the associated specification and o-kernel contract binding.
+The system SHALL follow its owned specification and referenced o-kernel contract for validation, export, datatype-position handling, registry delegation, and non-reserved IRI handling.
 
 #### Concept References
   * [OWL reserved vocabulary registry](../Thesaurus/Thesaurus.md#owl-reserved-vocabulary-registry)
@@ -169,10 +169,12 @@ Detailed validation, export, datatype-position, registry delegation, and non-res
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Standards Reserved Vocabulary Recognition Specification](../Architecture/OntologyKernelSpecifications.md#standards-reserved-vocabulary-recognition-specification)
 
 #### Relations
+  * satisfiedBy: [validation.rs](../../crates/reqvire-core/src/graph_registry/validation.rs)
+  * satisfiedBy: [owl_reserved.rs](../../crates/o-kernel/src/owl_reserved.rs)
   * definedBy: [OWL Reserved Vocabulary Recognition Specification](SemanticModelSpecifications.md#owl-reserved-vocabulary-recognition-specification)
   * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
   * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
@@ -300,7 +302,7 @@ Detailed export commands, artifact split, deterministic comparison, validation-g
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Runtime Reqvire SHACL Artifact Specification](SemanticModelSpecifications.md#runtime-reqvire-shacl-artifact-specification)
 
 #### Relations

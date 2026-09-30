@@ -165,6 +165,14 @@ workflow_model_quality_audit_prompt_request() {
   jq -n -c '{jsonrpc:"2.0",id:56,method:"prompts/get",params:{name:"reqvire.workflow.model_quality_audit",arguments:{question:"Audit model quality",scope:"MCP interface"}}}'
 }
 
+semantic_contract_context_prompt_request() {
+  jq -n -c '{jsonrpc:"2.0",id:57,method:"prompts/get",params:{name:"reqvire.semantic.contract_context_search"}}'
+}
+
+workflow_verify_coverage_prompt_request() {
+  jq -n -c '{jsonrpc:"2.0",id:58,method:"prompts/get",params:{name:"reqvire.workflow.verify_coverage"}}'
+}
+
 unknown_prompt_request() {
   jq -n -c '{jsonrpc:"2.0",id:28,method:"prompts/get",params:{name:"reqvire.unknown.prompt"}}'
 }
@@ -689,7 +697,9 @@ run_http_mcp_sequence "$DEFAULT_PORT" "$PROMPTS_OUTPUT" \
   "$(workflow_refactor_model_structure_prompt_request)" \
   "$(semantic_author_ontology_contract_prompt_request)" \
   "$(workflow_author_concepts_prompt_request)" \
-  "$(workflow_model_quality_audit_prompt_request)" || fail "new MCP prompt request sequence failed"
+  "$(workflow_model_quality_audit_prompt_request)" \
+  "$(semantic_contract_context_prompt_request)" \
+  "$(workflow_verify_coverage_prompt_request)" || fail "new MCP prompt request sequence failed"
 stop_http_mcp
 trap - EXIT
 
@@ -778,6 +788,20 @@ assert_jq_line "$PROMPTS_OUTPUT" 4 '.result.messages[0].content.text | contains(
 assert_jq_line "$PROMPTS_OUTPUT" 5 '.result.messages[0].content.text | contains("reqvire.semantic.vocabulary") and contains("ontology_base") and contains("ontology_prefix") and contains("SHACL") and contains("use") and contains("constrain") and contains("semantic-contract") and contains("governance metadata") and contains("implementation satisfaction")' "ontology/contract authoring prompt includes semantic, SHACL, and ontology guardrail rules"
 assert_jq_line "$PROMPTS_OUTPUT" 6 '.result.messages[0].content.text | contains("concept-scheme") and contains("concept") and contains("SKOS") and contains("broader") and contains("related") and contains("Concept References") and contains("reqvire:mapsToConcept") and contains("concept_id") and contains("names collide")' "concept authoring prompt includes native SKOS, identity, and naming rules"
 assert_jq_line "$PROMPTS_OUTPUT" 7 '.result.messages[0].content.text | contains("validation evidence") and contains("reqvire.lint") and contains("reqvire.coverage") and contains("redundant verification") and contains("safe auto-fix") and contains("manual-review")' "model quality prompt includes validation, lint, coverage, and audit buckets"
+# Retrieved prompt text must preserve the distinction used by model coverage.
+assert_contract_dependency_guidance() {
+  assert_jq_line "$1" "$2" '.result.messages[0].content.text | contains("Contract Bindings") and contains("shared implementation obligations") and contains("Contract References") and contains("content dependencies") and contains("change impact") and contains("only binding consumers contribute")' "contract dependency guidance in $3"
+}
+assert_contract_dependency_guidance "$DEFAULT_OUTPUT" 26 "model exploration"
+assert_contract_dependency_guidance "$DEFAULT_OUTPUT" 27 "change-impact review"
+for prompt_line in 1 2 4 7 8 9; do
+  assert_contract_dependency_guidance "$PROMPTS_OUTPUT" "$prompt_line" "workflow prompt $prompt_line"
+done
+for prompt_line in 2 4; do
+  assert_jq_line "$PROMPTS_OUTPUT" "$prompt_line" '.result.messages[0].content.text | contains("referenceContract") and contains("cannot contain both") and contains("acyclic")' "authoring and refactoring preserve contract dependency constraints"
+done
+assert_jq_line "$PROMPTS_OUTPUT" 8 '.result.messages[0].content.text | contains("referencesContract") and contains("bindsContract")' "semantic context includes both dependency predicates"
+assert_jq_line "$PROMPTS_OUTPUT" 9 '.result.messages[0].content.text | contains("terminal requirements") and contains("verification leaves") and contains("satisfiedBy")' "coverage prompt separates terminal implementation from leaf verification"
 assert_jq_line "$DEFAULT_OUTPUT" 29 '.result.structuredContent.include_external == true and (.result.structuredContent.content | contains("MCP external code datatype")) and (.result.structuredContent.content | contains("ext:ExternalCode")) and (.result.structuredContent.content | contains("MCP external resource") | not) and (.result.structuredContent.content | contains("MCP JSON-LD external resource") | not) and (.result.structuredContent.content | contains("MCP RDF/XML external resource") | not) and (.result.structuredContent.content | contains("ext:ExternalResource") | not) and (.result.structuredContent.content | contains("jsonext:JsonExternalResource") | not) and (.result.structuredContent.content | contains("rdfext:RdfExternalResource") | not)' "semantic export external-used layer materializes only used external subset triples"
 assert_jq_line "$DEFAULT_OUTPUT" 29 '.result.structuredContent.include_external == true and (.result.structuredContent.content | contains("ext:ExternalCode rdfs:isDefinedBy") | not)' "semantic export external-used layer does not generate isDefinedBy for external terms"
 assert_jq_line "$DEFAULT_OUTPUT" 29 '.result.structuredContent.include_external == true and (.result.structuredContent.ontology_declarations["https://example.test/mcp-external#ExternalCode"][] | select(.external == true))' "semantic export external-used layer marks used external declaration"

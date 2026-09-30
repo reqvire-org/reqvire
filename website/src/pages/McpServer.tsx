@@ -107,6 +107,40 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
         </div>
       </Section>
 
+      <Section title="Scoped Coverage">
+        <p className="text-zinc-600 mb-4">
+          Call <code>reqvire.coverage</code> without arguments for the whole
+          model. The optional string <code>from</code> selects a capability by
+          its exact, case-sensitive name, including a nested capability.
+          Replace the example name with a capability in your model.
+        </p>
+        <CodeBlock>{`{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": { "name": "reqvire.coverage", "arguments": {} }
+}`}</CodeBlock>
+        <CodeBlock>{`{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "reqvire.coverage",
+    "arguments": { "from": "Alpha Root" }
+  }
+}`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Unknown names and names of non-capability elements return a
+          structured tool error; they never fall back to the whole model.
+          Scoped results use the same semantics as CLI and Explorer coverage:
+          coverage is calculated against the complete current model before
+          selecting the reported subjects. Evidence outside the selected
+          subtree remains visible without adding its elements to the scope's
+          subject counts. Scoped results include membership IDs in
+          <code> scope</code>; orphan diagnostics remain a whole-model concern.
+        </p>
+      </Section>
+
       <Section title="Semantic Model Evidence">
         <DetailGrid
           items={[
@@ -116,7 +150,7 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             },
             {
               name: "Read element",
-              desc: "reqvire.read_element returns element details, relations, Contract Bindings entries, concept references, and optional size estimates.",
+              desc: "reqvire.read_element returns element details, relations, separate Contract Bindings and Contract References, concept references, and optional size estimates.",
             },
             {
               name: "Collect",
@@ -152,6 +186,42 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             },
           ]}
         />
+      </Section>
+
+      <Section title="Contract Reference Search">
+        <p className="text-zinc-600 mb-4">
+          Set <code>has_contract_references</code> to <code>true</code> to find
+          requirements with at least one Contract Reference. Use{" "}
+          <code>filter_contract_references</code> to match a referenced contract's
+          normalized, workspace-relative identifier with a case-sensitive glob,
+          such as <code>specifications/Errors.md#error-response-specification</code>.
+          Matching uses the target identifier rather than the Markdown link label.
+        </p>
+        <CodeBlock>{`{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "method": "tools/call",
+  "params": {
+    "name": "reqvire.search",
+    "arguments": {
+      "has_contract_references": true,
+      "filter_contract_references": "*#error-response-specification",
+      "filter_name": ".*Documentation.*"
+    }
+  }
+}`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          This request returns requirements whose names contain Documentation
+          and that reference a matching error contract. Every supplied filter
+          must match; omitting these filters preserves the usual search behavior.
+          Invalid globs return a structured tool error.
+        </p>
+        <p className="text-zinc-600 mt-4">
+          Search selects the reported requirements. Change-impact analysis
+          follows Contract References from changed contracts to their consumers
+          using the full model. A reference-only consumer contributes no
+          implementation coverage or evidence to the contract owner.
+        </p>
       </Section>
 
       <Section title="Prompts">

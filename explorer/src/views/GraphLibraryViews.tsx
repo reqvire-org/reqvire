@@ -76,7 +76,7 @@ function roleColor(kind: string) {
 function relationCategory(edge: { label?: unknown; kind?: unknown }): RelationCategory {
   const label = String(edge.label || "").toLowerCase();
   const kind = String(edge.kind || "").toLowerCase();
-  if (kind === "contract_bindings" || label === "binds contract") return "bind";
+  if (kind === "contract_bindings" || kind === "contract_references" || label === "binds contract") return "bind";
   if (kind === "concept-reference" || label === "conceptref") return "concept-reference";
   if (label.includes("derive")) return "derive";
   if (label.includes("specif")) return "specify";
@@ -93,6 +93,7 @@ function displayEdgeLabel(edge: Pick<GraphEdge, "label" | "kind">): string {
   if (kind === "contract_bindings" || label.toLowerCase() === "binds contract") {
     return "contract binding";
   }
+  if (kind === "contract_references") return "contract reference";
   return label;
 }
 
@@ -575,7 +576,7 @@ export function KnowledgeGraphView({
           ...edge,
           type: "arrow",
           label: displayEdgeLabel(edge),
-          size: edge.kind === "contract_bindings" || edge.kind === "concept-reference" ? 0.8 : 1.1,
+          size: edge.kind === "contract_bindings" || edge.kind === "contract_references" || edge.kind === "concept-reference" ? 0.8 : 1.1,
           color: edgeColor(edge),
           hidden: !visibleEdge(edge),
         });

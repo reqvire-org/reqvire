@@ -100,6 +100,8 @@ pub struct ChangedElement {
     /// Set of contract_bindings target strings that changed (for rendering with ⚠️)
     #[serde(skip_serializing_if = "FxHashSet::is_empty")]
     pub changed_contract_bindings: FxHashSet<String>,
+    #[serde(skip_serializing_if = "BTreeSet::is_empty")]
+    pub changed_contract_references: BTreeSet<String>,
 }
 
 impl ChangedElement {
@@ -285,7 +287,7 @@ impl ChangeImpactReport {
 
                 let impact_tree =
                     render_change_impact_tree_json(&elem.change_impact_tree, base_url, git_commit);
-                json!({
+                let mut result = json!({
                     "element_id": element_url,
                     "name": elem.name,
                     "old_content": elem.old_content,
@@ -295,7 +297,11 @@ impl ChangeImpactReport {
                     "removed_relations": removed_relations,
                     "change_impact_tree": impact_tree,
                     "changed_contract_bindings": elem.changed_contract_bindings
-                })
+                });
+                if !elem.changed_contract_references.is_empty() {
+                    result["changed_contract_references"] = json!(elem.changed_contract_references);
+                }
+                result
             })
             .collect();
         let relocated: Vec<_> = self
@@ -413,12 +419,14 @@ impl ChangeImpactReport {
         for elem in &self.changed {
             let element_url = format!("{}/blob/{}/{}", base_url, git_commit, elem.element_id);
             // Add ⚠️ if element has content or contract_bindings changes
-            let change_marker =
-                if elem.content_changed || !elem.changed_contract_bindings.is_empty() {
-                    " ⚠️"
-                } else {
-                    ""
-                };
+            let change_marker = if elem.content_changed
+                || !elem.changed_contract_bindings.is_empty()
+                || !elem.changed_contract_references.is_empty()
+            {
+                " ⚠️"
+            } else {
+                ""
+            };
             output.push_str(&format!(
                 "* [{}]({}){}\n",
                 elem.name, element_url, change_marker
@@ -443,6 +451,13 @@ impl ChangeImpactReport {
                 output.push_str(&format!(
                     "    * 📎 [{}]({}){}\n",
                     contract_binding_name, att_url, change_icon
+                ));
+            }
+
+            for identifier in &elem.changed_contract_references {
+                output.push_str(&format!(
+                    "    * Contract References changed: {}\n",
+                    identifier
                 ));
             }
 
@@ -597,10 +612,9 @@ fn format_contract_binding_name(target: &element::ContractBindingTarget) -> Stri
                 .split('-')
                 .map(|word| {
                     let mut chars = word.chars();
-                    match chars.next() {
-                        None => String::new(),
-                        Some(c) => c.to_uppercase().chain(chars).collect(),
-                    }
+                    chars
+                        .next()
+                        .map_or_else(String::new, |c| c.to_uppercase().chain(chars).collect())
                 })
                 .collect::<Vec<_>>()
                 .join(" ")
@@ -793,8 +807,7 @@ pub fn build_change_impact_tree(
 
             // Use the text from the first relation as a fallback display name
             let fallback_name = impact_relations.first().map(|rel| rel.target.text.clone());
-            let child_node =
-                build_change_impact_tree(current, impacted_id.clone(), visited, fallback_name);
+            let child_node = build_change_impact_tree(current, impacted_id, visited, fallback_name);
             let forward_relations: Vec<_> = impact_relations
                 .into_iter()
                 .map(|rel| RelationNode {
@@ -811,6 +824,38 @@ pub fn build_change_impact_tree(
         })
         .flatten()
         .collect();
+
+    let mut referencing: Vec<_> = current
+        .get_all_elements()
+        .into_iter()
+        .filter(|candidate| {
+            candidate
+                .contract_references
+                .iter()
+                .any(|entry| entry.target.as_str() == element.identifier)
+        })
+        .map(|candidate| candidate.identifier.clone())
+        .collect();
+    referencing.sort();
+    for identifier in referencing {
+        let child_node = if visited.insert(identifier.clone()) {
+            build_change_impact_tree(current, identifier, visited, None)
+        } else {
+            // Preserve the dependency edge even when another path has already
+            // assessed this consumer and expanded its downstream impact.
+            ElementNode {
+                element: current
+                    .get_element(&identifier)
+                    .expect("reference consumer")
+                    .clone(),
+                relations: Vec::new(),
+            }
+        };
+        relations.push(RelationNode {
+            relation_trigger: "contract_references".into(),
+            element_node: child_node,
+        });
+    }
 
     for impacted_id in maps_to_concept_impacted_ontology_elements(current, &element) {
         if !visited.insert(impacted_id.clone()) {
@@ -992,6 +1037,7 @@ fn is_smart_filter_child_relation(relation_type: &str) -> bool {
             | "usedBy"
             | "verifiedBy"
             | "mappedByOntology"
+            | "contract_references"
     )
 }
 
@@ -1101,7 +1147,7 @@ fn normalize_relation_for_comparison(rel: &Relation) -> (String, String) {
     (relation_type, rel.target.link.as_str().to_string())
 }
 
-fn is_scope_element(elem: &element::Element) -> bool {
+const fn is_scope_element(elem: &element::Element) -> bool {
     matches!(
         elem.element_type,
         element::ElementType::Capability | element::ElementType::Requirement(_)
@@ -1176,7 +1222,9 @@ fn find_scope_parent_id(
 }
 
 /// Compute the impact scope: the per-branch lowest common ancestors of all
-/// impacted capability/requirement elements. Requirement scope walks
+/// impacted capability/requirement elements.
+///
+/// Requirement scope walks
 /// `derivedFrom` requirement parents first, then crosses to the specifying
 /// capability through `specify`; capability scope walks only capability
 /// `derivedFrom` parents.
@@ -1306,6 +1354,39 @@ pub fn compute_impact_scope(
     result
 }
 
+fn changed_reference_targets(
+    current_element: &element::Element,
+    previous_element: &element::Element,
+    current: &graph_registry::GraphRegistry,
+    previous: &graph_registry::GraphRegistry,
+) -> BTreeSet<String> {
+    let targets = |element: &element::Element, registry: &graph_registry::GraphRegistry| {
+        element
+            .contract_references
+            .iter()
+            .map(|entry| {
+                let identifier = entry.target.as_str();
+                let identity = registry
+                    .get_element(&identifier)
+                    .map(|target| target.id.clone())
+                    .unwrap_or_else(|| identifier.clone());
+                (identity, identifier)
+            })
+            .collect::<std::collections::BTreeMap<_, _>>()
+    };
+    let now = targets(current_element, current);
+    let before = targets(previous_element, previous);
+    now.iter()
+        .filter(|(identity, _)| !before.contains_key(*identity))
+        .chain(
+            before
+                .iter()
+                .filter(|(identity, _)| !now.contains_key(*identity)),
+        )
+        .map(|(_, identifier)| identifier.clone())
+        .collect()
+}
+
 pub fn compute_change_impact(
     current: &graph_registry::GraphRegistry,
     reference: &graph_registry::GraphRegistry,
@@ -1395,7 +1476,10 @@ pub fn compute_change_impact(
         let changed_contract_bindings =
             get_changed_contract_bindings(cur_elem, ref_elem, current, reference);
 
+        let changed_contract_references =
+            changed_reference_targets(cur_elem, ref_elem, current, reference);
         let has_changed = content_changed
+            || !changed_contract_references.is_empty()
             || contract_bindings_changed
             || !added_relations.is_empty()
             || !removed_relations.is_empty();
@@ -1427,6 +1511,7 @@ pub fn compute_change_impact(
                 removed_relations,
                 change_impact_tree,
                 changed_contract_bindings,
+                changed_contract_references,
             });
         }
     }
@@ -1513,7 +1598,10 @@ pub fn compute_change_impact(
                 let changed_contract_bindings =
                     get_changed_contract_bindings(cur_elem, ref_elem, current, reference);
 
+                let changed_contract_references =
+                    changed_reference_targets(cur_elem, ref_elem, current, reference);
                 let has_changed = content_changed
+                    || !changed_contract_references.is_empty()
                     || !changed_contract_bindings.is_empty()
                     || !added_relations.is_empty()
                     || !removed_relations.is_empty();
@@ -1537,6 +1625,7 @@ pub fn compute_change_impact(
                         removed_relations,
                         change_impact_tree,
                         changed_contract_bindings,
+                        changed_contract_references,
                     });
                 }
             }
@@ -1790,16 +1879,19 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
 
         current
             .register_element(current_concept, "Thesaurus.md")
-            .unwrap();
+            .expect("register valid test element");
         current
             .register_element(ontology.clone(), "Ontology.md")
-            .unwrap();
+            .expect("register valid test element");
         reference
             .register_element(reference_concept, "Thesaurus.md")
-            .unwrap();
-        reference.register_element(ontology, "Ontology.md").unwrap();
+            .expect("register valid test element");
+        reference
+            .register_element(ontology, "Ontology.md")
+            .expect("register valid test element");
 
-        let report = compute_change_impact(&current, &reference).unwrap();
+        let report = compute_change_impact(&current, &reference)
+            .expect("compute change impact for test models");
         let concept_tree = changed_tree_for(&report, "Verification Coverage");
 
         assert!(concept_tree.relations.iter().any(|relation| {
@@ -1872,10 +1964,18 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
             "test.md#payload-requirement",
         );
 
-        registry.register_element(ontology, "test.md").unwrap();
-        registry.register_element(contract, "test.md").unwrap();
-        registry.register_element(requirement, "test.md").unwrap();
-        registry.register_element(verification, "test.md").unwrap();
+        registry
+            .register_element(ontology, "test.md")
+            .expect("register valid test element");
+        registry
+            .register_element(contract, "test.md")
+            .expect("register valid test element");
+        registry
+            .register_element(requirement, "test.md")
+            .expect("register valid test element");
+        registry
+            .register_element(verification, "test.md")
+            .expect("register valid test element");
     }
 
     #[test]
@@ -1895,7 +1995,8 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
             "requirement",
         );
 
-        let report = compute_change_impact(&current, &reference).unwrap();
+        let report = compute_change_impact(&current, &reference)
+            .expect("compute change impact for test models");
         let tree = changed_tree_for(&report, "Payload Ontology");
 
         assert!(tree_contains_name(tree, "Payload Contract"));
@@ -1920,7 +2021,8 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
             "requirement",
         );
 
-        let report = compute_change_impact(&current, &reference).unwrap();
+        let report = compute_change_impact(&current, &reference)
+            .expect("compute change impact for test models");
         let tree = changed_tree_for(&report, "Payload Contract");
 
         assert!(tree_contains_name(tree, "Payload Requirement"));
@@ -1948,7 +2050,8 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
             "requirement v1",
         );
 
-        let report = compute_change_impact(&current, &reference).unwrap();
+        let report = compute_change_impact(&current, &reference)
+            .expect("compute change impact for test models");
         let tree = changed_tree_for(&report, "Payload Requirement");
 
         assert!(tree_contains_name(tree, "Payload Contract"));
@@ -1973,11 +2076,11 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
             "A",
         );
         my_struct
-            .register_element(element_a.clone(), "file.md")
-            .unwrap();
+            .register_element(element_a, "file.md")
+            .expect("register valid test element");
         my_struct
             .register_element(element_b.clone(), "file.md")
-            .unwrap();
+            .expect("register valid test element");
         let mut visited = BTreeSet::new();
         visited.insert("B".to_string());
         let tree = build_change_impact_tree(&my_struct, "B".to_string(), &mut visited, None);
@@ -2017,10 +2120,10 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         );
         my_struct
             .register_element(element_a.clone(), "file.md")
-            .unwrap();
+            .expect("register valid test element");
         my_struct
             .register_element(element_b.clone(), "file.md")
-            .unwrap();
+            .expect("register valid test element");
         let mut visited = BTreeSet::new();
         visited.insert("A".to_string());
         let tree = build_change_impact_tree(&my_struct, "A".to_string(), &mut visited, None);
@@ -2137,19 +2240,20 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
 
         current_registry
             .register_element(parent_req, "req1.md")
-            .unwrap();
+            .expect("register valid test element");
         current_registry
             .register_element(child_req, "req1.md")
-            .unwrap();
+            .expect("register valid test element");
         current_registry
             .register_element(verification, "verify.md")
-            .unwrap();
+            .expect("register valid test element");
 
         // Create empty reference registry (all elements are new)
         let reference_registry = GraphRegistry::new();
 
         // Compute change impact
-        let report = compute_change_impact(&current_registry, &reference_registry).unwrap();
+        let report = compute_change_impact(&current_registry, &reference_registry)
+            .expect("compute change impact for test models");
 
         // Verify results according to smart filtering requirement:
         // Child requirement is filtered out because it's referenced in parent's relations
@@ -2231,16 +2335,17 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
 
         current_registry
             .register_element(requirement, "req.md")
-            .unwrap();
+            .expect("register valid test element");
         current_registry
             .register_element(verification, "verify.md")
-            .unwrap();
+            .expect("register valid test element");
 
         // Create empty reference registry (all elements are new)
         let reference_registry = GraphRegistry::new();
 
         // Compute change impact
-        let report = compute_change_impact(&current_registry, &reference_registry).unwrap();
+        let report = compute_change_impact(&current_registry, &reference_registry)
+            .expect("compute change impact for test models");
 
         // According to smart filtering requirement:
         // If both are new, and requirement has verifiedBy pointing to verification,
@@ -2308,10 +2413,10 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
 
         reference_registry
             .register_element(parent_ref.clone(), "file.md")
-            .unwrap();
+            .expect("register valid test element");
         reference_registry
             .register_element(child_ref.clone(), "file.md")
-            .unwrap();
+            .expect("register valid test element");
 
         // Current registry (HEAD - file modified but relations unchanged)
         let mut current_registry = GraphRegistry::new();
@@ -2356,16 +2461,17 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         let new_elem = create_element("file.md#newelem", "New Element", "New content");
         current_registry
             .register_element(parent_curr.clone(), "file.md")
-            .unwrap();
+            .expect("register valid test element");
         current_registry
             .register_element(child_curr, "file.md")
-            .unwrap();
+            .expect("register valid test element");
         current_registry
             .register_element(new_elem, "file.md")
-            .unwrap();
+            .expect("register valid test element");
 
         // Test: Compute change impact
-        let report = compute_change_impact(&current_registry, &reference_registry).unwrap();
+        let report = compute_change_impact(&current_registry, &reference_registry)
+            .expect("compute change impact for test models");
 
         // Parent Element should NOT appear in changed elements
         // because its auto-generated derive relation hasn't actually changed
@@ -2443,9 +2549,15 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         let mut child_b = create_element("req.md#child-b", "Child B", "Content B v2");
         add_derived_from(&mut child_b, "req.md#parent");
 
-        current.register_element(parent.clone(), "req.md").unwrap();
-        current.register_element(child_a, "req.md").unwrap();
-        current.register_element(child_b, "req.md").unwrap();
+        current
+            .register_element(parent.clone(), "req.md")
+            .expect("register valid test element");
+        current
+            .register_element(child_a, "req.md")
+            .expect("register valid test element");
+        current
+            .register_element(child_b, "req.md")
+            .expect("register valid test element");
 
         // Reference: same structure, different content for children
         let mut ref_parent = create_element("req.md#parent", "Parent Req", "Parent content");
@@ -2457,11 +2569,18 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         let mut ref_child_b = create_element("req.md#child-b", "Child B", "Content B v1");
         add_derived_from(&mut ref_child_b, "req.md#parent");
 
-        reference.register_element(ref_parent, "req.md").unwrap();
-        reference.register_element(ref_child_a, "req.md").unwrap();
-        reference.register_element(ref_child_b, "req.md").unwrap();
+        reference
+            .register_element(ref_parent, "req.md")
+            .expect("register valid test element");
+        reference
+            .register_element(ref_child_a, "req.md")
+            .expect("register valid test element");
+        reference
+            .register_element(ref_child_b, "req.md")
+            .expect("register valid test element");
 
-        let report = compute_change_impact(&current, &reference).unwrap();
+        let report = compute_change_impact(&current, &reference)
+            .expect("compute change impact for test models");
 
         // Both children changed, so they should merge into parent
         assert!(
@@ -2487,17 +2606,24 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         let mut reference = GraphRegistry::new();
 
         let parent = create_element("req.md#parent", "Parent Req", "Parent content");
-        current.register_element(parent.clone(), "req.md").unwrap();
+        current
+            .register_element(parent, "req.md")
+            .expect("register valid test element");
 
         // Reference has both parent and child
         let ref_parent = create_element("req.md#parent", "Parent Req", "Parent content");
         let mut ref_child = create_element("req.md#child", "Child Req", "Child content");
         add_derived_from(&mut ref_child, "req.md#parent");
 
-        reference.register_element(ref_parent, "req.md").unwrap();
-        reference.register_element(ref_child, "req.md").unwrap();
+        reference
+            .register_element(ref_parent, "req.md")
+            .expect("register valid test element");
+        reference
+            .register_element(ref_child, "req.md")
+            .expect("register valid test element");
 
-        let report = compute_change_impact(&current, &reference).unwrap();
+        let report = compute_change_impact(&current, &reference)
+            .expect("compute change impact for test models");
 
         // Deleted child's parent should appear in scope
         assert_eq!(report.impact_scope.len(), 1, "Should have 1 scope root");
@@ -2527,10 +2653,18 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         let mut child_b = create_element("req.md#child-b", "Child B", "Child B v2");
         add_derived_from(&mut child_b, "req.md#root-b");
 
-        current.register_element(root_a, "req.md").unwrap();
-        current.register_element(child_a, "req.md").unwrap();
-        current.register_element(root_b, "req.md").unwrap();
-        current.register_element(child_b, "req.md").unwrap();
+        current
+            .register_element(root_a, "req.md")
+            .expect("register valid test element");
+        current
+            .register_element(child_a, "req.md")
+            .expect("register valid test element");
+        current
+            .register_element(root_b, "req.md")
+            .expect("register valid test element");
+        current
+            .register_element(child_b, "req.md")
+            .expect("register valid test element");
 
         // Reference: same structure, different content
         let mut ref_root_a = create_element("req.md#root-a", "Root A", "Root A content");
@@ -2543,12 +2677,21 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         let mut ref_child_b = create_element("req.md#child-b", "Child B", "Child B v1");
         add_derived_from(&mut ref_child_b, "req.md#root-b");
 
-        reference.register_element(ref_root_a, "req.md").unwrap();
-        reference.register_element(ref_child_a, "req.md").unwrap();
-        reference.register_element(ref_root_b, "req.md").unwrap();
-        reference.register_element(ref_child_b, "req.md").unwrap();
+        reference
+            .register_element(ref_root_a, "req.md")
+            .expect("register valid test element");
+        reference
+            .register_element(ref_child_a, "req.md")
+            .expect("register valid test element");
+        reference
+            .register_element(ref_root_b, "req.md")
+            .expect("register valid test element");
+        reference
+            .register_element(ref_child_b, "req.md")
+            .expect("register valid test element");
 
-        let report = compute_change_impact(&current, &reference).unwrap();
+        let report = compute_change_impact(&current, &reference)
+            .expect("compute change impact for test models");
 
         // Each branch has only 1 changed child, so no merging happens
         // Both children remain as separate scope roots
@@ -2582,18 +2725,27 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         let mut only_child = create_element("req.md#only-child", "Only Child", "Child v2");
         add_derived_from(&mut only_child, "req.md#parent");
 
-        current.register_element(parent.clone(), "req.md").unwrap();
-        current.register_element(only_child, "req.md").unwrap();
+        current
+            .register_element(parent.clone(), "req.md")
+            .expect("register valid test element");
+        current
+            .register_element(only_child, "req.md")
+            .expect("register valid test element");
 
         let mut ref_parent = create_element("req.md#parent", "Parent Req", "Parent content");
         add_derive(&mut ref_parent, "req.md#only-child");
         let mut ref_child = create_element("req.md#only-child", "Only Child", "Child v1");
         add_derived_from(&mut ref_child, "req.md#parent");
 
-        reference.register_element(ref_parent, "req.md").unwrap();
-        reference.register_element(ref_child, "req.md").unwrap();
+        reference
+            .register_element(ref_parent, "req.md")
+            .expect("register valid test element");
+        reference
+            .register_element(ref_child, "req.md")
+            .expect("register valid test element");
 
-        let report = compute_change_impact(&current, &reference).unwrap();
+        let report = compute_change_impact(&current, &reference)
+            .expect("compute change impact for test models");
 
         // Only one child changed, no sibling to merge with -> child stays as scope root
         assert_eq!(report.impact_scope.len(), 1, "Should have 1 scope root");

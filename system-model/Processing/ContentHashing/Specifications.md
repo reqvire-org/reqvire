@@ -11,8 +11,8 @@ Canonical encoding and compatibility contract for the parsed-element model revis
 - Encode each string as UTF-8 preceded by its byte length as an unsigned 64-bit big-endian integer. Encode a byte buffer with the same length framing.
 - Encode each collection as its unsigned 64-bit big-endian item count followed by its encoded items. Tuple fields use the order specified below.
 - Sort strings by UTF-8 bytes and tuples lexicographically by their component strings, without locale-dependent ordering or Unicode normalization.
-- The model stream begins with the framed string `reqvire.model-revision.v1`, followed by a counted collection of elements sorted by canonical identifier. Each element is a length-framed buffer containing its canonical record.
-- Each element record begins with the framed string `reqvire.element.v1`, followed by the fields below in this order. Keep the record encoder reusable without exposing a public per-element fingerprint API.
+- The model stream begins with the framed string `reqvire.model-revision.v2`, followed by a counted collection of elements sorted by canonical identifier. Each element is a length-framed buffer containing its canonical record.
+- Each element record begins with the framed string `reqvire.element.v2`, followed by the fields below in this order. Keep the record encoder reusable without exposing a public per-element fingerprint API.
 
 | Field | Canonical value |
 | --- | --- |
@@ -24,13 +24,15 @@ Canonical encoding and compatibility contract for the parsed-element model revis
 | Metadata | Counted `(key, value)` string tuples, sorted by key, covering all authored metadata |
 | Relations | Counted, sorted, deduplicated `(relation_type, target_kind, target)` string tuples from the resolved element graph |
 | Contract bindings | Counted, sorted, deduplicated `(target_kind, target)` string tuples |
+| Contract references | Counted, sorted, deduplicated identifier targets, encoded as `(identifier, target)` string tuples |
 
 ##### Field semantics
 - Metadata includes governance (`status`, `priority`, `risk`, `owner`), ontology and concept namespace metadata, `type`, and other authored keys. Exclude the parser-generated `_single_element_format` marker. Future internal metadata must remain outside the authored projection.
 - Relation target kinds are `identifier`, `internal_path`, and `external_url`. Contract-binding target kinds are `identifier` and `internal_path`.
 - Resolved internal paths and identifiers are workspace-root-relative with `/` separators. External URLs are preserved verbatim. Paths that cannot be represented losslessly as UTF-8 are rejected, rather than encoded as empty or lossy replacements. Resolved path fields must not include the absolute workspace directory.
 - Relations include both authored edges and generated inverse edges. Exclude `user_created`, display labels, and cached target IDs. Identical effective tuples contribute once. An edge change can therefore change both endpoint records.
-- Contract bindings encode targets and exclude cached referenced-file content hashes.
+- Contract bindings and references encode targets in separate collections and exclude cached referenced-file content hashes.
+- Version 2 adds Contract References. Consumers MUST invalidate version-1 revision and element-fingerprint caches when upgrading.
 - Preserve the parser's stored content, including ontology/shapes blocks and concept-reference content. Apply no further whitespace removal, trimming, Markdown rewriting, or RDF canonicalization.
 - Content comparison policies that strip whitespace do not define this projection: `"a b"` and `"ab"` remain distinct content. Formatting retained by the parser affects the revision; formatting discarded during parsing does not.
 

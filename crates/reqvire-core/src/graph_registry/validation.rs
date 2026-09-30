@@ -35,6 +35,190 @@ impl GraphRegistry {
         Ok(errors)
     }
 
+    /// Validate informational contract edges independently from fulfillment edges.
+    pub(crate) fn validate_contract_references(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        let mut errors = Vec::new();
+        let mut nodes: Vec<_> = self.nodes.values().collect();
+        nodes.sort_by_key(|node| &node.element.identifier);
+        for node in nodes {
+            let element = &node.element;
+            let invalid = |message: String| {
+                ReqvireError::InvalidContractReference(format!(
+                    "Element '{}' (file: {}): {message}",
+                    element.name, element.file_path
+                ))
+            };
+            if !element.contract_references.is_empty() && !element.contract_bindings.is_empty() {
+                errors.push(invalid("Contract Bindings and Contract References cannot coexist on the same element, including when targets differ".into()));
+            }
+            let mut seen = FxHashSet::default();
+            for reference in &element.contract_references {
+                if !element.element_type.is_requirement() {
+                    errors.push(invalid(
+                        "Only requirements may author Contract References".into(),
+                    ));
+                    break;
+                }
+                let crate::element::ContractBindingTarget::ElementIdentifier(identifier) =
+                    &reference.target
+                else {
+                    errors.push(invalid(
+                        "Contract References require element identifiers".into(),
+                    ));
+                    continue;
+                };
+                if !seen.insert(identifier) {
+                    errors.push(invalid(format!(
+                        "Duplicate Contract References target '{identifier}'"
+                    )));
+                }
+                if element
+                    .relations
+                    .iter()
+                    .any(|relation| relation.target.link.as_str() == identifier)
+                {
+                    errors.push(invalid(format!(
+                        "Target '{identifier}' appears in both Relations and Contract References"
+                    )));
+                }
+                match self.get_element(identifier) {
+                    None => errors.push(invalid(format!(
+                        "Missing Contract References target '{identifier}'"
+                    ))),
+                    Some(target) if !target.element_type.is_requirement_contract() => {
+                        errors.push(invalid(format!(
+                            "Contract References target '{}' must be a requirement-owned contract",
+                            target.name
+                        )));
+                    }
+                    Some(target) if self.get_requirement_contract_owner(identifier).is_none() => {
+                        let owners = self
+                            .get_contract_owners(identifier)
+                            .iter()
+                            .filter_map(|id| self.get_element(id))
+                            .map(|owner| {
+                                format!("'{}' ({})", owner.name, owner.element_type.as_str())
+                            })
+                            .collect::<Vec<_>>();
+                        let owners = if owners.is_empty() {
+                            "none".to_string()
+                        } else {
+                            owners.join(", ")
+                        };
+                        errors.push(invalid(format!(
+                            "Contract References target '{}' ({identifier}) must have exactly one requirement owner; found: {owners}",
+                            target.name
+                        )));
+                    }
+                    Some(_) => {}
+                }
+            }
+        }
+        errors.extend(self.validate_contract_reference_cycles());
+        Ok(errors)
+    }
+
+    /// Content dependency direction is consumer -> contract owner and child -> parent.
+    /// This graph validates references; it is not an implementation coverage graph.
+    fn validate_contract_reference_cycles(&self) -> Vec<ReqvireError> {
+        let mut dependencies: BTreeMap<String, BTreeMap<String, String>> = self
+            .nodes
+            .values()
+            .filter(|node| node.element.element_type.is_requirement())
+            .map(|node| (node.element.identifier.clone(), BTreeMap::new()))
+            .collect();
+        let requirement_ids: BTreeSet<_> = dependencies.keys().cloned().collect();
+        let mut references = BTreeSet::new();
+        for (id, edges) in &mut dependencies {
+            let element = &self.nodes[id].element;
+            for relation in &element.relations {
+                if relation.relation_type.name == "derivedFrom" {
+                    if let LinkType::Identifier(parent) = &relation.target.link {
+                        if requirement_ids.contains(parent) {
+                            edges.insert(parent.clone(), "parent requirement".to_string());
+                        }
+                    }
+                }
+            }
+            for (kind, entries) in [
+                ("Contract Bindings", &element.contract_bindings),
+                ("Contract References", &element.contract_references),
+            ] {
+                for entry in entries {
+                    let crate::element::ContractBindingTarget::ElementIdentifier(contract) =
+                        &entry.target
+                    else {
+                        continue;
+                    };
+                    let owners = self.get_defining_requirements(contract);
+                    if let [owner] = owners.as_slice() {
+                        edges.insert(owner.clone(), format!("{kind}: {contract}"));
+                        if kind == "Contract References" {
+                            references.insert((id.clone(), owner.clone()));
+                        }
+                    }
+                }
+            }
+        }
+
+        let mut cycles = BTreeSet::new();
+        for (source, owner) in references {
+            // A reference closes a cycle exactly when its owner can already reach
+            // its consumer. Search per reference so a different cycle in the same
+            // component cannot hide this edge behind a completed DFS branch.
+            let mut previous = BTreeMap::from([(owner.clone(), None)]);
+            let mut pending = std::collections::VecDeque::from([owner.clone()]);
+            while let Some(current) = pending.pop_front() {
+                if current == source {
+                    break;
+                }
+                if let Some(edges) = dependencies.get(&current) {
+                    for next in edges.keys() {
+                        if !previous.contains_key(next) {
+                            previous.insert(next.clone(), Some(current.clone()));
+                            pending.push_back(next.clone());
+                        }
+                    }
+                }
+            }
+            if !previous.contains_key(&source) {
+                continue;
+            }
+            let mut cycle = vec![source.clone()];
+            let mut current = source;
+            while let Some(Some(parent)) = previous.get(&current) {
+                cycle.push(parent.clone());
+                current.clone_from(parent);
+            }
+            cycle.reverse();
+            // Rotate the open cycle to its smallest identifier, then close it.
+            // Multiple reference edges in the same cycle produce one diagnostic.
+            let start = cycle
+                .iter()
+                .enumerate()
+                .min_by_key(|(_, id)| *id)
+                .map_or(0, |(index, _)| index);
+            cycle.rotate_left(start);
+            cycle.push(cycle[0].clone());
+            cycles.insert(cycle);
+        }
+        cycles
+            .into_iter()
+            .map(|cycle| {
+                let mut description = cycle[0].clone();
+                for edge in cycle.windows(2) {
+                    description.push_str(&format!(
+                        " -[{}]-> {}",
+                        dependencies[&edge[0]][&edge[1]], edge[1]
+                    ));
+                }
+                ReqvireError::CircularDependencyError(format!(
+                    "Contract References dependency cycle: {description}"
+                ))
+            })
+            .collect()
+    }
+
     /// Validates relations for target existence and element type compatibility.
     pub(super) fn validate_relations(
         &self,
@@ -324,6 +508,8 @@ impl GraphRegistry {
                 &mut errors,
             );
         }
+
+        errors.extend(self.validate_requirement_fulfillment_cycles());
 
         // Check for missing requirement parent relations.
         for element_node in &sorted_nodes {
@@ -1935,17 +2121,12 @@ impl GraphRegistry {
                     continue;
                 }
 
-                // Use relation metadata to traverse in canonical direction only
-                let should_traverse = if let Some(_opposite) = relation.relation_type.opposite {
-                    // For bidirectional relations, only traverse in one canonical direction
-                    // to avoid detecting the same logical cycle twice
-                    // Traverse if this relation type is "lexicographically smaller" than its opposite
-                    // or if this is the primary direction for this relation type
-                    relation.relation_type.name < relation.relation_type.opposite.unwrap_or("")
-                } else {
-                    // For unidirectional relations, always traverse
-                    true
-                };
+                // Traverse unidirectional relations, or the lexicographically smaller
+                // direction of a bidirectional pair, so each logical cycle is visited once.
+                let should_traverse = relation
+                    .relation_type
+                    .opposite
+                    .is_none_or(|opposite| relation.relation_type.name < opposite);
 
                 if should_traverse {
                     if let Some(target_element) = self.get_element(target_id) {

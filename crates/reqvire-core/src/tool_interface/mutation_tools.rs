@@ -1,6 +1,6 @@
 use super::*;
 
-pub(crate) fn add_element_tool(
+pub fn add_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -19,7 +19,7 @@ pub(crate) fn add_element_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn remove_element_tool(
+pub fn remove_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -37,7 +37,7 @@ pub(crate) fn remove_element_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn move_element_tool(
+pub fn move_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -58,7 +58,7 @@ pub(crate) fn move_element_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn rename_element_tool(
+pub fn rename_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -77,7 +77,7 @@ pub(crate) fn rename_element_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn merge_elements_tool(
+pub fn merge_elements_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -93,7 +93,7 @@ pub(crate) fn merge_elements_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn move_file_tool(
+pub fn move_file_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -106,13 +106,15 @@ pub(crate) fn move_file_tool(
         excluded_filename_patterns,
         &workspace_root,
         &workspace_root,
-        bool_arg(args, "dry_run", false),
-        bool_arg(args, "squash", false),
+        crud::MoveFileOptions {
+            dry_run: bool_arg(args, "dry_run", false),
+            squash: bool_arg(args, "squash", false),
+        },
     )?;
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn move_folder_tool(
+pub fn move_folder_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -129,7 +131,7 @@ pub(crate) fn move_folder_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn link_tool(
+pub fn link_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -165,7 +167,7 @@ pub(crate) fn link_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn unlink_tool(
+pub fn unlink_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -180,7 +182,7 @@ pub(crate) fn unlink_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn relink_tool(
+pub fn relink_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -197,7 +199,7 @@ pub(crate) fn relink_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn move_asset_tool(
+pub fn move_asset_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -212,7 +214,7 @@ pub(crate) fn move_asset_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn remove_asset_tool(
+pub fn remove_asset_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {

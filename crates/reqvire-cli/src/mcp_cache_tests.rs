@@ -11,22 +11,22 @@ const OTHER: &str = include_str!("../../../tests/test-cache-integration/fixtures
 
 fn isolated(name: &str, test: impl Future<Output = ()>) {
     if std::env::var("REQVIRE_MCP_CACHE_TEST_CHILD").as_deref() == Ok(name) {
-        let directory = tempfile::tempdir().unwrap();
-        std::env::set_current_dir(directory.path()).unwrap();
+        let directory = tempfile::tempdir().expect("create temporary test workspace");
+        std::env::set_current_dir(directory.path()).expect("change test working directory");
         assert!(Command::new("git")
             .args(["init", "-q"])
             .status()
-            .unwrap()
+            .expect("run test subprocess")
             .success());
-        std::fs::write("Model.md", MODEL).unwrap();
+        std::fs::write("Model.md", MODEL).expect("write test fixture");
         tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
-            .unwrap()
+            .expect("build test configuration")
             .block_on(test);
         return;
     }
-    let mut child = Command::new(std::env::current_exe().unwrap())
+    let mut child = Command::new(std::env::current_exe().expect("locate test executable"))
         .args([
             "--exact",
             &format!("mcp::cache_correctness_tests::{name}"),
@@ -36,16 +36,16 @@ fn isolated(name: &str, test: impl Future<Output = ()>) {
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .spawn()
-        .unwrap();
+        .expect("spawn isolated test process");
     let deadline = Instant::now() + Duration::from_secs(20);
-    while child.try_wait().unwrap().is_none() {
+    while child.try_wait().expect("check child test status").is_none() {
         if Instant::now() >= deadline {
-            child.kill().unwrap();
+            child.kill().expect("terminate timed-out child test");
             panic!("MCP regression exceeded deadline");
         }
         std::thread::sleep(Duration::from_millis(10));
     }
-    let output = child.wait_with_output().unwrap();
+    let output = child.wait_with_output().expect("collect child test output");
     assert!(
         output.status.success(),
         "{}\n{}",
@@ -66,8 +66,8 @@ fn server(fail_refresh: bool) -> (ReqvireMcpServer, Arc<AtomicUsize>, Arc<Atomic
     // Simulate an already outstanding refresh diagnostic. Any hook invocation
     // would clear it on success, so we can observe an incorrect gate directly.
     let diagnostic = Arc::new(AtomicBool::new(true));
-    let hook_calls = calls.clone();
-    let hook_diagnostic = diagnostic.clone();
+    let hook_calls = Arc::clone(&calls);
+    let hook_diagnostic = Arc::clone(&diagnostic);
     let hook: PostWriteHook = Arc::new(move || {
         hook_calls.fetch_add(1, Ordering::SeqCst);
         hook_diagnostic.store(fail_refresh, Ordering::SeqCst);
@@ -87,7 +87,7 @@ fn server(fail_refresh: bool) -> (ReqvireMcpServer, Arc<AtomicUsize>, Arc<Atomic
             false,
             &reqvire::exclusions::ExclusionSetBuilder::new()
                 .build()
-                .unwrap(),
+                .expect("build test configuration"),
             Arc::new(Mutex::new(())),
             Some(hook),
         ),
@@ -97,7 +97,7 @@ fn server(fail_refresh: bool) -> (ReqvireMcpServer, Arc<AtomicUsize>, Arc<Atomic
 }
 fn add(content: &str, dry_run: bool) -> Value {
     json!({"name": "reqvire.add_element", "arguments": {
-        "file": "Model.md", "content": content.split_once("# Elements\n\n").unwrap().1, "dry_run": dry_run,
+        "file": "Model.md", "content": content.split_once("# Elements\n\n").expect("expected fixture to contain an Elements header").1, "dry_run": dry_run,
     }})
 }
 
@@ -106,12 +106,15 @@ case!(rejected_core_mutation_does_not_invoke_refresh_hook, {
     let result = server
         .call_handler("tools/call", add(MODEL, false), true)
         .await
-        .unwrap();
+        .expect("execute test MCP request");
     assert_eq!(
         result["isError"], true,
         "must exercise tool rejection inside JSON-RPC success"
     );
-    assert_eq!(std::fs::read_to_string("Model.md").unwrap(), MODEL);
+    assert_eq!(
+        std::fs::read_to_string("Model.md").expect("read generated test file"),
+        MODEL
+    );
     assert_eq!(
         calls.load(Ordering::SeqCst),
         0,
@@ -132,7 +135,7 @@ case!(rejected_tool_error_is_not_replaced_by_refresh_error, {
         result.is_ok(),
         "rejected mutation was misreported as succeeded-but-refresh-failed: {result:?}"
     );
-    assert_eq!(result.unwrap()["isError"], true);
+    assert_eq!(result.expect("add: expected success")["isError"], true);
     assert_eq!(calls.load(Ordering::SeqCst), 0);
 });
 
@@ -143,7 +146,7 @@ case!(
         let result = server
             .call_handler("tools/call", add(MODEL, false), true)
             .await
-            .unwrap();
+            .expect("execute test MCP request");
         assert_eq!(result["isError"], true);
         assert!(
             diagnostic.load(Ordering::SeqCst),
@@ -157,9 +160,12 @@ case!(preview_preserves_sources_and_refresh_diagnostic, {
     let result = server
         .call_handler("tools/call", add(OTHER, true), true)
         .await
-        .unwrap();
+        .expect("execute test MCP request");
     assert!(!result["isError"].as_bool().unwrap_or(false));
-    assert_eq!(std::fs::read_to_string("Model.md").unwrap(), MODEL);
+    assert_eq!(
+        std::fs::read_to_string("Model.md").expect("read generated test file"),
+        MODEL
+    );
     assert_eq!(calls.load(Ordering::SeqCst), 0);
     assert!(diagnostic.load(Ordering::SeqCst));
 });
@@ -185,16 +191,16 @@ case!(
         let result = server
             .call_handler("tools/call", add(OTHER, false), true)
             .await
-            .unwrap();
+            .expect("execute test MCP request");
         assert!(!result["isError"].as_bool().unwrap_or(false));
         assert!(std::fs::read_to_string("Model.md")
-            .unwrap()
+            .expect("read generated test file")
             .contains("Other Subject"));
         assert_eq!(calls.load(Ordering::SeqCst), 1);
         assert!(!diagnostic.load(Ordering::SeqCst));
         let read = server.call_handler("tools/call", json!({"name": "reqvire.semantic.sparql", "arguments": {
         "query": "ASK { ?s <https://www.reqvire.org/ontology#elementName> \"Other Subject\" }"
-    }}), false).await.unwrap();
+    }}), false).await.expect("execute test MCP request");
         assert_eq!(read["structuredContent"]["boolean"], true);
     }
 );
@@ -207,11 +213,11 @@ case!(
             .call_handler("tools/call", add(OTHER, false), true)
             .await;
         assert!(result
-            .unwrap_err()
+            .expect_err("expected the operation to fail")
             .message
             .contains("mutation succeeded but Explorer runtime refresh failed"));
         assert!(std::fs::read_to_string("Model.md")
-            .unwrap()
+            .expect("read generated test file")
             .contains("Other Subject"));
         assert_eq!(calls.load(Ordering::SeqCst), 1);
         assert!(diagnostic.load(Ordering::SeqCst));
@@ -224,37 +230,42 @@ case!(read_during_write_gate_cannot_publish_partial_persistence, {
     server
         .call_handler("tools/call", request.clone(), false)
         .await
-        .unwrap();
+        .expect("execute test MCP request");
     let gate = server.write_lock.lock().await;
     // Controlled intermediate state of a write holding the same gate used by MCP.
     std::fs::write(
         "Model.md",
         MODEL.replace("Cache Subject", "Partial Subject"),
     )
-    .unwrap();
+    .expect("write test fixture");
     let mut read = Box::pin(server.call_handler("tools/call", request.clone(), false));
     let first_poll = read.as_mut().poll(&mut Context::from_waker(Waker::noop()));
     let pending = first_poll.is_pending();
     let safe = match first_poll {
         Poll::Pending => true,
         Poll::Ready(result) => {
-            let result = result.unwrap();
+            let result = result.expect("add: expected success");
             !result.to_string().contains("Partial Subject")
                 && result.to_string().contains("Cache Subject")
         }
     };
-    std::fs::write("Model.md", MODEL.replace("Cache Subject", "Final Subject")).unwrap();
+    std::fs::write("Model.md", MODEL.replace("Cache Subject", "Final Subject"))
+        .expect("write test fixture");
     reqvire::model_cache::invalidate();
     drop(gate);
     // Complete the queued read before issuing another one: Tokio's fair mutex
     // otherwise reserves the gate for this unpolled future indefinitely.
     if pending {
-        assert!(read.await.unwrap().to_string().contains("Final Subject"));
+        assert!(read
+            .await
+            .expect("add: expected success")
+            .to_string()
+            .contains("Final Subject"));
     }
     let after = server
         .call_handler("tools/call", request, false)
         .await
-        .unwrap();
+        .expect("execute test MCP request");
     assert!(after.to_string().contains("Final Subject"));
     assert!(
         safe,

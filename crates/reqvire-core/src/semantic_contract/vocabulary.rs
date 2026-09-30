@@ -204,7 +204,7 @@ pub(super) fn to_reqvire_projection_term(
     }
 }
 
-pub(super) fn to_reqvire_construct_family(
+pub(super) const fn to_reqvire_construct_family(
     family: constructs::OntologyConstructFamily,
 ) -> OntologyConstructFamily {
     match family {
@@ -231,7 +231,7 @@ pub(super) fn to_reqvire_construct_family(
     }
 }
 
-pub(super) fn to_reqvire_construct_kind(
+pub(super) const fn to_reqvire_construct_kind(
     kind: constructs::OntologyConstructKind,
 ) -> OntologyConstructKind {
     match kind {
@@ -260,7 +260,7 @@ pub(super) fn to_reqvire_construct_kind(
     }
 }
 
-pub(super) fn to_reqvire_property_characteristic(
+pub(super) const fn to_reqvire_property_characteristic(
     characteristic: constructs::OntologyPropertyCharacteristic,
 ) -> OntologyPropertyCharacteristic {
     match characteristic {
@@ -288,7 +288,7 @@ pub(super) fn to_reqvire_property_characteristic(
     }
 }
 
-pub(super) fn to_reqvire_restriction_kind(
+pub(super) const fn to_reqvire_restriction_kind(
     restriction: constructs::OntologyRestrictionKind,
 ) -> OntologyRestrictionKind {
     match restriction {
@@ -316,7 +316,7 @@ pub(super) fn to_reqvire_restriction_kind(
     }
 }
 
-pub(super) fn to_reqvire_class_expression_kind(
+pub(super) const fn to_reqvire_class_expression_kind(
     class_expression: constructs::OntologyClassExpressionKind,
 ) -> OntologyClassExpressionKind {
     match class_expression {
@@ -330,7 +330,7 @@ pub(super) fn to_reqvire_class_expression_kind(
     }
 }
 
-pub(super) fn to_reqvire_shape_overlay_kind(
+pub(super) const fn to_reqvire_shape_overlay_kind(
     overlay: constructs::OntologyShapeOverlayKind,
 ) -> OntologyShapeOverlayKind {
     match overlay {

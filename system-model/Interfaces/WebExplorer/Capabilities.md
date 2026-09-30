@@ -36,7 +36,6 @@ Implementation details shall follow the associated contract specifications.
   * [Two-Pass Validation Behavior](../../Operations/Validation/Behaviors.md#two-pass-validation-behavior)
   * [Validation Error Reporting Behavior](../../Operations/Validation/Behaviors.md#validation-error-reporting-behavior)
   * [Explorer Serve Pipeline Specification](Specifications.md#explorer-serve-pipeline-specification)
-  * [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
 
 #### Relations
   * definedBy: [Serve Command Contract Specification](Specifications.md#serve-command-contract-specification)
@@ -259,7 +258,7 @@ The Ontologies view shall:
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
   * [Ontology Projection Subgraph Materialization Specification](../../Reports/ModelReports/Specifications.md#ontology-projection-subgraph-materialization-specification)
 
@@ -285,10 +284,11 @@ Detailed semantic-index, source-traceability, projection-subgraph, SHACL slot/fa
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Ontology Construct Classification Specification](../../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
 
 #### Relations
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
   * definedBy: [OWL Semantic Ontology Projection Contract Specification](Specifications.md#owl-semantic-ontology-projection-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
@@ -305,6 +305,8 @@ Construct grouping shall cover equivalence groups, inverse properties, property-
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
+  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * definedBy: [Ontology Construct Grouping Contract Specification](Specifications.md#ontology-construct-grouping-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
@@ -321,6 +323,8 @@ Detailed domain/range aggregation, deduplicated relationship rendering, modal ev
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
+  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * definedBy: [Ontology Property-Centric Visualization Contract Specification](Specifications.md#ontology-property-centric-visualization-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
@@ -337,6 +341,8 @@ The symbol vocabulary shall define each symbol with its semantic meaning, raw Un
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
+  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * definedBy: [Ontology Symbol and Badge Vocabulary Contract Specification](Specifications.md#ontology-symbol-and-badge-vocabulary-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
@@ -399,6 +405,7 @@ The SPA Explorer shell shall:
   * type: requirement
 
 #### Contract Bindings
+  * [Contract Reference Evidence Projection Specification](../../Reports/ModelReports/Specifications.md#contract-reference-evidence-projection-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
 
 #### Relations
@@ -457,6 +464,63 @@ When an Explorer route identifies a model element, file, source page, or resourc
   * verifiedBy: [Explorer Route Identifier Resolution Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#explorer-route-identifier-resolution-verification)
 ---
 
+### Explorer Scoped Coverage
+
+When a user selects a coverage scope, the system SHALL consistently display its coverage summaries, evidence, gaps, and navigation counts.
+
+#### Details
+While displaying coverage, the system SHALL present capabilities in a parent-before-child hierarchy with roots and siblings ranked by coverage.
+
+When the available coverage panel width changes, the system SHALL adapt the row layout while retaining distinguishable hierarchy levels and aligned verification and implementation values.
+
+When a user selects a requirement name in coverage, the system SHALL open its element details with access to its implementation evidence.
+
+When a user expands a capability coverage row, the system SHALL reveal its attached requirement hierarchy.
+
+When a requirement specifies a capability and derives from a requirement displayed elsewhere, the system SHALL make its coverage details accessible within that capability's requirement disclosure.
+
+While displaying a terminal requirement, the system SHALL communicate its coverage through the row's status labels and retain its element-detail link.
+
+When a requirement has child requirements or binding consumers to inspect, the system SHALL provide a coverage disclosure control.
+
+While displaying verification coverage, the system SHALL label published coverage states as Verified, Partially verified, and Not verified.
+
+When displaying verification or implementation coverage on a requirement row, the system SHALL use the same colored bars, percentages, and counts as capability coverage rows.
+
+While displaying the coverage hierarchy, the system SHALL distinguish consecutive capability and requirement rows with alternating surface shades and separate rows through spacing and shading.
+
+When a user expands a requirement coverage row, the system SHALL present its immediate child requirements beneath that row and display requirements binding its owned contracts in the same context.
+
+When displaying requirement coverage details, the system SHALL distinguish immediate implementation dependencies from outstanding blockers using the shared coverage report.
+
+While displaying implementation coverage, the system SHALL present status and blocker counts beside the requirement.
+
+While demonstrating coverage in the showcase, the system SHALL use the same Coverage view and components as the Explorer with fixture data.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
+  * [Implementation Coverage Output Structure Specification](../../Reports/ModelReports/Specifications.md#implementation-coverage-output-structure-specification)
+
+#### Relations
+  * derivedFrom: [SPA Explorer Shell and Project Store](#spa-explorer-shell-and-project-store)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
+  * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
+  * satisfiedBy: [CoverageDrilldown.tsx](../../../explorer/design-system/product-patterns/reports/CoverageDrilldown.tsx)
+  * satisfiedBy: [ReportPatterns.tsx](../../../explorer/design-system/product-patterns/reports/ReportPatterns.tsx)
+  * satisfiedBy: [PaneControls.tsx](../../../explorer/design-system/product-patterns/side-pane/PaneControls.tsx)
+  * satisfiedBy: [MockShell.tsx](../../../explorer/design-system/showcase/MockShell.tsx)
+  * satisfiedBy: [ProductPatternsPage.tsx](../../../explorer/design-system/showcase/pages/ProductPatternsPage.tsx)
+  * satisfiedBy: [ExplorerSidePane.tsx](../../../explorer/src/components/ExplorerSidePane.tsx)
+  * satisfiedBy: [coverage.ts](../../../explorer/src/lib/coverage.ts)
+  * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
+  * satisfiedBy: [loadStore.ts](../../../explorer/src/store/loadStore.ts)
+  * satisfiedBy: [types.ts](../../../explorer/src/store/types.ts)
+  * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
+---
+
 ### Thesaurus View Generation
 
 The system shall expose a Thesaurus Explorer view during serve workflows that presents standalone native concept schemes and concepts as curated SKOS terminology instead of as ontology children or filesystem folders.
@@ -488,7 +552,7 @@ Detailed route data, left-pane behavior, flow/row rendering, Mermaid roll-up dia
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Trace Diagram Projection Data Contract Specification](../../Reports/ModelReports/Specifications.md#trace-diagram-projection-data-contract-specification)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 

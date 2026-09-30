@@ -98,7 +98,7 @@ pub fn external_materialization_metadata(
     })
 }
 
-pub(crate) fn materialized_external_subjects(block: &SemanticBlock) -> BTreeSet<String> {
+pub fn materialized_external_subjects(block: &SemanticBlock) -> BTreeSet<String> {
     block
         .quads
         .iter()
@@ -612,10 +612,12 @@ fn append_model_element_context_turtle(
     let subject = element_iri(element);
     append_model_element_identity_turtle(output, element, &subject);
     append_model_element_relations_turtle(output, element, registry, artifacts, mode, &subject);
+    append_contract_references_turtle(output, element, registry, artifacts, &subject);
     append_model_element_concept_references_turtle(output, element, registry, &subject);
 
     if !element.relations.is_empty()
         || !element.contract_bindings.is_empty()
+        || !element.contract_references.is_empty()
         || !element.concept_references.is_empty()
     {
         output.push('\n');
@@ -760,6 +762,29 @@ fn append_model_element_relations_turtle(
     }
 }
 
+fn append_contract_references_turtle(
+    output: &mut String,
+    element: &Element,
+    registry: &GraphRegistry,
+    artifacts: &mut BTreeSet<String>,
+    subject: &str,
+) {
+    for reference in &element.contract_references {
+        let Some(target) = contract_bindings_target_iri(&reference.target, registry, artifacts)
+        else {
+            continue;
+        };
+        let identifier = reference.target.as_str();
+        append_model_relation_turtle(output, subject, "contract_references", &target, &identifier);
+        append_normalized_relation_family_turtle(output, subject, &target, "contract_references");
+        output.push_str(&format!(
+            "{} reqvire:contractReferencesTargetIdentifier {} .\n",
+            subject,
+            turtle_string(&identifier)
+        ));
+    }
+}
+
 fn append_model_element_concept_references_turtle(
     output: &mut String,
     element: &Element,
@@ -837,6 +862,8 @@ pub(super) fn build_generated_model_turtle(
                 relation.relation_type.name,
             );
         }
+
+        append_contract_references_turtle(&mut output, element, registry, &mut artifacts, &subject);
 
         for contract_bindings in &element.contract_bindings {
             let Some(target_iri) =
@@ -1489,7 +1516,7 @@ pub(super) fn turtle_prefix_is_reserved(declaration: &TurtlePrefixDeclaration) -
         || (declaration.source_rank == 0)
 }
 
-pub(super) fn turtle_prefix_source_kind(source_rank: u8) -> &'static str {
+pub(super) const fn turtle_prefix_source_kind(source_rank: u8) -> &'static str {
     match source_rank {
         0 => "built-in",
         10 => "authored-ontology",

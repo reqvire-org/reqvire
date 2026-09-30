@@ -93,7 +93,7 @@ mod tests {
         let b = SourcedQuad {
             source: "test".to_string(),
             quad: Quad {
-                subject: head.clone().into(),
+                subject: head.into(),
                 predicate: NamedNode::new(RDF_REST).expect(""),
                 object: Term::BlankNode(first.clone()),
                 graph_name: oxigraph::model::GraphName::DefaultGraph,
@@ -111,7 +111,7 @@ mod tests {
         let d = SourcedQuad {
             source: "test".to_string(),
             quad: Quad {
-                subject: first.clone().into(),
+                subject: first.into(),
                 predicate: NamedNode::new(RDF_REST).expect(""),
                 object: Term::BlankNode(second.clone()),
                 graph_name: oxigraph::model::GraphName::DefaultGraph,
@@ -129,7 +129,7 @@ mod tests {
         let f = SourcedQuad {
             source: "test".to_string(),
             quad: Quad {
-                subject: second.clone().into(),
+                subject: second.into(),
                 predicate: NamedNode::new(RDF_REST).expect(""),
                 object: Term::NamedNode(
                     oxigraph::model::NamedNode::new(crate::vocab::RDF_NIL).expect(""),

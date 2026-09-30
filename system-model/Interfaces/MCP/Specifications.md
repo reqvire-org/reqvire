@@ -70,6 +70,24 @@ Compatibility rules:
   * define: [MCP Compatibility Versioning](Tools.md#mcp-compatibility-versioning)
 ---
 
+### MCP Coverage Scope Selection Specification
+
+MCP request mapping of the shared coverage scope contract.
+
+#### Details
+- `reqvire.coverage` accepts an optional string argument `from` selecting a capability by its exact model element name.
+- Omitting `from` preserves whole-model behavior. Unknown names and names of non-capability elements produce a structured tool error; never silently return whole-model coverage for an invalid explicit selection.
+- The tool MUST invoke the shared coverage operation with the selector and current validated snapshot. It MUST not compute MCP-specific membership, coverage classifications, or aggregates.
+- For the same model snapshot and selector, the structured report payload MUST match other consumers of the shared operation, including scope metadata, evidence identifiers, and whole-model-only orphan semantics. Protocol envelope and revision metadata remain governed by existing MCP contracts.
+- Tool discovery MUST advertise the optional argument. Results need only contain the requested scope, without embedding every available scope.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Coverage Scope Selection](Tools.md#mcp-coverage-scope-selection)
+---
+
 ### MCP Model Evidence Tools Specification
 
 The MCP interface is expected to expose read-only model evidence tools grounded in Reqvire core reports and lookup behavior.
@@ -92,6 +110,8 @@ Model evidence tool behavior is inherited from reused Reqvire search, model, con
 - `not_have_relations`: optional comma-separated relation type list excluding elements that have all listed relations.
 - `has_contract_bindings`: optional boolean requiring at least one contract_bindings.
 - `filter_contract_bindings`: optional contract_bindings target glob.
+- `has_contract_references`: optional boolean requiring at least one Contract Reference.
+- `filter_contract_references`: optional glob matching a normalized Contract Reference target identifier. Invalid globs MUST produce a structured error; reference filters MUST combine conjunctively with other search filters.
 
 Governance metadata filters apply to effective governance metadata values and exclude non-governance-bearing elements when active. Successful `reqvire.search` structured results include effective governance metadata for capability and requirement element evidence.
 
@@ -243,7 +263,7 @@ Prompt capability behavior:
 Prompt set:
 - `reqvire.semantic.query` guides ontology-aware SPARQL query construction.
 - `reqvire.semantic.verification_search` guides semantic verification counts and evidence lookup.
-- `reqvire.semantic.contract_context_search` guides semantic-contract and contract bindings search.
+- `reqvire.semantic.contract_context_search` guides semantic-contract and contract dependency search.
 - `reqvire.semantic.author_ontology_contract` guides ontology and semantic-contract authoring with semantic vocabulary evidence.
 - `reqvire.workflow.explore_model` guides regular read-only Reqvire model exploration.
 - `reqvire.workflow.plan_change` guides model and implementation change planning.
@@ -257,26 +277,28 @@ Prompt set:
 - `reqvire.workflow.verify_coverage` guides validation, lint, coverage, and verification trace review.
 
 Prompt content rules:
+- Contract dependency guidance MUST follow the Contract Reference Semantics Specification referenced by the owning requirement. It MUST identify Contract Bindings as shared implementation obligations and Contract References as content dependencies, with both propagating change impact and only binding consumers contributing to owner fulfillment.
+- Exploration, authoring, refactoring, task-generation, change-impact, semantic contract-context, model-quality, and coverage prompts MUST inspect both dependency kinds. Authoring and refactoring guidance MUST explain `referenceContract`, section exclusivity, acyclic dependencies, and placement by implementation responsibility. Coverage guidance MUST distinguish implementation-terminal requirements from verification leaves and exclude references from fulfillment.
 - Semantic prompts direct clients to discover prefixes and vocabulary before writing SPARQL.
 - Semantic prompts reference `reqvire.semantic.vocabulary`, `reqvire.semantic.prefixes`, and `reqvire.semantic.sparql`.
 - Semantic prompts state that `include_external` exposes only the used external subset and is not a way to browse or dump raw full external ontology dependencies.
 - Ontology/semantic-contract authoring prompts require layer decisions between native concepts, ontology, requirements, requirement-owned contracts, and semantic contracts before edits are proposed.
 - Ontology/semantic-contract authoring prompts require ontology boundary checks for `ontology_base`, `ontology_prefix`, explicit Turtle prefixes, `use`/`usedBy`, `constrain`/`constrainedBy`, and SHACL-vs-OWL ownership.
 - Regular workflow prompts reference non-semantic tools such as workspace status, search, read element, model, collect, lint, coverage, and traces.
-- Implementation-task prompts require change-impact buckets, downstream collection from `impact_scope[]`, governance metadata (`status`, `priority`, `risk`, `owner`), requirement implementation links, verification evidence links, and contract-binding consumers to be included in task planning. They require Reqvire command evidence to be preferred over raw Markdown scanning and require task plans to separate new requirements, modified requirements, affected reusable contracts, affected verifications, and final validation/evidence updates.
+- Implementation-task prompts require change-impact buckets, downstream collection from `impact_scope[]`, governance metadata (`status`, `priority`, `risk`, `owner`), requirement implementation links, verification evidence links, and binding and reference consumers to be included in task planning. They require Reqvire command evidence to be preferred over raw Markdown scanning and require task plans to separate new requirements, modified requirements, affected reusable contracts, affected verifications, and final validation/evidence updates.
 - Capability/requirement authoring prompts distinguish capabilities from requirements, require EARS-style implementable obligations for requirements, preserve `specify`/`specifiedBy`, `definedBy`/`define`, concept references, semantic contracts, and verification expectations. They require submodel inspection before capability-root selection and forbid adding governance metadata unless the user, source material, or existing parent context explicitly calls for authored values.
 - Verification authoring prompts require verification-objective parents, concrete verification types, `verify`/`verifiedBy` requirement targets, evidence-backed `satisfiedBy` rules, leaf-requirement rollup, and alignment between verification criteria and actual tests or evidence.
-- Model-structure refactor prompts require intent preservation, contract extraction, containment checks, submodel boundary review, contract-bindings replacement for cross-boundary reuse, and validation in slices. They require cross-subgraph dependency visibility to be preserved through explicit replacements such as contract bindings, concept references, semantic-contract relations, or local requirement-owned contracts.
+- Model-structure refactor prompts require intent preservation, contract extraction, containment checks, submodel boundary review, responsibility-based binding or reference replacements for cross-boundary reuse, and validation in slices. They require cross-subgraph dependency visibility to be preserved through explicit replacements such as contract bindings, contract references, concept references, semantic-contract relations, or local requirement-owned contracts.
 - Change-impact audit prompts reference change-impact analysis and require direct changes, propagated impacts, invalidated verifications, and no-update decisions to be reported separately.
 - Change-impact audit prompts instruct clients to state the comparison base; analyze the structured `added[]`, `changed[]`, `removed[]`, `relocated[]`, `impact_scope[]`, and `invalidated_verifications[]` buckets; and treat `impact_scope[]` as the high-level affected-area summary.
 - Change-impact audit prompts instruct clients to collect downstream from each impact-scope root so descendants are not skipped.
-- Change-impact audit prompts include change-propagation rules for parent-child hierarchy, capability-to-requirement review, requirement-to-verification invalidation, satisfiedBy evidence review, verification-only changes, and contract-binding consumers.
-- Change-impact audit prompts include review of impacted documentation or assistant-guidance artifacts bound to changed specifications.
+- Change-impact audit prompts include change-propagation rules for parent-child hierarchy, capability-to-requirement review, requirement-to-verification invalidation, satisfiedBy evidence review, verification-only changes, and binding and reference consumers.
+- Change-impact audit prompts include review of impacted documentation or assistant-guidance artifacts referencing changed specifications.
 - Concept-authoring prompts require native `concept-scheme`/`concept` authoring, unique concept namespaces, SKOS taxonomy/mapping rules, concept-reference consumers, concept naming precedence, generated SKOS identity guardrails, and concept-vs-ontology decisions.
 - Ontology/semantic-contract authoring prompts forbid governance metadata and implementation satisfaction claims on ontology elements.
 - Model-quality audit prompts require findings to be separated into validation, coverage, lint/model-quality, containment/submodel, semantic-structure, safe auto-fix, and manual-review categories.
 - Prompt content warns clients not to rebuild semantic stores or infer prefixes from raw Turtle when MCP vocabulary/prefix tools are available.
-- Prompt content distinguishes capability, requirement, contract, ontology, semantic-contract, verification, and contract bindings semantics where relevant.
+- Prompt content distinguishes capability, requirement, contract, ontology, semantic-contract, verification, and both contract dependency kinds where relevant.
 
 Safety behavior:
 - Prompt listing and retrieval do not parse arbitrary files, execute shell commands, fetch remote URLs, or mutate workspace state.
@@ -851,7 +873,7 @@ Required workspace/session tools:
 - `reqvire.tool_contract`: reports supported tool names, request schemas, result schemas, versions, and Reqvire capability flags for the current startup mode.
 - `reqvire.model_revision`: reports the parsed-element fingerprint defined by the bound Model Revision Hash Specification, source file metadata, excluded-pattern metadata, and cache freshness. Cache freshness is determined separately from the parsed-element fingerprint.
 - `reqvire.model_revision.model_fingerprint`, `reqvire.workspace_status.model.fingerprint`, and existing semantic-tool `model_fingerprint` fields use the same shared model revision computation for the same snapshot.
-- Preserve existing field names and output shapes while migrating digest values from 16 to 64 lowercase hexadecimal characters. Clients discard cached 16-character revisions once when upgrading to canonical encoding `reqvire.model-revision.v1`; there is no old-to-new value mapping. The bound Model Revision Hash Specification defines the newly covered authored metadata and exclusions.
+- Preserve existing field names and output shapes while migrating digest values from 16 to 64 lowercase hexadecimal characters. Clients MUST discard cached revisions when upgrading to canonical encoding `reqvire.model-revision.v2`, including v1 SHA-256 revisions; v2 includes the distinct Contract References collection. There is no old-to-new value mapping. The bound Model Revision Hash Specification defines the newly covered authored metadata and exclusions.
 - The revision identifies the defined parsed-element projection. Page frontmatter, external referenced-file contents, Git state, and other excluded inputs may change without changing it; source cache freshness continues to follow the MCP Server State and Cache Specification.
 - This migration adds no per-element hash field, command, or argument. Explorer's manifest-derived revision keeps its existing wire-byte contract.
 

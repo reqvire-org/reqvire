@@ -7,7 +7,7 @@ export default function Verifications() {
       <h1 className="text-4xl font-bold text-zinc-900 mb-5">Verifications</h1>
       <p className="text-base text-zinc-600 leading-relaxed mb-10">
         Verification confirms that system behavior, implementation evidence, or
-        operational evidence satisfies the capabilities and requirements it is
+        operational evidence satisfies the requirements it is
         linked to. Reqvire keeps those verification links inside the same
         default semantic export as requirements, contracts, and implementation
         artifacts.
@@ -46,11 +46,13 @@ export default function Verifications() {
 
       <Section title="Two-Level Evidence Model">
         <p className="text-zinc-600 mb-4">
-          Capabilities and requirements link to concrete verification elements with{" "}
+          Requirements link to concrete verification elements with{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             verifiedBy
           </code>
-          . Each concrete verification must derive from a verification-objective parent.
+          . Capabilities receive verification coverage through requirement
+          roll-up, without direct verification links. Each concrete verification
+          must derive from a verification-objective parent.
           Evidence-backed concrete verification elements then link to concrete test or proof
           artifacts with{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
@@ -104,6 +106,23 @@ The system shall process data within 500ms.
         </p>
         <CodeBlock>{`reqvire coverage
 reqvire coverage --json`}</CodeBlock>
+      </Section>
+
+      <Section title="Scoped Verification Membership">
+        <p className="text-zinc-600 mb-4">
+          A capability scope includes a concrete verification when it targets
+          at least one requirement in that scope, including an intermediate
+          requirement. Verification objectives remain excluded. Membership is
+          determined by requirement targets, not by assigning the verification
+          to a capability owner.
+        </p>
+        <BulletList items={[
+          "A verification shared by requirements in several submodels appears in every relevant scope, once per scope and once in the whole model.",
+          "Scoped verification totals are therefore not necessarily additive.",
+          "Coverage is calculated against the full model before selecting subjects, so scoping preserves evidence and leaf classification.",
+          "A verification without a requirement target is an orphan. Orphans are reported only for the whole model; zero in a scoped report makes no claim about global orphans.",
+        ]} />
+        <CodeBlock>{`reqvire coverage --from "Alpha Root" --json`}</CodeBlock>
       </Section>
 
       <Section title="What Gets Flagged">

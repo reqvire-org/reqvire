@@ -101,12 +101,11 @@ Required Rust unit-test coverage:
 - Verify output metadata distinguishes seed, directly referenced, support, annotation, list-closure, and depth-boundary triples.
 - Verify the service returns generic RDF-native subset data without application source locations, element identifiers, graph-layer names, or presentation payloads.
 
-This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
-
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [mod.rs](../../../crates/o-kernel/src/subset/mod.rs)
   * verify: [Referenced Graph Subset Construction](../../Architecture/OntologyKernelRequirements.md#referenced-graph-subset-construction)
 ---
 

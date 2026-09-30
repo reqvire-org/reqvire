@@ -13,23 +13,24 @@ use crate::parser::extract_single_fenced_subsection;
 /// Returns (main_content, details_content) where:
 /// - main_content: Everything before the first "#### Details" header
 /// - details_content: Everything after "#### Details" header until the next #### section
-pub(crate) fn extract_content_parts(content: &str) -> (String, String) {
+pub fn extract_content_parts(content: &str) -> (String, String) {
     let details_marker = "#### Details";
-    if let Some(pos) = content.find(details_marker) {
-        let main = content[..pos].to_string();
-        let after_marker = pos + details_marker.len();
-        let rest = &content[after_marker..];
+    content.find(details_marker).map_or_else(
+        || (content.to_string(), String::new()),
+        |pos| {
+            let main = content[..pos].to_string();
+            let after_marker = pos + details_marker.len();
+            let rest = &content[after_marker..];
 
-        // Find end of details (next #### or end)
-        let details_end = rest.find("\n#### ").unwrap_or(rest.len());
+            // Find end of details (next #### or end)
+            let details_end = rest.find("\n#### ").unwrap_or(rest.len());
 
-        (main, rest[..details_end].to_string())
-    } else {
-        (content.to_string(), String::new())
-    }
+            (main, rest[..details_end].to_string())
+        },
+    )
 }
 
-pub(crate) fn extract_leading_prose(content: &str) -> String {
+pub fn extract_leading_prose(content: &str) -> String {
     let mut lines = Vec::new();
     for line in content.lines() {
         if line.trim_start().starts_with("#### ") {
@@ -41,37 +42,39 @@ pub(crate) fn extract_leading_prose(content: &str) -> String {
 }
 
 /// Merge additional content into the Details section of target content
-pub(crate) fn merge_content_into_details(target_content: &str, additional: &str) -> String {
+pub fn merge_content_into_details(target_content: &str, additional: &str) -> String {
     if additional.trim().is_empty() {
         return target_content.to_string();
     }
 
     let details_marker = "#### Details";
-    if let Some(pos) = target_content.find(details_marker) {
-        // Find end of existing details
-        let after_marker = pos + details_marker.len();
-        let rest = &target_content[after_marker..];
-        let details_end = rest
-            .find("\n#### ")
-            .map(|p| after_marker + p)
-            .unwrap_or(target_content.len());
+    target_content.find(details_marker).map_or_else(
+        || {
+            format!(
+                "{}\n#### Details\n{}",
+                target_content.trim_end(),
+                additional
+            )
+        },
+        |pos| {
+            // Find end of existing details
+            let after_marker = pos + details_marker.len();
+            let rest = &target_content[after_marker..];
+            let details_end = rest
+                .find("\n#### ")
+                .map(|p| after_marker + p)
+                .unwrap_or(target_content.len());
 
-        // Insert additional content at end of Details
-        let mut result = target_content[..details_end].to_string();
-        result.push_str(additional);
-        result.push_str(&target_content[details_end..]);
-        result
-    } else {
-        // No Details section - create one
-        format!(
-            "{}\n#### Details\n{}",
-            target_content.trim_end(),
-            additional
-        )
-    }
+            // Insert additional content at end of Details
+            let mut result = target_content[..details_end].to_string();
+            result.push_str(additional);
+            result.push_str(&target_content[details_end..]);
+            result
+        },
+    )
 }
 
-pub(crate) fn merge_ontology_blocks_into_target(
+pub fn merge_ontology_blocks_into_target(
     target_content: &str,
     target_element: &Element,
     source_elements: &[Element],
@@ -203,7 +206,7 @@ fn dedupe_turtle_block(block: &str) -> String {
     output.join("\n").trim_end().to_string()
 }
 
-pub(crate) fn replace_single_fenced_subsection(
+pub fn replace_single_fenced_subsection(
     content: &str,
     subsection: &str,
     replacement: &str,

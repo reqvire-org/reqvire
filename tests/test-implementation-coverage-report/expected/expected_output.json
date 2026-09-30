@@ -3,43 +3,111 @@
     "files": {
       "specifications/Requirements.md": [
         {
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 0,
+          "blocking_requirements": [],
+          "contributing_requirements": [],
           "coverage_source": "direct_satisfied",
+          "direct_evidence": [
+            "specifications/src/contract_consumer.rs"
+          ],
           "evidence": [
             "specifications/src/contract_consumer.rs"
           ],
           "identifier": "specifications/Requirements.md#contract-consumer-implemented",
+          "is_terminal": true,
           "name": "Contract Consumer Implemented"
         },
         {
-          "coverage_source": "contract_satisfied_via_contract_bindings",
-          "evidence": [
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 0,
+          "blocking_requirements": [],
+          "contributing_requirements": [
             "specifications/Requirements.md#contract-consumer-implemented"
           ],
+          "coverage_source": "contract_consumer_rollup",
+          "direct_evidence": [],
+          "evidence": [
+            "specifications/src/contract_consumer.rs"
+          ],
           "identifier": "specifications/Requirements.md#contract-owner",
+          "is_terminal": false,
           "name": "Contract Owner"
         },
         {
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 0,
+          "blocking_requirements": [],
+          "contributing_requirements": [],
           "coverage_source": "direct_satisfied",
+          "direct_evidence": [
+            "specifications/src/derived_child.rs"
+          ],
           "evidence": [
             "specifications/src/derived_child.rs"
           ],
           "identifier": "specifications/Requirements.md#derived-child-implemented",
+          "is_terminal": true,
           "name": "Derived Child Implemented"
         },
         {
-          "coverage_source": "contract_satisfied_via_child",
-          "evidence": [
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 0,
+          "blocking_requirements": [],
+          "contributing_requirements": [
             "specifications/Requirements.md#derived-child-implemented"
           ],
+          "coverage_source": "requirement_rollup",
+          "direct_evidence": [],
+          "evidence": [
+            "specifications/src/derived_child.rs"
+          ],
+          "identifier": "specifications/Requirements.md#derived-intermediate",
+          "is_terminal": false,
+          "name": "Derived Intermediate"
+        },
+        {
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 0,
+          "blocking_requirements": [],
+          "contributing_requirements": [
+            "specifications/Requirements.md#derived-intermediate"
+          ],
+          "coverage_source": "requirement_rollup",
+          "direct_evidence": [],
+          "evidence": [
+            "specifications/src/derived_child.rs"
+          ],
           "identifier": "specifications/Requirements.md#derived-parent",
+          "is_terminal": false,
           "name": "Derived Parent"
         },
         {
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 0,
+          "blocking_requirements": [],
+          "contributing_requirements": [],
           "coverage_source": "direct_satisfied",
+          "direct_evidence": [
+            "specifications/src/direct.rs"
+          ],
           "evidence": [
             "specifications/src/direct.rs"
           ],
           "identifier": "specifications/Requirements.md#direct-implemented",
+          "is_terminal": true,
           "name": "Direct Implemented"
         }
       ]
@@ -47,28 +115,62 @@
   },
   "summary": {
     "coverage_sources": {
-      "contract_satisfied_via_child": 1,
-      "contract_satisfied_via_contract_bindings": 1,
-      "direct_satisfied": 3
+      "combined_rollup": 0,
+      "contract_consumer_rollup": 1,
+      "direct_satisfied": 3,
+      "requirement_rollup": 2
     },
-    "covered_requirements": 5,
-    "implementation_coverage_percentage": 62.5,
+    "covered_requirements": 6,
+    "covered_terminal_requirements": 3,
+    "implementation_coverage_percentage": 75.0,
     "total_requirements_in_scope": 8,
-    "uncovered_requirements": 3
+    "total_terminal_requirements": 4,
+    "uncovered_requirements": 2,
+    "uncovered_terminal_requirements": 1
   },
   "uncovered_requirements": {
     "files": {
       "specifications/Requirements.md": [
         {
-          "identifier": "specifications/Requirements.md#derived-intermediate",
-          "name": "Derived Intermediate"
-        },
-        {
+          "aggregate_covered_terminal_requirements": 3,
+          "aggregate_leaf_requirements": 5,
+          "aggregate_terminal_requirements": 4,
+          "aggregate_verified_leaf_requirements": 0,
+          "blocking_requirements": [
+            "specifications/Requirements.md#uncovered-requirement"
+          ],
+          "contributing_requirements": [
+            "specifications/Requirements.md#contract-consumer-implemented",
+            "specifications/Requirements.md#contract-owner",
+            "specifications/Requirements.md#derived-parent",
+            "specifications/Requirements.md#direct-implemented",
+            "specifications/Requirements.md#uncovered-requirement"
+          ],
+          "coverage_source": "uncovered",
+          "direct_evidence": [],
+          "evidence": [
+            "specifications/src/contract_consumer.rs",
+            "specifications/src/derived_child.rs",
+            "specifications/src/direct.rs"
+          ],
           "identifier": "specifications/Requirements.md#root-requirement",
+          "is_terminal": false,
           "name": "Root Requirement"
         },
         {
+          "aggregate_covered_terminal_requirements": 0,
+          "aggregate_leaf_requirements": 1,
+          "aggregate_terminal_requirements": 1,
+          "aggregate_verified_leaf_requirements": 0,
+          "blocking_requirements": [
+            "specifications/Requirements.md#uncovered-requirement"
+          ],
+          "contributing_requirements": [],
+          "coverage_source": "uncovered",
+          "direct_evidence": [],
+          "evidence": [],
           "identifier": "specifications/Requirements.md#uncovered-requirement",
+          "is_terminal": true,
           "name": "Uncovered Requirement"
         }
       ]

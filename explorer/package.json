@@ -13,6 +13,7 @@
     "build:showcase": "npm run lint && npm run generate:icons && vite build --config design-system/vite.showcase.config.ts",
     "generate:adherence": "node scripts/generate-adherence-config.mjs",
     "generate:icons": "node scripts/generate-icons.mjs",
+    "generate:coverage-showcase": "python3 scripts/generate-coverage-showcase.py",
     "lint": "npm run lint:artifacts && npm run lint:adherence && npm run lint:style && npm run lint:css-ownership",
     "lint:artifacts": "node scripts/lint-generated-artifacts.mjs",
     "lint:adherence": "npm run generate:adherence && oxlint --deny-warnings --ignore-path=.oxlintignore --config .vite/_adherence.oxlintrc.json src design-system && node scripts/lint-product-pattern-boundaries.mjs",

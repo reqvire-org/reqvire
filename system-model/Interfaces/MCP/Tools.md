@@ -63,6 +63,8 @@ The system shall expose MCP protocol compatibility and Reqvire tool interface co
 The system shall expose MCP read tools that return model evidence needed by external tools and AI agents.
 
 #### Details
+WHEN a caller requests contract-reference filtering, the system SHALL apply the shared search presence and target-filter semantics.
+
 - The MCP interface shall expose read tools for authoritative Reqvire model evidence.
 - Model evidence tools shall support element lookup, model structure, containment, collection, submodel analysis, and split semantic export collection.
 - Semantic export tools shall be named under the `reqvire.semantic` namespace and shall expose separate read tools for ontology vocabulary, SHACL shapes, SKOS concepts, generated model facts, a combined graph wrapper, and the canonical layer-composed export operation.
@@ -77,7 +79,9 @@ The system shall expose MCP read tools that return model evidence needed by exte
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
+  * [SearchFiltering](../../Reports/ModelReports/SearchFiltering.md#searchfiltering)
+  * [Contract Reference Evidence Projection Specification](../../Reports/ModelReports/Specifications.md#contract-reference-evidence-projection-specification)
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
   * [Flexible Search Type Filtering Contract Specification](../../Reports/ModelReports/Specifications.md#flexible-search-type-filtering-contract-specification)
   * [Containment View Report Contract Specification](../../Reports/ModelReports/Specifications.md#containment-view-report-contract-specification)
@@ -104,7 +108,7 @@ Detailed engine, graph composition, graph-role metadata, query-form result shape
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Semantic Relation Family Projection Specification](../../Reports/ModelReports/Specifications.md#semantic-relation-family-projection-specification)
   * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
 
@@ -118,19 +122,24 @@ Detailed engine, graph composition, graph-role metadata, query-form result shape
 
 ### MCP Prompt Guidance
 
-The system shall expose MCP prompts that guide regular Reqvire workflows and semantic query construction.
+The system SHALL expose MCP prompts that guide regular Reqvire workflows and semantic query construction.
 
 #### Details
-- The MCP interface shall advertise the standard MCP prompts capability.
-- The MCP interface shall support `prompts/list` and `prompts/get` for Reqvire-authored prompt templates.
-- Prompt templates shall include regular Reqvire model exploration, change planning, implementation task generation, capability/requirement authoring, verification authoring/alignment, model-structure refactoring, change-impact audit, concept authoring, model-quality audit, and verification coverage review workflows.
-- Prompt templates shall include semantic query, semantic verification search, semantic contract-context search, and ontology/semantic-contract authoring workflows.
-- Semantic prompt templates shall direct clients to use `reqvire.semantic.vocabulary`, `reqvire.semantic.prefixes`, and `reqvire.semantic.sparql` for ontology-aware questions, and shall state that `include_external` exposes only the used external subset (`reqvire:external-used-subset`) rather than raw external dependency files.
-- Prompt templates shall be imported into Rust at build time and shall not be read from workspace source files at runtime.
-- Prompt retrieval shall not mutate the model or filesystem.
+- The MCP interface SHALL advertise the standard MCP prompts capability.
+- The MCP interface SHALL support `prompts/list` and `prompts/get` for Reqvire-authored prompt templates.
+- Prompt templates SHALL include regular Reqvire model exploration, change planning, implementation task generation, capability/requirement authoring, verification authoring/alignment, model-structure refactoring, change-impact audit, concept authoring, model-quality audit, and verification coverage review workflows.
+- Prompt templates SHALL include semantic query, semantic verification search, semantic contract-context search, and ontology/semantic-contract authoring workflows.
+- Semantic prompt templates SHALL direct clients to use `reqvire.semantic.vocabulary`, `reqvire.semantic.prefixes`, and `reqvire.semantic.sparql` for ontology-aware questions, and SHALL state that `include_external` exposes only the used external subset (`reqvire:external-used-subset`) rather than raw external dependency files.
+- Prompt templates SHALL be imported into Rust at build time and SHALL not be read from workspace source files at runtime.
+- Prompt retrieval SHALL not mutate the model or filesystem.
+
+When guiding contract authoring, refactoring, exploration, implementation planning, impact review, or coverage assessment, the system SHALL distinguish shared implementation obligations from content dependencies according to the referenced contract semantics.
 
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
 
 #### Relations
   * definedBy: [MCP Prompt Guidance Specification](Specifications.md#mcp-prompt-guidance-specification)
@@ -240,15 +249,18 @@ The system shall serialize mutation execution per workspace when the MCP transpo
 
 ### MCP Mutation Execution Flow
 
-The system shall execute MCP mutations through deterministic operation-specific preview and execution behavior backed by Reqvire core.
+The system SHALL execute MCP mutations through deterministic operation-specific preview and execution behavior backed by Reqvire core.
 
 #### Details
-Detailed preview, execution, diagnostics, changed-file reporting, affected-scope reporting, synchronization, and mutation-safety rules shall follow the associated specification.
+The system SHALL provide preview, execution, diagnostics, changed-file reporting, affected-scope reporting, synchronization, and mutation safety according to its mutation execution specification.
+
+When a client creates, removes, or relinks a Contract Reference, the system SHALL apply the shared reference mutation contract.
 
 #### Metadata
   * type: requirement
 
 #### Contract Bindings
+  * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
   * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
 
 #### Relations
@@ -357,9 +369,11 @@ The system shall expose MCP read tools for linting, coverage, verification trace
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
+  * [Implementation Coverage Output Structure Specification](../../Reports/ModelReports/Specifications.md#implementation-coverage-output-structure-specification)
+  * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
   * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
-  * [Requirement Implementation Coverage Logic Specification](../../Reports/ModelReports/Specifications.md#requirement-implementation-coverage-logic-specification)
+  * [Requirement Implementation Coverage Logic Specification](../../Implementation/Traceability/Specifications.md#requirement-implementation-coverage-logic-specification)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
   * [Resources Report Format Specification](../../Reports/ModelReports/Specifications.md#resources-report-format-specification)
   * [Impact Scope Computation Specification](../../Processing/ChangeImpact/Specifications.md#impact-scope-computation-specification)
@@ -372,6 +386,23 @@ The system shall expose MCP read tools for linting, coverage, verification trace
   * verifiedBy: [MCP Quality Traceability Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-quality-traceability-tools-verification)
 ---
 
+### MCP Coverage Scope Selection
+
+When a client selects a capability in a coverage tool request, the system SHALL return the shared coverage report for that capability subtree from the current validated model snapshot.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
+
+#### Relations
+  * derivedFrom: [MCP Quality Traceability Tools](#mcp-quality-traceability-tools)
+  * satisfiedBy: [definitions.rs](../../../crates/reqvire-core/src/tool_interface/definitions.rs)
+  * satisfiedBy: [dispatch.rs](../../../crates/reqvire-core/src/tool_interface/dispatch.rs)
+  * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
+---
+
 ### MCP Resource Interface
 
 The system shall expose MCP resources only as read-only, revision-tagged views of workspace, model, element, file, and report state.
@@ -382,7 +413,7 @@ Detailed resource listing, template, read, revision metadata, non-mutating behav
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Resources Report Format Specification](../../Reports/ModelReports/Specifications.md#resources-report-format-specification)
   * [Containment View Report Contract Specification](../../Reports/ModelReports/Specifications.md#containment-view-report-contract-specification)
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
@@ -529,7 +560,7 @@ Detailed schema-source, semantic evidence, mutation/error result, versioning, an
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
 
 #### Relations

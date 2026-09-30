@@ -1,14 +1,16 @@
 use super::formatting::format_identifier_markdown_link;
 use crate::element;
-use crate::element::ContractBindingTarget;
-use crate::graph_registry::GraphRegistry;
+use crate::error::ReqvireError;
+use crate::graph_registry::{GraphRegistry, RequirementDependencies};
 use crate::relation;
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::Serialize;
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct CoverageReport {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    scope: Option<CoverageScope>,
     summary: CoverageSummary,
     verified_leaf_requirements: RequirementsByFile,
     unverified_leaf_requirements: RequirementsByFile,
@@ -20,7 +22,7 @@ pub struct CoverageReport {
     capability_coverage: CapabilityCoverageByCapability,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct CoverageSummary {
     // Leaf requirements metrics
     total_leaf_requirements: usize,
@@ -46,11 +48,14 @@ struct CoverageSummary {
     total_requirements_in_scope: usize,
     covered_requirements: usize,
     uncovered_requirements: usize,
+    total_terminal_requirements: usize,
+    covered_terminal_requirements: usize,
+    uncovered_terminal_requirements: usize,
     implementation_coverage_percentage: f64,
     coverage_sources: CoverageSourceCounts,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone, Default)]
 struct VerificationTypeCounts {
     test: usize,
     formal_proof: usize,
@@ -59,14 +64,39 @@ struct VerificationTypeCounts {
     demonstration: usize,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone, Default)]
 struct CoverageSourceCounts {
     direct_satisfied: usize,
-    contract_satisfied_via_contract_bindings: usize,
-    contract_satisfied_via_child: usize,
+    requirement_rollup: usize,
+    contract_consumer_rollup: usize,
+    combined_rollup: usize,
 }
 
-#[derive(Serialize)]
+impl VerificationTypeCounts {
+    const fn record(&mut self, kind: &element::VerificationType) {
+        match kind {
+            element::VerificationType::Default | element::VerificationType::Test => self.test += 1,
+            element::VerificationType::FormalProof => self.formal_proof += 1,
+            element::VerificationType::Analysis => self.analysis += 1,
+            element::VerificationType::Inspection => self.inspection += 1,
+            element::VerificationType::Demonstration => self.demonstration += 1,
+        }
+    }
+}
+
+impl CoverageSourceCounts {
+    fn record(&mut self, source: &str) {
+        match source {
+            "direct_satisfied" => self.direct_satisfied += 1,
+            "requirement_rollup" => self.requirement_rollup += 1,
+            "contract_consumer_rollup" => self.contract_consumer_rollup += 1,
+            "combined_rollup" => self.combined_rollup += 1,
+            _ => {}
+        }
+    }
+}
+
+#[derive(Serialize, Clone)]
 struct CapabilityCoverageByCapability {
     capabilities: Vec<CapabilityCoverageDetails>,
 }
@@ -84,25 +114,30 @@ struct CapabilityCoverageDetails {
     local_covered_requirements: usize,
     aggregate_requirements: usize,
     aggregate_covered_requirements: usize,
+    local_terminal_requirements: usize,
+    local_covered_terminal_requirements: usize,
+    aggregate_terminal_requirements: usize,
+    aggregate_covered_terminal_requirements: usize,
+    implementation_covered: bool,
     implementation_coverage_percentage: f64,
     mark: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct RequirementsByFile {
     files: FxHashMap<String, Vec<RequirementDetails>>,
 }
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct VerificationsByFile {
     files: FxHashMap<String, Vec<VerificationDetails>>,
 }
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct CoveredRequirementsByFile {
-    files: FxHashMap<String, Vec<ImplementationCoveredRequirementDetails>>,
+    files: FxHashMap<String, Vec<ImplementationRequirementDetails>>,
 }
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct UncoveredRequirementsByFile {
-    files: FxHashMap<String, Vec<ImplementationUncoveredRequirementDetails>>,
+    files: FxHashMap<String, Vec<ImplementationRequirementDetails>>,
 }
 
 #[derive(Serialize, Clone)]
@@ -120,17 +155,56 @@ struct VerificationDetails {
 }
 
 #[derive(Serialize, Clone)]
-struct ImplementationCoveredRequirementDetails {
+struct ImplementationRequirementDetails {
     identifier: String,
     name: String,
     coverage_source: String,
+    is_terminal: bool,
+    aggregate_leaf_requirements: usize,
+    aggregate_verified_leaf_requirements: usize,
+    aggregate_terminal_requirements: usize,
+    aggregate_covered_terminal_requirements: usize,
+    direct_evidence: Vec<String>,
     evidence: Vec<String>,
+    contributing_requirements: Vec<String>,
+    blocking_requirements: Vec<String>,
 }
 
 #[derive(Serialize, Clone)]
-struct ImplementationUncoveredRequirementDetails {
-    identifier: String,
-    name: String,
+struct CoverageScope {
+    kind: &'static str,
+    capability_identifier: String,
+    capability_name: String,
+    capability_ids: BTreeSet<String>,
+    requirement_ids: BTreeSet<String>,
+    verification_ids: BTreeSet<String>,
+    orphaned_verifications_scope: &'static str,
+}
+
+/// Compact generated-store entry. Evidence stays in the shared whole-model records.
+#[derive(Serialize)]
+pub struct CoverageScopeSummary {
+    scope: CoverageScope,
+    summary: CoverageSummary,
+}
+
+fn retain_records<T>(files: &mut FxHashMap<String, Vec<T>>, keep: impl Fn(&T) -> bool) {
+    files.retain(|_, records| {
+        records.retain(&keep);
+        !records.is_empty()
+    });
+}
+
+fn record_count<T>(files: &FxHashMap<String, Vec<T>>) -> usize {
+    files.values().map(Vec::len).sum()
+}
+
+fn percentage(count: usize, total: usize) -> f64 {
+    if total == 0 {
+        0.0
+    } else {
+        round_to_two_decimals(count as f64 * 100.0 / total as f64)
+    }
 }
 
 /// Helper function to format an identifier as a markdown link
@@ -143,33 +217,166 @@ fn round_to_two_decimals(value: f64) -> f64 {
     (value * 100.0).round() / 100.0
 }
 
-fn find_directly_satisfied_descendant(
-    start_requirement: &str,
-    children_by_requirement: &FxHashMap<String, Vec<String>>,
-    direct_satisfaction: &FxHashMap<String, Vec<String>>,
-) -> Option<String> {
-    let mut stack: Vec<String> = children_by_requirement
-        .get(start_requirement)
-        .cloned()
-        .unwrap_or_default();
-
-    // DFS traversal with deterministic ordering (children vectors are pre-sorted).
-    while let Some(current) = stack.pop() {
-        if direct_satisfaction.contains_key(&current) {
-            return Some(current);
+impl CoverageReport {
+    /// Select subjects after whole-model evidence classification. No dependency graph is pruned.
+    pub fn with_scope(
+        self,
+        registry: &GraphRegistry,
+        name: Option<&str>,
+    ) -> Result<Self, ReqvireError> {
+        let Some(name) = name else {
+            return Ok(self);
+        };
+        let identifier = registry
+            .find_element_by_name(name)
+            .map_err(|error| match error {
+                ReqvireError::MissingElement(_) | ReqvireError::ElementNotFound(_) => {
+                    ReqvireError::ElementNotFound(format!("Coverage capability '{name}' not found"))
+                }
+                other => other,
+            })?;
+        let capability = registry
+            .get_element(&identifier)
+            .ok_or_else(|| ReqvireError::ElementNotFound(identifier.clone()))?;
+        if !matches!(capability.element_type, element::ElementType::Capability) {
+            return Err(ReqvireError::InvalidOperation(format!(
+                "Coverage scope '{name}' must be a capability"
+            )));
         }
-
-        if let Some(children) = children_by_requirement.get(&current) {
-            for child in children.iter().rev() {
-                stack.push(child.clone());
-            }
-        }
+        Ok(self.project_capability(registry, capability))
     }
 
-    None
-}
+    pub fn scope_index(&self, registry: &GraphRegistry) -> BTreeMap<String, CoverageScopeSummary> {
+        self.capability_coverage
+            .capabilities
+            .iter()
+            .filter_map(|row| {
+                let capability = registry.get_element(&row.identifier)?;
+                let report = self.clone().project_capability(registry, capability);
+                Some((
+                    row.identifier.clone(),
+                    CoverageScopeSummary {
+                        scope: report.scope?,
+                        summary: report.summary,
+                    },
+                ))
+            })
+            .collect()
+    }
 
-impl CoverageReport {
+    fn project_capability(
+        mut self,
+        registry: &GraphRegistry,
+        capability: &element::Element,
+    ) -> Self {
+        let (capability_ids, requirement_ids) =
+            super::submodels::capability_subtree_members(registry, &capability.identifier);
+        let verifications: Vec<_> = registry
+            .get_all_elements()
+            .into_iter()
+            .filter(|item| {
+                matches!(item.element_type, element::ElementType::Verification(_))
+                    && item.relations.iter().any(|rel| {
+                        rel.relation_type.name == "verify"
+                            && matches!(&rel.target.link,
+                    relation::LinkType::Identifier(id) if requirement_ids.contains(id))
+                    })
+            })
+            .collect();
+        let verification_ids: BTreeSet<_> = verifications
+            .iter()
+            .map(|item| item.identifier.clone())
+            .collect();
+        retain_records(&mut self.verified_leaf_requirements.files, |item| {
+            requirement_ids.contains(&item.identifier)
+        });
+        retain_records(&mut self.unverified_leaf_requirements.files, |item| {
+            requirement_ids.contains(&item.identifier)
+        });
+        retain_records(&mut self.covered_requirements.files, |item| {
+            requirement_ids.contains(&item.identifier)
+        });
+        retain_records(&mut self.uncovered_requirements.files, |item| {
+            requirement_ids.contains(&item.identifier)
+        });
+        retain_records(&mut self.satisfied_test_verifications.files, |item| {
+            verification_ids.contains(&item.identifier)
+        });
+        retain_records(&mut self.unsatisfied_test_verifications.files, |item| {
+            verification_ids.contains(&item.identifier)
+        });
+        self.orphaned_verifications.files.clear();
+        self.capability_coverage
+            .capabilities
+            .retain(|item| capability_ids.contains(&item.identifier));
+        let summary = &mut self.summary;
+        summary.verified_leaf_requirements = record_count(&self.verified_leaf_requirements.files);
+        summary.unverified_leaf_requirements =
+            record_count(&self.unverified_leaf_requirements.files);
+        summary.total_leaf_requirements =
+            summary.verified_leaf_requirements + summary.unverified_leaf_requirements;
+        summary.leaf_requirements_coverage_percentage = percentage(
+            summary.verified_leaf_requirements,
+            summary.total_leaf_requirements,
+        );
+        summary.satisfied_test_verifications =
+            record_count(&self.satisfied_test_verifications.files);
+        summary.unsatisfied_test_verifications =
+            record_count(&self.unsatisfied_test_verifications.files);
+        summary.total_test_verifications =
+            summary.satisfied_test_verifications + summary.unsatisfied_test_verifications;
+        summary.test_verifications_satisfaction_percentage = percentage(
+            summary.satisfied_test_verifications,
+            summary.total_test_verifications,
+        );
+        summary.total_verifications = verification_ids.len();
+        summary.orphaned_verifications = 0;
+        summary.orphaned_verifications_percentage = 0.0;
+        summary.verification_types = VerificationTypeCounts::default();
+        for verification in verifications {
+            if let element::ElementType::Verification(kind) = &verification.element_type {
+                summary.verification_types.record(kind);
+            }
+        }
+        summary.total_requirements_in_scope = requirement_ids.len();
+        summary.covered_requirements = record_count(&self.covered_requirements.files);
+        summary.uncovered_requirements = record_count(&self.uncovered_requirements.files);
+        summary.covered_terminal_requirements = self
+            .covered_requirements
+            .files
+            .values()
+            .flatten()
+            .filter(|record| record.is_terminal)
+            .count();
+        summary.uncovered_terminal_requirements = self
+            .uncovered_requirements
+            .files
+            .values()
+            .flatten()
+            .filter(|record| record.is_terminal)
+            .count();
+        summary.total_terminal_requirements =
+            summary.covered_terminal_requirements + summary.uncovered_terminal_requirements;
+        summary.implementation_coverage_percentage = percentage(
+            summary.covered_terminal_requirements,
+            summary.total_terminal_requirements,
+        );
+        summary.coverage_sources = CoverageSourceCounts::default();
+        for record in self.covered_requirements.files.values().flatten() {
+            summary.coverage_sources.record(&record.coverage_source);
+        }
+        self.scope = Some(CoverageScope {
+            kind: "capability",
+            capability_identifier: capability.identifier.clone(),
+            capability_name: capability.name.clone(),
+            capability_ids,
+            requirement_ids,
+            verification_ids,
+            orphaned_verifications_scope: "whole_model_only",
+        });
+        self
+    }
+
     pub fn to_json_string(&self) -> String {
         serde_json::to_string_pretty(&self).expect("failed to serialize JSON")
     }
@@ -184,6 +391,10 @@ impl CoverageReport {
 
     pub fn format_text(&self) -> String {
         let mut output = String::new();
+
+        if let Some(scope) = &self.scope {
+            output.push_str(&format!("## Coverage scope: {}\n\nOrphan diagnostics are available in whole-model coverage only.\n\n", scope.capability_name));
+        }
 
         // Summary
         output.push_str("## Summary\n\n");
@@ -378,12 +589,19 @@ impl CoverageReport {
             self.summary.total_requirements_in_scope
         ));
         output.push_str(&format!(
-            "- **Covered Requirements:** {} ({:.1}%)\n",
-            self.summary.covered_requirements, self.summary.implementation_coverage_percentage
+            "- **Covered Requirements:** {}\n",
+            self.summary.covered_requirements
         ));
         output.push_str(&format!(
-            "- **Uncovered Requirements:** {}\n\n",
+            "- **Uncovered Requirements:** {}\n",
             self.summary.uncovered_requirements
+        ));
+        output.push_str(&format!(
+            "- **Total Terminal Requirements:** {}\n- **Covered Terminal Requirements:** {} ({:.1}%)\n- **Uncovered Terminal Requirements:** {}\n\n",
+            self.summary.total_terminal_requirements,
+            self.summary.covered_terminal_requirements,
+            self.summary.implementation_coverage_percentage,
+            self.summary.uncovered_terminal_requirements,
         ));
 
         output.push_str("#### Coverage Sources\n\n");
@@ -392,14 +610,13 @@ impl CoverageReport {
             self.summary.coverage_sources.direct_satisfied
         ));
         output.push_str(&format!(
-            "- contract_satisfied_via_contract_bindings: {}\n",
-            self.summary
-                .coverage_sources
-                .contract_satisfied_via_contract_bindings
+            "- requirement_rollup: {}\n",
+            self.summary.coverage_sources.requirement_rollup
         ));
         output.push_str(&format!(
-            "- contract_satisfied_via_child: {}\n\n",
-            self.summary.coverage_sources.contract_satisfied_via_child
+            "- contract_consumer_rollup: {}\n- combined_rollup: {}\n\n",
+            self.summary.coverage_sources.contract_consumer_rollup,
+            self.summary.coverage_sources.combined_rollup
         ));
 
         if !self.covered_requirements.files.is_empty() {
@@ -417,12 +634,7 @@ impl CoverageReport {
                         "- ✅ **[{}]({})** ({})\n",
                         requirement.name, requirement.identifier, requirement.coverage_source
                     ));
-                    if !requirement.evidence.is_empty() {
-                        output.push_str("  - Evidence:\n");
-                        for id in &requirement.evidence {
-                            output.push_str(&format!("    - {}\n", format_identifier_link(id)));
-                        }
-                    }
+                    format_implementation_evidence(&mut output, &requirement);
                 }
                 output.push('\n');
             }
@@ -440,9 +652,10 @@ impl CoverageReport {
 
                 for requirement in sorted_requirements {
                     output.push_str(&format!(
-                        "- ❌ **[{}]({})**\n",
+                        "- ❌ **[{}]({})** (uncovered)\n",
                         requirement.name, requirement.identifier
                     ));
+                    format_implementation_evidence(&mut output, &requirement);
                 }
             }
         }
@@ -451,7 +664,7 @@ impl CoverageReport {
             output.push_str("\n## Capability Coverage\n\n");
             for capability in &self.capability_coverage.capabilities {
                 output.push_str(&format!(
-                    "- **[{}]({})**: {} verification {:.1}% ({}/{} leaf), implementation {:.1}% ({}/{} requirements)\n",
+                    "- **[{}]({})**: {} verification {:.1}% ({}/{} leaf), implementation {:.1}% ({}/{} terminal requirements), implementation {}\n",
                     capability.name,
                     capability.identifier,
                     capability.mark,
@@ -459,8 +672,10 @@ impl CoverageReport {
                     capability.aggregate_verified_leaf_requirements,
                     capability.aggregate_leaf_requirements,
                     capability.implementation_coverage_percentage,
-                    capability.aggregate_covered_requirements,
-                    capability.aggregate_requirements
+                    capability.aggregate_covered_terminal_requirements,
+                    capability.aggregate_terminal_requirements,
+                    if capability.aggregate_requirements == 0 { "not applicable" }
+                    else if capability.implementation_covered { "covered" } else { "incomplete" }
                 ));
             }
         }
@@ -496,14 +711,10 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         FxHashMap::default();
     let mut orphaned_verifications_files: FxHashMap<String, Vec<VerificationDetails>> =
         FxHashMap::default();
-    let mut covered_requirements_files: FxHashMap<
-        String,
-        Vec<ImplementationCoveredRequirementDetails>,
-    > = FxHashMap::default();
-    let mut uncovered_requirements_files: FxHashMap<
-        String,
-        Vec<ImplementationUncoveredRequirementDetails>,
-    > = FxHashMap::default();
+    let mut covered_requirements_files: FxHashMap<String, Vec<ImplementationRequirementDetails>> =
+        FxHashMap::default();
+    let mut uncovered_requirements_files: FxHashMap<String, Vec<ImplementationRequirementDetails>> =
+        FxHashMap::default();
 
     // First pass: collect all verification counts
     for element in registry.get_all_elements() {
@@ -511,27 +722,16 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
             total_verifications += 1;
 
             // Check if this verification has any verify relations
-            let verify_relations: Vec<String> = element
+            let has_verify_relation = element
                 .relations
                 .iter()
-                .filter(|r| r.relation_type.name == "verify")
-                .map(|r| match &r.target.link {
-                    relation::LinkType::Identifier(id) => id.clone(),
-                    relation::LinkType::ExternalUrl(url) => url.clone(),
-                    relation::LinkType::InternalPath(path) => path.to_string_lossy().to_string(),
-                })
-                .collect();
+                .any(|r| r.relation_type.name == "verify");
 
-            // Count by verification type
+            verification_types.record(verification_type);
             match verification_type {
                 element::VerificationType::Default
                 | element::VerificationType::Test
                 | element::VerificationType::FormalProof => {
-                    if matches!(verification_type, element::VerificationType::FormalProof) {
-                        verification_types.formal_proof += 1;
-                    } else {
-                        verification_types.test += 1;
-                    }
                     total_test_verifications += 1;
 
                     // For test verifications, check if they have satisfiedBy relations
@@ -570,19 +770,13 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                             .push(verification_details);
                     }
                 }
-                element::VerificationType::Analysis => {
-                    verification_types.analysis += 1;
-                }
-                element::VerificationType::Inspection => {
-                    verification_types.inspection += 1;
-                }
-                element::VerificationType::Demonstration => {
-                    verification_types.demonstration += 1;
-                }
+                element::VerificationType::Analysis
+                | element::VerificationType::Inspection
+                | element::VerificationType::Demonstration => {}
             }
 
             // Check if this verification is orphaned (no verify relations)
-            if verify_relations.is_empty() {
+            if !has_verify_relation {
                 orphaned_verifications_count += 1;
                 let orphaned_details = VerificationDetails {
                     identifier: element.identifier.clone(),
@@ -598,7 +792,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         }
     }
 
-    // Third pass: implementation coverage (direct / contract via contract_bindings / via child)
+    // Assess the complete requirement graph before projecting any report scope.
     let requirements: Vec<&element::Element> = registry
         .get_all_elements()
         .into_iter()
@@ -610,9 +804,11 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         })
         .collect();
 
-    let mut owned_contracts: FxHashMap<String, Vec<String>> = FxHashMap::default();
-    let mut children_by_requirement: FxHashMap<String, Vec<String>> = FxHashMap::default();
-    let mut contract_bindings_consumers: FxHashMap<String, Vec<String>> = FxHashMap::default();
+    let fulfillment = registry.requirement_fulfillment_dependencies();
+    let children_by_requirement: FxHashMap<String, Vec<String>> = fulfillment
+        .iter()
+        .map(|(id, dependencies)| (id.clone(), dependencies.children.iter().cloned().collect()))
+        .collect();
     let mut direct_satisfaction: FxHashMap<String, Vec<String>> = FxHashMap::default();
 
     for req in &requirements {
@@ -632,186 +828,36 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         if !satisfied_by_targets.is_empty() {
             direct_satisfaction.insert(req.identifier.clone(), satisfied_by_targets);
         }
-
-        // Hierarchy edges for local child-evidence rule
-        let mut children: Vec<String> = req
-            .relations
-            .iter()
-            .filter(|r| r.relation_type.name == "derive")
-            .filter_map(|r| match &r.target.link {
-                relation::LinkType::Identifier(id) => Some(id.clone()),
-                _ => None,
-            })
-            .collect();
-        children.sort();
-        children.dedup();
-        children_by_requirement.insert(req.identifier.clone(), children);
-
-        // Owned requirement contracts
-        let mut contracts: Vec<String> = req
-            .relations
-            .iter()
-            .filter(|r| r.relation_type.name == "definedBy")
-            .filter_map(|r| match &r.target.link {
-                relation::LinkType::Identifier(id) => Some(id.clone()),
-                _ => None,
-            })
-            .collect();
-        contracts.sort();
-        contracts.dedup();
-        owned_contracts.insert(req.identifier.clone(), contracts);
-
-        // Contract identifier contract_bindings (consumer -> contract)
-        for contract_bindings in &req.contract_bindings {
-            if let ContractBindingTarget::ElementIdentifier(id) = &contract_bindings.target {
-                contract_bindings_consumers
-                    .entry(id.clone())
-                    .or_default()
-                    .push(req.identifier.clone());
-            }
-        }
     }
 
-    for consumers in contract_bindings_consumers.values_mut() {
-        consumers.sort();
-        consumers.dedup();
-    }
-
-    let mut impl_coverage: FxHashMap<String, CoverageState> = FxHashMap::default();
-    for req in &requirements {
-        // direct_satisfied
-        if let Some(evidence) = direct_satisfaction.get(&req.identifier) {
-            impl_coverage.insert(
-                req.identifier.clone(),
-                CoverageState {
-                    source: "direct_satisfied".to_string(),
-                    evidence: evidence.clone(),
-                },
-            );
-            continue;
-        }
-
-        let owns_contract = owned_contracts
-            .get(&req.identifier)
-            .map(|v| !v.is_empty())
-            .unwrap_or(false);
-        if !owns_contract {
-            continue;
-        }
-
-        // contract covered via contract_bindings by directly satisfied requirement
-        if let Some(contracts) = owned_contracts.get(&req.identifier) {
-            let mut matched_consumer: Option<String> = None;
-            for contract_id in contracts {
-                if let Some(consumers) = contract_bindings_consumers.get(contract_id) {
-                    if let Some(consumer) = consumers
-                        .iter()
-                        .find(|consumer_id| {
-                            *consumer_id != &req.identifier
-                                && direct_satisfaction.contains_key(*consumer_id)
-                        })
-                        .cloned()
-                    {
-                        matched_consumer = Some(consumer);
-                        break;
-                    }
-                }
-            }
-
-            if let Some(consumer_id) = matched_consumer {
-                impl_coverage.insert(
-                    req.identifier.clone(),
-                    CoverageState {
-                        source: "contract_satisfied_via_contract_bindings".to_string(),
-                        evidence: vec![consumer_id],
-                    },
-                );
-                continue;
-            }
-        }
-
-        // contract covered via directly satisfied descendant requirement
-        if let Some(descendant_id) = find_directly_satisfied_descendant(
-            &req.identifier,
-            &children_by_requirement,
-            &direct_satisfaction,
-        ) {
-            impl_coverage.insert(
-                req.identifier.clone(),
-                CoverageState {
-                    source: "contract_satisfied_via_child".to_string(),
-                    evidence: vec![descendant_id],
-                },
-            );
-        }
-    }
-
+    let impl_coverage = evaluate_implementation_coverage(&fulfillment, &direct_satisfaction);
     let total_requirements_in_scope = requirements.len();
-    let covered_requirements = impl_coverage.len();
-    let uncovered_requirements = total_requirements_in_scope.saturating_sub(covered_requirements);
-
-    let mut coverage_sources = CoverageSourceCounts {
-        direct_satisfied: 0,
-        contract_satisfied_via_contract_bindings: 0,
-        contract_satisfied_via_child: 0,
-    };
-
-    for req in &requirements {
-        if let Some(state) = impl_coverage.get(&req.identifier) {
-            match state.source.as_str() {
-                "direct_satisfied" => coverage_sources.direct_satisfied += 1,
-                "contract_satisfied_via_contract_bindings" => {
-                    coverage_sources.contract_satisfied_via_contract_bindings += 1
-                }
-                "contract_satisfied_via_child" => {
-                    coverage_sources.contract_satisfied_via_child += 1
-                }
-                _ => {}
-            }
-
-            covered_requirements_files
-                .entry(req.file_path.clone())
-                .or_default()
-                .push(ImplementationCoveredRequirementDetails {
-                    identifier: req.identifier.clone(),
-                    name: req.name.clone(),
-                    coverage_source: state.source.clone(),
-                    evidence: state.evidence.clone(),
-                });
-        } else {
-            uncovered_requirements_files
-                .entry(req.file_path.clone())
-                .or_default()
-                .push(ImplementationUncoveredRequirementDetails {
-                    identifier: req.identifier.clone(),
-                    name: req.name.clone(),
-                });
-        }
-    }
+    let covered_requirements = impl_coverage
+        .values()
+        .filter(|state| state.is_covered())
+        .count();
+    let uncovered_requirements = total_requirements_in_scope - covered_requirements;
+    let total_terminal_requirements = impl_coverage
+        .values()
+        .filter(|state| state.is_terminal)
+        .count();
+    let covered_terminal_requirements = impl_coverage
+        .values()
+        .filter(|state| state.is_terminal && state.is_covered())
+        .count();
+    let uncovered_terminal_requirements =
+        total_terminal_requirements - covered_terminal_requirements;
+    let mut coverage_sources = CoverageSourceCounts::default();
 
     // Second pass: identify leaf requirements and check their verification
     for element in registry.get_all_elements() {
         // Only process requirement-type elements
         if matches!(element.element_type, element::ElementType::Requirement(_)) {
-            // Check if this is a leaf requirement (no forward relations to other requirements)
-            let has_forward_relations = element.relations.iter().any(|relation| {
-                // Check if relation is a forward relation to another requirement
-                match relation.relation_type.name {
-                    "contain" | "derive" | "definedBy" => {
-                        // These are forward relations - check if target is a requirement
-                        if let relation::LinkType::Identifier(_) = &relation.target.link {
-                            // Assume it's a requirement if it's an identifier link
-                            // This is a simplified check - in practice you'd resolve the target
-                            true
-                        } else {
-                            false
-                        }
-                    }
-                    _ => false,
-                }
-            });
-
-            if !has_forward_relations {
+            // Contract ownership and contract consumers do not change verification leaf status.
+            if children_by_requirement
+                .get(&element.identifier)
+                .is_none_or(Vec::is_empty)
+            {
                 // This is a leaf requirement
                 total_leaf_requirements += 1;
 
@@ -855,6 +901,43 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         }
     }
 
+    for req in &requirements {
+        let state = &impl_coverage[&req.identifier];
+        let subtree = collect_subtree_ids(vec![req.identifier.clone()], &children_by_requirement);
+        let record = ImplementationRequirementDetails {
+            identifier: req.identifier.clone(),
+            name: req.name.clone(),
+            coverage_source: state.source.to_string(),
+            is_terminal: state.is_terminal,
+            aggregate_leaf_requirements: count_leaf_requirements(
+                subtree.iter(), &verified_leaf_ids, &unverified_leaf_ids,
+            ),
+            aggregate_verified_leaf_requirements: subtree.iter()
+                .filter(|id| verified_leaf_ids.contains(*id)).count(),
+            aggregate_terminal_requirements: state.terminal_requirements,
+            aggregate_covered_terminal_requirements: state.covered_terminal_requirements,
+            direct_evidence: direct_satisfaction
+                .get(&req.identifier)
+                .cloned()
+                .unwrap_or_default(),
+            evidence: state.evidence.clone(),
+            contributing_requirements: state.contributing_requirements.clone(),
+            blocking_requirements: state.blocking_requirements.clone(),
+        };
+        if state.is_covered() {
+            coverage_sources.record(state.source);
+            covered_requirements_files
+                .entry(req.file_path.clone())
+                .or_default()
+                .push(record);
+        } else {
+            uncovered_requirements_files
+                .entry(req.file_path.clone())
+                .or_default()
+                .push(record);
+        }
+    }
+
     // Calculate percentages
     let leaf_requirements_coverage_percentage = if total_leaf_requirements > 0 {
         (verified_leaf_requirements as f64 / total_leaf_requirements as f64) * 100.0
@@ -874,11 +957,8 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         0.0
     };
 
-    let implementation_coverage_percentage = if total_requirements_in_scope > 0 {
-        (covered_requirements as f64 / total_requirements_in_scope as f64) * 100.0
-    } else {
-        0.0
-    };
+    let implementation_coverage_percentage =
+        percentage(covered_terminal_requirements, total_terminal_requirements);
 
     let capability_coverage = build_capability_coverage(
         registry,
@@ -898,6 +978,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         round_to_two_decimals(implementation_coverage_percentage);
 
     CoverageReport {
+        scope: None,
         summary: CoverageSummary {
             total_leaf_requirements,
             verified_leaf_requirements,
@@ -917,6 +998,9 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
             total_requirements_in_scope,
             covered_requirements,
             uncovered_requirements,
+            total_terminal_requirements,
+            covered_terminal_requirements,
+            uncovered_terminal_requirements,
             implementation_coverage_percentage,
             coverage_sources,
         },
@@ -1042,11 +1126,19 @@ fn build_capability_coverage(
 
         let local_covered_requirements = local_requirements
             .iter()
-            .filter(|id| impl_coverage.contains_key(*id))
+            .filter(|id| {
+                impl_coverage
+                    .get(*id)
+                    .is_some_and(CoverageState::is_covered)
+            })
             .count();
         let aggregate_covered_requirements = aggregate_requirements
             .iter()
-            .filter(|id| impl_coverage.contains_key(*id))
+            .filter(|id| {
+                impl_coverage
+                    .get(*id)
+                    .is_some_and(CoverageState::is_covered)
+            })
             .count();
 
         let verification_coverage_percentage = if aggregate_leaf_requirements > 0 {
@@ -1058,14 +1150,44 @@ fn build_capability_coverage(
             0.0
         };
 
-        let implementation_coverage_percentage = if !aggregate_requirements.is_empty() {
-            round_to_two_decimals(
-                (aggregate_covered_requirements as f64 / aggregate_requirements.len() as f64)
-                    * 100.0,
-            )
-        } else {
-            0.0
-        };
+        let local_terminal_requirements = local_requirements
+            .iter()
+            .filter(|id| {
+                impl_coverage
+                    .get(*id)
+                    .is_some_and(|state| state.is_terminal)
+            })
+            .count();
+        let local_covered_terminal_requirements = local_requirements
+            .iter()
+            .filter(|id| {
+                impl_coverage
+                    .get(*id)
+                    .is_some_and(|state| state.is_terminal && state.is_covered())
+            })
+            .count();
+        let aggregate_terminal_requirements = aggregate_requirements
+            .iter()
+            .filter(|id| {
+                impl_coverage
+                    .get(*id)
+                    .is_some_and(|state| state.is_terminal)
+            })
+            .count();
+        let aggregate_covered_terminal_requirements = aggregate_requirements
+            .iter()
+            .filter(|id| {
+                impl_coverage
+                    .get(*id)
+                    .is_some_and(|state| state.is_terminal && state.is_covered())
+            })
+            .count();
+        let implementation_coverage_percentage = percentage(
+            aggregate_covered_terminal_requirements,
+            aggregate_terminal_requirements,
+        );
+        let implementation_covered = !aggregate_requirements.is_empty()
+            && aggregate_covered_requirements == aggregate_requirements.len();
 
         let mark = if aggregate_leaf_requirements == 0 && aggregate_requirements.is_empty() {
             "not-applicable"
@@ -1092,6 +1214,11 @@ fn build_capability_coverage(
             local_covered_requirements,
             aggregate_requirements: aggregate_requirements.len(),
             aggregate_covered_requirements,
+            local_terminal_requirements,
+            local_covered_terminal_requirements,
+            aggregate_terminal_requirements,
+            aggregate_covered_terminal_requirements,
+            implementation_covered,
             implementation_coverage_percentage,
             mark: mark.to_string(),
         });
@@ -1103,8 +1230,142 @@ fn build_capability_coverage(
 
 #[derive(Clone)]
 struct CoverageState {
-    source: String,
+    terminal_requirements: usize,
+    covered_terminal_requirements: usize,
+    source: &'static str,
+    is_terminal: bool,
     evidence: Vec<String>,
+    contributing_requirements: Vec<String>,
+    blocking_requirements: Vec<String>,
+}
+
+impl CoverageState {
+    fn is_covered(&self) -> bool {
+        self.source != "uncovered"
+    }
+}
+
+fn format_implementation_evidence(output: &mut String, record: &ImplementationRequirementDetails) {
+    for (label, identifiers) in [
+        ("Direct evidence", &record.direct_evidence),
+        ("Supporting evidence", &record.evidence),
+        (
+            "Contributing requirements",
+            &record.contributing_requirements,
+        ),
+        ("Blocking requirements", &record.blocking_requirements),
+    ] {
+        if !identifiers.is_empty() {
+            output.push_str(&format!("  - {label}:\n"));
+            for id in identifiers {
+                output.push_str(&format!("    - {}\n", format_identifier_link(id)));
+            }
+        }
+    }
+}
+
+/// Evaluate once over the full graph. Only implemented terminals seed coverage;
+/// each other requirement waits for every child and every explicit contract consumer.
+fn evaluate_implementation_coverage(
+    fulfillment: &BTreeMap<String, RequirementDependencies>,
+    direct_evidence: &FxHashMap<String, Vec<String>>,
+) -> FxHashMap<String, CoverageState> {
+    let mut dependencies: FxHashMap<String, BTreeSet<String>> = FxHashMap::default();
+    let mut dependents: FxHashMap<String, Vec<String>> = FxHashMap::default();
+    let mut remaining: FxHashMap<String, usize> = FxHashMap::default();
+    let mut covered: FxHashSet<String> = FxHashSet::default();
+    let mut ready = VecDeque::new();
+
+    for (id, contributions) in fulfillment {
+        let required: BTreeSet<String> = contributions.all().cloned().collect();
+        for dependency in &required {
+            dependents
+                .entry(dependency.clone())
+                .or_default()
+                .push(id.clone());
+        }
+        remaining.insert(id.clone(), required.len());
+        if required.is_empty()
+            && direct_evidence
+                .get(id)
+                .is_some_and(|items| !items.is_empty())
+        {
+            covered.insert(id.clone());
+            ready.push_back(id.clone());
+        }
+        dependencies.insert(id.clone(), required);
+    }
+    while let Some(id) = ready.pop_front() {
+        for parent in dependents.get(&id).into_iter().flatten() {
+            let count = remaining
+                .get_mut(parent)
+                .expect("every dependent is a requirement");
+            *count -= 1;
+            if *count == 0 && covered.insert(parent.clone()) {
+                ready.push_back(parent.clone());
+            }
+        }
+    }
+
+    // Trace partial evidence as well as complete coverage. Iterative traversal
+    // deduplicates shared paths and remains bounded even for an invalid cyclic graph.
+    dependencies
+        .iter()
+        .map(|(id, required)| {
+            let is_terminal = required.is_empty();
+            let source = if !covered.contains(id) {
+                "uncovered"
+            } else if is_terminal {
+                "direct_satisfied"
+            } else {
+                match (
+                    !fulfillment[id].children.is_empty(),
+                    !fulfillment[id].contract_consumers.is_empty(),
+                ) {
+                    (true, true) => "combined_rollup",
+                    (true, false) => "requirement_rollup",
+                    _ => "contract_consumer_rollup",
+                }
+            };
+            let mut terminal_requirements = 0;
+            let mut covered_terminal_requirements = 0;
+            let mut evidence = BTreeSet::new();
+            let mut blockers = BTreeSet::new();
+            let mut visited = FxHashSet::default();
+            let mut pending = vec![id];
+            while let Some(current) = pending.pop() {
+                if !visited.insert(current) {
+                    continue;
+                }
+                evidence.extend(direct_evidence.get(current).into_iter().flatten().cloned());
+                if current != id && !covered.contains(current) {
+                    blockers.insert(current.clone());
+                }
+                if let Some(next) = dependencies.get(current) {
+                    if next.is_empty() {
+                        terminal_requirements += 1;
+                        covered_terminal_requirements += usize::from(covered.contains(current));
+                    }
+                    pending.extend(next);
+                }
+            }
+            if !covered.contains(id) && blockers.is_empty() {
+                blockers.insert(id.clone());
+            }
+            (
+                id.clone(),
+                CoverageState {
+                    terminal_requirements,
+                    covered_terminal_requirements,
+                    source,
+                    is_terminal,
+                    evidence: evidence.into_iter().collect(),
+                    contributing_requirements: required.iter().cloned().collect(),
+                    blocking_requirements: blockers.into_iter().collect(),
+                },
+            )
+        })
+        .collect()
 }
 
 fn collect_requirement_subtree_ids(

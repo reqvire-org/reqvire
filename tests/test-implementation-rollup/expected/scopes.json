@@ -1,0 +1,39 @@
+{
+  "Owners": [
+    "specifications/Model.md#both-child",
+    "specifications/Model.md#both-child-gap",
+    "specifications/Model.md#both-complete",
+    "specifications/Model.md#both-consumer-gap",
+    "specifications/Model.md#both-missing-child",
+    "specifications/Model.md#complete-owner",
+    "specifications/Model.md#good-child",
+    "specifications/Model.md#missing-child",
+    "specifications/Model.md#mixed-owner",
+    "specifications/Model.md#parent-with-evidence",
+    "specifications/Model.md#terminal-done",
+    "specifications/Model.md#terminal-gap",
+    "specifications/Model.md#tree-a",
+    "specifications/Model.md#tree-middle",
+    "specifications/Model.md#tree-other",
+    "specifications/Model.md#tree-root",
+    "specifications/Model.md#tree-shared",
+    "specifications/Model.md#unused-done",
+    "specifications/Model.md#unused-owner"
+  ],
+  "Consumers": [
+    "specifications/Model.md#both-consumer",
+    "specifications/Model.md#complete-consumer",
+    "specifications/Model.md#complete-consumer-a",
+    "specifications/Model.md#complete-consumer-b",
+    "specifications/Model.md#consumer-child",
+    "specifications/Model.md#good-consumer",
+    "specifications/Model.md#missing-consumer",
+    "specifications/Model.md#missing-consumer-child",
+    "specifications/Model.md#other-consumer",
+    "specifications/Model.md#partial-consumer"
+  ],
+  "Delegated Service": [
+    "specifications/Model.md#complete-owner"
+  ],
+  "Empty Capability": []
+}

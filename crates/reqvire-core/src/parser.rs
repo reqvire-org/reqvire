@@ -1,7 +1,7 @@
 use crate::element::{
     is_legacy_contract_bindings_section, ConceptReference, ContractBindingEntry,
     ContractBindingTarget, Element, ElementType, FencedBlock, RequirementType, SubSection,
-    CONTRACT_BINDINGS_SECTION,
+    CONTRACT_BINDINGS_SECTION, CONTRACT_REFERENCES_SECTION,
 };
 use crate::error::ReqvireError;
 use crate::relation::{self, Relation};
@@ -10,6 +10,41 @@ use log::debug;
 use rustc_hash::FxHashSet;
 use std::collections::BTreeMap;
 use std::path::Path;
+
+/// Parse review dependencies through the same identifier normalizer as relations.
+fn insert_contract_reference(
+    entries: &mut Vec<ContractBindingEntry>,
+    line: &str,
+    file: &str,
+) -> Result<(), ReqvireError> {
+    let invalid =
+        |message: String| ReqvireError::InvalidContractReference(format!("{file}: {message}"));
+    let href =
+        utils::parse_contract_bindings_line(line).map_err(|error| invalid(error.to_string()))?;
+    if !href.contains('#') || utils::is_external_url(&href) {
+        return Err(invalid(format!(
+            "Contract References require an element identifier, got '{href}'"
+        )));
+    }
+    let identifier = if let Some(fragment) = href.strip_prefix('#') {
+        format!("{file}#{}", utils::normalize_fragment(fragment))
+    } else {
+        let base = crate::workspace::workspace_root()?
+            .join(Path::new(file).parent().unwrap_or_else(|| Path::new(".")));
+        utils::normalize_identifier(&href, &base).map_err(|error| invalid(error.to_string()))?
+    };
+    let target = ContractBindingTarget::ElementIdentifier(identifier);
+    if entries.iter().any(|entry| entry.target == target) {
+        return Err(invalid(format!(
+            "Duplicate Contract References target '{href}'"
+        )));
+    }
+    entries.push(ContractBindingEntry {
+        target,
+        content_hash: None,
+    });
+    Ok(())
+}
 
 pub const ELEMENTS_HEADER: &str = "# Elements";
 pub const SINGLE_ELEMENT_HEADER: &str = "# Element";
@@ -293,7 +328,7 @@ pub enum ModelFileType {
 }
 
 /// Returns an example of correctly formatted element markdown for error messages
-fn get_element_example() -> &'static str {
+const fn get_element_example() -> &'static str {
     r#"
 Example of correctly formatted element:
 
@@ -505,7 +540,16 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                     ));
                 }
             }
-
+        } else if current_subsection == SubSection::ContractReference {
+            if !trimmed.is_empty() {
+                if let Some(element) = &mut current_element {
+                    insert_contract_reference(
+                        &mut element.contract_references,
+                        trimmed,
+                        file_path,
+                    )?;
+                }
+            }
         // Parse contract_bindings
         } else if current_subsection == SubSection::ContractBinding {
             if let Some(element) = &mut current_element {
@@ -656,7 +700,9 @@ pub fn parse_single_element_contract(
                 seen_metadata = true;
             } else if section.eq_ignore_ascii_case("Relations") {
                 seen_relations = true;
-            } else if !section.eq_ignore_ascii_case(CONTRACT_BINDINGS_SECTION) {
+            } else if !section.eq_ignore_ascii_case(CONTRACT_BINDINGS_SECTION)
+                && !section.eq_ignore_ascii_case(CONTRACT_REFERENCES_SECTION)
+            {
                 // Dynamic element name section header: `## <Element Name>`
                 seen_element_name = true;
             }
@@ -765,6 +811,7 @@ fn parse_single_element_file(
     let mut element_content = String::new();
     let mut element_relations: Vec<Relation> = Vec::new();
     let mut element_contract_bindings: Vec<ContractBindingEntry> = Vec::new();
+    let mut element_contract_references = Vec::new();
     let mut metadata: rustc_hash::FxHashMap<String, String> = rustc_hash::FxHashMap::default();
 
     enum DocSection {
@@ -772,6 +819,7 @@ fn parse_single_element_file(
         Metadata,
         Relations,
         ContractBinding,
+        ContractReference,
         Document,
     }
     let mut section = DocSection::None;
@@ -804,6 +852,7 @@ fn parse_single_element_file(
                 }
                 "Relations" => DocSection::Relations,
                 CONTRACT_BINDINGS_SECTION => DocSection::ContractBinding,
+                CONTRACT_REFERENCES_SECTION => DocSection::ContractReference,
                 _ => {
                     // Dynamic element name section header (e.g., `## Change Propagation`)
                     seen_element_name = true;
@@ -966,6 +1015,19 @@ fn parse_single_element_file(
                     )));
                 }
             }
+            DocSection::ContractReference => {
+                if !trimmed.is_empty() {
+                    if let Err(error) = utils::get_relative_path(file_path).and_then(|path| {
+                        insert_contract_reference(
+                            &mut element_contract_references,
+                            trimmed,
+                            &path.to_string_lossy(),
+                        )
+                    }) {
+                        errors.push(error);
+                    }
+                }
+            }
             DocSection::Document | DocSection::None => {}
         }
     }
@@ -992,10 +1054,10 @@ fn parse_single_element_file(
         }
         None => raw_identifier,
     };
-    let relative_file = match utils::get_relative_path(file_path) {
-        Ok(path) => path.to_string_lossy().to_string(),
-        Err(_) => file.to_string(),
-    };
+    let relative_file = utils::get_relative_path(file_path).map_or_else(
+        |_| file.to_string(),
+        |path| path.to_string_lossy().to_string(),
+    );
 
     let mut element = Element::new(
         &final_element_name,
@@ -1010,6 +1072,7 @@ fn parse_single_element_file(
     element.set_type_from_metadata();
     element.relations = element_relations;
     element.contract_bindings = element_contract_bindings;
+    element.contract_references = element_contract_references;
     element.freeze_content();
     element.file_order_index = 0;
 
@@ -1017,6 +1080,7 @@ fn parse_single_element_file(
 }
 
 /// Parses a markdown document and extracts elements with metadata and relations.
+///
 /// Returns: (elements, errors, page_content)
 /// Only parses files where the first H1 heading is "# Elements" or "# Element".
 /// If git_commit is Some, file contract_bindings hashes are computed from the git commit, not working directory.
@@ -1040,7 +1104,6 @@ pub fn parse_elements(
     let mut elements = Vec::new();
     let mut current_element: Option<Element> = None;
     let mut errors = Vec::new();
-    let mut seen_identifiers = FxHashSet::default();
     let mut skip_current_element = false;
     let mut seen_subsections = FxHashSet::default();
     let mut in_details_block = false;
@@ -1123,8 +1186,6 @@ pub fn parse_elements(
                                     continue;
                                 }
                             };
-
-                            seen_identifiers.insert(identifier.clone());
 
                             // Default element type is always 'requirement' (location-independent)
                             let element_type = ElementType::Requirement(RequirementType::System);
@@ -1376,6 +1437,18 @@ pub fn parse_elements(
                     errors.push(ReqvireError::InvalidRelationFormat(msg.clone()));
                     debug!("Error: {}", msg);
                     current_subsection = SubSection::Other("".to_string());
+                }
+            }
+        } else if current_subsection == SubSection::ContractReference && !skip_current_element {
+            if !trimmed.is_empty() {
+                if let Some(element) = &mut current_element {
+                    if let Err(error) = insert_contract_reference(
+                        &mut element.contract_references,
+                        trimmed,
+                        &element.file_path,
+                    ) {
+                        errors.push(error);
+                    }
                 }
             }
         } else if current_subsection == SubSection::ContractBinding && !skip_current_element {

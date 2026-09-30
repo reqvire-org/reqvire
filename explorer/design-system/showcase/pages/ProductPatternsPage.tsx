@@ -1,3 +1,4 @@
+import { COVERAGE_PATTERN_ITEMS } from "../fixtures/coverage";
 import { useState, type ReactNode } from "react";
 import {
   AppShell,
@@ -5,6 +6,9 @@ import {
   CodeBody,
   CodePreviewFrame,
   CodeToolbar,
+  CoverageDashboard,
+  CoverageDrilldown,
+  CoveragePanel,
   CODE_PREVIEW_FALLBACK_CLASS,
   DetailDialog,
   DiagramBlockFrame,
@@ -105,6 +109,12 @@ interface ShowcaseDetailElement {
 }
 
 const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
+  "SPEC-DET-001": {
+    id: "SPEC-DET-001", title: "Coverage Report Specification", elementType: "specification",
+    typeFamily: "contract", sourceHref: "#/content/system-model/Specifications.md",
+    metaBadges: [], content: <p>Coverage reports distinguish verification and implementation evidence.</p>,
+    relations: [], contract_bindings: [],
+  },
   "REQ-DET-042": {
     id: "REQ-DET-042",
     title: "Traceability Coverage Requirement",
@@ -297,6 +307,18 @@ export function ProductPatternsPage() {
       </Section>
 
       <Section
+        title="Coverage Drill-down"
+        desc="The same coverage component used by Explorer, with example data. Expand capabilities and parent requirements to inspect their children. Select requirement names in Mocks to inspect evidence through the full application."
+      >
+        <CoverageDashboard>
+          <CoveragePanel title="Capability coverage">
+            <CoverageDrilldown items={COVERAGE_PATTERN_ITEMS}
+              onInspect={target => pushElementDialog(target.id)} />
+          </CoveragePanel>
+        </CoverageDashboard>
+      </Section>
+
+      <Section
         title="File Browser"
         desc="Explorer file/model table product pattern. This is the real table surface used by the model browser."
       >
@@ -446,7 +468,9 @@ export function ProductPatternsPage() {
                 </MarkdownFrame>
               }
               relations={DETAIL_RELATIONS}
-              contract_bindings={DETAIL_ATTACHMENTS}
+              contract_references={[{ id: "reference-coverage-contract", targetId: "SPEC-DET-001",
+                kind: "element", label: "Coverage Report Specification", elementType: "specification",
+                typeFamily: "contract", href: "#/elements/SPEC-DET-001", external: false }]}
               onOpenElement={openElementDialog}
               onOpenResource={() => {}}
             />

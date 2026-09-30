@@ -86,6 +86,13 @@ export function ElementDetailModal({
     [contract_bindings, elementById, resourceById],
   );
 
+  const contractReferenceItems = useMemo(
+    () => (store.contract_references ?? []).filter(reference => reference.source_id === identifier)
+      .map(reference => ({ id: reference.id, targetId: reference.target, kind: reference.target_kind,
+        ...contractBindingsDisplayTarget(reference, elementById, resourceById) })),
+    [store.contract_references, identifier, elementById, resourceById],
+  );
+
   const conceptReferenceItems = useMemo(
     () =>
       conceptRefs.map((conceptRef): DetailConceptReferenceItem => {
@@ -195,6 +202,7 @@ export function ElementDetailModal({
             }
             relations={relationItems}
             contract_bindings={contractBindingsItems}
+            contract_references={contractReferenceItems}
             onOpenElement={onOpenElement}
             onOpenResource={openHashRoute}
           />

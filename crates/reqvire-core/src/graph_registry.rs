@@ -9,6 +9,7 @@ use std::sync::LazyLock;
 use crate::element::{
     ConceptLink, Element, ElementType, GovernanceMetadataEntry, GovernanceMetadataSource,
     RequirementGovernanceMetadata, SizeEstimate, CONTRACT_BINDINGS_SECTION,
+    CONTRACT_REFERENCES_SECTION,
 };
 use crate::error::ReqvireError;
 use crate::exclusions::ExclusionSet as GlobSet;
@@ -26,10 +27,13 @@ use regex::Regex;
 
 mod content_merge;
 mod crud_ops;
+mod fulfillment;
 mod hierarchy;
 mod ontology_context;
 mod registration;
 mod validation;
+
+pub(crate) use fulfillment::RequirementDependencies;
 
 use content_merge::{
     extract_content_parts, extract_leading_prose, merge_content_into_details,
@@ -52,7 +56,7 @@ pub struct Page {
 }
 
 impl Page {
-    pub fn new(frontmatter_content: String) -> Self {
+    pub const fn new(frontmatter_content: String) -> Self {
         Self {
             frontmatter_content,
         }
@@ -115,7 +119,9 @@ mod tests {
     }
 
     fn add_relation(from: &mut Element, relation_type: &'static str, to_id: &str) {
-        let relation_info = RELATION_TYPES.get(relation_type).unwrap();
+        let relation_info = RELATION_TYPES
+            .get(relation_type)
+            .expect("expected supported test relation type");
         // Extract element_id from identifier (fragment after #)
         let element_id = crate::utils::extract_path_and_fragment(to_id)
             .1
@@ -153,7 +159,9 @@ mod tests {
 
         let mut without_estimate = element.clone();
         without_estimate.size_estimate = None;
-        let expected_rendered_context_bytes = serde_json::to_vec(&without_estimate).unwrap().len();
+        let expected_rendered_context_bytes = serde_json::to_vec(&without_estimate)
+            .expect("serialize test value")
+            .len();
 
         assert_eq!(estimate.content_bytes, element.content.len());
         assert_eq!(
@@ -174,13 +182,17 @@ mod tests {
 
         add_relation(&mut a, "derive", "B");
 
-        registry.register_element(a.clone(), "file.md").unwrap();
-        registry.register_element(b.clone(), "file.md").unwrap();
+        registry
+            .register_element(a.clone(), "file.md")
+            .expect("register valid test element");
+        registry
+            .register_element(b, "file.md")
+            .expect("register valid test element");
 
         let mut graph = registry;
         graph.build_relation_graph();
 
-        let a_node = graph.nodes.get("A").unwrap();
+        let a_node = graph.nodes.get("A").expect("expected test node to exist");
         assert_eq!(a_node.relations.len(), 1);
         assert_eq!(a_node.relations[0].relation_trigger, "derive");
         assert_eq!(a_node.relations[0].element_node.element.identifier, "B");
@@ -194,19 +206,23 @@ mod tests {
 
         add_relation(&mut a, "derive", "B");
 
-        registry.register_element(a.clone(), "file.md").unwrap();
-        registry.register_element(b.clone(), "file.md").unwrap();
+        registry
+            .register_element(a.clone(), "file.md")
+            .expect("register valid test element");
+        registry
+            .register_element(b, "file.md")
+            .expect("register valid test element");
 
         let mut graph = registry;
         graph.build_relation_graph();
         graph.update_identifier("B", "B_NEW");
 
         // B should no longer exist, B_NEW should
-        assert!(graph.nodes.get("B").is_none());
-        assert!(graph.nodes.get("B_NEW").is_some());
+        assert!(!graph.nodes.contains_key("B"));
+        assert!(graph.nodes.contains_key("B_NEW"));
 
         // A's relation should now point to B_NEW
-        let a_node = graph.nodes.get("A").unwrap();
+        let a_node = graph.nodes.get("A").expect("expected test node to exist");
         assert_eq!(a_node.relations.len(), 1);
         assert_eq!(a_node.relations[0].element_node.element.identifier, "B_NEW");
     }
@@ -221,9 +237,15 @@ mod tests {
         add_relation(&mut a, "derive", "B");
         add_relation(&mut b, "derive", "C");
 
-        registry.register_element(a.clone(), "file.md").unwrap();
-        registry.register_element(b.clone(), "file.md").unwrap();
-        registry.register_element(c.clone(), "file.md").unwrap();
+        registry
+            .register_element(a.clone(), "file.md")
+            .expect("register valid test element");
+        registry
+            .register_element(b.clone(), "file.md")
+            .expect("register valid test element");
+        registry
+            .register_element(c, "file.md")
+            .expect("register valid test element");
 
         let mut graph = registry;
         graph.build_relation_graph();
@@ -248,8 +270,12 @@ mod tests {
         add_relation(&mut a, "derive", "B");
         add_relation(&mut b, "derive", "A");
 
-        registry.register_element(a.clone(), "file.md").unwrap();
-        registry.register_element(b.clone(), "file.md").unwrap();
+        registry
+            .register_element(a.clone(), "file.md")
+            .expect("register valid test element");
+        registry
+            .register_element(b.clone(), "file.md")
+            .expect("register valid test element");
 
         let mut graph = registry;
         graph.build_relation_graph();
@@ -276,8 +302,12 @@ mod tests {
 
         add_relation(&mut a, "derivedFrom", "B");
 
-        registry.register_element(a.clone(), "file1.md").unwrap();
-        registry.register_element(b.clone(), "file2.md").unwrap();
+        registry
+            .register_element(a.clone(), "file1.md")
+            .expect("register valid test element");
+        registry
+            .register_element(b, "file2.md")
+            .expect("register valid test element");
 
         let mut graph = registry;
 
@@ -286,7 +316,7 @@ mod tests {
         assert!(result.is_ok());
 
         // Verify A is now in file2.md
-        let a_node = graph.nodes.get("A").unwrap();
+        let a_node = graph.nodes.get("A").expect("expected test node to exist");
         assert_eq!(a_node.element.file_path, "file2.md");
     }
 
@@ -295,14 +325,16 @@ mod tests {
         let mut registry = GraphRegistry::new();
         let a = make_element("A", "Element A");
 
-        registry.register_element(a.clone(), "file.md").unwrap();
+        registry
+            .register_element(a, "file.md")
+            .expect("register valid test element");
         let mut graph = registry;
 
         // Try to move to non-existent file
         let result = graph.move_element_to_location("A", "nonexistent.md");
         assert!(result.is_err());
         assert!(result
-            .unwrap_err()
+            .expect_err("expected the operation to fail")
             .to_string()
             .contains("does not exist in the graph"));
     }
@@ -320,9 +352,15 @@ mod tests {
         let mut c = make_element("C", "Element C");
         c.file_path = "file1.md".to_string(); // Same file as A
 
-        registry.register_element(a.clone(), "file1.md").unwrap();
-        registry.register_element(b.clone(), "file2.md").unwrap();
-        registry.register_element(c.clone(), "file1.md").unwrap();
+        registry
+            .register_element(a, "file1.md")
+            .expect("register valid test element");
+        registry
+            .register_element(b, "file2.md")
+            .expect("register valid test element");
+        registry
+            .register_element(c, "file1.md")
+            .expect("register valid test element");
 
         let graph = registry;
         let locations = graph.get_available_locations();
@@ -344,9 +382,15 @@ mod tests {
         add_relation(&mut b, "derive", "A");
         add_relation(&mut c, "derivedFrom", "A");
 
-        registry.register_element(a.clone(), "file.md").unwrap();
-        registry.register_element(b.clone(), "file.md").unwrap();
-        registry.register_element(c.clone(), "file.md").unwrap();
+        registry
+            .register_element(a, "file.md")
+            .expect("register valid test element");
+        registry
+            .register_element(b.clone(), "file.md")
+            .expect("register valid test element");
+        registry
+            .register_element(c.clone(), "file.md")
+            .expect("register valid test element");
 
         let graph = registry;
         let impact = graph.get_move_impact("A");
@@ -362,7 +406,9 @@ mod tests {
         let mut registry = GraphRegistry::new();
         let a = make_element("A", "Element A");
 
-        registry.register_element(a.clone(), "file.md").unwrap();
+        registry
+            .register_element(a, "file.md")
+            .expect("register valid test element");
         let mut graph = registry;
 
         // Move A to a new file
@@ -370,7 +416,7 @@ mod tests {
         assert!(result.is_ok());
 
         // Verify A is now in the new file
-        let a_node = graph.nodes.get("A").unwrap();
+        let a_node = graph.nodes.get("A").expect("expected test node to exist");
         assert_eq!(a_node.element.file_path, "new_file.md");
     }
 
@@ -380,7 +426,9 @@ mod tests {
         let mut a = make_element("A", "Element A");
         a.file_path = "existing.md".to_string();
 
-        registry.register_element(a.clone(), "existing.md").unwrap();
+        registry
+            .register_element(a, "existing.md")
+            .expect("register valid test element");
         let mut graph = registry;
 
         // Add a new file location
@@ -390,7 +438,10 @@ mod tests {
         // Try to add the same file again (should fail)
         let result = graph.add_file_location("existing.md");
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("already exists"));
+        assert!(result
+            .expect_err("expected the operation to fail")
+            .to_string()
+            .contains("already exists"));
     }
 
     #[test]
@@ -411,16 +462,26 @@ mod tests {
         add_relation(&mut b, "derive", "A");
         add_relation(&mut c, "derive", "A");
 
-        registry.register_element(a.clone(), "file1.md").unwrap();
-        registry.register_element(b.clone(), "file1.md").unwrap();
-        registry.register_element(c.clone(), "file2.md").unwrap();
+        registry
+            .register_element(a, "file1.md")
+            .expect("register valid test element");
+        registry
+            .register_element(b.clone(), "file1.md")
+            .expect("register valid test element");
+        registry
+            .register_element(c.clone(), "file2.md")
+            .expect("register valid test element");
 
         let mut graph = registry;
         graph.build_relation_graph();
 
         // Verify initial relations exist
-        let b_relations = graph.list_relations("B").unwrap();
-        let c_relations = graph.list_relations("C").unwrap();
+        let b_relations = graph
+            .list_relations("B")
+            .expect("list relations for test element");
+        let c_relations = graph
+            .list_relations("C")
+            .expect("list relations for test element");
         assert_eq!(b_relations.len(), 1);
         assert_eq!(c_relations.len(), 1);
         assert_eq!(b_relations[0], ("derive".to_string(), "A".to_string()));
@@ -431,13 +492,19 @@ mod tests {
         assert!(result.is_ok());
 
         // Check that A's location has changed
-        let a_element = graph.get_element("A").unwrap();
+        let a_element = graph
+            .get_element("A")
+            .expect("expected test element to exist");
         assert_eq!(a_element.file_path, "file3.md");
 
         // CRITICAL: Relations from B and C should still point to A
         // But they should be pointing to the NEW identifier if A's identifier changed
-        let b_relations_after = graph.list_relations("B").unwrap();
-        let c_relations_after = graph.list_relations("C").unwrap();
+        let b_relations_after = graph
+            .list_relations("B")
+            .expect("list relations for test element");
+        let c_relations_after = graph
+            .list_relations("C")
+            .expect("list relations for test element");
 
         // These should still exist and point to the moved element
         assert_eq!(
@@ -482,8 +549,12 @@ mod tests {
         // B has a relation pointing to A
         add_relation(&mut b, "derivedFrom", "A");
 
-        registry.register_element(a.clone(), "file1.md").unwrap();
-        registry.register_element(b.clone(), "file1.md").unwrap();
+        registry
+            .register_element(a, "file1.md")
+            .expect("register valid test element");
+        registry
+            .register_element(b.clone(), "file1.md")
+            .expect("register valid test element");
 
         let mut graph = registry;
 
@@ -505,7 +576,12 @@ mod tests {
         // When B gets written to file1.md, it should reference A as "file2.md#A" not just "A"
 
         // Let's check what the markdown would look like:
-        let b_element = graph.nodes.get("B").unwrap().element.clone();
+        let b_element = graph
+            .nodes
+            .get("B")
+            .expect("expected test node to exist")
+            .element
+            .clone();
         let b_markdown = graph.element_to_markdown_with_context(&b_element, "file1.md", true);
         println!("B's markdown after A is moved:");
         println!("{}", b_markdown);
@@ -537,14 +613,25 @@ mod tests {
         add_relation(&mut a, "derivedFrom", "B");
         add_relation(&mut a, "derive", "C");
 
-        registry.register_element(a.clone(), "file1.md").unwrap();
-        registry.register_element(b.clone(), "file2.md").unwrap();
-        registry.register_element(c.clone(), "file1.md").unwrap();
+        registry
+            .register_element(a.clone(), "file1.md")
+            .expect("register valid test element");
+        registry
+            .register_element(b, "file2.md")
+            .expect("register valid test element");
+        registry
+            .register_element(c, "file1.md")
+            .expect("register valid test element");
 
         let mut graph = registry;
 
         // Check A's initial relations in markdown
-        let a_element_initial = graph.nodes.get("A").unwrap().element.clone();
+        let a_element_initial = graph
+            .nodes
+            .get("A")
+            .expect("expected test node to exist")
+            .element
+            .clone();
         let a_markdown_initial =
             graph.element_to_markdown_with_context(&a_element_initial, "file1.md", true);
         println!("A's initial markdown (in file1.md):");
@@ -558,7 +645,12 @@ mod tests {
         assert!(result.is_ok());
 
         // Check A's relations after the move
-        let a_element_moved = graph.nodes.get("A").unwrap().element.clone();
+        let a_element_moved = graph
+            .nodes
+            .get("A")
+            .expect("expected test node to exist")
+            .element
+            .clone();
         let a_markdown_moved =
             graph.element_to_markdown_with_context(&a_element_moved, "file3.md", true);
         println!("A's markdown after move to file3.md:");
@@ -624,9 +716,15 @@ mod tests {
         add_relation(&mut a, "derive", "ElementC");
         add_relation(&mut b, "derivedFrom", "ElementA");
 
-        registry.register_element(a.clone(), "file1.md").unwrap();
-        registry.register_element(b.clone(), "file2.md").unwrap();
-        registry.register_element(c.clone(), "file1.md").unwrap();
+        registry
+            .register_element(a.clone(), "file1.md")
+            .expect("register valid test element");
+        registry
+            .register_element(b.clone(), "file2.md")
+            .expect("register valid test element");
+        registry
+            .register_element(c, "file1.md")
+            .expect("register valid test element");
 
         let mut graph = registry;
 
@@ -635,7 +733,7 @@ mod tests {
         assert!(result.is_ok());
 
         // Create temp directory for flush output
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new().expect("create temporary test directory");
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
@@ -644,14 +742,18 @@ mod tests {
 
         // List what files were actually created
         println!("Files created in output directory:");
-        for entry in fs::read_dir(output_path).unwrap() {
-            let entry = entry.unwrap();
+        for entry in fs::read_dir(output_path).expect("read test directory") {
+            let entry = entry.expect(
+                "test flush creates proper markdown with cross file relations: expected success",
+            );
             println!("  {}", entry.file_name().to_string_lossy());
         }
 
         // Read the generated markdown files and verify their content
-        let file1_content = fs::read_to_string(output_path.join("file1.md")).unwrap();
-        let file3_content = fs::read_to_string(output_path.join("file3.md")).unwrap();
+        let file1_content =
+            fs::read_to_string(output_path.join("file1.md")).expect("read generated test file");
+        let file3_content =
+            fs::read_to_string(output_path.join("file3.md")).expect("read generated test file");
 
         // file2.md might not exist if it only contained ElementB which moved to file3.md
         let file2_content = fs::read_to_string(output_path.join("file2.md")).unwrap_or_else(|_| {
@@ -723,8 +825,8 @@ mod tests {
         a.file_path = "test_file.md".to_string();
 
         registry
-            .register_element(a.clone(), "test_file.md")
-            .unwrap();
+            .register_element(a, "test_file.md")
+            .expect("register valid test element");
 
         // Add page content
         let page =
@@ -734,7 +836,7 @@ mod tests {
         let graph = registry;
 
         // Create temp directory for flush output
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new().expect("create temporary test directory");
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
@@ -742,7 +844,8 @@ mod tests {
         assert!(result.is_ok());
 
         // Read the generated markdown file
-        let file_content = fs::read_to_string(output_path.join("test_file.md")).unwrap();
+        let file_content =
+            fs::read_to_string(output_path.join("test_file.md")).expect("read generated test file");
 
         println!("=== Generated file content ===");
         println!("{}", file_content);
@@ -758,11 +861,15 @@ mod tests {
         assert!(file_content.contains("### Element A Description"));
 
         // Verify order: header, page content, element
-        let header_pos = file_content.find("# Elements").unwrap();
+        let header_pos = file_content
+            .find("# Elements")
+            .expect("expected generated content to contain test text");
         let page_content_pos = file_content
             .find("This is page frontmatter content.")
-            .unwrap();
-        let element_pos = file_content.find("### Element A Description").unwrap();
+            .expect("expected generated content to contain test text");
+        let element_pos = file_content
+            .find("### Element A Description")
+            .expect("expected generated content to contain test text");
 
         assert!(header_pos < page_content_pos);
         assert!(page_content_pos < element_pos);
@@ -785,11 +892,11 @@ mod tests {
         b.file_order_index = 2;
 
         registry
-            .register_element(a.clone(), "test_file.md")
-            .unwrap();
+            .register_element(a, "test_file.md")
+            .expect("register valid test element");
         registry
-            .register_element(b.clone(), "test_file.md")
-            .unwrap();
+            .register_element(b, "test_file.md")
+            .expect("register valid test element");
 
         // Add page content
         let page = Page::new("Page frontmatter content.".to_string());
@@ -798,7 +905,7 @@ mod tests {
         let graph = registry;
 
         // Create temp directory for flush output
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new().expect("create temporary test directory");
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
@@ -806,7 +913,8 @@ mod tests {
         assert!(result.is_ok());
 
         // Read the generated markdown file
-        let file_content = fs::read_to_string(output_path.join("test_file.md")).unwrap();
+        let file_content =
+            fs::read_to_string(output_path.join("test_file.md")).expect("read generated test file");
 
         println!("=== Generated file content ===");
         println!("{}", file_content);
@@ -829,8 +937,8 @@ mod tests {
         a.file_path = "test_file.md".to_string();
 
         registry
-            .register_element(a.clone(), "test_file.md")
-            .unwrap();
+            .register_element(a, "test_file.md")
+            .expect("register valid test element");
 
         // Add empty page content (should be skipped)
         let page = Page::new("   \n\t  \n  ".to_string()); // only whitespace
@@ -839,7 +947,7 @@ mod tests {
         let graph = registry;
 
         // Create temp directory for flush output
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new().expect("create temporary test directory");
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
@@ -847,7 +955,8 @@ mod tests {
         assert!(result.is_ok());
 
         // Read the generated markdown file
-        let file_content = fs::read_to_string(output_path.join("test_file.md")).unwrap();
+        let file_content =
+            fs::read_to_string(output_path.join("test_file.md")).expect("read generated test file");
 
         println!("=== Generated file content ===");
         println!("{}", file_content);
@@ -867,7 +976,9 @@ mod tests {
         let mut a = make_element("ElementA", "Element A Description");
         a.file_path = "MOEs.md".to_string();
 
-        registry.register_element(a.clone(), "MOEs.md").unwrap();
+        registry
+            .register_element(a, "MOEs.md")
+            .expect("register valid test element");
 
         // Add page content (without header - parser strips the H1)
         let page = Page::new("This is the MOEs page content.".to_string());
@@ -876,7 +987,7 @@ mod tests {
         let graph = registry;
 
         // Create temp directory for flush output
-        let temp_dir = TempDir::new().unwrap();
+        let temp_dir = TempDir::new().expect("create temporary test directory");
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
@@ -884,7 +995,8 @@ mod tests {
         assert!(result.is_ok());
 
         // Read the generated markdown file
-        let file_content = fs::read_to_string(output_path.join("MOEs.md")).unwrap();
+        let file_content =
+            fs::read_to_string(output_path.join("MOEs.md")).expect("read generated test file");
 
         println!("=== Generated file content ===");
         println!("{}", file_content);

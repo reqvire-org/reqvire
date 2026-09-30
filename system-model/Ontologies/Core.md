@@ -389,6 +389,9 @@ reqvire:detailsSubsection a reqvire:ReservedSubsection ;
 reqvire:contractBindingsSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Contract Bindings" ;
   rdfs:comment "Explicit cross-subgraph reuse of requirement-owned contract context." .
+reqvire:contractReferencesSubsection a reqvire:ReservedSubsection ;
+  reqvire:subsectionName "Contract References" ;
+  rdfs:comment "Requirement dependencies on owned contract content for change-impact review." .
 reqvire:conceptReferencesSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Concept References" ;
   reqvire:mapsToConcept concept:ConceptReference ;

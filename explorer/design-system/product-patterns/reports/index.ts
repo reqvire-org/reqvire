@@ -1,3 +1,5 @@
+export { CoverageDrilldown } from "./CoverageDrilldown";
+export type { CoverageDrilldownItem, CoverageDrilldownAssessment, CoverageDrilldownTarget } from "./CoverageDrilldown";
 export {
   CoverageBarFrame,
   CoverageBarList,
@@ -5,6 +7,7 @@ export {
   CoverageBreakdownPie,
   CoverageCapabilityList,
   CoverageCapabilityRow,
+  CoverageControls,
   CoverageDashboard,
   CoverageEmptyNote,
   CoverageEmptyState,

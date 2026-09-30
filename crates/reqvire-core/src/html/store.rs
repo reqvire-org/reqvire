@@ -24,6 +24,8 @@ pub struct ExplorerProjectStore {
     pub elements: Vec<ProjectStoreElement>,
     pub relations: Vec<ProjectStoreRelation>,
     pub contract_bindings: Vec<ProjectStoreContractBindingEntry>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub contract_references: Vec<ProjectStoreContractBindingEntry>,
     pub concept_refs: Vec<ProjectStoreConceptReference>,
     pub thesaurus: ProjectStoreThesaurus,
     pub submodels: Value,
@@ -223,6 +225,7 @@ pub fn build_project_store(
     let elements = build_elements(registry);
     let (relations, mut resources) = build_relations(registry);
     let contract_bindings = build_contract_bindings(registry, &mut resources);
+    let contract_references = build_contract_references(registry);
     let concept_refs = build_concept_refs(registry, &mut resources);
     enrich_resource_sources(&mut resources);
     let (files, folders) = build_files_and_folders(registry, &resources);
@@ -234,6 +237,7 @@ pub fn build_project_store(
         &elements,
         &relations,
         &contract_bindings,
+        &contract_references,
         &concept_refs,
         &resources,
         &submodels,
@@ -259,9 +263,10 @@ pub fn build_project_store(
     let trace_report =
         crate::verification_trace::VerificationTraceGenerator::new(registry).generate();
     let traces = serde_json::to_value(trace_report).unwrap_or_else(|_| json!({"files":{}}));
-    let coverage =
-        serde_json::to_value(crate::report::coverage::generate_coverage_report(registry))
-            .unwrap_or_else(|_| json!({}));
+    let coverage_report = crate::operations::coverage_report(registry);
+    let scope_index = coverage_report.scope_index(registry);
+    let mut coverage = serde_json::to_value(coverage_report).unwrap_or_else(|_| json!({}));
+    coverage["scope_index"] = serde_json::to_value(scope_index).unwrap_or_else(|_| json!({}));
     let summaries = ProjectStoreSummaries {
         elements: elements.len(),
         files: files.len(),
@@ -285,6 +290,7 @@ pub fn build_project_store(
         elements,
         relations,
         contract_bindings,
+        contract_references,
         concept_refs,
         thesaurus,
         submodels,
@@ -450,6 +456,7 @@ fn build_knowledge_graph_projection(
     elements: &[ProjectStoreElement],
     relations: &[ProjectStoreRelation],
     contract_bindings: &[ProjectStoreContractBindingEntry],
+    contract_references: &[ProjectStoreContractBindingEntry],
     concept_refs: &[ProjectStoreConceptReference],
     resources: &BTreeMap<String, ProjectStoreResource>,
     submodels: &Value,
@@ -543,8 +550,15 @@ fn build_knowledge_graph_projection(
             "authored": true
         }))
     });
+    let reference_edges = contract_references.iter().map(|reference| {
+        json!({
+            "source": reference.source_id, "target": reference.target,
+            "label": "references contract", "kind": "contract_references", "authored": true,
+        })
+    });
     let edges = relation_edges
         .chain(bound_context_edges)
+        .chain(reference_edges)
         .chain(concept_edges)
         .collect::<Vec<_>>();
 
@@ -1160,6 +1174,25 @@ fn build_contract_bindings(
         }
     }
     entries.sort_by(|a, b| a.id.cmp(&b.id));
+    entries
+}
+
+fn build_contract_references(registry: &GraphRegistry) -> Vec<ProjectStoreContractBindingEntry> {
+    let mut entries = Vec::new();
+    for element in registry.get_all_elements() {
+        for reference in &element.contract_references {
+            let target = reference.target.as_str();
+            entries.push(ProjectStoreContractBindingEntry {
+                id: format!("contract_references:{}:{}", element.identifier, target),
+                source_id: element.identifier.clone(),
+                target,
+                target_kind: "element".into(),
+                resource_id: None,
+                content_hash: None,
+            });
+        }
+    }
+    entries.sort_by(|left, right| left.id.cmp(&right.id));
     entries
 }
 
@@ -1857,6 +1890,7 @@ ext:UnusedTerm a owl:Class ;
             &elements,
             &relations,
             &contract_bindings,
+            &build_contract_references(&registry),
             &concept_refs,
             &resources,
             &serde_json::json!({"submodels":[]}),
@@ -1981,6 +2015,7 @@ ext:UnusedTerm a owl:Class ;
             &elements,
             &relations,
             &contract_bindings,
+            &build_contract_references(&registry),
             &concept_refs,
             &resources,
             &serde_json::json!({"submodels":[]}),

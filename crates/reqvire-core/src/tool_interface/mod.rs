@@ -63,11 +63,11 @@ pub struct ReqvireToolRegistry<'a> {
 }
 
 impl<'a> ReqvireToolRegistry<'a> {
-    pub fn new(enable_mutations: bool, excluded_filename_patterns: &'a GlobSet) -> Self {
+    pub const fn new(enable_mutations: bool, excluded_filename_patterns: &'a GlobSet) -> Self {
         Self::new_with_options(enable_mutations, false, excluded_filename_patterns)
     }
 
-    pub fn new_with_options(
+    pub const fn new_with_options(
         enable_mutations: bool,
         with_size_estimates: bool,
         excluded_filename_patterns: &'a GlobSet,
@@ -79,7 +79,7 @@ impl<'a> ReqvireToolRegistry<'a> {
         }
     }
 
-    pub fn mutation_tools_enabled(&self) -> bool {
+    pub const fn mutation_tools_enabled(&self) -> bool {
         self.enable_mutations
     }
 

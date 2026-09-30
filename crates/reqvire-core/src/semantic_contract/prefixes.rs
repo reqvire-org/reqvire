@@ -1,6 +1,6 @@
 use super::*;
 
-pub(crate) fn parse_turtle_prefix_declarations(content: &str) -> Vec<(String, String)> {
+pub fn parse_turtle_prefix_declarations(content: &str) -> Vec<(String, String)> {
     let mut prefixes = Vec::new();
     for line in content.lines() {
         let trimmed = line.trim();
@@ -179,7 +179,7 @@ pub(super) fn turtle_prefix_binding(content: &str, expected_prefix: &str) -> Opt
     None
 }
 
-pub(crate) fn parse_turtle_prefix_line(line: &str) -> Option<(String, String)> {
+pub fn parse_turtle_prefix_line(line: &str) -> Option<(String, String)> {
     let rest = line
         .strip_prefix("@prefix ")
         .or_else(|| line.strip_prefix("@PREFIX "))

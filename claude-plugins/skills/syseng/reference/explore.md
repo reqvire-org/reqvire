@@ -68,7 +68,9 @@ Use `--short` when analyzing model structure without needing full content. Use `
 | `--have-relations` | Elements with ALL relations | `--have-relations="verifiedBy,satisfiedBy"` |
 | `--not-have-relations` | Elements without ALL relations | `--not-have-relations="verifiedBy"` |
 | `--has-contract-bindings` | Elements with contract_bindings | `--has-contract-bindings` |
-| `--filter-contract-bindings` | Filter by contract_bindings pattern | `--filter-contract-bindings="*.pdf"` |
+| `--filter-contract-bindings` | Filter by contract_bindings pattern | `--filter-contract-bindings="*#error-response-specification"` |
+| `--has-contract-references` | Elements with Contract References | `--has-contract-references` |
+| `--filter-contract-references` | Match referenced contract identifiers | `--filter-contract-references="*#error-response-specification"` |
 
 **Element types for --filter-type (supports comma-separated list):** capability, requirement, ontology, semantic-contract, verification-objective, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
 
@@ -128,7 +130,7 @@ reqvire search --filter-type="specification" --not-have-relations="define" --sho
 reqvire search --has-contract-bindings --short
 
 # Find elements with specific contract_bindings type
-reqvire search --filter-contract-bindings="*.pdf" --short
+reqvire search --filter-contract-bindings="*#error-response-specification" --short
 reqvire search --filter-type="specification" --short
 ```
 
@@ -158,7 +160,7 @@ reqvire resources
 
 When you find an element of interest:
 1. Read the full element content (not just --short output)
-2. Check for **contract_bindings** - they contain critical details
+2. Inspect **contract_bindings** and **contract_references** for implementation obligations and review dependencies respectively
 3. Follow relations to understand context:
    - `derivedFrom` → parent requirements (why this exists)
    - `satisfiedBy` → implementations (how it's fulfilled)
@@ -167,7 +169,7 @@ When you find an element of interest:
 To gather complete context for a requirement, use the collect command:
 
 ```bash
-# Get full requirement chain with all ancestor content and contract_bindings
+# Get full requirement chain with ancestor content and both kinds of contract dependencies
 reqvire collect "<requirement-name>" [--json]
 
 # Example: collect all context for a capability

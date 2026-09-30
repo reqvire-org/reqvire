@@ -77,26 +77,46 @@
 ### Requirement Implementation Coverage
 
 - **Total Requirements in Scope:** 6
-- **Covered Requirements:** 0 (0.0%)
+- **Covered Requirements:** 0
 - **Uncovered Requirements:** 6
+- **Total Terminal Requirements:** 5
+- **Covered Terminal Requirements:** 0 (0.0%)
+- **Uncovered Terminal Requirements:** 5
 
 #### Coverage Sources
 
 - direct_satisfied: 0
-- contract_satisfied_via_contract_bindings: 0
-- contract_satisfied_via_child: 0
+- requirement_rollup: 0
+- contract_consumer_rollup: 0
+- combined_rollup: 0
 
 ## Uncovered Requirements
 
 ### [specifications/Requirements.md](specifications/Requirements.md)
 
-- ❌ **[Another Leaf Requirement Verified](specifications/Requirements.md#another-leaf-requirement-verified)**
-- ❌ **[Leaf Requirement Formal Proof Unsatisfied](specifications/Requirements.md#leaf-requirement-formal-proof-unsatisfied)**
-- ❌ **[Leaf Requirement Unverified](specifications/Requirements.md#leaf-requirement-unverified)**
-- ❌ **[Leaf Requirement Verified](specifications/Requirements.md#leaf-requirement-verified)**
-- ❌ **[Leaf Requirement Verified By Formal Proof](specifications/Requirements.md#leaf-requirement-verified-by-formal-proof)**
-- ❌ **[Parent Requirement](specifications/Requirements.md#parent-requirement)**
+- ❌ **[Another Leaf Requirement Verified](specifications/Requirements.md#another-leaf-requirement-verified)** (uncovered)
+  - Blocking requirements:
+    - [specifications/Requirements.md#another-leaf-requirement-verified](specifications/Requirements.md#another-leaf-requirement-verified)
+- ❌ **[Leaf Requirement Formal Proof Unsatisfied](specifications/Requirements.md#leaf-requirement-formal-proof-unsatisfied)** (uncovered)
+  - Blocking requirements:
+    - [specifications/Requirements.md#leaf-requirement-formal-proof-unsatisfied](specifications/Requirements.md#leaf-requirement-formal-proof-unsatisfied)
+- ❌ **[Leaf Requirement Unverified](specifications/Requirements.md#leaf-requirement-unverified)** (uncovered)
+  - Blocking requirements:
+    - [specifications/Requirements.md#leaf-requirement-unverified](specifications/Requirements.md#leaf-requirement-unverified)
+- ❌ **[Leaf Requirement Verified](specifications/Requirements.md#leaf-requirement-verified)** (uncovered)
+  - Blocking requirements:
+    - [specifications/Requirements.md#leaf-requirement-verified](specifications/Requirements.md#leaf-requirement-verified)
+- ❌ **[Leaf Requirement Verified By Formal Proof](specifications/Requirements.md#leaf-requirement-verified-by-formal-proof)** (uncovered)
+  - Blocking requirements:
+    - [specifications/Requirements.md#leaf-requirement-verified-by-formal-proof](specifications/Requirements.md#leaf-requirement-verified-by-formal-proof)
+- ❌ **[Parent Requirement](specifications/Requirements.md#parent-requirement)** (uncovered)
+  - Contributing requirements:
+    - [specifications/Requirements.md#leaf-requirement-unverified](specifications/Requirements.md#leaf-requirement-unverified)
+    - [specifications/Requirements.md#leaf-requirement-verified](specifications/Requirements.md#leaf-requirement-verified)
+  - Blocking requirements:
+    - [specifications/Requirements.md#leaf-requirement-unverified](specifications/Requirements.md#leaf-requirement-unverified)
+    - [specifications/Requirements.md#leaf-requirement-verified](specifications/Requirements.md#leaf-requirement-verified)
 
 ## Capability Coverage
 
-- **[Coverage Capability](specifications/Requirements.md#coverage-capability)**: partial verification 80.0% (4/5 leaf), implementation 0.0% (0/6 requirements)
+- **[Coverage Capability](specifications/Requirements.md#coverage-capability)**: partial verification 80.0% (4/5 leaf), implementation 0.0% (0/5 terminal requirements), implementation incomplete

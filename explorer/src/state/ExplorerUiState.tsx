@@ -1,6 +1,8 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useStore } from "../store/StoreContext";
 import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
+import { projectCoverage } from "../lib/coverage";
+import type { CoverageProjection, ExplorerProjectStore } from "../store/types";
 
 export type ModelMode = "list" | "grid" | "graph";
 export type ModelSelectionId = "__root__" | `folder:${string}` | `file:${string}` | string;
@@ -118,6 +120,10 @@ interface ExplorerUiState {
   setThesaurusQuery: (query: string) => void;
   coverageSectionId: CoverageSectionId;
   setCoverageSectionId: (id: CoverageSectionId) => void;
+  coverageScopeId: string | null;
+  setCoverageScopeId: (id: string | null) => void;
+  coverageProjection: CoverageProjection;
+  coverageNotice: string | null;
   traceFilePath: string | null;
   setTraceFilePath: (path: string | null) => void;
   traceSelectionId: string | null;
@@ -130,6 +136,7 @@ const ExplorerUiStateContext = createContext<ExplorerUiState | null>(null);
 
 export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
   const { store } = useStore();
+  const coverageState = useCoverageState(store);
   const searchElementTypeKeys = useMemo(
     () => Array.from(new Set(store.elements.map((element) => element.element_type).filter(Boolean))).sort(),
     [store.elements],
@@ -170,6 +177,7 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<ExplorerUiState>(
     () => ({
+      ...coverageState,
       modelMode,
       setModelMode,
       modelSelectionId,
@@ -221,6 +229,7 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
       setTraceTreeQuery,
     }),
     [
+      coverageState,
       knowledgeGraphSelectionId,
       ontologySelectionId,
       thesaurusSelectionId,
@@ -249,6 +258,48 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
       {children}
     </ExplorerUiStateContext.Provider>
   );
+}
+
+interface CoveragePreferences {
+  scopeId: string | null;
+  notice: string | null;
+}
+
+function readCoveragePreferences(key: string): CoveragePreferences {
+  try {
+    const stored = JSON.parse(localStorage.getItem(key) ?? "null");
+    return {
+      scopeId: typeof stored?.scopeId === "string" ? stored.scopeId : null,
+      notice: null,
+    };
+  } catch { return { scopeId: null, notice: null }; }
+}
+
+function useCoverageState(store: ExplorerProjectStore) {
+  const projectKey = `reqvire:coverage:${JSON.stringify([store.project.workspace_root, store.project.repository, store.project.name])}`;
+  const initial = useMemo(() => readCoveragePreferences(projectKey), [projectKey]);
+  const [selections, setSelections] = useState<Record<string, CoveragePreferences>>({});
+  const preferences = selections[projectKey] ?? initial;
+  const missing = preferences.scopeId !== null && (!store.coverage.scope_index[preferences.scopeId]
+    || !store.elements.some(element => element.id === preferences.scopeId && element.element_type === "capability"));
+  const coverageScopeId = missing ? null : preferences.scopeId;
+  const update = useCallback((patch: Partial<CoveragePreferences>) => {
+    setSelections(current => {
+      const next = { ...(current[projectKey] ?? initial), ...patch };
+      try { localStorage.setItem(projectKey, JSON.stringify({ scopeId: next.scopeId })); } catch { /* Session state remains usable without storage. */ }
+      return { ...current, [projectKey]: next };
+    });
+  }, [projectKey, initial]);
+  const missingNotice = "The selected capability is no longer available. Showing Whole model.";
+  useEffect(() => {
+    if (missing) update({ scopeId: null, notice: missingNotice });
+  }, [missing, update]);
+  const setCoverageScopeId = useCallback((scopeId: string | null) => update({ scopeId, notice: null }), [update]);
+  const coverageProjection = useMemo(() => projectCoverage(store.coverage, coverageScopeId), [store.coverage, coverageScopeId]);
+  return useMemo(() => ({
+    coverageScopeId, setCoverageScopeId, coverageProjection,
+    coverageNotice: missing ? missingNotice : preferences.notice,
+  }), [coverageScopeId, setCoverageScopeId, preferences.notice, coverageProjection, store.coverage.scope_index, missing]);
 }
 
 export function useExplorerUiState() {

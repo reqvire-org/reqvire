@@ -118,11 +118,11 @@ fn format_identifier_link(identifier: &str, name: &str) -> String {
     format_identifier_markdown_link(name, identifier)
 }
 
-fn is_requirement_element(element_type: &ElementType) -> bool {
+const fn is_requirement_element(element_type: &ElementType) -> bool {
     matches!(element_type, ElementType::Requirement(_))
 }
 
-fn is_capability_element(element_type: &ElementType) -> bool {
+const fn is_capability_element(element_type: &ElementType) -> bool {
     matches!(element_type, ElementType::Capability)
 }
 
@@ -248,63 +248,50 @@ fn resolve_requirement_capability_roots(
     result
 }
 
-fn collect_requirement_descendants(
-    start_id: &str,
-    requirement_child_map: &FxHashMap<String, Vec<String>>,
-) -> BTreeSet<String> {
-    let mut result = BTreeSet::new();
-    let mut stack = vec![start_id.to_string()];
-
-    while let Some(current) = stack.pop() {
-        if !result.insert(current.clone()) {
-            continue;
-        }
-        if let Some(children) = requirement_child_map.get(&current) {
-            for child in children {
-                stack.push(child.clone());
-            }
-        }
-    }
-
-    result
-}
-
-fn collect_capability_subtree_requirements(
+/// Membership follows every validated capability/specification/requirement path.
+/// Display parents, evidence links, and file locations do not participate.
+pub(crate) fn capability_subtree_members(
+    registry: &GraphRegistry,
     capability_id: &str,
-    capability_child_map: &FxHashMap<String, Vec<String>>,
-    capability_to_requirements_map: &FxHashMap<String, Vec<String>>,
-    requirement_child_map: &FxHashMap<String, Vec<String>>,
-) -> BTreeSet<String> {
-    let mut capability_ids = BTreeSet::new();
+) -> (BTreeSet<String>, BTreeSet<String>) {
+    let mut capabilities = BTreeSet::new();
+    let mut requirements = BTreeSet::new();
     let mut stack = vec![capability_id.to_string()];
-
-    while let Some(current) = stack.pop() {
-        if !capability_ids.insert(current.clone()) {
+    while let Some(identifier) = stack.pop() {
+        let Some(element) = registry.get_element(&identifier) else {
+            continue;
+        };
+        let is_capability = matches!(element.element_type, ElementType::Capability);
+        let is_requirement = matches!(element.element_type, ElementType::Requirement(_));
+        let inserted = if is_capability {
+            capabilities.insert(identifier)
+        } else if is_requirement {
+            requirements.insert(identifier)
+        } else {
+            false
+        };
+        if !inserted {
             continue;
         }
-        if let Some(children) = capability_child_map.get(&current) {
-            for child in children {
-                stack.push(child.clone());
+        for relation in &element.relations {
+            let LinkType::Identifier(target) = &relation.target.link else {
+                continue;
+            };
+            let Some(child) = registry.get_element(target) else {
+                continue;
+            };
+            let follows = match (relation.relation_type.name, &child.element_type) {
+                ("derive", ElementType::Capability) => is_capability,
+                ("specifiedBy", ElementType::Requirement(_)) => is_capability,
+                ("derive", ElementType::Requirement(_)) => is_requirement,
+                _ => false,
+            };
+            if follows {
+                stack.push(target.clone());
             }
         }
     }
-
-    let mut requirements = BTreeSet::new();
-    for current_capability_id in capability_ids {
-        for requirement_id in capability_to_requirements_map
-            .get(&current_capability_id)
-            .cloned()
-            .unwrap_or_default()
-        {
-            for descendant_id in
-                collect_requirement_descendants(&requirement_id, requirement_child_map)
-            {
-                requirements.insert(descendant_id);
-            }
-        }
-    }
-
-    requirements
+    (capabilities, requirements)
 }
 
 pub fn generate_submodels_report(
@@ -338,7 +325,6 @@ pub fn generate_submodels_report(
             ),
         );
     }
-    let capability_child_map = build_child_map(&capability_parent_map);
 
     let mut requirement_parent_map: FxHashMap<String, Vec<String>> = FxHashMap::default();
     let mut requirement_specify_map: FxHashMap<String, Vec<String>> = FxHashMap::default();
@@ -518,12 +504,7 @@ pub fn generate_submodels_report(
             .ok_or_else(|| ReqvireError::ElementNotFound(from_id.clone()))?;
 
         if matches!(from_element.element_type, ElementType::Capability) {
-            let scoped_requirements = collect_capability_subtree_requirements(
-                &from_id,
-                &capability_child_map,
-                &capability_to_requirements_map,
-                &requirement_child_map,
-            );
+            let (_, scoped_requirements) = capability_subtree_members(registry, &from_id);
 
             report.submodels = vec![SubmodelSummary {
                 root_id: from_element.identifier.clone(),

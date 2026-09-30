@@ -18,6 +18,7 @@ export interface ElementDetailContentProps {
   content: ElementDetailContentSlot;
   relations?: DetailRelationItem[];
   contract_bindings?: DetailContractBindingItem[];
+  contract_references?: DetailContractBindingItem[];
   detailListsDefaultExpanded?: boolean;
   onOpenElement: OpenElementHandler;
   onOpenResource?: OpenResourceHandler;
@@ -28,6 +29,7 @@ export function ElementDetailContent({
   content,
   relations = [],
   contract_bindings = [],
+  contract_references = [],
   detailListsDefaultExpanded = true,
   onOpenElement,
   onOpenResource,
@@ -46,6 +48,13 @@ export function ElementDetailContent({
         />
         <ContractBindingList
           contract_bindings={contract_bindings}
+          defaultExpanded={detailListsDefaultExpanded}
+          onOpenElement={onOpenElement}
+          onOpenResource={onOpenResource}
+        />
+        <ContractBindingList
+          title="Contract References"
+          contract_bindings={contract_references}
           defaultExpanded={detailListsDefaultExpanded}
           onOpenElement={onOpenElement}
           onOpenResource={onOpenResource}

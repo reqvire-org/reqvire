@@ -29,6 +29,7 @@ import { useStore } from "../store/StoreContext";
 import { routeForContent, routeForResource, VIEW_TITLES, type ViewId } from "../router/routes";
 import type {
   ExplorerProjectStore,
+  CoverageProjection,
   KnowledgeGraphNode,
   OntologyGraphNode,
   ProjectStoreElement,
@@ -391,8 +392,8 @@ function ExplorerViewControls({
   }
 
   if (activeView === "coverage") {
-    const coverageItems = buildCoveragePaneItems(store);
-    const coverage = isPlainRecord(store.coverage) ? store.coverage : {};
+    const coverage = ui.coverageProjection;
+    const coverageItems = buildCoveragePaneItems(coverage);
     const summary = isPlainRecord(coverage.summary) ? coverage.summary : {};
     const coverageSummaryItems = [
       { label: "Requirements", value: formatSummaryValue(readNumber(summary.total_requirements_in_scope)) },
@@ -409,9 +410,10 @@ function ExplorerViewControls({
                   key={item.id}
                   icon={item.icon}
                   label={item.label}
-                  count={formatCompactCount(item.count)}
+                  count={item.count === undefined ? undefined : formatCompactCount(item.count)}
                   selected={ui.coverageSectionId === item.id}
                   onClick={() => {
+                    if (item.id === "orphaned-verifications" && coverage.scope) ui.setCoverageScopeId(null);
                     ui.setCoverageSectionId(item.id);
                     navigateCoverageSection(item.id);
                   }}
@@ -1596,19 +1598,18 @@ function buildSearchKindCounts(store: ExplorerProjectStore): Record<SearchKind, 
   };
 }
 
-function buildCoveragePaneItems(store: ExplorerProjectStore): Array<{
+function buildCoveragePaneItems(coverage: CoverageProjection): Array<{
   id: CoverageSectionId;
   label: string;
-  count: number;
+  count?: number;
   icon: "pie-chart" | "box" | "file" | "activity" | "x" | "help-circle";
 }> {
-  const coverage = isPlainRecord(store.coverage) ? store.coverage : {};
   const summary = isPlainRecord(coverage.summary) ? coverage.summary : {};
   return [
     {
       id: "overview",
       label: "Overview",
-      count: readNumber(summary.total_requirements_in_scope, store.elements.length),
+      count: readNumber(summary.total_requirements_in_scope),
       icon: "pie-chart",
     },
     {
@@ -1637,8 +1638,8 @@ function buildCoveragePaneItems(store: ExplorerProjectStore): Array<{
     },
     {
       id: "orphaned-verifications",
-      label: "Orphaned verifications",
-      count: coverageSectionCount(coverage.orphaned_verifications),
+      label: coverage.scope ? "Orphans (whole model)" : "Orphaned verifications",
+      count: coverage.scope ? undefined : coverageSectionCount(coverage.orphaned_verifications),
       icon: "help-circle",
     },
   ];

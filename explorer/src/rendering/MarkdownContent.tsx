@@ -130,7 +130,7 @@ export function stripRenderedDetailSections(markdown: string): string {
 }
 
 function isRenderedDetailSectionHeading(line: string): boolean {
-  return /^####\s+(Concept References|Contract Bindings)\s*$/i.test(line.trim());
+  return /^####\s+(Concept References|Contract Bindings|Contract References)\s*$/i.test(line.trim());
 }
 
 function stripYamlFrontmatter(markdown: string): string {

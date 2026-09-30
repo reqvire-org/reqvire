@@ -40,6 +40,89 @@ pub struct Args {
     pub command: Option<Commands>,
 }
 
+#[derive(clap::Args, Debug)]
+pub struct SearchArgs {
+    /// Output results in JSON format
+    #[clap(long, help_heading = "SEARCH OPTIONS")]
+    json: bool,
+
+    /// Save JSON output to file (requires --json)
+    #[clap(long, value_name = "FILE", help_heading = "SEARCH OPTIONS")]
+    output: Option<String>,
+
+    /// Output abbreviated format (one-line per element in text, omit fields in JSON)
+    #[clap(long, help_heading = "SEARCH OPTIONS")]
+    short: bool,
+
+    /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+    #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
+    filter_file: Option<String>,
+
+    /// Only include elements whose name matches this regular expression
+    #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
+    filter_name: Option<String>,
+
+    /// Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+    #[clap(long, value_name = "TYPE[,TYPE...]", help_heading = "SEARCH OPTIONS")]
+    filter_type: Option<String>,
+
+    /// Only include requirement-family elements with matching effective status values
+    #[clap(
+        long,
+        value_name = "STATUS[,STATUS...]",
+        help_heading = "SEARCH OPTIONS"
+    )]
+    filter_status: Option<String>,
+
+    /// Only include requirement-family elements with matching effective priority values
+    #[clap(
+        long,
+        value_name = "PRIORITY[,PRIORITY...]",
+        help_heading = "SEARCH OPTIONS"
+    )]
+    filter_priority: Option<String>,
+
+    /// Only include requirement-family elements with matching effective risk values
+    #[clap(long, value_name = "RISK[,RISK...]", help_heading = "SEARCH OPTIONS")]
+    filter_risk: Option<String>,
+
+    /// Only include requirement-family elements whose effective owner matches this regular expression
+    #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
+    filter_owner: Option<String>,
+
+    /// Only include elements whose content matches this regular expression
+    #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
+    filter_content: Option<String>,
+
+    /// Only include elements whose parent file page content matches this regular expression
+    #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
+    filter_page_content: Option<String>,
+
+    /// Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")
+    #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
+    have_relations: Option<String>,
+
+    /// Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
+    #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
+    not_have_relations: Option<String>,
+
+    /// Only include elements that have contract_bindings
+    #[clap(long, help_heading = "SEARCH OPTIONS")]
+    has_contract_bindings: bool,
+
+    /// Only include elements with contract_bindings matching this glob pattern (e.g., "*.pdf", "docs/**/*")
+    #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
+    filter_contract_bindings: Option<String>,
+
+    /// Only include elements that have Contract References
+    #[clap(long, help_heading = "SEARCH OPTIONS")]
+    has_contract_references: bool,
+
+    /// Only include elements with Contract Reference targets matching this glob (e.g., "*#error-response-specification")
+    #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
+    filter_contract_references: Option<String>,
+}
+
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Serve the embedded Explorer UI via HTTP server
@@ -162,81 +245,9 @@ pub enum Commands {
 
     /// Search and filter model elements with comprehensive filtering options
     #[clap(
-        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)"
+        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)\n      --has-contract-bindings          Only include elements that have Contract Bindings\n      --filter-contract-bindings <GLOB> Match Contract Binding target identifiers\n      --has-contract-references        Only include elements that have Contract References\n      --filter-contract-references <GLOB> Match Contract Reference target identifiers"
     )]
-    Search {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "SEARCH OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "SEARCH OPTIONS")]
-        output: Option<String>,
-
-        /// Output abbreviated format (one-line per element in text, omit fields in JSON)
-        #[clap(long, help_heading = "SEARCH OPTIONS")]
-        short: bool,
-
-        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
-        #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
-        filter_file: Option<String>,
-
-        /// Only include elements whose name matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
-        filter_name: Option<String>,
-
-        /// Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
-        #[clap(long, value_name = "TYPE[,TYPE...]", help_heading = "SEARCH OPTIONS")]
-        filter_type: Option<String>,
-
-        /// Only include requirement-family elements with matching effective status values
-        #[clap(
-            long,
-            value_name = "STATUS[,STATUS...]",
-            help_heading = "SEARCH OPTIONS"
-        )]
-        filter_status: Option<String>,
-
-        /// Only include requirement-family elements with matching effective priority values
-        #[clap(
-            long,
-            value_name = "PRIORITY[,PRIORITY...]",
-            help_heading = "SEARCH OPTIONS"
-        )]
-        filter_priority: Option<String>,
-
-        /// Only include requirement-family elements with matching effective risk values
-        #[clap(long, value_name = "RISK[,RISK...]", help_heading = "SEARCH OPTIONS")]
-        filter_risk: Option<String>,
-
-        /// Only include requirement-family elements whose effective owner matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
-        filter_owner: Option<String>,
-
-        /// Only include elements whose content matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
-        filter_content: Option<String>,
-
-        /// Only include elements whose parent file page content matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
-        filter_page_content: Option<String>,
-
-        /// Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")
-        #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
-        have_relations: Option<String>,
-
-        /// Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
-        #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
-        not_have_relations: Option<String>,
-
-        /// Only include elements that have contract_bindings
-        #[clap(long, help_heading = "SEARCH OPTIONS")]
-        has_contract_bindings: bool,
-
-        /// Only include elements with contract_bindings matching this glob pattern (e.g., "*.pdf", "docs/**/*")
-        #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
-        filter_contract_bindings: Option<String>,
-    },
+    Search(Box<SearchArgs>),
 
     /// Analyze change impact and provide report
     #[clap(
@@ -280,9 +291,12 @@ pub enum Commands {
 
     /// Generate verification and implementation coverage report
     #[clap(
-        override_help = "Generate verification and implementation coverage report\n\nCOVERAGE OPTIONS:\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)"
+        override_help = "Generate verification and implementation coverage report\n\nCOVERAGE OPTIONS:\n      --from <NAME>              Select a capability subtree by exact name (default: whole model)\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)"
     )]
     Coverage {
+        /// Select a capability subtree by exact name
+        #[clap(long, value_name = "NAME", help_heading = "COVERAGE OPTIONS")]
+        from: Option<String>,
         /// Output results in JSON format
         #[clap(long, help_heading = "COVERAGE OPTIONS")]
         json: bool,
@@ -449,7 +463,7 @@ pub enum Commands {
 
     /// Merge multiple elements into target element
     #[clap(
-        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and contract_bindings are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Concrete verifications can merge into concrete verifications\n    - Verification objectives can merge only into verification objectives\n    - Contracts can merge into contracts (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
+        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations, contract bindings, and contract references are merged with deduplication; mixed dependency sections are rejected\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Concrete verifications can merge into concrete verifications\n    - Verification objectives can merge only into verification objectives\n    - Contracts can merge into contracts (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
     )]
     Merge {
         /// Target element name (receives merged content)
@@ -526,16 +540,16 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Add relation or contract_bindings between elements
+    /// Add relation, contract binding, or contract reference between elements
     #[clap(
         name = "link",
-        override_help = "Add relation or contract_bindings between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or bindContract>  Relation type OR 'bindContract' keyword for contract_bindings\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    define        - Source contract element defines a requirement\n    definedBy     - Source requirement owns a compatible contract element\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    broader       - Source concept has a broader concept\n    narrower      - Source concept has a narrower concept\n    related       - Source concept is related to another concept\n    exactMatch    - Source concept exactly matches an external concept IRI or concept element\n    closeMatch    - Source concept closely matches an external concept IRI or concept element\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source requirement is verified by concrete verification\n    verify        - Source concrete verification verifies a requirement\n\nCONTRACT BINDINGS:\n    Use 'bindContract' keyword to bind compatible requirement-owned contract elements\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For bindContract: requirement may reuse compatible requirement-owned source, constraint, behavior, specification, state, or input-output contract element identifiers (file.md#element-id or #element-id). Non-ontology prose uses Concept References; structural ontology uses reqvire:mapsToConcept; semantic contracts use use/usedBy.\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" definedBy \"Invoice Numbering Specification\"\n    reqvire link \"Invoice Numbering Specification\" define \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Traceability\" broader \"Engineering Knowledge\"\n    reqvire link \"Traceability\" related \"Verification Evidence\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"System Requirement\" bindContract \"constraints.md#latency-limit\""
+        override_help = "Add relation, contract binding, or contract reference between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE>           Relation type, bindContract, or referenceContract\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    define        - Source contract element defines a requirement\n    definedBy     - Source requirement owns a compatible contract element\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    broader       - Source concept has a broader concept\n    narrower      - Source concept has a narrower concept\n    related       - Source concept is related to another concept\n    exactMatch    - Source concept exactly matches an external concept IRI or concept element\n    closeMatch    - Source concept closely matches an external concept IRI or concept element\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source requirement is verified by concrete verification\n    verify        - Source concrete verification verifies a requirement\n\nCONTRACT BINDINGS:\n    Use 'bindContract' keyword to bind compatible requirement-owned contract elements\n\nCONTRACT REFERENCES:\n    Use 'referenceContract' for a contract content dependency used by change impact.\n    A requirement may use Contract Bindings or Contract References, never both.\n\nTARGET TYPES:\n    For referenceContract: requirement-owned contract element name or identifier\n    For relations: element name, internal file path, or external URL (http/https)\n    For bindContract: requirement may reuse compatible requirement-owned source, constraint, behavior, specification, state, or input-output contract element identifiers (file.md#element-id or #element-id). Non-ontology prose uses Concept References; structural ontology uses reqvire:mapsToConcept; semantic contracts use use/usedBy.\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" definedBy \"Invoice Numbering Specification\"\n    reqvire link \"Invoice Numbering Specification\" define \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Traceability\" broader \"Engineering Knowledge\"\n    reqvire link \"Traceability\" related \"Verification Evidence\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"System Requirement\" bindContract \"constraints.md#latency-limit\""
     )]
     Link {
         /// Source element name
         source: String,
 
-        /// Relation type OR 'bindContract'.
+        /// Relation type, 'bindContract', or 'referenceContract'.
         /// Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, broader, narrower, related, exactMatch, closeMatch, satisfiedBy, satisfy, verifiedBy, verify.
         /// Use 'bindContract' to reuse compatible requirement-owned contract elements
         relation_type: String,
@@ -556,10 +570,10 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Remove relation or contract_bindings between elements (auto-detects type)
+    /// Remove relation, contract binding, or contract reference between elements (auto-detects type)
     #[clap(
         name = "unlink",
-        override_help = "Remove relation or contract_bindings between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Searches relations first, then contract_bindings.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Capability Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
+        override_help = "Remove relation, contract binding, or contract reference between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Detects relations, Contract Bindings, and Contract References.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Capability Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
     )]
     Unlink {
         /// Source element name
@@ -747,7 +761,7 @@ pub enum Commands {
 
     /// Collect content from capability, requirement, ontology, concept-scheme, or concept context
     #[clap(
-        override_help = "Collect content from capability, requirement, ontology, concept-scheme, or concept context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the capability, requirement, ontology, concept-scheme, or concept element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)\n\nCOLLECTED CONTEXT:\n    Capability/requirement starts include traversed elements, authored concept references, requirement contracts, and contract_bindings.\n    Ontology starts include ontology hierarchy and downstream semantic contracts that use reachable ontology.\n    Concept-scheme/concept starts include thesaurus context through concept hierarchy."
+        override_help = "Collect content from capability, requirement, ontology, concept-scheme, or concept context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the capability, requirement, ontology, concept-scheme, or concept element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)\n\nCOLLECTED CONTEXT:\n    Capability/requirement starts include traversed elements, authored concept references, requirement contracts, contract bindings, and contract references.\n    Ontology starts include ontology hierarchy and downstream semantic contracts that use reachable ontology.\n    Concept-scheme/concept starts include thesaurus context through concept hierarchy."
     )]
     Collect {
         /// Name of the capability, requirement, ontology, concept-scheme, or concept element to collect from
@@ -823,12 +837,12 @@ pub enum SemanticLayerArg {
 impl From<SemanticLayerArg> for SemanticExportLayer {
     fn from(value: SemanticLayerArg) -> Self {
         match value {
-            SemanticLayerArg::Ontologies => SemanticExportLayer::Ontologies,
-            SemanticLayerArg::Shapes => SemanticExportLayer::Shapes,
-            SemanticLayerArg::Concepts => SemanticExportLayer::Concepts,
-            SemanticLayerArg::Model => SemanticExportLayer::Model,
-            SemanticLayerArg::ExternalUsed => SemanticExportLayer::ExternalUsed,
-            SemanticLayerArg::Prefixes => SemanticExportLayer::Prefixes,
+            SemanticLayerArg::Ontologies => Self::Ontologies,
+            SemanticLayerArg::Shapes => Self::Shapes,
+            SemanticLayerArg::Concepts => Self::Concepts,
+            SemanticLayerArg::Model => Self::Model,
+            SemanticLayerArg::ExternalUsed => Self::ExternalUsed,
+            SemanticLayerArg::Prefixes => Self::Prefixes,
         }
     }
 }
@@ -873,15 +887,15 @@ impl Args {
         // Check if help was requested before parsing
         let args: Vec<String> = std::env::args().collect();
         if args.len() > 1 && (args[1] == "--help" || args[1] == "-h" || args[1] == "help") {
-            let cmd = Args::command();
+            let cmd = Self::command();
             print_custom_help(&cmd);
             std::process::exit(0);
         }
-        Args::parse()
+        Self::parse()
     }
 
     pub fn print_help() {
-        let cmd = Args::command();
+        let cmd = Self::command();
         print_custom_help(&cmd);
     }
 }
@@ -945,9 +959,9 @@ fn print_custom_help(cmd: &clap::Command) {
             .map(|s| s.to_string())
             .unwrap_or_default();
 
+        println!("  {:<17} {}", name, about);
         // Check if this command has subcommands (like verifications)
         if subcommand.has_subcommands() {
-            println!("  {:<17} {}", name, about);
             // List nested subcommands indented
             for nested in subcommand.get_subcommands() {
                 let nested_name = format!("{} {}", name, nested.get_name());
@@ -957,8 +971,6 @@ fn print_custom_help(cmd: &clap::Command) {
                     .unwrap_or_default();
                 println!("    {:<15} {}", nested_name, nested_about);
             }
-        } else {
-            println!("  {:<17} {}", name, about);
         }
     }
     println!("  help               Print this message or the help of the given subcommand(s)");
@@ -1124,13 +1136,13 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
     }
 }
 
-fn wants_json(args: &Args) -> bool {
+const fn wants_json(args: &Args) -> bool {
     match &args.command {
         Some(Commands::Format { json, .. }) => *json,
         Some(Commands::Migrate { json, .. }) => *json,
         Some(Commands::Validate { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
-        Some(Commands::Search { json, .. }) => *json,
+        Some(Commands::Search(search)) => search.json,
         Some(Commands::Traces { .. }) => true,
         Some(Commands::Coverage { json, .. }) => *json,
         Some(Commands::Model { .. }) => true,
@@ -1163,7 +1175,7 @@ fn handle_json_output(json_content: &str, output: &Option<String>) -> Result<(),
     Ok(())
 }
 
-fn semantic_export_format(jsonld: bool) -> SemanticExportFormat {
+const fn semantic_export_format(jsonld: bool) -> SemanticExportFormat {
     if jsonld {
         SemanticExportFormat::JsonLd
     } else {
@@ -1203,7 +1215,7 @@ pub async fn handle_command(
             Commands::Format { output, json, .. } => (output.is_some(), *json),
             Commands::Migrate { output, json, .. } => (output.is_some(), *json),
             Commands::Validate { output, json, .. } => (output.is_some(), *json),
-            Commands::Search { output, json, .. } => (output.is_some(), *json),
+            Commands::Search(search) => (search.output.is_some(), search.json),
             Commands::ChangeImpact { output, json, .. } => (output.is_some(), *json),
             Commands::Traces { output, .. } => (output.is_some(), true),
             Commands::Coverage { output, json, .. } => (output.is_some(), *json),
@@ -1325,24 +1337,27 @@ pub async fn handle_command(
             }
             Ok(0)
         }
-        Some(Commands::Search {
-            json,
-            output,
-            short,
-            filter_file,
-            filter_name,
-            filter_type,
-            filter_status,
-            filter_priority,
-            filter_risk,
-            filter_owner,
-            filter_content,
-            filter_page_content,
-            have_relations,
-            not_have_relations,
-            has_contract_bindings,
-            filter_contract_bindings,
-        }) => {
+        Some(Commands::Search(search)) => {
+            let SearchArgs {
+                json,
+                output,
+                short,
+                filter_file,
+                filter_name,
+                filter_type,
+                filter_status,
+                filter_priority,
+                filter_risk,
+                filter_owner,
+                filter_content,
+                filter_page_content,
+                have_relations,
+                not_have_relations,
+                has_contract_bindings,
+                filter_contract_bindings,
+                has_contract_references,
+                filter_contract_references,
+            } = *search;
             // Build search filters
             let filters = reqvire::search::SearchFilters::new(
                 filter_file.as_deref(),
@@ -1358,6 +1373,10 @@ pub async fn handle_command(
                 not_have_relations.as_deref(),
                 has_contract_bindings,
                 filter_contract_bindings.as_deref(),
+            )?
+            .with_contract_references(
+                has_contract_references,
+                filter_contract_references.as_deref(),
             )?;
 
             // Generate search report
@@ -1539,8 +1558,9 @@ pub async fn handle_command(
 
             Ok(0)
         }
-        Some(Commands::Coverage { json, output }) => {
-            let coverage_report = operations::coverage_report(&model_manager.graph_registry);
+        Some(Commands::Coverage { from, json, output }) => {
+            let coverage_report =
+                operations::scoped_coverage_report(&model_manager.graph_registry, from.as_deref())?;
             if json {
                 handle_json_output(&coverage_report.to_json_string(), &output)?;
             } else {
@@ -1856,8 +1876,7 @@ pub async fn handle_command(
                 excluded_filename_patterns,
                 &current_dir,
                 &workspace_root,
-                dry_run,
-                squash,
+                crud::MoveFileOptions { dry_run, squash },
             )?;
 
             // Output result
@@ -2701,7 +2720,7 @@ mod tests {
 
     #[test]
     fn test_cli_parsing_subcommand() {
-        let args = Args::parse_from(&["reqvire", "serve", "--host", "127.0.0.1", "--port", "9000"]);
+        let args = Args::parse_from(["reqvire", "serve", "--host", "127.0.0.1", "--port", "9000"]);
         assert!(matches!(
             args.command,
             Some(Commands::Serve { host, port, enable_mcp, mcp_enable_mutations })
@@ -2711,7 +2730,7 @@ mod tests {
 
     #[test]
     fn parses_serve_with_embedded_mcp() {
-        let args = Args::parse_from(&["reqvire", "serve", "--enable-mcp", "--enable-mutations"]);
+        let args = Args::parse_from(["reqvire", "serve", "--enable-mcp", "--enable-mutations"]);
         assert!(matches!(
             args.command,
             Some(Commands::Serve {
@@ -2754,7 +2773,7 @@ mod tests {
 
     #[test]
     fn workspace_flag_is_global() {
-        let args = Args::parse_from(&["reqvire", "--workspace", "/tmp", "validate"]);
+        let args = Args::parse_from(["reqvire", "--workspace", "/tmp", "validate"]);
         assert_eq!(args.workspace, Some(PathBuf::from("/tmp")));
         assert!(matches!(args.command, Some(Commands::Validate { .. })));
     }
@@ -2762,7 +2781,7 @@ mod tests {
     #[test]
     fn apply_workspace_rejects_missing_directory() {
         let missing = PathBuf::from("/definitely/not/a/reqvire/workspace");
-        let err = apply_workspace(Some(&missing)).unwrap_err();
+        let err = apply_workspace(Some(&missing)).expect_err("expected the operation to fail");
         assert!(err.to_string().contains("Failed to resolve workspace"));
     }
 }

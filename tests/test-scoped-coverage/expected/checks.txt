@@ -1,0 +1,45 @@
+PASS fixture-valid
+PASS cli-whole-model-json
+PASS cli-whole-model-text
+PASS cli-help
+PASS cli-json-Alpha Root
+PASS cli-text-Alpha Root
+PASS cli-json-Alpha Left
+PASS cli-text-Alpha Left
+PASS cli-json-Alpha Right
+PASS cli-text-Alpha Right
+PASS cli-json-Shared Branch
+PASS cli-text-Shared Branch
+PASS cli-json-Empty Branch
+PASS cli-text-Empty Branch
+PASS cli-json-Beta Root
+PASS cli-text-Beta Root
+PASS cli-invalid-Missing Capability
+PASS cli-invalid-Alpha Local
+PASS cli-invalid-Exchange Format
+PASS cli-invalid-Shared Check
+PASS cli-invalid-alpha root
+PASS exported-store-scope-index
+PASS served-store-scope-index
+PASS browser-served-exported-and-live-coverage
+PASS mcp-discovery
+PASS mcp-whole-model
+PASS mcp-scope-Alpha Root
+PASS mcp-scope-Alpha Left
+PASS mcp-scope-Alpha Right
+PASS mcp-scope-Shared Branch
+PASS mcp-scope-Empty Branch
+PASS mcp-scope-Beta Root
+PASS mcp-invalid-Missing Capability
+PASS mcp-invalid-Alpha Local
+PASS mcp-invalid-Exchange Format
+PASS mcp-invalid-Shared Check
+PASS mcp-invalid-alpha root
+PASS repeated-scope-and-cli-mcp-parity
+PASS mcp-revision-after-external-edit
+PASS mcp-whole-model-after-external-edit
+PASS external-evidence-removed
+PASS cli-after-edit-Alpha Root
+PASS mcp-after-edit-Alpha Root
+PASS cli-after-edit-Shared Branch
+PASS mcp-after-edit-Shared Branch

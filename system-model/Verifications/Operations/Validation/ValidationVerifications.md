@@ -359,6 +359,17 @@ This verification test checks that Reqvire correctly identifies and reports inva
 - System should report clear error messages with details about the invalid format
 - Two separate test scenarios should validate Pass 1 and Pass 2 errors independently
 
+##### Requirement Fulfillment Cycle Cases
+- Evaluate cycles over the combined requirement-child and owned-contract-consumer dependencies used for implementation rollup. A consumer is a requirement explicitly binding a contract owned by another requirement.
+- Reject reciprocal bindings between independent requirement branches under the same capability root, even when both requirements have direct implementation artifacts. Text and JSON validation identify the circular dependency and its participating requirements.
+- Reject a three-root binding cycle even when no pair of capability roots has reciprocal bindings.
+- Reject a cycle that closes only when requirement-child edges and contract-consumer edges are combined. Separate acyclic binding and hierarchy graphs do not establish that the combined graph is acyclic.
+- Reordering declarations and relation lists preserves rejection and the reported cycle participants.
+- Whole-model coverage rejects the same-root and mixed cycles with validation diagnostics instead of emitting a partial coverage report.
+- Breaking the reciprocal binding restores valid validation and coverage. An acyclic graph with a shared descendant and one consumer binding several contracts of the same owner remains valid and implementation-covered.
+- Validation and coverage leave all fixture model sources and artifacts unchanged, including rejected cases.
+- Starting from an acyclic model, reject a binding addition, a requirement-child relation, or an element merge that closes a fulfillment cycle. Check both normal and dry-run mutations, require cycle diagnostics, and compare source bytes before and after rejection.
+
 #### Metadata
   * type: test-verification
 

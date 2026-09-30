@@ -52,12 +52,12 @@ Use this method when building or refactoring a system model, not only when clean
    - Requirements may use `#### Concept References` to bind readable text to SKOS concepts.
    - `semantic-contract` elements contain `#### Shapes` only, never `#### Ontology`, use ontology through `use`/`usedBy`, and constrain requirements through `constrain`/`constrainedBy`.
 
-5. **Preserve boundaries through contract_bindings**
+5. **Preserve boundaries through contract dependencies**
    - Use hierarchy only inside a capability, requirement, or ontology family.
    - Use concept references for cross-root SKOS concept reuse.
-   - Use requirement contract_bindings for cross-root reusable requirement-owned contracts.
+   - Use requirement Contract Bindings for cross-root implementation obligations and Contract References for content dependencies.
    - Use `use` for semantic-contract ontology dependencies and `constrain` for semantic-contract requirement dependencies.
-   - After changing contract_bindings or hierarchy, check `submodels --json` for unintended cross-submodel couplings.
+   - After changing bindings, references, or hierarchy, check `submodels --json` for unintended cross-submodel couplings.
 
 6. **Update verification and tests in the same slice**
    - Verifications verify requirements directly; capabilities are covered through requirement rollup.
@@ -142,7 +142,7 @@ For each capability root:
 - Confirm it is a real independent capability root.
 - Check whether it has requirements through `specifiedBy`/`specify`.
 - If it has zero requirements, confirm it is still a meaningful capability because it has child capabilities; otherwise add a concrete obligation that specifies it or move pure vocabulary into `system-model/Ontologies` and reference it from consuming elements.
-- Confirm cross-root dependencies are contract_bindings, not hierarchy relations.
+- Confirm cross-root contract dependencies use bindings or references according to responsibility, rather than hierarchy relations.
 - If one root is too broad, split it into child capabilities first and move local requirements to the child capabilities before editing ontology or contracts.
 
 ### 2. Classify Candidate Text
@@ -200,7 +200,7 @@ When an obligation needs specific closed-world validation:
 - Add `use` relations to the ontology elements that declare the SHACL terms.
 - Use only ontology terms declared by the semantic contract's explicit ontology-use graph.
 
-### 6. Wire Relations And Contract Bindings
+### 6. Wire Relations And Contract Dependencies
 
 Use:
 
@@ -212,7 +212,7 @@ Use:
 - Requirement contract_bindings only for compatible requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` contracts.
 
 Use semantic relation families or concept references instead of a generic relation to preserve ownership or dependency meaning.
-Do not remove a cross-root dependency unless the consumer now has an explicit concept reference, semantic-contract relation, or requirement contract_bindings that gives `collect` and change impact the same dependency path.
+Do not remove a cross-root dependency unless the consumer now has an explicit concept reference, semantic-contract relation, or requirement binding/reference that gives `collect` and change impact the same dependency path.
 
 ### 7. Update Verifications And Tests
 
@@ -250,5 +250,5 @@ Run focused e2e tests for touched behavior, then full e2e before finishing.
 - Do not create one universal capability root for all shared contracts.
 - Do not move workflow behavior or implementation commitments into ontology just because the text is structured.
 - Do not let SHACL profiles introduce new ontology terms.
-- Do not remove cross-subgraph relations without replacing intentional dependencies with contract_bindings.
+- Do not remove cross-subgraph relations without preserving intentional dependencies as appropriate bindings or references.
 - Do not leave capability roots with zero requirements unless they have child capabilities; move pure vocabulary to ontology.

@@ -400,9 +400,9 @@ impl LinkType {
     /// Use `as_string()` if you need an owned fallback for non-UTF-8 paths.
     pub fn as_str(&self) -> &str {
         match self {
-            LinkType::Identifier(id) => id,
-            LinkType::ExternalUrl(url) => url,
-            LinkType::InternalPath(path) => path.to_str().unwrap_or_default(),
+            Self::Identifier(id) => id,
+            Self::ExternalUrl(url) => url,
+            Self::InternalPath(path) => path.to_str().unwrap_or_default(),
         }
     }
 }
@@ -494,22 +494,18 @@ impl Relation {
     }
 
     /// Creates an opposite relation if possible for given target
-    pub fn to_opposite(&self, name: &str, identifier: &str, element_id: &str) -> Option<Relation> {
-        if let Some(opposite_name) = self.relation_type.opposite {
-            RELATION_TYPES
-                .get(opposite_name)
-                .map(|opposite_info| Relation {
-                    relation_type: opposite_info,
-                    target: RelationTarget {
-                        text: name.to_string(),
-                        link: LinkType::Identifier(identifier.to_string()),
-                        element_id: Some(element_id.to_string()),
-                    },
-                    user_created: false, // Auto-generated opposite relations are not user-created
-                })
-        } else {
-            None
-        }
+    pub fn to_opposite(&self, name: &str, identifier: &str, element_id: &str) -> Option<Self> {
+        self.relation_type.opposite.and_then(|opposite_name| {
+            RELATION_TYPES.get(opposite_name).map(|opposite_info| Self {
+                relation_type: opposite_info,
+                target: RelationTarget {
+                    text: name.to_string(),
+                    link: LinkType::Identifier(identifier.to_string()),
+                    element_id: Some(element_id.to_string()),
+                },
+                user_created: false, // Auto-generated opposite relations are not user-created
+            })
+        })
     }
 }
 
@@ -554,6 +550,7 @@ pub fn supported_relation_types_list() -> String {
 }
 
 /// Get the list of general parent relation types (backward dependencies).
+///
 /// These are the "backward" pointing relations where an element refers to something it depends on.
 /// Includes hierarchical (derivedFrom), satisfaction (satisfy), and verification (verify) parents.
 pub fn get_parent_relation_types() -> Vec<&'static str> {

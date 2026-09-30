@@ -55,13 +55,8 @@ impl GraphRegistry {
         Ok(())
     }
 
-    /// Build relations and validate graph structure
-    pub fn build_relations(
-        &mut self,
-        excluded_filename_patterns: &GlobSet,
-    ) -> Result<Vec<ReqvireError>, ReqvireError> {
-        debug!("GraphRegistry: Building relations and validating graph structure");
-
+    /// Rebuild normalized graph edges and inverse relations before validation.
+    pub(crate) fn refresh_relation_context(&mut self, excluded_filename_patterns: &GlobSet) {
         // Normalize any non-canonical relation references before validation:
         // keep canonical full identifiers in-memory and keep markdown rendering compact
         // through serialization-time relative-link conversion.
@@ -75,6 +70,15 @@ impl GraphRegistry {
 
         // Populate element_id for all relations
         self.populate_relation_element_ids();
+    }
+
+    /// Build relations and validate graph structure
+    pub fn build_relations(
+        &mut self,
+        excluded_filename_patterns: &GlobSet,
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("GraphRegistry: Building relations and validating graph structure");
+        self.refresh_relation_context(excluded_filename_patterns);
 
         // Materialize namespace-derived concept payload fields after relation
         // resolution so JSON evidence and generated RDF use the same SKOS IRIs.
@@ -97,6 +101,7 @@ impl GraphRegistry {
 
         // Validate contract_bindings exist
         errors.extend(self.validate_contract_bindings()?);
+        errors.extend(self.validate_contract_references()?);
 
         // Validate legacy contract relation names before the stricter
         // contract-element ownership checks.

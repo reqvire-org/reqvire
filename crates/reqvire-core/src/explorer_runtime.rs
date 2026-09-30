@@ -85,21 +85,18 @@ pub fn export_to_dir(
 }
 
 fn copy_workspace_assets(output_dir: &std::path::Path) -> Result<(), ReqvireError> {
-    use std::path::Path;
-
     let output_dir = output_dir
         .canonicalize()
         .unwrap_or_else(|_| output_dir.to_path_buf());
     let scope = crate::workspace::WorkspaceScope::discover()?;
     for scan_root in scope.scan_roots() {
-        copy_workspace_assets_from_dir(&scope, Path::new("."), &scan_root, &output_dir)?;
+        copy_workspace_assets_from_dir(&scope, &scan_root, &output_dir)?;
     }
     Ok(())
 }
 
 fn copy_workspace_assets_from_dir(
     scope: &crate::workspace::WorkspaceScope,
-    root: &std::path::Path,
     dir: &std::path::Path,
     output_dir: &std::path::Path,
 ) -> Result<(), ReqvireError> {
@@ -124,7 +121,7 @@ fn copy_workspace_assets_from_dir(
             if should_skip_workspace_asset_dir(&name) {
                 continue;
             }
-            copy_workspace_assets_from_dir(scope, root, &path, output_dir)?;
+            copy_workspace_assets_from_dir(scope, &path, output_dir)?;
             continue;
         }
 

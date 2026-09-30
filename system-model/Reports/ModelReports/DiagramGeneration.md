@@ -48,6 +48,8 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [verification_trace.rs](../../../crates/reqvire-core/src/verification_trace.rs)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * definedBy: [Trace Diagram Node Target Data Contract Specification](Specifications.md#trace-diagram-node-target-data-contract-specification)
   * derivedFrom: [Trace Diagram Projection Data](#trace-diagram-projection-data)
 ---

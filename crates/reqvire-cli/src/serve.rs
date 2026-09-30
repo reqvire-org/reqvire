@@ -38,7 +38,7 @@ struct RuntimeState {
 }
 
 #[derive(Clone)]
-pub(crate) struct ServeState {
+pub struct ServeState {
     excluded_filename_patterns: Arc<GlobSet>,
     runtime_assets: Arc<Mutex<RuntimeState>>,
     live_refresh: bool,
@@ -252,10 +252,12 @@ async fn refresh_runtime_assets(state: &ServeState) -> Result<(), ReqvireError> 
         Ok(snapshot) => {
             published.snapshot = snapshot;
             published.refresh_error = None;
+            drop(published);
             Ok(())
         }
         Err(error) => {
             published.refresh_error = Some(error.to_string());
+            drop(published);
             Err(error)
         }
     }
@@ -292,38 +294,43 @@ async fn live_response(
     };
     let revision = &snapshot.live.revision;
     let etag = format!("\"{revision}\"");
-    let (status, body) = if let Some(error) = error {
-        (
-            StatusCode::SERVICE_UNAVAILABLE,
-            serde_json::json!({ "revision": revision, "error": error }).to_string(),
-        )
-    } else if headers
-        .get(header::IF_NONE_MATCH)
-        .and_then(|value| value.to_str().ok())
-        .is_some_and(|value| {
-            value.split(',').any(|candidate| {
-                let candidate = candidate
-                    .trim()
-                    .strip_prefix("W/")
-                    .unwrap_or(candidate.trim());
-                candidate == etag || candidate == "*"
-            })
-        })
-    {
-        (StatusCode::NOT_MODIFIED, String::new())
-    } else if method == Method::HEAD {
-        (StatusCode::OK, String::new())
-    } else if manifest {
-        (StatusCode::OK, snapshot.live.manifest_json.clone())
-    } else {
-        (
-            StatusCode::OK,
-            format!(
-                "{{\"revision\":\"{revision}\",\"store\":{}}}",
-                snapshot.assets.project_store_json
-            ),
-        )
-    };
+    let (status, body) = error.map_or_else(
+        || {
+            if headers
+                .get(header::IF_NONE_MATCH)
+                .and_then(|value| value.to_str().ok())
+                .is_some_and(|value| {
+                    value.split(',').any(|candidate| {
+                        let candidate = candidate
+                            .trim()
+                            .strip_prefix("W/")
+                            .unwrap_or_else(|| candidate.trim());
+                        candidate == etag || candidate == "*"
+                    })
+                })
+            {
+                (StatusCode::NOT_MODIFIED, String::new())
+            } else if method == Method::HEAD {
+                (StatusCode::OK, String::new())
+            } else if manifest {
+                (StatusCode::OK, snapshot.live.manifest_json.clone())
+            } else {
+                (
+                    StatusCode::OK,
+                    format!(
+                        "{{\"revision\":\"{revision}\",\"store\":{}}}",
+                        snapshot.assets.project_store_json
+                    ),
+                )
+            }
+        },
+        |error| {
+            (
+                StatusCode::SERVICE_UNAVAILABLE,
+                serde_json::json!({ "revision": revision, "error": error }).to_string(),
+            )
+        },
+    );
     Response::builder()
         .status(status)
         .header(header::CONTENT_TYPE, "application/json")
@@ -410,14 +417,16 @@ fn workspace_file_response(method: Method, request_path: &str) -> Option<Respons
         return None;
     }
 
-    match std::fs::read(&absolute_path) {
-        Ok(content) => Some(bytes_response(
-            method,
-            content_type_for_path(request_path),
-            content,
-        )),
-        Err(_) => Some(response_with_status(StatusCode::NOT_FOUND)),
-    }
+    std::fs::read(&absolute_path).map_or_else(
+        |_| Some(response_with_status(StatusCode::NOT_FOUND)),
+        |content| {
+            Some(bytes_response(
+                method,
+                content_type_for_path(request_path),
+                content,
+            ))
+        },
+    )
 }
 
 fn resolve_request_path(raw_request_path: &str) -> Result<String, StatusCode> {
@@ -491,7 +500,7 @@ mod tests {
                 project_store_json: json,
                 ontologies_ttl: "@prefix : <urn:test:> .".into(),
             })
-            .unwrap(),
+            .expect("build test runtime snapshot"),
         )
     }
 
@@ -500,7 +509,7 @@ mod tests {
             excluded_filename_patterns: Arc::new(
                 reqvire::exclusions::ExclusionSetBuilder::new()
                     .build()
-                    .unwrap(),
+                    .expect("build test configuration"),
             ),
             runtime_assets: Arc::new(Mutex::new(RuntimeState {
                 snapshot: snapshot("initial"),
@@ -515,10 +524,10 @@ mod tests {
         String::from_utf8(
             to_bytes(response.into_body(), usize::MAX)
                 .await
-                .unwrap()
+                .expect("read response body")
                 .to_vec(),
         )
-        .unwrap()
+        .expect("expected UTF-8 response body")
     }
 
     #[tokio::test]
@@ -541,7 +550,7 @@ mod tests {
                         .uri("/api/project-store/manifest")
                         .header(header::IF_NONE_MATCH, condition)
                         .body(Body::empty())
-                        .unwrap(),
+                        .expect("build valid test HTTP request"),
                 )
                 .await
                 .unwrap();
@@ -564,7 +573,7 @@ mod tests {
                     .method(Method::HEAD)
                     .uri("/api/project-store/manifest")
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("build valid test HTTP request"),
             )
             .await
             .unwrap();
@@ -584,11 +593,11 @@ mod tests {
                 Request::builder()
                     .uri("/api/project-store/manifest")
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("build valid test HTTP request"),
             ),
         )
         .await
-        .unwrap()
+        .expect("manifest read should finish while the model gate is held")
         .unwrap();
         assert_eq!(response.status(), StatusCode::OK);
     }
@@ -609,7 +618,7 @@ mod tests {
                         .method(method)
                         .uri(url)
                         .body(Body::empty())
-                        .unwrap(),
+                        .expect("build valid test HTTP request"),
                 )
                 .await
                 .unwrap();
@@ -620,7 +629,7 @@ mod tests {
                 Request::builder()
                     .uri("/assets/project-store.js")
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("build valid test HTTP request"),
             )
             .await
             .unwrap();
@@ -631,21 +640,27 @@ mod tests {
     async fn superseded_manifest_conflicts_but_captured_snapshot_remains_immutable() {
         let state = state(true);
         let captured = Arc::clone(&state.runtime_assets.lock().await.snapshot);
-        let manifest: Value = serde_json::from_str(&captured.live.manifest_json).unwrap();
+        let manifest: Value =
+            serde_json::from_str(&captured.live.manifest_json).expect("parse generated JSON");
         let hash = manifest["sections"]["elements"]["hashes"][0]
             .as_str()
-            .unwrap()
+            .expect("expected a JSON string")
             .to_string();
         let request = ChunkRequest {
             revision: captured.live.revision.clone(),
             hashes: vec![hash.clone()],
         };
         state.runtime_assets.lock().await.snapshot = snapshot("updated");
-        let captured_response: Value =
-            serde_json::from_str(&captured.live.chunks_json(&request).unwrap()).unwrap();
+        let captured_response: Value = serde_json::from_str(
+            &captured
+                .live
+                .chunks_json(&request)
+                .expect("retrieve requested test chunks"),
+        )
+        .expect("parse generated JSON");
         assert!(captured_response["chunks"][&hash]
             .as_str()
-            .unwrap()
+            .expect("expected a JSON string")
             .contains("initial"));
         let app = explorer_routes(true).with_state(state);
         let response = app
@@ -657,7 +672,7 @@ mod tests {
                     .body(Body::from(
                         json!({"revision": request.revision, "hashes": request.hashes}).to_string(),
                     ))
-                    .unwrap(),
+                    .expect("build valid test HTTP request"),
             )
             .await
             .unwrap();
@@ -686,12 +701,13 @@ mod tests {
                     .uri("/api/project-store/manifest")
                     .header(header::IF_NONE_MATCH, format!("\"{revision}\""))
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("build valid test HTTP request"),
             )
             .await
             .unwrap();
         assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
-        let diagnostic: Value = serde_json::from_str(&body(response).await).unwrap();
+        let diagnostic: Value =
+            serde_json::from_str(&body(response).await).expect("parse generated JSON");
         assert_eq!(diagnostic["revision"], revision);
         let seed = app
             .clone()
@@ -699,7 +715,7 @@ mod tests {
                 Request::builder()
                     .uri("/assets/project-store.js")
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("build valid test HTTP request"),
             )
             .await
             .unwrap();
@@ -711,7 +727,7 @@ mod tests {
                     .uri("/api/project-store/manifest")
                     .header(header::IF_NONE_MATCH, format!("\"{revision}\""))
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("build valid test HTTP request"),
             )
             .await
             .unwrap();

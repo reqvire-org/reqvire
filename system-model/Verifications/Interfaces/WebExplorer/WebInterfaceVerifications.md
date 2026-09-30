@@ -194,6 +194,48 @@ Verify authored identifiers through the compiled Explorer served by the CLI in a
   * verify: [Explorer Route Identifier Resolution](../../../Interfaces/WebExplorer/Capabilities.md#explorer-route-identifier-resolution)
 ---
 
+### Explorer Scoped Coverage Verification
+
+This verification checks consistent coverage scope selection, ranked hierarchical presentation, and compact evidence links in the existing Explorer.
+
+#### Details
+Expected checks:
+- Open Coverage on a model with two independent roots, nested capabilities, an empty capability, shared verification targets, an orphan, and cross-root contract-consumption evidence. Default to Whole model with a ranked parent-before-child hierarchy and no display selector.
+- Inspect generated served and exported Project Store data before browser projection. Assert that `coverage.scope_index` has exactly one entry for every capability, including nested and empty capabilities, and no entries for other element types. Compare each entry's `scope` and `summary` with the shared scoped report for the same snapshot, including sorted distinct membership identifiers, external evidence exclusion from membership, and the whole-model-only orphan marker.
+- Select each root and a nested capability. Compare every summary, chart count, type/source breakdown, gap list, evidence-satisfaction list, and sidebar count against the shared scoped report for the same snapshot.
+- Assert parent-before-child ordering, depth indentation, and ascending verification/implementation ranking within roots and sibling groups, including name and identifier tie breaks. Ranking keeps each displayed subtree together. Multiple valid parent paths must not duplicate counts or hide reachable members; reordering input records must not change the display parent.
+- Assert evidence links use the existing compact endpoint pattern, wrap without overflow at narrow widths, and open both element and resource targets. A requirement with several artifacts must not produce full-width action buttons.
+- Confirm external binding consumers remain linked and open the existing detail workflow without changing scope membership.
+- Confirm implementation percentages display terminal numerators and denominators from the shared report, while capability completeness is separate. A covered capability with external terminal consumers can display zero local terminal units without being labelled incomplete.
+- Confirm that capability rows retain the ranked hierarchy while attached requirement rows initially remain collapsed. Expand a capability to reveal its attached requirements, then expand a requirement to reveal its immediate child requirements. Expand a child with descendants to reveal the next requirement level, then select a terminal requirement name to inspect its implementation evidence in element details. Inspect the shared report surface, element-type markers, indentation, and chevron disclosure state. Collapse the capability to hide its requirement details while preserving the ranked capability rows. Name links retain the existing element detail workflow independently of expansion controls.
+- Expand a nested capability whose attached requirement has a parent displayed under another capability. Inspect that requirement and its descendants within the nested capability, retaining published status, element-detail navigation, and shared report totals. Confirm each requirement appears once within each capability disclosure, with deterministic parent choice and independent disclosure state across capability contexts.
+- Inspect an uncovered parent with direct evidence: its child rows appear directly below it. Each child has its own published coverage status. The parent implementation status retains the recursive gap count on the right of its row. Terminal rows with and without artifacts retain their metrics and element-detail link without an expansion action. Requirements with children or binding consumers remain expandable.
+- Inspect covered and uncovered terminal requirement rows: verification and implementation retain their published statuses and show the same colored bars and metric layout as capability rows, including full `100% · 1 / 1` and empty `0% · 0 / 1` values. Check an independently verified but unimplemented terminal, and check complete and incomplete parent bars against their published aggregate counts, retaining blocker statuses. Check binding-consumer progress across scope boundaries.
+- Compare verification row labels with published report values: complete coverage is Verified, nonzero incomplete coverage is Partially verified, and zero coverage is Not verified. Implementation classifications retain their own labels.
+- Inspect visible capability and requirement rows in light and dark themes: consecutive rows alternate surface tones across the complete visible hierarchy, including after expanding and collapsing a branch. Inspect hierarchy branches and dependency lists for border-free row separation; rows within each list alternate the same tones. Compare verification and implementation column positions across capability and requirement depths on wide and narrow screens. Element identities and dependency links retain hierarchy indentation, with readable wrapping.
+- At a 780px viewport, expand three successive requirement levels with the Explorer pane open and then collapsed. Confirm each child identity is indented beyond its parent, coverage columns and dependency statuses remain aligned, and the row layout adapts to the available panel width. Repeat on a wide viewport and a narrow viewport.
+- Compare immediate contribution identifiers with the displayed child rows and additional dependency links. Contract consumers appear under Binding consumers with their published status and applicable outside-scope marker. A shared child chosen for display under another parent remains linked under Additional child requirements. Check that all reported immediate dependencies remain reachable.
+- Expand a parent and its descendants and confirm that the coverage hierarchy contains no artifact lists or Direct / Via dependencies labels. Select the terminal requirement name, inspect its satisfiedBy relations in the element detail modal, and follow an artifact link to the resource view. Confirm coverage counts and scope remain unchanged. Compare the right edges of binding consumer statuses with the requirement status column.
+- Assert Scope is in the Coverage title header, aligned right on wide screens and contained without overflow on narrow screens.
+- Open the showcase coverage fixture through the real Explorer application, expand its capability and requirement rows, and use its actual detail and resource workflows.
+- Use long requirement and binding consumer names. Assert retained element-detail targets and wrapping without horizontal overflow at narrow widths.
+- In capability scope, assert that orphan diagnostics are labelled whole-model-only and that the explicit navigation action switches to Whole model and opens the orphan section.
+- Reload and refresh valid snapshots while preserving available scope identifiers and ranked hierarchy. Ignore previously stored root-summary or flat-ranked display preferences. Remove the selected capability in a later snapshot and assert explained fallback to Whole model with internally consistent counts.
+- Verify empty-capability behavior and project-specific state isolation. Remove required scope data or requirement aggregate counts and assert a store diagnostic before rendering.
+- Exercise the same scoped projection through served and exported Explorer data, with the Coverage view and sidebar agreeing in both cases.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [MockShell.test.tsx](../../../../explorer/design-system/showcase/MockShell.test.tsx)
+  * satisfiedBy: [loadStore.test.ts](../../../../explorer/src/store/loadStore.test.ts)
+  * satisfiedBy: [CoverageView.test.tsx](../../../../explorer/src/views/CoverageView.test.tsx)
+  * satisfiedBy: [test.sh](../../../../tests/test-scoped-coverage/test.sh)
+  * verify: [Explorer Scoped Coverage](../../../Interfaces/WebExplorer/Capabilities.md#explorer-scoped-coverage)
+---
+
 ### Explorer Serve Verification
 
 This test verifies that the system serves the native SPA Explorer shell with Model route containment modes and Project Store data.
