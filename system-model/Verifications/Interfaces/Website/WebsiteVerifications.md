@@ -8,6 +8,25 @@ This objective groups review of public documentation wording, examples, and navi
   * type: verification-objective
 ---
 
+### Website MCP HTTP Configuration Documentation Verification
+
+This inspection verifies that endpoint-host and browser-origin setup examples match MCP startup and transport behavior.
+
+#### Details
+- Review standalone and embedded command examples for repeatable `--allow-origin`, the embedded `--enable-mcp` prerequisite, and valid HTTP(S) origins without paths.
+- Confirm that the page explains additive loopback defaults, exact scheme/host/port matching, and rejection of unlisted origins.
+- Confirm that the page distinguishes browser origin configuration from bind address, endpoint URL, and authentication.
+- Review direct-host and reverse-proxy examples for automatic bind-host acceptance, explicit allowed hostnames with optional ports, wildcard listener behavior, and equivalent embedded MCP options.
+- Build the website and check the examples against command help and the transport verification results.
+
+#### Metadata
+  * type: inspection-verification
+
+#### Relations
+  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
+  * verify: [Website Assistant Integration Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-assistant-integration-documentation)
+---
+
 ### Website Contract Binding Placement Documentation Verification
 
 This inspection verifies that public documentation explains contract binding placement according to implementation responsibility and inherited obligation scope.

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MockShell } from "./MockShell";
 
@@ -25,6 +25,8 @@ describe("showcase application coverage", () => {
     const view = render(<MockShell example="coverage" />);
     try {
       expect(screen.getByRole("heading", { name: "Coverage" })).toBeTruthy();
+      const scopeId = "specifications/Capabilities.md#alpha-root";
+      fireEvent.change(screen.getByRole("combobox", { name: "Scope" }), { target: { value: scopeId } });
       expand("Shared Branch");
       expand("Alpha Parent");
       const parent = screen.getByRole("article", { name: "Alpha Parent" });
@@ -39,8 +41,15 @@ describe("showcase application coverage", () => {
       fireEvent.click(within(terminal).getByRole("link", { name: "requirement Alpha Implemented" }));
       const detail = await screen.findByRole("dialog");
       expect(within(detail).getAllByText("satisfiedBy").length).toBeGreaterThan(0);
-      fireEvent.click(within(detail).getByRole("link", { name: /alpha.txt/ }));
+      const artifact = within(detail).getByRole("link", { name: /alpha.txt/ });
+      expect(artifact.getAttribute("href")).toBe("#/content/evidence/alpha.txt");
+      fireEvent.click(artifact);
       expect(await screen.findByText(/Synthetic implementation artifact for the alpha fixture/)).toBeTruthy();
+      expect(window.location.hash).toBe("#/content/evidence/alpha.txt");
+      expect(screen.queryByRole("dialog")).toBeNull();
+      fireEvent.click(screen.getByRole("tab", { name: "Coverage" }));
+      await waitFor(() => expect((screen.getByRole("combobox", { name: "Scope" }) as HTMLSelectElement).value).toBe(scopeId));
+      expect(screen.getByText("1 / 3 terminal requirements covered")).toBeTruthy();
     } finally {
       view.unmount();
       window.reqvireProjectStore = seed;

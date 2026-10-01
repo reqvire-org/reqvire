@@ -315,7 +315,7 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           Blocker counts accompany the requirement's
           implementation status.
           Select a requirement name to inspect its evidence in element details and follow
-          artifact links to the resource view.
+          local artifact links to the file-content viewer. Returning to Coverage keeps your selected scope.
           Verified, Partially verified, and Not verified describe the model's
           verification coverage; they are coverage labels rather than test execution results.
         </p>

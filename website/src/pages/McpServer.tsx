@@ -54,9 +54,76 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' \\
   http://127.0.0.1:8081/mcp`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
-          Browser-originated requests are local-safe by default: missing Origin
-          headers and loopback origins are accepted, while non-loopback origins
-          are rejected.
+          Requests without an Origin header and HTTP(S) loopback origins are
+          accepted by default. Add other browser origins explicitly with the
+          repeatable <code>--allow-origin</code> option.
+        </p>
+      </Section>
+
+      <Section title="Hosting MCP">
+        <p className="text-zinc-600 mb-4">
+          <code>--host</code> selects the listening address. When you bind to
+          a specific hostname or IP address, Reqvire accepts that endpoint host
+          at the listening port automatically. Use your server&apos;s address:
+        </p>
+        <CodeBlock>{`reqvire mcp --host 192.0.2.50 --port 8081`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          For all interfaces, use <code>--host 0.0.0.0</code> and explicitly
+          allow the hostname or IP that clients use. Repeat
+          <code> --allow-host</code> for additional endpoint names:
+        </p>
+        <CodeBlock>{`reqvire mcp --host 0.0.0.0 --port 8081 \\
+  --allow-host mcp.example.com --allow-host 192.0.2.50:8081
+
+reqvire serve --enable-mcp --host 0.0.0.0 \\
+  --allow-host explorer.example.com`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          Host values contain no scheme or path. A hostname without a port
+          accepts that exact name on any port; adding a port restricts it to
+          that authority. Subdomains need separate entries. IPv6 authorities
+          use brackets, for example <code>[2001:db8::1]:8081</code>.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          For <code>https://mcp.example.com/mcp</code> behind a reverse proxy,
+          keep the backend on loopback and permit the public host:
+        </p>
+        <CodeBlock>{`reqvire mcp --host 127.0.0.1 --port 8081 \\
+  --allow-host mcp.example.com`}</CodeBlock>
+        <p className="text-zinc-600">
+          Configure the proxy to forward <code>/mcp</code> to
+          <code> http://127.0.0.1:8081/mcp</code>, preserve the allowed Host
+          header, and handle HTTPS and authentication. Forwarded-host headers
+          alone do not authorize a hostname. Native MCP clients normally need
+          this endpoint configuration without an additional browser origin.
+        </p>
+      </Section>
+
+      <Section title="Browser Origins">
+        <CodeBlock>{`reqvire mcp --allow-origin https://app.example.com \\
+  --allow-origin http://192.0.2.10:3000
+
+reqvire serve --enable-mcp --allow-origin https://app.example.com`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          Use the origin of the browser application: its scheme, hostname, and
+          port, without a path. For example, a page at
+          <code> https://app.example.com/chat</code> has origin
+          <code> https://app.example.com</code>. This is separate from the
+          Reqvire endpoint URL ending in <code>/mcp</code>.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Additional origins retain loopback access. Matching uses the exact
+          scheme, hostname, and effective port; omitted ports mean 80 for HTTP
+          and 443 for HTTPS. Other ports and subdomains need their own entries.
+          Wildcards and <code>null</code> origins are rejected. Permitted
+          origins receive CORS preflight and response headers; unlisted origins
+          receive HTTP 403.
+        </p>
+        <p className="text-zinc-600">
+          The <code>--host</code> option controls the listening address.
+          <code> --allow-origin</code> controls browser access to the MCP
+          endpoint and applies to embedded MCP when <code>--enable-mcp</code>
+          is present. Origin permission does not provide authentication;
+          deployments use their own authentication and authorization controls.
         </p>
       </Section>
 

@@ -50,12 +50,14 @@ Expected checks:
 - Verify `assets/project-store.js` and `ontologies.ttl` responses include no-store cache control.
 - Verify `--enable-mutations` is rejected unless `--enable-mcp` is also provided for `reqvire serve`.
 - Verify `/mcp` is handled by RMCP transport and is not served by the Explorer SPA fallback.
+- Verify repeated `--allow-origin` values configure embedded MCP with the same origin matching and CORS preflight behavior as standalone MCP. Verify the option requires `--enable-mcp` and Explorer routes retain their own response headers.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-http-access/test.sh)
   * verify: [Serve Command Embedded MCP Endpoint](../../../Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
 ---
 
@@ -150,7 +152,18 @@ Expected checks:
 - Verify HTTP `tools/list`, `resources/list`, and representative `tools/call` responses expose the expected tool names, schemas, annotations, mutation gating, and structured result semantics.
 - Verify HTTP requests without an `Origin` header are accepted.
 - Verify HTTP requests with loopback `Origin` headers are accepted.
-- Verify HTTP requests with non-loopback, `null`, file, or malformed `Origin` headers are rejected before tool execution.
+- Verify unlisted non-loopback, `null`, file, malformed, and multiple-valued Origin headers receive HTTP 403 before tool execution.
+- Configure two origins through repeated `--allow-origin` arguments on standalone and embedded MCP. Verify both origins can initialize and call tools, loopback and no-Origin clients still work, and a different scheme, port, subdomain, or unlisted origin is rejected.
+- Verify allowed origins receive matching CORS headers on successful requests and protocol errors. Verify OPTIONS preflight permits POST and the specified MCP/authentication headers, exposes the MCP response headers, and varies by origin. Verify invalid origins are rejected on OPTIONS, POST, GET, and DELETE.
+- Verify default HTTP/HTTPS ports match equivalent explicitly specified ports, while nondefault ports remain distinct.
+- Verify wildcard, opaque, non-HTTP(S), credential-bearing, path, query, fragment, malformed, and invalid-port CLI values fail before startup. Verify `serve --allow-origin` requires `--enable-mcp` and both help surfaces describe repetition.
+- Verify configuring embedded MCP CORS preserves Explorer routes and does not grant those routes cross-origin access.
+- Bind to a non-wildcard hostname or IP and verify its authority at the listening port is accepted automatically. Verify wildcard binds preserve host validation and accept explicitly configured public hostnames, IP authorities, and multiple aliases.
+- Verify a bare Host matches an explicitly permitted HTTP port 80, with HTTPS URI authorities using port 443, while proxy forwarding headers cannot change that interpretation.
+- Verify bare and bracketed IPv6 bind forms produce the same listener hostname and correctly bracketed endpoint URL.
+- Verify configured hosts initialize MCP and discover tools through standalone and embedded endpoints. Check case-insensitive exact hostname matching, explicit port restrictions, omitted-port behavior, and rejection of different hosts, subdomains, and ports before mutation execution.
+- Verify `Forwarded` and `X-Forwarded-Host` headers do not authorize an otherwise rejected Host header. Verify allowing a host does not allow its browser origin, and allowing an origin does not allow its host as an endpoint authority.
+- Verify malformed, wildcard, URL-shaped, credential-bearing, path-bearing, query-bearing, fragment-bearing, invalid-port, and unspecified-IP host arguments fail before startup. Verify both help surfaces describe repetition and embedded `--allow-host` requires `--enable-mcp`.
 - Verify HTTP mutation tools are absent unless the server is started with `--enable-mutations`.
 - Verify mutation-capable HTTP mode still requires explicit `--enable-mutations` and does not become enabled by selecting HTTP transport.
 - Verify concurrent HTTP mutation requests for the same workspace are serialized so filesystem writes and post-mutation model refresh cannot interleave.
@@ -167,6 +180,9 @@ Cache rebuild races and post-write model/runtime coherence are additionally cove
   * verify: [MCP Mutation Concurrency Control](../../../Interfaces/MCP/Tools.md#mcp-mutation-concurrency-control)
   * verify: [MCP Streamable HTTP Transport](../../../Interfaces/MCP/Tools.md#mcp-streamable-http-transport)
   * verify: [MCP Streamable HTTP Transport Safety](../../../Interfaces/MCP/Tools.md#mcp-streamable-http-transport-safety)
+  * verify: [MCP Server Command](../../../Interfaces/MCP/Tools.md#mcp-server-command)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-http-access/test.sh)
+  * satisfiedBy: [mcp_http.rs](../../../../crates/reqvire-cli/src/mcp_http.rs)
 ---
 
 ### MCP Model Evidence Tools Verification

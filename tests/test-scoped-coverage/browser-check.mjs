@@ -91,11 +91,18 @@ try {
     }
     throw new Error(`Browser condition timed out: ${fn.toString()}`);
   }
-  async function navigate(baseUrl) {
+  async function loadPage(url) {
     const loaded = new Promise(resolve => events.set("Page.loadEventFired", resolve));
-    await rpc("Page.navigate", { url: `${baseUrl}/#/coverage` });
+    await rpc("Page.navigate", { url });
     await loaded;
+  }
+  async function navigate(baseUrl) {
+    // A fresh document resets route overlays and disclosure state, while
+    // retaining persisted scope for the checks that explicitly exercise it.
+    await loadPage("about:blank");
+    await loadPage(`${baseUrl}/#/coverage`);
     await waitFor(() => !!document.querySelector('select[aria-label="Scope"]'));
+    await evaluate(async () => { await document.fonts.ready; });
   }
   async function select(name) {
     await evaluate(name => {
@@ -115,7 +122,7 @@ try {
   async function assertTerminalLinks() {
     await evaluate(() => {
       const hierarchy = document.querySelector(".ux-coverage-drilldown");
-      if (hierarchy.querySelector('a[href^="#/resources/"]')
+      if (hierarchy.querySelector('a[href^="#/resources/"], a[href^="#/content/"]')
         || hierarchy.textContent.includes("Via dependencies")) throw new Error("Coverage hierarchy repeats artifact evidence");
       for (const name of ["Alpha Implemented", "Alpha Gap"]) {
         const terminal = document.querySelector(`article[aria-label="${name}"]`);
@@ -219,12 +226,25 @@ try {
       failed = true;
       console.log(`${label}: FAIL`);
       console.error(`${label}: ${error.message}`);
+      console.error(await evaluate(() => JSON.stringify({
+        url: location.href, width: innerWidth,
+        dialogLinks: [...document.querySelectorAll('[role="dialog"] a')].map(link => ({ text: link.textContent.trim(), href: link.getAttribute("href") })),
+      })));
       console.error(await evaluate(() => document.body.innerText.slice(0, 1800)));
+    } finally {
+      await rpc("Emulation.setDeviceMetricsOverride", defaultViewport);
     }
   }
   for (const [mode, url] of [["served", servedUrl], ["exported", exportedUrl]]) {
-    await run(`${mode} defaults`, async () => {
+    const scenario = (label, check) => run(`${mode} ${label}`, async () => {
       await navigate(url);
+      if (await evaluate(() => !!document.querySelector('button[aria-label="Expand explorer"]'))) {
+        await click("Expand explorer");
+      }
+      await waitFor(() => !!document.querySelector('button[aria-label="Collapse explorer"]'));
+      await check();
+    });
+    await scenario("defaults", async () => {
       await assertReport(reports.whole);
       await assertRows(["Alpha Root", "Empty Branch", "Alpha Left", "Shared Branch", "Alpha Right", "Beta Root"], [0, 1, 1, 2, 1, 0]);
       if (await evaluate(() => !!document.querySelector('[aria-label="Display"]'))) throw new Error("Unexpected display selector");
@@ -235,7 +255,7 @@ try {
         return scope.left > title.right && scope.top < title.bottom && scope.bottom >= title.top;
       })) throw new Error("Scope is not at the right of the Coverage title");
     });
-    await run(`${mode} scope and sidebar parity`, async () => {
+    await scenario("scope and sidebar parity", async () => {
       for (const name of ["Alpha Root", "Beta Root", "Alpha Left", "Shared Branch", "Empty Branch"]) {
         await select(name);
         await assertReport(reports[name]);
@@ -247,7 +267,7 @@ try {
       }
       await waitFor(() => document.body.textContent.includes("No requirements in this capability scope"));
     });
-    await run(`${mode} hierarchy and evidence navigation`, async () => {
+    await scenario("hierarchy and evidence navigation", async () => {
       await select("Alpha Root");
       await assertRows(["Alpha Root", "Empty Branch", "Alpha Left", "Shared Branch", "Alpha Right"], [0, 1, 1, 2, 1]);
       await assertReport(reports["Alpha Root"]);
@@ -349,15 +369,19 @@ try {
       await waitFor(() => document.querySelector('[role="dialog"]')?.textContent.includes("Alpha Implemented"));
       await evaluate(() => {
         const dialog = document.querySelector('[role="dialog"]');
-        const file = [...dialog.querySelectorAll("a")].find(link => link.getAttribute("href") === "#/resources/resource:evidence/alpha.txt");
+        const file = [...dialog.querySelectorAll("a")].find(link => link.getAttribute("href") === "#/content/evidence/alpha.txt");
         if (!file || !dialog.textContent.includes("satisfiedBy")) throw new Error("Missing implementation evidence in element details");
         file.click();
       });
-      await waitFor(() => location.hash.startsWith("#/resources/") && document.body.textContent.includes("Synthetic implementation artifact for the alpha fixture."));
-      await evaluate(() => { location.hash = "#/coverage"; });
+      await waitFor(() => location.hash === "#/content/evidence/alpha.txt"
+        && !document.querySelector('[role="dialog"]')
+        && document.body.textContent.includes("Synthetic implementation artifact for the alpha fixture."));
+      await click("Coverage");
+      await waitFor(() => document.querySelector('select[aria-label="Scope"]')?.selectedOptions[0]?.text === "Alpha Root");
       await assertReport(reports["Alpha Root"]);
     });
-    await run(`${mode} reload and orphan navigation`, async () => {
+    await scenario("reload and orphan navigation", async () => {
+      await select("Alpha Root");
       const loaded = new Promise(resolve => events.set("Page.loadEventFired", resolve));
       await rpc("Page.reload");
       await loaded;
@@ -368,7 +392,7 @@ try {
       await assertReport(reports.whole);
       await waitFor(() => document.querySelector("#coverage-section-orphaned-verifications")?.textContent.includes("Orphan Check"));
     });
-    await run(`${mode} narrow coverage controls`, async () => {
+    await scenario("narrow coverage controls", async () => {
       await rpc("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: false });
       await click("Collapse explorer");
       await select("Alpha Root");
@@ -385,7 +409,6 @@ try {
           && [...document.querySelectorAll(".ux-coverage-drilldown__row")].every(row => getComputedStyle(row).gridTemplateColumns.split(" ").length === 2);
       });
       await click("Expand explorer");
-      await rpc("Emulation.setDeviceMetricsOverride", defaultViewport);
     });
   }
   async function tool(name, args) {

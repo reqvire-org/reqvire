@@ -1,3 +1,4 @@
+use crate::mcp_http::{endpoint_authority, listener_hostname, validate_http_headers, HttpAccess};
 use reqvire::error::{ReqvireError, ValidationDiagnostic};
 use reqvire::exclusions::ExclusionSet as GlobSet;
 use reqvire::mcp_prompts::{prompt_definitions_json, prompt_get_result_json};
@@ -278,18 +279,29 @@ pub async fn serve_http(
     excluded_filename_patterns: &GlobSet,
     host: &str,
     port: u16,
+    http_access: &HttpAccess,
 ) -> Result<(), ReqvireError> {
     shared_validate_startup_with_options(excluded_filename_patterns, with_size_estimates)?;
 
-    let addr = format!("{}:{}", host, port);
-    let listener = tokio::net::TcpListener::bind(&addr).await.map_err(|e| {
-        ReqvireError::ProcessError(format!("Failed to start MCP HTTP server: {}", e))
-    })?;
+    let listener = tokio::net::TcpListener::bind((listener_hostname(host), port))
+        .await
+        .map_err(|e| {
+            ReqvireError::ProcessError(format!("Failed to start MCP HTTP server: {}", e))
+        })?;
 
+    let port = listener
+        .local_addr()
+        .map_err(|e| ReqvireError::ProcessError(e.to_string()))?
+        .port();
+    let addr = endpoint_authority(host, port);
+    let http_access = http_access
+        .for_listener(host, port)
+        .map_err(ReqvireError::ProcessError)?;
     let app = router(
         enable_mutations,
         with_size_estimates,
         excluded_filename_patterns,
+        &http_access,
     );
 
     eprintln!("MCP HTTP server listening at http://{}/mcp", addr);
@@ -308,12 +320,14 @@ pub fn router(
     enable_mutations: bool,
     with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
+    http_access: &HttpAccess,
 ) -> axum::Router {
     router_with_write_lock(
         enable_mutations,
         with_size_estimates,
         excluded_filename_patterns,
         Arc::new(Mutex::new(())),
+        http_access,
     )
 }
 
@@ -322,6 +336,7 @@ pub fn router_with_write_lock(
     with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
     write_lock: Arc<Mutex<()>>,
+    http_access: &HttpAccess,
 ) -> axum::Router {
     mount_service(
         axum::Router::new(),
@@ -329,6 +344,7 @@ pub fn router_with_write_lock(
         with_size_estimates,
         excluded_filename_patterns,
         write_lock,
+        http_access,
     )
 }
 
@@ -338,6 +354,7 @@ pub fn mount_service<S>(
     with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
     write_lock: Arc<Mutex<()>>,
+    http_access: &HttpAccess,
 ) -> axum::Router<S>
 where
     S: Clone + Send + Sync + 'static,
@@ -349,6 +366,7 @@ where
         excluded_filename_patterns,
         write_lock,
         None,
+        http_access,
     )
 }
 
@@ -359,6 +377,7 @@ pub fn mount_service_with_post_write_hook<S>(
     excluded_filename_patterns: &GlobSet,
     write_lock: Arc<Mutex<()>>,
     post_write_hook: Option<PostWriteHook>,
+    http_access: &HttpAccess,
 ) -> axum::Router<S>
 where
     S: Clone + Send + Sync + 'static,
@@ -370,16 +389,25 @@ where
         write_lock,
         post_write_hook,
     );
+    let origin_policy = http_access.origins.clone();
     let service: StreamableHttpService<ReqvireMcpServer, LocalSessionManager> =
         StreamableHttpService::new(
             move || Ok(server.clone()),
             LocalSessionManager::default().into(),
             StreamableHttpServerConfig::default()
-                .with_allowed_origins(loopback_allowed_origins())
+                .with_allowed_hosts(http_access.rmcp_allowed_hosts())
+                .with_allowed_origins(origin_policy.rmcp_allowed_origins())
                 .with_stateful_mode(false)
                 .with_json_response(true),
         );
-    router.nest_service("/mcp", service)
+    let mcp_routes = axum::Router::new()
+        .nest_service("/mcp", service)
+        .layer(origin_policy.cors_layer())
+        .layer(axum::middleware::from_fn_with_state(
+            origin_policy,
+            validate_http_headers,
+        ));
+    router.merge(mcp_routes)
 }
 
 fn request_refreshes_runtime_after_write(params: &Value) -> bool {
@@ -394,17 +422,6 @@ fn request_refreshes_runtime_after_write(params: &Value) -> bool {
             .and_then(|args| args.get("dry_run"))
             .and_then(Value::as_bool)
             .unwrap_or(false)
-}
-
-const fn loopback_allowed_origins() -> [&'static str; 6] {
-    [
-        "http://localhost",
-        "https://localhost",
-        "http://127.0.0.1",
-        "https://127.0.0.1",
-        "http://[::1]",
-        "https://[::1]",
-    ]
 }
 
 fn handle_rpc_value(

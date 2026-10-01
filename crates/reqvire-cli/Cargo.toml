@@ -44,7 +44,7 @@ ignore = "0.4"
 # HTTP server
 tokio = { workspace = true }
 axum = { workspace = true }
-tower-http = { workspace = true }
+tower-http = { workspace = true, features = ["cors"] }
 percent-encoding = { workspace = true }
 rmcp = { version = "1.8.0", features = ["server", "macros", "schemars", "transport-streamable-http-server"] }
 

@@ -49,6 +49,8 @@ SERVE OPTIONS:
       --port <PORT>             Server port
       --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp
       --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint
+      --allow-origin <ORIGIN>   Additional MCP browser origin (repeatable; loopback remains allowed)
+      --allow-host <HOST[:PORT]> Additional MCP endpoint host or host:port (repeatable; requires --enable-mcp)
 
 EXPORT OPTIONS:
       --output <OUTPUT>         Output directory
@@ -58,6 +60,8 @@ MCP OPTIONS:
       --port <PORT>             HTTP server port
       --enable-mutations        Advertise and allow mutation tools
       --with-size-estimates     Include element size estimates in model evidence tools
+      --allow-origin <ORIGIN>   Additional browser origin (repeatable; loopback remains allowed)
+      --allow-host <HOST[:PORT]> Additional endpoint host or host:port (repeatable)
 
 FORMAT OPTIONS:
       --fix                     Apply formatting changes to files

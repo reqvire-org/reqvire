@@ -127,7 +127,7 @@ pub struct SearchArgs {
 pub enum Commands {
     /// Serve the embedded Explorer UI via HTTP server
     #[clap(
-        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>             Bind address (default: localhost)\n      --port <PORT>             Server port (default: 8080)\n      --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint"
+        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>             Bind address (default: localhost)\n      --port <PORT>             Server port (default: 8080)\n      --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; requires --enable-mcp)\n      --allow-host <HOST[:PORT]>  Additional MCP endpoint hostname (repeatable; requires --enable-mcp)"
     )]
     Serve {
         /// Bind address
@@ -149,6 +149,24 @@ pub enum Commands {
             help_heading = "SERVE OPTIONS"
         )]
         mcp_enable_mutations: bool,
+
+        /// Additional MCP browser origin (repeatable; loopback remains allowed)
+        #[clap(
+            long = "allow-origin",
+            value_name = "ORIGIN",
+            requires = "enable_mcp",
+            help_heading = "SERVE OPTIONS"
+        )]
+        allowed_origins: Vec<crate::mcp_http::AllowedOrigin>,
+
+        /// Additional MCP endpoint host or host:port (repeatable; requires --enable-mcp)
+        #[clap(
+            long = "allow-host",
+            value_name = "HOST[:PORT]",
+            requires = "enable_mcp",
+            help_heading = "SERVE OPTIONS"
+        )]
+        allowed_hosts: Vec<crate::mcp_http::AllowedHost>,
     },
 
     /// Export the Explorer SPA as a static site to a directory
@@ -169,7 +187,7 @@ pub enum Commands {
     /// Start Reqvire MCP server
     #[clap(
         name = "mcp",
-        override_help = "Start Reqvire MCP Streamable HTTP server\n\nMCP OPTIONS:\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --with-size-estimates     Include element size estimates in model evidence tools"
+        override_help = "Start Reqvire MCP Streamable HTTP server\n\nMCP OPTIONS:\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --with-size-estimates     Include element size estimates in model evidence tools\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; loopback remains allowed)\n      --allow-host <HOST[:PORT]>  Additional endpoint hostname (repeatable)"
     )]
     Mcp {
         /// HTTP bind address
@@ -187,6 +205,22 @@ pub enum Commands {
         /// Include element size estimates in model evidence tools
         #[clap(long, help_heading = "MCP OPTIONS")]
         with_size_estimates: bool,
+
+        /// Additional browser origin (repeatable; loopback remains allowed)
+        #[clap(
+            long = "allow-origin",
+            value_name = "ORIGIN",
+            help_heading = "MCP OPTIONS"
+        )]
+        allowed_origins: Vec<crate::mcp_http::AllowedOrigin>,
+
+        /// Additional endpoint host or host:port (repeatable)
+        #[clap(
+            long = "allow-host",
+            value_name = "HOST[:PORT]",
+            help_heading = "MCP OPTIONS"
+        )]
+        allowed_hosts: Vec<crate::mcp_http::AllowedHost>,
     },
 
     /// Format and normalize requirements files. By default, shows preview without applying changes
@@ -1254,6 +1288,8 @@ pub async fn handle_command(
         port,
         enable_mutations,
         with_size_estimates,
+        allowed_origins,
+        allowed_hosts,
     }) = args.command
     {
         return mcp::serve_http(
@@ -1262,6 +1298,7 @@ pub async fn handle_command(
             excluded_filename_patterns,
             &host,
             port,
+            &crate::mcp_http::HttpAccess::new(&allowed_origins, &allowed_hosts),
         )
         .await
         .map(|_| 0);
@@ -1666,6 +1703,8 @@ pub async fn handle_command(
             port,
             enable_mcp,
             mcp_enable_mutations,
+            allowed_origins,
+            allowed_hosts,
         }) => {
             // Enable quiet mode for serve command runtime generation.
             reqvire::utils::enable_quiet_mode();
@@ -1681,6 +1720,7 @@ pub async fn handle_command(
                 enable_mcp,
                 mcp_enable_mutations,
                 excluded_filename_patterns,
+                &crate::mcp_http::HttpAccess::new(&allowed_origins, &allowed_hosts),
             )
             .await?;
 
@@ -2719,11 +2759,97 @@ mod tests {
     }
 
     #[test]
+    fn mcp_cors_cli_accepts_repeated_origins() {
+        for command in [
+            vec!["reqvire", "mcp"],
+            vec!["reqvire", "serve", "--enable-mcp"],
+        ] {
+            let mut args = command;
+            args.extend([
+                "--allow-origin",
+                "https://app.example",
+                "--allow-origin",
+                "http://192.0.2.10:3000",
+            ]);
+            assert!(Args::try_parse_from(args).is_ok());
+        }
+    }
+
+    #[test]
+    fn mcp_cors_cli_rejects_invalid_origins_and_missing_embedded_endpoint() {
+        for prefix in [
+            vec!["reqvire", "mcp"],
+            vec!["reqvire", "serve", "--enable-mcp"],
+        ] {
+            for value in [
+                "*",
+                "null",
+                "https://app.example/path",
+                "https://app.example:65536",
+            ] {
+                let mut args = prefix.clone();
+                args.extend(["--allow-origin", value]);
+                let error = Args::try_parse_from(args)
+                    .expect_err("reject invalid MCP origin configuration");
+                assert_eq!(error.kind(), clap::error::ErrorKind::ValueValidation);
+            }
+        }
+        let error =
+            Args::try_parse_from(["reqvire", "serve", "--allow-origin", "https://app.example"])
+                .expect_err("reject invalid MCP origin configuration");
+        assert_eq!(
+            error.kind(),
+            clap::error::ErrorKind::MissingRequiredArgument
+        );
+    }
+
+    #[test]
+    fn mcp_host_cli_accepts_aliases_and_rejects_invalid_configuration() {
+        for prefix in [
+            vec!["reqvire", "mcp"],
+            vec!["reqvire", "serve", "--enable-mcp"],
+        ] {
+            let mut args = prefix.clone();
+            args.extend([
+                "--host",
+                "0.0.0.0",
+                "--allow-host",
+                "mcp.example",
+                "--allow-host",
+                "192.0.2.50:8081",
+            ]);
+            assert!(Args::try_parse_from(args).is_ok());
+            for invalid in [
+                "*",
+                "0.0.0.0",
+                "https://mcp.example",
+                "mcp.example/path",
+                "mcp.example:65536",
+            ] {
+                let mut args = prefix.clone();
+                args.extend(["--allow-host", invalid]);
+                assert_eq!(
+                    Args::try_parse_from(args)
+                        .expect_err("reject invalid host")
+                        .kind(),
+                    clap::error::ErrorKind::ValueValidation
+                );
+            }
+        }
+        assert_eq!(
+            Args::try_parse_from(["reqvire", "serve", "--allow-host", "mcp.example"])
+                .expect_err("require embedded MCP")
+                .kind(),
+            clap::error::ErrorKind::MissingRequiredArgument
+        );
+    }
+
+    #[test]
     fn test_cli_parsing_subcommand() {
         let args = Args::parse_from(["reqvire", "serve", "--host", "127.0.0.1", "--port", "9000"]);
         assert!(matches!(
             args.command,
-            Some(Commands::Serve { host, port, enable_mcp, mcp_enable_mutations })
+            Some(Commands::Serve { host, port, enable_mcp, mcp_enable_mutations, .. })
                 if host == "127.0.0.1" && port == 9000 && !enable_mcp && !mcp_enable_mutations
         ));
     }

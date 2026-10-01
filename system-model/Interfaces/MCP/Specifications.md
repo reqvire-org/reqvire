@@ -514,6 +514,8 @@ The `reqvire mcp` command is expected to start the MCP server for the current wo
 Command behavior:
 - `reqvire mcp` starts MCP protocol service mode with read/report tools only, and MCP `tools/list` does not include mutation tools.
 - `reqvire mcp --enable-mutations` starts MCP protocol service mode with mutation mode enabled, and MCP `tools/list` includes mutation tools.
+- `reqvire mcp --allow-origin <ORIGIN>` MUST accept repeatable additional browser origins according to the MCP Streamable HTTP Transport Safety Specification bound by its owning requirement. Invalid values MUST fail argument validation before model loading or opening a listener.
+- `reqvire mcp --allow-host <HOST[:PORT]>` MUST accept repeatable endpoint hostnames according to the same bound transport safety contract. Invalid values MUST fail argument validation before model loading or opening a listener.
 - `reqvire mcp` is not exposed back through MCP as a tool.
 - The server resolves the workspace root using the Workspace Scope Specification shared with Reqvire core commands.
 - Startup validates the model before the server accepts protocol requests.
@@ -625,9 +627,20 @@ HTTP endpoint rules:
 Local safety rules:
 - HTTP transport binds to `127.0.0.1` by default.
 - Binding to non-localhost addresses requires explicit startup configuration.
+- Endpoint host validation MUST retain loopback hostnames and add an explicitly configured non-wildcard bind hostname or IP address at the actual listening port. IPv6 bind addresses MUST be accepted in bare or bracketed form and formatted with brackets in displayed endpoint URLs.
+- Repeatable `--allow-host <HOST[:PORT]>` options MUST add accepted endpoint authorities for direct access or a reverse proxy. Values MUST be concrete DNS names, IPv4 addresses, or bracketed IPv6 addresses with an optional valid port, without a scheme, credentials, path, query, fragment, wildcard, or unspecified IP address. Hostname matching MUST be case-insensitive and exact; an omitted port permits that named host on any port, while an explicit port limits it to that port.
+- Wildcard bind addresses `0.0.0.0` and `::` MUST select listening interfaces without disabling host validation. Non-loopback request hosts used with a wildcard listener MUST be configured through `--allow-host`.
+- RMCP MUST enforce the effective allowed hosts on MCP requests before execution. Unlisted hosts MUST receive HTTP 403. Proxy forwarding headers MUST NOT implicitly authorize an unlisted request host; the deployment MUST preserve an allowed Host authority or explicitly rewrite it to an allowed backend authority.
+- A request Host without an explicit port MUST use the HTTP default port 80, or 443 when the request URI explicitly uses HTTPS, for matching a port-restricted host entry. Proxy forwarding headers MUST NOT determine this default.
+- Host permissions and browser-origin permissions MUST remain independent. Allowing an endpoint hostname MUST NOT authorize a browser origin, and allowing a browser origin MUST NOT authorize an endpoint hostname. These permissions MUST NOT enable mutation tools or replace deployment authentication.
 - Requests without an `Origin` header are allowed so non-browser MCP clients can connect.
-- Requests with a loopback `Origin` header are allowed for local browser-based tools through RMCP allowed-origin configuration.
-- Requests with a non-loopback, `null`, file, or malformed `Origin` header are rejected by RMCP allowed-origin validation before executing MCP requests.
+- HTTP and HTTPS origins on `localhost`, `127.0.0.1`, and `[::1]` MUST remain permitted on any port by default.
+- Repeatable `--allow-origin <ORIGIN>` options MUST add browser origins to those defaults. Each value MUST be an HTTP or HTTPS origin containing a host and optional port, without credentials, path, query, fragment, wildcard, or opaque `null` origin. Invalid values MUST be rejected at startup.
+- Configured origins MUST match by normalized scheme, hostname, and effective port. Omitted HTTP and HTTPS ports mean 80 and 443 respectively; specifying a host MUST NOT grant access to its other ports or subdomains.
+- Requests without `Origin` MUST retain normal MCP behavior. Requests with an unpermitted, malformed, opaque, or multiple-valued Origin header MUST receive HTTP 403 before MCP execution, including preflight requests.
+- Allowed browser requests MUST receive `Access-Control-Allow-Origin` equal to their request origin and origin-dependent `Vary` headers, including MCP protocol error responses.
+- CORS preflight requests for permitted origins MUST succeed for POST with `Content-Type`, `Authorization`, `Mcp-Protocol-Version`, `Mcp-Session-Id`, and `Last-Event-ID` request headers. Responses MUST expose `Mcp-Session-Id` and `Mcp-Protocol-Version` to browser clients. The stateless endpoint's existing GET and DELETE behavior MUST remain unchanged.
+- The shared MCP origin policy MUST govern request admission and CORS responses on both standalone and embedded endpoints. CORS handling MUST apply only to `/mcp`, preserving Explorer route behavior.
 - Origin validation protects local HTTP MCP servers from browser-originated cross-site or DNS rebinding requests and does not restrict normal non-browser MCP clients.
 - Mutation-capable HTTP servers require explicit `--enable-mutations` and must not be enabled accidentally by selecting HTTP transport.
 - Non-local HTTP exposure requires an explicit authentication/authorization decision before it is considered supported.
@@ -658,6 +671,8 @@ Transport rules:
 - Tool names, input schemas, output schemas, annotations, resources, mutation gating, and Reqvire core behavior are independent from HTTP transport mechanics unless the MCP protocol requires transport-specific metadata.
 - Streamable HTTP transport uses the Rust `rmcp` streamable HTTP server transport according to MCP Streamable HTTP rules.
 - HTTP transport startup options include host and port.
+- HTTP transport startup options MUST include repeatable additional browser origins.
+- HTTP transport startup options MUST include repeatable accepted endpoint hostnames.
 - HTTP transport defaults to `127.0.0.1` and fixed endpoint `/mcp`.
 - HTTP transport is appropriate for long-running local service use, multiple clients, and future streaming/server-to-client notifications.
 
@@ -896,6 +911,8 @@ Embedded MCP behavior:
 - `reqvire serve --enable-mcp` mounts the Reqvire MCP Streamable HTTP service at `/mcp` on the same host and port as the Explorer server.
 - `reqvire serve --enable-mcp --enable-mutations` enables MCP mutation tools for the embedded `/mcp` endpoint.
 - `--enable-mutations` requires `--enable-mcp`; mutation tools are not advertised or executable for embedded MCP unless both capabilities are present.
+- `reqvire serve --enable-mcp --allow-origin <ORIGIN>` MUST configure the embedded endpoint using the MCP Streamable HTTP Transport Safety Specification bound by its owning requirement. `--allow-origin` MUST require `--enable-mcp` and support the same repeated values and validation as standalone MCP startup.
+- `reqvire serve --enable-mcp --allow-host <HOST[:PORT]>` MUST configure embedded MCP endpoint host validation through the same bound contract, including automatic permission for a non-wildcard bind host. `--allow-host` MUST require `--enable-mcp`.
 - The embedded `/mcp` endpoint reuses the same MCP adapter, shared Reqvire tool registry, RMCP Streamable HTTP transport configuration, allowed-origin policy, stateless JSON response mode, and mutation serialization behavior as `reqvire mcp`.
 - The embedded MCP endpoint uses the current serve workspace and excluded-file-pattern configuration.
 - Successful embedded MCP mutations immediately rebuild and atomically publish the served Explorer runtime snapshot, complete manifest, immutable chunks, and revision through the post-write hook. Explorer live refresh adopts that snapshot without restarting the server. Browser manifest polls and chunk requests read the published in-memory snapshot without scanning or rebuilding the model or taking the MCP workspace write gate under the bound Served Explorer Runtime Freshness and Explorer Live Store Refresh contracts.

@@ -436,12 +436,15 @@ The system shall provide `reqvire mcp` as the command that starts the Reqvire MC
 - The MCP server command shall expose read/report tools by default.
 - The MCP server command shall expose mutation tools only when mutation capability is explicitly enabled at startup.
 - The MCP server command shall support opt-in element size estimates when explicitly enabled at startup.
+- WHEN additional browser origins are configured at startup, the system SHALL apply them to the MCP endpoint's origin policy.
+- WHEN additional endpoint hostnames are configured at startup, the system SHALL apply them to the MCP endpoint's host policy.
 
 #### Metadata
   * type: requirement
 
 #### Contract Bindings
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+  * [MCP Streamable HTTP Transport Safety Specification](Specifications.md#mcp-streamable-http-transport-safety-specification)
 
 #### Relations
   * definedBy: [MCP Server Command Specification](Specifications.md#mcp-server-command-specification)
@@ -532,13 +535,18 @@ The system shall provide MCP service through RMCP Streamable HTTP transport.
 
 ### MCP Streamable HTTP Transport Safety
 
-The system shall implement Streamable HTTP transport with local-safe defaults and MCP-compliant HTTP behavior when HTTP transport is enabled.
+WHEN HTTP transport is enabled, the system SHALL provide MCP-compliant request handling with configurable browser-origin access.
 
 #### Details
-- The MCP Streamable HTTP transport shall provide MCP-compliant HTTP request handling.
-- The MCP Streamable HTTP transport shall use local-safe defaults.
-- The MCP Streamable HTTP transport shall protect local workspaces from browser-origin and non-local exposure risks.
-- The MCP Streamable HTTP transport shall require explicit mutation enablement before exposing mutation tools.
+- WHEN no additional browser origins are configured, the system SHALL accept loopback origins and clients without an Origin header.
+- WHEN an explicitly permitted browser origin sends an MCP request or CORS preflight, the system SHALL provide the cross-origin response headers needed to access the endpoint.
+- IF a request contains an invalid or unpermitted Origin header, THEN the system SHALL reject it before MCP execution.
+- IF a configured origin is invalid, THEN the system SHALL reject startup with a diagnostic identifying the invalid value.
+- The system SHALL use a loopback HTTP listening address by default.
+- WHEN an explicit non-wildcard listening address is configured, the system SHALL accept MCP requests addressed to that host and listening port.
+- WHEN additional endpoint hostnames are configured, the system SHALL accept MCP requests addressed to those hosts according to the associated specification.
+- IF an MCP request is addressed to an unpermitted host, THEN the system SHALL reject it before MCP execution.
+- The system SHALL require explicit startup enablement before exposing mutation tools.
 
 #### Metadata
   * type: requirement
@@ -546,6 +554,7 @@ The system shall implement Streamable HTTP transport with local-safe defaults an
 #### Relations
   * definedBy: [MCP Streamable HTTP Transport Safety Specification](Specifications.md#mcp-streamable-http-transport-safety-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+  * satisfiedBy: [mcp_http.rs](../../../crates/reqvire-cli/src/mcp_http.rs)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * verifiedBy: [MCP HTTP Transport End-to-End Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-http-transport-end-to-end-verification)
 ---

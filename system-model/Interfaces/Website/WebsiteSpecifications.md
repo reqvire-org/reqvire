@@ -23,6 +23,10 @@ Assistant integration content covers MCP, coding-assistant plugins, Codex skills
 
 Review triggers include changes to MCP tool schemas, prompt guidance, protocol support, and assistant integration workflows.
 
+The MCP server page MUST show repeatable `--allow-origin` examples for standalone and embedded MCP, explain the loopback defaults and exact scheme/host/port matching, and distinguish a browser origin from the MCP endpoint URL. It MUST explain the separate roles of bind address, browser origin permission, and deployment authentication according to the transport contracts referenced by its owning requirement.
+
+The MCP server page MUST document automatic acceptance of a non-wildcard bind authority and repeatable `--allow-host` for endpoint aliases, including a reverse-proxy example, wildcard listener behavior, optional port matching, and embedded MCP usage. It MUST distinguish the endpoint hostname from a browser application's origin and explain that non-browser MCP clients normally need host configuration rather than CORS permission.
+
 The MCP server page's coverage guidance and tool-call examples MUST conform to the MCP Coverage Scope Selection Specification and Coverage Scope Specification referenced by the owning requirement. Topics include selector syntax, valid selections, default scope, error responses, and the distinction between report membership and external supporting evidence.
 
 The MCP server page MUST explain `has_contract_references` and `filter_contract_references`, normalized target matching, and composition with other search filters according to the MCP Model Evidence Tools Specification and SearchFiltering contract referenced by its owning requirement. Its example MUST distinguish search selection from change-impact propagation and implementation coverage.

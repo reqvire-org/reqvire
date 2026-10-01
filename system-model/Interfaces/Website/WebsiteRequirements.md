@@ -41,11 +41,17 @@ The system SHALL provide usage examples for whole-model and capability-scoped co
 
 WHEN documenting MCP model search, the system SHALL explain contract-reference filters according to the referenced model-evidence and search-filtering contracts.
 
+WHEN documenting browser MCP clients, the system SHALL explain origin configuration for standalone and embedded endpoints according to the referenced transport contracts.
+
+WHEN documenting MCP deployments, the system SHALL explain listening addresses and accepted endpoint hostnames according to the referenced transport contracts.
+
 #### Metadata
   * type: requirement
 
 #### Contract References
   * [MCP Model Evidence Tools Specification](../MCP/Specifications.md#mcp-model-evidence-tools-specification)
+  * [MCP Streamable HTTP Transport Safety Specification](../MCP/Specifications.md#mcp-streamable-http-transport-safety-specification)
+  * [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
   * [SearchFiltering](../../Reports/ModelReports/SearchFiltering.md#searchfiltering)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [MCP Prompt Guidance Specification](../MCP/Specifications.md#mcp-prompt-guidance-specification)

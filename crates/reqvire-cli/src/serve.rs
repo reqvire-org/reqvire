@@ -53,12 +53,16 @@ pub async fn serve_explorer(
     enable_mcp: bool,
     mcp_enable_mutations: bool,
     excluded_filename_patterns: &GlobSet,
+    http_access: &crate::mcp_http::HttpAccess,
 ) -> Result<(), ReqvireError> {
-    let addr = format!("{}:{}", host, port);
-    let listener = tokio::net::TcpListener::bind(&addr)
+    let listener = tokio::net::TcpListener::bind((crate::mcp_http::listener_hostname(host), port))
         .await
         .map_err(|e| ReqvireError::ProcessError(format!("Failed to start server: {}", e)))?;
 
+    let port = listener
+        .local_addr()
+        .map_err(|e| ReqvireError::ProcessError(e.to_string()))?
+        .port();
     let state = ServeState {
         excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
         runtime_assets: Arc::new(Mutex::new(RuntimeState {
@@ -71,6 +75,9 @@ pub async fn serve_explorer(
     let mut app = explorer_routes(state.live_refresh);
 
     if enable_mcp {
+        let http_access = http_access
+            .for_listener(host, port)
+            .map_err(ReqvireError::ProcessError)?;
         let refresh_state = state.clone();
         let post_write_hook: mcp::PostWriteHook = Arc::new(move || {
             let refresh_state = refresh_state.clone();
@@ -84,11 +91,12 @@ pub async fn serve_explorer(
             excluded_filename_patterns,
             Arc::clone(&state.write_lock),
             state.live_refresh.then_some(post_write_hook),
+            &http_access,
         );
     }
     let app = app.with_state(state);
 
-    let url = format!("http://{}:{}", host, port);
+    let url = format!("http://{}", crate::mcp_http::endpoint_authority(host, port));
     println!(
         "🌐 Server running at: \x1b]8;;{}\x1b\\{}\x1b]8;;\x1b\\",
         url, url

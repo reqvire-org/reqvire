@@ -2,6 +2,7 @@ pub mod cli;
 pub mod config;
 mod live_store;
 mod mcp;
+mod mcp_http;
 mod serve;
 
 use crate::cli::apply_workspace;

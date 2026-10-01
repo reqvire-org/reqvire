@@ -82,7 +82,11 @@ When an embedded MCP request is a preview or a rejected mutation, the system sha
 The system shall allow the Explorer serve command to expose the Reqvire MCP Streamable HTTP endpoint at `/mcp` on the same HTTP listener when explicitly enabled.
 
 #### Details
-Detailed embedded endpoint, registry reuse, transport, mutation gating, route preservation, runtime refresh, and endpoint display rules shall follow the associated specification.
+WHEN embedded MCP is enabled, the system SHALL provide its endpoint, registry reuse, transport, mutation gating, route preservation, runtime refresh, and endpoint display according to the associated specification.
+
+WHEN additional browser origins are configured for embedded MCP, the system SHALL apply the shared MCP origin policy to that endpoint.
+
+WHEN an embedded MCP endpoint uses a configured bind address or additional endpoint hostnames, the system SHALL apply the shared MCP host policy to that endpoint.
 
 #### Metadata
   * type: requirement
@@ -93,6 +97,7 @@ Detailed embedded endpoint, registry reuse, transport, mutation gating, route pr
   * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
   * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
   * [MCP Mutation Execution Flow Specification](../MCP/Specifications.md#mcp-mutation-execution-flow-specification)
+  * [MCP Streamable HTTP Transport Safety Specification](../MCP/Specifications.md#mcp-streamable-http-transport-safety-specification)
 
 #### Relations
   * definedBy: [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
