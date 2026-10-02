@@ -51,7 +51,7 @@ Inspect the delivered Claude and Codex guidance for correct contract ownership, 
 Review artifacts: [SKILL.md](../../../../claude-plugins/skills/syseng/SKILL.md), [SKILL.md](../../../../codex-skills/reqvire-syseng/SKILL.md).
 
 #### Metadata
-  * type: inspection-verification
+  * type: demonstration-verification
 
 #### Relations
   * derivedFrom: [AI Skill Installer Verification Objective](#ai-skill-installer-verification-objective)

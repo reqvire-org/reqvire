@@ -508,7 +508,7 @@ Detailed request/result types, shared operation semantics, adapter boundary, dis
   * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/tool_interface/mod.rs)
   * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
   * verifiedBy: [MCP Shared Operation Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-shared-operation-contracts-verification)
-  * verifiedBy: [MCP Tool Call Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-call-contracts-verification)
+  * verifiedBy: [MCP Tool Contract and Side Effect Classification Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-contract-and-side-effect-classification-verification)
 ---
 
 ### MCP Streamable HTTP Transport
@@ -612,7 +612,7 @@ The system shall classify every MCP tool by side-effect behavior so clients and 
   * definedBy: [MCP Tool Side Effect Classification Specification](Specifications.md#mcp-tool-side-effect-classification-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * verifiedBy: [MCP Tool Side Effect Classification Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-side-effect-classification-verification)
+  * verifiedBy: [MCP Tool Contract and Side Effect Classification Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-contract-and-side-effect-classification-verification)
 ---
 
 ### MCP Workspace Session Tools

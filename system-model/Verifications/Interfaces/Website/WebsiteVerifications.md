@@ -22,7 +22,7 @@ This inspection verifies that endpoint-host and browser-origin setup examples ma
 Review artifacts: [McpServer.tsx](../../../../website/src/pages/McpServer.tsx).
 
 #### Metadata
-  * type: inspection-verification
+  * type: demonstration-verification
 
 #### Relations
   * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
@@ -46,7 +46,7 @@ Expected checks:
 Review artifacts: [ModelingLanguage.tsx](../../../../website/src/pages/ModelingLanguage.tsx).
 
 #### Metadata
-  * type: inspection-verification
+  * type: demonstration-verification
 
 #### Relations
   * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
@@ -75,7 +75,7 @@ Expected checks:
 Review artifacts: [Advanced.tsx](../../../../website/src/pages/Advanced.tsx), [UserGuide.tsx](../../../../website/src/pages/UserGuide.tsx).
 
 #### Metadata
-  * type: inspection-verification
+  * type: demonstration-verification
 
 #### Relations
   * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
@@ -103,7 +103,7 @@ Expected checks:
 Review artifacts: [ModelingLanguage.tsx](../../../../website/src/pages/ModelingLanguage.tsx).
 
 #### Metadata
-  * type: inspection-verification
+  * type: demonstration-verification
 
 #### Relations
   * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
@@ -122,7 +122,7 @@ Inspect the native query authoring and CLI/MCP artifact examples against their s
 Check Query and optional Produces syntax, explicit ontology use and prefixes, generated identity/form, namespace selection, exact-byte export/hash checks, and downstream runtime behavior. Build the website and compare documented commands with CLI help and managed query verification results.
 
 #### Metadata
-  * type: inspection-verification
+  * type: demonstration-verification
 
 #### Relations
   * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)

@@ -69,7 +69,7 @@ Review artifacts: [implementation_coverage.rs](../../../crates/reqvire-core/test
   * [Terminal Requirement](../../Thesaurus/Thesaurus.md#terminal-requirement)
 
 #### Metadata
-  * type: analysis-verification
+  * type: demonstration-verification
 
 #### Relations
   * derivedFrom: [Implementation Traceability Verification Objective](#implementation-traceability-verification-objective)
