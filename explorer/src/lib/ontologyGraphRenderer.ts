@@ -552,7 +552,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
             zIndex: true,
             nodeProgramClasses: {
                 queryGlyph: createNodeImageProgram({
-                    objectFit: 'contain', keepWithinCircle: false, correctCentering: true,
+                    objectFit: 'contain', keepWithinCircle: true, correctCentering: true,
                     padding: 0, drawingMode: 'background', size: { mode: 'force', value: 256 }
                 }),
                 constructGlyph: createNodeImageProgram({
@@ -1221,7 +1221,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
     function queryGlyphImage(muted = false) {
         const fill = muted ? dimColor(cssVar('--ontology'), 0.2) : cssVar('--ontology');
         const ink = muted ? textMuted : textStrong;
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><rect x="8" y="8" width="240" height="240" rx="24" fill="${escapeXml(fill)}"/><text x="128" y="172" font-family="monospace" font-size="144" font-weight="700" text-anchor="middle" fill="${escapeXml(ink)}">${ELEMENT_TYPES['semantic-query'].glyph}</text></svg>`;
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><circle cx="128" cy="128" r="120" fill="${escapeXml(fill)}"/><text x="128" y="172" font-family="monospace" font-size="144" font-weight="700" text-anchor="middle" fill="${escapeXml(ink)}">${ELEMENT_TYPES['semantic-query'].glyph}</text></svg>`;
         return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
     }
 
@@ -2362,6 +2362,9 @@ ${body}
         }
         if (!edgePassesRelationFilters(edgeData)) {
             return false;
+        }
+        if (edgeData.source_kind === 'query') {
+            return true;
         }
         if ((edgeData.layer || 'authored') !== 'authored') {
             return true;

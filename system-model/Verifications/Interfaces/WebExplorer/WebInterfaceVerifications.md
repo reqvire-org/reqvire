@@ -450,7 +450,7 @@ Expected analysis checks:
 Review artifacts: [OntologiesView.test.tsx](../../../../explorer/src/views/OntologiesView.test.tsx), [OntologyNodeDetailModal.test.tsx](../../../../explorer/src/components/OntologyNodeDetailModal.test.tsx).
 
 #### Metadata
-  * type: analysis-verification
+  * type: demonstration-verification
 
 #### Relations
   * verify: [Ontology Construct Grouping](../../../Interfaces/WebExplorer/Capabilities.md#ontology-construct-grouping)
@@ -662,7 +662,7 @@ This test verifies that the Thesaurus Explorer route is backed by a native Proje
 Verify managed query identity and vocabulary context across Explorer and the shared design system.
 
 #### Details
-Check that semantic-query icons and badges use the shared Q marker, that native queries occur once in ontology graph data with source provenance and vocabulary/output edges, and that graph rendering preserves their marker, name, filter behavior, and property dependency targets. Inspect query form, exact text, used ontologies, declared outputs, and source navigation in the detail dialog. Exercise exported Project Store generation from a native query fixture.
+Check that semantic-query icons and badges use the shared Q marker, that native queries occur once in ontology graph data with source provenance and vocabulary/output edges, and that graph rendering preserves their circular Q marker, name, filter behavior, and property dependency targets. Inspect query form, exact text, used ontologies, declared outputs, and source navigation in the detail dialog. Exercise exported Project Store generation from a native query fixture. Verify that query hover and selection render `uses vocabulary` and `declares output` connectors with their property targets, that query/layer filters hide them, and that re-enabling filters restores eligible focused relations.
 
 #### Metadata
   * type: test-verification
@@ -670,6 +670,7 @@ Check that semantic-query icons and badges use the shared Q marker, that native 
 #### Relations
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * verify: [OWL Semantic Ontology Projection](../../../Interfaces/WebExplorer/Capabilities.md#owl-semantic-ontology-projection)
+  * verify: [Ontology Property-Centric Visualization](../../../Interfaces/WebExplorer/Capabilities.md#ontology-property-centric-visualization)
   * verify: [Ontology Symbol and Badge Vocabulary](../../../Interfaces/WebExplorer/Capabilities.md#ontology-symbol-and-badge-vocabulary)
   * satisfiedBy: [semantic_queries.rs](../../../../crates/reqvire-core/tests/semantic_queries.rs)
   * satisfiedBy: [OntologiesView.test.tsx](../../../../explorer/src/views/OntologiesView.test.tsx)
