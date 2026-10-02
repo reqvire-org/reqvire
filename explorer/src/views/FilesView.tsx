@@ -189,7 +189,13 @@ export function FilesView({
       ui.setModelMode(nextLayout as ModelMode);
       return;
     }
-    if (nextLayout !== "graph") {
+    if (nextLayout === "graph" || nextLayout === "flow") {
+      if (ui) {
+        ui.setModelSelectionId(selectedFile ? `file:${selectedFile.path}` : currentFolderPath === ROOT_FOLDER ? "__root__" : `folder:${currentFolderPath}`);
+        ui.setModelMode(nextLayout);
+        window.location.hash = "#/model";
+      }
+    } else {
       setLocalLayout(nextLayout);
     }
   }

@@ -14,12 +14,15 @@
 
 Model browsing modes display the physical organization and graph structure of the model inside the canonical `index.html#/model` Explorer route. List and Grid browse the Project Store hierarchy, while Graph renders the project knowledge graph in the same Model workspace. There is no separate primary Containment Explorer route.
 
-Three workspace modes are available:
+Four workspace modes are available:
 - **List**: Tabular folder/file/element browsing with sortable fields
 - **Grid**: Card-based folder/file/element browsing
 - **Graph**: Interactive project graph over elements, resources, relations, contract_bindings, and trace facts
+- **Flow**: Capability-first, top-to-bottom element cards descending through requirements, verifications, and evidence, with shared element details and complete path highlighting through splits and merges
 
-Users switch between Model modes using compact controls in the left Explorer pane.
+In Flow, left-tree selection updates the relation scope displayed in the main workspace and keeps the Model route active. Activating an element card's name or body opens the shared element-detail modal. Pointer hover and keyboard focus on a card highlight its full directed paths through splits and merges.
+
+Users switch between Model modes using the shared workspace layout selector. Flow uses the same card-and-connection pattern as the native trace preview, with horizontal/vertical layout, pan/zoom, and source navigation. The project-tree selection scopes Flow to folder/file elements and immediate relation endpoints while retaining their capability ancestry, or the complete directed paths of a selected element, as specified by the Model Browser and Graph Specification.
 
 ## Hierarchy Extraction
 
@@ -104,9 +107,28 @@ The Graph view renders the project knowledge graph inside the Model workspace.
 
 ---
 
+### Flow View
+
+**Structure:**
+- The project overview starts with root capabilities and follows child capabilities, requirements, verification, and evidence.
+- Cards place the element name beside its type glyph and show context below the name.
+- Shared endpoints appear once, with their incoming and outgoing relation labels and arrow directions preserved.
+
+**Interactive Capabilities:**
+- Selecting a folder, file, or element in the left tree renders its relation scope in the right workspace; tree selection and element inspection are separate actions.
+- Clicking a card name or body opens the shared element-detail modal. Closing it returns to the same Flow context.
+- Hovering or keyboard-focusing a card accents the complete visible paths into and out of that element, including every split and merge, and fades unrelated paths. Related lines and arrowheads change together.
+- Moving the pointer away clears temporary highlighting. Focus path pins the highlight until cleared. These interactions preserve card positions and the viewport.
+- The direction control switches between Top to bottom and Left to right while retaining relation direction. Pan, zoom, Fit, and actual-size controls support navigation.
+- Initial framing and Fit include the full layout of cards, connections, and labels. The minimum zoom adapts to layout and canvas size so large flows fit; users can zoom farther out or return to 100%. Scope, direction, and canvas resizing refresh framing.
+- Expand flow opens a full-page overlay with the same scope, direction, and path focus. Close or Escape returns to the embedded view and its expand control. Element details open above the expanded canvas and return to it when closed.
+- Source and focus controls perform their respective actions independently of opening element details.
+
+---
+
 ## Visual Semantics
 
-Both Model route visualizations use the Explorer design-system semantic palette rather than local color literals.
+All Model route visualizations use the Explorer design-system semantic palette.
 
 | Role | Visual contract |
 |------|-----------------|
@@ -126,10 +148,10 @@ The concrete color values are owned by the Explorer design-system tokens. This d
 
 ## Model Mode Controls
 
-The Model route includes compact mode controls in the shared left Explorer pane:
+The Model route includes compact mode controls in the shared workspace toolbar:
 
 **Toggle Buttons:**
-- Three compact icon buttons: "List", "Grid", and "Graph"
+- Four compact icon buttons: "List", "Grid", "Graph", and "Flow"
 - Active button uses the shared selected-control background and selected-control foreground tokens
 - Clicking switches the visible view
 
@@ -137,12 +159,13 @@ The Model route includes compact mode controls in the shared left Explorer pane:
 - View instructions belong in the shared Explorer help surfaces rather than in a page header or content preamble
 - List/Grid: "Browse folders and files. Select modeled elements to inspect details."
 - Graph: "Select graph nodes to focus relations. Use the selected element link to open details."
+- Flow: "Select a tree item to explore its flow. Hover a card to follow its paths and select its name to inspect details."
 
 **Technical Implementation:**
-- Model List, Grid, and Graph render as native Explorer mode states over the Project Store filesystem and knowledge-graph projections.
+- Model List, Grid, Graph, and Flow render as native Explorer mode states over the Project Store filesystem and knowledge-graph projections.
 - Graph uses the shared Sigma/Graphology knowledge-graph renderer behavior inside the Model workspace, including visible-graph ForceAtlas layout and focused-neighborhood no-overlap animation.
 - Model mode changes are handled by React Explorer UI state inside the canonical `index.html#/model` route, with no separate containment route.
-- The route uses the shared headerless Explorer shell with vertical `Explorer` edge strip, expanded left-pane Model mode controls, central workspace, selected-item modal detail, and right tool rail.
+- The route uses the shared headerless Explorer shell with vertical `Explorer` edge strip, left-pane project tree, workspace mode controls, selected-item modal detail, and right tool rail.
 
 ---
 
@@ -214,7 +237,7 @@ The Model workspace consumes Project Store records directly:
 **Processing:**
 1. Files, folders, elements, resources, and graph edges are normalized during serve runtime generation
 2. JSON data preserves workspace-root-relative source paths and canonical element identifiers
-3. The compiled Explorer bundle renders List, Grid, and Graph modes from the shared Project Store
+3. The compiled Explorer bundle renders List, Grid, Graph, and Flow modes from the shared Project Store
 4. The served Explorer shall not depend on route-local Markdown code blocks or CDN-loaded visualization scripts for native Model modes
 
 ---
@@ -224,7 +247,7 @@ The Model workspace consumes Project Store records directly:
 Explorer integration must:
 
 **Index Page:**
-- Expose List, Grid, and Graph modes inside the canonical `index.html#/model` Explorer route
+- Expose List, Grid, Graph, and Flow modes inside the canonical `index.html#/model` Explorer route
 - Seed from the central Project Store containment/file sections rather than a page-local data island
 - Keep `index.html` as the primary Explorer shell and browser entry point for model browsing
 
@@ -238,4 +261,4 @@ Explorer integration must:
 - Generated during Explorer serve runtime generation
 - Updates automatically when model changes
 - Deterministic output for version control
-- List, Grid, and Graph modes render correctly with proper dimensions
+- List, Grid, Graph, and Flow modes render correctly with proper dimensions

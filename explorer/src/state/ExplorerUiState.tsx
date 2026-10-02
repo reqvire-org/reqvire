@@ -4,7 +4,7 @@ import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
 import { projectCoverage } from "../lib/coverage";
 import type { CoverageProjection, ExplorerProjectStore } from "../store/types";
 
-export type ModelMode = "list" | "grid" | "graph";
+export type ModelMode = "list" | "grid" | "graph" | "flow";
 export type ModelSelectionId = "__root__" | `folder:${string}` | `file:${string}` | string;
 export type GraphOverlayKey = "cross" | "verification" | "trace";
 export type CoverageSectionId =

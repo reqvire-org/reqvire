@@ -762,6 +762,7 @@ function TreeFolderNode({
             <TreeResourceNode
               key={resource.id}
               resource={resource}
+              activeView={activeView}
               sourceBrowsing={sourceBrowsing}
               onOpenSourceRoute={onOpenSourceRoute}
               depth={depth + 1}
@@ -789,11 +790,13 @@ function TreeFolderNode({
 
 function TreeResourceNode({
   resource,
+  activeView,
   sourceBrowsing,
   onOpenSourceRoute,
   depth,
 }: {
   resource: ProjectStoreResource;
+  activeView: ViewId;
   sourceBrowsing: boolean;
   onOpenSourceRoute?: (hash: string) => void;
   depth: number;
@@ -807,6 +810,7 @@ function TreeResourceNode({
       onOpenSourceRoute?.(route);
       return;
     }
+    if (activeView === "model" && ui.modelMode === "flow") return;
     window.location.hash = route;
   }
 
@@ -984,6 +988,7 @@ function TreeFileNode({
       return;
     }
     if (activeView === "files") onNavigate("model");
+    if (ui.modelMode === "flow") return;
     onOpenElement(elementId);
   }
 
