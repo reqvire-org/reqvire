@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { css, cx } from "@linaria/atomic";
 import {
-  BaseEdge, EdgeText, Handle, MarkerType, Position, ReactFlow, getViewportForBounds,
+  BaseEdge, Handle, MarkerType, Position, ReactFlow, getViewportForBounds,
   type Edge, type EdgeProps, type Node, type NodeProps, type ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -182,8 +182,13 @@ const skinX = css`
   .react-flow__edge { transition: opacity var(--dur-fast) var(--ease-standard); }
   .react-flow__edge.ux-trace-edge-dimmed { opacity: 0.15; }
   .react-flow__edge.ux-trace-edge-highlighted .react-flow__edge-path { stroke: var(--accent); stroke-width: var(--border-w-thick); }
-  .react-flow__edge-text { fill: var(--text-muted); }
-  .react-flow__edge-textbg { fill: var(--bg-canvas); }
+  .ux-trace-edge-label {
+    fill: var(--text-muted);
+    stroke: var(--bg-canvas);
+    stroke-width: var(--space-2);
+    stroke-linejoin: round;
+    paint-order: stroke;
+  }
   .react-flow__attribution { background: var(--bg-canvas); color: var(--text-muted); }
   @media (prefers-reduced-motion: reduce) {
     .ux-trace-flow-node, .react-flow__edge { transition: none; }
@@ -206,15 +211,16 @@ type FlowNodeData = Record<string, unknown> & {
   onOpenSource: TraceFlowProps["onOpenSource"];
 };
 type FlowNode = Node<FlowNodeData>;
-type FlowEdge = Edge<{ path: string; labelPosition: { x: number; y: number }; paintRevision: number }>;
+type FlowEdge = Edge<{ path: string; labelPosition: { x: number; y: number } }>;
 
 function TraceEdge({ id, data, label, markerEnd }: EdgeProps<FlowEdge>) {
   if (!data) return null;
   return <>
-    {/* Recreate strokes at the settled transform to invalidate stale SVG paint on long routes.
-        Keep measured labels and the focusable edge wrapper mounted. */}
-    <BaseEdge key={data.paintRevision} id={id} path={data.path} markerEnd={markerEnd} />
-    <EdgeText x={data.labelPosition.x} y={data.labelPosition.y} label={label} />
+    <BaseEdge id={id} path={data.path} markerEnd={markerEnd} />
+    {/* Anchor text directly in graph coordinates. Cached getBBox measurements at tiny
+        overview scales can produce oversized background rectangles after zooming. */}
+    <text className="react-flow__edge-text ux-trace-edge-label"
+      x={data.labelPosition.x} y={data.labelPosition.y} textAnchor="middle" dominantBaseline="central">{label}</text>
   </>;
 }
 const EDGE_TYPES = { trace: TraceEdge };
@@ -298,10 +304,6 @@ function FlowCanvas({ topology, title, summary, kind, collapsed, onToggle, onExp
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [flow, setFlow] = useState<ReactFlowInstance<FlowNode, FlowEdge> | null>(null);
-  const [edgePaintRevision, setEdgePaintRevision] = useState(0);
-  // One paint refresh per completed wheel, pan, or programmatic viewport change.
-  // Geometry comes from the existing ELK result; navigation never requests layout.
-  const refreshEdgePaint = useCallback(() => setEdgePaintRevision(revision => revision + 1), []);
   const canvas = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const { graph, pending, failed, retry } = useTraceFlowLayout(topology, direction);
@@ -334,7 +336,7 @@ function FlowCanvas({ topology, title, summary, kind, collapsed, onToggle, onExp
   const activeId = [hoveredId, focusedId].find(id => id && nodeById.has(id)) ?? null;
   const neighborhood = useMemo(() => graph && activeId ? traceFlowNeighborhood(graph.edges, activeId) : null, [graph, activeId]);
   const focusedNode = focusedId ? nodeById.get(focusedId) : undefined;
-  // Retain node objects during viewport repaint so React Flow keeps measured handles.
+  // Retain node objects during viewport navigation so React Flow keeps measured handles.
   const nodes = useMemo<FlowNode[]>(() => (graph?.nodes ?? []).map(node => ({
     id: node.id, type: "trace", position: node.position,
     width: TRACE_NODE_WIDTH, height: TRACE_NODE_HEIGHT,
@@ -351,7 +353,7 @@ function FlowCanvas({ topology, title, summary, kind, collapsed, onToggle, onExp
   })), [graph, direction, collapsed, onOpenElement, onOpenSource, focusedId, neighborhood, onToggle]);
   const edges: FlowEdge[] = (graph?.edges ?? []).map(edge => ({ id: edge.id, source: edge.source, target: edge.target, label: edge.label, type: "trace",
     className: neighborhood ? neighborhood.edgeIds.has(edge.id) ? "ux-trace-edge-highlighted" : "ux-trace-edge-dimmed" : undefined,
-    data: { path: edge.path, labelPosition: edge.labelPosition, paintRevision: edgePaintRevision },
+    data: { path: edge.path, labelPosition: edge.labelPosition },
     markerEnd: { type: MarkerType.ArrowClosed, color: neighborhood?.edgeIds.has(edge.id) ? "var(--accent)" : "var(--edge-trace)" },
     ariaLabel: `${nodeById.get(edge.source)?.element.name} ${edge.label} ${nodeById.get(edge.target)?.element.name}`,
   }));
@@ -387,7 +389,6 @@ function FlowCanvas({ topology, title, summary, kind, collapsed, onToggle, onExp
     </header>
     <div className="ux-trace-flow-canvas" ref={canvas}>
       {graph && <ReactFlow key={graph.direction} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} onInit={setFlow}
-        onMoveEnd={refreshEdgePaint}
         onNodeClick={(event, node) => {
           // Register with React Flow so read-only nodes retain browser pointer events.
           // Embedded links and controls handle their own actions.

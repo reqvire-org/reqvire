@@ -80,7 +80,56 @@ afterEach(() => {
 });
 
 describe("trace flow showcase", () => {
-  it("refreshes connection paint after viewport navigation while keeping cards, labels, and focus", async () => {
+  it.each([
+    { width: 800, height: 160 },
+    { width: 0, height: 0 },
+  ])("keeps relation labels visible and compact with SVG text bounds $width × $height", async (bounds) => {
+    Object.defineProperty(SVGElement.prototype, "getBBox", {
+      configurable: true, value: () => ({ x: 0, y: 0, ...bounds }),
+    });
+    const data: ElementFlowData = {
+      id: "label-bounds", title: "Label bounds",
+      nodes: ["root", "leaf"].map((id, index) => ({
+        element: { id, name: id, file: "Labels.md" },
+        type: index === 0 ? "capability" : "requirement", context: "Model", root: index === 0,
+      })),
+      edges: [{ id: "root-leaf", source: "root", target: "leaf", label: "specifiedBy" }],
+    };
+    render(<ElementFlow data={data} onOpenElement={vi.fn()} onOpenSource={vi.fn()} />);
+    const region = screen.getByRole("region", { name: "Model flow" });
+    const assertLabel = () => {
+      const edge = region.querySelector('.react-flow__edge[data-id="root-leaf"]')!;
+      expect(edge).not.toBeNull();
+      const label = edge.querySelector("text")!;
+      expect(label.textContent).toBe("specifiedBy");
+      // Oversized cached rectangles hide adjacent routes; the label uses a glyph outline.
+      expect([...edge.querySelectorAll("rect")].map(rect => ({
+        width: Number(rect.getAttribute("width")), height: Number(rect.getAttribute("height")),
+      }))).toEqual([]);
+      expect(label.closest('[visibility="hidden"]')).toBeNull();
+      expect(label.getAttribute("text-anchor")).toBe("middle");
+      expect(label.getAttribute("dominant-baseline")).toBe("central");
+      expect(Number(label.getAttribute("x"))).toBeGreaterThan(0);
+      expect(Number(label.getAttribute("y"))).toBeGreaterThan(0);
+      expect(edge.querySelector(".react-flow__edge-path")?.getAttribute("marker-end")).toBeTruthy();
+      return label;
+    };
+    for (const direction of ["Top to bottom", "Left to right"]) {
+      fireEvent.click(within(region).getByRole("button", { name: direction }));
+      await waitFor(() => expect(region.getAttribute("aria-busy")).toBe("false"));
+      await waitFor(() => expectCardsFit(region));
+      const label = assertLabel();
+      const placement = label.outerHTML;
+      fireEvent.click(within(region).getByRole("button", { name: "Zoom out" }));
+      await waitFor(() => expect(viewport(region).zoom).toBeLessThan(1));
+      expect(assertLabel().outerHTML).toBe(placement);
+      fireEvent.click(within(region).getByRole("button", { name: "100%" }));
+      await waitFor(() => expect(viewport(region).zoom).toBe(1));
+      expect(assertLabel().outerHTML).toBe(placement);
+    }
+  });
+
+  it("preserves connections, centered labels, cards, and focus during viewport navigation", async () => {
     render(<MocksPage />);
     fireEvent.click(screen.getByRole("treeitem", { name: /Ontology Projection Verification/ }));
     const region = screen.getByRole("region", { name: "Verification trace flow" });
@@ -91,14 +140,15 @@ describe("trace flow showcase", () => {
       fireEvent.click(within(region).getByRole("button", { name: direction }));
       await waitFor(() => expect(region.getAttribute("aria-busy")).toBe("false"));
       await waitFor(() => expectCardsFit(region));
-      // Wait for React Flow's initial viewport-end event before inspecting navigation.
+      // Allow React Flow's asynchronous initialization and initial fit to settle.
       await act(async () => { await new Promise(resolve => setTimeout(resolve, 30)); });
       const renderer = region.querySelector(".react-flow");
       const cards = [...region.querySelectorAll(".react-flow__node")];
       const positions = cards.map(card => getComputedStyle(card).transform);
       const wrappers = [...region.querySelectorAll<SVGElement>(".react-flow__edge")];
       expect(wrappers.length).toBeGreaterThan(0);
-      const labels = [...region.querySelectorAll(".react-flow__edge-textwrapper")];
+      const labels = [...region.querySelectorAll(".ux-trace-edge-label")];
+      expect(labels).toHaveLength(wrappers.length);
       const descriptions = labels.map(label => label.outerHTML);
       const paths = () => [...region.querySelectorAll<SVGPathElement>(".react-flow__edge-path")];
       const geometry = paths().map(path => [path.getAttribute("d"), path.getAttribute("marker-end")]);
@@ -113,16 +163,15 @@ describe("trace flow showcase", () => {
       const navigate = async (action: () => void) => {
         const previousPaths = paths();
         const previousViewport = viewport(region);
-        // Keep focus on the edge wrapper; the paint refresh must preserve it.
+        // Keep focus on the edge wrapper while navigating the canvas.
         act(() => wrappers[0].focus());
         action();
         await waitFor(() => {
           expect(viewport(region)).not.toEqual(previousViewport);
-          // Fresh SVG strokes invalidate stale browser paint; labels stay measured.
-          expect(previousPaths.every(path => !path.isConnected)).toBe(true);
+          expect(previousPaths.every(path => path.isConnected)).toBe(true);
         });
         expect(paths().map(path => [path.getAttribute("d"), path.getAttribute("marker-end")])).toEqual(geometry);
-        const currentLabels = [...region.querySelectorAll(".react-flow__edge-textwrapper")];
+        const currentLabels = [...region.querySelectorAll(".ux-trace-edge-label")];
         expect(currentLabels.length).toBe(labels.length);
         labels.forEach((label, index) => expect(currentLabels[index] === label, `label ${index} stays mounted`).toBe(true));
         expect(labels.map(label => label.outerHTML)).toEqual(descriptions);
@@ -256,11 +305,11 @@ describe("trace flow showcase", () => {
       expect(beforeActualSize).toHaveLength(data.edges.length);
       fireEvent.click(screen.getByRole("button", { name: "100%" }));
       await waitFor(() => expect(viewport(region).zoom).toBe(1));
-      await waitFor(() => expect(beforeActualSize.every(path => !path.isConnected)).toBe(true));
+      expect(beforeActualSize.every(path => path.isConnected)).toBe(true);
       const beforeFit = [...region.querySelectorAll(".react-flow__edge-path")];
       fireEvent.click(screen.getByRole("button", { name: "Fit flow" }));
       await waitFor(() => expectCardsFit(region));
-      await waitFor(() => expect(beforeFit.every(path => !path.isConnected)).toBe(true));
+      expect(beforeFit.every(path => path.isConnected)).toBe(true);
       const fittedZoom = viewport(region).zoom;
       fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
       await waitFor(() => expect(viewport(region).zoom).toBeLessThan(fittedZoom));
