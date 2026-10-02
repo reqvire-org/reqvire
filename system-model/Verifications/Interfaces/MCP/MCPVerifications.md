@@ -69,6 +69,7 @@ This verification shall prove that MCP does not expose arbitrary shell execution
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-http-access/test.sh)
   * verify: [MCP Access Control Baseline](../../../Interfaces/MCP/Tools.md#mcp-access-control-baseline)
 ---
 
@@ -137,6 +138,7 @@ This verification shall prove that MCP startup/tool discovery reports the negoti
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Compatibility Versioning](../../../Interfaces/MCP/Tools.md#mcp-compatibility-versioning)
 ---
 
@@ -150,6 +152,7 @@ Expected checks:
 - Start `reqvire mcp --host 127.0.0.1 --port <PORT>` and verify standard MCP streamable HTTP requests are accepted at fixed endpoint `/mcp`.
 - Verify `reqvire mcp --transport stdio` is rejected because stdio compatibility mode is not supported.
 - Verify HTTP `tools/list`, `resources/list`, and representative `tools/call` responses expose the expected tool names, schemas, annotations, mutation gating, and structured result semantics.
+- Compare the complete default and mutation-enabled HTTP tool catalog fixtures against the shared registry in unit tests. Both catalogs include the read-only managed query discovery and validation tools.
 - Verify HTTP requests without an `Origin` header are accepted.
 - Verify HTTP requests with loopback `Origin` headers are accepted.
 - Verify unlisted non-loopback, `null`, file, malformed, and multiple-valued Origin headers receive HTTP 403 before tool execution.
@@ -183,6 +186,7 @@ Cache rebuild races and post-write model/runtime coherence are additionally cove
   * verify: [MCP Server Command](../../../Interfaces/MCP/Tools.md#mcp-server-command)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-http-access/test.sh)
   * satisfiedBy: [mcp_http.rs](../../../../crates/reqvire-cli/src/mcp_http.rs)
+  * satisfiedBy: [mod.rs](../../../../crates/reqvire-core/src/tool_interface/mod.rs)
 ---
 
 ### MCP Model Evidence Tools Verification
@@ -218,6 +222,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Model Evidence Tools](../../../Interfaces/MCP/Tools.md#mcp-model-evidence-tools)
   * verify: [Ontology Term Definition Link Materialization](../../../Semantics/SemanticModelRequirements.md#ontology-term-definition-link-materialization)
 ---
@@ -243,6 +248,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Mutation Execution Flow](../../../Interfaces/MCP/Tools.md#mcp-mutation-execution-flow)
 ---
 
@@ -265,6 +271,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Mutation Tool Safety](../../../Interfaces/MCP/Tools.md#mcp-mutation-tool-safety)
 ---
 
@@ -315,6 +322,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Protocol Standard Conformance](../../../Interfaces/MCP/Tools.md#mcp-protocol-standard-conformance)
 ---
 
@@ -339,6 +347,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Quality Traceability Tools](../../../Interfaces/MCP/Tools.md#mcp-quality-traceability-tools)
 ---
 
@@ -359,6 +368,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Resource Interface](../../../Interfaces/MCP/Tools.md#mcp-resource-interface)
 ---
 
@@ -577,6 +587,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Server Command](../../../Interfaces/MCP/Tools.md#mcp-server-command)
 ---
 

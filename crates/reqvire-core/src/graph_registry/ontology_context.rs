@@ -201,7 +201,7 @@ impl GraphRegistry {
         context.into_iter().collect()
     }
 
-    pub(super) fn expand_ontology_context(&self, ontology_ids: BTreeSet<String>) -> Vec<String> {
+    pub(crate) fn expand_ontology_context(&self, ontology_ids: BTreeSet<String>) -> Vec<String> {
         let mut context = BTreeSet::new();
         let mut stack: Vec<String> = ontology_ids.into_iter().collect();
 

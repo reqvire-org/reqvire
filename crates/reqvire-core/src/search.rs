@@ -621,7 +621,7 @@ fn build_search_result(
                         .entry("verification-objective".to_string())
                         .or_insert(0) += 1;
                 }
-                element::ElementType::SemanticContract => {
+                element::ElementType::SemanticContract | element::ElementType::SemanticQuery => {
                     *c.total_semantic_contract_types
                         .entry("semantic-contract".to_string())
                         .or_insert(0) += 1;

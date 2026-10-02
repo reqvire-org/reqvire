@@ -1671,6 +1671,7 @@ impl GraphRegistry {
                 if !seen.insert(key) {
                     continue;
                 }
+                if kind == "http://www.w3.org/ns/shacl#targetNode" && semantic_index.queries.iter().any(|q| q.iri == iri && q.diagnostics.is_empty()) { continue; }
                 if owl_reserved::is_reserved_vocabulary_iri(iri) {
                     continue;
                 }
@@ -1940,11 +1941,11 @@ impl GraphRegistry {
         errors
     }
 
-    fn semantic_contract_used_ontology_context(&self, contract_id: &str) -> Vec<String> {
+    pub(crate) fn semantic_contract_used_ontology_context(&self, contract_id: &str) -> Vec<String> {
         let Some(contract) = self.nodes.get(contract_id) else {
             return Vec::new();
         };
-        if !contract.element.element_type.is_semantic_contract() {
+        if !contract.element.element_type.is_semantic_contract() && !contract.element.element_type.is_semantic_query() {
             return Vec::new();
         }
 

@@ -27,6 +27,14 @@ pub fn dispatch_tool(
         "reqvire.containment" => containment_tool(args, excluded_filename_patterns),
         "reqvire.collect" => collect_tool(args, excluded_filename_patterns),
         "reqvire.submodels" => submodels_tool(args, excluded_filename_patterns),
+        "reqvire.semantic.queries" | "reqvire.semantic.queries.validate" => {
+            super::semantic_tools::semantic_queries_tool(
+                args,
+                excluded_filename_patterns,
+                with_size_estimates,
+                name.ends_with(".validate"),
+            )
+        }
         "reqvire.semantic.export" => {
             semantic_export_tool(args, excluded_filename_patterns, with_size_estimates)
         }

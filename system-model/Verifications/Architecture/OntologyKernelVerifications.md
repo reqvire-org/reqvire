@@ -56,12 +56,11 @@ Required Rust test coverage:
 - Verify referenced graph subset tests are colocated with seed, reference, closure, and construct modules or submodules.
 - Verify `prelude` re-exports stable public types without exposing private module internals.
 
-This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
-
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [lib.rs](../../../crates/o-kernel/src/lib.rs)
   * verify: [O-Kernel Physical Module Architecture](../../Architecture/OntologyKernelRequirements.md#o-kernel-physical-module-architecture)
 ---
 
@@ -77,12 +76,11 @@ Required Rust test coverage:
 - Verify configured annotation predicates include labels, comments, preferred labels, definitions, and descriptions for selected and support terms.
 - Verify construction returns generic direct/support/annotation classification metadata without source-location, output-surface, or application external-source assumptions.
 
-This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
-
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [mod.rs](../../../crates/o-kernel/src/describe/mod.rs)
   * verify: [RDF Term Description Construction](../../Architecture/OntologyKernelRequirements.md#rdf-term-description-construction)
 ---
 
@@ -145,12 +143,11 @@ Required Rust test coverage:
 - Verify SHACL ontology alignment reports generic undeclared class, property, datatype, target-node, and invalid inverse-path diagnostics without application source-document assumptions.
 - Verify `sh:hasValue` and `sh:in` values are preserved without requiring every listed value IRI to be declared as an ontology term.
 
-This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
-
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [mod.rs](../../../crates/o-kernel/src/shacl/mod.rs)
   * verify: [SHACL Ontology Alignment](../../Architecture/OntologyKernelRequirements.md#shacl-ontology-alignment)
   * verify: [SHACL Structural Parser Registry](../../Architecture/OntologyKernelRequirements.md#shacl-structural-parser-registry)
 ---

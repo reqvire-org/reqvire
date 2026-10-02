@@ -210,6 +210,7 @@ fn semantic_export_layers_arg(args: &Value) -> Result<Vec<SemanticExportLayer>, 
             "model" => SemanticExportLayer::Model,
             "external-used" => SemanticExportLayer::ExternalUsed,
             "prefixes" => SemanticExportLayer::Prefixes,
+            "queries" => SemanticExportLayer::Queries,
             other => {
                 return Err(ReqvireError::ProcessError(format!(
                     "Invalid semantic export layer '{}'. Valid values: ontologies, shapes, concepts, model, external-used, prefixes",
@@ -2023,6 +2024,12 @@ fn semantic_graph_layers_for_export(layers: &[SemanticExportLayer]) -> Vec<Value
     let includes = |layer| layers.contains(&layer);
     vec![
         graph_layer(
+            "queries",
+            semantic_store::GRAPH_GENERATED,
+            includes(SemanticExportLayer::Queries),
+            "native managed SPARQL query resources",
+        ),
+        graph_layer(
             "ontologies",
             semantic_store::GRAPH_AUTHORED_ONTOLOGY,
             includes(SemanticExportLayer::Ontologies),
@@ -2160,4 +2167,58 @@ fn curie(iri: &str, prefixes: &[VocabularyPrefix]) -> String {
         }
         (None, None) => iri.to_string(),
     }
+}
+
+pub fn semantic_queries_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+    validate: bool,
+) -> Result<Value, ReqvireError> {
+    if validate {
+        let mut model = ModelManager::new();
+        let result = model.parse_and_validate_with_options(
+            None,
+            excluded_filename_patterns,
+            ModelBuildOptions {
+                lenient: false,
+                with_size_estimates,
+            },
+        );
+        let index = model
+            .semantic_store
+            .as_ref()
+            .map(|store| store.index.clone())
+            .unwrap_or_else(|| semantic_contract::build_semantic_index(&model.graph_registry));
+        return index.query_validation_report(
+            string_arg(args, "name").as_deref(),
+            string_arg(args, "iri").as_deref(),
+            result
+                .err()
+                .map(|e| vec![e.to_string()])
+                .unwrap_or_default(),
+        );
+    }
+    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
+    let index = &model
+        .semantic_store
+        .as_ref()
+        .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?
+        .index;
+    let name = string_arg(args, "name");
+    let iri = string_arg(args, "iri");
+    let namespace = string_arg(args, "namespace_base");
+    let records = index.select_queries(name.as_deref(), iri.as_deref(), namespace.as_deref())?;
+    let valid = records.iter().all(|q| q.diagnostics.is_empty());
+    let values: Result<Vec<_>, ReqvireError> = records
+        .into_iter()
+        .map(|q| {
+            if bool_arg(args, "include_content", false) {
+                q.artifact()
+            } else {
+                serde_json::to_value(q).map_err(ReqvireError::from)
+            }
+        })
+        .collect();
+    Ok(json!({"queries":values?,"valid":valid}))
 }

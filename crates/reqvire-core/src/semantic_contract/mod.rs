@@ -540,6 +540,7 @@ pub struct ModelContextEdge {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct SemanticIndex {
+    pub queries: Vec<queries::QueryRecord>,
     pub blocks: Vec<SemanticBlock>,
     pub external_blocks: Vec<SemanticBlock>,
     pub external_sources: Vec<ExternalOntologySource>,
@@ -562,6 +563,7 @@ pub enum SemanticExportFormat {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SemanticExportLayer {
+    Queries,
     Ontologies,
     Shapes,
     Concepts,
@@ -573,6 +575,7 @@ pub enum SemanticExportLayer {
 impl SemanticExportLayer {
     pub fn default_layers() -> Vec<Self> {
         vec![
+            Self::Queries,
             Self::Ontologies,
             Self::Shapes,
             Self::Concepts,
@@ -584,6 +587,7 @@ impl SemanticExportLayer {
 
     pub const fn as_str(&self) -> &'static str {
         match self {
+            Self::Queries => "queries",
             Self::Ontologies => "ontologies",
             Self::Shapes => "shapes",
             Self::Concepts => "concepts",
@@ -822,6 +826,7 @@ impl SemanticIndex {
             .flat_map(|document| document.element_identifiers.iter().cloned())
             .collect();
 
+        index.queries.retain(|q| q.namespaces.contains(&namespace));
         index.blocks.retain(|block| match block.kind {
             SemanticBlockKind::Ontology => {
                 retained_sources.contains(&block.source)
@@ -1257,7 +1262,9 @@ impl SemanticIndex {
         registry: &GraphRegistry,
     ) -> Result<String, ReqvireError> {
         let prefix_map = self.turtle_prefix_map(true)?;
-        build_generated_model_turtle(registry, self, &prefix_map)
+        let mut output = build_generated_model_turtle(registry, self, &prefix_map)?;
+        output.push_str(&self.queries_turtle());
+        Ok(output)
     }
 
     pub fn to_raw_external_turtle_string(&self) -> Result<String, ReqvireError> {
@@ -1469,6 +1476,7 @@ impl SemanticIndex {
     ) -> Result<String, ReqvireError> {
         let prefix_map = self.turtle_prefix_map(include_external)?;
         let mut output = self.to_turtle_string_with_external(include_external)?;
+        output.push_str(&self.queries_turtle());
         output.push_str(&self.model_context_turtle);
         output.push_str(&build_semantic_term_context_turtle(self));
         output.push_str(&build_ontology_projection_turtle(self));
@@ -1566,6 +1574,9 @@ impl SemanticIndex {
                 .into_iter()
                 .collect()
         };
+        if selected_layers.contains(&SemanticExportLayer::Queries) {
+            for query in &self.queries { if !query.diagnostics.is_empty() { return Err(ReqvireError::ProcessError(format!("Cannot export invalid query '{}'",query.name))); } }
+        }
         let has_model = selected_layers.contains(&SemanticExportLayer::Model);
         if has_model && namespace_base.is_some_and(|value| !value.trim().is_empty()) {
             return Err(ReqvireError::ProcessError(
@@ -1631,6 +1642,7 @@ impl SemanticIndex {
             )?;
         }
 
+        if layers.contains(&SemanticExportLayer::Queries) { output.push_str(&self.queries_turtle()); }
         if layers.contains(&SemanticExportLayer::Shapes) {
             append_blocks_turtle(
                 &mut output,
@@ -1756,6 +1768,7 @@ impl SemanticIndex {
 
 mod export;
 mod index;
+pub mod queries;
 mod prefixes;
 mod vocabulary;
 
@@ -1907,6 +1920,7 @@ ext:UnusedTerm a owl:Class ;
 "#;
 
         SemanticIndex {
+            queries: Vec::new(),
             blocks: Vec::new(),
             external_blocks: vec![external_block(raw_external)],
             external_sources: vec![ExternalOntologySource {
@@ -2100,6 +2114,7 @@ ext:UnusedTerm a owl:Class ;
     fn generated_model_turtle_declares_builtin_prefixes_when_it_uses_them() {
         let registry = GraphRegistry::new();
         let index = SemanticIndex {
+            queries: Vec::new(),
             blocks: Vec::new(),
             external_blocks: Vec::new(),
             external_sources: Vec::new(),
@@ -2180,6 +2195,7 @@ concept:TraceabilityConstruct a owl:Class ;
 "#;
 
         let index = SemanticIndex {
+            queries: Vec::new(),
             blocks: vec![ontology_block(authored)],
             external_blocks: vec![external_block],
             external_sources: vec![source],

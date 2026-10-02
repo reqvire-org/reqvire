@@ -176,7 +176,7 @@ fi
 # Error handling - non capability/requirement type.
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Test Verification" 2>&1)
 EXIT_CODE=$?
-if [ $EXIT_CODE -eq 0 ] || ! echo "$OUTPUT" | grep -q "not a capability, requirement, ontology, concept-scheme, or concept type"; then
+if [ $EXIT_CODE -eq 0 ] || ! echo "$OUTPUT" | grep -q "not a capability, requirement, ontology, semantic-query, concept-scheme, or concept type"; then
   echo "FAILED: verification collect should return type error"
   echo "$OUTPUT"
   exit 1

@@ -19,6 +19,8 @@ This inspection verifies that endpoint-host and browser-origin setup examples ma
 - Review direct-host and reverse-proxy examples for automatic bind-host acceptance, explicit allowed hostnames with optional ports, wildcard listener behavior, and equivalent embedded MCP options.
 - Build the website and check the examples against command help and the transport verification results.
 
+Review artifacts: [McpServer.tsx](../../../../website/src/pages/McpServer.tsx).
+
 #### Metadata
   * type: inspection-verification
 
@@ -40,6 +42,8 @@ Expected checks:
 - Review semantic-model, submodel, and implementation-coverage guidance for consistent placement and scope. A child binding must not imply applicability to unrelated siblings or the whole consuming capability-root submodel.
 - Confirm that the owning website requirements reference the documented placement constraint and retain satisfaction links to their page sources.
 - Build the website and inspect the affected rendered routes for the placement guidance and example.
+
+Review artifacts: [ModelingLanguage.tsx](../../../../website/src/pages/ModelingLanguage.tsx).
 
 #### Metadata
   * type: inspection-verification
@@ -68,6 +72,8 @@ Expected checks:
 - Review semantic-model and submodel guidance for validated ownership, evidence crossing scope without transferring membership, and the distinction between capability-scoped coverage and the submodels command's capability/requirement scope rules.
 - Build and inspect the affected public documentation routes, confirm navigation links resolve, and ensure examples and descriptions agree with the implemented feature before publication.
 
+Review artifacts: [Advanced.tsx](../../../../website/src/pages/Advanced.tsx), [UserGuide.tsx](../../../../website/src/pages/UserGuide.tsx).
+
 #### Metadata
   * type: inspection-verification
 
@@ -94,6 +100,8 @@ Expected checks:
 - Confirm that the owning documentation requirements reference the contracts they describe, so contract changes reach documentation through change-impact analysis.
 - Build and inspect the affected rendered routes and check that examples agree with validated model behavior before publication.
 
+Review artifacts: [ModelingLanguage.tsx](../../../../website/src/pages/ModelingLanguage.tsx).
+
 #### Metadata
   * type: inspection-verification
 
@@ -104,4 +112,19 @@ Expected checks:
   * verify: [Website Semantic Model Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-semantic-model-documentation)
   * verify: [Website Command and Workflow Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-command-and-workflow-documentation)
   * verify: [Website Assistant Integration Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-assistant-integration-documentation)
+---
+
+### Website Managed Query Documentation Verification
+
+Inspect the native query authoring and CLI/MCP artifact examples against their shared core contracts.
+
+#### Details
+Check Query and optional Produces syntax, explicit ontology use and prefixes, generated identity/form, namespace selection, exact-byte export/hash checks, and downstream runtime behavior. Build the website and compare documented commands with CLI help and managed query verification results.
+
+#### Metadata
+  * type: inspection-verification
+
+#### Relations
+  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
+  * verify: [Website Ontology Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-ontology-documentation)
 ---

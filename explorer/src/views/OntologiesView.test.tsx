@@ -5,6 +5,8 @@ import { ExplorerUiStateProvider } from "../state/ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
 import type { ExplorerProjectStore } from "../store/types";
+import { ElementIcon, TypeBadge } from "@ds";
+import { semanticQueryStore, queryId } from "../store/fixtures/semanticQueryGraph";
 import { OntologiesView } from "./OntologiesView";
 
 const sigmaState = vi.hoisted(() => ({
@@ -100,6 +102,34 @@ function resetSigmaState() {
 }
 
 describe("OntologiesView", () => {
+  it("renders query glyphs and retains vocabulary property links, with a query visibility filter", async () => {
+    renderWithStore(semanticQueryStore);
+    await waitFor(() => expect(sigmaState.graphs[0]).toBeTruthy());
+    const graph = sigmaState.graphs[0] as unknown as {
+      hasNode: (id: string) => boolean;
+      getNodeAttributes: (id: string) => Record<string, unknown>;
+      hasDirectedEdge: (from: string, to: string) => boolean;
+    };
+    const query = graph.getNodeAttributes(queryId);
+    expect(query.type).toBe("queryGlyph");
+    expect(query.fullLabel).toBe("Item labels");
+    expect(decodeURIComponent(String(query.image))).toContain(">Q</text>");
+    expect(query.hidden).toBe(false);
+    expect(graph.hasNode("https://example.org/items#name")).toBe(true);
+    expect(graph.getNodeAttributes("https://example.org/items#name").hidden).toBe(false);
+    expect(graph.hasDirectedEdge(queryId, "https://example.org/items#name")).toBe(true);
+    expect(graph.hasDirectedEdge(queryId, "https://example.org/items#Item")).toBe(true);
+    act(() => window.setOntologyGraphFilter?.("role", "semantic-query", false));
+    expect(graph.getNodeAttributes(queryId).hidden).toBe(true);
+    act(() => window.setOntologyGraphFilter?.("role", "semantic-query", true));
+    expect(graph.getNodeAttributes(queryId).hidden).toBe(false);
+  });
+
+  it("uses the shared query marker in element icons and type badges", () => {
+    render(<><ElementIcon type="semantic-query" /><TypeBadge type="semantic-query" /></>);
+    expect(screen.getAllByText("Q")).toHaveLength(2);
+  });
+
   it("renders the TypeScript ontology graph without injected renderer assets", () => {
     const { container } = renderWithStore();
 

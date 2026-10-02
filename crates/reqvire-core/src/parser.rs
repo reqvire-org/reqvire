@@ -59,90 +59,119 @@ pub struct ParsedExternalOntologySource {
     pub line_number: usize,
 }
 
+/// Real subsection headings, excluding fenced examples and details content.
+fn subsection_headers(content: &str) -> Vec<(usize, &str)> {
+    let mut headers = Vec::new();
+    let mut fence = 0;
+    let mut details = false;
+    for (i, line) in content.lines().enumerate() {
+        let t = line.trim();
+        if details {
+            if t.starts_with("</details>") {
+                details = false;
+            }
+            continue;
+        }
+        if fence > 0 {
+            if t.len() >= fence && t.chars().all(|c| c == '`') {
+                fence = 0;
+            }
+            continue;
+        }
+        if t.starts_with("<details") {
+            details = true;
+            continue;
+        }
+        if t.starts_with("```") {
+            fence = t.chars().take_while(|c| *c == '`').count();
+            continue;
+        }
+        if let Some(name) = t.strip_prefix("#### ") {
+            headers.push((i, name));
+        }
+    }
+    headers
+}
+
 pub fn extract_single_fenced_subsection(content: &str, subsection: &str) -> Vec<FencedBlock> {
-    let header = format!("#### {}", subsection);
+    let headers = subsection_headers(content);
+    let lines: Vec<_> = content.lines().collect();
     let mut blocks = Vec::new();
-    let mut in_section = false;
-    let mut in_fence = false;
-    let mut language = String::new();
-    let mut block_content = String::new();
-    let mut fence_line_number = 0;
-
-    for (line_index, line) in content.lines().enumerate() {
-        let trimmed = line.trim();
-
-        if trimmed.starts_with("#### ") {
-            if in_fence {
+    for (n, (start, name)) in headers.iter().enumerate() {
+        if *name != subsection {
+            continue;
+        }
+        let end = headers.get(n + 1).map_or(lines.len(), |(i, _)| *i);
+        let mut fence = 0;
+        let mut language = String::new();
+        let mut text = String::new();
+        let mut line_number = 0;
+        for (i, line) in lines.iter().enumerate().take(end).skip(start + 1) {
+            let t = line.trim();
+            if fence == 0 && t.starts_with("```") {
+                fence = t.chars().take_while(|c| *c == '`').count();
+                language = t[fence..].trim().to_owned();
+                line_number = i + 1;
+            } else if fence > 0 && t.len() >= fence && t.chars().all(|c| c == '`') {
                 blocks.push(FencedBlock {
                     language: language.clone(),
-                    content: block_content.trim_end().to_string(),
-                    line_number: fence_line_number,
+                    content: text.trim_end().to_owned(),
+                    line_number,
                 });
-                in_fence = false;
-                language.clear();
-                block_content.clear();
-                fence_line_number = 0;
+                fence = 0;
+                text.clear();
+            } else if fence > 0 {
+                text.push_str(line);
+                text.push('\n');
             }
-            in_section = trimmed == header;
-            continue;
         }
-
-        if !in_section {
-            continue;
-        }
-
-        if trimmed.starts_with("```") {
-            if in_fence {
-                blocks.push(FencedBlock {
-                    language: language.clone(),
-                    content: block_content.trim_end().to_string(),
-                    line_number: fence_line_number,
-                });
-                in_fence = false;
-                language.clear();
-                block_content.clear();
-                fence_line_number = 0;
-            } else {
-                in_fence = true;
-                language = trimmed.trim_start_matches("```").trim().to_string();
-                fence_line_number = line_index + 1;
-            }
-            continue;
-        }
-
-        if in_fence {
-            block_content.push_str(line);
-            block_content.push('\n');
+        if fence > 0 {
+            blocks.push(FencedBlock {
+                language,
+                content: text.trim_end().to_owned(),
+                line_number,
+            });
         }
     }
-
-    if in_fence {
-        blocks.push(FencedBlock {
-            language,
-            content: block_content.trim_end().to_string(),
-            line_number: fence_line_number,
-        });
-    }
-
     blocks
 }
 
 pub fn has_subsection(content: &str, subsection: &str) -> bool {
-    let header = format!("#### {}", subsection);
-    content
-        .lines()
-        .any(|line| line.trim() == header || line.trim().starts_with(&(header.clone() + " ")))
+    subsection_headers(content)
+        .iter()
+        .any(|(_, name)| *name == subsection || name.starts_with(&format!("{subsection} ")))
+}
+
+/// Byte range of a real subsection, excluding lookalike headings in code fences.
+pub(crate) fn subsection_range(content: &str, subsection: &str) -> Option<std::ops::Range<usize>> {
+    let headers = subsection_headers(content);
+    let position = headers.iter().position(|(_, name)| *name == subsection)?;
+    let mut offset = 0;
+    let offsets: Vec<_> = content
+        .split_inclusive('\n')
+        .map(|line| {
+            let start = offset;
+            offset += line.len();
+            start
+        })
+        .collect();
+    let start = offsets[headers[position].0];
+    let end = headers
+        .get(position + 1)
+        .map_or(content.len(), |(line, _)| offsets[*line]);
+    Some(start..end)
 }
 
 pub fn extract_concept_references(content: &str) -> (Vec<ConceptReference>, Vec<String>) {
     let mut references = Vec::new();
     let mut diagnostics = Vec::new();
     let mut in_section = false;
+    let headers = subsection_headers(content);
 
     for (line_index, line) in content.lines().enumerate() {
         let trimmed = line.trim();
 
-        if trimmed.starts_with("#### ") {
+        if headers.iter().any(|(index, _)| *index == line_index) {
             in_section = trimmed == "#### Concept References";
             continue;
         }
@@ -364,8 +393,23 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
     let mut in_details_block = false;
     let mut found_header = false;
 
-    for (line_num, line) in content.lines().enumerate() {
+    let mut content_fence = 0;
+    for (line_num, line) in content.split_terminator('\n').enumerate() {
         let trimmed = line.trim();
+        if !in_details_block && (content_fence > 0 || trimmed.starts_with("```")) {
+            if trimmed.starts_with("```") {
+                let length = trimmed.chars().take_while(|c| *c == '`').count();
+                if content_fence == 0 {
+                    content_fence = length;
+                    if current_subsection == SubSection::Other("Query".to_owned()) {
+                        if let Some(element)=&mut current_element {element.query_line_number=Some(line_num+1);}
+                    }
+                }
+                else if length >= content_fence && trimmed.chars().all(|c| c == '`') { content_fence = 0; }
+            }
+            if let Some(element) = &mut current_element { element.add_content(&format!("{}\n", line)); }
+            continue;
+        }
 
         // Handle <details> blocks
         if in_details_block {
@@ -1116,8 +1160,23 @@ pub fn parse_elements(
     // File element order tracking
     let mut file_element_counter: usize = 0;
 
-    for (line_num, line) in content.lines().enumerate() {
+    let mut content_fence = 0;
+    for (line_num, line) in content.split_terminator('\n').enumerate() {
         let trimmed = line.trim();
+        if !in_details_block && (content_fence > 0 || trimmed.starts_with("```")) {
+            if trimmed.starts_with("```") {
+                let length = trimmed.chars().take_while(|c| *c == '`').count();
+                if content_fence == 0 {
+                    content_fence = length;
+                    if current_subsection == SubSection::Other("Query".to_owned()) {
+                        if let Some(element)=&mut current_element {element.query_line_number=Some(line_num+1);}
+                    }
+                }
+                else if length >= content_fence && trimmed.chars().all(|c| c == '`') { content_fence = 0; }
+            }
+            if let Some(element) = &mut current_element { element.add_content(&format!("{}\n", line)); }
+            continue;
+        }
 
         if in_details_block {
             if !skip_current_element {

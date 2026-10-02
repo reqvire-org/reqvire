@@ -55,6 +55,18 @@ pub struct OntologyGraphNode {
     pub literal_values: Vec<OntologyGraphLiteralValue>,
     pub slot_facets: Vec<OntologyGraphSlotFacet>,
     pub constructs: Vec<OntologyGraphConstructDetail>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub query: Option<OntologyGraphQuery>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct OntologyGraphQuery {
+    pub form: String,
+    pub text: String,
+    pub ontologies: Vec<OntologyGraphSource>,
+    pub vocabulary: Vec<OntologyGraphTermRef>,
+    pub produces_properties: Vec<OntologyGraphTermRef>,
+    pub produces_families: Vec<OntologyGraphTermRef>,
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq, PartialOrd, Ord)]
@@ -175,6 +187,7 @@ pub fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
     populate_construct_metadata(&mut nodes, &mut edges, report);
     apply_shape_slot_facets(&mut nodes, &all_blocks, &rdf_list_values);
     add_model_context_layer(&mut nodes, &mut edges, report);
+    add_query_nodes(&mut nodes, &mut edges, report);
     apply_ontology_document_ownership(&mut nodes, report);
     promote_typed_named_individuals(&mut nodes);
     apply_skos_scheme_metadata(&mut nodes);
@@ -536,6 +549,96 @@ fn add_model_context_layer(
     }
 }
 
+fn add_query_nodes(
+    nodes: &mut BTreeMap<String, OntologyGraphNode>,
+    edges: &mut BTreeSet<OntologyGraphEdge>,
+    report: &SemanticIndex,
+) {
+    for query in report
+        .queries
+        .iter()
+        .filter(|query| query.diagnostics.is_empty())
+    {
+        let source = ontology_graph_source_metadata(
+            &query.source_elements[0],
+            &query.name,
+            &query.source_files[0],
+            query.line_number,
+            "query",
+        );
+        let term = |iri: &String| OntologyGraphTermRef {
+            iri: iri.clone(),
+            label: nodes
+                .get(iri)
+                .map_or_else(|| clean_uri(iri), |node| node.label.clone()),
+            kind: nodes
+                .get(iri)
+                .map_or_else(|| "resource".to_string(), |node| node.semantic_type.clone()),
+        };
+        let detail = OntologyGraphQuery {
+            form: query.query_form.clone().unwrap_or_default(),
+            text: query.content.clone(),
+            ontologies: report
+                .blocks
+                .iter()
+                .filter(|block| query.ontology_context.contains(&block.source))
+                .map(|block| {
+                    ontology_graph_source_metadata(
+                        &block.source,
+                        &block.source_name,
+                        &block.file_path,
+                        block.line_number,
+                        "ontology",
+                    )
+                })
+                .collect(),
+            vocabulary: query.referenced_terms.iter().map(term).collect(),
+            produces_properties: query.materializes_properties.iter().map(term).collect(),
+            produces_families: query.materializes_families.iter().map(term).collect(),
+        };
+        upsert_ontology_graph_node(
+            nodes,
+            OntologyGraphNodeUpsert {
+                id: query.iri.clone(),
+                label: query.name.clone(),
+                node_type: "generic",
+                semantic_type: "semantic-query",
+                layer: GRAPH_LAYER_AUTHORED,
+                source_kind: "query",
+                full_uri: query.iri.clone(),
+                source: source.clone(),
+                semantic_update: None,
+            },
+        );
+        let node = nodes.get_mut(&query.iri).expect("query node inserted");
+        node.label = query.name.clone();
+        node.semantic_type = "semantic-query".to_string();
+        node.layer = GRAPH_LAYER_AUTHORED.to_string();
+        node.source_kind = "query".to_string();
+        node.comment = query.purpose.clone().unwrap_or_default();
+        node.rdf_types.push("SemanticQuery".to_string());
+        node.sources.retain(|existing| existing != &source);
+        node.sources.insert(0, source);
+        node.query = Some(detail);
+        for iri in &query.referenced_terms {
+            let produced = query.materializes_properties.contains(iri)
+                || query.materializes_families.contains(iri);
+            edges.insert(OntologyGraphEdge {
+                source: query.iri.clone(),
+                target: iri.clone(),
+                label: if produced {
+                    "declares output"
+                } else {
+                    "uses vocabulary"
+                }
+                .to_string(),
+                layer: GRAPH_LAYER_AUTHORED.to_string(),
+                source_kind: "query".to_string(),
+            });
+        }
+    }
+}
+
 fn is_semantic_context_edge(label: &str) -> bool {
     matches!(label, "declaresTerm" | "referencesTerm")
 }
@@ -578,6 +681,7 @@ fn insert_semantic_context_node(
             literal_values: Vec::new(),
             slot_facets: Vec::new(),
             constructs: Vec::new(),
+            query: None,
         });
 }
 
@@ -977,6 +1081,7 @@ fn upsert_ontology_graph_node(
             literal_values: Vec::new(),
             slot_facets: Vec::new(),
             constructs: Vec::new(),
+            query: None,
         });
 }
 
@@ -2323,6 +2428,7 @@ ex:rule a ex:Thing .
 "#;
 
         let index = SemanticIndex {
+            queries: Vec::new(),
             blocks: vec![ontology_block(content)],
             external_blocks: Vec::new(),
             external_sources: Vec::new(),
@@ -2423,6 +2529,7 @@ concept:ChangeImpact a skos:Concept ;
 "#;
 
         let index = SemanticIndex {
+            queries: Vec::new(),
             blocks: vec![ontology_block(content), concept_block(concepts)],
             external_blocks: Vec::new(),
             external_sources: Vec::new(),
@@ -2507,6 +2614,7 @@ concept:LegacyTraceability a skos:Concept ;
 "#;
 
         let index = SemanticIndex {
+            queries: Vec::new(),
             blocks: vec![ontology_block(content)],
             external_blocks: Vec::new(),
             external_sources: Vec::new(),

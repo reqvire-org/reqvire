@@ -290,6 +290,7 @@ Detailed semantic-index, source-traceability, projection-subgraph, SHACL slot/fa
   * type: requirement
 
 #### Contract References
+  * [Semantic Query Discovery Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-discovery-specification)
   * [Ontology Construct Classification Specification](../../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
 
 #### Relations

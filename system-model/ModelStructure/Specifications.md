@@ -3,6 +3,8 @@
 ### Capability Collect Traversal Specification
 
 #### Details
+Semantic-query collection MUST include its authored Query/Produces content and resolve upstream used ontology context. Ontology downstream collection MUST include native queries using reachable ontology.
+
 Collect supports `capability`, `requirement`, and `ontology` start elements.
 
 Default collection excludes implementation/evidence relations (`satisfiedBy`, `satisfy`, `verify`, `verifiedBy`) from structural hierarchy views.
@@ -19,8 +21,8 @@ When starting from a `capability`:
 
 When starting from an `ontology`:
 - UPSTREAM traverses parent ontology elements through `derivedFrom`.
-- DOWNSTREAM traverses child ontology elements through `derive` and includes semantic contracts that use each reachable ontology element through `use`/`usedBy`.
-- The collected content is for semantic authoring context; full RDF/SHACL export remains the responsibility of the `ontologies` command.
+- DOWNSTREAM traverses child ontology elements through `derive` and includes semantic contracts and semantic queries that use each reachable ontology element through `use`/`usedBy`.
+- The collected content is for semantic authoring context; full RDF/SHACL export remains the responsibility of the `semantic export` command.
 
 The `specifiedBy`/`specify` bridge is therefore directional:
 - Requirement UPSTREAM uses the bridge to add capability context.
@@ -450,7 +452,8 @@ The implementation shall enforce the ontology and semantic-contract structure:
 - Ontology and semantic-contract elements use reserved type-specific subsections:
   - `ontology`: `#### Ontology` is required with exactly one fenced Turtle block; `#### Shapes` is forbidden.
   - `semantic-contract`: `#### Ontology` is forbidden; `#### Shapes` is required with exactly one fenced Turtle block.
-- These reserved subsections are stored as ontology and semantic-contract ADT fields, not only as generic content.
+- `semantic-query`: Query and optional Produces MUST follow the Semantic Query Authoring Specification. Queries use ontology context through use/usedBy.
+- Reserved subsections MUST be stored as structured element fields and reused by the semantic index.
 - Top parent ontology elements in ontology hierarchy subgraphs must define non-empty `ontology_base` and `ontology_prefix` metadata. Child ontology elements inherit document-base and canonical prefix context from their ontology parent path.
 - The root ontology Turtle block should explicitly declare `<ontology_base> a owl:Ontology` for authored OWL document identity.
 - Reqvire derives one ontology document declaration per distinct resolved `ontology_base`; the ontology document IRI is `ontology_base`, and the term namespace is `<ontology_base>#`.
@@ -523,7 +526,7 @@ Structured markdown detection behavior:
 Element types supported by the system for classification and behavior determination.
 
 #### Details
-The canonical type vocabulary is defined by the Reqvire core element, capability, requirement, ontology, semantic-contract, and verification model contracts.
+The canonical type vocabulary is defined by the Reqvire core element, capability, requirement, ontology, semantic-contract, semantic-query, and verification model contracts.
 
 The implementation shall use those contracts as the authoritative source for:
 - capability, requirement, contract, verification, and custom type categories

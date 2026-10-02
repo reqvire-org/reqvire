@@ -122,7 +122,7 @@ Semantic model evidence rules:
 - `reqvire.read_element` returns `concept_references` for non-ontology, non-semantic-contract elements that author `#### Concept References`.
 - `reqvire.collect` includes authored concept references for capability/requirement collection and semantic-contract ontology-use context for semantic-contract evidence where the underlying Reqvire operation returns it.
 - `reqvire.model` and `reqvire.submodels` preserve capability roots, requirement ownership through `specify`/`specifiedBy`, ontology hierarchy through `derive`/`derivedFrom`, and concept-reference facts needed for semantic dependency traceability.
-- `reqvire.semantic.export` exposes the canonical layer-composed semantic RDF export. It accepts optional `format`, optional repeatable-equivalent `layers` array with `ontologies`, `shapes`, `concepts`, `model`, `external-used`, and `prefixes`, and optional `namespace_base`. Omitted or empty `layers` exports all public layers.
+- `reqvire.semantic.export` exposes the canonical layer-composed semantic RDF export. It accepts optional `format`, optional repeatable-equivalent `layers` array with `ontologies`, `shapes`, `concepts`, `model`, `external-used`, `prefixes`, and `queries`, and optional `namespace_base`. Omitted or empty `layers` exports all public layers.
 - `reqvire.semantic.ontologies` exposes authored OWL/RDF ontology vocabulary only. It accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`. Authored `reqvire:mapsToConcept` bridge triples remain in this ontology layer.
 - `reqvire.semantic.shapes` exposes semantic-contract SHACL shapes only. It accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`.
 - `reqvire.semantic.concepts` exposes SKOS concept scheme/thesaurus triples only. It accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`. It does not include authored ontology bridge triples.
@@ -137,7 +137,7 @@ Semantic model evidence rules:
 - `reqvire.semantic.vocabulary` returns compact paged semantic vocabulary with prefixes included in every response for SPARQL query construction. It accepts optional `include_external`; omitted or false returns authored vocabulary only, while true also returns used external subset vocabulary terms marked as external with external source metadata.
 - MCP semantic tools that return Turtle use the same prefixed Turtle semantic export contract as CLI output, including deterministic `@prefix` declarations, safe compact prefixed names, preservation of authored `owl:Ontology` and `owl:imports` facts, and no Turtle prefix behavior for JSON-LD responses.
 - `reqvire.semantic.sparql` executes SPARQL against the semantic store used by the combined semantic graph. It accepts optional `include_external`; omitted or false queries the authored semantic store only, while true queries a store that includes only the used external subset.
-- Export tool responses expose `graph_layers` metadata with layer roles `ontologies`, `shapes`, `concepts`, `model`, `external-used`, `prefixes`, and `raw-external-source`; query-helper responses expose store graph roles `default`, `authored-ontology`, `authored-model`, `generated`, `external-used-subset`, and `raw-external-source`. Raw external source graphs remain hidden.
+- Export tool responses expose `graph_layers` metadata with layer roles `ontologies`, `shapes`, `concepts`, `model`, `external-used`, `prefixes`, `queries`, and `raw-external-source`; query-helper responses expose store graph roles `default`, `authored-ontology`, `authored-model`, `generated`, `external-used-subset`, and `raw-external-source`. Raw external source graphs remain hidden.
 
 #### Metadata
   * type: specification
@@ -927,4 +927,19 @@ Embedded MCP behavior:
 
 #### Relations
   * define: [Serve Command Embedded MCP Endpoint](../WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
+---
+
+### MCP Managed Query Artifacts Specification
+
+The MCP interface MUST expose managed query operations through shared core contracts.
+
+#### Details
+Query discovery MUST return native authored records sorted by generated IRI then name. Namespace filters MUST match used ontology namespaces. Query validation MUST return per-candidate diagnostics and use the common validation gate. Selectors MUST resolve exactly and reject unknown or ambiguous results. Exported content and hashes MUST come from the shared core renderer. Validation and artifact rendering MUST preserve downstream SERVICE, datasets, and extension functions without executing them.
+Tools MUST be `reqvire.semantic.queries` with optional `iri`, `name`, `namespace_base`, and `include_content`, and `reqvire.semantic.queries.validate` with optional `iri` or `name`. `include_content` MUST add content and SHA-256. `reqvire.semantic.export` MUST support the queries layer, including it for omitted or empty layer selection.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Managed Query Artifacts](ManagedQueries.md#mcp-managed-query-artifacts)
 ---

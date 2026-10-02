@@ -34,6 +34,10 @@ ontology elements and SHACL semantic contracts.
 - When changing ontology identity, check dependent semantic contracts, requirements constrained by shapes, concept bridges, Explorer ontology/thesaurus data, MCP semantic tools, and tests that assert exported Turtle.
 - When validation is part of the task, run focused checks such as `validate`, `semantic export --layer ontologies`, `semantic export --layer shapes`, `semantic export --layer model`, and any affected fixture tests before finishing.
 
+## Managed query authoring
+
+For native `semantic-query` elements, Query/Produces syntax, ontology context, CLI artifacts, or MCP discovery, read [SemanticQueries.md](references/SemanticQueries.md).
+
 ## Workflow
 
 1. Establish the domain-concept frame before project-specific examples.

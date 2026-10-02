@@ -80,6 +80,27 @@ reqvire semantic export --layer ontologies --output ontologies.ttl
 reqvire semantic export --jsonld --output semantic-graph.jsonld`}</CodeBlock>
       </Section>
 
+      <Section title="Managed Query Artifacts">
+        <p className="text-zinc-600 mb-4">
+          Discover native queries, validate their vocabulary context, and export
+          standalone SPARQL for downstream tools. Namespace filtering selects the
+          ontologies a query uses. Use the exact name or generated IRI from discovery
+          to select one artifact.
+        </p>
+        <CodeBlock>{`reqvire semantic query list --json
+reqvire semantic query list --namespace-base https://example.org/items
+reqvire semantic query validate --json
+reqvire semantic query export --name "Active Items Lookup" --output active-items.sparql
+reqvire semantic query export --name "Active Items Lookup" --json
+reqvire semantic query check --name "Active Items Lookup" --artifact active-items.sparql
+reqvire semantic export --layer queries --output queries.ttl`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          JSON export includes the exact content and SHA-256 digest. Check compares
+          the complete file and fails for stale or missing artifacts without rewriting
+          them. File export replaces an artifact atomically after validation.
+        </p>
+      </Section>
+
       <Section title="Working with Elements">
         <CommandList
           items={[

@@ -530,6 +530,8 @@ function mermaidClassForRole(role: ElementRole): string {
   switch (role) {
     case "input-output":
       return "inputOutput";
+    case "semantic-query":
+      return "ontology";
     case "semantic-contract":
       return "semanticContract";
     case "verification-objective":

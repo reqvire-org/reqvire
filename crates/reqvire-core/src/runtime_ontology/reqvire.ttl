@@ -37,7 +37,6 @@ reqvire:CommentStyleContract rdfs:isDefinedBy <https://www.reqvire.org/ontology>
 reqvire:CommentStyleKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:Concept rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ConceptElementType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:ConceptRelationConstructQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ConceptRelationProjection rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ConceptRelationProjectionEvidence rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ConceptScheme rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -63,7 +62,6 @@ reqvire:ElementLocation rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ElementType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:EvidenceBackedVerification rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ExternalOntologySource rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:ExternalOntologySubsetConstructQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ExternalUrlTarget rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:File rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:FormalProofVerification rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -91,7 +89,6 @@ reqvire:ModelRelation rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:MutationSafetyGate rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:NamespaceScopedOntologyExport rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:NonEvidenceBackedVerification rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:NormalizedRelationConstructQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:Ontology rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:OntologyBlock rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:OntologyConstruct rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -117,7 +114,6 @@ reqvire:RdfTriple rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ReferenceTargetKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RelationConstraint rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RelationFamily rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:RelationFamilyConstructQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RelationPredicateLayer rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RelationRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RelationSemanticCategory rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -135,11 +131,11 @@ reqvire:RuntimeOntologyNamespace rdfs:isDefinedBy <https://www.reqvire.org/ontol
 reqvire:SatisfactionRelationPattern rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:SemanticArtifactExport rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:SemanticBlock rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:SemanticConstructQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:SemanticContract rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:SemanticContractElementType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:SemanticDependency rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:SemanticExport rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:SemanticQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ShapeBlock rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ShapeContract rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:Source rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -221,7 +217,6 @@ reqvire:conceptLabel rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptReference rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptReferenceDependencyRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptReferencesSubsection rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:conceptRelationNormalizedConstructQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptRelationProjectionEvidence rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptSchemeType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -238,11 +233,6 @@ reqvire:constructObject rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:constructPredicate rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:constructProperty rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:constructProvenance rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:constructQueryMaterializesFamily rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:constructQueryMaterializesProperty rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:constructQueryName rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:constructQueryPurpose rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:constructQueryText rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:constructSequenceIndex rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:constructSourceBlock rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:constructSubject rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -332,10 +322,6 @@ reqvire:externalSubsetSource rdfs:isDefinedBy <https://www.reqvire.org/ontology>
 reqvire:externalUrl rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:externalUrlReferenceTargetKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:externalUsedTerm rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:externalUsedTermAnnotationConstructQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:externalUsedTermDirectDescriptionConstructQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:externalUsedTermSeedQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:externalUsedTermSupportClosureConstructQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:filePath rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:formalProofVerificationType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:forwardModelTraversalRelationUsageCategory rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -448,6 +434,13 @@ reqvire:propagationTarget rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:propertyCharacteristic rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:provenanceEvidence rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:provenanceSource rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:queryElement rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:queryForm rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:queryMaterializesFamily rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:queryMaterializesProperty rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:queryName rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:queryPurpose rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:queryText rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:recognizesReservedVocabularyTerm rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:redundantHierarchicalLintRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:redundantRelationLintRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -464,7 +457,6 @@ reqvire:relationFamilyForwardProperty rdfs:isDefinedBy <https://www.reqvire.org/
 reqvire:relationFamilyInverseProperty rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:relationFamilyMeaning rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:relationFamilyName rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
-reqvire:relationFamilyNormalizedConstructQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:relationName rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:relationPattern rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:relationPredicateLayer rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -532,6 +524,7 @@ reqvire:semanticContractUsesOntology rdfs:isDefinedBy <https://www.reqvire.org/o
 reqvire:semanticDependency rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:semanticDuplicateDeclarationIssueKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:semanticPatternName rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:semanticQueryType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:semanticReferenceNotFoundIssueKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:semanticReferenceOutsideContextIssueKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:semanticReferenceReachabilityRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -982,6 +975,10 @@ reqvire:Ontology a owl:Class ;
 	rdfs:subClassOf reqvire:Element ;
 	reqvire:mapsToConcept concept:OntologyElement ;
 	rdfs:comment "First-class ontology element that defines reusable RDF/OWL vocabulary." .
+reqvire:SemanticQuery a owl:Class ;
+	rdfs:subClassOf reqvire:Element ;
+	reqvire:mapsToConcept concept:SemanticQuery ;
+	rdfs:comment "Native SPARQL query artifact with vocabulary context and source provenance." .
 reqvire:ShapeContract a owl:Class ;
 	rdfs:subClassOf reqvire:SemanticContract ;
 	reqvire:mapsToConcept concept:SemanticContract ;
@@ -1018,6 +1015,10 @@ reqvire:shapesText a owl:DatatypeProperty ;
 	rdfs:domain reqvire:SemanticContract ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Inline Turtle SHACL shape text carried by a semantic contract." .
+reqvire:semanticQueryType a reqvire:ElementType ;
+	reqvire:elementTypeName "semantic-query" ;
+	reqvire:elementTypeCategory "semantic-query" ;
+	reqvire:defaultElementType false .
 reqvire:semanticContractType a reqvire:SemanticContractElementType ;
 	reqvire:elementTypeName "semantic-contract" ;
 	reqvire:elementTypeCategory "semantic-contract" ;
@@ -1581,53 +1582,53 @@ reqvire:impactEdge a owl:ObjectProperty ;
 	rdfs:range reqvire:ChangeImpactEdge ;
 	rdfs:comment "Propagation edge included in a change-impact path." .
 reqvire:semanticDependency a owl:ObjectProperty .
-_:d4c92395245ccb550f95047e8af9c9e4 a owl:Class .
-_:b7f3e29a6d81d372e0db31ab4952b3f1 rdf:first reqvire:ChangeImpactAnalysis .
-_:d4c92395245ccb550f95047e8af9c9e4 owl:unionOf _:b7f3e29a6d81d372e0db31ab4952b3f1 .
-_:dbd828f130b201d3a99342c8812f3462 rdf:first reqvire:SemanticDependency .
-_:b7f3e29a6d81d372e0db31ab4952b3f1 rdf:rest _:dbd828f130b201d3a99342c8812f3462 .
-_:dbd828f130b201d3a99342c8812f3462 rdf:rest rdf:nil .
-reqvire:semanticDependency rdfs:domain _:d4c92395245ccb550f95047e8af9c9e4 .
-_:df37d68288c254d9d13f70f220144a85 a owl:Class .
-_:ce55728f199006432409125321da5130 rdf:first reqvire:SemanticDependency .
-_:df37d68288c254d9d13f70f220144a85 owl:unionOf _:ce55728f199006432409125321da5130 .
-_:d20c3dec0d6d879e983f3da6959f941f rdf:first reqvire:SemanticContract .
-_:ce55728f199006432409125321da5130 rdf:rest _:d20c3dec0d6d879e983f3da6959f941f .
-_:d20c3dec0d6d879e983f3da6959f941f rdf:rest rdf:nil .
-reqvire:semanticDependency rdfs:range _:df37d68288c254d9d13f70f220144a85 ;
+_:cc86536d7374e559ea19beb10e6ef7df a owl:Class .
+_:eebcf96146b7d1e53d84e192703f60c7 rdf:first reqvire:ChangeImpactAnalysis .
+_:cc86536d7374e559ea19beb10e6ef7df owl:unionOf _:eebcf96146b7d1e53d84e192703f60c7 .
+_:a368d6f77cf3cb48aee32ed9d1091abc rdf:first reqvire:SemanticDependency .
+_:eebcf96146b7d1e53d84e192703f60c7 rdf:rest _:a368d6f77cf3cb48aee32ed9d1091abc .
+_:a368d6f77cf3cb48aee32ed9d1091abc rdf:rest rdf:nil .
+reqvire:semanticDependency rdfs:domain _:cc86536d7374e559ea19beb10e6ef7df .
+_:b853f42b50dfc7734b8d13158b54e471 a owl:Class .
+_:c3269602ce2cc896b70c049a044921af rdf:first reqvire:SemanticDependency .
+_:b853f42b50dfc7734b8d13158b54e471 owl:unionOf _:c3269602ce2cc896b70c049a044921af .
+_:b9bf80113ac4c0b336e3db12499e3a91 rdf:first reqvire:SemanticContract .
+_:c3269602ce2cc896b70c049a044921af rdf:rest _:b9bf80113ac4c0b336e3db12499e3a91 .
+_:b9bf80113ac4c0b336e3db12499e3a91 rdf:rest rdf:nil .
+reqvire:semanticDependency rdfs:range _:b853f42b50dfc7734b8d13158b54e471 ;
 	rdfs:comment "Semantic dependency considered during change-impact analysis, or the semantic contract target resolved by a dependency record." .
 reqvire:reviewedByVerification a owl:ObjectProperty ;
 	rdfs:domain reqvire:ImpactReview ;
 	rdfs:range reqvire:Verification ;
 	rdfs:comment "Verification evidence or method used to review an impact." .
 reqvire:impactReason a owl:DatatypeProperty .
-_:c1e98e81c9e7e81b7308a79ed4f5da77 a owl:Class .
-_:e9ce908e5e498e53108781d9ca9baf9a rdf:first reqvire:ChangeImpactEdge .
-_:c1e98e81c9e7e81b7308a79ed4f5da77 owl:unionOf _:e9ce908e5e498e53108781d9ca9baf9a .
-_:ebafd14ed0a7945666273efcd2f8831a rdf:first reqvire:ChangePropagationRule .
-_:e9ce908e5e498e53108781d9ca9baf9a rdf:rest _:ebafd14ed0a7945666273efcd2f8831a .
-_:ebafd14ed0a7945666273efcd2f8831a rdf:rest rdf:nil .
-reqvire:impactReason rdfs:domain _:c1e98e81c9e7e81b7308a79ed4f5da77 ;
+_:a554b7161c4b02ce1268aba695c9744b a owl:Class .
+_:ee122489a788ce4d10b7d2f60d4e0bf0 rdf:first reqvire:ChangeImpactEdge .
+_:a554b7161c4b02ce1268aba695c9744b owl:unionOf _:ee122489a788ce4d10b7d2f60d4e0bf0 .
+_:d4091045439e790f201fd474774a100b rdf:first reqvire:ChangePropagationRule .
+_:ee122489a788ce4d10b7d2f60d4e0bf0 rdf:rest _:d4091045439e790f201fd474774a100b .
+_:d4091045439e790f201fd474774a100b rdf:rest rdf:nil .
+reqvire:impactReason rdfs:domain _:a554b7161c4b02ce1268aba695c9744b ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Human-readable reason explaining why an edge or rule propagates impact." .
 reqvire:impactRelation a owl:DatatypeProperty .
-_:a564627ce535bea230d4c8881013c4f1 a owl:Class .
-_:ed660440586efaa628fac70f8a12d5cb rdf:first reqvire:ChangeImpactEdge .
-_:a564627ce535bea230d4c8881013c4f1 owl:unionOf _:ed660440586efaa628fac70f8a12d5cb .
-_:b1d67539feaad09290e7d8ce7a644714 rdf:first reqvire:ChangePropagationRule .
-_:ed660440586efaa628fac70f8a12d5cb rdf:rest _:b1d67539feaad09290e7d8ce7a644714 .
-_:b1d67539feaad09290e7d8ce7a644714 rdf:rest rdf:nil .
-reqvire:impactRelation rdfs:domain _:a564627ce535bea230d4c8881013c4f1 ;
+_:d3cc6d530e2e480a6825f012befa3542 a owl:Class .
+_:d773bd8c23b75bfbc644b6c37dc5755d rdf:first reqvire:ChangeImpactEdge .
+_:d3cc6d530e2e480a6825f012befa3542 owl:unionOf _:d773bd8c23b75bfbc644b6c37dc5755d .
+_:b56ef2fbcc6a0393bb8e754c7316f654 rdf:first reqvire:ChangePropagationRule .
+_:d773bd8c23b75bfbc644b6c37dc5755d rdf:rest _:b56ef2fbcc6a0393bb8e754c7316f654 .
+_:b56ef2fbcc6a0393bb8e754c7316f654 rdf:rest rdf:nil .
+reqvire:impactRelation rdfs:domain _:d3cc6d530e2e480a6825f012befa3542 ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Canonical relation or dependency token that caused an impact edge or activates a propagation rule." .
 reqvire:impactDirection a owl:DatatypeProperty .
-_:f938a4e7b3be08b514351dc359c453ac a owl:Class .
-_:d41c246da318e05fc736885f02a94491 rdf:first reqvire:ChangeImpactEdge .
-_:f938a4e7b3be08b514351dc359c453ac owl:unionOf _:d41c246da318e05fc736885f02a94491 .
-_:ce3f76f4113aee8a010fdaa93b99a75f rdf:first reqvire:ChangePropagationRule .
-_:d41c246da318e05fc736885f02a94491 rdf:rest _:ce3f76f4113aee8a010fdaa93b99a75f .
-_:ce3f76f4113aee8a010fdaa93b99a75f rdf:rest rdf:nil .
-reqvire:impactDirection rdfs:domain _:f938a4e7b3be08b514351dc359c453ac ;
+_:ef8a48bbcbff16d90b1ef28afd4bae3c a owl:Class .
+_:fafb8c0780a0f007e29f4a31253a365a rdf:first reqvire:ChangeImpactEdge .
+_:ef8a48bbcbff16d90b1ef28afd4bae3c owl:unionOf _:fafb8c0780a0f007e29f4a31253a365a .
+_:e973ead49d6314eec2f24843ef3290c9 rdf:first reqvire:ChangePropagationRule .
+_:fafb8c0780a0f007e29f4a31253a365a rdf:rest _:e973ead49d6314eec2f24843ef3290c9 .
+_:e973ead49d6314eec2f24843ef3290c9 rdf:rest rdf:nil .
+reqvire:impactDirection rdfs:domain _:ef8a48bbcbff16d90b1ef28afd4bae3c ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Propagation direction token for an impact edge or propagation rule." .
 reqvire:impactScope a owl:DatatypeProperty ;
@@ -2203,24 +2204,48 @@ reqvire:semanticContractConstrainsRequirement a owl:ObjectProperty ;
 	rdfs:range reqvire:Requirement ;
 	owl:inverseOf reqvire:requirementConstrainedBySemanticContract ;
 	rdfs:comment "Normalized direct constraint relation from a semantic contract to a constrained requirement." .
-reqvire:use a owl:ObjectProperty ;
-	rdfs:domain reqvire:SemanticContract ;
+reqvire:use a owl:ObjectProperty .
+_:f6416a655ca6ac19b58839d014b815d0 a owl:Class .
+_:cfab59e28c6f88cbc756aaba54c0dbc1 rdf:first reqvire:SemanticContract .
+_:f6416a655ca6ac19b58839d014b815d0 owl:unionOf _:cfab59e28c6f88cbc756aaba54c0dbc1 .
+_:b0600318204cbba0b121923e2eda2747 rdf:first reqvire:SemanticQuery .
+_:cfab59e28c6f88cbc756aaba54c0dbc1 rdf:rest _:b0600318204cbba0b121923e2eda2747 .
+_:b0600318204cbba0b121923e2eda2747 rdf:rest rdf:nil .
+reqvire:use rdfs:domain _:f6416a655ca6ac19b58839d014b815d0 ;
 	rdfs:range reqvire:Ontology ;
 	owl:inverseOf reqvire:usedBy ;
-	rdfs:comment "Relation from a semantic contract to ontology vocabulary it uses." .
+	rdfs:comment "Relation from a semantic contract or query to ontology vocabulary it uses." .
 reqvire:usedBy a owl:ObjectProperty ;
-	rdfs:domain reqvire:Ontology ;
-	rdfs:range reqvire:SemanticContract ;
+	rdfs:domain reqvire:Ontology .
+_:d63993b5a00f5c5b222c3590122cd161 a owl:Class .
+_:ae631bf240b56614ee0b7caae4506118 rdf:first reqvire:SemanticContract .
+_:d63993b5a00f5c5b222c3590122cd161 owl:unionOf _:ae631bf240b56614ee0b7caae4506118 .
+_:dd02bae4f5a3623409cae87c7c1f0a4c rdf:first reqvire:SemanticQuery .
+_:ae631bf240b56614ee0b7caae4506118 rdf:rest _:dd02bae4f5a3623409cae87c7c1f0a4c .
+_:dd02bae4f5a3623409cae87c7c1f0a4c rdf:rest rdf:nil .
+reqvire:usedBy rdfs:range _:d63993b5a00f5c5b222c3590122cd161 ;
 	owl:inverseOf reqvire:use ;
-	rdfs:comment "Relation from ontology vocabulary to a semantic contract that uses it." .
-reqvire:semanticContractUsesOntology a owl:ObjectProperty ;
-	rdfs:domain reqvire:SemanticContract ;
+	rdfs:comment "Relation from ontology vocabulary to a semantic contract or query that uses it." .
+reqvire:semanticContractUsesOntology a owl:ObjectProperty .
+_:fbd0684548c181d72953ecff4ea330fe a owl:Class .
+_:db85ddcfb5342f72758b1c9b69962013 rdf:first reqvire:SemanticContract .
+_:fbd0684548c181d72953ecff4ea330fe owl:unionOf _:db85ddcfb5342f72758b1c9b69962013 .
+_:ec3799f52b7aeacd07062efffa52fbe9 rdf:first reqvire:SemanticQuery .
+_:db85ddcfb5342f72758b1c9b69962013 rdf:rest _:ec3799f52b7aeacd07062efffa52fbe9 .
+_:ec3799f52b7aeacd07062efffa52fbe9 rdf:rest rdf:nil .
+reqvire:semanticContractUsesOntology rdfs:domain _:fbd0684548c181d72953ecff4ea330fe ;
 	rdfs:range reqvire:Ontology ;
 	owl:inverseOf reqvire:ontologyUsedBySemanticContract ;
-	rdfs:comment "Normalized direct dependency from a semantic contract to ontology vocabulary it uses." .
+	rdfs:comment "Normalized direct dependency from a semantic contract or query to ontology vocabulary it uses." .
 reqvire:ontologyUsedBySemanticContract a owl:ObjectProperty ;
-	rdfs:domain reqvire:Ontology ;
-	rdfs:range reqvire:SemanticContract ;
+	rdfs:domain reqvire:Ontology .
+_:ef4723de0da8491fb748176fc45e2449 a owl:Class .
+_:e52f8c9f365b5612b2c005ee88f2af2a rdf:first reqvire:SemanticContract .
+_:ef4723de0da8491fb748176fc45e2449 owl:unionOf _:e52f8c9f365b5612b2c005ee88f2af2a .
+_:edaf49a1aa1374ca5fc368e6cd8f60df rdf:first reqvire:SemanticQuery .
+_:e52f8c9f365b5612b2c005ee88f2af2a rdf:rest _:edaf49a1aa1374ca5fc368e6cd8f60df .
+_:edaf49a1aa1374ca5fc368e6cd8f60df rdf:rest rdf:nil .
+reqvire:ontologyUsedBySemanticContract rdfs:range _:ef4723de0da8491fb748176fc45e2449 ;
 	owl:inverseOf reqvire:semanticContractUsesOntology ;
 	rdfs:comment "Normalized direct dependency from ontology vocabulary to semantic contracts that use it." .
 reqvire:verify a owl:ObjectProperty ;
@@ -2290,11 +2315,11 @@ reqvire:contractReferencedBy reqvire:relationPredicateLayer reqvire:normalizedRe
 reqvire:implementedByArtifact a owl:ObjectProperty ;
 	rdfs:domain reqvire:Capability ;
 	rdfs:range reqvire:Artifact .
-_:c384ff1dfc1ce8ac9b12348372ed3f71 rdf:first reqvire:specifiedBy .
-reqvire:implementedByArtifact owl:propertyChainAxiom _:c384ff1dfc1ce8ac9b12348372ed3f71 .
-_:ef3b59bc3135aa4405d0b4d97393c1b1 rdf:first reqvire:satisfiedBy .
-_:c384ff1dfc1ce8ac9b12348372ed3f71 rdf:rest _:ef3b59bc3135aa4405d0b4d97393c1b1 .
-_:ef3b59bc3135aa4405d0b4d97393c1b1 rdf:rest rdf:nil .
+_:b85e35c5d959d4e425dfb623c44d18e0 rdf:first reqvire:specifiedBy .
+reqvire:implementedByArtifact owl:propertyChainAxiom _:b85e35c5d959d4e425dfb623c44d18e0 .
+_:cd75327fa32517846ee8a73622b60ec6 rdf:first reqvire:satisfiedBy .
+_:b85e35c5d959d4e425dfb623c44d18e0 rdf:rest _:cd75327fa32517846ee8a73622b60ec6 .
+_:cd75327fa32517846ee8a73622b60ec6 rdf:rest rdf:nil .
 reqvire:implementedByArtifact rdfs:comment "Inferred capability-to-artifact evidence trace when a specifying requirement has direct satisfaction. This trace alone does not establish complete capability implementation coverage." .
 reqvire:derive reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
 reqvire:derivedFrom reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
@@ -2673,12 +2698,12 @@ reqvire:useRelationRule a reqvire:RelationRule ;
 	reqvire:relationFamily reqvire:semanticContractOntologyUseRelationFamily ;
 	reqvire:normalizedForwardProperty reqvire:semanticContractUsesOntology ;
 	reqvire:normalizedInverseProperty reqvire:ontologyUsedBySemanticContract ;
-	reqvire:allowedSourceType "semantic-contract" ;
+	reqvire:allowedSourceType "semantic-contract" , "semantic-query" ;
 	reqvire:allowedTargetType "ontology" ;
 	reqvire:relationDirection "forward" ;
 	reqvire:createsOwnership false ;
 	reqvire:propagatesChangeImpact true ;
-	reqvire:relationRuleDescription "Semantic contract points to ontology vocabulary used by its SHACL shapes." .
+	reqvire:relationRuleDescription "Semantic contract or query points to ontology vocabulary used by its SHACL shapes or SPARQL vocabulary." .
 reqvire:usedByRelationRule a reqvire:RelationRule ;
 	rdfs:label "usedBy" ;
 	reqvire:relationName "usedBy" ;
@@ -2688,11 +2713,11 @@ reqvire:usedByRelationRule a reqvire:RelationRule ;
 	reqvire:normalizedForwardProperty reqvire:semanticContractUsesOntology ;
 	reqvire:normalizedInverseProperty reqvire:ontologyUsedBySemanticContract ;
 	reqvire:allowedSourceType "ontology" ;
-	reqvire:allowedTargetType "semantic-contract" ;
+	reqvire:allowedTargetType "semantic-contract" , "semantic-query" ;
 	reqvire:relationDirection "inverse" ;
 	reqvire:createsOwnership false ;
 	reqvire:propagatesChangeImpact true ;
-	reqvire:relationRuleDescription "Ontology points to a semantic contract that uses its vocabulary." .
+	reqvire:relationRuleDescription "Ontology points to a semantic contract or query that uses its vocabulary." .
 reqvire:verifiedByRelationRule a reqvire:RelationRule ;
 	rdfs:label "verifiedBy" ;
 	reqvire:relationName "verifiedBy" ;
@@ -2856,24 +2881,6 @@ reqvire:UsedExternalOntologyTerm a owl:Class ;
 	rdfs:comment "External ontology term selected for exposure because authored Reqvire semantic content references it directly or through required support closure." .
 reqvire:ModelContextProjection a owl:Class ;
 	rdfs:subClassOf reqvire:RdfProjection .
-reqvire:SemanticConstructQuery a owl:Class ;
-	rdfs:subClassOf reqvire:RdfProjection ;
-	reqvire:mapsToConcept concept:OntologyProjection ;
-	rdfs:comment "Versioned SPARQL CONSTRUCT query specification that defines generated semantic projection facts independently of the current Rust materialization path." .
-reqvire:NormalizedRelationConstructQuery a owl:Class ;
-	rdfs:subClassOf reqvire:SemanticConstructQuery ;
-	rdfs:comment "Construct query that materializes normalized relation facts from authored relation evidence while preserving authored source records separately." .
-reqvire:RelationFamilyConstructQuery a owl:Class ;
-	rdfs:subClassOf reqvire:NormalizedRelationConstructQuery ;
-	reqvire:mapsToConcept concept:RelationFamilyConstructQuery ;
-	rdfs:comment "SPARQL CONSTRUCT query specification for materializing canonical forward and inverse relation-family facts from authored Reqvire model relations." .
-reqvire:ConceptRelationConstructQuery a owl:Class ;
-	rdfs:subClassOf reqvire:NormalizedRelationConstructQuery ;
-	rdfs:comment "SPARQL CONSTRUCT query specification for materializing normalized SKOS taxonomy, association, and mapping facts from native concept Markdown relations." .
-reqvire:ExternalOntologySubsetConstructQuery a owl:Class ;
-	rdfs:subClassOf reqvire:SemanticConstructQuery ;
-	reqvire:mapsToConcept concept:ExternalOntologySubsetConstructQuery ;
-	rdfs:comment "SPARQL query specification for selecting the used external ontology subset from internal raw external dependency graphs." .
 reqvire:OntologyProjectionGraph a owl:Class ;
 	rdfs:subClassOf reqvire:RdfProjection ;
 	rdfs:comment "Generated graph-level projection record for ontology construct facts emitted in full semantic exports." .
@@ -2921,8 +2928,14 @@ reqvire:turtlePrefixDeclaration a owl:ObjectProperty ;
 reqvire:declaresTerm a owl:ObjectProperty ;
 	rdfs:domain reqvire:SemanticBlock ;
 	rdfs:range reqvire:OntologyTerm .
-reqvire:referencesTerm a owl:ObjectProperty ;
-	rdfs:domain reqvire:SemanticBlock ;
+reqvire:referencesTerm a owl:ObjectProperty .
+_:d72bdd24271d6167f0d52298c925a16f a owl:Class .
+_:e648435e50897bfd844d9f400df529c9 rdf:first reqvire:SemanticBlock .
+_:d72bdd24271d6167f0d52298c925a16f owl:unionOf _:e648435e50897bfd844d9f400df529c9 .
+_:c8f06bda26ae203a40386d4c199edb77 rdf:first reqvire:SemanticQuery .
+_:e648435e50897bfd844d9f400df529c9 rdf:rest _:c8f06bda26ae203a40386d4c199edb77 .
+_:c8f06bda26ae203a40386d4c199edb77 rdf:rest rdf:nil .
+reqvire:referencesTerm rdfs:domain _:d72bdd24271d6167f0d52298c925a16f ;
 	rdfs:range reqvire:OntologyTerm .
 reqvire:externalOntologyResource a owl:ObjectProperty ;
 	rdfs:domain reqvire:ExternalOntologySource ;
@@ -2951,13 +2964,17 @@ reqvire:relationTarget a owl:ObjectProperty ;
 reqvire:conceptReference a owl:ObjectProperty ;
 	rdfs:domain reqvire:RdfProjection ;
 	rdfs:range reqvire:OntologyTerm .
-reqvire:constructQueryMaterializesFamily a owl:ObjectProperty ;
-	rdfs:domain reqvire:SemanticConstructQuery ;
+reqvire:queryElement a owl:ObjectProperty ;
+	rdfs:domain reqvire:SemanticQuery ;
+	rdfs:range reqvire:Element ;
+	rdfs:comment "Authored model element supplying the query artifact." .
+reqvire:queryMaterializesFamily a owl:ObjectProperty ;
+	rdfs:domain reqvire:SemanticQuery ;
 	rdfs:range reqvire:RelationFamily ;
 	rdfs:comment "Relation family whose normalized semantic facts are materialized by a construct-query specification." .
-reqvire:constructQueryMaterializesProperty a owl:ObjectProperty ;
-	rdfs:domain reqvire:SemanticConstructQuery ;
-	rdfs:range owl:ObjectProperty ;
+reqvire:queryMaterializesProperty a owl:ObjectProperty ;
+	rdfs:domain reqvire:SemanticQuery ;
+	rdfs:range rdf:Property ;
 	rdfs:comment "Normalized RDF property that can be emitted by a construct-query specification." .
 reqvire:projectedConstruct a owl:ObjectProperty ;
 	rdfs:domain reqvire:RdfProjection ;
@@ -3039,10 +3056,16 @@ reqvire:elementId a owl:DatatypeProperty ;
 	rdfs:domain reqvire:Element ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Stable model element id emitted in semantic export records." .
-reqvire:lineNumber a owl:DatatypeProperty ;
-	rdfs:domain reqvire:SemanticBlock ;
+reqvire:lineNumber a owl:DatatypeProperty .
+_:e00a0f337553953aa4004b1aa492f0a0 a owl:Class .
+_:ddfddd00a99c6df7795f552073b2d91f rdf:first reqvire:SemanticBlock .
+_:e00a0f337553953aa4004b1aa492f0a0 owl:unionOf _:ddfddd00a99c6df7795f552073b2d91f .
+_:fda8059968114c72e32b8ea842a6f944 rdf:first reqvire:SemanticQuery .
+_:ddfddd00a99c6df7795f552073b2d91f rdf:rest _:fda8059968114c72e32b8ea842a6f944 .
+_:fda8059968114c72e32b8ea842a6f944 rdf:rest rdf:nil .
+reqvire:lineNumber rdfs:domain _:e00a0f337553953aa4004b1aa492f0a0 ;
 	rdfs:range xsd:integer ;
-	rdfs:comment "Source line number for a semantic block or semantic source projection record." .
+	rdfs:comment "Source line number for a semantic block, query artifact, or semantic source projection record." .
 reqvire:relationType a owl:DatatypeProperty ;
 	rdfs:domain reqvire:RdfProjection ;
 	rdfs:range xsd:string ;
@@ -3159,16 +3182,20 @@ reqvire:blockKind a owl:DatatypeProperty ;
 	rdfs:domain reqvire:OntologyProjectionSource ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Semantic block kind token for a generated ontology projection source." .
-reqvire:constructQueryName a owl:DatatypeProperty ;
-	rdfs:domain reqvire:SemanticConstructQuery ;
+reqvire:queryName a owl:DatatypeProperty ;
+	rdfs:domain reqvire:SemanticQuery ;
 	rdfs:range xsd:string ;
-	rdfs:comment "Stable construct-query specification token." .
-reqvire:constructQueryText a owl:DatatypeProperty ;
-	rdfs:domain reqvire:SemanticConstructQuery ;
+	rdfs:comment "Name authored in the query element heading." .
+reqvire:queryText a owl:DatatypeProperty ;
+	rdfs:domain reqvire:SemanticQuery ;
 	rdfs:range xsd:string ;
-	rdfs:comment "SPARQL CONSTRUCT text that specifies generated semantic projection facts." .
-reqvire:constructQueryPurpose a owl:DatatypeProperty ;
-	rdfs:domain reqvire:SemanticConstructQuery ;
+	rdfs:comment "Standalone SPARQL query document." .
+reqvire:queryForm a owl:DatatypeProperty ;
+	rdfs:domain reqvire:SemanticQuery ;
+	rdfs:range xsd:string ;
+	rdfs:comment "SPARQL query form derived from parsed syntax." .
+reqvire:queryPurpose a owl:DatatypeProperty ;
+	rdfs:domain reqvire:SemanticQuery ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Human-readable purpose and intended consumer behavior for a construct-query specification." .
 reqvire:sourceRelationType a owl:DatatypeProperty ;
@@ -3203,49 +3230,6 @@ reqvire:semanticArtifactExportMode a reqvire:SemanticArtifactExport ;
 	rdfs:comment "Semantic ontology export mode that emits generated ontology document declarations plus authored ontology vocabulary with source comments. Turtle serialization uses deterministic prefix declarations and safe compact prefixed names." .
 reqvire:fullSemanticModelExportMode a reqvire:FullSemanticModelExport ;
 	rdfs:comment "Semantic graph export mode that emits generated ontology document declarations, authored ontology and SHACL blocks, and RDF triples for Reqvire model elements, relations, contract_bindings, concept references, ontology term declarations, shape references, and generated ontology projection facts. Turtle serialization uses deterministic prefix declarations and safe compact prefixed names." .
-reqvire:externalUsedTermSeedQuery a reqvire:ExternalOntologySubsetConstructQuery ;
-	reqvire:constructQueryName "external-used-term-seed-query" ;
-	reqvire:constructFamily "external-used-subset" ;
-	reqvire:constructKind "seed-query" ;
-	reqvire:projectionDerivationMode "construct-query-specified" ;
-	reqvire:constructQueryPurpose "Select external ontology terms referenced by authored ontology, SHACL, concept-reference, model, or generated semantic projection facts whose IRIs fall under declared external namespaces." ;
-	reqvire:constructQueryText "\nPREFIX reqvire: <https://www.reqvire.org/ontology#>\n\nSELECT DISTINCT ?term\nWHERE {\n  ?source a reqvire:ExternalOntologySource ;\n    reqvire:externalOntologyNamespace ?namespace .\n  {\n    ?block reqvire:referencesTerm ?term .\n  }\n  UNION {\n    ?block reqvire:declaresTerm ?term .\n  }\n  UNION {\n    ?projection reqvire:conceptReference ?term .\n  }\n  UNION {\n    ?projection reqvire:constructSubject|reqvire:constructPredicate|reqvire:constructObject|reqvire:constructProperty ?term .\n  }\n  FILTER(isIRI(?term))\n  FILTER(STRSTARTS(STR(?term), STR(?namespace)))\n}\n" .
-reqvire:externalUsedTermDirectDescriptionConstructQuery a reqvire:ExternalOntologySubsetConstructQuery ;
-	reqvire:constructQueryName "external-used-term-direct-description-construct" ;
-	reqvire:constructFamily "external-used-subset" ;
-	reqvire:constructKind "direct-description-construct" ;
-	reqvire:projectionDerivationMode "construct-query-specified" ;
-	reqvire:constructQueryPurpose "Construct direct raw-external-graph description triples for seed external ontology terms only." ;
-	reqvire:constructQueryText "\nPREFIX reqvire: <https://www.reqvire.org/ontology#>\n\nCONSTRUCT {\n  ?term ?p ?o .\n}\nWHERE {\n  ?subset a reqvire:UsedExternalOntologySubset ;\n    reqvire:externalUsedTerm ?term ;\n    reqvire:externalSubsetGraph ?rawExternalGraph .\n  GRAPH ?rawExternalGraph {\n    ?term ?p ?o .\n  }\n}\n" .
-reqvire:externalUsedTermSupportClosureConstructQuery a reqvire:ExternalOntologySubsetConstructQuery ;
-	reqvire:constructQueryName "external-used-term-support-closure-construct" ;
-	reqvire:constructFamily "external-used-subset" ;
-	reqvire:constructKind "support-closure-construct" ;
-	reqvire:projectionDerivationMode "construct-query-specified" ;
-	reqvire:constructQueryPurpose "Construct one-hop support facts for used external terms across selected RDF, RDFS, and OWL support predicates." ;
-	reqvire:constructQueryText "\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX reqvire: <https://www.reqvire.org/ontology#>\n\nCONSTRUCT {\n  ?support ?p ?supportObject .\n}\nWHERE {\n  ?subset a reqvire:UsedExternalOntologySubset ;\n    reqvire:externalUsedTerm ?term ;\n    reqvire:externalSubsetGraph ?rawExternalGraph .\n  GRAPH ?rawExternalGraph {\n    ?term ?p ?support .\n    FILTER(?p IN (rdf:type, rdfs:subClassOf, rdfs:subPropertyOf, rdfs:domain, rdfs:range, owl:equivalentClass, owl:equivalentProperty, owl:inverseOf, owl:onProperty, owl:someValuesFrom, owl:allValuesFrom, owl:hasValue))\n    FILTER(isIRI(?support) || isBlank(?support))\n    OPTIONAL {\n      ?support ?p ?supportObject .\n      FILTER(?p IN (rdf:type, rdfs:subClassOf, rdfs:subPropertyOf, rdfs:domain, rdfs:range, owl:equivalentClass, owl:equivalentProperty, owl:inverseOf, owl:onProperty, owl:someValuesFrom, owl:allValuesFrom, owl:hasValue))\n    }\n  }\n}\n" .
-reqvire:externalUsedTermAnnotationConstructQuery a reqvire:ExternalOntologySubsetConstructQuery ;
-	reqvire:constructQueryName "external-used-term-annotation-construct" ;
-	reqvire:constructFamily "external-used-subset" ;
-	reqvire:constructKind "annotation-construct" ;
-	reqvire:projectionDerivationMode "construct-query-specified" ;
-	reqvire:constructQueryPurpose "Construct label, comment, preferred-label, definition, and description annotation triples for used external terms and support terms." ;
-	reqvire:constructQueryText "\nPREFIX dcterms: <http://purl.org/dc/terms/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX reqvire: <https://www.reqvire.org/ontology#>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n\nCONSTRUCT {\n  ?describedTerm ?annotationProperty ?annotationValue .\n}\nWHERE {\n  ?subset a reqvire:UsedExternalOntologySubset ;\n    reqvire:externalSubsetGraph ?rawExternalGraph .\n  {\n    ?subset reqvire:externalUsedTerm ?describedTerm .\n  }\n  UNION {\n    ?subset reqvire:externalUsedTerm ?term .\n    GRAPH ?rawExternalGraph {\n      ?term ?supportProperty ?describedTerm .\n      FILTER(?supportProperty IN (rdfs:subClassOf, rdfs:subPropertyOf, rdfs:domain, rdfs:range, owl:equivalentClass, owl:equivalentProperty, owl:inverseOf, owl:onProperty, owl:someValuesFrom, owl:allValuesFrom, owl:hasValue))\n    }\n  }\n  GRAPH ?rawExternalGraph {\n    ?describedTerm ?annotationProperty ?annotationValue .\n    FILTER(?annotationProperty IN (rdfs:label, rdfs:comment, skos:prefLabel, skos:definition, dcterms:description))\n  }\n}\n" .
-reqvire:relationFamilyNormalizedConstructQuery a reqvire:RelationFamilyConstructQuery , reqvire:NormalizedRelationConstructQuery ;
-	reqvire:constructQueryName "relation-family-normalized-projection" ;
-	reqvire:constructFamily "semantic-search" ;
-	reqvire:constructKind "relation-family-normalized-projection" ;
-	reqvire:projectionDerivationMode "construct-query-specified" ;
-	reqvire:constructQueryPurpose "Materialize canonical forward and inverse relation-family predicates for every authored Reqvire model relation so semantic search can query relation meaning rather than raw Markdown relation tokens." ;
-	reqvire:constructQueryText "\nPREFIX reqvire: <https://www.reqvire.org/ontology#>\n\nCONSTRUCT {\n  ?canonicalSource ?forwardProperty ?canonicalTarget .\n  ?canonicalTarget ?inverseProperty ?canonicalSource .\n}\nWHERE {\n  ?relation a reqvire:ModelRelation ;\n    reqvire:relationSource ?source ;\n    reqvire:relationTarget ?target ;\n    reqvire:relationType ?relationName .\n\n  ?rule a reqvire:RelationRule ;\n    reqvire:relationName ?relationName ;\n    reqvire:relationDirection ?direction ;\n    reqvire:normalizedForwardProperty ?forwardProperty ;\n    reqvire:normalizedInverseProperty ?inverseProperty .\n\n  BIND(IF(?direction = \"inverse\", ?target, ?source) AS ?canonicalSource)\n  BIND(IF(?direction = \"inverse\", ?source, ?target) AS ?canonicalTarget)\n}\n" .
-reqvire:conceptRelationNormalizedConstructQuery a reqvire:ConceptRelationConstructQuery , reqvire:NormalizedRelationConstructQuery ;
-	reqvire:constructQueryName "concept-relation-normalized-projection" ;
-	reqvire:constructFamily "concept-relation" ;
-	reqvire:constructKind "concept-relation-normalized-projection" ;
-	reqvire:projectionDerivationMode "construct-query-specified" ;
-	reqvire:constructQueryMaterializesProperty skos:broader , skos:narrower , skos:related , skos:exactMatch , skos:closeMatch ;
-	reqvire:constructQueryPurpose "Materialize canonical SKOS concept relation facts from authored native concept relations so child broader, parent narrower, symmetric association, and mapping neighborhoods are queryable without client-side inverse inference." ;
-	reqvire:constructQueryText "\nPREFIX reqvire: <https://www.reqvire.org/ontology#>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n\nCONSTRUCT {\n  ?canonicalSource ?forwardProperty ?canonicalTarget .\n  ?canonicalTarget ?inverseProperty ?canonicalSource .\n}\nWHERE {\n  ?relation a reqvire:ModelRelation ;\n    reqvire:relationSource ?source ;\n    reqvire:relationTarget ?target ;\n    reqvire:relationType ?relationName .\n\n  VALUES (?relationName ?direction ?forwardProperty ?inverseProperty) {\n    (\"broader\" \"forward\" skos:broader skos:narrower)\n    (\"narrower\" \"inverse\" skos:broader skos:narrower)\n    (\"related\" \"forward\" skos:related skos:related)\n    (\"exactMatch\" \"forward\" skos:exactMatch skos:exactMatch)\n    (\"closeMatch\" \"forward\" skos:closeMatch skos:closeMatch)\n  }\n\n  BIND(IF(?direction = \"inverse\", ?target, ?source) AS ?canonicalSource)\n  BIND(IF(?direction = \"inverse\", ?source, ?target) AS ?canonicalTarget)\n}\n" .
 
 # -----------------------------------------------------------------------------
 # Source: system-model/Ontologies/Verification.md#reqvire-verification-ontology
@@ -3263,10 +3247,10 @@ reqvire:ConcreteVerification a owl:Class ;
 reqvire:EvidenceBackedVerification a owl:Class ;
 	rdfs:label "Evidence-backed verification" ;
 	rdfs:subClassOf reqvire:ConcreteVerification .
-_:d48ebcd9a4dede1965303abd3a4f8690 a owl:Restriction ;
+_:be8e2925d067c1ac9b8d6a70172eb564 a owl:Restriction ;
 	owl:onProperty reqvire:satisfiedBy ;
 	owl:someValuesFrom reqvire:Artifact .
-reqvire:EvidenceBackedVerification rdfs:subClassOf _:d48ebcd9a4dede1965303abd3a4f8690 ;
+reqvire:EvidenceBackedVerification rdfs:subClassOf _:be8e2925d067c1ac9b8d6a70172eb564 ;
 	owl:disjointWith reqvire:NonEvidenceBackedVerification ;
 	rdfs:comment "Verification class whose instances require satisfiedBy evidence for coverage satisfaction." .
 reqvire:NonEvidenceBackedVerification a owl:Class ;

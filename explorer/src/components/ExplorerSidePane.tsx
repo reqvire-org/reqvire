@@ -566,6 +566,9 @@ function ExplorerViewControls({
           <PaneFilterGrid columns="two">
             <div>
               <PaneFilterGroup label="Types">
+                <ToggleRow label="Semantic query" colorToken="--ontology" variant="filter"
+                  on={ui.ontologyFilters.has("semantic-query")}
+                  onToggle={() => ui.toggleOntologyFilter("semantic-query")} />
                 <PaneLegend
                   rows={[
                     { id: "class", label: "Class", colorToken: ontologyColorToken("class") },
@@ -1554,6 +1557,7 @@ const ELEMENT_TYPE_ORDER = [
   "demonstration-verification",
   "specification",
   "semantic-contract",
+  "semantic-query",
   "ontology",
   "concept-scheme",
   "concept",
@@ -1867,6 +1871,7 @@ function searchKindColorToken(kind: SearchKind): DesignSystemColorToken {
 function ontologyColorToken(value: string): DesignSystemColorToken {
   const colors: Record<string, DesignSystemColorToken> = {
     class: "--rdf-class",
+    "semantic-query": "--ontology",
     "object-property": "--rdf-objprop",
     "datatype-property": "--rdf-dtprop",
     "rdf-property": "--rdf-rdfprop",

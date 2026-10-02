@@ -17,6 +17,8 @@ reqvire.concepts.get
 reqvire.concept_schemes.list
 reqvire.concept_mappings.list
 reqvire.semantic.graph
+reqvire.semantic.queries
+reqvire.semantic.queries.validate
 reqvire.semantic.prefixes
 reqvire.semantic.vocabulary
 reqvire.semantic.sparql

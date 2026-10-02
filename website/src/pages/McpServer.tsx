@@ -229,11 +229,15 @@ reqvire serve --enable-mcp --allow-origin https://app.example.com`}</CodeBlock>
             },
             {
               name: "Semantic layers",
-              desc: "reqvire.semantic.shapes returns SHACL shapes, reqvire.semantic.concepts returns SKOS concept scheme/thesaurus triples, reqvire.semantic.model returns generated model facts, and reqvire.semantic.export composes layers: ontologies, shapes, concepts, model, external-used, and prefixes.",
+              desc: "reqvire.semantic.shapes returns SHACL shapes, reqvire.semantic.concepts returns SKOS concept scheme/thesaurus triples, reqvire.semantic.model returns generated model facts, and reqvire.semantic.export composes layers: ontologies, shapes, concepts, queries, model, external-used, and prefixes.",
             },
             {
               name: "Concept tools",
               desc: "reqvire.concept_schemes.list, reqvire.concepts.list, reqvire.concepts.get, and reqvire.concept_mappings.list expose standalone Thesaurus schemes, generated SKOS concepts, and mapsToConcept bridge inventory.",
+            },
+            {
+              name: "Managed query artifacts",
+              desc: "reqvire.semantic.queries lists native semantic-query elements. Optional name or iri selects one, namespace_base filters used ontology namespaces, and include_content adds standalone SPARQL plus SHA-256. reqvire.semantic.queries.validate returns candidate diagnostics and model validation status without executing query content. The queries RDF layer is also included in full semantic exports.",
             },
             {
               name: "Semantic prefixes",

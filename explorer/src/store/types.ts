@@ -440,7 +440,7 @@ export interface OntologyGraphNode {
   node_type?: string;
   semantic_type: string;
   layer: "authored" | "concepts" | "reqvire-context" | "external-source";
-  source_kind: "ontology" | "shape" | "concepts" | "model-context" | "external-ontology";
+  source_kind: "ontology" | "shape" | "concepts" | "model-context" | "external-ontology" | "query";
   full_uri: string;
   ontology_document?: string;
   scheme_iri?: string;
@@ -459,6 +459,14 @@ export interface OntologyGraphNode {
   literal_values: { predicate: string; value: string; source: OntologyGraphSource }[];
   slot_facets: OntologyGraphSlotFacet[];
   constructs: OntologyGraphConstructDetail[];
+  query?: {
+    form: string;
+    text: string;
+    ontologies: OntologyGraphSource[];
+    vocabulary: { label: string; iri: string; kind: string }[];
+    produces_properties: { label: string; iri: string; kind: string }[];
+    produces_families: { label: string; iri: string; kind: string }[];
+  };
 }
 
 export interface OntologyGraphEdge {
@@ -466,7 +474,7 @@ export interface OntologyGraphEdge {
   target: string;
   label: string;
   layer: "authored" | "concepts" | "reqvire-context" | "external-source";
-  source_kind: "ontology" | "shape" | "concepts" | "model-context" | "external-ontology";
+  source_kind: "ontology" | "shape" | "concepts" | "model-context" | "external-ontology" | "query";
 }
 
 export interface OntologyGraphSource {

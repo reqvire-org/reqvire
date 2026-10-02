@@ -39,6 +39,7 @@ serde_json = { workspace = true }
 rustc-hash = { workspace = true }
 sha2 = { workspace = true }
 oxigraph = { workspace = true }
+spargebra = { workspace = true }
 o-kernel = { workspace = true }
 
 # Terminal output

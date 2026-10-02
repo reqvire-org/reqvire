@@ -516,6 +516,19 @@ pub(super) fn build_external_subset_derivation_store(
         "ontology projection graph for external subset derivation",
     )?;
 
+    let term_context = build_semantic_term_context_turtle(index);
+    load_default_graph(
+        &store,
+        &term_context,
+        "semantic term references for external subset derivation",
+    )?;
+    load_named_graph(
+        &store,
+        &term_context,
+        GRAPH_GENERATED,
+        "semantic term references for external subset derivation",
+    )?;
+
     let raw_external_turtle = index.to_raw_external_turtle_string()?;
     load_named_graph(
         &store,
@@ -1188,6 +1201,14 @@ pub(super) fn append_normalized_relation_family_turtle(
 
 pub(super) fn build_semantic_term_context_turtle(index: &SemanticIndex) -> String {
     let mut output = String::new();
+    for query in &index.queries {
+        for term in &query.referenced_terms {
+            output.push_str(&format!(
+                "<{}> <{REQVIRE_NS}referencesTerm> <{}> .\n",
+                query.iri, term
+            ));
+        }
+    }
     let mut emitted = BTreeSet::new();
 
     let mut declarations: Vec<_> = index
@@ -1727,6 +1748,7 @@ pub(super) fn element_type_classes(element_type: &ElementType) -> Vec<&'static s
                 "reqvire:Requirement",
             ]
         }
+        ElementType::SemanticQuery => vec!["owl:NamedIndividual", "reqvire:Element"],
         ElementType::Ontology => {
             vec!["owl:NamedIndividual", "reqvire:Element", "reqvire:Ontology"]
         }

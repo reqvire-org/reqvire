@@ -58,6 +58,7 @@ pub const ELEMENT_TYPES: &[&str] = &[
     "demonstration-verification", // VerificationType::Demonstration
     "verification-objective",     // ElementType::VerificationObjective
     "source",                     // ContractType::Source
+    "semantic-query",
     "semantic-contract",          // ElementType::SemanticContract
     "constraint",                 // ContractType::Constraint
     "behavior",                   // ContractType::Behavior
@@ -371,6 +372,7 @@ pub enum ElementType {
     ConceptScheme,
     Concept,
     SemanticContract,
+    SemanticQuery,
     VerificationObjective,
     Verification(VerificationType),
     Contract(ContractType),
@@ -395,6 +397,7 @@ impl ElementType {
             Self::Ontology => "ontology",
             Self::ConceptScheme => "concept-scheme",
             Self::Concept => "concept",
+            Self::SemanticQuery => "semantic-query",
             Self::SemanticContract => "semantic-contract",
             Self::VerificationObjective => "verification-objective",
             Self::Verification(ver) => match ver {
@@ -448,6 +451,7 @@ impl ElementType {
             "inspection-verification" => Self::Verification(VerificationType::Inspection),
             "demonstration-verification" => Self::Verification(VerificationType::Demonstration),
 
+            "semantic-query" => Self::SemanticQuery,
             "semantic-contract" => Self::SemanticContract,
 
             // Contract types
@@ -517,6 +521,8 @@ impl ElementType {
         )
     }
 
+    pub const fn is_semantic_query(&self) -> bool { matches!(self, Self::SemanticQuery) }
+
     pub const fn is_semantic_contract(&self) -> bool {
         matches!(self, Self::SemanticContract)
     }
@@ -532,6 +538,7 @@ impl ElementType {
             Self::Requirement(_) => "requirement",
             Self::Ontology => "ontology",
             Self::ConceptScheme | Self::Concept => "concept",
+            Self::SemanticQuery => "semantic-query",
             Self::SemanticContract => "semantic-contract",
             Self::VerificationObjective => "verification-objective",
             Self::Verification(_) => "verification",
@@ -583,6 +590,10 @@ pub struct Element {
     // Parsed ADT for semantic-contract elements.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub semantic_contract: Option<SemanticContract>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub semantic_query: Option<crate::semantic_contract::queries::QuerySource>,
+    #[serde(skip)]
+    pub query_line_number: Option<usize>,
     // Parsed ADT for ontology elements.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ontology: Option<Ontology>,
@@ -628,6 +639,8 @@ impl Element {
             contract_references: vec![],
             size_estimate: None,
             semantic_contract: None,
+            semantic_query: None,
+            query_line_number: None,
             ontology: None,
             concept_scheme: None,
             concept: None,
@@ -652,6 +665,8 @@ impl Element {
 
         self.content = trimmed.to_string();
         self.hash_impact_content = utils::hash_content(&normalized);
+        self.semantic_query = self.element_type.is_semantic_query().then(|| crate::semantic_contract::queries::QuerySource::parse(&self.content));
+        if self.element_type.is_semantic_query() { self.hash_impact_content = utils::hash_content(&self.content); }
         self.populate_ontology();
         self.populate_semantic_contract();
         self.populate_concept_scheme();

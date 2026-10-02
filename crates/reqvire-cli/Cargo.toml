@@ -41,6 +41,8 @@ globset = { workspace = true }
 rustc-hash = { workspace = true }
 ignore = "0.4"
 
+tempfile = { workspace = true }
+
 # HTTP server
 tokio = { workspace = true }
 axum = { workspace = true }
@@ -51,6 +53,5 @@ rmcp = { version = "1.8.0", features = ["server", "macros", "schemars", "transpo
 [dev-dependencies]
 assert_fs = { workspace = true }
 predicates = { workspace = true }
-tempfile = { workspace = true }
 tokio = { workspace = true, features = ["time"] }
 tower = { version = "0.5", features = ["util"] }

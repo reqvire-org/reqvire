@@ -49,6 +49,7 @@ WHEN documenting MCP deployments, the system SHALL explain listening addresses a
   * type: requirement
 
 #### Contract References
+  * [MCP Managed Query Artifacts Specification](../MCP/Specifications.md#mcp-managed-query-artifacts-specification)
   * [MCP Model Evidence Tools Specification](../MCP/Specifications.md#mcp-model-evidence-tools-specification)
   * [MCP Streamable HTTP Transport Safety Specification](../MCP/Specifications.md#mcp-streamable-http-transport-safety-specification)
   * [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
@@ -81,6 +82,7 @@ The system SHALL explain coverage scope selection and ranked hierarchical capabi
   * type: requirement
 
 #### Contract References
+  * [CLI Managed Query Artifacts Specification](../CLI/Specifications.md#cli-managed-query-artifacts-specification)
   * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [CLI Interface Structure Contract Specification](../CLI/Specifications.md#cli-interface-structure-contract-specification)
@@ -170,12 +172,14 @@ The system SHALL describe requirements as verification targets and capability ve
 
 ### Website Ontology Documentation
 
-The system SHALL document ontology authoring, external ontology sources, built-in reserved vocabulary behavior, semantic contracts, validation, and ontology export modes.
+The system SHALL document ontology authoring, external ontology sources, built-in reserved vocabulary behavior, semantic contracts, managed semantic queries, validation, and ontology export modes.
 
 #### Metadata
   * type: requirement
 
 #### Contract References
+  * [Semantic Query Authoring Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-authoring-specification)
+  * [Semantic Query Context Validation Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
   * [Local External Ontology Source Specification](../../Semantics/SemanticModelSpecifications.md#local-external-ontology-source-specification)
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
   * [Ontology Projection Subgraph Materialization Specification](../../Reports/ModelReports/Specifications.md#ontology-projection-subgraph-materialization-specification)

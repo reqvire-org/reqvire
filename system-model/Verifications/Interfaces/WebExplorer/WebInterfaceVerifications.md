@@ -447,6 +447,8 @@ Expected analysis checks:
 - Confirm graph-registry provenance and generated-projection provenance are not exposed as graph-wide filter axes; source/provenance evidence remains available in the ontology node modal and Project Store data.
 - Confirm active filters combine inclusively within one category and narrow together across different active categories on the canvas without narrowing the ontology element modal evidence.
 
+Review artifacts: [OntologiesView.test.tsx](../../../../explorer/src/views/OntologiesView.test.tsx), [OntologyNodeDetailModal.test.tsx](../../../../explorer/src/components/OntologyNodeDetailModal.test.tsx).
+
 #### Metadata
   * type: analysis-verification
 
@@ -528,6 +530,8 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [loadStore.test.ts](../../../../explorer/src/store/loadStore.test.ts)
+  * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
   * verify: [SPA Explorer Shell and Project Store](../../../Interfaces/WebExplorer/Capabilities.md#spa-explorer-shell-and-project-store)
 ---
 
@@ -651,4 +655,24 @@ This test verifies that the Thesaurus Explorer route is backed by a native Proje
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-thesaurus-project-store/test.sh)
   * verify: [Thesaurus View Generation](../../../Interfaces/WebExplorer/Capabilities.md#thesaurus-view-generation)
+---
+
+### Explorer Semantic Query Presentation Verification
+
+Verify managed query identity and vocabulary context across Explorer and the shared design system.
+
+#### Details
+Check that semantic-query icons and badges use the shared Q marker, that native queries occur once in ontology graph data with source provenance and vocabulary/output edges, and that graph rendering preserves their marker, name, filter behavior, and property dependency targets. Inspect query form, exact text, used ontologies, declared outputs, and source navigation in the detail dialog. Exercise exported Project Store generation from a native query fixture.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [OWL Semantic Ontology Projection](../../../Interfaces/WebExplorer/Capabilities.md#owl-semantic-ontology-projection)
+  * verify: [Ontology Symbol and Badge Vocabulary](../../../Interfaces/WebExplorer/Capabilities.md#ontology-symbol-and-badge-vocabulary)
+  * satisfiedBy: [semantic_queries.rs](../../../../crates/reqvire-core/tests/semantic_queries.rs)
+  * satisfiedBy: [OntologiesView.test.tsx](../../../../explorer/src/views/OntologiesView.test.tsx)
+  * satisfiedBy: [OntologyNodeDetailModal.test.tsx](../../../../explorer/src/components/OntologyNodeDetailModal.test.tsx)
+  * satisfiedBy: [test.sh](../../../../tests/test-semantic-queries/test.sh)
 ---

@@ -62,7 +62,7 @@ pub struct SearchArgs {
     #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
     filter_name: Option<String>,
 
-    /// Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+    /// Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
     #[clap(long, value_name = "TYPE[,TYPE...]", help_heading = "SEARCH OPTIONS")]
     filter_type: Option<String>,
 
@@ -279,7 +279,7 @@ pub enum Commands {
 
     /// Search and filter model elements with comprehensive filtering options
     #[clap(
-        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)\n      --has-contract-bindings          Only include elements that have Contract Bindings\n      --filter-contract-bindings <GLOB> Match Contract Binding target identifiers\n      --has-contract-references        Only include elements that have Contract References\n      --filter-contract-references <GLOB> Match Contract Reference target identifiers"
+        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)\n      --has-contract-bindings          Only include elements that have Contract Bindings\n      --filter-contract-bindings <GLOB> Match Contract Binding target identifiers\n      --has-contract-references        Only include elements that have Contract References\n      --filter-contract-references <GLOB> Match Contract Reference target identifiers"
     )]
     Search(Box<SearchArgs>),
 
@@ -347,7 +347,7 @@ pub enum Commands {
     /// Use --reverse for leaf-to-root traversal.
     ///
     #[clap(
-        override_help = "Generate model-centric JSON structure with nested relations\n\nBy default, shows ontology roots, concept roots, and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save JSON output to file"
+        override_help = "Generate model-centric JSON structure with nested relations\n\nBy default, shows ontology roots, concept roots, and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save JSON output to file"
     )]
     Model {
         /// Start from specific element by name
@@ -358,7 +358,7 @@ pub enum Commands {
         #[clap(long, help_heading = "MODEL OPTIONS")]
         reverse: bool,
 
-        /// Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+        /// Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
         #[clap(long, value_name = "TYPE", help_heading = "MODEL OPTIONS")]
         filter_type: Option<String>,
 
@@ -830,12 +830,14 @@ pub enum Commands {
 
 #[derive(Subcommand, Debug)]
 pub enum SemanticCommands {
+    /// Manage authored SPARQL query artifacts
+    Query { #[clap(subcommand)] command: QueryCommands },
     /// Export selected semantic RDF layers
     #[clap(
-        override_help = "Export selected semantic RDF layers\n\nSEMANTIC EXPORT OPTIONS:\n      --layer <LAYER>            Include layer: ontologies, shapes, concepts, model, external-used, prefixes. Repeatable; omitted means all layers\n      --jsonld                   Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --namespace-base <IRI>     Filter clean authored export to one ontology base or term namespace. Cannot be combined with model\n      --output <FILE>            Save output to file"
+        override_help = "Export selected semantic RDF layers\n\nSEMANTIC EXPORT OPTIONS:\n      --layer <LAYER>            Include layer: ontologies, shapes, concepts, queries, model, external-used, prefixes. Repeatable; omitted means all layers\n      --jsonld                   Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --namespace-base <IRI>     Filter clean authored export to one ontology base or term namespace. Cannot be combined with model\n      --output <FILE>            Save output to file"
     )]
     Export {
-        /// Include layer: ontologies, shapes, concepts, model, external-used, prefixes. Repeatable; omitted means all layers
+        /// Include layer: ontologies, shapes, concepts, queries, model, external-used, prefixes. Repeatable; omitted means all layers
         #[clap(
             long,
             value_enum,
@@ -860,6 +862,7 @@ pub enum SemanticCommands {
 
 #[derive(Clone, Debug, ValueEnum)]
 pub enum SemanticLayerArg {
+    Queries,
     Ontologies,
     Shapes,
     Concepts,
@@ -871,6 +874,7 @@ pub enum SemanticLayerArg {
 impl From<SemanticLayerArg> for SemanticExportLayer {
     fn from(value: SemanticLayerArg) -> Self {
         match value {
+            SemanticLayerArg::Queries => Self::Queries,
             SemanticLayerArg::Ontologies => Self::Ontologies,
             SemanticLayerArg::Shapes => Self::Shapes,
             SemanticLayerArg::Concepts => Self::Concepts,
@@ -1172,6 +1176,7 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
 
 const fn wants_json(args: &Args) -> bool {
     match &args.command {
+        Some(Commands::Semantic { command: SemanticCommands::Query { command } }) => match command { QueryCommands::List{json,..}|QueryCommands::Validate{json,..}|QueryCommands::Export{json,..}|QueryCommands::Check{json,..}=>*json },
         Some(Commands::Format { json, .. }) => *json,
         Some(Commands::Migrate { json, .. }) => *json,
         Some(Commands::Validate { json, .. }) => *json,
@@ -1328,6 +1333,30 @@ pub async fn handle_command(
 
     let json_output = wants_json(&args);
 
+    if let Some(Commands::Semantic {
+        command:
+            SemanticCommands::Query {
+                command: QueryCommands::Validate { name, iri, json },
+            },
+    }) = &args.command
+    {
+        let index = model_manager
+            .semantic_store
+            .as_ref()
+            .map(|store| store.index.clone())
+            .unwrap_or_else(|| {
+                semantic_contract::build_semantic_index(&model_manager.graph_registry)
+            });
+        let model_errors = parse_result
+            .as_ref()
+            .err()
+            .map(|e| vec![e.to_string()])
+            .unwrap_or_default();
+        let report =
+            index.query_validation_report(name.as_deref(), iri.as_deref(), model_errors)?;
+        print_query_validation_report(&report, *json)?;
+        return Ok(if report["valid"] == true { 0 } else { 1 });
+    }
     // Handle validation failures for all commands (including validate)
     match &parse_result {
         Err(ReqvireError::ValidationError(errors)) => {
@@ -2106,8 +2135,9 @@ pub async fn handle_command(
             Ok(0)
         }
         Some(Commands::Semantic { command }) => {
-            let index = semantic_contract::build_semantic_index(&model_manager.graph_registry);
+            let index = &model_manager.semantic_store.as_ref().ok_or_else(||ReqvireError::ProcessError("Missing semantic index".into()))?.index;
             match command {
+                SemanticCommands::Query { command } => return run_query_command(index, command),
                 SemanticCommands::Export {
                     layer,
                     jsonld,
@@ -2910,4 +2940,165 @@ mod tests {
         let err = apply_workspace(Some(&missing)).expect_err("expected the operation to fail");
         assert!(err.to_string().contains("Failed to resolve workspace"));
     }
+}
+
+#[derive(Subcommand, Debug)]
+pub enum QueryCommands {
+    /// List native query artifacts and their source metadata
+    List {
+        #[clap(long, conflicts_with = "iri")]
+        name: Option<String>,
+        #[clap(long)]
+        iri: Option<String>,
+        #[clap(long)]
+        namespace_base: Option<String>,
+        #[clap(long)]
+        json: bool,
+    },
+    /// Validate query artifacts without executing them
+    Validate {
+        #[clap(long, conflicts_with = "iri")]
+        name: Option<String>,
+        #[clap(long)]
+        iri: Option<String>,
+        #[clap(long)]
+        json: bool,
+    },
+    /// Export a standalone SPARQL artifact
+    Export {
+        #[clap(long, required_unless_present = "iri", conflicts_with = "iri")]
+        name: Option<String>,
+        #[clap(long, required_unless_present = "name")]
+        iri: Option<String>,
+        #[clap(long, conflicts_with = "json")]
+        output: Option<std::path::PathBuf>,
+        #[clap(long)]
+        json: bool,
+    },
+    /// Compare a generated query with an existing artifact
+    Check {
+        #[clap(long, required_unless_present = "iri", conflicts_with = "iri")]
+        name: Option<String>,
+        #[clap(long, required_unless_present = "name")]
+        iri: Option<String>,
+        #[clap(long)]
+        artifact: std::path::PathBuf,
+        #[clap(long)]
+        json: bool,
+    },
+}
+
+fn run_query_command(
+    index: &semantic_contract::SemanticIndex,
+    command: QueryCommands,
+) -> Result<i32, ReqvireError> {
+    match command {
+        QueryCommands::List {
+            name,
+            iri,
+            namespace_base,
+            json,
+        } => {
+            let records =
+                index.select_queries(name.as_deref(), iri.as_deref(), namespace_base.as_deref())?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&records)?);
+            } else {
+                for record in records {
+                    println!(
+                        "{}\t{}\t{}",
+                        record.iri,
+                        record.query_form.as_deref().unwrap_or("invalid"),
+                        record.name
+                    );
+                }
+            }
+        }
+        QueryCommands::Validate { name, iri, json } => {
+            let report = index.query_validation_report(name.as_deref(), iri.as_deref(), Vec::new())?;
+            print_query_validation_report(&report, json)?;
+            return Ok(if report["valid"] == true { 0 } else { 1 });
+        }
+        QueryCommands::Export {
+            name,
+            iri,
+            output,
+            json,
+        } => {
+            let records = index.select_queries(name.as_deref(), iri.as_deref(), None)?;
+            let record = records[0];
+            let envelope = record.artifact()?;
+            if let Some(path) = output {
+                use std::io::Write;
+                let parent = path
+                    .parent()
+                    .filter(|p| !p.as_os_str().is_empty())
+                    .unwrap_or(std::path::Path::new("."));
+                let mut temp = tempfile::NamedTempFile::new_in(parent)?;
+                temp.write_all(record.content.as_bytes())?;
+                temp.as_file().sync_all()?;
+                temp.persist(&path).map_err(|e| {
+                    ReqvireError::ProcessError(format!("Cannot write {}: {}", path.display(), e))
+                })?;
+                eprintln!("Wrote {}", path.display());
+            } else if json {
+                println!("{}", serde_json::to_string_pretty(&envelope)?);
+            } else {
+                print!("{}", record.content);
+            }
+        }
+        QueryCommands::Check {
+            name,
+            iri,
+            artifact,
+            json,
+        } => {
+            let records = index.select_queries(name.as_deref(), iri.as_deref(), None)?;
+            let expected = records[0].artifact()?;
+            let (status, actual) = match std::fs::read(&artifact) {
+                Ok(bytes) => (
+                    if bytes == records[0].content.as_bytes() {
+                        "matching"
+                    } else {
+                        "stale"
+                    },
+                    Some(reqvire::hashing::sha256_hex(&bytes)),
+                ),
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => ("missing", None),
+                Err(error) => {
+                    return Err(ReqvireError::ProcessError(format!(
+                        "Cannot read {}: {}",
+                        artifact.display(),
+                        error
+                    )))
+                }
+            };
+            let result = serde_json::json!({"status":status,"expected_sha256":expected["sha256"],"actual_sha256":actual});
+            if json {
+                println!("{}", serde_json::to_string_pretty(&result)?);
+            } else {
+                println!("{}", result);
+            }
+            return Ok(if status == "matching" { 0 } else { 1 });
+        }
+    }
+    Ok(0)
+}
+
+fn print_query_validation_report(report: &serde_json::Value, json: bool) -> Result<(), ReqvireError> {
+    if json {
+        println!("{}", serde_json::to_string_pretty(report)?);
+    } else {
+        for query in report["queries"].as_array().into_iter().flatten() {
+            let valid = query["diagnostics"].as_array().is_some_and(|d| d.is_empty());
+            println!("{}: {}", query["name"].as_str().unwrap_or_default(), if valid { "valid" } else { "invalid" });
+            for diagnostic in query["diagnostics"].as_array().into_iter().flatten() {
+                eprintln!("{}", diagnostic);
+            }
+        }
+        for error in report["model_errors"].as_array().into_iter().flatten() {
+            eprintln!("{}", error.as_str().unwrap_or_default());
+        }
+    }
+    Ok(())
 }

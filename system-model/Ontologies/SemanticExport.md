@@ -10,6 +10,7 @@ Semantic exports preserve Markdown as the source of truth while exposing parsed 
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix concept: <https://www.reqvire.org/concepts#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
@@ -77,24 +78,6 @@ reqvire:UsedExternalOntologyTerm a owl:Class ;
   rdfs:comment "External ontology term selected for exposure because authored Reqvire semantic content references it directly or through required support closure." .
 reqvire:ModelContextProjection a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection .
-reqvire:SemanticConstructQuery a owl:Class ;
-  rdfs:subClassOf reqvire:RdfProjection ;
-  reqvire:mapsToConcept concept:OntologyProjection ;
-  rdfs:comment "Versioned SPARQL CONSTRUCT query specification that defines generated semantic projection facts independently of the current Rust materialization path." .
-reqvire:NormalizedRelationConstructQuery a owl:Class ;
-  rdfs:subClassOf reqvire:SemanticConstructQuery ;
-  rdfs:comment "Construct query that materializes normalized relation facts from authored relation evidence while preserving authored source records separately." .
-reqvire:RelationFamilyConstructQuery a owl:Class ;
-  rdfs:subClassOf reqvire:NormalizedRelationConstructQuery ;
-  reqvire:mapsToConcept concept:RelationFamilyConstructQuery ;
-  rdfs:comment "SPARQL CONSTRUCT query specification for materializing canonical forward and inverse relation-family facts from authored Reqvire model relations." .
-reqvire:ConceptRelationConstructQuery a owl:Class ;
-  rdfs:subClassOf reqvire:NormalizedRelationConstructQuery ;
-  rdfs:comment "SPARQL CONSTRUCT query specification for materializing normalized SKOS taxonomy, association, and mapping facts from native concept Markdown relations." .
-reqvire:ExternalOntologySubsetConstructQuery a owl:Class ;
-  rdfs:subClassOf reqvire:SemanticConstructQuery ;
-  reqvire:mapsToConcept concept:ExternalOntologySubsetConstructQuery ;
-  rdfs:comment "SPARQL query specification for selecting the used external ontology subset from internal raw external dependency graphs." .
 reqvire:OntologyProjectionGraph a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection ;
   rdfs:comment "Generated graph-level projection record for ontology construct facts emitted in full semantic exports." .
@@ -143,7 +126,7 @@ reqvire:declaresTerm a owl:ObjectProperty ;
   rdfs:domain reqvire:SemanticBlock ;
   rdfs:range reqvire:OntologyTerm .
 reqvire:referencesTerm a owl:ObjectProperty ;
-  rdfs:domain reqvire:SemanticBlock ;
+  rdfs:domain [ a owl:Class ; owl:unionOf ( reqvire:SemanticBlock reqvire:SemanticQuery ) ] ;
   rdfs:range reqvire:OntologyTerm .
 reqvire:externalOntologyResource a owl:ObjectProperty ;
   rdfs:domain reqvire:ExternalOntologySource ;
@@ -172,13 +155,17 @@ reqvire:relationTarget a owl:ObjectProperty ;
 reqvire:conceptReference a owl:ObjectProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range reqvire:OntologyTerm .
-reqvire:constructQueryMaterializesFamily a owl:ObjectProperty ;
-  rdfs:domain reqvire:SemanticConstructQuery ;
+reqvire:queryElement a owl:ObjectProperty ;
+  rdfs:domain reqvire:SemanticQuery ;
+  rdfs:range reqvire:Element ;
+  rdfs:comment "Authored model element supplying the query artifact." .
+reqvire:queryMaterializesFamily a owl:ObjectProperty ;
+  rdfs:domain reqvire:SemanticQuery ;
   rdfs:range reqvire:RelationFamily ;
   rdfs:comment "Relation family whose normalized semantic facts are materialized by a construct-query specification." .
-reqvire:constructQueryMaterializesProperty a owl:ObjectProperty ;
-  rdfs:domain reqvire:SemanticConstructQuery ;
-  rdfs:range owl:ObjectProperty ;
+reqvire:queryMaterializesProperty a owl:ObjectProperty ;
+  rdfs:domain reqvire:SemanticQuery ;
+  rdfs:range rdf:Property ;
   rdfs:comment "Normalized RDF property that can be emitted by a construct-query specification." .
 reqvire:projectedConstruct a owl:ObjectProperty ;
   rdfs:domain reqvire:RdfProjection ;
@@ -261,9 +248,9 @@ reqvire:elementId a owl:DatatypeProperty ;
   rdfs:range xsd:string ;
   rdfs:comment "Stable model element id emitted in semantic export records." .
 reqvire:lineNumber a owl:DatatypeProperty ;
-  rdfs:domain reqvire:SemanticBlock ;
+  rdfs:domain [ a owl:Class ; owl:unionOf ( reqvire:SemanticBlock reqvire:SemanticQuery ) ] ;
   rdfs:range xsd:integer ;
-  rdfs:comment "Source line number for a semantic block or semantic source projection record." .
+  rdfs:comment "Source line number for a semantic block, query artifact, or semantic source projection record." .
 reqvire:relationType a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;
@@ -380,16 +367,20 @@ reqvire:blockKind a owl:DatatypeProperty ;
   rdfs:domain reqvire:OntologyProjectionSource ;
   rdfs:range xsd:string ;
   rdfs:comment "Semantic block kind token for a generated ontology projection source." .
-reqvire:constructQueryName a owl:DatatypeProperty ;
-  rdfs:domain reqvire:SemanticConstructQuery ;
+reqvire:queryName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:SemanticQuery ;
   rdfs:range xsd:string ;
-  rdfs:comment "Stable construct-query specification token." .
-reqvire:constructQueryText a owl:DatatypeProperty ;
-  rdfs:domain reqvire:SemanticConstructQuery ;
+  rdfs:comment "Name authored in the query element heading." .
+reqvire:queryText a owl:DatatypeProperty ;
+  rdfs:domain reqvire:SemanticQuery ;
   rdfs:range xsd:string ;
-  rdfs:comment "SPARQL CONSTRUCT text that specifies generated semantic projection facts." .
-reqvire:constructQueryPurpose a owl:DatatypeProperty ;
-  rdfs:domain reqvire:SemanticConstructQuery ;
+  rdfs:comment "Standalone SPARQL query document." .
+reqvire:queryForm a owl:DatatypeProperty ;
+  rdfs:domain reqvire:SemanticQuery ;
+  rdfs:range xsd:string ;
+  rdfs:comment "SPARQL query form derived from parsed syntax." .
+reqvire:queryPurpose a owl:DatatypeProperty ;
+  rdfs:domain reqvire:SemanticQuery ;
   rdfs:range xsd:string ;
   rdfs:comment "Human-readable purpose and intended consumer behavior for a construct-query specification." .
 reqvire:sourceRelationType a owl:DatatypeProperty ;
@@ -425,185 +416,12 @@ reqvire:semanticArtifactExportMode a reqvire:SemanticArtifactExport ;
   rdfs:comment "Semantic ontology export mode that emits generated ontology document declarations plus authored ontology vocabulary with source comments. Turtle serialization uses deterministic prefix declarations and safe compact prefixed names." .
 reqvire:fullSemanticModelExportMode a reqvire:FullSemanticModelExport ;
   rdfs:comment "Semantic graph export mode that emits generated ontology document declarations, authored ontology and SHACL blocks, and RDF triples for Reqvire model elements, relations, contract_bindings, concept references, ontology term declarations, shape references, and generated ontology projection facts. Turtle serialization uses deterministic prefix declarations and safe compact prefixed names." .
-reqvire:externalUsedTermSeedQuery a reqvire:ExternalOntologySubsetConstructQuery ;
-  reqvire:constructQueryName "external-used-term-seed-query" ;
-  reqvire:constructFamily "external-used-subset" ;
-  reqvire:constructKind "seed-query" ;
-  reqvire:projectionDerivationMode "construct-query-specified" ;
-  reqvire:constructQueryPurpose "Select external ontology terms referenced by authored ontology, SHACL, concept-reference, model, or generated semantic projection facts whose IRIs fall under declared external namespaces." ;
-  reqvire:constructQueryText """
-PREFIX reqvire: <https://www.reqvire.org/ontology#>
 
-SELECT DISTINCT ?term
-WHERE {
-  ?source a reqvire:ExternalOntologySource ;
-    reqvire:externalOntologyNamespace ?namespace .
-  {
-    ?block reqvire:referencesTerm ?term .
-  }
-  UNION {
-    ?block reqvire:declaresTerm ?term .
-  }
-  UNION {
-    ?projection reqvire:conceptReference ?term .
-  }
-  UNION {
-    ?projection reqvire:constructSubject|reqvire:constructPredicate|reqvire:constructObject|reqvire:constructProperty ?term .
-  }
-  FILTER(isIRI(?term))
-  FILTER(STRSTARTS(STR(?term), STR(?namespace)))
-}
-""" .
-reqvire:externalUsedTermDirectDescriptionConstructQuery a reqvire:ExternalOntologySubsetConstructQuery ;
-  reqvire:constructQueryName "external-used-term-direct-description-construct" ;
-  reqvire:constructFamily "external-used-subset" ;
-  reqvire:constructKind "direct-description-construct" ;
-  reqvire:projectionDerivationMode "construct-query-specified" ;
-  reqvire:constructQueryPurpose "Construct direct raw-external-graph description triples for seed external ontology terms only." ;
-  reqvire:constructQueryText """
-PREFIX reqvire: <https://www.reqvire.org/ontology#>
 
-CONSTRUCT {
-  ?term ?p ?o .
-}
-WHERE {
-  ?subset a reqvire:UsedExternalOntologySubset ;
-    reqvire:externalUsedTerm ?term ;
-    reqvire:externalSubsetGraph ?rawExternalGraph .
-  GRAPH ?rawExternalGraph {
-    ?term ?p ?o .
-  }
-}
-""" .
-reqvire:externalUsedTermSupportClosureConstructQuery a reqvire:ExternalOntologySubsetConstructQuery ;
-  reqvire:constructQueryName "external-used-term-support-closure-construct" ;
-  reqvire:constructFamily "external-used-subset" ;
-  reqvire:constructKind "support-closure-construct" ;
-  reqvire:projectionDerivationMode "construct-query-specified" ;
-  reqvire:constructQueryPurpose "Construct one-hop support facts for used external terms across selected RDF, RDFS, and OWL support predicates." ;
-  reqvire:constructQueryText """
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX reqvire: <https://www.reqvire.org/ontology#>
 
-CONSTRUCT {
-  ?support ?p ?supportObject .
-}
-WHERE {
-  ?subset a reqvire:UsedExternalOntologySubset ;
-    reqvire:externalUsedTerm ?term ;
-    reqvire:externalSubsetGraph ?rawExternalGraph .
-  GRAPH ?rawExternalGraph {
-    ?term ?p ?support .
-    FILTER(?p IN (rdf:type, rdfs:subClassOf, rdfs:subPropertyOf, rdfs:domain, rdfs:range, owl:equivalentClass, owl:equivalentProperty, owl:inverseOf, owl:onProperty, owl:someValuesFrom, owl:allValuesFrom, owl:hasValue))
-    FILTER(isIRI(?support) || isBlank(?support))
-    OPTIONAL {
-      ?support ?p ?supportObject .
-      FILTER(?p IN (rdf:type, rdfs:subClassOf, rdfs:subPropertyOf, rdfs:domain, rdfs:range, owl:equivalentClass, owl:equivalentProperty, owl:inverseOf, owl:onProperty, owl:someValuesFrom, owl:allValuesFrom, owl:hasValue))
-    }
-  }
-}
-""" .
-reqvire:externalUsedTermAnnotationConstructQuery a reqvire:ExternalOntologySubsetConstructQuery ;
-  reqvire:constructQueryName "external-used-term-annotation-construct" ;
-  reqvire:constructFamily "external-used-subset" ;
-  reqvire:constructKind "annotation-construct" ;
-  reqvire:projectionDerivationMode "construct-query-specified" ;
-  reqvire:constructQueryPurpose "Construct label, comment, preferred-label, definition, and description annotation triples for used external terms and support terms." ;
-  reqvire:constructQueryText """
-PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX reqvire: <https://www.reqvire.org/ontology#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-CONSTRUCT {
-  ?describedTerm ?annotationProperty ?annotationValue .
-}
-WHERE {
-  ?subset a reqvire:UsedExternalOntologySubset ;
-    reqvire:externalSubsetGraph ?rawExternalGraph .
-  {
-    ?subset reqvire:externalUsedTerm ?describedTerm .
-  }
-  UNION {
-    ?subset reqvire:externalUsedTerm ?term .
-    GRAPH ?rawExternalGraph {
-      ?term ?supportProperty ?describedTerm .
-      FILTER(?supportProperty IN (rdfs:subClassOf, rdfs:subPropertyOf, rdfs:domain, rdfs:range, owl:equivalentClass, owl:equivalentProperty, owl:inverseOf, owl:onProperty, owl:someValuesFrom, owl:allValuesFrom, owl:hasValue))
-    }
-  }
-  GRAPH ?rawExternalGraph {
-    ?describedTerm ?annotationProperty ?annotationValue .
-    FILTER(?annotationProperty IN (rdfs:label, rdfs:comment, skos:prefLabel, skos:definition, dcterms:description))
-  }
-}
-""" .
-reqvire:relationFamilyNormalizedConstructQuery a reqvire:RelationFamilyConstructQuery,
-    reqvire:NormalizedRelationConstructQuery ;
-  reqvire:constructQueryName "relation-family-normalized-projection" ;
-  reqvire:constructFamily "semantic-search" ;
-  reqvire:constructKind "relation-family-normalized-projection" ;
-  reqvire:projectionDerivationMode "construct-query-specified" ;
-  reqvire:constructQueryPurpose "Materialize canonical forward and inverse relation-family predicates for every authored Reqvire model relation so semantic search can query relation meaning rather than raw Markdown relation tokens." ;
-  reqvire:constructQueryText """
-PREFIX reqvire: <https://www.reqvire.org/ontology#>
 
-CONSTRUCT {
-  ?canonicalSource ?forwardProperty ?canonicalTarget .
-  ?canonicalTarget ?inverseProperty ?canonicalSource .
-}
-WHERE {
-  ?relation a reqvire:ModelRelation ;
-    reqvire:relationSource ?source ;
-    reqvire:relationTarget ?target ;
-    reqvire:relationType ?relationName .
 
-  ?rule a reqvire:RelationRule ;
-    reqvire:relationName ?relationName ;
-    reqvire:relationDirection ?direction ;
-    reqvire:normalizedForwardProperty ?forwardProperty ;
-    reqvire:normalizedInverseProperty ?inverseProperty .
-
-  BIND(IF(?direction = "inverse", ?target, ?source) AS ?canonicalSource)
-  BIND(IF(?direction = "inverse", ?source, ?target) AS ?canonicalTarget)
-}
-""" .
-reqvire:conceptRelationNormalizedConstructQuery a reqvire:ConceptRelationConstructQuery,
-    reqvire:NormalizedRelationConstructQuery ;
-  reqvire:constructQueryName "concept-relation-normalized-projection" ;
-  reqvire:constructFamily "concept-relation" ;
-  reqvire:constructKind "concept-relation-normalized-projection" ;
-  reqvire:projectionDerivationMode "construct-query-specified" ;
-  reqvire:constructQueryMaterializesProperty skos:broader, skos:narrower, skos:related, skos:exactMatch, skos:closeMatch ;
-  reqvire:constructQueryPurpose "Materialize canonical SKOS concept relation facts from authored native concept relations so child broader, parent narrower, symmetric association, and mapping neighborhoods are queryable without client-side inverse inference." ;
-  reqvire:constructQueryText """
-PREFIX reqvire: <https://www.reqvire.org/ontology#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-CONSTRUCT {
-  ?canonicalSource ?forwardProperty ?canonicalTarget .
-  ?canonicalTarget ?inverseProperty ?canonicalSource .
-}
-WHERE {
-  ?relation a reqvire:ModelRelation ;
-    reqvire:relationSource ?source ;
-    reqvire:relationTarget ?target ;
-    reqvire:relationType ?relationName .
-
-  VALUES (?relationName ?direction ?forwardProperty ?inverseProperty) {
-    ("broader" "forward" skos:broader skos:narrower)
-    ("narrower" "inverse" skos:broader skos:narrower)
-    ("related" "forward" skos:related skos:related)
-    ("exactMatch" "forward" skos:exactMatch skos:exactMatch)
-    ("closeMatch" "forward" skos:closeMatch skos:closeMatch)
-  }
-
-  BIND(IF(?direction = "inverse", ?target, ?source) AS ?canonicalSource)
-  BIND(IF(?direction = "inverse", ?source, ?target) AS ?canonicalTarget)
-}
-""" .
 ```
 
 #### Metadata
@@ -913,105 +731,54 @@ reqvire:OntologyConstructShape
     sh:datatype xsd:string ;
   ] .
 
-reqvire:SemanticConstructQueryShape
+reqvire:SemanticQueryShape
   a sh:NodeShape ;
-  sh:targetClass reqvire:SemanticConstructQuery ;
-  sh:property [
-    sh:path reqvire:constructQueryName ;
-    sh:minCount 1 ;
-    sh:maxCount 1 ;
-    sh:datatype xsd:string ;
-  ] ;
-  sh:property [
-    sh:path reqvire:constructQueryText ;
-    sh:minCount 1 ;
-    sh:maxCount 1 ;
-    sh:datatype xsd:string ;
-  ] ;
-  sh:property [
-    sh:path reqvire:constructQueryPurpose ;
-    sh:datatype xsd:string ;
-  ] ;
-  sh:property [
-    sh:path reqvire:constructQueryMaterializesProperty ;
-    sh:nodeKind sh:IRI ;
-  ] .
-
-reqvire:NormalizedRelationConstructQueryShape
-  a sh:NodeShape ;
-  sh:targetClass reqvire:NormalizedRelationConstructQuery ;
-  sh:property [
-    sh:path reqvire:projectionDerivationMode ;
-    sh:hasValue "construct-query-specified" ;
-  ] ;
-  sh:xone (
-    [
-      sh:property [
-        sh:path rdf:type ;
-        sh:hasValue reqvire:RelationFamilyConstructQuery ;
-      ]
-    ]
-    [
-      sh:property [
-        sh:path rdf:type ;
-        sh:hasValue reqvire:ConceptRelationConstructQuery ;
-      ]
-    ]
+  sh:targetClass reqvire:SemanticQuery ;
+  sh:nodeKind sh:IRI ;
+  sh:or (
+    [ sh:property [ sh:path reqvire:queryForm ; sh:hasValue "CONSTRUCT" ] ]
+    [ sh:property [ sh:path reqvire:queryMaterializesProperty ; sh:maxCount 0 ] ;
+      sh:property [ sh:path reqvire:queryMaterializesFamily ; sh:maxCount 0 ] ]
   ) ;
+  sh:property [ sh:path reqvire:queryForm ; sh:minCount 1 ; sh:maxCount 1 ; sh:in ("SELECT" "ASK" "CONSTRUCT" "DESCRIBE") ] ;
+  sh:property [ sh:path reqvire:queryMaterializesFamily ; sh:nodeKind sh:IRI ; sh:class reqvire:RelationFamily ] ;
   sh:property [
-    sh:path reqvire:constructQueryMaterializesProperty ;
+    sh:path reqvire:queryName ;
     sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:minLength 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:queryText ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:minLength 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:queryPurpose ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:queryMaterializesProperty ;
     sh:nodeKind sh:IRI ;
   ] .
 
-reqvire:ConceptRelationConstructQueryShape
-  a sh:NodeShape ;
-  sh:targetClass reqvire:ConceptRelationConstructQuery ;
-  sh:property [
-    sh:path reqvire:constructFamily ;
-    sh:hasValue "concept-relation" ;
-  ] ;
-  sh:property [
-    sh:path reqvire:constructKind ;
-    sh:hasValue "concept-relation-normalized-projection" ;
-  ] ;
-  sh:property [
-    sh:path reqvire:constructQueryMaterializesProperty ;
-    sh:hasValue skos:broader ;
-  ] ;
-  sh:property [
-    sh:path reqvire:constructQueryMaterializesProperty ;
-    sh:hasValue skos:narrower ;
-  ] ;
-  sh:property [
-    sh:path reqvire:constructQueryMaterializesProperty ;
-    sh:hasValue skos:related ;
-  ] ;
-  sh:property [
-    sh:path reqvire:constructQueryMaterializesProperty ;
-    sh:hasValue skos:exactMatch ;
-  ] ;
-  sh:property [
-    sh:path reqvire:constructQueryMaterializesProperty ;
-    sh:hasValue skos:closeMatch ;
-  ] .
+reqvire:RelationProjectionQueryShape a sh:NodeShape ;
+  sh:targetNode <urn:reqvire:semantic-query:relation-family-normalized-projection> ;
+  sh:property [ sh:path reqvire:queryForm ; sh:hasValue "CONSTRUCT" ] ;
+  sh:property [ sh:path reqvire:queryMaterializesFamily ; sh:minCount 1 ; sh:class reqvire:RelationFamily ] .
 
-reqvire:RelationFamilyConstructQueryShape
-  a sh:NodeShape ;
-  sh:targetClass reqvire:RelationFamilyConstructQuery ;
-  sh:property [
-    sh:path reqvire:constructFamily ;
-    sh:hasValue "semantic-search" ;
-  ] ;
-  sh:property [
-    sh:path reqvire:constructKind ;
-    sh:hasValue "relation-family-normalized-projection" ;
-  ] ;
-  sh:property [
-    sh:path reqvire:constructQueryMaterializesFamily ;
-    sh:minCount 1 ;
-    sh:class reqvire:RelationFamily ;
-  ] .
+reqvire:ConceptProjectionQueryShape a sh:NodeShape ;
+  sh:targetNode <urn:reqvire:semantic-query:concept-relation-normalized-projection> ;
+  sh:property [ sh:path reqvire:queryForm ; sh:hasValue "CONSTRUCT" ] ;
+  sh:property [ sh:path reqvire:queryMaterializesProperty ; sh:hasValue skos:broader ] ;
+  sh:property [ sh:path reqvire:queryMaterializesProperty ; sh:hasValue skos:narrower ] ;
+  sh:property [ sh:path reqvire:queryMaterializesProperty ; sh:hasValue skos:related ] ;
+  sh:property [ sh:path reqvire:queryMaterializesProperty ; sh:hasValue skos:exactMatch ] ;
+  sh:property [ sh:path reqvire:queryMaterializesProperty ; sh:hasValue skos:closeMatch ] .
 
 reqvire:OntologyConstructMemberShape
   a sh:NodeShape ;

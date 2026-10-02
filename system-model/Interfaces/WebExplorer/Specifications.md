@@ -558,6 +558,7 @@ Model-centric view generation behavior:
 
 #### Details
 Semantic projection behavior:
+- Projects each native managed semantic query as a query node with its generated IRI, name, purpose, form, query text, used ontology sources, referenced vocabulary, declared outputs, and source location. Query vocabulary and output relationships remain navigable alongside the OWL projection.
 - Classifies resources into semantic node kinds, including OWL/RDFS class, object property, datatype property, RDF property, named individual, SHACL node shape, SHACL property shape, datatype, and generic RDF resource when no stronger kind is known. Literal values are not primary graph nodes; they are subject-owned modal/search evidence.
 - Promotes otherwise-generic named resources to named-individual view nodes when their RDF type evidence references a class declared in the same ontology graph, even when the authored RDF does not explicitly include `owl:NamedIndividual`.
 - Consumes generated ontology projection facts derived from o-kernel construct classifications and reused through `SemanticIndex` before full semantic export or Explorer rendering.
@@ -579,7 +580,8 @@ Semantic projection behavior:
 
 #### Details
 Ontologies view generation behavior:
-- Uses the semantic index built from graph-registry ontology and semantic-contract elements.
+- Uses the semantic index built from graph-registry ontology, semantic-contract, and native semantic-query elements.
+- Includes managed query nodes and their vocabulary/output edges in the Core layer. The Semantic query type filter controls their visibility. Query detail dialogs show the SPARQL document, form, ontology dependencies, output declarations, and source navigation.
 - Displays summary counts for ontology blocks, shape blocks, RDF quads, total blocks, and the `ontologies.ttl` download action in the Ontologies left Explorer pane near the reset/search controls.
 - Aligns ontology summary and download controls with the shared left-pane summary treatment: compact entries, muted surface tokens, visible grouping, wrapping when needed, and no clipped `Download .ttl` action.
 - Builds the browser visualization, search index, and ontology node modal metadata from `SemanticIndex.ontology_projection` facts; raw quads may support labels, comments, RDF type evidence, SHACL constraint display, and generic low-level links, but must not be a separate authoritative extraction path for OWL/RDFS construct metadata.
@@ -703,6 +705,8 @@ Property-centric visualization behavior:
 
 #### Details
 The ontology viewer symbol vocabulary defines canonical rendered symbols for OWL and set-theoretic concepts. The viewer must render the `Rendered Unicode Character` value for visual badges and must keep the `Raw Unicode` code point available in source/specification evidence.
+
+Semantic queries use the shared design-system `Q` marker with the ontology palette in model icons, type badges, search results, and ontology graph nodes. Graph labels retain query names and source links open the authored query element. Properties referenced by queries remain available as dependency targets alongside their domain/range edges.
 
 Symbols must:
 - Appear only in approved viewer locations listed in the table.

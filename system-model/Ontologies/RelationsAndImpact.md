@@ -1361,23 +1361,23 @@ reqvire:semanticContractConstrainsRequirement a owl:ObjectProperty ;
   owl:inverseOf reqvire:requirementConstrainedBySemanticContract ;
   rdfs:comment "Normalized direct constraint relation from a semantic contract to a constrained requirement." .
 reqvire:use a owl:ObjectProperty ;
-  rdfs:domain reqvire:SemanticContract ;
+  rdfs:domain [ a owl:Class ; owl:unionOf (reqvire:SemanticContract reqvire:SemanticQuery) ] ;
   rdfs:range reqvire:Ontology ;
   owl:inverseOf reqvire:usedBy ;
-  rdfs:comment "Relation from a semantic contract to ontology vocabulary it uses." .
+  rdfs:comment "Relation from a semantic contract or query to ontology vocabulary it uses." .
 reqvire:usedBy a owl:ObjectProperty ;
   rdfs:domain reqvire:Ontology ;
-  rdfs:range reqvire:SemanticContract ;
+  rdfs:range [ a owl:Class ; owl:unionOf (reqvire:SemanticContract reqvire:SemanticQuery) ] ;
   owl:inverseOf reqvire:use ;
-  rdfs:comment "Relation from ontology vocabulary to a semantic contract that uses it." .
+  rdfs:comment "Relation from ontology vocabulary to a semantic contract or query that uses it." .
 reqvire:semanticContractUsesOntology a owl:ObjectProperty ;
-  rdfs:domain reqvire:SemanticContract ;
+  rdfs:domain [ a owl:Class ; owl:unionOf (reqvire:SemanticContract reqvire:SemanticQuery) ] ;
   rdfs:range reqvire:Ontology ;
   owl:inverseOf reqvire:ontologyUsedBySemanticContract ;
-  rdfs:comment "Normalized direct dependency from a semantic contract to ontology vocabulary it uses." .
+  rdfs:comment "Normalized direct dependency from a semantic contract or query to ontology vocabulary it uses." .
 reqvire:ontologyUsedBySemanticContract a owl:ObjectProperty ;
   rdfs:domain reqvire:Ontology ;
-  rdfs:range reqvire:SemanticContract ;
+  rdfs:range [ a owl:Class ; owl:unionOf (reqvire:SemanticContract reqvire:SemanticQuery) ] ;
   owl:inverseOf reqvire:semanticContractUsesOntology ;
   rdfs:comment "Normalized direct dependency from ontology vocabulary to semantic contracts that use it." .
 reqvire:verify a owl:ObjectProperty ;
@@ -1841,12 +1841,12 @@ reqvire:useRelationRule a reqvire:RelationRule ;
   reqvire:relationFamily reqvire:semanticContractOntologyUseRelationFamily ;
   reqvire:normalizedForwardProperty reqvire:semanticContractUsesOntology ;
   reqvire:normalizedInverseProperty reqvire:ontologyUsedBySemanticContract ;
-  reqvire:allowedSourceType "semantic-contract" ;
+  reqvire:allowedSourceType "semantic-contract", "semantic-query" ;
   reqvire:allowedTargetType "ontology" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Semantic contract points to ontology vocabulary used by its SHACL shapes." .
+  reqvire:relationRuleDescription "Semantic contract or query points to ontology vocabulary used by its SHACL shapes or SPARQL vocabulary." .
 
 reqvire:usedByRelationRule a reqvire:RelationRule ;
   rdfs:label "usedBy" ;
@@ -1857,11 +1857,11 @@ reqvire:usedByRelationRule a reqvire:RelationRule ;
   reqvire:normalizedForwardProperty reqvire:semanticContractUsesOntology ;
   reqvire:normalizedInverseProperty reqvire:ontologyUsedBySemanticContract ;
   reqvire:allowedSourceType "ontology" ;
-  reqvire:allowedTargetType "semantic-contract" ;
+  reqvire:allowedTargetType "semantic-contract", "semantic-query" ;
   reqvire:relationDirection "inverse" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Ontology points to a semantic contract that uses its vocabulary." .
+  reqvire:relationRuleDescription "Ontology points to a semantic contract or query that uses its vocabulary." .
 
 reqvire:verifiedByRelationRule a reqvire:RelationRule ;
   rdfs:label "verifiedBy" ;

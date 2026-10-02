@@ -1587,6 +1587,7 @@ ext:UnusedTerm a owl:Class ;
 "#;
 
         SemanticIndex {
+            queries: Vec::new(),
             blocks: Vec::new(),
             external_blocks: vec![external_block(raw_external)],
             external_sources: vec![ExternalOntologySource {

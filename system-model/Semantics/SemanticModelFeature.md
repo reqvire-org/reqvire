@@ -97,3 +97,20 @@ The authored source of truth remains `system-model/Ontologies`. The generated `r
   * specifiedBy: [Runtime Reqvire Ontology Synchronization](SemanticModelRequirements.md#runtime-reqvire-ontology-synchronization)
   * specifiedBy: [Runtime Reqvire SHACL Artifact](SemanticModelRequirements.md#runtime-reqvire-shacl-artifact)
 ---
+
+### Managed SPARQL Query Artifacts
+
+As a semantic model author, I want to maintain reusable queries with the model vocabulary they consume, so that downstream applications can discover and export validated query artifacts.
+
+#### Details
+This capability owns query authoring, vocabulary validation, discovery, RDF projection, deterministic artifacts, and artifact drift checks. CLI and MCP consumers reuse its evaluation contracts.
+
+#### Concept References
+  * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [Semantic Model Core](#semantic-model-core)
+---
