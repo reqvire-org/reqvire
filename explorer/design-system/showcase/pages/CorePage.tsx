@@ -4,6 +4,7 @@ import {
   Badge,
   Button,
   Card,
+  ExpandableViewport,
   Icon,
   IconButton,
   Modal,
@@ -29,6 +30,7 @@ function Section({ title, desc, children }: { title: string; desc?: string; chil
 
 export function CorePage() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [viewportExpanded, setViewportExpanded] = useState(false);
 
   return (
     <div className="showcase-page">
@@ -118,6 +120,23 @@ export function CorePage() {
             <div className="showcase-card-demo__title">Accent bar</div>
             <div className="showcase-card-demo__desc">Left color rail</div>
           </Card>
+        </div>
+      </Section>
+
+      <Section title="ExpandableViewport" desc="A persistent canvas frame that expands to the page. Close or Escape returns to the embedded view.">
+        <div className="showcase-canvas">
+          <ExpandableViewport expanded={viewportExpanded} onExpandedChange={setViewportExpanded} label="Expanded preview">
+            <Card>
+              <div className="showcase-row showcase-row--center">
+                <IconButton aria-label={viewportExpanded ? "Close expanded preview" : "Expand preview"}
+                  aria-expanded={viewportExpanded} data-expanded-close={viewportExpanded || undefined}
+                  onClick={() => setViewportExpanded(value => !value)}>
+                  <Icon name={viewportExpanded ? "x" : "maximize"} />
+                </IconButton>
+                <span>Preview content stays mounted while the viewport expands.</span>
+              </div>
+            </Card>
+          </ExpandableViewport>
         </div>
       </Section>
 

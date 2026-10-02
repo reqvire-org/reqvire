@@ -236,6 +236,39 @@ Expected checks:
   * verify: [Explorer Scoped Coverage](../../../Interfaces/WebExplorer/Capabilities.md#explorer-scoped-coverage)
 ---
 
+### Explorer Trace Flow Preview Verification
+
+This test verifies the native trace-flow pattern and its design-system mock interactions.
+
+#### Details
+- From the Mocks Explorer shell, the Traces navigation item opens the native trace map. Direct loading of `#/traces` and returning from another Explorer view use the same entry point. The mock presents one Explorer navigation menu with shared shell theme controls.
+- A simple trace retains verification-to-requirement `verifies` and child-to-ancestor `derivedFrom` direction.
+- Branching traces merge shared requirement identifiers into one node and count unique requirements, preserving all distinct relations.
+- A trace that splits, merges, splits again, and merges again preserves every relation, including a shortcut across intermediate ranks. Cards and relation labels remain separate, and routed connections avoid unrelated card interiors.
+- Reordering requirements and parent identifiers leaves graph positions and routes unchanged.
+- The direction control switches between Left to right and Top to bottom. Both preserve node identities, relation direction, counts, branch disclosure, and pinned path focus. ELK layout places incoming/outgoing connections on west/east sides for horizontal flow and north/south sides for vertical flow, with orthogonal segments and distinct relation labels.
+- While layout is pending, the current map remains available. Out-of-order layout completions and failures cannot replace a newer result, including rapid switches between layout directions. Layout failures display a retry action; retry can recover without resetting an already displayed map.
+- Collapsing a branch hides only nodes no longer reachable through the visible trace and preserves full-trace counts; Expand all restores its nodes and relations.
+- Graph node names appear beside the colored element glyph, with context labels below. Clicking the name or card body opens the application's Model element-detail modal through the canonical element route, displaying fixture content, type, metadata, and incoming/outgoing relations. Related-element navigation and Back preserve the trace behind the modal; Close returns to the trace. Source navigation opens the fixture source page. Focus and disclosure controls do not open the modal. Selecting a file shows its verification overview.
+- Check that the rendered node wrapper and card accept pointer input before exercising name clicks, card clicks, and hover, including when node dragging and selection are disabled.
+- Hover and keyboard focus highlight connections into and out of the chosen node to the end of every visible directed path, including repeated splits and merges. Highlighted lines and arrowheads use the accent token and stronger stroke treatment, while sibling-only paths remain dimmed. Pointer exit clears temporary highlighting. A separate Focus path action pins the highlight after pointer exit; clearing restores all paths without moving cards or resetting zoom.
+- The mock provides simple, branching, long-name, and empty examples through the public design-system pattern, with pan/zoom controls and light/dark theme selection.
+- Nodes use shared glyphs and token-based styling. Fitting caps zoom at actual size; zoom controls allow inspecting dense traces at reading scale.
+- For a large layout that needs less than 20% zoom, assert that initial framing and Fit include all card bounds on desktop and narrow canvases. Check both directions, manual zoom-out, returning from 100%, canvas resize, and switching back to a small scope. Verify layout bounds contain routed connections and relation labels as well as cards.
+- Exercise wheel zoom, toolbar zoom, actual size, Fit, and pan in both directions while leaving the pointer away from cards. Verify that viewport navigation retains routed geometry, labels, arrowheads, card identity, pinned paths, and keyboard focus. Simulate oversized and zero-sized SVG text measurements and assert that labels remain visible at their centered route positions with a compact outline around the text. In a browser, inspect long connections for continuous rendering immediately after navigation, including in the expanded view.
+- Expand the active trace to a full-page overlay. Verify that the same canvas remains mounted, direction and branch disclosure persist, and pinned paths remain highlighted. Exercise direction, zoom, Fit, card detail, and source actions from the overlay. Close and Escape return to the embedded view with focus restored to Expand flow. Escape in an element-detail modal closes those details while keeping the expanded flow open.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [Traces View Generation](../../../Interfaces/WebExplorer/Capabilities.md#traces-view-generation)
+  * satisfiedBy: [TraceFlow.test.ts](../../../../explorer/design-system/product-patterns/reports/TraceFlow.test.ts)
+  * satisfiedBy: [useTraceFlowLayout.test.ts](../../../../explorer/design-system/product-patterns/reports/useTraceFlowLayout.test.ts)
+  * satisfiedBy: [TraceFlowMock.test.tsx](../../../../explorer/design-system/showcase/TraceFlowMock.test.tsx)
+---
+
 ### Explorer Serve Verification
 
 This test verifies that the system serves the native SPA Explorer shell with Model route containment modes and Project Store data.
@@ -245,7 +278,7 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
 ##### Acceptance Criteria:
 - System shall serve `index.html` as the primary SPA Explorer shell and browser-local Project Store host
 - `index.html` shall contain a Project Store seed before Explorer views render
-- The Model route shall display folders, files, elements, and the project graph through native List, Grid, and Graph modes.
+- The Model route shall display folders, files, elements, and the project graph through native List, Grid, Graph, and Flow modes.
 - The Model project tree shall initialize with top-level `Model` and `Resources` branches and their Git worktree identity folders expanded, so first useful content folders/files are visible while deeper folder and file element rows remain collapsed until user action or selected-descendant reveal behavior requires expansion.
 - Modeled-element Grid cards shall use a single leading element marker, keep the title close to that marker, and render adjacent type badges without repeating the marker dot, shape, or glyph.
 - Graph mode shall render the project knowledge graph with pan/zoom, search/focus, selected-node state, and graph filters in the Model left pane.
@@ -360,6 +393,36 @@ This test verifies that the served Explorer Model containment data preserves con
   * verify: [Containment View Contract Bindings Links](../../../Interfaces/WebExplorer/Capabilities.md#containment-view-contract-bindings-links)
 ---
 
+### Explorer Model Flow Verification
+
+Verify the Model Flow mode through the same application and design-system patterns used by the showcase.
+
+#### Details
+- Select Flow from the existing Model layout selector, switch between all four modes, and retain the selected folder, file, or element.
+- Select an element and a capability in the left project tree while Flow is active: the right workspace updates to that selection's relation scope and retains the Model route. The detail dialog opens only after activating a Flow card name or body, independently of tree selection.
+- At the project root, assert that Flow starts with root capabilities above their child capabilities and specifying requirements, then descends through requirement decomposition to verification and evidence. Switch to horizontal layout and retain that ordering. Assert corresponding inverse labels for the displayed direction and unchanged canonical store facts; Traces keep their verification-to-ancestor direction.
+- Compare Flow nodes and labelled directed connections with the Project Store, including different element types, evidence endpoints, contract bindings and references, and generated inverse relations. Shared endpoints appear once; different relations between the same endpoints remain distinct.
+- Select a file or folder and assert that its elements and their immediate relation endpoints remain reachable, together with requirement and capability ancestry back to the owning root capabilities. Select an element and assert its full incoming and outgoing paths across repeated splits and merges. Include an isolated element, an empty folder, and a cyclic non-hierarchical relation graph.
+- Switch between horizontal and vertical layout and exercise path focus and clearing. Hover or keyboard-focus a card and inspect full-path highlighting through splits and merges, accent lines and arrowheads, faded unrelated connections, and unchanged card positions.
+- Click a card body and name to open the existing element-detail modal, inspect metadata and incoming/outgoing relations, navigate a related element, go back, and close to the same Flow workspace. Source and focus controls perform their own actions.
+- Confirm React Flow's rendered node wrapper and card accept pointer input while node dragging and selection are disabled. Check pointer eligibility before dispatching card and hover interactions so synthetic events cannot mask a browser hit-testing failure.
+- Render a large Model Flow requiring less than 20% zoom on desktop and narrow canvases. Assert that initial framing and Fit keep all cards inside the canvas in both directions, manual zoom-out remains available, and Fit restores the overview after 100%. Resize the canvas and select a small scope to check updated framing and the 100% fitting cap. Confirm complete layout bounds include connection routes and relation labels.
+- Check connection rendering after wheel and toolbar zoom, pan, Fit, actual size, canvas resizing, and overlay changes. Preserve routing, centered labels, arrowheads, node identity, pinned path, and keyboard focus. Include oversized and zero-sized SVG text measurements in regression tests. Inspect long routes and the compact outlines around label text in the browser immediately after navigation, with the pointer away from cards, to verify continuity at the new scale.
+- Open and close the full-page Flow overlay using its controls and Escape. Assert that scope, direction, pinned path, and canvas identity are retained. Verify overlay keyboard focus containment and focus restoration, usable flow controls, and shared element details above the overlay; closing the detail modal leaves Flow expanded. Source navigation exits to the requested source page.
+- Run the projection and application interaction tests, design-system adherence checks, and both Explorer and showcase builds.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [Model-Centric View Generation](../../../Interfaces/WebExplorer/Capabilities.md#model-centric-view-generation)
+  * verify: [Model View Element Navigation](../../../Interfaces/WebExplorer/Capabilities.md#model-view-element-navigation)
+  * satisfiedBy: [modelFlow.test.ts](../../../../explorer/src/lib/modelFlow.test.ts)
+  * satisfiedBy: [TraceFlow.test.ts](../../../../explorer/design-system/product-patterns/reports/TraceFlow.test.ts)
+  * satisfiedBy: [TraceFlowMock.test.tsx](../../../../explorer/design-system/showcase/TraceFlowMock.test.tsx)
+---
+
 ### Model View Element Navigation Test
 
 Test verifies that element names in the model-centric view are clickable links.
@@ -447,8 +510,10 @@ Expected analysis checks:
 - Confirm graph-registry provenance and generated-projection provenance are not exposed as graph-wide filter axes; source/provenance evidence remains available in the ontology node modal and Project Store data.
 - Confirm active filters combine inclusively within one category and narrow together across different active categories on the canvas without narrowing the ontology element modal evidence.
 
+Review artifacts: [OntologiesView.test.tsx](../../../../explorer/src/views/OntologiesView.test.tsx), [OntologyNodeDetailModal.test.tsx](../../../../explorer/src/components/OntologyNodeDetailModal.test.tsx).
+
 #### Metadata
-  * type: analysis-verification
+  * type: demonstration-verification
 
 #### Relations
   * verify: [Ontology Construct Grouping](../../../Interfaces/WebExplorer/Capabilities.md#ontology-construct-grouping)
@@ -516,7 +581,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - Assert the Model Graph mode paints the shell, graph canvas, and design-system spinner loading notice before deferred Sigma/ForceAtlas graph construction starts, clears the loading notice after renderer startup, computes full-graph ForceAtlas layout from currently visible nodes and edges with bounded settings derived from visible node count, edge density, and average rendered node size, and keeps layout quality while using cached adjacency/focus lookup for interaction.
 - Assert selecting a Model Graph node computes a visible focused neighborhood, applies bounded Graphology no-overlap layout from stable post-ForceAtlas baseline coordinates to that neighborhood only with spacing scaled by neighborhood size, keeps unrelated graph nodes out of the layout update, restores nodes from the previous focus when they leave scope, centers selected nodes through Sigma display-coordinate mapping after focus layout updates without changing zoom, and animates resulting node coordinates through Sigma node animation without accumulating coordinate drift.
 - Assert the Model tree, grid cards, modeled-element lists, relation/contract_bindings endpoints, and element legends use the shared Explorer `ElementIcon` type glyphs, that capability, semantic-contract, and verification-objective elements use their own role colors as plain squares with no glyph, that verification-objective uses the darker verification-objective token distinct from concrete verification, that inline concept-reference terms in element content use standard link color with no glyph or pill and underline only on hover or focus, that evidence-file artifacts and resource/evidence tree leaves use the neutral/default treatment rather than the yellow file/source resource token, and that contract-family subtypes keep the shared contract color while rendering distinct glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output`.
-- Assert selecting a folder, file, or modeled element in the left Model project tree updates the active Model workspace mode: List/Grid browse the selected folder or file, Graph focuses the matching graph node when one exists, and modeled-element rows open the shared element-detail modal without leaving the Model workspace.
+- Assert selecting a folder, file, or modeled element in the left Model project tree updates the active Model workspace mode: List/Grid browse the selected folder or file, and Graph focuses the matching graph node when one exists; their modeled-element rows open the shared element-detail modal. Flow tree selection renders the selected relation scope in the main workspace, with element details opened separately from the Flow card.
 - Assert the Search route's left-pane result-type controls do not render a duplicate passive legend for the same result-type colors and labels.
 - Assert the Coverage route's left Explorer pane renders the coverage explorer section rows with counts, that selecting a row scrolls or selects the matching central Coverage section, and that the left pane does not duplicate the Coverage dashboard summaries or legend content.
 - Assert the Explorer builds its ranked search index in a browser worker after the initial shell render, keeps non-search Explorer views interactive during indexing, and returns BM25-style ranked results that prioritize title matches over path/result-kind matches and body/content matches.
@@ -528,6 +593,8 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [loadStore.test.ts](../../../../explorer/src/store/loadStore.test.ts)
+  * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
   * verify: [SPA Explorer Shell and Project Store](../../../Interfaces/WebExplorer/Capabilities.md#spa-explorer-shell-and-project-store)
 ---
 
@@ -651,4 +718,25 @@ This test verifies that the Thesaurus Explorer route is backed by a native Proje
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-thesaurus-project-store/test.sh)
   * verify: [Thesaurus View Generation](../../../Interfaces/WebExplorer/Capabilities.md#thesaurus-view-generation)
+---
+
+### Explorer Semantic Query Presentation Verification
+
+Verify managed query identity and vocabulary context across Explorer and the shared design system.
+
+#### Details
+Check that semantic-query icons and badges use the shared Q marker, that native queries occur once in ontology graph data with source provenance and vocabulary/output edges, and that graph rendering preserves their circular Q marker, name, filter behavior, and property dependency targets. Inspect query form, exact text, used ontologies, declared outputs, and source navigation in the detail dialog. Exercise exported Project Store generation from a native query fixture. Verify that query hover and selection render `uses vocabulary` and `declares output` connectors with their property targets, that query/layer filters hide them, and that re-enabling filters restores eligible focused relations.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [OWL Semantic Ontology Projection](../../../Interfaces/WebExplorer/Capabilities.md#owl-semantic-ontology-projection)
+  * verify: [Ontology Property-Centric Visualization](../../../Interfaces/WebExplorer/Capabilities.md#ontology-property-centric-visualization)
+  * verify: [Ontology Symbol and Badge Vocabulary](../../../Interfaces/WebExplorer/Capabilities.md#ontology-symbol-and-badge-vocabulary)
+  * satisfiedBy: [semantic_queries.rs](../../../../crates/reqvire-core/tests/semantic_queries.rs)
+  * satisfiedBy: [OntologiesView.test.tsx](../../../../explorer/src/views/OntologiesView.test.tsx)
+  * satisfiedBy: [OntologyNodeDetailModal.test.tsx](../../../../explorer/src/components/OntologyNodeDetailModal.test.tsx)
+  * satisfiedBy: [test.sh](../../../../tests/test-semantic-queries/test.sh)
 ---

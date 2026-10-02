@@ -34,6 +34,7 @@
     "@wyw-in-js/babel-preset": "^2.0.1",
     "@xyflow/react": "^12.10.0",
     "d3": "^7.9.0",
+    "elkjs": "0.9.3",
     "graphology": "^0.25.4",
     "graphology-layout-forceatlas2": "^0.10.1",
     "graphology-layout-noverlap": "^0.4.2",

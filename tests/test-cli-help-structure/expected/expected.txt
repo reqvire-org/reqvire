@@ -30,6 +30,7 @@ Commands:
   containment       Generate containment view showing folder/file/element hierarchy
   resources         Generate resources report showing files referenced by the model
   semantic          Export semantic RDF layers
+    semantic query  Manage authored SPARQL query artifacts
     semantic export Export selected semantic RDF layers
   concepts          Work with standalone Reqvire concept schemes and thesaurus concepts
     concepts export Export generated SKOS concept scheme/thesaurus triples
@@ -84,7 +85,7 @@ SEARCH OPTIONS:
       --short                   Output abbreviated format (one-line per element in text, omit fields in JSON)
       --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
       --filter-name <REGEX>     Only include elements whose name matches this regular expression
-      --filter-type <TYPE[,TYPE...]> Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+      --filter-type <TYPE[,TYPE...]> Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
       --filter-status <STATUS[,STATUS...]> Only include requirement-family elements with matching effective status values
       --filter-priority <PRIORITY[,PRIORITY...]> Only include requirement-family elements with matching effective priority values
       --filter-risk <RISK[,RISK...]> Only include requirement-family elements with matching effective risk values
@@ -117,7 +118,7 @@ COVERAGE OPTIONS:
 MODEL OPTIONS:
       --from <NAME>             Start from specific element by name
       --reverse                 Traverse from leaves to roots (follow backward relations)
-      --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+      --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
       --with-size-estimates     Include element size estimates in JSON output
       --output <FILE>           Save JSON output to file
 
@@ -223,7 +224,7 @@ RESOURCES OPTIONS:
       --output <FILE>           Save JSON output to file
 
 SEMANTIC EXPORT OPTIONS:
-      --layer <LAYER>           Include layer: ontologies, shapes, concepts, model, external-used, prefixes. Repeatable; omitted means all layers
+      --layer <LAYER>           Include layer: ontologies, shapes, concepts, queries, model, external-used, prefixes. Repeatable; omitted means all layers
       --jsonld                  Output JSON-LD format instead of RDF/Turtle (.ttl)
       --namespace-base <IRI>    Filter clean authored export to one ontology base or term namespace. Cannot be combined with model
       --output <FILE>           Save output to file

@@ -68,7 +68,7 @@ WHEN a caller requests contract-reference filtering, the system SHALL apply the 
 - The MCP interface shall expose read tools for authoritative Reqvire model evidence.
 - Model evidence tools shall support element lookup, model structure, containment, collection, submodel analysis, and split semantic export collection.
 - Semantic export tools shall be named under the `reqvire.semantic` namespace and shall expose separate read tools for ontology vocabulary, SHACL shapes, SKOS concepts, generated model facts, a combined graph wrapper, and the canonical layer-composed export operation.
-- `reqvire.semantic.export` shall support typed `layers` values `ontologies`, `shapes`, `concepts`, `model`, `external-used`, and `prefixes`; omitted or empty layers shall export all public layers.
+- `reqvire.semantic.export` shall support typed `layers` values `ontologies`, `shapes`, `concepts`, `model`, `external-used`, `prefixes`, and `queries`; omitted or empty layers shall export all public layers.
 - The `ontologies`, `shapes`, `concepts`, `model`, and `graph` tools shall be stable wrappers over the same export-layer serialization contract.
 - Semantic prefix and vocabulary tools shall keep imported external ontology declarations hidden by default and expose only used external subset entries through a typed `include_external` argument with explicit external markers and source metadata generated through the o-kernel subset layer.
 - Model evidence tools shall support read-only semantic query execution over collected ontology, SHACL, model, and ontology projection RDF when requested by a typed MCP operation, and shall support an explicit `include_external` argument for querying the graph that includes the used external subset.
@@ -508,7 +508,7 @@ Detailed request/result types, shared operation semantics, adapter boundary, dis
   * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/tool_interface/mod.rs)
   * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
   * verifiedBy: [MCP Shared Operation Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-shared-operation-contracts-verification)
-  * verifiedBy: [MCP Tool Call Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-call-contracts-verification)
+  * verifiedBy: [MCP Tool Contract and Side Effect Classification Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-contract-and-side-effect-classification-verification)
 ---
 
 ### MCP Streamable HTTP Transport
@@ -612,7 +612,7 @@ The system shall classify every MCP tool by side-effect behavior so clients and 
   * definedBy: [MCP Tool Side Effect Classification Specification](Specifications.md#mcp-tool-side-effect-classification-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * verifiedBy: [MCP Tool Side Effect Classification Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-side-effect-classification-verification)
+  * verifiedBy: [MCP Tool Contract and Side Effect Classification Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-contract-and-side-effect-classification-verification)
 ---
 
 ### MCP Workspace Session Tools

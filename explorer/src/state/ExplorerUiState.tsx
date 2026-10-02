@@ -4,7 +4,7 @@ import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
 import { projectCoverage } from "../lib/coverage";
 import type { CoverageProjection, ExplorerProjectStore } from "../store/types";
 
-export type ModelMode = "list" | "grid" | "graph";
+export type ModelMode = "list" | "grid" | "graph" | "flow";
 export type ModelSelectionId = "__root__" | `folder:${string}` | `file:${string}` | string;
 export type GraphOverlayKey = "cross" | "verification" | "trace";
 export type CoverageSectionId =
@@ -18,6 +18,7 @@ export type CoverageSectionId =
 export const MODEL_DEFAULT_OVERLAYS = ["cross", "verification", "trace"] as const;
 
 export const ONTOLOGY_NODE_ROLES = [
+  "semantic-query",
   "class",
   "object-property",
   "datatype-property",
@@ -61,6 +62,7 @@ export const ONTOLOGY_LAYER_FILTERS = [
 ] as const;
 
 export const ONTOLOGY_DEFAULT_FILTERS = [
+  "semantic-query",
   "layer-authored",
   "layer-concepts",
   "ontology-term",

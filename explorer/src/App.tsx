@@ -4,6 +4,7 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
 } from "react";
 import { AppShell, type ShellActionItem, type ShellNavigationItem } from "@ds";
 import { useLiveStore } from "./store/useLiveStore";
@@ -16,7 +17,7 @@ import { ExplorerSidePane } from "./components/ExplorerSidePane";
 import { ExplorerUiStateProvider } from "./state/ExplorerUiState";
 import { SearchIndexProvider } from "./search/SearchIndexContext";
 import { useHashRoute } from "./router/useHashRoute";
-import { VIEW_TITLES, type ViewId } from "./router/routes";
+import { VIEW_TITLES, routeForContent, type ViewId } from "./router/routes";
 import { ResourcesView } from "./views/ResourcesView";
 import { SearchView } from "./views/SearchView";
 import { FilesView } from "./views/FilesView";
@@ -43,7 +44,17 @@ const SHELL_NAVIGATION_ITEMS: ShellNavigationItem[] = [
   { value: "coverage", label: "Coverage", icon: "pie-chart" },
 ];
 
-export function App() {
+/** Route composition slots let the showcase use the application shell and router. */
+export interface ExplorerViewSlots {
+  main: (props: { onOpenElement: (id: string) => void; onOpenSource: (file: string) => void }) => ReactNode;
+  sidePane: (props: { open: boolean; onToggle: () => void }) => ReactNode;
+}
+
+interface AppProps {
+  viewOverrides?: Partial<Record<ViewId, ExplorerViewSlots>>;
+}
+
+export function App({ viewOverrides }: AppProps = {}) {
   const { result, refreshError } = useLiveStore();
 
   if (!result.ok) {
@@ -55,6 +66,7 @@ export function App() {
       <SearchIndexProvider>
         <ExplorerUiStateProvider>
           <ExplorerShell
+            viewOverrides={viewOverrides}
             schemaMismatch={result.schemaMismatch}
             refreshError={refreshError}
           />
@@ -64,11 +76,12 @@ export function App() {
   );
 }
 
-function ExplorerShell({ schemaMismatch, refreshError }: {
+function ExplorerShell({ schemaMismatch, refreshError, viewOverrides }: AppProps & {
   schemaMismatch: string | null;
   refreshError: string | null;
 }) {
   const { route, navigateView, openElement, closeElement } = useHashRoute();
+  const viewOverride = viewOverrides?.[route.view];
   const [helpOpen, setHelpOpen] = useState(false);
   const [leftPaneOpen, setLeftPaneOpen] = useState(true);
   const [leftPaneResizing, setLeftPaneResizing] = useState(false);
@@ -228,7 +241,7 @@ function ExplorerShell({ schemaMismatch, refreshError }: {
         ? `Refresh failed: ${refreshError}. Keeping the last valid view; will retry automatically.`
         : schemaMismatch ? `Store schema mismatch: ${schemaMismatch}` : null}
       sidePane={
-        <ExplorerSidePane
+        viewOverride ? viewOverride.sidePane({ open: leftPaneOpen, onToggle: toggleLeftPane }) : <ExplorerSidePane
           activeView={sidePaneView}
           open={leftPaneOpen}
           chrome="app"
@@ -243,7 +256,10 @@ function ExplorerShell({ schemaMismatch, refreshError }: {
         />
       }
       main={
-        <ActiveView
+        viewOverride ? viewOverride.main({
+          onOpenElement: handleOpenElement,
+          onOpenSource: (file) => { window.location.hash = routeForContent(file); },
+        }) : <ActiveView
           view={route.view}
           param={route.param}
           onNavigate={navigateView}

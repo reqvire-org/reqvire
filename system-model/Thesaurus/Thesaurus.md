@@ -816,3 +816,18 @@ Effective Reqvire process root used as the SOI model path, identifier, diagnosti
   * related: [Git Worktree](#git-worktree)
   * related: [Model Eligibility Boundary](#model-eligibility-boundary)
 ---
+
+### Semantic Query
+
+A named SPARQL query artifact with an ontology vocabulary context, source provenance, and optional description of its intended results.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Semantic Export](#semantic-export)
+
+#### Scope Note
+Query form describes SELECT, ASK, CONSTRUCT, or DESCRIBE syntax. Query purpose describes its intended use by consumers.
+---

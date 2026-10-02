@@ -100,6 +100,7 @@ const roleSkinX = css`
   &[data-element-role="semantic-contract"] { --ds-elemicon-color: var(--semantic-contract); }
   &[data-element-role="verification-objective"] { --ds-elemicon-color: var(--verification-objective); }
   &[data-element-role="verification"] { --ds-elemicon-color: var(--verification); }
+  &[data-element-role="semantic-query"],
   &[data-element-role="ontology"] { --ds-elemicon-color: var(--ontology); }
   &[data-element-role="concept"] { --ds-elemicon-color: var(--concept); }
   &[data-element-role="concept-scheme"] { --ds-elemicon-color: var(--concept-scheme); }

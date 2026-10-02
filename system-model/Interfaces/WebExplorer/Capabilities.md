@@ -208,7 +208,7 @@ Implementation details shall follow the associated contract specifications.
 The system shall render a model-centric Explorer visualization showing model roots with nested relations containing full element details.
 
 #### Details
-Implementation details shall follow the associated contract specifications.
+The Model workspace provides List, Grid, Graph, and Flow modes. Flow starts with root capabilities and descends through child capabilities, requirements, verification, and evidence as interactive element cards, with shared element details and complete path highlighting. Scope, navigation, and presentation follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
@@ -219,11 +219,12 @@ Implementation details shall follow the associated contract specifications.
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
+  * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
 ---
 
 ### Model View Element Navigation
 
-The system shall make element names in the model-centric view clickable links that navigate to the element's definition in its source file.
+The system shall make modeled element names in the Model workspace actionable so users can inspect their details and access their source definitions.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -235,6 +236,8 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Model View Element Navigation Contract Specification](Specifications.md#model-view-element-navigation-contract-specification)
   * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
+  * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
+  * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/product-patterns/reports/TraceFlow.tsx)
   * verifiedBy: [Model View Element Navigation Test](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-view-element-navigation-test)
 ---
 
@@ -290,6 +293,7 @@ Detailed semantic-index, source-traceability, projection-subgraph, SHACL slot/fa
   * type: requirement
 
 #### Contract References
+  * [Semantic Query Discovery Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-discovery-specification)
   * [Ontology Construct Classification Specification](../../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
 
 #### Relations
@@ -391,8 +395,8 @@ The SPA Explorer shell shall:
 - Be a native single-page application built with Vite, TypeScript, and React, using the Reqvire Explorer design system and compiled CSS, served as `index.html` plus deterministic `assets/explorer.js` and `assets/explorer.css` bundles with no CDN-loaded framework or stylesheet and no runtime CSS compiler.
 - Treat `index.html` as the primary browser entry point and central Project Store host.
 - Expose project identity metadata in the Project Store, including effective workspace root label and eligible Git worktree names, paths, and source-control metadata when available, so Explorer navigation can group modeled files and resources by Git worktree identity instead of showing a generic project label.
-- Render the primary Model route as a native SPA view module reading from the Project Store. The Model route shall host List, Grid, and Graph modes over the Project Store filesystem/model and knowledge-graph projections.
-- Keep Model project-tree selection shared across List, Grid, and Graph modes so selecting a folder, file, or modeled element in the left Explorer tree updates the active Model workspace instead of opening a disconnected Filesystem view.
+- Render the primary Model route as a native SPA view module reading from the Project Store. The Model route shall host List, Grid, Graph, and Flow modes over the Project Store filesystem/model and knowledge-graph projections.
+- Keep Model project-tree selection shared across List, Grid, Graph, and Flow modes so selecting a folder, file, or modeled element in the left Explorer tree updates the active Model workspace instead of opening a disconnected Filesystem view.
 - Render Graph as a Model mode over the Project Store knowledge-graph projection, render specialist Ontologies and Traces routed views from top navigation and tool actions, and render supporting Search, file deep links, Coverage, Resources, and element-detail workflows from the same Project Store without making them primary left-pane navigation modes.
 - Build the Search route's ranked MiniSearch index in a browser worker after the initial shell render, using Project Store search documents with boosted title, path, result-kind, and content fields so indexing does not block primary Explorer interaction.
 - Open element-detail routes in an in-shell scrollable modal backed by Project Store element records, preserving the current Explorer view context behind the modal.
@@ -552,7 +556,7 @@ Detailed route source, concept-scheme grouping, navigation, modal, map rendering
 The system shall expose verification traceability as a specialist Explorer view backed by Project Store trace projections and rendered through the shared Explorer shell.
 
 #### Details
-Detailed route data, left-pane behavior, flow/row rendering, Mermaid roll-up diagram rendering, modal interaction, and trace-data ownership rules shall follow the associated specifications.
+Detailed route data, left-pane behavior, flow/row rendering, native trace-preview interaction, modal navigation, and trace-data ownership rules shall follow the associated specifications.
 
 #### Metadata
   * type: requirement
@@ -567,6 +571,7 @@ Detailed route data, left-pane behavior, flow/row rendering, Mermaid roll-up dia
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
+  * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/product-patterns/reports/TraceFlow.tsx)
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
 ---
 
@@ -585,7 +590,7 @@ The color scheme shall provide:
 The system shall ensure color consistency between:
 - Explorer route styling
 - Browser-rendered Mermaid diagram rendering
-- Model List/Grid/Graph views
+- Model List/Grid/Graph/Flow views
 - Ontology graph visualization
 - Trace flow visualization
 

@@ -62,12 +62,14 @@ Inspect the SHACL constraints for valid covered and uncovered terminal records, 
 
 Confirm that the concept bridges, semantic-contract constraint, owned specification, and consuming requirement bindings provide explicit traceability. This analysis checks the modeled semantics; executable evaluation correctness requires separate test verification.
 
+Review artifacts: [implementation_coverage.rs](../../../crates/reqvire-core/tests/implementation_coverage.rs), [test.sh](../../../tests/test-implementation-coverage-report/test.sh).
+
 #### Concept References
   * [Implementation Coverage](../../Thesaurus/Thesaurus.md#implementation-coverage)
   * [Terminal Requirement](../../Thesaurus/Thesaurus.md#terminal-requirement)
 
 #### Metadata
-  * type: analysis-verification
+  * type: demonstration-verification
 
 #### Relations
   * derivedFrom: [Implementation Traceability Verification Objective](#implementation-traceability-verification-objective)

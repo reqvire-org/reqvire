@@ -5,10 +5,18 @@ import { ExplorerUiStateProvider } from "../state/ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
 import type { ExplorerProjectStore } from "../store/types";
+import { ElementIcon, TypeBadge } from "@ds";
+import { semanticQueryStore, queryId } from "../store/fixtures/semanticQueryGraph";
 import { OntologiesView } from "./OntologiesView";
+
+type NodeEventHandler = (event: { node: string }) => void;
+type GraphReducer = (id: string, attributes: Record<string, unknown>) => Record<string, unknown>;
+type RendererSettings = { nodeReducer: GraphReducer; edgeReducer: GraphReducer };
 
 const sigmaState = vi.hoisted(() => ({
   graphs: [] as Array<{ forEachNode: (callback: (node: string, attributes: Record<string, unknown>) => void) => void }>,
+  settings: [] as RendererSettings[],
+  handlers: [] as Array<Map<string, NodeEventHandler>>,
   constructs: 0,
   kills: 0,
 }));
@@ -50,15 +58,18 @@ vi.mock("sigma/utils", () => ({
 
 vi.mock("sigma", () => ({
   default: class MockSigma {
-    constructor(graph: { forEachNode: (callback: (node: string, attributes: Record<string, unknown>) => void) => void }) {
+    handlers = new Map<string, NodeEventHandler>();
+    constructor(graph: { forEachNode: (callback: (node: string, attributes: Record<string, unknown>) => void) => void }, _container: HTMLElement, settings: RendererSettings) {
       sigmaState.constructs += 1;
       sigmaState.graphs.push(graph);
+      sigmaState.settings.push(settings);
+      sigmaState.handlers.push(this.handlers);
     }
     refresh = vi.fn();
     kill = vi.fn(() => {
       sigmaState.kills += 1;
     });
-    on = vi.fn();
+    on = vi.fn((name: string, handler: NodeEventHandler) => this.handlers.set(name, handler));
     getNodeDisplayData = vi.fn(() => ({ x: 4, y: -3 }));
     getCamera = () => ({
       animate: vi.fn(),
@@ -91,6 +102,8 @@ function setupWebGLMock() {
 
 function resetSigmaState() {
   sigmaState.graphs.length = 0;
+  sigmaState.settings.length = 0;
+  sigmaState.handlers.length = 0;
   sigmaState.constructs = 0;
   sigmaState.kills = 0;
   mockAnimateNodes.mockReset();
@@ -100,6 +113,69 @@ function resetSigmaState() {
 }
 
 describe("OntologiesView", () => {
+  it("renders query glyphs and retains vocabulary property links, with a query visibility filter", async () => {
+    renderWithStore(semanticQueryStore);
+    await waitFor(() => expect(sigmaState.graphs[0]).toBeTruthy());
+    const graph = sigmaState.graphs[0] as unknown as {
+      hasNode: (id: string) => boolean;
+      getNodeAttributes: (id: string) => Record<string, unknown>;
+      hasDirectedEdge: (from: string, to: string) => boolean;
+    };
+    const query = graph.getNodeAttributes(queryId);
+    expect(query.type).toBe("queryGlyph");
+    expect(query.fullLabel).toBe("Item labels");
+    expect(decodeURIComponent(String(query.image))).toContain(">Q</text>");
+    expect(decodeURIComponent(String(query.image))).toContain("<circle ");
+    expect(decodeURIComponent(String(query.image))).not.toContain("<rect ");
+    expect(query.hidden).toBe(false);
+    expect(graph.hasNode("https://example.org/items#name")).toBe(true);
+    expect(graph.getNodeAttributes("https://example.org/items#name").hidden).toBe(false);
+    expect(graph.hasDirectedEdge(queryId, "https://example.org/items#name")).toBe(true);
+    expect(graph.hasDirectedEdge(queryId, "https://example.org/items#Item")).toBe(true);
+    act(() => window.setOntologyGraphFilter?.("role", "semantic-query", false));
+    expect(graph.getNodeAttributes(queryId).hidden).toBe(true);
+    act(() => window.setOntologyGraphFilter?.("role", "semantic-query", true));
+    expect(graph.getNodeAttributes(queryId).hidden).toBe(false);
+  });
+
+  it.each(["hover", "selection"])("shows query relations and their vocabulary targets on %s, respecting visibility filters", async (interaction) => {
+    renderWithStore(semanticQueryStore);
+    await waitFor(() => expect(sigmaState.graphs[0]).toBeTruthy());
+    const graph = sigmaState.graphs[0] as unknown as {
+      edges: () => string[];
+      getEdgeAttributes: (id: string) => Record<string, unknown>;
+      getNodeAttributes: (id: string) => Record<string, unknown>;
+    };
+    const settings = sigmaState.settings[0];
+    const renderedEdges = () => graph.edges().map(id => settings.edgeReducer(id, graph.getEdgeAttributes(id)));
+    expect(renderedEdges()).toHaveLength(2);
+    expect(renderedEdges().every(edge => edge.hidden)).toBe(true);
+    act(() => {
+      if (interaction === "hover") sigmaState.handlers[0].get("enterNode")?.({ node: queryId });
+      else window.focusOntologyNode?.(queryId);
+    });
+    const visible = renderedEdges().filter(edge => !edge.hidden);
+    expect(visible.map(edge => edge.label).sort()).toEqual(["declares output", "uses vocabulary"]);
+    for (const edge of visible) {
+      const target = String(edge.target);
+      const node = settings.nodeReducer(target, graph.getNodeAttributes(target));
+      expect(node.hidden).toBe(false);
+      expect(node.inFocusNeighborhood).toBe(true);
+      expect(node.label).toBeTruthy();
+    }
+    for (const [category, value] of [["role", "semantic-query"], ["layer", "layer-authored"]]) {
+      act(() => window.setOntologyGraphFilter?.(category, value, false));
+      expect(renderedEdges().every(edge => edge.hidden)).toBe(true);
+      act(() => window.setOntologyGraphFilter?.(category, value, true));
+      expect(renderedEdges().filter(edge => !edge.hidden)).toHaveLength(2);
+    }
+  });
+
+  it("uses the shared query marker in element icons and type badges", () => {
+    render(<><ElementIcon type="semantic-query" /><TypeBadge type="semantic-query" /></>);
+    expect(screen.getAllByText("Q")).toHaveLength(2);
+  });
+
   it("renders the TypeScript ontology graph without injected renderer assets", () => {
     const { container } = renderWithStore();
 

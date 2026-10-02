@@ -113,7 +113,7 @@ Review triggers include changes to structured Markdown parsing, file identificat
 ### Website Ontology Documentation Specification
 
 #### Details
-Ontology content covers ontology elements, concept references, external ontology sources, built-in reserved vocabulary behavior, semantic contracts, validation rules, export modes, and semantic tooling.
+Ontology content covers ontology elements, concept references, external ontology sources, built-in reserved vocabulary behavior, semantic contracts, validation rules, export modes, and semantic tooling. Managed query documentation MUST explain Query and Produces authoring, used ontology context, generated identity/form, portable runtime features, native discovery, deterministic export, and artifact checks. CLI and MCP examples MUST use the shared managed query interfaces. Explorer guidance covers query graph navigation, vocabulary/output links, query details, source access, and visibility filtering.
 
 Terminology distinguishes authored ontology/SHACL output, full semantic model context, external ontology source inclusion, and Explorer ontology visualization behavior. Descriptions MUST NOT imply hidden Turtle prefix injection or hidden semantic triples.
 

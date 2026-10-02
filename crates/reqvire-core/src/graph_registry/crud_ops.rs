@@ -38,7 +38,15 @@ fn rewrite_moved_concept_reference_targets(
     let mut output = Vec::new();
     let mut in_section = false;
 
+    let section = crate::parser::subsection_range(&element.content, "Concept References");
+    let mut offset = 0;
     for line in element.content.split_inclusive('\n') {
+        let start = offset;
+        offset += line.len();
+        if section.as_ref().is_none_or(|range| !range.contains(&start)) {
+            output.push(line.to_string());
+            continue;
+        }
         let (body, suffix) = line.strip_suffix("\r\n").map_or_else(
             || {
                 line.strip_suffix('\n')
@@ -775,7 +783,15 @@ impl GraphRegistry {
         let mut output = Vec::new();
         let mut in_section = false;
 
+        let section = crate::parser::subsection_range(&element.content, "Concept References");
+        let mut offset = 0;
         for line in element.content.split_inclusive('\n') {
+            let start = offset;
+            offset += line.len();
+            if section.as_ref().is_none_or(|range| !range.contains(&start)) {
+                output.push(line.to_string());
+                continue;
+            }
             let (body, suffix) = line.strip_suffix("\r\n").map_or_else(
                 || {
                     line.strip_suffix('\n')
@@ -839,8 +855,23 @@ impl GraphRegistry {
     fn ensure_blank_lines_before_subsections(content: &str) -> String {
         let mut result = String::new();
         let mut in_details = false;
+        let mut fence = 0;
 
-        for line in content.lines() {
+        for raw_line in content.split_inclusive('\n') {
+            let line = raw_line.trim_end_matches(['\r', '\n']);
+            let trimmed = line.trim();
+            if !in_details && (fence > 0 || trimmed.starts_with("```")) {
+                if trimmed.starts_with("```") {
+                    let length = trimmed.chars().take_while(|c| *c == '`').count();
+                    if fence == 0 {
+                        fence = length;
+                    } else if length >= fence && trimmed.chars().all(|c| c == '`') {
+                        fence = 0;
+                    }
+                }
+                result.push_str(raw_line);
+                continue;
+            }
             let trimmed_line = line.trim_start().to_lowercase();
 
             // Track <details> blocks
@@ -888,7 +919,6 @@ impl GraphRegistry {
             format!("{}\n", trimmed)
         }
     }
-
     /// Groups elements by their file path and orders them following Element Ordering Behavior
     pub fn group_elements_by_location(&self) -> FxHashMap<String, Vec<&Element>> {
         let mut file_elements: FxHashMap<String, Vec<&Element>> = FxHashMap::default();

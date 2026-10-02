@@ -49,3 +49,6 @@ export type {
   TraceReportPanelProps,
   TraceVerificationCardProps,
 } from "./ReportPatterns";
+export { TraceFlow, ElementFlow } from "./TraceFlow";
+export type { TraceFlowProps, ElementFlowProps } from "./TraceFlow";
+export type { TraceFlowData, TraceFlowElement, TraceFlowRequirement, ElementFlowData } from "./traceFlowLayout";

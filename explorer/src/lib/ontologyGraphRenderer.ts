@@ -8,7 +8,7 @@ import { EdgeProgram } from "sigma/rendering";
 import { animateNodes, floatColor } from "sigma/utils";
 import noverlap from "graphology-layout-noverlap";
 import type { OntologyGraphData, OntologyGraphNode } from "../store/types";
-import { cssVar } from "@ds";
+import { cssVar, ELEMENT_TYPES } from "@ds";
 
 export interface OntologyGraphRendererHandle {
   destroy: () => void;
@@ -355,6 +355,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
     const labelOnLight = cssVar('--slate-950');
     const defaultEdge = cssVar('--edge-default');
     const colorBySemanticType = {
+        'semantic-query': { fill: cssVar('--ontology'), stroke: cssVar('--ontology-ink'), text: textStrong },
         class: { fill: cssVar('--rdf-class'), stroke: textStrong, text: textStrong },
         'object-property': { fill: cssVar('--rdf-objprop'), stroke: textBody, text: textStrong },
         'datatype-property': { fill: cssVar('--rdf-dtprop'), stroke: textBody, text: textInverse },
@@ -413,7 +414,8 @@ function createSubclassTriangleEdgeProgram(options = {}) {
     });
     const rawNodeById = new Map(rawNodes.map(node => [node.id, node]));
     const propertyNodes = rawNodes.filter(isOntologyPropertyNode);
-    const nodes = rawNodes.filter(node => !isOntologyPropertyNode(node));
+    const queryDependencyTargets = new Set(ontologyGraphData.edges.filter(edge => edge.source_kind === 'query').map(edge => endpointId(edge.target)));
+    const nodes = rawNodes.filter(node => !isOntologyPropertyNode(node) || queryDependencyTargets.has(node.id));
     const links = buildRenderedOntologyLinks(ontologyGraphData.edges, rawNodeById, propertyNodes);
     const nodeById = new Map(nodes.map(node => [node.id, node]));
     const connectionCounts = computeRenderedNodeConnections(nodes, links);
@@ -430,6 +432,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
     const filterState = {
         role: new Set([
             'ontology-term',
+            'semantic-query',
             'shacl-shape',
             'resource',
             'external-reference'
@@ -507,11 +510,12 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         nodes.forEach(nodeData => {
             const palette = nodePalette(nodeData);
             const constructGlyph = isConstructGlyphNode(nodeData);
+            const queryGlyph = nodeData.semantic_type === 'semantic-query';
             graph.addNode(nodeData.id, {
                 ...nodeData,
-                type: constructGlyph ? 'constructGlyph' : 'circle',
-                image: constructGlyph ? constructGlyphImage(nodeData) : undefined,
-                mutedImage: constructGlyph ? constructGlyphImage(nodeData, true) : undefined,
+                type: queryGlyph ? 'queryGlyph' : constructGlyph ? 'constructGlyph' : 'circle',
+                image: queryGlyph ? queryGlyphImage() : constructGlyph ? constructGlyphImage(nodeData) : undefined,
+                mutedImage: queryGlyph ? queryGlyphImage(true) : constructGlyph ? constructGlyphImage(nodeData, true) : undefined,
                 label: sigmaNodeLabel(nodeData),
                 fullLabel: fullSigmaNodeLabel(nodeData),
                 x: nodeData.x,
@@ -547,6 +551,10 @@ function createSubclassTriangleEdgeProgram(options = {}) {
             defaultEdgeType: 'curvedArrow',
             zIndex: true,
             nodeProgramClasses: {
+                queryGlyph: createNodeImageProgram({
+                    objectFit: 'contain', keepWithinCircle: true, correctCentering: true,
+                    padding: 0, drawingMode: 'background', size: { mode: 'force', value: 256 }
+                }),
                 constructGlyph: createNodeImageProgram({
                     objectFit: 'contain',
                     keepWithinCircle: true,
@@ -645,6 +653,9 @@ function createSubclassTriangleEdgeProgram(options = {}) {
                     result.label = '';
                     result.forceLabel = false;
                     result.zIndex = ontologyZIndex.mutedNode;
+                }
+                if (attributes.semantic_type === 'semantic-query') {
+                    result.image = muted ? attributes.mutedImage : attributes.image;
                 }
                 if (constructGlyph) {
                     result.image = muted
@@ -1207,6 +1218,13 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         );
     }
 
+    function queryGlyphImage(muted = false) {
+        const fill = muted ? dimColor(cssVar('--ontology'), 0.2) : cssVar('--ontology');
+        const ink = muted ? textMuted : textStrong;
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><circle cx="128" cy="128" r="120" fill="${escapeXml(fill)}"/><text x="128" y="172" font-family="monospace" font-size="144" font-weight="700" text-anchor="middle" fill="${escapeXml(ink)}">${ELEMENT_TYPES['semantic-query'].glyph}</text></svg>`;
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    }
+
     function constructGlyphImage(nodeData, muted = false) {
         const symbol = constructNodeSymbolLabel(nodeData);
         const isRestriction = nodeHasConstructClass(nodeData, 'restriction');
@@ -1430,7 +1448,7 @@ ${body}
             if (!source || !target) {
                 return;
             }
-            if (isOntologyPropertyNode(allNodesById.get(source)) || isOntologyPropertyNode(allNodesById.get(target))) {
+            if (edgeData.source_kind !== 'query' && (isOntologyPropertyNode(allNodesById.get(source)) || isOntologyPropertyNode(allNodesById.get(target)))) {
                 return;
             }
             pushRenderedLink(rendered, seen, {
@@ -1485,7 +1503,7 @@ ${body}
 
     function nodeExistsForRenderedGraph(nodeId) {
         const nodeData = rawNodeById.get(nodeId);
-        return Boolean(nodeData && !isOntologyPropertyNode(nodeData));
+        return Boolean(nodeData && (!isOntologyPropertyNode(nodeData) || queryDependencyTargets.has(nodeId)));
     }
 
     function propertyEndpointTerms(terms) {
@@ -1674,6 +1692,7 @@ ${body}
     }
 
     const SEMANTIC_TYPE_LABELS = {
+        'semantic-query': 'Semantic query',
         'object-property': 'Object property',
         'datatype-property': 'Datatype property',
         'rdf-property': 'RDF property',
@@ -2215,6 +2234,8 @@ ${body}
             return 'external-reference';
         }
         const semanticType = nodeData.semantic_type || 'resource';
+        if (semanticType === 'semantic-query') return 'semantic-query';
+        if (queryDependencyTargets.has(nodeData.id)) return 'ontology-term';
         if (['object-property', 'datatype-property', 'rdf-property'].includes(semanticType)) {
             return 'property';
         }
@@ -2309,7 +2330,7 @@ ${body}
     }
 
     function hasAuthoredSource(nodeData) {
-        return (nodeData.sources || []).some(source => source.kind === 'ontology' || source.kind === 'shapes');
+        return (nodeData.sources || []).some(source => source.kind === 'ontology' || source.kind === 'shapes' || source.kind === 'query');
     }
 
     function nodePassesOwnFilters(nodeData) {
@@ -2341,6 +2362,9 @@ ${body}
         }
         if (!edgePassesRelationFilters(edgeData)) {
             return false;
+        }
+        if (edgeData.source_kind === 'query') {
+            return true;
         }
         if ((edgeData.layer || 'authored') !== 'authored') {
             return true;
@@ -2508,6 +2532,7 @@ ${body}
             glyph.className = 'ontology-graph-result-glyph';
             glyph.setAttribute('data-semantic-type', String(node.semantic_type || node.node_type || 'resource'));
             glyph.title = humanizeSemanticType(node.semantic_type);
+            if (node.semantic_type === 'semantic-query') glyph.textContent = ELEMENT_TYPES['semantic-query'].glyph;
 
             const notation = visibleBadgeSymbols(node);
             if (notation) {
@@ -2715,6 +2740,7 @@ ${body}
         filterState.layer.clear();
         relationFilterState.clear();
         filterState.role.add('ontology-term');
+        if (activeSet.has('semantic-query')) filterState.role.add('semantic-query');
         filterState.role.add('shacl-shape');
         filterState.role.add('resource');
         filterState.role.add('external-reference');

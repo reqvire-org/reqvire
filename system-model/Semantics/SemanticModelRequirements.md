@@ -332,3 +332,115 @@ The artifact is an implementation snapshot for runtime/bootstrap shape-rule need
   * specify: [Runtime Reqvire Ontology Vocabulary](SemanticModelFeature.md#runtime-reqvire-ontology-vocabulary)
   * verifiedBy: [Runtime Reqvire Ontology Artifact Verification](../Verifications/Semantics/SemanticModelVerifications.md#runtime-reqvire-ontology-artifact-verification)
 ---
+
+### Semantic Query Authoring
+
+WHEN an author supplies a semantic-query element, the system SHALL preserve its query document and optional output declarations as structured model content.
+
+#### Details
+Authoring grammar, generated identity, source locations, and serialization follow the owned specification.
+
+#### Concept References
+  * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
+
+#### Contract References
+  * [Supported Element Types Specification](../ModelStructure/Specifications.md#supported-element-types-specification)
+  * [Structure and Addressing in Markdown Documents Contract Specification](../ModelStructure/Specifications.md#structure-and-addressing-in-markdown-documents-contract-specification)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * specify: [Managed SPARQL Query Artifacts](SemanticModelFeature.md#managed-sparql-query-artifacts)
+  * definedBy: [Semantic Query Authoring Specification](SemanticQuerySpecifications.md#semantic-query-authoring-specification)
+---
+
+### Semantic Query Context Validation
+
+WHEN validating a semantic query, the system SHALL resolve schema references against its explicitly used ontology context and report invalid query content.
+
+#### Details
+Validation uses parsed syntax roles and the existing model mutation validation gate. Downstream runtime features remain portable without execution.
+
+#### Concept References
+  * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
+
+#### Contract References
+  * [Relation Semantics Specification](../ModelStructure/Specifications.md#relation-semantics-specification)
+  * [External Vocabulary Reference Resolution Specification](SemanticModelSpecifications.md#external-vocabulary-reference-resolution-specification)
+  * [Built-In External Ontology Source Specification](SemanticModelSpecifications.md#built-in-external-ontology-source-specification)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * specify: [Managed SPARQL Query Artifacts](SemanticModelFeature.md#managed-sparql-query-artifacts)
+  * definedBy: [Semantic Query Context Validation Specification](SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
+---
+
+### Semantic Query Discovery
+
+The system SHALL expose native authored semantic queries with their metadata, source provenance, and used ontology namespaces.
+
+#### Details
+Discovery, namespace selection, RDF projection, and CLI/MCP consumers share the native semantic index.
+
+#### Concept References
+  * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
+
+#### Contract References
+  * [Namespace-Scoped Ontology Export Specification](SemanticModelSpecifications.md#namespace-scoped-ontology-export-specification)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * specify: [Managed SPARQL Query Artifacts](SemanticModelFeature.md#managed-sparql-query-artifacts)
+  * definedBy: [Semantic Query Discovery Specification](SemanticQuerySpecifications.md#semantic-query-discovery-specification)
+---
+
+### Semantic Query Artifact Export
+
+WHEN exporting a selected semantic query, the system SHALL produce deterministic standalone SPARQL bytes and their SHA-256 digest.
+
+#### Details
+Selection and serialization follow the shared artifact contract.
+
+#### Concept References
+  * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
+  * specify: [Managed SPARQL Query Artifacts](SemanticModelFeature.md#managed-sparql-query-artifacts)
+  * definedBy: [Semantic Query Artifact Export Specification](SemanticQuerySpecifications.md#semantic-query-artifact-export-specification)
+---
+
+### Semantic Query Artifact Drift Check
+
+WHEN checking a query artifact, the system SHALL compare its bytes with the generated query document and report matching, stale, missing, or unreadable artifacts.
+
+#### Details
+Artifact checks preserve the checked file and report expected and available actual hashes.
+
+#### Concept References
+  * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
+
+#### Contract References
+  * [Semantic Query Artifact Export Specification](SemanticQuerySpecifications.md#semantic-query-artifact-export-specification)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
+  * specify: [Managed SPARQL Query Artifacts](SemanticModelFeature.md#managed-sparql-query-artifacts)
+  * definedBy: [Semantic Query Artifact Drift Check Specification](SemanticQuerySpecifications.md#semantic-query-artifact-drift-check-specification)
+---

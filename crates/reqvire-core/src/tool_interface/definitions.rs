@@ -95,7 +95,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                     "layers",
                     json!({
                         "type": "array",
-                        "items": { "type": "string", "enum": ["ontologies", "shapes", "concepts", "model", "external-used", "prefixes"] },
+                        "items": { "type": "string", "enum": ["ontologies", "shapes", "concepts", "model", "external-used", "prefixes", "queries"] },
                         "description": "Semantic export layers to include. Omit or pass an empty array to export all public layers."
                     }),
                 ),
@@ -177,6 +177,24 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "format",
                 json!({ "type": "string", "enum": ["turtle", "jsonld"], "default": "turtle" }),
             )]),
+        ),
+        read_tool(
+            "reqvire.semantic.queries",
+            "Discover and validate native SPARQL artifacts without execution.",
+            object_schema(vec![
+                ("name", json!({"type":"string"})),
+                ("iri", json!({"type":"string"})),
+                ("namespace_base", json!({"type":"string"})),
+                ("include_content", json!({"type":"boolean", "default":false})),
+            ]),
+        ),
+        read_tool(
+            "reqvire.semantic.queries.validate",
+            "Discover and validate native SPARQL artifacts without execution.",
+            object_schema(vec![
+                ("name", json!({"type":"string"})),
+                ("iri", json!({"type":"string"})),
+            ]),
         ),
         read_tool(
             "reqvire.semantic.prefixes",
@@ -564,6 +582,8 @@ fn read_tool_names() -> Vec<&'static str> {
         "reqvire.concept_schemes.list",
         "reqvire.concept_mappings.list",
         "reqvire.semantic.graph",
+        "reqvire.semantic.queries",
+        "reqvire.semantic.queries.validate",
         "reqvire.semantic.prefixes",
         "reqvire.semantic.vocabulary",
         "reqvire.semantic.sparql",

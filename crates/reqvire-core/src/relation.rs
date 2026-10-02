@@ -751,13 +751,13 @@ pub fn validate_relation_element_types(
         "use" => {
             matches!(
                 (source_type, target_type),
-                (ElementType::SemanticContract, ElementType::Ontology)
+                (ElementType::SemanticContract | ElementType::SemanticQuery, ElementType::Ontology)
             )
         }
         "usedBy" => {
             matches!(
                 (source_type, target_type),
-                (ElementType::Ontology, ElementType::SemanticContract)
+                (ElementType::Ontology, ElementType::SemanticContract | ElementType::SemanticQuery)
             )
         }
         "broader" | "narrower" | "related" => {
@@ -788,8 +788,8 @@ pub fn get_relation_element_type_description(relation_type: &str) -> Option<Stri
         "refine" => Some("'refine' is a legacy relation. Use 'define' for requirement-owned contract elements, or run `reqvire migrate`.".to_string()),
         "constrainedBy" => Some("'constrainedBy' should connect a requirement to a semantic-contract element".to_string()),
         "constrain" => Some("'constrain' should connect a semantic-contract element to a requirement".to_string()),
-        "use" => Some("'use' should connect a semantic-contract element to an ontology element".to_string()),
-        "usedBy" => Some("'usedBy' should connect an ontology element to a semantic-contract element".to_string()),
+        "use" => Some("'use' should connect a semantic-contract or semantic-query element to an ontology element".to_string()),
+        "usedBy" => Some("'usedBy' should connect an ontology element to a semantic-contract or semantic-query element".to_string()),
         "broader" => Some("'broader' should connect a concept to a broader concept".to_string()),
         "narrower" => Some("'narrower' should connect a concept to a narrower concept".to_string()),
         "related" => Some("'related' should connect a concept to a related concept".to_string()),

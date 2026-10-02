@@ -295,6 +295,7 @@ The semantic export command family is governed by the reused ontology collection
 
 Command-specific rules:
 - `semantic export --layer ontologies` emits generated ontology document declarations plus authored OWL/RDF ontology vocabulary.
+- `semantic export --layer queries` MUST emit managed query RDF resources selected by used ontology namespace.
 - `semantic export --layer shapes` emits semantic-contract SHACL shapes.
 - `semantic export --layer concepts` emits SKOS concept scheme/thesaurus triples.
 - `semantic export --layer model` emits Reqvire model facts, relation-family projection facts, ontology term declarations, semantic-contract shape references, and generated ontology projection facts.
@@ -620,4 +621,19 @@ Command-specific rules:
 
 #### Relations
   * define: [Validate Command](Commands.md#validate-command)
+---
+
+### CLI Managed Query Artifacts Specification
+
+The CLI interface MUST expose managed query operations through shared core contracts.
+
+#### Details
+Query discovery MUST return native authored records sorted by generated IRI then name. Namespace filters MUST match used ontology namespaces. Query validation MUST return per-candidate diagnostics and use the common validation gate. Selectors MUST resolve exactly and reject unknown or ambiguous results. Exported content and hashes MUST come from the shared core renderer. Validation and artifact rendering MUST preserve downstream SERVICE, datasets, and extension functions without executing them.
+Commands MUST be `semantic query list [--json] [--namespace-base IRI] [--name NAME] [--iri IRI]`, `semantic query validate [--json] [--name NAME|--iri IRI]`, `semantic query export (--name NAME|--iri IRI) [--output FILE|--json]`, and `semantic query check (--name NAME|--iri IRI) --artifact FILE [--json]`. Export MUST write raw SPARQL by default and atomically replace output files only after successful validation. Check MUST preserve the file, return failure on missing or stale content, and distinguish I/O errors.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [CLI Managed Query Artifacts](ManagedQueries.md#cli-managed-query-artifacts)
 ---

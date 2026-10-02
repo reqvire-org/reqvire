@@ -1001,6 +1001,18 @@ export const skinX = css`
     background: var(--rdf-resource);
   }
 
+  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="semantic-query"],
+  .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="semantic-query"] {
+    background: var(--ontology);
+    color: var(--text-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    font-weight: var(--weight-bold);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="class"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="class"] {
     background: var(--rdf-class);

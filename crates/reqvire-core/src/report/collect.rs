@@ -124,10 +124,11 @@ pub fn generate_collect_report(
         | ElementType::Requirement(_)
         | ElementType::Ontology
         | ElementType::ConceptScheme
+        | ElementType::SemanticQuery
         | ElementType::Concept => {}
         _ => {
             return Err(ReqvireError::ElementError(format!(
-                "Element '{}' is not a capability, requirement, ontology, concept-scheme, or concept type (found: {}). Only capability, requirement, ontology, concept-scheme, and concept types are supported.",
+                "Element '{}' is not a capability, requirement, ontology, semantic-query, concept-scheme, or concept type (found: {}). Only capability, requirement, ontology, semantic-query, concept-scheme, and concept types are supported.",
                 element_name,
                 element.element_type.as_str()
             )));
@@ -336,6 +337,11 @@ fn collect_upstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Strin
             }
             chain
         }
+        ElementType::SemanticQuery => {
+            let mut chain=vec![start_id.to_owned()];
+            chain.extend(registry.semantic_contract_used_ontology_context(start_id));
+            chain
+        }
         ElementType::Ontology => {
             collect_parent_chain_by_type(registry, start_id, ElementTypeKind::Ontology)
         }
@@ -413,6 +419,7 @@ fn collect_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Str
     match &start.element_type {
         ElementType::Capability => collect_capability_downstream_chain(registry, start_id),
         ElementType::Requirement(_) => collect_requirement_downstream_chain(registry, start_id),
+        ElementType::SemanticQuery => vec![start_id.to_owned()],
         ElementType::Ontology => collect_ontology_downstream_chain(registry, start_id),
         ElementType::ConceptScheme | ElementType::Concept => {
             collect_concept_downstream_chain(registry, start_id)
@@ -595,7 +602,7 @@ fn semantic_contracts_using_ontology(registry: &GraphRegistry, ontology_id: &str
                 if let relation::LinkType::Identifier(target_id) = &rel.target.link {
                     if registry
                         .get_element(target_id)
-                        .is_some_and(|element| element.element_type.is_semantic_contract())
+                        .is_some_and(|element| element.element_type.is_semantic_contract() || element.element_type.is_semantic_query())
                         && seen.insert(target_id.clone())
                     {
                         contracts.push(target_id.clone());
@@ -606,7 +613,7 @@ fn semantic_contracts_using_ontology(registry: &GraphRegistry, ontology_id: &str
     }
 
     for element in registry.get_all_elements() {
-        if !element.element_type.is_semantic_contract() {
+        if !element.element_type.is_semantic_contract() && !element.element_type.is_semantic_query() {
             continue;
         }
         let uses_ontology = element.relations.iter().any(|rel| {

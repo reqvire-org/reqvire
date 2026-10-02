@@ -291,6 +291,7 @@ fn apply_ontology_aware_rewrites(
 
     let element_ids: Vec<String> = registry.nodes.keys().cloned().collect();
     for element_id in element_ids {
+        let query_context = registry.semantic_contract_used_ontology_context(&element_id);
         let Some(node) = registry.nodes.get_mut(&element_id) else {
             continue;
         };
@@ -303,6 +304,9 @@ fn apply_ontology_aware_rewrites(
                 &term_rewrites,
                 &document_rewrites,
             )
+        } else if node.element.element_type.is_semantic_query() {
+            if !query_context.iter().any(|id| affected_ontology_elements.contains(id)) { continue; }
+            rewrite_query_vocabulary(&node.element, &term_rewrites)
         } else if node.element.element_type.is_semantic_contract() {
             if term_rewrites.is_empty() {
                 continue;
@@ -3320,4 +3324,39 @@ pub fn unlink(
             )))
         }
     }
+}
+
+/// Rewrite vocabulary IRIs, leaving SPARQL literals and comments byte-for-byte intact.
+fn rewrite_query_vocabulary(
+    element: &crate::element::Element,
+    rewrites: &BTreeSet<TermRewrite>,
+) -> String {
+    let Some(source) = &element.semantic_query else {
+        return element.content.clone();
+    };
+    let mut mappings = BTreeMap::new();
+    for r in rewrites {
+        mappings.insert(r.old_iri.clone(), r.new_iri.clone());
+        mappings.insert(r.old_namespace.clone(), r.new_namespace.clone());
+    }
+    let mut output = element.content.clone();
+    if let Some(block) = &source.query {
+        let rewritten =
+            crate::semantic_contract::queries::rewrite_iri_tokens(&block.content, &mappings);
+        if let Some(section) = crate::parser::subsection_range(&output, "Query") {
+            if let Some(offset) = output[section.clone()].find(&block.content) {
+                let start = section.start + offset;
+                output.replace_range(start..start + block.content.len(), &rewritten);
+            }
+        }
+    }
+    if let Some(section) = crate::parser::subsection_range(&output, "Produces") {
+        let mut produces = output[section.clone()].to_string();
+        for r in rewrites {
+            produces = produces.replace(&format!("<{}>", r.old_iri), &format!("<{}>", r.new_iri));
+            produces = replace_curie_token(&produces, &r.old_prefix, &r.local_name, &r.new_prefix);
+        }
+        output.replace_range(section, &produces);
+    }
+    output
 }

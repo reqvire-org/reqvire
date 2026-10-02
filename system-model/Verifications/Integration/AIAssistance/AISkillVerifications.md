@@ -48,8 +48,10 @@ Inspect the delivered Claude and Codex guidance for correct contract ownership, 
 - Confirm guidance rejects mixed binding/reference sections on one requirement, file-path reference targets, self-dependencies, and cycles through references, bindings, or requirement ancestry.
 - Confirm command examples use `referenceContract`, `unlink`, and the dedicated binding/reference search filters with identifier globs. Confirm both installed packages retain the same dependency semantics and the Claude marketplace advertises the updated plugin version.
 
+Review artifacts: [SKILL.md](../../../../claude-plugins/skills/syseng/SKILL.md), [SKILL.md](../../../../codex-skills/reqvire-syseng/SKILL.md).
+
 #### Metadata
-  * type: inspection-verification
+  * type: demonstration-verification
 
 #### Relations
   * derivedFrom: [AI Skill Installer Verification Objective](#ai-skill-installer-verification-objective)

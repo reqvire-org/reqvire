@@ -11,6 +11,8 @@ export { BUTTON_SIZE_CLASSES, BUTTON_TONE_CLASSES } from "./components/core/butt
 export type { ButtonSize, ButtonTone } from "./components/core/button_contract";
 export { Card } from "./components/core/Card";
 export type { CardProps } from "./components/core/Card";
+export { ExpandableViewport } from "./components/core/ExpandableViewport";
+export type { ExpandableViewportProps } from "./components/core/ExpandableViewport";
 export { Icon, ICON_NAMES } from "./components/core/Icon";
 export type { IconName, IconProps } from "./components/core/Icon";
 export { IconButton } from "./components/core/IconButton";
@@ -205,6 +207,8 @@ export {
   LabeledCoverageBarFrame,
   ConceptElementDetailContent,
   StoreNotice,
+  TraceFlow,
+  ElementFlow,
   TraceFileGroup,
   TraceFileHeader,
   TraceReportContent,
@@ -342,6 +346,12 @@ export type {
   CoverageGapRowButtonProps,
   CoveragePanelProps,
   StoreNoticeProps,
+  TraceFlowProps,
+  ElementFlowProps,
+  ElementFlowData,
+  TraceFlowData,
+  TraceFlowElement,
+  TraceFlowRequirement,
   TraceReportPanelProps,
   ThesaurusConceptItem,
   ThesaurusConceptUsage,

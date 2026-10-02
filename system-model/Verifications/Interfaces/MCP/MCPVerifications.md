@@ -28,9 +28,8 @@ This objective groups verification that Reqvire MCP servers, tools, resources, p
   * derive: [MCP Shared Operation Contracts Verification](#mcp-shared-operation-contracts-verification)
   * derive: [MCP Size Estimate Startup Verification](#mcp-size-estimate-startup-verification)
   * derive: [MCP Structured Payload Contracts Verification](#mcp-structured-payload-contracts-verification)
-  * derive: [MCP Tool Call Contracts Verification](#mcp-tool-call-contracts-verification)
+  * derive: [MCP Tool Contract and Side Effect Classification Verification](#mcp-tool-contract-and-side-effect-classification-verification)
   * derive: [MCP Tool Exposure Scope Verification](#mcp-tool-exposure-scope-verification)
-  * derive: [MCP Tool Side Effect Classification Verification](#mcp-tool-side-effect-classification-verification)
 ---
 
 ### Embedded MCP Serve Endpoint Verification
@@ -69,6 +68,7 @@ This verification shall prove that MCP does not expose arbitrary shell execution
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-http-access/test.sh)
   * verify: [MCP Access Control Baseline](../../../Interfaces/MCP/Tools.md#mcp-access-control-baseline)
 ---
 
@@ -137,6 +137,7 @@ This verification shall prove that MCP startup/tool discovery reports the negoti
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Compatibility Versioning](../../../Interfaces/MCP/Tools.md#mcp-compatibility-versioning)
 ---
 
@@ -150,6 +151,7 @@ Expected checks:
 - Start `reqvire mcp --host 127.0.0.1 --port <PORT>` and verify standard MCP streamable HTTP requests are accepted at fixed endpoint `/mcp`.
 - Verify `reqvire mcp --transport stdio` is rejected because stdio compatibility mode is not supported.
 - Verify HTTP `tools/list`, `resources/list`, and representative `tools/call` responses expose the expected tool names, schemas, annotations, mutation gating, and structured result semantics.
+- Compare the complete default and mutation-enabled HTTP tool catalog fixtures against the shared registry in unit tests. Both catalogs include the read-only managed query discovery and validation tools.
 - Verify HTTP requests without an `Origin` header are accepted.
 - Verify HTTP requests with loopback `Origin` headers are accepted.
 - Verify unlisted non-loopback, `null`, file, malformed, and multiple-valued Origin headers receive HTTP 403 before tool execution.
@@ -183,6 +185,7 @@ Cache rebuild races and post-write model/runtime coherence are additionally cove
   * verify: [MCP Server Command](../../../Interfaces/MCP/Tools.md#mcp-server-command)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-http-access/test.sh)
   * satisfiedBy: [mcp_http.rs](../../../../crates/reqvire-cli/src/mcp_http.rs)
+  * satisfiedBy: [mod.rs](../../../../crates/reqvire-core/src/tool_interface/mod.rs)
 ---
 
 ### MCP Model Evidence Tools Verification
@@ -218,6 +221,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Model Evidence Tools](../../../Interfaces/MCP/Tools.md#mcp-model-evidence-tools)
   * verify: [Ontology Term Definition Link Materialization](../../../Semantics/SemanticModelRequirements.md#ontology-term-definition-link-materialization)
 ---
@@ -243,6 +247,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Mutation Execution Flow](../../../Interfaces/MCP/Tools.md#mcp-mutation-execution-flow)
 ---
 
@@ -265,6 +270,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Mutation Tool Safety](../../../Interfaces/MCP/Tools.md#mcp-mutation-tool-safety)
 ---
 
@@ -315,6 +321,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Protocol Standard Conformance](../../../Interfaces/MCP/Tools.md#mcp-protocol-standard-conformance)
 ---
 
@@ -339,6 +346,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Quality Traceability Tools](../../../Interfaces/MCP/Tools.md#mcp-quality-traceability-tools)
 ---
 
@@ -359,6 +367,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Resource Interface](../../../Interfaces/MCP/Tools.md#mcp-resource-interface)
 ---
 
@@ -485,7 +494,7 @@ Expected checks:
 This verification shall prove the Reqvire MCP server behavior through the external RMCP Streamable HTTP protocol boundary.
 
 #### Details
-The e2e test starts `reqvire mcp` in a fixture workspace and verifies MCP initialization, capabilities, tool discovery, resource discovery and reads, structured tool calls including ontology semantic collection, protocol error handling, stdio transport rejection, default mutation-tool omission, mutation-mode tool exposure, dry-run mutation behavior, persisted mutation behavior, post-mutation reads, and startup validation failure handling.
+The e2e test starts `reqvire mcp` in a fixture workspace and verifies MCP initialization, capabilities, tool discovery, resource discovery and reads, structured tool calls including ontology semantic collection, protocol error handling, stdio transport rejection, default mutation-tool omission, mutation-mode tool exposure including non-read-only annotations on mutation tools such as `reqvire.add_element`, dry-run mutation behavior including read-only `reqvire.format` preview advertising `fix` enum `[false]` in default mode, persisted mutation behavior, post-mutation reads, and startup validation failure handling.
 
 #### Metadata
   * type: test-verification
@@ -548,8 +557,9 @@ Expected checks:
 - Verify result schemas match shared contract definitions.
 - Verify transport-only options such as JSON stdout/file output are not exposed as MCP request fields.
 - Verify no-argument tools use valid MCP object input schemas.
+- Verify `reqvire.search` inputSchema advertises governance metadata filter fields `filter_status`, `filter_priority`, `filter_risk`, and `filter_owner`, and rejects unsupported governance metadata filter values with accepted-value diagnostics.
 - Verify stable structured results are returned in `structuredContent` and conform to the declared `outputSchema`.
-- Verify unknown tool calls and malformed requests return standard MCP/JSON-RPC protocol errors.
+- Verify unknown tool calls, malformed requests, and schema-invalid arguments return standard MCP/JSON-RPC protocol errors.
 - Verify Reqvire parse, validation, and business-logic failures are forwarded as MCP tool execution errors with structured Reqvire error data where available.
 
 #### Metadata
@@ -577,6 +587,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Server Command](../../../Interfaces/MCP/Tools.md#mcp-server-command)
 ---
 
@@ -603,25 +614,23 @@ Expected checks:
   * verify: [MCP Structured Payload Interfaces](../../../Interfaces/MCP/Tools.md#mcp-structured-payload-interfaces)
 ---
 
-### MCP Tool Call Contracts Verification
+### MCP Tool Contract and Side Effect Classification Verification
 
-This verification shall prove that every advertised MCP tool has a complete tool definition and call contract.
+This verification shall prove that every advertised MCP tool has a complete tool definition and call contract and that tool discovery and tool annotations match the declared side-effect classification.
 
 #### Details
 Expected checks:
 - For every tool returned by `tools/list`, verify `name`, `description`, `inputSchema`, annotations, and any declared `outputSchema`.
 - Verify every `inputSchema` is a JSON object schema and rejects unsupported arguments.
-- Verify `reqvire.search` inputSchema advertises governance metadata filter fields `filter_status`, `filter_priority`, `filter_risk`, and `filter_owner`.
-- Verify `reqvire.search` rejects unsupported governance metadata filter values with accepted-value diagnostics.
-- Verify no-argument tools use an empty object schema.
-- Verify every successful tool call that declares `outputSchema` returns `structuredContent` conforming to that schema.
 - Verify every successful tool call includes compatible text `content` for clients that do not consume structured content.
-- Verify read/report tools declare `readOnlyHint: true`, `destructiveHint: false`, and `openWorldHint: false`.
-- Verify mutation tools are absent from default `tools/list`.
-- Verify mutation tools appear only when started with `--enable-mutations` and declare non-read-only annotations.
-- Verify `reqvire.format` is read-only when `fix` is false and mutation-gated when `fix` is true.
-- Verify `reqvire.lint` does not accept mutating `fix` arguments in read/report mode.
-- Verify unknown tools, malformed MCP requests, and schema-invalid arguments produce standard MCP/JSON-RPC protocol errors.
+- Verify every advertised tool has exactly one declared side-effect class.
+- Verify default `tools/list` advertises all `read_only` tools and omits all `mutation` tools.
+- Verify default `tools/list` advertises `conditional_mutation` tools only with read-only argument schemas.
+- Verify mutation-mode `tools/list` advertises mutation tools and mutation-capable schemas for conditional mutation tools.
+- Verify read-only tools declare `readOnlyHint: true`, `destructiveHint: false`, and `openWorldHint: false`.
+- Verify mutation tools declare `readOnlyHint: false`, `openWorldHint: false`, and the expected conservative `destructiveHint`.
+- Verify `reqvire.lint` does not expose mutating fix behavior until a separate mutation contract is specified.
+- Verify operation-specific preview requests for mutation-class tools are available only through mutation-class tools in mutation mode, except conditional mutation tools that explicitly expose read-only preview behavior.
 - Verify Reqvire parse, validation, and operation failures produce MCP tool execution errors with structured Reqvire error data where available.
 
 #### Metadata
@@ -629,6 +638,7 @@ Expected checks:
 
 #### Relations
   * verify: [MCP Shared Operation Interfaces](../../../Interfaces/MCP/Tools.md#mcp-shared-operation-interfaces)
+  * verify: [MCP Tool Side Effect Classification](../../../Interfaces/MCP/Tools.md#mcp-tool-side-effect-classification)
 ---
 
 ### MCP Tool Exposure Scope Verification
@@ -651,28 +661,6 @@ Expected checks:
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * satisfiedBy: [mcp.rs](../../../../crates/reqvire-cli/src/mcp.rs)
   * verify: [MCP Tool Exposure Scope](../../../Interfaces/MCP/Tools.md#mcp-tool-exposure-scope)
----
-
-### MCP Tool Side Effect Classification Verification
-
-This verification shall prove that MCP tool discovery and tool annotations match the declared side-effect classification.
-
-#### Details
-Expected checks:
-- Verify every advertised tool has exactly one declared side-effect class.
-- Verify default `tools/list` advertises all `read_only` tools and omits all `mutation` tools.
-- Verify default `tools/list` advertises `conditional_mutation` tools only with read-only argument schemas.
-- Verify mutation-mode `tools/list` advertises mutation tools and mutation-capable schemas for conditional mutation tools.
-- Verify read-only tools declare `readOnlyHint: true`, `destructiveHint: false`, and `openWorldHint: false`.
-- Verify mutation tools declare `readOnlyHint: false`, `openWorldHint: false`, and the expected conservative `destructiveHint`.
-- Verify `reqvire.lint` does not expose mutating fix behavior until a separate mutation contract is specified.
-- Verify operation-specific preview requests for mutation-class tools are available only through mutation-class tools in mutation mode, except conditional mutation tools that explicitly expose read-only preview behavior.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [MCP Tool Side Effect Classification](../../../Interfaces/MCP/Tools.md#mcp-tool-side-effect-classification)
 ---
 
 ### MCP Workspace Session Tools Verification

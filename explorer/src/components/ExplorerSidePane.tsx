@@ -566,6 +566,9 @@ function ExplorerViewControls({
           <PaneFilterGrid columns="two">
             <div>
               <PaneFilterGroup label="Types">
+                <ToggleRow label="Semantic query" colorToken="--ontology" variant="filter"
+                  on={ui.ontologyFilters.has("semantic-query")}
+                  onToggle={() => ui.toggleOntologyFilter("semantic-query")} />
                 <PaneLegend
                   rows={[
                     { id: "class", label: "Class", colorToken: ontologyColorToken("class") },
@@ -759,6 +762,7 @@ function TreeFolderNode({
             <TreeResourceNode
               key={resource.id}
               resource={resource}
+              activeView={activeView}
               sourceBrowsing={sourceBrowsing}
               onOpenSourceRoute={onOpenSourceRoute}
               depth={depth + 1}
@@ -786,11 +790,13 @@ function TreeFolderNode({
 
 function TreeResourceNode({
   resource,
+  activeView,
   sourceBrowsing,
   onOpenSourceRoute,
   depth,
 }: {
   resource: ProjectStoreResource;
+  activeView: ViewId;
   sourceBrowsing: boolean;
   onOpenSourceRoute?: (hash: string) => void;
   depth: number;
@@ -804,6 +810,7 @@ function TreeResourceNode({
       onOpenSourceRoute?.(route);
       return;
     }
+    if (activeView === "model" && ui.modelMode === "flow") return;
     window.location.hash = route;
   }
 
@@ -981,6 +988,7 @@ function TreeFileNode({
       return;
     }
     if (activeView === "files") onNavigate("model");
+    if (ui.modelMode === "flow") return;
     onOpenElement(elementId);
   }
 
@@ -1554,6 +1562,7 @@ const ELEMENT_TYPE_ORDER = [
   "demonstration-verification",
   "specification",
   "semantic-contract",
+  "semantic-query",
   "ontology",
   "concept-scheme",
   "concept",
@@ -1867,6 +1876,7 @@ function searchKindColorToken(kind: SearchKind): DesignSystemColorToken {
 function ontologyColorToken(value: string): DesignSystemColorToken {
   const colors: Record<string, DesignSystemColorToken> = {
     class: "--rdf-class",
+    "semantic-query": "--ontology",
     "object-property": "--rdf-objprop",
     "datatype-property": "--rdf-dtprop",
     "rdf-property": "--rdf-rdfprop",

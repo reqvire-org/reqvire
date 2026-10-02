@@ -207,7 +207,9 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
         let ontology =
             crate::parser::extract_single_fenced_subsection(&element.content, "Ontology");
         let shapes = crate::parser::extract_single_fenced_subsection(&element.content, "Shapes");
-        let query = crate::parser::extract_single_fenced_subsection(&element.content, "Query");
+        let query = if element.element_type.is_semantic_query() {
+            element.semantic_query.as_ref().and_then(|source|source.query.clone()).into_iter().collect()
+        } else { crate::parser::extract_single_fenced_subsection(&element.content, "Query") };
 
         validate_semantic_sections(element, &ontology, &shapes, &query, &mut diagnostics);
 
@@ -344,6 +346,7 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
     let ontology_projection = build_ontology_projection(registry, &blocks);
 
     let mut index = SemanticIndex {
+        queries: Vec::new(),
         summary: SemanticIndexSummary {
             ontology_blocks,
             shape_blocks,
@@ -364,6 +367,7 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
         },
         model_context_turtle: String::new(),
     };
+    super::queries::index_queries(registry, &mut index);
     index.model_context = build_model_context_graph(registry, &index);
     index.model_context_turtle = build_model_context_turtle(registry, &index);
     index
@@ -975,13 +979,13 @@ pub(super) fn validate_semantic_sections(
         });
     }
 
-    if has_query_section {
+    if has_query_section && !element.element_type.is_semantic_query() {
         diagnostics.push(SemanticDiagnostic {
             source: element.identifier.clone(),
             file_path: element.file_path.clone(),
             line_number: query_line_number,
             message: format!(
-                "Element '{}' is type '{}' and must not contain a #### Query section. No Reqvire element type currently supports this reserved subsection.",
+                "Element '{}' is type '{}' and must not contain a #### Query section. Query belongs on semantic-query elements.",
                 element.name,
                 element.element_type.as_str()
             ),
