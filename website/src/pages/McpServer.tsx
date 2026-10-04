@@ -136,6 +136,7 @@ reqvire serve --enable-mcp --allow-origin https://app.example.com`}</CodeBlock>
         <div className="grid sm:grid-cols-2 gap-2">
           {[
             "reqvire.workspace_status",
+            "reqvire.worktree.list",
             "reqvire.tool_contract",
             "reqvire.model_revision",
             "reqvire.read_element",
@@ -154,6 +155,8 @@ reqvire serve --enable-mcp --allow-origin https://app.example.com`}</CodeBlock>
             "reqvire.concept_schemes.list",
             "reqvire.concept_mappings.list",
             "reqvire.semantic.graph",
+            "reqvire.semantic.queries",
+            "reqvire.semantic.queries.validate",
             "reqvire.semantic.prefixes",
             "reqvire.semantic.vocabulary",
             "reqvire.semantic.sparql",
@@ -350,11 +353,103 @@ reqvire serve --enable-mcp --allow-origin https://app.example.com`}</CodeBlock>
         <BulletList
           items={[
             "Mutation mode adds add, remove, move, rename, merge, link, unlink, relink, move-asset, and remove-asset tools.",
-            "Mutation tools use Reqvire core operations and return structured diffs.",
+            "Startup requires a clean Git worktree on a committed branch, a valid model, and Git author identity. Only one mutation-enabled MCP server may own the branch.",
+            "Successful changes are validated and saved before the updated model is published. Automatic commits are off by default: HEAD and staging stay unchanged, and results omit the commit field.",
+            "Add --enable-commits to commit each successful non-empty mutation locally and include its commit identifier in the result. This flag requires --enable-mutations. Previews, rejections, and no-ops never create commits.",
+            "Both modes update subsequent MCP reads and refresh the embedded Explorer after a successful write.",
+            "The running server owns its model snapshot. External edits are not imported and affected model files may be overwritten. Stop the server before editing its workspace externally.",
+            "Restart requires the same clean-start checks. Use reqvire.git.commit for accepted pending changes before stopping, or resolve saved changes before restarting. Branch creation and remote publication require explicit tool calls.",
             "Most mutation tools support dry_run.",
-            "HTTP mutation requests are serialized so concurrent clients cannot interleave filesystem writes.",
+            "Mutations, commits, and publication serialize within each worktree. Independent worktrees can progress separately.",
           ]}
         />
+        <CodeBlock>{`# Opt into automatic commits
+reqvire mcp --enable-mutations --enable-commits
+
+# Explorer with the same opt-in commit behavior
+reqvire serve --enable-mcp --enable-mutations --enable-commits`}</CodeBlock>
+      </Section>
+
+      <Section title="Worktrees and Explorer">
+        <CodeBlock>{`# Browse local branches without mutation permissions
+reqvire serve
+# Add read-only MCP on the same listener
+reqvire serve --enable-mcp
+# Manage worktrees and edit models through MCP
+reqvire serve --enable-mcp --enable-mutations
+# Explorer: http://localhost:8080/
+# MCP:      http://localhost:8080/mcp`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          The branch picker lists local branches in every serving mode. Models load
+          on demand: selecting a branch reuses its worktree or creates an isolated
+          managed worktree, without switching an existing checkout. Read-only loads
+          accept valid uncommitted content and check the existing model cache for
+          changed inputs. Mutation-enabled serving requires a clean worktree and
+          normal ownership admission before loading a new context; dirty targets
+          are rejected. Active contexts reuse their accepted model, including
+          accepted uncommitted writes when automatic commits are disabled.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Each browser tab keeps its own branch selection in the URL across reload
+          and back/forward navigation. Switching retains cached context data and
+          does not redirect MCP calls or preload other branches. Use
+          <code> reqvire.worktree.list</code> to obtain admitted context IDs for MCP
+          requests. Prepared worktrees and their changes survive server shutdown.
+        </p>
+        <DetailGrid items={[
+          { name: "reqvire.worktree.create", desc: "Requires branch and base_ref. Uses a local commit or ref without fetching. With multiple contexts, pass from_worktree_id for relative bases such as HEAD. The selected source must be clean." },
+          { name: "reqvire.worktree.open", desc: "Requires an existing local branch. Reuses a healthy context or admits its clean worktree, creating a managed worktree when necessary. It never forces a second checkout." },
+          { name: "reqvire.worktree.remove", desc: "Requires worktree_id. Removes only clean, server-created secondary worktrees and preserves the branch and commits. Original and externally created worktrees are protected." },
+          { name: "reqvire.git.commit", desc: "Requires a message and commits only accepted pending changes. Unrelated staged files and intervening external versions are excluded. No pending changes means no new commit. This tool works without GitHub enablement." },
+        ]} />
+        <CodeBlock>{`{
+  "name": "reqvire.worktree.create",
+  "arguments": { "branch": "model/review", "base_ref": "main" }
+}
+
+{
+  "name": "reqvire.coverage",
+  "arguments": { "worktree_id": "<returned worktree_id>" }
+}`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Pass the returned <code>worktree_id</code> to workspace-bound tools
+          and prompts. Resources use <code>?worktree_id=...</code>. Omission
+          works with one admitted context; with multiple contexts it is an error.
+          IDs belong to the current server session. Each result identifies its
+          context and accepted model revision. Discovery and worktree inventory
+          are server-wide. Restart preserves worktree files and branches but
+          requires clean admission again.
+        </p>
+      </Section>
+
+      <Section title="GitHub Publication">
+        <CodeBlock>{`reqvire mcp --enable-mutations --enable-github
+reqvire serve --enable-mcp --enable-mutations --enable-github
+# Optional remote override (default: origin)
+reqvire mcp --enable-mutations --enable-github --github-remote upstream`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          GitHub support is off by default and requires mutation mode. At startup,
+          Reqvire checks the installed <code>gh</code> command, active authentication
+          for the remote host, and repository access. If a check fails, publication
+          tools are hidden and direct calls are rejected. Local model, worktree,
+          and commit tools remain available. Inspect <code>reqvire.tool_contract</code>
+          or worktree inventory for the reason, fix the setup, and restart.
+        </p>
+        <DetailGrid items={[
+          { name: "reqvire.git.push", desc: "Pushes the context's accepted committed HEAD to the same branch in the pinned repository. Requires a clean worktree with no pending accepted changes. It never force-pushes or implicitly commits." },
+          { name: "reqvire.github.pr.create", desc: "Requires base, title, and body; draft is optional. Push the branch first. The base can be main or another feature branch for a stacked PR. An existing matching open PR is returned without duplication or edits; conflicting bases are reported." },
+          { name: "reqvire.github.pr.comment", desc: "Requires a positive pr_number and non-empty body. Adds the exact comment to a PR in the pinned repository, including a PR on another branch. Pending local changes are allowed; commenting never commits or pushes them." },
+        ]} />
+        <p className="text-zinc-600 mt-4">
+          Only the startup repository and configured remote are supported; forks
+          are not supported. Automatic commits remain a separate opt-in through
+          <code> --enable-commits</code>. Repository access at startup does not
+          guarantee permission for every operation: push rules and later permission
+          changes appear in the tool result. Results distinguish completed, no-op,
+          failed, and unknown outcomes. If the response was lost after a possible
+          remote change, inspect the returned branch or PR before retrying; comments
+          are never automatically posted again.
+        </p>
       </Section>
 
       <Section title="Error Handling">

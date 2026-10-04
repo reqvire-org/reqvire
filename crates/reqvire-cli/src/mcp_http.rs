@@ -307,7 +307,7 @@ mod tests {
             "http://plain.example:80",
         ]
         .map(|value| value.parse().expect("parse configured test origin"));
-        crate::mcp::router(false, false, &exclusions, &HttpAccess::new(&origins, &[]))
+        crate::mcp::router(false, false, &exclusions, &HttpAccess::new(&origins, &[])).expect("read-only router")
     }
 
     fn request(method: &str, origin: Option<&str>) -> Request<Body> {
@@ -591,7 +591,7 @@ mod tests {
                     .expect("parse valid test value")],
                 &[],
             ),
-        );
+        ).expect("read-only router");
         let response = router
             .clone()
             .oneshot(request("POST", Some("https://app.example")))
@@ -625,7 +625,7 @@ mod tests {
         let exclusions = ExclusionSetBuilder::new()
             .build()
             .expect("build test exclusions");
-        let router = crate::mcp::router(false, false, &exclusions, &HttpAccess::default());
+        let router = crate::mcp::router(false, false, &exclusions, &HttpAccess::default()).expect("read-only router");
         for origin in [
             None,
             Some("http://localhost:5173"),
@@ -691,9 +691,9 @@ mod tests {
                 &exclusions,
                 std::sync::Arc::new(tokio::sync::Mutex::new(())),
                 &access,
-            )
+            ).expect("read-only router")
         } else {
-            crate::mcp::router(false, false, &exclusions, &access)
+            crate::mcp::router(false, false, &exclusions, &access).expect("read-only router")
         }
     }
 

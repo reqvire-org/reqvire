@@ -264,17 +264,18 @@ This verification checks read-result consistency and mutation visibility through
 
 ##### Acceptance Criteria
 - Two consecutive `reqvire.read_element` calls over an unchanged workspace return the same requested element. Equal payloads establish result consistency only, not a cache hit or absence of parsing.
-- After a successful persisted `reqvire.add_element`, a subsequent search exposes the added element.
-- After a direct Markdown edit adds an element, a subsequent search exposes that element.
+- After a successful persisted `reqvire.add_element` with automatic commits disabled, a subsequent search exposes the added element while HEAD and index remain unchanged.
+- In read-only MCP mode, after a direct Markdown edit adds an element, a subsequent search exposes that element. Mutation-enabled sessions retain their accepted snapshot until an accepted mutation or restart.
 - A standalone `change-impact --git-commit` invocation completes against the fixture history. A separate instrumented core check establishes actual cache bypass.
 
 ##### Test Criteria
-1. Start a `reqvire mcp` server against a fixture workspace.
+1. Start a mutation-enabled `reqvire mcp` server against a clean committed fixture workspace.
 2. Issue two identical `reqvire.read_element` calls back-to-back; assert both resolve the requested element and return equal structured content.
-3. Issue a `reqvire.add_element` CRUD call to add a new element; assert the call succeeds.
+3. Issue a `reqvire.add_element` CRUD call without the commit startup flag; assert the call succeeds without advancing HEAD, changing index contents, or returning a `commit` field.
 4. Issue another `reqvire.search`; assert the newly added element is present.
-5. Append another element directly to a Markdown source and issue a read; assert the result reflects the change.
+5. Stop and reap the mutation server, start a read-only server, and verify mutation tools are absent. Warm its model cache, append another element directly to a Markdown source, and issue a read; assert the result reflects the change.
 6. Run a standalone `reqvire change-impact --git-commit=<hash>` invocation and check its exit status.
+7. Verify the test timing wrapper forwards termination and interruption to its child, waits for child shutdown, and preserves normal stdin, exit status, and timing records; a previous mutation server must not survive and answer the read-only phase.
 
 ##### Evidence Scope
 The satisfiedBy evidence supplies these response and mutation assertions. Response equality and standalone command completion do not prove internal reuse or bypass. The dedicated input-freshness and publication verifications own the instrumented correctness assertions and their execution status.

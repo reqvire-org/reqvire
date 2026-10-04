@@ -50,6 +50,9 @@ SERVE OPTIONS:
       --port <PORT>             Server port
       --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp
       --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint
+      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)
+      --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)
+      --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)
       --allow-origin <ORIGIN>   Additional MCP browser origin (repeatable; loopback remains allowed)
       --allow-host <HOST[:PORT]> Additional MCP endpoint host or host:port (repeatable; requires --enable-mcp)
 
@@ -60,6 +63,9 @@ MCP OPTIONS:
       --host <HOST>             HTTP bind address
       --port <PORT>             HTTP server port
       --enable-mutations        Advertise and allow mutation tools
+      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)
+      --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)
+      --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)
       --with-size-estimates     Include element size estimates in model evidence tools
       --allow-origin <ORIGIN>   Additional browser origin (repeatable; loopback remains allowed)
       --allow-host <HOST[:PORT]> Additional endpoint host or host:port (repeatable)

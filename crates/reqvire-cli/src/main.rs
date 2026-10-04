@@ -2,7 +2,12 @@ pub mod cli;
 pub mod config;
 mod live_store;
 mod mcp;
+mod mcp_github;
 mod mcp_http;
+mod mcp_process;
+mod mcp_session;
+mod mcp_worker;
+mod mcp_worktrees;
 mod serve;
 
 use crate::cli::apply_workspace;
@@ -14,11 +19,15 @@ use reqvire::error::ReqvireError;
 
 #[tokio::main]
 async fn main() {
-    let args = Args::parse_args();
-
-    // Configure logging without mutating the process environment. Default to
-    // `error` when RUST_LOG is unset so logs do not corrupt structured stdout.
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("error")).init();
+    if std::env::args().nth(1).as_deref() == Some("__mcp-worktree-worker") {
+        if let Err(error) = mcp_worker::run() {
+            eprintln!("{error}");
+            std::process::exit(1);
+        }
+        return;
+    }
+    let args = Args::parse_args();
 
     if let Err(err) = apply_workspace(args.workspace.as_ref()) {
         error!("{}", err);

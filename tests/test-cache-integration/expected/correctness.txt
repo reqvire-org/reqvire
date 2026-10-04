@@ -170,7 +170,7 @@ PASS serve/sources/move-visible
 PASS serve/sources/remove-visible
 PASS serve/sources/invalid-rejects-stale-success
 PASS serve/sources/repair-recovers
-PASS serve/runtime/external-edit-visible-to-mcp
+PASS serve/runtime/external-edit-not-imported
 PASS serve/runtime/no-external-polling
 PASS serve/runtime/manifest-does-not-load-model
 PASS serve/runtime/preview-success
@@ -182,6 +182,9 @@ PASS serve/runtime/rejected-no-refresh-load
 PASS serve/runtime/rejected-keeps-assets
 PASS serve/runtime/rejected-keeps-file
 PASS serve/runtime/success-persists-file
+PASS serve/runtime/default-omits-commit
+PASS serve/runtime/default-keeps-head
+PASS serve/runtime/default-keeps-index
 PASS serve/runtime/success-status
 PASS serve/runtime/success-publishes-new-graph
 PASS serve/runtime/post-write-search

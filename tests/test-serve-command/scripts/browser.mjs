@@ -2,6 +2,27 @@ import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+// Let Chromium shut down its children before the caller removes its profile.
+// A lost debugging connection must still terminate and reap the launched process.
+export async function stopBrowser(child, requestClose, timeout = 2000) {
+  const exited = () => child.exitCode !== null || child.signalCode !== null;
+  const waitForExit = () => {
+    if (exited()) return Promise.resolve(true);
+    return new Promise(resolve => {
+      const done = () => { clearTimeout(timer); child.off("exit", done); resolve(exited()); };
+      const timer = setTimeout(done, timeout);
+      child.once("exit", done);
+    });
+  };
+  if (exited()) return;
+  await requestClose().catch(() => {});
+  if (await waitForExit()) return;
+  child.kill("SIGTERM");
+  if (await waitForExit()) return;
+  child.kill("SIGKILL");
+  if (!await waitForExit()) throw new Error("Browser process did not exit during cleanup");
+}
+
 // The serve E2Es use the real compiled bundle and Chromium's debugging
 // protocol, with Node's built-in WebSocket and no separate test framework.
 export async function openBrowser(browser, profile) {
@@ -13,14 +34,11 @@ export async function openBrowser(browser, profile) {
     "--disable-renderer-backgrounding",
     `--user-data-dir=${profile}`, "about:blank",
   ], { stdio: ["ignore", "ignore", "inherit"] });
-  let socket;
-  const close = async () => {
-    socket?.close();
-    child.kill();
-    if (child.exitCode === null && child.signalCode === null) {
-      await new Promise(resolve => child.once("exit", resolve));
-    }
-  };
+  let socket, requestClose = async () => {}, closing;
+  const close = () => closing ??= (async () => {
+    try { await stopBrowser(child, requestClose); }
+    finally { socket?.close(); }
+  })();
   try {
     let port;
     for (let attempt = 0; attempt < 200; attempt++) {
@@ -64,7 +82,7 @@ export async function openBrowser(browser, profile) {
       }
       pending.clear();
     });
-    function rpc(method, params = {}) {
+    function rpc(method, params = {}, sessionId, timeout = 15000) {
       return new Promise((resolve, reject) => {
         if (socket.readyState !== WebSocket.OPEN) {
           reject(new Error("Browser debugging connection is not open"));
@@ -74,11 +92,12 @@ export async function openBrowser(browser, profile) {
         const timer = setTimeout(() => {
           pending.delete(id);
           reject(new Error(`Browser command timed out: ${method}`));
-        }, 15000);
+        }, timeout);
         pending.set(id, { resolve, reject, timer });
-        socket.send(JSON.stringify({ id, method, params }));
+        socket.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }));
       });
     }
+    requestClose = () => rpc("Browser.close", {}, undefined, 2000);
     async function evaluate(fn, ...args) {
       const result = await rpc("Runtime.evaluate", {
         expression: `(${fn.toString()})(${args.map(arg => JSON.stringify(arg)).join(",")})`,
@@ -106,7 +125,8 @@ export async function openBrowser(browser, profile) {
     }
     return { rpc, evaluate, navigate, close };
   } catch (error) {
-    await close();
+    try { await close(); }
+    catch (cleanupError) { throw new AggregateError([error, cleanupError], "Browser startup and cleanup failed"); }
     throw error;
   }
 }

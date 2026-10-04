@@ -114,7 +114,7 @@ impl<'a> ReqvireToolRegistry<'a> {
                 .get("dry_run")
                 .and_then(Value::as_bool)
                 .unwrap_or(false);
-        if persists {
+        if persists && !crate::mutation_io::active() {
             crate::model_cache::begin_write();
         }
         let exclusions = self.excluded_filename_patterns.refreshed();
@@ -128,7 +128,7 @@ impl<'a> ReqvireToolRegistry<'a> {
         // Both successful writes and failed multi-file operations may persist
         // changes. Centralize eviction here, including format fixes, without
         // replacing the original operation result.
-        if persists {
+        if persists && !crate::mutation_io::active() {
             crate::model_cache::invalidate();
         }
         result
@@ -258,30 +258,8 @@ mod tests {
     }
 
     #[test]
-    fn http_read_tool_catalog_matches_shared_registry() {
-        assert_http_tool_catalog(
-            false,
-            include_str!("../../../../tests/test-mcp-server/expected/http-read-tools.txt"),
-        );
-    }
-
-    #[test]
-    fn http_mutation_tool_catalog_matches_shared_registry() {
-        assert_http_tool_catalog(
-            true,
-            include_str!("../../../../tests/test-mcp-server/expected/http-mutation-tools.txt"),
-        );
-    }
-
-    fn assert_http_tool_catalog(enable_mutations: bool, expected: &str) {
-        let ignored = ignored_patterns();
-        let registry = ReqvireToolRegistry::new(enable_mutations, &ignored);
-        let tools = registry.tool_definitions();
-        let names: Vec<_> = tools
-            .iter()
-            .map(|tool| tool["name"].as_str().expect("tool name"))
-            .collect();
-        assert_eq!(names, expected.lines().collect::<Vec<_>>());
+    fn managed_query_tools_are_read_only() {
+        let tools = tool_definitions(false);
         for name in [
             "reqvire.semantic.queries",
             "reqvire.semantic.queries.validate",

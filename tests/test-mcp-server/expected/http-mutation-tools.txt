@@ -40,3 +40,8 @@ reqvire.unlink
 reqvire.relink
 reqvire.move_asset
 reqvire.remove_asset
+reqvire.worktree.list
+reqvire.worktree.create
+reqvire.worktree.open
+reqvire.worktree.remove
+reqvire.git.commit

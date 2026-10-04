@@ -32,11 +32,13 @@ export interface ShellActionItem {
 
 export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
   brandLabel?: ReactNode;
+  /** Context controls below the persistent navigation header. */
   toolbar?: ReactNode;
   navigationItems?: ShellNavigationItem[];
   activeNavigationValue?: string;
   headerActions?: ShellActionItem[];
   sidePane?: ReactNode;
+  sidePaneHeader?: ReactNode;
   main?: ReactNode;
   detailPane?: ReactNode;
   mainWarning?: ReactNode;
@@ -89,37 +91,6 @@ const shellBaseUX = css`
 
   &.has-right-inspector .ux-inspector-tab {
     display: flex;
-  }
-
-  .ux-side-pane {
-    position: relative;
-    inset: auto;
-    z-index: auto;
-    align-self: stretch;
-    flex: 0 0 var(--ux-current-left-width);
-    width: var(--ux-current-left-width);
-    min-width: 0;
-    min-height: 0;
-    height: 100%;
-  }
-
-  .ux-side-pane.is-collapsed {
-    display: none;
-  }
-
-  .ux-side-content {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  .ux-tree-tab,
-  .ux-pane-chrome-header {
-    display: none;
   }
 
   [data-route-frame] {
@@ -187,6 +158,14 @@ const headerBaseUX = css`
   @media (max-width: 900px) {
     padding-right: 0;
   }
+`;
+
+const sidePaneHeaderClass = css`
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: var(--space-6) var(--side-pane-content-inset-inline) 0;
+  border-right: var(--border-w) solid var(--border-subtle);
+  background: var(--bg-surface);
 `;
 
 const headerSkinX = css`
@@ -317,6 +296,7 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
     activeNavigationValue,
     headerActions = [],
     sidePane,
+    sidePaneHeader,
     main,
     detailPane,
     mainWarning,
@@ -355,18 +335,18 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
       )}
       {...props}
     >
-      {toolbar ?? (
-        <ShellHeader
-          brandLabel={brandLabel}
-          navigationItems={navigationItems}
-          activeNavigationValue={activeNavigationValue}
-          headerActions={headerActions}
-          onNavigate={onNavigate}
-        />
-      )}
+      <ShellHeader
+        brandLabel={brandLabel}
+        navigationItems={navigationItems}
+        activeNavigationValue={activeNavigationValue}
+        headerActions={headerActions}
+        onNavigate={onNavigate}
+      />
+      {toolbar}
       <div data-product-pattern-slot="body" className={cx(mainClass)}>
         {sidePane != null ? (
           <ShellPane placement="start" collapsed={!leftPaneOpen}>
+            {sidePaneHeader != null ? <div className={cx(sidePaneHeaderClass)} data-product-pattern-slot="side-pane-header">{sidePaneHeader}</div> : null}
             {sidePane}
           </ShellPane>
         ) : null}

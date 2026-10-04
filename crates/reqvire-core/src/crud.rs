@@ -1376,8 +1376,8 @@ pub fn move_file(
     if !dry_run {
         // Delete the source file from disk
         let source_path = workspace_root.join(&source_file_normalized);
-        if source_path.exists() {
-            std::fs::remove_file(&source_path).map_err(ReqvireError::IoError)?;
+        if crate::mutation_io::exists(&source_path) {
+            crate::mutation_io::remove_file(&source_path).map_err(ReqvireError::IoError)?;
         }
     }
 
@@ -1410,7 +1410,7 @@ pub fn move_folder(
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     use crate::utils;
-    use std::fs;
+    use crate::mutation_io as fs;
 
     let absolute_source = current_dir.join(source_folder);
     let source_folder_normalized = normalize_folder_arg(
@@ -1451,13 +1451,13 @@ pub fn move_folder(
             source_folder
         )));
     }
-    if !source_abs.exists() {
+    if !crate::mutation_io::exists(&source_abs) {
         return Err(ReqvireError::LocationNotFound(format!(
             "Source folder '{}' does not exist",
             source_folder
         )));
     }
-    if !source_abs.is_dir() {
+    if !crate::mutation_io::is_dir(&source_abs) {
         return Err(ReqvireError::InvalidOperation(format!(
             "Source path '{}' is not a directory",
             source_folder
@@ -1471,7 +1471,7 @@ pub fn move_folder(
             target_folder
         )));
     }
-    if target_abs.exists() {
+    if crate::mutation_io::exists(&target_abs) {
         return Err(ReqvireError::DuplicateElement(format!(
             "Target folder '{}' already exists",
             target_folder
@@ -1512,12 +1512,11 @@ pub fn move_folder(
     };
 
     if !dry_run {
-        for entry in walkdir::WalkDir::new(&source_abs)
-            .into_iter()
-            .filter_map(Result::ok)
-            .filter(|entry| entry.file_type().is_file())
-        {
-            let old_abs = entry.path();
+        let paths = crate::mutation_io::paths_under(&source_abs).unwrap_or_else(|| {
+            walkdir::WalkDir::new(&source_abs).into_iter().filter_map(Result::ok)
+                .filter(|entry| entry.file_type().is_file()).map(|entry| entry.into_path()).collect()
+        });
+        for old_abs in &paths {
             let old_relative = old_abs
                 .strip_prefix(workspace_root)
                 .map_err(|err| ReqvireError::PathError(err.to_string()))?
@@ -1539,7 +1538,7 @@ pub fn move_folder(
             fs::rename(old_abs, &new_abs).map_err(ReqvireError::IoError)?;
         }
 
-        if source_abs.exists() {
+        if crate::mutation_io::exists(&source_abs) {
             fs::remove_dir_all(&source_abs).map_err(ReqvireError::IoError)?;
         }
 
@@ -1598,6 +1597,7 @@ fn prune_empty_parent_dirs(
     git_root: &Path,
     target_abs: &Path,
 ) -> Result<(), ReqvireError> {
+    if crate::mutation_io::active() { return Ok(()); }
     let mut current = dir.to_path_buf();
     while current != git_root && current.starts_with(git_root) && !target_abs.starts_with(&current)
     {
@@ -1630,7 +1630,7 @@ pub fn reuse(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
     use std::path::PathBuf;
 
     // Find the element by name
@@ -1716,7 +1716,7 @@ pub fn remove_contract_bindings(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
     use std::path::PathBuf;
 
     // Find the element by name
@@ -1939,7 +1939,7 @@ pub fn reuse_contract_element_identifier(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
 
     let target_element = model_manager
         .graph_registry
@@ -2152,7 +2152,7 @@ pub fn remove_reused_contract_element_identifier(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
 
     let target_element = model_manager
         .graph_registry
@@ -2270,7 +2270,7 @@ pub fn mv_asset(
     workspace_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
 
     let (old_path_normalized, old_abs) = resolve_workspace_relative_arg(old_path, workspace_root)?;
     let (new_path_normalized, new_abs) = resolve_workspace_relative_arg(new_path, workspace_root)?;
@@ -2379,7 +2379,7 @@ pub fn rm_asset(
     workspace_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
 
     let (file_path_normalized, abs_path) =
         resolve_workspace_relative_arg(file_path_arg, workspace_root)?;
@@ -2429,7 +2429,7 @@ pub fn rm_asset(
     }
 
     // Delete the actual file
-    if !dry_run && abs_path.exists() {
+    if !dry_run && crate::mutation_io::exists(&abs_path) {
         fs::remove_file(&abs_path).map_err(ReqvireError::IoError)?;
     }
 
@@ -3300,8 +3300,8 @@ pub fn unlink(
 
             // Check if target is a file path contract_bindings
             let cwd = std::env::current_dir().unwrap_or_default();
-            let file_exists_cwd = cwd.join(target).exists();
-            let file_exists_git_root = git_root.join(target).exists();
+            let file_exists_cwd = crate::mutation_io::exists(cwd.join(target));
+            let file_exists_git_root = crate::mutation_io::exists(git_root.join(target));
 
             if file_exists_cwd || file_exists_git_root {
                 return remove_contract_bindings(model_manager, source, target, git_root, dry_run);

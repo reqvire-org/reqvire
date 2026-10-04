@@ -10,7 +10,8 @@ Boundary rules:
 - Reqvire core remains authoritative for parsing, validation, reporting, formatting, and mutation semantics.
 - MCP handlers call shared Reqvire tool contracts instead of reimplementing model behavior.
 - MCP does not expose arbitrary shell command execution.
-- MCP does not store an independent model copy that can diverge from the filesystem.
+- MCP retains only core-built model snapshots under the read-only freshness or mutation ownership contract of each worktree context. Accepted model changes are persisted; external edits are not silently adopted by mutation-enabled contexts.
+- Typed worktree, commit, and same-repository GitHub publication operations orchestrate repository services around those contexts without reimplementing model semantics or exposing arbitrary Git/gh execution.
 - MCP responses include standard MCP protocol metadata where required and Reqvire contract/workspace/model revision metadata inside Reqvire tool or resource results.
 
 #### Metadata

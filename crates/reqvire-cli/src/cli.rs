@@ -127,7 +127,7 @@ pub struct SearchArgs {
 pub enum Commands {
     /// Serve the embedded Explorer UI via HTTP server
     #[clap(
-        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>             Bind address (default: localhost)\n      --port <PORT>             Server port (default: 8080)\n      --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; requires --enable-mcp)\n      --allow-host <HOST[:PORT]>  Additional MCP endpoint hostname (repeatable; requires --enable-mcp)"
+        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>             Bind address (default: localhost)\n      --port <PORT>             Server port (default: 8080)\n      --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint\n      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)\n      --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)\n      --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; requires --enable-mcp)\n      --allow-host <HOST[:PORT]>  Additional MCP endpoint hostname (repeatable; requires --enable-mcp)"
     )]
     Serve {
         /// Bind address
@@ -149,6 +149,31 @@ pub enum Commands {
             help_heading = "SERVE OPTIONS"
         )]
         mcp_enable_mutations: bool,
+
+        /// Commit successful mutations automatically (default: false; requires --enable-mutations)
+        #[clap(
+            long = "enable-commits",
+            requires = "mcp_enable_mutations",
+            help_heading = "SERVE OPTIONS"
+        )]
+        mcp_enable_commits: bool,
+
+        /// Enable same-repository GitHub publication (requires --enable-mutations)
+        #[clap(
+            long = "enable-github",
+            requires = "mcp_enable_mutations",
+            help_heading = "SERVE OPTIONS"
+        )]
+        mcp_enable_github: bool,
+
+        /// Configured publication remote (default: origin; requires --enable-github)
+        #[clap(
+            long = "github-remote",
+            requires = "mcp_enable_github",
+            value_name = "NAME",
+            help_heading = "SERVE OPTIONS"
+        )]
+        mcp_github_remote: Option<String>,
 
         /// Additional MCP browser origin (repeatable; loopback remains allowed)
         #[clap(
@@ -187,7 +212,7 @@ pub enum Commands {
     /// Start Reqvire MCP server
     #[clap(
         name = "mcp",
-        override_help = "Start Reqvire MCP Streamable HTTP server\n\nMCP OPTIONS:\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --with-size-estimates     Include element size estimates in model evidence tools\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; loopback remains allowed)\n      --allow-host <HOST[:PORT]>  Additional endpoint hostname (repeatable)"
+        override_help = "Start Reqvire MCP Streamable HTTP server\n\nMCP OPTIONS:\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)\n      --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)\n      --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)\n      --with-size-estimates     Include element size estimates in model evidence tools\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; loopback remains allowed)\n      --allow-host <HOST[:PORT]>  Additional endpoint hostname (repeatable)"
     )]
     Mcp {
         /// HTTP bind address
@@ -201,6 +226,23 @@ pub enum Commands {
         /// Advertise and allow mutation tools
         #[clap(long, help_heading = "MCP OPTIONS")]
         enable_mutations: bool,
+
+        /// Commit successful mutations automatically (default: false; requires --enable-mutations)
+        #[clap(long, requires = "enable_mutations", help_heading = "MCP OPTIONS")]
+        enable_commits: bool,
+
+        /// Enable same-repository GitHub publication (requires --enable-mutations)
+        #[clap(long, requires = "enable_mutations", help_heading = "MCP OPTIONS")]
+        enable_github: bool,
+
+        /// Configured publication remote (default: origin; requires --enable-github)
+        #[clap(
+            long,
+            requires = "enable_github",
+            value_name = "NAME",
+            help_heading = "MCP OPTIONS"
+        )]
+        github_remote: Option<String>,
 
         /// Include element size estimates in model evidence tools
         #[clap(long, help_heading = "MCP OPTIONS")]
@@ -831,7 +873,10 @@ pub enum Commands {
 #[derive(Subcommand, Debug)]
 pub enum SemanticCommands {
     /// Manage authored SPARQL query artifacts
-    Query { #[clap(subcommand)] command: QueryCommands },
+    Query {
+        #[clap(subcommand)]
+        command: QueryCommands,
+    },
     /// Export selected semantic RDF layers
     #[clap(
         override_help = "Export selected semantic RDF layers\n\nSEMANTIC EXPORT OPTIONS:\n      --layer <LAYER>            Include layer: ontologies, shapes, concepts, queries, model, external-used, prefixes. Repeatable; omitted means all layers\n      --jsonld                   Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --namespace-base <IRI>     Filter clean authored export to one ontology base or term namespace. Cannot be combined with model\n      --output <FILE>            Save output to file"
@@ -1176,7 +1221,14 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
 
 const fn wants_json(args: &Args) -> bool {
     match &args.command {
-        Some(Commands::Semantic { command: SemanticCommands::Query { command } }) => match command { QueryCommands::List{json,..}|QueryCommands::Validate{json,..}|QueryCommands::Export{json,..}|QueryCommands::Check{json,..}=>*json },
+        Some(Commands::Semantic {
+            command: SemanticCommands::Query { command },
+        }) => match command {
+            QueryCommands::List { json, .. }
+            | QueryCommands::Validate { json, .. }
+            | QueryCommands::Export { json, .. }
+            | QueryCommands::Check { json, .. } => *json,
+        },
         Some(Commands::Format { json, .. }) => *json,
         Some(Commands::Migrate { json, .. }) => *json,
         Some(Commands::Validate { json, .. }) => *json,
@@ -1292,6 +1344,9 @@ pub async fn handle_command(
         host,
         port,
         enable_mutations,
+        enable_commits,
+        enable_github,
+        github_remote,
         with_size_estimates,
         allowed_origins,
         allowed_hosts,
@@ -1299,6 +1354,9 @@ pub async fn handle_command(
     {
         return mcp::serve_http(
             enable_mutations,
+            enable_commits,
+            enable_github,
+            github_remote.as_deref().unwrap_or("origin"),
             with_size_estimates,
             excluded_filename_patterns,
             &host,
@@ -1733,6 +1791,9 @@ pub async fn handle_command(
             port,
             enable_mcp,
             mcp_enable_mutations,
+            mcp_enable_commits,
+            mcp_enable_github,
+            mcp_github_remote,
             allowed_origins,
             allowed_hosts,
         }) => {
@@ -1749,6 +1810,9 @@ pub async fn handle_command(
                 port,
                 enable_mcp,
                 mcp_enable_mutations,
+                mcp_enable_commits,
+                mcp_enable_github,
+                mcp_github_remote.as_deref().unwrap_or("origin"),
                 excluded_filename_patterns,
                 &crate::mcp_http::HttpAccess::new(&allowed_origins, &allowed_hosts),
             )
@@ -2136,7 +2200,11 @@ pub async fn handle_command(
             Ok(0)
         }
         Some(Commands::Semantic { command }) => {
-            let index = &model_manager.semantic_store.as_ref().ok_or_else(||ReqvireError::ProcessError("Missing semantic index".into()))?.index;
+            let index = &model_manager
+                .semantic_store
+                .as_ref()
+                .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?
+                .index;
             match command {
                 SemanticCommands::Query { command } => return run_query_command(index, command),
                 SemanticCommands::Export {
@@ -2166,9 +2234,9 @@ pub async fn handle_command(
                 include_mappings,
                 output,
             } => {
-                let index = model_manager.semantic_index().ok_or_else(|| {
-                    ReqvireError::ProcessError("Missing semantic index".into())
-                })?;
+                let index = model_manager
+                    .semantic_index()
+                    .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?;
                 let format = semantic_export_format(jsonld);
                 let output_content = index.serialize_concepts(format, include_mappings)?;
                 write_or_print_semantic_output(output.as_ref(), output_content)?;
@@ -2196,9 +2264,9 @@ pub async fn handle_command(
             namespace_base,
             output,
         }) => {
-            let index = model_manager.semantic_index().ok_or_else(|| {
-                ReqvireError::ProcessError("Missing semantic index".into())
-            })?;
+            let index = model_manager
+                .semantic_index()
+                .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?;
             let format = if jsonld {
                 SemanticExportFormat::JsonLd
             } else {
@@ -3020,7 +3088,8 @@ fn run_query_command(
             }
         }
         QueryCommands::Validate { name, iri, json } => {
-            let report = index.query_validation_report(name.as_deref(), iri.as_deref(), Vec::new())?;
+            let report =
+                index.query_validation_report(name.as_deref(), iri.as_deref(), Vec::new())?;
             print_query_validation_report(&report, json)?;
             return Ok(if report["valid"] == true { 0 } else { 1 });
         }
@@ -3090,13 +3159,22 @@ fn run_query_command(
     Ok(0)
 }
 
-fn print_query_validation_report(report: &serde_json::Value, json: bool) -> Result<(), ReqvireError> {
+fn print_query_validation_report(
+    report: &serde_json::Value,
+    json: bool,
+) -> Result<(), ReqvireError> {
     if json {
         println!("{}", serde_json::to_string_pretty(report)?);
     } else {
         for query in report["queries"].as_array().into_iter().flatten() {
-            let valid = query["diagnostics"].as_array().is_some_and(|d| d.is_empty());
-            println!("{}: {}", query["name"].as_str().unwrap_or_default(), if valid { "valid" } else { "invalid" });
+            let valid = query["diagnostics"]
+                .as_array()
+                .is_some_and(|d| d.is_empty());
+            println!(
+                "{}: {}",
+                query["name"].as_str().unwrap_or_default(),
+                if valid { "valid" } else { "invalid" }
+            );
             for diagnostic in query["diagnostics"].as_array().into_iter().flatten() {
                 eprintln!("{}", diagnostic);
             }

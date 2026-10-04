@@ -2,6 +2,7 @@
 set -uo pipefail
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 mkdir -p "$TEST_DIR/output"
+printf '/output/\n' >> "$TEST_DIR/.git/info/exclude"
 python3 "$TEST_SCRIPT_DIR/check_http_access.py" "$REQVIRE_BIN" "$TEST_DIR" > "$TEST_DIR/output/checks.txt" || {
   cat "$TEST_DIR/output/checks.txt"
   exit 1

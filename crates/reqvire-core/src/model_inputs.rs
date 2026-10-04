@@ -82,13 +82,13 @@ fn record(path: &Path, value: Observation) {
 }
 
 pub fn read_to_string(path: &Path) -> std::io::Result<String> {
-    let result = std::fs::read_to_string(path);
+    let result = crate::mutation_io::read_to_string(path);
     record(path, content_observation(&result));
     result
 }
 
 pub fn exists(path: &Path) -> bool {
-    let exists = path.exists();
+    let exists = crate::mutation_io::exists(path);
     record(path, Observation::Exists(exists));
     exists
 }

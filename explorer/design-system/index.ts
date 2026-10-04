@@ -360,3 +360,5 @@ export type {
   TraceVerificationCardProps,
   WorkspaceToolbarProps,
 } from "./product-patterns";
+export { WorktreeSelector } from "./product-patterns/shell/WorktreeSelector";
+export type { WorktreeSelectorProps } from "./product-patterns/shell/WorktreeSelector";

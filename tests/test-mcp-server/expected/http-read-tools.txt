@@ -28,3 +28,4 @@ reqvire.traces
 reqvire.resources
 reqvire.change_impact
 reqvire.format
+reqvire.worktree.list

@@ -155,7 +155,7 @@ try {
     await rendered(main, "Live Refresh Requirement");
     await rendered(plain, "Live Refresh Requirement", false);
     assert.equal(await plain.evaluate(() => Boolean(window.reqvireLiveRefresh)), false);
-    assert.equal((await live(plainUrl)).status, 404);
+    assert.equal((await live(plainUrl)).status, 200);
     for (const session of [main, plain]) {
       assert.equal(await session.evaluate(() => Boolean(document.querySelector('button[aria-label="Refresh"]'))), false);
     }
@@ -246,8 +246,8 @@ try {
     assert.equal(wireHash(payload.chunks[hash]), hash);
     assert.equal(payload.revision, first.revision);
     assert.deepEqual(JSON.parse(payload.chunks[hash]), first.store.elements[0]);
-    assert.equal((await fetch(`${plainUrl}/api/project-store/manifest`)).status, 404);
-    assert.equal((await fetch(`${plainUrl}/api/project-store/chunks`, { method: "POST" })).status, 404);
+    assert.equal((await fetch(`${plainUrl}/api/project-store/manifest`)).status, 200);
+    assert.equal((await fetch(`${plainUrl}/api/project-store/chunks`, { method: "POST" })).status, 415);
   });
 
   let context;

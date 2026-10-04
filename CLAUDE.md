@@ -15,11 +15,14 @@ Reqvire is an AI-driven framework for system modeling and requirements managemen
 
 **Never skip the requirements step.** Implementation without requirements violates the MBSE methodology and project principles.
 
+Apply this workflow to engineering obligations. Cosmetic adjustments reuse existing UI requirements; do not add verification elements, acceptance criteria, or tests for individual width, spacing, alignment, or color tweaks. Keep verifications focused on meaningful behavior and accessibility. Use the existing design-system guards and showcase review for cosmetic changes, and report when visual review could not be performed.
+
 ## Domain-Specific Guides
 
 This guide is split into domain-specific guides for better organization:
 
 - **[tests/CLAUDE.md](tests/CLAUDE.md)** - Guide for writing and executing end-to-end tests
+- **[explorer/DS.md](explorer/DS.md)** - Read before visual Explorer changes. Shared design-system components, product patterns, and tokens own sizing and layout constraints; application views consume their public APIs.
 - **Core Development** (see sections below) - Guide for Rust code development, architecture, and components
 
 ## Building and Running Reqvire

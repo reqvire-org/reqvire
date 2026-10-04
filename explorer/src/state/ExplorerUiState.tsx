@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode, type Dispatch, type SetStateAction } from "react";
 import { useStore } from "../store/StoreContext";
 import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
 import { projectCoverage } from "../lib/coverage";
@@ -88,6 +88,7 @@ export const ONTOLOGY_DEFAULT_FILTERS = [
 ] as const;
 
 interface ExplorerUiState {
+  navigationNotice: string | null;
   modelMode: ModelMode;
   setModelMode: (mode: ModelMode) => void;
   modelSelectionId: ModelSelectionId;
@@ -139,6 +140,8 @@ const ExplorerUiStateContext = createContext<ExplorerUiState | null>(null);
 export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
   const { store } = useStore();
   const coverageState = useCoverageState(store);
+  const contextKey = store.project.worktree_id ?? store.project.workspace_root;
+  const [navigationNotice, setNavigationNotice] = useContextSelection<string | null>(contextKey, null);
   const searchElementTypeKeys = useMemo(
     () => Array.from(new Set(store.elements.map((element) => element.element_type).filter(Boolean))).sort(),
     [store.elements],
@@ -155,7 +158,7 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
     [store.knowledge_graph.nodes],
   );
   const [modelMode, setModelMode] = useState<ModelMode>("grid");
-  const [modelSelectionId, setModelSelectionId] = useState<ModelSelectionId>("__root__");
+  const [modelSelectionId, setModelSelectionId] = useContextSelection<ModelSelectionId>(contextKey, "__root__");
   const [modelTreeQuery, setModelTreeQuery] = useState("");
   const [modelTypes, setModelTypes] = useState(() => new Set<string>(modelTypeKeys));
   const [modelOverlays, setModelOverlays] = useState<Set<GraphOverlayKey>>(
@@ -168,18 +171,37 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
   const [ontologyLayoutNonce, setOntologyLayoutNonce] = useState(0);
   const [searchKinds, setSearchKinds] = useState(() => new Set<SearchKind>(SEARCH_KINDS));
   const [searchElementTypes, setSearchElementTypes] = useState(() => new Set<string>(searchElementTypeKeys));
-  const [knowledgeGraphSelectionId, setKnowledgeGraphSelectionId] = useState<string | null>(null);
-  const [ontologySelectionId, setOntologySelectionId] = useState<string | null>(null);
-  const [thesaurusSelectionId, setThesaurusSelectionId] = useState<string | null>(null);
+  const [knowledgeGraphSelectionId, setKnowledgeGraphSelectionId] = useContextSelection<string | null>(contextKey, null);
+  const [ontologySelectionId, setOntologySelectionId] = useContextSelection<string | null>(contextKey, null);
+  const [thesaurusSelectionId, setThesaurusSelectionId] = useContextSelection<string | null>(contextKey, null);
   const [thesaurusQuery, setThesaurusQuery] = useState("");
   const [coverageSectionId, setCoverageSectionId] = useState<CoverageSectionId>("overview");
-  const [traceFilePath, setTraceFilePath] = useState<string | null>(null);
-  const [traceSelectionId, setTraceSelectionId] = useState<string | null>(null);
+  const [traceFilePath, setTraceFilePath] = useContextSelection<string | null>(contextKey, null);
+  const [traceSelectionId, setTraceSelectionId] = useContextSelection<string | null>(contextKey, null);
   const [traceTreeQuery, setTraceTreeQuery] = useState("");
+
+  useEffect(() => {
+    if (!store.project.worktree_id) return;
+    let cleared = false;
+    const exists = (id: string) => store.elements.some(element => element.id === id);
+    if (modelSelectionId !== "__root__" && !exists(modelSelectionId)
+      && !store.resources.some(resource => resource.id === modelSelectionId)
+      && !store.files.some(file => `file:${file.path}` === modelSelectionId)
+      && !store.folders.some(folder => `folder:${folder.path}` === modelSelectionId)) {
+      setModelSelectionId("__root__"); cleared = true;
+    }
+    if (traceSelectionId && !exists(traceSelectionId)) { setTraceSelectionId(null); cleared = true; }
+    if (traceFilePath && !store.files.some(file => file.path === traceFilePath)) { setTraceFilePath(null); cleared = true; }
+    if (thesaurusSelectionId && !store.thesaurus.concepts.some(concept => concept.id === thesaurusSelectionId)) { setThesaurusSelectionId(null); cleared = true; }
+    if (knowledgeGraphSelectionId && !store.knowledge_graph.nodes?.some(node => node.id === knowledgeGraphSelectionId)) { setKnowledgeGraphSelectionId(null); cleared = true; }
+    if (ontologySelectionId && !store.ontology.graph_data?.nodes?.some(node => node.id === ontologySelectionId)) { setOntologySelectionId(null); cleared = true; }
+    if (cleared) setNavigationNotice("The previous selection is unavailable in this worktree. Select an available item to continue.");
+  }, [store, modelSelectionId, setModelSelectionId, traceSelectionId, setTraceSelectionId, traceFilePath, setTraceFilePath, thesaurusSelectionId, setThesaurusSelectionId, knowledgeGraphSelectionId, setKnowledgeGraphSelectionId, ontologySelectionId, setOntologySelectionId, setNavigationNotice]);
 
   const value = useMemo<ExplorerUiState>(
     () => ({
       ...coverageState,
+      navigationNotice,
       modelMode,
       setModelMode,
       modelSelectionId,
@@ -232,6 +254,7 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
     }),
     [
       coverageState,
+      navigationNotice,
       knowledgeGraphSelectionId,
       ontologySelectionId,
       thesaurusSelectionId,
@@ -262,6 +285,16 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
   );
 }
 
+function useContextSelection<T>(key: string, initial: T): [T, Dispatch<SetStateAction<T>>] {
+  const [selections, setSelections] = useState<Record<string, T>>({});
+  const set = useCallback((value: SetStateAction<T>) => setSelections(current => {
+    const previous = current[key] ?? initial;
+    const next = typeof value === "function" ? (value as (previous: T) => T)(previous) : value;
+    return Object.is(previous, next) ? current : { ...current, [key]: next };
+  }), [key, initial]);
+  return [selections[key] ?? initial, set];
+}
+
 interface CoveragePreferences {
   scopeId: string | null;
   notice: string | null;
@@ -278,7 +311,9 @@ function readCoveragePreferences(key: string): CoveragePreferences {
 }
 
 function useCoverageState(store: ExplorerProjectStore) {
-  const projectKey = `reqvire:coverage:${JSON.stringify([store.project.workspace_root, store.project.repository, store.project.name])}`;
+  const identity = [store.project.workspace_root, store.project.repository, store.project.name];
+  if (store.project.worktree_id) identity.push(store.project.worktree_id);
+  const projectKey = `reqvire:coverage:${JSON.stringify(identity)}`;
   const initial = useMemo(() => readCoveragePreferences(projectKey), [projectKey]);
   const [selections, setSelections] = useState<Record<string, CoveragePreferences>>({});
   const preferences = selections[projectKey] ?? initial;

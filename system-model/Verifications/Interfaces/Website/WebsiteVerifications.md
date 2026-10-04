@@ -18,6 +18,7 @@ This inspection verifies that endpoint-host and browser-origin setup examples ma
 - Confirm that the page distinguishes browser origin configuration from bind address, endpoint URL, and authentication.
 - Review direct-host and reverse-proxy examples for automatic bind-host acceptance, explicit allowed hostnames with optional ports, wildcard listener behavior, and equivalent embedded MCP options.
 - Build the website and check the examples against command help and the transport verification results.
+- Review mutation examples for default-disabled automatic commits, explicit `--enable-commits`, standalone/embedded prerequisites, unchanged ownership, and resolution of uncommitted changes before a clean restart.
 
 Review artifacts: [McpServer.tsx](../../../../website/src/pages/McpServer.tsx).
 
@@ -127,4 +128,22 @@ Check Query and optional Produces syntax, explicit ontology use and prefixes, ge
 #### Relations
   * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
   * verify: [Website Ontology Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-ontology-documentation)
+---
+
+### Website MCP Worktree and Publication Documentation Verification
+
+This review verifies the documented worktree and publication workflow against implemented tool contracts and Explorer behavior before public release.
+
+#### Details
+- Review standalone and embedded startup examples, flag prerequisites/defaults, configured remote selection, failed gh checks, and operation-time permission errors against command help and discovery fixtures.
+- Follow examples from explicit base to worktree creation/opening, context-scoped model reads/mutations, manual commit, push, explicit-base PR creation, and comment. Check same-repository and no-fork rules, no implicit effects, and recovery from uncertain outcomes.
+- Verify documentation presents one branch picker, metadata-only inventory, and on-demand loading with worktree reuse or creation handled internally. Explain read-only dirty-content support and existing cache freshness, mutation-enabled rejection of dirty targets before first load, normal ownership admission, accepted-snapshot reuse on reselection including accepted uncommitted writes, and worktree preservation on shutdown. The examples must not imply eager loading of all worktrees, cache resets on switching, or a read-only bypass in mutation mode. Clean restart, accepted-only commits, and managed-worktree removal retain their existing rules. Two tabs independently select branches without changing another client's routing or requiring an MCP switching tool.
+- Build and inspect the MCP documentation route only after implementation. Do not mark this planned review completed by adding source-file links as executable evidence.
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
+  * verify: [Website Assistant Integration Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-assistant-integration-documentation)
 ---

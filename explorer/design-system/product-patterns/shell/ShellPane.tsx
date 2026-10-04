@@ -16,6 +16,7 @@ const baseUX = css`
 `;
 
 const startUX = css`
+  flex-direction: column;
   flex: 0 0 var(--ux-current-left-width);
   width: var(--ux-current-left-width);
   height: 100%;

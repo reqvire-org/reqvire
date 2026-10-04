@@ -17,6 +17,7 @@
 export const EXPECTED_SCHEMA_VERSION = "2026-06-30.project-store.v4";
 
 export interface ProjectStoreProject {
+  worktree_id?: string;
   name: string;
   root_label: string;
   workspace_root: string;
@@ -596,6 +597,7 @@ export interface ExplorerProjectStore {
 declare global {
   interface Window {
     reqvireProjectStore?: unknown;
+    reqvireWorktreeRouting?: boolean;
     /** Advertised only by serve with embedded MCP mutations enabled. */
     reqvireLiveRefresh?: { revision: string; manifest: unknown };
   }

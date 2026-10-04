@@ -1,10 +1,20 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MockShell } from "./MockShell";
+import { ProductPatternsPage } from "./pages/ProductPatternsPage";
 
 // Coverage uses the real application. JSDOM only substitutes unavailable WebGL and worker APIs.
 vi.mock("../../src/views/GraphLibraryViews", () => ({ KnowledgeGraphView: () => null }));
 vi.mock("../../src/lib/ontologyGraphRenderer", () => ({ mountOntologyGraph: vi.fn() }));
+
+function selectWorktree(branch: string) {
+  fireEvent.click(screen.getByRole("combobox", { name: "Branch" }));
+  fireEvent.click(screen.getByRole("option", { name: new RegExp(`^${branch} `) }));
+}
+
+function expectBranch(branch: string) {
+  expect(screen.getByRole("combobox", { name: "Branch" }).textContent).toBe(branch);
+}
 
 function expand(name: string) {
   fireEvent.click(screen.getByRole("button", { name: `Expand ${name}` }));
@@ -17,6 +27,54 @@ describe("showcase application coverage", () => {
     vi.stubGlobal("Worker", class { postMessage() {} terminate() {} });
   });
   afterEach(() => vi.unstubAllGlobals());
+
+  it("previews branch labels and unavailable choices in Patterns", () => {
+    const view = render(<ProductPatternsPage />);
+    try {
+      const selector = screen.getByRole("combobox", { name: "Branch" });
+      expectBranch("main");
+      fireEvent.click(selector);
+      expect(screen.getByRole("option", { name: /archived.*Unavailable/ }).getAttribute("aria-disabled")).toBe("true");
+      fireEvent.keyDown(selector, { key: "Escape" });
+      selectWorktree("coverage-review");
+      expectBranch("coverage-review");
+    } finally { view.unmount(); }
+  });
+
+  it("switches fixture worktrees in the real Explorer shell and closes old details", async () => {
+    window.history.replaceState(null, "", "/?tab=mocks#/coverage");
+    localStorage.setItem("reqvire-explorer-theme", "light");
+    let view = render(<MockShell />);
+    try {
+      expand("Example Capability");
+      const requirement = screen.getByRole("article", { name: "Example Requirement" });
+      fireEvent.click(within(requirement).getByRole("link", { name: "requirement Example Requirement" }));
+      await screen.findByRole("dialog");
+      selectWorktree("coverage-review");
+      await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+      expectBranch("coverage-review");
+      expect(screen.getByRole("article", { name: "Alpha Root" })).toBeTruthy();
+      expect(screen.queryByRole("article", { name: "Example Capability" })).toBeNull();
+      expect(window.location.hash).toBe("#/coverage");
+      expect(new URLSearchParams(window.location.search).get("worktree_id")).toBe("showcase-coverage");
+      expect(screen.getByRole("tab", { name: "Coverage" }).getAttribute("aria-selected")).toBe("true");
+      view.unmount();
+      view = render(<MockShell />);
+      expectBranch("coverage-review");
+      expect(screen.getByRole("article", { name: "Alpha Root" })).toBeTruthy();
+      selectWorktree("main");
+      expectBranch("main");
+      expect(screen.getByRole("article", { name: "Example Capability" })).toBeTruthy();
+      window.history.back();
+      await waitFor(() => expectBranch("coverage-review"));
+      expect(screen.getByRole("article", { name: "Alpha Root" })).toBeTruthy();
+      window.history.forward();
+      await waitFor(() => expectBranch("main"));
+    } finally {
+      view.unmount();
+      window.history.replaceState(null, "", "/");
+    }
+  });
 
   it("uses the real Explorer app and detail navigation in the showcase mock", async () => {
     window.history.replaceState(null, "", "/?tab=mocks&example=coverage#/coverage");

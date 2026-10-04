@@ -1,3 +1,4 @@
+import { useWorktreeUrl } from "../store/worktreeUrls";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   Button,
@@ -288,6 +289,7 @@ function ExplorerViewControls({
   onOpenElement: (id: string) => void;
   onOpenOntologyNode: (id: string) => void;
 }) {
+  const contextualUrl = useWorktreeUrl();
   const ui = useExplorerUiState();
   const { store, elementById } = useStore();
 
@@ -525,7 +527,7 @@ function ExplorerViewControls({
             <PaneActionRow>
               {store.ontology.ttl_href ? (
                 <PaneGhostLink
-                  href={store.ontology.ttl_href}
+                  href={contextualUrl(store.ontology.ttl_href)}
                   title="Download the exported ontology as Turtle (ontologies.ttl)"
                 >
                   <Icon name="download" />

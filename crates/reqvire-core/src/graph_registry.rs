@@ -2,7 +2,6 @@ use log::{debug, warn};
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
