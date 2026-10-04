@@ -320,4 +320,4 @@ fn supersede(state: &mut CacheState) {
 
 #[cfg(test)]
 #[path = "model_cache_tests.rs"]
-mod tests;
+pub(crate) mod tests;

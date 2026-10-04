@@ -331,9 +331,15 @@ Verify coordinated model construction and publication of complete current state 
 
 ##### Acceptance Criteria
 - Concurrent cold requests for identical workspace inputs and build mode perform one model build and receive its completed result. Distinct build modes cannot share incompatible graph, diagnostics, or size-estimate state.
+- Each resolved construction attempt builds one semantic index, reused by validation and RDF capture in strict, lenient, and size-estimate modes. Warm reads and semantic exports do not build another index or initialize query stores.
+- A strict semantic failure retains query diagnostics without publishing a query store. Repair and repeated parsing replace the failed state. Changed mutation candidates receive fresh semantic validation, and invalid edits leave persisted sources unchanged.
+- Changing an external ontology between semantic validation and RDF capture cannot mix validation from one version with RDF from another. Cache publication detects the changed dependency and retries with a newly built index.
 - While a build is paused before publication, invalidate its workspace and complete a newer persisted update/build. Releasing the older build cannot replace the newer cached state; waiting dependent reads resolve current state or an explicit applicable error.
 - A relevant source, configuration, or dependency change during construction supersedes the candidate. The published identity and model reflect the inputs actually consumed; a candidate cannot be tagged with one input observation while containing another.
 - A read that has captured a completed model retains consistent graph, page, and semantic query state while later publication occurs. Subsequent dependent reads after a successful write use the completed new state.
+- A completed model initially has no prepared query-store variants. First use prepares only the requested variant; repeated and concurrent use through snapshot clones shares that completed store. All public variants retain their expected default/named graph contents and external visibility.
+- First use after dependency deletion, and initialization paused across source edits and newer publication, use the captured RDF. Mutating a separate working registry cannot alter an older snapshot's deferred store. Current-model loads still reject missing or invalid dependencies and recover after repair.
+- A failed store initialization returns the same applicable error to concurrent callers without exposing partial graphs; another snapshot can initialize successfully.
 - Controlled writes cannot expose partially persisted files to a newly published model. Reuse of a post-write model requires its semantic state and persisted-input identity to agree with its graph; invalidation and rebuild remain a valid fallback.
 - Failed construction or superseded attempts release all waiting requests and permit retry/recovery. Continuous external changes produce a bounded retry outcome rather than an endless wait or stale success. Old valid data is not reported as current for invalid new inputs.
 - Rejected/previews with unchanged sources do not publish mutation candidates. If a failure occurs after any persistence, affected cache state is invalidated and the operation error remains visible.
@@ -343,10 +349,12 @@ Verify coordinated model construction and publication of complete current state 
 - Exercise both successful and failing shared builds and assert every waiter completes under a bounded test deadline. Verify the next valid load recovers.
 - Inject a persistence failure only after observing changed bytes successfully written to the first affected file. Assert the operation error remains visible, affected cached state is invalidated, subsequent reads follow authoritative validation, and repaired sources recover.
 - Compare graph/page data and SPARQL-visible triples for the accepted generation; verify a captured older result remains internally consistent. Generation instrumentation is internal and does not require new public interface fields.
+- Observe prepared-store counts and store identity independently of response equality. Pause first-use initialization with a deterministic hook and verify old/new SPARQL results against their respective captured RDF. Check initialization failures with malformed captured RDF in an internal fixture.
+- Instrument semantic-index builds and pause immediately after semantic validation. Assert per-attempt index counts, retained invalid-query diagnostics, refreshed mutation validation, and agreement between validated external labels and captured RDF across an intervening file edit.
 - Consumer-owned verifications establish transport write gating and derived-artifact integration; this verification owns the core construction/publication invariants.
 
 ##### Evidence Status
-Regression execution passes for coordinated construction, superseded publication, input rechecks, bounded failure under continuous edits, and invalidation after partial persistence. All 19 core cache tests pass, including a contender arriving between cache lookup and build registration. Captured graph/page/SPARQL state and derived semantic artifacts remain consistent across later changes. The consumer adapter tests establish read isolation during controlled persistence. Persistence errors remain visible, partial inputs receive authoritative validation, and repaired inputs recover.
+Regression execution passes for coordinated construction, superseded publication, input rechecks, bounded failure under continuous edits, and invalidation after partial persistence. The core cache tests include a contender arriving between cache lookup and build registration, first-use queries after dependency removal, and deferred initialization paused across newer publication. Instrumented tests establish one semantic index per resolved construction attempt across build modes, retained diagnostics after strict semantic failure, reset on repeated parsing, and fresh validation for mutated candidates. An external edit between validation and RDF capture preserves the validated version within the attempt and forces a fresh cache build before publication. Captured graph/page/SPARQL state and derived semantic artifacts remain consistent across later changes. Store tests establish deferred preparation, shared concurrent initialization, graph visibility, and error propagation. The consumer adapter tests establish read isolation during controlled persistence. Persistence errors remain visible, partial inputs receive authoritative validation, and repaired inputs recover.
 
 #### Metadata
   * type: test-verification
@@ -354,6 +362,7 @@ Regression execution passes for coordinated construction, superseded publication
 #### Relations
   * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
   * satisfiedBy: [mcp_cache_tests.rs](../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [semantic_store.rs](../../../crates/reqvire-core/src/semantic_store.rs)
   * satisfiedBy: [model_cache_tests.rs](../../../crates/reqvire-core/src/model_cache_tests.rs)
   * verify: [In-Memory Model Build Cache](../../ModelStructure/ModelManagement.md#in-memory-model-build-cache)
 ---

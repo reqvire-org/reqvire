@@ -45,6 +45,8 @@ If input changes or invalidation supersede an in-progress build, the system shal
 
 #### Details
 - The system shall keep each served model's parsed elements, page content, validation state, and semantic query state consistent with the same completed construction inputs.
+- The system shall reuse the semantic index built for a resolved graph during semantic validation, RDF capture, and subsequent read-only semantic reports and exports. A changed mutation candidate shall receive fresh semantic validation against its own graph.
+- The system shall prepare query-store variants on first use from RDF captured during validated model construction and reuse each prepared variant within that model snapshot.
 - If a current model cannot be built under the requested validation mode, the system shall report the applicable failure or diagnostics rather than present an older cached model as current.
 - The system shall preserve content-sensitive freshness when a source edit leaves file size and modification time unchanged.
 - The system shall keep cached build modes and workspace scopes distinct.
@@ -64,6 +66,8 @@ If input changes or invalidation supersede an in-progress build, the system shal
   * satisfiedBy: [exclusions.rs](../../crates/reqvire-core/src/exclusions.rs)
   * satisfiedBy: [model_cache.rs](../../crates/reqvire-core/src/model_cache.rs)
   * satisfiedBy: [model_inputs.rs](../../crates/reqvire-core/src/model_inputs.rs)
+  * satisfiedBy: [model.rs](../../crates/reqvire-core/src/model.rs)
+  * satisfiedBy: [semantic_store.rs](../../crates/reqvire-core/src/semantic_store.rs)
   * satisfiedBy: [arg_helpers.rs](../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
   * verifiedBy: [In-Memory Model Build Cache Verification](../Verifications/ModelStructure/ParsingVerifications.md#in-memory-model-build-cache-verification)
 ---

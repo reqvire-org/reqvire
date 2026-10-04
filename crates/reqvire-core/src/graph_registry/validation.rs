@@ -1563,8 +1563,16 @@ impl GraphRegistry {
         &self,
         removed_declaration_source: Option<&str>,
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
-        let mut errors = Vec::new();
         let semantic_index = semantic_contract::build_semantic_index(self);
+        self.validate_semantic_contracts_with_index(&semantic_index, removed_declaration_source)
+    }
+
+    pub(super) fn validate_semantic_contracts_with_index(
+        &self,
+        semantic_index: &semantic_contract::SemanticIndex,
+        removed_declaration_source: Option<&str>,
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
+        let mut errors = Vec::new();
         for diagnostic in &semantic_index.diagnostics {
             errors.push(ReqvireError::InvalidMarkdownStructure(format!(
                 "File {}: semantic model element '{}' at line {}: {}",
@@ -1587,17 +1595,17 @@ impl GraphRegistry {
         }
 
         errors.extend(self.validate_semantic_contract_shape_alignment(
-            &semantic_index,
+            semantic_index,
             removed_declaration_source,
         ));
 
-        errors.extend(self.validate_semantic_contract_shape_prefixes(&semantic_index));
+        errors.extend(self.validate_semantic_contract_shape_prefixes(semantic_index));
 
         errors.extend(self.validate_concept_references(removed_declaration_source));
 
-        errors.extend(self.validate_maps_to_concept_targets(&semantic_index));
+        errors.extend(self.validate_maps_to_concept_targets(semantic_index));
 
-        for (iri, declarations) in semantic_index.ontology_declarations {
+        for (iri, declarations) in &semantic_index.ontology_declarations {
             let authored_declarations: Vec<_> = declarations
                 .iter()
                 .filter(|declaration| !declaration.external)

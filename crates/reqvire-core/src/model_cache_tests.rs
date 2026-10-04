@@ -15,6 +15,8 @@ const MODEL: &str = include_str!("../../../tests/test-cache-integration/fixtures
 const ONTOLOGY: &str =
     include_str!("../../../tests/test-cache-integration/fixtures/ontology.md.txt");
 const EXTERNAL: &str = include_str!("../../../tests/test-cache-integration/fixtures/external.ttl");
+const QUERIES: &str =
+    include_str!("../../../tests/test-semantic-queries/specifications/Queries.md");
 const PAGE: &str = include_str!("../../../tests/test-cache-integration/fixtures/page.md.txt");
 const BROKEN: &str = include_str!("../../../tests/test-cache-integration/fixtures/broken.md.txt");
 const REFERENCE: &str =
@@ -30,7 +32,7 @@ type Observer = Arc<dyn Fn(&str) + Send + Sync>;
 static OBSERVER: Mutex<Option<Observer>> = Mutex::new(None);
 static BUILDS: AtomicUsize = AtomicUsize::new(0);
 
-pub(super) fn checkpoint(phase: &str) {
+pub(crate) fn checkpoint(phase: &str) {
     if phase == "build-start" {
         BUILDS.fetch_add(1, Ordering::SeqCst);
     }
@@ -149,6 +151,9 @@ fn load() -> Result<ModelManager, ReqvireError> {
 fn builds() -> usize {
     BUILDS.load(Ordering::SeqCst)
 }
+fn index_builds() -> usize {
+    crate::semantic_contract::INDEX_BUILD_COUNT.load(Ordering::SeqCst)
+}
 fn content(model: &ModelManager) -> String {
     model
         .graph_registry
@@ -167,7 +172,8 @@ fn labels(model: &ModelManager) -> Vec<String> {
                 .semantic_store
                 .as_ref()
                 .expect("expected semantic store in test model")
-                .store(true, true),
+                .store(true, true)
+                .expect("prepare captured query store"),
         )
         .execute()
         .expect("execute test SPARQL query");
@@ -213,6 +219,226 @@ fn candidate() -> thread::JoinHandle<Result<ModelManager, ReqvireError>> {
         .spawn(load)
         .expect("candidate: expected success")
 }
+
+case!(one_semantic_index_per_resolved_model_build, {
+    let _workspace = Workspace::new();
+    std::fs::write("Ontology.md", ONTOLOGY).unwrap();
+    std::fs::write("external.ttl", EXTERNAL).unwrap();
+    for lenient in [false, true] {
+        for with_size_estimates in [false, true] {
+            let before = index_builds();
+            let model = load_cached_model(
+                &patterns(&[]),
+                ModelBuildOptions {
+                    lenient,
+                    with_size_estimates,
+                },
+            )
+            .expect("construct model");
+            assert_eq!(
+                index_builds() - before,
+                1,
+                "one index for validation and RDF capture"
+            );
+            let store = model.semantic_store.as_ref().unwrap();
+            assert!(std::ptr::eq(
+                model.semantic_index().unwrap(),
+                store.index.as_ref()
+            ));
+            crate::explorer_runtime::build_runtime_assets(&model).unwrap();
+            assert_eq!(store.initialized_store_count(), 0);
+            assert_eq!(labels(&model), ["\"Label alpha\""]);
+            load_cached_model(
+                &patterns(&[]),
+                ModelBuildOptions {
+                    lenient,
+                    with_size_estimates,
+                },
+            )
+            .unwrap();
+            assert_eq!(
+                index_builds() - before,
+                1,
+                "export, query and warm read must reuse index"
+            );
+        }
+    }
+});
+
+case!(
+    semantic_failures_retain_diagnostics_and_reparse_clears_old_state,
+    {
+        let _workspace = Workspace::new();
+        std::fs::write("Queries.md", QUERIES).unwrap();
+        let mut model = ModelManager::new();
+        model.parse_and_validate(None, &patterns(&[])).unwrap();
+        assert_eq!(index_builds(), 1);
+        let captured = model.clone();
+
+        let invalid = QUERIES.replace("?item a item:Item", "?item a item:Unknown");
+        std::fs::write("Queries.md", &invalid).unwrap();
+        let error = model.parse_and_validate(None, &patterns(&[])).unwrap_err();
+        assert!(
+            model.semantic_store.is_none(),
+            "strict failure cannot expose a query store"
+        );
+        let report = model
+            .semantic_index()
+            .unwrap()
+            .query_validation_report(None, None, vec![error.to_string()])
+            .unwrap();
+        assert_eq!(report["valid"], false);
+        assert!(report["queries"][0]["diagnostics"]
+            .to_string()
+            .contains("Unknown"));
+        assert_eq!(index_builds(), 2);
+        assert!(captured.semantic_index().unwrap().diagnostics.is_empty());
+
+        let before = index_builds();
+        let report = crate::tool_interface::ReqvireToolRegistry::new(true, &patterns(&[]))
+            .call_tool("reqvire.semantic.queries.validate", &serde_json::json!({}))
+            .unwrap();
+        assert_eq!(report["valid"], false);
+        assert!(report["queries"][0]["diagnostics"]
+            .to_string()
+            .contains("Unknown"));
+        assert_eq!(
+            index_builds() - before,
+            1,
+            "MCP diagnostics reuse the failed validation index"
+        );
+
+        let before = index_builds();
+        model
+            .parse_and_validate_with_mode(None, &patterns(&[]), true)
+            .unwrap();
+        assert!(!model.semantic_index().unwrap().diagnostics.is_empty());
+        assert_eq!(
+            model
+                .semantic_store
+                .as_ref()
+                .unwrap()
+                .initialized_store_count(),
+            0
+        );
+        assert_eq!(
+            index_builds() - before,
+            1,
+            "lenient invalid construction shares its index"
+        );
+
+        std::fs::write("Queries.md", QUERIES).unwrap();
+        let before = index_builds();
+        model.parse_and_validate(None, &patterns(&[])).unwrap();
+        assert!(model.semantic_index().unwrap().diagnostics.is_empty());
+        assert_eq!(index_builds() - before, 1);
+        std::fs::write("Duplicate.md", QUERIES).unwrap();
+        assert!(model.parse_and_validate(None, &patterns(&[])).is_err());
+        assert!(
+            model.semantic_index().is_none(),
+            "pass 1 failure cannot retain a previous index"
+        );
+        assert!(model.semantic_store.is_none());
+    }
+);
+
+case!(mutation_candidates_build_fresh_semantic_indexes, {
+    let _workspace = Workspace::new();
+    std::fs::write("Queries.md", QUERIES).unwrap();
+    let model = load().unwrap();
+    let mut candidate = model.graph_registry.clone();
+    let query = candidate
+        .nodes
+        .get_mut("Queries.md#item-lookup")
+        .unwrap()
+        .element
+        .semantic_query
+        .as_mut()
+        .unwrap()
+        .query
+        .as_mut()
+        .unwrap();
+    query.content = query
+        .content
+        .replace("?item a item:Item", "?item a item:Unknown");
+    let before = index_builds();
+    let errors = candidate.validate_semantic_contracts_in_memory().unwrap();
+    assert!(errors.iter().any(|e| e.to_string().contains("Unknown")));
+    assert_eq!(index_builds() - before, 1);
+    assert!(model.semantic_index().unwrap().diagnostics.is_empty());
+
+    let mut removed = model.graph_registry.clone();
+    removed.nodes.remove("Queries.md#item-ontology");
+    let before = index_builds();
+    assert!(!removed
+        .validate_semantic_contracts_after_removal("Queries.md#item-ontology")
+        .unwrap()
+        .is_empty());
+    assert_eq!(index_builds() - before, 1);
+
+    let before = index_builds();
+    let invalid = "### Item Lookup\n\n#### Metadata\n  * type: semantic-query\n\n#### Query\n```sparql\nASK { ?s a <https://example.org/items#Unknown> }\n```\n\n#### Relations\n  * use: [Item Ontology](#item-ontology)\n";
+    let error = crate::tool_interface::ReqvireToolRegistry::new(true, &patterns(&[]))
+        .call_tool(
+            "reqvire.add_element",
+            &serde_json::json!({
+                "file": "Queries.md", "override_existing": true, "content": invalid,
+            }),
+        )
+        .unwrap_err();
+    assert!(
+        error
+            .diagnostics()
+            .iter()
+            .any(|d| d.message.contains("Unknown")),
+        "{error:?}"
+    );
+    assert!(
+        index_builds() > before,
+        "mutation must validate changed candidate"
+    );
+    assert_eq!(std::fs::read_to_string("Queries.md").unwrap(), QUERIES);
+    assert!(model.semantic_index().unwrap().diagnostics.is_empty());
+});
+
+case!(external_edit_after_validation_does_not_mix_captured_rdf, {
+    let _workspace = Workspace::new();
+    std::fs::write("Ontology.md", ONTOLOGY).unwrap();
+    std::fs::write("external.ttl", EXTERNAL).unwrap();
+    *OBSERVER.lock().unwrap() = Some(Arc::new(|phase| {
+        if phase == "semantic-validated" {
+            std::fs::write("external.ttl", EXTERNAL.replace("alpha", "omega")).unwrap();
+        }
+    }));
+    let mut model = ModelManager::new();
+    model.parse_and_validate(None, &patterns(&[])).unwrap();
+    assert_eq!(
+        labels(&model),
+        ["\"Label alpha\""],
+        "RDF must use the validated dependency"
+    );
+    assert_eq!(index_builds(), 1);
+    *OBSERVER.lock().unwrap() = None;
+    assert_eq!(labels(&load().unwrap()), ["\"Label omega\""]);
+});
+
+case!(external_edit_after_validation_retries_with_fresh_index, {
+    let _workspace = Workspace::new();
+    std::fs::write("Ontology.md", ONTOLOGY).unwrap();
+    std::fs::write("external.ttl", EXTERNAL).unwrap();
+    let changed = AtomicBool::new(false);
+    *OBSERVER.lock().unwrap() = Some(Arc::new(move |phase| {
+        if phase == "semantic-validated" && !changed.swap(true, Ordering::SeqCst) {
+            std::fs::write("external.ttl", EXTERNAL.replace("alpha", "omega")).unwrap();
+        }
+    }));
+    let model = load().expect("retry changed dependency");
+    assert_eq!(labels(&model), ["\"Label omega\""]);
+    assert_eq!(builds(), 2, "changed dependency supersedes first attempt");
+    assert_eq!(index_builds(), 2, "each attempt builds its own index once");
+    load().unwrap();
+    assert_eq!(index_builds(), 2);
+});
 
 case!(equivalent_regex_matcher_reconstruction_reuses_build, {
     let _workspace = Workspace::new();
@@ -612,6 +838,24 @@ case!(
         std::fs::write("external.ttl", EXTERNAL).expect("write test fixture");
         std::fs::write("Page.md", PAGE).expect("write test fixture");
         let captured = load().expect("load valid test model");
+        assert_eq!(
+            captured
+                .semantic_store
+                .as_ref()
+                .expect("semantic state")
+                .initialized_store_count(),
+            0
+        );
+        crate::explorer_runtime::build_runtime_assets(&captured)
+            .expect("export from captured index without preparing query stores");
+        assert_eq!(
+            captured
+                .semantic_store
+                .as_ref()
+                .expect("semantic state")
+                .initialized_store_count(),
+            0
+        );
         std::fs::write("external.ttl", EXTERNAL.replace("alpha", "omega"))
             .expect("write test fixture");
         std::fs::write("Page.md", PAGE.replace("alpha", "omega")).expect("write test fixture");
@@ -638,6 +882,116 @@ case!(
         assert!(captured_assets.project_store_json.contains("Label alpha"));
         assert!(!captured_assets.project_store_json.contains("Label omega"));
         assert!(current_assets.project_store_json.contains("Label omega"));
+    }
+);
+
+case!(
+    deferred_query_survives_dependency_removal_and_current_load_recovers,
+    {
+        let _workspace = Workspace::new();
+        std::fs::write("Ontology.md", ONTOLOGY).expect("write ontology");
+        std::fs::write("external.ttl", EXTERNAL).expect("write dependency");
+        let captured = load().expect("capture valid snapshot");
+        assert_eq!(
+            captured
+                .semantic_store
+                .as_ref()
+                .expect("semantic state")
+                .initialized_store_count(),
+            0
+        );
+        std::fs::remove_file("external.ttl").expect("remove dependency before first query");
+        assert_eq!(labels(&captured), ["\"Label alpha\""]);
+        assert!(
+            load().is_err(),
+            "current load must reject missing dependency"
+        );
+        std::fs::write("external.ttl", EXTERNAL.replace("alpha", "omega"))
+            .expect("repair dependency");
+        let current = load().expect("capture repaired snapshot");
+        assert_eq!(labels(&current), ["\"Label omega\""]);
+        assert_eq!(labels(&captured), ["\"Label alpha\""]);
+    }
+);
+
+case!(
+    deferred_initialization_stays_with_captured_rdf_across_new_publication,
+    {
+        let _workspace = Workspace::new();
+        std::fs::write("Ontology.md", ONTOLOGY).expect("write ontology");
+        std::fs::write("external.ttl", EXTERNAL).expect("write dependency");
+        let captured = load().expect("capture valid snapshot");
+        let semantic = captured.semantic_store.as_ref().expect("semantic state");
+        let (reached_tx, reached_rx) = mpsc::channel();
+        let (release_tx, release_rx) = mpsc::channel();
+        let release_rx = Mutex::new(release_rx);
+        semantic.set_store_init_hook(move || {
+            reached_tx.send(()).expect("signal first initialization");
+            release_rx
+                .lock()
+                .expect("release lock")
+                .recv_timeout(DEADLINE)
+                .expect("release old initialization");
+        });
+        let mut working = captured.clone();
+        for node in working.graph_registry.nodes.values_mut() {
+            node.element.content = node.element.content.replace("alpha", "candidate");
+            if node.element.name == "Cache Subject" {
+                node.element.name = "Candidate Subject".into();
+            }
+        }
+        let worker = thread::spawn(move || {
+            let external_labels = labels(&working);
+            let store = working
+                .semantic_store
+                .as_ref()
+                .expect("captured semantic state")
+                .store(true, true)
+                .expect("prepared captured store");
+            for (name, expected) in [("Cache Subject", true), ("Candidate Subject", false)] {
+                let query = format!(
+                    "ASK {{ ?s <https://www.reqvire.org/ontology#elementName> \"{name}\" }}"
+                );
+                let result = SparqlEvaluator::new()
+                    .parse_query(&query)
+                    .expect("parse name query")
+                    .on_store(store)
+                    .execute()
+                    .expect("query captured model names");
+                assert!(
+                    matches!(result, QueryResults::Boolean(value) if value == expected),
+                    "captured RDF must retain original model identity: {name}"
+                );
+            }
+            external_labels
+        });
+        reached_rx
+            .recv_timeout(DEADLINE)
+            .expect("reach deferred initialization");
+        std::fs::write("Model.md", MODEL.replace("alpha", "omega")).expect("edit model");
+        std::fs::write("external.ttl", EXTERNAL.replace("alpha", "omega"))
+            .expect("edit dependency");
+        invalidate();
+        let current = load().expect("publish newer snapshot");
+        assert_eq!(labels(&current), ["\"Label omega\""]);
+        assert!(content(&current).contains("omega"));
+        release_tx.send(()).expect("resume old initialization");
+        assert_eq!(
+            worker.join().expect("old query worker"),
+            ["\"Label alpha\""]
+        );
+        assert_eq!(labels(&captured), ["\"Label alpha\""]);
+        assert!(content(&captured).contains("alpha"));
+        let count = builds();
+        assert_eq!(
+            labels(&load().expect("retain newer publication")),
+            ["\"Label omega\""]
+        );
+        assert_eq!(
+            builds(),
+            count,
+            "old initialization must not replace current cache"
+        );
     }
 );
 

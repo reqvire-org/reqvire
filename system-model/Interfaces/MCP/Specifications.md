@@ -424,8 +424,8 @@ SPARQL tool request:
 - Optional `include_external` boolean defaults to false. When true, the selected graph also includes only the used external ontology subset derived from parsed local external dependency files.
 
 Execution behavior:
-- The validated Reqvire model owns an in-memory Oxigraph semantic store built after parsing and graph validation.
-- The tool executes against the selected model-owned semantic store without rebuilding or reloading RDF for each query call.
+- The validated Reqvire model owns captured RDF inputs and initializes the selected in-memory Oxigraph store on first query use under the In-Memory Model Build Cache Specification.
+- Subsequent calls reuse that snapshot's selected store. Initialization uses its captured RDF inputs and propagates preparation errors through the existing tool error contract.
 - The tool executes the query with Oxigraph SPARQL evaluation.
 - The tool does not persist an RDF store and does not write generated triples back to Markdown source.
 - The tool does not expose SPARQL Update, arbitrary shell execution, arbitrary filesystem reads, or remote URL fetching.

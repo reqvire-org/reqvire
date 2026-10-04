@@ -173,6 +173,8 @@ pub(super) fn authored_ontology_subject_definition_edges(
 }
 
 pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
+    #[cfg(test)]
+    INDEX_BUILD_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
     let mut blocks = Vec::new();
     let mut external_blocks = Vec::new();
     let mut external_sources = Vec::new();

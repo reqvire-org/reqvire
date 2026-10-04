@@ -1341,11 +1341,12 @@ pub async fn handle_command(
     }) = &args.command
     {
         let index = model_manager
-            .semantic_store
-            .as_ref()
-            .map(|store| store.index.clone())
+            .semantic_index()
+            .map(std::borrow::Cow::Borrowed)
             .unwrap_or_else(|| {
-                semantic_contract::build_semantic_index(&model_manager.graph_registry)
+                std::borrow::Cow::Owned(semantic_contract::build_semantic_index(
+                    &model_manager.graph_registry,
+                ))
             });
         let model_errors = parse_result
             .as_ref()
@@ -2165,7 +2166,9 @@ pub async fn handle_command(
                 include_mappings,
                 output,
             } => {
-                let index = semantic_contract::build_semantic_index(&model_manager.graph_registry);
+                let index = model_manager.semantic_index().ok_or_else(|| {
+                    ReqvireError::ProcessError("Missing semantic index".into())
+                })?;
                 let format = semantic_export_format(jsonld);
                 let output_content = index.serialize_concepts(format, include_mappings)?;
                 write_or_print_semantic_output(output.as_ref(), output_content)?;
@@ -2193,7 +2196,9 @@ pub async fn handle_command(
             namespace_base,
             output,
         }) => {
-            let index = semantic_contract::build_semantic_index(&model_manager.graph_registry);
+            let index = model_manager.semantic_index().ok_or_else(|| {
+                ReqvireError::ProcessError("Missing semantic index".into())
+            })?;
             let format = if jsonld {
                 SemanticExportFormat::JsonLd
             } else {

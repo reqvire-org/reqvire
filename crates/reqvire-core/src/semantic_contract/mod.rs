@@ -1778,6 +1778,9 @@ use index::*;
 pub use export::external_materialization_metadata;
 pub(crate) use export::materialized_external_subjects;
 pub use index::build_semantic_index;
+#[cfg(test)]
+pub(crate) static INDEX_BUILD_COUNT: std::sync::atomic::AtomicUsize =
+    std::sync::atomic::AtomicUsize::new(0);
 pub(crate) use prefixes::{parse_turtle_prefix_declarations, parse_turtle_prefix_line};
 
 #[cfg(test)]

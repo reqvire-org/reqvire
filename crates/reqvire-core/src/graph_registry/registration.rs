@@ -72,11 +72,11 @@ impl GraphRegistry {
         self.populate_relation_element_ids();
     }
 
-    /// Build relations and validate graph structure
+    /// Resolve and validate the graph, retaining the index used for semantic validation.
     pub fn build_relations(
         &mut self,
         excluded_filename_patterns: &GlobSet,
-    ) -> Result<Vec<ReqvireError>, ReqvireError> {
+    ) -> Result<(Vec<ReqvireError>, semantic_contract::SemanticIndex), ReqvireError> {
         debug!("GraphRegistry: Building relations and validating graph structure");
         self.refresh_relation_context(excluded_filename_patterns);
 
@@ -129,9 +129,10 @@ impl GraphRegistry {
         errors.extend(self.validate_cross_section_duplicates()?);
 
         // Validate semantic-contract reserved sections, declarations, and references
-        errors.extend(self.validate_semantic_contracts(None)?);
+        let semantic_index = semantic_contract::build_semantic_index(self);
+        errors.extend(self.validate_semantic_contracts_with_index(&semantic_index, None)?);
 
-        Ok(errors)
+        Ok((errors, semantic_index))
     }
 
     /// Populate optional element-level size estimates for JSON evidence consumers.

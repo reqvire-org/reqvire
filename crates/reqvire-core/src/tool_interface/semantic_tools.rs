@@ -150,7 +150,7 @@ fn semantic_export_layers_tool(
     };
     let include_external = effective_layers.contains(&SemanticExportLayer::ExternalUsed);
     let mut serializable_index = filter.map_or_else(
-        || semantic_store.index.clone(),
+        || semantic_store.index.as_ref().clone(),
         |filter| filtered_semantic_index(&semantic_store.index, filter),
     );
     serializable_index.apply_external_visibility(include_external)?;
@@ -2186,10 +2186,13 @@ pub fn semantic_queries_tool(
             },
         );
         let index = model
-            .semantic_store
-            .as_ref()
-            .map(|store| store.index.clone())
-            .unwrap_or_else(|| semantic_contract::build_semantic_index(&model.graph_registry));
+            .semantic_index()
+            .map(std::borrow::Cow::Borrowed)
+            .unwrap_or_else(|| {
+                std::borrow::Cow::Owned(semantic_contract::build_semantic_index(
+                    &model.graph_registry,
+                ))
+            });
         return index.query_validation_report(
             string_arg(args, "name").as_deref(),
             string_arg(args, "iri").as_deref(),

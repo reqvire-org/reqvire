@@ -210,7 +210,7 @@ pub fn sparql_tool(
     let results = SparqlEvaluator::new()
         .parse_query(&query)
         .map_err(|error| ReqvireError::ProcessError(format!("Invalid SPARQL query: {}", error)))?
-        .on_store(semantic_store.store(full, include_external))
+        .on_store(semantic_store.store(full, include_external)?)
         .execute()
         .map_err(|error| ReqvireError::ProcessError(format!("SPARQL query failed: {}", error)))?;
 

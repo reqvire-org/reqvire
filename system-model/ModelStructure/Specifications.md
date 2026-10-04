@@ -263,9 +263,23 @@ Correctness contract for reusable current-workspace model construction.
 2. Reuse only a completed model matching those inputs and the requested build mode. Never satisfy a strict request with a lenient model or return size estimates from another build mode.
 3. Coordinate concurrent misses for identical inputs and build mode so one build supplies their completed model or applicable failure. Cache lookup/publication locks are not held during parsing or dependency I/O; waiting for a shared build does not require publishing partially built state.
 4. Associate the candidate and its identity with the inputs actually consumed. Check that relevant observations and the workspace invalidation generation still permit publication. If they changed during construction, discard the superseded candidate and retry from fresh inputs or report that a stable current model could not be obtained; retries are bounded.
-5. Publish parsed graph, pages, semantic index/query stores, and applicable validation state together. A read holds one completed model throughout its operation; later builds or mutations do not modify that captured model in place.
+5. Publish parsed graph, pages, semantic index, captured RDF inputs for query stores, and applicable validation state together. A read holds one completed model throughout its operation; later builds or mutations do not modify that captured model in place.
 - Failed construction releases waiting requests with the applicable error/diagnostics and permits later recovery. An older valid entry may be retained internally, but cannot be returned as authoritative evidence for newer invalid inputs. Lenient behavior remains governed by the requested validation mode.
 - Source observations do not turn unrelated external filesystem writes into atomic transactions. Detected changes during construction cannot be silently accepted as a matching candidate; controlled Reqvire writes use the owning operation's serialization and persistence guarantees.
+
+##### Semantic index construction
+- After parsing and relation resolution, build one semantic index for that construction attempt. Semantic validation borrows that index, and RDF capture uses the same index and resolved graph. Optional size estimates do not require another index.
+- Read-only semantic reports and ontology/concept exports reuse the constructed index. Query validation retains its index and diagnostics even when strict semantic validation fails; a failure before relation resolution may build a diagnostic index from the available partial graph without publishing it as a validated model.
+- Strict failures remain failures and do not prepare query stores. Lenient construction uses the same index under the existing lenient rules. Repeated parsing clears previous semantic state, and each rebuild/retry constructs an index from its own inputs.
+- Mutation validation constructs a fresh index for the candidate graph, including removal validation. It cannot validate changed content using the accepted model's index. Existing pre-persistence validation and atomic rejection rules remain mandatory.
+
+##### Query-store preparation
+- Model construction completes validation, dependency capture, and serialization of the authored ontology, authored model, generated, raw external, and used external RDF layers before publication.
+- The four public query-store variants and the internal derivation store are loaded on first use. Preparing one variant leaves the other variants uninitialized. Reports and exports that consume the model or semantic index preserve this deferred state.
+- Initialization consumes only the captured RDF strings belonging to that snapshot. It does not reopen source or dependency files, consult the current workspace model, or serialize a subsequently mutated registry.
+- Clones of one snapshot share completed store variants and coordinate concurrent first use so each variant is initialized once. Each newly constructed snapshot owns separate initialization state.
+- A store becomes available after all of its required graphs have loaded. Initialization failure returns the applicable error to every caller of that snapshot's variant; partially loaded stores remain private. A newly constructed snapshot has fresh initialization state.
+- Later source edits, dependency removal, and newer model publication leave a captured snapshot's query results consistent with its original graph and RDF. Subsequent current-model loads retain the existing freshness, validation, and invalidation rules.
 
 ##### Controlled writes and boundaries
 - Successful persisted mutations invalidate affected source observations before subsequent dependent reads. Invalidation also supersedes older in-progress builds so they cannot repopulate current cache state after the write.
