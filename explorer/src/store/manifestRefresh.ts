@@ -1,3 +1,4 @@
+import { worktreeUrl } from "./worktreeUrls";
 import { sha256 } from "@noble/hashes/sha2.js";
 import { bytesToHex } from "@noble/hashes/utils.js";
 import { loadStoreCandidate, type StoreLoadResult } from "./loadStore";
@@ -86,7 +87,8 @@ export class ManifestStoreClient {
   private store?: ExplorerProjectStore;
   private chunks: ReadonlyMap<string, unknown> = new Map();
 
-  constructor(store?: ExplorerProjectStore, seed?: { revision: string; manifest: unknown }) {
+  constructor(store?: ExplorerProjectStore, seed?: { revision: string; manifest: unknown }, private readonly worktreeId?: string) {
+    if (worktreeId && store?.project.worktree_id !== worktreeId) return;
     if (!store || !seed) return;
     try {
       const manifest = validateManifest(seed.manifest);
@@ -121,12 +123,12 @@ export class ManifestStoreClient {
     }
   }
 
-  async prepare(signal: AbortSignal): Promise<PreparedStore | null> {
+  async prepare(signal: AbortSignal, force = false): Promise<PreparedStore | null> {
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       signal.throwIfAborted();
-      const response = await fetch("/api/project-store/manifest", {
+      const response = await fetch(worktreeUrl("/api/project-store/manifest", this.worktreeId), {
         cache: "no-store",
-        headers: this.revision ? { "If-None-Match": `"${this.revision}"` } : {},
+        headers: this.revision && !force ? { "If-None-Match": `"${this.revision}"` } : {},
         signal,
       });
       signal.throwIfAborted();
@@ -151,7 +153,7 @@ export class ManifestStoreClient {
       let superseded = false;
       for (let start = 0; start < missing.length; start += CHUNK_BATCH_SIZE) {
         const batch = missing.slice(start, start + CHUNK_BATCH_SIZE);
-        const chunksResponse = await fetch("/api/project-store/chunks", {
+        const chunksResponse = await fetch(worktreeUrl("/api/project-store/chunks", this.worktreeId), {
           method: "POST", cache: "no-store", signal,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ revision, hashes: batch }),
@@ -188,6 +190,7 @@ export class ManifestStoreClient {
       const result = loadStoreCandidate(Object.fromEntries(entries));
       if (!result.ok) throw new Error(result.detail ?? result.reason);
       if (result.schemaMismatch) throw new Error(result.schemaMismatch);
+      if (this.worktreeId && result.store.project.worktree_id !== this.worktreeId) throw new Error("The server returned a different worktree context.");
       signal.throwIfAborted();
       // UI consumers share unchanged records with the content-addressed cache.
       // Protect that identity from incidental renderer mutations.

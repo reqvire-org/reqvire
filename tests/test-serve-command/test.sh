@@ -363,7 +363,7 @@ kill -0 "$SERVE_PID" "$PLAIN_PID" || {
     exit 1
 }
 
-# Test 10: Embedded MCP without mutation authorization advertises no live API.
+# Test 10: Read-only MCP exposes branch snapshot reads, without periodic live refresh.
 READ_ONLY_PORT=$((11000 + RANDOM % 1000))
 "$SERVER_BIN" serve --host "$TEST_HOST" --port "$READ_ONLY_PORT" --enable-mcp \
     > "$TEST_DIR/serve_read_only_output.log" 2>&1 &
@@ -384,10 +384,10 @@ if grep -q 'window.reqvireLiveRefresh' "$TEST_DIR/read_only_store.js"; then
     echo "FAILED: Read-only embedded MCP advertised mutation-only refresh"
     exit 1
 fi
-for api_path in project-store project-store/manifest project-store/chunks; do
+for api_path in worktrees project-store project-store/manifest; do
     HTTP_CODE=$(curl -sS -o /dev/null -w '%{http_code}' "http://$TEST_HOST:$READ_ONLY_PORT/api/$api_path")
-    if [ "$HTTP_CODE" != "404" ]; then
-        echo "FAILED: Read-only embedded MCP exposed /api/$api_path"
+    if [ "$HTTP_CODE" != "200" ]; then
+        echo "FAILED: Read-only branch snapshot route /api/$api_path returned $HTTP_CODE"
         exit 1
     fi
 done

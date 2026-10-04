@@ -831,3 +831,30 @@ A named SPARQL query artifact with an ontology vocabulary context, source proven
 #### Scope Note
 Query form describes SELECT, ASK, CONSTRUCT, or DESCRIBE syntax. Query purpose describes its intended use by consumers.
 ---
+
+### MCP Worktree Context
+
+An independently addressed MCP model session rooted in one Git worktree, with its own branch identity, accepted model state, and operation lifecycle.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Git Worktree](#git-worktree)
+  * related: [Workspace Root](#workspace-root)
+  * related: [Model Context Protocol Interface](#model-context-protocol-interface)
+---
+
+### Model Change Publication
+
+The progression of accepted model changes into local Git history, a remote branch, and a pull request or review comment in the same repository.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Git Worktree](#git-worktree)
+  * related: [Model Context Protocol Interface](#model-context-protocol-interface)
+---

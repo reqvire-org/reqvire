@@ -26,7 +26,7 @@ spec.loader.exec_module(revision_e2e)
 
 
 class Server(revision_e2e.McpServer):
-    def __init__(self, binary, workspace, output, mode, name, mutations=False, commits=False):
+    def __init__(self, binary, workspace, output, mode, name, mutations=False, commits=False, extra_args=(), environment=None, embedded_mcp=True):
         self.output = output / name
         self.output.mkdir()
         self.log = (self.output / "server.log").open("w")
@@ -37,14 +37,14 @@ class Server(revision_e2e.McpServer):
             port = listener.getsockname()[1]
         self.base = f"http://127.0.0.1:{port}"
         self.url = self.base + "/mcp"
-        options = ["--enable-mcp"] if mode == "serve" else []
+        options = ["--enable-mcp"] if mode == "serve" and embedded_mcp else []
         self.process = subprocess.Popen(
             [binary, mode, "--host", "127.0.0.1", "--port", str(port),
              *(["--enable-mutations"] if mutations else []),
-             *(["--enable-commits"] if commits else []), *options], cwd=workspace,
+             *(["--enable-commits"] if commits else []), *options, *extra_args], cwd=workspace,
             stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True,
             env={**os.environ, "TOKIO_WORKER_THREADS": "4",
-                 "RUST_LOG": "reqvire::model=debug,reqvire::model_cache=debug,reqvire::utils=debug"})
+                 "RUST_LOG": "reqvire::model=debug,reqvire::model_cache=debug,reqvire::utils=debug", **(environment or {})})
 
     def counts(self):
         log = (self.output / "server.log").read_text()

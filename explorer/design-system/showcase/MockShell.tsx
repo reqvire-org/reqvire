@@ -1,14 +1,16 @@
 /**
  * MockShell — renders the real App shell, router, and providers with fixture data.
  * The Traces route composes the native design-system preview in that same shell.
- * Injecting devFixture into window.reqvireProjectStore makes loadStore work in any build mode.
+ * Fixture contexts replace HTTP loading while retaining the application's providers and navigation.
  */
-import { App } from "../../src/App";
+import { useEffect, useState } from "react";
+import { ExplorerApplication } from "../../src/App";
 import { devFixture } from "../../src/store/devFixture";
 import type { ExplorerProjectStore } from "../../src/store/types";
 import scopedCoverage from "../../src/store/fixtures/scopedCoverage.json";
 import { useTraceFlowMock } from "./TraceFlowMock";
 import { TRACE_CAPABILITY, TRACE_EXAMPLES, traceExampleElements, traceExampleSource } from "./fixtures/traces";
+import { SHOWCASE_WORKTREES } from "./fixtures/productPatterns";
 
 /** Feed the same normalized records to the preview and the application's detail workflows. */
 function withTraceElements(base: ExplorerProjectStore): ExplorerProjectStore {
@@ -76,9 +78,42 @@ function withTraceElements(base: ExplorerProjectStore): ExplorerProjectStore {
 const modelStore = withTraceElements(devFixture);
 const coverageStore = withTraceElements(scopedCoverage as ExplorerProjectStore);
 
+const fixtureStores = new Map(SHOWCASE_WORKTREES.filter(choice => choice.available).map(choice => {
+  const base = choice.id === "showcase-coverage" ? coverageStore : modelStore;
+  return [choice.id, { ...base, project: { ...base.project, branch: choice.branch, worktree_id: choice.id } }];
+}));
+
+function requestedFixture(fallback: string) {
+  const id = new URLSearchParams(window.location.search).get("worktree_id");
+  return id && fixtureStores.has(id) ? id : fallback;
+}
+
 export function MockShell({ example = "model" }: { example?: "model" | "coverage" }) {
   const traces = useTraceFlowMock();
-  // The application's normal loader reads this fixture seed on mount.
-  window.reqvireProjectStore = example === "coverage" ? coverageStore : modelStore;
-  return <App viewOverrides={{ traces }} />;
+  const initialId = example === "coverage" ? "showcase-coverage" : "showcase-main";
+  const [worktreeId, setWorktreeId] = useState(() => requestedFixture(initialId));
+  useEffect(() => {
+    const onPopState = () => setWorktreeId(requestedFixture(initialId));
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [initialId]);
+  const selectWorktree = (id: string) => {
+    if (!fixtureStores.has(id) || id === worktreeId) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("worktree_id", id);
+    window.history.pushState(null, "", url);
+    setWorktreeId(id);
+  };
+  return <ExplorerApplication viewOverrides={{ traces }} live={{
+    result: { ok: true, schemaMismatch: null, store: fixtureStores.get(worktreeId)! },
+    refreshError: null,
+    worktreeRouting: true,
+    worktrees: SHOWCASE_WORKTREES.map(choice => ({ worktree_id: choice.id, branch: choice.branch,
+      workspace_root: choice.root, available: choice.available, explorer_available: choice.available })),
+    selectedWorktree: worktreeId,
+    selectWorktree,
+    refreshWorktrees: async () => {},
+    switching: false,
+    automaticRefresh: false,
+  }} />;
 }

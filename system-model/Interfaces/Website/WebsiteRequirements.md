@@ -47,10 +47,25 @@ WHEN documenting MCP deployments, the system SHALL explain listening addresses a
 
 WHEN documenting MCP mutations, the system SHALL distinguish mutation permission from opt-in automatic commits and explain the unchanged ownership and clean-start rules.
 
+WHEN documenting model collaboration, the system SHALL explain unified browser branch selection backed by independent worktree contexts, accepted-only commits, optional GitHub availability, and explicit same-repository publication according to the referenced contracts.
+
 #### Metadata
   * type: requirement
 
 #### Contract References
+  * [MCP Worktree Worker Sessions Specification](../MCP/Specifications.md#mcp-worktree-worker-sessions-specification)
+  * [Explorer Worktree Runtime Isolation Specification](../WebExplorer/Specifications.md#explorer-worktree-runtime-isolation-specification)
+  * [MCP Worktree Context Isolation Specification](../MCP/Specifications.md#mcp-worktree-context-isolation-specification)
+  * [MCP Worktree Creation Specification](../MCP/Specifications.md#mcp-worktree-creation-specification)
+  * [MCP Worktree Opening and Inventory Specification](../MCP/Specifications.md#mcp-worktree-opening-and-inventory-specification)
+  * [MCP Managed Worktree Removal Specification](../MCP/Specifications.md#mcp-managed-worktree-removal-specification)
+  * [MCP Accepted Change Commit Specification](../MCP/Specifications.md#mcp-accepted-change-commit-specification)
+  * [MCP GitHub Tool Availability Specification](../MCP/Specifications.md#mcp-github-tool-availability-specification)
+  * [MCP Publication Scope and Recovery Specification](../MCP/Specifications.md#mcp-publication-scope-and-recovery-specification)
+  * [MCP Branch Push Specification](../MCP/Specifications.md#mcp-branch-push-specification)
+  * [MCP Pull Request Creation Specification](../MCP/Specifications.md#mcp-pull-request-creation-specification)
+  * [MCP Pull Request Commenting Specification](../MCP/Specifications.md#mcp-pull-request-commenting-specification)
+  * [Explorer Worktree Selection Specification](../WebExplorer/Specifications.md#explorer-worktree-selection-specification)
   * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
   * [MCP Server Command Specification](../MCP/Specifications.md#mcp-server-command-specification)
   * [MCP Managed Query Artifacts Specification](../MCP/Specifications.md#mcp-managed-query-artifacts-specification)

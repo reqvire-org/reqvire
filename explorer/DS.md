@@ -260,6 +260,26 @@ Do not use absolute positioning for ordinary page, panel, card, toolbar, form,
 or list layout. If a layout can be expressed with flex or grid, use flex or
 grid.
 
+### Control sizing ownership
+
+Shared primitives and product patterns own control sizing, density, and
+responsive behavior. Application views and showcase fixtures consume their
+public APIs. User-resized pane geometry remains runtime state; the design
+system defines how controls fill that space.
+
+Controls in the same pane must use its shared horizontal insets and fill the
+available control column. Avoid independent width caps that make a picker
+shorter than its neighboring filter. Referencing a spacing token in an
+arbitrary `max-width` calculation does not establish a shared sizing rule.
+Use intrinsic/flexible sizing by default; introduce an intentional constraint
+through the owning component API or a semantic sizing token when needed.
+
+Review sizing in the real shell mock, including pane resizing, rather than
+compensating with application or showcase styling. Existing token, CSS
+ownership, and architecture guards complement that review; passing them does
+not prove visual alignment. Cosmetic corrections do not need individual
+system-model verification criteria or tests.
+
 ### Design file hygiene
 
 Every design-system example, mock, and translated production surface should

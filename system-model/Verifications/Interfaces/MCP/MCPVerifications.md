@@ -45,7 +45,7 @@ Expected checks:
 - Start `reqvire serve --enable-mcp --enable-mutations --host 127.0.0.1 --port <PORT>` and verify MCP `tools/list` includes mutation tools.
 - Execute an embedded MCP mutation and verify that the published runtime seed contains updated model data. An already-open compiled Explorer adopts the manifest and missing chunks under the owning Explorer Automatic Store Refresh Verification.
 - Verify unchanged conditional manifest requests retain the materialized runtime snapshot under the owning Served Explorer Runtime Freshness Verification.
-- Verify read-only embedded MCP advertises no live refresh and exposes none of the mutation-enabled manifest, chunk, or full-store APIs.
+- Verify read-only embedded MCP advertises no periodic live refresh while serving selected branches through worktree contexts; mutation tools remain unavailable whether the worktree was reused or created for browsing.
 - Verify `assets/project-store.js` and `ontologies.ttl` responses include no-store cache control.
 - Verify `--enable-mutations` is rejected unless `--enable-mcp` is also provided for `reqvire serve`.
 - Verify `/mcp` is handled by RMCP transport and is not served by the Explorer SPA fallback.
@@ -649,9 +649,9 @@ Expected checks:
 - Verify every advertised tool has exactly one declared side-effect class.
 - Verify default `tools/list` advertises all `read_only` tools and omits all `mutation` tools.
 - Verify default `tools/list` advertises `conditional_mutation` tools only with read-only argument schemas.
-- Verify mutation-mode `tools/list` advertises mutation tools and mutation-capable schemas for conditional mutation tools.
+- Verify mutation-mode `tools/list` advertises eligible local mutation tools and mutation-capable schemas for conditional mutation tools; publication tools additionally require enabled and available GitHub integration.
 - Verify read-only tools declare `readOnlyHint: true`, `destructiveHint: false`, and `openWorldHint: false`.
-- Verify mutation tools declare `readOnlyHint: false`, `openWorldHint: false`, and the expected conservative `destructiveHint`.
+- Verify local mutation tools declare `readOnlyHint: false`, `openWorldHint: false`, and the expected conservative `destructiveHint`; optional publication tools declare `openWorldHint: true`.
 - Verify `reqvire.lint` does not expose mutating fix behavior until a separate mutation contract is specified.
 - Verify operation-specific preview requests for mutation-class tools are available only through mutation-class tools in mutation mode, except conditional mutation tools that explicitly expose read-only preview behavior.
 - Verify Reqvire parse, validation, and operation failures produce MCP tool execution errors with structured Reqvire error data where available.
@@ -666,7 +666,7 @@ Expected checks:
 
 ### MCP Tool Exposure Scope Verification
 
-This verification shall prove that MCP exposes only supported Reqvire model operations.
+This verification shall prove that MCP exposes only specified Reqvire model and typed repository workflow operations.
 
 #### Details
 Expected checks:
@@ -711,4 +711,207 @@ The linked MCP server suite covers workspace and tool-contract metadata. The mod
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-model-revision-hashing/test.sh)
   * verify: [MCP Workspace Session Tools](../../../Interfaces/MCP/Tools.md#mcp-workspace-session-tools)
+---
+
+### MCP Repository Workflow Verification Objective
+
+This objective groups verification of isolated worktree model sessions, accepted-change commits, and optional same-repository GitHub publication.
+
+#### Details
+These are planned executable acceptance checks. Add test evidence only after implementing the fixtures and observing their results. Use disposable local Git repositories and controlled gh executables; do not publish to a live repository during regular tests.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
+---
+
+### MCP Worktree Context Isolation Verification
+
+Verify that MCP worker sessions implement the shared context boundary on successful and rejected paths.
+
+#### Details
+- Start with two worktrees containing identical relative paths and element names but different model content. Interleave reads, CRUD, coverage, collect, semantic prefixes/exports/SPARQL, resources, and model-bearing prompts; assert the selected content, revisions, Git HEAD, and accepted pending changes never cross contexts.
+- Reject omitted selectors with multiple registered contexts and unknown/removed/unavailable IDs; allow omission for one context. Assert server-scoped discovery/listing remains callable and no request changes a global selection.
+- Verify independent worker processes, fixed roots, exclusion rules, semantic initialization, and mutation gates. Hold one worker mutation and read/write the other; then prove reads within the held context cannot observe partial persistence.
+- Test ownership contention across MCP processes, external HEAD changes, invalid/dirty startup, worker crash, reopening, and both commit modes. Failure in one worker must leave the other usable.
+- Exercise standalone and embedded endpoints. Each mutation refreshes only its context's Explorer runtime, and browser context selection does not redirect MCP calls. Verify resource URI/template and prompt selector schemas, isolation of cache keys, and unchanged read-only refresh behavior; do not advertise unsupported subscriptions.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * verify: [MCP Worktree Worker Sessions](../../../Interfaces/MCP/Tools.md#mcp-worktree-worker-sessions)
+---
+
+### MCP Worktree Creation Verification
+
+Verify the successful and rejected paths of mcp worktree creation.
+
+#### Details
+- Create two branches from a committed owned branch, local `main`, and a locally known remote-tracking ref. Assert exact base SHAs, separate roots/workers, unchanged source checkouts, and no Git network calls.
+- Reject unknown/non-commit bases, missing or ambiguous context-relative selection, invalid/duplicate branch names, dirty source state in either commit mode, foreign repositories, path overlap/symlink escape, and ownership conflicts with no source changes.
+- Reproduce a valid source whose selected base has an invalid model. Inject worker/startup/worktree creation failure and verify no usable context is exposed; cleanup affects only new unchanged assets, with explicit residual-state reporting if cleanup is unsafe.
+- Verify uncommitted accepted and external edits are never silently copied, committed, stashed, or discarded.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * verify: [MCP Worktree Creation](../../../Interfaces/MCP/Tools.md#mcp-worktree-creation)
+---
+
+### MCP Worktree Opening and Inventory Verification
+
+Verify the successful and rejected paths of mcp worktree opening and inventory.
+
+#### Details
+- List original, managed, external, unregistered, and unavailable worktrees without side effects. Open an existing clean branch with and without an existing worktree; repeated opening returns the same healthy context and does not create duplicate checkouts.
+- Reject unknown/detached branches, dirty index/files/untracked files, invalid models, missing Git identity, overlapping roots, and another process's ownership. Verify pre-existing worktrees survive failures unchanged.
+- Stop/restart with committed work and with pending accepted changes; confirm no implicit branch nesting or loss of files, clean reopening, and rejection of dirty reopening. Inventory must distinguish unavailable contexts from healthy sessions.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * verify: [MCP Worktree Opening and Inventory](../../../Interfaces/MCP/Tools.md#mcp-worktree-opening-and-inventory)
+---
+
+### MCP Managed Worktree Removal Verification
+
+Verify the successful and rejected paths of mcp managed worktree removal.
+
+#### Details
+- Remove a clean managed context with both commit policies and verify its branch/commits remain. Confirm original and other contexts still answer unchanged, while calls to the removed ID fail.
+- Reject original/external worktrees, foreign ownership, invalid IDs, accepted uncommitted changes, external modified/staged/untracked files, and changed HEAD without deletion.
+- Hold an operation during removal and assert orderly draining and rejection of new calls; inject Git removal failure and verify explicit stopped/residual status. Shutdown must preserve every worktree and pending file.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * verify: [MCP Managed Worktree Removal](../../../Interfaces/MCP/Tools.md#mcp-managed-worktree-removal)
+---
+
+### MCP Accepted Change Commit Verification
+
+Verify the successful and rejected paths of mcp accepted change commit.
+
+#### Details
+- Accumulate two accepted mutations with automatic commits disabled, explicitly commit them, and assert exact contents, parent HEAD, message, modes, pending-state clearance, and success of a subsequent mutation.
+- Stage an unrelated file and edit a managed file externally after acceptance; assert neither external version enters the commit, unrelated index entries survive, and accepted model/revision stays consistent. Include accepted moves, removals, asset modes, and changes that cancel to a net no-op.
+- Check auto-commit mode, empty-message rejection, repeated no-op commits, missing identity, invalid candidates, commit/ref failure, unexpected HEAD, and separate worktree commits. Assert failure retains pending changes and no operation publishes another context's files.
+- Verify local commit remains discoverable/executable without gh and without GitHub enablement; commit-only success must not trigger Explorer content refresh.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * verify: [MCP Accepted Change Commit](../../../Interfaces/MCP/Tools.md#mcp-accepted-change-commit)
+---
+
+### MCP GitHub Tool Availability Verification
+
+Verify the successful and rejected paths of mcp github tool availability.
+
+#### Details
+- Test the standalone and embedded flag matrix: default, mutations only, optional commits, GitHub with/without mutations, and remote override with/without GitHub. Invalid combinations fail before listener startup.
+- Supply a controlled gh executable for missing binary, bad version, authentication failure, inaccessible/wrong repository, malformed JSON, nonzero exit, and timeout. Verify MCP remains locally usable, all three publication tools are omitted, direct calls are rejected, and reasons contain no credentials.
+- Confirm startup uses active host authentication status rather than trusting JSON exit behavior, issues no publication commands, and retains fixed availability until restart.
+- Exercise low `viewerPermission`, later revoked credentials, denied pushes, and denied comments; prove individual call results report real authorization failure while local model operations remain available. Check input/output schemas and side-effect annotations.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * satisfiedBy: [mcp_github.rs](../../../../crates/reqvire-cli/src/mcp_github.rs)
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * verify: [MCP GitHub Tool Availability](../../../Interfaces/MCP/Tools.md#mcp-github-tool-availability)
+---
+
+### MCP Publication Scope and Recovery Verification
+
+Verify the successful and rejected paths of mcp publication scope and recovery.
+
+#### Details
+- Use temporary Git repositories and a recording gh double to test same-repository SSH/HTTPS identity normalization, foreign/fork targets, multiple push URLs, changed remotes, and invalid caller selectors. Assert rejection before any publication command.
+- Exercise quotes, newlines, shell metacharacters, and leading hyphens in messages/bodies; assert exact argument/data preservation and no shell evaluation. Verify prompt suppression, timeouts, and sanitized errors.
+- Inject authentication, branch-rule, non-fast-forward, subprocess, network, and ambiguous-response failures. Assert accepted snapshots, local commits, pending changes, and unrelated contexts survive unchanged.
+- Test completed/failed/unknown reconciliation, including timeout after a remote side effect. Verify no blind retry, forced push, merge, reset, implicit commit, or fork.
+- Run regular automated checks only against local fixture remotes and controlled gh behavior. Real GitHub publication is an explicitly authorized integration exercise, never a normal test side effect.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_github.rs](../../../../crates/reqvire-cli/src/mcp_github.rs)
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * verify: [MCP Publication Scope and Recovery](../../../Interfaces/MCP/Tools.md#mcp-publication-scope-and-recovery)
+---
+
+### MCP Branch Push Verification
+
+Verify the successful and rejected paths of mcp branch push.
+
+#### Details
+- Push a newly committed branch to a local bare fixture remote; verify exact SHA, same branch name, upstream tracking, and no changes to other refs. Repeated publication of the same tip is a no-op.
+- Reject accepted pending changes, external dirtiness, unexpected HEAD, wrong remote, non-fast-forward divergence, and denied transport/branch permissions without force or loss of local commits.
+- Coordinate push with same-context mutation and simultaneous activity in another context; verify the exact intended commit is published and no implicit PR/comment is attempted.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_github.rs](../../../../crates/reqvire-cli/src/mcp_github.rs)
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * verify: [MCP Branch Push](../../../Interfaces/MCP/Tools.md#mcp-branch-push)
+---
+
+### MCP Pull Request Creation Verification
+
+Verify the successful and rejected paths of mcp pull request creation.
+
+#### Details
+- Create ordinary and draft PRs using explicit main and feature-branch bases; verify recorded gh arguments, pushed accepted SHA, same repository, and returned number/URL. Exercise stacked PR creation.
+- Reject missing/unknown/same-as-head bases, unpushed or stale remote head, no valid comparison, dirty/pending context, and foreign heads before creation. Assert no implicit push/fork/commit.
+- Return an existing exact open PR without duplicates or metadata edits; surface conflicting base/multiple matches. Simulate a response lost after creation and confirm read-only reconciliation rather than blind retries.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_github.rs](../../../../crates/reqvire-cli/src/mcp_github.rs)
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * verify: [MCP Pull Request Creation](../../../Interfaces/MCP/Tools.md#mcp-pull-request-creation)
+---
+
+### MCP Pull Request Commenting Verification
+
+Verify the successful and rejected paths of mcp pull request commenting.
+
+#### Details
+- Comment on a same-repository PR with the context head and with a different head, including a context with pending accepted changes. Verify exact multiline content, originating context, target PR, and comment URL/ID; HEAD and files remain unchanged.
+- Reject invalid/missing PR numbers, blank bodies, foreign repository arguments, permission failures, and disabled direct calls without remote side effects.
+- Lose the response after posting and verify reconciliation or an explicit unknown outcome without duplicate auto-posts. Distinguish an intentional second caller request from an automatic retry.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_github.rs](../../../../crates/reqvire-cli/src/mcp_github.rs)
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * verify: [MCP Pull Request Commenting](../../../Interfaces/MCP/Tools.md#mcp-pull-request-commenting)
 ---

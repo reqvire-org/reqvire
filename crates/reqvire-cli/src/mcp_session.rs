@@ -20,7 +20,9 @@ pub struct MutationSession {
     _ownership: File,
     _worktree_ownership: File,
     files: SnapshotFiles,
+    committed_files: SnapshotFiles,
     model: Arc<ModelManager>,
+    model_revision: String,
     exclusions: ExclusionSet,
     options: ModelBuildOptions,
     poisoned: bool,
@@ -29,7 +31,7 @@ pub struct MutationSession {
 fn error(message: impl Into<String>) -> ReqvireError {
     ReqvireError::ProcessError(message.into())
 }
-fn git(
+pub fn git(
     root: &Path,
     args: &[&str],
     input: Option<&[u8]>,
@@ -64,19 +66,19 @@ fn git(
     }
     Ok(output.stdout)
 }
-fn git_text(root: &Path, args: &[&str]) -> Result<String, ReqvireError> {
+pub fn git_text(root: &Path, args: &[&str]) -> Result<String, ReqvireError> {
     Ok(String::from_utf8(git(root, args, None, None)?)
         .map_err(|e| error(e.to_string()))?
         .trim()
         .to_string())
 }
 #[cfg(unix)]
-fn claim(file: &File) -> Result<(), ReqvireError> {
+pub fn claim(file: &File) -> Result<(), ReqvireError> {
     rustix::fs::flock(file, rustix::fs::FlockOperation::NonBlockingLockExclusive)
         .map_err(|_| error("MCP branch/worktree already owned by another mutation-enabled server"))
 }
 #[cfg(windows)]
-fn claim(file: &File) -> Result<(), ReqvireError> {
+pub fn claim(file: &File) -> Result<(), ReqvireError> {
     use std::os::windows::io::AsRawHandle;
     use windows_sys::Win32::{
         Storage::FileSystem::{LockFileEx, LOCKFILE_EXCLUSIVE_LOCK, LOCKFILE_FAIL_IMMEDIATELY},
@@ -196,14 +198,17 @@ impl MutationSession {
         files = capture.prepared().0;
         drop(capture);
         require_clean(&root)?;
+        let model_revision = reqvire::model_fingerprint(&model.graph_registry.get_all_elements())?;
         let session = Self {
             root,
             branch,
             head,
             _ownership: ownership,
             _worktree_ownership: worktree_ownership,
+            committed_files: files.clone(),
             files,
             model: Arc::new(model),
+            model_revision,
             exclusions: exclusions.clone(),
             options,
             poisoned: false,
@@ -215,7 +220,7 @@ impl MutationSession {
     pub fn model(&self) -> ModelManager {
         (*self.model).clone()
     }
-    fn check_head(&self) -> Result<(), ReqvireError> {
+    pub fn check_head(&self) -> Result<(), ReqvireError> {
         if self.poisoned {
             return Err(error(
                 "MCP session requires recovery; further mutations are disabled",
@@ -260,7 +265,10 @@ impl MutationSession {
         }
         let changed: BTreeSet<_> = changed
             .into_iter()
-            .filter(|p| self.files.files.get(p) != candidate_files.files.get(p))
+            .filter(|p| {
+                self.files.files.get(p) != candidate_files.files.get(p)
+                    || self.files.executable.contains(p) != candidate_files.executable.contains(p)
+            })
             .collect();
         if changed.is_empty() {
             return Ok((Ok(result), false));
@@ -272,13 +280,18 @@ impl MutationSession {
         if !persists {
             return Ok((Ok(result), false));
         }
+        let revision = reqvire::model_fingerprint(&candidate.graph_registry.get_all_elements())?;
         self.check_head()?;
         let commit = self.persist_candidate(&candidate_files, &changed, tool)?;
         if let Some(commit) = &commit {
             self.head = commit.clone();
         }
         self.files = candidate_files;
+        if self.enable_commits {
+            self.committed_files = self.files.clone();
+        }
         self.model = Arc::new(candidate);
+        self.model_revision = revision;
         reqvire::model_cache::invalidate();
         if let (Some(commit), Some(content)) = (
             commit,
@@ -291,11 +304,90 @@ impl MutationSession {
         }
         Ok((Ok(result), true))
     }
+    pub fn status(&self) -> Value {
+        serde_json::json!({
+            "workspace_root": self.root, "branch": self.branch.trim_start_matches("refs/heads/"),
+            "head": self.head, "enable_commits": self.enable_commits,
+            "model_revision": self.model_revision,
+            "pending_changes": self.pending_paths().iter().filter_map(|p| p.strip_prefix(&self.root).ok()).collect::<Vec<_>>(),
+            "dirty": require_clean(&self.root).is_err(), "available": self.check_head().is_ok(),
+        })
+    }
+    fn pending_paths(&self) -> BTreeSet<PathBuf> {
+        self.files
+            .files
+            .keys()
+            .chain(self.committed_files.files.keys())
+            .filter(|p| {
+                p.starts_with(&self.root)
+                    && (self.files.files.get(*p) != self.committed_files.files.get(*p)
+                        || self.files.executable.contains(*p)
+                            != self.committed_files.executable.contains(*p))
+            })
+            .cloned()
+            .collect()
+    }
+    pub fn explicit_commit(&mut self, message: &str) -> Result<Value, ReqvireError> {
+        if message.trim().is_empty() {
+            return Err(error("Commit message must not be empty"));
+        }
+        self.check_head()?;
+        let changed = self.pending_paths();
+        if changed.is_empty() {
+            return Ok(serde_json::json!({"outcome":"no_op", "head": self.head}));
+        }
+        let files = self.files.clone();
+        let scope = files.enter(None);
+        let mut candidate = ModelManager::new();
+        candidate.parse_and_validate_with_options(None, &self.exclusions, self.options)?;
+        drop(scope);
+        let mut publication = self.prepare_commit(&files, &changed, message)?;
+        self.check_head()?;
+        git(
+            &self.root,
+            &[
+                "update-ref",
+                "-m",
+                "reqvire: explicit commit",
+                &self.branch,
+                &publication.commit,
+                &self.head,
+            ],
+            None,
+            None,
+        )?;
+        if let Err(failure) = fs::rename(&publication.index_lock.path, &publication.index_path) {
+            // Compare-and-swap rollback never overwrites a subsequent external ref update.
+            if git(
+                &self.root,
+                &["update-ref", &self.branch, &self.head, &publication.commit],
+                None,
+                None,
+            )
+            .is_err()
+            {
+                self.poisoned = true;
+                return Err(error("Explicit commit index publication failed; ref recovery failed; writes disabled"));
+            }
+            return Err(failure.into());
+        }
+        publication.index_lock.published = true;
+        let old_head = std::mem::replace(&mut self.head, publication.commit);
+        self.committed_files = files;
+        Ok(
+            serde_json::json!({"outcome":"completed", "old_head":old_head, "head":self.head,
+            "commit":self.head, "changed_files":changed.iter().filter_map(|p| p.strip_prefix(&self.root).ok()).collect::<Vec<_>>() }),
+        )
+    }
+    pub fn with_snapshot<T>(&self, call: impl FnOnce(&ModelManager) -> T) -> T {
+        let _scope = self.files.enter(Some(Arc::clone(&self.model)));
+        call(&self.model)
+    }
     fn prepare_commit(
         &mut self,
         files: &SnapshotFiles,
         changed: &BTreeSet<PathBuf>,
-        tool: &str,
+        message: &str,
     ) -> Result<PreparedCommit, ReqvireError> {
         let candidate_index = tempfile::NamedTempFile::new()?.into_temp_path();
         fs::remove_file(&candidate_index)?;
@@ -346,14 +438,7 @@ impl MutationSession {
         .map_err(|e| error(e.to_string()))?;
         let commit = git_text(
             &self.root,
-            &[
-                "commit-tree",
-                tree.trim(),
-                "-p",
-                &self.head,
-                "-m",
-                &format!("reqvire: {tool}"),
-            ],
+            &["commit-tree", tree.trim(), "-p", &self.head, "-m", message],
         )?;
         // Hold Git's real index lock across persistence and reference publication.
         // A separate index preserves unrelated staged changes without including
@@ -405,7 +490,7 @@ impl MutationSession {
         // No index or Git object writes in the default mode. Both modes use the
         // same validated candidate, persistence, and rollback boundary.
         let mut publication = if self.enable_commits {
-            Some(self.prepare_commit(files, changed, tool)?)
+            Some(self.prepare_commit(files, changed, &format!("reqvire: {tool}"))?)
         } else {
             None
         };
@@ -512,7 +597,7 @@ impl Drop for IndexLock {
         }
     }
 }
-fn require_clean(root: &Path) -> Result<(), ReqvireError> {
+pub fn require_clean(root: &Path) -> Result<(), ReqvireError> {
     if !git(
         root,
         &["status", "--porcelain=v1", "--untracked-files=all"],

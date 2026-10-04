@@ -59,6 +59,7 @@ struct ReqvireMcpServer {
     write_lock: Arc<Mutex<()>>,
     post_write_hook: Option<PostWriteHook>,
     session: Option<Arc<std::sync::Mutex<crate::mcp_session::MutationSession>>>,
+    worktrees: Option<Arc<crate::mcp_worktrees::Worktrees>>,
 }
 
 impl ReqvireMcpServer {
@@ -93,6 +94,7 @@ impl ReqvireMcpServer {
             write_lock,
             post_write_hook,
             session,
+            worktrees: None,
         })
     }
 
@@ -102,6 +104,15 @@ impl ReqvireMcpServer {
         params: Value,
         serialize: bool,
     ) -> Result<Value, McpError> {
+        if let Some(worktrees) = &self.worktrees {
+            let worktrees = Arc::clone(worktrees);
+            let method = method.to_string();
+            return tokio::task::spawn_blocking(move || worktrees.handle(&method, params))
+                .await
+                .map_err(|e| {
+                    McpError::internal_error(format!("Worktree request failed: {e}"), None)
+                })?;
+        }
         // These handlers obtain their model after dispatch. They must wait for
         // a controlled write rather than scan a partially persisted workspace.
         if serialize || matches!(method, "tools/call" | "resources/read") {
@@ -150,6 +161,38 @@ impl ReqvireMcpServer {
     }
 
     fn call_handler_unlocked(&self, method: &str, params: Value) -> Result<Value, McpError> {
+        if !self.enable_mutations
+            && method == "tools/call"
+            && params["name"] == "reqvire.worktree.list"
+        {
+            let args = &params["arguments"];
+            if !args.as_object().is_some_and(serde_json::Map::is_empty) {
+                return Err(McpError::invalid_params(
+                    "worktree.list takes no arguments",
+                    None,
+                ));
+            }
+            let value = std::env::current_dir()
+                .map_err(ReqvireError::from)
+                .and_then(|root| crate::mcp_worktrees::repository_worktrees(&root));
+            return Ok(match value {
+                Ok(rows) => tool_success(json!({"worktrees":rows})),
+                Err(e) => tool_error("reqvire.worktree.list", e),
+            });
+        }
+        if !self.enable_mutations
+            && method == "resources/read"
+            && params["uri"] == "reqvire://tools/contract"
+        {
+            let contract = self.call_handler_unlocked(
+                "tools/call",
+                json!({"name":"reqvire.tool_contract","arguments":{}}),
+            )?;
+            return Ok(
+                json!({"contents":[{"uri":"reqvire://tools/contract","mimeType":"application/json","text":contract["structuredContent"].to_string()}]}),
+            );
+        }
+        let contract = method == "tools/call" && params["name"] == "reqvire.tool_contract";
         let response = handle_rpc_value(
             json!({
                 "jsonrpc": "2.0",
@@ -172,10 +215,30 @@ impl ReqvireMcpServer {
             let data = error.get("data").cloned();
             return Err(McpError::new(ErrorCode(code), message, data));
         }
-        response
+        let mut result = response
             .get("result")
             .cloned()
-            .ok_or_else(|| McpError::internal_error("MCP response missing result", None))
+            .ok_or_else(|| McpError::internal_error("MCP response missing result", None))?;
+        if !self.enable_mutations {
+            let definition = crate::mcp_worktrees::local_definitions().remove(0);
+            if method == "tools/list" {
+                result["tools"]
+                    .as_array_mut()
+                    .expect("registry tool array")
+                    .push(definition);
+            } else if contract {
+                result["structuredContent"]["tools"]
+                    .as_array_mut()
+                    .expect("registry tool array")
+                    .push(definition);
+                result["structuredContent"]["capabilities"] =
+                    json!({"worktree_contexts":false,"automatic_commits":false});
+                result["structuredContent"]["github"] =
+                    json!({"requested":false,"available":false});
+                result = tool_success(result["structuredContent"].take());
+            }
+        }
+        Ok(result)
     }
 }
 
@@ -267,7 +330,12 @@ impl ServerHandler for ReqvireMcpServer {
         _context: RequestContext<RoleServer>,
     ) -> impl Future<Output = Result<ListResourceTemplatesResult, McpError>> + MaybeSendFuture + '_
     {
-        std::future::ready(Ok(ListResourceTemplatesResult::with_all_items(vec![])))
+        async move {
+            let value = self
+                .call_handler("resources/templates/list", json!({}), false)
+                .await?;
+            serde_json::from_value(value).map_err(|e| McpError::internal_error(e.to_string(), None))
+        }
     }
 
     fn list_prompts(
@@ -318,20 +386,29 @@ impl ServerHandler for ReqvireMcpServer {
 pub async fn serve_http(
     enable_mutations: bool,
     enable_commits: bool,
+    enable_github: bool,
+    github_remote: &str,
     with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
     host: &str,
     port: u16,
     http_access: &HttpAccess,
 ) -> Result<(), ReqvireError> {
-    let server = ReqvireMcpServer::new_with_write_lock(
-        enable_mutations,
-        enable_commits,
-        with_size_estimates,
-        excluded_filename_patterns,
-        Arc::new(Mutex::new(())),
-        None,
-    )?;
+    let worktrees = if enable_mutations {
+        crate::mcp_session::require_clean(&std::env::current_dir()?)?;
+        Some(crate::mcp_worktrees::Worktrees::start(
+            &std::env::current_dir()?,
+            &std::env::current_exe()?,
+            enable_commits,
+            with_size_estimates,
+            false,
+            enable_github,
+            github_remote,
+        )?)
+    } else {
+        None
+    };
+    let server = server_with_worktrees(worktrees, with_size_estimates, excluded_filename_patterns)?;
     if !enable_mutations {
         shared_validate_startup_with_options(excluded_filename_patterns, with_size_estimates)?;
     }
@@ -446,6 +523,36 @@ where
     Ok(mount_server(router, server, http_access))
 }
 
+fn server_with_worktrees(
+    worktrees: Option<Arc<crate::mcp_worktrees::Worktrees>>,
+    with_size_estimates: bool,
+    exclusions: &GlobSet,
+) -> Result<ReqvireMcpServer, ReqvireError> {
+    let mut server = ReqvireMcpServer::new_with_write_lock(
+        false,
+        false,
+        with_size_estimates,
+        exclusions,
+        Arc::new(Mutex::new(())),
+        None,
+    )?;
+    server.enable_mutations = worktrees.is_some();
+    server.worktrees = worktrees;
+    Ok(server)
+}
+pub fn mount_worktrees<S: Clone + Send + Sync + 'static>(
+    router: axum::Router<S>,
+    worktrees: Arc<crate::mcp_worktrees::Worktrees>,
+    exclusions: &GlobSet,
+    access: &HttpAccess,
+) -> Result<axum::Router<S>, ReqvireError> {
+    Ok(mount_server(
+        router,
+        server_with_worktrees(Some(worktrees), false, exclusions)?,
+        access,
+    ))
+}
+
 fn mount_server<S: Clone + Send + Sync + 'static>(
     router: axum::Router<S>,
     server: ReqvireMcpServer,
@@ -472,7 +579,7 @@ fn mount_server<S: Clone + Send + Sync + 'static>(
     router.merge(mcp_routes)
 }
 
-fn request_refreshes_runtime_after_write(params: &Value) -> bool {
+pub fn request_refreshes_runtime_after_write(params: &Value) -> bool {
     let tool_name = match params.get("name").and_then(Value::as_str) {
         Some(tool_name) => tool_name,
         None => return false,
@@ -486,7 +593,7 @@ fn request_refreshes_runtime_after_write(params: &Value) -> bool {
             .unwrap_or(false)
 }
 
-fn handle_rpc_value(
+pub fn handle_rpc_value(
     raw: Value,
     enable_mutations: bool,
     with_size_estimates: bool,

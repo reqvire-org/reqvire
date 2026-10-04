@@ -140,7 +140,7 @@ Verify automatic refresh through the compiled Explorer in a real browser rather 
 - Missing and corrupt chunk responses leave the prior displayed content and committed revision intact, show a failure diagnostic, and recover automatically when valid responses resume.
 - The shell has no manual Refresh action.
 - Hidden documents suspend automatic refresh and check again when visible, catching up across several missed MCP mutations and a deletion.
-- Plain serving and static exports issue no live API requests.
+- Plain and read-only embedded serving load selected worktree contexts on demand under existing cache/freshness rules without adding periodic refresh or preloading other branches; static exports issue no live API requests.
 - Unit checks enforce an immediate visible check and the five-second interval, prevent overlapping checks, release timed-out checks for automatic retry, and discard late responses after hiding, unmount, or StrictMode cleanup.
 - Client transactions preserve unchanged object identity, ordered current arrays, and unknown sections; deletion-only refreshes require no new chunks and remove obsolete cache entries.
 - Malformed or unsupported manifests/stores, incorrect chunk hashes or response membership/revisions, exhausted conflicts, and interrupted multi-batch downloads cannot advance the committed cursor or publish partial data. Subsequent valid responses recover from the last committed revision.
@@ -661,7 +661,7 @@ Verify that immutable published runtime data and its manifest adopt embedded MCP
 - Manifest HEAD responses have no body and retain revision headers. Strong, weak, list, and wildcard conditional tags return the expected statuses; unsupported methods on the full-store route return `405`, and missing API paths return `404`.
 - Generated seed data, the full JSON store, and the manifest revision agree after mutations, and generated ontology data remains available.
 - Cached refresh diagnostics return `503` while retaining the valid seed and revision; clearing a diagnostic permits a matching conditional `304` without advancing that revision.
-- Plain serving and read-only embedded MCP do not advertise live refresh or expose the manifest, chunk, or full-store APIs.
+- Plain serving and read-only embedded MCP expose snapshot APIs for branch selection but do not advertise periodic live refresh.
 - The same server processes remain alive and one initialized MCP client can issue successful reads after each runtime refresh without reinitialization.
 
 ##### Test Criteria
@@ -739,4 +739,63 @@ Check that semantic-query icons and badges use the shared Q marker, that native 
   * satisfiedBy: [OntologiesView.test.tsx](../../../../explorer/src/views/OntologiesView.test.tsx)
   * satisfiedBy: [OntologyNodeDetailModal.test.tsx](../../../../explorer/src/components/OntologyNodeDetailModal.test.tsx)
   * satisfiedBy: [test.sh](../../../../tests/test-semantic-queries/test.sh)
+---
+
+### Explorer Worktree Selection Verification
+
+Verify one branch-browsing experience backed by independent worktree contexts with plain serving, read-only MCP, and writable MCP.
+
+#### Details
+Acceptance checks:
+- Start two admitted contexts with different models and assets but overlapping relative filenames and element identifiers. Verify the shell selector uses shared controls, labels branches, supports keyboard selection, and lists local branches without loading them or creating worktrees during inventory reads. Mutation-enabled first selection must complete ordinary admission before loading its target.
+- Confirm the compact branch picker is inside the left pane above view filters, without a full-width toolbar or repeated "Viewing" label. Check light/dark themes, narrow panes, and long branch/path values. Verify names truncate without overflowing and full paths are available in the opened picker.
+- Exercise arrow keys, Home/End, type-ahead, Enter/Space, Escape, Tab, and outside dismissal. Unavailable choices cannot be selected. During pending and failed switches, the trigger and selection marker continue identifying the displayed model even when worktrees share a branch label.
+- In design-system Patterns, select different available branches and verify labels and disabled unavailable choices. In Mocks, switch between distinct fixture models from the same shell selector; assert the model and branch change together, view navigation remains available, prior-context modals close, and URL/history/reload retain the chosen fixture without contacting MCP.
+- Open two browser tabs, select different contexts, and exercise Model, Flow, Ontologies, Traces, Coverage, search, element modals, source pages, and asset downloads. Each result and label must belong to the selected context; neither selection changes Git checkouts, MCP routing, or the other tab.
+- Mutate each context through MCP and verify only its selected views refresh; test both automatic-commit policies. Confirm inventory reads do not scan/build models and requests for initialized runtimes do not rebuild them.
+- Delay a previous context's manifest, chunks, source response, and asset request while switching. Confirm target publication is atomic, late responses cannot overwrite it, and cache keys include context even when fingerprints match. Validate path traversal and wrong-context requests are rejected.
+- Check URL selection, reload, back/forward, per-context coverage scope, retained view mode, closed old-context modals, and invalid selection explanations. Remove or fail a selected context and assert a labelled stale/unavailable view rather than fallback to another branch.
+- Inject target runtime generation, manifest, chunk, and network failures; keep the prior valid model and label together, then recover by explicit selection. Check no switch tool appears in MCP discovery.
+- Populate several existing worktrees and branches without worktrees, including an invalid unselected model. Measure worker starts and model/runtime builds: startup loads only the original context, inventory loads none, and selecting a branch loads only that target. In every serving mode, the same picker lists all choices without prevalidation. First selection of a branch without a worktree creates one managed worktree, applies the mode's admission rules, and loads its model, ontology and assets through the common pipeline. Repeated unchanged and concurrent selections reuse its worktree, completed model, and runtime. Changing its local branch tip before first selection uses the current tip.
+- Confirm preparing a missing worktree leaves existing checkouts, indexes, files, branch refs, and other clients' routing unchanged while registering only the required worktree. Read-only selection takes no ownership; mutation-enabled selection takes ownership only through normal admission. Race preparation with another checkout and require reuse or an explicit conflict without forcing duplicate checkouts. Failed preparation releases only ownership acquired by that attempt and cleans up only newly created unchanged assets, preserving pre-existing work and reporting residual paths. Normal shutdown preserves successful worktrees and their changes.
+- In plain and read-only embedded serving, exercise the same loading and cache checks against reused and newly created worktrees. Include valid dirty content, repeat unchanged selections, then edit selected-context sources, root exclusions, and used external ontology inputs. The next demand load/read must follow existing invalidation and rebuild rules without restart; equal-length preserved-timestamp edits remain detectable. Invalid changed inputs return diagnostics rather than stale success, and repaired inputs recover. Other branches are not scanned or loaded, mutation tools remain unavailable, and no new periodic model polling is introduced. Static exports retain one snapshot.
+- In mutation-enabled serving, attempt first selection of targets with staged, unstaged, and non-ignored untracked changes. Each fails before model parsing/runtime construction, retains the displayed branch and all files/index/refs, and offers no read-only fallback. After changes are resolved, normal admission validates and loads the branch; author-identity and ownership conflicts retain their existing failure behavior. Exercise both reused and newly created worktrees.
+- With either automatic-commit policy, reselect a healthy active context and reuse its accepted model without source freshness scans or rebuilds. With commits disabled, accepted uncommitted writes must not cause a new clean-start failure on reselection. External edits must not be imported into that accepted model. Accepted mutations update only their context's runtime and derived cache state. Stop and restart with pending changes to confirm the existing clean-start rule still rejects admission.
+
+##### Evidence scope
+The Rust worktree and HTTP router regressions exercise on-demand admission, dirty-target rejection, accepted-snapshot reuse, read-only source/exclusion/preview invalidation, and repair recovery. Explorer hook and application tests cover explicit loading, cached periodic reads, failed-switch retention, and retry selection. The HTTP/browser cases in `tests/test-mcp-worktrees` are authored; their browser execution remains unconfirmed.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * satisfiedBy: [serve.rs](../../../../crates/reqvire-cli/src/serve.rs)
+  * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
+  * satisfiedBy: [App.test.tsx](../../../../explorer/src/App.test.tsx)
+  * verify: [Explorer Worktree Selection](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-selection)
+---
+
+### Explorer Worktree Runtime Isolation Verification
+
+Verify that the served Explorer runtime fulfills its shared context-isolation and live-store implementation obligations.
+
+#### Details
+Acceptance checks:
+- In writable and read-only serving, admit two contexts with colliding identifiers and filenames but different content. Assert inventory, seed, manifest, chunks, full store, ontology download, source rendering, and eligible asset routes return only the selected context and carry matching identity.
+- Exercise missing selectors on legacy original-context routes and explicit unknown, removed, stopped, and runtime-unavailable IDs. Explicit failures must never return another branch's data or the SPA fallback shell. Reject path traversal, encoded traversal, and symlink escapes under the existing asset boundary.
+- Confirm reused and newly created worktrees initialize on demand through the same fixed-root worker pipeline after the mode's admission checks, with concurrent identical loads sharing one preparation outside the asynchronous request executor. Startup/inventory never initialize unrequested worktrees. Unchanged read-only demand loads reuse existing core cache entries; changed inputs rebuild only the selected context under existing invalidation rules. Mutation-mode reads reuse accepted snapshots; manifest/chunk transfer and inventory do not initiate model scans/builds. Successful mutations replace only their own runtime, failed generation retains labelled last-valid data, and a later allowed initialization/refresh recovers.
+- Interleave publication and context removal with in-flight reads; each response retains one captured immutable snapshot or reports that context unavailable. Identical model fingerprints must not conflate context identity or request routing.
+- Verify branch/HEAD status after explicit commit or push without misreporting a model revision change, and exercise both commit policies. Backend requests cannot change another browser's selection or switch an existing Git checkout; preparing a missing worktree is isolated to the selected branch.
+- Use disposable Git worktrees with actual private worker processes and the embedded HTTP router for backend checks. Run the HTTP/browser E2E suite against the built binary for transport and browser integration.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * satisfiedBy: [serve.rs](../../../../crates/reqvire-cli/src/serve.rs)
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [Explorer Worktree Runtime Isolation](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-runtime-isolation)
 ---

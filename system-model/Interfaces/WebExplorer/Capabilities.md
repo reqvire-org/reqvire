@@ -47,7 +47,7 @@ Implementation details shall follow the associated contract specifications.
 
 ### Served Explorer Runtime Freshness
 
-When an embedded MCP mutation succeeds during serving with mutations enabled, the system shall publish the updated valid model to Explorer clients without restarting the server or interrupting MCP access.
+When an embedded MCP mutation succeeds during serving with mutations enabled, the system shall publish the updated valid model to Explorer clients viewing that worktree context without restarting the server or interrupting MCP access.
 
 While the mutation's runtime snapshot is being rebuilt, the system shall serve the last valid published snapshot without waiting for model validation or generation.
 
@@ -608,4 +608,63 @@ The system shall ensure color consistency between:
   * satisfiedBy: [ContractBindingList.tsx](../../../explorer/design-system/product-patterns/detail/ContractBindingList.tsx)
   * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
   * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
+---
+
+### Explorer Worktree Selection
+
+WHEN Explorer is served, the system SHALL let each browser tab select any local branch through one branch picker and load only the requested context under the server's existing read-only or mutation-enabled admission rules, without switching existing Git checkouts or changing another client's context.
+
+#### Details
+Selection SHALL resolve the branch to an existing or newly created isolated worktree and atomically adopt its context's model, reports, source content, and assets. Mutation-enabled serving SHALL reject a dirty target before loading a newly admitted context. The same admission, validation, existing cache/invalidation, navigation, and refresh rules SHALL apply regardless of whether the worktree already existed. Branch identity remains visible; reselecting an active context reuses its accepted model under the existing session rules.
+
+#### Metadata
+  * type: requirement
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Contract References
+  * [Explorer Worktree Runtime Isolation Specification](Specifications.md#explorer-worktree-runtime-isolation-specification)
+  * [MCP Worktree Opening and Inventory Specification](../MCP/Specifications.md#mcp-worktree-opening-and-inventory-specification)
+  * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
+  * [MCP Server State and Cache Specification](../MCP/Specifications.md#mcp-server-state-and-cache-specification)
+  * [Explorer Automatic Store Refresh Specification](Specifications.md#explorer-automatic-store-refresh-specification)
+  * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
+
+#### Relations
+  * satisfiedBy: [WorktreeSelector.tsx](../../../explorer/design-system/product-patterns/shell/WorktreeSelector.tsx)
+  * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
+  * satisfiedBy: [manifestRefresh.ts](../../../explorer/src/store/manifestRefresh.ts)
+  * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
+  * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
+  * specify: [Explorer Worktree Browsing](../InterfacesFeature.md#explorer-worktree-browsing)
+  * definedBy: [Explorer Worktree Selection Specification](Specifications.md#explorer-worktree-selection-specification)
+---
+
+### Explorer Worktree Runtime Isolation
+
+WHILE multiple worktree contexts are served, the system SHALL publish and route each context's Explorer model, source content, and eligible assets independently according to the bound isolation and live-store contracts.
+
+#### Details
+This requirement implements the Explorer portion of shared worktree isolation and snapshot publication. Browser selection consumes its runtime interface without taking ownership of MCP model operations.
+
+#### Metadata
+  * type: requirement
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Contract Bindings
+  * [MCP Worktree Context Isolation Specification](../MCP/Specifications.md#mcp-worktree-context-isolation-specification)
+  * [Served Explorer Runtime Freshness Specification](Specifications.md#served-explorer-runtime-freshness-specification)
+  * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
+  * [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
+
+#### Relations
+  * satisfiedBy: [worktreeUrls.tsx](../../../explorer/src/store/worktreeUrls.tsx)
+  * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
+  * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * specify: [Explorer Worktree Browsing](../InterfacesFeature.md#explorer-worktree-browsing)
+  * definedBy: [Explorer Worktree Runtime Isolation Specification](Specifications.md#explorer-worktree-runtime-isolation-specification)
 ---

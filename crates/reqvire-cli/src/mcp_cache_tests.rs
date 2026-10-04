@@ -310,6 +310,8 @@ case!(mutation_startup_rejects_dirty_worktree_before_listening, {
         true,
         false,
         false,
+        "origin",
+        false,
         &reqvire::exclusions::ExclusionSetBuilder::new()
             .build()
             .expect("ownership test assertion"),

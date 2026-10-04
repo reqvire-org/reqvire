@@ -312,6 +312,24 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           interrupting MCP access. Failed updates keep the last valid view and
           retry automatically. External file edits require a server restart.
         </p>
+        <p className="text-zinc-600 mb-4">
+          The branch picker at the top of the left pane is available with plain
+          serving and read-only MCP too. It lists every local branch in the startup
+          repository and loads only the branch you select, reusing its worktree or
+          creating an isolated managed worktree. Each tab can browse a different model; its URL
+          preserves the selection across reload and back/forward navigation.
+          A successful switch updates the model, branch label, and asset links
+          together and closes old element details. If loading fails or the worktree
+          disappears, Explorer keeps the last valid view labelled with its branch
+          and shows an error. Select a branch to retry. Existing checkouts remain
+          unchanged. Read-only selection accepts valid uncommitted content and
+          checks source freshness through the existing cache. Mutation-enabled
+          serving rejects dirty targets before first admission. Reselecting an
+          active mutation context reuses its accepted model, including its own
+          uncommitted changes. Unchanged data stays cached across switches, and
+          prepared worktrees survive shutdown. Exported pages contain only their
+          exported snapshot.
+        </p>
       </Section>
 
       <Section title="Coverage in Explorer">

@@ -35,6 +35,7 @@ import {
   StoreNotice,
   TreeItem,
   TypeBadge,
+  WorktreeSelector,
   type DetailContractBindingItem,
   type DetailMetaBadge,
   type DetailRelationItem,
@@ -52,6 +53,7 @@ import {
   ONTOLOGY_COMPACT_NODE,
   ONTOLOGY_NODES,
   ONTOLOGY_REQUIREMENT_NODE,
+  SHOWCASE_WORKTREES,
 } from "../fixtures/productPatterns";
 
 const PRIMARY_DETAIL_ELEMENT_ID = "REQ-DET-042";
@@ -224,6 +226,7 @@ function Section({ title, desc, children }: { title: string; desc?: string; chil
 }
 
 export function ProductPatternsPage() {
+  const [worktreeId, setWorktreeId] = useState(SHOWCASE_WORKTREES[0].id);
   const [leftPaneOpen, setLeftPaneOpen] = useState(true);
   const [codeExpanded, setCodeExpanded] = useState(true);
   const [codeWrapped, setCodeWrapped] = useState(false);
@@ -304,6 +307,16 @@ export function ProductPatternsPage() {
             detailPane={<ShellDetailRail />}
           />
         </div>
+      </Section>
+
+      <Section title="Worktree Selector" desc="Choose an admitted branch and worktree. Unavailable contexts remain visible and disabled. In Mocks, this control switches the displayed fixture model through the Explorer shell.">
+        <WorktreeSelector
+          value={worktreeId}
+          choices={SHOWCASE_WORKTREES}
+          branch={SHOWCASE_WORKTREES.find(choice => choice.id === worktreeId)?.branch}
+          onChange={setWorktreeId}
+          onOpen={() => {}}
+        />
       </Section>
 
       <Section

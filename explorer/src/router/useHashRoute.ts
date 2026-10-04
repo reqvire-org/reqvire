@@ -67,9 +67,13 @@ export function useHashRoute() {
     [applyHash],
   );
 
-  const closeElement = useCallback(() => {
-    applyHash(routeForBase(lastBaseRouteRef.current));
-  }, [applyHash]);
+  const closeElement = useCallback((replace = false) => {
+    const hash = routeForBase(lastBaseRouteRef.current);
+    if (replace) {
+      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}${hash}`);
+      setRoute(read());
+    } else applyHash(hash);
+  }, [applyHash, read]);
 
   return { route, navigateView, openElement, closeElement };
 }

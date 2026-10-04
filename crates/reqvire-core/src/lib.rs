@@ -21,9 +21,11 @@ pub mod mcp_prompts;
 pub mod migrations;
 pub mod model;
 pub mod model_cache;
-pub mod mutation_io;
 mod model_inputs;
 pub(crate) mod model_revision;
+pub mod mutation_io;
+/// Canonical content revision shared by CLI sessions and model evidence adapters.
+pub use model_revision::fingerprint as model_fingerprint;
 pub mod ontology_graph;
 pub mod operations;
 pub mod parser;
