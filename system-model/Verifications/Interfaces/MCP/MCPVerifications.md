@@ -79,13 +79,13 @@ Verify that long-lived MCP tools apply the core cache freshness/publication cont
 #### Details
 
 ##### Acceptance Criteria
-- In one running MCP process, changing applicable root exclusions changes subsequent search/read results without restart. Editing only a used external ontology updates vocabulary and SPARQL results; their public parsed-element revision may remain unchanged. Invalid current inputs produce the applicable tool error or lenient diagnostics instead of stale success, and repaired inputs recover.
+- In one running read-only MCP process, changing applicable root exclusions changes subsequent search/read results without restart. Editing only a used external ontology updates vocabulary and SPARQL results; their public parsed-element revision may remain unchanged. Invalid current inputs produce the applicable tool error or lenient diagnostics instead of stale success, and repaired inputs recover.
 - Run equivalent model-read scenarios through standalone MCP and the embedded MCP endpoint so both adapters apply the same core cache contract.
 - Coordinate a read/rebuild with a real persisted MCP write. Reads that already captured an allowed pre-write snapshot remain internally consistent; dependent reads after successful mutation completion observe the post-write graph and semantic state. Tools that cannot expose the required concurrent-read context wait for the write gate.
 - A superseded pre-write build cannot replace the model used for post-write MCP evidence or Explorer runtime generation. Generated store and ontology artifacts agree with the accepted post-write model under the existing runtime projection.
-- Successful persisted mutations invoke the existing post-write runtime refresh lifecycle. Preview requests, JSON-RPC errors, and tool results with `isError: true` do not invoke it, change published assets/revision, or clear a previous runtime-refresh diagnostic.
+- Successful persisted mutations invoke the existing post-write runtime refresh lifecycle with commits disabled or enabled. Preview requests, no-op executions, JSON-RPC errors, and tool results with `isError: true` do not invoke it, change published assets/revision, or clear a previous runtime-refresh diagnostic.
 - A runtime-generation failure after a successful persisted mutation preserves the last valid Explorer snapshot and the existing diagnostic behavior; it remains distinct from a rejected mutation with no write.
-- Ordinary manifest/chunk requests keep reading the published snapshot without triggering source scans or builds. External edits become visible to MCP model reads under the core contract; this change does not add external-edit polling to Explorer's publication lifecycle.
+- Ordinary manifest/chunk requests keep reading the published snapshot without triggering source scans or builds. External edits become visible to read-only MCP model reads under the core contract; mutation-enabled reads retain the accepted snapshot; this change does not add external-edit polling to Explorer's publication lifecycle.
 - Tool names, request arguments, structured-result field names, SHA-256 model revision encoding, and Explorer manifest/chunk/ETag contracts remain compatible with the existing interface specifications.
 
 ##### Required Evidence
@@ -93,8 +93,8 @@ Verify that long-lived MCP tools apply the core cache freshness/publication cont
 - Use controlled barriers for read/write races and a mutation rejected by core validation that returns an MCP tool error inside a successful JSON-RPC response.
 - Compare MCP graph/query results and generated Explorer artifacts from the accepted model while preserving existing last-valid-snapshot and browser refresh assertions. Keep the existing browser wire-hash verification unchanged.
 
-##### Evidence Status
-All 190 shared HTTP regression checks pass, including freshness in standalone and embedded MCP and preservation of Explorer publication after rejected mutations. All eight adapter regressions pass: rejected writes and previews do not invoke refresh, prior refresh diagnostics and original tool errors remain intact, successful writes refresh once, and reads wait through controlled persistence. Core barriers establish superseded-build behavior and consistent captured semantic state; HTTP requests establish transport-visible outcomes.
+##### Evidence Scope
+The HTTP suite exercises read-only source freshness separately from authoritative mutation-mode runtime publication. Adapter tests exercise branch/worktree ownership, commit publication and failure recovery without requiring a listening socket. Executing the HTTP suite remains necessary to establish transport-visible outcomes.
 
 #### Metadata
   * type: test-verification
@@ -237,18 +237,30 @@ Expected checks:
 - Verify preview requests execute through Reqvire core and do not modify the filesystem.
 - Verify preview results include diffs or equivalent change descriptions, changed files when known, validation risks, and affected scope.
 - Verify execution requests execute only when mutation mode is enabled.
-- Verify execution requests update the Reqvire core graph and persist filesystem changes before success is reported.
+- Verify execution requests validate prepared file changes, persist them, create one local commit only with `--enable-commits`, and publish the accepted Reqvire core graph before success is reported.
 - Verify post-mutation diagnostics run according to the tool contract.
 - Verify subsequent MCP reads observe the refreshed core graph state.
 - Verify mutation results include changed files, diffs, diagnostics, refreshed model revision, and affected elements/submodels.
 - Verify attempts to bypass Reqvire model semantics or perform arbitrary file writes are rejected.
+
+- Verify mutation startup rejects staged, unstaged, and non-ignored untracked files, detached/unborn HEAD, invalid models, and a second owner; restart after release resumes the same branch.
+- Without `--enable-commits`, verify successful mutations change the expected files, leave HEAD and index contents unchanged, omit the `commit` result field, and permit successive writes and reads from the accepted snapshot even though the worktree is now dirty.
+- With `--enable-commits`, verify successful mutations create exactly one commit with only their prepared paths and return its identifier. In both modes, rejected, dry-run and no-op requests leave files, HEAD, index, and published runtime state unchanged and omit `commit`.
+- Verify commit-disabled shutdown leaves changes uncommitted; mutation-enabled restart rejects that dirty worktree until the user commits or otherwise resolves it, then resumes the same branch without creating an extra commit.
+- Verify external model edits do not enter session reads or commits, unrelated staged changes are preserved, and unexpected HEAD/branch changes reject writes.
+- Verify complete candidate validation covers asset operations and formatting before persistence, and commit/persistence failures preserve accepted files and model state.
+- Verify file/folder moves update subsequent reads, asset moves preserve executable modes, and newly occupied external destination files are not overwritten.
+- Verify successive reads reuse the accepted snapshot without filesystem cache rebuilding; semantic exports and Explorer refresh adopt successfully persisted candidates in both commit modes. In commit-enabled mode, adoption must also wait for a successful commit.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
+  * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
   * verify: [MCP Mutation Execution Flow](../../../Interfaces/MCP/Tools.md#mcp-mutation-execution-flow)
+  * verify: [MCP Mutation Concurrency Control](../../../Interfaces/MCP/Tools.md#mcp-mutation-concurrency-control)
 ---
 
 ### MCP Mutation Tool Safety Verification
@@ -480,13 +492,19 @@ Expected checks:
 - Verify startup validation failures are forwarded from Reqvire diagnostics and prevent the server from accepting protocol requests.
 - Verify default startup returns read/report tools only from MCP `tools/list`.
 - Verify startup with `--enable-mutations` returns mutation tools from MCP `tools/list`.
+- Verify root, `mcp --help`, and `serve --help` advertise `--enable-commits`, its default-disabled behavior, and mutation-mode prerequisite.
+- Verify `mcp --enable-commits` and `serve --enable-mcp --enable-commits` reject the missing `--enable-mutations` before model loading/listening; `serve --enable-mutations --enable-commits` rejects missing `--enable-mcp`.
+- Verify valid standalone and embedded combinations accept `--enable-commits` and reach the ordinary clean-worktree startup checks.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-cli-help-structure/test.sh)
   * verify: [MCP Server Command](../../../Interfaces/MCP/Tools.md#mcp-server-command)
+  * verify: [Serve Command Embedded MCP Endpoint](../../../Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
 ---
 
 ### MCP Server End-to-End Verification
@@ -519,18 +537,21 @@ The e2e test starts `reqvire mcp` in a fixture workspace and verifies MCP initia
 
 ### MCP Server State and Cache Verification
 
-This verification shall prove that MCP cached state is subordinate to Reqvire source files and Reqvire core parsing.
+This verification shall prove read-only MCP source freshness and mutation-enabled MCP reuse of its accepted persisted snapshot.
 
 #### Details
-Expected checks:
+Read-only expected checks:
 - Verify workspace status reports workspace root, source-control `HEAD` and dirty state when available, Reqvire version, MCP protocol revision, Reqvire tool contract version, model fingerprint, and last diagnostics.
 - Verify source file, available source-control state, excluded-pattern, Reqvire version, or Reqvire tool contract changes invalidate cached model state.
 - Verify markdown content changes invalidate cached model state even when filesystem modification time is preserved.
 - Verify changes to source-file inputs excluded from model revision encoding can invalidate/rebuild cached state while leaving the public model revision unchanged; the SHA-256 model revision must not replace the existing source cache key.
 - Change page-only content while preserving file length and modification time; verify the next MCP search exposes the updated page content while `model_fingerprint` remains unchanged.
-- Verify controlled MCP mutations refresh MCP internal state from the updated Reqvire core graph.
 - Verify external filesystem drift triggers invalidation/reparse before serving stale model data.
 - Verify dirty worktree state is reported in metadata when available and does not block tools when the equivalent Reqvire core operation can run.
+
+Mutation-enabled expected checks:
+- Verify accepted persisted mutations replace the graph, pages, and semantic snapshot together in both commit modes, while external edits do not replace it.
+- Verify repeated reads reuse the accepted snapshot without filesystem cache rebuilding.
 
 ##### Evidence Scope
 The linked hashing suite proves the unchanged-public-revision page-content freshness case. Model Cache Input Freshness Verification owns actual cache reuse and complete dependency invalidation; MCP Cache and Runtime Coherence Verification owns live configuration/dependency visibility across MCP tools and the embedded runtime boundary. Their passing regression assertions establish those guarantees independently of equal model revisions.
@@ -541,6 +562,8 @@ The linked hashing suite proves the unchanged-public-revision page-content fresh
 #### Relations
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-model-revision-hashing/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
+  * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
   * verify: [MCP Server State and Cache](../../../Interfaces/MCP/Tools.md#mcp-server-state-and-cache)
 ---
 

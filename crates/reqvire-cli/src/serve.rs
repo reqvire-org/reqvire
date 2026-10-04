@@ -52,6 +52,7 @@ pub async fn serve_explorer(
     port: u16,
     enable_mcp: bool,
     mcp_enable_mutations: bool,
+    mcp_enable_commits: bool,
     excluded_filename_patterns: &GlobSet,
     http_access: &crate::mcp_http::HttpAccess,
 ) -> Result<(), ReqvireError> {
@@ -79,20 +80,21 @@ pub async fn serve_explorer(
             .for_listener(host, port)
             .map_err(ReqvireError::ProcessError)?;
         let refresh_state = state.clone();
-        let post_write_hook: mcp::PostWriteHook = Arc::new(move || {
+        let post_write_hook: mcp::PostWriteHook = Arc::new(move |model| {
             let refresh_state = refresh_state.clone();
-            Box::pin(async move { refresh_runtime_assets(&refresh_state).await })
+            Box::pin(async move { refresh_runtime_assets(&refresh_state, model).await })
                 as Pin<Box<dyn std::future::Future<Output = Result<(), ReqvireError>> + Send>>
         });
         app = mcp::mount_service_with_post_write_hook(
             app,
             mcp_enable_mutations,
+            mcp_enable_commits,
             false,
             excluded_filename_patterns,
             Arc::clone(&state.write_lock),
             state.live_refresh.then_some(post_write_hook),
             &http_access,
-        );
+        )?;
     }
     let app = app.with_state(state);
 
@@ -238,16 +240,23 @@ async fn runtime_asset_response(
 
 /// Called only after an embedded MCP write, while the MCP workspace write gate
 /// is held. Browser requests read the published snapshot without model I/O.
-async fn refresh_runtime_assets(state: &ServeState) -> Result<(), ReqvireError> {
+async fn refresh_runtime_assets(
+    state: &ServeState,
+    accepted: Option<reqvire::ModelManager>,
+) -> Result<(), ReqvireError> {
     let exclusions = Arc::clone(&state.excluded_filename_patterns);
     let result = tokio::task::spawn_blocking(move || {
-        let model = model_cache::load_cached_model(
-            exclusions.as_ref(),
-            ModelBuildOptions {
-                lenient: false,
-                with_size_estimates: false,
-            },
-        )?;
+        let model = if let Some(model) = accepted {
+            model
+        } else {
+            model_cache::load_cached_model(
+                exclusions.as_ref(),
+                ModelBuildOptions {
+                    lenient: false,
+                    with_size_estimates: false,
+                },
+            )?
+        };
         let assets = build_runtime_assets(&model)?;
         RuntimeSnapshot::new(assets).map(Arc::new)
     })

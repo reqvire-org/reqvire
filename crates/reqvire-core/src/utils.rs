@@ -271,7 +271,7 @@ pub fn validate_target_path(
     }
 
     // Check if file exists
-    let needs_file_creation = !absolute_path.exists();
+    let needs_file_creation = !crate::mutation_io::exists(&absolute_path);
 
     // We'll check section existence later in GraphRegistry (needs parsed file)
     let needs_section_creation = section.is_some() && !needs_file_creation;
@@ -302,6 +302,10 @@ pub fn scan_markdown_files(
     match commit {
         Some(commit_id) => scan_markdown_files_from_commit(commit_id, excluded_filename_patterns),
         None => {
+            if let Some(files) = crate::mutation_io::paths_under(&std::env::current_dir()?) {
+                return Ok(files.into_iter().filter(|p| p.extension().is_some_and(|e| e == "md"))
+                    .filter(|p| !is_to_be_ignored(p, excluded_filename_patterns)).collect());
+            }
             let mut files = Vec::new();
             let workspace_scope = workspace::WorkspaceScope::discover()?;
 

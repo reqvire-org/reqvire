@@ -1,0 +1,3 @@
+PASS exit-and-stdin
+PASS terminate-stops-child
+PASS interrupt-stops-child

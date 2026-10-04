@@ -152,29 +152,28 @@ The MCP server is expected to preserve Reqvire filesystem mutation guarantees un
 
 #### Details
 Concurrency rules:
-- For transports that can receive concurrent requests, mutation execution is serialized per workspace.
-- The per-workspace write gate covers loading or refreshing the current model state, applying the Reqvire core mutation, flushing changed files, running required diagnostics, and refreshing MCP-visible model state.
-- Two mutation requests for the same workspace must not concurrently mutate or flush overlapping model state.
-- Mutation requests queue deterministically behind the per-workspace write gate.
-- Read-only tools may run concurrently with other reads.
-- Read-only tools may run concurrently with mutations only if each read result includes the model revision or fingerprint it observed.
-- Each concurrent read uses one completed core model throughout result construction. A read already using a pre-write snapshot may finish under the rule above; dependent reads begun after mutation completion use the completed post-write state. The parsed-element revision alone cannot establish freshness of page content, external dependencies, or configuration.
-- Source capture and cache publication coordinate with the workspace write gate so a reader cannot publish a model built from partially persisted controlled writes. Tools that cannot satisfy the concurrent-read snapshot rule wait for the mutation gate.
-- Core cache invalidation supersedes older in-progress builds. Such a build cannot overwrite state published after a mutation or let waiting requests accept the superseded state as current.
-- If stronger consistency is required for a tool, that read tool may take the same workspace read/write gate and wait for active mutation completion.
-- Mutation results include changed files, diffs or equivalent change descriptions, and refreshed model revision/fingerprint after execution.
-- Failed mutations must not leave MCP-visible cached state ahead of the filesystem.
-- If an error follows persisted changes, invalidate affected cache state before releasing the gate and preserve the operation's error; do not treat transport-level success as proof of tool success.
+- A mutation-enabled MCP server MUST claim exclusive ownership of its current branch and worktree before accepting requests. Ownership is coordinated between Reqvire MCP processes sharing the repository and released when the owning process exits.
+- Startup MUST require exactly one eligible Git worktree at the workspace root, a named branch with an existing commit, a clean index and working tree including non-ignored untracked files, configured Git author identity, and a valid model. Startup MUST NOT create or switch branches, stash changes, or create worktrees.
+- Ownership covers standalone MCP and the embedded mutation-enabled MCP endpoint equally. Read-only servers retain their existing dirty-worktree and source-refresh behaviour.
+- Automatic Git commits default to false. Only the startup flag `--enable-commits`, together with `--enable-mutations`, enables them; enabling mutations alone MUST NOT enable commits. The commit setting remains fixed for the server session and MUST NOT change ownership, validation, serialization, or authoritative snapshot behavior.
+- The accepted validated model and its captured source inputs are authoritative for the session. External model-file edits are not imported; affected managed files may be overwritten by subsequent mutations. Unrelated files and staged changes MUST NOT be included in a mutation commit.
+- An unexpected branch or HEAD change MUST stop mutation execution. Ownership coordinates cooperating MCP writers; it does not prevent arbitrary external Git commands or file edits.
+- Requests sharing the session MUST serialize candidate preparation, validation, persistence, Git publication, and model publication. Reads MUST observe one accepted snapshot and MUST NOT publish partially persisted changes.
 
 Mutation critical section:
-- Acquire the workspace mutation gate.
-- Refresh or validate the current model view from Reqvire core.
-- Apply the typed Reqvire core operation.
-- Flush filesystem changes using the same persistence guarantees as Reqvire CLI/core.
-- Run required formatting, validation, or affected-scope diagnostics.
-- Refresh MCP-visible model state from the updated Reqvire core graph or reparsed filesystem state.
-- Publish only a complete graph/page/semantic state under the bound core cache contract. A cold rebuild remains an allowed correctness fallback when the updated core graph does not yet contain complete derived state.
-- Release the workspace mutation gate.
+- Check the owned branch and expected HEAD.
+- Execute the shared core operation against the accepted model and captured files, preparing changes without modifying the working tree.
+- Validate the complete candidate model before persistence, including formatting, relation, asset and file/folder operations.
+- Persist only prepared changes. With commits disabled, leave Git HEAD and index contents unchanged and leave accepted file changes uncommitted. Later mutations in the same session continue from the accepted persisted snapshot even though its own writes made the worktree dirty.
+- With commits enabled, create one local Git commit for a successful non-empty mutation, parented by the last accepted HEAD. Git ref publication MUST compare the expected old HEAD.
+- Preserve executable file modes when moving assets. Reject a newly occupied destination that was absent from the accepted snapshot rather than overwriting an unrelated external file.
+- Publish the new graph/page/semantic snapshot after persistence succeeds and, when commits are enabled, after the commit succeeds. Include `commit` in the mutation result only when that request creates a commit; omit it with commits disabled and for previews, rejections, and no-ops.
+- Dry runs, rejected candidates, and no-op executions MUST NOT create commits or advance the accepted snapshot.
+- On persistence or Git publication failure, restore the operation's affected paths and retain the previous accepted model. If recovery cannot complete, disable further writes and report recovery failure explicitly.
+- Recovery MUST NOT restore files into an externally changed branch or HEAD; report recovery failure and disable further writes in that case.
+- Git commits use Reqvire's prepared tree and Git author/committer identity; user index contents and hook-modified trees MUST NOT be substituted for the validated candidate.
+- No automatic push, branch creation, worktree creation, merge, or history rewrite is performed.
+- The clean-start requirement applies in both commit modes. After stopping a session that left uncommitted changes, users must commit or otherwise resolve those changes before restarting mutation-enabled MCP; restart MUST NOT silently commit or discard them.
 
 #### Metadata
   * type: specification
@@ -202,9 +201,9 @@ Durable mutation flow:
 - Server executes preview through Reqvire core without filesystem changes.
 - Preview result returns diffs or equivalent change description, changed files when known, validation risks, and affected scope.
 - Client sends explicit execution request using the operation-specific mutating control, such as `dry_run: false` or `fix: true`, when mutation mode is enabled.
-- Server executes through Reqvire core; Reqvire core updates the in-memory graph and persists filesystem changes.
+- Server prepares and validates the Reqvire core candidate, persists its affected files, commits it only when `--enable-commits` was supplied at startup, and publishes the accepted snapshot under the MCP Mutation Concurrency Control Specification.
 - Server runs formatting/validation diagnostics according to the tool contract.
-- Server syncs its MCP internal graph view from the updated Reqvire core graph.
+- Server retains the complete accepted persisted model for subsequent requests without filesystem freshness scans in mutation mode, regardless of the commit setting.
 - Server computes affected elements/submodels for client cache invalidation.
 - Server returns mutation result with changed files, diffs, diagnostics, refreshed model revision, and affected scope.
 
@@ -214,7 +213,7 @@ Mutation flow constraints:
 - Single-root ownership, relation type compatibility, contract bindings, and file persistence guarantees are inherited from Reqvire core operation contracts.
 - Operation-specific preview requests for mutation-class tools are available only when mutation tools are advertised, except for conditional mutation tools such as `reqvire.format` where the read-only preview form may be advertised by default.
 - Post-write success handling requires a successful tool result and a persisted execution request. An MCP result with `isError: true`, a JSON-RPC error, or a preview response does not trigger a successful-mutation Explorer refresh.
-- A refresh failure after a committed mutation remains distinguishable from rejection before persistence; preserve the existing runtime failure diagnostic and last valid published snapshot.
+- A successful persisted change triggers Explorer refresh in either commit mode; the presence of a `commit` result field MUST NOT be the refresh condition. A refresh failure remains distinguishable from rejection before persistence; preserve the existing runtime failure diagnostic and last valid published snapshot.
 
 #### Metadata
   * type: specification
@@ -513,7 +512,9 @@ The `reqvire mcp` command is expected to start the MCP server for the current wo
 #### Details
 Command behavior:
 - `reqvire mcp` starts MCP protocol service mode with read/report tools only, and MCP `tools/list` does not include mutation tools.
-- `reqvire mcp --enable-mutations` starts MCP protocol service mode with mutation mode enabled, and MCP `tools/list` includes mutation tools.
+- `reqvire mcp --enable-mutations` claims the current clean branch and worktree under the MCP Mutation Concurrency Control Specification, validates the model, and advertises mutation tools, with automatic commits disabled.
+- `reqvire mcp --enable-mutations --enable-commits` additionally enables automatic local commits. `--enable-commits` is a boolean startup flag, defaults to false when absent, and requires `--enable-mutations`. Invalid combinations MUST fail argument validation before model loading or opening a listener.
+- Root and MCP command help MUST describe `--enable-commits` as opt-in automatic commits requiring mutation mode.
 - `reqvire mcp --allow-origin <ORIGIN>` MUST accept repeatable additional browser origins according to the MCP Streamable HTTP Transport Safety Specification bound by its owning requirement. Invalid values MUST fail argument validation before model loading or opening a listener.
 - `reqvire mcp --allow-host <HOST[:PORT]>` MUST accept repeatable endpoint hostnames according to the same bound transport safety contract. Invalid values MUST fail argument validation before model loading or opening a listener.
 - `reqvire mcp` is not exposed back through MCP as a tool.
@@ -532,7 +533,7 @@ Command behavior:
 
 ### MCP Server State and Cache Specification
 
-The MCP server is expected to cache parsed model state only as a performance optimization.
+Read-only MCP caches parsed model state as a performance optimization. Mutation-enabled MCP retains the authoritative accepted model for its owned branch.
 
 #### Details
 Server state includes:
@@ -546,7 +547,7 @@ Server state includes:
 - Active exclusion configuration and its matching policy.
 - Last parse and validation diagnostics.
 
-Cache rules:
+Read-only cache rules (mutation mode instead follows the ownership and accepted-snapshot contract above):
 - Eligible Git-worktree Reqvire markdown files remain the durable source of truth.
 - Reqvire core parsing remains authoritative for model semantics.
 - Model-loading tools and resources use the bound core cache construction identity, dependency freshness, build coordination, and publication contract; MCP does not maintain a second parsed-model cache.
@@ -554,10 +555,10 @@ Cache rules:
 - Local external ontology bytes and other construction/validation dependencies participate in freshness under the core contract. Semantic prefixes, vocabulary, exports, and SPARQL use derived state from the same completed model as the graph. Missing or invalid current inputs follow the owning strict/lenient operation's error behavior instead of silently returning older semantic data.
 - Public model revisions follow the bound Model Revision Hash Specification. They do not replace the parsed-model cache key: source bytes, build options, excluded patterns, and source-control metadata retain their existing invalidation responsibilities. Migrating model revisions does not migrate the existing file-content hash algorithm.
 - Cached state is invalidated when relevant source/dependency observations, eligible Git worktree metadata state, effective exclusions, Reqvire version, or Reqvire tool contract version changes. Source changes can require refresh while the public parsed-element revision remains unchanged.
-- Controlled MCP mutations sync MCP internal state from the updated Reqvire core graph after successful core mutation.
+- Mutation-enabled sessions reuse their accepted model and captured inputs. Successful persistence, including a successful commit when enabled, replaces that snapshot and its derived semantic state together; failed operations retain the previous snapshot. A missing `commit` field does not prevent adoption in the default commit-disabled mode.
 - Each response is constructed from one completed model; any exposed model fingerprint describes that response's parsed elements. The source-cache generation is internal and is not inferred from the public model fingerprint.
 - The cache correctness change preserves existing tool names, request arguments, structured-result field names, and public SHA-256 revision encoding. It requires no new public cache-status field.
-- Dirty worktree state is reported in metadata and is not a default execution blocker when the equivalent Reqvire core operation can run.
+- Read-only mode reports dirty state without blocking compatible read operations. Mutation-enabled startup requires a clean worktree.
 
 #### Metadata
   * type: specification
@@ -911,6 +912,7 @@ Embedded MCP behavior:
 - `reqvire serve --enable-mcp` mounts the Reqvire MCP Streamable HTTP service at `/mcp` on the same host and port as the Explorer server.
 - `reqvire serve --enable-mcp --enable-mutations` enables MCP mutation tools for the embedded `/mcp` endpoint.
 - `--enable-mutations` requires `--enable-mcp`; mutation tools are not advertised or executable for embedded MCP unless both capabilities are present.
+- Embedded MCP automatic commits default to false. `reqvire serve --enable-mcp --enable-mutations --enable-commits` enables them with the same semantics as standalone MCP. `--enable-commits` requires `--enable-mutations`, which requires `--enable-mcp`; invalid combinations MUST fail argument validation before model loading or opening a listener. Root and serve command help MUST document this opt-in flag.
 - `reqvire serve --enable-mcp --allow-origin <ORIGIN>` MUST configure the embedded endpoint using the MCP Streamable HTTP Transport Safety Specification bound by its owning requirement. `--allow-origin` MUST require `--enable-mcp` and support the same repeated values and validation as standalone MCP startup.
 - `reqvire serve --enable-mcp --allow-host <HOST[:PORT]>` MUST configure embedded MCP endpoint host validation through the same bound contract, including automatic permission for a non-wildcard bind host. `--allow-host` MUST require `--enable-mcp`.
 - The embedded `/mcp` endpoint reuses the same MCP adapter, shared Reqvire tool registry, RMCP Streamable HTTP transport configuration, allowed-origin policy, stateless JSON response mode, and mutation serialization behavior as `reqvire mcp`.

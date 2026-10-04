@@ -2,6 +2,7 @@ pub mod cli;
 pub mod config;
 mod live_store;
 mod mcp;
+mod mcp_session;
 mod mcp_http;
 mod serve;
 

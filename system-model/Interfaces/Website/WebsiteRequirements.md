@@ -45,10 +45,14 @@ WHEN documenting browser MCP clients, the system SHALL explain origin configurat
 
 WHEN documenting MCP deployments, the system SHALL explain listening addresses and accepted endpoint hostnames according to the referenced transport contracts.
 
+WHEN documenting MCP mutations, the system SHALL distinguish mutation permission from opt-in automatic commits and explain the unchanged ownership and clean-start rules.
+
 #### Metadata
   * type: requirement
 
 #### Contract References
+  * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
+  * [MCP Server Command Specification](../MCP/Specifications.md#mcp-server-command-specification)
   * [MCP Managed Query Artifacts Specification](../MCP/Specifications.md#mcp-managed-query-artifacts-specification)
   * [MCP Model Evidence Tools Specification](../MCP/Specifications.md#mcp-model-evidence-tools-specification)
   * [MCP Streamable HTTP Transport Safety Specification](../MCP/Specifications.md#mcp-streamable-http-transport-safety-specification)

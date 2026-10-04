@@ -47,7 +47,7 @@ start_http_mcp() {
   local port="$1"
   local output_prefix="$2"
   shift 2
-  (cd "$TEST_DIR" && "$REQVIRE_BIN" mcp --host 127.0.0.1 --port "$port" "$@") > "${output_prefix}.stdout" 2> "${output_prefix}.stderr" &
+  (cd "$TEST_DIR" && exec "$REQVIRE_BIN" mcp --host 127.0.0.1 --port "$port" "$@") > "${output_prefix}.stdout" 2> "${output_prefix}.stderr" &
   HTTP_MCP_PID=$!
 }
 
@@ -868,11 +868,14 @@ assert_jq_line "$SIZE_OUTPUT" 3 '.result.structuredContent.size_estimate.content
 assert_jq_line "$SIZE_OUTPUT" 4 '[.result.structuredContent.elements[]? | .. | objects | select(has("identifier") and has("name"))] as $elements | ($elements | length) > 0 and all($elements[]; (.size_estimate.content_bytes | type == "number") and (.size_estimate.rendered_context_bytes | type == "number") and (.size_estimate.estimated_tokens | type == "number"))' "model tool includes size estimates when enabled"
 assert_jq_line "$SIZE_OUTPUT" 5 '.result.contents[0].text | fromjson | .size_estimates_enabled == true' "workspace status resource reports size estimates enabled"
 
+printf '/output/\n' >> "$TEST_DIR/.git/info/exclude"
+(cd "$TEST_DIR" && git add specifications docs && git commit -qm "Prepare MCP mutation fixture") || fail "commit clean mutation fixture"
 DRY_RUN_OUTPUT="$TEST_DIR/output/mcp-mutation-dry-run.jsonl"
 ADD_CONTENT="$(< "$TEST_SCRIPT_DIR/fixtures/mcp-added-requirement.md")"
 DRY_RUN_PORT="$(pick_port)"
 DRY_RUN_OUTPUT_PREFIX="$TEST_DIR/output/mcp-mutation-dry-run"
-start_http_mcp "$DRY_RUN_PORT" "$DRY_RUN_OUTPUT_PREFIX" --enable-mutations
+PREVIEW_HEAD="$(git -C "$TEST_DIR" rev-parse HEAD)"
+start_http_mcp "$DRY_RUN_PORT" "$DRY_RUN_OUTPUT_PREFIX" --enable-mutations --enable-commits
 trap stop_http_mcp EXIT
 wait_for_http_mcp "$DRY_RUN_PORT" "$TEST_DIR/output/mcp-mutation-dry-run-init.json" || fail "dry-run MCP HTTP server did not start" "${DRY_RUN_OUTPUT_PREFIX}.stderr"
 run_http_mcp_sequence "$DRY_RUN_PORT" "$DRY_RUN_OUTPUT" \
@@ -890,10 +893,11 @@ if grep -q "MCP Added Requirement" "$TEST_DIR/specifications/Requirements.md"; t
   fail "dry-run mutation modified the fixture file"
 fi
 
+[ "$(git -C "$TEST_DIR" rev-parse HEAD)" = "$PREVIEW_HEAD" ] || fail "preview created a commit"
 MUTATION_OUTPUT="$TEST_DIR/output/mcp-mutation-execute.jsonl"
 MUTATION_PORT="$(pick_port)"
 MUTATION_OUTPUT_PREFIX="$TEST_DIR/output/mcp-mutation-execute"
-start_http_mcp "$MUTATION_PORT" "$MUTATION_OUTPUT_PREFIX" --enable-mutations
+start_http_mcp "$MUTATION_PORT" "$MUTATION_OUTPUT_PREFIX" --enable-mutations --enable-commits
 trap stop_http_mcp EXIT
 wait_for_http_mcp "$MUTATION_PORT" "$TEST_DIR/output/mcp-mutation-execute-init.json" || fail "mutation MCP HTTP server did not start" "${MUTATION_OUTPUT_PREFIX}.stderr"
 run_http_mcp_sequence "$MUTATION_PORT" "$MUTATION_OUTPUT" \
@@ -903,6 +907,10 @@ run_http_mcp_sequence "$MUTATION_PORT" "$MUTATION_OUTPUT" \
 stop_http_mcp
 trap - EXIT
 
+MUTATION_HEAD="$(git -C "$TEST_DIR" rev-parse HEAD)"
+[ "$(git -C "$TEST_DIR" rev-parse HEAD^)" = "$PREVIEW_HEAD" ] || fail "mutation must create exactly one commit"
+assert_jq_line "$MUTATION_OUTPUT" 2 ".result.structuredContent.commit == \"$MUTATION_HEAD\"" "mutation returns accepted commit"
+[ -z "$(git -C "$TEST_DIR" status --porcelain)" ] || fail "mutation must leave its fixture clean"
 assert_jq_line "$MUTATION_OUTPUT" 2 '.result.structuredContent.dry_run == false and (.result.structuredContent.diffs | length) >= 1' "executing mutation returns persisted diffs"
 grep -q "MCP Added Requirement" "$TEST_DIR/specifications/Requirements.md" || fail "executing mutation did not update the fixture file"
 assert_jq_line "$MUTATION_OUTPUT" 3 '.result.structuredContent.name == "MCP Added Requirement"' "post-mutation read observes refreshed model state"
@@ -967,7 +975,7 @@ stop_http_mcp
 
 HTTP_MUTATION_PORT="$(pick_port)"
 HTTP_MUTATION_OUTPUT_PREFIX="$TEST_DIR/output/mcp-http-mutations"
-start_http_mcp "$HTTP_MUTATION_PORT" "$HTTP_MUTATION_OUTPUT_PREFIX" --enable-mutations
+start_http_mcp "$HTTP_MUTATION_PORT" "$HTTP_MUTATION_OUTPUT_PREFIX" --enable-mutations --enable-commits
 wait_for_http_mcp "$HTTP_MUTATION_PORT" "$TEST_DIR/output/mcp-http-mutations-init.json" || fail "HTTP mutation MCP server did not start" "${HTTP_MUTATION_OUTPUT_PREFIX}.stderr"
 
 http_mcp_call "$HTTP_MUTATION_PORT" "$(tools_list_request)" "$TEST_DIR/output/mcp-http-mutation-tools.json" || fail "HTTP mutation tools/list request failed"
@@ -984,6 +992,7 @@ HTTP_CONCURRENT_CONTENT_B="$(< "$TEST_SCRIPT_DIR/fixtures/http-concurrent-requir
 HTTP_CONCURRENT_REQUEST_A="$(jq -n -c --arg content "$HTTP_CONCURRENT_CONTENT_A" '{jsonrpc:"2.0",id:11,method:"tools/call",params:{name:"reqvire.add_element",arguments:{file:"specifications/Requirements.md",content:$content,dry_run:false}}}')"
 HTTP_CONCURRENT_REQUEST_B="$(jq -n -c --arg content "$HTTP_CONCURRENT_CONTENT_B" '{jsonrpc:"2.0",id:12,method:"tools/call",params:{name:"reqvire.add_element",arguments:{file:"specifications/Requirements.md",content:$content,dry_run:false}}}')"
 
+CONCURRENT_HEAD="$(git -C "$TEST_DIR" rev-parse HEAD)"
 http_mcp_call "$HTTP_MUTATION_PORT" "$HTTP_CONCURRENT_REQUEST_A" "$TEST_DIR/output/mcp-http-concurrent-a.json" &
 HTTP_CURL_PID_A=$!
 http_mcp_call "$HTTP_MUTATION_PORT" "$HTTP_CONCURRENT_REQUEST_B" "$TEST_DIR/output/mcp-http-concurrent-b.json" &
@@ -991,6 +1000,7 @@ HTTP_CURL_PID_B=$!
 wait "$HTTP_CURL_PID_A" || fail "first concurrent HTTP mutation failed" "$TEST_DIR/output/mcp-http-concurrent-a.json"
 wait "$HTTP_CURL_PID_B" || fail "second concurrent HTTP mutation failed" "$TEST_DIR/output/mcp-http-concurrent-b.json"
 
+[ "$(git -C "$TEST_DIR" rev-list --count "$CONCURRENT_HEAD..HEAD")" = 2 ] || fail "concurrent mutations must create two sequential commits"
 jq -e '.result.structuredContent.dry_run == false' "$TEST_DIR/output/mcp-http-concurrent-a.json" >/dev/null \
   || fail "first concurrent HTTP mutation should execute" "$TEST_DIR/output/mcp-http-concurrent-a.json"
 jq -e '.result.structuredContent.dry_run == false' "$TEST_DIR/output/mcp-http-concurrent-b.json" >/dev/null \

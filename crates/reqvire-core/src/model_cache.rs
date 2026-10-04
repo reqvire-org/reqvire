@@ -114,6 +114,7 @@ pub fn load_cached_model(
     excluded_filename_patterns: &GlobSet,
     options: ModelBuildOptions,
 ) -> Result<ModelManager, ReqvireError> {
+    if let Some(model) = crate::mutation_io::model() { return Ok(model); }
     for _ in 0..MAX_BUILD_ATTEMPTS {
         let generation = MODEL_CACHE
             .lock()

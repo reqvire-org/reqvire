@@ -18,6 +18,7 @@ This inspection verifies that endpoint-host and browser-origin setup examples ma
 - Confirm that the page distinguishes browser origin configuration from bind address, endpoint URL, and authentication.
 - Review direct-host and reverse-proxy examples for automatic bind-host acceptance, explicit allowed hostnames with optional ports, wildcard listener behavior, and equivalent embedded MCP options.
 - Build the website and check the examples against command help and the transport verification results.
+- Review mutation examples for default-disabled automatic commits, explicit `--enable-commits`, standalone/embedded prerequisites, unchanged ownership, and resolution of uncommitted changes before a clean restart.
 
 Review artifacts: [McpServer.tsx](../../../../website/src/pages/McpServer.tsx).
 

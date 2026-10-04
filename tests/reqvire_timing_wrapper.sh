@@ -17,8 +17,34 @@ now_ns() {
 }
 
 started_ns="$(now_ns)"
-"$REAL_REQVIRE_BIN" "$@"
-status=$?
+child_pid=""
+pending_signal=""
+wait_interrupted=false
+forward_signal() {
+    pending_signal="$1"
+    wait_interrupted=true
+    if [[ -n "$child_pid" ]]; then
+        kill -s "$1" "$child_pid" 2>/dev/null || true
+    fi
+}
+# Test servers are stopped by terminating this wrapper. Relay cancellation and
+# reap the actual binary before returning, so it cannot retain a port or lock.
+# Async shell children may inherit SIGINT ignored; use TERM for cancellation.
+trap 'forward_signal TERM' TERM INT
+trap 'forward_signal HUP' HUP
+"$REAL_REQVIRE_BIN" "$@" <&0 &
+child_pid=$!
+if [[ -n "$pending_signal" ]]; then
+    forward_signal "$pending_signal"
+fi
+while true; do
+    wait_interrupted=false
+    wait "$child_pid"
+    status=$?
+    if [[ "$wait_interrupted" == false ]]; then
+        break
+    fi
+done
 elapsed_ms="$((( $(now_ns) - started_ns ) / 1000000))"
 
 if [[ -n "${REQVIRE_BENCHMARK_INVOCATIONS:-}" ]]; then

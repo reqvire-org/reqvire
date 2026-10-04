@@ -5,6 +5,7 @@ set -uo pipefail
 # Membership expectations are authored independently of Reqvire's graph traversal.
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 mkdir -p "$TEST_DIR/output"
+printf '/output/\n' >> "$TEST_DIR/.git/info/exclude"
 
 status=0
 python3 "$TEST_SCRIPT_DIR/check_scoped_coverage.py" \

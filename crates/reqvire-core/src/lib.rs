@@ -21,6 +21,7 @@ pub mod mcp_prompts;
 pub mod migrations;
 pub mod model;
 pub mod model_cache;
+pub mod mutation_io;
 mod model_inputs;
 pub(crate) mod model_revision;
 pub mod ontology_graph;

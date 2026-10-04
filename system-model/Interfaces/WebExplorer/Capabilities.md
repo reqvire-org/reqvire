@@ -84,6 +84,8 @@ The system shall allow the Explorer serve command to expose the Reqvire MCP Stre
 #### Details
 WHEN embedded MCP is enabled, the system SHALL provide its endpoint, registry reuse, transport, mutation gating, route preservation, runtime refresh, and endpoint display according to the associated specification.
 
+WHEN embedded MCP mutations are enabled, the system SHALL persist validated changes without automatic commits by default and SHALL commit them only when explicitly enabled at startup.
+
 WHEN additional browser origins are configured for embedded MCP, the system SHALL apply the shared MCP origin policy to that endpoint.
 
 WHEN an embedded MCP endpoint uses a configured bind address or additional endpoint hostnames, the system SHALL apply the shared MCP host policy to that endpoint.

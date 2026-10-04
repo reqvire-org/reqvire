@@ -114,7 +114,7 @@ impl<'a> ReqvireToolRegistry<'a> {
                 .get("dry_run")
                 .and_then(Value::as_bool)
                 .unwrap_or(false);
-        if persists {
+        if persists && !crate::mutation_io::active() {
             crate::model_cache::begin_write();
         }
         let exclusions = self.excluded_filename_patterns.refreshed();
@@ -128,7 +128,7 @@ impl<'a> ReqvireToolRegistry<'a> {
         // Both successful writes and failed multi-file operations may persist
         // changes. Centralize eviction here, including format fixes, without
         // replacing the original operation result.
-        if persists {
+        if persists && !crate::mutation_io::active() {
             crate::model_cache::invalidate();
         }
         result

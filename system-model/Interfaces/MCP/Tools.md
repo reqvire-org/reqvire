@@ -226,11 +226,13 @@ The system shall expose an MCP read tool that pages compact semantic vocabulary 
 
 ### MCP Mutation Concurrency Control
 
-The system shall serialize mutation execution per workspace when the MCP transport can receive concurrent client requests.
+While mutation mode is enabled, the system SHALL exclusively own its current Git branch and worktree, serialize model changes, and validate and persist each successful mutation before publishing its model state.
 
 #### Details
 - The MCP server shall prevent concurrent mutation requests from interleaving writes for the same workspace.
-- The MCP server shall preserve Reqvire filesystem persistence guarantees under multi-request transports.
+- The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned worktrees.
+- The MCP server SHALL create automatic commits only when explicitly enabled at startup; without that opt-in, successful mutations SHALL leave HEAD and the Git index unchanged.
+- The MCP server SHALL preserve the previous accepted model after rejected or failed mutations and SHALL reject unexpected branch or HEAD changes.
 - The MCP server shall make observed model revision visible to clients for read responses.
 - The MCP server shall keep post-mutation model state synchronized before serving dependent reads.
 
@@ -244,6 +246,8 @@ The system shall serialize mutation execution per workspace when the MCP transpo
   * definedBy: [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
+  * satisfiedBy: [mutation_io.rs](../../../crates/reqvire-core/src/mutation_io.rs)
   * verifiedBy: [MCP HTTP Transport End-to-End Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-http-transport-end-to-end-verification)
 ---
 
@@ -267,6 +271,8 @@ When a client creates, removes, or relinks a Contract Reference, the system SHAL
   * definedBy: [MCP Mutation Execution Flow Specification](Specifications.md#mcp-mutation-execution-flow-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
+  * satisfiedBy: [mutation_io.rs](../../../crates/reqvire-core/src/mutation_io.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
   * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/tool_interface/mod.rs)
@@ -435,6 +441,7 @@ The system shall provide `reqvire mcp` as the command that starts the Reqvire MC
 - The MCP server command shall keep server startup behavior outside the MCP tool surface.
 - The MCP server command shall expose read/report tools by default.
 - The MCP server command shall expose mutation tools only when mutation capability is explicitly enabled at startup.
+- The MCP server command SHALL disable automatic commits by default and SHALL accept an explicit commit opt-in only when mutation capability is enabled.
 - The MCP server command shall support opt-in element size estimates when explicitly enabled at startup.
 - WHEN additional browser origins are configured at startup, the system SHALL apply them to the MCP endpoint's origin policy.
 - WHEN additional endpoint hostnames are configured at startup, the system SHALL apply them to the MCP endpoint's host policy.
@@ -460,15 +467,15 @@ The system shall provide `reqvire mcp` as the command that starts the Reqvire MC
 
 ### MCP Server State and Cache
 
-The system shall keep MCP server cached model state subordinate to Reqvire source files and Reqvire core parsing.
+The system shall serve MCP model state from Reqvire core parsing, refreshing source inputs in read-only mode and retaining the accepted persisted snapshot in mutation-enabled mode.
 
 #### Details
-- The MCP server shall keep Reqvire source files as the durable source of truth.
-- The MCP server shall keep cached model state subordinate to Reqvire core parsing.
+- The MCP server shall keep accepted model changes durable in Reqvire source files; mutation-enabled sessions shall also commit each non-empty persisted mutation only when automatic commits are explicitly enabled.
+- Both modes shall use Reqvire core parsing and validation to construct accepted model state.
 - The MCP server shall report enough revision state for clients to reason about cache freshness.
-- The MCP server shall refresh stale model state before returning authoritative model evidence.
-- When active exclusion configuration or a model construction dependency changes, the MCP server shall apply the updated inputs on subsequent model reads without requiring a server restart.
-- The MCP server shall use the shared core cache correctness and publication guarantees for model reads and post-mutation synchronization.
+- Read-only MCP shall refresh stale model state before returning authoritative model evidence, including changes to active exclusions and model construction dependencies without requiring a restart.
+- Mutation-enabled MCP shall reuse its accepted model and captured source inputs for reads and candidate preparation without importing external edits or rebuilding the filesystem cache on each request.
+- Mutation-enabled MCP shall publish complete graph, page, and semantic state only after candidate validation, successful persistence, and a successful commit when enabled under the ownership contract.
 
 #### Metadata
   * type: requirement
@@ -482,6 +489,8 @@ The system shall keep MCP server cached model state subordinate to Reqvire sourc
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [model_cache.rs](../../../crates/reqvire-core/src/model_cache.rs)
   * satisfiedBy: [arg_helpers.rs](../../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
+  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
+  * satisfiedBy: [mutation_io.rs](../../../crates/reqvire-core/src/mutation_io.rs)
 ---
 
 ### MCP Shared Operation Interfaces

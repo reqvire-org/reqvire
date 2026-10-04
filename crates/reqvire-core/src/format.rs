@@ -10,7 +10,7 @@ use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::workspace;
 use log::debug;
-use std::fs;
+use crate::mutation_io as fs;
 
 /// Result of formatting operation
 #[derive(Debug)]
@@ -49,7 +49,7 @@ pub fn format_files(
         let full_file_path = base_dir.join(&file_path);
 
         // Read current content if file exists
-        let current_content = if full_file_path.exists() {
+        let current_content = if crate::mutation_io::exists(&full_file_path) {
             fs::read_to_string(&full_file_path).map_err(ReqvireError::IoError)?
         } else {
             String::new() // File doesn't exist, treat as empty

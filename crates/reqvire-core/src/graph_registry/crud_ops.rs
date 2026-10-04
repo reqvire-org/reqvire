@@ -1,3 +1,4 @@
+use crate::mutation_io as fs;
 use super::*;
 
 fn normalize_folder_path(path: &str) -> String {
@@ -1215,7 +1216,7 @@ impl GraphRegistry {
             };
 
             // Skip if source file doesn't exist
-            if !src_path.is_file() {
+            if !crate::mutation_io::is_file(&src_path) {
                 warn!("Skipping missing InternalPath file: {:?}", src_path);
                 continue;
             }
@@ -1685,7 +1686,7 @@ impl GraphRegistry {
         with_full_relations: bool,
     ) -> Result<(usize, usize), ReqvireError> {
         // Create output directory if it doesn't exist
-        if !output_dir.exists() {
+        if !crate::mutation_io::exists(output_dir) {
             fs::create_dir_all(output_dir).map_err(ReqvireError::IoError)?;
         }
 
@@ -1726,7 +1727,7 @@ impl GraphRegistry {
         with_full_relations: bool,
     ) -> Result<(usize, usize), ReqvireError> {
         // Create output directory if it doesn't exist
-        if !output_dir.exists() {
+        if !crate::mutation_io::exists(output_dir) {
             fs::create_dir_all(output_dir).map_err(ReqvireError::IoError)?;
         }
 
@@ -2312,7 +2313,7 @@ impl GraphRegistry {
         // Determine target type: element name, external URL, or internal path
         let is_external_url = crate::utils::is_external_url(target);
         let is_internal_path = !is_external_url
-            && (target.ends_with(".md") || target.contains('/') || git_root.join(target).exists());
+            && (target.ends_with(".md") || target.contains('/') || crate::mutation_io::exists(git_root.join(target)));
 
         // Resolve target and create relation components
         let (target_display_name, relation_target_link, target_id_for_check, element_id_opt) =
@@ -3482,7 +3483,7 @@ impl GraphRegistry {
             if !grouped_elements.contains_key(file_path) {
                 // This file has no elements, delete it
                 let file_full_path = directory.join(file_path);
-                if file_full_path.exists() {
+                if crate::mutation_io::exists(&file_full_path) {
                     fs::remove_file(&file_full_path).map_err(ReqvireError::IoError)?;
                     log::info!("Deleted empty file: {}", file_path);
                 }

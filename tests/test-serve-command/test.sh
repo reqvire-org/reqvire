@@ -237,6 +237,15 @@ MCP_PORT=$((9000 + RANDOM % 1000))
 MCP_PROTOCOL_VERSION="2025-11-25"
 MCP_CONTENT="$(cat "${TEST_DIR}/fixtures/serve-embedded-mcp-added-requirement.md.txt")"
 
+cat >> "$TEST_DIR/.git/info/exclude" <<'EOF'
+/*.log
+/output/
+/browser-*.txt
+/browser-profile/
+/serve_mcp_*.json
+/serve_mcp_project_store.*
+/read_only_store.js
+EOF
 "$SERVER_BIN" serve --host "$TEST_HOST" --port "$MCP_PORT" --enable-mcp --enable-mutations > "${TEST_DIR}/serve_mcp_output.log" 2>&1 &
 SERVE_PID=$!
 
@@ -293,6 +302,8 @@ if ! jq -e '[.result.tools[].name] | index("reqvire.add_element") != null and in
     exit 1
 fi
 
+MCP_HEAD_BEFORE="$(git -C "$TEST_DIR" rev-parse HEAD)"
+git -C "$TEST_DIR" ls-files --stage > "$TEST_DIR/output/index-before-mutation"
 curl -sS -o "${TEST_DIR}/serve_mcp_mutation.json" \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json, text/event-stream' \
@@ -300,9 +311,18 @@ curl -sS -o "${TEST_DIR}/serve_mcp_mutation.json" \
   --data "$MCP_MUTATION_REQUEST" \
   "http://$TEST_HOST:$MCP_PORT/mcp"
 
-if ! jq -e '.result.structuredContent.dry_run == false and (.result.structuredContent.diffs | length) >= 1' "${TEST_DIR}/serve_mcp_mutation.json" >/dev/null; then
+if ! jq -e '.result.structuredContent | .dry_run == false and (.diffs | length) >= 1 and (has("commit") | not)' "${TEST_DIR}/serve_mcp_mutation.json" >/dev/null; then
     echo "❌ FAILED: Embedded MCP mutation did not execute"
     cat "${TEST_DIR}/serve_mcp_mutation.json"
+    exit 1
+fi
+if [ "$(git -C "$TEST_DIR" rev-parse HEAD)" != "$MCP_HEAD_BEFORE" ]; then
+    echo "FAILED: Embedded mutation without --enable-commits changed HEAD"
+    exit 1
+fi
+git -C "$TEST_DIR" ls-files --stage > "$TEST_DIR/output/index-after-mutation"
+if ! diff -u "$TEST_DIR/output/index-before-mutation" "$TEST_DIR/output/index-after-mutation"; then
+    echo "FAILED: Embedded mutation without --enable-commits changed index contents"
     exit 1
 fi
 

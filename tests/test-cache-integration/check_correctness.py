@@ -26,7 +26,7 @@ spec.loader.exec_module(revision_e2e)
 
 
 class Server(revision_e2e.McpServer):
-    def __init__(self, binary, workspace, output, mode, name):
+    def __init__(self, binary, workspace, output, mode, name, mutations=False, commits=False):
         self.output = output / name
         self.output.mkdir()
         self.log = (self.output / "server.log").open("w")
@@ -40,7 +40,8 @@ class Server(revision_e2e.McpServer):
         options = ["--enable-mcp"] if mode == "serve" else []
         self.process = subprocess.Popen(
             [binary, mode, "--host", "127.0.0.1", "--port", str(port),
-             "--enable-mutations", *options], cwd=workspace,
+             *(["--enable-mutations"] if mutations else []),
+             *(["--enable-commits"] if commits else []), *options], cwd=workspace,
             stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True,
             env={**os.environ, "TOKIO_WORKER_THREADS": "4",
                  "RUST_LOG": "reqvire::model=debug,reqvire::model_cache=debug,reqvire::utils=debug"})
@@ -118,10 +119,10 @@ class Checks:
             dest.write_text(self.fixture(fixture))
         return path
 
-    def server(self, workspace, mode=None):
+    def server(self, workspace, mode=None, mutations=False):
         self.serial += 1
         return Server(self.binary, workspace, self.output, mode or self.mode,
-                      f"{workspace.name}-{self.serial}")
+                      f"{workspace.name}-{self.serial}", mutations=mutations)
 
     def names(self, server):
         result = server.tool("reqvire.search")
@@ -293,13 +294,17 @@ class Checks:
 
     def runtime(self):
         path = self.workspace("runtime", {"Model.md": "model.md.txt"})
-        with self.server(path) as server:
+        for args in (("config", "user.email", "test@example.invalid"), ("config", "user.name", "MCP Test"), ("add", "."), ("commit", "-qm", "runtime baseline")):
+            subprocess.run(["git", *args], cwd=path, check=True)
+        with self.server(path, mutations=True) as server:
+            initial_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=path)
+            initial_index = subprocess.check_output(["git", "ls-files", "--stage"], cwd=path)
             server.tool("reqvire.search")
             initial = server.http("/api/project-store/manifest")
             model = path / "Model.md"
             original = model.read_text()
             model.write_text(original.replace("alpha", "omega"))
-            self.check("runtime/external-edit-visible-to-mcp", "omega" in json.dumps(server.tool("reqvire.read_element", name="Cache Subject")))
+            self.check("runtime/external-edit-not-imported", "alpha" in json.dumps(server.tool("reqvire.read_element", name="Cache Subject")))
             counts = server.counts()
             self.equal("runtime/no-external-polling", server.http("/api/project-store/manifest"), initial)
             self.equal("runtime/manifest-does-not-load-model", server.counts(), counts)
@@ -307,7 +312,7 @@ class Checks:
             counts = server.counts()["loads"]
             preview = server.raw_tool("reqvire.add_element", **add)
             self.equal("runtime/preview-success", preview.get("isError", False), False)
-            self.equal("runtime/preview-no-refresh-load", server.counts()["loads"] - counts, 1)
+            self.equal("runtime/preview-no-refresh-load", server.counts()["loads"] - counts, 0)
             self.equal("runtime/preview-keeps-assets", server.http("/api/project-store/manifest"), initial)
             self.golden_file("runtime/preview-keeps-file", model, "runtime-before-write.md.txt")
             # Duplicate names pass argument validation but fail core mutation validation:
@@ -316,15 +321,18 @@ class Checks:
             rejected = server.raw_tool("reqvire.add_element", file="Model.md",
                 content=original.split("# Elements\n\n", 1)[1], dry_run=False)
             self.equal("runtime/rejected-is-tool-error", rejected.get("isError", False), True)
-            self.equal("runtime/rejected-no-refresh-load", server.counts()["loads"] - counts, 1)
+            self.equal("runtime/rejected-no-refresh-load", server.counts()["loads"] - counts, 0)
             self.equal("runtime/rejected-keeps-assets", server.http("/api/project-store/manifest"), initial)
             self.golden_file("runtime/rejected-keeps-file", model, "runtime-before-write.md.txt")
             add["dry_run"] = False
-            server.tool("reqvire.add_element", **add)
+            result = server.tool("reqvire.add_element", **add)
             self.golden_file("runtime/success-persists-file", model, "runtime-after-write.md.txt")
+            self.check("runtime/default-omits-commit", "commit" not in result)
+            self.equal("runtime/default-keeps-head", subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=path).decode(), initial_head.decode())
+            self.equal("runtime/default-keeps-index", subprocess.check_output(["git", "ls-files", "--stage"], cwd=path).decode(), initial_index.decode())
             status, store = server.http("/api/project-store")
             self.equal("runtime/success-status", status, 200)
-            self.check("runtime/success-publishes-new-graph", "Other Subject" in store and "omega" in store)
+            self.check("runtime/success-publishes-new-graph", "Other Subject" in store and "alpha" in store)
             self.equal("runtime/post-write-search", self.names(server), ["Cache Subject", "Other Subject"])
             query = 'ASK { ?s <https://www.reqvire.org/ontology#elementName> "Other Subject" }'
             self.equal("runtime/post-write-sparql", server.tool("reqvire.semantic.sparql", query=query).get("boolean"), True)

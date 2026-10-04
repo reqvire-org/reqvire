@@ -127,7 +127,7 @@ pub struct SearchArgs {
 pub enum Commands {
     /// Serve the embedded Explorer UI via HTTP server
     #[clap(
-        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>             Bind address (default: localhost)\n      --port <PORT>             Server port (default: 8080)\n      --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; requires --enable-mcp)\n      --allow-host <HOST[:PORT]>  Additional MCP endpoint hostname (repeatable; requires --enable-mcp)"
+        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>             Bind address (default: localhost)\n      --port <PORT>             Server port (default: 8080)\n      --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint\n      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; requires --enable-mcp)\n      --allow-host <HOST[:PORT]>  Additional MCP endpoint hostname (repeatable; requires --enable-mcp)"
     )]
     Serve {
         /// Bind address
@@ -149,6 +149,14 @@ pub enum Commands {
             help_heading = "SERVE OPTIONS"
         )]
         mcp_enable_mutations: bool,
+
+        /// Commit successful mutations automatically (default: false; requires --enable-mutations)
+        #[clap(
+            long = "enable-commits",
+            requires = "mcp_enable_mutations",
+            help_heading = "SERVE OPTIONS"
+        )]
+        mcp_enable_commits: bool,
 
         /// Additional MCP browser origin (repeatable; loopback remains allowed)
         #[clap(
@@ -187,7 +195,7 @@ pub enum Commands {
     /// Start Reqvire MCP server
     #[clap(
         name = "mcp",
-        override_help = "Start Reqvire MCP Streamable HTTP server\n\nMCP OPTIONS:\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --with-size-estimates     Include element size estimates in model evidence tools\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; loopback remains allowed)\n      --allow-host <HOST[:PORT]>  Additional endpoint hostname (repeatable)"
+        override_help = "Start Reqvire MCP Streamable HTTP server\n\nMCP OPTIONS:\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)\n      --with-size-estimates     Include element size estimates in model evidence tools\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; loopback remains allowed)\n      --allow-host <HOST[:PORT]>  Additional endpoint hostname (repeatable)"
     )]
     Mcp {
         /// HTTP bind address
@@ -201,6 +209,10 @@ pub enum Commands {
         /// Advertise and allow mutation tools
         #[clap(long, help_heading = "MCP OPTIONS")]
         enable_mutations: bool,
+
+        /// Commit successful mutations automatically (default: false; requires --enable-mutations)
+        #[clap(long, requires = "enable_mutations", help_heading = "MCP OPTIONS")]
+        enable_commits: bool,
 
         /// Include element size estimates in model evidence tools
         #[clap(long, help_heading = "MCP OPTIONS")]
@@ -1292,6 +1304,7 @@ pub async fn handle_command(
         host,
         port,
         enable_mutations,
+        enable_commits,
         with_size_estimates,
         allowed_origins,
         allowed_hosts,
@@ -1299,6 +1312,7 @@ pub async fn handle_command(
     {
         return mcp::serve_http(
             enable_mutations,
+            enable_commits,
             with_size_estimates,
             excluded_filename_patterns,
             &host,
@@ -1733,6 +1747,7 @@ pub async fn handle_command(
             port,
             enable_mcp,
             mcp_enable_mutations,
+            mcp_enable_commits,
             allowed_origins,
             allowed_hosts,
         }) => {
@@ -1749,6 +1764,7 @@ pub async fn handle_command(
                 port,
                 enable_mcp,
                 mcp_enable_mutations,
+                mcp_enable_commits,
                 excluded_filename_patterns,
                 &crate::mcp_http::HttpAccess::new(&allowed_origins, &allowed_hosts),
             )

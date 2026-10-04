@@ -239,7 +239,7 @@ examples/**
 
 ### In-Memory Model Build Cache Specification
 
-Correctness contract for reusable current-workspace model construction.
+Correctness contract for reusable current-workspace model construction. Authoritative mutation-enabled MCP sessions use their accepted persisted snapshot, optionally committed according to the startup setting, under the MCP Mutation Concurrency Control Specification; filesystem freshness rules below apply to ordinary CLI and read-only MCP loads.
 
 #### Details
 

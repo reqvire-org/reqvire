@@ -350,11 +350,21 @@ reqvire serve --enable-mcp --allow-origin https://app.example.com`}</CodeBlock>
         <BulletList
           items={[
             "Mutation mode adds add, remove, move, rename, merge, link, unlink, relink, move-asset, and remove-asset tools.",
-            "Mutation tools use Reqvire core operations and return structured diffs.",
+            "Startup requires a clean Git worktree on a committed branch, a valid model, and Git author identity. Only one mutation-enabled MCP server may own the branch.",
+            "Successful changes are validated and saved before the updated model is published. Automatic commits are off by default: HEAD and staging stay unchanged, and results omit the commit field.",
+            "Add --enable-commits to commit each successful non-empty mutation locally and include its commit identifier in the result. This flag requires --enable-mutations. Previews, rejections, and no-ops never create commits.",
+            "Both modes update subsequent MCP reads and refresh the embedded Explorer after a successful write.",
+            "The running server owns its model snapshot. External edits are not imported and affected model files may be overwritten. Stop the server before editing its workspace externally.",
+            "Restart requires the same clean-start checks. After a session without automatic commits, commit or otherwise resolve the saved changes yourself before restarting. MCP does not automatically create branches or push commits.",
             "Most mutation tools support dry_run.",
             "HTTP mutation requests are serialized so concurrent clients cannot interleave filesystem writes.",
           ]}
         />
+        <CodeBlock>{`# Opt into automatic commits
+reqvire mcp --enable-mutations --enable-commits
+
+# Explorer with the same opt-in commit behavior
+reqvire serve --enable-mcp --enable-mutations --enable-commits`}</CodeBlock>
       </Section>
 
       <Section title="Error Handling">
