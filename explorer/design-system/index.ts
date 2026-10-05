@@ -352,6 +352,8 @@ export type {
   TraceFlowData,
   TraceFlowElement,
   TraceFlowRequirement,
+  FlowLayoutEngine,
+  FlowLayoutTask,
   TraceReportPanelProps,
   ThesaurusConceptItem,
   ThesaurusConceptUsage,

@@ -22,7 +22,7 @@ pub struct CoverageReport {
     capability_coverage: CapabilityCoverageByCapability,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Default)]
 struct CoverageSummary {
     // Leaf requirements metrics
     total_leaf_requirements: usize,
@@ -188,15 +188,168 @@ pub struct CoverageScopeSummary {
     summary: CoverageSummary,
 }
 
+/// Operation-local indexes borrow the already classified records. In particular,
+/// compact scope generation never copies evidence or projects detailed reports.
+struct ScopeSummaryIndex<'a> {
+    registry: &'a GraphRegistry,
+    verified_leaf_ids: FxHashSet<&'a str>,
+    unverified_leaf_ids: FxHashSet<&'a str>,
+    covered: FxHashMap<&'a str, &'a ImplementationRequirementDetails>,
+    uncovered: FxHashMap<&'a str, &'a ImplementationRequirementDetails>,
+    satisfied_test_ids: FxHashSet<&'a str>,
+    unsatisfied_test_ids: FxHashSet<&'a str>,
+    verifications_by_requirement: FxHashMap<&'a str, Vec<&'a element::Element>>,
+}
+
+impl<'a> ScopeSummaryIndex<'a> {
+    fn new(report: &'a CoverageReport, registry: &'a GraphRegistry) -> Self {
+        let mut verifications_by_requirement: FxHashMap<_, Vec<_>> = FxHashMap::default();
+        for node in registry.nodes.values() {
+            let verification = &node.element;
+            if !matches!(
+                verification.element_type,
+                element::ElementType::Verification(_)
+            ) {
+                continue;
+            }
+            for relation in &verification.relations {
+                if relation.relation_type.name == "verify" {
+                    if let relation::LinkType::Identifier(target) = &relation.target.link {
+                        verifications_by_requirement
+                            .entry(target.as_str())
+                            .or_default()
+                            .push(verification);
+                    }
+                }
+            }
+        }
+        Self {
+            registry,
+            verified_leaf_ids: report
+                .verified_leaf_requirements
+                .files
+                .values()
+                .flatten()
+                .map(|record| record.identifier.as_str())
+                .collect(),
+            unverified_leaf_ids: report
+                .unverified_leaf_requirements
+                .files
+                .values()
+                .flatten()
+                .map(|record| record.identifier.as_str())
+                .collect(),
+            covered: report
+                .covered_requirements
+                .files
+                .values()
+                .flatten()
+                .map(|record| (record.identifier.as_str(), record))
+                .collect(),
+            uncovered: report
+                .uncovered_requirements
+                .files
+                .values()
+                .flatten()
+                .map(|record| (record.identifier.as_str(), record))
+                .collect(),
+            satisfied_test_ids: report
+                .satisfied_test_verifications
+                .files
+                .values()
+                .flatten()
+                .map(|record| record.identifier.as_str())
+                .collect(),
+            unsatisfied_test_ids: report
+                .unsatisfied_test_verifications
+                .files
+                .values()
+                .flatten()
+                .map(|record| record.identifier.as_str())
+                .collect(),
+            verifications_by_requirement,
+        }
+    }
+
+    fn project(&self, capability: &element::Element) -> CoverageScopeSummary {
+        let (capability_ids, requirement_ids) =
+            super::submodels::capability_subtree_members(self.registry, &capability.identifier);
+        let mut verifications = BTreeMap::new();
+        let mut summary = CoverageSummary {
+            total_requirements_in_scope: requirement_ids.len(),
+            ..CoverageSummary::default()
+        };
+        for id in &requirement_ids {
+            summary.verified_leaf_requirements +=
+                usize::from(self.verified_leaf_ids.contains(id.as_str()));
+            summary.unverified_leaf_requirements +=
+                usize::from(self.unverified_leaf_ids.contains(id.as_str()));
+            if let Some(record) = self.covered.get(id.as_str()) {
+                summary.covered_requirements += 1;
+                summary.covered_terminal_requirements += usize::from(record.is_terminal);
+                summary.coverage_sources.record(&record.coverage_source);
+            }
+            if let Some(record) = self.uncovered.get(id.as_str()) {
+                summary.uncovered_requirements += 1;
+                summary.uncovered_terminal_requirements += usize::from(record.is_terminal);
+            }
+            for verification in self
+                .verifications_by_requirement
+                .get(id.as_str())
+                .into_iter()
+                .flatten()
+            {
+                verifications.insert(verification.identifier.as_str(), *verification);
+            }
+        }
+        for (id, verification) in &verifications {
+            summary.satisfied_test_verifications +=
+                usize::from(self.satisfied_test_ids.contains(id));
+            summary.unsatisfied_test_verifications +=
+                usize::from(self.unsatisfied_test_ids.contains(id));
+            if let element::ElementType::Verification(kind) = &verification.element_type {
+                summary.verification_types.record(kind);
+            }
+        }
+        summary.total_verifications = verifications.len();
+        summary.total_leaf_requirements =
+            summary.verified_leaf_requirements + summary.unverified_leaf_requirements;
+        summary.leaf_requirements_coverage_percentage = percentage(
+            summary.verified_leaf_requirements,
+            summary.total_leaf_requirements,
+        );
+        summary.total_test_verifications =
+            summary.satisfied_test_verifications + summary.unsatisfied_test_verifications;
+        summary.test_verifications_satisfaction_percentage = percentage(
+            summary.satisfied_test_verifications,
+            summary.total_test_verifications,
+        );
+        summary.total_terminal_requirements =
+            summary.covered_terminal_requirements + summary.uncovered_terminal_requirements;
+        summary.implementation_coverage_percentage = percentage(
+            summary.covered_terminal_requirements,
+            summary.total_terminal_requirements,
+        );
+        CoverageScopeSummary {
+            scope: CoverageScope {
+                kind: "capability",
+                capability_identifier: capability.identifier.clone(),
+                capability_name: capability.name.clone(),
+                capability_ids,
+                requirement_ids,
+                verification_ids: verifications.keys().map(|id| (*id).to_string()).collect(),
+                orphaned_verifications_scope: "whole_model_only",
+            },
+            summary,
+        }
+    }
+}
+
 fn retain_records<T>(files: &mut FxHashMap<String, Vec<T>>, keep: impl Fn(&T) -> bool) {
     files.retain(|_, records| {
         records.retain(&keep);
         !records.is_empty()
     });
-}
-
-fn record_count<T>(files: &FxHashMap<String, Vec<T>>) -> usize {
-    files.values().map(Vec::len).sum()
 }
 
 fn percentage(count: usize, total: usize) -> f64 {
@@ -247,19 +400,13 @@ impl CoverageReport {
     }
 
     pub fn scope_index(&self, registry: &GraphRegistry) -> BTreeMap<String, CoverageScopeSummary> {
+        let index = ScopeSummaryIndex::new(self, registry);
         self.capability_coverage
             .capabilities
             .iter()
             .filter_map(|row| {
                 let capability = registry.get_element(&row.identifier)?;
-                let report = self.clone().project_capability(registry, capability);
-                Some((
-                    row.identifier.clone(),
-                    CoverageScopeSummary {
-                        scope: report.scope?,
-                        summary: report.summary,
-                    },
-                ))
+                Some((row.identifier.clone(), index.project(capability)))
             })
             .collect()
     }
@@ -269,111 +416,32 @@ impl CoverageReport {
         registry: &GraphRegistry,
         capability: &element::Element,
     ) -> Self {
-        let (capability_ids, requirement_ids) =
-            super::submodels::capability_subtree_members(registry, &capability.identifier);
-        let verifications: Vec<_> = registry
-            .get_all_elements()
-            .into_iter()
-            .filter(|item| {
-                matches!(item.element_type, element::ElementType::Verification(_))
-                    && item.relations.iter().any(|rel| {
-                        rel.relation_type.name == "verify"
-                            && matches!(&rel.target.link,
-                    relation::LinkType::Identifier(id) if requirement_ids.contains(id))
-                    })
-            })
-            .collect();
-        let verification_ids: BTreeSet<_> = verifications
-            .iter()
-            .map(|item| item.identifier.clone())
-            .collect();
+        let CoverageScopeSummary { scope, summary } =
+            ScopeSummaryIndex::new(&self, registry).project(capability);
         retain_records(&mut self.verified_leaf_requirements.files, |item| {
-            requirement_ids.contains(&item.identifier)
+            scope.requirement_ids.contains(&item.identifier)
         });
         retain_records(&mut self.unverified_leaf_requirements.files, |item| {
-            requirement_ids.contains(&item.identifier)
+            scope.requirement_ids.contains(&item.identifier)
         });
         retain_records(&mut self.covered_requirements.files, |item| {
-            requirement_ids.contains(&item.identifier)
+            scope.requirement_ids.contains(&item.identifier)
         });
         retain_records(&mut self.uncovered_requirements.files, |item| {
-            requirement_ids.contains(&item.identifier)
+            scope.requirement_ids.contains(&item.identifier)
         });
         retain_records(&mut self.satisfied_test_verifications.files, |item| {
-            verification_ids.contains(&item.identifier)
+            scope.verification_ids.contains(&item.identifier)
         });
         retain_records(&mut self.unsatisfied_test_verifications.files, |item| {
-            verification_ids.contains(&item.identifier)
+            scope.verification_ids.contains(&item.identifier)
         });
         self.orphaned_verifications.files.clear();
         self.capability_coverage
             .capabilities
-            .retain(|item| capability_ids.contains(&item.identifier));
-        let summary = &mut self.summary;
-        summary.verified_leaf_requirements = record_count(&self.verified_leaf_requirements.files);
-        summary.unverified_leaf_requirements =
-            record_count(&self.unverified_leaf_requirements.files);
-        summary.total_leaf_requirements =
-            summary.verified_leaf_requirements + summary.unverified_leaf_requirements;
-        summary.leaf_requirements_coverage_percentage = percentage(
-            summary.verified_leaf_requirements,
-            summary.total_leaf_requirements,
-        );
-        summary.satisfied_test_verifications =
-            record_count(&self.satisfied_test_verifications.files);
-        summary.unsatisfied_test_verifications =
-            record_count(&self.unsatisfied_test_verifications.files);
-        summary.total_test_verifications =
-            summary.satisfied_test_verifications + summary.unsatisfied_test_verifications;
-        summary.test_verifications_satisfaction_percentage = percentage(
-            summary.satisfied_test_verifications,
-            summary.total_test_verifications,
-        );
-        summary.total_verifications = verification_ids.len();
-        summary.orphaned_verifications = 0;
-        summary.orphaned_verifications_percentage = 0.0;
-        summary.verification_types = VerificationTypeCounts::default();
-        for verification in verifications {
-            if let element::ElementType::Verification(kind) = &verification.element_type {
-                summary.verification_types.record(kind);
-            }
-        }
-        summary.total_requirements_in_scope = requirement_ids.len();
-        summary.covered_requirements = record_count(&self.covered_requirements.files);
-        summary.uncovered_requirements = record_count(&self.uncovered_requirements.files);
-        summary.covered_terminal_requirements = self
-            .covered_requirements
-            .files
-            .values()
-            .flatten()
-            .filter(|record| record.is_terminal)
-            .count();
-        summary.uncovered_terminal_requirements = self
-            .uncovered_requirements
-            .files
-            .values()
-            .flatten()
-            .filter(|record| record.is_terminal)
-            .count();
-        summary.total_terminal_requirements =
-            summary.covered_terminal_requirements + summary.uncovered_terminal_requirements;
-        summary.implementation_coverage_percentage = percentage(
-            summary.covered_terminal_requirements,
-            summary.total_terminal_requirements,
-        );
-        summary.coverage_sources = CoverageSourceCounts::default();
-        for record in self.covered_requirements.files.values().flatten() {
-            summary.coverage_sources.record(&record.coverage_source);
-        }
-        self.scope = Some(CoverageScope {
-            kind: "capability",
-            capability_identifier: capability.identifier.clone(),
-            capability_name: capability.name.clone(),
-            capability_ids,
-            requirement_ids,
-            verification_ids,
-            orphaned_verifications_scope: "whole_model_only",
-        });
+            .retain(|item| scope.capability_ids.contains(&item.identifier));
+        self.summary = summary;
+        self.scope = Some(scope);
         self
     }
 

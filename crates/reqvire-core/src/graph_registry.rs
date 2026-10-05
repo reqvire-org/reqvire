@@ -62,12 +62,28 @@ impl Page {
     }
 }
 
+/// An impact-propagating edge resolved within its owning registry.
+#[derive(Debug, Clone, Serialize)]
+pub struct RelationEdge {
+    pub relation_trigger: String,
+    pub target_id: String,
+}
+
+/// One canonical element and its flat impact adjacency within a model snapshot.
+#[derive(Debug, Clone, Serialize)]
+pub struct RegistryNode {
+    pub element: Element,
+    pub relations: Vec<RelationEdge>,
+}
+
+/// A recursive report edge, constructed separately from canonical adjacency.
 #[derive(Debug, Clone, Serialize)]
 pub struct RelationNode {
     pub relation_trigger: String,
     pub element_node: ElementNode,
 }
 
+/// An element in a change-impact report tree, not a canonical registry node.
 #[derive(Debug, Clone, Serialize)]
 pub struct ElementNode {
     pub element: Element,
@@ -76,7 +92,7 @@ pub struct ElementNode {
 
 #[derive(Debug, Clone)]
 pub struct GraphRegistry {
-    pub nodes: FxHashMap<String, ElementNode>,
+    pub nodes: FxHashMap<String, RegistryNode>,
     pub pages: FxHashMap<String, Page>,
     pub modified_files: FxHashSet<String>, // Track files modified during CRUD operations
 }
@@ -137,6 +153,186 @@ mod tests {
     }
 
     #[test]
+    fn canonical_storage_is_bounded_across_rebuilds() {
+        // A small cycle reproduces retained nested copies without constructing an
+        // unbounded baseline. The diamond also exercises shared target payloads.
+        for (ids, edges) in [
+            (vec!["A", "B"], vec![("A", "B"), ("B", "A")]),
+            (
+                vec!["A", "B", "C", "D"],
+                vec![("A", "B"), ("A", "C"), ("B", "D"), ("C", "D")],
+            ),
+        ] {
+            for reversed in [false, true] {
+                let mut registry = GraphRegistry::new();
+                let mut ordered_ids = ids.clone();
+                if reversed {
+                    ordered_ids.reverse();
+                }
+                for id in ordered_ids {
+                    let mut element = make_element(id, id);
+                    for &(source, target) in &edges {
+                        if source == id {
+                            add_relation(&mut element, "derive", target);
+                        }
+                    }
+                    registry.register_element(element, "file.md").unwrap();
+                }
+
+                let mut counts = Vec::new();
+                for iteration in 0..8 {
+                    if iteration % 2 == 0 {
+                        registry.build_relation_graph();
+                    } else {
+                        registry.populate_size_estimates().unwrap();
+                    }
+                    // Count *all* stored payloads/edges, including any hidden in
+                    // target copies. Top-level registry.len() conceals the bug.
+                    let serialized = serde_json::to_value(&registry.nodes).unwrap();
+                    let mut pending = vec![&serialized];
+                    let (mut payloads, mut relations) = (0, 0);
+                    while let Some(value) = pending.pop() {
+                        match value {
+                            serde_json::Value::Object(fields) => {
+                                payloads += usize::from(fields.contains_key("element"));
+                                relations += usize::from(fields.contains_key("relation_trigger"));
+                                pending.extend(fields.values());
+                            }
+                            serde_json::Value::Array(values) => pending.extend(values),
+                            _ => {}
+                        }
+                    }
+                    counts.push((payloads, relations));
+                }
+                assert_eq!(
+                    counts,
+                    vec![(ids.len(), edges.len()); 8],
+                    "storage must depend on this graph, not rebuild history (reversed={reversed})"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn canonical_storage_includes_normalized_inverse_edges_on_first_refresh() {
+        let mut registry = GraphRegistry::new();
+        let mut child = make_element("file.md#child", "Child");
+        add_relation(&mut child, "derivedFrom", "#parent");
+        // Neither a missing element nor an external URL is a registry edge.
+        add_relation(&mut child, "derive", "#missing");
+        let external = Relation::new(
+            "satisfiedBy",
+            "Evidence".into(),
+            "https://example.org/evidence",
+            None,
+        )
+        .unwrap();
+        child.relations.push(external);
+        registry.register_element(child, "file.md").unwrap();
+        registry
+            .register_element(make_element("file.md#parent", "Parent"), "file.md")
+            .unwrap();
+        let exclusions = crate::exclusions::ExclusionSetBuilder::new()
+            .build()
+            .unwrap();
+
+        registry.refresh_relation_context(&exclusions);
+        let expected = vec![("derive".to_string(), "file.md#child".to_string())];
+        assert_eq!(registry.list_relations("file.md#parent").unwrap(), expected);
+        assert!(registry.list_relations("file.md#child").unwrap().is_empty());
+        let child_relation = &registry.nodes["file.md#child"].element.relations[0];
+        assert!(child_relation.user_created);
+        assert_eq!(
+            child_relation.target.link,
+            LinkType::Identifier("file.md#parent".into())
+        );
+        let inverse = &registry.nodes["file.md#parent"].element.relations[0];
+        assert!(!inverse.user_created);
+        assert_eq!(inverse.relation_type.name, "derive");
+
+        let first = serde_json::to_value(&registry.nodes).unwrap();
+        registry.refresh_relation_context(&exclusions);
+        assert_eq!(serde_json::to_value(&registry.nodes).unwrap(), first);
+    }
+
+    #[test]
+    fn canonical_storage_candidate_edits_keep_reports_current_and_accepted_graph_isolated() {
+        let mut accepted = GraphRegistry::new();
+        let mut a = make_element("file.md#a", "A");
+        let mut b = make_element("file.md#b", "B");
+        let mut c = make_element("other.md#c", "C");
+        c.file_path = "other.md".into();
+        add_relation(&mut a, "derive", "file.md#b");
+        add_relation(&mut b, "derive", "file.md#a");
+        for element in [a, b, c] {
+            accepted.add_element(element).unwrap();
+        }
+        accepted.build_relation_graph();
+        let original = serde_json::to_value(&accepted.nodes).unwrap();
+        let original_report = serde_json::to_value(accepted.get_impact_tree("file.md#a")).unwrap();
+        let mut candidate = accepted.clone();
+        candidate
+            .move_element_to_location("file.md#b", "other.md")
+            .unwrap();
+        candidate.update_identifier("file.md#b", "other.md#renamed");
+        let edited = &mut candidate.nodes.get_mut("other.md#renamed").unwrap().element;
+        edited.content = "Candidate content".into();
+        edited.freeze_content();
+
+        // Compare the full serialized report shape, including the existing
+        // element_node field and cycle guard. Targets use their current data.
+        let expected_report = serde_json::json!({
+            "element": candidate.nodes["file.md#a"].element,
+            "relations": [{
+                "relation_trigger": "derive",
+                "element_node": {
+                    "element": candidate.nodes["other.md#renamed"].element,
+                    "relations": []
+                }
+            }]
+        });
+        assert_eq!(
+            serde_json::to_value(candidate.get_impact_tree("file.md#a")).unwrap(),
+            expected_report
+        );
+        assert_eq!(
+            expected_report["relations"][0]["element_node"]["element"]["file_path"],
+            "other.md"
+        );
+        assert_eq!(
+            expected_report["relations"][0]["element_node"]["element"]["content"],
+            "Candidate content"
+        );
+
+        candidate
+            .remove_relation("file.md#a", "other.md#renamed", "derive")
+            .unwrap();
+        candidate
+            .add_relation("file.md#a", "other.md#c", "derive")
+            .unwrap();
+        assert!(candidate
+            .add_relation("file.md#a", "other.md#c", "derive")
+            .is_err());
+        let relinked = candidate.get_impact_tree("file.md#a");
+        assert_eq!(
+            relinked.relations[0].element_node.element.identifier,
+            "other.md#c"
+        );
+        candidate.remove_element("other.md#c").unwrap();
+        assert!(candidate.get_impact_tree("file.md#a").relations.is_empty());
+        candidate.remove_element("other.md#renamed").unwrap();
+        candidate.build_relation_graph();
+        assert!(candidate.list_relations("file.md#a").unwrap().is_empty());
+        assert!(candidate.nodes["file.md#a"].element.relations.is_empty());
+
+        assert_eq!(serde_json::to_value(&accepted.nodes).unwrap(), original);
+        assert_eq!(
+            serde_json::to_value(accepted.get_impact_tree("file.md#a")).unwrap(),
+            original_report
+        );
+    }
+
+    #[test]
     fn populate_size_estimates_adds_non_recursive_element_metadata() {
         let mut registry = GraphRegistry::new();
         let element = make_element("file.md#size-estimate", "Size Estimate");
@@ -194,7 +390,7 @@ mod tests {
         let a_node = graph.nodes.get("A").expect("expected test node to exist");
         assert_eq!(a_node.relations.len(), 1);
         assert_eq!(a_node.relations[0].relation_trigger, "derive");
-        assert_eq!(a_node.relations[0].element_node.element.identifier, "B");
+        assert_eq!(a_node.relations[0].target_id, "B");
     }
 
     #[test]
@@ -223,7 +419,7 @@ mod tests {
         // A's relation should now point to B_NEW
         let a_node = graph.nodes.get("A").expect("expected test node to exist");
         assert_eq!(a_node.relations.len(), 1);
-        assert_eq!(a_node.relations[0].element_node.element.identifier, "B_NEW");
+        assert_eq!(a_node.relations[0].target_id, "B_NEW");
     }
 
     #[test]

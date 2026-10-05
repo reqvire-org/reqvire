@@ -823,3 +823,16 @@ Implementation details shall follow the associated contract specifications.
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
 ---
+
+### npm CLI Distribution
+
+When Reqvire is invoked through its npm package, the system SHALL launch the packaged native CLI for the supported platform and safely reuse its extraction cache across concurrent invocations.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [CLI interface](../InterfacesRequirements.md#cli-interface)
+  * definedBy: [npm CLI Launch Specification](Specifications.md#npm-cli-launch-specification)
+  * satisfiedBy: [reqvire.js](../../../npm/reqvire/bin/reqvire.js)
+---

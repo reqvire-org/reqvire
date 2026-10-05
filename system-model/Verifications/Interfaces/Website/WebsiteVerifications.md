@@ -136,9 +136,10 @@ This review verifies the documented worktree and publication workflow against im
 
 #### Details
 - Review standalone and embedded startup examples, flag prerequisites/defaults, configured remote selection, failed gh checks, and operation-time permission errors against command help and discovery fixtures.
-- Follow examples from explicit base to worktree creation/opening, context-scoped model reads/mutations, manual commit, push, explicit-base PR creation, and comment. Check same-repository and no-fork rules, no implicit effects, and recovery from uncertain outcomes.
+- Follow examples from explicit base to worktree creation/opening, context-scoped model reads/mutations, manual commit, push, explicit-base PR creation, and comment. Check same-repository and no-fork rules, no implicit effects, and recovery from uncertain outcomes. Check the documented distinction between accepted snapshot reads, blocked writes/publication, unavailable local file downloads, and repair/restart after mutation recovery failure.
 - Verify documentation presents one branch picker, metadata-only inventory, and on-demand loading with worktree reuse or creation handled internally. Explain read-only dirty-content support and existing cache freshness, mutation-enabled rejection of dirty targets before first load, normal ownership admission, accepted-snapshot reuse on reselection including accepted uncommitted writes, and worktree preservation on shutdown. The examples must not imply eager loading of all worktrees, cache resets on switching, or a read-only bypass in mutation mode. Clean restart, accepted-only commits, and managed-worktree removal retain their existing rules. Two tabs independently select branches without changing another client's routing or requiring an MCP switching tool.
 - Build and inspect the MCP documentation route only after implementation. Do not mark this planned review completed by adding source-file links as executable evidence.
+- Check restart guidance distinguishes reusable leftover lock files from live ownership, permission denial and unsupported locking, without advising lock deletion or automatic permission changes.
 
 #### Metadata
   * type: demonstration-verification

@@ -2,8 +2,6 @@ name: Rust and End-to-End Tests on PR
 
 on:
   pull_request:
-    branches:
-      - main  # Change this to match your default branch
 
 jobs:
   test:
@@ -45,11 +43,21 @@ jobs:
         # so the bundle must be built before cargo build/test.
         run: cd explorer && npm run build
 
-      - name: Run Tests
-        run: cargo test --verbose
+      - name: Build CLI for Rust and end-to-end tests
+        run: cargo build --locked --bin reqvire
 
-      - name: Build CLI for end-to-end tests
-        run: cargo build --bin reqvire
+      - name: Share current CLI with model validation
+        uses: actions/upload-artifact@v6
+        with:
+          name: reqvire-pr-cli
+          path: target/debug/reqvire
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Run Tests
+        env:
+          REQVIRE_TEST_BIN: ${{ github.workspace }}/target/debug/reqvire
+        run: cargo test --locked --verbose
 
       - name: Install headless Chromium for end-to-end tests
         env:
@@ -73,25 +81,34 @@ jobs:
 
   validate:
     name: Validate Requirements
-    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
         
-      - name: Install Reqvire
-        run: curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
-                
+      - name: Download current CLI
+        uses: actions/download-artifact@v6
+        with:
+          name: reqvire-pr-cli
+          path: target/debug
+
+      - name: Make downloaded CLI executable
+        run: chmod +x target/debug/reqvire
+
       - name: Validate Requirements via validate command
         id: validate
-        continue-on-error: true
+        shell: bash
         run: |
           mkdir -p reports
-          reqvire validate | tee reports/validation_report.txt
+          ./target/debug/reqvire validate 2>&1 | tee reports/validation_report.txt
+          ./target/debug/reqvire lint 2>&1 | tee reports/lint_report.txt
 
-      - name: Upload Validation Report if validation failed
-        if: failure()
+      - name: Upload validation reports
+        if: ${{ always() && steps.validate.outcome != 'skipped' }}
         uses: actions/upload-artifact@v6
         with:
           name: reqvire-validation-report
-          path: reports/validation_report.txt          
+          path: reports/*.txt

@@ -1,4 +1,4 @@
-import type { ELK as ElkEngine, ElkNode } from "elkjs/lib/elk-api";
+import type { ElkNode, ElkPort } from "elkjs/lib/elk-api";
 
 export interface TraceFlowElement {
   id: string;
@@ -131,13 +131,12 @@ export function buildTraceFlowTopology(trace: TraceFlowData, collapsed: Readonly
 export type TraceFlowDirection = "RIGHT" | "DOWN";
 export type TraceFlowGraph = Awaited<ReturnType<typeof buildTraceFlowGraph>>;
 
-let engine: Promise<ElkEngine> | undefined;
-function getEngine() {
-  // Load the layout engine only when a trace map is opened.
-  return engine ??= import("elkjs/lib/elk.bundled.js")
-    .then(({ default: ELK }) => new ELK({ algorithms: ["layered"] }))
-    .catch(error => { engine = undefined; throw error; });
+/** The application owns worker lifetime; visual patterns only cancel their own task. */
+export interface FlowLayoutTask {
+  result: Promise<ElkNode>;
+  cancel: () => void;
 }
+export type FlowLayoutEngine = (input: ElkNode) => FlowLayoutTask;
 
 const portId = (edgeId: string, side: "source" | "target") => JSON.stringify([edgeId, side]);
 const coordinate = (value: number | undefined) => {
@@ -146,9 +145,21 @@ const coordinate = (value: number | undefined) => {
 };
 
 /** ELK owns card placement, ports, orthogonal routing, and relation-label space. */
-export async function buildTraceFlowGraph(topology: TraceFlowTopology, direction: TraceFlowDirection = "RIGHT") {
+export async function buildTraceFlowGraph(topology: TraceFlowTopology, direction: TraceFlowDirection, layout: (input: ElkNode) => Promise<ElkNode>) {
   // Canonical insertion order keeps layout independent of model serialization.
   const edges = [...topology.edges].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+  const portsByNode = new Map<string, ElkPort[]>();
+  const addPort = (nodeId: string, edgeId: string, endpoint: "source" | "target", side: string) => {
+    const ports = portsByNode.get(nodeId) ?? [];
+    ports.push({ id: portId(edgeId, endpoint), width: 0, height: 0, layoutOptions: { "elk.port.side": side } });
+    portsByNode.set(nodeId, ports);
+  };
+  // Follow the sorted edge order once. Self-loops retain both endpoint ports;
+  // distinct edges between the same nodes retain their individual port IDs.
+  for (const edge of edges) {
+    addPort(edge.source, edge.id, "source", direction === "DOWN" ? "SOUTH" : "EAST");
+    addPort(edge.target, edge.id, "target", direction === "DOWN" ? "NORTH" : "WEST");
+  }
   const input: ElkNode = {
     id: "trace-layout",
     layoutOptions: {
@@ -167,12 +178,7 @@ export async function buildTraceFlowGraph(topology: TraceFlowTopology, direction
     children: [...topology.nodes].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0).map(node => ({
       id: node.id, width: TRACE_NODE_WIDTH, height: TRACE_NODE_HEIGHT,
       layoutOptions: { "elk.portConstraints": "FIXED_SIDE", ...(node.root ? { "elk.layered.layering.layerConstraint": "FIRST" } : {}) },
-      ports: edges.flatMap(edge => {
-        return [
-          ...(edge.source === node.id ? [{ id: portId(edge.id, "source"), width: 0, height: 0, layoutOptions: { "elk.port.side": direction === "DOWN" ? "SOUTH" : "EAST" } }] : []),
-          ...(edge.target === node.id ? [{ id: portId(edge.id, "target"), width: 0, height: 0, layoutOptions: { "elk.port.side": direction === "DOWN" ? "NORTH" : "WEST" } }] : []),
-        ];
-      }),
+      ports: portsByNode.get(node.id) ?? [],
     })),
     edges: edges.map(edge => ({
       id: edge.id,
@@ -180,7 +186,7 @@ export async function buildTraceFlowGraph(topology: TraceFlowTopology, direction
       labels: [{ text: edge.label, width: 100, height: 28, layoutOptions: { "elk.edgeLabels.placement": "CENTER" } }],
     })),
   };
-  const result = await (await getEngine()).layout(input);
+  const result = await layout(input);
   const positions = new Map(result.children?.map(node => [node.id, { x: coordinate(node.x), y: coordinate(node.y) }]));
   const routes = new Map(result.edges?.map(edge => [edge.id, edge]));
   return {

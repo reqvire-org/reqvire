@@ -78,6 +78,32 @@ This test verifies that the system rejects Contract elements that include a Rela
   * verify: [Contract Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
 ---
 
+### Canonical Graph Storage Verification
+
+Verify bounded canonical graph storage, current target resolution, and isolation of mutation candidates while preserving change-impact report behavior.
+
+#### Details
+- Rebuild cyclic and reconvergent helper graphs repeatedly, including size-estimate rebuilding and reversed registration order. Count serialized canonical element payloads and adjacency edges; counts remain equal to the fixture's vertices and retained edges without nested target payloads.
+- Normalize relative identifiers and propagate inverse relations before building adjacency. Repeating relation-context preparation produces the same edges and retains authored/generated relation provenance.
+- Clone an accepted graph, then edit, rename, move, relink, and remove candidate targets. Assert current target content and locations in reports, preserved report JSON fields and cycle guards, and unchanged accepted graph data.
+- Run the existing change-impact and CRUD E2E golden comparisons for capability and contract propagation, element relocation, relation consistency, relinking, and cross-file moves.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
+  * verify: [Canonical Graph Storage](../../ModelStructure/ModelManagement.md#canonical-graph-storage)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [test.sh](../../../tests/test-capability-change-impact/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-change-impact-contract-bindings/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-change-impact-detection/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-change-impact-element-relocation/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-crud-relation-consistency/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-relink-command/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-mv-cross-file-relation-integrity/test.sh)
+---
+
 ### Element Size Estimate Model Build Verification
 
 This verification shall prove that element size estimates are computed only when model building explicitly enables them.
@@ -296,6 +322,7 @@ Verify stable model construction identity, complete input invalidation, and reco
 
 ##### Acceptance Criteria
 - After one completed build, repeated unchanged reads reuse that model without another parse, validation, or semantic-store build. Exercise a regex-backed exclusion pattern that executes matching, multiple worker threads, and reconstruction of an equivalent matcher; response equality alone is insufficient evidence.
+- Assert shared model/registry identity across cache hits and concurrent same-input loads, with no graph/page copies. Retain an old read handle across changed-input publication and invalidation; its original content and semantic state remain intact. Mutable candidate edits must not change either cached handle.
 - Effective pattern identity distinguishes different rules and matching options even when pattern counts and the selected Markdown inventory are equal. Reordering or repeating any-match rules without changing their effective meaning preserves identity.
 - Creating, editing, and removing applicable root `.gitignore` and `.reqvireignore` files changes the actual active matcher and selected model inventory on the next load without restart. Equivalent policy edits do not force construction solely because of matcher runtime state. Nested ignore files do not change the root-only policy.
 - Source edits, additions, removals, and moves become visible. Equal-length content edits with preserved modification time remain detectable, including page-only changes excluded from the public parsed-element revision.

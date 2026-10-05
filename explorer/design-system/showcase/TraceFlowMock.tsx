@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import {
-  ElementIcon, Icon,
+  ElementIcon, Icon, type FlowLayoutEngine,
   PaneControlSection, PaneSearchForm, PaneSummary, PaneTree, RouteFrame,
   SidePaneFrame, TraceFileHeader, TraceFlow, TraceReportContent, TraceReportPanel,
   TraceVerificationCard, TraceVerificationHeader, TraceVerificationList, TraceVerificationMeta,
@@ -11,7 +11,7 @@ import { TRACE_EXAMPLES } from "./fixtures/traces";
 const files = [...new Set(TRACE_EXAMPLES.map(example => example.trace.verification.file))];
 
 /** A preview harness: every visual comes from public design-system exports. */
-export function useTraceFlowMock() {
+export function useTraceFlowMock(layoutEngine: FlowLayoutEngine) {
   const [selectedId, setSelectedId] = useState<string | null>("classification-test");
   const [selectedFile, setSelectedFile] = useState(TRACE_EXAMPLES.find(item => item.trace.verification.id === "classification-test")!.trace.verification.file);
   const [closedFiles, setClosedFiles] = useState<Set<string>>(new Set());
@@ -63,7 +63,7 @@ export function useTraceFlowMock() {
       <PaneSummary placement="footer" items={[{ label: "Files", value: files.length }, { label: "Verifications", value: TRACE_EXAMPLES.length }]} />
     </SidePaneFrame>,
     main: ({ onOpenElement, onOpenSource }: { onOpenElement: (id: string) => void; onOpenSource: (file: string) => void }) => <RouteFrame viewId="traces">
-      {example ? <TraceFlow trace={example.trace} onOpenElement={onOpenElement} onOpenSource={element => onOpenSource(element.file)} />
+      {example ? <TraceFlow layoutEngine={layoutEngine} trace={example.trace} onOpenElement={onOpenElement} onOpenSource={element => onOpenSource(element.file)} />
         : <TraceReportPanel><TraceReportContent>
           <TraceFileHeader file={selectedFile} countLabel={`${TRACE_EXAMPLES.filter(item => item.trace.verification.file === selectedFile).length} verifications`} />
           <TraceVerificationList>{TRACE_EXAMPLES.filter(item => item.trace.verification.file === selectedFile).map(item =>

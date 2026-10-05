@@ -19,6 +19,9 @@ dist = false
 [lints]
 workspace = true
 
+[features]
+test-support = []
+
 [dependencies]
 oxigraph = { workspace = true }
 thiserror = { workspace = true }

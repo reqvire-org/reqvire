@@ -32,6 +32,13 @@ def git(root, *args):
     return subprocess.check_output(['git', *args], cwd=root, text=True).strip()
 
 
+def selector_error(result, tool, *diagnostics):
+    error = result.get('structuredContent', {}).get('error', {})
+    return (result.get('isError') is True and error.get('tool') == tool
+            and all(text in error.get('message', '') for text in diagnostics)
+            and '_meta' not in result and 'context' not in result.get('structuredContent', {}))
+
+
 for mode in ('mcp', 'serve'):
     base = [binary, mode, *(['--enable-mcp'] if mode == 'serve' else [])]
     help_result = subprocess.run([*base, '--help'], capture_output=True, text=True)
@@ -119,10 +126,7 @@ for embedded in (False, True):
                         response = json.loads((server.output / f'response-{server.request_id:03}.json').read_text())['response']
                         rejected = response.get('error', {}).get('code') == -32602
                     check(f'{mode}/mutation-rejected', rejected)
-                browser = os.environ.get('CHROME_BIN') or next((shutil.which(n) for n in ('chromium', 'chromium-browser', 'google-chrome') if shutil.which(n)), None)
-                if not browser:
-                    raise RuntimeError('Chromium is required for read-only branch browser checks')
-                run = subprocess.run(['node', str(suite / 'browser-check.mjs'), server.base, rows['main']['worktree_id'], rows['second']['worktree_id'], browser], capture_output=True, text=True, timeout=100)
+                run = subprocess.run(['node', str(suite / 'browser-check.mjs'), server.base, rows['main']['worktree_id'], rows['second']['worktree_id'], str(output / f'{mode}-browser-profile')], capture_output=True, text=True, timeout=100)
                 check(f'{mode}/browser-selection', run.returncode == 0, run.stdout + run.stderr)
                 check(f'{mode}/git-unchanged', before == [(git(p, 'rev-parse', 'HEAD'), git(p, 'status', '--porcelain=v1')) for p in (root, second, invalid)]
                       and not [p for p in (root / '.git').glob('reqvire-mcp*') if p.name != 'reqvire-mcp-administration.lock'])
@@ -180,7 +184,18 @@ for mode in ('mcp', 'serve'):
                 same = server.tool('reqvire.worktree.open', branch='feature-a')
                 check(f'{mode}/open-idempotent', same['worktree_id'] == child)
                 ambiguous = server.raw_tool('reqvire.search')
-                check(f'{mode}/ambiguous-selector-rejected', ambiguous.get('isError') is True)
+                check(f'{mode}/ambiguous-selector-rejected', selector_error(
+                    ambiguous, 'reqvire.search', 'worktree_id is required', origin, child), ambiguous)
+                unknown = server.raw_tool('reqvire.search', worktree_id='unknown-context')
+                check(f'{mode}/unknown-selector-tool-error', selector_error(
+                    unknown, 'reqvire.search', 'Unknown or removed worktree_id: unknown-context'), unknown)
+                try:
+                    server.raw_tool('reqvire.search', worktree_id=42)
+                    invalid = {}
+                except RuntimeError:
+                    invalid = json.loads((server.output / f'response-{server.request_id:03}.json').read_text())['response']
+                check(f'{mode}/invalid-selector-protocol-error', invalid.get('error', {}).get('code') == -32602
+                      and 'result' not in invalid, invalid)
                 content = (fixture / 'fixtures/other.md.txt').read_text().split('# Elements\n\n', 1)[1]
                 server.tool('reqvire.add_element', worktree_id=child, file='Model.md', content=content)
                 a = server.tool('reqvire.search', worktree_id=origin)
@@ -245,23 +260,22 @@ for mode in ('mcp', 'serve'):
                     status_b, b = server.http('/api/project-store?worktree_id=' + child)
                     check('serve/runtime-isolation', status == status_b == 200
                           and 'Other Subject' not in a and 'Other Subject' in b)
-                    browser = os.environ.get('CHROME_BIN') or next((shutil.which(name) for name in ('chromium', 'chromium-browser', 'google-chrome') if shutil.which(name)), None)
-                    if not browser:
-                        raise RuntimeError('Chromium is required for worktree browser checks')
                     browser_dirty = pathlib.Path(temp) / 'browser-dirty'
                     git(root, 'worktree', 'add', '-qb', 'browser-dirty', str(browser_dirty))
                     (browser_dirty / 'untracked.txt').write_text('preserve me')
                     _, listing = server.http('/api/worktrees')
                     browser_dirty_id = next(r['worktree_id'] for r in json.loads(listing)['worktrees'] if r['branch'] == 'browser-dirty')
-                    browser_run = subprocess.run(['node', str(suite / 'browser-check.mjs'), server.base, origin, child, browser, browser_dirty_id], capture_output=True, text=True, timeout=100)
+                    browser_run = subprocess.run(['node', str(suite / 'browser-check.mjs'), server.base, origin, child, str(output / 'serve-browser-profile'), browser_dirty_id], capture_output=True, text=True, timeout=100)
                     check('serve/browser-worktree-selection', browser_run.returncode == 0, browser_run.stdout + browser_run.stderr)
                     status, _ = server.http('/api/project-store?worktree_id=unknown')
                     check('serve/unknown-runtime-rejected', status in (404, 410, 503))
                 server.tool('reqvire.worktree.remove', worktree_id=child)
                 removed = server.raw_tool('reqvire.search', worktree_id=child)
+                remaining = server.raw_tool('reqvire.search', worktree_id=origin)
                 check(f'{mode}/remove-keeps-branch', not child_root.exists()
                       and git(root, 'rev-parse', 'feature-a') == commit['commit']
-                      and removed.get('isError') is True)
+                      and selector_error(removed, 'reqvire.search', child)
+                      and remaining.get('_meta', {}).get('reqvire/context', {}).get('worktree_id') == origin)
     except Exception:
         check(f'{mode}/lifecycle', False, traceback.format_exc())
 raise SystemExit(bool(failures))

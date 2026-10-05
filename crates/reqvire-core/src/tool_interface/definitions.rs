@@ -1,6 +1,57 @@
 use super::*;
+use std::sync::LazyLock;
+
+struct ToolCatalog {
+    definitions: Vec<Value>,
+    by_name: BTreeMap<String, usize>,
+}
+
+impl ToolCatalog {
+    fn new(enable_mutations: bool) -> Self {
+        let definitions = build_tool_definitions(enable_mutations);
+        let by_name = definitions
+            .iter()
+            .enumerate()
+            .map(|(index, tool)| {
+                (
+                    tool["name"]
+                        .as_str()
+                        .expect("tool definition name")
+                        .to_owned(),
+                    index,
+                )
+            })
+            .collect();
+        Self {
+            definitions,
+            by_name,
+        }
+    }
+
+    fn get(&self, name: &str) -> Option<&Value> {
+        self.by_name
+            .get(name)
+            .map(|index| &self.definitions[*index])
+    }
+}
+
+fn catalog(enable_mutations: bool) -> &'static ToolCatalog {
+    static READ_ONLY: LazyLock<ToolCatalog> = LazyLock::new(|| ToolCatalog::new(false));
+    static MUTATIONS: LazyLock<ToolCatalog> = LazyLock::new(|| ToolCatalog::new(true));
+    if enable_mutations {
+        &MUTATIONS
+    } else {
+        &READ_ONLY
+    }
+}
 
 pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
+    catalog(enable_mutations).definitions.clone()
+}
+
+fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
+    #[cfg(test)]
+    tests::CATALOG_BUILDS.with(|count| count.set(count.get() + 1));
     let mut tools = vec![
         read_tool(
             "reqvire.workspace_status",
@@ -544,10 +595,8 @@ pub fn validate_tool_arguments(
     arguments: &Value,
     enable_mutations: bool,
 ) -> Result<(), String> {
-    let tools = tool_definitions(enable_mutations);
-    let tool = tools
-        .iter()
-        .find(|tool| tool.get("name").and_then(Value::as_str) == Some(tool_name))
+    let tool = catalog(enable_mutations)
+        .get(tool_name)
         .ok_or_else(|| format!("Unknown tool '{}'", tool_name))?;
     let schema = tool
         .get("inputSchema")
@@ -556,51 +605,11 @@ pub fn validate_tool_arguments(
 }
 
 pub fn tool_exists(name: &str, enable_mutations: bool) -> bool {
-    read_tool_names().contains(&name)
-        || conditional_tool_names().contains(&name)
-        || (enable_mutations && mutation_tool_names().contains(&name))
+    catalog(enable_mutations).get(name).is_some()
 }
 
-fn read_tool_names() -> Vec<&'static str> {
-    vec![
-        "reqvire.workspace_status",
-        "reqvire.tool_contract",
-        "reqvire.model_revision",
-        "reqvire.read_element",
-        "reqvire.search",
-        "reqvire.model",
-        "reqvire.containment",
-        "reqvire.collect",
-        "reqvire.submodels",
-        "reqvire.semantic.export",
-        "reqvire.semantic.ontologies",
-        "reqvire.semantic.shapes",
-        "reqvire.semantic.concepts",
-        "reqvire.semantic.model",
-        "reqvire.concepts.list",
-        "reqvire.concepts.get",
-        "reqvire.concept_schemes.list",
-        "reqvire.concept_mappings.list",
-        "reqvire.semantic.graph",
-        "reqvire.semantic.queries",
-        "reqvire.semantic.queries.validate",
-        "reqvire.semantic.prefixes",
-        "reqvire.semantic.vocabulary",
-        "reqvire.semantic.sparql",
-        "reqvire.lint",
-        "reqvire.coverage",
-        "reqvire.traces",
-        "reqvire.resources",
-        "reqvire.change_impact",
-    ]
-}
-
-fn conditional_tool_names() -> Vec<&'static str> {
-    vec!["reqvire.format"]
-}
-
-pub fn mutation_tool_names() -> Vec<&'static str> {
-    vec![
+pub const fn mutation_tool_names() -> &'static [&'static str] {
+    &[
         "reqvire.add_element",
         "reqvire.remove_element",
         "reqvire.move_element",
@@ -783,4 +792,107 @@ fn validate_property_enum(name: &str, value: &Value, schema: &Value) -> Result<(
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::cell::Cell;
+
+    thread_local! {
+        pub(super) static CATALOG_BUILDS: Cell<usize> = const { Cell::new(0) };
+    }
+
+    #[test]
+    fn catalog_validation_reuses_definitions_after_warmup() {
+        let args = json!({"short":true});
+        for enabled in [false, true] {
+            validate_tool_arguments("reqvire.search", &args, enabled).unwrap();
+            let before = CATALOG_BUILDS.with(Cell::get);
+            for _ in 0..20 {
+                validate_tool_arguments("reqvire.search", &args, enabled).unwrap();
+                assert!(validate_tool_arguments("reqvire.not_a_tool", &args, enabled).is_err());
+            }
+            assert_eq!(
+                CATALOG_BUILDS.with(Cell::get),
+                before,
+                "validation must not rebuild catalogs"
+            );
+        }
+    }
+
+    #[test]
+    fn cached_catalogs_preserve_mode_schemas_and_diagnostics() {
+        for enabled in [false, true] {
+            let definitions = tool_definitions(enabled);
+            let names: Vec<_> = definitions
+                .iter()
+                .map(|tool| tool["name"].as_str().unwrap())
+                .collect();
+            assert_eq!(names.contains(&"reqvire.add_element"), enabled);
+            for (name, args, diagnostic) in [
+                (
+                    "reqvire.not_a_tool",
+                    json!({}),
+                    "Unknown tool 'reqvire.not_a_tool'",
+                ),
+                (
+                    "reqvire.search",
+                    json!([]),
+                    "Tool arguments must be a JSON object",
+                ),
+                (
+                    "reqvire.search",
+                    json!({"alien":true}),
+                    "Unknown argument 'alien'",
+                ),
+                (
+                    "reqvire.collect",
+                    json!({}),
+                    "Missing required argument 'element_name'",
+                ),
+                (
+                    "reqvire.search",
+                    json!({"short":"yes"}),
+                    "Argument 'short' must be a boolean",
+                ),
+                (
+                    "reqvire.collect",
+                    json!({"element_name":"Root", "direction":"sideways"}),
+                    "Argument 'direction' has unsupported value '\"sideways\"'",
+                ),
+                (
+                    "reqvire.semantic.export",
+                    json!({"layers":[42]}),
+                    "Argument 'layers' must contain only strings",
+                ),
+            ] {
+                assert_eq!(
+                    validate_tool_arguments(name, &args, enabled).unwrap_err(),
+                    diagnostic
+                );
+            }
+        }
+        assert!(validate_tool_arguments("reqvire.format", &json!({"fix":true}), false).is_err());
+        assert!(validate_tool_arguments("reqvire.format", &json!({"fix":true}), true).is_ok());
+        assert!(validate_tool_arguments(
+            "reqvire.add_element",
+            &json!({"file":"Model.md","content":"content"}),
+            false
+        )
+        .is_err());
+        assert!(validate_tool_arguments(
+            "reqvire.add_element",
+            &json!({"file":"Model.md","content":"content"}),
+            true
+        )
+        .is_ok());
+        // Consumers own their discovery output and cannot mutate the cached schema.
+        let mut altered = tool_definitions(false);
+        altered[0]["inputSchema"]["properties"]["alien"] = json!({"type":"boolean"});
+        assert!(
+            validate_tool_arguments("reqvire.workspace_status", &json!({"alien":true}), false)
+                .is_err()
+        );
+    }
 }

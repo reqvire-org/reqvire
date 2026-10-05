@@ -1,5 +1,6 @@
+import { testFlowLayoutEngine } from "../../test/flowLayoutEngine";
 import { describe, expect, it } from "vitest";
-import { buildTraceFlowGraph, buildTraceFlowTopology, traceFlowNeighborhood, TRACE_NODE_HEIGHT, TRACE_NODE_WIDTH, type TraceFlowData, type TraceFlowDirection } from "./traceFlowLayout";
+import { buildTraceFlowGraph as buildGraph, buildTraceFlowTopology, traceFlowNeighborhood, TRACE_NODE_HEIGHT, TRACE_NODE_WIDTH, type TraceFlowData, type TraceFlowDirection } from "./traceFlowLayout";
 import { SPLIT_MERGE_TRACE } from "../../showcase/fixtures/traces";
 
 const trace: TraceFlowData = {
@@ -16,13 +17,14 @@ const trace: TraceFlowData = {
 const layoutTrace = (data: TraceFlowData, collapsed?: ReadonlySet<string>, direction?: TraceFlowDirection) => buildTraceFlowGraph(buildTraceFlowTopology(data, collapsed), direction);
 
 describe("native trace flow", () => {
-  it("lays out a cyclic model context and reflexive relation without losing connections", async () => {
+  it.each(["RIGHT", "DOWN"] as const)("lays out cycles, parallel edges and reflexive relations without losing connections (%s)", async direction => {
     const graph = await buildTraceFlowGraph({ totalCount: 2,
       nodes: ["a", "b"].map(id => ({ id, element: { id, name: id, file: "Model.md" }, type: "requirement", context: "requirement", parentCount: 0 })),
       edges: [{ id: "ab", source: "a", target: "b", label: "trace" },
-        { id: "ba", source: "b", target: "a", label: "trace" }, { id: "aa", source: "a", target: "a", label: "related" }],
-    }, "DOWN");
-    expect(graph.edges).toHaveLength(3);
+        { id: "ba", source: "b", target: "a", label: "trace" }, { id: "aa", source: "a", target: "a", label: "related" },
+        { id: "ab-parallel", source: "a", target: "b", label: "derive" }],
+    }, direction);
+    expect(graph.edges.map(edge => edge.id)).toEqual(["ab", "ba", "aa", "ab-parallel"]);
     expect(graph.edges.every(edge => edge.path.startsWith("M ") && !edge.path.includes("NaN"))).toBe(true);
   });
   it("highlights paths through a chosen node without leaking into sibling-only paths", async () => {
@@ -163,3 +165,7 @@ describe("native trace flow", () => {
     expect(graph.totalCount).toBe(0);
   });
 });
+
+function buildTraceFlowGraph(topology: Parameters<typeof buildGraph>[0], direction: Parameters<typeof buildGraph>[1] = "RIGHT") {
+  return buildGraph(topology, direction, input => testFlowLayoutEngine(input).result);
+}

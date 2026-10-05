@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useExplorerUiState, type ModelMode } from "../state/ExplorerUiState";
 import { ElementFlow, Icon, RouteLayout, SegmentedControl, WorkspaceShell } from "@ds";
 import { useStore } from "../store/StoreContext";
+import { flowLayoutEngine } from "../workers/flowLayoutEngine";
 import { buildModelFlow } from "../lib/modelFlow";
 import { routeForContent, routeForResource } from "../router/routes";
 import { FilesView } from "./FilesView";
@@ -34,7 +35,7 @@ function ModelFlowView({ onOpenElement }: { onOpenElement: (id: string) => void 
       <WorkspaceShell rootLabel="Model" currentLabel="Flow" breadcrumbLabel="Model flow breadcrumbs"
         onRootClick={() => ui.setModelSelectionId("__root__")}
         controls={<ModelModeSelector value={ui.modelMode} onChange={ui.setModelMode} />}>
-        <ElementFlow data={data} onOpenElement={id => {
+        <ElementFlow layoutEngine={flowLayoutEngine} data={data} onOpenElement={id => {
           if (elementById(id)) onOpenElement(id);
           else window.location.hash = routeForResource(id);
         }} onOpenSource={element => { window.location.hash = element.sourceHref ?? routeForContent(element.file); }} />

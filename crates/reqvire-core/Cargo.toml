@@ -46,6 +46,7 @@ o-kernel = { workspace = true }
 termcolor = { workspace = true }
 
 [dev-dependencies]
+o-kernel = { workspace = true, features = ["test-support"] }
 assert_fs = { workspace = true }
 predicates = { workspace = true }
 tempfile = { workspace = true }

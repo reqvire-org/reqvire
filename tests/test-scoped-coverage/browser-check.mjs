@@ -1,102 +1,27 @@
-import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
-import path from "node:path";
+import { withBrowser } from "../browser.mjs";
 
-// Drive the real served bundle through Chrome's debugging protocol using
-// Node's built-in WebSocket, without adding a separate test framework.
-const [browser, servedUrl, exportedUrl, profile, reportsPath, addedPath] = process.argv.slice(2);
+const [servedUrl, exportedUrl, profile, reportsPath, addedPath] = process.argv.slice(2);
 const reports = JSON.parse(await readFile(reportsPath, "utf8"));
-// Ignore inherited desktop authentication when launching an isolated headless browser.
-const browserEnv = { ...process.env };
-for (const key of ["DISPLAY", "WAYLAND_DISPLAY", "XAUTHORITY"]) delete browserEnv[key];
-const child = spawn(browser, [
-  "--headless", "--no-sandbox", "--disable-dev-shm-usage",
-  "--use-gl=angle", "--use-angle=swiftshader-webgl", "--enable-unsafe-swiftshader",
-  "--ozone-platform=headless", "--disable-vulkan",
-  "--no-first-run", "--no-default-browser-check", "--remote-debugging-port=0",
-  "--disable-background-networking", "--disable-background-timer-throttling",
-  "--disable-renderer-backgrounding",
-  `--user-data-dir=${profile}`, "about:blank",
-], { stdio: ["ignore", "ignore", "inherit"], env: browserEnv });
-let socket;
 const pause = () => new Promise(resolve => setTimeout(resolve, 50));
-
-try {
-  let port;
-  for (let attempt = 0; attempt < 200; attempt++) {
-    if (child.exitCode !== null) throw new Error(`Browser exited: ${child.exitCode}`);
-    try {
-      port = (await readFile(path.join(profile, "DevToolsActivePort"), "utf8")).split("\n")[0];
-      break;
-    } catch {
-      await pause();
-    }
-  }
-  if (!port) throw new Error("Browser debugging endpoint did not start");
-  const pages = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
-  const page = pages.find(target => target.type === "page");
-  if (!page) throw new Error("Browser has no page target");
-  socket = new WebSocket(page.webSocketDebuggerUrl);
-  await new Promise((resolve, reject) => {
-    socket.addEventListener("open", resolve, { once: true });
-    socket.addEventListener("error", reject, { once: true });
-  });
-  let nextId = 0;
-  const pending = new Map();
-  const events = new Map();
-  socket.addEventListener("message", event => {
-    const message = JSON.parse(event.data);
-    if (message.id) {
-      const request = pending.get(message.id);
-      pending.delete(message.id);
-      if (message.error) request?.reject(new Error(message.error.message));
-      else request?.resolve(message.result);
-    } else if (events.has(message.method)) {
-      events.get(message.method)(message.params);
-      events.delete(message.method);
-    }
-  });
-  function rpc(method, params = {}) {
-    return new Promise((resolve, reject) => {
-      const id = ++nextId;
-      pending.set(id, { resolve, reject });
-      socket.send(JSON.stringify({ id, method, params }));
-    });
-  }
-  async function evaluate(fn, ...args) {
-    const result = await rpc("Runtime.evaluate", {
-      expression: `(${fn.toString()})(${args.map(arg => JSON.stringify(arg)).join(",")})`,
-      awaitPromise: true,
-      returnByValue: true,
-    });
-    if (result.exceptionDetails) {
-      const { exception, text } = result.exceptionDetails;
-      throw new Error(exception?.description ?? exception?.value ?? text);
-    }
-    return result.result.value;
-  }
-  await rpc("Page.enable");
-  socket.addEventListener("message", event => {
-    const message = JSON.parse(event.data);
-    if (message.method === "Runtime.exceptionThrown") console.error(JSON.stringify(message.params));
-  });
+console.error("Starting scoped-coverage browser");
+await withBrowser(profile, async ({ rpc, evaluate, loadPage, reloadPage, on }) => {
+  on("Runtime.exceptionThrown", params => console.error(JSON.stringify(params)));
   await rpc("Runtime.enable");
   const defaultViewport = { width: 780, height: 844, deviceScaleFactor: 1, mobile: false };
   await rpc("Emulation.setDeviceMetricsOverride", defaultViewport);
 
   async function waitFor(fn, ...args) {
-    for (let attempt = 0; attempt < 300; attempt++) {
+    console.error(`Waiting: ${fn.toString()}`);
+    const deadline = Date.now() + 15000;
+    while (Date.now() < deadline) {
       if (await evaluate(fn, ...args)) return;
       await pause();
     }
     throw new Error(`Browser condition timed out: ${fn.toString()}`);
   }
-  async function loadPage(url) {
-    const loaded = new Promise(resolve => events.set("Page.loadEventFired", resolve));
-    await rpc("Page.navigate", { url });
-    await loaded;
-  }
   async function navigate(baseUrl) {
+    console.error(`Navigating: ${baseUrl}/#/coverage`);
     // A fresh document resets route overlays and disclosure state, while
     // retaining persisted scope for the checks that explicitly exercise it.
     await loadPage("about:blank");
@@ -219,6 +144,8 @@ try {
   }
   let failed = false;
   async function run(label, check) {
+    const started = Date.now();
+    console.error(`START ${label}`);
     try {
       await check();
       console.log(`${label}: PASS`);
@@ -232,6 +159,7 @@ try {
       })));
       console.error(await evaluate(() => document.body.innerText.slice(0, 1800)));
     } finally {
+      console.error(`END ${label}: ${Date.now() - started}ms`);
       await rpc("Emulation.setDeviceMetricsOverride", defaultViewport);
     }
   }
@@ -382,9 +310,7 @@ try {
     });
     await scenario("reload and orphan navigation", async () => {
       await select("Alpha Root");
-      const loaded = new Promise(resolve => events.set("Page.loadEventFired", resolve));
-      await rpc("Page.reload");
-      await loaded;
+      await reloadPage();
       await waitFor(() => document.querySelector('select[aria-label="Scope"]')?.selectedOptions[0]?.text === "Alpha Root");
       await assertRows(["Alpha Root", "Empty Branch", "Alpha Left", "Shared Branch", "Alpha Right"], [0, 1, 1, 2, 1]);
       await assertReport(reports["Alpha Root"]);
@@ -413,6 +339,7 @@ try {
   }
   async function tool(name, args) {
     const response = await fetch(`${servedUrl}/mcp`, {
+      signal: AbortSignal.timeout(15000),
       method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json, text/event-stream", "Mcp-Protocol-Version": "2025-11-25" },
       body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name, arguments: args } }),
     });
@@ -435,7 +362,4 @@ try {
     await assertRows(["Alpha Root", "Alpha Right", "Alpha Left", "Shared Branch", "Beta Root"], [0, 1, 1, 2, 0]);
   });
   if (failed) process.exitCode = 1;
-} finally {
-  socket?.close();
-  child.kill();
-}
+});

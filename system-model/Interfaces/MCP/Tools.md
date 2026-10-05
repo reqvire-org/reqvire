@@ -231,6 +231,7 @@ While mutation mode is enabled, the system SHALL exclusively own each admitted c
 #### Details
 - The MCP server shall prevent concurrent mutation requests from interleaving writes for the same workspace.
 - The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned worktrees.
+- If branch, worktree or repository-administration ownership cannot be acquired, the system SHALL reject the operation with an actionable diagnostic that distinguishes contention from filesystem failures, without modifying model files or bypassing ownership.
 - The MCP server SHALL create automatic commits only when explicitly enabled at startup; without that opt-in, successful mutations SHALL leave HEAD and the Git index unchanged.
 - The MCP server SHALL preserve the previous accepted model after rejected or failed mutations and SHALL reject unexpected branch or HEAD changes.
 - The MCP server shall make observed model revision visible to clients for read responses.
@@ -475,7 +476,9 @@ The system shall serve MCP model state from Reqvire core parsing, refreshing sou
 - Both modes shall use Reqvire core parsing and validation to construct accepted model state.
 - The MCP server shall report enough revision state for clients to reason about cache freshness.
 - Read-only MCP shall refresh stale model state before returning authoritative model evidence, including changes to active exclusions and model construction dependencies without requiring a restart.
+- Read-only MCP SHALL allow independent requests to execute concurrently within bounded admission and execution limits, without blocking the asynchronous transport or bypassing controlled workspace writes and core cache freshness checks.
 - Mutation-enabled MCP shall reuse its accepted model and captured source inputs for reads and candidate preparation without importing external edits or rebuilding the filesystem cache on each request.
+- Mutation-enabled MCP SHALL allow bounded concurrent audited snapshot reads, preserve each read's captured model identity through its response, and keep mutation preparation and publication serialized within the selected context.
 - Mutation-enabled MCP shall publish complete graph, page, and semantic state only after candidate validation, successful persistence, and a successful commit when enabled under the ownership contract.
 
 #### Metadata
@@ -886,6 +889,8 @@ WHEN a client requests a comment on a pull request in the pinned repository, the
 ### MCP Worktree Worker Sessions
 
 WHEN an MCP request targets an admitted worktree context, the system SHALL route it to that context's isolated worker and apply the shared context boundary to model reads, mutations, resources, prompts, and repository operations.
+
+IF mutation recovery fails while the worker retains a valid accepted snapshot, the system SHALL keep supported reads of that snapshot available with recovery diagnostics and SHALL reject further writes and publication until the context is recovered through normal admission.
 
 #### Metadata
   * type: requirement

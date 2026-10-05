@@ -2,7 +2,6 @@
 //! current store, so clients need neither earlier manifests nor mutation logs.
 use axum::http::StatusCode;
 use reqvire::error::ReqvireError;
-use reqvire::explorer_runtime::ExplorerRuntimeAssets;
 use reqvire::hashing::sha256_hex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -49,14 +48,7 @@ fn valid_hash(hash: &str) -> bool {
 }
 
 impl LiveStore {
-    pub fn new(assets: &ExplorerRuntimeAssets) -> Result<Self, ReqvireError> {
-        // This JSON was generated from the validated model, rather than supplied
-        // by an HTTP client. Nested projections must not acquire a new depth
-        // limit just because we split the generated store into chunks.
-        let mut deserializer = serde_json::Deserializer::from_str(&assets.project_store_json);
-        deserializer.disable_recursion_limit();
-        let store = Value::deserialize(&mut deserializer)?;
-        deserializer.end()?;
+    pub fn new(store: &Value, ontologies_ttl: &str) -> Result<Self, ReqvireError> {
         let object = store
             .as_object()
             .ok_or_else(|| ReqvireError::ProcessError("Explorer store must be an object".into()))?;
@@ -82,7 +74,7 @@ impl LiveStore {
         let manifest_json = serde_json::to_string(&StoreManifest {
             protocol: "reqvire-manifest.v1",
             sections,
-            ontology_hash: content_hash(&assets.ontologies_ttl),
+            ontology_hash: content_hash(ontologies_ttl),
         })?;
         Ok(Self {
             revision: content_hash(&manifest_json),
@@ -122,12 +114,7 @@ mod tests {
     use serde_json::json;
 
     fn snapshot(store: Value, ontology: &str) -> LiveStore {
-        LiveStore::new(&ExplorerRuntimeAssets {
-            project_store_js: String::new(),
-            project_store_json: store.to_string(),
-            ontologies_ttl: ontology.into(),
-        })
-        .expect("build test live store")
+        LiveStore::new(&store, ontology).expect("build test live store")
     }
 
     #[test]
@@ -139,18 +126,26 @@ mod tests {
     }
 
     #[test]
+    fn canonical_store_preserves_wire_bytes_of_the_previous_json_input_path() {
+        let store = json!({"numbers":[-0.0, 1.0, 1e-20, 1e20, 33.3, 66.7,
+            9223372036854775807_i64], "text":"</script> 測定 &\u{2028}",
+            "empty":[], "unknown":{"nested":[true,null,{"key":"value"}]}});
+        let previous: Value = serde_json::from_str(&store.to_string()).unwrap();
+        let direct = LiveStore::new(&store, "ontology").unwrap();
+        let through_json = LiveStore::new(&previous, "ontology").unwrap();
+        assert_eq!(direct.chunks, through_json.chunks);
+        assert_eq!(direct.manifest_json, through_json.manifest_json);
+        assert_eq!(direct.revision, through_json.revision);
+    }
+
+    #[test]
     fn accepts_deep_valid_generated_json_without_an_extra_depth_limit() {
         let mut nested = serde_json::json!("leaf");
         for _ in 0..140 {
             nested = serde_json::json!({"child": nested});
         }
         let store = serde_json::json!({"extra": nested});
-        let assets = ExplorerRuntimeAssets {
-            project_store_js: String::new(),
-            project_store_json: store.to_string(),
-            ontologies_ttl: String::new(),
-        };
-        assert!(LiveStore::new(&assets).is_ok());
+        assert!(LiveStore::new(&store, "").is_ok());
     }
 
     #[test]

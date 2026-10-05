@@ -6,6 +6,7 @@ hide the remaining regressions. Logs and responses live outside each worktree.
 """
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import difflib
 import importlib.util
 import json
@@ -14,6 +15,7 @@ from pathlib import Path
 import socket
 import subprocess
 import traceback
+import time
 import urllib.error
 import urllib.request
 
@@ -52,8 +54,8 @@ class Server(revision_e2e.McpServer):
                 "scans": log.count("Scanning for markdown files in:"),
                 "loads": log.count("model cache hit (") + log.count("model cache miss (")}
 
-    def raw_tool(self, name, **arguments):
-        return self.rpc("tools/call", {"name": name, "arguments": arguments})
+    def raw_tool(self, tool_name, **arguments):
+        return self.rpc("tools/call", {"name": tool_name, "arguments": arguments})
 
     def http(self, path, data=None):
         request = urllib.request.Request(self.base + path,
@@ -138,6 +140,78 @@ class Checks:
             for _ in range(12):
                 server.tool("reqvire.workspace_status")
             self.equal("regex/unchanged-reads-do-not-build", server.counts()["builds"] - before, 0)
+
+    def parallel_reads(self):
+        path = self.workspace("parallel", {"Model.md": "model.md.txt"})
+        with self.server(path) as server:
+            # Each client has its own request counter and response log. Sharing
+            # McpServer.rpc across threads would race IDs in the test itself.
+            clients = []
+            for i in range(5):
+                client = object.__new__(Server)
+                client.url = server.url
+                client.session = None
+                client.request_id = 1000 * (i + 1)
+                client.output = server.output / f"client-{i}"
+                client.output.mkdir()
+                clients.append(client)
+            samples = {}
+            with ThreadPoolExecutor(max_workers=5) as pool:
+                def wave(label, name, args=None):
+                    args = args or {}
+                    def call(client):
+                        start = time.perf_counter()
+                        attempts = 0
+                        while True:
+                            try:
+                                value = client.raw_tool(name, **args)
+                                return value, time.perf_counter() - start, attempts
+                            except RuntimeError as error:
+                                if ("MCP read capacity exhausted; retry later" not in str(error)
+                                        or "'retryable': True" not in str(error)
+                                        or time.perf_counter() - start > 10):
+                                    raise
+                                attempts += 1
+                                time.sleep(min(0.005 * attempts, 0.1))
+                    start = time.perf_counter()
+                    results = list(pool.map(call, clients))
+                    samples[label] = {"five_client_seconds": [r[1] for r in results],
+                                      "busy_retries": [r[2] for r in results],
+                                      "total_seconds": time.perf_counter() - start}
+                    return [r[0] for r in results]
+
+                (path / "Model.md").write_text(self.fixture("model.md.txt").replace("alpha", "omega"))
+                before = server.counts()["builds"]
+                cold = wave("cold", "reqvire.search")
+                self.equal("parallel/cold-single-build", server.counts()["builds"] - before, 1)
+                oracle = server.raw_tool("reqvire.search")
+                self.check("parallel/cold-complete-payloads", all(r == oracle for r in cold)
+                           and "omega" in json.dumps(oracle))
+                tools = [
+                    ("reqvire.workspace_status", {}), ("reqvire.search", {}),
+                    ("reqvire.read_element", {"name": "Cache Subject"}),
+                    ("reqvire.coverage", {}), ("reqvire.lint", {}), ("reqvire.traces", {}),
+                    ("reqvire.semantic.sparql", {"query": "ASK { ?s ?p ?o }"}),
+                ]
+                for name, args in tools:
+                    oracle = server.raw_tool(name, **args)
+                    serial = []
+                    for _ in range(5):
+                        start = time.perf_counter()
+                        value = server.raw_tool(name, **args)
+                        serial.append(time.perf_counter() - start)
+                        assert value == oracle and not value.get("isError"), value
+                    results = wave(name, name, args)
+                    samples[name]["single_client_seconds"] = serial
+                    self.check("parallel/" + name, all(r == oracle for r in results))
+                (path / "Broken.md").write_text(self.fixture("broken.md.txt"))
+                failures = wave("invalid", "reqvire.search")
+                self.check("parallel/invalid-inputs-reject", all(r.get("isError") for r in failures))
+                (path / "Broken.md").unlink()
+                repaired = wave("repair", "reqvire.search")
+                oracle = server.raw_tool("reqvire.search")
+                self.check("parallel/repair-recovers", all(r == oracle and not r.get("isError") for r in repaired))
+            (server.output / "parallel-timings.json").write_text(json.dumps(samples, indent=2) + "\n")
 
     def ignores(self):
         for filename in (".reqvireignore", ".gitignore"):
@@ -347,7 +421,7 @@ class Checks:
 
     def run(self):
         for self.mode in ("mcp", "serve"):
-            cases = [self.unchanged, self.ignores, self.dependencies, self.resolution, self.evidence, self.source_changes]
+            cases = [self.unchanged, self.parallel_reads, self.ignores, self.dependencies, self.resolution, self.evidence, self.source_changes]
             if self.mode == "serve":
                 cases.append(self.runtime)
             for case in cases:
@@ -355,6 +429,7 @@ class Checks:
                     case()
                 except Exception:
                     details = traceback.format_exc()
+                    print(details, flush=True)
                     self.check(case.__name__ + "/harness-error", False, details, "scenario completes")
         (self.output / "results.json").write_text(json.dumps(self.results, indent=2) + "\n")
         (self.output / "checks.txt").write_text("".join(

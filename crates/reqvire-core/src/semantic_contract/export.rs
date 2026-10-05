@@ -185,7 +185,16 @@ pub(super) fn append_used_external_subset_turtle(
         &used_external_subset_turtle,
         "used external ontology subset projection",
     )?;
-    let used_external_subset_quads = unique_quads(used_external_subset_quads.iter(), seen_quads);
+    append_external_subset_quads(&used_external_subset_quads, output, seen_quads, prefix_map)
+}
+
+pub(super) fn append_external_subset_quads(
+    quads: &[Quad],
+    output: &mut String,
+    seen_quads: &mut BTreeSet<String>,
+    prefix_map: &TurtlePrefixMap,
+) -> Result<(), ReqvireError> {
+    let used_external_subset_quads = unique_quads(quads.iter(), seen_quads);
     if used_external_subset_quads.is_empty() {
         return Ok(());
     }
@@ -422,6 +431,11 @@ pub(super) fn strip_turtle_prefix_declarations(turtle: &str) -> String {
     output.trim_start_matches('\n').to_string()
 }
 
+#[cfg(test)]
+std::thread_local! {
+    pub(crate) static SUBSET_DERIVATIONS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 pub(super) fn materialize_used_external_subset_turtle(
     index: &SemanticIndex,
 ) -> Result<String, ReqvireError> {
@@ -429,6 +443,8 @@ pub(super) fn materialize_used_external_subset_turtle(
         return Ok(String::new());
     }
 
+    #[cfg(test)]
+    SUBSET_DERIVATIONS.set(SUBSET_DERIVATIONS.get() + 1);
     let store = build_external_subset_derivation_store(index)?;
     let subset = o_kernel::subset::build_external_dependency_subset(
         &store,

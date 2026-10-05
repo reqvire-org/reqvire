@@ -180,6 +180,50 @@ def lifecycle(mode, commits):
             check(f"{prefix}/external-head-rejected", result.get("isError") is True and "HEAD changed" in str(result))
 
 
+def recovery_reads(mode):
+    prefix = f"{mode}/recovery"
+    with tempfile.TemporaryDirectory(prefix="reqvire-recovery-") as directory:
+        root = pathlib.Path(directory)
+        git(root, "init", "-q")
+        git(root, "config", "user.email", "test@example.invalid")
+        git(root, "config", "user.name", "MCP Recovery E2E")
+        (root / "Model.md").write_text((source / "fixtures/model.md.txt").read_text())
+        (root / "evidence.txt").write_text("accepted evidence")
+        git(root, "add", ".")
+        git(root, "commit", "-qm", "baseline")
+        head = git(root, "rev-parse", "HEAD")
+        with helpers.Server(binary, root, output, mode, f"{mode}-recovery", mutations=True, commits=True) as server:
+            before = server.tool("reqvire.search")
+            before_store = server.http("/api/project-store") if mode == "serve" else None
+            hook = root / ".git/hooks/reference-transaction"
+            hook.write_text('#!/bin/sh\nif [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi\n')
+            hook.chmod(0o755)
+            content = (source / "fixtures/other.md.txt").read_text().split("# Elements\n\n", 1)[1]
+            failed = server.raw_tool("reqvire.add_element", file="Model.md", content=content)
+            hook.unlink()
+            check(f"{prefix}/failure-injected", failed.get("isError") is True and "recovery failed" in str(failed)
+                  and (root / "Model.md").is_dir())
+            after = server.tool("reqvire.search")
+            context = after["context"]
+            check(f"{prefix}/accepted-reads", after["files"] == before["files"]
+                  and context["available"] and not context["writes_available"]
+                  and context["state"] == "recovery_required" and context["diagnostic"]
+                  and context["model_revision"] == before["context"]["model_revision"])
+            status = server.tool("reqvire.workspace_status")
+            resource = server.rpc("resources/read", {"uri":"reqvire://workspace/status"})
+            semantic = server.tool("reqvire.semantic.sparql", query='ASK { ?s <https://www.reqvire.org/ontology#elementName> "Cache Subject" }')
+            check(f"{prefix}/status-resources-semantics", status["context"]["recovery_required"]
+                  and resource["_meta"]["reqvire/context"]["recovery_required"] and semantic["boolean"])
+            blocked = [server.raw_tool("reqvire.add_element", file="Model.md", content=content, dry_run=True),
+                       server.raw_tool("reqvire.format", fix=False), server.raw_tool("reqvire.change_impact"),
+                       server.raw_tool("reqvire.git.commit", message="forbidden")]
+            check(f"{prefix}/unsafe-operations-blocked", all(r.get("isError") is True and "recovery" in str(r) for r in blocked)
+                  and git(root, "rev-parse", "HEAD") == head and (root / "Model.md").is_dir())
+            if mode == "serve":
+                check(f"{prefix}/explorer-snapshot", server.http("/api/project-store") == before_store
+                      and server.http("/evidence.txt")[0] == 503)
+
+
 cli_options()
 for mode in ("mcp", "serve"):
     for commits in (False, True):
@@ -188,4 +232,9 @@ for mode in ("mcp", "serve"):
         except Exception:
             check(f"{mode}/commits-{'enabled' if commits else 'disabled'}/infrastructure-or-startup", False,
                   traceback.format_exc())
+for mode in ("mcp", "serve"):
+    try:
+        recovery_reads(mode)
+    except Exception:
+        check(f"{mode}/recovery/infrastructure-or-startup", False, traceback.format_exc())
 raise SystemExit(bool(failures))

@@ -260,6 +260,25 @@ The system shall validate relation types against a defined vocabulary and provid
   * verifiedBy: [Same-File Fragment Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#same-file-fragment-relations-test)
 ---
 
+### Native Concept Taxonomy Cycle Validation
+
+The system shall reject cycles formed by native concept `broader` and `narrower` relations before accepting model reads or persisting mutations.
+
+#### Details
+Canonical direction, reciprocal aliases, cycle diagnostics, and candidate rejection shall follow the associated specification.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * constrainedBy: [Validation Rule Diagnostic Shape](../../Ontologies/BehaviorValidationOperations.md#validation-rule-diagnostic-shape)
+  * definedBy: [Native Concept Taxonomy Cycle Validation Specification](Specifications.md#native-concept-taxonomy-cycle-validation-specification)
+  * derivedFrom: [Relation Type Validation](#relation-type-validation)
+  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
+  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
+  * verifiedBy: [Concept Relation Projection Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#concept-relation-projection-verification)
+---
+
 ### Native Concept Taxonomy Scheme Boundary Validation
 
 The system shall reject native concept `broader` and `narrower` taxonomy relations whose source and target concepts resolve to different `concept-scheme` roots.

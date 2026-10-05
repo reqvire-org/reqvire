@@ -236,3 +236,22 @@ Verify that trace-report presentation fulfills the CLI output obligation indepen
   * verify: [CLI Traces Result Presentation](../../../Interfaces/CLI/Commands.md#cli-traces-result-presentation)
   * satisfiedBy: [test.sh](../../../../tests/test-json-file-output/test.sh)
 ---
+
+### npm Concurrent Launch Verification
+
+Verify packaged CLI invocation and atomic extraction under concurrent first use.
+
+#### Details
+- Launch sixteen copies of the actual npm launcher against a fixture archive with synchronized extraction. All invocations must complete and preserve their argument/output values; one complete executable remains cached and invocation-owned temporary directories are removed.
+- Warm-cache launches skip extraction. Distinct versions remain isolated.
+- Fail extraction after writing partial output, assert no executable is published and temporary output is cleaned, then retry successfully. A concurrent failed extractor must not damage a successful publisher.
+- Check missing archives, unsupported platforms, native nonzero exit status, termination signals, and arguments containing spaces.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [CLI Interface Verification Objective](#cli-interface-verification-objective)
+  * verify: [npm CLI Distribution](../../../Interfaces/CLI/Commands.md#npm-cli-distribution)
+  * satisfiedBy: [test.sh](../../../../tests/test-npm-launcher/test.sh)
+---

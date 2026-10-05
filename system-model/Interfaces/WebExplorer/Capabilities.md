@@ -240,6 +240,8 @@ Implementation details shall follow the associated contract specifications.
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
   * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/product-patterns/reports/TraceFlow.tsx)
+  * satisfiedBy: [flowLayoutEngine.ts](../../../explorer/src/workers/flowLayoutEngine.ts)
+  * satisfiedBy: [flowLayout.worker.ts](../../../explorer/src/workers/flowLayout.worker.ts)
   * verifiedBy: [Model View Element Navigation Test](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-view-element-navigation-test)
 ---
 
@@ -420,6 +422,7 @@ The SPA Explorer shell shall:
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
 
 #### Relations
+  * satisfiedBy: [build.rs](../../../crates/reqvire-core/build.rs)
   * definedBy: [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
   * definedBy: [SPA Explorer Store Contract Specification](Specifications.md#spa-explorer-store-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
@@ -574,6 +577,8 @@ Detailed route data, left-pane behavior, flow/row rendering, native trace-previe
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
   * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/product-patterns/reports/TraceFlow.tsx)
+  * satisfiedBy: [flowLayoutEngine.ts](../../../explorer/src/workers/flowLayoutEngine.ts)
+  * satisfiedBy: [flowLayout.worker.ts](../../../explorer/src/workers/flowLayout.worker.ts)
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
 ---
 

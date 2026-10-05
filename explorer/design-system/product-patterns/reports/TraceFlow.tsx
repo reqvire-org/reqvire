@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { css, cx } from "@linaria/atomic";
 import {
   BaseEdge, Handle, MarkerType, Position, ReactFlow, getViewportForBounds,
@@ -14,18 +14,20 @@ import { Spinner } from "../../components/core/Spinner";
 import { ExpandableViewport } from "../../components/core/ExpandableViewport";
 import {
   buildTraceFlowTopology, traceFlowNeighborhood, TRACE_NODE_HEIGHT, TRACE_NODE_WIDTH,
-  type TraceFlowData, type TraceFlowElement, type TraceFlowDirection, type TraceFlowTopology, type ElementFlowData,
+  type TraceFlowData, type TraceFlowElement, type TraceFlowDirection, type TraceFlowTopology, type ElementFlowData, type FlowLayoutEngine,
 } from "./traceFlowLayout";
 import { useTraceFlowLayout } from "./useTraceFlowLayout";
 
 export interface TraceFlowProps {
   trace: TraceFlowData;
+  layoutEngine: FlowLayoutEngine;
   onOpenElement: (id: string) => void;
   onOpenSource: (element: TraceFlowElement) => void;
 }
 
 export interface ElementFlowProps {
   data: ElementFlowData;
+  layoutEngine: FlowLayoutEngine;
   onOpenElement: TraceFlowProps["onOpenElement"];
   onOpenSource: TraceFlowProps["onOpenSource"];
 }
@@ -290,7 +292,7 @@ export function ElementFlow({ data, ...navigation }: ElementFlowProps) {
     summary={`${data.nodes.length} elements · ${data.edges.length} relations`} />;
 }
 
-function FlowCanvas({ topology, title, summary, kind, collapsed, onToggle, onExpandAll, onOpenElement, onOpenSource }: {
+function FlowCanvas({ layoutEngine, topology, title, summary, kind, collapsed, onToggle, onExpandAll, onOpenElement, onOpenSource }: {
   topology: TraceFlowTopology;
   title: string;
   summary: string;
@@ -303,10 +305,29 @@ function FlowCanvas({ topology, title, summary, kind, collapsed, onToggle, onExp
   const [expanded, setExpanded] = useState(false);
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [flow, setFlow] = useState<ReactFlowInstance<FlowNode, FlowEdge> | null>(null);
+  const [initializedCanvas, setInitializedCanvas] = useState<{
+    generation: object;
+    flow: ReactFlowInstance<FlowNode, FlowEdge>;
+  } | null>(null);
   const canvas = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
-  const { graph, pending, failed, retry } = useTraceFlowLayout(topology, direction);
+  const { graph, pending, failed, retry } = useTraceFlowLayout(topology, direction, layoutEngine);
+  // React Flow's deferred onInit can arrive after its canvas is unmounted.
+  // A generation distinguishes DOWN → RIGHT → DOWN, even with equal directions.
+  const canvasGeneration = useMemo(() => ({}), [graph?.direction]);
+  const activeCanvas = useRef<object | null>(null);
+  useLayoutEffect(() => {
+    activeCanvas.current = canvasGeneration;
+    return () => { activeCanvas.current = null; };
+  }, [canvasGeneration]);
+  const initializeCanvas = useCallback((instance: ReactFlowInstance<FlowNode, FlowEdge>) => {
+    if (activeCanvas.current === canvasGeneration) {
+      setInitializedCanvas({ generation: canvasGeneration, flow: instance });
+    }
+  }, [canvasGeneration]);
+  const flow = initializedCanvas?.generation === canvasGeneration ? initializedCanvas.flow : null;
+  const waitingForCanvas = Boolean(graph && !flow);
+  const busy = pending || waitingForCanvas;
   const nodeById = useMemo(() => new Map(graph?.nodes.map(node => [node.id, node])), [graph]);
   useEffect(() => {
     const element = canvas.current;
@@ -329,10 +350,7 @@ function FlowCanvas({ topology, title, summary, kind, collapsed, onToggle, onExp
   const fitFlow = useCallback(() => {
     if (fittedViewport) void flow?.setViewport(fittedViewport);
   }, [flow, fittedViewport]);
-  useEffect(() => {
-    const frame = requestAnimationFrame(fitFlow);
-    return () => cancelAnimationFrame(frame);
-  }, [fitFlow]);
+  useLayoutEffect(fitFlow, [fitFlow]);
   const activeId = [hoveredId, focusedId].find(id => id && nodeById.has(id)) ?? null;
   const neighborhood = useMemo(() => graph && activeId ? traceFlowNeighborhood(graph.edges, activeId) : null, [graph, activeId]);
   const focusedNode = focusedId ? nodeById.get(focusedId) : undefined;
@@ -359,7 +377,7 @@ function FlowCanvas({ topology, title, summary, kind, collapsed, onToggle, onExp
   }));
   return <ExpandableViewport expanded={expanded} onExpandedChange={setExpanded}
     label={kind === "trace" ? "Expanded verification trace flow" : "Expanded model flow"}>
-    <section className={cx(baseUX, skinX)} data-product-pattern="trace-flow" aria-label={kind === "trace" ? "Verification trace flow" : "Model flow"} aria-busy={pending}
+    <section className={cx(baseUX, skinX)} data-product-pattern="trace-flow" aria-label={kind === "trace" ? "Verification trace flow" : "Model flow"} aria-busy={busy}
     onKeyDown={event => { if (event.key === "Escape" && !expanded) { setFocusedId(null); setHoveredId(null); } }}>
     <header className="ux-trace-flow-header">
       <div className="ux-trace-flow-heading">
@@ -376,10 +394,10 @@ function FlowCanvas({ topology, title, summary, kind, collapsed, onToggle, onExp
           { value: "RIGHT", label: "Left to right" }, { value: "DOWN", label: "Top to bottom" },
         ]} />
         {Boolean(collapsed?.size) && <Button tone="ghost" size="sm" onClick={onExpandAll}>Expand all</Button>}
-        <IconButton aria-label="Zoom out" title="Zoom out" onClick={() => void flow?.zoomOut()}><Icon name="minus" /></IconButton>
-        <IconButton aria-label="Zoom in" title="Zoom in" onClick={() => void flow?.zoomIn()}><Icon name="plus" /></IconButton>
-        <Button tone="secondary" size="sm" onClick={fitFlow}>{kind === "trace" ? "Fit trace" : "Fit flow"}</Button>
-        <Button tone="ghost" size="sm" onClick={() => void flow?.zoomTo(1)}>100%</Button>
+        <IconButton aria-label="Zoom out" title="Zoom out" disabled={!flow} onClick={() => void flow?.zoomOut()}><Icon name="minus" /></IconButton>
+        <IconButton aria-label="Zoom in" title="Zoom in" disabled={!flow} onClick={() => void flow?.zoomIn()}><Icon name="plus" /></IconButton>
+        <Button tone="secondary" size="sm" disabled={!flow} onClick={fitFlow}>{kind === "trace" ? "Fit trace" : "Fit flow"}</Button>
+        <Button tone="ghost" size="sm" disabled={!flow} onClick={() => void flow?.zoomTo(1)}>100%</Button>
         <IconButton aria-label={expanded ? "Close expanded flow" : "Expand flow"}
           title={expanded ? "Close expanded flow" : "Expand flow"} aria-expanded={expanded}
           data-expanded-close={expanded || undefined} onClick={() => setExpanded(value => !value)}>
@@ -388,7 +406,7 @@ function FlowCanvas({ topology, title, summary, kind, collapsed, onToggle, onExp
       </div>
     </header>
     <div className="ux-trace-flow-canvas" ref={canvas}>
-      {graph && <ReactFlow key={graph.direction} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} onInit={setFlow}
+      {graph && <ReactFlow key={graph.direction} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} onInit={initializeCanvas}
         onNodeClick={(event, node) => {
           // Register with React Flow so read-only nodes retain browser pointer events.
           // Embedded links and controls handle their own actions.
@@ -398,7 +416,7 @@ function FlowCanvas({ topology, title, summary, kind, collapsed, onToggle, onExp
         minZoom={minZoom} maxZoom={1.5} nodesDraggable={false} nodesConnectable={false}
         nodesFocusable={false} edgesFocusable elementsSelectable={false}
         zoomOnDoubleClick={false} onPaneClick={() => { setFocusedId(null); setHoveredId(null); }} />}
-      {pending && <div className="ux-trace-flow-status" role="status"><Spinner aria-hidden="true" />{graph ? "Updating flow…" : "Loading flow…"}</div>}
+      {busy && <div className="ux-trace-flow-status" role="status"><Spinner aria-hidden="true" />{graph ? "Updating flow…" : "Loading flow…"}</div>}
       {!pending && !failed && topology.nodes.length === 0 && <div className="ux-trace-flow-status" role="status">No elements in this selection.</div>}
       {failed && <div className="ux-trace-flow-status" role="alert">
         <span>Couldn’t lay out this flow.</span><Button tone="secondary" size="sm" onClick={retry}>Retry</Button>

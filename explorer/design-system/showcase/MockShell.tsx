@@ -8,6 +8,7 @@ import { ExplorerApplication } from "../../src/App";
 import { devFixture } from "../../src/store/devFixture";
 import type { ExplorerProjectStore } from "../../src/store/types";
 import scopedCoverage from "../../src/store/fixtures/scopedCoverage.json";
+import { flowLayoutEngine } from "../../src/workers/flowLayoutEngine";
 import { useTraceFlowMock } from "./TraceFlowMock";
 import { TRACE_CAPABILITY, TRACE_EXAMPLES, traceExampleElements, traceExampleSource } from "./fixtures/traces";
 import { SHOWCASE_WORKTREES } from "./fixtures/productPatterns";
@@ -89,7 +90,7 @@ function requestedFixture(fallback: string) {
 }
 
 export function MockShell({ example = "model" }: { example?: "model" | "coverage" }) {
-  const traces = useTraceFlowMock();
+  const traces = useTraceFlowMock(flowLayoutEngine);
   const initialId = example === "coverage" ? "showcase-coverage" : "showcase-main";
   const [worktreeId, setWorktreeId] = useState(() => requestedFixture(initialId));
   useEffect(() => {
@@ -115,5 +116,6 @@ export function MockShell({ example = "model" }: { example?: "model" | "coverage
     refreshWorktrees: async () => {},
     switching: false,
     automaticRefresh: false,
+    recoveryWarning: null,
   }} />;
 }

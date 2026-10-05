@@ -145,7 +145,7 @@ fn patterns(values: &[&str]) -> GlobSet {
     }
     builder.build().expect("build test configuration")
 }
-fn load() -> Result<ModelManager, ReqvireError> {
+fn load() -> Result<Arc<ModelManager>, ReqvireError> {
     load_cached_model(&patterns(&[]), STRICT)
 }
 fn builds() -> usize {
@@ -213,12 +213,35 @@ fn pause(phase: &'static str) -> (mpsc::Receiver<()>, mpsc::SyncSender<()>) {
     }));
     (reached_rx, release_tx)
 }
-fn candidate() -> thread::JoinHandle<Result<ModelManager, ReqvireError>> {
+fn candidate() -> thread::JoinHandle<Result<Arc<ModelManager>, ReqvireError>> {
     thread::Builder::new()
         .name("candidate".into())
         .spawn(load)
         .expect("candidate: expected success")
 }
+
+case!(read_models_share_identity_and_survive_later_publication, {
+    let _workspace = Workspace::new();
+    let first = load().unwrap();
+    let second = load().unwrap();
+    assert!(
+        std::ptr::eq(&first.graph_registry, &second.graph_registry),
+        "cache hits must share graph/page storage, not clone it"
+    );
+    let readers: Vec<_> = (0..4).map(|_| thread::spawn(|| load().unwrap())).collect();
+    for reader in readers {
+        let model = reader.join().unwrap();
+        assert!(std::ptr::eq(&first.graph_registry, &model.graph_registry));
+    }
+    assert_eq!(builds(), 1);
+    std::fs::write("Model.md", MODEL.replace("alpha", "bravo")).unwrap();
+    let next = load().unwrap();
+    assert!(!std::ptr::eq(&first.graph_registry, &next.graph_registry));
+    assert!(content(&next).contains("bravo"));
+    assert!(content(&first).contains("alpha"));
+    invalidate();
+    assert!(content(&second).contains("alpha"));
+});
 
 case!(one_semantic_index_per_resolved_model_build, {
     let _workspace = Workspace::new();
@@ -243,9 +266,14 @@ case!(one_semantic_index_per_resolved_model_build, {
             let store = model.semantic_store.as_ref().unwrap();
             assert!(std::ptr::eq(
                 model.semantic_index().unwrap(),
-                store.index.as_ref()
+                store.index().as_ref()
             ));
-            crate::explorer_runtime::build_runtime_assets(&model).unwrap();
+            let assets = crate::explorer_runtime::build_runtime_assets(&model).unwrap();
+            let escaped_json = assets.project_store_json
+                .replace('<', "\\u003c").replace('>', "\\u003e").replace('&', "\\u0026")
+                .replace('\u{2028}', "\\u2028").replace('\u{2029}', "\\u2029");
+            assert!(assets.project_store_js == format!("window.reqvireProjectStore = {escaped_json};\n"),
+                "seed must reuse the serialized JSON instead of serializing the store again");
             assert_eq!(store.initialized_store_count(), 0);
             assert_eq!(labels(&model), ["\"Label alpha\""]);
             load_cached_model(
@@ -644,6 +672,13 @@ fn concurrent_builds(invalid: bool) {
     *OBSERVER.lock().expect("test mutex should not be poisoned") = None;
     let count = builds();
     assert!(results.iter().all(|result| result.is_err() == invalid));
+    if !invalid {
+        let shared = results[0].as_ref().unwrap();
+        for result in &results[1..] {
+            assert!(Arc::ptr_eq(shared, result.as_ref().unwrap()),
+                "single-flight waiters must share the completed model");
+        }
+    }
     if invalid {
         std::fs::remove_file("Broken.md").expect("remove test fixture");
     }
@@ -933,7 +968,7 @@ case!(
                 .recv_timeout(DEADLINE)
                 .expect("release old initialization");
         });
-        let mut working = captured.clone();
+        let mut working = captured.as_ref().clone();
         for node in working.graph_registry.nodes.values_mut() {
             node.element.content = node.element.content.replace("alpha", "candidate");
             if node.element.name == "Cache Subject" {

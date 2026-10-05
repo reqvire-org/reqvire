@@ -1,18 +1,13 @@
-import { mkdtemp, rm } from 'node:fs/promises';
-import os from 'node:os';
-import path from 'node:path';
-import { openBrowser, waitFor } from '../test-serve-command/scripts/browser.mjs';
+import { withBrowser, waitFor } from '../browser.mjs';
 
-const [base, original, secondary, chromium, dirty] = process.argv.slice(2);
-const profile = await mkdtemp(path.join(os.tmpdir(), 'reqvire-worktree-browser-'));
-let browser, failure;
+const [base, original, secondary, profile, dirty] = process.argv.slice(2);
+await withBrowser(profile, async browser => {
 let stage = 'browser startup';
 async function wait(check, description) {
   stage = description;
   await waitFor(check);
 }
 try {
-  browser = await openBrowser(chromium, profile);
   await browser.navigate(`${base}/?worktree_id=${original}#/model`);
   await wait(() => browser.evaluate(id => window.reqvireProjectStore?.project.worktree_id === id, original), 'original model');
   // A second tab in the same browser shares storage, but not its model selection.
@@ -69,7 +64,7 @@ try {
   await wait(() => browser.evaluate(id => window.reqvireProjectStore.project.worktree_id === id && !document.querySelector('[role="dialog"]'), secondary), 'secondary branch adoption');
   assert(await browser.evaluate(id => new URLSearchParams(location.search).get('worktree_id') === id, secondary), 'Selection absent from URL');
   const previousDocument = await browser.evaluate(() => performance.timeOrigin);
-  await browser.rpc('Page.reload');
+  await browser.reloadPage();
   await wait(() => browser.evaluate((id, previous) => performance.timeOrigin !== previous
     && window.reqvireProjectStore?.project.worktree_id === id
     && Boolean(document.querySelector('[data-product-pattern="app-shell"]')), secondary, previousDocument), 'reloaded selection');
@@ -77,7 +72,7 @@ try {
   await wait(() => browser.evaluate(id => window.reqvireProjectStore?.project.worktree_id === id, original), 'back to original branch');
   assert(await other(id => window.reqvireProjectStore.project.worktree_id === id, secondary), 'History affected the second tab');
 } catch (error) {
-  failure = new Error(`Worktree browser check failed during ${stage}`, { cause: error });
+  const failure = new Error(`Worktree browser check failed during ${stage}`, { cause: error });
   try {
     console.error('Browser state:', await browser?.evaluate(() => ({
       url: location.href,
@@ -85,12 +80,7 @@ try {
       text: document.body.innerText.slice(0, 4000),
     })));
   } catch { /* Keep the original failure when the debugging connection is gone. */ }
-} finally {
-  const errors = failure ? [failure] : [];
-  try { await browser?.close(); } catch (error) { errors.push(error); }
-  try { await rm(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); }
-  catch (error) { errors.push(error); }
-  if (errors.length === 1) throw errors[0];
-  if (errors.length > 1) throw new AggregateError(errors, 'Worktree browser check and cleanup failed');
+  throw failure;
 }
+});
 console.log('PASS serve/browser-worktree-selection');

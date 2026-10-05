@@ -3,7 +3,7 @@ use crate::element::{Element, ElementType, CONTRACT_BINDINGS_SECTION};
 use crate::error::ReqvireError;
 use crate::exclusions::ExclusionSet as GlobSet;
 use crate::filesystem;
-use crate::graph_registry::{ElementNode, GraphRegistry};
+use crate::graph_registry::{GraphRegistry, RegistryNode};
 use crate::relation::{LinkType, Relation, RELATION_TYPES};
 use crate::utils;
 use serde::Serialize;
@@ -267,7 +267,7 @@ pub fn apply_verification_objective_holders(
             let objective = holder_objective_element();
             registry.nodes.insert(
                 VERIFICATION_OBJECTIVE_HOLDER_ID.to_string(),
-                ElementNode {
+                RegistryNode {
                     element: objective,
                     relations: Vec::new(),
                 },

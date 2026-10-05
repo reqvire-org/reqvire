@@ -412,6 +412,8 @@ Verify contract reference change propagation across authored models and publishe
 - Pure contract relocation updates reference targets without propagating content impact.
 - Invalid reference cycles prevent change-impact and coverage reports. Valid converging dependency paths terminate and deduplicate reached elements.
 - When a changed contract reaches a consumer both through its owner's requirement hierarchy and through a Contract Reference, the report retains the explicit contract_references edge to that consumer. Downstream implementation evidence remains reachable and each affected verification occurs once in the invalidated-verification list.
+- Count exactly one pass over current-model elements and references to build reverse consumers per report, even with several changed or added roots. Use operation counts on growing sparse fixtures, not timing thresholds.
+- Preserve ordered reference edges, convergent paths, traversal cycle guards, invalidated-verification deduplication, and the separation from binding consumers. Changed reference lists and removed consumers must be reflected in the next operation without altering prior results.
 
 #### Metadata
   * type: test-verification
@@ -420,6 +422,7 @@ Verify contract reference change propagation across authored models and publishe
   * derivedFrom: [Contract Bindings and Resource Operation Verification Objective](#contract-bindings-and-resource-operation-verification-objective)
   * verify: [Contract Reference Change Propagation](../../../Processing/ChangeImpact/ChangeImpactRequirements.md#contract-reference-change-propagation)
   * satisfiedBy: [test.sh](../../../../tests/test-contract-references/test.sh)
+  * satisfiedBy: [change_impact.rs](../../../../crates/reqvire-core/src/change_impact.rs)
   * satisfiedBy: [contract_references.rs](../../../../crates/reqvire-core/tests/contract_references.rs)
 ---
 

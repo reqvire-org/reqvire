@@ -15,7 +15,7 @@ impl GraphRegistry {
     pub fn get_contract_owners(&self, contract_id: &str) -> Vec<String> {
         let mut owners = Vec::new();
 
-        let mut sorted_nodes: Vec<(&String, &ElementNode)> = self.nodes.iter().collect();
+        let mut sorted_nodes: Vec<(&String, &RegistryNode)> = self.nodes.iter().collect();
         sorted_nodes.sort_by(|(a_id, _), (b_id, _)| a_id.cmp(b_id));
 
         for (element_id, element_node) in sorted_nodes {

@@ -58,15 +58,15 @@ pub fn concepts_tool(
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let (format_name, export_format) = semantic_tool_format(args, "semantic concepts")?;
-    let content = semantic_store.index.serialize_export_layers(
+    let content = semantic_store.serialize_export_layers(
         export_format,
         &[SemanticExportLayer::Concepts],
         None,
     )?;
     let mut serializable_index =
-        filtered_semantic_index(&semantic_store.index, OntologyContentFilter::Concepts);
+        filtered_semantic_index(semantic_store.index(), OntologyContentFilter::Concepts);
     serializable_index.apply_external_visibility(false)?;
-    let prefixes = vocabulary_prefixes(&model, &semantic_store.index);
+    let prefixes = vocabulary_prefixes(&model, semantic_store.index());
     let compact_prefixes = compact_vocabulary_prefixes(&prefixes);
     let term_index = collect_term_index(&serializable_index);
     let concepts = concepts_section(
@@ -138,7 +138,7 @@ fn semantic_export_layers_tool(
     })?;
     let (format_name, export_format) = semantic_tool_format(args, semantic_layer)?;
     let namespace_base = string_arg(args, "namespace_base");
-    let content = semantic_store.index.serialize_export_layers(
+    let content = semantic_store.serialize_export_layers(
         export_format,
         &requested_layers,
         namespace_base.as_deref(),
@@ -149,13 +149,13 @@ fn semantic_export_layers_tool(
         requested_layers
     };
     let include_external = effective_layers.contains(&SemanticExportLayer::ExternalUsed);
-    let mut serializable_index = filter.map_or_else(
-        || semantic_store.index.as_ref().clone(),
-        |filter| filtered_semantic_index(&semantic_store.index, filter),
-    );
-    serializable_index.apply_external_visibility(include_external)?;
+    let visible_index = semantic_store.index_with_external_visibility(include_external)?;
+    let serializable_index = match filter {
+        Some(filter) => filtered_semantic_index(&visible_index, filter),
+        None => visible_index,
+    };
     let external_metadata = semantic_contract::external_materialization_metadata(
-        &semantic_store.index,
+        semantic_store.index(),
         &serializable_index,
         include_external,
     );
@@ -317,7 +317,7 @@ pub fn concept_mappings_list_tool(
     let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
-    let prefixes = vocabulary_prefixes(&model, &semantic_store.index);
+    let prefixes = vocabulary_prefixes(&model, semantic_store.index());
     let compact_prefixes = compact_vocabulary_prefixes(&prefixes);
     let concepts_by_iri = native_concept_items(&model)?
         .into_iter()
@@ -331,7 +331,7 @@ pub fn concept_mappings_list_tool(
 
     let mut seen = BTreeSet::new();
     let mut mappings = Vec::new();
-    for block in &semantic_store.index.blocks {
+    for block in &semantic_store.index().blocks {
         for quad in &block.quads {
             if quad.predicate.as_str() != REQVIRE_MAPS_TO_CONCEPT_IRI {
                 continue;
@@ -385,9 +385,9 @@ fn native_concept_items(model: &ModelManager) -> Result<Vec<Value>, ReqvireError
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let mut serializable_index =
-        filtered_semantic_index(&semantic_store.index, OntologyContentFilter::Concepts);
+        filtered_semantic_index(semantic_store.index(), OntologyContentFilter::Concepts);
     serializable_index.apply_external_visibility(false)?;
-    let prefixes = vocabulary_prefixes(model, &semantic_store.index);
+    let prefixes = vocabulary_prefixes(model, semantic_store.index());
     let compact_prefixes = compact_vocabulary_prefixes(&prefixes);
     let term_index = collect_term_index(&serializable_index);
     Ok(concepts_section(
@@ -536,10 +536,10 @@ fn filtered_semantic_index(
 }
 
 pub fn semantic_index_with_external_visibility(
-    source: &semantic_contract::SemanticIndex,
+    source: &crate::semantic_store::SemanticModelStore,
     include_external: bool,
 ) -> Result<semantic_contract::SemanticIndex, ReqvireError> {
-    source.with_external_visibility(include_external)
+    source.index_with_external_visibility(include_external)
 }
 
 pub fn semantic_prefixes_tool(
@@ -553,9 +553,9 @@ pub fn semantic_prefixes_tool(
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let visible_index =
-        semantic_index_with_external_visibility(&semantic_store.index, include_external)?;
+        semantic_index_with_external_visibility(semantic_store, include_external)?;
     let external_metadata = semantic_contract::external_materialization_metadata(
-        &semantic_store.index,
+        semantic_store.index(),
         &visible_index,
         include_external,
     );
@@ -565,7 +565,7 @@ pub fn semantic_prefixes_tool(
     let mut prefix_namespaces: std::collections::BTreeMap<String, BTreeSet<String>> =
         std::collections::BTreeMap::new();
 
-    for declaration in &semantic_store.index.ontology_documents {
+    for declaration in &semantic_store.index().ontology_documents {
         prefix_namespaces
             .entry(declaration.ontology_prefix.clone())
             .or_default()
@@ -604,7 +604,7 @@ pub fn semantic_prefixes_tool(
     }
 
     if include_external {
-        for source in used_external_sources(&semantic_store.index, &visible_index) {
+        for source in used_external_sources(semantic_store.index(), &visible_index) {
             prefix_namespaces
                 .entry(source.prefix.clone())
                 .or_default()
@@ -687,7 +687,7 @@ pub fn semantic_prefixes_tool(
         "summary": {
             "prefix_count": prefix_namespaces.len(),
             "namespace_count": namespace_count,
-            "ontology_document_count": semantic_store.index.ontology_documents.len(),
+            "ontology_document_count": semantic_store.index().ontology_documents.len(),
             "external_source_count": if include_external { external_metadata["external_counts"]["used_external_source_count"].as_u64().unwrap_or(0) } else { 0 },
             "conflict_count": conflicts.len()
         },
@@ -695,7 +695,7 @@ pub fn semantic_prefixes_tool(
         "external_materialization": external_metadata["external_materialization"].clone(),
         "external_counts": external_metadata["external_counts"].clone(),
         "graph_layers": graph_layers,
-        "diagnostics": semantic_store.index.diagnostics,
+        "diagnostics": semantic_store.index().diagnostics,
         "model_fingerprint": model_fingerprint(&model)?
     }))
 }
@@ -925,9 +925,9 @@ pub fn semantic_vocabulary_tool(
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let semantic_index =
-        semantic_index_with_external_visibility(&semantic_store.index, include_external)?;
+        semantic_index_with_external_visibility(semantic_store, include_external)?;
     let external_metadata = semantic_contract::external_materialization_metadata(
-        &semantic_store.index,
+        semantic_store.index(),
         &semantic_index,
         include_external,
     );
@@ -989,7 +989,7 @@ pub fn semantic_vocabulary_tool(
                 "next_cursor": Value::Null,
                 "has_more": false
             },
-            "diagnostics": semantic_store.index.diagnostics,
+            "diagnostics": semantic_store.index().diagnostics,
             "include_external": include_external,
             "ontology_document_filter": ontology_document_filter,
             "external_materialization": external_metadata["external_materialization"].clone(),
@@ -1028,7 +1028,7 @@ pub fn semantic_vocabulary_tool(
             "has_more": has_more,
             "total": total
         },
-        "diagnostics": semantic_store.index.diagnostics,
+        "diagnostics": semantic_store.index().diagnostics,
         "include_external": include_external,
         "ontology_document_filter": ontology_document_filter,
         "external_materialization": external_metadata["external_materialization"].clone(),
@@ -2203,11 +2203,11 @@ pub fn semantic_queries_tool(
         );
     }
     let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
-    let index = &model
+    let index = model
         .semantic_store
         .as_ref()
         .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?
-        .index;
+        .index();
     let name = string_arg(args, "name");
     let iri = string_arg(args, "iri");
     let namespace = string_arg(args, "namespace_base");

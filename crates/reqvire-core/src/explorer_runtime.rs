@@ -7,6 +7,8 @@
 use crate::error::ReqvireError;
 use crate::html::store::{build_project_store, project_store_javascript};
 use crate::model::ModelManager;
+use serde::Serialize;
+use serde_json::Value;
 
 include!(concat!(env!("OUT_DIR"), "/explorer_bundle_manifest.rs"));
 
@@ -17,26 +19,65 @@ pub struct ExplorerRuntimeAssets {
     pub ontologies_ttl: String,
 }
 
-pub fn build_runtime_assets(model: &ModelManager) -> Result<ExplorerRuntimeAssets, ReqvireError> {
+/// Canonical structured runtime. Local generation and worker publication use
+/// this value for assets and chunks without reparsing generated JSON text.
+pub struct ExplorerRuntimeData {
+    pub project_store: Value,
+    pub ontologies_ttl: String,
+}
+
+/// Serving identity is applied to the typed store before any serialization.
+pub struct ExplorerRuntimeContext<'a> {
+    pub worktree_id: &'a str,
+    pub branch: &'a str,
+}
+
+impl ExplorerRuntimeAssets {
+    pub fn from_store(
+        store: &impl Serialize,
+        ontologies_ttl: String,
+    ) -> Result<Self, ReqvireError> {
+        let project_store_json = serde_json::to_string(store)?;
+        let project_store_js = project_store_javascript(&project_store_json);
+        Ok(Self {
+            project_store_js,
+            project_store_json,
+            ontologies_ttl,
+        })
+    }
+}
+
+impl ExplorerRuntimeData {
+    pub fn into_assets(self) -> Result<ExplorerRuntimeAssets, ReqvireError> {
+        ExplorerRuntimeAssets::from_store(&self.project_store, self.ontologies_ttl)
+    }
+}
+
+pub fn build_runtime_data(
+    model: &ModelManager,
+    context: Option<ExplorerRuntimeContext<'_>>,
+) -> Result<ExplorerRuntimeData, ReqvireError> {
+    log::debug!("Building Explorer runtime assets from validated model");
     // Use the semantic state accepted with this graph. Re-reading external
     // ontology files here could mix two different source observations.
-    let semantic_index = &model
-        .semantic_store
-        .as_ref()
-        .ok_or_else(|| {
-            ReqvireError::ProcessError("Explorer assets require a completed model build".to_owned())
-        })?
-        .index;
-    let project_store = build_project_store(&model.graph_registry, semantic_index);
-    let project_store_js = project_store_javascript(&project_store)?;
-    let project_store_json = serde_json::to_string(&project_store)?;
-    let ontologies_ttl = semantic_index.to_turtle_string()?;
+    let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
+        ReqvireError::ProcessError("Explorer assets require a completed model build".to_owned())
+    })?;
+    let mut project_store = build_project_store(&model.graph_registry, semantic_store);
+    if let Some(context) = context {
+        project_store.project.worktree_id = Some(context.worktree_id.to_owned());
+        project_store.project.branch = Some(context.branch.to_owned());
+    }
+    let ontologies_ttl = semantic_store.index().to_turtle_string()?;
 
-    Ok(ExplorerRuntimeAssets {
-        project_store_js,
-        project_store_json,
+    Ok(ExplorerRuntimeData {
+        project_store: serde_json::to_value(project_store)?,
         ontologies_ttl,
     })
+}
+
+pub fn build_runtime_assets(model: &ModelManager) -> Result<ExplorerRuntimeAssets, ReqvireError> {
+    build_runtime_data(model, None)?.into_assets()
 }
 
 /// Writes the full Explorer SPA + generated runtime data to `output_dir`.
@@ -215,5 +256,53 @@ fn normalize_asset_path(path: &str) -> String {
         "index.html".to_string()
     } else {
         trimmed.to_string()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::cell::Cell;
+
+    #[test]
+    fn seed_and_json_share_one_serialization_and_preserve_script_sensitive_content() {
+        struct Counted<'a> {
+            visits: &'a Cell<usize>,
+            store: Value,
+        }
+        impl Serialize for Counted<'_> {
+            fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+                self.visits.set(self.visits.get() + 1);
+                self.store.serialize(serializer)
+            }
+        }
+        let visits = Cell::new(0);
+        let counted = Counted {
+            visits: &visits,
+            store: serde_json::json!({
+                "elements":[{"name":"Lärche 測定 </script>&\u{2028}\u{2029}", "content":"quotes: \" \\"}],
+                "numbers":[-0.0, 1.0, 1e-20, 9223372036854775807_i64], "empty":[], "null":null,
+            }),
+        };
+        let assets = ExplorerRuntimeAssets::from_store(&counted, "ontology 測定".into()).unwrap();
+        assert_eq!(
+            visits.get(),
+            1,
+            "seed and full JSON must serialize the store once"
+        );
+        assert_eq!(
+            serde_json::from_str::<Value>(&assets.project_store_json).unwrap(),
+            counted.store
+        );
+        let seed = assets
+            .project_store_js
+            .strip_prefix("window.reqvireProjectStore = ")
+            .unwrap()
+            .strip_suffix(";\n")
+            .unwrap();
+        assert!(!seed.contains(['<', '>', '&', '\u{2028}', '\u{2029}']));
+        assert!(seed.contains("\\u003c/script\\u003e\\u0026\\u2028\\u2029"));
+        assert_eq!(serde_json::from_str::<Value>(seed).unwrap(), counted.store);
+        assert_eq!(assets.ontologies_ttl, "ontology 測定");
     }
 }

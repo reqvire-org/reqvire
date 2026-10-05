@@ -838,6 +838,11 @@ fn validate_model_after_mutation(
             .graph_registry
             .validate_requirement_fulfillment_cycles(),
     );
+    errors.extend(
+        model_manager
+            .graph_registry
+            .validate_concept_taxonomy_cycles(),
+    );
     if errors.is_empty() {
         Ok(())
     } else {

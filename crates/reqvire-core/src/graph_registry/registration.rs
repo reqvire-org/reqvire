@@ -46,7 +46,7 @@ impl GraphRegistry {
 
         self.nodes.insert(
             element_id,
-            ElementNode {
+            RegistryNode {
                 element,
                 relations: Vec::new(),
             },
@@ -62,14 +62,14 @@ impl GraphRegistry {
         // through serialization-time relative-link conversion.
         self.normalize_element_relation_targets();
 
-        // First build the relation graph
-        self.build_relation_graph();
-
         // Add missing opposites
         self.propagate_missing_opposites(excluded_filename_patterns);
 
         // Populate element_id for all relations
         self.populate_relation_element_ids();
+
+        // Adjacency must include generated inverse relations on the first build.
+        self.build_relation_graph();
     }
 
     /// Resolve and validate the graph, retaining the index used for semantic validation.
@@ -129,10 +129,10 @@ impl GraphRegistry {
         errors.extend(self.validate_cross_section_duplicates()?);
 
         // Validate semantic-contract reserved sections, declarations, and references
-        let semantic_index = semantic_contract::build_semantic_index(self);
-        errors.extend(self.validate_semantic_contracts_with_index(&semantic_index, None)?);
+        let semantic_build = semantic_contract::build_semantic_index_with_shapes(self);
+        errors.extend(self.validate_semantic_contracts_with_build(&semantic_build, None)?);
 
-        Ok((errors, semantic_index))
+        Ok((errors, semantic_build.index))
     }
 
     /// Populate optional element-level size estimates for JSON evidence consumers.
@@ -175,10 +175,10 @@ impl GraphRegistry {
                                 .resolve_relation_identifier(&source_node.element, target_id)
                                 .unwrap_or_else(|| target_id.to_string());
 
-                            if let Some(target_node) = self.nodes.get(&resolved_target) {
-                                relation_nodes.push(RelationNode {
+                            if self.nodes.contains_key(&resolved_target) {
+                                relation_nodes.push(RelationEdge {
                                     relation_trigger: relation.relation_type.name.to_string(),
-                                    element_node: target_node.clone(),
+                                    target_id: resolved_target,
                                 });
                             }
                         }

@@ -6,11 +6,12 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
-import { openBrowser, waitFor } from "./browser.mjs";
+import { withBrowser, waitFor } from "../../browser.mjs";
+import { instrument as instrumentRefresh } from "./refresh-instrumentation.mjs";
 
-const [browser, plainUrl, mcpUrl, workspace, serverBin] = process.argv.slice(2);
-const main = await openBrowser(browser, path.join(workspace, "refresh-main-profile"));
-const plain = await openBrowser(browser, path.join(workspace, "refresh-plain-profile"));
+const [plainUrl, mcpUrl, workspace, serverBin] = process.argv.slice(2);
+await withBrowser(path.join(workspace, "refresh-main-profile"), main =>
+  withBrowser(path.join(workspace, "refresh-plain-profile"), async plain => {
 const requirements = path.join(workspace, "specifications/Requirements.md");
 const original = await readFile(requirements, "utf8");
 const added = await readFile(path.join(workspace, "fixtures/live-refresh-requirement.md.txt"), "utf8");
@@ -24,37 +25,7 @@ let staticDir;
 
 // Observe real HTTP traffic and inject failures at the transport boundary.
 // The production store client and compiled UI remain responsible for recovery.
-await main.rpc("Page.addScriptToEvaluateOnNewDocument", { source: `(${function instrument() {
-  const original = window.fetch;
-  window.reqvireManifestTraffic = [];
-  window.fetch = async (...args) => {
-    const url = String(args[0]);
-    if (!url.startsWith("/api/project-store")) return original(...args);
-    const request = args[1] ?? {};
-    const entry = { url, method: request.method ?? "GET" };
-    if (url.endsWith("/chunks")) Object.assign(entry, JSON.parse(request.body));
-    window.reqvireManifestTraffic.push(entry);
-    if (url.endsWith("/chunks") && window.reqvireHoldNextChunks) {
-      window.reqvireHoldNextChunks = false;
-      window.reqvireHeldChunks = true;
-      await new Promise(resolve => {
-        window.reqvireReleaseChunks = () => { window.reqvireHeldChunks = false; resolve(); };
-      });
-    }
-    let response = await original(...args);
-    entry.status = response.status;
-    if (url.endsWith("/chunks") && response.ok && window.reqvireChunkFault) {
-      const payload = await response.clone().json();
-      const first = Object.keys(payload.chunks)[0];
-      entry.fault = window.reqvireChunkFault;
-      if (entry.fault === "missing") delete payload.chunks[first];
-      else payload.chunks[first] += " ";
-      window.reqvireChunkFault = null;
-      response = new Response(JSON.stringify(payload), { status: 200, headers: response.headers });
-    }
-    return response;
-  };
-}.toString()})();` });
+await main.rpc("Page.addScriptToEvaluateOnNewDocument", { source: `(${instrumentRefresh.toString()})();` });
 
 const referencedHashes = manifest => new Set(Object.values(manifest.sections)
   .flatMap(section => section.kind === "array" ? section.hashes : [section.hash]));
@@ -169,10 +140,10 @@ try {
     const missing = [...referencedHashes(latest)].filter(hash => !before.has(hash)).sort();
     assert.ok(missing.length > 0);
     const traffic = await main.evaluate(start => window.reqvireManifestTraffic.slice(start), trafficStart);
-    const transferred = traffic.filter(entry => entry.url.endsWith("/chunks") && entry.status === 200)
+    const transferred = traffic.filter(entry => entry.path === "/api/project-store/chunks" && entry.status === 200)
       .flatMap(entry => entry.hashes).sort();
     assert.deepEqual(transferred, missing);
-    assert.equal(traffic.some(entry => entry.url === "/api/project-store"), false);
+    assert.equal(traffic.some(entry => entry.path === "/api/project-store"), false);
     await browserMatchesPublished();
   });
 
@@ -318,8 +289,8 @@ try {
     await main.evaluate(() => window.reqvireReleaseChunks());
     await rendered(main, "Live source marker omega café 測定.", true, '[role="dialog"]');
     const traffic = await main.evaluate(start => window.reqvireManifestTraffic.slice(start), start);
-    assert.ok(traffic.some(entry => entry.url.endsWith("/chunks") && entry.status === 409));
-    assert.ok(traffic.some(entry => entry.url.endsWith("/chunks") && entry.status === 200));
+    assert.ok(traffic.some(entry => entry.path === "/api/project-store/chunks" && entry.status === 409));
+    assert.ok(traffic.some(entry => entry.path === "/api/project-store/chunks" && entry.status === 200));
     await browserMatchesPublished();
     await sameDocument(main);
   });
@@ -327,8 +298,10 @@ try {
   for (const [fault, marker, previous] of [["missing", "sigma", "omega café 測定"], ["corrupt", "phi", "sigma"]]) {
     await run(`${fault} chunks retain the valid store and recover`, async () => {
       const before = await main.evaluate(() => window.reqvireLiveRefresh.revision);
+      const trafficStart = await main.evaluate(() => window.reqvireManifestTraffic.length);
       await main.evaluate(fault => { window.reqvireChunkFault = fault; }, fault);
       await edit(marker);
+      await waitFor(() => main.evaluate((start, fault) => window.reqvireManifestTraffic.slice(start).some(entry => entry.fault === fault), trafficStart, fault));
       await rendered(main, "Refresh failed", true, '[role="alert"]');
       assert.equal(await main.evaluate(() => window.reqvireLiveRefresh.revision), before);
       await rendered(main, `Live source marker ${previous}.`, true, '[role="dialog"]');
@@ -408,7 +381,7 @@ try {
   if (failed) process.exitCode = 1;
 } finally {
   await writeFile(requirements, original);
-  await Promise.all([main.close(), plain.close()]);
   if (staticServer) await new Promise(resolve => staticServer.close(resolve));
   if (staticDir) await rm(staticDir, { recursive: true, force: true });
 }
+}));

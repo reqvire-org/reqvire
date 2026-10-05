@@ -1,0 +1,14 @@
+https://example.test/projection-alpha#ProjectionChild broader https://example.test/projection-alpha#ProjectionParent
+https://example.test/projection-alpha#ProjectionChild closeMatch https://example.test/projection-beta#ProjectionRemote
+https://example.test/projection-alpha#ProjectionChild closeMatch https://external.example/Close
+https://example.test/projection-alpha#ProjectionChild exactMatch https://example.test/projection-beta#ProjectionRemote
+https://example.test/projection-alpha#ProjectionChild exactMatch https://external.example/Exact
+https://example.test/projection-alpha#ProjectionChild related https://example.test/projection-alpha#ProjectionPeer
+https://example.test/projection-alpha#ProjectionChild related https://example.test/projection-beta#ProjectionRemote
+https://example.test/projection-alpha#ProjectionParent narrower https://example.test/projection-alpha#ProjectionChild
+https://example.test/projection-alpha#ProjectionPeer related https://example.test/projection-alpha#ProjectionChild
+https://example.test/projection-beta#ProjectionRemote closeMatch https://example.test/projection-alpha#ProjectionChild
+https://example.test/projection-beta#ProjectionRemote exactMatch https://example.test/projection-alpha#ProjectionChild
+https://example.test/projection-beta#ProjectionRemote related https://example.test/projection-alpha#ProjectionChild
+https://external.example/Close closeMatch https://example.test/projection-alpha#ProjectionChild
+https://external.example/Exact exactMatch https://example.test/projection-alpha#ProjectionChild

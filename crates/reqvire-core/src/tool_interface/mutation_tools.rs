@@ -4,7 +4,7 @@ pub fn add_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let workspace_root = current_dir_path();
     let result = crud::add_element(
         &mut model,
@@ -23,7 +23,7 @@ pub fn remove_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let element_id = model
         .graph_registry
         .find_element_by_name(&required_string_arg(args, "element_name")?)?;
@@ -41,7 +41,7 @@ pub fn move_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let element_id = model
         .graph_registry
         .find_element_by_name(&required_string_arg(args, "element_name")?)?;
@@ -62,7 +62,7 @@ pub fn rename_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let element_id = model
         .graph_registry
         .find_element_by_name(&required_string_arg(args, "element_name")?)?;
@@ -81,7 +81,7 @@ pub fn merge_elements_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let workspace_root = current_dir_path();
     let result = crud::merge_elements(
         &mut model,
@@ -97,7 +97,7 @@ pub fn move_file_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let workspace_root = current_dir_path();
     let result = crud::move_file(
         &mut model,
@@ -118,7 +118,7 @@ pub fn move_folder_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let workspace_root = current_dir_path();
     let result = crud::move_folder(
         &mut model,
@@ -135,7 +135,7 @@ pub fn link_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let source = required_string_arg(args, "source")?;
     let relation_type = required_string_arg(args, "relation_type")?;
     let target = required_string_arg(args, "target")?;
@@ -171,7 +171,7 @@ pub fn unlink_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let result = crud::unlink(
         &mut model,
         &required_string_arg(args, "source")?,
@@ -186,7 +186,7 @@ pub fn relink_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let result = crud::relink(
         &mut model,
         &required_string_arg(args, "source")?,
@@ -203,7 +203,7 @@ pub fn move_asset_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let result = crud::mv_asset(
         &mut model,
         &required_string_arg(args, "old_path")?,
@@ -218,7 +218,7 @@ pub fn remove_asset_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let result = crud::rm_asset(
         &mut model,
         &required_string_arg(args, "file_path")?,

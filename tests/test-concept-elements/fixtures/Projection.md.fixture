@@ -1,0 +1,87 @@
+# Elements
+
+### Projection Alpha Scheme
+
+Vocabulary for projection normalization checks.
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/projection-alpha
+  * concept_prefix: pa
+---
+
+### Projection Child
+
+A child with local, cross-scheme and external relationships.
+
+#### Mappings
+  * exactMatch: <https://external.example/Exact>
+  * closeMatch: <https://external.example/Close>
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Projection Alpha Scheme](#projection-alpha-scheme)
+  * broader: [Projection Parent](#projection-parent)
+  * related: [Projection Peer](#projection-peer)
+  * related: [Projection Remote](#projection-remote)
+  * exactMatch: [Projection Remote](#projection-remote)
+  * closeMatch: [Projection Remote](#projection-remote)
+---
+
+### Projection Isolated
+
+An isolated concept still has its own RDF description.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Projection Alpha Scheme](#projection-alpha-scheme)
+---
+
+### Projection Parent
+
+A parent with a reciprocal authored taxonomy link.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Projection Alpha Scheme](#projection-alpha-scheme)
+  * narrower: [Projection Child](#projection-child)
+---
+
+### Projection Peer
+
+An association declared consistently in both directions.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Projection Alpha Scheme](#projection-alpha-scheme)
+  * related: [Projection Child](#projection-child)
+---
+
+### Projection Beta Scheme
+
+Separate namespace for cross-scheme association checks.
+
+#### Metadata
+  * type: concept-scheme
+  * concept_base: https://example.test/projection-beta
+  * concept_prefix: pb
+---
+
+### Projection Remote
+
+A concept linked from a different scheme without reciprocal declarations.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Projection Beta Scheme](#projection-beta-scheme)
+---

@@ -133,6 +133,13 @@ reqvire serve --enable-mcp --allow-origin https://app.example.com`}</CodeBlock>
           include text content for chat clients and structuredContent for
           clients that consume machine-readable data.
         </p>
+        <p className="text-zinc-600 mb-4">
+          Read-only requests can run concurrently, using the machine&apos;s available
+          CPU parallelism as the admission limit shared by clients. When capacity
+          is full, MCP returns a retryable busy error (JSON-RPC code -32000 with
+          data.retryable set to true). Clients should retry with backoff. Model
+          reads continue checking for external changes.
+        </p>
         <div className="grid sm:grid-cols-2 gap-2">
           {[
             "reqvire.workspace_status",
@@ -358,9 +365,13 @@ reqvire serve --enable-mcp --allow-origin https://app.example.com`}</CodeBlock>
             "Add --enable-commits to commit each successful non-empty mutation locally and include its commit identifier in the result. This flag requires --enable-mutations. Previews, rejections, and no-ops never create commits.",
             "Both modes update subsequent MCP reads and refresh the embedded Explorer after a successful write.",
             "The running server owns its model snapshot. External edits are not imported and affected model files may be overwritten. Stop the server before editing its workspace externally.",
+            "If mutation recovery fails, the last accepted model remains readable with a recovery diagnostic. Further edits, previews, commits, pushes and PR operations are blocked. Explorer labels the accepted snapshot; local file downloads and live change-impact analysis remain unavailable until recovery. Stop the server, repair and validate the worktree, then restart under the usual clean-worktree checks.",
             "Restart requires the same clean-start checks. Use reqvire.git.commit for accepted pending changes before stopping, or resolve saved changes before restarting. Branch creation and remote publication require explicit tool calls.",
+            "Leftover lock files are reused after their holders exit. A worker that survives its parent still owns its locks. If startup reports a lock error, check the named path and OS error: fix permissions for the server/container user or use a filesystem with locking support as indicated. Do not delete lock files to bypass an active owner.",
             "Most mutation tools support dry_run.",
             "Mutations, commits, and publication serialize within each worktree. Independent worktrees can progress separately.",
+            "Model reads can run concurrently from the accepted snapshot. A read already in progress can finish with the earlier revision after a write; its context metadata identifies that revision. Reads admitted after publication use the updated model.",
+            "Read and control requests have separate admission budgets based on available CPU parallelism. Full capacity returns a retryable busy error, so slow reads do not consume every slot needed for writes. Cancelling a client request does not cancel work already dispatched.",
           ]}
         />
         <CodeBlock>{`# Opt into automatic commits

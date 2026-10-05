@@ -82,6 +82,26 @@ Rationale: Element names serve as stable IDs for element identity, independent o
   * type: specification
 ---
 
+### Native Concept Taxonomy Cycle Validation Specification
+
+Native concept taxonomy must be acyclic independently of concept ancestry and requirement dependencies.
+
+#### Details
+- Resolve native concept `broader` and `narrower` targets, then normalize taxonomy to child-to-parent edges: `A broader B` and `B narrower A` are one edge. Consistent reciprocal declarations must not create a false cycle.
+- Reject self-loops, contradictory two-concept taxonomy, and longer cycles, including cycles mixing the two authored aliases. Ignore `related`, `exactMatch`, and `closeMatch` when detecting taxonomy cycles; symmetric associations remain valid.
+- Preserve acyclic multiple-parent and reconvergent taxonomy. Build taxonomy adjacency once per validation and traverse it without recursive stack growth or enumerating all possible paths.
+- Report a deterministic closed concept-identifier path in canonical `broader` direction. Element and relation input order must not change the diagnostic.
+- Apply this rule to ordinary validation and model-dependent reads, and to mutation candidate validation before persistence, including relation addition, element replacement, and dry runs. Reject invalid candidates without changing accepted source files or accepted model state.
+- Candidate validation must examine the candidate's current relations even when derived concept payloads still describe the previously accepted model.
+- Existing missing-target and scheme-boundary checks remain in force; cycle detection does not weaken them.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Native Concept Taxonomy Cycle Validation](ValidationRequirements.md#native-concept-taxonomy-cycle-validation)
+---
+
 ### Native Concept Taxonomy Scheme Boundary Validation Specification
 
 The native concept taxonomy scheme boundary contract defines the hard validation rule for SKOS taxonomy authored through Reqvire native concept elements.
@@ -152,6 +172,7 @@ The Reqvire SHACL context adapter must:
 - Derive the generic SHACL domain ontology index from those supplied RDF quads rather than manually rebuilding declaration buckets in the validation adapter.
 - Treat built-in RDF, RDFS, OWL, XSD, and SHACL vocabulary through the o-kernel reserved vocabulary registry where supported positions allow it.
 - Pass the compiled SHACL registry and the reachable domain ontology index into the generic SHACL ontology aligner.
+- Reuse the SHACL registry compiled during the same semantic-index build, including for in-memory edits and declaration-removal validation, without recompiling its Shapes block for alignment.
 - Reject hidden ontology dependencies by passing only the explicit reachable ontology subset to the generic aligner; a model-owned SHACL reference outside that subset must fail as an undeclared alignment reference from the perspective of the semantic contract.
 - Convert generic SHACL parser and alignment diagnostics into Reqvire validation errors that include semantic-contract identifiers, reference kind, referenced IRI, declaring ontology context when available, and fix guidance.
 - Keep full SHACL data validation/execution out of scope unless a separate verification requirement introduces a SHACL execution engine.

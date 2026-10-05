@@ -2,15 +2,16 @@
 //! dispatch and registry entry points.
 
 use super::*;
+use std::sync::Arc;
 
-pub fn load_model(excluded_filename_patterns: &GlobSet) -> Result<ModelManager, ReqvireError> {
+pub fn load_model(excluded_filename_patterns: &GlobSet) -> Result<Arc<ModelManager>, ReqvireError> {
     load_model_with_options(excluded_filename_patterns, false)
 }
 
 pub fn load_model_with_options(
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
-) -> Result<ModelManager, ReqvireError> {
+) -> Result<Arc<ModelManager>, ReqvireError> {
     crate::model_cache::load_cached_model(
         excluded_filename_patterns,
         ModelBuildOptions {
@@ -18,6 +19,11 @@ pub fn load_model_with_options(
             with_size_estimates,
         },
     )
+}
+
+/// Mutable candidates never share graph/page state with accepted read handles.
+pub(super) fn load_mutation_model(exclusions: &GlobSet) -> Result<ModelManager, ReqvireError> {
+    Ok(load_model(exclusions)?.as_ref().clone())
 }
 
 pub fn parse_json_string(json_str: String) -> Result<Value, ReqvireError> {
@@ -66,7 +72,7 @@ pub fn git_state() -> Value {
     let status = git_output(["status", "--porcelain"]);
     json!({
         "head": head,
-        "dirty": status.as_ref().is_some_and(|s| !s.trim().is_empty())
+        "dirty": status.as_ref().map(|s| !s.trim().is_empty())
     })
 }
 
@@ -96,7 +102,7 @@ pub fn eligible_git_worktrees_state() -> Value {
                 "root": root.to_string_lossy().to_string(),
                 "workspace_relative_root": workspace_relative_root,
                 "head": head,
-                "dirty": status.as_ref().is_some_and(|s| !s.trim().is_empty())
+                "dirty": status.as_ref().map(|s| !s.trim().is_empty())
             })
         })
         .collect::<Vec<_>>();

@@ -1,7 +1,10 @@
+import { testFlowLayoutEngine } from "../test/flowLayoutEngine";
 import { act, cleanup, fireEvent, render, screen, within, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ElementFlow, type ElementFlowData } from "@ds";
 import { MocksPage } from "./pages/MocksPage";
+
+vi.mock("../../src/workers/flowLayoutEngine", () => ({ flowLayoutEngine: testFlowLayoutEngine }));
 
 vi.mock("../../src/views/GraphLibraryViews", () => ({ KnowledgeGraphView: () => null }));
 vi.mock("../../src/lib/ontologyGraphRenderer", () => ({ mountOntologyGraph: vi.fn() }));
@@ -95,7 +98,7 @@ describe("trace flow showcase", () => {
       })),
       edges: [{ id: "root-leaf", source: "root", target: "leaf", label: "specifiedBy" }],
     };
-    render(<ElementFlow data={data} onOpenElement={vi.fn()} onOpenSource={vi.fn()} />);
+    render(<ElementFlow layoutEngine={testFlowLayoutEngine} data={data} onOpenElement={vi.fn()} onOpenSource={vi.fn()} />);
     const region = screen.getByRole("region", { name: "Model flow" });
     const assertLabel = () => {
       const edge = region.querySelector('.react-flow__edge[data-id="root-leaf"]')!;
@@ -279,7 +282,7 @@ describe("trace flow showcase", () => {
       })), { id: "long-route", source: "large-0", target: "large-120", label: "specifiedBy" }],
     };
     const navigation = { onOpenElement: vi.fn(), onOpenSource: vi.fn() };
-    const { rerender } = render(<ElementFlow data={data} {...navigation} />);
+    const { rerender } = render(<ElementFlow layoutEngine={testFlowLayoutEngine} data={data} {...navigation} />);
     const region = screen.getByRole("region", { name: "Model flow" });
     await waitFor(() => expect(region.getAttribute("aria-busy")).toBe("false"), { timeout: 10000 });
     await waitFor(() => expectCardsFit(region));
@@ -315,7 +318,7 @@ describe("trace flow showcase", () => {
       await waitFor(() => expect(viewport(region).zoom).toBeLessThan(fittedZoom));
       await resizeCanvas(360, 520);
     }
-    rerender(<ElementFlow data={{ ...data, nodes: data.nodes.slice(0, 1), edges: [] }} {...navigation} />);
+    rerender(<ElementFlow layoutEngine={testFlowLayoutEngine} data={{ ...data, nodes: data.nodes.slice(0, 1), edges: [] }} {...navigation} />);
     await waitFor(() => expect(region.querySelectorAll(".react-flow__node")).toHaveLength(1));
     await waitFor(() => {
       expectCardsFit(region);

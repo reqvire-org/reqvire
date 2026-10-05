@@ -656,6 +656,9 @@ mod tests {
                 .expect("validated worktree context invariant");
         }
         fn access(&self) -> GithubAccess {
+            self.access_with_check_timeout(CHECK_TIMEOUT)
+        }
+        fn access_with_check_timeout(&self, timeout: Duration) -> GithubAccess {
             let mut access = GithubAccess::check(&self.root, false, "origin");
             access.requested = true;
             access.gh_executable = self
@@ -663,8 +666,7 @@ mod tests {
                 .to_str()
                 .expect("validated worktree context invariant")
                 .into();
-            access.check_timeout = Duration::from_millis(300);
-            access.operation_timeout = Duration::from_secs(2);
+            access.check_timeout = timeout;
             if let Err(failure) = access.check_inner(&self.root) {
                 access.repository = None;
                 access.reason = Some(failure.to_string());
@@ -709,6 +711,37 @@ mod tests {
         }
     }
     #[test]
+    fn startup_accepts_a_slow_executable_within_the_production_deadline() {
+        let fixture = Fixture::new();
+        let script = fs::read_to_string(&fixture.gh).unwrap().replace(
+            "import os, runpy\n",
+            "import os, runpy, sys, time\nif sys.argv[1:] == ['--version']: time.sleep(0.4)\n",
+        );
+        fs::write(&fixture.gh, script).unwrap();
+        let access = fixture.access();
+        assert!(access.available(), "{}", access.status());
+        assert_eq!(access.check_timeout, CHECK_TIMEOUT);
+        assert_eq!(access.operation_timeout, OP_TIMEOUT);
+    }
+
+    #[test]
+    fn stalled_authentication_times_out_after_reaching_the_intended_check() {
+        let fixture = Fixture::new();
+        fixture.scenario(json!({"timeout":"auth status"}));
+        let access = fixture.access_with_check_timeout(Duration::from_secs(2));
+        assert!(!access.available());
+        assert!(access.reason.as_deref().unwrap().contains("timed out"));
+        let calls = fixture.calls();
+        assert!(
+            calls
+                .iter()
+                .any(|call| { call["args"][0] == "auth" && call["args"][1] == "status" }),
+            "must reach stalled authentication: {calls:?}"
+        );
+        assert!(calls.iter().all(|call| call["args"][0] != "repo"));
+    }
+
+    #[test]
     fn availability_is_bounded_sanitized_and_checks_active_auth_without_publication() {
         let fixture = Fixture::new();
         for scenario in [
@@ -717,7 +750,6 @@ mod tests {
             json!({"malformed":"repo view"}),
             json!({"malformed":"--version"}),
             json!({"repository":"other/repo"}),
-            json!({"timeout":"auth status"}),
         ] {
             fixture.scenario(scenario);
             let access = fixture.access();

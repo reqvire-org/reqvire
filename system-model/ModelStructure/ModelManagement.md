@@ -33,6 +33,23 @@ The system shall process structured documents and relations to extract model-rel
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
 ---
 
+### Canonical Graph Storage
+
+The system shall keep model graph storage proportional to the number of elements and relations, independently of graph rebuild history.
+
+When a graph is copied for a mutation candidate, the system shall isolate candidate changes from the accepted graph and resolve relation targets within the corresponding graph.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Efficient Processing](#efficient-processing)
+  * definedBy: [Canonical Graph Storage Specification](Specifications.md#canonical-graph-storage-specification)
+  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [registration.rs](../../crates/reqvire-core/src/graph_registry/registration.rs)
+  * satisfiedBy: [crud_ops.rs](../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
+---
+
 ### In-Memory Model Build Cache
 
 When a completed cached model matches the current construction inputs and requested build mode, the system shall reuse it without repeating Markdown parsing, graph validation, or semantic-store construction.
@@ -45,6 +62,7 @@ If input changes or invalidation supersede an in-progress build, the system shal
 
 #### Details
 - The system shall keep each served model's parsed elements, page content, validation state, and semantic query state consistent with the same completed construction inputs.
+- The system shall share completed immutable models between read requests without copying their graph and page payloads, while isolating mutable candidates and preserving snapshots already held by readers.
 - The system shall reuse the semantic index built for a resolved graph during semantic validation, RDF capture, and subsequent read-only semantic reports and exports. A changed mutation candidate shall receive fresh semantic validation against its own graph.
 - The system shall prepare query-store variants on first use from RDF captured during validated model construction and reuse each prepared variant within that model snapshot.
 - If a current model cannot be built under the requested validation mode, the system shall report the applicable failure or diagnostics rather than present an older cached model as current.

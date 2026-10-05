@@ -3,20 +3,21 @@ use crate::{
     live_store::LiveStore,
     mcp_github::GithubAccess,
     mcp_process::git,
-    mcp_worker::{RuntimeData, WorkerOptions},
+    mcp_session::lock_file,
+    mcp_worker::WorkerOptions,
 };
-use reqvire::{error::ReqvireError, explorer_runtime::ExplorerRuntimeAssets};
+use reqvire::{error::ReqvireError, explorer_runtime::{ExplorerRuntimeAssets, ExplorerRuntimeData}};
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::{
     collections::BTreeMap,
-    fs::{self, File, OpenOptions},
+    fs,
     io::{BufRead, BufReader, Write},
     path::{Path, PathBuf},
     process::{Child, ChildStdin, Command, Stdio},
     sync::{
-        atomic::{AtomicBool, Ordering},
-        mpsc, Arc, Mutex, RwLock,
+        atomic::{AtomicBool, AtomicU64, Ordering},
+        mpsc, Arc, LazyLock, Mutex, RwLock,
     },
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
@@ -30,16 +31,6 @@ fn text<'a>(value: &'a Value, field: &str) -> Result<&'a str, ReqvireError> {
         .filter(|s| !s.trim().is_empty())
         .ok_or_else(|| error(format!("{field} must be a non-empty string")))
 }
-fn lock_file(path: &Path) -> Result<File, ReqvireError> {
-    let file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .truncate(false)
-        .open(path)?;
-    crate::mcp_session::claim(&file)?;
-    Ok(file)
-}
 fn parse_json(bytes: &str) -> Result<Value, ReqvireError> {
     let mut deserializer = serde_json::Deserializer::from_str(bytes);
     deserializer.disable_recursion_limit();
@@ -52,18 +43,50 @@ pub struct PublishedRuntime {
     pub assets: ExplorerRuntimeAssets,
     pub live: LiveStore,
 }
+impl PublishedRuntime {
+    pub fn new(data: ExplorerRuntimeData) -> Result<Self, ReqvireError> {
+        let live = LiveStore::new(&data.project_store, &data.ontologies_ttl)?;
+        let assets = data.into_assets()?;
+        Ok(Self { assets, live })
+    }
+
+    fn from_worker(mut value: Value) -> Result<Self, ReqvireError> {
+        let fields = value
+            .as_object_mut()
+            .ok_or_else(|| error("Invalid worker runtime"))?;
+        let project_store = fields
+            .remove("project_store")
+            .ok_or_else(|| error("Missing worker Project Store"))?;
+        let Some(Value::String(ontologies_ttl)) = fields.remove("ontologies_ttl") else {
+            return Err(error("Missing worker ontology data"));
+        };
+        Self::new(ExplorerRuntimeData {
+            project_store,
+            ontologies_ttl,
+        })
+    }
+}
 struct Published {
     status: Value,
+    sequence: u64,
     runtime: Option<Arc<PublishedRuntime>>,
     runtime_error: Option<String>,
     failure: Option<String>,
     stopped: bool,
 }
+type WorkerReply = Result<Value, String>;
+type PendingReplies = Arc<Mutex<BTreeMap<u64, mpsc::SyncSender<WorkerReply>>>>;
 struct Worker {
-    child: Child,
-    input: ChildStdin,
-    output: mpsc::Receiver<Result<Value, String>>,
+    child: Mutex<Child>,
+    input: Mutex<ChildStdin>,
+    pending: PendingReplies,
+    next_id: AtomicU64,
     alive: Arc<AtomicBool>,
+}
+fn fail_pending(pending: &PendingReplies, message: &str) {
+    for (_, reply) in std::mem::take(&mut *pending.lock().expect("worker replies poisoned")) {
+        let _ = reply.send(Err(message.into()));
+    }
 }
 impl Worker {
     fn spawn(
@@ -80,56 +103,107 @@ impl Worker {
             .spawn()?;
         let input = child.stdin.take().expect("piped stdin");
         let output = child.stdout.take().expect("piped stdout");
-        let (send, receive) = mpsc::channel();
+        let (ready_send, ready_receive) = mpsc::sync_channel(1);
         let alive = Arc::new(AtomicBool::new(true));
         let reader_alive = Arc::clone(&alive);
+        let pending: PendingReplies = Arc::new(Mutex::new(BTreeMap::new()));
+        let reader_pending = pending.clone();
         std::thread::spawn(move || {
-            for line in BufReader::new(output).lines() {
-                let value = line
-                    .map_err(|e| e.to_string())
-                    .and_then(|line| parse_json(&line).map_err(|e| e.to_string()));
-                if send.send(value).is_err() {
+            let mut lines = BufReader::new(output).lines();
+            let parse = |line: std::io::Result<String>| {
+                line.map_err(|e| e.to_string())
+                    .and_then(|line| parse_json(&line).map_err(|e| e.to_string()))
+            };
+            let first = lines
+                .next()
+                .ok_or_else(|| "Worker exited before initialization".to_owned())
+                .and_then(parse);
+            let _ = ready_send.send(first);
+            let mut failure =
+                "Worktree worker exited; inspect its files before reopening".to_owned();
+            for line in lines {
+                let value = match parse(line) {
+                    Ok(value) => value,
+                    Err(e) => {
+                        failure = e;
+                        break;
+                    }
+                };
+                let reply = value["request_id"].as_u64().and_then(|id| {
+                    reader_pending
+                        .lock()
+                        .expect("worker replies poisoned")
+                        .remove(&id)
+                });
+                let Some(reply) = reply else {
+                    failure = "Invalid or unmatched worker response ID".into();
                     break;
-                }
+                };
+                let _ = reply.send(Ok(value));
             }
             reader_alive.store(false, Ordering::Release);
+            fail_pending(&reader_pending, &failure);
         });
-        let mut worker = Self {
-            child,
-            input,
-            output: receive,
+        let worker = Self {
+            child: Mutex::new(child),
+            input: Mutex::new(input),
+            pending,
+            next_id: AtomicU64::new(1),
             alive,
         };
         worker.send(&json!(options))?;
-        let ready = worker.receive()?;
+        let ready = ready_receive
+            .recv_timeout(Duration::from_secs(120))
+            .map_err(|_| error("Worktree initialization stopped or timed out"))?
+            .map_err(error)?;
         if let Some(message) = ready["error"].as_str() {
             return Err(error(message));
         }
         Ok((worker, ready))
     }
-    fn send(&mut self, request: &Value) -> Result<(), ReqvireError> {
-        serde_json::to_writer(&mut self.input, request)?;
-        self.input.write_all(b"\n")?;
-        self.input.flush()?;
+    fn send(&self, request: &Value) -> Result<(), ReqvireError> {
+        let mut input = self.input.lock().expect("worker input poisoned");
+        serde_json::to_writer(&mut *input, request)?;
+        input.write_all(b"\n")?;
+        input.flush()?;
         Ok(())
     }
-    fn receive(&mut self) -> Result<Value, ReqvireError> {
-        self.output
-            .recv_timeout(Duration::from_secs(120))
-            .map_err(|_| {
-                error("Worktree worker stopped or timed out; inspect its files before reopening")
-            })?
-            .map_err(error)
+    fn request(&self, value: &Value) -> Result<Value, ReqvireError> {
+        let id = self.next_id.fetch_add(1, Ordering::Relaxed);
+        let (send, receive) = mpsc::sync_channel(1);
+        {
+            let mut pending = self.pending.lock().expect("worker replies poisoned");
+            if !self.alive.load(Ordering::Acquire) {
+                return Err(error("Worktree worker is unavailable"));
+            }
+            pending.insert(id, send);
+        }
+        let mut request = value.clone();
+        request["request_id"] = json!(id);
+        let result = self.send(&request).and_then(|_| {
+            receive.recv_timeout(Duration::from_secs(120)).map_err(|_| {
+                error("Worktree request stopped or timed out; effects may be unknown; inspect files before reopening")
+            })?.map_err(error)
+        });
+        if result.is_err() {
+            self.stop();
+        }
+        result
     }
-    fn request(&mut self, value: &Value) -> Result<Value, ReqvireError> {
-        self.send(value)?;
-        self.receive()
+    fn stop(&self) {
+        self.alive.store(false, Ordering::Release);
+        let mut child = self.child.lock().expect("worker process poisoned");
+        let _ = child.kill();
+        let _ = child.wait();
+        fail_pending(
+            &self.pending,
+            "Worktree worker stopped; effects may be unknown; inspect files before reopening",
+        );
     }
 }
 impl Drop for Worker {
     fn drop(&mut self) {
-        let _ = self.child.kill();
-        let _ = self.child.wait();
+        self.stop();
     }
 }
 pub struct Context {
@@ -140,25 +214,27 @@ pub struct Context {
     managed: bool,
     read_only: bool,
     // This is the per-context gate, also held through commits, publication and removal.
-    worker: Mutex<Option<Worker>>,
+    worker: Mutex<Option<Arc<Worker>>>,
     published: RwLock<Published>,
     alive: Arc<AtomicBool>,
 }
 impl Context {
-    fn update(&self, response: &Value) -> Result<(), ReqvireError> {
+    fn update(&self, response: &mut Value) -> Result<(), ReqvireError> {
         let runtime = response
-            .get("runtime")
-            .cloned()
-            .map(serde_json::from_value::<RuntimeData>)
-            .transpose()?
-            .map(|data| {
-                let assets = data.assets();
-                LiveStore::new(&assets).map(|live| Arc::new(PublishedRuntime { assets, live }))
-            })
+            .get_mut("runtime")
+            .map(Value::take)
+            .map(PublishedRuntime::from_worker)
+            .map(|runtime| runtime.map(Arc::new))
             .transpose();
         let mut published = self.published.write().expect("context registry poisoned");
         if let Some(status) = response.get("status") {
-            published.status = status.clone();
+            let sequence = response["sequence"]
+                .as_u64()
+                .unwrap_or(published.sequence + 1);
+            if sequence >= published.sequence {
+                published.status = status.clone();
+                published.sequence = sequence;
+            }
         }
         match runtime {
             Ok(Some(runtime)) => {
@@ -177,17 +253,19 @@ impl Context {
     }
     fn request_locked(
         &self,
-        worker: &mut Option<Worker>,
+        worker: &mut Option<Arc<Worker>>,
         request: &Value,
     ) -> Result<Value, ReqvireError> {
         let result = worker
             .as_mut()
             .ok_or_else(|| error("Worktree context is unavailable"))?
             .request(request);
-        let response = match result {
+        let mut response = match result {
             Ok(response) => response,
             Err(failure) => {
-                *worker = None;
+                if let Some(worker) = worker.take() {
+                    worker.stop();
+                }
                 self.published
                     .write()
                     .expect("context registry poisoned")
@@ -195,7 +273,7 @@ impl Context {
                 return Err(failure);
             }
         };
-        self.update(&response)?;
+        self.update(&mut response)?;
         if let Some(message) = response["error"].as_str() {
             return Err(error(message));
         }
@@ -207,9 +285,40 @@ impl Context {
             request,
         )
     }
+    fn read_request(&self, request: &Value) -> Result<Value, ReqvireError> {
+        let worker = self
+            .worker
+            .lock()
+            .expect("worktree lock poisoned")
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| error("Worktree context is unavailable"))?;
+        let mut response = match worker.request(request) {
+            Ok(response) => response,
+            Err(failure) => {
+                self.published
+                    .write()
+                    .expect("context registry poisoned")
+                    .failure = Some(failure.to_string());
+                return Err(failure);
+            }
+        };
+        self.update(&mut response)?;
+        let published = self.published.read().expect("context registry poisoned");
+        if !self.alive.load(Ordering::Acquire) || published.stopped || published.failure.is_some() {
+            return Err(error("Worktree context became unavailable during read"));
+        }
+        Ok(response)
+    }
     pub fn metadata(&self) -> Value {
         let published = self.published.read().expect("context registry poisoned");
-        let mut value = published.status.clone();
+        self.decorate_metadata(published.status.clone(), &published)
+    }
+    fn read_metadata(&self, status: Value) -> Value {
+        let published = self.published.read().expect("context registry poisoned");
+        self.decorate_metadata(status, &published)
+    }
+    fn decorate_metadata(&self, mut value: Value, published: &Published) -> Value {
         value["worktree_id"] = json!(self.id);
         value["original"] = json!(self.original);
         value["managed"] = json!(self.managed);
@@ -219,10 +328,14 @@ impl Context {
             && !published.stopped
             && value["available"].as_bool() == Some(true);
         value["available"] = json!(available);
+        value["writes_available"] =
+            json!(available && !self.read_only && value["writes_available"] == true);
         value["owned"] =
             json!(!self.read_only && alive && !published.stopped && published.failure.is_none());
         value["state"] = json!(if published.stopped {
             "stopped"
+        } else if available && value["recovery_required"] == true {
+            "recovery_required"
         } else if available {
             "ready"
         } else {
@@ -232,7 +345,8 @@ impl Context {
             .failure
             .as_deref()
             .or_else(|| (!alive && !published.stopped)
-                .then_some("Worktree worker exited; reopen to recover")));
+                .then_some("Worktree worker exited; reopen to recover"))
+            .or_else(|| value["diagnostic"].as_str()));
         value["explorer_available"] =
             json!(available && published.runtime.is_some() && published.runtime_error.is_none());
         value["explorer_diagnostic"] = json!(published.runtime_error);
@@ -263,6 +377,53 @@ impl Context {
     }
 }
 
+struct SessionToolCatalog {
+    definitions: Vec<Value>,
+    // The boolean distinguishes core schemas from wrapper-local operations.
+    by_name: BTreeMap<String, (usize, bool)>,
+}
+
+impl SessionToolCatalog {
+    fn new(github_available: bool) -> Self {
+        #[cfg(test)]
+        tests::CATALOG_BUILDS.with(|count| count.set(count.get() + 1));
+        let mut definitions = reqvire::tool_interface::tool_definitions(true);
+        let core_count = definitions.len();
+        for tool in &mut definitions {
+            if tool["name"] != "reqvire.tool_contract" {
+                tool["inputSchema"]["properties"]["worktree_id"] = selector();
+            }
+        }
+        definitions.extend(local_definitions().iter().cloned());
+        if github_available {
+            definitions.extend(publication_definitions());
+        }
+        let by_name = definitions
+            .iter()
+            .enumerate()
+            .map(|(index, tool)| {
+                (
+                    tool["name"]
+                        .as_str()
+                        .expect("tool definition name")
+                        .to_owned(),
+                    (index, index < core_count),
+                )
+            })
+            .collect();
+        Self {
+            definitions,
+            by_name,
+        }
+    }
+
+    fn get(&self, name: &str) -> Option<(&Value, bool)> {
+        self.by_name
+            .get(name)
+            .map(|(index, core)| (&self.definitions[*index], *core))
+    }
+}
+
 pub struct Worktrees {
     root: PathBuf,
     common: PathBuf,
@@ -277,6 +438,7 @@ pub struct Worktrees {
     browser_branches: Mutex<BTreeMap<String, String>>,
     admin: Mutex<()>,
     github: GithubAccess,
+    tool_catalog: SessionToolCatalog,
 }
 impl Worktrees {
     pub fn start(
@@ -347,6 +509,7 @@ impl Worktrees {
             contexts: RwLock::new(BTreeMap::new()),
             browser_branches: Mutex::new(BTreeMap::new()),
             admin: Mutex::new(()),
+            tool_catalog: SessionToolCatalog::new(github.available()),
             github,
         });
         manager.admit(root, original, true, false)?;
@@ -393,7 +556,7 @@ impl Worktrees {
                 return Err(error("Overlapping worktree roots are not allowed"));
             }
         }
-        let (worker, ready) = Worker::spawn(
+        let (worker, mut ready) = Worker::spawn(
             &self.executable,
             &root,
             &WorkerOptions {
@@ -402,6 +565,7 @@ impl Worktrees {
                 with_size_estimates: self.with_size_estimates,
                 explorer: self.explorer,
                 read_only: self.read_only,
+                read_parallelism: crate::mcp_worker::available_parallelism(),
             },
         )?;
         let branch = text(&ready["status"], "branch")?.to_string();
@@ -413,16 +577,17 @@ impl Worktrees {
             managed,
             read_only: self.read_only,
             alive: Arc::clone(&worker.alive),
-            worker: Mutex::new(Some(worker)),
+            worker: Mutex::new(Some(Arc::new(worker))),
             published: RwLock::new(Published {
                 status: ready["status"].clone(),
+                sequence: 0,
                 runtime: None,
                 runtime_error: None,
                 failure: None,
                 stopped: false,
             }),
         });
-        context.update(&ready)?;
+        context.update(&mut ready)?;
         self.contexts
             .write()
             .expect("validated worktree context invariant")
@@ -605,7 +770,6 @@ impl Worktrees {
     }
     fn create_or_open(&self, args: &Value, create: bool) -> Result<Value, ReqvireError> {
         let _gate = self.admin.lock().expect("worktree lock poisoned");
-        let _repo_lock = lock_file(&self.common.join("reqvire-mcp-administration.lock"))?;
         let branch = text(args, "branch")?;
         self.validate_branch(branch)?;
         let existing = self
@@ -615,7 +779,7 @@ impl Worktrees {
             .values()
             .find(|c| c.branch == branch)
             .cloned();
-        if let Some(context) = existing {
+        if let Some(context) = existing.as_ref() {
             if create {
                 return Err(error("Branch already exists"));
             }
@@ -628,6 +792,23 @@ impl Worktrees {
                 }
                 return Ok(context.metadata());
             }
+        }
+        // An already accepted context needs no Git administration. Acquire the
+        // cross-process lock before changing registrations or preparing worktrees.
+        let _repo_lock = lock_file(&self.common.join("reqvire-mcp-administration.lock"))?;
+        if let Some(context) = existing {
+            // Readers and browser handles can retain this context after it is
+            // removed from the registry. Stop its process explicitly before
+            // readmission so those handles cannot retain the old ownership.
+            let mut worker = context.worker.lock().expect("worktree lock poisoned");
+            if let Some(worker) = worker.take() {
+                worker.stop();
+            }
+            context
+                .published
+                .write()
+                .expect("context registry poisoned")
+                .stopped = true;
             self.contexts
                 .write()
                 .expect("context registry poisoned")
@@ -714,35 +895,19 @@ impl Worktrees {
                 vec!["worktree", "add", "--", path, branch]
             };
             if let Err(failure) = git(&self.root, &args) {
-                let cleaned = self.compensate_creation(&root, branch, &base_commit, create);
-                return Err(error(format!(
-                    "{failure}{}",
-                    if cleaned {
-                        String::new()
-                    } else {
-                        format!(
-                            "; partial worktree/ref retained for recovery: {} ({branch})",
-                            root.display()
-                        )
-                    }
-                )));
+                return Err(self.creation_failure(failure, &root, branch, &base_commit, create));
             }
             if let Err(failure) = fs::write(
                 self.provenance_path(&root),
                 serde_json::to_vec(&json!({"workspace_root":root,"branch":branch}))?,
             ) {
-                let cleaned = self.compensate_creation(&root, branch, &base_commit, create);
-                return Err(error(format!(
-                    "Cannot record managed worktree: {failure}{}",
-                    if cleaned {
-                        String::new()
-                    } else {
-                        format!(
-                            "; worktree/ref retained for recovery: {} ({branch})",
-                            root.display()
-                        )
-                    }
-                )));
+                return Err(self.creation_failure(
+                    format!("Cannot record managed worktree: {failure}"),
+                    &root,
+                    branch,
+                    &base_commit,
+                    create,
+                ));
             }
         }
         let managed = self.is_managed(&root, branch);
@@ -759,31 +924,43 @@ impl Worktrees {
                 value["base_commit"] = json!(base_commit);
                 Ok(value)
             }
-            Err(failure) => {
-                let residual =
-                    created && !self.compensate_creation(&root, branch, &base_commit, create);
-                Err(error(format!(
-                    "{failure}{}",
-                    if residual {
-                        format!(
-                            "; partial worktree/ref retained for recovery: {} ({branch})",
-                            root.display()
-                        )
-                    } else {
-                        String::new()
-                    }
-                )))
-            }
+            Err(failure) => Err(if created {
+                self.creation_failure(failure, &root, branch, &base_commit, create)
+            } else {
+                failure
+            }),
         }
     }
+    fn creation_failure(
+        &self,
+        failure: impl std::fmt::Display,
+        root: &Path,
+        branch: &str,
+        base: &str,
+        new_branch: bool,
+    ) -> ReqvireError {
+        let cleanup = match self.compensate_creation(root, branch, base, new_branch) {
+            Ok(true) => return error(failure.to_string()),
+            Ok(false) => String::new(),
+            Err(reason) => format!("; cleanup failed: {reason}"),
+        };
+        error(format!(
+            "{failure}{cleanup}; partial worktree/ref retained for recovery: {} ({branch})",
+            root.display()
+        ))
+    }
     // Compensation is limited to a new, still-clean checkout at the exact expected branch and commit.
-    fn compensate_creation(&self, root: &Path, branch: &str, base: &str, new_branch: bool) -> bool {
-        let Ok(_guard) = lock_file(&self.common.join(format!(
+    fn compensate_creation(
+        &self,
+        root: &Path,
+        branch: &str,
+        base: &str,
+        new_branch: bool,
+    ) -> Result<bool, ReqvireError> {
+        let _guard = lock_file(&self.common.join(format!(
             "reqvire-mcp-{}.lock",
             reqvire::utils::hash_content(&format!("refs/heads/{branch}"))
-        ))) else {
-            return false;
-        };
+        )))?;
         if !repository_worktrees(&self.root).is_ok_and(|rows| {
             rows.iter().any(|row| {
                 row["workspace_root"].as_str() == root.to_str() && row["branch"] == branch
@@ -795,7 +972,7 @@ impl Worktrees {
                 .as_deref()
                 != Some(branch)
         {
-            return false;
+            return Ok(false);
         }
         if git(
             &self.root,
@@ -808,15 +985,15 @@ impl Worktrees {
         )
         .is_err()
         {
-            return false;
+            return Ok(false);
         }
         let _ = fs::remove_file(self.provenance_path(root));
-        !new_branch
+        Ok(!new_branch
             || git(
                 &self.root,
                 &["update-ref", "-d", &format!("refs/heads/{branch}"), base],
             )
-            .is_ok()
+            .is_ok())
     }
     fn remove(&self, context: &Arc<Context>) -> Result<Value, ReqvireError> {
         let _gate = self.admin.lock().expect("worktree lock poisoned");
@@ -846,7 +1023,9 @@ impl Worktrees {
                     .expect("validated worktree context invariant"),
             ],
         )?;
-        *worker = None;
+        if let Some(worker) = worker.take() {
+            worker.stop();
+        }
         context
             .published
             .write()
@@ -939,16 +1118,10 @@ impl Worktrees {
             let empty = json!({});
             let args = params.get("arguments").unwrap_or(&empty);
             let validation = (|| {
-                let definitions = self.definitions();
-                let definition = definitions
-                    .iter()
-                    .find(|tool| tool["name"] == name)
+                let (definition, core_tool) = self.tool_catalog.get(name)
                     .ok_or_else(|| error(format!("Tool {name} is unavailable for this session")))?;
                 validate_arguments(args, &definition["inputSchema"])?;
-                if reqvire::tool_interface::tool_definitions(true)
-                    .iter()
-                    .any(|tool| tool["name"] == name)
-                {
+                if core_tool {
                     let mut core_args = args.clone();
                     if let Some(arguments) = core_args.as_object_mut() {
                         arguments.remove("worktree_id");
@@ -966,6 +1139,11 @@ impl Worktrees {
                     ),
                 ));
             }
+        }
+        if crate::mcp_worker::parallel_read(method, &params)
+            && !(method == "resources/read" && params["uri"] == "reqvire://tools/contract")
+        {
+            return self.handle_read(method, params);
         }
         let result = self.handle_inner(method, &mut params);
         result.map_err(|e| {
@@ -1047,53 +1225,107 @@ impl Worktrees {
                 json!({"contents":[{"uri":"reqvire://tools/contract","mimeType":"application/json","text":self.contract().to_string()}]}),
             );
         }
-        let (id, original_uri) = if method == "resources/read" {
-            let uri = text(params, "uri")?.to_string();
-            let (base, id) = resource_selector(&uri)?;
-            params["uri"] = json!(base);
-            (id, Some(uri))
-        } else {
-            let id = params["arguments"]
-                .get("worktree_id")
-                .map(|v| {
-                    v.as_str()
-                        .map(str::to_owned)
-                        .ok_or_else(|| error("worktree_id must be a string"))
-                })
-                .transpose()?;
-            if let Some(args) = params["arguments"].as_object_mut() {
-                args.remove("worktree_id");
-            }
-            (id, None)
-        };
-        let context = self.resolve(id.as_deref())?;
-        let mut worker = context.worker.lock().expect("worktree lock poisoned");
-        let response = context.request_locked(
-            &mut worker,
-            &json!({"operation":"rpc","method":method,"params":params}),
-        )?;
-        if let Some(failure) = response.get("rpc_error") {
-            return Err(error(failure.to_string()));
+        Err(error(format!("Unknown MCP method: {method}")))
+    }
+    fn handle_read(&self, method: &str, mut params: Value) -> Result<Value, rmcp::ErrorData> {
+        if method == "tools/call" && params.get("arguments").is_none() {
+            params["arguments"] = json!({});
         }
-        let mut result = response["result"].clone();
-        result["_meta"] = json!({"reqvire/context":context.metadata()});
+        let selected = (|| {
+            let (id, original_uri) = if method == "resources/read" {
+                let uri = text(&params, "uri")?.to_string();
+                let (base, id) = resource_selector(&uri)?;
+                params["uri"] = json!(base);
+                (id, Some(uri))
+            } else {
+                let id = params["arguments"]
+                    .get("worktree_id")
+                    .map(|v| {
+                        v.as_str()
+                            .map(str::to_owned)
+                            .ok_or_else(|| error("worktree_id must be a string"))
+                    })
+                    .transpose()?;
+                if let Some(args) = params["arguments"].as_object_mut() {
+                    args.remove("worktree_id");
+                }
+                (id, None)
+            };
+            Ok::<_, ReqvireError>((self.resolve(id.as_deref())?, original_uri))
+        })();
+        let (context, original_uri) = match selected {
+            Ok(selected) => selected,
+            // Schema validation already succeeded in handle(). Preserve the
+            // same execution-error envelope as serialized tool dispatch.
+            Err(failure) if method == "tools/call" => {
+                return Ok(crate::mcp::tool_error(
+                    params["name"].as_str().unwrap_or(method),
+                    failure,
+                ));
+            }
+            Err(failure) => {
+                return Err(rmcp::ErrorData::invalid_params(failure.to_string(), None));
+            }
+        };
+        let name = params["name"].as_str().unwrap_or(method);
+        let reply =
+            context.read_request(&json!({"operation":"rpc","method":method,"params":params}));
+        let (mut result, metadata) = match reply {
+            Ok(response) => {
+                let metadata = response
+                    .get("read_status")
+                    .filter(|status| status.is_object())
+                    .map(|status| context.read_metadata(status.clone()))
+                    .unwrap_or_else(|| context.metadata());
+                if let Some(failure) = response.get("rpc_error") {
+                    let mut failure: rmcp::ErrorData = serde_json::from_value(failure.clone())
+                        .unwrap_or_else(|_| {
+                            rmcp::ErrorData::internal_error("Invalid worker error", None)
+                        });
+                    let data = failure.data.get_or_insert_with(|| json!({}));
+                    data["context"] = metadata;
+                    return Err(failure);
+                }
+                (response["result"].clone(), metadata)
+            }
+            Err(failure) if method == "tools/call" => {
+                (crate::mcp::tool_error(name, failure), context.metadata())
+            }
+            Err(failure) => {
+                return Err(rmcp::ErrorData::invalid_params(
+                    failure.to_string(),
+                    Some(json!({"context":context.metadata()})),
+                ))
+            }
+        };
+        result["_meta"] = json!({"reqvire/context":metadata});
+        if method == "tools/call" {
+            if name == "reqvire.workspace_status" {
+                result["structuredContent"]["github"] = self.github.status();
+            }
+            result["structuredContent"]["context"] = metadata.clone();
+            result["content"] = json!([{"type":"text","text":serde_json::to_string_pretty(&result["structuredContent"])
+                .map_err(|e| rmcp::ErrorData::internal_error(e.to_string(), None))?}]);
+        }
         if let Some(uri) = original_uri {
             for content in result["contents"].as_array_mut().into_iter().flatten() {
                 content["uri"] = json!(uri);
             }
         }
         if method == "prompts/get" {
-            result["messages"].as_array_mut().ok_or_else(||error("Invalid prompt response"))?.insert(0,json!({"role":"user","content":{"type":"text","text":format!("Use worktree_id={} for all workspace-bound tool calls in this workflow.",context.id)}}));
+            let messages = result["messages"].as_array_mut().ok_or_else(|| {
+                rmcp::ErrorData::internal_error(
+                    "Invalid prompt response",
+                    Some(json!({"context":metadata})),
+                )
+            })?;
+            messages.insert(0,json!({"role":"user","content":{"type":"text","text":format!("Use worktree_id={} for all workspace-bound tool calls in this workflow.",context.id)}}));
         }
         Ok(result)
     }
     fn call_tool(&self, name: &str, mut args: Value) -> Result<Value, ReqvireError> {
-        let definitions = self.definitions();
-        let definition = definitions
-            .iter()
-            .find(|t| t["name"] == name)
-            .ok_or_else(|| error(format!("Tool {name} is unavailable for this session")))?;
-        validate_arguments(&args, &definition["inputSchema"])?;
+        // handle() has already validated the wrapper and core schemas before
+        // dispatch. The fixed-root worker still validates its process boundary.
         match name {
             "reqvire.tool_contract" => return Ok(success(self.contract())),
             "reqvire.worktree.list" => return self.inventory().map(success),
@@ -1128,9 +1360,9 @@ impl Worktrees {
                 name,
                 "reqvire.git.push" | "reqvire.github.pr.create" | "reqvire.github.pr.comment"
             ) {
-                context.request_locked(worker,&json!({"operation":if name.ends_with(".comment"){"status"}else{"check_clean"}}))?;
+                context.request_locked(worker,&json!({"operation":if name.ends_with(".comment"){"check_writable"}else{"check_clean"}}))?;
                 let status = context.metadata();
-                if status["available"] != true {
+                if status["writes_available"] != true {
                     return Err(error("Owned HEAD changed; restart before publication"));
                 }
                 if !name.ends_with(".comment")
@@ -1188,18 +1420,8 @@ impl Worktrees {
         contract["github"] = self.github.status();
         contract
     }
-    fn definitions(&self) -> Vec<Value> {
-        let mut tools = reqvire::tool_interface::tool_definitions(true);
-        for tool in &mut tools {
-            if tool["name"] != "reqvire.tool_contract" {
-                tool["inputSchema"]["properties"]["worktree_id"] = selector();
-            }
-        }
-        tools.extend(local_definitions());
-        if self.github.available() {
-            tools.extend(publication_definitions());
-        }
-        tools
+    fn definitions(&self) -> &[Value] {
+        &self.tool_catalog.definitions
     }
 }
 fn success(value: Value) -> Value {
@@ -1219,7 +1441,14 @@ fn definition(
     json!({"name":name,"description":description,"inputSchema":{"type":"object","properties":fields,"required":required,"additionalProperties":false},
         "outputSchema":{"type":"object","additionalProperties":true},"annotations":{"readOnlyHint":read,"destructiveHint":!read,"idempotentHint":read,"openWorldHint":external}})
 }
-pub fn local_definitions() -> Vec<Value> {
+pub fn local_definitions() -> &'static [Value] {
+    static DEFINITIONS: LazyLock<Vec<Value>> = LazyLock::new(build_local_definitions);
+    &DEFINITIONS
+}
+
+fn build_local_definitions() -> Vec<Value> {
+    #[cfg(test)]
+    tests::LOCAL_CATALOG_BUILDS.with(|count| count.set(count.get() + 1));
     vec![
         definition(
             "reqvire.worktree.list",
@@ -1292,6 +1521,8 @@ fn publication_definitions() -> Vec<Value> {
     ]
 }
 fn validate_arguments(args: &Value, schema: &Value) -> Result<(), ReqvireError> {
+    #[cfg(test)]
+    tests::WRAPPER_VALIDATIONS.with(|count| count.set(count.get() + 1));
     let args = args
         .as_object()
         .ok_or_else(|| error("Arguments must be an object"))?;
@@ -1387,9 +1618,260 @@ pub fn repository_worktrees(root: &Path) -> Result<Vec<Value>, ReqvireError> {
 }
 
 #[cfg(test)]
+pub(crate) fn local_catalog_build_count() -> usize {
+    tests::LOCAL_CATALOG_BUILDS.with(std::cell::Cell::get)
+}
+
+#[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn runtime_publication_consumes_payload_and_retains_last_valid_snapshot_on_failure() {
+        let context = Context {
+            id: "context-test".into(),
+            root: PathBuf::from("/unused"),
+            branch: "main".into(),
+            original: true,
+            managed: false,
+            read_only: false,
+            worker: Mutex::new(None),
+            alive: Arc::new(AtomicBool::new(true)),
+            published: RwLock::new(Published {
+                status: json!({}),
+                sequence: 0,
+                runtime: None,
+                runtime_error: None,
+                failure: None,
+                stopped: false,
+            }),
+        };
+        let mut deep = json!("leaf");
+        for _ in 0..140 {
+            deep = json!({"child":deep});
+        }
+        let store = json!({
+            "project":{"worktree_id":"context-test", "branch":"main"},
+            "elements":[{"id":"Lärche 測定", "content":"</script>&\u{2028}\u{2029}", "number":-0.0}],
+            "unknown":deep, "empty":[],
+        });
+        let response = json!({"runtime":{"project_store":store,"ontologies_ttl":"ontology"},
+            "status":{"available":true},"result":{"preserve":"tool result"}});
+        // This is the production pipe decoder, including its deep-store policy.
+        let mut response = parse_json(&response.to_string()).unwrap();
+        let ontology_address = response["runtime"]["ontologies_ttl"]
+            .as_str()
+            .unwrap()
+            .as_ptr();
+        context.update(&mut response).unwrap();
+        assert!(
+            response["runtime"].is_null(),
+            "publication must consume the payload, not clone it"
+        );
+        assert_eq!(response["result"]["preserve"], "tool result");
+        let accepted = Arc::clone(context.published.read().unwrap().runtime.as_ref().unwrap());
+        assert_eq!(accepted.assets.ontologies_ttl.as_ptr(), ontology_address);
+        assert_eq!(
+            parse_json(&accepted.assets.project_store_json).unwrap(),
+            store
+        );
+        let seed = accepted
+            .assets
+            .project_store_js
+            .strip_prefix("window.reqvireProjectStore = ")
+            .unwrap()
+            .strip_suffix(";\n")
+            .unwrap();
+        assert_eq!(parse_json(seed).unwrap(), store);
+        assert!(!seed.contains(['<', '>', '&', '\u{2028}', '\u{2029}']));
+        let prior_revision = accepted.live.revision.clone();
+        context
+            .update(&mut json!({"sequence":42,"status":{"available":true,"model_revision":"new"}}))
+            .unwrap();
+        context
+            .update(
+                &mut json!({"sequence":41,"status":{"available":true,"model_revision":"old"},
+            "read_status":{"model_revision":"old"}}),
+            )
+            .unwrap();
+        assert_eq!(
+            context.metadata()["model_revision"],
+            "new",
+            "late read rolled back status"
+        );
+        assert!(
+            Arc::ptr_eq(&accepted, &context.runtime().unwrap()),
+            "read replaced Explorer runtime"
+        );
+        for bad in [
+            json!({"project_store":[],"ontologies_ttl":"other"}),
+            json!({"project_store":store,"ontologies_ttl":null}),
+        ] {
+            let mut response = json!({"runtime":bad,"status":{"available":true}});
+            context.update(&mut response).unwrap();
+            let published = context.published.read().unwrap();
+            assert!(published.runtime_error.is_some());
+            assert!(Arc::ptr_eq(published.runtime.as_ref().unwrap(), &accepted));
+            assert_eq!(accepted.live.revision, prior_revision);
+        }
+        let mut response = json!({"runtime":{"project_store":{"elements":[]},"ontologies_ttl":"new"}});
+        context.update(&mut response).unwrap();
+        let published = context.published.read().unwrap();
+        assert!(published.runtime_error.is_none());
+        assert!(!Arc::ptr_eq(published.runtime.as_ref().unwrap(), &accepted));
+        assert_eq!(accepted.live.revision, prior_revision);
+        assert_ne!(
+            published.runtime.as_ref().unwrap().live.revision,
+            prior_revision
+        );
+    }
+    use std::cell::Cell;
+    thread_local! {
+        pub(super) static CATALOG_BUILDS: Cell<usize> = const { Cell::new(0) };
+        pub(super) static LOCAL_CATALOG_BUILDS: Cell<usize> = const { Cell::new(0) };
+        pub(super) static WRAPPER_VALIDATIONS: Cell<usize> = const { Cell::new(0) };
+    }
+
+    #[test]
+    fn dispatch_reuses_session_catalog_and_validates_wrapper_once() {
+        for commits in [false, true] {
+            let temp = fixture();
+            let manager = manager(temp.path(), commits);
+            let expected = manager.handle("tools/list", json!({})).unwrap();
+            let before = CATALOG_BUILDS.with(Cell::get);
+            let validations = WRAPPER_VALIDATIONS.with(Cell::get);
+            for _ in 0..3 {
+                call(&manager, "reqvire.search", json!({"short":true}));
+            }
+            assert_eq!(
+                CATALOG_BUILDS.with(Cell::get),
+                before,
+                "ordinary calls must reuse the session catalog"
+            );
+            assert_eq!(
+                WRAPPER_VALIDATIONS.with(Cell::get),
+                validations + 3,
+                "validate once per wrapper call"
+            );
+            assert_eq!(manager.handle("tools/list", json!({})).unwrap(), expected);
+        }
+    }
+
+    #[test]
+    fn catalog_github_gating_keeps_shared_schemas_immutable() {
+        let local = SessionToolCatalog::new(false);
+        let github = SessionToolCatalog::new(true);
+        for name in [
+            "reqvire.git.push",
+            "reqvire.github.pr.create",
+            "reqvire.github.pr.comment",
+        ] {
+            assert!(local.get(name).is_none());
+            let (definition, core) = github.get(name).unwrap();
+            assert!(!core);
+            assert_eq!(definition["annotations"]["openWorldHint"], true);
+        }
+        assert_eq!(
+            &github.definitions[..local.definitions.len()],
+            local.definitions
+        );
+        for enabled in [false, true] {
+            for definition in reqvire::tool_interface::tool_definitions(enabled) {
+                assert!(definition["inputSchema"]["properties"]
+                    .get("worktree_id")
+                    .is_none());
+            }
+        }
+    }
+
+    #[test]
+    fn catalog_rejection_precedes_worker_dispatch() {
+        let temp = fixture();
+        let manager = manager(temp.path(), false);
+        let context = manager.resolve(None).unwrap();
+        let before = fs::read(temp.path().join("Model.md")).unwrap();
+        let head = git(temp.path(), &["rev-parse", "HEAD"]).unwrap();
+        // Holding the worker gate proves rejected inputs do not reach the worker.
+        let gate = context.worker.lock().unwrap();
+        let thread_manager = Arc::clone(&manager);
+        let (done, completed) = mpsc::channel();
+        let pending = std::thread::spawn(move || {
+            for (name, args, diagnostic) in [
+                (
+                    "reqvire.not_a_tool",
+                    json!({}),
+                    "Tool reqvire.not_a_tool is unavailable for this session",
+                ),
+                (
+                    "reqvire.search",
+                    json!({"unknown":true}),
+                    "Unknown argument: unknown",
+                ),
+                (
+                    "reqvire.add_element",
+                    json!({"file":"Model.md"}),
+                    "Missing required argument: content",
+                ),
+                (
+                    "reqvire.search",
+                    json!({"short":"yes"}),
+                    "Invalid argument type: short",
+                ),
+                (
+                    "reqvire.collect",
+                    json!({"element_name":"Root", "direction":"sideways"}),
+                    "Argument 'direction' has unsupported value '\"sideways\"'",
+                ),
+                (
+                    "reqvire.semantic.export",
+                    json!({"layers":[42]}),
+                    "Argument 'layers' must contain only strings",
+                ),
+                (
+                    "reqvire.search",
+                    json!({"worktree_id":" "}),
+                    "worktree_id must not be empty",
+                ),
+                (
+                    "reqvire.github.pr.comment",
+                    json!({"pr_number":1,"body":"text"}),
+                    "Tool reqvire.github.pr.comment is unavailable for this session",
+                ),
+            ] {
+                let rejected = thread_manager
+                    .handle("tools/call", json!({"name":name,"arguments":args}))
+                    .unwrap_err();
+                assert_eq!(rejected.code, rmcp::model::ErrorCode::INVALID_PARAMS);
+                assert_eq!(
+                    rejected.message,
+                    "Invalid tool arguments or unavailable tool"
+                );
+                let data = rejected.data.unwrap();
+                assert_eq!(data["tool"], name);
+                assert!(
+                    data["message"].as_str().unwrap().ends_with(diagnostic),
+                    "{data}"
+                );
+            }
+            done.send(()).unwrap();
+        });
+        let outcome = completed.recv_timeout(Duration::from_secs(3));
+        drop(gate);
+        outcome.expect("argument rejection must complete while the worker gate is held");
+        pending.join().unwrap();
+        // Bypass the wrapper to exercise the worker's independent schema gate.
+        let mut worker = context.worker.lock().unwrap();
+        let response = context.request_locked(&mut worker, &json!({
+            "operation":"rpc", "method":"tools/call",
+            "params":{"name":"reqvire.add_element", "arguments":{"file":"Model.md", "unexpected":true}}
+        })).unwrap();
+        assert_eq!(response["rpc_error"]["code"], -32602);
+        assert_eq!(response["rpc_error"]["message"], "Invalid tool arguments");
+        assert_eq!(fs::read(temp.path().join("Model.md")).unwrap(), before);
+        assert_eq!(git(temp.path(), &["rev-parse", "HEAD"]).unwrap(), head);
+    }
+
     const MODEL: &str = include_str!("../../../tests/test-cache-integration/fixtures/model.md.txt");
     const OTHER: &str = include_str!("../../../tests/test-cache-integration/fixtures/other.md.txt");
     struct TestRepo {
@@ -1466,10 +1948,12 @@ mod tests {
         }))
         .unwrap();
         let (_worker, ready) = Worker::spawn(&executable(), root, &options).unwrap();
-        assert!(ready["runtime"]["project_store_json"]
-            .as_str()
-            .unwrap()
-            .contains("Uncommitted Subject"));
+        let store = &ready["runtime"]["project_store"];
+        assert!(store.is_object(), "worker must transfer one structured store");
+        assert!(store.to_string().contains("Uncommitted Subject"));
+        assert_eq!(store["project"]["worktree_id"], "read-test");
+        assert_eq!(store["project"]["branch"], "main");
+        assert!(ready["runtime"].get("project_store_json").is_none());
         assert_eq!(fs::read_to_string(root.join("Model.md")).unwrap(), changed);
         assert_eq!(git(root, &["status", "--porcelain=v1"]).unwrap(), before);
         assert_eq!(git(root, &["branch", "--show-current"]).unwrap(), "main");
@@ -1478,6 +1962,89 @@ mod tests {
             .file_name()
             .to_string_lossy()
             .starts_with("reqvire-mcp")));
+    }
+
+    #[test]
+    fn healthy_context_reuse_does_not_require_repository_administration() {
+        let repo = fixture();
+        git(repo.path(), &["branch", "unopened"]).unwrap();
+        let manager = manager(repo.path(), false);
+        let original = manager.resolve(Some(&manager.original)).unwrap();
+        let administration = lock_file(&manager.common.join("reqvire-mcp-administration.lock")).unwrap();
+        let reused = call(&manager, "reqvire.worktree.open", json!({"branch":"main"}));
+        assert_eq!(reused["worktree_id"], original.id);
+        assert!(Arc::ptr_eq(&original, &manager.resolve(Some(&original.id)).unwrap()));
+        rejected(&manager, "reqvire.worktree.open", json!({"branch":"unopened"}));
+        assert_eq!(manager.contexts.read().unwrap().len(), 1);
+        assert_eq!(repository_worktrees(repo.path()).unwrap().len(), 1);
+        drop(administration);
+        call(&manager, "reqvire.worktree.open", json!({"branch":"unopened"}));
+        assert_eq!(manager.contexts.read().unwrap().len(), 2);
+    }
+
+    #[test]
+    fn lock_failures_identify_administration_path_without_changing_contexts() {
+        let repo = fixture();
+        git(repo.path(), &["branch", "unopened"]).unwrap();
+        let manager = manager(repo.path(), false);
+        let before = fs::read(repo.path().join("Model.md")).unwrap();
+        let head = git(repo.path(), &["rev-parse", "HEAD"]).unwrap();
+        let index = fs::read(repo.path().join(".git/index")).unwrap();
+        let path = manager.common.join("reqvire-mcp-administration.lock");
+        fs::create_dir(&path).unwrap();
+        let rejected = rejected(
+            &manager,
+            "reqvire.worktree.open",
+            json!({"branch":"unopened"}),
+        );
+        let failure = rejected.to_string();
+        assert!(
+            failure.contains(path.to_str().unwrap())
+                && failure.contains("open")
+                && failure.contains("os error"),
+            "{failure}"
+        );
+        assert!(!failure.contains("already owned"), "{failure}");
+        assert_eq!(manager.contexts.read().unwrap().len(), 1);
+        assert_eq!(repository_worktrees(repo.path()).unwrap().len(), 1);
+        assert_eq!(fs::read(repo.path().join("Model.md")).unwrap(), before);
+        assert_eq!(fs::read(repo.path().join(".git/index")).unwrap(), index);
+        assert_eq!(git(repo.path(), &["rev-parse", "HEAD"]).unwrap(), head);
+        fs::remove_dir(path).unwrap();
+        call(
+            &manager,
+            "reqvire.worktree.open",
+            json!({"branch":"unopened"}),
+        );
+    }
+
+    #[test]
+    fn lock_failure_during_compensation_preserves_both_errors_and_residual_path() {
+        let repo = fixture();
+        let manager = manager(repo.path(), false);
+        let path = manager.common.join(format!(
+            "reqvire-mcp-{}.lock",
+            reqvire::utils::hash_content("refs/heads/blocked")
+        ));
+        fs::create_dir(&path).unwrap();
+        let failure = rejected(
+            &manager,
+            "reqvire.worktree.create",
+            json!({"branch":"blocked", "base_ref":"main"}),
+        )
+        .to_string();
+        assert!(
+            failure.contains("cleanup failed")
+                && failure.contains("retained for recovery")
+                && failure.contains(path.to_str().unwrap()),
+            "{failure}"
+        );
+        assert!(path.is_dir());
+        assert_eq!(manager.contexts.read().unwrap().len(), 1);
+        assert_eq!(
+            git(repo.path(), &["branch", "--show-current"]).unwrap(),
+            "main"
+        );
     }
 
     #[test]
@@ -1846,6 +2413,243 @@ mod tests {
         );
         rejected(&manager, "reqvire.search", json!({"worktree_id":id}));
     }
+    #[cfg(unix)]
+    #[test]
+    fn recovery_worker_retains_accepted_context() {
+        use std::os::unix::fs::PermissionsExt;
+        let temp = fixture();
+        let manager = manager(temp.path(), true);
+        let child = call(
+            &manager,
+            "reqvire.worktree.create",
+            json!({"branch":"recovery","base_ref":"main"}),
+        );
+        let id = child["worktree_id"].as_str().unwrap();
+        let root = PathBuf::from(child["workspace_root"].as_str().unwrap());
+        let context = manager.resolve(Some(id)).unwrap();
+        let accepted = context.runtime().unwrap();
+        let revision = context.metadata()["model_revision"].clone();
+        let head = context.metadata()["head"].clone();
+        let hook = temp.path().join(".git/hooks/reference-transaction");
+        fs::write(
+            &hook,
+            r#"#!/bin/sh
+if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
+"#,
+        )
+        .unwrap();
+        fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
+        let failed = rejected(
+            &manager,
+            "reqvire.add_element",
+            json!({"worktree_id":id,"file":"Model.md","content":OTHER.split_once("# Elements\n\n").unwrap().1}),
+        );
+        fs::remove_file(hook).unwrap();
+        assert!(failed.to_string().contains("recovery failed"), "{failed}");
+        assert!(
+            root.join("Model.md").is_dir(),
+            "force an incomplete filesystem restoration"
+        );
+        let status = call(
+            &manager,
+            "reqvire.workspace_status",
+            json!({"worktree_id":id}),
+        );
+        assert_eq!(status["context"]["state"], "recovery_required");
+        assert_eq!(status["context"]["writes_available"], false);
+        assert_eq!(status["context"]["model_revision"], revision);
+        assert_eq!(status["context"]["head"], head);
+        let read = call(&manager, "reqvire.search", json!({"worktree_id":id}));
+        assert!(
+            read.to_string().contains("Cache Subject")
+                && !read.to_string().contains("Other Subject")
+        );
+        assert!(Arc::ptr_eq(&accepted, &context.runtime().unwrap()));
+        let reopened = call(
+            &manager,
+            "reqvire.worktree.open",
+            json!({"branch":"recovery"}),
+        );
+        assert_eq!(reopened["worktree_id"], id);
+        assert_eq!(context.metadata()["recovery_required"], true);
+        let resource = manager
+            .handle(
+                "resources/read",
+                json!({"uri":format!("reqvire://workspace/status?worktree_id={id}")}),
+            )
+            .unwrap();
+        assert_eq!(
+            resource["_meta"]["reqvire/context"]["recovery_required"],
+            true
+        );
+        rejected(
+            &manager,
+            "reqvire.git.commit",
+            json!({"worktree_id":id,"message":"blocked"}),
+        );
+        rejected(
+            &manager,
+            "reqvire.worktree.remove",
+            json!({"worktree_id":id}),
+        );
+        for name in [
+            "reqvire.git.push",
+            "reqvire.github.pr.create",
+            "reqvire.github.pr.comment",
+        ] {
+            // Exercise the publication gate even when gh discovery hides these tools.
+            let result = manager.call_tool(name, json!({"worktree_id":id})).unwrap();
+            assert_eq!(result["isError"], true);
+            assert!(result.to_string().contains("requires recovery"), "{result}");
+        }
+        call(
+            &manager,
+            "reqvire.add_element",
+            json!({"worktree_id":manager.original,"file":"Model.md","content":OTHER.split_once("# Elements\n\n").unwrap().1}),
+        );
+        assert!(!call(&manager, "reqvire.search", json!({"worktree_id":id}))
+            .to_string()
+            .contains("Other Subject"));
+        {
+            let mut gate = context.worker.lock().unwrap();
+            let worker = gate.as_mut().unwrap();
+            worker.child.lock().unwrap().kill().unwrap();
+            worker.child.lock().unwrap().wait().unwrap();
+        }
+        rejected(&manager, "reqvire.search", json!({"worktree_id":id}));
+        assert_eq!(context.metadata()["available"], false);
+        assert_eq!(context.metadata()["writes_available"], false);
+        assert!(context.runtime().is_err());
+        rejected(
+            &manager,
+            "reqvire.worktree.open",
+            json!({"branch":"recovery"}),
+        );
+    }
+
+    #[cfg(unix)]
+    fn worker_permissions(commits: bool, track_file_mode: bool) {
+        use std::os::unix::fs::PermissionsExt;
+        let temp = fixture();
+        let root = temp.path();
+        let model_path = root.join("Model.md");
+        let evidence_path = root.join("evidence.txt");
+        fs::write(
+            root.join("Evidence.md"),
+            include_str!("../../../tests/test-cache-integration/fixtures/evidence.md.txt"),
+        )
+        .unwrap();
+        fs::write(&evidence_path, "#!/bin/sh\nexit 0\n").unwrap();
+        fs::set_permissions(&evidence_path, fs::Permissions::from_mode(0o750)).unwrap();
+        git(root, &["config", "core.filemode", "true"]).unwrap();
+        git(root, &["add", "."]).unwrap();
+        git(root, &["commit", "-qm", "executable evidence"]).unwrap();
+        let model_mode = if track_file_mode { 0o640 } else { 0o777 };
+        if !track_file_mode {
+            git(root, &["config", "core.filemode", "false"]).unwrap();
+            fs::set_permissions(&evidence_path, fs::Permissions::from_mode(0o644)).unwrap();
+        }
+        fs::set_permissions(&model_path, fs::Permissions::from_mode(model_mode)).unwrap();
+        let head = git(root, &["rev-parse", "HEAD"]).unwrap();
+        let index = git(root, &["ls-files", "--stage"]).unwrap();
+        let manager = manager(root, commits);
+        call(
+            &manager,
+            "reqvire.add_element",
+            json!({
+                "file":"Model.md", "content":OTHER.split_once("# Elements\n\n").unwrap().1
+            }),
+        );
+        assert_eq!(
+            fs::metadata(&model_path).unwrap().permissions().mode() & 0o7777,
+            model_mode
+        );
+        call(
+            &manager,
+            "reqvire.move_asset",
+            json!({"old_path":"evidence.txt", "new_path":"moved.sh"}),
+        );
+        call(
+            &manager,
+            "reqvire.move_file",
+            json!({"source_file":"Model.md", "target_file":"Renamed.md"}),
+        );
+        assert!(!model_path.exists());
+        assert!(!evidence_path.exists());
+        assert_eq!(
+            fs::read_to_string(root.join("moved.sh")).unwrap(),
+            "#!/bin/sh\nexit 0\n"
+        );
+        if track_file_mode {
+            assert_ne!(
+                fs::metadata(root.join("moved.sh"))
+                    .unwrap()
+                    .permissions()
+                    .mode()
+                    & 0o111,
+                0
+            );
+            assert_eq!(
+                fs::metadata(root.join("Renamed.md"))
+                    .unwrap()
+                    .permissions()
+                    .mode()
+                    & 0o111,
+                0
+            );
+        }
+        if !commits {
+            assert_eq!(git(root, &["rev-parse", "HEAD"]).unwrap(), head);
+            assert_eq!(git(root, &["ls-files", "--stage"]).unwrap(), index);
+            call(
+                &manager,
+                "reqvire.git.commit",
+                json!({"message":"Accepted permissions and moves"}),
+            );
+        }
+        assert!(git(root, &["ls-tree", "HEAD", "--", "Renamed.md"])
+            .unwrap()
+            .starts_with("100644"));
+        assert!(git(root, &["ls-tree", "HEAD", "--", "moved.sh"])
+            .unwrap()
+            .starts_with("100755"));
+        assert_eq!(git(root, &["status", "--porcelain"]).unwrap(), "");
+        let search = call(&manager, "reqvire.search", json!({}));
+        assert!(
+            search.to_string().contains("Renamed.md")
+                && search.to_string().contains("Other Subject")
+        );
+        assert!(manager
+            .browser_context(Some(&manager.original))
+            .unwrap()
+            .runtime()
+            .unwrap()
+            .assets
+            .project_store_json
+            .contains("moved.sh"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn worker_permissions_without_commits() {
+        worker_permissions(false, true);
+    }
+    #[cfg(unix)]
+    #[test]
+    fn worker_permissions_with_commits() {
+        worker_permissions(true, true);
+    }
+    #[cfg(unix)]
+    #[test]
+    fn worker_permissions_ignored_filemode_without_commits() {
+        worker_permissions(false, false);
+    }
+    #[cfg(unix)]
+    #[test]
+    fn worker_permissions_ignored_filemode_with_commits() {
+        worker_permissions(true, false);
+    }
+
     #[test]
     fn resources_prompts_and_concurrent_model_reads_keep_context() {
         let temp = fixture();
@@ -1856,6 +2660,17 @@ mod tests {
             json!({"branch":"secondary","base_ref":"main"}),
         );
         let id = child["worktree_id"].as_str().unwrap();
+        let contract = call(&manager, "reqvire.tool_contract", json!({}));
+        assert_eq!(contract["capabilities"]["worktree_contexts"], true);
+        assert!(contract["tools"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|tool| tool["name"] == "reqvire.worktree.create"));
+        assert!(
+            contract.get("context").is_none(),
+            "server-scoped discovery acquired a context"
+        );
         let resources = manager.handle("resources/list", json!({})).unwrap();
         assert!(resources.to_string().contains(&format!("worktree_id={id}")));
         assert!(manager
@@ -2024,8 +2839,8 @@ mod tests {
         {
             let mut gate = context.worker.lock().unwrap();
             let worker = gate.as_mut().unwrap();
-            worker.child.kill().unwrap();
-            worker.child.wait().unwrap();
+            worker.child.lock().unwrap().kill().unwrap();
+            worker.child.lock().unwrap().wait().unwrap();
         }
         let failed = rejected(&manager, "reqvire.search", json!({"worktree_id":id}));
         assert_eq!(failed["structuredContent"]["context"]["worktree_id"], id);
@@ -2074,6 +2889,22 @@ mod tests {
             rejected_commit["structuredContent"]["context"]["available"],
             false
         );
+        for (method, params) in [
+            (
+                "resources/read",
+                json!({"uri":format!("reqvire://workspace/status?worktree_id={}", manager.original)}),
+            ),
+            (
+                "prompts/get",
+                json!({"name":"reqvire.workflow.verify_coverage","arguments":{"worktree_id":manager.original}}),
+            ),
+        ] {
+            let failure = manager.handle(method, params).unwrap_err();
+            let metadata = &failure.data.as_ref().unwrap()["context"];
+            assert_eq!(metadata["worktree_id"], manager.original);
+            assert_eq!(metadata["available"], false);
+            assert!(failure.message.contains("HEAD changed"), "{failure}");
+        }
     }
     #[test]
     fn http_catalog_includes_context_administration_but_not_unavailable_publication() {
@@ -2093,7 +2924,7 @@ mod tests {
                 .collect::<Vec<_>>()
         );
         let mut read = reqvire::tool_interface::tool_definitions(false);
-        read.push(local_definitions().remove(0));
+        read.push(local_definitions()[0].clone());
         assert_eq!(
             read.iter()
                 .map(|tool| tool["name"].as_str().unwrap())

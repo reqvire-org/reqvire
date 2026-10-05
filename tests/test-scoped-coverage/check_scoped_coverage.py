@@ -15,10 +15,14 @@ import shutil
 import signal
 import socket
 import subprocess
+import sys
 import time
 from threading import Thread
 import urllib.error
 import urllib.request
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from stop_test_processes import stop as stop_test_processes
 
 
 VERIFICATION_KINDS = {
@@ -66,6 +70,27 @@ def equal(actual, expected, label):
 def require(condition, message):
     if not condition:
         raise AssertionError(message)
+
+
+def run_browser(command, output, timeout=90):
+    stdout_path, stderr_path = output / "browser.stdout", output / "browser.stderr"
+    timed_out = False
+    # Persist while running: a timeout must not discard progress or diagnostics.
+    with stdout_path.open("w") as stdout, stderr_path.open("w") as stderr:
+        process = subprocess.Popen(command, stdout=stdout, stderr=stderr, start_new_session=True)
+        try:
+            process.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+        finally:
+            # Also catch browser children left by an unexpectedly exited driver.
+            stop_test_processes(process.pid)
+            process.wait(timeout=5)
+    stdout, stderr = stdout_path.read_text(), stderr_path.read_text()
+    diagnostics = f"{stdout[-4000:]}\n{stderr[-6000:]}"
+    require(not timed_out, f"Browser timed out after {timeout}s: {diagnostics}")
+    require(process.returncode == 0, f"Browser failed: {diagnostics}")
+    return stdout
 
 
 def records(report, section):
@@ -357,8 +382,6 @@ def main():
             check("served-store-scope-index", served_store)
 
             def browser_checks():
-                browser = os.environ.get("REQVIRE_TEST_BROWSER") or next((shutil.which(name) for name in ("chromium", "chromium-browser", "google-chrome") if shutil.which(name)), None)
-                require(browser is not None, "Scoped coverage browser E2E requires Chrome/Chromium")
                 reports = {"whole": whole, **{name: expected_projection(whole, scope) for name, scope in scopes.items()}}
                 (output / "browser-reports.json").write_text(json.dumps(reports))
                 class QuietHandler(SimpleHTTPRequestHandler):
@@ -369,14 +392,11 @@ def main():
                 thread.start()
                 originals = {path: path.read_bytes() for path in (root / "specifications").glob("*.md")}
                 try:
-                    result = subprocess.run(["node", str(Path(__file__).with_name("browser-check.mjs")), browser,
+                    browser_stdout = run_browser(["node", str(Path(__file__).with_name("browser-check.mjs")),
                         served.base_url, f"http://127.0.0.1:{http.server_port}", str(output / "browser-profile"),
                         str(output / "browser-reports.json"), str(fixtures / "Added.md")],
-                        capture_output=True, text=True, timeout=90)
-                    (output / "browser.stdout").write_text(result.stdout)
-                    (output / "browser.stderr").write_text(result.stderr)
-                    require(result.returncode == 0, f"Browser failed: {result.stdout}\n{result.stderr[-4000:]}")
-                    equal(result.stdout, (expected / "browser.txt").read_text(), "Browser check outcomes")
+                        output)
+                    equal(browser_stdout, (expected / "browser.txt").read_text(), "Browser check outcomes")
                 finally:
                     http.shutdown()
                     http.server_close()

@@ -37,6 +37,7 @@ export function useLiveStore() {
     return found;
   }, [clients, selectedWorktree]);
   const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [recovery, setRecovery] = useState<{ context?: string; required: boolean }>({ required: false });
   const requestRef = useRef<AbortController | null>(null);
   const mountedRef = useRef(false);
   const inventoryRequestRef = useRef<AbortController | null>(null);
@@ -92,6 +93,8 @@ export function useLiveStore() {
         setResult(next.result);
         if (worktreeRouting && !selectedWorktree) setSelectedWorktree(next.result.store.project.worktree_id);
       }
+      setRecovery({ context: next?.result.store.project.worktree_id ?? selectedWorktree ?? displayedRef.current,
+        required: client.recoveryRequired });
       setRefreshError(null);
     } catch (error: unknown) {
       if (mountedRef.current && !controller.signal.aborted) {
@@ -141,6 +144,9 @@ export function useLiveStore() {
   }, [worktreeRouting, refreshWorktrees]);
 
   return { result, automaticRefresh: Boolean(live), refreshError: refreshError ?? inventoryError, worktreeRouting, worktrees,
+    recoveryWarning: recovery.required && recovery.context === displayedRef.current
+      ? "MCP recovery required: showing the last accepted model; writes are disabled. Local file downloads are unavailable until the worktree is repaired and the server restarted."
+      : null,
     selectedWorktree, selectWorktree, refreshWorktrees,
     switching: !refreshError && worktreeRouting && selectedWorktree !== undefined && (!result.ok || selectedWorktree !== result.store.project.worktree_id),
   };

@@ -121,6 +121,7 @@ Detailed graph-role identification, o-kernel subset construction, metadata prese
 
 #### Relations
   * definedBy: [External Vocabulary Description Construction Specification](SemanticModelSpecifications.md#external-vocabulary-description-construction-specification)
+  * satisfiedBy: [semantic_store.rs](../../crates/reqvire-core/src/semantic_store.rs)
   * derivedFrom: [Used External Vocabulary Selection](#used-external-vocabulary-selection)
   * specify: [External Ontology Source Management](SemanticModelFeature.md#external-ontology-source-management)
   * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)

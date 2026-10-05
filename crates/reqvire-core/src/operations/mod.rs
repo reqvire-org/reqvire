@@ -15,15 +15,16 @@ use crate::search;
 use crate::verification_trace::{self, VerificationTracesReport};
 use crate::{ModelBuildOptions, ModelManager};
 use serde_json::Value;
+use std::sync::Arc;
 
-pub fn load_model(excluded_filename_patterns: &GlobSet) -> Result<ModelManager, ReqvireError> {
+pub fn load_model(excluded_filename_patterns: &GlobSet) -> Result<Arc<ModelManager>, ReqvireError> {
     load_model_with_options(excluded_filename_patterns, false)
 }
 
 pub fn load_model_with_options(
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
-) -> Result<ModelManager, ReqvireError> {
+) -> Result<Arc<ModelManager>, ReqvireError> {
     model_cache::load_cached_model(
         excluded_filename_patterns,
         ModelBuildOptions {
@@ -35,7 +36,7 @@ pub fn load_model_with_options(
 
 pub fn load_model_lenient(
     excluded_filename_patterns: &GlobSet,
-) -> Result<ModelManager, ReqvireError> {
+) -> Result<Arc<ModelManager>, ReqvireError> {
     model_cache::load_cached_model(
         excluded_filename_patterns,
         ModelBuildOptions {

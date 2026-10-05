@@ -32,10 +32,16 @@
 
 set -e
 
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Use non-default host and random port to test custom options
 TEST_HOST="127.0.0.1"
 TEST_PORT=$((8000 + RANDOM % 1000))
 SERVER_BIN="${REAL_REQVIRE_BIN:-$REQVIRE_BIN}"
+
+# Check initialization before listener startup, including rejected admission.
+python3 "$TEST_SCRIPT_DIR/scripts/startup-check.py" "$REQVIRE_BIN" "$TEST_DIR/output/startup"
+diff -u "$TEST_SCRIPT_DIR/expected/startup-checks.txt" "$TEST_DIR/output/startup/checks.txt"
 
 # Start serve command in background with non-default host and port
 cd "$TEST_DIR"
@@ -57,7 +63,6 @@ stop_server() {
 # Function to cleanup server on exit
 cleanup() {
     stop_server
-    rm -rf "${TEST_DIR}"
 }
 trap cleanup EXIT
 
@@ -69,10 +74,6 @@ for i in {1..20}; do
         break
     fi
     if [ $i -eq 20 ]; then
-        if grep -qi "Operation not permitted" "${TEST_DIR}/serve_output.log"; then
-            echo "⚠ SKIPPED: Serve test cannot bind in this environment"
-            exit 0
-        fi
         echo "❌ FAILED: Server did not start within 10 seconds"
         cat "${TEST_DIR}/serve_output.log"
         exit 1
@@ -114,36 +115,18 @@ if ! echo "$CONTENT" | grep -q '<div id="root"></div>' || ! echo "$CONTENT" | gr
     exit 1
 fi
 
-STORE_RESPONSE=$(curl -s -w "\n%{http_code}" "http://$TEST_HOST:$TEST_PORT/assets/project-store.js")
-STORE_CODE=$(echo "$STORE_RESPONSE" | tail -n1)
-STORE_CONTENT=$(echo "$STORE_RESPONSE" | sed '$d')
-if [ "$STORE_CODE" != "200" ] || ! echo "$STORE_CONTENT" | grep -q "reqvireProjectStore"; then
+STORE_FILE="$TEST_DIR/output/project-store.js"
+STORE_CODE=$(curl -sS -o "$STORE_FILE" -w '%{http_code}' "http://$TEST_HOST:$TEST_PORT/assets/project-store.js")
+if [ "$STORE_CODE" != "200" ]; then
     echo "❌ FAILED: Project Store data asset was not served"
     exit 1
 fi
 
-if ! echo "$STORE_CONTENT" | grep -q '"path": "specifications/Requirements.md"'; then
-    echo "❌ FAILED: Project Store is missing modeled source file records"
-    exit 1
-fi
+python3 "$TEST_DIR/scripts/check-store.py" "$STORE_FILE"
 
 # Exercise the compiled bundle and its real browser URL serialization, using
 # the same temporary Git workspace and golden-file comparisons as other E2Es.
-BROWSER_BIN="${REQVIRE_TEST_BROWSER:-}"
-if [ -z "$BROWSER_BIN" ]; then
-    for candidate in chromium chromium-browser google-chrome; do
-        if command -v "$candidate" >/dev/null 2>&1; then
-            BROWSER_BIN=$(command -v "$candidate")
-            break
-        fi
-    done
-fi
-if [ -z "$BROWSER_BIN" ]; then
-    echo "FAILED: Browser route E2E requires Chrome/Chromium; set REQVIRE_TEST_BROWSER to its executable"
-    exit 1
-fi
-
-if ! timeout -k 5s 45s node "$TEST_DIR/scripts/route-check.mjs" "$BROWSER_BIN" \
+if ! timeout -k 5s 45s node "$TEST_SCRIPT_DIR/scripts/route-check.mjs" \
     "http://$TEST_HOST:$TEST_PORT" "$TEST_DIR/browser-profile" \
     > "$TEST_DIR/browser-routes.txt" 2> "$TEST_DIR/browser-routes.log"; then
     echo "FAILED: Served Explorer browser route checks failed"
@@ -154,23 +137,6 @@ fi
 if ! diff -u "$TEST_DIR/expected/browser-routes.txt" "$TEST_DIR/browser-routes.txt"; then
     echo "FAILED: Served Explorer browser route results do not match expected"
     cat "$TEST_DIR/browser-routes.log"
-    exit 1
-fi
-
-if echo "$STORE_CONTENT" | grep -q '"path": "scripts/evidence.sh"'; then
-    echo "❌ FAILED: Project Store included a resource-only evidence file in the model tree"
-    exit 1
-fi
-
-if ! echo "$STORE_CONTENT" | grep -q '"file_path": "scripts/evidence.sh"' ||
-   ! echo "$STORE_CONTENT" | grep -q '"id": "resource:scripts/evidence.sh"' ||
-   ! echo "$STORE_CONTENT" | grep -q 'serve command evidence'; then
-    echo "❌ FAILED: Project Store did not include the existing graph-referenced evidence file as a resource"
-    exit 1
-fi
-
-if echo "$STORE_CONTENT" | grep -q '"path": "notes/unrelated.md"'; then
-    echo "❌ FAILED: Project Store included an unrelated repository file in the model tree"
     exit 1
 fi
 
@@ -256,10 +222,6 @@ for i in {1..20}; do
         break
     fi
     if [ $i -eq 20 ]; then
-        if grep -qi "Operation not permitted" "${TEST_DIR}/serve_mcp_output.log"; then
-            echo "⚠ SKIPPED: Embedded MCP serve test cannot bind in this environment"
-            exit 0
-        fi
         echo "❌ FAILED: Embedded MCP server did not start within 10 seconds"
         cat "${TEST_DIR}/serve_mcp_output.log"
         exit 1
@@ -345,7 +307,7 @@ if ! grep -q "Serve Embedded MCP Added Requirement" "${TEST_DIR}/serve_mcp_proje
 fi
 
 # Test 9: Embedded MCP browser freshness, conditional revisions, and visibility.
-if ! timeout -k 5s 240s node "$TEST_DIR/scripts/refresh-check.mjs" "$BROWSER_BIN" \
+if ! timeout -k 5s 240s node "$TEST_SCRIPT_DIR/scripts/refresh-check.mjs" \
     "http://$TEST_HOST:$TEST_PORT" "http://$TEST_HOST:$MCP_PORT" "$TEST_DIR" "$SERVER_BIN" \
     > "$TEST_DIR/browser-refresh.txt" 2> "$TEST_DIR/browser-refresh.log"; then
     echo "FAILED: Served Explorer live refresh checks failed"

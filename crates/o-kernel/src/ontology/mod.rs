@@ -44,8 +44,13 @@ pub fn alignment_reference(error: &shacl::AlignmentError) -> Option<(&str, &'sta
 
 /// Extracts referenced SHACL IRIs from a graph, excluding ontology-neutral builtins.
 pub fn extract_shape_references(quads: &[Quad]) -> Vec<shacl::ReferencedIri> {
+    extract_compiled_shape_references(&shacl::ShaclRegistry::parse(quads))
+}
+
+/// Extracts ontology references without recompiling an existing SHACL registry.
+pub fn extract_compiled_shape_references(registry: &shacl::ShaclRegistry) -> Vec<shacl::ReferencedIri> {
     let mut references = Vec::new();
-    for reference in shacl::ShaclRegistry::parse(quads).referenced_iris() {
+    for reference in registry.referenced_iris() {
         let iri = reference.iri.as_str();
         if reference.predicate == SH_DATATYPE && owl_reserved::is_supported_datatype_iri(iri) {
             continue;
@@ -60,7 +65,9 @@ pub fn extract_shape_references(quads: &[Quad]) -> Vec<shacl::ReferencedIri> {
 
 #[cfg(test)]
 mod tests {
-    use super::{alignment_reference, extract_shape_references, MODULE};
+    use super::{
+        alignment_reference, extract_compiled_shape_references, extract_shape_references, MODULE,
+    };
     use oxigraph::io::{RdfFormat, RdfParser};
     use oxigraph::model::{BlankNode, NamedNode, NamedOrBlankNode};
 
@@ -110,6 +117,12 @@ ex:Shape
         );
 
         let references = extract_shape_references(&quads);
+        let registry = crate::shacl::ShaclRegistry::parse(&quads);
+        let compiled_references = extract_compiled_shape_references(&registry);
+        assert_eq!(
+            references.iter().collect::<std::collections::HashSet<_>>(),
+            compiled_references.iter().collect::<std::collections::HashSet<_>>()
+        );
         let values = references
             .iter()
             .map(|reference| (reference.iri.as_str(), reference.predicate))

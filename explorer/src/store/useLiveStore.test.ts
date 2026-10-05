@@ -210,6 +210,28 @@ describe("worktree selection", () => {
     vi.stubGlobal("fetch", fetchMock);
     return { a, b, fetchMock, transport };
   }
+  it("keeps recovery warnings with the displayed context across failed and successful switches", async () => {
+    const { a, b, fetchMock, transport } = contexts();
+    fetchMock.mockImplementation(async (url, init) => {
+      const response = await transport(url, init);
+      if (url.includes('/manifest') && url.includes('worktree_id=a')) response.headers.set('X-Reqvire-Recovery-Required', 'true');
+      return response;
+    });
+    const hook = renderHook(() => useLiveStore());
+    await tick();
+    expect(hook.result.current.recoveryWarning).toMatch(/recovery/i);
+    fetchMock.mockImplementation(async (url, init) => url.includes('worktree_id=b')
+      ? Response.json({ error: 'unavailable' }, { status: 503 }) : transport(url, init));
+    act(() => hook.result.current.selectWorktree('b'));
+    await tick();
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(a.store);
+    expect(hook.result.current.recoveryWarning).toMatch(/recovery/i);
+    fetchMock.mockImplementation(transport);
+    act(() => hook.result.current.selectWorktree('b'));
+    await tick();
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
+    expect(hook.result.current.recoveryWarning).toBeNull();
+  });
   it("loads read-only branch selections without enabling periodic refresh", async () => {
     const { a, b, fetchMock } = contexts();
     delete window.reqvireLiveRefresh;
@@ -282,9 +304,12 @@ describe("worktree selection", () => {
     await tick();
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
     expect(window.location.search).toBe("?worktree_id=b");
-    await act(async () => { release(manifestResponse(a)); });
+    const late = manifestResponse(a);
+    late.headers.set('X-Reqvire-Recovery-Required', 'true');
+    await act(async () => { release(late); });
     await tick();
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
+    expect(hook.result.current.recoveryWarning).toBeNull();
     expect(fetchMock.mock.calls.filter(([url]) => url.includes("/chunks")).every(([url]) => url.includes("worktree_id="))).toBe(true);
   });
   it("retains the labelled valid branch when a selected ID disappears, and recovers explicitly", async () => {
@@ -307,4 +332,42 @@ describe("worktree selection", () => {
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(a.store);
     expect(storage).not.toHaveBeenCalled();
   });
+});
+
+it("keeps a recovery warning on unchanged accepted snapshots and clears it with a healthy response", async () => {
+  const { seed, fetchMock, transport } = backend();
+  let recovery = true;
+  fetchMock.mockImplementation(async (url, init) => {
+    const response = await transport(url, init);
+    if (recovery && url.endsWith('/manifest')) response.headers.set('X-Reqvire-Recovery-Required', 'true');
+    return response;
+  });
+  const hook = renderHook(() => useLiveStore());
+  await tick();
+  expect(hook.result.current.recoveryWarning).toMatch(/last accepted model.*writes are disabled/i);
+  expect(hook.result.current.refreshError).toBeNull();
+  expect(hook.result.current.result.ok && hook.result.current.result.store).toBe(seed.store);
+  await tick(5000);
+  expect(hook.result.current.recoveryWarning).toMatch(/recovery/i);
+  expect(fetchMock.mock.calls.every(([url]) => url.endsWith('/manifest'))).toBe(true);
+  recovery = false;
+  await tick(5000);
+  expect(hook.result.current.recoveryWarning).toBeNull();
+});
+
+it("adopts a fresh recovery snapshot after reload and labels it without a refresh failure", async () => {
+  const seed = wireSnapshot(smallStore());
+  delete window.reqvireProjectStore;
+  window.reqvireLiveRefresh = seed.seed;
+  vi.stubGlobal('fetch', vi.fn(async (url: string, init: RequestInit = {}) => {
+    if (!url.endsWith('/manifest')) return chunkResponse(seed, init);
+    const response = manifestResponse(seed);
+    response.headers.set('X-Reqvire-Recovery-Required', 'true');
+    return response;
+  }));
+  const hook = renderHook(() => useLiveStore());
+  await tick();
+  expect(hook.result.current.result.ok).toBe(true);
+  expect(hook.result.current.recoveryWarning).toMatch(/writes are disabled/i);
+  expect(hook.result.current.refreshError).toBeNull();
 });

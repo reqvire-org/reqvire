@@ -51,4 +51,4 @@ export type {
 } from "./ReportPatterns";
 export { TraceFlow, ElementFlow } from "./TraceFlow";
 export type { TraceFlowProps, ElementFlowProps } from "./TraceFlow";
-export type { TraceFlowData, TraceFlowElement, TraceFlowRequirement, ElementFlowData } from "./traceFlowLayout";
+export type { TraceFlowData, TraceFlowElement, TraceFlowRequirement, ElementFlowData, FlowLayoutEngine, FlowLayoutTask } from "./traceFlowLayout";

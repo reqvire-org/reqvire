@@ -26,11 +26,19 @@ use serde_json::{json, Value};
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::{RwLock, Semaphore};
+
+pub(crate) fn capacity_error() -> McpError {
+    McpError::new(
+        ErrorCode(-32000),
+        "MCP request capacity exhausted; retry later",
+        Some(json!({"retryable":true})),
+    )
+}
 
 pub type PostWriteHook = Arc<
     dyn Fn(
-            Option<reqvire::ModelManager>,
+            Option<Arc<reqvire::ModelManager>>,
         ) -> Pin<Box<dyn Future<Output = Result<(), ReqvireError>> + Send>>
         + Send
         + Sync,
@@ -56,10 +64,14 @@ struct ReqvireMcpServer {
     enable_mutations: bool,
     with_size_estimates: bool,
     excluded_filename_patterns: Arc<GlobSet>,
-    write_lock: Arc<Mutex<()>>,
+    write_lock: Arc<RwLock<()>>,
     post_write_hook: Option<PostWriteHook>,
+    read_capacity: Arc<Semaphore>,
+    control_capacity: Arc<Semaphore>,
     session: Option<Arc<std::sync::Mutex<crate::mcp_session::MutationSession>>>,
     worktrees: Option<Arc<crate::mcp_worktrees::Worktrees>>,
+    #[cfg(test)]
+    before_dispatch: Option<Arc<dyn Fn(&str, &Value) + Send + Sync>>,
 }
 
 impl ReqvireMcpServer {
@@ -68,7 +80,7 @@ impl ReqvireMcpServer {
         enable_commits: bool,
         with_size_estimates: bool,
         excluded_filename_patterns: &GlobSet,
-        write_lock: Arc<Mutex<()>>,
+        write_lock: Arc<RwLock<()>>,
         post_write_hook: Option<PostWriteHook>,
     ) -> Result<Self, ReqvireError> {
         if enable_commits && !enable_mutations {
@@ -93,8 +105,12 @@ impl ReqvireMcpServer {
             excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
             write_lock,
             post_write_hook,
+            read_capacity: Arc::new(Semaphore::new(crate::mcp_worker::available_parallelism())),
+            control_capacity: Arc::new(Semaphore::new(crate::mcp_worker::available_parallelism())),
             session,
             worktrees: None,
+            #[cfg(test)]
+            before_dispatch: None,
         })
     }
 
@@ -105,18 +121,58 @@ impl ReqvireMcpServer {
         serialize: bool,
     ) -> Result<Value, McpError> {
         if let Some(worktrees) = &self.worktrees {
+            // Separate budgets let control operations progress even when all
+            // read slots are occupied; both queues remain bounded.
+            let budget = if crate::mcp_worker::parallel_read(method, &params) {
+                &self.read_capacity
+            } else {
+                &self.control_capacity
+            };
+            let permit = budget
+                .clone()
+                .try_acquire_owned()
+                .map_err(|_| capacity_error())?;
             let worktrees = Arc::clone(worktrees);
             let method = method.to_string();
-            return tokio::task::spawn_blocking(move || worktrees.handle(&method, params))
-                .await
-                .map_err(|e| {
-                    McpError::internal_error(format!("Worktree request failed: {e}"), None)
-                })?;
+            return tokio::task::spawn_blocking(move || {
+                let _permit = permit;
+                worktrees.handle(&method, params)
+            })
+            .await
+            .map_err(|e| {
+                McpError::internal_error(format!("Worktree request failed: {e}"), None)
+            })?;
+        }
+        if !self.enable_mutations {
+            // All clients share this budget. There is no extra admission queue:
+            // reserve capacity before creating a blocking job or waiting for a
+            // controlled write. Size it from the host's available parallelism;
+            // parsing/validation/query work can consume a full CPU per request.
+            let capacity = self
+                .read_capacity
+                .clone()
+                .try_acquire_owned()
+                .map_err(|_| capacity_error())?;
+            // A fair shared gate allows independent reads, without racing a
+            // controlled write or starving an already queued writer.
+            let gate = self.write_lock.clone().read_owned().await;
+            let server = self.clone();
+            let method = method.to_owned();
+            return tokio::task::spawn_blocking(move || {
+                // Keep both guards inside the job. Dropping the async waiter
+                // cannot release them while synchronous work is still running.
+                let (_capacity, _gate) = (capacity, gate);
+                server.call_handler_unlocked(&method, params)
+            })
+            .await
+            .map_err(|error| {
+                McpError::internal_error(format!("MCP read failed: {error}"), None)
+            })?;
         }
         // These handlers obtain their model after dispatch. They must wait for
         // a controlled write rather than scan a partially persisted workspace.
         if serialize || matches!(method, "tools/call" | "resources/read") {
-            let _guard = self.write_lock.lock().await;
+            let _guard = self.write_lock.write().await;
             let should_refresh_runtime =
                 method == "tools/call" && request_refreshes_runtime_after_write(&params);
             let (result, persisted) = if let Some(session) = &self.session {
@@ -161,6 +217,10 @@ impl ReqvireMcpServer {
     }
 
     fn call_handler_unlocked(&self, method: &str, params: Value) -> Result<Value, McpError> {
+        #[cfg(test)]
+        if let Some(hook) = &self.before_dispatch {
+            hook(method, &params);
+        }
         if !self.enable_mutations
             && method == "tools/call"
             && params["name"] == "reqvire.worktree.list"
@@ -219,8 +279,8 @@ impl ReqvireMcpServer {
             .get("result")
             .cloned()
             .ok_or_else(|| McpError::internal_error("MCP response missing result", None))?;
-        if !self.enable_mutations {
-            let definition = crate::mcp_worktrees::local_definitions().remove(0);
+        if !self.enable_mutations && (method == "tools/list" || contract) {
+            let definition = crate::mcp_worktrees::local_definitions()[0].clone();
             if method == "tools/list" {
                 result["tools"]
                     .as_array_mut()
@@ -383,6 +443,52 @@ impl ServerHandler for ReqvireMcpServer {
     }
 }
 
+/// RMCP's typed ReadResourceResult contains only `contents`, so converting a
+/// resource result to that type loses protocol-level `_meta`. Keep its normal
+/// dispatch for other methods and carry resource metadata in a raw result at
+/// the service boundary shared by standalone and embedded HTTP MCP.
+#[derive(Clone)]
+struct ReqvireMcpTransport(ReqvireMcpServer);
+
+impl rmcp::Service<RoleServer> for ReqvireMcpTransport {
+    async fn handle_request(
+        &self,
+        request: rmcp::model::ClientRequest,
+        context: RequestContext<RoleServer>,
+    ) -> Result<rmcp::model::ServerResult, McpError> {
+        if let rmcp::model::ClientRequest::ReadResourceRequest(request) = request {
+            let mut value = self
+                .0
+                .call_handler("resources/read", json!({"uri":request.params.uri}), false)
+                .await?;
+            let metadata = value
+                .as_object_mut()
+                .and_then(|object| object.remove("_meta"));
+            // Preserve the existing content validation/error behavior.
+            let result = serde_json::from_value::<ReadResourceResult>(value)
+                .map_err(|error| McpError::internal_error(error.to_string(), None))?;
+            return match metadata {
+                Some(metadata) => Ok(rmcp::model::ServerResult::CustomResult(
+                    rmcp::model::CustomResult(json!({"contents":result.contents,"_meta":metadata})),
+                )),
+                None => Ok(rmcp::model::ServerResult::ReadResourceResult(result)),
+            };
+        }
+        rmcp::Service::handle_request(&self.0, request, context).await
+    }
+
+    async fn handle_notification(
+        &self,
+        notification: rmcp::model::ClientNotification,
+        context: rmcp::service::NotificationContext<RoleServer>,
+    ) -> Result<(), McpError> {
+        rmcp::Service::handle_notification(&self.0, notification, context).await
+    }
+
+    fn get_info(&self) -> ServerInfo {
+        ServerHandler::get_info(&self.0)
+    }
+}
 pub async fn serve_http(
     enable_mutations: bool,
     enable_commits: bool,
@@ -452,7 +558,7 @@ pub fn router(
         enable_mutations,
         with_size_estimates,
         excluded_filename_patterns,
-        Arc::new(Mutex::new(())),
+        Arc::new(RwLock::new(())),
         http_access,
     )
 }
@@ -462,7 +568,7 @@ pub fn router_with_write_lock(
     enable_mutations: bool,
     with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
-    write_lock: Arc<Mutex<()>>,
+    write_lock: Arc<RwLock<()>>,
     http_access: &HttpAccess,
 ) -> Result<axum::Router, ReqvireError> {
     mount_service(
@@ -481,7 +587,7 @@ pub fn mount_service<S>(
     enable_mutations: bool,
     with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
-    write_lock: Arc<Mutex<()>>,
+    write_lock: Arc<RwLock<()>>,
     http_access: &HttpAccess,
 ) -> Result<axum::Router<S>, ReqvireError>
 where
@@ -505,7 +611,7 @@ pub fn mount_service_with_post_write_hook<S>(
     enable_commits: bool,
     with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
-    write_lock: Arc<Mutex<()>>,
+    write_lock: Arc<RwLock<()>>,
     post_write_hook: Option<PostWriteHook>,
     http_access: &HttpAccess,
 ) -> Result<axum::Router<S>, ReqvireError>
@@ -533,7 +639,7 @@ fn server_with_worktrees(
         false,
         with_size_estimates,
         exclusions,
-        Arc::new(Mutex::new(())),
+        Arc::new(RwLock::new(())),
         None,
     )?;
     server.enable_mutations = worktrees.is_some();
@@ -559,9 +665,9 @@ fn mount_server<S: Clone + Send + Sync + 'static>(
     http_access: &HttpAccess,
 ) -> axum::Router<S> {
     let origin_policy = http_access.origins.clone();
-    let service: StreamableHttpService<ReqvireMcpServer, LocalSessionManager> =
+    let service: StreamableHttpService<ReqvireMcpTransport, LocalSessionManager> =
         StreamableHttpService::new(
-            move || Ok(server.clone()),
+            move || Ok(ReqvireMcpTransport(server.clone())),
             LocalSessionManager::default().into(),
             StreamableHttpServerConfig::default()
                 .with_allowed_hosts(http_access.rmcp_allowed_hosts())
@@ -925,6 +1031,55 @@ fn rpc_error(id: Value, code: i64, message: &str, data: Option<Value>) -> Value 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn read_only_adapter_reuses_local_catalog() {
+        let exclusions = reqvire::exclusions::ExclusionSetBuilder::new()
+            .build()
+            .unwrap();
+        let server = ReqvireMcpServer::new_with_write_lock(
+            false,
+            false,
+            false,
+            &exclusions,
+            Arc::new(RwLock::new(())),
+            None,
+        )
+        .unwrap();
+        let expected = server
+            .call_handler_unlocked("tools/list", json!({}))
+            .unwrap();
+        let before = crate::mcp_worktrees::local_catalog_build_count();
+        for _ in 0..3 {
+            assert_eq!(
+                server
+                    .call_handler_unlocked("tools/list", json!({}))
+                    .unwrap(),
+                expected
+            );
+            server
+                .call_handler_unlocked("resources/list", json!({}))
+                .unwrap();
+            let contract = server
+                .call_handler_unlocked(
+                    "tools/call",
+                    json!({"name":"reqvire.tool_contract","arguments":{}}),
+                )
+                .unwrap();
+            assert_eq!(contract["structuredContent"]["tools"], expected["tools"]);
+            let resource = server
+                .call_handler_unlocked("resources/read", json!({"uri":"reqvire://tools/contract"}))
+                .unwrap();
+            let resource_contract: Value =
+                serde_json::from_str(resource["contents"][0]["text"].as_str().unwrap()).unwrap();
+            assert_eq!(resource_contract["tools"], expected["tools"]);
+        }
+        assert_eq!(
+            crate::mcp_worktrees::local_catalog_build_count(),
+            before,
+            "read-only responses must not rebuild local tool schemas"
+        );
+    }
 
     #[test]
     fn default_tool_list_does_not_advertise_mutations() {

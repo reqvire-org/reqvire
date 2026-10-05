@@ -744,12 +744,54 @@ fn should_traverse_change_impact_relation(source: &element::Element, rel: &Relat
     }
 }
 
+/// Reverse consumers belong to a single report's immutable current registry.
+/// Reuse them across all roots; do not cache them across model revisions.
+struct ContractReferenceConsumers<'a> {
+    by_contract: FxHashMap<String, BTreeSet<&'a str>>,
+}
+
+impl<'a> ContractReferenceConsumers<'a> {
+    fn build(registry: &'a graph_registry::GraphRegistry) -> Self {
+        let mut by_contract: FxHashMap<String, BTreeSet<&str>> = FxHashMap::default();
+        for node in registry.nodes.values() {
+            #[cfg(test)]
+            REFERENCE_CONSUMER_WORK.with(|count| {
+                let (elements, references) = count.get();
+                count.set((elements + 1, references));
+            });
+            for reference in &node.element.contract_references {
+                #[cfg(test)]
+                REFERENCE_CONSUMER_WORK.with(|count| {
+                    let (elements, references) = count.get();
+                    count.set((elements, references + 1));
+                });
+                by_contract
+                    .entry(reference.target.as_str())
+                    .or_default()
+                    .insert(node.element.identifier.as_str());
+            }
+        }
+        Self { by_contract }
+    }
+}
+
 /// Builds the change impact tree recursively using `ElementNode` and keeps only forward relations.
 pub fn build_change_impact_tree(
     current: &graph_registry::GraphRegistry,
     element_id: String,
     visited: &mut BTreeSet<String>,
     fallback_name: Option<String>,
+) -> ElementNode {
+    let consumers = ContractReferenceConsumers::build(current);
+    build_change_impact_tree_with_consumers(current, element_id, visited, fallback_name, &consumers)
+}
+
+fn build_change_impact_tree_with_consumers(
+    current: &graph_registry::GraphRegistry,
+    element_id: String,
+    visited: &mut BTreeSet<String>,
+    fallback_name: Option<String>,
+    consumers: &ContractReferenceConsumers<'_>,
 ) -> ElementNode {
     // Fetch the current element or generate a placeholder
     let element = current
@@ -807,7 +849,13 @@ pub fn build_change_impact_tree(
 
             // Use the text from the first relation as a fallback display name
             let fallback_name = impact_relations.first().map(|rel| rel.target.text.clone());
-            let child_node = build_change_impact_tree(current, impacted_id, visited, fallback_name);
+            let child_node = build_change_impact_tree_with_consumers(
+                current,
+                impacted_id,
+                visited,
+                fallback_name,
+                consumers,
+            );
             let forward_relations: Vec<_> = impact_relations
                 .into_iter()
                 .map(|rel| RelationNode {
@@ -825,27 +873,26 @@ pub fn build_change_impact_tree(
         .flatten()
         .collect();
 
-    let mut referencing: Vec<_> = current
-        .get_all_elements()
+    for &identifier in consumers
+        .by_contract
+        .get(&element.identifier)
         .into_iter()
-        .filter(|candidate| {
-            candidate
-                .contract_references
-                .iter()
-                .any(|entry| entry.target.as_str() == element.identifier)
-        })
-        .map(|candidate| candidate.identifier.clone())
-        .collect();
-    referencing.sort();
-    for identifier in referencing {
-        let child_node = if visited.insert(identifier.clone()) {
-            build_change_impact_tree(current, identifier, visited, None)
+        .flatten()
+    {
+        let child_node = if visited.insert(identifier.to_string()) {
+            build_change_impact_tree_with_consumers(
+                current,
+                identifier.to_string(),
+                visited,
+                None,
+                consumers,
+            )
         } else {
             // Preserve the dependency edge even when another path has already
             // assessed this consumer and expanded its downstream impact.
             ElementNode {
                 element: current
-                    .get_element(&identifier)
+                    .get_element(identifier)
                     .expect("reference consumer")
                     .clone(),
                 relations: Vec::new(),
@@ -861,7 +908,8 @@ pub fn build_change_impact_tree(
         if !visited.insert(impacted_id.clone()) {
             continue;
         }
-        let child_node = build_change_impact_tree(current, impacted_id, visited, None);
+        let child_node =
+            build_change_impact_tree_with_consumers(current, impacted_id, visited, None, consumers);
         relations.push(RelationNode {
             relation_trigger: "mappedByOntology".to_string(),
             element_node: child_node,
@@ -1392,6 +1440,7 @@ pub fn compute_change_impact(
     reference: &graph_registry::GraphRegistry,
 ) -> Result<ChangeImpactReport, ReqvireError> {
     let mut report = ChangeImpactReport::new();
+    let consumers = ContractReferenceConsumers::build(current);
     let current_ids: FxHashSet<String> = current
         .get_all_elements()
         .iter()
@@ -1498,8 +1547,9 @@ pub fn compute_change_impact(
 
             let mut visited = BTreeSet::new();
             visited.insert(id.clone());
-            let change_impact_tree =
-                build_change_impact_tree(current, id.to_string(), &mut visited, None);
+            let change_impact_tree = build_change_impact_tree_with_consumers(
+                current, id.to_string(), &mut visited, None, &consumers,
+            );
 
             report.changed.push(ChangedElement {
                 element_id: id.clone(),
@@ -1608,11 +1658,12 @@ pub fn compute_change_impact(
                 if has_changed {
                     let mut visited = BTreeSet::new();
                     visited.insert(cur_elem.identifier.clone());
-                    let change_impact_tree = build_change_impact_tree(
+                    let change_impact_tree = build_change_impact_tree_with_consumers(
                         current,
                         cur_elem.identifier.to_string(),
                         &mut visited,
                         None,
+                        &consumers,
                     );
 
                     report.changed.push(ChangedElement {
@@ -1650,8 +1701,9 @@ pub fn compute_change_impact(
             .collect();
         let mut visited = BTreeSet::new();
         visited.insert(id.clone());
-        let change_impact_tree =
-            build_change_impact_tree(current, id.to_string(), &mut visited, None);
+        let change_impact_tree = build_change_impact_tree_with_consumers(
+            current, id.to_string(), &mut visited, None, &consumers,
+        );
         report.added.push(AddedElement {
             element_id: id.clone(),
             name: cur_elem.name.clone(),
@@ -2056,6 +2108,239 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
 
         assert!(tree_contains_name(tree, "Payload Contract"));
         assert!(tree_contains_name(tree, "Payload Verification"));
+    }
+
+    fn reference_consumer_fixture(size: usize, reverse: bool) -> GraphRegistry {
+        use crate::element::{
+            ContractBindingEntry, ContractBindingTarget, ContractType, ElementType,
+        };
+        let mut elements = vec![
+            create_typed_element(
+                "contract-0",
+                "Contract Zero",
+                "old zero",
+                ElementType::Contract(ContractType::Specification),
+            ),
+            create_typed_element(
+                "contract-1",
+                "Contract One",
+                "old one",
+                ElementType::Contract(ContractType::Specification),
+            ),
+        ];
+        for number in 0..size {
+            let mut consumer = create_element(
+                &format!("consumer-{number:03}"),
+                &format!("Consumer {number}"),
+                "consumer",
+            );
+            consumer.contract_references = ["contract-0", "contract-1"]
+                .into_iter()
+                .map(|id| ContractBindingEntry {
+                    target: ContractBindingTarget::ElementIdentifier(id.into()),
+                    content_hash: None,
+                })
+                .collect();
+            elements.push(consumer);
+        }
+        if reverse {
+            elements.reverse();
+        }
+        let mut registry = GraphRegistry::new();
+        for element in elements {
+            registry.register_element(element, "test.md").unwrap();
+        }
+        registry
+    }
+
+    fn edit_reference_contracts(registry: &mut GraphRegistry) {
+        for id in ["contract-0", "contract-1"] {
+            let element = &mut registry.nodes.get_mut(id).unwrap().element;
+            element.add_content("changed contract");
+            element.freeze_content();
+        }
+    }
+
+    #[test]
+    fn reference_consumer_lookup_visits_model_once_for_multiple_impact_roots() {
+        for size in [3, 12, 48] {
+            let previous = reference_consumer_fixture(size, false);
+            let mut current = previous.clone();
+            edit_reference_contracts(&mut current);
+            REFERENCE_CONSUMER_WORK.with(|count| count.set((0, 0)));
+            let report = compute_change_impact(&current, &previous).unwrap();
+            assert_eq!(report.changed.len(), 2);
+            REFERENCE_CONSUMER_WORK.with(|count| {
+                assert_eq!(
+                    count.get(),
+                    (size + 2, size * 2),
+                    "reverse-consumer construction for {size} consumers across two changed roots"
+                )
+            });
+            let expected: Vec<_> = (0..size)
+                .map(|number| format!("consumer-{number:03}"))
+                .collect();
+            for change in report.changed {
+                let consumers: Vec<_> = change
+                    .change_impact_tree
+                    .relations
+                    .iter()
+                    .filter(|edge| edge.relation_trigger == "contract_references")
+                    .map(|edge| edge.element_node.element.identifier.clone())
+                    .collect();
+                assert_eq!(consumers, expected);
+            }
+            // Newly added roots reuse the same per-report index as changed roots.
+            let added = create_element("added", "Added Root", "new");
+            current.register_element(added, "test.md").unwrap();
+            REFERENCE_CONSUMER_WORK.with(|count| count.set((0, 0)));
+            let report = compute_change_impact(&current, &previous).unwrap();
+            assert_eq!(report.added.len(), 1);
+            REFERENCE_CONSUMER_WORK.with(|count| assert_eq!(count.get(), (size + 3, size * 2)));
+            let mut moved = current.nodes.remove("contract-1").unwrap().element;
+            moved.identifier = "relocated-contract-1".into();
+            current.register_element(moved, "test.md").unwrap();
+            for node in current.nodes.values_mut() {
+                for reference in &mut node.element.contract_references {
+                    if reference.target.as_str() == "contract-1" {
+                        reference.target = element::ContractBindingTarget::ElementIdentifier(
+                            "relocated-contract-1".into(),
+                        );
+                    }
+                }
+            }
+            REFERENCE_CONSUMER_WORK.with(|count| count.set((0, 0)));
+            let relocated = compute_change_impact(&current, &previous).unwrap();
+            assert_eq!(relocated.relocated.len(), 1);
+            assert!(relocated
+                .changed
+                .iter()
+                .any(|change| change.element_id == "relocated-contract-1"));
+            REFERENCE_CONSUMER_WORK.with(|count| assert_eq!(count.get(), (size + 3, size * 2)));
+        }
+    }
+
+    #[test]
+    fn reference_consumer_lookup_preserves_diamonds_cycle_guards_and_binding_separation() {
+        use crate::element::{
+            ContractBindingEntry, ContractBindingTarget, ElementType, VerificationType,
+        };
+        let mut current = reference_consumer_fixture(2, false);
+        let mut binder = create_element("binder", "Binding Consumer", "binding");
+        binder.contract_bindings.push(ContractBindingEntry {
+            target: ContractBindingTarget::ElementIdentifier("contract-0".into()),
+            content_hash: None,
+        });
+        current.register_element(binder, "test.md").unwrap();
+        let verification = create_typed_element(
+            "check",
+            "Shared Check",
+            "test",
+            ElementType::Verification(VerificationType::Test),
+        );
+        current.register_element(verification, "test.md").unwrap();
+        for id in ["consumer-000", "consumer-001"] {
+            add_relation(
+                &mut current.nodes.get_mut(id).unwrap().element,
+                relation_type("verifiedBy"),
+                "check",
+            );
+        }
+        // One consumer also appears in ordinary downstream traversal. Its explicit
+        // reference edge must survive even though it is no longer expanded there.
+        add_relation(
+            &mut current.nodes.get_mut("contract-0").unwrap().element,
+            relation_type("define"),
+            "consumer-000",
+        );
+        let tree = build_change_impact_tree(
+            &current,
+            "contract-0".into(),
+            &mut BTreeSet::from(["contract-0".into()]),
+            None,
+        );
+        assert_eq!(
+            tree.relations
+                .iter()
+                .filter(|edge| edge.relation_trigger == "contract_references")
+                .map(|edge| edge.element_node.element.identifier.as_str())
+                .collect::<Vec<_>>(),
+            vec!["consumer-000", "consumer-001"]
+        );
+        assert!(!tree_contains_name(&tree, "Binding Consumer"));
+        assert_eq!(
+            collect_verification_elements_from_impact_tree(&tree).len(),
+            1
+        );
+        assert_eq!(
+            tree.relations
+                .iter()
+                .filter(|edge| edge.element_node.element.identifier == "consumer-000")
+                .count(),
+            2
+        );
+        // Reports normally follow validation; the low-level traversal still guards
+        // a cycle in unvalidated input instead of recurring indefinitely.
+        add_relation(
+            &mut current.nodes.get_mut("consumer-000").unwrap().element,
+            relation_type("definedBy"),
+            "contract-0",
+        );
+        let guarded = build_change_impact_tree(
+            &current,
+            "contract-0".into(),
+            &mut BTreeSet::from(["contract-0".into()]),
+            None,
+        );
+        assert_eq!(
+            collect_verification_elements_from_impact_tree(&guarded).len(),
+            1
+        );
+    }
+
+    #[test]
+    fn reference_consumer_lookup_is_deterministic_and_isolated_between_operations() {
+        let previous = reference_consumer_fixture(2, false);
+        let mut current = previous.clone();
+        edit_reference_contracts(&mut current);
+        let report = compute_change_impact(&current, &previous).unwrap();
+        let mut reordered = reference_consumer_fixture(2, true);
+        edit_reference_contracts(&mut reordered);
+        assert_eq!(
+            report.to_json("", "head", "base"),
+            compute_change_impact(&reordered, &previous)
+                .unwrap()
+                .to_json("", "head", "base")
+        );
+        let before = report.to_json("", "head", "base");
+        current
+            .nodes
+            .get_mut("consumer-000")
+            .unwrap()
+            .element
+            .contract_references
+            .clear();
+        current.nodes.remove("consumer-001");
+        let edited = compute_change_impact(&current, &previous).unwrap();
+        for id in ["contract-0", "contract-1"] {
+            let change = edited
+                .changed
+                .iter()
+                .find(|change| change.element_id == id)
+                .unwrap();
+            assert!(change
+                .change_impact_tree
+                .relations
+                .iter()
+                .all(|edge| edge.relation_trigger != "contract_references"));
+        }
+        assert_eq!(report.to_json("", "head", "base"), before);
+        assert_eq!(
+            compute_change_impact(&reordered, &previous)
+                .unwrap()
+                .to_json("", "head", "base"),
+            before
+        );
     }
 
     #[test]
@@ -2751,4 +3036,9 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         assert_eq!(report.impact_scope.len(), 1, "Should have 1 scope root");
         assert_eq!(report.impact_scope[0].element_id, "req.md#only-child");
     }
+}
+
+#[cfg(test)]
+thread_local! {
+    static REFERENCE_CONSUMER_WORK: std::cell::Cell<(usize, usize)> = const { std::cell::Cell::new((0, 0)) };
 }

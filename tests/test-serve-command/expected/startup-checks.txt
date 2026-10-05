@@ -1,0 +1,13 @@
+PASS plain
+PASS plain-invalid
+PASS read-only-mcp
+PASS read-only-mcp-invalid
+PASS writable
+PASS writable-invalid
+PASS writable-dirty
+PASS auto-commits
+PASS auto-commits-invalid
+PASS auto-commits-dirty
+PASS aggregate
+PASS aggregate-invalid
+PASS no-eligible-worktree

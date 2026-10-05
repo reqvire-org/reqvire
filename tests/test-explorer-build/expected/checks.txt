@@ -1,0 +1,10 @@
+PASS failed-requested-rebuild
+PASS missing-npm-requested-rebuild
+PASS prebuilt-without-npm
+PASS identical-outputs-untouched
+PASS changed-and-removed-assets
+PASS missing-bundle
+PASS successful-requested-rebuild
+PASS input-watches
+PASS cargo-prebuilt-incremental
+PASS cargo-requested-incremental

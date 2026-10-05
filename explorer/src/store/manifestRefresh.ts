@@ -17,6 +17,7 @@ export interface StoreManifest {
 }
 
 export interface PreparedStore {
+  recoveryRequired: boolean;
   revision: string;
   manifest: StoreManifest;
   result: Extract<StoreLoadResult, { ok: true }>;
@@ -82,6 +83,7 @@ async function httpError(response: Response): Promise<Error> {
 /** Preparation never changes the published revision or cache. The hook commits
  * only if its mounted, visible consumer still owns the request. */
 export class ManifestStoreClient {
+  recoveryRequired = false;
   private revision?: string;
   private manifest?: StoreManifest;
   private store?: ExplorerProjectStore;
@@ -132,10 +134,12 @@ export class ManifestStoreClient {
         signal,
       });
       signal.throwIfAborted();
+      const recoveryRequired = response.headers.get("X-Reqvire-Recovery-Required") === "true";
       if (response.status === 304) {
         if (!this.revision || response.headers.get("etag") !== `"${this.revision}"`) {
           throw new Error("Invalid unchanged refresh response.");
         }
+        this.recoveryRequired = recoveryRequired;
         return null;
       }
       if (!response.ok) throw await httpError(response);
@@ -196,12 +200,13 @@ export class ManifestStoreClient {
       // Protect that identity from incidental renderer mutations.
       freezeJson(result.store);
       freezeJson(manifest);
-      return { revision, manifest, result, chunks: staged };
+      return { revision, manifest, result, chunks: staged, recoveryRequired };
     }
     throw new Error("The model kept changing during refresh; will retry automatically.");
   }
 
   commit(next: PreparedStore): void {
+    this.recoveryRequired = next.recoveryRequired;
     this.revision = next.revision;
     this.manifest = next.manifest;
     this.store = next.result.store;

@@ -148,8 +148,8 @@ impl GraphRegistry {
                 }
 
                 for relation_node in &mut other_node.relations {
-                    if relation_node.element_node.element.identifier == old_id {
-                        relation_node.element_node.element.identifier = new_id.to_string();
+                    if relation_node.target_id == old_id {
+                        relation_node.target_id = new_id.to_string();
                     }
                 }
             }
@@ -231,15 +231,6 @@ impl GraphRegistry {
 
             node.element.file_path = new_file_path.to_string();
 
-            // Update the element in all relation nodes that reference it
-            for (_id, other_node) in self.nodes.iter_mut() {
-                for relation_node in &mut other_node.relations {
-                    if relation_node.element_node.element.identifier == element_id {
-                        relation_node.element_node.element.file_path = new_file_path.to_string();
-                    }
-                }
-            }
-
             log::debug!(
                 "Moved element '{}' from '{}' to '{}'",
                 element_id,
@@ -283,7 +274,7 @@ impl GraphRegistry {
 
         self.nodes.insert(
             virtual_id,
-            ElementNode {
+            RegistryNode {
                 element: virtual_element,
                 relations: Vec::new(),
             },
@@ -313,15 +304,6 @@ impl GraphRegistry {
             let old_file_path = node.element.file_path.clone();
 
             node.element.file_path = new_file_path.to_string();
-
-            // Update the element in all relation nodes that reference it
-            for (_id, other_node) in self.nodes.iter_mut() {
-                for relation_node in &mut other_node.relations {
-                    if relation_node.element_node.element.identifier == element_id {
-                        relation_node.element_node.element.file_path = new_file_path.to_string();
-                    }
-                }
-            }
 
             // Update relation identifiers for cross-file references
             self.update_relation_identifiers(element_id, &old_file_path, new_file_path);
@@ -406,7 +388,7 @@ impl GraphRegistry {
         let mut child_nodes = Vec::new();
 
         for relation_node in &current_node.relations {
-            let target_id = &relation_node.element_node.element.identifier;
+            let target_id = &relation_node.target_id;
 
             // Skip relations to already visited nodes to prevent cycles
             if visited.contains(target_id) {
@@ -1965,7 +1947,7 @@ impl GraphRegistry {
 
         self.nodes.insert(
             element_id,
-            ElementNode {
+            RegistryNode {
                 element,
                 relations: Vec::new(),
             },
@@ -2000,7 +1982,7 @@ impl GraphRegistry {
         // Remove all relations pointing to this element from graph structure
         for node in self.nodes.values_mut() {
             node.relations
-                .retain(|rel| rel.element_node.element.identifier != element_id);
+                .retain(|rel| rel.target_id != element_id);
         }
 
         // Remove all relations pointing to this element from element's own relations list
@@ -2068,13 +2050,6 @@ impl GraphRegistry {
             )));
         }
 
-        // Get the target node to create the relation
-        let target_node = self
-            .nodes
-            .get(target_id)
-            .expect("node not found in registry")
-            .clone();
-
         // Add the relation to the source element
         let source_node = self
             .nodes
@@ -2083,8 +2058,7 @@ impl GraphRegistry {
 
         // Check if relation already exists
         let relation_exists = source_node.relations.iter().any(|rel| {
-            rel.element_node.element.identifier == target_id
-                && rel.relation_trigger == relation_type
+            rel.target_id == target_id && rel.relation_trigger == relation_type
         });
 
         if relation_exists {
@@ -2094,9 +2068,9 @@ impl GraphRegistry {
             )));
         }
 
-        source_node.relations.push(RelationNode {
+        source_node.relations.push(RelationEdge {
             relation_trigger: relation_type.to_string(),
-            element_node: target_node,
+            target_id: target_id.to_string(),
         });
 
         Ok(())
@@ -2123,8 +2097,7 @@ impl GraphRegistry {
         let initial_count = source_node.relations.len();
 
         source_node.relations.retain(|rel| {
-            !(rel.element_node.element.identifier == target_id
-                && rel.relation_trigger == relation_type)
+            !(rel.target_id == target_id && rel.relation_trigger == relation_type)
         });
 
         if source_node.relations.len() == initial_count {
@@ -2237,12 +2210,7 @@ impl GraphRegistry {
         let relations = node
             .relations
             .iter()
-            .map(|rel| {
-                (
-                    rel.relation_trigger.clone(),
-                    rel.element_node.element.identifier.clone(),
-                )
-            })
+            .map(|rel| (rel.relation_trigger.clone(), rel.target_id.clone()))
             .collect();
 
         Ok(relations)

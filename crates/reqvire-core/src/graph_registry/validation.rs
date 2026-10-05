@@ -452,7 +452,7 @@ impl GraphRegistry {
         log::debug!("Validating concrete verification objective parents...");
         let mut errors = Vec::new();
 
-        let mut sorted_nodes: Vec<&ElementNode> = self.nodes.values().collect();
+        let mut sorted_nodes: Vec<&RegistryNode> = self.nodes.values().collect();
         sorted_nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
 
         for element_node in sorted_nodes {
@@ -496,7 +496,7 @@ impl GraphRegistry {
         let mut visited = FxHashSet::default();
 
         // Check for circular dependencies - but be less strict about what constitutes a cycle
-        let mut sorted_nodes: Vec<&ElementNode> = self.nodes.values().collect();
+        let mut sorted_nodes: Vec<&RegistryNode> = self.nodes.values().collect();
         sorted_nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
 
         for element_node in &sorted_nodes {
@@ -805,7 +805,7 @@ impl GraphRegistry {
         debug!("Validating contract_bindings targets...");
         let mut errors = Vec::new();
 
-        let mut sorted_nodes: Vec<&ElementNode> = self.nodes.values().collect();
+        let mut sorted_nodes: Vec<&RegistryNode> = self.nodes.values().collect();
         sorted_nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
 
         for element_node in sorted_nodes {
@@ -1477,7 +1477,92 @@ impl GraphRegistry {
             }
         }
 
+        errors.extend(self.validate_concept_taxonomy_cycles());
         Ok(errors)
+    }
+
+    /// Check SKOS taxonomy independently from requirement dependency propagation.
+    /// `broader` and `narrower` declarations share canonical child-to-parent edges.
+    pub(crate) fn validate_concept_taxonomy_cycles(&self) -> Vec<ReqvireError> {
+        let mut adjacency: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+        for node in self.nodes.values() {
+            let element = &node.element;
+            if !element.element_type.is_concept() {
+                continue;
+            }
+            let source = &element.identifier;
+            adjacency.entry(source.clone()).or_default();
+            // Relations are authoritative during mutations; derived concept payloads
+            // may still describe the accepted model until candidate publication.
+            for relation in &element.relations {
+                let reverse = match relation.relation_type.name {
+                    "broader" => false,
+                    "narrower" => true,
+                    _ => continue,
+                };
+                let LinkType::Identifier(target) = &relation.target.link else {
+                    continue;
+                };
+                let Some(target) = self.resolve_concept_element_id(target) else {
+                    continue;
+                };
+                let (child, parent) = if reverse {
+                    (target, source.clone())
+                } else {
+                    (source.clone(), target)
+                };
+                adjacency.entry(parent.clone()).or_default();
+                adjacency.entry(child).or_default().insert(parent);
+            }
+        }
+        let adjacency: BTreeMap<_, Vec<_>> = adjacency
+            .into_iter()
+            .map(|(id, parents)| (id, parents.into_iter().collect()))
+            .collect();
+        let mut completed = FxHashSet::default();
+        let mut active = FxHashMap::default();
+        let mut path = Vec::new();
+        let mut cycles = BTreeSet::new();
+        // Iterative DFS visits each canonical edge once, including reconvergent DAGs.
+        for root in adjacency.keys() {
+            if completed.contains(root) {
+                continue;
+            }
+            active.insert(root.clone(), 0);
+            path.push(root.clone());
+            let mut stack = vec![(root.clone(), 0)];
+            while let Some((id, next)) = stack.last_mut() {
+                if *next == adjacency[id].len() {
+                    completed.insert(id.clone());
+                    active.remove(id);
+                    path.pop();
+                    stack.pop();
+                    continue;
+                }
+                let target = adjacency[id][*next].clone();
+                *next += 1;
+                if let Some(&start) = active.get(&target) {
+                    let mut cycle = path[start..].to_vec();
+                    let first = cycle
+                        .iter()
+                        .enumerate()
+                        .min_by_key(|(_, id)| *id)
+                        .unwrap()
+                        .0;
+                    cycle.rotate_left(first);
+                    cycle.push(cycle[0].clone());
+                    cycles.insert(cycle);
+                } else if !completed.contains(&target) {
+                    active.insert(target.clone(), path.len());
+                    path.push(target.clone());
+                    stack.push((target, 0));
+                }
+            }
+        }
+        cycles.into_iter().map(|cycle| ReqvireError::CircularDependencyError(format!(
+            "Concept taxonomy cycle (child --broader--> parent): {}. Remove a broader/narrower edge to make the taxonomy acyclic.",
+            cycle.join(" --broader--> ")
+        ))).collect()
     }
 
     pub(super) fn validate_governance_metadata(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
@@ -1563,15 +1648,16 @@ impl GraphRegistry {
         &self,
         removed_declaration_source: Option<&str>,
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
-        let semantic_index = semantic_contract::build_semantic_index(self);
-        self.validate_semantic_contracts_with_index(&semantic_index, removed_declaration_source)
+        let semantic_build = semantic_contract::build_semantic_index_with_shapes(self);
+        self.validate_semantic_contracts_with_build(&semantic_build, removed_declaration_source)
     }
 
-    pub(super) fn validate_semantic_contracts_with_index(
+    pub(super) fn validate_semantic_contracts_with_build(
         &self,
-        semantic_index: &semantic_contract::SemanticIndex,
+        semantic_build: &semantic_contract::SemanticIndexBuild,
         removed_declaration_source: Option<&str>,
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
+        let semantic_index = &semantic_build.index;
         let mut errors = Vec::new();
         for diagnostic in &semantic_index.diagnostics {
             errors.push(ReqvireError::InvalidMarkdownStructure(format!(
@@ -1595,7 +1681,7 @@ impl GraphRegistry {
         }
 
         errors.extend(self.validate_semantic_contract_shape_alignment(
-            semantic_index,
+            semantic_build,
             removed_declaration_source,
         ));
 
@@ -1651,27 +1737,23 @@ impl GraphRegistry {
 
     fn validate_semantic_contract_shape_alignment(
         &self,
-        semantic_index: &semantic_contract::SemanticIndex,
+        semantic_build: &semantic_contract::SemanticIndexBuild,
         removed_declaration_source: Option<&str>,
     ) -> Vec<ReqvireError> {
+        let semantic_index = &semantic_build.index;
         let mut errors = Vec::new();
         let mut seen = BTreeSet::new();
 
-        for block in &semantic_index.blocks {
-            if !matches!(block.kind, semantic_contract::SemanticBlockKind::Shapes) {
-                continue;
-            }
-
+        for block in &semantic_build.compiled_shapes {
             let context = self.semantic_contract_used_ontology_context(&block.source);
             if context.is_empty() {
                 continue;
             }
             let context: BTreeSet<String> = context.into_iter().collect();
             let domain_index = semantic_index.shacl_domain_ontology_index(&context);
-            let registry = shacl::ShaclRegistry::parse(&block.quads);
             let aligner = shacl::OntologyAligner::new(&domain_index);
 
-            for alignment_error in aligner.cross_check_shapes(&registry.compiled_shapes) {
+            for alignment_error in aligner.cross_check_shapes(&block.registry.compiled_shapes) {
                 let Some((iri, kind)) = ontology::alignment_reference(&alignment_error) else {
                     continue;
                 };

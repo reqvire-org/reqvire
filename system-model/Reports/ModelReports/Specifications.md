@@ -186,6 +186,12 @@ Generated SKOS facts:
 - For each canonical taxonomy edge where `child` is narrower than `parent`, emit `child skos:broader parent` and `parent skos:narrower child`.
 - For each canonical symmetric association or mapping edge, emit reciprocal SKOS facts when serializing a normalized concept projection, while graph renderers may collapse the reciprocal pair to one displayed edge.
 - Generated inverse and reciprocal facts are additional semantic-search/export facts and must not mutate authored Markdown.
+- Each local endpoint retains its own generated concept IRI, including cross-scheme `related`, `exactMatch`, and `closeMatch` links; a source namespace must not be substituted for the target namespace. External mapping IRIs are preserved verbatim.
+
+Construction and lifetime:
+- Build outgoing, inverse, and symmetric concept adjacency once per semantic-index construction. Visit each registry element and each authored concept link once for normalization, then emit each concept from its indexed neighborhood instead of rescanning or sorting the registry per concept.
+- Deduplicate and order each neighborhood deterministically, independent of element or relation input order. Isolated concepts retain their RDF and produce no invented relationships.
+- The adjacency belongs only to that build. Edited or rejected candidates must not reuse earlier relationships or modify an accepted snapshot; existing target, scheme-boundary, and cycle validation remains authoritative.
 
 Projection surface contract:
 - `reqvire semantic export --layer concepts` and `reqvire semantic export` consume the normalized concept-relation projection, not only direct-authored concept relation fields.
@@ -260,6 +266,7 @@ Shared contract for selecting coverage report subjects while retaining their mod
 - Capability-scoped orphan lists and counts are empty or zero because orphans have no scoped membership; the scope marker MUST accompany those fields. Human-readable consumers MUST explain the whole-model-only diagnostic scope.
 - A scoped human-readable result identifies the selected capability and presents the same classifications, evidence, counts, and gap membership as its structured result.
 - A result for one requested scope need not include summaries or membership lists for other scopes. Consumers that need many scopes may request or materialize compact summaries and membership indexes over shared coverage records.
+- Generating summaries for multiple scopes MUST reuse the whole-model classifications without copying detailed evidence records into each summary. Preparation is shared within the operation; per-scope work follows the selected memberships rather than scanning every model element or projecting a full detailed report again. Compact and detailed results MUST agree for the same scope and snapshot.
 
 #### Metadata
   * type: specification

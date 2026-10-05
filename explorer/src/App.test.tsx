@@ -85,6 +85,7 @@ describe("Explorer worktree navigation", () => {
       result: { ok: true, schemaMismatch: null, store: { ...devFixture,
         project: { ...devFixture.project, worktree_id: "original", branch: "main" },
       } },
+      recoveryWarning: "MCP recovery required: showing the last accepted model; writes are disabled.",
       refreshError: null, automaticRefresh: true, worktreeRouting: true, selectedWorktree: "original", switching: false,
       worktrees: [
         { worktree_id: "original", branch: "main", workspace_root: "/repo", available: true, explorer_available: true },
@@ -96,6 +97,8 @@ describe("Explorer worktree navigation", () => {
     });
     const view = render(<App />);
     try {
+      expect(screen.getByText(/MCP recovery required: showing the last accepted model/)).toBeTruthy();
+      expect(screen.queryByText(/Refresh failed/)).toBeNull();
       const selector = screen.getByRole("combobox", { name: "Branch" });
       const navigation = screen.getByRole("navigation", { name: "Explorer views" });
       expect(selector.closest('[data-product-pattern-slot="start-pane"]')).toBeTruthy();
@@ -118,6 +121,13 @@ describe("Explorer worktree navigation", () => {
       expect(screen.getByRole("option", { name: /stopped/ }).getAttribute("aria-disabled")).toBe("true");
       fireEvent.click(screen.getByRole("option", { name: /repair/ }));
       expect(selectWorktree).toHaveBeenCalledWith("repair");
+      // A later connection failure must not hide the accepted snapshot's
+      // recovery state while that same model is still displayed.
+      const accepted = vi.mocked(liveStore.useLiveStore).mock.results.at(-1)!.value;
+      vi.mocked(liveStore.useLiveStore).mockReturnValue({ ...accepted, refreshError: "Connection lost" });
+      view.rerender(<App />);
+      expect(screen.getByText(/MCP recovery required: showing the last accepted model/).textContent)
+        .toContain("Refresh failed: Connection lost");
     } finally {
       view.unmount();
       window.history.replaceState(null, "", "/");

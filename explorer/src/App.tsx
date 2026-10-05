@@ -86,6 +86,7 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
             viewOverrides={viewOverrides}
             schemaMismatch={result.schemaMismatch}
             refreshError={refreshError}
+            recoveryWarning={live.recoveryWarning}
             automaticRefresh={live.automaticRefresh}
             toolbar={toolbar}
             worktreeId={result.store.project.worktree_id}
@@ -97,7 +98,8 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
   );
 }
 
-function ExplorerShell({ schemaMismatch, refreshError, automaticRefresh, viewOverrides, toolbar, worktreeId }: AppProps & {
+function ExplorerShell({ schemaMismatch, refreshError, recoveryWarning, automaticRefresh, viewOverrides, toolbar, worktreeId }: AppProps & {
+  recoveryWarning?: string | null;
   schemaMismatch: string | null;
   refreshError: string | null;
   automaticRefresh: boolean;
@@ -272,9 +274,9 @@ function ExplorerShell({ schemaMismatch, refreshError, automaticRefresh, viewOve
       onToggleLeftPane={toggleLeftPane}
       onLeftPaneResizePointerDown={handleLeftPaneResizePointerDown}
       onLeftPaneResizeKeyDown={handleLeftPaneResizeKeyDown}
-      mainWarning={refreshError
+      mainWarning={[recoveryWarning, refreshError
         ? `Refresh failed: ${refreshError}. Keeping the last valid view. ${automaticRefresh ? "Will retry automatically." : "Select a branch to retry."}`
-        : schemaMismatch ? `Store schema mismatch: ${schemaMismatch}` : navigationNotice}
+        : schemaMismatch ? `Store schema mismatch: ${schemaMismatch}` : navigationNotice].filter(Boolean).join(" ") || null}
       sidePane={
         viewOverride ? viewOverride.sidePane({ open: leftPaneOpen, onToggle: toggleLeftPane }) : <ExplorerSidePane
           activeView={sidePaneView}

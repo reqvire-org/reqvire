@@ -199,9 +199,9 @@ pub fn sparql_tool(
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let visible_index =
-        semantic_index_with_external_visibility(&semantic_store.index, include_external)?;
+        semantic_index_with_external_visibility(semantic_store, include_external)?;
     let external_metadata = semantic_contract::external_materialization_metadata(
-        &semantic_store.index,
+        semantic_store.index(),
         &visible_index,
         include_external,
     );
@@ -276,10 +276,10 @@ pub fn sparql_tool(
             "external_counts".to_string(),
             external_metadata["external_counts"].clone(),
         );
-        object.insert("summary".to_string(), json!(semantic_store.index.summary));
+        object.insert("summary".to_string(), json!(semantic_store.index().summary));
         object.insert(
             "diagnostics".to_string(),
-            json!(semantic_store.index.diagnostics),
+            json!(semantic_store.index().diagnostics),
         );
         object.insert(
             "model_fingerprint".to_string(),

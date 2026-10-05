@@ -450,6 +450,8 @@ Test cases:
 10. A semantic contract validates when its used ontology declares a local `#### External Ontology` Turtle source and SHACL references reachable external source terms through `sh:targetClass`, `sh:targetNode`, `sh:path`, `sh:class`, and `sh:datatype`.
 11. The external-source fixture preserves `sh:hasValue` and `sh:in` value constraints without requiring those value-list IRIs to be authored ontology terms.
 12. A semantic contract fails when `sh:targetNode` references an external source term declared by a connected sibling ontology that is outside the contract's reachable `use` context.
+13. Count actual SHACL compilations during standalone semantic-index construction, complete graph validation, in-memory validation, and declaration-removal validation: each parsed Shapes block compiles once per build, including malformed SHACL blocks.
+14. Revalidate edited shape and ontology candidates and confirm current missing-reference and sanity diagnostics retain source identity, reference kind, IRI, and removal guidance; rejected candidates do not alter the accepted model's references or subsequent validation.
 
 #### Metadata
   * type: test-verification
@@ -457,6 +459,8 @@ Test cases:
 #### Relations
   * derivedFrom: [Validation and Semantic Integrity Verification Objective](#validation-and-semantic-integrity-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-shacl-recursive-ast/test.sh)
+  * satisfiedBy: [shacl_build.rs](../../../../crates/reqvire-core/tests/shacl_build.rs)
+  * verify: [Ontology and Shapes Collection](../../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
   * verify: [SHACL Ontology Alignment](../../../Architecture/OntologyKernelRequirements.md#shacl-ontology-alignment)
   * verify: [SHACL Structural Parser Registry](../../../Architecture/OntologyKernelRequirements.md#shacl-structural-parser-registry)
   * verify: [Reqvire SHACL Context Adapter](../../../Operations/Validation/ValidationRequirements.md#reqvire-shacl-context-adapter)

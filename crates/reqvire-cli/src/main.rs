@@ -21,7 +21,10 @@ use reqvire::error::ReqvireError;
 async fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("error")).init();
     if std::env::args().nth(1).as_deref() == Some("__mcp-worktree-worker") {
-        if let Err(error) = mcp_worker::run() {
+        if let Err(error) = tokio::task::spawn_blocking(mcp_worker::run)
+            .await
+            .expect("worker task")
+        {
             eprintln!("{error}");
             std::process::exit(1);
         }

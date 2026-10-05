@@ -43,6 +43,8 @@ Content changes to a referenced contract MUST reach its referencing requirements
 
 A requirement's outgoing Contract Reference MUST NOT propagate its changes back to the referenced contract or owner. Adding or removing a reference MUST be reported as a change to the referencing requirement. Identifier-only relocation MUST preserve existing relocation semantics without treating unchanged contract content as changed.
 
+Build the reverse lookup from referenced contract identifier to referencing requirements once for each change-impact operation, visiting each current-model element and authored reference once. Reuse that lookup across changed, relocated-and-edited, and added roots and recursive traversal. Keep consumer order deterministic and do not include Contract Bindings as reference edges. Each operation uses its own current model; edits, removals, and relocations must not reuse a prior lookup.
+
 Impact traversal MUST deduplicate assessment of reached elements across converging acyclic paths while preserving reference-edge provenance. A `contract_references` edge to a consumer MUST remain identifiable when the consumer is also reached through the contract owner's requirement hierarchy. Invalidated verification lists MUST contain each reached verification once. Cyclic references MUST fail model validation before change-impact reporting. Implementation coverage MUST remain independent of this review traversal.
 
 #### Metadata

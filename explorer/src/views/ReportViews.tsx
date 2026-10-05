@@ -172,6 +172,7 @@ export function TracesView({
           <TraceReportContent>
             <TraceRows
               file={selectedFile}
+              contextId={JSON.stringify([store.project.workspace_root, store.project.worktree_id])}
               elementById={elementById}
               onOpenElement={onOpenElement}
               onSelect={setSelectedId}
@@ -189,12 +190,14 @@ export function TracesView({
 
 function TraceRows({
   file,
+  contextId,
   elementById,
   onOpenElement,
   onSelect,
   selectedVerificationId,
 }: {
   file: TraceFileNode | undefined;
+  contextId: string;
   elementById: Map<string, ProjectStoreElement>;
   onOpenElement: (id: string) => void;
   onSelect: (id: string) => void;
@@ -247,6 +250,7 @@ function TraceRows({
                 ]}
               />
               <TraceRollupDiagram
+                contextId={contextId}
                 verification={verification}
                 elementById={elementById}
                 onOpenElement={onOpenElement}
@@ -260,33 +264,27 @@ function TraceRows({
 }
 
 const TraceRollupDiagram = memo(function TraceRollupDiagram({
+  contextId,
   verification,
   elementById,
   onOpenElement,
 }: {
+  contextId: string;
   verification: TraceVerificationNode;
   elementById: Map<string, ProjectStoreElement>;
   onOpenElement: (id: string) => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const cancelQueuedRenderRef = useRef<(() => void) | null>(null);
-  const releaseRenderSlotRef = useRef<(() => void) | null>(null);
-  const [shouldRender, setShouldRender] = useState(false);
-  const [model, setModel] = useState<TraceRollupMermaidModel | null>(null);
-  const startQueuedRender = useCallback(() => {
-    if (shouldRender || model || cancelQueuedRenderRef.current || releaseRenderSlotRef.current) return;
-    cancelQueuedRenderRef.current = enqueueTraceMermaidRender((release) => {
-      cancelQueuedRenderRef.current = null;
-      releaseRenderSlotRef.current = release;
-      setModel(buildTraceRollupMermaidModel(verification, elementById));
-      setShouldRender(true);
-    });
-  }, [elementById, model, shouldRender, verification]);
-
-  const releaseRenderSlot = useCallback(() => {
-    releaseRenderSlotRef.current?.();
-    releaseRenderSlotRef.current = null;
-  }, []);
+  const [prepared, setPrepared] = useState<{
+    contextId: string;
+    verification: TraceVerificationNode;
+    elementById: Map<string, ProjectStoreElement>;
+    model: TraceRollupMermaidModel;
+    release: () => void;
+  } | null>(null);
+  const current = prepared?.contextId === contextId
+    && prepared.verification === verification && prepared.elementById === elementById
+    ? prepared : null;
   const handleDiagramClick = useCallback((event: ReactMouseEvent<HTMLDivElement>) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
@@ -298,58 +296,67 @@ const TraceRollupDiagram = memo(function TraceRollupDiagram({
     onOpenElement(elementId);
   }, [elementById, onOpenElement]);
 
-  useEffect(
-    () => () => {
-      cancelQueuedRenderRef.current?.();
-      cancelQueuedRenderRef.current = null;
-      releaseRenderSlotRef.current?.();
-      releaseRenderSlotRef.current = null;
-    },
-    [],
-  );
-
   useEffect(() => {
     const node = containerRef.current;
-    if (!node || shouldRender) return;
+    if (!node) return;
 
+    let cancelled = false;
+    let cancelQueuedRender: (() => void) | undefined;
+    let releaseRenderSlot: (() => void) | undefined;
     let timeout: ReturnType<typeof globalThis.setTimeout> | undefined;
     let idleCallback: ReturnType<typeof window.requestIdleCallback> | undefined;
+    let observer: IntersectionObserver | undefined;
+    const startQueuedRender = () => {
+      if (cancelled || cancelQueuedRender) return;
+      cancelQueuedRender = enqueueTraceMermaidRender((release) => {
+        if (cancelled) { release(); return; }
+        releaseRenderSlot = release;
+        setPrepared({
+          contextId, verification, elementById,
+          model: buildTraceRollupMermaidModel(verification, elementById),
+          release,
+        });
+      });
+    };
+
     if (!("IntersectionObserver" in window)) {
       timeout = globalThis.setTimeout(startQueuedRender, 0);
-      return () => globalThis.clearTimeout(timeout);
+    } else {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (cancelled || !entries.some((entry) => entry.isIntersecting)) return;
+          observer?.disconnect();
+          if ("requestIdleCallback" in window) {
+            idleCallback = window.requestIdleCallback(startQueuedRender, { timeout: 250 });
+          } else {
+            timeout = globalThis.setTimeout(startQueuedRender, 0);
+          }
+        },
+        { rootMargin: "320px 0px" },
+      );
+      observer.observe(node);
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        if ("requestIdleCallback" in window) {
-          idleCallback = window.requestIdleCallback(startQueuedRender, { timeout: 250 });
-        } else {
-          timeout = globalThis.setTimeout(startQueuedRender, 0);
-        }
-      },
-      { rootMargin: "320px 0px" },
-    );
-    observer.observe(node);
-
     return () => {
-      observer.disconnect();
+      cancelled = true;
+      observer?.disconnect();
       if (idleCallback !== undefined && "cancelIdleCallback" in window) {
         window.cancelIdleCallback(idleCallback);
       }
       if (timeout !== undefined) globalThis.clearTimeout(timeout);
+      cancelQueuedRender?.();
+      releaseRenderSlot?.();
     };
-  }, [shouldRender, startQueuedRender]);
+  }, [contextId, elementById, verification]);
 
   return (
     <TraceRollupDiagramShell ref={containerRef} onClickCapture={handleDiagramClick}>
-      {shouldRender && model ? (
+      {current ? (
         <MermaidBlock
-          code={model.code}
-          nodeClickTargets={model.nodeClickTargets}
+          code={current.model.code}
+          nodeClickTargets={current.model.nodeClickTargets}
           onNodeClick={onOpenElement}
-          onRenderSettled={releaseRenderSlot}
+          onRenderSettled={current.release}
         />
       ) : (
         <TraceRollupPlaceholder>

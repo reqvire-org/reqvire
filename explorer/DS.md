@@ -549,6 +549,7 @@ bodies. Hover and keyboard focus accent the complete directed path, including
 all splits and merges; pinning a path preserves that highlight on pointer exit.
 Model's Flow mode composes the same canvas through `ElementFlow`, with a
 capability-first top-to-bottom layout and corresponding inverse relation labels.
+The application supplies the `layoutEngine` callback to both patterns. It starts a real Web Worker on demand and returns a result promise and cancel callback; the pattern cancels its previous task on topology/direction changes and teardown. Worker code stays in `src/`, with no same-thread production fallback.
 Its project-tree selection scopes the data supplied by the application while
 keeping the Model workspace active. Card name/body activation opens the shared
 element-detail modal; source and focus controls keep their own actions. The
@@ -1162,7 +1163,7 @@ The application workspace dependencies relevant to the design system:
 |---------|------|
 | `react`, `react-dom` | Component runtime |
 | `@xyflow/react` | Interactive Thesaurus, Model Flow, and verification trace canvases |
-| `elkjs` | Asynchronous layered flow layout, connection routing, and label placement; React Flow renders the design-system cards |
+| `elkjs` | Application-owned worker for layered flow layout, connection routing, and label placement; React Flow renders the design-system cards |
 | `@linaria/atomic`, `@linaria/core`, `@linaria/react` | Component-scoped CSS authoring |
 | `@wyw-in-js/babel-preset`, `@wyw-in-js/vite` | Linaria/WyW extraction in dev + build |
 | `@vitejs/plugin-react` | JSX transform for dev + build |

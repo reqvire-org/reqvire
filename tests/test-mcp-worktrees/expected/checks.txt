@@ -45,6 +45,8 @@ PASS read-only-mcp/prepared-worktree-persists
 PASS mcp/create-isolated-context
 PASS mcp/open-idempotent
 PASS mcp/ambiguous-selector-rejected
+PASS mcp/unknown-selector-tool-error
+PASS mcp/invalid-selector-protocol-error
 PASS mcp/model-isolation
 PASS mcp/semantic-isolation
 PASS mcp/dirty-removal-rejected
@@ -55,6 +57,8 @@ PASS mcp/remove-keeps-branch
 PASS serve/create-isolated-context
 PASS serve/open-idempotent
 PASS serve/ambiguous-selector-rejected
+PASS serve/unknown-selector-tool-error
+PASS serve/invalid-selector-protocol-error
 PASS serve/model-isolation
 PASS serve/semantic-isolation
 PASS serve/dirty-removal-rejected

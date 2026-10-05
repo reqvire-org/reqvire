@@ -1,7 +1,8 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
+import type Graph from "graphology";
 import { describe, expect, it, vi } from "vitest";
-import { ExplorerUiStateProvider } from "../state/ExplorerUiState";
+import { ExplorerUiStateProvider, ONTOLOGY_DEFAULT_FILTERS } from "../state/ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
 import type { ExplorerProjectStore } from "../store/types";
@@ -14,7 +15,7 @@ type GraphReducer = (id: string, attributes: Record<string, unknown>) => Record<
 type RendererSettings = { nodeReducer: GraphReducer; edgeReducer: GraphReducer };
 
 const sigmaState = vi.hoisted(() => ({
-  graphs: [] as Array<{ forEachNode: (callback: (node: string, attributes: Record<string, unknown>) => void) => void }>,
+  graphs: [] as Graph[],
   settings: [] as RendererSettings[],
   handlers: [] as Array<Map<string, NodeEventHandler>>,
   constructs: 0,
@@ -59,7 +60,7 @@ vi.mock("sigma/utils", () => ({
 vi.mock("sigma", () => ({
   default: class MockSigma {
     handlers = new Map<string, NodeEventHandler>();
-    constructor(graph: { forEachNode: (callback: (node: string, attributes: Record<string, unknown>) => void) => void }, _container: HTMLElement, settings: RendererSettings) {
+    constructor(graph: Graph, _container: HTMLElement, settings: RendererSettings) {
       sigmaState.constructs += 1;
       sigmaState.graphs.push(graph);
       sigmaState.settings.push(settings);
@@ -113,6 +114,44 @@ function resetSigmaState() {
 }
 
 describe("OntologiesView", () => {
+  it("does not resynchronize unchanged filters on selection or surrounding rerenders", async () => {
+    const { rerender } = renderWithStore(semanticQueryStore);
+    await waitFor(() => expect(sigmaState.graphs[0]).toBeTruthy());
+    const sync = vi.spyOn(window, "syncOntologyGraphFilters");
+    act(() => window.focusOntologyNode?.(queryId));
+    expect(sync).not.toHaveBeenCalled();
+    rerender(<StoreProvider store={semanticQueryStore} schemaMismatch={null}>
+      <ExplorerUiStateProvider><OntologiesView /></ExplorerUiStateProvider>
+    </StoreProvider>);
+    expect(sync).not.toHaveBeenCalled();
+    sync.mockRestore();
+  });
+
+  it("skips equivalent filter application but honors changed membership and individual toggles", async () => {
+    renderWithStore(semanticQueryStore);
+    await waitFor(() => expect(sigmaState.graphs[0]).toBeTruthy());
+    const graph = sigmaState.graphs[0];
+    act(() => window.focusOntologyNode?.(queryId));
+    const setAttribute = vi.spyOn(graph, "setNodeAttribute");
+    mockNoverlapAssign.mockClear();
+    act(() => window.syncOntologyGraphFilters?.([...ONTOLOGY_DEFAULT_FILTERS].reverse()));
+    expect(setAttribute).not.toHaveBeenCalled();
+    expect(mockNoverlapAssign).not.toHaveBeenCalled();
+    const withoutQueries = [...ONTOLOGY_DEFAULT_FILTERS].map(value => value === "semantic-query" ? "layer-external-source" : value);
+    act(() => window.syncOntologyGraphFilters?.(withoutQueries));
+    expect(graph.getNodeAttribute(queryId, "hidden")).toBe(true);
+    expect(setAttribute).toHaveBeenCalled();
+    act(() => window.syncOntologyGraphFilters?.([...ONTOLOGY_DEFAULT_FILTERS]));
+    expect(graph.getNodeAttribute(queryId, "hidden")).toBe(false);
+    act(() => window.setOntologyGraphFilter?.("role", "semantic-query", false));
+    expect(graph.getNodeAttribute(queryId, "hidden")).toBe(true);
+    act(() => window.syncOntologyGraphFilters?.([...ONTOLOGY_DEFAULT_FILTERS]));
+    expect(graph.getNodeAttribute(queryId, "hidden")).toBe(false);
+    setAttribute.mockClear();
+    act(() => window.setOntologyGraphFilter?.("role", "semantic-query", true));
+    expect(setAttribute).not.toHaveBeenCalled();
+  });
+
   it("renders query glyphs and retains vocabulary property links, with a query visibility filter", async () => {
     renderWithStore(semanticQueryStore);
     await waitFor(() => expect(sigmaState.graphs[0]).toBeTruthy());

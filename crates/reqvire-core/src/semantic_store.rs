@@ -1,7 +1,9 @@
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::rdf_store::{load_default_graph, load_named_graph};
-use crate::semantic_contract::SemanticIndex;
+use crate::semantic_contract::{
+    SemanticBlock, SemanticExportFormat, SemanticExportLayer, SemanticIndex,
+};
 use oxigraph::store::Store;
 use std::fmt;
 use std::sync::{Arc, OnceLock};
@@ -20,11 +22,11 @@ pub const GRAPH_EXTERNAL_USED_SUBSET: &str = "urn:reqvire:semantic-graph:externa
 
 #[derive(Clone)]
 pub struct SemanticModelStore {
-    pub index: Arc<SemanticIndex>,
+    index: Arc<SemanticIndex>,
     captured: Arc<CapturedQueryStores>,
 }
 
-/// Strings and initialization cells have one owner per completed snapshot.
+/// Captured RDF and initialization cells have one owner per completed snapshot.
 /// Deferred work never receives a mutable registry or a filesystem path.
 struct CapturedQueryStores {
     parts: SemanticStoreTurtleParts,
@@ -85,6 +87,70 @@ impl fmt::Debug for SemanticModelStore {
 }
 
 impl SemanticModelStore {
+    /// Read the semantic index accepted with this snapshot.
+    pub fn index(&self) -> &Arc<SemanticIndex> {
+        &self.index
+    }
+
+    /// Export semantic layers from this completed snapshot.
+    pub fn serialize_export_layers(
+        &self,
+        format: SemanticExportFormat,
+        layers: &[SemanticExportLayer],
+        namespace_base: Option<&str>,
+    ) -> Result<String, ReqvireError> {
+        self.index
+            .serialize_export_layers_with_subset(format, layers, namespace_base, |filtered| {
+                self.subset_for_namespace(filtered, namespace_base)
+            })
+    }
+
+    /// Export the ontology command's clean or full projection from this snapshot.
+    pub fn serialize_with_options_and_filter(
+        &self,
+        format: SemanticExportFormat,
+        full: bool,
+        include_external: bool,
+        namespace_base: Option<&str>,
+    ) -> Result<String, ReqvireError> {
+        self.index.serialize_with_options_and_filter_with_subset(
+            format,
+            full,
+            include_external,
+            namespace_base,
+            |filtered| self.subset_for_namespace(filtered, namespace_base),
+        )
+    }
+
+    fn subset_for_namespace(
+        &self,
+        filtered: &SemanticIndex,
+        namespace_base: Option<&str>,
+    ) -> Result<Option<SemanticBlock>, ReqvireError> {
+        if namespace_base.is_some_and(|value| !value.trim().is_empty()) {
+            filtered.used_external_subset_block()
+        } else {
+            Ok(self.used_external_subset().cloned())
+        }
+    }
+
+    /// Project external visibility for this completed snapshot.
+    pub fn index_with_external_visibility(
+        &self,
+        include_external: bool,
+    ) -> Result<SemanticIndex, ReqvireError> {
+        let mut index = self.index.as_ref().clone();
+        index.apply_external_visibility_with_subset(
+            include_external,
+            self.used_external_subset().cloned(),
+        );
+        Ok(index)
+    }
+
+    pub(crate) fn used_external_subset(&self) -> Option<&SemanticBlock> {
+        self.captured.parts.external_used_subset.as_ref()
+    }
+
     #[cfg(test)]
     pub(crate) fn initialized_store_count(&self) -> usize {
         [
@@ -147,7 +213,7 @@ struct SemanticStoreTurtleParts {
     authored_model: String,
     generated: String,
     raw_external_source: String,
-    external_used_subset: String,
+    external_used_subset: Option<SemanticBlock>,
 }
 
 impl SemanticStoreTurtleParts {
@@ -157,7 +223,7 @@ impl SemanticStoreTurtleParts {
             authored_model: index.to_authored_model_layer_turtle_string(registry)?,
             generated: index.to_generated_layer_turtle_string(registry)?,
             raw_external_source: index.to_raw_external_turtle_string()?,
-            external_used_subset: index.to_used_external_subset_turtle_string()?,
+            external_used_subset: index.used_external_subset_block()?,
         })
     }
 }
@@ -188,7 +254,10 @@ fn build_public_store(
     if include_external_subset {
         load_public_role(
             &store,
-            &parts.external_used_subset,
+            parts
+                .external_used_subset
+                .as_ref()
+                .map_or("", |block| block.content.as_str()),
             GRAPH_EXTERNAL_USED_SUBSET,
             "derived external used-subset graph",
         )?;
@@ -227,12 +296,261 @@ fn new_store() -> Result<Store, ReqvireError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::semantic_contract::{
+        build_semantic_index, ExternalOntologySource, SemanticBlock, SemanticBlockKind,
+        SUBSET_DERIVATIONS,
+    };
+    use crate::test_support::parse_test_quads;
     use oxigraph::model::{GraphNameRef, NamedNodeRef, QuadRef};
 
     fn empty_snapshot() -> Result<SemanticModelStore, ReqvireError> {
         let registry = GraphRegistry::new();
         let index = crate::semantic_contract::build_semantic_index(&registry);
         SemanticModelStore::from_index(&registry, Arc::new(index))
+    }
+
+    fn external_fixture() -> (GraphRegistry, SemanticIndex) {
+        let mut registry = GraphRegistry::new();
+        for prefix in ["alpha", "beta"] {
+            let content = format!("### {prefix}\n#### Metadata\n  * type: ontology\n  * ontology_base: https://example.test/{prefix}\n  * ontology_prefix: {prefix}\n#### Ontology\n```turtle\n@prefix {prefix}: <https://example.test/{prefix}#> .\n@prefix owl: <http://www.w3.org/2002/07/owl#> .\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n<https://example.test/{prefix}> a owl:Ontology .\n{prefix}:Local a owl:Class ; rdfs:subClassOf <https://example.test/external#{prefix}> .\n```\n");
+            let element = crate::parser::parse_single_element(&content, "model.md").unwrap();
+            registry.register_element(element, "model.md").unwrap();
+        }
+        let mut index = build_semantic_index(&registry);
+        let content = "@prefix ext: <https://example.test/external#> .\n@prefix owl: <http://www.w3.org/2002/07/owl#> .\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\next:alpha a owl:Class ; rdfs:label \"Alpha external\" ; rdfs:subClassOf ext:Support .\next:beta a owl:Class ; rdfs:label \"Beta external\" .\next:Support a owl:Class ; rdfs:label \"Support\" .\next:Unused a owl:Class ; rdfs:label \"Unused\" .\n";
+        index.external_blocks = vec![SemanticBlock {
+            kind: SemanticBlockKind::ExternalOntology,
+            source: "references/external.ttl".into(),
+            source_name: "External vocabulary".into(),
+            file_path: "references/external.ttl".into(),
+            line_number: 1,
+            language: "turtle".into(),
+            external_materialization: None,
+            content: content.into(),
+            quads: parse_test_quads(content),
+        }];
+        index.external_sources = vec![ExternalOntologySource {
+            owner_identifier: "model.md#alpha".into(),
+            owner_name: "alpha".into(),
+            prefix: "ext".into(),
+            namespace: "https://example.test/external#".into(),
+            resource: Some("https://example.test/external".into()),
+            source: "references/external.ttl".into(),
+            format: "turtle".into(),
+            line_number: 1,
+            builtin: false,
+        }];
+        // Isolate authored-graph seeds to exercise different namespace subsets.
+        index.model_context_turtle.clear();
+        index.ontology_projection.constructs.clear();
+        index.ontology_projection.symbols.clear();
+        (registry, index)
+    }
+
+    fn subset_export(snapshot: &SemanticModelStore, namespace: Option<&str>) -> String {
+        snapshot
+            .serialize_export_layers(
+                SemanticExportFormat::Turtle,
+                &[SemanticExportLayer::ExternalUsed],
+                namespace,
+            )
+            .unwrap()
+    }
+
+    fn triple_set(turtle: &str) -> std::collections::BTreeSet<String> {
+        parse_test_quads(turtle)
+            .iter()
+            .map(ToString::to_string)
+            .collect()
+    }
+
+    #[test]
+    fn external_subset_is_shared_by_capture_exports_visibility_and_explorer() {
+        let (registry, index) = external_fixture();
+        let expected = index.with_external_visibility(true).unwrap();
+        let expected_export = index
+            .serialize_export_layers(
+                SemanticExportFormat::Turtle,
+                &[SemanticExportLayer::ExternalUsed],
+                None,
+            )
+            .unwrap();
+        let before = SUBSET_DERIVATIONS.get();
+        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index)).unwrap();
+        assert_eq!(SUBSET_DERIVATIONS.get() - before, 1);
+        let mut model = crate::model::ModelManager::new();
+        model.graph_registry = registry;
+        model.semantic_store = Some(snapshot.clone());
+        for _ in 0..2 {
+            assert_eq!(
+                triple_set(&subset_export(&snapshot, None)),
+                triple_set(&expected_export)
+            );
+            let visible = snapshot.index_with_external_visibility(true).unwrap();
+            assert_eq!(
+                serde_json::to_value(&visible).unwrap(),
+                serde_json::to_value(&expected).unwrap()
+            );
+            for full in [false, true] {
+                snapshot.store(full, true).unwrap();
+            }
+            let runtime = crate::explorer_runtime::build_runtime_assets(&model).unwrap();
+            assert!(runtime.project_store_json.contains("Alpha external"));
+            assert!(!runtime.project_store_json.contains("Unused\""));
+        }
+        assert_eq!(
+            SUBSET_DERIVATIONS.get() - before,
+            1,
+            "all consumers must reuse the captured subset"
+        );
+    }
+
+    #[test]
+    fn external_subset_filtered_exports_have_independent_inputs() {
+        let (registry, index) = external_fixture();
+        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index)).unwrap();
+        let whole = subset_export(&snapshot, None);
+        for namespace in ["alpha", "beta", "alpha"] {
+            let before = SUBSET_DERIVATIONS.get();
+            let output = subset_export(
+                &snapshot,
+                Some(&format!("https://example.test/{namespace}")),
+            );
+            assert_eq!(
+                SUBSET_DERIVATIONS.get() - before,
+                1,
+                "one derivation per filtered export"
+            );
+            assert!(output.contains(if namespace == "alpha" {
+                "Alpha external"
+            } else {
+                "Beta external"
+            }));
+            assert!(!output.contains(if namespace == "alpha" {
+                "Beta external"
+            } else {
+                "Alpha external"
+            }));
+            assert_eq!(
+                triple_set(&subset_export(&snapshot, None)),
+                triple_set(&whole)
+            );
+        }
+    }
+
+    #[test]
+    fn external_subset_ontology_exports_reuse_capture_in_both_formats_and_projections() {
+        let (registry, index) = external_fixture();
+        let formats = [SemanticExportFormat::Turtle, SemanticExportFormat::JsonLd];
+        let expected: Vec<_> = formats
+            .into_iter()
+            .flat_map(|format| {
+                [false, true].map(|full| {
+                    (
+                        format,
+                        full,
+                        index
+                            .serialize_with_options_and_filter(format, full, true, None)
+                            .unwrap(),
+                    )
+                })
+            })
+            .collect();
+        let before = SUBSET_DERIVATIONS.get();
+        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index)).unwrap();
+        for _ in 0..2 {
+            for (format, full, content) in &expected {
+                assert_eq!(
+                    &snapshot
+                        .serialize_with_options_and_filter(*format, *full, true, None)
+                        .unwrap(),
+                    content
+                );
+            }
+        }
+        assert_eq!(
+            SUBSET_DERIVATIONS.get() - before,
+            1,
+            "ontology exports must reuse capture"
+        );
+        for namespace in ["alpha", "beta"] {
+            let before = SUBSET_DERIVATIONS.get();
+            let content = snapshot
+                .serialize_with_options_and_filter(
+                    SemanticExportFormat::Turtle,
+                    false,
+                    true,
+                    Some(&format!("https://example.test/{namespace}")),
+                )
+                .unwrap();
+            assert_eq!(SUBSET_DERIVATIONS.get() - before, 1);
+            assert!(content.contains(if namespace == "alpha" {
+                "Alpha external"
+            } else {
+                "Beta external"
+            }));
+            assert!(!content.contains(if namespace == "alpha" {
+                "Beta external"
+            } else {
+                "Alpha external"
+            }));
+        }
+    }
+
+    #[test]
+    fn external_subset_concurrent_readers_do_not_rederive() {
+        let (registry, index) = external_fixture();
+        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index)).unwrap();
+        let expected = triple_set(&subset_export(&snapshot, None));
+        std::thread::scope(|scope| {
+            let threads: Vec<_> = (0..4)
+                .map(|_| {
+                    let snapshot = snapshot.clone();
+                    scope.spawn(move || {
+                        let before = SUBSET_DERIVATIONS.get();
+                        let output = subset_export(&snapshot, None);
+                        snapshot.index_with_external_visibility(true).unwrap();
+                        snapshot.store(true, true).unwrap();
+                        (triple_set(&output), SUBSET_DERIVATIONS.get() - before)
+                    })
+                })
+                .collect();
+            for thread in threads {
+                let (output, derivations) = thread.join().unwrap();
+                assert_eq!(output, expected);
+                assert_eq!(derivations, 0, "snapshot clone must share derived subset");
+            }
+        });
+    }
+
+    #[test]
+    fn external_subset_failed_and_edited_candidates_preserve_accepted_snapshot() {
+        let (registry, index) = external_fixture();
+        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index)).unwrap();
+        let accepted = subset_export(&snapshot, None);
+        let mut invalid = snapshot.index().as_ref().clone();
+        invalid.model_context_turtle = "invalid turtle".into();
+        let invalid = Arc::new(invalid);
+        let first = SemanticModelStore::from_index(&registry, invalid.clone())
+            .unwrap_err()
+            .to_string();
+        let second = SemanticModelStore::from_index(&registry, invalid)
+            .unwrap_err()
+            .to_string();
+        assert_eq!(first, second);
+        assert!(first.contains("model"), "{first}");
+        let mut edited = snapshot.index().as_ref().clone();
+        let block = &mut edited.external_blocks[0];
+        block.content = block.content.replace("Alpha external", "Edited external");
+        block.quads = parse_test_quads(&block.content);
+        let before = SUBSET_DERIVATIONS.get();
+        let candidate = SemanticModelStore::from_index(&registry, Arc::new(edited)).unwrap();
+        assert_eq!(SUBSET_DERIVATIONS.get() - before, 1);
+        assert!(subset_export(&candidate, None).contains("Edited external"));
+        assert_eq!(
+            triple_set(&subset_export(&snapshot, None)),
+            triple_set(&accepted)
+        );
     }
 
     #[test]
@@ -313,9 +631,18 @@ mod tests {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let mut snapshot = empty_snapshot()?;
         let mut parts = parts_with_raw_external();
-        parts.external_used_subset =
-            "<https://example.test/used> <https://example.test/p> <https://example.test/o> ."
-                .into();
+        let content = "<https://example.test/used> <https://example.test/p> <https://example.test/o> .";
+        parts.external_used_subset = Some(SemanticBlock {
+            kind: crate::semantic_contract::SemanticBlockKind::ExternalOntology,
+            source: "reqvire:external-used-subset".into(),
+            source_name: "Used subset".into(),
+            file_path: String::new(),
+            line_number: 0,
+            language: "turtle".into(),
+            external_materialization: Some("used_subset".into()),
+            content: content.into(),
+            quads: crate::test_support::parse_test_quads(content),
+        });
         snapshot.captured = Arc::new(CapturedQueryStores::new(parts));
         for (full, external) in [(false, false), (false, true), (true, false), (true, true)] {
             let store = snapshot.store(full, external)?;
@@ -364,7 +691,7 @@ mod tests {
             authored_model: "<https://example.test/context> <https://example.test/p> <https://example.test/o> .".to_string(),
             generated: "<https://example.test/projection> <https://example.test/p> <https://example.test/o> .".to_string(),
             raw_external_source: "<https://example.test/raw> <https://example.test/p> <https://example.test/o> .".to_string(),
-            external_used_subset: String::new(),
+            external_used_subset: None,
         }
     }
 

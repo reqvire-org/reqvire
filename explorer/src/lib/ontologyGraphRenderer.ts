@@ -459,7 +459,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
             'shape-overlay'
         ])
     };
-    const relationFilterState = new Set([
+    let relationFilterState = new Set([
         'class-membership',
         'class-disjointness',
         'class-expressions'
@@ -2721,7 +2721,7 @@ ${body}
         const targetSet = category === 'relation'
             ? relationFilterState
             : filterState[category];
-        if (!targetSet) {
+        if (!targetSet || targetSet.has(value) === active) {
             return;
         }
         if (active) {
@@ -2734,46 +2734,28 @@ ${body}
 
     window.syncOntologyGraphFilters = function (activeValues) {
         const activeSet = new Set(activeValues || []);
-        filterState.role.clear();
-        filterState.construct.clear();
-        filterState.origin.clear();
-        filterState.layer.clear();
-        relationFilterState.clear();
-        filterState.role.add('ontology-term');
-        if (activeSet.has('semantic-query')) filterState.role.add('semantic-query');
-        filterState.role.add('shacl-shape');
-        filterState.role.add('resource');
-        filterState.role.add('external-reference');
-        relationFilterState.add('class-membership');
-        ['shacl-shape', 'resource', 'external-reference'].forEach(value => {
-            if (activeSet.has(value)) filterState.role.add(value);
+        const next = {
+            role: new Set(['ontology-term', 'shacl-shape', 'resource', 'external-reference']),
+            construct: new Set([
+                'domain-range', 'subclass', 'membership', 'disjoint', 'equivalence',
+                'inverse', 'property-chain', 'property-characteristic', 'class-expression', 'shape-overlay'
+            ].filter(value => activeSet.has(value))),
+            origin: new Set(['authored', 'registry', 'construct'].filter(value => activeSet.has(value))),
+            layer: new Set([
+                'layer-authored', 'layer-concepts', 'layer-reqvire-context', 'layer-external-source'
+            ].filter(value => activeSet.has(value))),
+        };
+        if (activeSet.has('semantic-query')) next.role.add('semantic-query');
+        const nextRelations = new Set(['class-membership']);
+        ['class-disjointness', 'class-expressions'].forEach(value => {
+            if (activeSet.has(value)) nextRelations.add(value);
         });
-        [
-            'domain-range',
-            'subclass',
-            'membership',
-            'disjoint',
-            'equivalence',
-            'inverse',
-            'property-chain',
-            'property-characteristic',
-            'class-expression',
-            'shape-overlay'
-        ].forEach(value => {
-            if (activeSet.has(value)) filterState.construct.add(value);
-        });
-        ['authored', 'registry', 'construct'].forEach(value => {
-            if (activeSet.has(value)) filterState.origin.add(value);
-        });
-        ['layer-authored', 'layer-concepts', 'layer-reqvire-context', 'layer-external-source'].forEach(value => {
-            if (activeSet.has(value)) filterState.layer.add(value);
-        });
-        [
-            'class-disjointness',
-            'class-expressions'
-        ].forEach(value => {
-            if (activeSet.has(value)) relationFilterState.add(value);
-        });
+        const sameValues = (left, right) => left.size === right.size
+            && [...left].every(value => right.has(value));
+        if (Object.keys(next).every(key => sameValues(filterState[key], next[key]))
+            && sameValues(relationFilterState, nextRelations)) return;
+        Object.assign(filterState, next);
+        relationFilterState = nextRelations;
         applyGraphFilters();
     };
 

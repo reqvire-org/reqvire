@@ -57,3 +57,12 @@ PASS serve/commits-enabled/successive-mutation
 PASS serve/commits-enabled/noop
 PASS serve/commits-enabled/restart-same-branch
 PASS serve/commits-enabled/external-head-rejected
+PASS mcp/recovery/failure-injected
+PASS mcp/recovery/accepted-reads
+PASS mcp/recovery/status-resources-semantics
+PASS mcp/recovery/unsafe-operations-blocked
+PASS serve/recovery/failure-injected
+PASS serve/recovery/accepted-reads
+PASS serve/recovery/status-resources-semantics
+PASS serve/recovery/unsafe-operations-blocked
+PASS serve/recovery/explorer-snapshot

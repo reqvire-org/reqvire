@@ -166,6 +166,25 @@ Element size estimates are expected to be optional model-build metadata.
   * define: [Opt-In Element Size Estimate Model Build](ModelManagement.md#opt-in-element-size-estimate-model-build)
 ---
 
+### Canonical Graph Storage Specification
+
+Canonical graph storage and relation-target resolution within one model snapshot.
+
+#### Details
+- The registry owns one canonical element payload per identifier. Its impact adjacency stores target identifiers and relation triggers, without embedded copies of target elements or their adjacency.
+- Stored canonical node and edge records are bounded by the number of elements and retained relations, independently of registration order and repeated relation or size-estimate rebuilds. This bound excludes element-content byte lengths and separately constructed report trees.
+- Adjacency is rebuilt from normalized element relations after inverse relations have been populated. Only resolvable model-element targets of impact-propagating relation types become adjacency edges; external resources and missing targets keep their existing handling.
+- Rename, move, relation removal, and element removal preserve target resolution within the same registry. Traversal reads current canonical target content and file locations.
+- A cloned mutation candidate owns independent canonical elements and adjacency. Candidate edits cannot alter an accepted graph or cause either graph to resolve a target through the other graph.
+- Recursive change-impact report nodes are constructed separately from canonical storage. Existing report field names, relation triggers, traversal order, and cycle guards remain unchanged.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Canonical Graph Storage](ModelManagement.md#canonical-graph-storage)
+---
+
 ### Element Type Metadata Specification
 
 Specification for declaring element types in markdown documents through the Metadata subsection.
@@ -282,12 +301,13 @@ Correctness contract for reusable current-workspace model construction. Authorit
 - Later source edits, dependency removal, and newer model publication leave a captured snapshot's query results consistent with its original graph and RDF. Subsequent current-model loads retain the existing freshness, validation, and invalidation rules.
 
 ##### Controlled writes and boundaries
+- Completed cache results and single-flight waiters share immutable model handles. Read-only operation helpers and authoritative MCP snapshot reads retain those handles; only mutation preparation explicitly creates an independently mutable model. A later publication or invalidation cannot alter graph, page, or semantic state already held by a reader.
 - Successful persisted mutations invalidate affected source observations before subsequent dependent reads. Invalidation also supersedes older in-progress builds so they cannot repopulate current cache state after the write.
 - Reuse of a completed post-write core model is permitted only after its graph, pages, semantic state, dependency observations, and source identity agree with persisted inputs. Otherwise rebuild through the same core construction path. An updated graph with a stale semantic store is not publishable.
 - Preview requests and rejected operations that leave sources unchanged do not publish a mutation candidate. If an error follows any persisted change, invalidate affected state and report the error; never preserve a cache hit by assuming that every failed operation wrote nothing.
 - This cache covers current-workspace construction only. Historical Git-commit builds bypass it.
 - Subsystems loading current-workspace models reuse this construction contract through their consuming requirements. Subsystems generating or publishing derived artifacts own their output snapshots, output hashes, refresh triggers, and delivery lifecycle; source-cache freshness alone does not trigger artifact publication.
-- Shared-reference return types, cache capacity/eviction, incremental parsing, filesystem watchers, path memoization, and latency targets are later implementation/performance choices. They cannot weaken the correctness rules above.
+- Cache capacity/eviction, incremental parsing, filesystem watchers, path memoization, and latency targets are later implementation/performance choices. They cannot weaken the correctness rules above.
 
 ##### Required verification evidence
 Observe actual build/reuse events or instrumented build counts independently of response equality and elapsed time. Tests must distinguish reuse, invalidation, superseded publication, and successful recovery; instrumentation need not add public interface fields.

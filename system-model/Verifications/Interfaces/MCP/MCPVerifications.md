@@ -81,12 +81,21 @@ Verify that long-lived MCP tools apply the core cache freshness/publication cont
 ##### Acceptance Criteria
 - In one running read-only MCP process, changing applicable root exclusions changes subsequent search/read results without restart. Editing only a used external ontology updates vocabulary and SPARQL results; their public parsed-element revision may remain unchanged. Invalid current inputs produce the applicable tool error or lenient diagnostics instead of stale success, and repaired inputs recover.
 - Run equivalent model-read scenarios through standalone MCP and the embedded MCP endpoint so both adapters apply the same core cache contract.
+- Hold five read-only HTTP requests at a controlled dispatch barrier and confirm they overlap on blocking threads while a ping completes on a single-thread asynchronous runtime. Verify response IDs and complete tool/resource payloads for status, search, element lookup, coverage, lint, traces and semantic queries against serial results.
+- Fill read-only admission and execution limits; confirm excess requests receive a retryable capacity error before dispatch, queued cancellation frees admission, and cancelling a started read retains its execution permit and shared workspace guard until completion. Verify failed and panicking handlers release reservations. An exclusive writer must wait for active readers and take precedence over later readers; existing partial-persistence and post-write freshness checks remain applicable.
+- Run five-client cold and warm reads through the real HTTP endpoints in the existing cache suite, checking complete responses, request correlation, one coordinated cold build, source-change visibility and invalid-input recovery. Record single-client and five-client timings separately from build counts; timing alone does not establish overlap.
 - Coordinate a read/rebuild with a real persisted MCP write. Reads that already captured an allowed pre-write snapshot remain internally consistent; dependent reads after successful mutation completion observe the post-write graph and semantic state. Tools that cannot expose the required concurrent-read context wait for the write gate.
+- In a real mutation-enabled worker under each commit policy, hold concurrent accepted reads behind controlled barriers, complete an independent read and mutation while they remain held, then confirm the delayed responses retain their original revision/HEAD/pending paths and later reads use the new snapshot. Verify final physical/recovery diagnostics without misclassifying the internal commit as an external checkout change.
+- Verify out-of-order pipe replies keep request IDs and payloads paired; older responses cannot roll back published status or runtime. Confirm bounded read admission does not starve control operations, external source edits stay excluded, and dry-run/rejected mutations do not publish. Stop/remove a worker with reads in flight and confirm all callers fail without hanging, retaining ownership or substituting another context.
+- Through the production in-process HTTP router and real workers, hold an accepted read across a completed mutation in both commit modes. Assert its captured revision/HEAD/pending paths, newer published runtime, JSON-RPC response IDs, overload code and retryable data. Cancelling a dispatched caller retains its read slot until completion; the separate control budget permits previews and worktree removal while reads are held.
+- Move HEAD externally while an accepted read is held, then explicitly reopen the unavailable context. Confirm old callers fail with their original context identity, retained browser/read handles cannot retain ownership, and new admission uses the clean current HEAD without replacing the old caller's result with a new-context response.
+- After external checkout changes, resource and prompt admission errors retain context diagnostics in protocol errors rather than returning malformed successful resource/prompt payloads.
 - A superseded pre-write build cannot replace the model used for post-write MCP evidence or Explorer runtime generation. Generated store and ontology artifacts agree with the accepted post-write model under the existing runtime projection.
 - Successful persisted mutations invoke the existing post-write runtime refresh lifecycle with commits disabled or enabled. Preview requests, no-op executions, JSON-RPC errors, and tool results with `isError: true` do not invoke it, change published assets/revision, or clear a previous runtime-refresh diagnostic.
 - A runtime-generation failure after a successful persisted mutation preserves the last valid Explorer snapshot and the existing diagnostic behavior; it remains distinct from a rejected mutation with no write.
 - Ordinary manifest/chunk requests keep reading the published snapshot without triggering source scans or builds. External edits become visible to read-only MCP model reads under the core contract; mutation-enabled reads retain the accepted snapshot; this change does not add external-edit polling to Explorer's publication lifecycle.
 - Tool names, request arguments, structured-result field names, SHA-256 model revision encoding, and Explorer manifest/chunk/ETag contracts remain compatible with the existing interface specifications.
+- Count worker Git observations separately from model/runtime construction. Confirm unchanged read-only loads retain entry and exit checkout checks while using the exit observation for response metadata, failed/invalid loads do not publish a runtime, and restoring valid sources permits a fresh load. A branch change during an accepted mutation-mode read must be visible in its final physical status without changing the accepted model identity.
 
 ##### Required Evidence
 - Extend the existing cache/MCP/serve suites with real server requests and committed expected results. Observe cache builds through internal test instrumentation or logs, and observe post-write hook invocation directly; unchanged assets alone cannot prove that an unnecessary rebuild did not run.
@@ -104,6 +113,8 @@ The HTTP suite exercises read-only source freshness separately from authoritativ
   * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
   * satisfiedBy: [model_cache_tests.rs](../../../../crates/reqvire-core/src/model_cache_tests.rs)
   * satisfiedBy: [test.sh](../../../../tests/test-cache-integration/test.sh)
+  * satisfiedBy: [check_git_observations.py](../../../../tests/test-mcp-ownership/check_git_observations.py)
+  * satisfiedBy: [check_parallel_reads.py](../../../../tests/test-mcp-ownership/check_parallel_reads.py)
   * verify: [MCP Mutation Concurrency Control](../../../Interfaces/MCP/Tools.md#mcp-mutation-concurrency-control)
   * verify: [MCP Mutation Execution Flow](../../../Interfaces/MCP/Tools.md#mcp-mutation-execution-flow)
   * verify: [MCP Server State and Cache](../../../Interfaces/MCP/Tools.md#mcp-server-state-and-cache)
@@ -244,22 +255,38 @@ Expected checks:
 - Verify attempts to bypass Reqvire model semantics or perform arbitrary file writes are rejected.
 
 - Verify mutation startup rejects staged, unstaged, and non-ignored untracked files, detached/unborn HEAD, invalid models, and a second owner; restart after release resumes the same branch.
+- Exercise branch and worktree locks independently: keep one held, reject another owner with the exact path, acquire operation and original OS error, and retain the lock file identity/content. Restart with the same accessible files after orderly worker shutdown and forced termination; a worker surviving its parent must keep excluding a contender until that worker exits. Confirm unchanged model bytes, HEAD and index in both commit modes.
+- Retain a duplicate Unix descriptor to reproduce subprocess-startup inheritance for branch, worktree and administration locks. Orderly owner release must allow immediate reacquisition while that duplicate remains open; closing the duplicate afterward must not release the new owner's lock. Run worktree reopen/remove lifecycle checks with the default parallel Rust suite.
+- Reproduce denied lock-file opens and inject denied/unsupported acquisition and other OS failures. Assert operation, path, underlying error and actionable category; non-contention failures must not claim an active owner. Failed admission must release any earlier acquired lock. Do not unlink or chmod a lock to recover. Distinguish Unix fault injection/process checks from real Windows/Docker bind-mount validation.
 - Without `--enable-commits`, verify successful mutations change the expected files, leave HEAD and index contents unchanged, omit the `commit` result field, and permit successive writes and reads from the accepted snapshot even though the worktree is now dirty.
 - With `--enable-commits`, verify successful mutations create exactly one commit with only their prepared paths and return its identifier. In both modes, rejected, dry-run and no-op requests leave files, HEAD, index, and published runtime state unchanged and omit `commit`.
 - Verify commit-disabled shutdown leaves changes uncommitted; mutation-enabled restart rejects that dirty worktree until the user commits or otherwise resolves it, then resumes the same branch without creating an extra commit.
 - Verify external model edits do not enter session reads or commits, unrelated staged changes are preserved, and unexpected HEAD/branch changes reject writes.
 - Verify complete candidate validation covers asset operations and formatting before persistence, and commit/persistence failures preserve accepted files and model state.
 - Verify file/folder moves update subsequent reads, asset moves preserve executable modes, and newly occupied external destination files are not overwritten.
+- In both commit modes, inject permission-setting denial while content writes remain possible. Existing content edits with matching executable state must retain their native permissions without a permission call, including non-default modes. Exercise new files and executable/non-executable asset moves; a required denied or ineffectual permission change must reject publication with its path and operation, preserve the accepted revision, and leave the session usable when rollback fully succeeds.
+- Force a later Git publication failure and confirm restored bytes and native permissions, unchanged HEAD/index/accepted revision, and no unnecessary permission calls during restoration. Separately force a genuinely required restoration failure and confirm writes remain disabled. Verify unattempted paths are not restored and no failed candidate becomes visible.
+- With `core.filemode=false`, simulate filesystem execute bits differing from tracked Git modes. Content edits and asset moves must preserve the logical index mode and avoid filesystem chmod, with the correct tree mode after explicit or automatic commit. Include real-worker checks for non-default native permissions and moves; retain a Windows host-clone/container-bind-mount reproduction procedure and distinguish local fault injection from platform validation.
 - Verify successive reads reuse the accepted snapshot without filesystem cache rebuilding; semantic exports and Explorer refresh adopt successfully persisted candidates in both commit modes. In commit-enabled mode, adoption must also wait for a successful commit.
+- Check shared identity of accepted model and file-map entries across read scopes. Verify request-local overlays provide read-after-write, delete/rename/directory visibility and executable-mode preservation without changing the base or importing external edits; dropping failed/preview scopes discards preparation. Capture dependencies only during explicit startup capture.
+- In both commit modes, retain earlier read handles through successful and failed writes and confirm their content remains immutable. For commit-disabled sessions, exercise successive edits, deletion/recreation, moves and byte/mode reversions to the committed baseline; pending paths match only accepted differences. Failed and preview requests retain pending state, while successful explicit/automatic commits clear it and preserve unrelated staged files.
+- Instrument real worker Git subprocesses for repeated accepted reads, unchanged read-only loads, and runtime metadata. Confirm reduced duplicate observations without cross-request reuse. Exercise branch/HEAD changes between requests and during loading/preparation, fresh staged/unstaged/untracked dirty state, detached/unborn metadata, invalid reload recovery, and Git observation failures. Preserve the existing commit/publication race and rollback checks.
+- Exercise the production worker through its private pipes in both commit modes: repeated reads, preview, accepted add, duplicate rejection, external edit exclusion, removal back to the original file set, and a no-op explicit commit. These process checks establish worker behavior without claiming HTTP transport coverage.
+- In recovery-required state, send resource reads through the production HTTP router and inspect the serialized JSON-RPC response: context identity, accepted revision, and recovery diagnostics in `_meta` must match internal dispatch. Cover both commit policies; retain the standalone/embedded HTTP E2E assertions.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [mcp_session.rs](../../../../crates/reqvire-cli/src/mcp_session.rs)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
   * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * verify: [MCP Mutation Execution Flow](../../../Interfaces/MCP/Tools.md#mcp-mutation-execution-flow)
+  * satisfiedBy: [mutation_io.rs](../../../../crates/reqvire-core/src/mutation_io.rs)
+  * satisfiedBy: [check_locks.py](../../../../tests/test-mcp-ownership/check_locks.py)
+  * satisfiedBy: [check_git_observations.py](../../../../tests/test-mcp-ownership/check_git_observations.py)
   * verify: [MCP Mutation Concurrency Control](../../../Interfaces/MCP/Tools.md#mcp-mutation-concurrency-control)
 ---
 
@@ -655,6 +682,8 @@ Expected checks:
 - Verify `reqvire.lint` does not expose mutating fix behavior until a separate mutation contract is specified.
 - Verify operation-specific preview requests for mutation-class tools are available only through mutation-class tools in mutation mode, except conditional mutation tools that explicitly expose read-only preview behavior.
 - Verify Reqvire parse, validation, and operation failures produce MCP tool execution errors with structured Reqvire error data where available.
+- Count catalog construction and wrapper validation during repeated calls after initialization: immutable definitions are reused, and each call enters wrapper validation once. Preserve independent worker validation and startup GitHub availability gating.
+- Compare advertised definitions across read-only and mutation modes, automatic commits enabled/disabled, and GitHub unavailable/available. Reject unknown tools/fields, missing required fields, invalid types, enum values and array members, and invalid context selectors with unchanged error envelopes before any worker mutation.
 
 #### Metadata
   * type: test-verification
@@ -662,6 +691,9 @@ Expected checks:
 #### Relations
   * verify: [MCP Shared Operation Interfaces](../../../Interfaces/MCP/Tools.md#mcp-shared-operation-interfaces)
   * verify: [MCP Tool Side Effect Classification](../../../Interfaces/MCP/Tools.md#mcp-tool-side-effect-classification)
+  * satisfiedBy: [definitions.rs](../../../../crates/reqvire-core/src/tool_interface/definitions.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * satisfiedBy: [mcp.rs](../../../../crates/reqvire-cli/src/mcp.rs)
 ---
 
 ### MCP Tool Exposure Scope Verification
@@ -734,14 +766,19 @@ Verify that MCP worker sessions implement the shared context boundary on success
 #### Details
 - Start with two worktrees containing identical relative paths and element names but different model content. Interleave reads, CRUD, coverage, collect, semantic prefixes/exports/SPARQL, resources, and model-bearing prompts; assert the selected content, revisions, Git HEAD, and accepted pending changes never cross contexts.
 - Reject omitted selectors with multiple registered contexts and unknown/removed/unavailable IDs; allow omission for one context. Assert server-scoped discovery/listing remains callable and no request changes a global selection.
+- Inspect serialized HTTP responses for omitted, unknown and removed context selectors on schema-valid read and serialized tool calls: assert `result.isError`, structured tool identity and selector diagnostics, with no JSON-RPC error or substituted context. Assert invalid selector types still use `-32602`; resource/prompt failures remain protocol errors. Repeat both commit modes, retain explicit-context success and single-context omission, and verify rejection leaves models and Git unchanged.
 - Verify independent worker processes, fixed roots, exclusion rules, semantic initialization, and mutation gates. Hold one worker mutation and read/write the other; then prove reads within the held context cannot observe partial persistence.
 - Test ownership contention across MCP processes, external HEAD changes, invalid/dirty startup, worker crash, reopening, and both commit modes. Failure in one worker must leave the other usable.
+- Force persistence plus rollback failure in both commit modes, including captured external semantic inputs. Assert supported model/status/resource/semantic reads retain exactly the accepted model/revision and expose recovery-required state, disabled writes and the original diagnostic. Change disk files and Git availability afterward; neither may replace the accepted snapshot or produce a false clean-state observation.
+- Reject further mutations (including previews and format), explicit commits, worktree removal, live change-impact analysis, and push/PR/comment publication before their side effects. Keep discovery callable. Confirm another context remains usable, reopening the live context does not clear recovery, and worker death makes even accepted reads unavailable. Cover adapter failure injection plus production worker/process and in-process HTTP routing; do not describe socket-restricted checks as external HTTP passes.
 - Exercise standalone and embedded endpoints. Each mutation refreshes only its context's Explorer runtime, and browser context selection does not redirect MCP calls. Verify resource URI/template and prompt selector schemas, isolation of cache keys, and unchanged read-only refresh behavior; do not advertise unsupported subscriptions.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
   * verify: [MCP Worktree Worker Sessions](../../../Interfaces/MCP/Tools.md#mcp-worktree-worker-sessions)
@@ -772,6 +809,8 @@ Verify the successful and rejected paths of mcp worktree opening and inventory.
 
 #### Details
 - List original, managed, external, unregistered, and unavailable worktrees without side effects. Open an existing clean branch with and without an existing worktree; repeated opening returns the same healthy context and does not create duplicate checkouts.
+- Hold the repository-administration lock while reopening a healthy registered branch. Verify it returns the identical context without admission, while an unopened branch is rejected without changing registrations or checkouts; opening the new branch succeeds after lock release.
+- Repeat administration failure with an unopenable lock path; assert no published context or model/HEAD/index change and reuse after repair. Use shared lock-acquisition fault injection for denied/unsupported OS failures across branch, worktree and administration paths, checking that they preserve the file and report the correct diagnostic category. Failed creation cleanup must preserve both the initiating error and any lock error explaining retained paths.
 - Reject unknown/detached branches, dirty index/files/untracked files, invalid models, missing Git identity, overlapping roots, and another process's ownership. Verify pre-existing worktrees survive failures unchanged.
 - Stop/restart with committed work and with pending accepted changes; confirm no implicit branch nesting or loss of files, clean reopening, and rejection of dirty reopening. Inventory must distinguish unavailable contexts from healthy sessions.
 
@@ -779,6 +818,7 @@ Verify the successful and rejected paths of mcp worktree opening and inventory.
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [mcp_session.rs](../../../../crates/reqvire-cli/src/mcp_session.rs)
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
   * verify: [MCP Worktree Opening and Inventory](../../../Interfaces/MCP/Tools.md#mcp-worktree-opening-and-inventory)
@@ -829,6 +869,7 @@ Verify the successful and rejected paths of mcp github tool availability.
 #### Details
 - Test the standalone and embedded flag matrix: default, mutations only, optional commits, GitHub with/without mutations, and remote override with/without GitHub. Invalid combinations fail before listener startup.
 - Supply a controlled gh executable for missing binary, bad version, authentication failure, inaccessible/wrong repository, malformed JSON, nonzero exit, and timeout. Verify MCP remains locally usable, all three publication tools are omitted, direct calls are rejected, and reasons contain no credentials.
+- Give successful subprocess fixtures the production deadlines, including a delayed successful startup. Isolate the shortened deadline to an intentionally stalled authentication check and confirm that check was reached and reports a timeout, rather than accepting an unrelated startup failure as timeout coverage.
 - Confirm startup uses active host authentication status rather than trusting JSON exit behavior, issues no publication commands, and retains fixed availability until restart.
 - Exercise low `viewerPermission`, later revoked credentials, denied pushes, and denied comments; prove individual call results report real authorization failure while local model operations remain available. Check input/output schemas and side-effect annotations.
 

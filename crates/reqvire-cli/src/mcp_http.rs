@@ -584,7 +584,7 @@ mod tests {
             false,
             false,
             &exclusions,
-            std::sync::Arc::new(tokio::sync::Mutex::new(())),
+            std::sync::Arc::new(tokio::sync::RwLock::new(())),
             &HttpAccess::new(
                 &["https://app.example"
                     .parse()
@@ -689,7 +689,7 @@ mod tests {
                 false,
                 false,
                 &exclusions,
-                std::sync::Arc::new(tokio::sync::Mutex::new(())),
+                std::sync::Arc::new(tokio::sync::RwLock::new(())),
                 &access,
             ).expect("read-only router")
         } else {

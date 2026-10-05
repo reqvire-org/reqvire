@@ -4,8 +4,9 @@ use crate::graph_registry::GraphRegistry;
 use crate::ontology_graph::{build_graph_data, OntologyGraphData};
 use crate::relation::{self, LinkType};
 use crate::semantic_contract::{
-    external_materialization_metadata, materialized_external_subjects, SemanticIndex,
+    external_materialization_metadata, materialized_external_subjects, SemanticBlock, SemanticIndex,
 };
+use crate::semantic_store::SemanticModelStore;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
@@ -46,6 +47,8 @@ pub struct ProjectStoreProject {
     pub eligible_git_worktrees: Vec<ProjectStoreGitWorktree>,
     pub repository: Option<String>,
     pub branch: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub worktree_id: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -220,8 +223,9 @@ pub struct ProjectStoreRoute {
 
 pub fn build_project_store(
     registry: &GraphRegistry,
-    semantic_index: &SemanticIndex,
+    semantic_store: &SemanticModelStore,
 ) -> ExplorerProjectStore {
+    let semantic_index = semantic_store.index();
     let elements = build_elements(registry);
     let (relations, mut resources) = build_relations(registry);
     let contract_bindings = build_contract_bindings(registry, &mut resources);
@@ -243,7 +247,7 @@ pub fn build_project_store(
         &submodels,
     );
     let (visible_semantic_index, external_metadata) =
-        explorer_visible_semantic_index(semantic_index);
+        explorer_visible_semantic_index(semantic_index, semantic_store.used_external_subset());
     let ontology_graph_data = build_graph_data(&visible_semantic_index);
     let thesaurus = build_thesaurus_projection(registry, &concept_refs, &ontology_graph_data);
     let search = build_search_documents(&elements, &files, &resources, &ontology_graph_data);
@@ -327,6 +331,7 @@ fn build_project_metadata() -> ProjectStoreProject {
         eligible_git_worktrees,
         repository,
         branch,
+        worktree_id: None,
     }
 }
 
@@ -406,15 +411,16 @@ fn repository_name_from_url(url: &str) -> Option<String> {
         .filter(|name| !name.is_empty())
 }
 
-fn explorer_visible_semantic_index(source: &SemanticIndex) -> (SemanticIndex, Value) {
+fn explorer_visible_semantic_index(
+    source: &SemanticIndex,
+    used_subset_block: Option<&SemanticBlock>,
+) -> (SemanticIndex, Value) {
     let mut visible = source.clone();
-    let used_subset_block = visible.used_external_subset_block().ok().flatten();
     let used_terms = used_subset_block
-        .as_ref()
         .map(materialized_external_subjects)
         .unwrap_or_default();
 
-    visible.external_blocks = used_subset_block.into_iter().collect();
+    visible.external_blocks = used_subset_block.into_iter().cloned().collect();
     visible.ontology_declarations.retain(|_iri, declarations| {
         declarations.retain_mut(|declaration| {
             if !declaration.external {
@@ -438,10 +444,8 @@ fn explorer_external_materialization_metadata(
     external_materialization_metadata(source, visible, !source.external_sources.is_empty())
 }
 
-pub fn project_store_javascript(
-    store: &ExplorerProjectStore,
-) -> Result<String, crate::error::ReqvireError> {
-    let json = serde_json::to_string_pretty(store)?;
+/// Wrap already serialized store JSON, preserving safe JavaScript embedding.
+pub fn project_store_javascript(json: &str) -> String {
     let escaped = json
         .replace('<', "\\u003c")
         .replace('>', "\\u003e")
@@ -449,7 +453,7 @@ pub fn project_store_javascript(
         .replace('\u{2028}', "\\u2028")
         .replace('\u{2029}', "\\u2029");
 
-    Ok(format!("window.reqvireProjectStore = {escaped};\n"))
+    format!("window.reqvireProjectStore = {escaped};\n")
 }
 
 fn build_knowledge_graph_projection(
@@ -1646,7 +1650,10 @@ ext:UnusedTerm a owl:Class ;
     #[test]
     fn explorer_visible_semantic_index_materializes_used_external_subset_only() {
         let source = test_semantic_index_with_external_subset();
-        let (visible, metadata) = explorer_visible_semantic_index(&source);
+        let (visible, metadata) = explorer_visible_semantic_index(
+            &source,
+            source.used_external_subset_block().unwrap().as_ref(),
+        );
         let graph_data = build_graph_data(&visible);
         let graph_node_ids = graph_data
             .nodes
@@ -1699,7 +1706,10 @@ ext:UnusedTerm a owl:Class ;
     #[test]
     fn explorer_search_indexes_visible_ontology_subset_only() {
         let source = test_semantic_index_with_external_subset();
-        let (visible, _metadata) = explorer_visible_semantic_index(&source);
+        let (visible, _metadata) = explorer_visible_semantic_index(
+            &source,
+            source.used_external_subset_block().unwrap().as_ref(),
+        );
         let graph_data = build_graph_data(&visible);
         let docs = build_search_documents(&[], &[], &BTreeMap::new(), &graph_data);
         let ontology_text = docs

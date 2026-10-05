@@ -1,7 +1,6 @@
 use crate::mcp;
 use crate::serve;
 use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
-use log::info;
 use reqvire::crud;
 use reqvire::diff::{render_crud_json, render_crud_result};
 use reqvire::element::Element;
@@ -1367,6 +1366,34 @@ pub async fn handle_command(
         .map(|_| 0);
     }
 
+    if let Some(Commands::Serve {
+        host,
+        port,
+        enable_mcp,
+        mcp_enable_mutations,
+        mcp_enable_commits,
+        mcp_enable_github,
+        mcp_github_remote,
+        allowed_origins,
+        allowed_hosts,
+    }) = args.command
+    {
+        reqvire::utils::enable_quiet_mode();
+        return serve::serve_explorer(
+            &host,
+            port,
+            enable_mcp,
+            mcp_enable_mutations,
+            mcp_enable_commits,
+            mcp_enable_github,
+            mcp_github_remote.as_deref().unwrap_or("origin"),
+            excluded_filename_patterns,
+            &crate::mcp_http::HttpAccess::new(&allowed_origins, &allowed_hosts),
+        )
+        .await
+        .map(|_| 0);
+    }
+
     // Get current working directory once at the start
     let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
 
@@ -1786,40 +1813,6 @@ pub async fn handle_command(
 
             Ok(0)
         }
-        Some(Commands::Serve {
-            host,
-            port,
-            enable_mcp,
-            mcp_enable_mutations,
-            mcp_enable_commits,
-            mcp_enable_github,
-            mcp_github_remote,
-            allowed_origins,
-            allowed_hosts,
-        }) => {
-            // Enable quiet mode for serve command runtime generation.
-            reqvire::utils::enable_quiet_mode();
-
-            let explorer_assets = explorer_runtime::build_runtime_assets(&model_manager)?;
-
-            // Start HTTP server (runs until Ctrl-C)
-            info!("Starting HTTP server at http://{}:{}/", host, port);
-            serve::serve_explorer(
-                explorer_assets,
-                &host,
-                port,
-                enable_mcp,
-                mcp_enable_mutations,
-                mcp_enable_commits,
-                mcp_enable_github,
-                mcp_github_remote.as_deref().unwrap_or("origin"),
-                excluded_filename_patterns,
-                &crate::mcp_http::HttpAccess::new(&allowed_origins, &allowed_hosts),
-            )
-            .await?;
-
-            Ok(0)
-        }
         Some(Commands::Export { output }) => {
             reqvire::utils::enable_quiet_mode();
 
@@ -2200,13 +2193,14 @@ pub async fn handle_command(
             Ok(0)
         }
         Some(Commands::Semantic { command }) => {
-            let index = &model_manager
+            let semantic_store = model_manager
                 .semantic_store
                 .as_ref()
-                .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?
-                .index;
+                .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?;
             match command {
-                SemanticCommands::Query { command } => return run_query_command(index, command),
+                SemanticCommands::Query { command } => {
+                    return run_query_command(semantic_store.index(), command);
+                }
                 SemanticCommands::Export {
                     layer,
                     jsonld,
@@ -2218,7 +2212,7 @@ pub async fn handle_command(
                         .into_iter()
                         .map(SemanticExportLayer::from)
                         .collect::<Vec<_>>();
-                    let output_content = index.serialize_export_layers(
+                    let output_content = semantic_store.serialize_export_layers(
                         format,
                         &layers,
                         namespace_base.as_deref(),
@@ -2264,15 +2258,16 @@ pub async fn handle_command(
             namespace_base,
             output,
         }) => {
-            let index = model_manager
-                .semantic_index()
+            let semantic_store = model_manager
+                .semantic_store
+                .as_ref()
                 .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?;
             let format = if jsonld {
                 SemanticExportFormat::JsonLd
             } else {
                 SemanticExportFormat::Turtle
             };
-            let output_content = index.serialize_with_options_and_filter(
+            let output_content = semantic_store.serialize_with_options_and_filter(
                 format,
                 full,
                 include_external,
@@ -2339,7 +2334,9 @@ pub async fn handle_command(
             run_sout(&model_manager.graph_registry)?;
             Ok(0)
         }
-        Some(Commands::Mcp { .. }) => unreachable!("MCP command is handled before model parsing"),
+        Some(Commands::Mcp { .. } | Commands::Serve { .. }) => {
+            unreachable!("Server commands are handled before model parsing")
+        }
         None => {
             // This case is handled at the beginning of handle_command
             unreachable!("Command is None but should have been handled earlier");

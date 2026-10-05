@@ -28,7 +28,7 @@ fn managed_queries_mcp_discovery_validation_projection_and_cache() {
     let mut model = reqvire::model::ModelManager::new();
     model.parse_and_validate(None, &exclusions).unwrap();
     let graph =
-        reqvire::ontology_graph::build_graph_data(&model.semantic_store.as_ref().unwrap().index);
+        reqvire::ontology_graph::build_graph_data(model.semantic_store.as_ref().unwrap().index());
     let native_query = graph
         .nodes
         .iter()

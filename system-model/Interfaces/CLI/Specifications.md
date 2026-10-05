@@ -637,3 +637,18 @@ Commands MUST be `semantic query list [--json] [--namespace-base IRI] [--name NA
 #### Relations
   * define: [CLI Managed Query Artifacts](ManagedQueries.md#cli-managed-query-artifacts)
 ---
+
+### npm CLI Launch Specification
+
+#### Details
+- Select the package's native archive for Linux x64, macOS arm64, or macOS x64; report unsupported platforms and missing archives as failures.
+- Reuse the native executable cache by package version and platform/architecture. Concurrent first invocations must extract privately and publish only a complete executable atomically. A losing publisher reuses the complete winner without removing or overwriting another invocation's cache or extraction state.
+- Remove only the current invocation's temporary extraction directory on success or extraction failure. Failed extraction must not publish a partial executable, and a later invocation must be able to retry.
+- Forward arguments, inherited standard input/output/error, native exit status, and native termination signal. Repeated launches with an existing complete executable must not extract again.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [npm CLI Distribution](Commands.md#npm-cli-distribution)
+---
