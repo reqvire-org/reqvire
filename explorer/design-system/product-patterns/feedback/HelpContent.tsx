@@ -93,6 +93,7 @@ const ELEMENT_LEGEND = [
   ["inspection-verification", "Inspection Verification"],
   ["demonstration-verification", "Demonstration Verification"],
   ["specification", "Specification"],
+  ["semantic-query", "Semantic Query"],
   ["semantic-contract", "Semantic Contract"],
   ["ontology", "Ontology"],
   ["concept-scheme", "Concept Scheme"],

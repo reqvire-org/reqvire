@@ -1,5 +1,10 @@
+import { useMemo } from "react";
 import { useExplorerUiState, type ModelMode } from "../state/ExplorerUiState";
-import { Icon, RouteLayout, SegmentedControl, WorkspaceShell } from "@ds";
+import { ElementFlow, Icon, RouteLayout, SegmentedControl, WorkspaceShell } from "@ds";
+import { useStore } from "../store/StoreContext";
+import { flowLayoutEngine } from "../workers/flowLayoutEngine";
+import { buildModelFlow } from "../lib/modelFlow";
+import { routeForContent, routeForResource } from "../router/routes";
 import { FilesView } from "./FilesView";
 import { KnowledgeGraphView } from "./GraphLibraryViews";
 import { ViewFrame } from "./ViewFrame";
@@ -10,6 +15,7 @@ export function ModelView({ onOpenElement }: { onOpenElement: (id: string) => vo
   if (modelMode === "graph") {
     return <ModelGraphView onOpenElement={onOpenElement} />;
   }
+  if (modelMode === "flow") return <ModelFlowView onOpenElement={onOpenElement} />;
 
   return (
     <FilesView
@@ -18,6 +24,24 @@ export function ModelView({ onOpenElement }: { onOpenElement: (id: string) => vo
       onOpenElement={onOpenElement}
     />
   );
+}
+
+function ModelFlowView({ onOpenElement }: { onOpenElement: (id: string) => void }) {
+  const ui = useExplorerUiState();
+  const { store, elementById } = useStore();
+  const data = useMemo(() => buildModelFlow(store, ui.modelSelectionId), [store, ui.modelSelectionId]);
+  return <ViewFrame testId="model">
+    <RouteLayout>
+      <WorkspaceShell rootLabel="Model" currentLabel="Flow" breadcrumbLabel="Model flow breadcrumbs"
+        onRootClick={() => ui.setModelSelectionId("__root__")}
+        controls={<ModelModeSelector value={ui.modelMode} onChange={ui.setModelMode} />}>
+        <ElementFlow layoutEngine={flowLayoutEngine} data={data} onOpenElement={id => {
+          if (elementById(id)) onOpenElement(id);
+          else window.location.hash = routeForResource(id);
+        }} onOpenSource={element => { window.location.hash = element.sourceHref ?? routeForContent(element.file); }} />
+      </WorkspaceShell>
+    </RouteLayout>
+  </ViewFrame>;
 }
 
 function ModelGraphView({ onOpenElement }: { onOpenElement: (id: string) => void }) {
@@ -56,6 +80,7 @@ function ModelModeSelector({
         { value: "list", label: "List", icon: <Icon name="list" /> },
         { value: "grid", label: "Grid", icon: <Icon name="layout-grid" /> },
         { value: "graph", label: "Graph", icon: <Icon name="git-branch" /> },
+        { value: "flow", label: "Flow", icon: <Icon name="network" /> },
       ]}
     />
   );

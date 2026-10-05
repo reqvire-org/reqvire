@@ -88,12 +88,12 @@ pub struct RelationInfo {
 impl LintReport {
     pub fn to_json_string(&self, show_only_fixable: bool, show_only_auditable: bool) -> String {
         let filtered_report = if show_only_fixable {
-            LintReport {
+            Self {
                 auto_fixable: self.auto_fixable.clone(),
                 needs_manual_review: vec![],
             }
         } else if show_only_auditable {
-            LintReport {
+            Self {
                 auto_fixable: vec![],
                 needs_manual_review: self.needs_manual_review.clone(),
             }

@@ -42,6 +42,7 @@ termcolor = "1.4"
 globset = "0.4.16"
 rustc-hash = "2.1"
 difference = "2.0"
+spargebra = "0.4.7"
 oxigraph = { version = "0.5.8", default-features = false }
 o-kernel = { path = "crates/o-kernel" }
 reqvire = { path = "crates/reqvire-core" }

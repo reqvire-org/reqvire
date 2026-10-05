@@ -3,11 +3,7 @@ use oxigraph::io::{RdfFormat, RdfParser};
 use oxigraph::model::NamedNode;
 use oxigraph::store::Store;
 
-pub(crate) fn load_default_graph(
-    store: &Store,
-    turtle: &str,
-    label: &str,
-) -> Result<(), ReqvireError> {
+pub fn load_default_graph(store: &Store, turtle: &str, label: &str) -> Result<(), ReqvireError> {
     if turtle.trim().is_empty() {
         return Ok(());
     }
@@ -21,7 +17,7 @@ pub(crate) fn load_default_graph(
         })
 }
 
-pub(crate) fn load_named_graph(
+pub fn load_named_graph(
     store: &Store,
     turtle: &str,
     graph_iri: &str,

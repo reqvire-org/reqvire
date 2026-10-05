@@ -36,7 +36,6 @@ Implementation details shall follow the associated contract specifications.
   * [Two-Pass Validation Behavior](../../Operations/Validation/Behaviors.md#two-pass-validation-behavior)
   * [Validation Error Reporting Behavior](../../Operations/Validation/Behaviors.md#validation-error-reporting-behavior)
   * [Explorer Serve Pipeline Specification](Specifications.md#explorer-serve-pipeline-specification)
-  * [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
 
 #### Relations
   * definedBy: [Serve Command Contract Specification](Specifications.md#serve-command-contract-specification)
@@ -48,7 +47,7 @@ Implementation details shall follow the associated contract specifications.
 
 ### Served Explorer Runtime Freshness
 
-When an embedded MCP mutation succeeds during serving with mutations enabled, the system shall publish the updated valid model to Explorer clients without restarting the server or interrupting MCP access.
+When an embedded MCP mutation succeeds during serving with mutations enabled, the system shall publish the updated valid model to Explorer clients viewing that worktree context without restarting the server or interrupting MCP access.
 
 While the mutation's runtime snapshot is being rebuilt, the system shall serve the last valid published snapshot without waiting for model validation or generation.
 
@@ -83,7 +82,13 @@ When an embedded MCP request is a preview or a rejected mutation, the system sha
 The system shall allow the Explorer serve command to expose the Reqvire MCP Streamable HTTP endpoint at `/mcp` on the same HTTP listener when explicitly enabled.
 
 #### Details
-Detailed embedded endpoint, registry reuse, transport, mutation gating, route preservation, runtime refresh, and endpoint display rules shall follow the associated specification.
+WHEN embedded MCP is enabled, the system SHALL provide its endpoint, registry reuse, transport, mutation gating, route preservation, runtime refresh, and endpoint display according to the associated specification.
+
+WHEN embedded MCP mutations are enabled, the system SHALL persist validated changes without automatic commits by default and SHALL commit them only when explicitly enabled at startup.
+
+WHEN additional browser origins are configured for embedded MCP, the system SHALL apply the shared MCP origin policy to that endpoint.
+
+WHEN an embedded MCP endpoint uses a configured bind address or additional endpoint hostnames, the system SHALL apply the shared MCP host policy to that endpoint.
 
 #### Metadata
   * type: requirement
@@ -94,6 +99,7 @@ Detailed embedded endpoint, registry reuse, transport, mutation gating, route pr
   * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
   * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
   * [MCP Mutation Execution Flow Specification](../MCP/Specifications.md#mcp-mutation-execution-flow-specification)
+  * [MCP Streamable HTTP Transport Safety Specification](../MCP/Specifications.md#mcp-streamable-http-transport-safety-specification)
 
 #### Relations
   * definedBy: [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
@@ -204,7 +210,7 @@ Implementation details shall follow the associated contract specifications.
 The system shall render a model-centric Explorer visualization showing model roots with nested relations containing full element details.
 
 #### Details
-Implementation details shall follow the associated contract specifications.
+The Model workspace provides List, Grid, Graph, and Flow modes. Flow starts with root capabilities and descends through child capabilities, requirements, verification, and evidence as interactive element cards, with shared element details and complete path highlighting. Scope, navigation, and presentation follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
@@ -215,11 +221,12 @@ Implementation details shall follow the associated contract specifications.
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
+  * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
 ---
 
 ### Model View Element Navigation
 
-The system shall make element names in the model-centric view clickable links that navigate to the element's definition in its source file.
+The system shall make modeled element names in the Model workspace actionable so users can inspect their details and access their source definitions.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -231,6 +238,10 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Model View Element Navigation Contract Specification](Specifications.md#model-view-element-navigation-contract-specification)
   * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
+  * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
+  * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/product-patterns/reports/TraceFlow.tsx)
+  * satisfiedBy: [flowLayoutEngine.ts](../../../explorer/src/workers/flowLayoutEngine.ts)
+  * satisfiedBy: [flowLayout.worker.ts](../../../explorer/src/workers/flowLayout.worker.ts)
   * verifiedBy: [Model View Element Navigation Test](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-view-element-navigation-test)
 ---
 
@@ -259,7 +270,7 @@ The Ontologies view shall:
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
   * [Ontology Projection Subgraph Materialization Specification](../../Reports/ModelReports/Specifications.md#ontology-projection-subgraph-materialization-specification)
 
@@ -285,10 +296,12 @@ Detailed semantic-index, source-traceability, projection-subgraph, SHACL slot/fa
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
+  * [Semantic Query Discovery Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-discovery-specification)
   * [Ontology Construct Classification Specification](../../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
 
 #### Relations
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
   * definedBy: [OWL Semantic Ontology Projection Contract Specification](Specifications.md#owl-semantic-ontology-projection-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
@@ -305,6 +318,8 @@ Construct grouping shall cover equivalence groups, inverse properties, property-
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
+  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * definedBy: [Ontology Construct Grouping Contract Specification](Specifications.md#ontology-construct-grouping-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
@@ -321,6 +336,8 @@ Detailed domain/range aggregation, deduplicated relationship rendering, modal ev
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
+  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * definedBy: [Ontology Property-Centric Visualization Contract Specification](Specifications.md#ontology-property-centric-visualization-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
@@ -337,6 +354,8 @@ The symbol vocabulary shall define each symbol with its semantic meaning, raw Un
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
+  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * definedBy: [Ontology Symbol and Badge Vocabulary Contract Specification](Specifications.md#ontology-symbol-and-badge-vocabulary-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
@@ -380,8 +399,8 @@ The SPA Explorer shell shall:
 - Be a native single-page application built with Vite, TypeScript, and React, using the Reqvire Explorer design system and compiled CSS, served as `index.html` plus deterministic `assets/explorer.js` and `assets/explorer.css` bundles with no CDN-loaded framework or stylesheet and no runtime CSS compiler.
 - Treat `index.html` as the primary browser entry point and central Project Store host.
 - Expose project identity metadata in the Project Store, including effective workspace root label and eligible Git worktree names, paths, and source-control metadata when available, so Explorer navigation can group modeled files and resources by Git worktree identity instead of showing a generic project label.
-- Render the primary Model route as a native SPA view module reading from the Project Store. The Model route shall host List, Grid, and Graph modes over the Project Store filesystem/model and knowledge-graph projections.
-- Keep Model project-tree selection shared across List, Grid, and Graph modes so selecting a folder, file, or modeled element in the left Explorer tree updates the active Model workspace instead of opening a disconnected Filesystem view.
+- Render the primary Model route as a native SPA view module reading from the Project Store. The Model route shall host List, Grid, Graph, and Flow modes over the Project Store filesystem/model and knowledge-graph projections.
+- Keep Model project-tree selection shared across List, Grid, Graph, and Flow modes so selecting a folder, file, or modeled element in the left Explorer tree updates the active Model workspace instead of opening a disconnected Filesystem view.
 - Render Graph as a Model mode over the Project Store knowledge-graph projection, render specialist Ontologies and Traces routed views from top navigation and tool actions, and render supporting Search, file deep links, Coverage, Resources, and element-detail workflows from the same Project Store without making them primary left-pane navigation modes.
 - Build the Search route's ranked MiniSearch index in a browser worker after the initial shell render, using Project Store search documents with boosted title, path, result-kind, and content fields so indexing does not block primary Explorer interaction.
 - Open element-detail routes in an in-shell scrollable modal backed by Project Store element records, preserving the current Explorer view context behind the modal.
@@ -399,9 +418,11 @@ The SPA Explorer shell shall:
   * type: requirement
 
 #### Contract Bindings
+  * [Contract Reference Evidence Projection Specification](../../Reports/ModelReports/Specifications.md#contract-reference-evidence-projection-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
 
 #### Relations
+  * satisfiedBy: [build.rs](../../../crates/reqvire-core/build.rs)
   * definedBy: [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
   * definedBy: [SPA Explorer Store Contract Specification](Specifications.md#spa-explorer-store-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
@@ -457,6 +478,63 @@ When an Explorer route identifies a model element, file, source page, or resourc
   * verifiedBy: [Explorer Route Identifier Resolution Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#explorer-route-identifier-resolution-verification)
 ---
 
+### Explorer Scoped Coverage
+
+When a user selects a coverage scope, the system SHALL consistently display its coverage summaries, evidence, gaps, and navigation counts.
+
+#### Details
+While displaying coverage, the system SHALL present capabilities in a parent-before-child hierarchy with roots and siblings ranked by coverage.
+
+When the available coverage panel width changes, the system SHALL adapt the row layout while retaining distinguishable hierarchy levels and aligned verification and implementation values.
+
+When a user selects a requirement name in coverage, the system SHALL open its element details with access to its implementation evidence.
+
+When a user expands a capability coverage row, the system SHALL reveal its attached requirement hierarchy.
+
+When a requirement specifies a capability and derives from a requirement displayed elsewhere, the system SHALL make its coverage details accessible within that capability's requirement disclosure.
+
+While displaying a terminal requirement, the system SHALL communicate its coverage through the row's status labels and retain its element-detail link.
+
+When a requirement has child requirements or binding consumers to inspect, the system SHALL provide a coverage disclosure control.
+
+While displaying verification coverage, the system SHALL label published coverage states as Verified, Partially verified, and Not verified.
+
+When displaying verification or implementation coverage on a requirement row, the system SHALL use the same colored bars, percentages, and counts as capability coverage rows.
+
+While displaying the coverage hierarchy, the system SHALL distinguish consecutive capability and requirement rows with alternating surface shades and separate rows through spacing and shading.
+
+When a user expands a requirement coverage row, the system SHALL present its immediate child requirements beneath that row and display requirements binding its owned contracts in the same context.
+
+When displaying requirement coverage details, the system SHALL distinguish immediate implementation dependencies from outstanding blockers using the shared coverage report.
+
+While displaying implementation coverage, the system SHALL present status and blocker counts beside the requirement.
+
+While demonstrating coverage in the showcase, the system SHALL use the same Coverage view and components as the Explorer with fixture data.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
+  * [Implementation Coverage Output Structure Specification](../../Reports/ModelReports/Specifications.md#implementation-coverage-output-structure-specification)
+
+#### Relations
+  * derivedFrom: [SPA Explorer Shell and Project Store](#spa-explorer-shell-and-project-store)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
+  * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
+  * satisfiedBy: [CoverageDrilldown.tsx](../../../explorer/design-system/product-patterns/reports/CoverageDrilldown.tsx)
+  * satisfiedBy: [ReportPatterns.tsx](../../../explorer/design-system/product-patterns/reports/ReportPatterns.tsx)
+  * satisfiedBy: [PaneControls.tsx](../../../explorer/design-system/product-patterns/side-pane/PaneControls.tsx)
+  * satisfiedBy: [MockShell.tsx](../../../explorer/design-system/showcase/MockShell.tsx)
+  * satisfiedBy: [ProductPatternsPage.tsx](../../../explorer/design-system/showcase/pages/ProductPatternsPage.tsx)
+  * satisfiedBy: [ExplorerSidePane.tsx](../../../explorer/src/components/ExplorerSidePane.tsx)
+  * satisfiedBy: [coverage.ts](../../../explorer/src/lib/coverage.ts)
+  * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
+  * satisfiedBy: [loadStore.ts](../../../explorer/src/store/loadStore.ts)
+  * satisfiedBy: [types.ts](../../../explorer/src/store/types.ts)
+  * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
+---
+
 ### Thesaurus View Generation
 
 The system shall expose a Thesaurus Explorer view during serve workflows that presents standalone native concept schemes and concepts as curated SKOS terminology instead of as ontology children or filesystem folders.
@@ -483,12 +561,12 @@ Detailed route source, concept-scheme grouping, navigation, modal, map rendering
 The system shall expose verification traceability as a specialist Explorer view backed by Project Store trace projections and rendered through the shared Explorer shell.
 
 #### Details
-Detailed route data, left-pane behavior, flow/row rendering, Mermaid roll-up diagram rendering, modal interaction, and trace-data ownership rules shall follow the associated specifications.
+Detailed route data, left-pane behavior, flow/row rendering, native trace-preview interaction, modal navigation, and trace-data ownership rules shall follow the associated specifications.
 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Trace Diagram Projection Data Contract Specification](../../Reports/ModelReports/Specifications.md#trace-diagram-projection-data-contract-specification)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
@@ -498,6 +576,9 @@ Detailed route data, left-pane behavior, flow/row rendering, Mermaid roll-up dia
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
+  * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/product-patterns/reports/TraceFlow.tsx)
+  * satisfiedBy: [flowLayoutEngine.ts](../../../explorer/src/workers/flowLayoutEngine.ts)
+  * satisfiedBy: [flowLayout.worker.ts](../../../explorer/src/workers/flowLayout.worker.ts)
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
 ---
 
@@ -516,7 +597,7 @@ The color scheme shall provide:
 The system shall ensure color consistency between:
 - Explorer route styling
 - Browser-rendered Mermaid diagram rendering
-- Model List/Grid/Graph views
+- Model List/Grid/Graph/Flow views
 - Ontology graph visualization
 - Trace flow visualization
 
@@ -532,4 +613,63 @@ The system shall ensure color consistency between:
   * satisfiedBy: [ContractBindingList.tsx](../../../explorer/design-system/product-patterns/detail/ContractBindingList.tsx)
   * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
   * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
+---
+
+### Explorer Worktree Selection
+
+WHEN Explorer is served, the system SHALL let each browser tab select any local branch through one branch picker and load only the requested context under the server's existing read-only or mutation-enabled admission rules, without switching existing Git checkouts or changing another client's context.
+
+#### Details
+Selection SHALL resolve the branch to an existing or newly created isolated worktree and atomically adopt its context's model, reports, source content, and assets. Mutation-enabled serving SHALL reject a dirty target before loading a newly admitted context. The same admission, validation, existing cache/invalidation, navigation, and refresh rules SHALL apply regardless of whether the worktree already existed. Branch identity remains visible; reselecting an active context reuses its accepted model under the existing session rules.
+
+#### Metadata
+  * type: requirement
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Contract References
+  * [Explorer Worktree Runtime Isolation Specification](Specifications.md#explorer-worktree-runtime-isolation-specification)
+  * [MCP Worktree Opening and Inventory Specification](../MCP/Specifications.md#mcp-worktree-opening-and-inventory-specification)
+  * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
+  * [MCP Server State and Cache Specification](../MCP/Specifications.md#mcp-server-state-and-cache-specification)
+  * [Explorer Automatic Store Refresh Specification](Specifications.md#explorer-automatic-store-refresh-specification)
+  * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
+
+#### Relations
+  * satisfiedBy: [WorktreeSelector.tsx](../../../explorer/design-system/product-patterns/shell/WorktreeSelector.tsx)
+  * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
+  * satisfiedBy: [manifestRefresh.ts](../../../explorer/src/store/manifestRefresh.ts)
+  * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
+  * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
+  * specify: [Explorer Worktree Browsing](../InterfacesFeature.md#explorer-worktree-browsing)
+  * definedBy: [Explorer Worktree Selection Specification](Specifications.md#explorer-worktree-selection-specification)
+---
+
+### Explorer Worktree Runtime Isolation
+
+WHILE multiple worktree contexts are served, the system SHALL publish and route each context's Explorer model, source content, and eligible assets independently according to the bound isolation and live-store contracts.
+
+#### Details
+This requirement implements the Explorer portion of shared worktree isolation and snapshot publication. Browser selection consumes its runtime interface without taking ownership of MCP model operations.
+
+#### Metadata
+  * type: requirement
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Contract Bindings
+  * [MCP Worktree Context Isolation Specification](../MCP/Specifications.md#mcp-worktree-context-isolation-specification)
+  * [Served Explorer Runtime Freshness Specification](Specifications.md#served-explorer-runtime-freshness-specification)
+  * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
+  * [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
+
+#### Relations
+  * satisfiedBy: [worktreeUrls.tsx](../../../explorer/src/store/worktreeUrls.tsx)
+  * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
+  * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * specify: [Explorer Worktree Browsing](../InterfacesFeature.md#explorer-worktree-browsing)
+  * definedBy: [Explorer Worktree Runtime Isolation Specification](Specifications.md#explorer-worktree-runtime-isolation-specification)
 ---

@@ -16,6 +16,7 @@ export type ElementRole =
   | "demonstration-verification"
   | "verification"
   | "specification"
+  | "semantic-query"
   | "semantic-contract"
   | "ontology"
   | "concept"
@@ -48,6 +49,7 @@ export const ELEMENT_ROLE_TOKENS = {
   "demonstration-verification": { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
   verification: { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
   specification: { fill: "--contract", ink: "--contract-ink", tint: "--contract-tint" },
+  "semantic-query": { fill: "--ontology", ink: "--ontology-ink", tint: "--ontology-tint" },
   "semantic-contract": { fill: "--semantic-contract", ink: "--semantic-contract-ink", tint: "--semantic-contract-tint" },
   ontology: { fill: "--ontology", ink: "--ontology-ink", tint: "--ontology-tint" },
   concept: { fill: "--concept", ink: "--concept-ink", tint: "--concept-tint" },
@@ -78,6 +80,7 @@ export const ELEMENT_TYPES: Record<ElementType, { color: string; shape: ElementI
   "demonstration-verification": { color: "var(--verification)", shape: "square", role: "verification", glyph: "D" },
   verification: { color: "var(--verification)", shape: "square", role: "verification" },
   specification: { color: "var(--contract)", shape: "diamond", role: "specification", glyph: "≡" },
+  "semantic-query": { color: "var(--ontology)", shape: "square", role: "semantic-query", glyph: "Q" },
   "semantic-contract": { color: "var(--semantic-contract)", shape: "square", role: "semantic-contract" },
   ontology: { color: "var(--ontology)", shape: "square", role: "ontology" },
   concept: { color: "var(--concept)", shape: "square", role: "concept" },
@@ -253,6 +256,7 @@ export function elementRole(type?: string | null, family?: string | null): Eleme
   }
   if (normalizedType.includes("capability") || normalizedFamily === "capability") return "capability";
   if (normalizedType.includes("verification") || normalizedFamily === "verification") return "verification";
+  if (normalizedType === "semantic-query") return "semantic-query";
   if (normalizedType.includes("ontology") || normalizedFamily === "ontology") return "ontology";
   if (normalizedType === "evidence-file" || normalizedType.includes("evidence")) return "other";
   if (normalizedType === "concept") return "concept";

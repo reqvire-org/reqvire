@@ -410,6 +410,7 @@ The SHACL structural parser registry must compile SHACL RDF graphs into reusable
 The SHACL parser registry must:
 
 - Accept RDF terms and quads as input.
+- Index SHACL subject/predicate lookups and property-shape references once per parse so repeated lookups do not rescan unrelated quads. Preserve input order and multiplicity within each lookup; duplicate path or RDF-list facts must remain available to structural validation.
 - Avoid dependencies on consumer element types, source documents, graph registries, source identifiers, and consumer validation wording.
 - Discover shape node candidates from explicit shape indicators (`sh:NodeShape`, `sh:PropertyShape`, `sh:Shape`), target predicates (`sh:targetClass`, `sh:targetNode`, `sh:targetSubjectsOf`, `sh:targetObjectsOf`, `sh:target`), property shape references, and `sh:path`.
 - Deduplicate shape node candidates before structural parsing.
@@ -421,6 +422,7 @@ The SHACL parser registry must:
 - Preserve raw SHACL constraint facts as predicate/object pairs alongside typed constraints.
 - Return parser diagnostics for malformed SHACL structures without converting those diagnostics into consumer-specific errors.
 - Store compiled shapes in a reusable registry keyed by RDF shape identifiers.
+- Allow ontology reference extraction to consume an already compiled registry with the same reference and reserved-vocabulary filtering semantics as extraction from RDF quads.
 
 #### Metadata
   * type: specification

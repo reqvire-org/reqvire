@@ -20,7 +20,7 @@ use std::process::Command;
 mod arg_helpers;
 use arg_helpers::{
     bool_arg, current_dir_path, current_dir_string, eligible_git_worktrees_state, git_state,
-    load_model, load_model_with_options, model_fingerprint, parse_json_string, required_string_arg,
+    load_model_with_options, model_fingerprint, parse_json_string, required_string_arg,
     string_arg, string_array_arg, usize_arg,
 };
 
@@ -63,11 +63,11 @@ pub struct ReqvireToolRegistry<'a> {
 }
 
 impl<'a> ReqvireToolRegistry<'a> {
-    pub fn new(enable_mutations: bool, excluded_filename_patterns: &'a GlobSet) -> Self {
+    pub const fn new(enable_mutations: bool, excluded_filename_patterns: &'a GlobSet) -> Self {
         Self::new_with_options(enable_mutations, false, excluded_filename_patterns)
     }
 
-    pub fn new_with_options(
+    pub const fn new_with_options(
         enable_mutations: bool,
         with_size_estimates: bool,
         excluded_filename_patterns: &'a GlobSet,
@@ -79,7 +79,7 @@ impl<'a> ReqvireToolRegistry<'a> {
         }
     }
 
-    pub fn mutation_tools_enabled(&self) -> bool {
+    pub const fn mutation_tools_enabled(&self) -> bool {
         self.enable_mutations
     }
 
@@ -114,7 +114,7 @@ impl<'a> ReqvireToolRegistry<'a> {
                 .get("dry_run")
                 .and_then(Value::as_bool)
                 .unwrap_or(false);
-        if persists {
+        if persists && !crate::mutation_io::active() {
             crate::model_cache::begin_write();
         }
         let exclusions = self.excluded_filename_patterns.refreshed();
@@ -128,7 +128,7 @@ impl<'a> ReqvireToolRegistry<'a> {
         // Both successful writes and failed multi-file operations may persist
         // changes. Centralize eviction here, including format fixes, without
         // replacing the original operation result.
-        if persists {
+        if persists && !crate::mutation_io::active() {
             crate::model_cache::invalidate();
         }
         result
@@ -255,6 +255,22 @@ mod tests {
             .expect("contract tools array")
             .iter()
             .any(|tool| tool["name"] == "reqvire.search"));
+    }
+
+    #[test]
+    fn managed_query_tools_are_read_only() {
+        let tools = tool_definitions(false);
+        for name in [
+            "reqvire.semantic.queries",
+            "reqvire.semantic.queries.validate",
+        ] {
+            let tool = tools
+                .iter()
+                .find(|tool| tool["name"] == name)
+                .expect("managed query tool");
+            assert_eq!(tool["annotations"]["readOnlyHint"], true, "{name}");
+            assert_eq!(tool["annotations"]["destructiveHint"], false, "{name}");
+        }
     }
 
     fn ignored_patterns() -> crate::exclusions::ExclusionSet {

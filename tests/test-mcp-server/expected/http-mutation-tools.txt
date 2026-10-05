@@ -17,6 +17,8 @@ reqvire.concepts.get
 reqvire.concept_schemes.list
 reqvire.concept_mappings.list
 reqvire.semantic.graph
+reqvire.semantic.queries
+reqvire.semantic.queries.validate
 reqvire.semantic.prefixes
 reqvire.semantic.vocabulary
 reqvire.semantic.sparql
@@ -38,3 +40,8 @@ reqvire.unlink
 reqvire.relink
 reqvire.move_asset
 reqvire.remove_asset
+reqvire.worktree.list
+reqvire.worktree.create
+reqvire.worktree.open
+reqvire.worktree.remove
+reqvire.git.commit

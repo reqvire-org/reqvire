@@ -27,6 +27,34 @@ describe("validateStore", () => {
     const seed = { ...devFixture, elements: {} as unknown };
     expect(validateStore(seed)).toContain('section "elements" must be an array');
   });
+
+  it("accepts optional contract references and rejects malformed reference collections", () => {
+    expect(validateStore({ ...devFixture, contract_references: [] })).toEqual([]);
+    expect(validateStore({ ...devFixture, contract_references: {} }))
+      .toContain('section "contract_references" must be an array');
+  });
+
+  it("rejects missing or malformed scope indexes", () => {
+    expect(validateStore(devFixture)).toEqual([]);
+    for (const scope_index of [undefined, null, [], { broken: { scope: {}, summary: {} } }]) {
+      const problems = validateStore({ ...devFixture, coverage: { ...devFixture.coverage, scope_index } });
+      expect(problems.some(problem => problem.includes("coverage.scope_index"))).toBe(true);
+    }
+  });
+  it("rejects missing or invalid requirement aggregate metrics", () => {
+    for (const section of ["covered_requirements", "uncovered_requirements"] as const) {
+      for (const key of ["aggregate_leaf_requirements", "aggregate_verified_leaf_requirements",
+        "aggregate_terminal_requirements", "aggregate_covered_terminal_requirements"]) {
+        for (const value of [undefined, -1, 0.5, "1"]) {
+          const seed = structuredClone(devFixture);
+          const row = Object.values(seed.coverage[section].files)[0][0];
+          Object.assign(row, { [key]: value });
+          expect(validateStore(seed).some(problem => problem.includes(`coverage.${section}`))).toBe(true);
+        }
+      }
+    }
+  });
+
 });
 
 describe("loadStore", () => {

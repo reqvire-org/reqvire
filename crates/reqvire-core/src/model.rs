@@ -1,8 +1,10 @@
 use crate::error::ReqvireError;
 use crate::filesystem;
 use crate::graph_registry::GraphRegistry;
+use crate::semantic_contract::SemanticIndex;
 use crate::semantic_store::SemanticModelStore;
 use log::debug;
+use std::sync::Arc;
 
 use crate::exclusions::ExclusionSet as GlobSet;
 use crate::parser;
@@ -14,6 +16,8 @@ pub struct ModelManager {
     pub graph_registry: GraphRegistry,
     /// Semantic RDF query state built from the validated graph.
     pub semantic_store: Option<SemanticModelStore>,
+    /// The constructed index also retains diagnostics after strict validation failure.
+    semantic_index: Option<Arc<SemanticIndex>>,
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -34,7 +38,14 @@ impl ModelManager {
         Self {
             graph_registry: GraphRegistry::new(),
             semantic_store: None,
+            semantic_index: None,
         }
+    }
+
+    /// Semantic state of the last construction attempt, including failed validation.
+    /// Mutation candidates must be validated against their own fresh index.
+    pub fn semantic_index(&self) -> Option<&SemanticIndex> {
+        self.semantic_index.as_deref()
     }
 
     pub fn parse_and_validate(
@@ -74,6 +85,7 @@ impl ModelManager {
         // Reset state so repeated parse/validate calls always start from a clean model.
         self.graph_registry = GraphRegistry::new();
         self.semantic_store = None;
+        self.semantic_index = None;
 
         // Pass 1: Element collection with local validation
         let pass1_errors =
@@ -94,7 +106,12 @@ impl ModelManager {
         debug!("Pass 1 completed, proceeding to Pass 2");
 
         // Pass 2: Graph construction and relation validation
-        let pass2_errors = self.pass2_build_relations(excluded_filename_patterns)?;
+        let (pass2_errors, semantic_index) =
+            self.pass2_build_relations(excluded_filename_patterns)?;
+        let semantic_index = Arc::new(semantic_index);
+        self.semantic_index = Some(Arc::clone(&semantic_index));
+        #[cfg(test)]
+        crate::model_cache::tests::checkpoint("semantic-validated");
 
         // If Pass 2 has errors, return them as an error (unless lenient mode)
         if !pass2_errors.is_empty() {
@@ -112,7 +129,10 @@ impl ModelManager {
             self.graph_registry.populate_size_estimates()?;
         }
 
-        self.semantic_store = Some(SemanticModelStore::build(&self.graph_registry)?);
+        self.semantic_store = Some(SemanticModelStore::from_index(
+            &self.graph_registry,
+            semantic_index,
+        )?);
 
         debug!("Validation completed");
         Ok(Vec::new())
@@ -224,7 +244,7 @@ impl ModelManager {
     fn pass2_build_relations(
         &mut self,
         excluded_filename_patterns: &GlobSet,
-    ) -> Result<Vec<ReqvireError>, ReqvireError> {
+    ) -> Result<(Vec<ReqvireError>, SemanticIndex), ReqvireError> {
         debug!("Pass 2: Delegating to GraphRegistry for relation building and validation");
         self.graph_registry
             .build_relations(excluded_filename_patterns)

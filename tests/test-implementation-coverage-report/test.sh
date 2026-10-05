@@ -60,6 +60,9 @@ run_json_report_test() {
       total_requirements_in_scope: .summary.total_requirements_in_scope,
       covered_requirements: .summary.covered_requirements,
       uncovered_requirements: .summary.uncovered_requirements,
+      total_terminal_requirements: .summary.total_terminal_requirements,
+      covered_terminal_requirements: .summary.covered_terminal_requirements,
+      uncovered_terminal_requirements: .summary.uncovered_terminal_requirements,
       implementation_coverage_percentage: .summary.implementation_coverage_percentage,
       coverage_sources: .summary.coverage_sources
     },

@@ -1,7 +1,7 @@
 use crate::element::{
     is_legacy_contract_bindings_section, ConceptReference, ContractBindingEntry,
     ContractBindingTarget, Element, ElementType, FencedBlock, RequirementType, SubSection,
-    CONTRACT_BINDINGS_SECTION,
+    CONTRACT_BINDINGS_SECTION, CONTRACT_REFERENCES_SECTION,
 };
 use crate::error::ReqvireError;
 use crate::relation::{self, Relation};
@@ -10,6 +10,41 @@ use log::debug;
 use rustc_hash::FxHashSet;
 use std::collections::BTreeMap;
 use std::path::Path;
+
+/// Parse review dependencies through the same identifier normalizer as relations.
+fn insert_contract_reference(
+    entries: &mut Vec<ContractBindingEntry>,
+    line: &str,
+    file: &str,
+) -> Result<(), ReqvireError> {
+    let invalid =
+        |message: String| ReqvireError::InvalidContractReference(format!("{file}: {message}"));
+    let href =
+        utils::parse_contract_bindings_line(line).map_err(|error| invalid(error.to_string()))?;
+    if !href.contains('#') || utils::is_external_url(&href) {
+        return Err(invalid(format!(
+            "Contract References require an element identifier, got '{href}'"
+        )));
+    }
+    let identifier = if let Some(fragment) = href.strip_prefix('#') {
+        format!("{file}#{}", utils::normalize_fragment(fragment))
+    } else {
+        let base = crate::workspace::workspace_root()?
+            .join(Path::new(file).parent().unwrap_or_else(|| Path::new(".")));
+        utils::normalize_identifier(&href, &base).map_err(|error| invalid(error.to_string()))?
+    };
+    let target = ContractBindingTarget::ElementIdentifier(identifier);
+    if entries.iter().any(|entry| entry.target == target) {
+        return Err(invalid(format!(
+            "Duplicate Contract References target '{href}'"
+        )));
+    }
+    entries.push(ContractBindingEntry {
+        target,
+        content_hash: None,
+    });
+    Ok(())
+}
 
 pub const ELEMENTS_HEADER: &str = "# Elements";
 pub const SINGLE_ELEMENT_HEADER: &str = "# Element";
@@ -24,90 +59,119 @@ pub struct ParsedExternalOntologySource {
     pub line_number: usize,
 }
 
+/// Real subsection headings, excluding fenced examples and details content.
+fn subsection_headers(content: &str) -> Vec<(usize, &str)> {
+    let mut headers = Vec::new();
+    let mut fence = 0;
+    let mut details = false;
+    for (i, line) in content.lines().enumerate() {
+        let t = line.trim();
+        if details {
+            if t.starts_with("</details>") {
+                details = false;
+            }
+            continue;
+        }
+        if fence > 0 {
+            if t.len() >= fence && t.chars().all(|c| c == '`') {
+                fence = 0;
+            }
+            continue;
+        }
+        if t.starts_with("<details") {
+            details = true;
+            continue;
+        }
+        if t.starts_with("```") {
+            fence = t.chars().take_while(|c| *c == '`').count();
+            continue;
+        }
+        if let Some(name) = t.strip_prefix("#### ") {
+            headers.push((i, name));
+        }
+    }
+    headers
+}
+
 pub fn extract_single_fenced_subsection(content: &str, subsection: &str) -> Vec<FencedBlock> {
-    let header = format!("#### {}", subsection);
+    let headers = subsection_headers(content);
+    let lines: Vec<_> = content.lines().collect();
     let mut blocks = Vec::new();
-    let mut in_section = false;
-    let mut in_fence = false;
-    let mut language = String::new();
-    let mut block_content = String::new();
-    let mut fence_line_number = 0;
-
-    for (line_index, line) in content.lines().enumerate() {
-        let trimmed = line.trim();
-
-        if trimmed.starts_with("#### ") {
-            if in_fence {
+    for (n, (start, name)) in headers.iter().enumerate() {
+        if *name != subsection {
+            continue;
+        }
+        let end = headers.get(n + 1).map_or(lines.len(), |(i, _)| *i);
+        let mut fence = 0;
+        let mut language = String::new();
+        let mut text = String::new();
+        let mut line_number = 0;
+        for (i, line) in lines.iter().enumerate().take(end).skip(start + 1) {
+            let t = line.trim();
+            if fence == 0 && t.starts_with("```") {
+                fence = t.chars().take_while(|c| *c == '`').count();
+                language = t[fence..].trim().to_owned();
+                line_number = i + 1;
+            } else if fence > 0 && t.len() >= fence && t.chars().all(|c| c == '`') {
                 blocks.push(FencedBlock {
                     language: language.clone(),
-                    content: block_content.trim_end().to_string(),
-                    line_number: fence_line_number,
+                    content: text.trim_end().to_owned(),
+                    line_number,
                 });
-                in_fence = false;
-                language.clear();
-                block_content.clear();
-                fence_line_number = 0;
+                fence = 0;
+                text.clear();
+            } else if fence > 0 {
+                text.push_str(line);
+                text.push('\n');
             }
-            in_section = trimmed == header;
-            continue;
         }
-
-        if !in_section {
-            continue;
-        }
-
-        if trimmed.starts_with("```") {
-            if in_fence {
-                blocks.push(FencedBlock {
-                    language: language.clone(),
-                    content: block_content.trim_end().to_string(),
-                    line_number: fence_line_number,
-                });
-                in_fence = false;
-                language.clear();
-                block_content.clear();
-                fence_line_number = 0;
-            } else {
-                in_fence = true;
-                language = trimmed.trim_start_matches("```").trim().to_string();
-                fence_line_number = line_index + 1;
-            }
-            continue;
-        }
-
-        if in_fence {
-            block_content.push_str(line);
-            block_content.push('\n');
+        if fence > 0 {
+            blocks.push(FencedBlock {
+                language,
+                content: text.trim_end().to_owned(),
+                line_number,
+            });
         }
     }
-
-    if in_fence {
-        blocks.push(FencedBlock {
-            language,
-            content: block_content.trim_end().to_string(),
-            line_number: fence_line_number,
-        });
-    }
-
     blocks
 }
 
 pub fn has_subsection(content: &str, subsection: &str) -> bool {
-    let header = format!("#### {}", subsection);
-    content
-        .lines()
-        .any(|line| line.trim() == header || line.trim().starts_with(&(header.clone() + " ")))
+    subsection_headers(content)
+        .iter()
+        .any(|(_, name)| *name == subsection || name.starts_with(&format!("{subsection} ")))
+}
+
+/// Byte range of a real subsection, excluding lookalike headings in code fences.
+pub(crate) fn subsection_range(content: &str, subsection: &str) -> Option<std::ops::Range<usize>> {
+    let headers = subsection_headers(content);
+    let position = headers.iter().position(|(_, name)| *name == subsection)?;
+    let mut offset = 0;
+    let offsets: Vec<_> = content
+        .split_inclusive('\n')
+        .map(|line| {
+            let start = offset;
+            offset += line.len();
+            start
+        })
+        .collect();
+    let start = offsets[headers[position].0];
+    let end = headers
+        .get(position + 1)
+        .map_or(content.len(), |(line, _)| offsets[*line]);
+    Some(start..end)
 }
 
 pub fn extract_concept_references(content: &str) -> (Vec<ConceptReference>, Vec<String>) {
     let mut references = Vec::new();
     let mut diagnostics = Vec::new();
     let mut in_section = false;
+    let headers = subsection_headers(content);
 
     for (line_index, line) in content.lines().enumerate() {
         let trimmed = line.trim();
 
-        if trimmed.starts_with("#### ") {
+        if headers.iter().any(|(index, _)| *index == line_index) {
             in_section = trimmed == "#### Concept References";
             continue;
         }
@@ -293,7 +357,7 @@ pub enum ModelFileType {
 }
 
 /// Returns an example of correctly formatted element markdown for error messages
-fn get_element_example() -> &'static str {
+const fn get_element_example() -> &'static str {
     r#"
 Example of correctly formatted element:
 
@@ -329,8 +393,23 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
     let mut in_details_block = false;
     let mut found_header = false;
 
-    for (line_num, line) in content.lines().enumerate() {
+    let mut content_fence = 0;
+    for (line_num, line) in content.split_terminator('\n').enumerate() {
         let trimmed = line.trim();
+        if !in_details_block && (content_fence > 0 || trimmed.starts_with("```")) {
+            if trimmed.starts_with("```") {
+                let length = trimmed.chars().take_while(|c| *c == '`').count();
+                if content_fence == 0 {
+                    content_fence = length;
+                    if current_subsection == SubSection::Other("Query".to_owned()) {
+                        if let Some(element)=&mut current_element {element.query_line_number=Some(line_num+1);}
+                    }
+                }
+                else if length >= content_fence && trimmed.chars().all(|c| c == '`') { content_fence = 0; }
+            }
+            if let Some(element) = &mut current_element { element.add_content(&format!("{}\n", line)); }
+            continue;
+        }
 
         // Handle <details> blocks
         if in_details_block {
@@ -505,7 +584,16 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                     ));
                 }
             }
-
+        } else if current_subsection == SubSection::ContractReference {
+            if !trimmed.is_empty() {
+                if let Some(element) = &mut current_element {
+                    insert_contract_reference(
+                        &mut element.contract_references,
+                        trimmed,
+                        file_path,
+                    )?;
+                }
+            }
         // Parse contract_bindings
         } else if current_subsection == SubSection::ContractBinding {
             if let Some(element) = &mut current_element {
@@ -656,7 +744,9 @@ pub fn parse_single_element_contract(
                 seen_metadata = true;
             } else if section.eq_ignore_ascii_case("Relations") {
                 seen_relations = true;
-            } else if !section.eq_ignore_ascii_case(CONTRACT_BINDINGS_SECTION) {
+            } else if !section.eq_ignore_ascii_case(CONTRACT_BINDINGS_SECTION)
+                && !section.eq_ignore_ascii_case(CONTRACT_REFERENCES_SECTION)
+            {
                 // Dynamic element name section header: `## <Element Name>`
                 seen_element_name = true;
             }
@@ -765,6 +855,7 @@ fn parse_single_element_file(
     let mut element_content = String::new();
     let mut element_relations: Vec<Relation> = Vec::new();
     let mut element_contract_bindings: Vec<ContractBindingEntry> = Vec::new();
+    let mut element_contract_references = Vec::new();
     let mut metadata: rustc_hash::FxHashMap<String, String> = rustc_hash::FxHashMap::default();
 
     enum DocSection {
@@ -772,6 +863,7 @@ fn parse_single_element_file(
         Metadata,
         Relations,
         ContractBinding,
+        ContractReference,
         Document,
     }
     let mut section = DocSection::None;
@@ -804,6 +896,7 @@ fn parse_single_element_file(
                 }
                 "Relations" => DocSection::Relations,
                 CONTRACT_BINDINGS_SECTION => DocSection::ContractBinding,
+                CONTRACT_REFERENCES_SECTION => DocSection::ContractReference,
                 _ => {
                     // Dynamic element name section header (e.g., `## Change Propagation`)
                     seen_element_name = true;
@@ -966,6 +1059,19 @@ fn parse_single_element_file(
                     )));
                 }
             }
+            DocSection::ContractReference => {
+                if !trimmed.is_empty() {
+                    if let Err(error) = utils::get_relative_path(file_path).and_then(|path| {
+                        insert_contract_reference(
+                            &mut element_contract_references,
+                            trimmed,
+                            &path.to_string_lossy(),
+                        )
+                    }) {
+                        errors.push(error);
+                    }
+                }
+            }
             DocSection::Document | DocSection::None => {}
         }
     }
@@ -992,10 +1098,10 @@ fn parse_single_element_file(
         }
         None => raw_identifier,
     };
-    let relative_file = match utils::get_relative_path(file_path) {
-        Ok(path) => path.to_string_lossy().to_string(),
-        Err(_) => file.to_string(),
-    };
+    let relative_file = utils::get_relative_path(file_path).map_or_else(
+        |_| file.to_string(),
+        |path| path.to_string_lossy().to_string(),
+    );
 
     let mut element = Element::new(
         &final_element_name,
@@ -1010,6 +1116,7 @@ fn parse_single_element_file(
     element.set_type_from_metadata();
     element.relations = element_relations;
     element.contract_bindings = element_contract_bindings;
+    element.contract_references = element_contract_references;
     element.freeze_content();
     element.file_order_index = 0;
 
@@ -1017,6 +1124,7 @@ fn parse_single_element_file(
 }
 
 /// Parses a markdown document and extracts elements with metadata and relations.
+///
 /// Returns: (elements, errors, page_content)
 /// Only parses files where the first H1 heading is "# Elements" or "# Element".
 /// If git_commit is Some, file contract_bindings hashes are computed from the git commit, not working directory.
@@ -1040,7 +1148,6 @@ pub fn parse_elements(
     let mut elements = Vec::new();
     let mut current_element: Option<Element> = None;
     let mut errors = Vec::new();
-    let mut seen_identifiers = FxHashSet::default();
     let mut skip_current_element = false;
     let mut seen_subsections = FxHashSet::default();
     let mut in_details_block = false;
@@ -1053,8 +1160,23 @@ pub fn parse_elements(
     // File element order tracking
     let mut file_element_counter: usize = 0;
 
-    for (line_num, line) in content.lines().enumerate() {
+    let mut content_fence = 0;
+    for (line_num, line) in content.split_terminator('\n').enumerate() {
         let trimmed = line.trim();
+        if !in_details_block && (content_fence > 0 || trimmed.starts_with("```")) {
+            if trimmed.starts_with("```") {
+                let length = trimmed.chars().take_while(|c| *c == '`').count();
+                if content_fence == 0 {
+                    content_fence = length;
+                    if current_subsection == SubSection::Other("Query".to_owned()) {
+                        if let Some(element)=&mut current_element {element.query_line_number=Some(line_num+1);}
+                    }
+                }
+                else if length >= content_fence && trimmed.chars().all(|c| c == '`') { content_fence = 0; }
+            }
+            if let Some(element) = &mut current_element { element.add_content(&format!("{}\n", line)); }
+            continue;
+        }
 
         if in_details_block {
             if !skip_current_element {
@@ -1123,8 +1245,6 @@ pub fn parse_elements(
                                     continue;
                                 }
                             };
-
-                            seen_identifiers.insert(identifier.clone());
 
                             // Default element type is always 'requirement' (location-independent)
                             let element_type = ElementType::Requirement(RequirementType::System);
@@ -1376,6 +1496,18 @@ pub fn parse_elements(
                     errors.push(ReqvireError::InvalidRelationFormat(msg.clone()));
                     debug!("Error: {}", msg);
                     current_subsection = SubSection::Other("".to_string());
+                }
+            }
+        } else if current_subsection == SubSection::ContractReference && !skip_current_element {
+            if !trimmed.is_empty() {
+                if let Some(element) = &mut current_element {
+                    if let Err(error) = insert_contract_reference(
+                        &mut element.contract_references,
+                        trimmed,
+                        &element.file_path,
+                    ) {
+                        errors.push(error);
+                    }
                 }
             }
         } else if current_subsection == SubSection::ContractBinding && !skip_current_element {

@@ -1,3 +1,5 @@
+export { CoverageDrilldown } from "./CoverageDrilldown";
+export type { CoverageDrilldownItem, CoverageDrilldownAssessment, CoverageDrilldownTarget } from "./CoverageDrilldown";
 export {
   CoverageBarFrame,
   CoverageBarList,
@@ -5,6 +7,7 @@ export {
   CoverageBreakdownPie,
   CoverageCapabilityList,
   CoverageCapabilityRow,
+  CoverageControls,
   CoverageDashboard,
   CoverageEmptyNote,
   CoverageEmptyState,
@@ -46,3 +49,6 @@ export type {
   TraceReportPanelProps,
   TraceVerificationCardProps,
 } from "./ReportPatterns";
+export { TraceFlow, ElementFlow } from "./TraceFlow";
+export type { TraceFlowProps, ElementFlowProps } from "./TraceFlow";
+export type { TraceFlowData, TraceFlowElement, TraceFlowRequirement, ElementFlowData, FlowLayoutEngine, FlowLayoutTask } from "./traceFlowLayout";

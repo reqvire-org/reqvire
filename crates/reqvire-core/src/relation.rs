@@ -400,9 +400,9 @@ impl LinkType {
     /// Use `as_string()` if you need an owned fallback for non-UTF-8 paths.
     pub fn as_str(&self) -> &str {
         match self {
-            LinkType::Identifier(id) => id,
-            LinkType::ExternalUrl(url) => url,
-            LinkType::InternalPath(path) => path.to_str().unwrap_or_default(),
+            Self::Identifier(id) => id,
+            Self::ExternalUrl(url) => url,
+            Self::InternalPath(path) => path.to_str().unwrap_or_default(),
         }
     }
 }
@@ -494,22 +494,18 @@ impl Relation {
     }
 
     /// Creates an opposite relation if possible for given target
-    pub fn to_opposite(&self, name: &str, identifier: &str, element_id: &str) -> Option<Relation> {
-        if let Some(opposite_name) = self.relation_type.opposite {
-            RELATION_TYPES
-                .get(opposite_name)
-                .map(|opposite_info| Relation {
-                    relation_type: opposite_info,
-                    target: RelationTarget {
-                        text: name.to_string(),
-                        link: LinkType::Identifier(identifier.to_string()),
-                        element_id: Some(element_id.to_string()),
-                    },
-                    user_created: false, // Auto-generated opposite relations are not user-created
-                })
-        } else {
-            None
-        }
+    pub fn to_opposite(&self, name: &str, identifier: &str, element_id: &str) -> Option<Self> {
+        self.relation_type.opposite.and_then(|opposite_name| {
+            RELATION_TYPES.get(opposite_name).map(|opposite_info| Self {
+                relation_type: opposite_info,
+                target: RelationTarget {
+                    text: name.to_string(),
+                    link: LinkType::Identifier(identifier.to_string()),
+                    element_id: Some(element_id.to_string()),
+                },
+                user_created: false, // Auto-generated opposite relations are not user-created
+            })
+        })
     }
 }
 
@@ -554,6 +550,7 @@ pub fn supported_relation_types_list() -> String {
 }
 
 /// Get the list of general parent relation types (backward dependencies).
+///
 /// These are the "backward" pointing relations where an element refers to something it depends on.
 /// Includes hierarchical (derivedFrom), satisfaction (satisfy), and verification (verify) parents.
 pub fn get_parent_relation_types() -> Vec<&'static str> {
@@ -754,13 +751,13 @@ pub fn validate_relation_element_types(
         "use" => {
             matches!(
                 (source_type, target_type),
-                (ElementType::SemanticContract, ElementType::Ontology)
+                (ElementType::SemanticContract | ElementType::SemanticQuery, ElementType::Ontology)
             )
         }
         "usedBy" => {
             matches!(
                 (source_type, target_type),
-                (ElementType::Ontology, ElementType::SemanticContract)
+                (ElementType::Ontology, ElementType::SemanticContract | ElementType::SemanticQuery)
             )
         }
         "broader" | "narrower" | "related" => {
@@ -791,8 +788,8 @@ pub fn get_relation_element_type_description(relation_type: &str) -> Option<Stri
         "refine" => Some("'refine' is a legacy relation. Use 'define' for requirement-owned contract elements, or run `reqvire migrate`.".to_string()),
         "constrainedBy" => Some("'constrainedBy' should connect a requirement to a semantic-contract element".to_string()),
         "constrain" => Some("'constrain' should connect a semantic-contract element to a requirement".to_string()),
-        "use" => Some("'use' should connect a semantic-contract element to an ontology element".to_string()),
-        "usedBy" => Some("'usedBy' should connect an ontology element to a semantic-contract element".to_string()),
+        "use" => Some("'use' should connect a semantic-contract or semantic-query element to an ontology element".to_string()),
+        "usedBy" => Some("'usedBy' should connect an ontology element to a semantic-contract or semantic-query element".to_string()),
         "broader" => Some("'broader' should connect a concept to a broader concept".to_string()),
         "narrower" => Some("'narrower' should connect a concept to a narrower concept".to_string()),
         "related" => Some("'related' should connect a concept to a related concept".to_string()),

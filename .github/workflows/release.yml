@@ -42,9 +42,15 @@ jobs:
       - name: Lint Explorer SPA
         run: cd explorer && npm run lint
 
+      - name: Build host CLI for Rust worker tests
+        env:
+          REQVIRE_BUILD_EXPLORER: "1"
+        run: cargo build --locked --bin reqvire
+
       - name: Test
         env:
           REQVIRE_BUILD_EXPLORER: "1"
+          REQVIRE_TEST_BIN: ${{ github.workspace }}/target/debug/reqvire
         run: |
           if [[ "$RUNNER_OS" == "macOS" ]]; then
             # on macOS skip our two tmpdir‐symlink tests

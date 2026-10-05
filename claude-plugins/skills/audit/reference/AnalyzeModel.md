@@ -66,3 +66,7 @@ Present findings in clear sections:
 - For detailed coverage analysis, see [AnalyzeCoverage](AnalyzeCoverage.md)
 - For lint details, see [Lint](Lint.md)
 - For change impact analysis, see [ChangeImpact](ChangeImpact.md)
+
+## Contract dependency audit
+
+Inspect `search --has-contract-bindings --json` and `search --has-contract-references --json` separately. Classify each dependency by responsibility: bindings allocate shared implementation obligations; references retain content and change-review context. Check the unique requirement owner, target compatibility, section exclusivity, and cycles. Use `collect` and `change-impact` to preserve context when converting a dependency; compare implementation coverage without counting references as fulfillment evidence.

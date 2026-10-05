@@ -110,6 +110,7 @@ const roleSkinX = css`
     --ds-typebadge-ink: var(--verification-ink);
   }
 
+  &[data-element-role="semantic-query"],
   &[data-element-role="ontology"] {
     --ds-typebadge-color: var(--ontology);
     --ds-typebadge-tint: var(--ontology-tint);

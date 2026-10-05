@@ -43,6 +43,7 @@ The system shall provide functionality to build upward trace trees from verifica
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [verification_trace.rs](../../../crates/reqvire-core/src/verification_trace.rs)
   * definedBy: [Verification Trace Tree Construction](Specifications.md#verification-trace-tree-construction)
   * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
 ---

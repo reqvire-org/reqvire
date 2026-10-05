@@ -2,6 +2,7 @@
 name = "o-kernel"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 description.workspace = true
 license.workspace = true
 repository.workspace = true
@@ -17,6 +18,9 @@ dist = false
 
 [lints]
 workspace = true
+
+[features]
+test-support = []
 
 [dependencies]
 oxigraph = { workspace = true }

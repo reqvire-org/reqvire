@@ -65,6 +65,18 @@
   overflow: hidden;
 }
 
+.showcase-mocks {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.showcase-mocks__workspace {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
 .showcase-topbar__brand {
   display: flex;
   align-items: center;

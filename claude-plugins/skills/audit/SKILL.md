@@ -39,6 +39,8 @@ Run from the intended effective workspace root, or pass that root with `--worksp
 | "what changed", "impact of changes", "change impact" | ChangeImpact |
 | "lint", "fix issues", "redundant verifications", "clean up" | Lint |
 
+Contract dependency is the umbrella term for Contract Bindings and Contract References. Audits distinguish implementation obligations (`contract_bindings`) from content dependencies (`contract_references`). Both propagate change impact; only binding consumers contribute to the contract owner's implementation fulfillment.
+
 ## Quick Diagnostic Commands
 
 ```bash

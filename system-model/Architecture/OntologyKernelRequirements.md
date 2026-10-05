@@ -15,6 +15,10 @@ Detailed boundary, adaptation, and consumer-ownership rules shall follow the ass
   * status: approved
 
 #### Relations
+  * satisfiedBy: [Cargo.toml](../../crates/o-kernel/Cargo.toml)
+  * satisfiedBy: [lib.rs](../../crates/o-kernel/src/lib.rs)
+  * satisfiedBy: [ontology_context.rs](../../crates/reqvire-core/src/graph_registry/ontology_context.rs)
+  * satisfiedBy: [semantic_store.rs](../../crates/reqvire-core/src/semantic_store.rs)
   * definedBy: [Application Boundary Isolation Specification](OntologyKernelSpecifications.md#application-boundary-isolation-specification)
   * specify: [Ontology Kernel Crate](OntologyKernelFeature.md#ontology-kernel-crate)
   * verifiedBy: [Ontology Kernel Boundary Analysis](../Verifications/Architecture/OntologyKernelVerifications.md#ontology-kernel-boundary-analysis)
@@ -59,6 +63,8 @@ The o-kernel shall expose separate vocabulary, RDF utility, SHACL, ontology inde
   * [Ontology Kernel RDF Native Boundary Specification](OntologyKernelSpecifications.md#ontology-kernel-rdf-native-boundary-specification)
 
 #### Relations
+  * satisfiedBy: [lib.rs](../../crates/o-kernel/src/lib.rs)
+  * satisfiedBy: [prelude.rs](../../crates/o-kernel/src/prelude.rs)
   * definedBy: [O-Kernel Physical Module Architecture Specification](OntologyKernelSpecifications.md#o-kernel-physical-module-architecture-specification)
   * derivedFrom: [Ontology Kernel Public Contract](#ontology-kernel-public-contract)
   * specify: [Ontology Kernel Crate](OntologyKernelFeature.md#ontology-kernel-crate)
@@ -101,6 +107,7 @@ Detailed graph inputs, dependency profile, reference extraction, support context
   * status: approved
 
 #### Relations
+  * satisfiedBy: [mod.rs](../../crates/o-kernel/src/subset/mod.rs)
   * definedBy: [Referenced Graph Subset Construction Specification](OntologyKernelSpecifications.md#referenced-graph-subset-construction-specification)
   * derivedFrom: [RDF Term Description Construction](#rdf-term-description-construction)
   * specify: [Ontology Kernel Crate](OntologyKernelFeature.md#ontology-kernel-crate)
@@ -165,6 +172,7 @@ The classifier shall cover standards-based ontology construct families and retur
   * status: approved
 
 #### Relations
+  * satisfiedBy: [classify.rs](../../crates/o-kernel/src/constructs/classify.rs)
   * definedBy: [Ontology Construct Classification Specification](OntologyKernelSpecifications.md#ontology-construct-classification-specification)
   * derivedFrom: [SHACL and Ontology Algorithm Services](#shacl-and-ontology-algorithm-services)
   * specify: [Ontology Kernel Crate](OntologyKernelFeature.md#ontology-kernel-crate)
@@ -186,6 +194,7 @@ Detailed registry inputs, ontology-index contents, SHACL reference checks, value
   * status: approved
 
 #### Relations
+  * satisfiedBy: [mod.rs](../../crates/o-kernel/src/shacl/mod.rs)
   * definedBy: [SHACL Ontology Alignment Specification](OntologyKernelSpecifications.md#shacl-ontology-alignment-specification)
   * derivedFrom: [SHACL and Ontology Algorithm Services](#shacl-and-ontology-algorithm-services)
   * specify: [Ontology Kernel Crate](OntologyKernelFeature.md#ontology-kernel-crate)
@@ -207,6 +216,7 @@ The parser registry shall consume RDF terms and quads, discover SHACL shape node
   * status: approved
 
 #### Relations
+  * satisfiedBy: [mod.rs](../../crates/o-kernel/src/shacl/mod.rs)
   * definedBy: [SHACL Structural Parser Registry Specification](OntologyKernelSpecifications.md#shacl-structural-parser-registry-specification)
   * derivedFrom: [SHACL and Ontology Algorithm Services](#shacl-and-ontology-algorithm-services)
   * specify: [Ontology Kernel Crate](OntologyKernelFeature.md#ontology-kernel-crate)
@@ -228,6 +238,7 @@ Detailed expanded-IRI matching, bundled standards graph, datatype/facet, semanti
   * status: approved
 
 #### Relations
+  * satisfiedBy: [reserved.rs](../../crates/o-kernel/src/vocab/reserved.rs)
   * definedBy: [Standards Reserved Vocabulary Recognition Specification](OntologyKernelSpecifications.md#standards-reserved-vocabulary-recognition-specification)
   * derivedFrom: [SHACL and Ontology Algorithm Services](#shacl-and-ontology-algorithm-services)
   * specify: [Standards Vocabulary Support](OntologyKernelFeature.md#standards-vocabulary-support)

@@ -20,7 +20,7 @@ pub enum OntologyConstructTermKind {
 }
 
 impl OntologyConstructTermKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::Iri => "iri",
             Self::BlankNode => "blank-node",
@@ -125,7 +125,7 @@ pub enum OntologyConstructFamily {
 }
 
 impl OntologyConstructFamily {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::PropertyDomainRange => "property-domain-range",
             Self::SubclassMembership => "subclass-membership",
@@ -156,7 +156,7 @@ pub enum OntologyConstructKind {
 }
 
 impl OntologyConstructKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::PropertyDomain => "property-domain",
             Self::PropertyRange => "property-range",
@@ -186,7 +186,7 @@ pub enum OntologyPropertyCharacteristic {
 }
 
 impl OntologyPropertyCharacteristic {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::Functional => "functional",
             Self::InverseFunctional => "inverse-functional",
@@ -245,7 +245,7 @@ impl ConstructMut<'_> {
         }
     }
 
-    pub(crate) fn with_shape_overlay_kind(
+    pub(crate) const fn with_shape_overlay_kind(
         self,
         shape_overlay_kind: Option<OntologyShapeOverlayKind>,
     ) {
@@ -336,7 +336,7 @@ impl OntologyConstructBuilder {
         )
     }
 
-    pub(crate) fn new_with_options(
+    pub(crate) const fn new_with_options(
         rdf_lists: BTreeMap<String, Vec<OntologyConstructMember>>,
         object_index: BTreeMap<(String, String), Vec<OntologyConstructTerm>>,
         options: OntologyConstructClassifierOptions,
@@ -1116,7 +1116,7 @@ mod tests {
         let d = SourcedQuad {
             source: "test".to_string(),
             quad: Quad {
-                subject: first.clone().into(),
+                subject: first.into(),
                 predicate: NamedNode::new(RDF_REST).expect(""),
                 object: Term::BlankNode(second.clone()),
                 graph_name: oxigraph::model::GraphName::DefaultGraph,
@@ -1134,7 +1134,7 @@ mod tests {
         let f = SourcedQuad {
             source: "test".to_string(),
             quad: Quad {
-                subject: second.clone().into(),
+                subject: second.into(),
                 predicate: NamedNode::new(RDF_REST).expect(""),
                 object: Term::NamedNode(iri(RDF_NIL)),
                 graph_name: oxigraph::model::GraphName::DefaultGraph,
@@ -1145,7 +1145,7 @@ mod tests {
             quad: Quad {
                 subject: chain.clone().into(),
                 predicate: NamedNode::new(OWL_PROPERTY_CHAIN_AXIOM).expect(""),
-                object: Term::BlankNode(chain.clone()),
+                object: Term::BlankNode(chain),
                 graph_name: oxigraph::model::GraphName::DefaultGraph,
             },
         };

@@ -149,6 +149,12 @@ function SourceElementView({
       }),
     [contractBindings, elementById, resourceById],
   );
+  const contractReferenceItems = useMemo(
+    () => (store.contract_references ?? []).filter(reference => reference.source_id === element.id)
+      .map(reference => ({ id: reference.id, targetId: reference.target, kind: reference.target_kind,
+        ...contractBindingsDisplayTarget(reference, elementById, resourceById) })),
+    [store.contract_references, element.id, elementById, resourceById],
+  );
   const conceptReferenceItems = useMemo(
     () =>
       conceptRefs.map((conceptRef): DetailConceptReferenceItem => {
@@ -244,6 +250,7 @@ function SourceElementView({
           }
           relations={relationItems}
           contract_bindings={contractBindingItems}
+          contract_references={contractReferenceItems}
           detailListsDefaultExpanded={false}
           onOpenElement={openSourceElement}
           onOpenResource={openResource}

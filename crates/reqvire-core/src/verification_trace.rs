@@ -42,7 +42,7 @@ pub struct RequirementNode {
     #[serde(rename = "type")]
     pub element_type: String,
     pub is_directly_verified: bool,
-    pub children: Vec<RequirementNode>,
+    pub children: Vec<Self>,
 }
 
 pub struct VerificationTraceGenerator<'a> {
@@ -50,7 +50,7 @@ pub struct VerificationTraceGenerator<'a> {
 }
 
 impl<'a> VerificationTraceGenerator<'a> {
-    pub fn new(registry: &'a GraphRegistry) -> Self {
+    pub const fn new(registry: &'a GraphRegistry) -> Self {
         Self { registry }
     }
 
@@ -118,7 +118,7 @@ impl<'a> VerificationTraceGenerator<'a> {
             file: verification.file_path.clone(),
             verification_type: verification.element_type.as_str().to_string(),
             directly_verified_count: directly_verified.len(),
-            directly_verified_requirements: directly_verified.clone(),
+            directly_verified_requirements: directly_verified,
             trace_tree,
             total_requirements_in_tree: total_count,
             file_order_index: verification.file_order_index,

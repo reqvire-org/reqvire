@@ -1,185 +1,78 @@
 # Link and Unlink Elements
 
-Create or remove relations between elements, or bind/unbind compatible requirement-owned contract elements.
+Use `definedBy` for contract ownership, `bindContract` for shared implementation obligations, and `referenceContract` for dependencies on contract content. The decision rules are in [Choosing Contract Dependencies](../SKILL.md#choosing-contract-dependencies).
 
----
+## Link
 
-## Linking Elements
+Inspect the source requirement, the target contract, its owner, and the existing dependency section before editing. Use exact element names or normalized identifiers. Both contract dependency kinds target compatible, uniquely requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` elements; file paths and URLs are not contract dependency targets.
 
-Create a relation between elements or bind compatible requirement-owned contract elements. This handles both relations and contract_bindings.
+Preview a reference, then apply it:
 
-### Steps
-
-1. **Understand the context:**
-   - Identify the source element (by name)
-   - Determine if this is a relation or contract_bindings ('bindContract' keyword)
-   - Identify the target (element name, file path, or URL)
-   - Verify source element exists
-
-2. **Preview the link operation:**
-   ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "<source-element>" "<relation-type-or-bindContract>" "<target>" --dry-run
-   ```
-
-   This shows:
-   - Which file will be modified
-   - The relation/contract_bindings that will be added
-   - Git-style diff for the affected file
-
-3. **Apply the link:**
-   ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "<source-element>" "<relation-type-or-bindContract>" "<target>"
-   ```
-
-   The link command automatically:
-   - For relations: Adds to the source element's Relations section
-   - For contract_bindings: Adds to the source element's Contract Bindings section
-   - Calculates correct relative path for cross-file links
-   - Creates the section if it doesn't exist
-   - Maintains idempotency (no duplicate relations/contract_bindings)
-
-4. **Verify the changes:**
-   ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
-   ```
-
-### Supported Relation Types
-
-| Relation Type | Description | Usage |
-|---------------|-------------|-------|
-| `derivedFrom` | Source derives from target | Child to parent inside the same family: capability, requirement, or ontology |
-| `derive` | Source has derived target | Parent to child inside the same family: capability, requirement, or ontology |
-| `verifiedBy` | Source is verified by target | Requirement to verification |
-| `verify` | Source verifies target | Verification to requirement |
-| `satisfiedBy` | Source is satisfied by target | Requirement to implementation |
-| `satisfy` | Source satisfies target | Implementation to requirement |
-| `definedBy` | Source owns target as contract | Requirement to requirement-owned contract |
-| `define` | Source defines target | Contract element to compatible owner (auto-generated) |
-| `bindContract` | Bind contract element | Bind compatible requirement-owned contracts to requirements |
-
-### Target Types
-
-**For relations:**
-- Element name (e.g., "System Requirement")
-- Internal file path (e.g., "src/impl.rs")
-- External URL (e.g., "https://example.com/spec.html")
-
-`definedBy` rule:
-- `definedBy` must target a contract element (by name/identifier).
-- Plain file-path targets are invalid for `definedBy`.
-
-`satisfiedBy` / `satisfy` rule:
-- Allowed source/target model element types are `requirement`, `test-verification`, and `formal-proof-verification`.
-- `capability` is not allowed to use `satisfiedBy`/`satisfy`.
-- `verification-objective` is not allowed to use `satisfiedBy`/`satisfy`.
-
-`verifiedBy` / `verify` rule:
-- Allowed concrete verification types are `test-verification`, `formal-proof-verification`, `analysis-verification`, `inspection-verification`, and `demonstration-verification`.
-- `verification-objective` may use `derivedFrom`/`derive` inside verification-family hierarchy but is not a valid `verify` source or `verifiedBy` target.
-
-**For bindContract:**
-- Internal file path (e.g., "docs/SLA.pdf")
-- Contract element name (e.g., "Performance Constraint")
-
-### Important Notes
-
-- **Duplicate detection**: The link command fails if the relation or contract_bindings already exists
-- **Cross-section duplicates**: Cannot add a relation to a target that already exists as a contract_bindings (and vice versa)
-- **Element names**: Use the exact element name as it appears in the heading
-- **Cross-file links**: Relative paths are calculated automatically
-- **Inverse relations**: Reqvire auto-generates inverse relations (e.g., derive from derivedFrom)
-
-### Examples
-
-**Link requirement to parent:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Password Login Requirement" derivedFrom "Authentication Requirement"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "API Documentation" referenceContract "Error Response Specification" --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "API Documentation" referenceContract "Error Response Specification"
 ```
 
-**Link requirement to implementation file:**
+A requirement implementing the shared error response obligation uses a binding:
+
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Authentication Requirement" satisfiedBy "src/auth/login.rs"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "API Endpoint" bindContract "Error Response Specification"
 ```
 
-**Link to external URL:**
+The command writes a Markdown link under the corresponding `#### Contract References` or `#### Contract Bindings` section and computes the relative target path. These are subsection operations, not tokens to author under `#### Relations`.
+
+### Supported ordinary relations
+
+| Relation | Purpose |
+|---|---|
+| `derivedFrom` / `derive` | Child/parent hierarchy within a compatible family |
+| `specify` / `specifiedBy` | Requirement/capability association |
+| `verifiedBy` / `verify` | Requirement/concrete verification association |
+| `satisfiedBy` / `satisfy` | Requirement or evidence-backed verification implementation/evidence |
+| `definedBy` / `define` | Requirement ownership of an ordinary contract |
+| `constrainedBy` / `constrain` | Requirement/semantic-contract application |
+| `use` / `usedBy` | Semantic-contract ontology context |
+
+Ordinary relation targets depend on the relation. For example, implementation evidence can target a file, while `definedBy` requires a contract element. Capabilities and verification objectives do not use `satisfiedBy`, and capabilities are not directly verified. Generated inverse relations do not constitute a second authored edge.
+
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Compliance Requirement" trace "https://example.com/regulations.html"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Password Login" derivedFrom "Authentication"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Password Login" satisfiedBy "src/auth/login.rs"
 ```
 
-**Reuse a document:**
+### Rejected candidates
+
+- A requirement cannot contain both Contract Bindings and Contract References, even for different targets.
+- Duplicate normalized reference targets and targets repeated in Relations are invalid.
+- References cannot point to their source's own contract or form cycles through referenced/bound contract owners and requirement parents. Acyclic references within one hierarchy are permitted.
+- Bindings retain hierarchy-independence, subgraph-direction, and combined fulfillment-cycle constraints.
+- Link, relink, create, override, hierarchy/ownership edits, and merge must validate the candidate before persisting it. Rejected edits leave authored files unchanged; dry runs do not persist edits.
+
+## Unlink
+
+`unlink` identifies the existing authored relation, binding, or reference to the target. It removes the entry and cleans up an empty subsection.
+
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" bindContract "docs/SLA.pdf"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "API Documentation" "Error Response Specification" --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "API Documentation" "Error Response Specification"
 ```
 
-**Reuse a contract element:**
+## Convert existing dependencies
+
+1. Read every dependency on the source requirement and decide whether it allocates implementation work or preserves content/review context.
+2. For a wholly context-dependent requirement, replace the whole Contract Bindings section with Contract References, preserving target identifiers. Review the complete candidate before applying it. For one target, unlink the binding and link the reference; a requirement with multiple bindings must have all bindings removed before any reference can be added.
+3. If the requirement has genuinely different responsibilities, separate those obligations into meaningful requirements and place each dependency accordingly. Do not reclassify an implementation obligation merely to avoid the mutually exclusive section rule.
+4. Preserve contract ownership and satisfaction evidence. Run validation and compare coverage: a contract owner that loses its last binding consumer may now need direct implementation evidence. A reference consumer does not satisfy that owner.
+5. Review collection and change impact to ensure dependency context remains reachable.
+
+## Search and verification
+
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" bindContract "Performance Constraint"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --has-contract-bindings --filter-contract-bindings="*#error-response-specification" --json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --has-contract-references --filter-contract-references="*#error-response-specification" --json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" collect "API Documentation" --json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json
 ```
 
-**Preview before linking:**
-```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Capability X" trace "Capability Y" --dry-run
-```
-
----
-
-## Unlinking Elements
-
-Remove an existing relation or contract_bindings between elements. The command auto-detects whether the target is a relation or contract_bindings.
-
-### Steps
-
-1. **Understand the context:**
-   - Identify the source element (by name)
-   - Identify the target (element name or file path)
-   - The command will auto-detect if it's a relation or contract_bindings
-
-2. **Preview the unlink operation:**
-   ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "<source-element>" "<target>" --dry-run
-   ```
-
-3. **Apply the unlink:**
-   ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "<source-element>" "<target>"
-   ```
-
-   The unlink command automatically:
-   - Searches relations first, then contract_bindings
-   - Removes the relation/contract_bindings from the source element
-   - Cleans up empty sections automatically
-   - Maintains model consistency
-
-4. **Verify the changes:**
-   ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
-   ```
-
-### Auto-Detection Behavior
-
-1. **First**: Searches for a relation from source to target element
-2. **Then**: If no relation found, searches for a contract_bindings matching the target
-3. Only one relation per source-target pair is allowed, so no ambiguity
-
-### Important Notes
-
-- **Explicit relations only**: Only removes user-created relations (not auto-generated inverse relations)
-- **Cleanup**: Empty Relations/Contract Bindings sections are removed automatically
-- **Validation**: Consider model validity after unlinking (orphaned elements may cause validation errors)
-
-### Examples
-
-**Remove a relation (auto-detected):**
-```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "Password Login Requirement" "Authentication Requirement"
-```
-
-**Remove a contract_bindings file:**
-```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "System Requirement" "docs/SLA.pdf"
-```
-
-**Preview before unlinking:**
-```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "Capability X" "Capability Y" --dry-run
-```
+Target filters use globs over normalized identifiers and combine with other filters using AND. Ordinary relation filters do not substitute for binding/reference filters. Both dependency kinds are included in collection and change-impact analysis; only bindings create fulfillment obligations.

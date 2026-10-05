@@ -9,6 +9,7 @@ pub const GOVERNANCE_STATUS_VALUES: &[&str] = &["draft", "review", "approved"];
 pub const GOVERNANCE_PRIORITY_VALUES: &[&str] = &["low", "medium", "high", "critical"];
 pub const GOVERNANCE_RISK_VALUES: &[&str] = &["low", "medium", "high", "critical"];
 pub const CONTRACT_BINDINGS_SECTION: &str = "Contract Bindings";
+pub const CONTRACT_REFERENCES_SECTION: &str = "Contract References";
 // Remove this legacy rejection list when the matching migration paths are removed.
 // These names are intentionally invalid in canonical Markdown; they remain named
 // only so validation can tell authors to run `reqvire migrate --fix`.
@@ -57,6 +58,7 @@ pub const ELEMENT_TYPES: &[&str] = &[
     "demonstration-verification", // VerificationType::Demonstration
     "verification-objective",     // ElementType::VerificationObjective
     "source",                     // ContractType::Source
+    "semantic-query",
     "semantic-contract",          // ElementType::SemanticContract
     "constraint",                 // ContractType::Constraint
     "behavior",                   // ContractType::Behavior
@@ -116,19 +118,19 @@ impl ContractBindingTarget {
     /// Returns a string representation of the contract_bindings target
     pub fn as_str(&self) -> String {
         match self {
-            ContractBindingTarget::FilePath(path) => path.to_string_lossy().to_string(),
-            ContractBindingTarget::ElementIdentifier(id) => id.clone(),
+            Self::FilePath(path) => path.to_string_lossy().to_string(),
+            Self::ElementIdentifier(id) => id.clone(),
         }
     }
 
     /// Returns true if this is a file path contract_bindings
-    pub fn is_file_path(&self) -> bool {
-        matches!(self, ContractBindingTarget::FilePath(_))
+    pub const fn is_file_path(&self) -> bool {
+        matches!(self, Self::FilePath(_))
     }
 
     /// Returns true if this is an element identifier contract_bindings
-    pub fn is_element_identifier(&self) -> bool {
-        matches!(self, ContractBindingTarget::ElementIdentifier(_))
+    pub const fn is_element_identifier(&self) -> bool {
+        matches!(self, Self::ElementIdentifier(_))
     }
 }
 
@@ -271,6 +273,7 @@ pub enum SubSection {
     Details,
     Properties,
     ContractBinding,
+    ContractReference,
     ConceptReferences,
     ScopeNote,
     Labels,
@@ -281,55 +284,57 @@ pub enum SubSection {
 impl SubSection {
     pub fn name(&self) -> &str {
         match self {
-            SubSection::Requirement => "Requirement",
-            SubSection::Relations => "Relations",
-            SubSection::Metadata => "Metadata",
-            SubSection::Details => "Details",
-            SubSection::Properties => "Properties",
-            SubSection::ContractBinding => CONTRACT_BINDINGS_SECTION,
-            SubSection::ConceptReferences => "Concept References",
-            SubSection::ScopeNote => "Scope Note",
-            SubSection::Labels => "Labels",
-            SubSection::Examples => "Examples",
-            SubSection::Mappings => "Mappings",
-            SubSection::ExternalOntology => "External Ontology",
-            SubSection::Other(name) => name.as_str(),
+            Self::Requirement => "Requirement",
+            Self::Relations => "Relations",
+            Self::Metadata => "Metadata",
+            Self::Details => "Details",
+            Self::Properties => "Properties",
+            Self::ContractBinding => CONTRACT_BINDINGS_SECTION,
+            Self::ContractReference => CONTRACT_REFERENCES_SECTION,
+            Self::ConceptReferences => "Concept References",
+            Self::ScopeNote => "Scope Note",
+            Self::Labels => "Labels",
+            Self::Examples => "Examples",
+            Self::Mappings => "Mappings",
+            Self::ExternalOntology => "External Ontology",
+            Self::Other(name) => name.as_str(),
         }
     }
 
-    pub fn is_repeatable(&self) -> bool {
-        matches!(self, SubSection::ExternalOntology)
+    pub const fn is_repeatable(&self) -> bool {
+        matches!(self, Self::ExternalOntology)
     }
 
-    pub fn is_content_bearing(&self) -> bool {
+    pub const fn is_content_bearing(&self) -> bool {
         matches!(
             self,
-            SubSection::Details
-                | SubSection::ConceptReferences
-                | SubSection::ScopeNote
-                | SubSection::Labels
-                | SubSection::Examples
-                | SubSection::Mappings
-                | SubSection::ExternalOntology
-                | SubSection::Other(_)
+            Self::Details
+                | Self::ConceptReferences
+                | Self::ScopeNote
+                | Self::Labels
+                | Self::Examples
+                | Self::Mappings
+                | Self::ExternalOntology
+                | Self::Other(_)
         )
     }
 
     pub fn parse(s: &str) -> Self {
         match s {
-            "Requirement" => SubSection::Requirement,
-            "Relations" => SubSection::Relations,
-            "Metadata" => SubSection::Metadata,
-            "Details" => SubSection::Details,
-            "Properties" => SubSection::Properties,
-            CONTRACT_BINDINGS_SECTION => SubSection::ContractBinding,
-            "Concept References" => SubSection::ConceptReferences,
-            "Scope Note" => SubSection::ScopeNote,
-            "Labels" => SubSection::Labels,
-            "Examples" => SubSection::Examples,
-            "Mappings" => SubSection::Mappings,
-            "External Ontology" => SubSection::ExternalOntology,
-            other => SubSection::Other(other.to_string()),
+            "Requirement" => Self::Requirement,
+            "Relations" => Self::Relations,
+            "Metadata" => Self::Metadata,
+            "Details" => Self::Details,
+            "Properties" => Self::Properties,
+            CONTRACT_BINDINGS_SECTION => Self::ContractBinding,
+            CONTRACT_REFERENCES_SECTION => Self::ContractReference,
+            "Concept References" => Self::ConceptReferences,
+            "Scope Note" => Self::ScopeNote,
+            "Labels" => Self::Labels,
+            "Examples" => Self::Examples,
+            "Mappings" => Self::Mappings,
+            "External Ontology" => Self::ExternalOntology,
+            other => Self::Other(other.to_string()),
         }
     }
 }
@@ -367,6 +372,7 @@ pub enum ElementType {
     ConceptScheme,
     Concept,
     SemanticContract,
+    SemanticQuery,
     VerificationObjective,
     Verification(VerificationType),
     Contract(ContractType),
@@ -384,16 +390,17 @@ impl ElementType {
     /// prefix) that is written back to Markdown.
     pub fn as_str(&self) -> &str {
         match self {
-            ElementType::Capability => "capability",
-            ElementType::Requirement(req) => match req {
+            Self::Capability => "capability",
+            Self::Requirement(req) => match req {
                 RequirementType::System => "requirement",
             },
-            ElementType::Ontology => "ontology",
-            ElementType::ConceptScheme => "concept-scheme",
-            ElementType::Concept => "concept",
-            ElementType::SemanticContract => "semantic-contract",
-            ElementType::VerificationObjective => "verification-objective",
-            ElementType::Verification(ver) => match ver {
+            Self::Ontology => "ontology",
+            Self::ConceptScheme => "concept-scheme",
+            Self::Concept => "concept",
+            Self::SemanticQuery => "semantic-query",
+            Self::SemanticContract => "semantic-contract",
+            Self::VerificationObjective => "verification-objective",
+            Self::Verification(ver) => match ver {
                 VerificationType::Default => "test-verification",
                 VerificationType::Test => "test-verification",
                 VerificationType::FormalProof => "formal-proof-verification",
@@ -401,7 +408,7 @@ impl ElementType {
                 VerificationType::Inspection => "inspection-verification",
                 VerificationType::Demonstration => "demonstration-verification",
             },
-            ElementType::Contract(ref_type) => match ref_type {
+            Self::Contract(ref_type) => match ref_type {
                 ContractType::Source => "source",
                 ContractType::Constraint => "constraint",
                 ContractType::Behavior => "behavior",
@@ -409,8 +416,8 @@ impl ElementType {
                 ContractType::State => "state",
                 ContractType::InputOutput => "input-output",
             },
-            ElementType::File => "file",
-            ElementType::Other(s) => s.as_str(),
+            Self::File => "file",
+            Self::Other(s) => s.as_str(),
         }
     }
 
@@ -421,7 +428,7 @@ impl ElementType {
     /// round-trips when an element is re-serialized to Markdown and re-validated.
     pub fn to_metadata_string(&self) -> String {
         match self {
-            ElementType::Other(custom_type) => format!("other-{}", custom_type),
+            Self::Other(custom_type) => format!("other-{}", custom_type),
             _ => self.as_str().to_string(),
         }
     }
@@ -429,84 +436,81 @@ impl ElementType {
     /// Parses a string into an ElementType
     pub fn from_metadata(value: &str) -> Self {
         match value.to_lowercase().as_str() {
-            "capability" => ElementType::Capability,
-            "requirement" | "system-requirement" => {
-                ElementType::Requirement(RequirementType::System)
-            }
-            "ontology" => ElementType::Ontology,
-            "concept-scheme" => ElementType::ConceptScheme,
-            "concept" => ElementType::Concept,
-            "verification-objective" => ElementType::VerificationObjective,
+            "capability" => Self::Capability,
+            "requirement" | "system-requirement" => Self::Requirement(RequirementType::System),
+            "ontology" => Self::Ontology,
+            "concept-scheme" => Self::ConceptScheme,
+            "concept" => Self::Concept,
+            "verification-objective" => Self::VerificationObjective,
 
             // Different verification types
-            "verification" => ElementType::Verification(VerificationType::Test),
-            "test-verification" => ElementType::Verification(VerificationType::Test),
-            "formal-proof-verification" => ElementType::Verification(VerificationType::FormalProof),
-            "analysis-verification" => ElementType::Verification(VerificationType::Analysis),
-            "inspection-verification" => ElementType::Verification(VerificationType::Inspection),
-            "demonstration-verification" => {
-                ElementType::Verification(VerificationType::Demonstration)
-            }
+            "verification" => Self::Verification(VerificationType::Test),
+            "test-verification" => Self::Verification(VerificationType::Test),
+            "formal-proof-verification" => Self::Verification(VerificationType::FormalProof),
+            "analysis-verification" => Self::Verification(VerificationType::Analysis),
+            "inspection-verification" => Self::Verification(VerificationType::Inspection),
+            "demonstration-verification" => Self::Verification(VerificationType::Demonstration),
 
-            "semantic-contract" => ElementType::SemanticContract,
+            "semantic-query" => Self::SemanticQuery,
+            "semantic-contract" => Self::SemanticContract,
 
             // Contract types
-            "source" => ElementType::Contract(ContractType::Source),
-            "constraint" => ElementType::Contract(ContractType::Constraint),
-            "behavior" => ElementType::Contract(ContractType::Behavior),
-            "specification" => ElementType::Contract(ContractType::Specification),
-            "state" => ElementType::Contract(ContractType::State),
-            "input-output" => ElementType::Contract(ContractType::InputOutput),
+            "source" => Self::Contract(ContractType::Source),
+            "constraint" => Self::Contract(ContractType::Constraint),
+            "behavior" => Self::Contract(ContractType::Behavior),
+            "specification" => Self::Contract(ContractType::Specification),
+            "state" => Self::Contract(ContractType::State),
+            "input-output" => Self::Contract(ContractType::InputOutput),
 
-            "file" => ElementType::File,
+            "file" => Self::File,
             other if other.starts_with("other-") && other.len() > 6 => {
-                ElementType::Other(other[6..].to_string())
+                Self::Other(other[6..].to_string())
             }
-            other => ElementType::Other(other.to_string()),
+            other => Self::Other(other.to_string()),
         }
     }
 
     /// Returns true if this element type is a requirement-owned contract type.
-    pub fn is_contract(&self) -> bool {
-        matches!(self, ElementType::Contract(_))
+    pub const fn is_contract(&self) -> bool {
+        matches!(self, Self::Contract(_))
     }
 
-    pub fn is_capability(&self) -> bool {
-        matches!(self, ElementType::Capability)
+    pub const fn is_capability(&self) -> bool {
+        matches!(self, Self::Capability)
     }
 
-    pub fn is_requirement(&self) -> bool {
-        matches!(self, ElementType::Requirement(_))
+    pub const fn is_requirement(&self) -> bool {
+        matches!(self, Self::Requirement(_))
     }
 
-    pub fn is_ontology(&self) -> bool {
-        matches!(self, ElementType::Ontology)
+    pub const fn is_ontology(&self) -> bool {
+        matches!(self, Self::Ontology)
     }
 
-    pub fn is_concept_scheme(&self) -> bool {
-        matches!(self, ElementType::ConceptScheme)
+    pub const fn is_concept_scheme(&self) -> bool {
+        matches!(self, Self::ConceptScheme)
     }
 
-    pub fn is_concept(&self) -> bool {
-        matches!(self, ElementType::Concept)
+    pub const fn is_concept(&self) -> bool {
+        matches!(self, Self::Concept)
     }
 
-    pub fn is_concept_family(&self) -> bool {
+    pub const fn is_concept_family(&self) -> bool {
         self.is_concept_scheme() || self.is_concept()
     }
 
-    pub fn is_governance_bearing(&self) -> bool {
+    pub const fn is_governance_bearing(&self) -> bool {
         self.is_capability() || self.is_requirement()
     }
 
-    pub fn is_capability_contract(&self) -> bool {
+    pub const fn is_capability_contract(&self) -> bool {
         false
     }
 
-    pub fn is_requirement_contract(&self) -> bool {
+    pub const fn is_requirement_contract(&self) -> bool {
         matches!(
             self,
-            ElementType::Contract(
+            Self::Contract(
                 ContractType::Source
                     | ContractType::Constraint
                     | ContractType::Behavior
@@ -517,33 +521,36 @@ impl ElementType {
         )
     }
 
-    pub fn is_semantic_contract(&self) -> bool {
-        matches!(self, ElementType::SemanticContract)
+    pub const fn is_semantic_query(&self) -> bool { matches!(self, Self::SemanticQuery) }
+
+    pub const fn is_semantic_contract(&self) -> bool {
+        matches!(self, Self::SemanticContract)
     }
 
-    pub fn is_verification_objective(&self) -> bool {
-        matches!(self, ElementType::VerificationObjective)
+    pub const fn is_verification_objective(&self) -> bool {
+        matches!(self, Self::VerificationObjective)
     }
 
     /// Returns the main type category for merge compatibility
-    pub fn main_category(&self) -> &'static str {
+    pub const fn main_category(&self) -> &'static str {
         match self {
-            ElementType::Capability => "capability",
-            ElementType::Requirement(_) => "requirement",
-            ElementType::Ontology => "ontology",
-            ElementType::ConceptScheme | ElementType::Concept => "concept",
-            ElementType::SemanticContract => "semantic-contract",
-            ElementType::VerificationObjective => "verification-objective",
-            ElementType::Verification(_) => "verification",
-            ElementType::Contract(_) => "contract",
-            ElementType::File => "file",
-            ElementType::Other(_) => "other",
+            Self::Capability => "capability",
+            Self::Requirement(_) => "requirement",
+            Self::Ontology => "ontology",
+            Self::ConceptScheme | Self::Concept => "concept",
+            Self::SemanticQuery => "semantic-query",
+            Self::SemanticContract => "semantic-contract",
+            Self::VerificationObjective => "verification-objective",
+            Self::Verification(_) => "verification",
+            Self::Contract(_) => "contract",
+            Self::File => "file",
+            Self::Other(_) => "other",
         }
     }
 
     /// Check if two element types are merge-compatible
     /// Elements are merge-compatible if they belong to the same main type category
-    pub fn is_merge_compatible(&self, other: &ElementType) -> bool {
+    pub fn is_merge_compatible(&self, other: &Self) -> bool {
         self.main_category() == other.main_category()
     }
 }
@@ -573,6 +580,9 @@ pub struct Element {
     //
     // Contract Bindings - external documents linked to this element
     pub contract_bindings: Vec<ContractBindingEntry>,
+    /// Content dependencies for review; excluded from implementation fulfillment.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub contract_references: Vec<ContractBindingEntry>,
     //
     // Optional model-build metadata for JSON evidence consumers.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -580,6 +590,10 @@ pub struct Element {
     // Parsed ADT for semantic-contract elements.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub semantic_contract: Option<SemanticContract>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub semantic_query: Option<crate::semantic_contract::queries::QuerySource>,
+    #[serde(skip)]
+    pub query_line_number: Option<usize>,
     // Parsed ADT for ontology elements.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ontology: Option<Ontology>,
@@ -622,8 +636,11 @@ impl Element {
             changed_since_commit: false,
             file_order_index: 0, // Will be set during parsing
             contract_bindings: vec![],
+            contract_references: vec![],
             size_estimate: None,
             semantic_contract: None,
+            semantic_query: None,
+            query_line_number: None,
             ontology: None,
             concept_scheme: None,
             concept: None,
@@ -648,6 +665,8 @@ impl Element {
 
         self.content = trimmed.to_string();
         self.hash_impact_content = utils::hash_content(&normalized);
+        self.semantic_query = self.element_type.is_semantic_query().then(|| crate::semantic_contract::queries::QuerySource::parse(&self.content));
+        if self.element_type.is_semantic_query() { self.hash_impact_content = utils::hash_content(&self.content); }
         self.populate_ontology();
         self.populate_semantic_contract();
         self.populate_concept_scheme();

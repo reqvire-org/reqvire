@@ -1,0 +1,158 @@
+## Summary
+
+### Leaf Requirements
+
+- **Total Leaf Requirements:** 6
+- **Verified Leaf Requirements:** 5 (83.3%)
+- **Unverified Leaf Requirements:** 1
+
+### Test Verifications
+
+- **Total Test Verifications:** 4
+- **Satisfied Test Verifications:** 2 (50.0%)
+- **Unsatisfied Test Verifications:** 2
+
+### Orphaned Verifications
+
+- **Total Verifications:** 7
+- **Orphaned Verifications:** 1 (14.3%)
+
+### Verification Types
+
+- Test: 3
+- Formal Proof: 1
+- Analysis: 1
+- Inspection: 1
+- Demonstration: 1
+
+## Verified Leaf Requirements
+
+### [specifications/Alpha.md](specifications/Alpha.md)
+
+- ✅ **[Alpha Contract Owner](specifications/Alpha.md#alpha-contract-owner)**
+  - Verified by:
+    - [specifications/Verifications.md#shared-proof](specifications/Verifications.md#shared-proof)
+- ✅ **[Alpha Gap](specifications/Alpha.md#alpha-gap)**
+  - Verified by:
+    - [specifications/Verifications.md#shared-check](specifications/Verifications.md#shared-check)
+    - [specifications/Verifications.md#gap-check](specifications/Verifications.md#gap-check)
+- ✅ **[Alpha Implemented](specifications/Alpha.md#alpha-implemented)**
+  - Verified by:
+    - [specifications/Verifications.md#shared-check](specifications/Verifications.md#shared-check)
+
+### [specifications/Beta.md](specifications/Beta.md)
+
+- ✅ **[Beta Consumer](specifications/Beta.md#beta-consumer)**
+  - Verified by:
+    - [specifications/Verifications.md#shared-check](specifications/Verifications.md#shared-check)
+- ✅ **[Beta Gap](specifications/Beta.md#beta-gap)**
+  - Verified by:
+    - [specifications/Verifications.md#shared-proof](specifications/Verifications.md#shared-proof)
+    - [specifications/Verifications.md#beta-analysis](specifications/Verifications.md#beta-analysis)
+
+## Unverified Leaf Requirements
+
+### [specifications/Alpha.md](specifications/Alpha.md)
+
+- ❌ **[Alpha Local](specifications/Alpha.md#alpha-local)**
+
+## Satisfied Test Verifications
+
+### [specifications/Verifications.md](specifications/Verifications.md)
+
+- ✅ **[Shared Check](specifications/Verifications.md#shared-check)** (test-verification)
+  - Satisfied by:
+    - [evidence/check.txt](evidence/check.txt)
+- ✅ **[Shared Proof](specifications/Verifications.md#shared-proof)** (formal-proof-verification)
+  - Satisfied by:
+    - [evidence/proof.txt](evidence/proof.txt)
+
+## Unsatisfied Test Verifications
+
+### [specifications/Verifications.md](specifications/Verifications.md)
+
+- ❌ **[Gap Check](specifications/Verifications.md#gap-check)** (test-verification)
+- ❌ **[Orphan Check](specifications/Verifications.md#orphan-check)** (test-verification)
+
+## Orphaned Verifications
+
+### [specifications/Verifications.md](specifications/Verifications.md)
+
+- ⚠️  **[Orphan Check](specifications/Verifications.md#orphan-check)** (test-verification)
+
+### Requirement Implementation Coverage
+
+- **Total Requirements in Scope:** 8
+- **Covered Requirements:** 4
+- **Uncovered Requirements:** 4
+- **Total Terminal Requirements:** 5
+- **Covered Terminal Requirements:** 2 (40.0%)
+- **Uncovered Terminal Requirements:** 3
+
+#### Coverage Sources
+
+- direct_satisfied: 2
+- requirement_rollup: 1
+- contract_consumer_rollup: 1
+- combined_rollup: 0
+
+## Covered Requirements
+
+### [specifications/Alpha.md](specifications/Alpha.md)
+
+- ✅ **[Alpha Contract Owner](specifications/Alpha.md#alpha-contract-owner)** (contract_consumer_rollup)
+  - Supporting evidence:
+    - [evidence/beta.txt](evidence/beta.txt)
+  - Contributing requirements:
+    - [specifications/Beta.md#beta-consumer](specifications/Beta.md#beta-consumer)
+- ✅ **[Alpha Implemented](specifications/Alpha.md#alpha-implemented)** (direct_satisfied)
+  - Direct evidence:
+    - [evidence/alpha.txt](evidence/alpha.txt)
+  - Supporting evidence:
+    - [evidence/alpha.txt](evidence/alpha.txt)
+- ✅ **[Alpha Middle](specifications/Alpha.md#alpha-middle)** (requirement_rollup)
+  - Supporting evidence:
+    - [evidence/alpha.txt](evidence/alpha.txt)
+  - Contributing requirements:
+    - [specifications/Alpha.md#alpha-implemented](specifications/Alpha.md#alpha-implemented)
+
+### [specifications/Beta.md](specifications/Beta.md)
+
+- ✅ **[Beta Consumer](specifications/Beta.md#beta-consumer)** (direct_satisfied)
+  - Direct evidence:
+    - [evidence/beta.txt](evidence/beta.txt)
+  - Supporting evidence:
+    - [evidence/beta.txt](evidence/beta.txt)
+
+## Uncovered Requirements
+
+### [specifications/Alpha.md](specifications/Alpha.md)
+
+- ❌ **[Alpha Gap](specifications/Alpha.md#alpha-gap)** (uncovered)
+  - Blocking requirements:
+    - [specifications/Alpha.md#alpha-gap](specifications/Alpha.md#alpha-gap)
+- ❌ **[Alpha Local](specifications/Alpha.md#alpha-local)** (uncovered)
+  - Blocking requirements:
+    - [specifications/Alpha.md#alpha-local](specifications/Alpha.md#alpha-local)
+- ❌ **[Alpha Parent](specifications/Alpha.md#alpha-parent)** (uncovered)
+  - Supporting evidence:
+    - [evidence/alpha.txt](evidence/alpha.txt)
+  - Contributing requirements:
+    - [specifications/Alpha.md#alpha-gap](specifications/Alpha.md#alpha-gap)
+    - [specifications/Alpha.md#alpha-middle](specifications/Alpha.md#alpha-middle)
+  - Blocking requirements:
+    - [specifications/Alpha.md#alpha-gap](specifications/Alpha.md#alpha-gap)
+### [specifications/Beta.md](specifications/Beta.md)
+
+- ❌ **[Beta Gap](specifications/Beta.md#beta-gap)** (uncovered)
+  - Blocking requirements:
+    - [specifications/Beta.md#beta-gap](specifications/Beta.md#beta-gap)
+
+## Capability Coverage
+
+- **[Alpha Left](specifications/Capabilities.md#alpha-left)**: partial verification 100.0% (3/3 leaf), implementation 50.0% (1/2 terminal requirements), implementation incomplete
+- **[Alpha Right](specifications/Capabilities.md#alpha-right)**: partial verification 100.0% (2/2 leaf), implementation 50.0% (1/2 terminal requirements), implementation incomplete
+- **[Alpha Root](specifications/Capabilities.md#alpha-root)**: partial verification 75.0% (3/4 leaf), implementation 33.3% (1/3 terminal requirements), implementation incomplete
+- **[Beta Root](specifications/Capabilities.md#beta-root)**: partial verification 100.0% (2/2 leaf), implementation 50.0% (1/2 terminal requirements), implementation incomplete
+- **[Empty Branch](specifications/Capabilities.md#empty-branch)**: not-applicable verification 0.0% (0/0 leaf), implementation 0.0% (0/0 terminal requirements), implementation not applicable
+- **[Shared Branch](specifications/Capabilities.md#shared-branch)**: partial verification 100.0% (2/2 leaf), implementation 50.0% (1/2 terminal requirements), implementation incomplete

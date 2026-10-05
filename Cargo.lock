@@ -1429,6 +1429,7 @@ dependencies = [
  "serde_json",
  "serial_test",
  "sha2",
+ "spargebra",
  "tempfile",
  "termcolor",
  "thiserror",
@@ -1451,12 +1452,14 @@ dependencies = [
  "reqvire",
  "rmcp",
  "rustc-hash",
+ "rustix",
  "serde",
  "serde_json",
  "tempfile",
  "tokio",
  "tower",
  "tower-http",
+ "windows-sys",
 ]
 
 [[package]]

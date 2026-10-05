@@ -63,3 +63,26 @@ The system shall implement a model change analyzer that identifies structural mo
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
   * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
 ---
+
+### Contract Reference Change Propagation
+
+When referenced contract content changes, the system SHALL identify referencing requirements and their downstream context for change-impact review.
+
+#### Details
+When a referencing requirement changes, the system SHALL propagate impact according to its own relationships while preserving the direction of its Contract References.
+
+When multiple acyclic dependency paths reach the same element, the system SHALL terminate impact traversal and report the affected elements deterministically.
+
+WHEN a referencing requirement is reached through multiple impact paths, the system SHALL preserve its reference dependency provenance and assess each affected element once.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
+
+#### Relations
+  * derivedFrom: [Change Impact Detection](#change-impact-detection)
+  * definedBy: [Contract Reference Change Impact Specification](Specifications.md#contract-reference-change-impact-specification)
+  * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
+---

@@ -11,6 +11,8 @@ export { BUTTON_SIZE_CLASSES, BUTTON_TONE_CLASSES } from "./components/core/butt
 export type { ButtonSize, ButtonTone } from "./components/core/button_contract";
 export { Card } from "./components/core/Card";
 export type { CardProps } from "./components/core/Card";
+export { ExpandableViewport } from "./components/core/ExpandableViewport";
+export type { ExpandableViewportProps } from "./components/core/ExpandableViewport";
 export { Icon, ICON_NAMES } from "./components/core/Icon";
 export type { IconName, IconProps } from "./components/core/Icon";
 export { IconButton } from "./components/core/IconButton";
@@ -185,6 +187,8 @@ export {
   CoverageBreakdownPie,
   CoverageCapabilityList,
   CoverageCapabilityRow,
+  CoverageControls,
+  CoverageDrilldown,
   CoverageDashboard,
   CoverageEmptyNote,
   CoverageEmptyState,
@@ -203,6 +207,8 @@ export {
   LabeledCoverageBarFrame,
   ConceptElementDetailContent,
   StoreNotice,
+  TraceFlow,
+  ElementFlow,
   TraceFileGroup,
   TraceFileHeader,
   TraceReportContent,
@@ -333,10 +339,21 @@ export type {
   ShellPaneProps,
   SidePaneFrameProps,
   CoverageCapabilityRowProps,
+  CoverageDrilldownItem,
+  CoverageDrilldownAssessment,
+  CoverageDrilldownTarget,
   CoverageDashboardProps,
   CoverageGapRowButtonProps,
   CoveragePanelProps,
   StoreNoticeProps,
+  TraceFlowProps,
+  ElementFlowProps,
+  ElementFlowData,
+  TraceFlowData,
+  TraceFlowElement,
+  TraceFlowRequirement,
+  FlowLayoutEngine,
+  FlowLayoutTask,
   TraceReportPanelProps,
   ThesaurusConceptItem,
   ThesaurusConceptUsage,
@@ -345,3 +362,5 @@ export type {
   TraceVerificationCardProps,
   WorkspaceToolbarProps,
 } from "./product-patterns";
+export { WorktreeSelector } from "./product-patterns/shell/WorktreeSelector";
+export type { WorktreeSelectorProps } from "./product-patterns/shell/WorktreeSelector";

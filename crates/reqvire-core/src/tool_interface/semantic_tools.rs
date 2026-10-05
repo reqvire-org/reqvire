@@ -2,7 +2,7 @@ use super::*;
 use crate::concept::concept_local_name;
 use crate::Element;
 
-pub(crate) fn semantic_export_tool(
+pub fn semantic_export_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -18,7 +18,7 @@ pub(crate) fn semantic_export_tool(
     )
 }
 
-pub(crate) fn ontologies_tool(
+pub fn ontologies_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -33,7 +33,7 @@ pub(crate) fn ontologies_tool(
     )
 }
 
-pub(crate) fn shapes_tool(
+pub fn shapes_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -48,7 +48,7 @@ pub(crate) fn shapes_tool(
     )
 }
 
-pub(crate) fn concepts_tool(
+pub fn concepts_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -58,15 +58,15 @@ pub(crate) fn concepts_tool(
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let (format_name, export_format) = semantic_tool_format(args, "semantic concepts")?;
-    let content = semantic_store.index.serialize_export_layers(
+    let content = semantic_store.serialize_export_layers(
         export_format,
         &[SemanticExportLayer::Concepts],
         None,
     )?;
     let mut serializable_index =
-        filtered_semantic_index(&semantic_store.index, OntologyContentFilter::Concepts);
+        filtered_semantic_index(semantic_store.index(), OntologyContentFilter::Concepts);
     serializable_index.apply_external_visibility(false)?;
-    let prefixes = vocabulary_prefixes(&model, &semantic_store.index);
+    let prefixes = vocabulary_prefixes(&model, semantic_store.index());
     let compact_prefixes = compact_vocabulary_prefixes(&prefixes);
     let term_index = collect_term_index(&serializable_index);
     let concepts = concepts_section(
@@ -94,7 +94,7 @@ pub(crate) fn concepts_tool(
     Ok(object)
 }
 
-pub(crate) fn semantic_model_tool(
+pub fn semantic_model_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -109,7 +109,7 @@ pub(crate) fn semantic_model_tool(
     )
 }
 
-pub(crate) fn semantic_graph_tool(
+pub fn semantic_graph_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -138,7 +138,7 @@ fn semantic_export_layers_tool(
     })?;
     let (format_name, export_format) = semantic_tool_format(args, semantic_layer)?;
     let namespace_base = string_arg(args, "namespace_base");
-    let content = semantic_store.index.serialize_export_layers(
+    let content = semantic_store.serialize_export_layers(
         export_format,
         &requested_layers,
         namespace_base.as_deref(),
@@ -146,17 +146,16 @@ fn semantic_export_layers_tool(
     let effective_layers = if requested_layers.is_empty() {
         SemanticExportLayer::default_layers()
     } else {
-        requested_layers.clone()
+        requested_layers
     };
     let include_external = effective_layers.contains(&SemanticExportLayer::ExternalUsed);
-    let mut serializable_index = if let Some(filter) = filter {
-        filtered_semantic_index(&semantic_store.index, filter)
-    } else {
-        semantic_store.index.clone()
+    let visible_index = semantic_store.index_with_external_visibility(include_external)?;
+    let serializable_index = match filter {
+        Some(filter) => filtered_semantic_index(&visible_index, filter),
+        None => visible_index,
     };
-    serializable_index.apply_external_visibility(include_external)?;
     let external_metadata = semantic_contract::external_materialization_metadata(
-        &semantic_store.index,
+        semantic_store.index(),
         &serializable_index,
         include_external,
     );
@@ -211,6 +210,7 @@ fn semantic_export_layers_arg(args: &Value) -> Result<Vec<SemanticExportLayer>, 
             "model" => SemanticExportLayer::Model,
             "external-used" => SemanticExportLayer::ExternalUsed,
             "prefixes" => SemanticExportLayer::Prefixes,
+            "queries" => SemanticExportLayer::Queries,
             other => {
                 return Err(ReqvireError::ProcessError(format!(
                     "Invalid semantic export layer '{}'. Valid values: ontologies, shapes, concepts, model, external-used, prefixes",
@@ -222,7 +222,7 @@ fn semantic_export_layers_arg(args: &Value) -> Result<Vec<SemanticExportLayer>, 
     Ok(layers)
 }
 
-pub(crate) fn concepts_list_tool(
+pub fn concepts_list_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -247,7 +247,7 @@ pub(crate) fn concepts_list_tool(
     }))
 }
 
-pub(crate) fn concept_schemes_list_tool(
+pub fn concept_schemes_list_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -266,7 +266,7 @@ pub(crate) fn concept_schemes_list_tool(
     }))
 }
 
-pub(crate) fn concept_get_tool(
+pub fn concept_get_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -304,7 +304,7 @@ pub(crate) fn concept_get_tool(
         })
 }
 
-pub(crate) fn concept_mappings_list_tool(
+pub fn concept_mappings_list_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -317,7 +317,7 @@ pub(crate) fn concept_mappings_list_tool(
     let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
-    let prefixes = vocabulary_prefixes(&model, &semantic_store.index);
+    let prefixes = vocabulary_prefixes(&model, semantic_store.index());
     let compact_prefixes = compact_vocabulary_prefixes(&prefixes);
     let concepts_by_iri = native_concept_items(&model)?
         .into_iter()
@@ -331,7 +331,7 @@ pub(crate) fn concept_mappings_list_tool(
 
     let mut seen = BTreeSet::new();
     let mut mappings = Vec::new();
-    for block in &semantic_store.index.blocks {
+    for block in &semantic_store.index().blocks {
         for quad in &block.quads {
             if quad.predicate.as_str() != REQVIRE_MAPS_TO_CONCEPT_IRI {
                 continue;
@@ -385,9 +385,9 @@ fn native_concept_items(model: &ModelManager) -> Result<Vec<Value>, ReqvireError
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let mut serializable_index =
-        filtered_semantic_index(&semantic_store.index, OntologyContentFilter::Concepts);
+        filtered_semantic_index(semantic_store.index(), OntologyContentFilter::Concepts);
     serializable_index.apply_external_visibility(false)?;
-    let prefixes = vocabulary_prefixes(model, &semantic_store.index);
+    let prefixes = vocabulary_prefixes(model, semantic_store.index());
     let compact_prefixes = compact_vocabulary_prefixes(&prefixes);
     let term_index = collect_term_index(&serializable_index);
     Ok(concepts_section(
@@ -535,14 +535,14 @@ fn filtered_semantic_index(
     index
 }
 
-pub(crate) fn semantic_index_with_external_visibility(
-    source: &semantic_contract::SemanticIndex,
+pub fn semantic_index_with_external_visibility(
+    source: &crate::semantic_store::SemanticModelStore,
     include_external: bool,
 ) -> Result<semantic_contract::SemanticIndex, ReqvireError> {
-    source.with_external_visibility(include_external)
+    source.index_with_external_visibility(include_external)
 }
 
-pub(crate) fn semantic_prefixes_tool(
+pub fn semantic_prefixes_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -553,9 +553,9 @@ pub(crate) fn semantic_prefixes_tool(
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let visible_index =
-        semantic_index_with_external_visibility(&semantic_store.index, include_external)?;
+        semantic_index_with_external_visibility(semantic_store, include_external)?;
     let external_metadata = semantic_contract::external_materialization_metadata(
-        &semantic_store.index,
+        semantic_store.index(),
         &visible_index,
         include_external,
     );
@@ -565,7 +565,7 @@ pub(crate) fn semantic_prefixes_tool(
     let mut prefix_namespaces: std::collections::BTreeMap<String, BTreeSet<String>> =
         std::collections::BTreeMap::new();
 
-    for declaration in &semantic_store.index.ontology_documents {
+    for declaration in &semantic_store.index().ontology_documents {
         prefix_namespaces
             .entry(declaration.ontology_prefix.clone())
             .or_default()
@@ -604,7 +604,7 @@ pub(crate) fn semantic_prefixes_tool(
     }
 
     if include_external {
-        for source in used_external_sources(&semantic_store.index, &visible_index) {
+        for source in used_external_sources(semantic_store.index(), &visible_index) {
             prefix_namespaces
                 .entry(source.prefix.clone())
                 .or_default()
@@ -687,7 +687,7 @@ pub(crate) fn semantic_prefixes_tool(
         "summary": {
             "prefix_count": prefix_namespaces.len(),
             "namespace_count": namespace_count,
-            "ontology_document_count": semantic_store.index.ontology_documents.len(),
+            "ontology_document_count": semantic_store.index().ontology_documents.len(),
             "external_source_count": if include_external { external_metadata["external_counts"]["used_external_source_count"].as_u64().unwrap_or(0) } else { 0 },
             "conflict_count": conflicts.len()
         },
@@ -695,7 +695,7 @@ pub(crate) fn semantic_prefixes_tool(
         "external_materialization": external_metadata["external_materialization"].clone(),
         "external_counts": external_metadata["external_counts"].clone(),
         "graph_layers": graph_layers,
-        "diagnostics": semantic_store.index.diagnostics,
+        "diagnostics": semantic_store.index().diagnostics,
         "model_fingerprint": model_fingerprint(&model)?
     }))
 }
@@ -729,22 +729,26 @@ fn ontology_prefix_source(
                 .find_map(|identifier| model.graph_registry.get_element(identifier))
         });
 
-    match source_element {
-        Some(element) => json!({
-            "element_identifier": element.identifier,
-            "element_name": element.name,
-            "file_path": element.file_path,
-            "line_number": element.line_number,
-            "content": semantic_prefix_source_content(&element.content)
-        }),
-        None => json!({
-            "element_identifier": null,
-            "element_name": null,
-            "file_path": null,
-            "line_number": null,
-            "content": ""
-        }),
-    }
+    source_element.map_or_else(
+        || {
+            json!({
+                "element_identifier": null,
+                "element_name": null,
+                "file_path": null,
+                "line_number": null,
+                "content": ""
+            })
+        },
+        |element| {
+            json!({
+                "element_identifier": element.identifier,
+                "element_name": element.name,
+                "file_path": element.file_path,
+                "line_number": element.line_number,
+                "content": semantic_prefix_source_content(&element.content)
+            })
+        },
+    )
 }
 
 fn concept_scheme_prefix_entries(model: &ModelManager) -> Vec<Value> {
@@ -841,32 +845,36 @@ fn external_ontology_prefix_source(
     source: &semantic_contract::ExternalOntologySource,
 ) -> Value {
     let owner = model.graph_registry.get_element(&source.owner_identifier);
-    match owner {
-        Some(element) => json!({
-            "element_identifier": element.identifier,
-            "element_name": element.name,
-            "file_path": element.file_path,
-            "line_number": source.line_number,
-            "content": semantic_prefix_source_content(&element.content),
-            "external_source": {
-                "resource": source.resource,
-                "source": source.source,
-                "format": source.format
-            }
-        }),
-        None => json!({
-            "element_identifier": source.owner_identifier,
-            "element_name": source.owner_name,
-            "file_path": null,
-            "line_number": source.line_number,
-            "content": "",
-            "external_source": {
-                "resource": source.resource,
-                "source": source.source,
-                "format": source.format
-            }
-        }),
-    }
+    owner.map_or_else(
+        || {
+            json!({
+                "element_identifier": source.owner_identifier,
+                "element_name": source.owner_name,
+                "file_path": null,
+                "line_number": source.line_number,
+                "content": "",
+                "external_source": {
+                    "resource": source.resource,
+                    "source": source.source,
+                    "format": source.format
+                }
+            })
+        },
+        |element| {
+            json!({
+                "element_identifier": element.identifier,
+                "element_name": element.name,
+                "file_path": element.file_path,
+                "line_number": source.line_number,
+                "content": semantic_prefix_source_content(&element.content),
+                "external_source": {
+                    "resource": source.resource,
+                    "source": source.source,
+                    "format": source.format
+                }
+            })
+        },
+    )
 }
 
 fn semantic_prefix_source_content(content: &str) -> String {
@@ -895,7 +903,7 @@ struct VocabularyPrefix {
     namespace: String,
 }
 
-pub(crate) fn semantic_vocabulary_tool(
+pub fn semantic_vocabulary_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -917,9 +925,9 @@ pub(crate) fn semantic_vocabulary_tool(
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let semantic_index =
-        semantic_index_with_external_visibility(&semantic_store.index, include_external)?;
+        semantic_index_with_external_visibility(semantic_store, include_external)?;
     let external_metadata = semantic_contract::external_materialization_metadata(
-        &semantic_store.index,
+        semantic_store.index(),
         &semantic_index,
         include_external,
     );
@@ -981,12 +989,12 @@ pub(crate) fn semantic_vocabulary_tool(
                 "next_cursor": Value::Null,
                 "has_more": false
             },
-            "diagnostics": semantic_store.index.diagnostics,
+            "diagnostics": semantic_store.index().diagnostics,
             "include_external": include_external,
             "ontology_document_filter": ontology_document_filter,
             "external_materialization": external_metadata["external_materialization"].clone(),
             "external_counts": external_metadata["external_counts"].clone(),
-            "graph_layers": graph_layers.clone(),
+            "graph_layers": graph_layers,
             "model_fingerprint": model_fingerprint(&model)?
         }));
     }
@@ -1020,7 +1028,7 @@ pub(crate) fn semantic_vocabulary_tool(
             "has_more": has_more,
             "total": total
         },
-        "diagnostics": semantic_store.index.diagnostics,
+        "diagnostics": semantic_store.index().diagnostics,
         "include_external": include_external,
         "ontology_document_filter": ontology_document_filter,
         "external_materialization": external_metadata["external_materialization"].clone(),
@@ -1842,17 +1850,19 @@ fn filter_items(items: &[Value], filter: Option<&str>) -> Vec<Value> {
 }
 
 fn source_for_element_identifier(model: &ModelManager, identifier: &str) -> Value {
-    match model.graph_registry.get_element(identifier) {
-        Some(element) => json!({
-            "element_identifier": element.identifier,
-            "element_name": element.name,
-            "element_type": element.element_type.as_str(),
-            "file_path": element.file_path,
-            "line_number": element.line_number,
-            "content": semantic_prefix_source_content(&element.content)
-        }),
-        None => Value::Null,
-    }
+    model
+        .graph_registry
+        .get_element(identifier)
+        .map_or(Value::Null, |element| {
+            json!({
+                "element_identifier": element.identifier,
+                "element_name": element.name,
+                "element_type": element.element_type.as_str(),
+                "file_path": element.file_path,
+                "line_number": element.line_number,
+                "content": semantic_prefix_source_content(&element.content)
+            })
+        })
 }
 
 fn base_term_item(
@@ -1941,7 +1951,7 @@ fn source_map_declaration_item(
     })
 }
 
-fn term_info_external(info: &TermInfo) -> bool {
+const fn term_info_external(info: &TermInfo) -> bool {
     matches!(info.source_block, Some(source) if source.external)
 }
 
@@ -2014,6 +2024,12 @@ fn semantic_graph_layers_for_export(layers: &[SemanticExportLayer]) -> Vec<Value
     let includes = |layer| layers.contains(&layer);
     vec![
         graph_layer(
+            "queries",
+            semantic_store::GRAPH_GENERATED,
+            includes(SemanticExportLayer::Queries),
+            "native managed SPARQL query resources",
+        ),
+        graph_layer(
             "ontologies",
             semantic_store::GRAPH_AUTHORED_ONTOLOGY,
             includes(SemanticExportLayer::Ontologies),
@@ -2058,7 +2074,7 @@ fn semantic_graph_layers_for_export(layers: &[SemanticExportLayer]) -> Vec<Value
     ]
 }
 
-pub(crate) fn semantic_graph_layers(full: bool, include_external: bool) -> Vec<Value> {
+pub fn semantic_graph_layers(full: bool, include_external: bool) -> Vec<Value> {
     let layers = vec![
         graph_layer(
             "default",
@@ -2151,4 +2167,61 @@ fn curie(iri: &str, prefixes: &[VocabularyPrefix]) -> String {
         }
         (None, None) => iri.to_string(),
     }
+}
+
+pub fn semantic_queries_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+    validate: bool,
+) -> Result<Value, ReqvireError> {
+    if validate {
+        let mut model = ModelManager::new();
+        let result = model.parse_and_validate_with_options(
+            None,
+            excluded_filename_patterns,
+            ModelBuildOptions {
+                lenient: false,
+                with_size_estimates,
+            },
+        );
+        let index = model
+            .semantic_index()
+            .map(std::borrow::Cow::Borrowed)
+            .unwrap_or_else(|| {
+                std::borrow::Cow::Owned(semantic_contract::build_semantic_index(
+                    &model.graph_registry,
+                ))
+            });
+        return index.query_validation_report(
+            string_arg(args, "name").as_deref(),
+            string_arg(args, "iri").as_deref(),
+            result
+                .err()
+                .map(|e| vec![e.to_string()])
+                .unwrap_or_default(),
+        );
+    }
+    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
+    let index = model
+        .semantic_store
+        .as_ref()
+        .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?
+        .index();
+    let name = string_arg(args, "name");
+    let iri = string_arg(args, "iri");
+    let namespace = string_arg(args, "namespace_base");
+    let records = index.select_queries(name.as_deref(), iri.as_deref(), namespace.as_deref())?;
+    let valid = records.iter().all(|q| q.diagnostics.is_empty());
+    let values: Result<Vec<_>, ReqvireError> = records
+        .into_iter()
+        .map(|q| {
+            if bool_arg(args, "include_content", false) {
+                q.artifact()
+            } else {
+                serde_json::to_value(q).map_err(ReqvireError::from)
+            }
+        })
+        .collect();
+    Ok(json!({"queries":values?,"valid":valid}))
 }

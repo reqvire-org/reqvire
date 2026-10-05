@@ -291,6 +291,7 @@ fn apply_ontology_aware_rewrites(
 
     let element_ids: Vec<String> = registry.nodes.keys().cloned().collect();
     for element_id in element_ids {
+        let query_context = registry.semantic_contract_used_ontology_context(&element_id);
         let Some(node) = registry.nodes.get_mut(&element_id) else {
             continue;
         };
@@ -303,6 +304,9 @@ fn apply_ontology_aware_rewrites(
                 &term_rewrites,
                 &document_rewrites,
             )
+        } else if node.element.element_type.is_semantic_query() {
+            if !query_context.iter().any(|id| affected_ontology_elements.contains(id)) { continue; }
+            rewrite_query_vocabulary(&node.element, &term_rewrites)
         } else if node.element.element_type.is_semantic_contract() {
             if term_rewrites.is_empty() {
                 continue;
@@ -590,11 +594,10 @@ fn replace_curie_token(
         if is_token_boundary(input, start, end) {
             output.push_str(&input[index..start]);
             output.push_str(&new);
-            index = end;
         } else {
             output.push_str(&input[index..end]);
-            index = end;
         }
+        index = end;
     }
     output.push_str(&input[index..]);
     output
@@ -619,11 +622,10 @@ pub(crate) fn replace_prefix_token(input: &str, old_prefix: &str, new_prefix: &s
         {
             output.push_str(&input[index..start]);
             output.push_str(&new);
-            index = end;
         } else {
             output.push_str(&input[index..end]);
-            index = end;
         }
+        index = end;
     }
     output.push_str(&input[index..]);
     output
@@ -635,7 +637,7 @@ fn is_token_boundary(input: &str, start: usize, end: usize) -> bool {
     !before.map(is_curie_char).unwrap_or(false) && !after.map(is_curie_char).unwrap_or(false)
 }
 
-fn is_curie_char(ch: char) -> bool {
+const fn is_curie_char(ch: char) -> bool {
     ch.is_ascii_alphanumeric() || matches!(ch, '_' | '-' | ':' | '.')
 }
 
@@ -798,7 +800,7 @@ fn finalize_crud_operation(
         apply_ontology_aware_rewrites(&mut model_manager.graph_registry, ontology_before)?;
     }
 
-    validate_semantic_contracts_after_mutation(model_manager, removed_declaration_source)?;
+    validate_model_after_mutation(model_manager, removed_declaration_source)?;
 
     let modified_files = collect_new_modified_files(model_manager, modified_before);
     let diffs = generate_crud_diffs(&model_manager.graph_registry, &modified_files, git_root)?;
@@ -812,11 +814,11 @@ fn finalize_crud_operation(
     Ok(diffs)
 }
 
-fn validate_semantic_contracts_after_mutation(
+fn validate_model_after_mutation(
     model_manager: &ModelManager,
     removed_declaration_source: Option<&str>,
 ) -> Result<(), ReqvireError> {
-    let semantic_errors = if let Some(source) = removed_declaration_source {
+    let mut errors = if let Some(source) = removed_declaration_source {
         model_manager
             .graph_registry
             .validate_semantic_contracts_after_removal(source)?
@@ -826,14 +828,29 @@ fn validate_semantic_contracts_after_mutation(
             .validate_semantic_contracts_in_memory()?
     };
 
-    if semantic_errors.is_empty() {
+    errors.extend(
+        model_manager
+            .graph_registry
+            .validate_contract_references()?,
+    );
+    errors.extend(
+        model_manager
+            .graph_registry
+            .validate_requirement_fulfillment_cycles(),
+    );
+    errors.extend(
+        model_manager
+            .graph_registry
+            .validate_concept_taxonomy_cycles(),
+    );
+    if errors.is_empty() {
         Ok(())
     } else {
-        Err(ReqvireError::validation_diagnostics(semantic_errors))
+        Err(ReqvireError::validation_diagnostics(errors))
     }
 }
 
-fn validate_semantic_contracts_after_contract_bindings_candidate(
+fn validate_contract_bindings_candidate(
     model_manager: &ModelManager,
     element_id: &str,
     contract_bindings_identifier: &str,
@@ -869,11 +886,13 @@ fn validate_semantic_contracts_after_contract_bindings_candidate(
         });
     }
 
-    let semantic_errors = candidate.validate_semantic_contracts_in_memory()?;
-    if semantic_errors.is_empty() {
+    let mut errors = candidate.validate_semantic_contracts_in_memory()?;
+    errors.extend(candidate.validate_contract_references()?);
+    errors.extend(candidate.validate_requirement_fulfillment_cycles());
+    if errors.is_empty() {
         Ok(())
     } else {
-        Err(ReqvireError::validation_diagnostics(semantic_errors))
+        Err(ReqvireError::validation_diagnostics(errors))
     }
 }
 
@@ -981,11 +1000,67 @@ pub fn add_element(
     }
 
     // Create element using core business logic
-    let element = model_manager.graph_registry.create_element_from_string(
+    let element = match model_manager.graph_registry.create_element_from_string(
         element_markdown,
         &target_file_normalized,
         excluded_patterns,
-    )?;
+    ) {
+        Ok(element) => element,
+        Err(error) => {
+            model_manager.graph_registry = registry_snapshot;
+            return Err(error);
+        }
+    };
+
+    if let Some(existing_id) = &removed_declaration_source {
+        // An override replaces an identity; deletion cleanup must not erase
+        // external ownership or consumers. Relocate their targets when needed.
+        let registry = &mut model_manager.graph_registry;
+        for (id, original) in &registry_snapshot.nodes {
+            if id == existing_id {
+                continue;
+            }
+            if let Some(node) = registry.nodes.get_mut(id) {
+                for (entries, previous) in [
+                    (
+                        &mut node.element.contract_bindings,
+                        &original.element.contract_bindings,
+                    ),
+                    (
+                        &mut node.element.contract_references,
+                        &original.element.contract_references,
+                    ),
+                ] {
+                    entries.clone_from(previous);
+                    for entry in entries {
+                        if let ContractBindingTarget::ElementIdentifier(target) = &mut entry.target
+                        {
+                            if target == existing_id {
+                                target.clone_from(&element.identifier);
+                                registry
+                                    .modified_files
+                                    .insert(node.element.file_path.clone());
+                            }
+                        }
+                    }
+                }
+                for relation in original.element.relations.iter().filter(|relation| {
+                    relation.user_created && relation.target.link.as_str() == existing_id
+                }) {
+                    let mut relation = relation.clone();
+                    relation.target.link = LinkType::Identifier(element.identifier.clone());
+                    relation.target.element_id = Some(element.identifier.clone());
+                    node.element.relations.push(relation);
+                    registry
+                        .modified_files
+                        .insert(node.element.file_path.clone());
+                }
+            }
+        }
+        model_manager
+            .graph_registry
+            .refresh_relation_context(excluded_patterns);
+    }
 
     let diffs = match finalize_crud_operation(
         model_manager,
@@ -1009,10 +1084,14 @@ pub fn add_element(
         CrudOperation::Add
     };
 
+    if dry_run {
+        model_manager.graph_registry = registry_snapshot;
+    }
+
     Ok(CrudResult {
         operation,
         element_id: element.identifier.clone(),
-        element_name: element.name.clone(),
+        element_name: element.name,
         diffs,
         dry_run,
     })
@@ -1232,7 +1311,16 @@ pub fn rename_element(
     })
 }
 
-/// Move entire file with all its elements to a new location
+/// Controls persistence and destination merging for a file move.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct MoveFileOptions {
+    /// Preview changes without writing them to disk.
+    pub dry_run: bool,
+    /// Merge into an existing target file.
+    pub squash: bool,
+}
+
+/// Move entire file with all its elements to a new location.
 pub fn move_file(
     model_manager: &mut ModelManager,
     source_file: &str,
@@ -1240,9 +1328,9 @@ pub fn move_file(
     excluded_patterns: &GlobSet,
     current_dir: &Path,
     workspace_root: &Path,
-    dry_run: bool,
-    squash: bool,
+    options: MoveFileOptions,
 ) -> Result<CrudResult, ReqvireError> {
+    let MoveFileOptions { dry_run, squash } = options;
     // Normalize file paths: convert from CWD-relative to workspace-root-relative
     use crate::utils;
     let absolute_source = current_dir.join(source_file);
@@ -1293,8 +1381,8 @@ pub fn move_file(
     if !dry_run {
         // Delete the source file from disk
         let source_path = workspace_root.join(&source_file_normalized);
-        if source_path.exists() {
-            std::fs::remove_file(&source_path).map_err(ReqvireError::IoError)?;
+        if crate::mutation_io::exists(&source_path) {
+            crate::mutation_io::remove_file(&source_path).map_err(ReqvireError::IoError)?;
         }
     }
 
@@ -1327,20 +1415,20 @@ pub fn move_folder(
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     use crate::utils;
-    use std::fs;
+    use crate::mutation_io as fs;
 
     let absolute_source = current_dir.join(source_folder);
     let source_folder_normalized = normalize_folder_arg(
-        &utils::get_relative_path(&absolute_source)?
+        utils::get_relative_path(&absolute_source)?
             .to_string_lossy()
-            .to_string(),
+            .as_ref(),
     );
 
     let absolute_target = current_dir.join(target_folder);
     let target_folder_normalized = normalize_folder_arg(
-        &utils::get_relative_path(&absolute_target)?
+        utils::get_relative_path(&absolute_target)?
             .to_string_lossy()
-            .to_string(),
+            .as_ref(),
     );
 
     if source_folder_normalized.is_empty() || source_folder_normalized == "." {
@@ -1368,13 +1456,13 @@ pub fn move_folder(
             source_folder
         )));
     }
-    if !source_abs.exists() {
+    if !crate::mutation_io::exists(&source_abs) {
         return Err(ReqvireError::LocationNotFound(format!(
             "Source folder '{}' does not exist",
             source_folder
         )));
     }
-    if !source_abs.is_dir() {
+    if !crate::mutation_io::is_dir(&source_abs) {
         return Err(ReqvireError::InvalidOperation(format!(
             "Source path '{}' is not a directory",
             source_folder
@@ -1388,7 +1476,7 @@ pub fn move_folder(
             target_folder
         )));
     }
-    if target_abs.exists() {
+    if crate::mutation_io::exists(&target_abs) {
         return Err(ReqvireError::DuplicateElement(format!(
             "Target folder '{}' already exists",
             target_folder
@@ -1429,12 +1517,11 @@ pub fn move_folder(
     };
 
     if !dry_run {
-        for entry in walkdir::WalkDir::new(&source_abs)
-            .into_iter()
-            .filter_map(Result::ok)
-            .filter(|entry| entry.file_type().is_file())
-        {
-            let old_abs = entry.path();
+        let paths = crate::mutation_io::paths_under(&source_abs).unwrap_or_else(|| {
+            walkdir::WalkDir::new(&source_abs).into_iter().filter_map(Result::ok)
+                .filter(|entry| entry.file_type().is_file()).map(|entry| entry.into_path()).collect()
+        });
+        for old_abs in &paths {
             let old_relative = old_abs
                 .strip_prefix(workspace_root)
                 .map_err(|err| ReqvireError::PathError(err.to_string()))?
@@ -1456,7 +1543,7 @@ pub fn move_folder(
             fs::rename(old_abs, &new_abs).map_err(ReqvireError::IoError)?;
         }
 
-        if source_abs.exists() {
+        if crate::mutation_io::exists(&source_abs) {
             fs::remove_dir_all(&source_abs).map_err(ReqvireError::IoError)?;
         }
 
@@ -1515,6 +1602,7 @@ fn prune_empty_parent_dirs(
     git_root: &Path,
     target_abs: &Path,
 ) -> Result<(), ReqvireError> {
+    if crate::mutation_io::active() { return Ok(()); }
     let mut current = dir.to_path_buf();
     while current != git_root && current.starts_with(git_root) && !target_abs.starts_with(&current)
     {
@@ -1547,7 +1635,7 @@ pub fn reuse(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
     use std::path::PathBuf;
 
     // Find the element by name
@@ -1613,7 +1701,7 @@ pub fn reuse(
         model_manager
             .graph_registry
             .modified_files
-            .insert(file_path.clone());
+            .insert(file_path);
     }
 
     Ok(CrudResult {
@@ -1633,7 +1721,7 @@ pub fn remove_contract_bindings(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
     use std::path::PathBuf;
 
     // Find the element by name
@@ -1677,7 +1765,7 @@ pub fn remove_contract_bindings(
         model_manager
             .graph_registry
             .modified_files
-            .insert(file_path.clone());
+            .insert(file_path);
     }
 
     Ok(CrudResult {
@@ -1730,6 +1818,124 @@ fn resolve_contract_bindings_identifier_for_element(
     })
 }
 
+/// Add a content dependency without creating an implementation obligation.
+pub fn reference_contract(
+    model_manager: &mut ModelManager,
+    source: &str,
+    target: &str,
+    workspace: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    update_contract_reference(
+        model_manager,
+        source,
+        None,
+        Some(target),
+        workspace,
+        dry_run,
+    )
+}
+
+fn update_contract_reference(
+    model_manager: &mut ModelManager,
+    source: &str,
+    remove: Option<&str>,
+    add: Option<&str>,
+    workspace: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    let registry = &model_manager.graph_registry;
+    let element = registry
+        .get_element_by_name(source)
+        .ok_or_else(|| ReqvireError::ElementNotFound(source.into()))?;
+    let source_id = element.identifier.clone();
+    let file = element.file_path.clone();
+    let resolve = |target: &str| -> Result<String, ReqvireError> {
+        if let Some(element) = registry
+            .get_element_by_name(target)
+            .or_else(|| registry.get_element(target))
+        {
+            return Ok(element.identifier.clone());
+        }
+        if crate::utils::is_external_url(target) || !target.contains('#') {
+            return Err(ReqvireError::InvalidContractReference(format!(
+                "Expected a contract name or element identifier: '{target}'"
+            )));
+        }
+        if let Some(fragment) = target.strip_prefix('#') {
+            return Ok(format!(
+                "{file}#{}",
+                crate::utils::normalize_fragment(fragment)
+            ));
+        }
+        crate::utils::normalize_identifier(
+            target,
+            &workspace.join(Path::new(&file).parent().unwrap_or_else(|| Path::new("."))),
+        )
+    };
+    let remove = remove.map(resolve).transpose()?;
+    let add = add.map(resolve).transpose()?;
+    if let Some(target) = &remove {
+        if !element
+            .contract_references
+            .iter()
+            .any(|entry| entry.target.as_str() == *target)
+        {
+            return Err(ReqvireError::InvalidContractReference(format!(
+                "No Contract References entry from '{source}' to '{target}'"
+            )));
+        }
+    }
+    if let Some(target) = &add {
+        if element
+            .contract_references
+            .iter()
+            .any(|entry| entry.target.as_str() == *target)
+        {
+            return Err(ReqvireError::InvalidContractReference(format!(
+                "Duplicate Contract References target '{target}'"
+            )));
+        }
+    }
+    let snapshot = registry.clone();
+    let modified_before = snapshot_modified_files(model_manager);
+    let node = model_manager
+        .graph_registry
+        .nodes
+        .get_mut(&source_id)
+        .expect("resolved source");
+    if let Some(target) = remove {
+        node.element
+            .contract_references
+            .retain(|entry| entry.target.as_str() != target);
+    }
+    if let Some(target) = add {
+        node.element.contract_references.push(ContractBindingEntry {
+            target: ContractBindingTarget::ElementIdentifier(target),
+            content_hash: None,
+        });
+    }
+    model_manager.graph_registry.modified_files.insert(file);
+    let result = finalize_crud_operation(
+        model_manager,
+        &modified_before,
+        workspace,
+        dry_run,
+        None,
+        None,
+    );
+    if dry_run || result.is_err() {
+        model_manager.graph_registry = snapshot;
+    }
+    Ok(CrudResult {
+        operation: CrudOperation::Update,
+        element_id: source_id,
+        element_name: format!("Updated Contract References for {source}"),
+        diffs: result?,
+        dry_run,
+    })
+}
+
 /// Reuse a compatible requirement-owned contract element identifier to a requirement.
 pub fn reuse_contract_element_identifier(
     model_manager: &mut ModelManager,
@@ -1738,7 +1944,7 @@ pub fn reuse_contract_element_identifier(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
 
     let target_element = model_manager
         .graph_registry
@@ -1860,7 +2066,7 @@ pub fn reuse_contract_element_identifier(
         )));
     }
 
-    validate_semantic_contracts_after_contract_bindings_candidate(
+    validate_contract_bindings_candidate(
         model_manager,
         &element_id,
         &contract_bindings_identifier,
@@ -1900,7 +2106,7 @@ pub fn reuse_contract_element_identifier(
         model_manager
             .graph_registry
             .modified_files
-            .insert(file_path.clone());
+            .insert(file_path);
     }
 
     Ok(CrudResult {
@@ -1951,7 +2157,7 @@ pub fn remove_reused_contract_element_identifier(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
 
     let target_element = model_manager
         .graph_registry
@@ -2004,7 +2210,7 @@ pub fn remove_reused_contract_element_identifier(
         &relative_identifier,
     )?;
 
-    validate_semantic_contracts_after_contract_bindings_candidate(
+    validate_contract_bindings_candidate(
         model_manager,
         &element_id,
         &contract_bindings_identifier,
@@ -2018,7 +2224,7 @@ pub fn remove_reused_contract_element_identifier(
         model_manager
             .graph_registry
             .modified_files
-            .insert(file_path.clone());
+            .insert(file_path);
     }
 
     Ok(CrudResult {
@@ -2069,7 +2275,7 @@ pub fn mv_asset(
     workspace_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
 
     let (old_path_normalized, old_abs) = resolve_workspace_relative_arg(old_path, workspace_root)?;
     let (new_path_normalized, new_abs) = resolve_workspace_relative_arg(new_path, workspace_root)?;
@@ -2178,7 +2384,7 @@ pub fn rm_asset(
     workspace_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
+    use crate::mutation_io as fs;
 
     let (file_path_normalized, abs_path) =
         resolve_workspace_relative_arg(file_path_arg, workspace_root)?;
@@ -2228,10 +2434,8 @@ pub fn rm_asset(
     }
 
     // Delete the actual file
-    if !dry_run {
-        if abs_path.exists() {
-            fs::remove_file(&abs_path).map_err(ReqvireError::IoError)?;
-        }
+    if !dry_run && crate::mutation_io::exists(&abs_path) {
+        fs::remove_file(&abs_path).map_err(ReqvireError::IoError)?;
     }
 
     Ok(CrudResult {
@@ -2380,7 +2584,7 @@ pub fn merge_elements(
         return Err(err);
     }
 
-    if let Err(err) = validate_semantic_contracts_after_mutation(model_manager, None) {
+    if let Err(err) = validate_model_after_mutation(model_manager, None) {
         model_manager.graph_registry = registry_snapshot;
         return Err(err);
     }
@@ -2537,7 +2741,7 @@ fn add_contract_binding_line_to_element(
             }
 
             // Add our new contract_bindings
-            result.push_str(&contract_bindings_line);
+            result.push_str(contract_bindings_line);
             result.push('\n');
             inserted = true;
             continue;
@@ -2547,7 +2751,7 @@ fn add_contract_binding_line_to_element(
         if in_target_element && !inserted && trimmed == "---" {
             // Need to add Contract Bindings section before the separator
             result.push_str("\n#### Contract Bindings\n");
-            result.push_str(&contract_bindings_line);
+            result.push_str(contract_bindings_line);
             result.push('\n');
             inserted = true;
         }
@@ -2782,6 +2986,10 @@ pub fn link(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
+    if relation_type == "referenceContract" {
+        return reference_contract(model_manager, source, target, git_root, dry_run);
+    }
+
     // Resolve source element by name
     let source_element = model_manager
         .graph_registry
@@ -2854,6 +3062,17 @@ pub fn relink(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
+    if relation_type == "referenceContract" {
+        return update_contract_reference(
+            model_manager,
+            source,
+            Some(from_target),
+            Some(to_target),
+            git_root,
+            dry_run,
+        );
+    }
+
     // Resolve source element by name
     let source_element = model_manager
         .graph_registry
@@ -2872,14 +3091,13 @@ pub fn relink(
     }
 
     // Validate existing relation type before mutation.
-    let from_target_resolved = if let Some(element) = model_manager
+    let from_target_resolved = model_manager
         .graph_registry
         .get_element_by_name(from_target)
-    {
-        element.identifier.clone()
-    } else {
-        from_target.to_string()
-    };
+        .map_or_else(
+            || from_target.to_string(),
+            |element| element.identifier.clone(),
+        );
 
     let existing_relation = model_manager
         .graph_registry
@@ -2991,6 +3209,31 @@ pub fn unlink(
     let source_id = source_element.identifier.clone();
     let source_name = source_element.name.clone();
 
+    let reference_target = model_manager
+        .graph_registry
+        .get_element_by_name(target)
+        .map(|element| element.identifier.clone())
+        .unwrap_or_else(|| {
+            crate::utils::normalize_relation_identifier_for_registry(
+                &source_element.file_path,
+                target,
+            )
+        });
+    if source_element
+        .contract_references
+        .iter()
+        .any(|entry| entry.target.as_str() == reference_target)
+    {
+        return update_contract_reference(
+            model_manager,
+            source,
+            Some(&reference_target),
+            None,
+            git_root,
+            dry_run,
+        );
+    }
+
     // Track modified files before
     let modified_before = snapshot_modified_files(model_manager);
     let registry_snapshot = model_manager.graph_registry.clone();
@@ -3062,8 +3305,8 @@ pub fn unlink(
 
             // Check if target is a file path contract_bindings
             let cwd = std::env::current_dir().unwrap_or_default();
-            let file_exists_cwd = cwd.join(target).exists();
-            let file_exists_git_root = git_root.join(target).exists();
+            let file_exists_cwd = crate::mutation_io::exists(cwd.join(target));
+            let file_exists_git_root = crate::mutation_io::exists(git_root.join(target));
 
             if file_exists_cwd || file_exists_git_root {
                 return remove_contract_bindings(model_manager, source, target, git_root, dry_run);
@@ -3086,4 +3329,39 @@ pub fn unlink(
             )))
         }
     }
+}
+
+/// Rewrite vocabulary IRIs, leaving SPARQL literals and comments byte-for-byte intact.
+fn rewrite_query_vocabulary(
+    element: &crate::element::Element,
+    rewrites: &BTreeSet<TermRewrite>,
+) -> String {
+    let Some(source) = &element.semantic_query else {
+        return element.content.clone();
+    };
+    let mut mappings = BTreeMap::new();
+    for r in rewrites {
+        mappings.insert(r.old_iri.clone(), r.new_iri.clone());
+        mappings.insert(r.old_namespace.clone(), r.new_namespace.clone());
+    }
+    let mut output = element.content.clone();
+    if let Some(block) = &source.query {
+        let rewritten =
+            crate::semantic_contract::queries::rewrite_iri_tokens(&block.content, &mappings);
+        if let Some(section) = crate::parser::subsection_range(&output, "Query") {
+            if let Some(offset) = output[section.clone()].find(&block.content) {
+                let start = section.start + offset;
+                output.replace_range(start..start + block.content.len(), &rewritten);
+            }
+        }
+    }
+    if let Some(section) = crate::parser::subsection_range(&output, "Produces") {
+        let mut produces = output[section.clone()].to_string();
+        for r in rewrites {
+            produces = produces.replace(&format!("<{}>", r.old_iri), &format!("<{}>", r.new_iri));
+            produces = replace_curie_token(&produces, &r.old_prefix, &r.local_name, &r.new_prefix);
+        }
+        output.replace_range(section, &produces);
+    }
+    output
 }

@@ -12,6 +12,8 @@
 
 Reserved subsection vocabulary is defined by the Reqvire core element ontology. This specification defines parser-facing syntax, validation, and serialization behavior for those ontology-defined subsection concepts.
 
+The parser-facing vocabulary comprises Relations, Details, Metadata, Contract Bindings, Contract References, Concept References, Ontology, External Ontology, Shapes, and Query. Each subsection MUST retain the element-type applicability, syntax, validation, and serialization behavior defined by its applicable contract.
+
 ## Relations Subsection
 
 Must be defined with a level 4 header: `#### Relations`.
@@ -112,7 +114,7 @@ Some details.
 
 Must be defined with a level 4 header: `#### Contract Bindings`.
 
-The Contract Bindings subsection links a requirement to explicit reusable contract context from another subgraph. Reused contract context does not provide ontology context. SKOS concept bindings belong in `#### Concept References`; semantic-contract ontology dependencies belong in `use`/`usedBy` relations.
+Contract dependencies comprise Contract Bindings and Contract References. The Contract Bindings subsection assigns a shared implementation obligation to the consuming requirement. Its implementation contributes to the owning requirement's fulfillment. Content dependencies that require review when a contract changes use Contract References. SKOS concept bindings belong in `#### Concept References`; semantic-contract ontology dependencies belong in `use`/`usedBy` relations.
 
 Legacy contract-binding subsection headings such as `#### Reused Contract Context` and `#### Attachments` are invalid in canonical Reqvire Markdown. `reqvire migrate --fix` performs the one-time rewrite to `#### Contract Bindings`; normal validation must reject the legacy headings instead of treating them as generic content.
 
@@ -143,6 +145,17 @@ The system shall expose an API contract.
 
 #### Contract Bindings
 * [Reusable Payload Shape](Contracts.md#reusable-payload-shape)
+```
+
+## Contract References Subsection
+
+Must be defined with a level 4 header: `#### Contract References`.
+
+Entries MUST be Markdown links to uniquely requirement-owned contracts. A Contract Reference declares a content dependency that propagates change impact without contributing to the contract owner's implementation fulfillment. Contract Bindings record shared implementation obligations. Syntax, endpoint compatibility, duplicate handling, and coverage semantics follow the Contract Reference Semantics Specification.
+
+```markdown
+#### Contract References
+  * [Error Response Specification](Specifications.md#error-response-specification)
 ```
 
 ## Concept References Subsection

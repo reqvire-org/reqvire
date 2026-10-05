@@ -13,6 +13,7 @@
 # - System runs in quiet mode without verbose runtime-generation output
 
 set -e
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 EXPORT_DIR="${TEST_DIR}/exported-site"
 
@@ -46,27 +47,8 @@ if ! grep -q "reqvireProjectStore" "$EXPORT_DIR/assets/project-store.js"; then
     exit 1
 fi
 
-if ! grep -q '"path": "specifications/Requirements.md"' "$EXPORT_DIR/assets/project-store.js"; then
-    echo "❌ FAILED: Project Store is missing modeled source file records"
-    exit 1
-fi
-
-if grep -q '"path": "scripts/evidence.sh"' "$EXPORT_DIR/assets/project-store.js"; then
-    echo "❌ FAILED: Project Store included a resource-only evidence file in the model tree"
-    exit 1
-fi
-
-if ! grep -q '"file_path": "scripts/evidence.sh"' "$EXPORT_DIR/assets/project-store.js" ||
-   ! grep -q '"id": "resource:scripts/evidence.sh"' "$EXPORT_DIR/assets/project-store.js" ||
-   ! grep -q 'export command evidence' "$EXPORT_DIR/assets/project-store.js"; then
-    echo "❌ FAILED: Project Store did not include the existing graph-referenced evidence file as a resource"
-    exit 1
-fi
-
-if grep -q '"path": "notes/unrelated.md"' "$EXPORT_DIR/assets/project-store.js"; then
-    echo "❌ FAILED: Project Store included an unrelated repository file in the model tree"
-    exit 1
-fi
+python3 "$TEST_SCRIPT_DIR/../test-serve-command/scripts/check-store.py" "$EXPORT_DIR/assets/project-store.js" \
+    --requirement-text "Test Requirement" --evidence-text "export command evidence"
 
 # Test 3: ontologies.ttl exists
 if [ ! -f "$EXPORT_DIR/ontologies.ttl" ]; then
@@ -93,6 +75,9 @@ if ! grep -q "Exported Explorer site to:" "${TEST_DIR}/export_output.log"; then
     cat "${TEST_DIR}/export_output.log"
     exit 1
 fi
+
+node "$TEST_SCRIPT_DIR/check-flow-worker.mjs" "$EXPORT_DIR" > "$TEST_DIR/flow-worker.txt"
+diff -u "$TEST_SCRIPT_DIR/expected/flow-worker.txt" "$TEST_DIR/flow-worker.txt"
 
 echo "✅ PASSED: Export command test"
 exit 0

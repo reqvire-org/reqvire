@@ -498,6 +498,10 @@ reqvire:Ontology a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   reqvire:mapsToConcept concept:OntologyElement ;
   rdfs:comment "First-class ontology element that defines reusable RDF/OWL vocabulary." .
+reqvire:SemanticQuery a owl:Class ;
+  rdfs:subClassOf reqvire:Element ;
+  reqvire:mapsToConcept concept:SemanticQuery ;
+  rdfs:comment "Native SPARQL query artifact with vocabulary context and source provenance." .
 reqvire:ShapeContract a owl:Class ;
   rdfs:subClassOf reqvire:SemanticContract ;
   reqvire:mapsToConcept concept:SemanticContract ;
@@ -534,6 +538,11 @@ reqvire:shapesText a owl:DatatypeProperty ;
   rdfs:domain reqvire:SemanticContract ;
   rdfs:range xsd:string ;
   rdfs:comment "Inline Turtle SHACL shape text carried by a semantic contract." .
+
+reqvire:semanticQueryType a reqvire:ElementType ;
+  reqvire:elementTypeName "semantic-query" ;
+  reqvire:elementTypeCategory "semantic-query" ;
+  reqvire:defaultElementType false .
 
 reqvire:semanticContractType a reqvire:SemanticContractElementType ;
   reqvire:elementTypeName "semantic-contract" ;

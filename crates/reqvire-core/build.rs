@@ -27,52 +27,57 @@ fn main() {
     let explorer_dir = repo_root.join("explorer");
     let dist = explorer_dir.join("dist");
 
-    // Re-run whenever Explorer sources change so the embedded bundle stays fresh.
+    let rebuild = env::var_os("REQVIRE_BUILD_EXPLORER").is_some();
+    // Watch source inputs, not generated kit/showcase output or our own build output.
+    // Prebuilt mode also watches dist because another build owns that input.
     for p in [
         "src",
-        "design-system",
         "public",
+        "scripts",
         "index.html",
         "package.json",
         "package-lock.json",
         "vite.config.ts",
-        "vite.config.js",
+        "tsconfig.json",
+        "vitest.config.ts",
+        ".stylelintrc.json",
+        ".oxlintignore",
+        "design-system/assets",
+        "design-system/components",
+        "design-system/hooks",
+        "design-system/showcase",
+        "design-system/product-patterns",
+        "design-system/tokens",
+        "design-system/index.ts",
+        "design-system/palette.ts",
+        "design-system/styles.css",
+        "design-system/vite.assetMerge.ts",
+        "design-system/vite.bundle.config.ts",
+        "design-system/vite.showcase.config.ts",
     ] {
-        println!("cargo:rerun-if-changed={}", explorer_dir.join(p).display());
+        let input = explorer_dir.join(p);
+        // Cargo treats a nonexistent watched path as perpetually dirty.
+        if input.exists() {
+            println!("cargo:rerun-if-changed={}", input.display());
+        }
     }
-    println!("cargo:rerun-if-changed={}", dist.display());
+    if !rebuild {
+        println!("cargo:rerun-if-changed={}", dist.display());
+    }
     println!("cargo:rerun-if-env-changed=REQVIRE_BUILD_EXPLORER");
 
     // Build the Explorer SPA only when explicitly requested.
-    if env::var("REQVIRE_BUILD_EXPLORER").is_ok() {
-        match Command::new("npm")
+    if rebuild {
+        let status = Command::new("npm")
             .arg("run")
             .arg("build")
             .current_dir(&explorer_dir)
             .status()
-        {
-            Ok(s) if s.success() => {}
-            Ok(s) => {
-                if !dist.is_dir() {
-                    panic!(
-                        "`npm run build` failed (status {s}) in {} and there is no existing dist/ to fall back to",
-                        explorer_dir.display()
-                    );
-                }
-                println!(
-                    "cargo:warning=`npm run build` failed (status {s}); embedding existing explorer/dist"
-                );
-            }
-            Err(e) => {
-                if !dist.is_dir() {
-                    panic!(
-                        "could not run `npm run build` in {} ({e}); install Node/npm and run `cd explorer && npm ci` first",
-                        explorer_dir.display()
-                    );
-                }
-                println!("cargo:warning=could not run npm ({e}); embedding existing explorer/dist");
-            }
-        }
+            .unwrap_or_else(|error| panic!(
+                "could not run `npm run build` in {} ({error}); install Node/npm and run `cd explorer && npm ci` first",
+                explorer_dir.display()
+            ));
+        assert!(status.success(), "`npm run build` failed (status {status}) in {}; refusing to embed stale Explorer assets", explorer_dir.display());
     }
 
     if !dist.join("index.html").is_file() {
@@ -82,12 +87,8 @@ fn main() {
         );
     }
 
-    // Stage: recursively copy the whole dist into OUT_DIR/explorer_bundle.
+    // Synchronize without rewriting identical assets or retaining removed ones.
     let bundle_out = out_dir.join("explorer_bundle");
-    if bundle_out.exists() {
-        fs::remove_dir_all(&bundle_out).expect("clear explorer_bundle out dir");
-    }
-    fs::create_dir_all(&bundle_out).expect("create explorer_bundle out dir");
 
     let mut files: Vec<String> = Vec::new();
     copy_tree(&dist, &dist, &bundle_out, &mut files);
@@ -105,30 +106,51 @@ fn main() {
         ));
     }
     manifest.push_str("];\n");
-    fs::write(out_dir.join("explorer_bundle_manifest.rs"), manifest)
-        .expect("write explorer_bundle_manifest.rs");
+    write_if_changed(
+        &out_dir.join("explorer_bundle_manifest.rs"),
+        manifest.as_bytes(),
+    );
 }
 
 /// Recursively copies files under `src` into `dst_root/<path relative to root>`,
 /// recording POSIX-style relative paths into `files`.
 fn copy_tree(root: &Path, src: &Path, dst_root: &Path, files: &mut Vec<String>) {
+    let dest_dir = dst_root.join(src.strip_prefix(root).expect("relative source directory"));
+    if dest_dir.is_file() {
+        fs::remove_file(&dest_dir).expect("remove replaced asset file");
+    }
+    fs::create_dir_all(&dest_dir).expect("create bundle directory");
+    for entry in fs::read_dir(&dest_dir).expect("read bundle directory") {
+        let path = entry.expect("bundle entry").path();
+        let source = src.join(path.file_name().expect("bundle entry name"));
+        if !source.exists() || source.is_dir() != path.is_dir() {
+            if path.is_dir() {
+                fs::remove_dir_all(&path).expect("remove obsolete bundle directory");
+            } else {
+                fs::remove_file(&path).expect("remove obsolete bundle asset");
+            }
+        }
+    }
     for entry in fs::read_dir(src).unwrap_or_else(|e| panic!("read dir {}: {e}", src.display())) {
-        let entry = entry.expect("dir entry");
-        let path = entry.path();
+        let path = entry.expect("dir entry").path();
         if path.is_dir() {
             copy_tree(root, &path, dst_root, files);
         } else if path.is_file() {
-            let rel = path
-                .strip_prefix(root)
-                .expect("failed to strip path prefix");
-            let dest = dst_root.join(rel);
-            if let Some(parent) = dest.parent() {
-                fs::create_dir_all(parent).expect("create parent dir");
-            }
-            fs::copy(&path, &dest)
-                .unwrap_or_else(|e| panic!("copy {} -> {}: {e}", path.display(), dest.display()));
-            println!("cargo:rerun-if-changed={}", path.display());
+            let rel = path.strip_prefix(root).expect("relative asset path");
+            let content =
+                fs::read(&path).unwrap_or_else(|e| panic!("read {}: {e}", path.display()));
+            write_if_changed(&dst_root.join(rel), &content);
             files.push(rel.to_string_lossy().replace('\\', "/"));
         }
     }
+}
+
+fn write_if_changed(path: &Path, content: &[u8]) {
+    match fs::read(path) {
+        Ok(existing) if existing == content => return,
+        Ok(_) => {}
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        Err(error) => panic!("read {}: {error}", path.display()),
+    }
+    fs::write(path, content).unwrap_or_else(|error| panic!("write {}: {error}", path.display()));
 }

@@ -264,4 +264,6 @@ if [ "$BEFORE_HASH" != "$AFTER_HASH" ]; then
 fi
 
 
-exit 0
+# Test 4: Contract-consumer and mixed requirement fulfillment cycles.
+# The Python driver runs every scenario and reports explicit expected/actual diffs.
+python3 "$TEST_DIR/check_fulfillment_cycles.py" "$REQVIRE_BIN" "$TEST_DIR"

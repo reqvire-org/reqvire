@@ -82,6 +82,7 @@ install_remote_skills() {
       ontology-authoring)
         install_remote_skill_file "$SKILL_NAME" "reference/OntologyAuthoring.md" "$STAGED_SKILL_DIR"
         install_remote_skill_file "$SKILL_NAME" "reference/OntologyRefactoring.md" "$STAGED_SKILL_DIR"
+        install_remote_skill_file "$SKILL_NAME" "reference/SemanticQueries.md" "$STAGED_SKILL_DIR"
         ;;
       syseng)
         install_remote_skill_file "$SKILL_NAME" "reference/AddCapability.md" "$STAGED_SKILL_DIR"

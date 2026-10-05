@@ -1,4 +1,4 @@
-//! Canonical parsed-element projection, version 1.
+//! Canonical parsed-element projection, version 2.
 //!
 //! This format is independent of Rust's `Hash` and the runtime Element layout.
 //! Changing its fields, framing, or ordering requires a new encoding version.
@@ -38,7 +38,7 @@ fn canonical_model_bytes(elements: &[&Element]) -> Result<Vec<u8>, ReqvireError>
         .collect::<Result<Vec<_>, ReqvireError>>()?;
     ordered.sort_unstable_by(|a, b| a.0.cmp(&b.0));
     let mut bytes = Vec::new();
-    string(&mut bytes, "reqvire.model-revision.v1");
+    string(&mut bytes, "reqvire.model-revision.v2");
     count(&mut bytes, ordered.len());
     for (_, element) in ordered {
         frame(&mut bytes, &canonical_element_bytes(element)?);
@@ -50,7 +50,7 @@ fn canonical_model_bytes(elements: &[&Element]) -> Result<Vec<u8>, ReqvireError>
 /// Inputs come from the resolved graph, including generated inverse relations.
 pub fn canonical_element_bytes(element: &Element) -> Result<Vec<u8>, ReqvireError> {
     let mut bytes = Vec::new();
-    string(&mut bytes, "reqvire.element.v1");
+    string(&mut bytes, "reqvire.element.v2");
     string(&mut bytes, &identifier(&element.identifier)?);
     string(&mut bytes, &element.name);
     string(&mut bytes, element.element_type.as_str());
@@ -103,6 +103,21 @@ pub fn canonical_element_bytes(element: &Element) -> Result<Vec<u8>, ReqvireErro
     count(&mut bytes, bindings.len());
     for (kind, target) in bindings {
         string(&mut bytes, kind);
+        string(&mut bytes, &target);
+    }
+    let references = element
+        .contract_references
+        .iter()
+        .map(|reference| match &reference.target {
+            ContractBindingTarget::ElementIdentifier(id) => identifier(id),
+            ContractBindingTarget::FilePath(_) => Err(ReqvireError::InvalidContractReference(
+                "Contract References require element identifiers".into(),
+            )),
+        })
+        .collect::<Result<BTreeSet<_>, ReqvireError>>()?;
+    count(&mut bytes, references.len());
+    for target in references {
+        string(&mut bytes, "identifier");
         string(&mut bytes, &target);
     }
     Ok(bytes)

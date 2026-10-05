@@ -3,11 +3,11 @@
 ### Public Documentation Website Source Context Specification
 
 #### Details
-The public documentation website shall treat React page modules, route configuration, layout, sidebar navigation, and static public images as implementation artifacts for website documentation requirements.
+The public documentation website is the documentation surface for `www.reqvire.org`. React page modules, route configuration, layout, sidebar navigation, and static public images are implementation artifacts for website documentation requirements.
 
-Each website page requirement shall link to the page source files that implement its user-facing wording. When a Reqvire model contract, relation rule, ontology workflow, verification rule, or CLI/MCP interface contract changes, change-impact review shall be able to reach the website requirement and then the concrete website page source through `satisfiedBy`.
+Each website page requirement MUST link to its page source files through `satisfiedBy`. A website specification's references to contracts owned by other requirement branches MUST be supported by Contract References on its owning website requirement. This provides the change-impact path from documented contracts to website requirements and concrete page sources.
 
-The website shall not be modeled as the Explorer UI. It is a separate public documentation surface for `www.reqvire.org`, while the Explorer is the model-browsing application served by Reqvire.
+The public documentation website and the Explorer are separate surfaces. The Explorer is the model-browsing application served by Reqvire.
 
 #### Metadata
   * type: specification
@@ -19,9 +19,27 @@ The website shall not be modeled as the Explorer UI. It is a separate public doc
 ### Website Assistant Integration Documentation Specification
 
 #### Details
-The assistant integration pages shall explain MCP, coding-assistant plugins, Codex skills, prompt workflows, MCP endpoints, protocol behavior, and assistant-facing Reqvire context.
+Assistant integration content covers MCP, coding-assistant plugins, Codex skills, prompt workflows, MCP endpoints, protocol behavior, and assistant-facing Reqvire context.
 
-These pages shall be reviewed when MCP tool schemas, prompt guidance, protocol support, or assistant integration workflows change.
+Review triggers include changes to MCP tool schemas, prompt guidance, protocol support, and assistant integration workflows.
+
+Explorer branch-browsing guidance MUST present one branch picker in every serving mode. Inventory lists Git metadata; models load only for the original startup context or an explicitly requested branch, never for every discovered worktree. Selecting a local branch reuses its worktree or prepares an isolated managed worktree when needed, without switching an existing checkout. Worktrees are the internal workspace mechanism. Read-only loads permit valid dirty content and use the existing source/dependency freshness and optimized cache rules. Mutation-enabled serving rejects dirty newly selected targets before loading, using ordinary MCP clean-start, validation, identity, and ownership admission. Already active mutation contexts reuse their accepted model, including accepted uncommitted writes when automatic commits are disabled. Unchanged context data remains cached across branch switches; accepted mutations refresh only their own context. Selection does not alter another client's routing or elevate startup permissions. Successfully prepared worktrees persist on shutdown. Static exports contain one exported snapshot.
+
+The MCP server page MUST explain that `--enable-mutations` persists validated changes without automatic commits by default, and that `--enable-commits` explicitly opts in and requires mutation mode. Standalone and embedded examples MUST show the required flag combinations. Ownership and snapshot behavior stay the same in both modes; the page MUST explain that uncommitted changes require user resolution before restarting mutation-enabled MCP under the clean-start rule. Explain recovery-required operation: accepted model reads remain available with diagnostics, writes/publication and live-file-dependent operations are blocked, Explorer labels its accepted snapshot, and repair/restart follows normal admission.
+
+Explain that leftover lock files alone do not prevent restart: accessible files are reused after their actual holders exit. Lock diagnostics identify the operation, path and OS error; users should inspect server/container permissions or filesystem locking support when indicated, and must not delete lock files to bypass a live owner.
+
+The MCP server page MUST show repeatable `--allow-origin` examples for standalone and embedded MCP, explain the loopback defaults and exact scheme/host/port matching, and distinguish a browser origin from the MCP endpoint URL. It MUST explain the separate roles of bind address, browser origin permission, and deployment authentication according to the transport contracts referenced by its owning requirement.
+
+The MCP server page MUST document automatic acceptance of a non-wildcard bind authority and repeatable `--allow-host` for endpoint aliases, including a reverse-proxy example, wildcard listener behavior, optional port matching, and embedded MCP usage. It MUST distinguish the endpoint hostname from a browser application's origin and explain that non-browser MCP clients normally need host configuration rather than CORS permission.
+
+The MCP server page's coverage guidance and tool-call examples MUST conform to the MCP Coverage Scope Selection Specification and Coverage Scope Specification referenced by the owning requirement. Topics include selector syntax, valid selections, default scope, error responses, and the distinction between report membership and external supporting evidence.
+
+The MCP server page MUST explain `has_contract_references` and `filter_contract_references`, normalized target matching, and composition with other search filters according to the MCP Model Evidence Tools Specification and SearchFiltering contract referenced by its owning requirement. Its example MUST distinguish search selection from change-impact propagation and implementation coverage.
+
+Worktree and publication guidance MUST show local worktree creation from an explicit committed base, opening/listing/removing eligible contexts, routing model requests by returned `worktree_id`, explicit commit, push, PR creation with an explicit base, and PR commenting. Explain the same-repository limit, original-worktree protection, retained branches, clean admission, unchanged original checkout, and independent browser-tab branch selection.
+
+The page MUST distinguish `--enable-mutations`, optional `--enable-commits`, and optional `--enable-github` with `--github-remote` defaulting to `origin`. Show standalone and embedded flag combinations, hidden publishing tools after failed gh startup checks, restart after repairing availability, and actual-operation permission errors. Examples MUST NOT suggest guaranteed write permission, implicit push/fork/merge, or automatic retries after uncertain remote outcomes. Public examples are published together with the implemented and verified tools, not as a claim that this specification alone provides them.
 
 #### Metadata
   * type: specification
@@ -33,9 +51,11 @@ These pages shall be reviewed when MCP tool schemas, prompt guidance, protocol s
 ### Website Command and Workflow Documentation Specification
 
 #### Details
-The workflow documentation pages shall describe CLI commands, report commands, model mutation commands, change-impact analysis, collection, coverage, traces, and advanced workflows using current command names and options.
+Workflow documentation covers CLI commands, report commands, model mutation commands, change-impact analysis, collection, coverage, traces, and advanced workflows using current command names and options.
 
-Workflow examples shall be treated as source context for CLI and report contract changes.
+Workflow examples form part of the source context for CLI and report contract changes.
+
+User-guide coverage examples MUST conform to the CLI Coverage Scope Selection Specification and Coverage Scope Specification referenced by the owning requirement. Examples cover root and nested capability selection, text and JSON reports, the default scope, and invalid selectors. Explorer guidance MUST conform to the referenced Explorer Coverage Scope and Display Specification; topics include scope selection beside the Coverage title, the default ranked hierarchy with parent-before-child rows and coverage-ranked siblings, capability and requirement expansion for nested child rows, terminal requirement metrics and element-detail links, verification coverage labels, labelled Binding consumers links identifying requirements responsible for shared contract obligations, blocker counts beside requirement statuses, and access to implementation evidence through requirement element details, dashboard and sidebar counts, and access to orphan diagnostics. Advanced workflow guidance links to the detailed coverage explanation.
 
 #### Metadata
   * type: specification
@@ -47,9 +67,9 @@ Workflow examples shall be treated as source context for CLI and report contract
 ### Website Home Messaging Specification
 
 #### Details
-The home page shall provide concise public positioning for Reqvire, introduce the semantic engineering framework, summarize the major knowledge categories, and route readers to conceptual and workflow pages.
+Home-page content comprises concise public positioning for Reqvire, an introduction to the semantic engineering framework, major knowledge categories, and links to conceptual and workflow pages.
 
-Homepage wording shall stay aligned with current model vocabulary for ontologies, capabilities, requirements, contracts, verification, implementation artifacts, change impact, and assistant context.
+Homepage wording MUST use current model vocabulary for ontologies, capabilities, requirements, contracts, verification, implementation artifacts, change impact, and assistant context.
 
 #### Metadata
   * type: specification
@@ -61,9 +81,17 @@ Homepage wording shall stay aligned with current model vocabulary for ontologies
 ### Website Implementation Coverage Documentation Specification
 
 #### Details
-The implementation coverage page shall explain how requirements and evidence-backed verifications use `satisfiedBy`, how implementation coverage and verification coverage differ, and how reports identify missing implementation or evidence links.
+Implementation-coverage content covers satisfaction links for requirements and evidence-backed verifications, the distinction between implementation and verification coverage, and report diagnostics for missing implementation or evidence links.
 
-The page shall remain aligned with implementation coverage report semantics and verification coverage semantics.
+Definitions and examples MUST conform to the implementation and verification coverage contracts referenced by the owning requirement.
+
+Implementation guidance MUST define terminal requirements, recursive all-child and all-consumer fulfillment, combined obligations, and the rule that direct parent evidence cannot override a gap. It MUST distinguish terminal percentage units from all-requirement classifications and describe partial evidence and blockers on uncovered requirements.
+
+Implementation guidance MUST explain that cycles in the combined child and contract-consumer dependency graph are validation errors, including within one capability root, and are rejected before coverage reporting even when direct evidence exists.
+
+Binding-placement guidance MUST follow the Contract Bindings Hierarchical Independence Constraint referenced by the owning requirement. It MUST distinguish independently implemented child obligations from a parent obligation applying to the entire requirement subtree, and explain that a common ancestor alone does not justify moving bindings upward.
+
+Scoped coverage guidance uses the referenced Coverage Scope Specification for membership, classification, and supporting evidence. The example includes a selected requirement whose owned contract is consumed by a directly satisfied requirement in another submodel. Its explanation distinguishes report subjects, external evidence, and coverage source according to the referenced contracts.
 
 #### Metadata
   * type: specification
@@ -75,9 +103,15 @@ The page shall remain aligned with implementation coverage report semantics and 
 ### Website Modeling Language Documentation Specification
 
 #### Details
-The modeling-language page shall document Reqvire Markdown structure, element metadata, relation syntax, reserved subsections, and examples using current parser and model-structure contracts.
+Modeling-language content covers Reqvire Markdown structure, element metadata, relation syntax, reserved subsections, and examples consistent with the parser and model-structure contracts referenced by the owning requirement.
 
-The page shall be reviewed when structured Markdown parsing, file identification, reserved subsections, relation syntax, or element addressing changes.
+The reserved-subsection overview and examples MUST use `Contract Bindings` and `Contract References` as defined by the referenced ReservedSubsections and Contract Reference Semantics contracts. Examples MUST distinguish shared implementation obligations from content dependencies and explain element-wide section exclusivity and acyclic reference dependencies.
+
+Terminology MUST use contract dependency as the umbrella term for bindings and references, and define a contract reference as a content dependency that propagates change impact without contributing to the contract owner's implementation fulfillment.
+
+Verification descriptions MUST identify requirements as verification targets and explain capability coverage through requirement roll-up according to the referenced Verification Coverage Specification.
+
+Review triggers include changes to structured Markdown parsing, file identification, reserved subsections, relation syntax, and element addressing.
 
 #### Metadata
   * type: specification
@@ -89,9 +123,9 @@ The page shall be reviewed when structured Markdown parsing, file identification
 ### Website Ontology Documentation Specification
 
 #### Details
-The ontology page shall document ontology elements, concept references, external ontology sources, built-in reserved vocabulary behavior, semantic contracts, validation rules, export modes, and semantic tooling.
+Ontology content covers ontology elements, concept references, external ontology sources, built-in reserved vocabulary behavior, semantic contracts, validation rules, export modes, and semantic tooling. Managed query documentation MUST explain Query and Produces authoring, used ontology context, generated identity/form, portable runtime features, native discovery, deterministic export, and artifact checks. CLI and MCP examples MUST use the shared managed query interfaces. Explorer guidance covers query graph navigation, vocabulary/output links, query details, source access, and visibility filtering.
 
-The page shall distinguish authored ontology/SHACL output, full semantic model context, external ontology source inclusion, and Explorer ontology visualization behavior without implying hidden Turtle prefix injection or hidden semantic triples.
+Terminology distinguishes authored ontology/SHACL output, full semantic model context, external ontology source inclusion, and Explorer ontology visualization behavior. Descriptions MUST NOT imply hidden Turtle prefix injection or hidden semantic triples.
 
 #### Metadata
   * type: specification
@@ -103,9 +137,15 @@ The page shall distinguish authored ontology/SHACL output, full semantic model c
 ### Website Requirements and Contracts Documentation Specification
 
 #### Details
-The requirements and capabilities page shall explain capability scope, requirement obligations, requirement-owned contracts, semantic contracts, governance metadata, concept references, and contract bindings.
+Requirements-and-capabilities content covers capability scope, requirement obligations, requirement-owned contracts, semantic contracts, governance metadata, concept references, and both kinds of contract dependency.
 
-Contract wording shall use the canonical phrasing: contracts define requirements in precise terms, including source basis, specifications, constraints, behavior, state, interfaces, and input/output semantics. Semantic contracts shall be presented as ontology-plane SHACL profiles that constrain requirements through `constrainedBy`/`constrain` and use ontology through `use`/`usedBy`.
+Contract dependency guidance MUST distinguish Contract Bindings, whose consumers contribute to the owner's implementation fulfillment, from Contract References, which identify content dependencies for change-impact review. It MUST show a documentation requirement referencing a contract and explain element-wide section exclusivity and rejection of circular reference dependencies according to the referenced Contract Reference Semantics Specification.
+
+Contract dependency MUST be presented as the umbrella term for both kinds, while the specific authoring subsections retain the names `Contract Bindings` and `Contract References`.
+
+Contract wording MUST follow the relation and semantic-contract specifications referenced by the owning requirement. The terminology distinguishes requirement-owned definitions of source basis, specifications, constraints, behavior, state, interfaces, and input/output semantics from ontology-plane SHACL profiles and their constraint and ontology-use relations.
+
+Binding-placement guidance MUST follow the Contract Bindings Hierarchical Independence Constraint referenced by the owning requirement. It MUST explain placement by implementation responsibility, separate child bindings for independently tracked obligations, parent bindings for whole-subtree obligations, downstream inheritance, and rejection of repeated ancestor/descendant bindings. A concrete example MUST distinguish independent child obligations from an obligation applying to the entire parent subtree.
 
 #### Metadata
   * type: specification
@@ -117,9 +157,13 @@ Contract wording shall use the canonical phrasing: contracts define requirements
 ### Website Semantic Model Documentation Specification
 
 #### Details
-The semantic model page shall explain Reqvire element families, relation semantics, ownership rules, submodel boundaries, concept references, contract bindings, verification links, and implementation evidence.
+Semantic-model content covers Reqvire element families, relation semantics, ownership rules, submodel boundaries, concept references, contract bindings, verification links, and implementation evidence.
 
-This page shall distinguish non-semantic requirement-owned contracts from semantic contracts and shall keep relation vocabulary aligned with the canonical relation families.
+The distinction between requirement-owned contracts and semantic contracts, and the relation vocabulary, MUST conform to the contracts referenced by the owning requirement.
+
+Contract binding scope MUST follow the Contract Bindings Hierarchical Independence Constraint referenced by the owning requirement. Descriptions MUST identify the binding requirement and its descendants as the applicability scope, rather than implying that a binding applies to every requirement in the consuming capability-root submodel. Placement guidance MUST distinguish child implementation responsibility from whole-subtree responsibility at a parent.
+
+Submodel guidance uses the referenced Requirement Submodels Report Specification and Coverage Scope Specification. Topics include validated ownership, cross-scope evidence, accepted selector types for each report, and the branch-reporting rules for capability and requirement selections. Examples MUST preserve the distinction between report scope and model ownership.
 
 #### Metadata
   * type: specification
@@ -131,9 +175,9 @@ This page shall distinguish non-semantic requirement-owned contracts from semant
 ### Website Strategic Positioning Documentation Specification
 
 #### Details
-The strategic positioning page shall explain why Reqvire separates ontologies, capabilities, requirements, contracts, verifications, implementation artifacts, and evidence. It shall describe Reqvire as a semantic engineering framework that supports traceability, verification, change-impact workflows, and AI-assisted implementation context.
+Strategic-positioning content explains the separation of ontologies, capabilities, requirements, contracts, verifications, implementation artifacts, and evidence. Reqvire's positioning is a semantic engineering framework supporting traceability, verification, change-impact workflows, and AI-assisted implementation context.
 
-When relation semantics, contract terminology, semantic-contract rules, or AI-context workflows change, this page shall be reviewed for wording drift.
+Review triggers include changes to relation semantics, contract terminology, semantic-contract rules, and AI-context workflows.
 
 #### Metadata
   * type: specification
@@ -145,9 +189,11 @@ When relation semantics, contract terminology, semantic-contract rules, or AI-co
 ### Website Verification Documentation Specification
 
 #### Details
-The verification page shall explain verification objectives, concrete verification types, evidence-backed verification satisfaction, requirement verification links, and capability coverage rollup philosophy.
+Verification content covers verification objectives, concrete verification types, evidence-backed verification satisfaction, requirement verification links, and capability coverage roll-up.
 
-The page shall keep the verification-objective model current: objectives organize verification work and concrete verification elements provide verification evidence through `verify`/`verifiedBy`; evidence-backed concrete verifications use `satisfiedBy` for test or proof artifacts.
+Terminology and examples MUST conform to the verification coverage, roll-up, and trace contracts referenced by the owning requirement, including the distinction between verification objectives, concrete verifications, and evidence artifacts.
+
+Scoped verification guidance uses the referenced Coverage Scope Specification. Topics include requirement-target membership, capability roll-up, objective exclusion, shared-verification counts within each scope and globally, non-additive submodel totals, and the scope of orphan diagnostics.
 
 #### Metadata
   * type: specification

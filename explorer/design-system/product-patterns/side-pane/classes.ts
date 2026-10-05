@@ -435,41 +435,6 @@ export const baseUX = css`
     display: none;
   }
 
-  .ux-app & {
-    position: relative;
-    inset: auto;
-    z-index: auto;
-    align-self: stretch;
-    flex: 0 0 var(--ux-current-left-width);
-    width: var(--ux-current-left-width);
-    min-width: 0;
-    min-height: 0;
-    height: 100%;
-  }
-
-  .ux-app &.is-collapsed {
-    display: none;
-  }
-
-  .${sideContentClass} {
-    display: flex;
-    min-width: 0;
-    min-height: 0;
-    flex: 1 1 auto;
-    flex-direction: column;
-    width: calc(var(--ux-left-pane-width) - var(--ux-left-pane-collapsed-width));
-  }
-
-  .ux-app & .${sideContentClass} {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    overflow: hidden;
-  }
-
   .${treeTabClass} {
     position: relative;
     display: flex;
@@ -482,10 +447,6 @@ export const baseUX = css`
     border: 0;
     border-left: 0;
     cursor: pointer;
-  }
-
-  .ux-app & .${treeTabClass} {
-    display: none;
   }
 
   &:not(.is-collapsed) .${treeTabLabelClass},
@@ -915,11 +876,15 @@ export const appRootClass = css`
   inset: auto;
   z-index: auto;
   align-self: stretch;
-  flex: 0 0 var(--ux-current-left-width);
-  width: var(--ux-current-left-width);
+  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
   min-height: 0;
-  height: 100%;
+  height: auto;
+
+  &.is-collapsed {
+    display: none;
+  }
 `;
 
 export const skinX = css`
@@ -999,6 +964,18 @@ export const skinX = css`
   .${globalSearchResultsClass} .ontology-graph-result-glyph,
   .ontology-graph-results .ontology-graph-result-glyph {
     background: var(--rdf-resource);
+  }
+
+  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="semantic-query"],
+  .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="semantic-query"] {
+    background: var(--ontology);
+    color: var(--text-strong);
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    font-weight: var(--weight-bold);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="class"],

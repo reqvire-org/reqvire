@@ -148,7 +148,7 @@ export function PaneFilterNavRow({
         <Icon name={icon} />
       </span>
       <span className={cx("ux-pane-nav-row__label", paneNavRowLabelClass)}>{label}</span>
-      <Badge className={cx("ux-pane-nav-row__count", paneNavRowCountClass)}>{count}</Badge>
+      {count !== undefined && count !== null && <Badge className={cx("ux-pane-nav-row__count", paneNavRowCountClass)}>{count}</Badge>}
     </button>
   );
 }

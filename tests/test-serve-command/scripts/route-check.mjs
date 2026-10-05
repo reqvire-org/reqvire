@@ -1,89 +1,11 @@
-import { spawn } from "node:child_process";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
+import { withBrowser, waitFor } from "../../browser.mjs";
 
-// Drive the real served bundle through Chrome's debugging protocol using
-// Node's built-in WebSocket, without adding a separate test framework.
-const [browser, baseUrl, profile] = process.argv.slice(2);
-const child = spawn(browser, [
-  "--headless", "--no-sandbox", "--disable-dev-shm-usage",
-  "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
-  "--no-first-run", "--no-default-browser-check", "--remote-debugging-port=0",
-  "--disable-background-networking", "--disable-background-timer-throttling",
-  "--disable-renderer-backgrounding",
-  `--user-data-dir=${profile}`, "about:blank",
-], { stdio: ["ignore", "ignore", "inherit"] });
-let socket;
-const pause = () => new Promise(resolve => setTimeout(resolve, 50));
-
-try {
-  let port;
-  for (let attempt = 0; attempt < 200; attempt++) {
-    if (child.exitCode !== null) throw new Error(`Browser exited: ${child.exitCode}`);
-    try {
-      port = (await readFile(path.join(profile, "DevToolsActivePort"), "utf8")).split("\n")[0];
-      break;
-    } catch {
-      await pause();
-    }
-  }
-  if (!port) throw new Error("Browser debugging endpoint did not start");
-  const pages = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
-  const page = pages.find(target => target.type === "page");
-  if (!page) throw new Error("Browser has no page target");
-  socket = new WebSocket(page.webSocketDebuggerUrl);
-  await new Promise((resolve, reject) => {
-    socket.addEventListener("open", resolve, { once: true });
-    socket.addEventListener("error", reject, { once: true });
-  });
-  let nextId = 0;
-  const pending = new Map();
-  const events = new Map();
-  socket.addEventListener("message", event => {
-    const message = JSON.parse(event.data);
-    if (message.id) {
-      const request = pending.get(message.id);
-      pending.delete(message.id);
-      if (message.error) request?.reject(new Error(message.error.message));
-      else request?.resolve(message.result);
-    } else if (events.has(message.method)) {
-      events.get(message.method)(message.params);
-      events.delete(message.method);
-    }
-  });
-  function rpc(method, params = {}) {
-    return new Promise((resolve, reject) => {
-      const id = ++nextId;
-      pending.set(id, { resolve, reject });
-      socket.send(JSON.stringify({ id, method, params }));
-    });
-  }
-  async function evaluate(fn, ...args) {
-    const result = await rpc("Runtime.evaluate", {
-      expression: `(${fn.toString()})(${args.map(arg => JSON.stringify(arg)).join(",")})`,
-      awaitPromise: true,
-      returnByValue: true,
-    });
-    if (result.exceptionDetails) throw new Error(result.exceptionDetails.text);
-    return result.result.value;
-  }
-  await rpc("Page.enable");
-
+const [baseUrl, profile] = process.argv.slice(2);
+await withBrowser(profile, async ({ evaluate, navigate: navigatePage }) => {
   let navigationCount = 0;
   async function navigate(route) {
-    const loaded = new Promise(resolve => events.set("Page.loadEventFired", resolve));
-    await rpc("Page.navigate", { url: `${baseUrl}/?route-e2e=${++navigationCount}${route}` });
-    await loaded;
-    await evaluate(async () => {
-      for (let attempt = 0; attempt < 100; attempt++) {
-        if (document.querySelector('[data-product-pattern="app-shell"]')) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          return;
-        }
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-      throw new Error("Explorer shell did not render");
-    });
+    await navigatePage(`${baseUrl}/?route-e2e=${++navigationCount}${route}`);
+    await evaluate(() => new Promise(resolve => setTimeout(resolve, 100)));
   }
   let failed = false;
   async function run(label, check) {
@@ -162,9 +84,31 @@ try {
     await navigate("#/content/specifications/broken%ZZ.md");
     return evaluate(() => document.body.textContent.includes("File not found: specifications/broken%ZZ.md"));
   });
+  await run("Model Flow packaged worker", async () => {
+    await navigate("#/model");
+    await evaluate(() => {
+      const button = [...document.querySelectorAll('[aria-label="Model layout"] button')]
+        .find(button => button.textContent.trim() === "Flow");
+      if (!button) throw new Error("Flow mode is missing");
+      button.click();
+    });
+    const ready = () => evaluate(() => {
+      const flow = document.querySelector('[aria-label="Model flow"]');
+      if (flow?.textContent.includes("Retry layout")) throw new Error("Flow worker failed");
+      return flow?.getAttribute("aria-busy") === "false" && flow.querySelectorAll(".react-flow__node").length > 0;
+    });
+    await waitFor(ready);
+    const original = await evaluate(() => [...document.querySelectorAll(".react-flow__node")].map(node => node.dataset.id).sort());
+    await evaluate(() => [...document.querySelectorAll('[aria-label="Flow direction"] button')]
+      .find(button => button.textContent === "Left to right").click());
+    await waitFor(ready);
+    return evaluate(original => {
+      const ids = [...document.querySelectorAll(".react-flow__node")].map(node => node.dataset.id).sort();
+      const workers = performance.getEntriesByType("resource").filter(entry => entry.name.includes("flowLayout.worker-"));
+      return JSON.stringify(ids) === JSON.stringify(original) && workers.length > 0
+        && workers.every(entry => new URL(entry.name).origin === location.origin);
+    }, original);
+  });
   console.log("completed");
   if (failed) process.exitCode = 1;
-} finally {
-  socket?.close();
-  child.kill();
-}
+});

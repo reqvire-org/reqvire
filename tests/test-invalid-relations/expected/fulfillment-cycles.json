@@ -1,0 +1,151 @@
+{
+  "binding-mutation": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#embedded-endpoint",
+      "Model.md#serve-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "binding-mutation-dry-run": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#embedded-endpoint",
+      "Model.md#serve-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "child-mutation": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#child-requirement",
+      "Model.md#consumer-requirement",
+      "Model.md#parent-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "child-mutation-dry-run": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#child-requirement",
+      "Model.md#consumer-requirement",
+      "Model.md#parent-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "merge-mutation": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#embedded-endpoint",
+      "Model.md#serve-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "merge-mutation-dry-run": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#embedded-endpoint",
+      "Model.md#serve-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "mixed-coverage": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#child-requirement",
+      "Model.md#consumer-requirement",
+      "Model.md#parent-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "mixed-json": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#child-requirement",
+      "Model.md#consumer-requirement",
+      "Model.md#parent-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "repaired-binding": {
+    "all_requirements_covered": true,
+    "coverage_succeeded": true,
+    "sources_unchanged": true,
+    "validation_errors": [],
+    "validation_succeeded": true
+  },
+  "same-root-coverage": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#embedded-endpoint",
+      "Model.md#serve-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "same-root-json": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#embedded-endpoint",
+      "Model.md#serve-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "same-root-reordered": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#embedded-endpoint",
+      "Model.md#serve-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "same-root-text": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#embedded-endpoint",
+      "Model.md#serve-requirement"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  },
+  "shared-dag": {
+    "all_requirements_covered": true,
+    "coverage_succeeded": true,
+    "sources_unchanged": true,
+    "validation_errors": [],
+    "validation_succeeded": true
+  },
+  "three-roots-json": {
+    "coverage_report_emitted": false,
+    "cycle_reported": true,
+    "participants": [
+      "Model.md#requirement-a",
+      "Model.md#requirement-b",
+      "Model.md#requirement-c"
+    ],
+    "rejected": true,
+    "sources_unchanged": true
+  }
+}

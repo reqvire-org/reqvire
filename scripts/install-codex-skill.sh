@@ -83,6 +83,7 @@ install_remote_skills() {
         install_remote_skill_file "$SKILL_NAME" "agents/openai.yaml" "$STAGED_SKILL_DIR"
         install_remote_skill_file "$SKILL_NAME" "references/OntologyAuthoring.md" "$STAGED_SKILL_DIR"
         install_remote_skill_file "$SKILL_NAME" "references/OntologyRefactoring.md" "$STAGED_SKILL_DIR"
+        install_remote_skill_file "$SKILL_NAME" "references/SemanticQueries.md" "$STAGED_SKILL_DIR"
         ;;
       reqvire-syseng)
         install_remote_skill_file "$SKILL_NAME" "references/AddCapability.md" "$STAGED_SKILL_DIR"

@@ -98,7 +98,7 @@ pub fn external_materialization_metadata(
     })
 }
 
-pub(crate) fn materialized_external_subjects(block: &SemanticBlock) -> BTreeSet<String> {
+pub fn materialized_external_subjects(block: &SemanticBlock) -> BTreeSet<String> {
     block
         .quads
         .iter()
@@ -185,7 +185,16 @@ pub(super) fn append_used_external_subset_turtle(
         &used_external_subset_turtle,
         "used external ontology subset projection",
     )?;
-    let used_external_subset_quads = unique_quads(used_external_subset_quads.iter(), seen_quads);
+    append_external_subset_quads(&used_external_subset_quads, output, seen_quads, prefix_map)
+}
+
+pub(super) fn append_external_subset_quads(
+    quads: &[Quad],
+    output: &mut String,
+    seen_quads: &mut BTreeSet<String>,
+    prefix_map: &TurtlePrefixMap,
+) -> Result<(), ReqvireError> {
+    let used_external_subset_quads = unique_quads(quads.iter(), seen_quads);
     if used_external_subset_quads.is_empty() {
         return Ok(());
     }
@@ -422,6 +431,11 @@ pub(super) fn strip_turtle_prefix_declarations(turtle: &str) -> String {
     output.trim_start_matches('\n').to_string()
 }
 
+#[cfg(test)]
+std::thread_local! {
+    pub(crate) static SUBSET_DERIVATIONS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 pub(super) fn materialize_used_external_subset_turtle(
     index: &SemanticIndex,
 ) -> Result<String, ReqvireError> {
@@ -429,6 +443,8 @@ pub(super) fn materialize_used_external_subset_turtle(
         return Ok(String::new());
     }
 
+    #[cfg(test)]
+    SUBSET_DERIVATIONS.set(SUBSET_DERIVATIONS.get() + 1);
     let store = build_external_subset_derivation_store(index)?;
     let subset = o_kernel::subset::build_external_dependency_subset(
         &store,
@@ -514,6 +530,19 @@ pub(super) fn build_external_subset_derivation_store(
         &ontology_projection_turtle,
         GRAPH_GENERATED,
         "ontology projection graph for external subset derivation",
+    )?;
+
+    let term_context = build_semantic_term_context_turtle(index);
+    load_default_graph(
+        &store,
+        &term_context,
+        "semantic term references for external subset derivation",
+    )?;
+    load_named_graph(
+        &store,
+        &term_context,
+        GRAPH_GENERATED,
+        "semantic term references for external subset derivation",
     )?;
 
     let raw_external_turtle = index.to_raw_external_turtle_string()?;
@@ -612,10 +641,12 @@ fn append_model_element_context_turtle(
     let subject = element_iri(element);
     append_model_element_identity_turtle(output, element, &subject);
     append_model_element_relations_turtle(output, element, registry, artifacts, mode, &subject);
+    append_contract_references_turtle(output, element, registry, artifacts, &subject);
     append_model_element_concept_references_turtle(output, element, registry, &subject);
 
     if !element.relations.is_empty()
         || !element.contract_bindings.is_empty()
+        || !element.contract_references.is_empty()
         || !element.concept_references.is_empty()
     {
         output.push('\n');
@@ -760,6 +791,29 @@ fn append_model_element_relations_turtle(
     }
 }
 
+fn append_contract_references_turtle(
+    output: &mut String,
+    element: &Element,
+    registry: &GraphRegistry,
+    artifacts: &mut BTreeSet<String>,
+    subject: &str,
+) {
+    for reference in &element.contract_references {
+        let Some(target) = contract_bindings_target_iri(&reference.target, registry, artifacts)
+        else {
+            continue;
+        };
+        let identifier = reference.target.as_str();
+        append_model_relation_turtle(output, subject, "contract_references", &target, &identifier);
+        append_normalized_relation_family_turtle(output, subject, &target, "contract_references");
+        output.push_str(&format!(
+            "{} reqvire:contractReferencesTargetIdentifier {} .\n",
+            subject,
+            turtle_string(&identifier)
+        ));
+    }
+}
+
 fn append_model_element_concept_references_turtle(
     output: &mut String,
     element: &Element,
@@ -837,6 +891,8 @@ pub(super) fn build_generated_model_turtle(
                 relation.relation_type.name,
             );
         }
+
+        append_contract_references_turtle(&mut output, element, registry, &mut artifacts, &subject);
 
         for contract_bindings in &element.contract_bindings {
             let Some(target_iri) =
@@ -1161,6 +1217,14 @@ pub(super) fn append_normalized_relation_family_turtle(
 
 pub(super) fn build_semantic_term_context_turtle(index: &SemanticIndex) -> String {
     let mut output = String::new();
+    for query in &index.queries {
+        for term in &query.referenced_terms {
+            output.push_str(&format!(
+                "<{}> <{REQVIRE_NS}referencesTerm> <{}> .\n",
+                query.iri, term
+            ));
+        }
+    }
     let mut emitted = BTreeSet::new();
 
     let mut declarations: Vec<_> = index
@@ -1489,7 +1553,7 @@ pub(super) fn turtle_prefix_is_reserved(declaration: &TurtlePrefixDeclaration) -
         || (declaration.source_rank == 0)
 }
 
-pub(super) fn turtle_prefix_source_kind(source_rank: u8) -> &'static str {
+pub(super) const fn turtle_prefix_source_kind(source_rank: u8) -> &'static str {
     match source_rank {
         0 => "built-in",
         10 => "authored-ontology",
@@ -1700,6 +1764,7 @@ pub(super) fn element_type_classes(element_type: &ElementType) -> Vec<&'static s
                 "reqvire:Requirement",
             ]
         }
+        ElementType::SemanticQuery => vec!["owl:NamedIndividual", "reqvire:Element"],
         ElementType::Ontology => {
             vec!["owl:NamedIndividual", "reqvire:Element", "reqvire:Ontology"]
         }

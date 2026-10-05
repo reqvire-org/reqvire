@@ -1,3 +1,4 @@
+import { useWorktreeUrl } from "../store/worktreeUrls";
 import {
   Children,
   isValidElement,
@@ -62,6 +63,7 @@ export function MarkdownContent({
   conceptReferences = [],
   onOpenConceptReference,
 }: MarkdownContentProps) {
+  const contextualUrl = useWorktreeUrl();
   const sourceHtmlPath = spaRouteForFile(sourceFilePath);
   const normalizedMarkdown = normalizeReqvireMarkdown(stripYamlFrontmatter(markdown));
   const content =
@@ -97,10 +99,10 @@ export function MarkdownContent({
           variant === "preview" ? PREVIEW_ALLOWED_ELEMENTS : undefined
         }
         urlTransform={(url) =>
-          sourceUrlTransform(url, {
+          contextualUrl(sourceUrlTransform(url, {
             sourceFilePath,
             sourceHtmlPath,
-          })
+          }))
         }
         components={components}
       >
@@ -130,7 +132,7 @@ export function stripRenderedDetailSections(markdown: string): string {
 }
 
 function isRenderedDetailSectionHeading(line: string): boolean {
-  return /^####\s+(Concept References|Contract Bindings)\s*$/i.test(line.trim());
+  return /^####\s+(Concept References|Contract Bindings|Contract References)\s*$/i.test(line.trim());
 }
 
 function stripYamlFrontmatter(markdown: string): string {

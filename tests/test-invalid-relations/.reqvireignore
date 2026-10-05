@@ -1,3 +1,6 @@
 # Test exclusion patterns
 **/Logical*.md
 **/Physical*.md
+cycle-fixtures/
+expected/
+output/

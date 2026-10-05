@@ -4,8 +4,10 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
 } from "react";
-import { AppShell, type ShellActionItem, type ShellNavigationItem } from "@ds";
+import { AppShell, WorktreeSelector, type ShellActionItem, type ShellNavigationItem } from "@ds";
+import { WorktreeUrlContext } from "./store/worktreeUrls";
 import { useLiveStore } from "./store/useLiveStore";
 import { StoreProvider } from "./store/StoreContext";
 import { MissingStoreNotice } from "./components/MissingStoreNotice";
@@ -13,10 +15,10 @@ import { HelpModal } from "./components/HelpModal";
 import { ElementDetailModal } from "./components/ElementDetailModal";
 import { OntologyNodeDetailModal } from "./components/OntologyNodeDetailModal";
 import { ExplorerSidePane } from "./components/ExplorerSidePane";
-import { ExplorerUiStateProvider } from "./state/ExplorerUiState";
+import { ExplorerUiStateProvider, useExplorerUiState } from "./state/ExplorerUiState";
 import { SearchIndexProvider } from "./search/SearchIndexContext";
 import { useHashRoute } from "./router/useHashRoute";
-import { VIEW_TITLES, type ViewId } from "./router/routes";
+import { VIEW_TITLES, routeForContent, type ViewId } from "./router/routes";
 import { ResourcesView } from "./views/ResourcesView";
 import { SearchView } from "./views/SearchView";
 import { FilesView } from "./views/FilesView";
@@ -43,32 +45,79 @@ const SHELL_NAVIGATION_ITEMS: ShellNavigationItem[] = [
   { value: "coverage", label: "Coverage", icon: "pie-chart" },
 ];
 
-export function App() {
-  const { result, refreshError } = useLiveStore();
+/** Route composition slots let the showcase use the application shell and router. */
+export interface ExplorerViewSlots {
+  main: (props: { onOpenElement: (id: string) => void; onOpenSource: (file: string) => void }) => ReactNode;
+  sidePane: (props: { open: boolean; onToggle: () => void }) => ReactNode;
+}
+
+interface AppProps {
+  viewOverrides?: Partial<Record<ViewId, ExplorerViewSlots>>;
+}
+
+export function App({ viewOverrides }: AppProps = {}) {
+  const live = useLiveStore();
+  return <ExplorerApplication live={live} viewOverrides={viewOverrides} />;
+}
+
+/** Shared application composition; the showcase supplies fixture snapshots in place of HTTP. */
+export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: ReturnType<typeof useLiveStore> }) {
+  const { result, refreshError } = live;
+  const toolbar = live.worktreeRouting ? <WorktreeSelector
+    value={live.selectedWorktree}
+    displayedValue={result.ok ? result.store.project.worktree_id : undefined}
+    choices={live.worktrees.map(item => ({ id: item.worktree_id, branch: item.branch, root: item.workspace_root, available: item.available && (item.explorer_available || item.owned === false) }))}
+    branch={result.ok ? result.store.project.branch : undefined}
+    pending={live.switching && !refreshError}
+    onChange={live.selectWorktree}
+    onOpen={() => { void live.refreshWorktrees(); }}
+  /> : undefined;
 
   if (!result.ok) {
-    return <MissingStoreNotice reason={result.reason} detail={result.detail} />;
+    return <>{toolbar}<MissingStoreNotice reason={result.reason} detail={refreshError ?? result.detail} /></>;
   }
 
   return (
+    <WorktreeUrlContext.Provider value={result.store.project.worktree_id}>
     <StoreProvider store={result.store} schemaMismatch={result.schemaMismatch}>
       <SearchIndexProvider>
         <ExplorerUiStateProvider>
           <ExplorerShell
+            viewOverrides={viewOverrides}
             schemaMismatch={result.schemaMismatch}
             refreshError={refreshError}
+            recoveryWarning={live.recoveryWarning}
+            automaticRefresh={live.automaticRefresh}
+            toolbar={toolbar}
+            worktreeId={result.store.project.worktree_id}
           />
         </ExplorerUiStateProvider>
       </SearchIndexProvider>
     </StoreProvider>
+    </WorktreeUrlContext.Provider>
   );
 }
 
-function ExplorerShell({ schemaMismatch, refreshError }: {
+function ExplorerShell({ schemaMismatch, refreshError, recoveryWarning, automaticRefresh, viewOverrides, toolbar, worktreeId }: AppProps & {
+  recoveryWarning?: string | null;
   schemaMismatch: string | null;
   refreshError: string | null;
+  automaticRefresh: boolean;
+  toolbar?: ReactNode;
+  worktreeId?: string;
 }) {
   const { route, navigateView, openElement, closeElement } = useHashRoute();
+  const { navigationNotice } = useExplorerUiState();
+  const previousContext = useRef(worktreeId);
+  const contextChanged = previousContext.current !== worktreeId;
+  useEffect(() => {
+    if (previousContext.current === worktreeId) return;
+    previousContext.current = worktreeId;
+    if (route.elementId) closeElement(true);
+    setElementDetailHistory([]);
+    setOntologyNodeId(null);
+  }, [worktreeId, route.elementId, closeElement]);
+  const viewOverride = viewOverrides?.[route.view];
   const [helpOpen, setHelpOpen] = useState(false);
   const [leftPaneOpen, setLeftPaneOpen] = useState(true);
   const [leftPaneResizing, setLeftPaneResizing] = useState(false);
@@ -212,6 +261,7 @@ function ExplorerShell({ schemaMismatch, refreshError }: {
       navigationItems={SHELL_NAVIGATION_ITEMS}
       activeNavigationValue={effectiveHeaderView}
       headerActions={headerActions}
+      sidePaneHeader={toolbar}
       leftPaneOpen={leftPaneOpen}
       leftPaneResizing={leftPaneResizing}
       leftPaneWidth={leftPaneWidth}
@@ -224,11 +274,11 @@ function ExplorerShell({ schemaMismatch, refreshError }: {
       onToggleLeftPane={toggleLeftPane}
       onLeftPaneResizePointerDown={handleLeftPaneResizePointerDown}
       onLeftPaneResizeKeyDown={handleLeftPaneResizeKeyDown}
-      mainWarning={refreshError
-        ? `Refresh failed: ${refreshError}. Keeping the last valid view; will retry automatically.`
-        : schemaMismatch ? `Store schema mismatch: ${schemaMismatch}` : null}
+      mainWarning={[recoveryWarning, refreshError
+        ? `Refresh failed: ${refreshError}. Keeping the last valid view. ${automaticRefresh ? "Will retry automatically." : "Select a branch to retry."}`
+        : schemaMismatch ? `Store schema mismatch: ${schemaMismatch}` : navigationNotice].filter(Boolean).join(" ") || null}
       sidePane={
-        <ExplorerSidePane
+        viewOverride ? viewOverride.sidePane({ open: leftPaneOpen, onToggle: toggleLeftPane }) : <ExplorerSidePane
           activeView={sidePaneView}
           open={leftPaneOpen}
           chrome="app"
@@ -243,7 +293,10 @@ function ExplorerShell({ schemaMismatch, refreshError }: {
         />
       }
       main={
-        <ActiveView
+        viewOverride ? viewOverride.main({
+          onOpenElement: handleOpenElement,
+          onOpenSource: (file) => { window.location.hash = routeForContent(file); },
+        }) : <ActiveView
           view={route.view}
           param={route.param}
           onNavigate={navigateView}
@@ -253,7 +306,7 @@ function ExplorerShell({ schemaMismatch, refreshError }: {
     >
       <HelpModal open={helpOpen} onOpenChange={setHelpOpen} />
       <ElementDetailModal
-        identifier={route.elementId}
+        identifier={contextChanged ? null : route.elementId}
         onClose={handleCloseElementDetail}
         onOpenElement={handleOpenRelatedElement}
         onOpenOntologyNode={setOntologyNodeId}
@@ -261,7 +314,7 @@ function ExplorerShell({ schemaMismatch, refreshError }: {
         previousElementLabel={elementDetailHistory.at(-1)}
       />
       <OntologyNodeDetailModal
-        nodeId={ontologyNodeId}
+        nodeId={contextChanged ? null : ontologyNodeId}
         onClose={() => setOntologyNodeId(null)}
       />
     </AppShell>

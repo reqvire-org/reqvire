@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useExplorerUiState } from "../state/ExplorerUiState";
 import type { ExplorerViewProps } from "./types/ExplorerViewProps";
 import { mountOntologyGraph, type OntologyGraphRendererHandle } from "../lib/ontologyGraphRenderer";
@@ -23,12 +23,13 @@ export function OntologiesView(_: Partial<ExplorerViewProps> = {}) {
   const { store } = useStore();
   const ui = useExplorerUiState();
   const graphData = store.ontology?.graph_data;
+  const activeFilters = useMemo(() => [...ui.ontologyFilters], [ui.ontologyFilters]);
 
   if (graphData && (graphData.nodes?.length ?? 0) > 0) {
     return (
       <OntologyGraphRenderer
         graphData={graphData}
-        activeFilters={[...ui.ontologyFilters]}
+        activeFilters={activeFilters}
       />
     );
   }

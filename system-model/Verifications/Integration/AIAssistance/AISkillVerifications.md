@@ -36,6 +36,29 @@ Verify that installed Claude and Codex system engineering skill references can b
   * verify: [AI Skills Markdown Implementation Artifacts](../../../Integration/AIAssistance/AISkills.md#ai-skills-markdown-implementation-artifacts)
 ---
 
+### AI Skill Contract Dependency Guidance Inspection
+
+Inspect the delivered Claude and Codex guidance for correct contract ownership, implementation obligations, and review dependencies.
+
+#### Details
+- Confirm that contract dependency names the umbrella category, Contract Bindings identify shared implementation obligations, and Contract References identify content dependencies for change-impact review. The specific Markdown section names and command examples retain their canonical names.
+- Compare authoring, extraction, ownership, submodel-refactoring, collection, search, mutation, and audit guidance in both skill packages. Context-only consumers use Contract References; requirements responsible for shared implementation obligations use Contract Bindings; the owning requirement uses `definedBy`.
+- Follow examples involving a kernel-service consumer, a coverage report, documentation, and a shared endpoint obligation. Confirm the examples preserve the intended fulfillment direction and explain changes to implementation coverage when a binding becomes a reference.
+- Confirm references remain visible to collection, search, and change-impact review while contributing no implementation evidence, blockers, terminal dependencies, or coverage units.
+- Confirm guidance rejects mixed binding/reference sections on one requirement, file-path reference targets, self-dependencies, and cycles through references, bindings, or requirement ancestry.
+- Confirm command examples use `referenceContract`, `unlink`, and the dedicated binding/reference search filters with identifier globs. Confirm both installed packages retain the same dependency semantics and the Claude marketplace advertises the updated plugin version.
+
+Review artifacts: [SKILL.md](../../../../claude-plugins/skills/syseng/SKILL.md), [SKILL.md](../../../../codex-skills/reqvire-syseng/SKILL.md).
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [AI Skill Installer Verification Objective](#ai-skill-installer-verification-objective)
+  * verify: [AI Skills Instruction Contracts](../../../Integration/AIAssistance/AISkills.md#ai-skills-instruction-contracts)
+  * verify: [AI Skills Markdown Implementation Artifacts](../../../Integration/AIAssistance/AISkills.md#ai-skills-markdown-implementation-artifacts)
+---
+
 ### AI Skill Installer Manifest Verification
 
 Verify that local and remote assistant skill installers install exactly the files present in the checked-in Claude and Codex skill source trees.

@@ -11,10 +11,24 @@ From the root directory:
 ./tests/run_tests.sh
 ```
 
-The runner always prints a final benchmark summary. The elapsed time is the
-sum of time spent inside `reqvire` binary invocations; fixture copy, temporary
-git setup, shell assertions, and diff checks are not included. Each test result
-line also shows the total Reqvire time for all Reqvire calls made by that test.
+The runner prints suite wall time separately from accumulated `reqvire` process
+time. Each test result includes wall time (fixture setup and execution), Reqvire
+invocation time, and invocation count. Overlapping server lifetimes may make
+accumulated process time exceed wall time; these are different measurements.
+
+Each run prints its unique log directory under `/tmp/reqvire-test-logs` (or
+`REQVIRE_TEST_LOG_DIR` when set). Logs and `invocations.tsv`/`tests.tsv` remain
+available after fixture cleanup. Successful fixtures are removed; failed
+fixtures are retained at the printed paths. Interrupting the runner stops its
+active test process group and removes the interrupted fixture.
+
+Browser suites use `tests/browser.mjs` for executable discovery, CDP, and profile
+lifecycle. Use `withBrowser(profile, check)` with a fresh profile under the test's
+output directory. It honors `REQVIRE_TEST_BROWSER`, then `CHROME_BIN`, then PATH;
+explicit invalid settings fail. Execute suite scripts from their repository paths
+so shared imports resolve, and pass the temporary fixture paths as arguments.
+Keep suite-specific browser assertions in the suite; do not copy the transport or
+launch/cleanup implementation.
 
 ### Run Specific Test
 ```bash
@@ -94,7 +108,8 @@ The test runner (`run_tests.sh`):
 3. Initializes git repository
 4. Runs `test.sh` in test context
 5. Reports pass/fail results
-6. Cleans up temporary files
+6. Removes successful fixtures and retains failed fixtures at their reported paths
+7. Retains logs and timing records in an independent directory per run
 
 ## Common Test Patterns
 
@@ -348,8 +363,8 @@ echo "$OUTPUT" | jq '.traces | length'
 
 ### View Test Output
 ```bash
-# Test logs are saved to test_results.log
-cat /path/to/test/directory/test_results.log
+# Use the actual unique directory printed by the runner
+cat /tmp/reqvire-test-logs/run-XXXXXX/test-capability-name.log
 ```
 
 ### Run Test Manually
@@ -384,7 +399,7 @@ cat tests/test-capability-name/test.sh
 6. **Error Messages**: Provide clear failure messages with context
 7. **Documentation**: Include acceptance criteria in test scripts
 8. **Git Setup**: Tests run in temporary git repositories
-9. **Cleanup**: Test runner handles cleanup automatically
+9. **Cleanup**: Test scripts stop their own servers and browser processes, but do not remove `$TEST_DIR`. The runner removes successful fixtures and retains failed fixtures for diagnosis.
 10. **Fast Execution**: Keep tests efficient for CI/CD pipelines
 11. **Silent Success**: Never add debug or echo outputs except for failure messages - tests should be silent on success
 

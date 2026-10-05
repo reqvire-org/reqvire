@@ -1,6 +1,6 @@
 use super::*;
 
-pub(crate) fn workspace_status(
+pub fn workspace_status(
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
 ) -> Result<Value, ReqvireError> {
@@ -33,7 +33,7 @@ pub(crate) fn workspace_status(
     }))
 }
 
-pub(crate) fn model_revision(
+pub fn model_revision(
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
 ) -> Result<Value, ReqvireError> {
@@ -53,7 +53,7 @@ pub(crate) fn model_revision(
     }))
 }
 
-pub(crate) fn read_element(
+pub fn read_element(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -79,7 +79,7 @@ pub(crate) fn read_element(
     serde_json::to_value(element).map_err(ReqvireError::from)
 }
 
-pub(crate) fn search_tool(
+pub fn search_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -98,6 +98,10 @@ pub(crate) fn search_tool(
         string_arg(args, "not_have_relations").as_deref(),
         bool_arg(args, "has_contract_bindings", false),
         string_arg(args, "filter_contract_bindings").as_deref(),
+    )?
+    .with_contract_references(
+        bool_arg(args, "has_contract_references", false),
+        string_arg(args, "filter_contract_references").as_deref(),
     )?;
     parse_json_string(crate::operations::search_report(
         &model.graph_registry,
@@ -107,7 +111,7 @@ pub(crate) fn search_tool(
     )?)
 }
 
-pub(crate) fn model_tool(
+pub fn model_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -128,7 +132,7 @@ pub(crate) fn model_tool(
     )?)
 }
 
-pub(crate) fn containment_tool(
+pub fn containment_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -140,7 +144,7 @@ pub(crate) fn containment_tool(
     serde_json::to_value(hierarchy).map_err(ReqvireError::from)
 }
 
-pub(crate) fn collect_tool(
+pub fn collect_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -167,7 +171,7 @@ pub(crate) fn collect_tool(
     )?)
 }
 
-pub(crate) fn submodels_tool(
+pub fn submodels_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -179,7 +183,7 @@ pub(crate) fn submodels_tool(
     parse_json_string(report.to_json_string())
 }
 
-pub(crate) fn sparql_tool(
+pub fn sparql_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
     with_size_estimates: bool,
@@ -195,9 +199,9 @@ pub(crate) fn sparql_tool(
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
     let visible_index =
-        semantic_index_with_external_visibility(&semantic_store.index, include_external)?;
+        semantic_index_with_external_visibility(semantic_store, include_external)?;
     let external_metadata = semantic_contract::external_materialization_metadata(
-        &semantic_store.index,
+        semantic_store.index(),
         &visible_index,
         include_external,
     );
@@ -206,7 +210,7 @@ pub(crate) fn sparql_tool(
     let results = SparqlEvaluator::new()
         .parse_query(&query)
         .map_err(|error| ReqvireError::ProcessError(format!("Invalid SPARQL query: {}", error)))?
-        .on_store(semantic_store.store(full, include_external))
+        .on_store(semantic_store.store(full, include_external)?)
         .execute()
         .map_err(|error| ReqvireError::ProcessError(format!("SPARQL query failed: {}", error)))?;
 
@@ -272,10 +276,10 @@ pub(crate) fn sparql_tool(
             "external_counts".to_string(),
             external_metadata["external_counts"].clone(),
         );
-        object.insert("summary".to_string(), json!(semantic_store.index.summary));
+        object.insert("summary".to_string(), json!(semantic_store.index().summary));
         object.insert(
             "diagnostics".to_string(),
-            json!(semantic_store.index.diagnostics),
+            json!(semantic_store.index().diagnostics),
         );
         object.insert(
             "model_fingerprint".to_string(),
@@ -342,7 +346,7 @@ fn rdf_term_json(term: &Term) -> Value {
     }
 }
 
-pub(crate) fn lint_tool(
+pub fn lint_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -354,13 +358,19 @@ pub(crate) fn lint_tool(
     ))
 }
 
-pub(crate) fn coverage_tool(excluded_filename_patterns: &GlobSet) -> Result<Value, ReqvireError> {
+pub fn coverage_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+) -> Result<Value, ReqvireError> {
     let model = crate::operations::load_model(excluded_filename_patterns)?;
-    let report = crate::operations::coverage_report(&model.graph_registry);
+    let report = crate::operations::scoped_coverage_report(
+        &model.graph_registry,
+        string_arg(args, "from").as_deref(),
+    )?;
     parse_json_string(report.to_json_string())
 }
 
-pub(crate) fn traces_tool(
+pub fn traces_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -374,13 +384,13 @@ pub(crate) fn traces_tool(
     serde_json::to_value(report).map_err(ReqvireError::from)
 }
 
-pub(crate) fn resources_tool(excluded_filename_patterns: &GlobSet) -> Result<Value, ReqvireError> {
+pub fn resources_tool(excluded_filename_patterns: &GlobSet) -> Result<Value, ReqvireError> {
     let model = crate::operations::load_model(excluded_filename_patterns)?;
     let report = crate::operations::resources_report(&model.graph_registry);
     parse_json_string(report.to_json_string())
 }
 
-pub(crate) fn change_impact_tool(
+pub fn change_impact_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
@@ -394,7 +404,7 @@ pub(crate) fn change_impact_tool(
     parse_json_string(report.to_json_string(&base_url, &current_commit, &git_commit))
 }
 
-pub(crate) fn format_tool(
+pub fn format_tool(
     args: &Value,
     enable_mutations: bool,
     excluded_filename_patterns: &GlobSet,

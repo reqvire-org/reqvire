@@ -11,6 +11,8 @@ Detailed inverse, symmetric, reciprocal, non-mutation, consumer, and ontology-pr
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [index.rs](../../../crates/reqvire-core/src/semantic_contract/index.rs)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/SemanticExport.md#semantic-export-projection-shape)
   * definedBy: [Concept Relation Projection Specification](Specifications.md#concept-relation-projection-specification)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
@@ -30,6 +32,8 @@ Detailed raw-source exclusion, used-subset exposure, layer behavior, API visibil
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [semantic_store.rs](../../../crates/reqvire-core/src/semantic_store.rs)
+  * satisfiedBy: [export.rs](../../../crates/reqvire-core/src/semantic_contract/export.rs)
   * definedBy: [External Vocabulary Exposure Policy Specification](Specifications.md#external-vocabulary-exposure-policy-specification)
   * derivedFrom: [External Vocabulary Description Construction](../../Semantics/SemanticModelRequirements.md#external-vocabulary-description-construction)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
@@ -56,30 +60,114 @@ When requested the system shall provide human readable and machine readable Syst
   * derive: [JSON Element Size Estimate Exposure](#json-element-size-estimate-exposure)
   * derive: [Model Structure and Summaries](#model-structure-and-summaries)
   * derive: [Provide Validation Reports](#provide-validation-reports)
-  * derive: [Requirement Implementation Coverage Report](#requirement-implementation-coverage-report)
   * derive: [Resources Report](#resources-report)
-  * derive: [Verification Coverage Report](#verification-coverage-report)
   * specify: [Provide Reports](../ReportsAndQueryFeature.md#provide-reports)
 ---
 
 ### Collect Capability and Requirement Context
 
-The system shall collect and consolidate context from a capability or requirement element, including directional capability and requirement traversal, authored concept references, requirement-owned `definedBy` targets, reused requirement contract contents, and source citations in text or JSON format.
+The system SHALL collect capability and requirement context with source citations in text or JSON format.
 
 #### Details
-The system shall define:
-- Content collection rules for elements, definedBy targets, and contract_bindings
-- Output format specifications for text and JSON modes
-- Direction-based traversal over capability hierarchy, requirement hierarchy, and the `specify`/`specifiedBy` bridge where defined by the collect traversal specification
+WHEN a caller selects a traversal direction, the system SHALL collect the applicable capability and requirement hierarchy according to the owned collection contract.
+
+WHEN collected elements own or consume contracts, the system SHALL include their contract content and distinguish ownership, Contract Bindings, and Contract References according to the owned and bound output contracts.
+
+WHEN collected elements author concept references, the system SHALL include their concept context.
+
+WHEN a referenced contract is reached through multiple collection paths, the system SHALL include its content and source citation once.
 
 #### Metadata
   * type: requirement
+
+#### Contract Bindings
+  * [Contract Reference Evidence Projection Specification](Specifications.md#contract-reference-evidence-projection-specification)
 
 #### Relations
   * definedBy: [Collect Content Specification](Specifications.md#collect-content-specification)
   * definedBy: [Collect Output Format Specification](Specifications.md#collect-output-format-specification)
   * derivedFrom: [Model Reports](#model-reports)
   * satisfiedBy: [collect.rs](../../../crates/reqvire-core/src/report/collect.rs)
+---
+
+### Coverage Reports
+
+When coverage is requested, the system SHALL report implementation coverage and verification coverage as distinct assessments of modeled requirements.
+
+#### Details
+The system SHALL report capability implementation and verification coverage through the corresponding requirement and capability roll-up rules.
+
+When a capability scope is selected, the system SHALL apply that scope consistently to both coverage assessments.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Model Reports](#model-reports)
+---
+
+### Requirement Implementation Coverage Report
+
+When implementation coverage is requested, the system SHALL report requirement implementation coverage according to the referenced implementation coverage logic specification.
+
+#### Details
+The system SHALL present implementation coverage scope, classifications, supporting evidence, grouping, and percentages according to its output specification.
+
+When reporting an individual requirement, the system SHALL include its aggregate verification-leaf and implementation-terminal counts evaluated over the full model.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Verification Coverage Specification](Specifications.md#verification-coverage-specification)
+  * [Requirement Implementation Coverage Logic Specification](../../Implementation/Traceability/Specifications.md#requirement-implementation-coverage-logic-specification)
+
+#### Relations
+  * definedBy: [Implementation Coverage Output Structure Specification](Specifications.md#implementation-coverage-output-structure-specification)
+  * derivedFrom: [Coverage Reports](#coverage-reports)
+  * satisfiedBy: [coverage.rs](../../../crates/reqvire-core/src/report/coverage.rs)
+---
+
+### Scoped Coverage Reporting
+
+When a capability scope is selected, the system SHALL report verification and implementation coverage for that capability subtree while preserving each included requirement's whole-model coverage classification and supporting evidence for the same validated model snapshot.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Capability Model Structure Specification](../../ModelStructure/Specifications.md#capability-model-structure-specification)
+  * [Requirement Submodels Report Specification](Specifications.md#requirement-submodels-report-specification)
+  * [Requirement Implementation Coverage Logic Specification](../../Implementation/Traceability/Specifications.md#requirement-implementation-coverage-logic-specification)
+  * [Verification Coverage Specification](Specifications.md#verification-coverage-specification)
+  * [Implementation Coverage Output Structure Specification](Specifications.md#implementation-coverage-output-structure-specification)
+
+#### Relations
+  * derivedFrom: [Coverage Reports](#coverage-reports)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/operations/mod.rs)
+  * satisfiedBy: [coverage.rs](../../../crates/reqvire-core/src/report/coverage.rs)
+  * satisfiedBy: [submodels.rs](../../../crates/reqvire-core/src/report/submodels.rs)
+---
+
+### Verification Coverage Report
+
+The system shall generate verification coverage reports focusing on leaf requirements, showing the percentage and details of verified and unverified requirements following clearly defined coverage philosophy.
+
+#### Details
+Detailed leaf-requirement scope, verification artifact handling, objective exclusion, grouping, output, and percentage rules shall follow the associated behavior and specification.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Verification Roll-up Specification](../../Verification/Traceability/Specifications.md#verification-roll-up-specification)
+  * [Verification Type Selection Guidelines](../../ModelStructure/Specifications.md#verification-type-selection-guidelines)
+
+#### Relations
+  * satisfiedBy: [coverage.rs](../../../crates/reqvire-core/src/report/coverage.rs)
+  * definedBy: [Verification Coverage Philosophy Behavior](Behaviors.md#verification-coverage-philosophy-behavior)
+  * definedBy: [Verification Coverage Specification](Specifications.md#verification-coverage-specification)
+  * derivedFrom: [Coverage Reports](#coverage-reports)
 ---
 
 ### JSON Element Size Estimate Exposure
@@ -125,11 +213,12 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Containment Specification](../../ModelStructure/Specifications.md#containment-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
 #### Relations
+  * satisfiedBy: [containment.rs](../../../crates/reqvire-core/src/containment.rs)
   * definedBy: [Containment View Report Contract Specification](Specifications.md#containment-view-report-contract-specification)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
   * verifiedBy: [Containment View Design Documents Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#containment-view-design-documents-test)
@@ -217,38 +306,33 @@ Detailed scope resolution, filtered capability/requirement behavior, empty-submo
 
 ### Search Report Generator
 
-The system shall implement a search report generator with comprehensive filtering and element type tracking.
+The system SHALL implement a search report generator with comprehensive filtering and element type tracking.
 
 #### Details
-The search report must include file-level, section-level, and element-level information.
+The system SHALL include file-level, section-level, and element-level information in search reports.
 
-Search JSON shall expose parsed semantic model fields when present. Ontology elements expose `ontology`; semantic-contract elements expose `semantic_contract`. Short mode may omit these parsed semantic fields.
+WHEN full search results contain ontology or semantic-contract elements, the system SHALL expose their parsed semantic model fields.
 
-The system shall define comprehensive search filtering capabilities:
-- By file path patterns
-- By element name patterns
-- By element type
-- By requirement governance metadata values
-- By element content patterns
-- By presence/absence of relations
-- By presence/absence of contract_bindings
+WHEN callers supply file, name, type, governance metadata, content, relation-presence, or contract-dependency filters, the system SHALL select elements according to all active search filters.
 
-Search result element evidence shall include effective requirement governance metadata when applicable.
-Search result summaries shall include effective governance metadata counts for matched governance-bearing elements.
+WHEN a caller supplies contract-reference presence or target filters, the system SHALL select requirements by their authored Contract References and combine these filters with the other active search filters.
 
-The system shall define custom element type tracking:
-- Identify types not in standard categories
-- Report custom types with counts
+WHEN a caller supplies an invalid contract-reference target pattern, the system SHALL report the invalid filter.
 
-Search filter tokens, collect source tokens, coverage source tokens, submodel report concepts, and report-command kind tokens are defined by the reporting, search, coverage, and interface contracts that emit or consume them.
+WHEN matched elements carry governance metadata, the system SHALL include their effective metadata and corresponding summary counts.
+
+WHEN matched elements have custom types, the system SHALL identify those types and report their counts.
+
+The system SHALL use the filtering and output vocabulary defined by its owned and referenced contracts.
 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
+  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
 
 #### Relations
   * definedBy: [SearchFiltering](SearchFiltering.md#searchfiltering)
@@ -317,23 +401,6 @@ The system shall implement a validation report generator that compiles and forma
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
 ---
 
-### Requirement Implementation Coverage Report
-
-The system shall generate requirement implementation coverage reports that identify which requirements are implemented using direct `satisfiedBy` evidence and contract consumption evidence.
-
-#### Details
-Detailed scope, source classification, evidence, output, grouping, and percentage formatting rules shall follow the associated behavior and specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Implementation Coverage Output Structure Specification](Specifications.md#implementation-coverage-output-structure-specification)
-  * definedBy: [Requirement Implementation Coverage Logic Specification](Specifications.md#requirement-implementation-coverage-logic-specification)
-  * derivedFrom: [Model Reports](#model-reports)
-  * satisfiedBy: [coverage.rs](../../../crates/reqvire-core/src/report/coverage.rs)
----
-
 ### Resources Report
 
 The system shall provide a resources report inventorying InternalPath relation targets that resolve to existing workspace-root-relative eligible Git-worktree files and contract_bindings targets that resolve to model element identifiers.
@@ -348,26 +415,6 @@ The system shall provide a resources report inventorying InternalPath relation t
   * verifiedBy: [Resources Report Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#resources-report-verification)
 ---
 
-### Verification Coverage Report
-
-The system shall generate verification coverage reports focusing on leaf requirements, showing the percentage and details of verified and unverified requirements following clearly defined coverage philosophy.
-
-#### Details
-Detailed leaf-requirement scope, verification artifact handling, objective exclusion, grouping, output, and percentage rules shall follow the associated behavior and specification.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Verification Roll-up Specification](../../Verification/Traceability/Specifications.md#verification-roll-up-specification)
-  * [Verification Type Selection Guidelines](../../ModelStructure/Specifications.md#verification-type-selection-guidelines)
-
-#### Relations
-  * definedBy: [Verification Coverage Philosophy Behavior](Behaviors.md#verification-coverage-philosophy-behavior)
-  * definedBy: [Verification Coverage Specification](Specifications.md#verification-coverage-specification)
-  * derivedFrom: [Model Reports](#model-reports)
----
-
 ### Trace Projection Data Generation
 
 The system shall materialize trace projection data showing verification traceability from concrete verifications through verified requirements and owning capability context, including grouped trace rows and per-verification roll-up diagram data for downstream report consumers.
@@ -375,11 +422,13 @@ The system shall materialize trace projection data showing verification traceabi
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
-  * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
+  * satisfiedBy: [verification_trace.rs](../../../crates/reqvire-core/src/verification_trace.rs)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
+  * derivedFrom: [Model Reports](#model-reports)
 ---
 
 ### Ontology Collection Output
@@ -393,6 +442,8 @@ Detailed semantic context consumption, serialization choices, command/API flags,
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [export.rs](../../../crates/reqvire-core/src/semantic_contract/export.rs)
+  * satisfiedBy: [semantic_tools.rs](../../../crates/reqvire-core/src/tool_interface/semantic_tools.rs)
   * definedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
   * derivedFrom: [Prefixed Turtle Semantic Export](../../Semantics/SemanticModelRequirements.md#prefixed-turtle-semantic-export)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
@@ -410,11 +461,13 @@ Detailed projection storage, generation timing, source/provenance fields, SHACL 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
   * [Ontology Construct Classification Specification](../../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
 
 #### Relations
+  * satisfiedBy: [export.rs](../../../crates/reqvire-core/src/semantic_contract/export.rs)
+  * satisfiedBy: [semantic_store.rs](../../../crates/reqvire-core/src/semantic_store.rs)
   * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/SemanticExport.md#semantic-export-projection-shape)
   * definedBy: [Ontology Projection Subgraph Materialization Specification](Specifications.md#ontology-projection-subgraph-materialization-specification)
   * specify: [Semantic Model Export](../ReportsAndQueryFeature.md#semantic-model-export)
@@ -423,10 +476,12 @@ Detailed projection storage, generation timing, source/provenance fields, SHACL 
 
 ### Semantic Relation Family Projection
 
-The system shall materialize ontology-defined relation-family projection facts as part of full semantic model export so semantic search can query relation meaning independently of raw Markdown relation token direction.
+The system SHALL materialize ontology-defined relation-family projection facts as part of semantic model export.
 
 #### Details
-Detailed relation-record, canonicalization, construct-query, implementation-boundary, non-mutation, and contract_bindings projection rules shall follow the associated specification.
+WHEN authored relations or contract dependencies are exported, the system SHALL preserve their source-target pairing and apply the canonical direction and predicates defined by the relation-family contracts.
+
+WHEN Contract References are exported, the system SHALL expose their distinct content-dependency facts according to the bound evidence projection contract.
 
 #### Concept References
   * [Relation family construct query](../../Thesaurus/Thesaurus.md#relation-family-construct-query)
@@ -434,6 +489,9 @@ Detailed relation-record, canonicalization, construct-query, implementation-boun
 
 #### Metadata
   * type: requirement
+
+#### Contract Bindings
+  * [Contract Reference Evidence Projection Specification](Specifications.md#contract-reference-evidence-projection-specification)
 
 #### Relations
   * constrainedBy: [Semantic Export Projection Shape](../../Ontologies/SemanticExport.md#semantic-export-projection-shape)
@@ -460,4 +518,32 @@ When tracing structural changes, the system shall analyze the System model and d
   * derive: [Change Impact Detection](../../Processing/ChangeImpact/ChangeImpactRequirements.md#change-impact-detection)
   * specify: [Trace Changes in System Model](../../Processing/RelationsAndImpactFeature.md#trace-changes-in-system-model)
   * verifiedBy: [Structural Change Reports Verification](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#structural-change-reports-verification)
+---
+
+### Contract Reference Evidence Projection
+
+When publishing element evidence, the system SHALL identify Contract References separately from Contract Bindings.
+
+#### Details
+When collecting requirement context, the system SHALL include the content of explicitly referenced contracts.
+
+When exporting semantic model facts, the system SHALL expose Contract References with their distinct forward and inverse predicates.
+
+When rendering element details, the system SHALL present referenced contracts as navigable dependencies for change-impact review.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
+
+#### Relations
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
+  * satisfiedBy: [search.rs](../../../crates/reqvire-core/src/search.rs)
+  * satisfiedBy: [containment.rs](../../../crates/reqvire-core/src/containment.rs)
+  * derivedFrom: [Model Reports](#model-reports)
+  * definedBy: [Contract Reference Evidence Projection Specification](Specifications.md#contract-reference-evidence-projection-specification)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
+  * satisfiedBy: [collect.rs](../../../crates/reqvire-core/src/report/collect.rs)
+  * satisfiedBy: [export.rs](../../../crates/reqvire-core/src/semantic_contract/export.rs)
 ---

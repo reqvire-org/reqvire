@@ -263,6 +263,15 @@ describe("native visualization parity views", () => {
     expect(screen.getByText("Concept scheme")).toBeTruthy();
   });
 
+  it("uses the canonical Thesaurus projection without reconstructing ontology graph concepts", () => {
+    const store = { ...devFixture, ontology: { ...devFixture.ontology, graph_data: { nodes: [], edges: [] } } };
+    renderWithStore(<ExplorerSidePane activeView="thesaurus" open onToggle={vi.fn()}
+      onNavigate={vi.fn()} onOpenElement={vi.fn()} onOpenOntologyNode={vi.fn()} />, store);
+    const tree = screen.getByRole("tree", { name: "Concept hierarchy" });
+    expect(within(tree).getByText("Example Thesaurus")).toBeTruthy();
+    expect(within(tree).getByText("Service Endpoint")).toBeTruthy();
+  });
+
   it("uses the Explorer pane as the thesaurus concept tree", () => {
     renderWithStore(
       <ExplorerSidePane

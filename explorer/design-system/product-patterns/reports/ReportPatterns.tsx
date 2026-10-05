@@ -289,7 +289,8 @@ const coverageDashboardBaseUX = css`
   .coverage-header {
     display: flex;
     scroll-margin-top: var(--space-12);
-    align-items: flex-start;
+    align-items: flex-end;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--space-10);
     padding-bottom: var(--space-10);
@@ -328,6 +329,32 @@ const coverageDashboardBaseUX = css`
     gap: var(--space-8);
   }
 
+  .coverage-controls {
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--space-8);
+  }
+
+  .coverage-controls__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-width: 100%;
+    font-size: var(--text-caption);
+  }
+
+  .coverage-controls select {
+    max-width: 100%;
+    min-height: var(--control-md);
+    padding: var(--space-4) var(--space-6);
+    border: var(--border-w) solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    font: inherit;
+  }
+
   .coverage-kpi-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -362,6 +389,30 @@ const coverageDashboardBaseUX = css`
     display: flex;
     align-items: center;
     gap: var(--space-5);
+  }
+
+  .coverage-capability-row[data-coverage-indent="1"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 1);
+  }
+
+  .coverage-capability-row[data-coverage-indent="2"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 2);
+  }
+
+  .coverage-capability-row[data-coverage-indent="3"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 3);
+  }
+
+  .coverage-capability-row[data-coverage-indent="4"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 4);
+  }
+
+  .coverage-capability-row[data-coverage-indent="5"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 5);
+  }
+
+  .coverage-capability-row[data-coverage-indent="6"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 6);
   }
 
   .coverage-panel__head {
@@ -637,6 +688,11 @@ const coverageDashboardBaseUX = css`
 
 const coverageDashboardSkinX = css`
   background: var(--bg-surface);
+
+  .coverage-controls select {
+    background: var(--bg-surface);
+    color: var(--text-body);
+  }
 
   .coverage-header {
     border-bottom: var(--border-w) solid var(--border-subtle);
@@ -925,10 +981,12 @@ export function CoverageHeader({
   id,
   title,
   eyebrow,
+  controls,
 }: {
   id?: string;
   title: ReactNode;
   eyebrow: ReactNode;
+  controls?: ReactNode;
 }) {
   return (
     <header id={id} className="coverage-header">
@@ -936,6 +994,7 @@ export function CoverageHeader({
         <span className="coverage-eyebrow">{eyebrow}</span>
         <h1>{title}</h1>
       </div>
+      {controls}
     </header>
   );
 }
@@ -1129,21 +1188,40 @@ export function CoverageCapabilityList({ children }: { children: ReactNode }) {
   return <div className="coverage-capability-list">{children}</div>;
 }
 
+export function CoverageControls({ scope, onScopeChange, scopes, disabled = false }: {
+  scope: string;
+  onScopeChange: (scope: string) => void;
+  scopes: { identifier: string; name: string }[];
+  disabled?: boolean;
+}) {
+  return <div className="coverage-controls">
+    <label className="coverage-controls__field">Scope
+      <select aria-label="Scope" value={scope} disabled={disabled} onChange={event => onScopeChange(event.target.value)}>
+        <option value="">Whole model</option>
+        {scopes.map(item => <option key={item.identifier} value={item.identifier}>{item.name}</option>)}
+      </select>
+    </label>
+  </div>;
+}
+
 export interface CoverageCapabilityRowProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "name" | "style"> {
   name: ReactNode;
   mark?: ReactNode;
   children: ReactNode;
+  depth?: number;
 }
 
 export function CoverageCapabilityRow({
   name,
   mark,
   children,
+  depth = 0,
   className = "",
   ...props
 }: CoverageCapabilityRowProps) {
   return (
-    <button type="button" className={cx("coverage-capability-row", className)} {...props}>
+    <button type="button" className={cx("coverage-capability-row", className)}
+      data-coverage-depth={depth} data-coverage-indent={Math.min(Math.max(0, depth), 6)} {...props}>
       <div className="coverage-capability-row__title">
         <ElementIcon type="capability" size="sm" />
         <span>{name}</span>

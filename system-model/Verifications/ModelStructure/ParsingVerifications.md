@@ -78,6 +78,32 @@ This test verifies that the system rejects Contract elements that include a Rela
   * verify: [Contract Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
 ---
 
+### Canonical Graph Storage Verification
+
+Verify bounded canonical graph storage, current target resolution, and isolation of mutation candidates while preserving change-impact report behavior.
+
+#### Details
+- Rebuild cyclic and reconvergent helper graphs repeatedly, including size-estimate rebuilding and reversed registration order. Count serialized canonical element payloads and adjacency edges; counts remain equal to the fixture's vertices and retained edges without nested target payloads.
+- Normalize relative identifiers and propagate inverse relations before building adjacency. Repeating relation-context preparation produces the same edges and retains authored/generated relation provenance.
+- Clone an accepted graph, then edit, rename, move, relink, and remove candidate targets. Assert current target content and locations in reports, preserved report JSON fields and cycle guards, and unchanged accepted graph data.
+- Run the existing change-impact and CRUD E2E golden comparisons for capability and contract propagation, element relocation, relation consistency, relinking, and cross-file moves.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
+  * verify: [Canonical Graph Storage](../../ModelStructure/ModelManagement.md#canonical-graph-storage)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [test.sh](../../../tests/test-capability-change-impact/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-change-impact-contract-bindings/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-change-impact-detection/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-change-impact-element-relocation/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-crud-relation-consistency/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-relink-command/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-mv-cross-file-relation-integrity/test.sh)
+---
+
 ### Element Size Estimate Model Build Verification
 
 This verification shall prove that element size estimates are computed only when model building explicitly enables them.
@@ -264,17 +290,18 @@ This verification checks read-result consistency and mutation visibility through
 
 ##### Acceptance Criteria
 - Two consecutive `reqvire.read_element` calls over an unchanged workspace return the same requested element. Equal payloads establish result consistency only, not a cache hit or absence of parsing.
-- After a successful persisted `reqvire.add_element`, a subsequent search exposes the added element.
-- After a direct Markdown edit adds an element, a subsequent search exposes that element.
+- After a successful persisted `reqvire.add_element` with automatic commits disabled, a subsequent search exposes the added element while HEAD and index remain unchanged.
+- In read-only MCP mode, after a direct Markdown edit adds an element, a subsequent search exposes that element. Mutation-enabled sessions retain their accepted snapshot until an accepted mutation or restart.
 - A standalone `change-impact --git-commit` invocation completes against the fixture history. A separate instrumented core check establishes actual cache bypass.
 
 ##### Test Criteria
-1. Start a `reqvire mcp` server against a fixture workspace.
+1. Start a mutation-enabled `reqvire mcp` server against a clean committed fixture workspace.
 2. Issue two identical `reqvire.read_element` calls back-to-back; assert both resolve the requested element and return equal structured content.
-3. Issue a `reqvire.add_element` CRUD call to add a new element; assert the call succeeds.
+3. Issue a `reqvire.add_element` CRUD call without the commit startup flag; assert the call succeeds without advancing HEAD, changing index contents, or returning a `commit` field.
 4. Issue another `reqvire.search`; assert the newly added element is present.
-5. Append another element directly to a Markdown source and issue a read; assert the result reflects the change.
+5. Stop and reap the mutation server, start a read-only server, and verify mutation tools are absent. Warm its model cache, append another element directly to a Markdown source, and issue a read; assert the result reflects the change.
 6. Run a standalone `reqvire change-impact --git-commit=<hash>` invocation and check its exit status.
+7. Verify the test timing wrapper forwards termination and interruption to its child, waits for child shutdown, and preserves normal stdin, exit status, and timing records; a previous mutation server must not survive and answer the read-only phase.
 
 ##### Evidence Scope
 The satisfiedBy evidence supplies these response and mutation assertions. Response equality and standalone command completion do not prove internal reuse or bypass. The dedicated input-freshness and publication verifications own the instrumented correctness assertions and their execution status.
@@ -295,6 +322,7 @@ Verify stable model construction identity, complete input invalidation, and reco
 
 ##### Acceptance Criteria
 - After one completed build, repeated unchanged reads reuse that model without another parse, validation, or semantic-store build. Exercise a regex-backed exclusion pattern that executes matching, multiple worker threads, and reconstruction of an equivalent matcher; response equality alone is insufficient evidence.
+- Assert shared model/registry identity across cache hits and concurrent same-input loads, with no graph/page copies. Retain an old read handle across changed-input publication and invalidation; its original content and semantic state remain intact. Mutable candidate edits must not change either cached handle.
 - Effective pattern identity distinguishes different rules and matching options even when pattern counts and the selected Markdown inventory are equal. Reordering or repeating any-match rules without changing their effective meaning preserves identity.
 - Creating, editing, and removing applicable root `.gitignore` and `.reqvireignore` files changes the actual active matcher and selected model inventory on the next load without restart. Equivalent policy edits do not force construction solely because of matcher runtime state. Nested ignore files do not change the root-only policy.
 - Source edits, additions, removals, and moves become visible. Equal-length content edits with preserved modification time remain detectable, including page-only changes excluded from the public parsed-element revision.
@@ -331,9 +359,15 @@ Verify coordinated model construction and publication of complete current state 
 
 ##### Acceptance Criteria
 - Concurrent cold requests for identical workspace inputs and build mode perform one model build and receive its completed result. Distinct build modes cannot share incompatible graph, diagnostics, or size-estimate state.
+- Each resolved construction attempt builds one semantic index, reused by validation and RDF capture in strict, lenient, and size-estimate modes. Warm reads and semantic exports do not build another index or initialize query stores.
+- A strict semantic failure retains query diagnostics without publishing a query store. Repair and repeated parsing replace the failed state. Changed mutation candidates receive fresh semantic validation, and invalid edits leave persisted sources unchanged.
+- Changing an external ontology between semantic validation and RDF capture cannot mix validation from one version with RDF from another. Cache publication detects the changed dependency and retries with a newly built index.
 - While a build is paused before publication, invalidate its workspace and complete a newer persisted update/build. Releasing the older build cannot replace the newer cached state; waiting dependent reads resolve current state or an explicit applicable error.
 - A relevant source, configuration, or dependency change during construction supersedes the candidate. The published identity and model reflect the inputs actually consumed; a candidate cannot be tagged with one input observation while containing another.
 - A read that has captured a completed model retains consistent graph, page, and semantic query state while later publication occurs. Subsequent dependent reads after a successful write use the completed new state.
+- A completed model initially has no prepared query-store variants. First use prepares only the requested variant; repeated and concurrent use through snapshot clones shares that completed store. All public variants retain their expected default/named graph contents and external visibility.
+- First use after dependency deletion, and initialization paused across source edits and newer publication, use the captured RDF. Mutating a separate working registry cannot alter an older snapshot's deferred store. Current-model loads still reject missing or invalid dependencies and recover after repair.
+- A failed store initialization returns the same applicable error to concurrent callers without exposing partial graphs; another snapshot can initialize successfully.
 - Controlled writes cannot expose partially persisted files to a newly published model. Reuse of a post-write model requires its semantic state and persisted-input identity to agree with its graph; invalidation and rebuild remain a valid fallback.
 - Failed construction or superseded attempts release all waiting requests and permit retry/recovery. Continuous external changes produce a bounded retry outcome rather than an endless wait or stale success. Old valid data is not reported as current for invalid new inputs.
 - Rejected/previews with unchanged sources do not publish mutation candidates. If a failure occurs after any persistence, affected cache state is invalidated and the operation error remains visible.
@@ -343,10 +377,12 @@ Verify coordinated model construction and publication of complete current state 
 - Exercise both successful and failing shared builds and assert every waiter completes under a bounded test deadline. Verify the next valid load recovers.
 - Inject a persistence failure only after observing changed bytes successfully written to the first affected file. Assert the operation error remains visible, affected cached state is invalidated, subsequent reads follow authoritative validation, and repaired sources recover.
 - Compare graph/page data and SPARQL-visible triples for the accepted generation; verify a captured older result remains internally consistent. Generation instrumentation is internal and does not require new public interface fields.
+- Observe prepared-store counts and store identity independently of response equality. Pause first-use initialization with a deterministic hook and verify old/new SPARQL results against their respective captured RDF. Check initialization failures with malformed captured RDF in an internal fixture.
+- Instrument semantic-index builds and pause immediately after semantic validation. Assert per-attempt index counts, retained invalid-query diagnostics, refreshed mutation validation, and agreement between validated external labels and captured RDF across an intervening file edit.
 - Consumer-owned verifications establish transport write gating and derived-artifact integration; this verification owns the core construction/publication invariants.
 
 ##### Evidence Status
-Regression execution passes for coordinated construction, superseded publication, input rechecks, bounded failure under continuous edits, and invalidation after partial persistence. All 19 core cache tests pass, including a contender arriving between cache lookup and build registration. Captured graph/page/SPARQL state and derived semantic artifacts remain consistent across later changes. The consumer adapter tests establish read isolation during controlled persistence. Persistence errors remain visible, partial inputs receive authoritative validation, and repaired inputs recover.
+Regression execution passes for coordinated construction, superseded publication, input rechecks, bounded failure under continuous edits, and invalidation after partial persistence. The core cache tests include a contender arriving between cache lookup and build registration, first-use queries after dependency removal, and deferred initialization paused across newer publication. Instrumented tests establish one semantic index per resolved construction attempt across build modes, retained diagnostics after strict semantic failure, reset on repeated parsing, and fresh validation for mutated candidates. An external edit between validation and RDF capture preserves the validated version within the attempt and forces a fresh cache build before publication. Captured graph/page/SPARQL state and derived semantic artifacts remain consistent across later changes. Store tests establish deferred preparation, shared concurrent initialization, graph visibility, and error propagation. The consumer adapter tests establish read isolation during controlled persistence. Persistence errors remain visible, partial inputs receive authoritative validation, and repaired inputs recover.
 
 #### Metadata
   * type: test-verification
@@ -354,6 +390,7 @@ Regression execution passes for coordinated construction, superseded publication
 #### Relations
   * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
   * satisfiedBy: [mcp_cache_tests.rs](../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [semantic_store.rs](../../../crates/reqvire-core/src/semantic_store.rs)
   * satisfiedBy: [model_cache_tests.rs](../../../crates/reqvire-core/src/model_cache_tests.rs)
   * verify: [In-Memory Model Build Cache](../../ModelStructure/ModelManagement.md#in-memory-model-build-cache)
 ---

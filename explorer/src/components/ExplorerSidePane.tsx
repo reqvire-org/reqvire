@@ -1,3 +1,6 @@
+import { prepareThesaurus, filterThesaurusSchemes, thesaurusAncestorIds, type ThesaurusSchemeTree } from "../lib/thesaurus";
+import type { ThesaurusConceptItem } from "@ds";
+import { useWorktreeUrl } from "../store/worktreeUrls";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   Button,
@@ -29,6 +32,7 @@ import { useStore } from "../store/StoreContext";
 import { routeForContent, routeForResource, VIEW_TITLES, type ViewId } from "../router/routes";
 import type {
   ExplorerProjectStore,
+  CoverageProjection,
   KnowledgeGraphNode,
   OntologyGraphNode,
   ProjectStoreElement,
@@ -287,8 +291,13 @@ function ExplorerViewControls({
   onOpenElement: (id: string) => void;
   onOpenOntologyNode: (id: string) => void;
 }) {
+  const contextualUrl = useWorktreeUrl();
   const ui = useExplorerUiState();
   const { store, elementById } = useStore();
+
+  const thesaurus = useMemo(() => activeView === "thesaurus" ? prepareThesaurus(store.thesaurus) : null, [activeView, store.thesaurus]);
+  const filteredThesaurus = useMemo(() => thesaurus ? filterThesaurusSchemes(thesaurus.schemes, ui.thesaurusQuery) : [], [thesaurus, ui.thesaurusQuery]);
+  const selectedConceptPath = useMemo(() => thesaurus ? thesaurusAncestorIds(thesaurus, ui.thesaurusSelectionId) : new Set<string>(), [thesaurus, ui.thesaurusSelectionId]);
 
   const graphControlsActive = (activeView === "model" && ui.modelMode === "graph");
   const graphTypeOptions = useMemo(
@@ -365,8 +374,7 @@ function ExplorerViewControls({
   if (activeView === "traces") return null;
 
   if (activeView === "thesaurus") {
-    const thesaurusTree = buildThesaurusPaneTree(store);
-    const filteredTree = filterThesaurusPaneTree(thesaurusTree, ui.thesaurusQuery);
+    const thesaurusTree = thesaurus?.schemes ?? [];
     const conceptCount = thesaurusTree.reduce((total, scheme) => total + scheme.concepts.length, 0);
     const summaryItems = [
       { label: "Schemes", value: formatSummaryValue(thesaurusTree.length) },
@@ -375,10 +383,11 @@ function ExplorerViewControls({
     return (
       <>
         <PaneTree aria-label="Concept hierarchy" id="thesaurus-tree">
-          {filteredTree.map((scheme) => (
+          {filteredThesaurus.map((scheme) => (
             <ThesaurusSchemeTreeNode
               key={scheme.id}
               scheme={scheme}
+              selectedPath={selectedConceptPath}
               selectedId={ui.thesaurusSelectionId}
               query={ui.thesaurusQuery}
               onSelectConcept={ui.setThesaurusSelectionId}
@@ -391,8 +400,8 @@ function ExplorerViewControls({
   }
 
   if (activeView === "coverage") {
-    const coverageItems = buildCoveragePaneItems(store);
-    const coverage = isPlainRecord(store.coverage) ? store.coverage : {};
+    const coverage = ui.coverageProjection;
+    const coverageItems = buildCoveragePaneItems(coverage);
     const summary = isPlainRecord(coverage.summary) ? coverage.summary : {};
     const coverageSummaryItems = [
       { label: "Requirements", value: formatSummaryValue(readNumber(summary.total_requirements_in_scope)) },
@@ -409,9 +418,10 @@ function ExplorerViewControls({
                   key={item.id}
                   icon={item.icon}
                   label={item.label}
-                  count={formatCompactCount(item.count)}
+                  count={item.count === undefined ? undefined : formatCompactCount(item.count)}
                   selected={ui.coverageSectionId === item.id}
                   onClick={() => {
+                    if (item.id === "orphaned-verifications" && coverage.scope) ui.setCoverageScopeId(null);
                     ui.setCoverageSectionId(item.id);
                     navigateCoverageSection(item.id);
                   }}
@@ -523,7 +533,7 @@ function ExplorerViewControls({
             <PaneActionRow>
               {store.ontology.ttl_href ? (
                 <PaneGhostLink
-                  href={store.ontology.ttl_href}
+                  href={contextualUrl(store.ontology.ttl_href)}
                   title="Download the exported ontology as Turtle (ontologies.ttl)"
                 >
                   <Icon name="download" />
@@ -564,6 +574,9 @@ function ExplorerViewControls({
           <PaneFilterGrid columns="two">
             <div>
               <PaneFilterGroup label="Types">
+                <ToggleRow label="Semantic query" colorToken="--ontology" variant="filter"
+                  on={ui.ontologyFilters.has("semantic-query")}
+                  onToggle={() => ui.toggleOntologyFilter("semantic-query")} />
                 <PaneLegend
                   rows={[
                     { id: "class", label: "Class", colorToken: ontologyColorToken("class") },
@@ -757,6 +770,7 @@ function TreeFolderNode({
             <TreeResourceNode
               key={resource.id}
               resource={resource}
+              activeView={activeView}
               sourceBrowsing={sourceBrowsing}
               onOpenSourceRoute={onOpenSourceRoute}
               depth={depth + 1}
@@ -784,11 +798,13 @@ function TreeFolderNode({
 
 function TreeResourceNode({
   resource,
+  activeView,
   sourceBrowsing,
   onOpenSourceRoute,
   depth,
 }: {
   resource: ProjectStoreResource;
+  activeView: ViewId;
   sourceBrowsing: boolean;
   onOpenSourceRoute?: (hash: string) => void;
   depth: number;
@@ -802,6 +818,7 @@ function TreeResourceNode({
       onOpenSourceRoute?.(route);
       return;
     }
+    if (activeView === "model" && ui.modelMode === "flow") return;
     window.location.hash = route;
   }
 
@@ -979,6 +996,7 @@ function TreeFileNode({
       return;
     }
     if (activeView === "files") onNavigate("model");
+    if (ui.modelMode === "flow") return;
     onOpenElement(elementId);
   }
 
@@ -1026,37 +1044,25 @@ function sourceRouteForElement(element: ProjectStoreElement) {
   return element.source_anchor;
 }
 
-interface ThesaurusPaneConcept {
-  id: string;
-  label: string;
-  parentId: string | null;
-  schemeId: string;
-  description: string;
-}
-
-interface ThesaurusPaneScheme {
-  id: string;
-  label: string;
-  concepts: ThesaurusPaneConcept[];
-}
-
 function ThesaurusSchemeTreeNode({
   scheme,
+  selectedPath,
   selectedId,
   query,
   onSelectConcept,
 }: {
-  scheme: ThesaurusPaneScheme;
+  scheme: ThesaurusSchemeTree;
+  selectedPath: ReadonlySet<string>;
   selectedId: string | null;
   query: string;
   onSelectConcept: (id: string | null) => void;
 }) {
-  const hasSelectedDescendant = selectedId ? scheme.concepts.some((concept) => concept.id === selectedId) : false;
+  const hasSelectedDescendant = selectedId ? scheme.byId.has(selectedId) : false;
   const [open, setOpen] = useState(hasSelectedDescendant || scheme.concepts.length <= 8);
 
   useOpenWhenSelectionEnters(hasSelectedDescendant, setOpen);
 
-  const children = thesaurusTopLevelConcepts(scheme.concepts);
+  const children = scheme.roots;
   const expanded = Boolean(query.trim()) || open;
 
   return (
@@ -1083,7 +1089,8 @@ function ThesaurusSchemeTreeNode({
         <ThesaurusConceptTreeNode
           key={concept.id}
           concept={concept}
-          concepts={scheme.concepts}
+          childrenById={scheme.childrenById}
+          selectedPath={selectedPath}
           selectedId={selectedId}
           query={query}
           onSelectConcept={onSelectConcept}
@@ -1096,21 +1103,23 @@ function ThesaurusSchemeTreeNode({
 
 function ThesaurusConceptTreeNode({
   concept,
-  concepts,
+  childrenById,
+  selectedPath,
   selectedId,
   query,
   onSelectConcept,
   depth,
 }: {
-  concept: ThesaurusPaneConcept;
-  concepts: readonly ThesaurusPaneConcept[];
+  concept: ThesaurusConceptItem;
+  childrenById: ReadonlyMap<string, ThesaurusConceptItem[]>;
+  selectedPath: ReadonlySet<string>;
   selectedId: string | null;
   query: string;
   onSelectConcept: (id: string | null) => void;
   depth: number;
 }) {
-  const children = concepts.filter((candidate) => candidate.parentId === concept.id);
-  const hasSelectedDescendant = selectedId ? conceptTreeContains(concepts, concept.id, selectedId) : false;
+  const children = childrenById.get(concept.id) ?? [];
+  const hasSelectedDescendant = selectedPath.has(concept.id);
   const [open, setOpen] = useState(depth < 2 || hasSelectedDescendant);
   const expanded = Boolean(query.trim()) || open;
 
@@ -1134,13 +1143,14 @@ function ThesaurusConceptTreeNode({
           }
           onSelectConcept(concept.id);
         }}
-        title={concept.description || concept.label}
+        title={concept.definition || concept.scopeNote || concept.label}
       />
       {expanded && children.map((child) => (
         <ThesaurusConceptTreeNode
           key={child.id}
           concept={child}
-          concepts={concepts}
+          childrenById={childrenById}
+          selectedPath={selectedPath}
           selectedId={selectedId}
           query={query}
           onSelectConcept={onSelectConcept}
@@ -1552,6 +1562,7 @@ const ELEMENT_TYPE_ORDER = [
   "demonstration-verification",
   "specification",
   "semantic-contract",
+  "semantic-query",
   "ontology",
   "concept-scheme",
   "concept",
@@ -1596,19 +1607,18 @@ function buildSearchKindCounts(store: ExplorerProjectStore): Record<SearchKind, 
   };
 }
 
-function buildCoveragePaneItems(store: ExplorerProjectStore): Array<{
+function buildCoveragePaneItems(coverage: CoverageProjection): Array<{
   id: CoverageSectionId;
   label: string;
-  count: number;
+  count?: number;
   icon: "pie-chart" | "box" | "file" | "activity" | "x" | "help-circle";
 }> {
-  const coverage = isPlainRecord(store.coverage) ? store.coverage : {};
   const summary = isPlainRecord(coverage.summary) ? coverage.summary : {};
   return [
     {
       id: "overview",
       label: "Overview",
-      count: readNumber(summary.total_requirements_in_scope, store.elements.length),
+      count: readNumber(summary.total_requirements_in_scope),
       icon: "pie-chart",
     },
     {
@@ -1637,8 +1647,8 @@ function buildCoveragePaneItems(store: ExplorerProjectStore): Array<{
     },
     {
       id: "orphaned-verifications",
-      label: "Orphaned verifications",
-      count: coverageSectionCount(coverage.orphaned_verifications),
+      label: coverage.scope ? "Orphans (whole model)" : "Orphaned verifications",
+      count: coverage.scope ? undefined : coverageSectionCount(coverage.orphaned_verifications),
       icon: "help-circle",
     },
   ];
@@ -1691,141 +1701,6 @@ function buildSearchElementTypeOptions(elements: readonly ProjectStoreElement[])
   });
 }
 
-function buildThesaurusPaneTree(store: ExplorerProjectStore): ThesaurusPaneScheme[] {
-  const graphNodes = store.ontology.graph_data?.nodes ?? [];
-  const graphEdges = store.ontology.graph_data?.edges ?? [];
-  const conceptNodes = graphNodes
-    .filter(isConceptGraphNode)
-    .sort((left, right) => conceptGraphLabel(left).localeCompare(conceptGraphLabel(right)));
-  const schemeIds = new Set(graphNodes.filter(isConceptSchemeGraphNode).map((node) => node.id));
-
-  const conceptIds = new Set(conceptNodes.map((node) => node.id));
-  const parentByConcept = new Map<string, string>();
-  for (const edge of graphEdges) {
-    if (edge.label === "broader" && conceptIds.has(edge.source) && conceptIds.has(edge.target)) {
-      parentByConcept.set(edge.source, edge.target);
-    }
-  }
-
-  const schemeById = new Map<string, ThesaurusPaneScheme>();
-  for (const node of conceptNodes) {
-    const schemeId = node.scheme_iri;
-    const schemeLabel = node.scheme_label;
-    if (!schemeId || !schemeLabel || !schemeIds.has(schemeId)) continue;
-    const scheme = ensureThesaurusPaneScheme(schemeById, schemeId, schemeLabel);
-    scheme.concepts.push({
-      id: node.id,
-      label: conceptGraphLabel(node),
-      parentId: parentByConcept.get(node.id) ?? null,
-      schemeId,
-      description: conceptGraphDescription(node),
-    });
-  }
-
-  return sortThesaurusPaneSchemes(Array.from(schemeById.values()).filter((scheme) => scheme.concepts.length > 0));
-}
-
-function filterThesaurusPaneTree(
-  schemes: readonly ThesaurusPaneScheme[],
-  query: string,
-): ThesaurusPaneScheme[] {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) return [...schemes];
-
-  return schemes
-    .map((scheme) => {
-      const included = new Set<string>();
-      const byId = new Map(scheme.concepts.map((concept) => [concept.id, concept]));
-      for (const concept of scheme.concepts) {
-        if (!thesaurusConceptMatches(concept, normalized)) continue;
-        included.add(concept.id);
-        let parentId = concept.parentId;
-        while (parentId) {
-          included.add(parentId);
-          parentId = byId.get(parentId)?.parentId ?? null;
-        }
-      }
-      return {
-        ...scheme,
-        concepts: scheme.concepts.filter((concept) => included.has(concept.id)),
-      };
-    })
-    .filter((scheme) => scheme.concepts.length > 0);
-}
-
-function ensureThesaurusPaneScheme(
-  schemeById: Map<string, ThesaurusPaneScheme>,
-  id: string,
-  label: string,
-): ThesaurusPaneScheme {
-  const existing = schemeById.get(id);
-  if (existing) return existing;
-  const scheme = { id, label, concepts: [] };
-  schemeById.set(id, scheme);
-  return scheme;
-}
-
-function sortThesaurusPaneSchemes(schemes: ThesaurusPaneScheme[]) {
-  return schemes
-    .map((scheme) => ({
-      ...scheme,
-      concepts: [...scheme.concepts].sort((left, right) => {
-        const leftDepth = thesaurusConceptDepth(scheme.concepts, left.id);
-        const rightDepth = thesaurusConceptDepth(scheme.concepts, right.id);
-        return leftDepth - rightDepth || left.label.localeCompare(right.label);
-      }),
-    }))
-    .sort((left, right) => left.label.localeCompare(right.label));
-}
-
-function isConceptGraphNode(node: OntologyGraphNode) {
-  return node.semantic_type === "skos-concept";
-}
-
-function isConceptSchemeGraphNode(node: OntologyGraphNode) {
-  return node.semantic_type === "skos-concept-scheme";
-}
-
-function conceptGraphLabel(node: OntologyGraphNode) {
-  return firstConceptLiteralValue(node, "prefLabel") || node.label;
-}
-
-function conceptGraphDescription(node: OntologyGraphNode) {
-  return firstConceptLiteralValue(node, "definition") || firstConceptLiteralValue(node, "scopeNote") || node.comment;
-}
-
-function firstConceptLiteralValue(node: OntologyGraphNode, predicateSuffix: string) {
-  return (node.literal_values ?? []).find((value) => value.predicate.endsWith(predicateSuffix))?.value ?? "";
-}
-
-function thesaurusConceptDepth(concepts: readonly ThesaurusPaneConcept[], id: string) {
-  const parentById = new Map(concepts.map((concept) => [concept.id, concept.parentId]));
-  let depth = 0;
-  let current = parentById.get(id);
-  const seen = new Set<string>([id]);
-  while (current && !seen.has(current)) {
-    seen.add(current);
-    depth += 1;
-    current = parentById.get(current) ?? null;
-  }
-  return depth;
-}
-
-function conceptTreeContains(concepts: readonly ThesaurusPaneConcept[], rootId: string, targetId: string): boolean {
-  if (rootId === targetId) return true;
-  const children = concepts.filter((concept) => concept.parentId === rootId);
-  return children.some((child) => conceptTreeContains(concepts, child.id, targetId));
-}
-
-function thesaurusConceptMatches(concept: ThesaurusPaneConcept, query: string) {
-  return concept.label.toLowerCase().includes(query) || concept.description.toLowerCase().includes(query);
-}
-
-function thesaurusTopLevelConcepts(concepts: readonly ThesaurusPaneConcept[]) {
-  const ids = new Set(concepts.map((concept) => concept.id));
-  return concepts.filter((concept) => concept.parentId === null || !ids.has(concept.parentId));
-}
-
 function elementTypeRank(type: string, family: string) {
   const direct = ELEMENT_TYPE_ORDER.indexOf(type);
   if (direct >= 0) return direct;
@@ -1866,6 +1741,7 @@ function searchKindColorToken(kind: SearchKind): DesignSystemColorToken {
 function ontologyColorToken(value: string): DesignSystemColorToken {
   const colors: Record<string, DesignSystemColorToken> = {
     class: "--rdf-class",
+    "semantic-query": "--ontology",
     "object-property": "--rdf-objprop",
     "datatype-property": "--rdf-dtprop",
     "rdf-property": "--rdf-rdfprop",

@@ -25,6 +25,8 @@ pub struct SearchFilters {
     not_have_relations: Vec<String>,
     has_contract_bindings: bool,
     contract_bindings_glob: Option<GlobMatcher>,
+    has_contract_references: bool,
+    contract_references_glob: Option<GlobMatcher>,
 }
 
 impl SearchFilters {
@@ -149,7 +151,7 @@ impl SearchFilters {
             Vec::new()
         };
 
-        Ok(SearchFilters {
+        Ok(Self {
             file_glob,
             name_re,
             type_patterns,
@@ -163,7 +165,22 @@ impl SearchFilters {
             not_have_relations,
             has_contract_bindings,
             contract_bindings_glob,
+            has_contract_references: false,
+            contract_references_glob: None,
         })
+    }
+
+    /// Adds optional Contract References filters using normalized target identifiers.
+    pub fn with_contract_references(
+        mut self,
+        has_references: bool,
+        target_pattern: Option<&str>,
+    ) -> Result<Self, ReqvireError> {
+        self.has_contract_references = has_references;
+        self.contract_references_glob = target_pattern
+            .map(crate::utils::compile_glob_matcher)
+            .transpose()?;
+        Ok(self)
     }
 
     /// Check if element matches all filters
@@ -187,19 +204,18 @@ impl SearchFilters {
             let mut matches_any = false;
 
             for tp in types {
-                let matches = if let Some(custom_type_name) = tp.strip_prefix("other-") {
-                    // Handle "other-TYPENAME" pattern for custom types
-                    // Strip "other-" prefix and compare with stored custom type name
-                    match &elem.element_type {
+                let matches = tp.strip_prefix("other-").map_or_else(
+                    || {
+                        let filter_type = element::ElementType::from_metadata(tp);
+                        elem.element_type == filter_type
+                    },
+                    |custom_type_name| match &elem.element_type {
                         element::ElementType::Other(actual_name) => {
                             actual_name.to_lowercase() == custom_type_name
                         }
                         _ => false, // Not an Other type
-                    }
-                } else {
-                    let filter_type = element::ElementType::from_metadata(tp);
-                    elem.element_type == filter_type
-                };
+                    },
+                );
 
                 if matches {
                     matches_any = true;
@@ -308,6 +324,19 @@ impl SearchFilters {
             }
         }
 
+        if self.has_contract_references && elem.contract_references.is_empty() {
+            return false;
+        }
+        if let Some(pattern) = &self.contract_references_glob {
+            if !elem
+                .contract_references
+                .iter()
+                .any(|entry| pattern.is_match(entry.target.as_str().as_str()))
+            {
+                return false;
+            }
+        }
+
         true
     }
 }
@@ -353,6 +382,8 @@ struct ElementSearchResult {
     relations: Vec<RelationSearchResult>,
     #[serde(skip_serializing_if = "Option::is_none")]
     contract_bindings: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    contract_references: Vec<String>,
 }
 
 #[derive(Serialize)]
@@ -590,7 +621,7 @@ fn build_search_result(
                         .entry("verification-objective".to_string())
                         .or_insert(0) += 1;
                 }
-                element::ElementType::SemanticContract => {
+                element::ElementType::SemanticContract | element::ElementType::SemanticQuery => {
                     *c.total_semantic_contract_types
                         .entry("semantic-contract".to_string())
                         .or_insert(0) += 1;
@@ -702,6 +733,14 @@ fn build_search_result(
             },
             relations: rels,
             contract_bindings,
+            contract_references: if short_mode {
+                Vec::new()
+            } else {
+                elem.contract_references
+                    .iter()
+                    .map(|entry| entry.target.as_str())
+                    .collect()
+            },
         };
 
         // Insert into flat file→elements map

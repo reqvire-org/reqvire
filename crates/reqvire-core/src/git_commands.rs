@@ -80,6 +80,7 @@ pub fn get_repository_base_url() -> Result<String, ReqvireError> {
     };
 
     *cached = Some(base_url.clone());
+    drop(cached);
 
     Ok(base_url)
 }
@@ -110,6 +111,7 @@ pub fn get_commit_hash() -> Result<String, ReqvireError> {
     }
 
     *cached = Some(hash.clone());
+    drop(cached);
 
     Ok(hash)
 }
@@ -142,6 +144,7 @@ pub fn get_branch_name() -> Result<String, ReqvireError> {
     }
 
     *cached = Some(branch.clone());
+    drop(cached);
 
     Ok(branch)
 }
@@ -198,6 +201,7 @@ pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, Reqv
         Ok(output) if output.status.success() => {
             let root = String::from_utf8_lossy(&output.stdout).trim().to_string();
             cache.insert(absolute_folder_path.clone(), root.clone());
+            drop(cache);
             Ok(root)
         }
         Ok(output) => {

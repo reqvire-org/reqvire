@@ -38,6 +38,8 @@ Technical specification for content collection from capability, requirement, and
  - FilePath pointing to other file types: Include as markdown link
  - ElementIdentifier: Include referenced element's content
 - Skip external URL contract_bindings
+- For each Contract Reference, collection MUST include the referenced contract content and source citation once per collected target, following the shared Contract Reference evidence projection contract.
+- If the target is already collected through ownership, bindings, or another reference, collection MUST reuse that content item.
 
 **Output Ordering:**
 - Flat list structure (no nesting)
@@ -49,7 +51,7 @@ Technical specification for content collection from capability, requirement, and
 - Element not found: Error with message
 - Element not a capability, requirement, or ontology type: Error with message
 - Contract Bindings file not found: Warning, continue with other content
-- Circular reference: Detect and break cycle
+- Cyclic Contract Reference dependencies MUST fail model validation before collection. Traversal of valid converging paths MUST deduplicate repeated reference targets.
 
 #### Metadata
   * type: specification
@@ -80,6 +82,7 @@ Each collected content block followed by source citation and separator:
 | Element | `— Source: [Element Name](file.md#element-id)` |
 | Contract Element (via definedBy) | `— Source: [Contract Name](file.md#contract-id) defining [Element Name](file.md#element-id)` |
 | Contract Bindings Element | `— Source: [Contract Name](file.md#contract-id) bound to [Element Name](file.md#element-id)` |
+| Contract Reference Element | `— Source: [Contract Name](file.md#contract-id) referenced by [Element Name](file.md#element-id)` |
 
 **JSON Format:**
 ```json
@@ -117,6 +120,8 @@ Each collected content block followed by source citation and separator:
 
 **Source Type Values:**
 Collect source type values are defined by this collect output contract.
+
+Items introduced through Contract References MUST use `source_type: "contract_reference_element"`, with `reused_by` identifying the referencing requirement. Metadata MUST count those items in `contract_references_count` and `total_items`. The reference count MAY be omitted when zero. A target already collected through another source retains that source's classification and is counted once.
 
 #### Metadata
   * type: specification
@@ -181,6 +186,12 @@ Generated SKOS facts:
 - For each canonical taxonomy edge where `child` is narrower than `parent`, emit `child skos:broader parent` and `parent skos:narrower child`.
 - For each canonical symmetric association or mapping edge, emit reciprocal SKOS facts when serializing a normalized concept projection, while graph renderers may collapse the reciprocal pair to one displayed edge.
 - Generated inverse and reciprocal facts are additional semantic-search/export facts and must not mutate authored Markdown.
+- Each local endpoint retains its own generated concept IRI, including cross-scheme `related`, `exactMatch`, and `closeMatch` links; a source namespace must not be substituted for the target namespace. External mapping IRIs are preserved verbatim.
+
+Construction and lifetime:
+- Build outgoing, inverse, and symmetric concept adjacency once per semantic-index construction. Visit each registry element and each authored concept link once for normalization, then emit each concept from its indexed neighborhood instead of rescanning or sorting the registry per concept.
+- Deduplicate and order each neighborhood deterministically, independent of element or relation input order. Isolated concepts retain their RDF and produce no invented relationships.
+- The adjacency belongs only to that build. Edited or rejected candidates must not reuse earlier relationships or modify an accepted snapshot; existing target, scheme-boundary, and cycle validation remains authoritative.
 
 Projection surface contract:
 - `reqvire semantic export --layer concepts` and `reqvire semantic export` consume the normalized concept-relation projection, not only direct-authored concept relation fields.
@@ -218,6 +229,50 @@ Browser presentation, layout, mode controls, graph rendering, and shell integrat
 
 #### Metadata
   * type: specification
+---
+
+### Coverage Scope Specification
+
+Shared contract for selecting coverage report subjects while retaining their model-wide evidence context.
+
+#### Details
+**Scope and ownership**
+- Omitted scope selects the whole validated model. An explicit scope selects one capability, including a capability below a root.
+- Capability scope includes the selected capability and every descendant reachable through the validated capability hierarchy. Requirement membership follows the capability-to-requirement specification bridge and requirement descendants under the existing submodel resolution contract.
+- Every requirement retains its validated owning capability root. Scope selection MUST not assign a requirement to two independent roots or infer ownership from file location, verification links, contract consumption, or presentation order.
+- Preserve all valid parent relationships. Traverse every hierarchy path and deduplicate by identifier; choosing a display parent MUST not change membership or coverage.
+- An explicit selection that does not resolve to a capability MUST fail with a diagnostic. A capability with no requirements is a valid empty scope.
+
+**Coverage evidence invariance**
+- For the same validated model snapshot, an included requirement MUST retain its whole-model verification status, implementation coverage classification, coverage source, and supporting evidence identifiers.
+- Determine verification leaf status and implementation terminal status from the complete model. Scope selection MUST NOT change either classification.
+- Follow relevant evidence dependencies across scope boundaries, including recursively assessed consumers of owned contracts and shared verification targets. Evidence outside the scope remains available and identifiable without entering the scope's requirement or capability membership and counts.
+- Selecting a contract owner's submodel MUST retain every required consumer's coverage and evidence, including uncovered consumers and their blockers. Scope selection MUST NOT turn contract-consumer rollup into direct satisfaction or verification.
+- Whole-model calculation followed by selection and calculation for scoped subjects with complete evidence dependency traversal are both permitted. The resulting classifications and evidence MUST agree.
+- Reuse the established verification and implementation coverage rules; scope selection MUST not introduce another classification engine.
+
+**Verification membership and aggregation**
+- A concrete verification belongs to a capability scope when at least one of its requirement targets belongs to that scope. Targets may be leaf or intermediate requirements; leaf coverage denominators continue to follow the existing verification coverage contract.
+- Capabilities are covered through requirement roll-up and cannot be direct verification targets. Verification objectives remain excluded from concrete verification counts.
+- A verification targeting requirements in several submodels may appear in each relevant scope. Count it once within each scope and once in the whole-model report, regardless of duplicate paths or how many in-scope requirements it verifies. Submodel verification totals are therefore not necessarily additive.
+- Orphaned concrete verifications have no requirement targets and belong only to the whole-model report. A scoped result MUST indicate that orphan diagnostics are whole-model-only, rather than imply that the complete model has no orphans.
+- All report summaries, percentages, verification-type counts, evidence-satisfaction counts, implementation-source counts, gap lists, and capability roll-ups MUST use the same selected subject sets.
+- Calculate totals from distinct subject identifiers, never by summing overlapping capability roll-up rows. Retain the existing zero-denominator and percentage-formatting conventions for empty scopes.
+
+**Result contract**
+- Whole-model output remains the default and preserves the existing report fields and meanings.
+- A capability-scoped structured result uses the existing report sections with an additional `scope` object containing `kind: capability`, `capability_identifier`, `capability_name`, `capability_ids`, `requirement_ids`, `verification_ids`, and `orphaned_verifications_scope: whole_model_only`.
+- Membership identifier arrays contain distinct identifiers sorted deterministically. Evidence identifiers may refer outside these arrays.
+- Capability-scoped orphan lists and counts are empty or zero because orphans have no scoped membership; the scope marker MUST accompany those fields. Human-readable consumers MUST explain the whole-model-only diagnostic scope.
+- A scoped human-readable result identifies the selected capability and presents the same classifications, evidence, counts, and gap membership as its structured result.
+- A result for one requested scope need not include summaries or membership lists for other scopes. Consumers that need many scopes may request or materialize compact summaries and membership indexes over shared coverage records.
+- Generating summaries for multiple scopes MUST reuse the whole-model classifications without copying detailed evidence records into each summary. Preparation is shared within the operation; per-scope work follows the selected memberships rather than scanning every model element or projecting a full detailed report again. Compact and detailed results MUST agree for the same scope and snapshot.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Scoped Coverage Reporting](ReportingRequirements.md#scoped-coverage-reporting)
 ---
 
 ### Deterministic Output Specification
@@ -305,24 +360,34 @@ Technical specification for implementation coverage report output structure.
 
 #### Details
 **Output Requirements (Text):**
-- Summary subsection with totals, covered/uncovered counts, and percentage.
-- Covered requirements list grouped by file with source classification and evidence identifiers.
-- Uncovered requirements list grouped by file.
+- Summary MUST distinguish all-requirement classification counts from terminal-requirement counts and the terminal implementation percentage.
+- Covered and uncovered requirements MUST be grouped by file with source classification, direct and supporting artifact evidence, required contributions, and blockers.
 
 **Output Requirements (JSON):**
 - `summary` includes:
  - `total_requirements_in_scope`
  - `covered_requirements`
  - `uncovered_requirements`
+ - `total_terminal_requirements`
+ - `covered_terminal_requirements`
+ - `uncovered_terminal_requirements`
  - `implementation_coverage_percentage`
- - `coverage_sources` object keyed by implementation coverage source names defined by the implementation coverage output and logic contracts
-- `covered_requirements` contains per-element:
+ - `coverage_sources`, counting covered requirements by `direct_satisfied`, `requirement_rollup`, `contract_consumer_rollup`, and `combined_rollup`
+- Both `covered_requirements` and `uncovered_requirements` MUST contain per-element:
  - `identifier`, `name`
- - `coverage_source`
- - `evidence` (identifier list)
-- `uncovered_requirements` contains per-element:
- - `identifier`, `name`
-- Coverage percentage values in summary is expected to be emitted with at most 2 decimal places.
+ - `is_terminal`, determined before scope projection
+ - `aggregate_leaf_requirements` and `aggregate_verified_leaf_requirements`, counting distinct verification leaves in the requirement's derived hierarchy, including itself when a leaf
+ - `aggregate_terminal_requirements` and `aggregate_covered_terminal_requirements`, counting distinct implementation terminals reachable through required children and binding consumers, including itself when terminal
+ - `coverage_source`, using the four covered source tokens or `uncovered`
+ - `direct_evidence`, containing direct artifact identifiers
+ - `evidence`, containing direct and recursively collected artifact identifiers, including partial evidence on uncovered requirements
+ - `contributing_requirements`, containing every distinct immediate required child or contract consumer
+ - `blocking_requirements`, containing uncovered contributing requirements reachable recursively, or the requirement itself when it is an uncovered terminal
+- Requirement aggregate metrics MUST be evaluated over the full model and retained unchanged when selecting a report scope. Required external binding consumers contribute to a requirement's implementation progress; scope and capability subject counts retain their own membership boundaries. Contract references MUST contribute to neither metric. Multiple paths to the same leaf or terminal MUST count that element once.
+- Evidence, contribution, and blocker arrays MUST be sorted and deduplicated.
+- Capability records MUST retain local and aggregate all-requirement counts, add corresponding terminal and covered-terminal counts, and calculate implementation percentages from aggregate terminal counts. `implementation_covered` MUST indicate complete requirement coverage separately from the terminal percentage, including scopes whose consumers are external.
+- An empty capability MUST have `implementation_covered: false`; its combined coverage mark remains `not-applicable`.
+- Percentages MUST be emitted with at most two decimal places; an empty terminal denominator MUST produce zero percent while retaining requirement and capability coverage classifications.
 
 #### Metadata
   * type: specification
@@ -611,35 +676,6 @@ Example:
   * define: [Search Report Generator](ReportingRequirements.md#search-report-generator)
 ---
 
-### Requirement Implementation Coverage Logic Specification
-
-Technical specification for requirement implementation coverage classification logic.
-
-#### Details
-Implementation coverage source values are defined by this implementation coverage logic contract.
-
-Implementation coverage scope includes only elements of type `requirement`. Elements of type `capability` are excluded from direct implementation coverage and receive implementation coverage through capability roll-up.
-
-The report must classify each requirement using the semantic coverage source vocabulary and the available `satisfiedBy`, `definedBy`, contract_bindings, and child requirement evidence.
-
-Coverage classification:
-- **Directly satisfied**: requirement has one or more `satisfiedBy` relations.
-- **Contract via contract_bindings**: requirement owns contract elements through `definedBy`, and at least one owned contract is reused by a requirement that is directly satisfied.
-- **Contract via child**: requirement owns contract elements through `definedBy`, and at least one derived descendant requirement has `satisfiedBy`.
-- **Uncovered**: requirement has no coverage evidence from the above sources.
-
-Rules:
-- Contract Bindings propagation uses only contract element identifiers as contracts.
-- Generic derivation roll-up is not used for implementation coverage.
-- Coverage source and evidence identifiers must be reported in text and JSON outputs.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Requirement Implementation Coverage Report](ReportingRequirements.md#requirement-implementation-coverage-report)
----
-
 ### Requirement Submodels Report Specification
 
 Technical specification for submodels report structure and deterministic ordering.
@@ -807,6 +843,7 @@ Normative construct-query contract:
 - Relation-family normalization is defined for every `reqvire:RelationRule` that declares `reqvire:relationName`, `reqvire:relationDirection`, `reqvire:normalizedForwardProperty`, and `reqvire:normalizedInverseProperty`.
 - Each authored relation edge is treated as a first-class `reqvire:ModelRelation` with `reqvire:relationSource`, `reqvire:relationTarget`, and `reqvire:relationType` so source/target pairing is preserved.
 - Contract binding edges are treated as first-class `reqvire:ModelRelation` records with `reqvire:relationType "contract_bindings"` so they participate in the same ontology-defined projection as authored relation entries.
+- Contract Reference edges MUST be first-class `reqvire:ModelRelation` records with `reqvire:relationType "contract_references"`, preserving the consumer as source and the contract as target.
 - For relation rules with `reqvire:relationDirection "forward"`, the authored source is the canonical forward source and the authored target is the canonical forward target.
 - For relation rules with `reqvire:relationDirection "inverse"`, the authored target is the canonical forward source and the authored source is the canonical forward target.
 - The projection emits both canonical forward and canonical inverse normalized predicates.
@@ -842,6 +879,7 @@ Implementation contract:
 - Full semantic model export must emit deterministic `reqvire:ModelRelation` resources for authored Markdown relations and contract bindings edges.
 - Full semantic model export must emit normalized forward and inverse predicates for `derive`/`derivedFrom`, `specify`/`specifiedBy`, `define`/`definedBy`, `constrain`/`constrainedBy`, `use`/`usedBy`, `verify`/`verifiedBy`, `satisfy`/`satisfiedBy`, and `contract_bindings`.
 - `contract_bindings` must normalize to `reqvire:bindsContract` from the consuming requirement to the reusable contract and `reqvire:boundByContract` from the reusable contract back to the consuming requirement.
+- `contract_references` MUST normalize to `reqvire:referencesContract` from the consuming requirement to the referenced contract and `reqvire:contractReferencedBy` in the inverse direction. Reference-only edges MUST remain independent of binding and implementation-contribution facts.
 - Future reasoner-backed or SPARQL-backed materialization must produce triples equivalent to the construct-query result.
 - Generated relation-family projection facts must not be written back to authored Markdown ontology, semantic-contract, requirement, or contract blocks.
 
@@ -947,4 +985,21 @@ Reqvire supports verification coverage analysis for requirement verification and
 
 #### Relations
   * define: [Verification Coverage Report](ReportingRequirements.md#verification-coverage-report)
+---
+
+### Contract Reference Evidence Projection Specification
+
+Contract Reference evidence is separately identifiable across human-readable and machine-readable model surfaces.
+
+#### Details
+Element-bearing model, search, containment, read-element, and Explorer Project Store outputs MUST expose authored references through a `contract_references` collection distinct from `contract_bindings`. Entries MUST use the corresponding surface's existing contract-target representation. Empty reference collections MAY be omitted. Consumers MUST accept an absent reference collection as empty, including in older stored data.
+
+Human-readable element details MUST label navigable targets `Contract References`. Element content collection MUST include the referenced contract content and its source citation once per collected target. Dependency reports MUST preserve the reference edge kind and its direction.
+
+Semantic model export MUST publish `reqvire:referencesContract` from requirement to contract, `reqvire:contractReferencedBy` in the inverse direction, and `reqvire:contractReferencesTargetIdentifier` for target identity. Reference-only edges MUST NOT emit binding predicates or implementation-contribution facts. Semantic vocabulary discovery MUST expose the distinct reference relation family.
+
+Publishing consumers MUST reuse the shared model projections. Element-detail consumers MUST show navigable references separately from implementation evidence.
+
+#### Metadata
+  * type: specification
 ---

@@ -2,6 +2,7 @@
 name = "reqvire-cli"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 description.workspace = true
 license.workspace = true
 authors.workspace = true
@@ -40,16 +41,23 @@ globset = { workspace = true }
 rustc-hash = { workspace = true }
 ignore = "0.4"
 
+tempfile = { workspace = true }
+
 # HTTP server
 tokio = { workspace = true }
 axum = { workspace = true }
-tower-http = { workspace = true }
+tower-http = { workspace = true, features = ["cors"] }
 percent-encoding = { workspace = true }
 rmcp = { version = "1.8.0", features = ["server", "macros", "schemars", "transport-streamable-http-server"] }
 
 [dev-dependencies]
 assert_fs = { workspace = true }
 predicates = { workspace = true }
-tempfile = { workspace = true }
 tokio = { workspace = true, features = ["time"] }
 tower = { version = "0.5", features = ["util"] }
+
+[target.'cfg(unix)'.dependencies]
+rustix = { version = "1.1", features = ["fs"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Storage_FileSystem", "Win32_System_IO", "Win32_Foundation"] }

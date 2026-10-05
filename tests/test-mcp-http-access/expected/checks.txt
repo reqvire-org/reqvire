@@ -1,0 +1,13 @@
+PASS cli-help-and-invalid-origins
+PASS cli-help-and-invalid-hosts
+PASS mcp-default-origins
+PASS mcp-configured-origins-and-preflight
+PASS mcp-rejected-mutation
+PASS serve-default-origins
+PASS serve-configured-origins-and-preflight
+PASS serve-rejected-mutation
+PASS explorer-route-isolation
+PASS mcp-explicit-bind-host
+PASS mcp-public-hosts-and-rejected-mutation
+PASS serve-explicit-bind-host
+PASS serve-public-hosts-and-rejected-mutation

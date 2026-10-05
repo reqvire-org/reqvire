@@ -368,7 +368,7 @@ mod tests {
                 RDF_FIRST,
                 Term::NamedNode(iri("https://example.test/A")),
             ),
-            quad(head.clone().into(), RDF_REST, Term::BlankNode(tail.clone())),
+            quad(head.into(), RDF_REST, Term::BlankNode(tail.clone())),
             quad(
                 tail.clone().into(),
                 RDF_FIRST,

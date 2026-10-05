@@ -77,24 +77,20 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
 
 ### Reserved Subsections Support
 
-The system shall support reserved subsections with predefined structure and behavior.
+The system SHALL support reserved subsections with predefined structure and behavior.
 
 #### Details
-Reserved subsection vocabulary is defined by the Reqvire core element ontology. Parser-facing support includes:
- * **Relations**: authored relation edges
- * **Details**: narrative element context
- * **Metadata**: element metadata, element type, and governance metadata where valid
- * **Contract Bindings**: explicit reusable requirement-owned contract dependencies
- * **Concept References**: readable bindings from non-ontology, non-semantic-contract elements to native concept elements with derived generated SKOS IRIs
- * **Ontology**: ontology-element Turtle content
- * **External Ontology**: ontology-element local external vocabulary source declarations
- * **Shapes**: semantic-contract SHACL content
- * **Query**: semantic-contract SPARQL content when a contract owns query text
+WHEN parsing a reserved subsection defined by the core element ontology, the system SHALL apply the syntax, validation, and serialization rules in the owned subsection contracts.
 
-Each reserved subsection has specific parsing rules, validation requirements, and behaviors.
+WHEN a requirement declares Contract Bindings or Contract References, the system SHALL retain their distinct implementation-obligation and content-dependency semantics.
+
+IF a reserved subsection violates its applicable element-type or entry constraints, THEN the system SHALL report the invalid declaration.
 
 #### Metadata
   * type: requirement
+
+#### Contract Bindings
+  * [Contract Reference Semantics Specification](Specifications.md#contract-reference-semantics-specification)
 
 #### Relations
   * definedBy: [ReservedSubsections](ReservedSubsections.md#reservedsubsections)

@@ -1,0 +1,16 @@
+PASS locks/commits-disabled/orderly-restart
+PASS locks/commits-disabled/branch-contention
+PASS locks/commits-disabled/worktree-contention
+PASS locks/commits-disabled/branch-open-error
+PASS locks/commits-disabled/worktree-open-error
+PASS locks/commits-disabled/forced-restart
+PASS locks/commits-disabled/surviving-worker
+PASS snapshots/commits-disabled/accepted-state-and-pending-reversion
+PASS locks/commits-enabled/orderly-restart
+PASS locks/commits-enabled/branch-contention
+PASS locks/commits-enabled/worktree-contention
+PASS locks/commits-enabled/branch-open-error
+PASS locks/commits-enabled/worktree-open-error
+PASS locks/commits-enabled/forced-restart
+PASS locks/commits-enabled/surviving-worker
+PASS snapshots/commits-enabled/accepted-state-and-pending-reversion

@@ -18,11 +18,12 @@ import { ViewFrame } from "./ViewFrame";
 import { routeForContent } from "../router/routes";
 import { MermaidBlock } from "../rendering/MarkdownContent";
 import {
+  Button,
+  CoverageControls,
+  CoverageDrilldown,
   CoverageBarFrame,
   CoverageBarList,
   CoverageBreakdownFrame,
-  CoverageCapabilityList,
-  CoverageCapabilityRow,
   CoverageDashboard,
   CoverageEmptyNote,
   CoverageEmptyState,
@@ -38,7 +39,6 @@ import {
   CoverageMoreButton,
   CoveragePanel,
   CoverageSourceRow,
-  LabeledCoverageBarFrame,
   ReportEmptyNote,
   ReportRouteLayout,
   TraceFileGroup,
@@ -59,6 +59,7 @@ import {
   type DesignSystemColorToken,
   type ElementRole,
 } from "@ds";
+import { coverageDrilldownItems, COVERAGE_SOURCE_LABELS } from "../lib/coverage";
 import { buildTraceFiles, type TraceFileNode, type TraceVerificationNode } from "../lib/traces";
 
 /*
@@ -171,6 +172,7 @@ export function TracesView({
           <TraceReportContent>
             <TraceRows
               file={selectedFile}
+              contextId={JSON.stringify([store.project.workspace_root, store.project.worktree_id])}
               elementById={elementById}
               onOpenElement={onOpenElement}
               onSelect={setSelectedId}
@@ -188,12 +190,14 @@ export function TracesView({
 
 function TraceRows({
   file,
+  contextId,
   elementById,
   onOpenElement,
   onSelect,
   selectedVerificationId,
 }: {
   file: TraceFileNode | undefined;
+  contextId: string;
   elementById: Map<string, ProjectStoreElement>;
   onOpenElement: (id: string) => void;
   onSelect: (id: string) => void;
@@ -246,6 +250,7 @@ function TraceRows({
                 ]}
               />
               <TraceRollupDiagram
+                contextId={contextId}
                 verification={verification}
                 elementById={elementById}
                 onOpenElement={onOpenElement}
@@ -259,33 +264,27 @@ function TraceRows({
 }
 
 const TraceRollupDiagram = memo(function TraceRollupDiagram({
+  contextId,
   verification,
   elementById,
   onOpenElement,
 }: {
+  contextId: string;
   verification: TraceVerificationNode;
   elementById: Map<string, ProjectStoreElement>;
   onOpenElement: (id: string) => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const cancelQueuedRenderRef = useRef<(() => void) | null>(null);
-  const releaseRenderSlotRef = useRef<(() => void) | null>(null);
-  const [shouldRender, setShouldRender] = useState(false);
-  const [model, setModel] = useState<TraceRollupMermaidModel | null>(null);
-  const startQueuedRender = useCallback(() => {
-    if (shouldRender || model || cancelQueuedRenderRef.current || releaseRenderSlotRef.current) return;
-    cancelQueuedRenderRef.current = enqueueTraceMermaidRender((release) => {
-      cancelQueuedRenderRef.current = null;
-      releaseRenderSlotRef.current = release;
-      setModel(buildTraceRollupMermaidModel(verification, elementById));
-      setShouldRender(true);
-    });
-  }, [elementById, model, shouldRender, verification]);
-
-  const releaseRenderSlot = useCallback(() => {
-    releaseRenderSlotRef.current?.();
-    releaseRenderSlotRef.current = null;
-  }, []);
+  const [prepared, setPrepared] = useState<{
+    contextId: string;
+    verification: TraceVerificationNode;
+    elementById: Map<string, ProjectStoreElement>;
+    model: TraceRollupMermaidModel;
+    release: () => void;
+  } | null>(null);
+  const current = prepared?.contextId === contextId
+    && prepared.verification === verification && prepared.elementById === elementById
+    ? prepared : null;
   const handleDiagramClick = useCallback((event: ReactMouseEvent<HTMLDivElement>) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
@@ -297,58 +296,67 @@ const TraceRollupDiagram = memo(function TraceRollupDiagram({
     onOpenElement(elementId);
   }, [elementById, onOpenElement]);
 
-  useEffect(
-    () => () => {
-      cancelQueuedRenderRef.current?.();
-      cancelQueuedRenderRef.current = null;
-      releaseRenderSlotRef.current?.();
-      releaseRenderSlotRef.current = null;
-    },
-    [],
-  );
-
   useEffect(() => {
     const node = containerRef.current;
-    if (!node || shouldRender) return;
+    if (!node) return;
 
+    let cancelled = false;
+    let cancelQueuedRender: (() => void) | undefined;
+    let releaseRenderSlot: (() => void) | undefined;
     let timeout: ReturnType<typeof globalThis.setTimeout> | undefined;
     let idleCallback: ReturnType<typeof window.requestIdleCallback> | undefined;
+    let observer: IntersectionObserver | undefined;
+    const startQueuedRender = () => {
+      if (cancelled || cancelQueuedRender) return;
+      cancelQueuedRender = enqueueTraceMermaidRender((release) => {
+        if (cancelled) { release(); return; }
+        releaseRenderSlot = release;
+        setPrepared({
+          contextId, verification, elementById,
+          model: buildTraceRollupMermaidModel(verification, elementById),
+          release,
+        });
+      });
+    };
+
     if (!("IntersectionObserver" in window)) {
       timeout = globalThis.setTimeout(startQueuedRender, 0);
-      return () => globalThis.clearTimeout(timeout);
+    } else {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (cancelled || !entries.some((entry) => entry.isIntersecting)) return;
+          observer?.disconnect();
+          if ("requestIdleCallback" in window) {
+            idleCallback = window.requestIdleCallback(startQueuedRender, { timeout: 250 });
+          } else {
+            timeout = globalThis.setTimeout(startQueuedRender, 0);
+          }
+        },
+        { rootMargin: "320px 0px" },
+      );
+      observer.observe(node);
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        if ("requestIdleCallback" in window) {
-          idleCallback = window.requestIdleCallback(startQueuedRender, { timeout: 250 });
-        } else {
-          timeout = globalThis.setTimeout(startQueuedRender, 0);
-        }
-      },
-      { rootMargin: "320px 0px" },
-    );
-    observer.observe(node);
-
     return () => {
-      observer.disconnect();
+      cancelled = true;
+      observer?.disconnect();
       if (idleCallback !== undefined && "cancelIdleCallback" in window) {
         window.cancelIdleCallback(idleCallback);
       }
       if (timeout !== undefined) globalThis.clearTimeout(timeout);
+      cancelQueuedRender?.();
+      releaseRenderSlot?.();
     };
-  }, [shouldRender, startQueuedRender]);
+  }, [contextId, elementById, verification]);
 
   return (
     <TraceRollupDiagramShell ref={containerRef} onClickCapture={handleDiagramClick}>
-      {shouldRender && model ? (
+      {current ? (
         <MermaidBlock
-          code={model.code}
-          nodeClickTargets={model.nodeClickTargets}
+          code={current.model.code}
+          nodeClickTargets={current.model.nodeClickTargets}
           onNodeClick={onOpenElement}
-          onRenderSettled={releaseRenderSlot}
+          onRenderSettled={current.release}
         />
       ) : (
         <TraceRollupPlaceholder>
@@ -529,6 +537,8 @@ function mermaidClassForRole(role: ElementRole): string {
   switch (role) {
     case "input-output":
       return "inputOutput";
+    case "semantic-query":
+      return "ontology";
     case "semantic-contract":
       return "semanticContract";
     case "verification-objective":
@@ -566,51 +576,6 @@ export function __testBuildTraceRollupMermaid(
   return buildTraceRollupMermaid(verification, elementById);
 }
 
-interface CoverageSummaryLike {
-  total_leaf_requirements?: number;
-  verified_leaf_requirements?: number;
-  unverified_leaf_requirements?: number;
-  leaf_requirements_coverage_percentage?: number;
-  total_test_verifications?: number;
-  satisfied_test_verifications?: number;
-  unsatisfied_test_verifications?: number;
-  test_verifications_satisfaction_percentage?: number;
-  total_verifications?: number;
-  orphaned_verifications?: number;
-  orphaned_verifications_percentage?: number;
-  total_requirements_in_scope?: number;
-  covered_requirements?: number;
-  uncovered_requirements?: number;
-  implementation_coverage_percentage?: number;
-  verification_types?: Record<string, number>;
-  coverage_sources?: Record<string, number>;
-}
-
-interface CoverageProjectionLike {
-  summary?: CoverageSummaryLike;
-  unverified_leaf_requirements?: unknown;
-  unsatisfied_test_verifications?: unknown;
-  orphaned_verifications?: unknown;
-  covered_requirements?: unknown;
-  uncovered_requirements?: unknown;
-  satisfied_test_verifications?: unknown;
-  capability_coverage?: {
-    capabilities?: CapabilityCoverageDetails[];
-  };
-}
-
-interface CapabilityCoverageDetails {
-  identifier: string;
-  name: string;
-  aggregate_leaf_requirements?: number;
-  aggregate_verified_leaf_requirements?: number;
-  verification_coverage_percentage?: number;
-  aggregate_requirements?: number;
-  aggregate_covered_requirements?: number;
-  implementation_coverage_percentage?: number;
-  mark?: string;
-}
-
 interface CoverageRequirementDetails {
   identifier: string;
   name: string;
@@ -629,6 +594,9 @@ interface CoveredRequirementDetails {
   name: string;
   coverage_source?: string;
   evidence?: string[];
+  direct_evidence?: string[];
+  contributing_requirements?: string[];
+  blocking_requirements?: string[];
 }
 
 type CoverageFileItem<T> = T & { file: string };
@@ -646,16 +614,24 @@ export function CoverageView({
   onOpenElement?: (id: string) => void;
 } & Partial<ExplorerViewProps> = {}) {
   const { store, elementById } = useStore();
-  const coverage = (store.coverage ?? {}) as CoverageProjectionLike;
+  const ui = useExplorerUiState();
+  const coverage = ui.coverageProjection;
   const summary = coverage.summary ?? {};
-  const capabilityRows = [...(coverage.capability_coverage?.capabilities ?? [])].sort(
-    (left, right) =>
-      (right.implementation_coverage_percentage ?? 0) -
-        (left.implementation_coverage_percentage ?? 0) ||
-      left.name.localeCompare(right.name),
-  );
+  const capabilityRows = useMemo(() => coverageDrilldownItems(store, coverage), [store, coverage]);
+  const scopeOptions = useMemo(() => Object.values(store.coverage.scope_index)
+    .map(entry => ({ identifier: entry.scope.capability_identifier, name: entry.scope.capability_name }))
+    .sort((a, b) => a.name.localeCompare(b.name) || a.identifier.localeCompare(b.identifier)), [store.coverage]);
+  const openOrphans = () => {
+    ui.setCoverageScopeId(null);
+    ui.setCoverageSectionId("orphaned-verifications");
+  };
+  useEffect(() => {
+    if (ui.coverageSectionId === "orphaned-verifications" && !ui.coverageScopeId) {
+      document.getElementById(coverageSectionDomId("orphaned-verifications"))?.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+  }, [ui.coverageSectionId, ui.coverageScopeId]);
   const unverifiedLeaf = coverageFileItems<CoverageRequirementDetails>(coverage.unverified_leaf_requirements);
-  const uncoveredRequirements = coverageFileItems<CoverageRequirementDetails>(coverage.uncovered_requirements);
+  const uncoveredRequirements = coverageFileItems<CoveredRequirementDetails>(coverage.uncovered_requirements);
   const unsatisfiedTests = coverageFileItems<CoverageVerificationDetails>(coverage.unsatisfied_test_verifications);
   const orphanedVerifications = coverageFileItems<CoverageVerificationDetails>(coverage.orphaned_verifications);
   const coveredRequirements = coverageFileItems<CoveredRequirementDetails>(coverage.covered_requirements);
@@ -690,8 +666,12 @@ export function CoverageView({
           <CoverageHeader
             id={coverageSectionDomId("overview")}
             eyebrow="Coverage"
-            title="Verification Coverage"
+            title="Coverage"
+            controls={<CoverageControls scope={ui.coverageScopeId ?? ""} onScopeChange={id => ui.setCoverageScopeId(id || null)}
+              scopes={scopeOptions} />}
           />
+          {ui.coverageNotice && <CoverageEmptyNote>{ui.coverageNotice}</CoverageEmptyNote>}
+          {coverage.scope && summary.total_requirements_in_scope === 0 && <CoverageEmptyNote>No requirements in this capability scope.</CoverageEmptyNote>}
 
           {!hasCoverageData ? (
             <CoverageEmptyState title="No coverage report in this Explorer seed">
@@ -709,7 +689,9 @@ export function CoverageView({
                 <CoverageKpi
                   label="Implementation"
                   value={summary.implementation_coverage_percentage}
-                  detail={`${formatNumber(summary.covered_requirements)} / ${formatNumber(summary.total_requirements_in_scope)} covered`}
+                  detail={summary.total_terminal_requirements === undefined
+                    ? `${formatNumber(summary.covered_requirements)} / ${formatNumber(summary.total_requirements_in_scope)} covered`
+                    : `${formatNumber(summary.covered_terminal_requirements)} / ${formatNumber(summary.total_terminal_requirements)} terminal requirements covered`}
                   token="--resource"
                 />
                 <CoverageKpi
@@ -718,13 +700,16 @@ export function CoverageView({
                   detail={`${formatNumber(summary.satisfied_test_verifications)} / ${formatNumber(summary.total_test_verifications)} satisfied`}
                   token="--verification"
                 />
-                <CoverageKpi
+                {coverage.scope ? <CoveragePanel title="Orphaned verifications">
+                  <CoverageEmptyNote>Orphan diagnostics are available for the whole model only.</CoverageEmptyNote>
+                  <Button onClick={openOrphans} aria-label="View whole-model orphan diagnostics">View whole model</Button>
+                </CoveragePanel> : <CoverageKpi
                   label="Orphaned verifications"
                   value={summary.orphaned_verifications_percentage}
                   detail={`${formatNumber(summary.orphaned_verifications)} / ${formatNumber(summary.total_verifications)} orphaned`}
                   token="--contract"
                   inverted
-                />
+                />}
               </CoverageKpiGrid>
 
               <CoverageGrid>
@@ -740,7 +725,7 @@ export function CoverageView({
                     ]}
                   />
                 </CoveragePanel>
-                <CoveragePanel title="Coverage sources">
+                <CoveragePanel title="Implementation sources">
                   <CoverageSourceBars values={summary.coverage_sources ?? {}} />
                 </CoveragePanel>
                 <CoveragePanel
@@ -748,7 +733,11 @@ export function CoverageView({
                   title="Capability coverage"
                   span="wide"
                 >
-                  <CapabilityCoverageList capabilities={capabilityRows} onOpenElement={onOpenElement} />
+                  {capabilityRows.length ? <CoverageDrilldown key={ui.coverageScopeId ?? "whole"} items={capabilityRows}
+                    onInspect={target => {
+                      if (target.kind === "element") onOpenElement?.(target.id);
+                      else if (target.href) window.location.hash = target.href;
+                    }} /> : <CoverageEmptyNote>No capability coverage rows were reported.</CoverageEmptyNote>}
                 </CoveragePanel>
               </CoverageGrid>
 
@@ -766,7 +755,7 @@ export function CoverageView({
                   id={coverageSectionDomId("unimplemented-requirements")}
                   title="Unimplemented requirements"
                   items={uncoveredRequirements}
-                  emptyLabel="All requirements in scope have implementation evidence."
+                  emptyLabel="All requirements in scope are implementation-covered."
                   defaultType="requirement"
                   elementById={elementById}
                   onOpenElement={onOpenElement}
@@ -780,16 +769,17 @@ export function CoverageView({
                   elementById={elementById}
                   onOpenElement={onOpenElement}
                 />
-                <CoverageGapList
+                {!coverage.scope && <CoverageGapList
                   id={coverageSectionDomId("orphaned-verifications")}
                   title="Orphaned verifications"
                   items={orphanedVerifications}
-                  emptyLabel="Every verification links to a requirement or capability."
+                  emptyLabel="Every verification links to a requirement."
                   defaultType="test-verification"
                   elementById={elementById}
                   onOpenElement={onOpenElement}
-                />
+                />}
               </CoverageGapGrid>
+
             </>
           )}
         </CoverageDashboard>
@@ -843,10 +833,14 @@ function CoverageBreakdown({
 
 function CoverageSourceBars({ values }: { values: Record<string, number> }) {
   const rows: [string, string, DesignSystemColorToken][] = [
-    ["direct_satisfied", "Direct evidence", "--resource"],
-    ["contract_satisfied_via_contract_bindings", "Reused contract", "--ontology"],
-    ["contract_satisfied_via_child", "Child contract", "--capability"],
+    ["direct_satisfied", COVERAGE_SOURCE_LABELS.direct_satisfied, "--resource"],
+    ["requirement_rollup", COVERAGE_SOURCE_LABELS.requirement_rollup, "--capability"],
+    ["contract_consumer_rollup", COVERAGE_SOURCE_LABELS.contract_consumer_rollup, "--ontology"],
+    ["combined_rollup", COVERAGE_SOURCE_LABELS.combined_rollup, "--requirement"],
   ];
+  for (const key of ["contract_satisfied_via_contract_bindings", "contract_satisfied_via_child"]) {
+    if (key in values) rows.push([key, COVERAGE_SOURCE_LABELS[key], "--ontology"]);
+  }
   const max = Math.max(1, ...rows.map(([key]) => values[key] ?? 0));
   return (
     <CoverageBarList>
@@ -859,44 +853,6 @@ function CoverageSourceBars({ values }: { values: Record<string, number> }) {
         );
       })}
     </CoverageBarList>
-  );
-}
-
-function CapabilityCoverageList({
-  capabilities,
-  onOpenElement,
-}: {
-  capabilities: CapabilityCoverageDetails[];
-  onOpenElement?: (id: string) => void;
-}) {
-  if (capabilities.length === 0) {
-    return <CoverageEmptyNote>No capability coverage rows were reported.</CoverageEmptyNote>;
-  }
-
-  return (
-    <CoverageCapabilityList>
-      {capabilities.map((capability) => (
-        <CoverageCapabilityRow
-          key={capability.identifier}
-          name={capability.name || displayIdentifier(capability.identifier)}
-          mark={capability.mark}
-          onClick={() => onOpenElement?.(capability.identifier)}
-        >
-          <LabeledCoverageBar
-            label="Verification"
-            value={capability.verification_coverage_percentage}
-            count={`${formatNumber(capability.aggregate_verified_leaf_requirements)} / ${formatNumber(capability.aggregate_leaf_requirements)}`}
-            token="--requirement"
-          />
-          <LabeledCoverageBar
-            label="Implementation"
-            value={capability.implementation_coverage_percentage}
-            count={`${formatNumber(capability.aggregate_covered_requirements)} / ${formatNumber(capability.aggregate_requirements)}`}
-            token="--resource"
-          />
-        </CoverageCapabilityRow>
-      ))}
-    </CoverageCapabilityList>
   );
 }
 
@@ -959,24 +915,6 @@ function CoverageGapList<T extends { identifier: string; name: string; file: str
 
 function coverageSectionDomId(section: CoverageSectionId) {
   return `coverage-section-${section}`;
-}
-
-function LabeledCoverageBar({
-  label,
-  value,
-  count,
-  token,
-}: {
-  label: string;
-  value?: number;
-  count: string;
-  token: DesignSystemColorToken;
-}) {
-  return (
-    <LabeledCoverageBarFrame label={label} value={`${formatPercent(value)} · ${count}`}>
-      <CoverageBar value={value ?? 0} token={token} />
-    </LabeledCoverageBarFrame>
-  );
 }
 
 function CoverageBar({ value, token }: { value: number; token: DesignSystemColorToken }) {

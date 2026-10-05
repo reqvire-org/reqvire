@@ -55,7 +55,7 @@ impl Filters {
             .map(crate::utils::compile_glob_matcher)
             .transpose()?;
 
-        Ok(Filters {
+        Ok(Self {
             file_glob,
             name_re,
             type_pat,

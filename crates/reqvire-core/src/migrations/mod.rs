@@ -3,7 +3,7 @@ use crate::element::{Element, ElementType, CONTRACT_BINDINGS_SECTION};
 use crate::error::ReqvireError;
 use crate::exclusions::ExclusionSet as GlobSet;
 use crate::filesystem;
-use crate::graph_registry::{ElementNode, GraphRegistry};
+use crate::graph_registry::{GraphRegistry, RegistryNode};
 use crate::relation::{LinkType, Relation, RELATION_TYPES};
 use crate::utils;
 use serde::Serialize;
@@ -31,7 +31,7 @@ pub struct MigrationPlan {
 }
 
 impl MigrationPlan {
-    pub fn empty() -> Self {
+    pub const fn empty() -> Self {
         Self {
             candidates: Vec::new(),
         }
@@ -267,7 +267,7 @@ pub fn apply_verification_objective_holders(
             let objective = holder_objective_element();
             registry.nodes.insert(
                 VERIFICATION_OBJECTIVE_HOLDER_ID.to_string(),
-                ElementNode {
+                RegistryNode {
                     element: objective,
                     relations: Vec::new(),
                 },
@@ -475,13 +475,13 @@ fn rewrite_concept_reference_links_content(
     let mut rewritten = 0;
 
     for line in content.split_inclusive('\n') {
-        let (body, suffix) = if let Some(body) = line.strip_suffix("\r\n") {
-            (body, "\r\n")
-        } else if let Some(body) = line.strip_suffix('\n') {
-            (body, "\n")
-        } else {
-            (line, "")
-        };
+        let (body, suffix) = line.strip_suffix("\r\n").map_or_else(
+            || {
+                line.strip_suffix('\n')
+                    .map_or((line, ""), |body| (body, "\n"))
+            },
+            |body| (body, "\r\n"),
+        );
 
         let trimmed = body.trim();
         if trimmed.starts_with("#### ") {
@@ -533,13 +533,13 @@ fn rewrite_contract_bindings_section_content(content: &str) -> Option<String> {
     let mut changed = false;
 
     for line in content.split_inclusive('\n') {
-        let (body, suffix) = if let Some(body) = line.strip_suffix("\r\n") {
-            (body, "\r\n")
-        } else if let Some(body) = line.strip_suffix('\n') {
-            (body, "\n")
-        } else {
-            (line, "")
-        };
+        let (body, suffix) = line.strip_suffix("\r\n").map_or_else(
+            || {
+                line.strip_suffix('\n')
+                    .map_or((line, ""), |body| (body, "\n"))
+            },
+            |body| (body, "\r\n"),
+        );
         let trimmed = body.trim();
         let replacement = contract_bindings_section_replacement(trimmed);
 
@@ -675,7 +675,7 @@ mod tests {
             .insert("type".to_string(), "test-verification".to_string());
         registry
             .register_element(verification, "system-model/Verifications/CLI.md")
-            .unwrap();
+            .expect("register valid test element");
         let mut second_verification = Element::new(
             "CLI Search Verification",
             "system-model/Verifications/CLI.md#cli-search-verification",
@@ -688,9 +688,9 @@ mod tests {
             .insert("type".to_string(), "test-verification".to_string());
         registry
             .register_element(second_verification, "system-model/Verifications/CLI.md")
-            .unwrap();
+            .expect("register valid test element");
 
-        let summary = apply_verification_objective_holders(&mut registry).unwrap();
+        let summary = apply_verification_objective_holders(&mut registry).expect("verification objective holder migration adds one shared holder and relations: expected success");
 
         assert_eq!(summary.objectives_created, 1);
         assert_eq!(summary.derive_relations_added, 2);
@@ -732,11 +732,11 @@ mod tests {
                 "system-model/Billing.md#invoice-numbering-specification",
                 Some("invoice-numbering-specification".to_string()),
             )
-            .unwrap(),
+            .expect("construct valid test relation"),
         );
         registry
             .register_element(requirement, "system-model/Billing.md")
-            .unwrap();
+            .expect("register valid test element");
 
         let mut specification = Element::new(
             "Invoice Numbering Specification",
@@ -755,13 +755,14 @@ mod tests {
                 "system-model/Billing.md#invoice-requirement",
                 Some("invoice-requirement".to_string()),
             )
-            .unwrap(),
+            .expect("construct valid test relation"),
         );
         registry
             .register_element(specification, "system-model/Billing.md")
-            .unwrap();
+            .expect("register valid test element");
 
-        let summary = apply_contract_relation_migration(&mut registry).unwrap();
+        let summary = apply_contract_relation_migration(&mut registry)
+            .expect("contract relation migration rewrites legacy relation names: expected success");
 
         assert_eq!(summary.relations_rewritten, 2);
         assert_eq!(summary.affected_files, vec!["system-model/Billing.md"]);
@@ -791,7 +792,9 @@ mod tests {
     #[test]
     fn documents_header_migration_rewrites_only_first_documents_h1() {
         let input = "\n# Documents\n\n## Metadata\n  * type: specification\n";
-        let rewritten = rewrite_documents_header_content(input).unwrap();
+        let rewritten = rewrite_documents_header_content(input).expect(
+            "documents header migration rewrites only first documents h1: expected success",
+        );
         assert_eq!(
             rewritten,
             "\n# Element\n\n## Metadata\n  * type: specification\n"
@@ -803,7 +806,8 @@ mod tests {
     #[test]
     fn contract_bindings_migration_rewrites_legacy_headings() {
         let input = "### Requirement\n\n#### Reused Contract Context\n  * [Contract](Contracts.md#contract)\n\n## Attachments\n";
-        let rewritten = rewrite_contract_bindings_section_content(input).unwrap();
+        let rewritten = rewrite_contract_bindings_section_content(input)
+            .expect("contract bindings migration rewrites legacy headings: expected success");
 
         assert_eq!(
             rewritten,

@@ -84,6 +84,7 @@ Analyze how changes to requirements propagate through the model.
 
 ## Change Propagation Rules
 
+- **Contract → Binding or reference consumer**: Both dependency kinds propagate content changes for review; only bindings affect implementation fulfillment. Inspect both structured edge kinds in the impact report.
 - **Parent → Child**: Parent changes propagate to all derived children
 - **Requirement → Verification**: Requirement changes invalidate verifications
 - **Requirement → Implementation**: May need implementation updates

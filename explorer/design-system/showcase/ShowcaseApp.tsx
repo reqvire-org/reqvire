@@ -15,7 +15,16 @@ const TABS = [
 ];
 
 export function ShowcaseApp() {
-  const [tab, setTab] = useState<Tab>("tokens");
+  const [tab, setTab] = useState<Tab>(() => {
+    const requested = new URLSearchParams(window.location.search).get("tab");
+    return TABS.find(item => item.value === requested)?.value ?? "tokens";
+  });
+  const selectTab = (value: Tab) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", value);
+    window.history.replaceState(null, "", url);
+    setTab(value);
+  };
   const isMocks = tab === "mocks";
 
   return (
@@ -25,7 +34,7 @@ export function ShowcaseApp() {
           <span className="showcase-topbar__brand-mark">RQ</span>
           Design System
         </div>
-        <Tabs items={TABS} value={tab} onChange={setTab} />
+        <Tabs items={TABS} value={tab} onChange={selectTab} />
       </div>
       <div className={isMocks ? "showcase-body showcase-body--full" : "showcase-body"}>
         {tab === "tokens" && <TokensPage />}

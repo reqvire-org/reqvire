@@ -2,6 +2,8 @@
 
 Use this prompt when the user wants to reorganize a Reqvire model without changing system intent.
 
+Contract dependencies include Contract Bindings for shared implementation obligations and Contract References for content dependencies. Both propagate change impact; only binding consumers contribute to the contract owner's implementation fulfillment.
+
 Workflow:
 - Start with `reqvire.workspace_status`, validation evidence, `reqvire.lint`, `reqvire.submodels`, `reqvire.containment`, and focused `reqvire.search` for the requested scope.
 - Use `reqvire.collect` before editing a candidate capability, requirement, contract, ontology, or verification branch.
@@ -12,10 +14,11 @@ Refactor rules:
 - Preserve system behavior and requirement intent. Refactoring changes structure, ownership, containment, or wording boundaries; it must not silently change obligations.
 - Capabilities own coherent system ability. Requirements own implementable obligations. Requirement-owned contracts own detailed specs, constraints, behavior, states, sources, and input/output.
 - Extract exact technical details from requirements into compatible requirement-owned contracts when that improves traceability.
-- Use `definedBy` / `define` for contract ownership and contract bindings only for explicit cross-subgraph reuse of compatible requirement-owned contracts.
-- Keep hierarchy inside compatible families and intended submodel boundaries. Cross-submodel requirement hierarchy should become explicit contract bindings, concept references, or semantic-contract links where appropriate.
-- Do not remove a cross-subgraph relation unless dependency visibility is preserved with an explicit replacement such as a contract binding, concept reference, semantic-contract relation, or local requirement-owned contract.
-- After replacing cross-boundary dependencies, check that `reqvire.collect` still shows the context needed by the consumer and change-impact still reports bound-contract consumers.
+- Use `definedBy` / `define` for contract ownership. Retain contract bindings on requirements responsible for implementing shared obligations; replace context-only bindings with Contract References using `referenceContract` through `reqvire.link` or the reserved Markdown section.
+- A requirement cannot contain both Contract Bindings and Contract References, even for different targets. Allocate distinct input-consumption and shared-output responsibilities to meaningful parent and child requirements when each needs a different dependency kind.
+- Keep hierarchy inside compatible families and intended submodel boundaries. Choose cross-submodel contract bindings for shared obligations, contract references for content dependencies, concept references for terminology, and semantic-contract links for SHACL constraints.
+- Preserve dependency visibility when replacing a cross-subgraph relation. Contract dependencies must remain acyclic through contract owners, both dependency kinds, and requirement ancestry.
+- After replacing cross-boundary dependencies, check that `reqvire.collect` still shows consumer context and change-impact still reports binding and reference consumers. Check implementation coverage again: converting a binding to a reference can reveal an unimplemented owner requirement.
 - Put reusable structural meaning in ontology, curated terminology in native concepts, and SHACL closed-world profiles in semantic contracts.
 - Semantic contracts contain `#### Shapes`, use ontology through `use` / `usedBy`, constrain requirements through `constrain` / `constrainedBy`, and do not contain `#### Ontology`.
 - Keep specification, constraint, and behavior language mechanism-focused. Move requirement-intent `shall` statements back to the owning requirement or rephrase contract text without changing meaning.

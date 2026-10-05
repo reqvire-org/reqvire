@@ -15,7 +15,7 @@ impl GraphRegistry {
     pub fn get_contract_owners(&self, contract_id: &str) -> Vec<String> {
         let mut owners = Vec::new();
 
-        let mut sorted_nodes: Vec<(&String, &ElementNode)> = self.nodes.iter().collect();
+        let mut sorted_nodes: Vec<(&String, &RegistryNode)> = self.nodes.iter().collect();
         sorted_nodes.sort_by(|(a_id, _), (b_id, _)| a_id.cmp(b_id));
 
         for (element_id, element_node) in sorted_nodes {
@@ -29,6 +29,7 @@ impl GraphRegistry {
                     if let LinkType::Identifier(target_id) = &relation.target.link {
                         if target_id == contract_id {
                             owners.push(element_id.clone());
+                            break;
                         }
                     }
                 }
@@ -200,7 +201,7 @@ impl GraphRegistry {
         context.into_iter().collect()
     }
 
-    pub(super) fn expand_ontology_context(&self, ontology_ids: BTreeSet<String>) -> Vec<String> {
+    pub(crate) fn expand_ontology_context(&self, ontology_ids: BTreeSet<String>) -> Vec<String> {
         let mut context = BTreeSet::new();
         let mut stack: Vec<String> = ontology_ids.into_iter().collect();
 
@@ -245,7 +246,7 @@ impl GraphRegistry {
     /// Check if a contract element has at least one `define` relation.
     /// Returns true if the contract has a define relation, false otherwise.
     pub fn contract_has_define_relation(&self, contract_id: &str) -> bool {
-        if let Some(node) = self.nodes.get(contract_id) {
+        self.nodes.get(contract_id).is_some_and(|node| {
             node.element
                 .relations
                 .iter()
@@ -253,10 +254,8 @@ impl GraphRegistry {
                 .any(|r| {
                     relation::is_contract_relation(r.relation_type)
                         && r.relation_type.name == CONTRACT_RELATIONS[0]
-                }) // define
-        } else {
-            false
-        }
+                })
+        })
     }
 
     pub(super) fn concept_scheme_namespace_context(

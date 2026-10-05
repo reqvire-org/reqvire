@@ -5,6 +5,7 @@ use crate::graph_registry::GraphRegistry;
 use crate::relation;
 use rustc_hash::FxHashSet;
 use serde::Serialize;
+use std::collections::BTreeSet;
 
 /// Model-centric report with nested element structure
 #[derive(Debug, Serialize)]
@@ -14,7 +15,7 @@ pub struct ModelCentricReport {
 }
 
 /// Direction of traversal for model report
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TraversalDirection {
     Forward, // Root to leaves through canonical traversal relations.
     Reverse, // Leaves to roots (derivedFrom, satisfy, verify)
@@ -32,6 +33,8 @@ pub struct ModelCentricElement {
     pub size_estimate: Option<SizeEstimate>,
     pub relations: Vec<ModelCentricRelation>,
     pub contract_bindings: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub contract_references: Vec<String>,
     #[serde(skip)]
     pub contract_bindings_labels: Vec<String>,
 }
@@ -342,6 +345,13 @@ fn build_element_recursive(
         relations,
         contract_bindings,
         contract_bindings_labels,
+        contract_references: element
+            .contract_references
+            .iter()
+            .map(|entry| entry.target.as_str())
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .collect(),
     })
 }
 

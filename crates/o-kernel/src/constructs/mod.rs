@@ -31,6 +31,6 @@ mod tests {
 
     #[test]
     fn module_is_compilable() {
-        assert!(MODULE.len() > 0);
+        assert!(!MODULE.is_empty());
     }
 }

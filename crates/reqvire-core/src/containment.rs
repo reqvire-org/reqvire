@@ -31,45 +31,45 @@ pub struct ContainmentElement {
     pub file_path: String,
     pub identifier: String,
     pub contract_bindings: Vec<ContainmentContractBinding>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub contract_references: Vec<ContainmentContractBinding>,
 }
 
 impl ContainmentElement {
     pub fn from_element(element: &Element, registry: &GraphRegistry) -> Self {
-        ContainmentElement {
+        let convert = |a: &crate::element::ContractBindingEntry| match &a.target {
+            crate::element::ContractBindingTarget::FilePath(path) => {
+                let file_name = path
+                    .file_name()
+                    .map(|n| n.to_string_lossy().into_owned())
+                    .unwrap_or_else(|| path.to_string_lossy().into_owned());
+                ContainmentContractBinding {
+                    name: file_name,
+                    is_element: false,
+                    link: Some(path.to_string_lossy().into_owned()),
+                }
+            }
+            crate::element::ContractBindingTarget::ElementIdentifier(id) => {
+                // Look up element name from registry using the identifier
+                let name = registry
+                    .get_element(id)
+                    .map(|e| e.name.clone())
+                    .unwrap_or_else(|| id.clone());
+                ContainmentContractBinding {
+                    name,
+                    is_element: true,
+                    link: Some(id.clone()),
+                }
+            }
+        };
+        Self {
             id: element.id.clone(),
             name: element.name.clone(),
             element_type: element.element_type.clone(),
             file_path: element.file_path.clone(),
             identifier: element.identifier.clone(),
-            contract_bindings: element
-                .contract_bindings
-                .iter()
-                .map(|a| match &a.target {
-                    crate::element::ContractBindingTarget::FilePath(path) => {
-                        let file_name = path
-                            .file_name()
-                            .map(|n| n.to_string_lossy().into_owned())
-                            .unwrap_or_else(|| path.to_string_lossy().into_owned());
-                        ContainmentContractBinding {
-                            name: file_name,
-                            is_element: false,
-                            link: Some(path.to_string_lossy().into_owned()),
-                        }
-                    }
-                    crate::element::ContractBindingTarget::ElementIdentifier(id) => {
-                        // Look up element name from registry using the identifier
-                        let name = registry
-                            .get_element(id)
-                            .map(|e| e.name.clone())
-                            .unwrap_or_else(|| id.clone());
-                        ContainmentContractBinding {
-                            name,
-                            is_element: true,
-                            link: Some(id.clone()),
-                        }
-                    }
-                })
-                .collect(),
+            contract_bindings: element.contract_bindings.iter().map(&convert).collect(),
+            contract_references: element.contract_references.iter().map(&convert).collect(),
         }
     }
 }
@@ -96,7 +96,7 @@ pub struct ContainmentFolder {
     pub path: Vec<String>,
     pub files: Vec<ContainmentFile>,
     pub design_documents: Vec<DesignDocument>,
-    pub subfolders: Vec<ContainmentFolder>,
+    pub subfolders: Vec<Self>,
 }
 
 /// Root containment hierarchy structure
@@ -145,7 +145,7 @@ impl ContainmentHierarchy {
         // Build folder structure
         let root_folder = build_folder_structure(&elements_map, &design_docs);
 
-        Ok(ContainmentHierarchy { root_folder })
+        Ok(Self { root_folder })
     }
 }
 

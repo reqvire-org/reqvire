@@ -71,7 +71,7 @@ pub const MCP_PROMPTS: &[McpPromptDefinition] = &[
     McpPromptDefinition {
         name: "reqvire.semantic.contract_context_search",
         title: "Reqvire Semantic Contract Context Search",
-        description: "Find cross-subgraph contract bindings and semantic-contract constraints.",
+        description: "Find cross-subgraph contract bindings, contract references, and semantic-contract constraints.",
         arguments: QUESTION_SCOPE_ARGUMENTS,
         content: include_str!("mcp_prompts/semantic_contract_context_search.md"),
     },
@@ -214,4 +214,68 @@ fn render_prompt_content(
         }
     }
     text
+}
+
+#[cfg(test)]
+mod tests {
+    use super::prompt_get_result_json;
+
+    fn text(name: &str) -> String {
+        prompt_get_result_json(name, None).expect("known prompt must be retrievable")["messages"][0]
+            ["content"]["text"]
+            .as_str()
+            .expect("prompt message must contain text")
+            .to_owned()
+    }
+
+    #[test]
+    fn contract_dependency_guidance_distinguishes_obligations_from_references() {
+        let mut missing = Vec::new();
+        for name in [
+            "reqvire.workflow.explore_model",
+            "reqvire.workflow.generate_implementation_tasks",
+            "reqvire.workflow.author_capability_requirement",
+            "reqvire.workflow.refactor_model_structure",
+            "reqvire.workflow.audit_change_impact",
+            "reqvire.semantic.contract_context_search",
+            "reqvire.workflow.model_quality_audit",
+            "reqvire.workflow.verify_coverage",
+        ] {
+            let content = text(name);
+            for rule in [
+                "Contract Bindings",
+                "shared implementation obligations",
+                "Contract References",
+                "content dependencies",
+                "change impact",
+                "only binding consumers contribute",
+            ] {
+                if !content.contains(rule) {
+                    missing.push(format!("{name}: missing {rule}"));
+                }
+            }
+        }
+        assert!(missing.is_empty(), "{}", missing.join("\n"));
+    }
+
+    #[test]
+    fn contract_dependency_authoring_guidance_preserves_validation_constraints() {
+        for name in [
+            "reqvire.workflow.author_capability_requirement",
+            "reqvire.workflow.refactor_model_structure",
+        ] {
+            let content = text(name);
+            for rule in ["referenceContract", "cannot contain both", "acyclic"] {
+                assert!(content.contains(rule), "{name}: missing {rule}");
+            }
+        }
+        let coverage = text("reqvire.workflow.verify_coverage");
+        for rule in [
+            "terminal requirements",
+            "verification leaves",
+            "satisfiedBy",
+        ] {
+            assert!(coverage.contains(rule), "Coverage prompt: missing {rule}");
+        }
+    }
 }
