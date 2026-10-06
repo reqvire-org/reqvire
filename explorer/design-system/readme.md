@@ -24,6 +24,12 @@ shell. Coverage starts its pane with the Model-style quick filter above the Whol
 Model tree, without a separate Capabilities heading. Coverage issue rows show
 their type badge on the right without a duplicate leading element icon.
 
+Patterns includes a Worktree Loading and Errors section using the exported
+Explorer dialog. Preview loading, connection failures, long validation diagnostics
+and automatic-refresh errors. The compact dialog left-aligns its heading and
+labelled branch context, separates recovery guidance from selectable diagnostic
+details, and keeps Close visible when lengthy details scroll.
+
 ## Sources
 
 - **Product site:** https://www.reqvire.org/

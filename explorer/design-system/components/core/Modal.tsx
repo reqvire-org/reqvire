@@ -36,6 +36,10 @@ const overlayBaseUX = css`
   padding: var(--space-24) var(--space-10);
   background: var(--ds-modal-overlay-bg);
   backdrop-filter: var(--ds-modal-overlay-backdrop-filter);
+
+  &[data-size="compact"] {
+    padding: var(--space-8);
+  }
 `;
 
 const centeredOverlayUX = css`
@@ -61,7 +65,8 @@ const baseUX = css`
   }
 
   &[data-size="compact"] {
-    --ds-modal-w: calc(var(--space-32) * 14);
+    --ds-modal-w: calc(var(--space-32) * 9);
+    max-height: calc(100dvh - 2 * var(--space-8));
   }
 `;
 
@@ -152,6 +157,7 @@ export function ModalContent({
   return createPortal(
     <ModalContentContext.Provider value={context}>
       <div
+        data-size={size}
         className={cx("ds-modal__overlay", overlayBaseUX, centered ? centeredOverlayUX : undefined)}
         role="presentation"
         onMouseDown={(event) => {

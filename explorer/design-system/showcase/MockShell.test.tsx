@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MockShell } from "./MockShell";
 import { ProductPatternsPage } from "./pages/ProductPatternsPage";
@@ -104,6 +104,34 @@ describe("showcase application coverage", () => {
       selectWorktree("coverage-review");
       expectBranch("coverage-review");
     } finally { view.unmount(); }
+  });
+
+  it("previews real worktree dialogs with connection, validation and refresh diagnostics", () => {
+    vi.useFakeTimers();
+    const view = render(<ProductPatternsPage />);
+    try {
+      fireEvent.click(screen.getByRole("button", { name: "Preview worktree loading" }));
+      const loading = screen.getByRole("dialog", { name: "Loading worktree" });
+      expect(within(loading).getByRole("status", { name: "Loading coverage-review" })).toBeTruthy();
+      fireEvent.keyDown(loading, { key: "Escape" });
+      expect(screen.getByRole("dialog", { name: "Loading worktree" })).toBe(loading);
+      act(() => vi.advanceTimersByTime(5000));
+      expect(screen.queryByRole("dialog")).toBeNull();
+      for (const [preview, title, diagnostic] of [
+        ["Preview connection error", "Couldn’t load worktree", "NetworkError"],
+        ["Preview validation error", "Couldn’t load worktree", "Validation failed with 2 errors:"],
+        ["Preview refresh error", "Couldn’t refresh model", "The server connection is unavailable."],
+      ]) {
+        fireEvent.click(screen.getByRole("button", { name: preview }));
+        const dialog = screen.getByRole("dialog", { name: title });
+        expect(dialog.getAttribute("data-product-pattern")).toBe("worktree-load-dialog");
+        expect(within(dialog).getByText("Branch")).toBeTruthy();
+        expect(within(dialog).getByRole("alert").textContent).toContain(diagnostic);
+        if (preview === "Preview validation error") expect(within(dialog).getByText("bug-fixes-01")).toBeTruthy();
+        fireEvent.click(within(dialog).getByRole("button", { name: "Close" }));
+        expect(screen.queryByRole("dialog")).toBeNull();
+      }
+    } finally { view.unmount(); vi.useRealTimers(); }
   });
 
   it("switches fixture worktrees in the real Explorer shell and closes old details", async () => {

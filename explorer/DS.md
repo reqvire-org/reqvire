@@ -282,10 +282,14 @@ badge. It omits a duplicate leading element icon in all four Coverage issue list
 
 `WorktreeLoadDialog` owns the shared loading/error presentation. Its refresh
 variant reports the displayed branch and retry policy in the same dismissible
-modal, with no duplicate refresh-error banner. The application owns dismissal
+modal, with no duplicate refresh-error banner. The compact modal has a
+left-aligned status heading and labelled Branch row. A separate explanation
+precedes the complete diagnostic in a wrapping, selectable, keyboard-scrollable
+region. The dismissal footer remains visible with long errors and constrained
+viewports. The application owns dismissal
 and suppresses repeated dialogs for the same unresolved failure while retaining
 the accepted model and automatic refresh. Patterns previews use the exported
-dialog for both worktree-selection and refresh errors.
+dialog for loading, connection errors, long validation errors and refresh errors.
 
 Controls in the same pane must use its shared horizontal insets and fill the
 available control column. Avoid independent width caps that make a picker

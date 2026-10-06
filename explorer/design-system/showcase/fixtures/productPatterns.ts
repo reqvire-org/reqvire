@@ -13,6 +13,7 @@ import type {
   PaneSummaryItem,
   ShellNavigationItem,
   WorktreeSelectorProps,
+  WorktreeLoadDialogProps,
 } from "@ds";
 
 export const SHOWCASE_WORKTREES: WorktreeSelectorProps["choices"] = [
@@ -20,6 +21,28 @@ export const SHOWCASE_WORKTREES: WorktreeSelectorProps["choices"] = [
   { id: "showcase-coverage", branch: "coverage-review", root: "/workspace/reqvire-coverage", available: true },
   { id: "showcase-unavailable", branch: "archived", root: "/workspace/reqvire-archived", available: false },
 ];
+
+export const SHOWCASE_WORKTREE_DIALOGS = {
+  pending: { branch: "coverage-review" },
+  connection: { branch: "coverage-review", error: "NetworkError when attempting to fetch resource." },
+  validation: {
+    branch: "bug-fixes-01",
+    error: [
+      "Validation failed with 2 errors:",
+      "Circular dependency error: requirement fulfillment system-model/Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint",
+      "−[contract consumer]→ system-model/Interfaces/WebExplorer/Capabilities.md#serve-command",
+      "−[child requirement]→ system-model/Interfaces/WebExplorer/Capabilities.md#served-explorer-runtime-freshness",
+      "−[contract consumer]→ system-model/Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint",
+      "Circular dependency error: requirement fulfillment system-model/Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint",
+      "−[contract consumer]→ system-model/Interfaces/WebExplorer/Capabilities.md#serve-command",
+      "−[contract consumer]→ system-model/Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint",
+    ].join(" "),
+  },
+  refresh: {
+    branch: "main", operation: "refresh", retryAutomatically: true,
+    error: "The server connection is unavailable.",
+  },
+} as const satisfies Record<string, Omit<WorktreeLoadDialogProps, "onDismiss">>;
 
 export type ShowcaseMockViewId = "thesaurus" | "model" | "traces" | "ontologies" | "coverage";
 

@@ -55,6 +55,7 @@ import {
   ONTOLOGY_NODES,
   ONTOLOGY_REQUIREMENT_NODE,
   SHOWCASE_WORKTREES,
+  SHOWCASE_WORKTREE_DIALOGS,
 } from "../fixtures/productPatterns";
 
 const PRIMARY_DETAIL_ELEMENT_ID = "REQ-DET-042";
@@ -227,10 +228,10 @@ function Section({ title, desc, children }: { title: string; desc?: string; chil
 }
 
 export function ProductPatternsPage() {
-  const [worktreeLoad, setWorktreeLoad] = useState<"pending" | "error" | "refresh" | null>(null);
+  const [worktreeLoad, setWorktreeLoad] = useState<keyof typeof SHOWCASE_WORKTREE_DIALOGS | null>(null);
   useEffect(() => {
     if (worktreeLoad !== "pending") return;
-    const timer = setTimeout(() => setWorktreeLoad(null), 1500);
+    const timer = setTimeout(() => setWorktreeLoad(null), 5000);
     return () => clearTimeout(timer);
   }, [worktreeLoad]);
   const [worktreeId, setWorktreeId] = useState(SHOWCASE_WORKTREES[0].id);
@@ -327,14 +328,17 @@ export function ProductPatternsPage() {
           onChange={setWorktreeId}
           onOpen={() => {}}
         />
-        <Button onClick={() => setWorktreeLoad("pending")}>Preview worktree loading</Button>
-        <Button onClick={() => setWorktreeLoad("error")}>Preview worktree error</Button>
-        <Button onClick={() => setWorktreeLoad("refresh")}>Preview refresh error</Button>
-        {worktreeLoad && <WorktreeLoadDialog branch="coverage-review"
-          operation={worktreeLoad === "refresh" ? "refresh" : "selection"}
-          retryAutomatically={worktreeLoad === "refresh"}
-          error={worktreeLoad === "error" ? "The selected worktree could not be loaded."
-            : worktreeLoad === "refresh" ? "The server connection is unavailable." : null}
+      </Section>
+
+      <Section title="Worktree Loading and Errors"
+        desc="The shared Explorer dialog identifies the branch, explains recovery, and keeps full diagnostics readable. The loading preview completes after five seconds; errors support Close, Escape and outside dismissal.">
+        <div className="showcase-row">
+          <Button onClick={() => setWorktreeLoad("pending")}>Preview worktree loading</Button>
+          <Button onClick={() => setWorktreeLoad("connection")}>Preview connection error</Button>
+          <Button onClick={() => setWorktreeLoad("validation")}>Preview validation error</Button>
+          <Button onClick={() => setWorktreeLoad("refresh")}>Preview refresh error</Button>
+        </div>
+        {worktreeLoad && <WorktreeLoadDialog {...SHOWCASE_WORKTREE_DIALOGS[worktreeLoad]}
           onDismiss={() => setWorktreeLoad(null)} />}
       </Section>
 
