@@ -9,14 +9,21 @@ const SKOS: &str = "http://www.w3.org/2004/02/skos/core#";
 
 fn put(registry: &mut GraphRegistry, content: &str) {
     registry
-        .register_element(parse_single_element(content, FILE).unwrap(), FILE)
-        .unwrap();
+        .register_element(
+            parse_single_element(content, FILE).expect("test fixture operation should succeed"),
+            FILE,
+        )
+        .expect("test fixture operation should succeed");
 }
 
 fn resolve(registry: &mut GraphRegistry) -> (Vec<crate::error::ReqvireError>, SemanticIndex) {
     registry
-        .build_relations(&ExclusionSetBuilder::new().build().unwrap())
-        .unwrap()
+        .build_relations(
+            &ExclusionSetBuilder::new()
+                .build()
+                .expect("test fixture operation should succeed"),
+        )
+        .expect("test fixture operation should succeed")
 }
 
 fn fixture(reverse: bool) -> GraphRegistry {
@@ -146,7 +153,8 @@ fn concept_projection_normalization_visits_each_element_and_link_once() {
 #[test]
 fn concept_projection_preserves_endpoint_namespaces_and_deterministic_facts() {
     let registry = fixture(false);
-    let before = serde_json::to_value(registry.get_all_elements()).unwrap();
+    let before = serde_json::to_value(registry.get_all_elements())
+        .expect("test fixture operation should succeed");
     let index = build_semantic_index(&registry);
     assert!(index.diagnostics.is_empty(), "{:?}", index.diagnostics);
     let expected = expected_facts();
@@ -159,7 +167,8 @@ fn concept_projection_preserves_endpoint_namespaces_and_deterministic_facts() {
         assert_eq!(facts(&build_semantic_index(&singly_authored)), expected);
     }
     assert_eq!(
-        serde_json::to_value(registry.get_all_elements()).unwrap(),
+        serde_json::to_value(registry.get_all_elements())
+            .expect("test fixture operation should succeed"),
         before
     );
     let mut reordered = fixture(true);
@@ -200,7 +209,7 @@ fn concept_projection_preserves_endpoint_namespaces_and_deterministic_facts() {
         .blocks
         .iter()
         .find(|block| block.source.ends_with("#projection-isolated"))
-        .unwrap();
+        .expect("test fixture operation should succeed");
     assert!(isolated.content.contains("skos:Concept"));
     assert!(!isolated.content.contains("skos:related"));
 }
@@ -215,12 +224,12 @@ fn concept_projection_candidates_rebuild_without_changing_accepted_relations() {
     let child = &mut edited
         .nodes
         .get_mut("model.md#projection-child")
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .element;
     child
         .concept
         .as_mut()
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .exact_match
         .retain(|link| !link.target.ends_with("#projection-remote"));
     let edited_index = build_semantic_index(&edited);

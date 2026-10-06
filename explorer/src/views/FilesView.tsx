@@ -1,8 +1,8 @@
+import { fileDisplayName as displayName, type FolderNode, type FileManagerModel } from "../lib/fileTrees";
 import { useEffect, useMemo, useState } from "react";
 import { useStore } from "../store/StoreContext";
 import type { ExplorerViewProps } from "./types/ExplorerViewProps";
 import type {
-  ExplorerProjectStore,
   ProjectStoreElement,
   ProjectStoreFile,
 } from "../store/types";
@@ -35,16 +35,6 @@ type SortDirection = FileBrowserSortDirection;
 
 type FileManagerKind = "folder" | "file";
 
-interface FolderNode {
-  kind: "folder";
-  id: string;
-  path: string;
-  name: string;
-  parent: string | null;
-  folders: FolderNode[];
-  files: ProjectStoreFile[];
-}
-
 interface FileManagerItem {
   kind: FileManagerKind;
   id: string;
@@ -55,13 +45,6 @@ interface FileManagerItem {
   childCount: number;
   file?: ProjectStoreFile;
   folder?: FolderNode;
-}
-
-interface FileManagerModel {
-  root: FolderNode;
-  folderByPath: Map<string, FolderNode>;
-  fileByPath: Map<string, ProjectStoreFile>;
-  folderElementCounts: Map<string, number>;
 }
 
 /*
@@ -78,13 +61,13 @@ export function FilesView({
   forcedLayout?: FileLayout;
   onOpenElement: (id: string) => void;
 } & Partial<ExplorerViewProps>) {
-  const { store, elementById } = useStore();
+  const { store, elementById, getFileManagerModel } = useStore();
   const ui = useOptionalExplorerUiState();
-  const model = useMemo(() => buildFileManagerModel(store), [store]);
+  const model = getFileManagerModel();
   const stateDriven = Boolean(forcedLayout && ui);
   const modelSelectionId = ui?.modelSelectionId ?? "__root__";
   const selectedFile = stateDriven
-    ? selectedFileFromModelSelection(modelSelectionId, model, store)
+    ? selectedFileFromModelSelection(modelSelectionId, model, elementById)
     : path
       ? model.fileByPath.get(path)
       : undefined;
@@ -95,14 +78,14 @@ export function FilesView({
 
   useEffect(() => {
     if (stateDriven) {
-      const folderPath = folderPathFromModelSelection(modelSelectionId, model, store);
+      const folderPath = folderPathFromModelSelection(modelSelectionId, model, elementById);
       setCurrentFolderPath(folderPath);
       return;
     }
     if (!selectedFile) return;
     const nextFolder = selectedFile.parent_folder || ROOT_FOLDER;
     setCurrentFolderPath(model.folderByPath.has(nextFolder) ? nextFolder : ROOT_FOLDER);
-  }, [model, model.folderByPath, modelSelectionId, selectedFile, stateDriven, store]);
+  }, [model, modelSelectionId, selectedFile, stateDriven, elementById]);
 
   const currentFolder = model.folderByPath.get(currentFolderPath) ?? model.root;
   const layout = forcedLayout ?? localLayout;
@@ -254,73 +237,6 @@ export function FilesView({
   );
 }
 
-function buildFileManagerModel(store: ExplorerProjectStore): FileManagerModel {
-  const root: FolderNode = {
-    kind: "folder",
-    id: "folder:__root__",
-    path: ROOT_FOLDER,
-    name: store.project.root_label || "Project root",
-    parent: null,
-    folders: [],
-    files: [],
-  };
-  const folderByPath = new Map<string, FolderNode>([[ROOT_FOLDER, root]]);
-
-  for (const folder of store.folders) {
-    const folderPath = normalizeFolderPath(folder.path);
-    if (folderPath === ROOT_FOLDER) continue;
-    folderByPath.set(folderPath, {
-      kind: "folder",
-      id: `folder:${folderPath}`,
-      path: folderPath,
-      name: displayName(folderPath),
-      parent: normalizeFolderPath(folder.parent),
-      folders: [],
-      files: [],
-    });
-  }
-
-  for (const folder of store.folders) {
-    const folderPath = normalizeFolderPath(folder.path);
-    if (folderPath === ROOT_FOLDER) continue;
-    const node = folderByPath.get(folderPath);
-    if (!node) continue;
-    const parentPath = normalizeFolderPath(folder.parent);
-    const parent = parentPath === ROOT_FOLDER ? root : folderByPath.get(parentPath);
-    (parent ?? root).folders.push(node);
-  }
-
-  const fileByPath = new Map<string, ProjectStoreFile>();
-  for (const file of store.files) {
-    fileByPath.set(file.path, file);
-    const parentPath = normalizeFolderPath(file.parent_folder);
-    const parent = folderByPath.get(parentPath) ?? root;
-    parent.files.push(file);
-  }
-
-  for (const folder of folderByPath.values()) {
-    folder.folders.sort((a, b) => a.name.localeCompare(b.name));
-    folder.files.sort((a, b) => a.display_path.localeCompare(b.display_path));
-  }
-
-  const folderElementCounts = new Map<string, number>();
-  function countElements(folder: FolderNode): number {
-    const direct = folder.files.reduce((count, file) => count + file.element_ids.length, 0);
-    const nested = folder.folders.reduce((count, child) => count + countElements(child), 0);
-    const total = direct + nested;
-    folderElementCounts.set(folder.path, total);
-    return total;
-  }
-  countElements(root);
-
-  return { root, folderByPath, fileByPath, folderElementCounts };
-}
-
-function normalizeFolderPath(path: string | null | undefined): string {
-  const normalized = (path ?? "").replace(/^\/+|\/+$/g, "");
-  return normalized || ROOT_FOLDER;
-}
-
 function isSelectedFileItem(item: FileManagerItem, selectedFile: ProjectStoreFile | undefined) {
   return Boolean(item.file && selectedFile && item.file.path === selectedFile.path);
 }
@@ -412,33 +328,29 @@ function compareItems(
   return direction === "asc" ? result : -result;
 }
 
-function displayName(path: string): string {
-  return path.split("/").filter(Boolean).at(-1) ?? path;
-}
-
 function selectedFileFromModelSelection(
   selectionId: string,
   model: FileManagerModel,
-  store: ExplorerProjectStore,
+  elementById: (id: string) => ProjectStoreElement | undefined,
 ): ProjectStoreFile | undefined {
   if (selectionId.startsWith("file:")) {
     return model.fileByPath.get(selectionId.slice("file:".length));
   }
-  const element = store.elements.find((item) => item.id === selectionId);
+  const element = elementById(selectionId);
   return element ? model.fileByPath.get(element.file_path) : undefined;
 }
 
 function folderPathFromModelSelection(
   selectionId: string,
   model: FileManagerModel,
-  store: ExplorerProjectStore,
+  elementById: (id: string) => ProjectStoreElement | undefined,
 ): string {
   if (selectionId === "__root__") return ROOT_FOLDER;
   if (selectionId.startsWith("folder:")) {
     const folderPath = selectionId.slice("folder:".length);
     return model.folderByPath.has(folderPath) ? folderPath : ROOT_FOLDER;
   }
-  const selectedFile = selectedFileFromModelSelection(selectionId, model, store);
+  const selectedFile = selectedFileFromModelSelection(selectionId, model, elementById);
   if (selectedFile) {
     const folderPath = selectedFile.parent_folder || ROOT_FOLDER;
     return model.folderByPath.has(folderPath) ? folderPath : ROOT_FOLDER;

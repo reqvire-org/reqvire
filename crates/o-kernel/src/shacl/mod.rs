@@ -964,7 +964,8 @@ impl<'a> ShaclParser<'a> {
     }
 
     fn raw_constraints(&self, id: &NamedOrBlankNode) -> Vec<AstConstraint> {
-        self.graph.subject_quads(id)
+        self.graph
+            .subject_quads(id)
             .into_iter()
             .filter(|quad| is_raw_constraint_predicate(quad.predicate.as_str()))
             .map(|quad| AstConstraint {
@@ -1470,7 +1471,7 @@ mod tests {
         // Candidate discovery has always used a HashSet: cross-shape diagnostic
         // order is unspecified, but codes, subjects, predicates and text must match.
         let mut indexed_diagnostics = indexed.diagnostics.clone();
-        let mut scanned_diagnostics = scanned.diagnostics.clone();
+        let mut scanned_diagnostics = scanned.diagnostics;
         indexed_diagnostics.sort_by_key(ShaclParseIssue::message);
         scanned_diagnostics.sort_by_key(ShaclParseIssue::message);
         assert_eq!(indexed_diagnostics, scanned_diagnostics);
@@ -1546,7 +1547,7 @@ ex:Property sh:path ex:value ; sh:minCount 2, 1 ; sh:maxCount 1 .
         let path = quads
             .iter()
             .find(|quad| quad.predicate.as_str() == SH_PATH)
-            .unwrap()
+            .expect("expected a string in the test response")
             .clone();
         quads.push(path.clone());
         let mut named_graph_path = path;
@@ -1555,7 +1556,7 @@ ex:Property sh:path ex:value ; sh:minCount 2, 1 ; sh:maxCount 1 .
         let min = quads
             .iter()
             .find(|quad| quad.predicate.as_str() == SH_MIN_COUNT)
-            .unwrap()
+            .expect("expected a string in the test response")
             .clone();
         quads.push(min);
         let registry = parse_checked(&quads);
@@ -1640,7 +1641,7 @@ ex:Property sh:path ex:value ; sh:minCount 2, 1 ; sh:maxCount 1 .
                 let first = quads
                     .iter()
                     .find(|quad| quad.predicate.as_str() == RDF_FIRST)
-                    .unwrap()
+                    .expect("expected a string in the test response")
                     .clone();
                 quads.push(first);
             }

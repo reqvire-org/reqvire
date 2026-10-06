@@ -114,6 +114,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const profile = process.argv.find(arg => arg.startsWith('--user-data-dir=')).split('=').slice(1).join('=');
 fs.writeFileSync(path.join(profile, 'pid'), String(process.pid));
+fs.writeFileSync(path.join(profile, 'arguments.json'), JSON.stringify(process.argv.slice(2)));
 fs.writeFileSync(path.join(profile, 'DevToolsActivePort'), '1234\\n');
 setInterval(() => {}, 1000);
 `);
@@ -144,6 +145,36 @@ function fakeTransport(t, profile) {
     }
   };
 }
+
+for (const gpuBackend of [undefined, 'swiftshader', 'native']) {
+  test(`GPU launch selection ${gpuBackend ?? 'default'} retains bounded lifecycle and reports actual launch flags`, async t => {
+    const { root } = await fakeBrowser(t);
+    const profile = path.join(root, 'gpu-profile');
+    fakeTransport(t, profile);
+    await support.withBrowser(profile, async () => {
+      const args = JSON.parse(await readFile(path.join(profile, 'arguments.json'), 'utf8'));
+      assert.ok(args.includes('--headless'));
+      assert.ok(args.includes('--use-gl=angle'));
+      assert.equal(args.includes('--use-angle=swiftshader-webgl'), gpuBackend !== 'native');
+      assert.equal(args.includes('--enable-unsafe-swiftshader'), gpuBackend !== 'native');
+      assert.equal(args.includes('--disable-vulkan'), gpuBackend !== 'native');
+      assert.equal(args.includes('--use-angle=vulkan'), gpuBackend === 'native');
+      assert.equal(args.includes('--enable-gpu'), gpuBackend === 'native');
+    }, gpuBackend === undefined ? undefined : { gpuBackend });
+    await assert.rejects(stat(profile), { code: 'ENOENT' });
+  });
+}
+
+test('unknown GPU launch selection is rejected before creating a profile', async t => {
+  const { root } = await fakeBrowser(t);
+  const profile = path.join(root, 'invalid-gpu');
+  fakeTransport(t, profile);
+  await assert.rejects(async () => {
+    const browser = await support.openBrowser(profile, { gpuBackend: 'unknown' });
+    await browser.close();
+  }, /GPU backend/);
+  await assert.rejects(stat(profile), { code: 'ENOENT' });
+});
 
 for (const fails of [false, true]) {
   test(`real child exits before ${fails ? 'retaining failed' : 'removing successful'} profile`, async t => {

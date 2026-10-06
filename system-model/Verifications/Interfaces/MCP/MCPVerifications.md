@@ -770,6 +770,9 @@ Verify that MCP worker sessions implement the shared context boundary on success
 - Verify independent worker processes, fixed roots, exclusion rules, semantic initialization, and mutation gates. Hold one worker mutation and read/write the other; then prove reads within the held context cannot observe partial persistence.
 - Test ownership contention across MCP processes, external HEAD changes, invalid/dirty startup, worker crash, reopening, and both commit modes. Failure in one worker must leave the other usable.
 - Force persistence plus rollback failure in both commit modes, including captured external semantic inputs. Assert supported model/status/resource/semantic reads retain exactly the accepted model/revision and expose recovery-required state, disabled writes and the original diagnostic. Change disk files and Git availability afterward; neither may replace the accepted snapshot or produce a false clean-state observation.
+- Stall an automatic-commit reference-transaction hook after the ref changes and add an unrelated external file that prevents verified automatic reconciliation. Require an unresolved-outcome diagnostic, disabled writes, the unchanged accepted HEAD/model/revision and index, released index lock, and exact accepted source content through a captured read despite changed physical files. Reject subsequent commit without repeating the ref side effect. A published candidate without conflicting evidence must instead reconcile automatically and return success under the commit verification.
+- In the isolated fixture, confirm the published commit's parent and exact intended source bytes, stop the old session, repair only the affected index entries, and restart from a clean validated worktree. Require the same published HEAD, writable new context, and exact reconciled source content; do not make another commit.
+- Require the automatic-commit failure diagnostic to identify the accepted HEAD and exact attempted commit that became the branch tip.
 - Reject further mutations (including previews and format), explicit commits, worktree removal, live change-impact analysis, and push/PR/comment publication before their side effects. Keep discovery callable. Confirm another context remains usable, reopening the live context does not clear recovery, and worker death makes even accepted reads unavailable. Cover adapter failure injection plus production worker/process and in-process HTTP routing; do not describe socket-restricted checks as external HTTP passes.
 - Exercise standalone and embedded endpoints. Each mutation refreshes only its context's Explorer runtime, and browser context selection does not redirect MCP calls. Verify resource URI/template and prompt selector schemas, isolation of cache keys, and unchanged read-only refresh behavior; do not advertise unsupported subscriptions.
 
@@ -850,7 +853,14 @@ Verify the successful and rejected paths of mcp accepted change commit.
 - Accumulate two accepted mutations with automatic commits disabled, explicitly commit them, and assert exact contents, parent HEAD, message, modes, pending-state clearance, and success of a subsequent mutation.
 - Stage an unrelated file and edit a managed file externally after acceptance; assert neither external version enters the commit, unrelated index entries survive, and accepted model/revision stays consistent. Include accepted moves, removals, asset modes, and changes that cancel to a net no-op.
 - Check auto-commit mode, empty-message rejection, repeated no-op commits, missing identity, invalid candidates, commit/ref failure, unexpected HEAD, and separate worktree commits. Assert failure retains pending changes and no operation publishes another context's files.
+- Stall an explicit-commit reference-transaction hook after the ref changes and add an unrelated external file that prevents verified automatic reconciliation. Require a bounded unresolved-outcome failure, recovery-required state with audited reads available, retained accepted HEAD/model/pending paths and previous index, released index lock, and no implicit retry or ref reset.
+- Confirm the fixture's published parent and exact binary asset bytes, stop the old session, reconcile affected index entries from that commit, and restart. Require the existing published HEAD, cleared recovery/pending state, writable new context, and exact captured asset bytes without another commit.
+- Require the explicit-commit failure diagnostic to identify the accepted HEAD and exact attempted commit that became the branch tip.
 - Verify local commit remains discoverable/executable without gh and without GitHub enablement; commit-only success must not trigger Explorer content refresh.
+
+- Reproduce automatic and explicit publication stalls through the actual worker's 30-second deadline. When the exact intended commit was published, require automatic verified reconciliation and success with `reconciled: true`, accepted published HEAD, cleared recovery/pending state, readable candidate content, writable state, and exactly one ref-hook effect. Automatic mutation refreshes only its selected Explorer runtime; explicit commit preserves accepted model/revision and runtime identity. A subsequent commit is no-op.
+- Stall both policies before ref publication and confirm the branch remains at accepted HEAD. Require an operation error, unchanged HEAD/index, released index lock, retained accepted model/revision, and writable state. Automatic mutation restores its physical source and pending state; explicit commit preserves its accepted pending source and paths uncommitted. No retry repeats the hook effect.
+- In both policies, verify automatic reconciliation of exact binary bytes, unusual literal paths, deletion scope, old captured reads, and preservation of pre-existing unrelated staging and group-only execute permissions. Separately prevent automatic reconciliation with conflicting external evidence, then repair it and exercise `reqvire.git.reconcile`: default preview retains accepted HEAD/revision/index/runtime and disabled writes; explicit apply accepts only the recorded commit and restores writes without another ref side effect. Reject wrong commit, branch/tip changes, physical edits, symlinks, owner-execute mode changes, new untracked sources, merge state, affected or unrelated external index edits, and an occupied index lock. Preserve rejected content/index, accepted state, and externally held lock; repeated apply is rejected.
 
 #### Metadata
   * type: test-verification
@@ -859,6 +869,7 @@ Verify the successful and rejected paths of mcp accepted change commit.
   * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * verify: [MCP Commit Outcome Reconciliation](../../../Interfaces/MCP/Tools.md#mcp-commit-outcome-reconciliation)
   * verify: [MCP Accepted Change Commit](../../../Interfaces/MCP/Tools.md#mcp-accepted-change-commit)
 ---
 
@@ -890,6 +901,7 @@ Verify the successful and rejected paths of mcp publication scope and recovery.
 #### Details
 - Use temporary Git repositories and a recording gh double to test same-repository SSH/HTTPS identity normalization, foreign/fork targets, multiple push URLs, changed remotes, and invalid caller selectors. Assert rejection before any publication command.
 - Exercise quotes, newlines, shell metacharacters, and leading hyphens in messages/bodies; assert exact argument/data preservation and no shell evaluation. Verify prompt suppression, timeouts, and sanitized errors.
+- Exercise concurrent large stdout/stderr with binary stdin, exact local Git blob bytes above the publication output limit, literal unusual paths, and alternate-index isolation. Require incomplete stdin to fail an otherwise successful command while preserving nonzero stderr diagnostics, and empty stdin to close. Test each output stream's cap, exact-boundary output, prompt settings and configured SSH transport, spawn failure versus interrupted execution, descendants holding pipes with a live or exited parent, and a side effect completed before timeout without erasure or automatic retry. Run process-family termination assertions on the native platform under test; cross-compilation alone is not native cleanup confirmation.
 - Inject authentication, branch-rule, non-fast-forward, subprocess, network, and ambiguous-response failures. Assert accepted snapshots, local commits, pending changes, and unrelated contexts survive unchanged.
 - Test completed/failed/unknown reconciliation, including timeout after a remote side effect. Verify no blind retry, forced push, merge, reset, implicit commit, or fork.
 - Run regular automated checks only against local fixture remotes and controlled gh behavior. Real GitHub publication is an explicitly authorized integration exercise, never a normal test side effect.
@@ -901,6 +913,7 @@ Verify the successful and rejected paths of mcp publication scope and recovery.
   * satisfiedBy: [mcp_github.rs](../../../../crates/reqvire-cli/src/mcp_github.rs)
   * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
   * verify: [MCP Publication Scope and Recovery](../../../Interfaces/MCP/Tools.md#mcp-publication-scope-and-recovery)
+  * satisfiedBy: [mcp_process.rs](../../../../crates/reqvire-cli/src/mcp_process.rs)
 ---
 
 ### MCP Branch Push Verification

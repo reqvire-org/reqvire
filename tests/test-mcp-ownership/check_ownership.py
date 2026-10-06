@@ -105,6 +105,14 @@ def lifecycle(mode, commits):
                             mutations=True, commits=commits) as server:
             reject(root, mode, commits, "owned")
             check(f"{prefix}/exclusive-owner", True)
+            definitions = server.rpc("tools/list", {})["tools"]
+            reconcile = next(tool for tool in definitions if tool["name"] == "reqvire.git.reconcile")
+            denied = server.raw_tool("reqvire.git.reconcile", attempted_commit=initial, dry_run=False)
+            check(f"{prefix}/reconcile-contract", reconcile["inputSchema"]["properties"]["dry_run"]["default"] is True
+                  and "attempted_commit" in reconcile["inputSchema"]["required"]
+                  and reconcile["annotations"]["readOnlyHint"] is False
+                  and denied.get("isError") is True and "No recorded" in str(denied)
+                  and git(root, "rev-parse", "HEAD") == initial and model.read_text() == original)
             content = (source / "fixtures/other.md.txt").read_text().split("# Elements\n\n", 1)[1]
             before_index = git(root, "ls-files", "--stage")
             runtime_before = server.http("/api/project-store/manifest") if mode == "serve" else None
@@ -216,7 +224,8 @@ def recovery_reads(mode):
                   and resource["_meta"]["reqvire/context"]["recovery_required"] and semantic["boolean"])
             blocked = [server.raw_tool("reqvire.add_element", file="Model.md", content=content, dry_run=True),
                        server.raw_tool("reqvire.format", fix=False), server.raw_tool("reqvire.change_impact"),
-                       server.raw_tool("reqvire.git.commit", message="forbidden")]
+                       server.raw_tool("reqvire.git.commit", message="forbidden"),
+                       server.raw_tool("reqvire.git.reconcile", attempted_commit=head, dry_run=False)]
             check(f"{prefix}/unsafe-operations-blocked", all(r.get("isError") is True and "recovery" in str(r) for r in blocked)
                   and git(root, "rev-parse", "HEAD") == head and (root / "Model.md").is_dir())
             if mode == "serve":

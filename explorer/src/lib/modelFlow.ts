@@ -6,8 +6,19 @@ const DOWNWARD_RELATIONS: Record<string, string> = {
   derivedFrom: "derive", specify: "specifiedBy", verify: "verifiedBy", define: "definedBy",
 };
 
-/** Adapt normalized store facts without evaluating or inventing model relations. */
-export function buildModelFlow(store: ExplorerProjectStore, selection: string): ElementFlowData {
+type FlowInputs = Pick<ExplorerProjectStore,
+  "elements" | "resources" | "relations" | "contract_bindings" | "contract_references" | "concept_refs">;
+
+export interface ModelFlowIndex {
+  readonly nodes: ReadonlyMap<string, ElementFlowData["nodes"][number]>;
+  readonly edges: readonly ElementFlowData["edges"][number][];
+  readonly outgoing: ReadonlyMap<string, readonly string[]>;
+  readonly incoming: ReadonlyMap<string, readonly string[]>;
+  readonly parents: ReadonlyMap<string, readonly string[]>;
+}
+
+/** Prepare normalized facts once; selection never changes this topology. */
+export function prepareModelFlow(store: FlowInputs): ModelFlowIndex {
   const nodes = new Map<string, ElementFlowData["nodes"][number]>();
   for (const element of store.elements) {
     nodes.set(element.id, { type: element.element_type, context: element.element_type.replaceAll("-", " "),
@@ -40,17 +51,30 @@ export function buildModelFlow(store: ExplorerProjectStore, selection: string): 
   for (const reference of store.contract_references ?? []) addEdge(reference.source_id, reference.resource_id ?? reference.target, "Contract reference");
   for (const reference of store.concept_refs) addEdge(reference.source_id, reference.target_element_id, "Concept reference");
 
+  const outgoing = new Map<string, string[]>();
+  const incoming = new Map<string, string[]>();
+  const parents = new Map<string, string[]>();
+  const append = (adjacency: Map<string, string[]>, from: string, to: string) => {
+    const targets = adjacency.get(from) ?? [];
+    targets.push(to);
+    adjacency.set(from, targets);
+  };
+  for (const edge of edges.values()) {
+    append(outgoing, edge.source, edge.target);
+    append(incoming, edge.target, edge.source);
+    if (edge.label === "derive" || edge.label === "specifiedBy") append(parents, edge.target, edge.source);
+  }
+  return { nodes, edges: [...edges.values()], outgoing, incoming, parents };
+}
+
+/** Preserve the existing directional scope rules over a prepared topology. */
+export function selectModelFlow(index: ModelFlowIndex, selection: string, rootLabel: string): ElementFlowData {
+  const { nodes, edges, outgoing, incoming, parents } = index;
   let visible = new Set<string>();
-  let title = store.project.root_label;
+  let title = rootLabel;
   if (selection === "__root__") {
     // The project overview grows from capabilities, never from verification leaves.
     const queue = [...nodes].filter(([, node]) => node.type === "capability").map(([id]) => id);
-    const outgoing = new Map<string, string[]>();
-    for (const edge of edges.values()) {
-      const targets = outgoing.get(edge.source) ?? [];
-      targets.push(edge.target);
-      outgoing.set(edge.source, targets);
-    }
     for (let index = 0; index < queue.length; index++) {
       const id = queue[index];
       if (visible.has(id)) continue;
@@ -67,18 +91,11 @@ export function buildModelFlow(store: ExplorerProjectStore, selection: string): 
         ? node.type === "resource" && (selection === "resource-root" || node.element.file.startsWith(`${path}/`))
         : node.element.file === path).map(([id]) => id));
     visible = new Set(contained);
-    for (const edge of edges.values()) {
+    for (const edge of edges) {
       if (contained.has(edge.source) || contained.has(edge.target)) {
         visible.add(edge.source);
         visible.add(edge.target);
       }
-    }
-    const parents = new Map<string, string[]>();
-    for (const edge of edges.values()) {
-      if (edge.label !== "derive" && edge.label !== "specifiedBy") continue;
-      const ids = parents.get(edge.target) ?? [];
-      ids.push(edge.source);
-      parents.set(edge.target, ids);
     }
     const ancestors = [...visible];
     for (let index = 0; index < ancestors.length; index++) {
@@ -92,15 +109,7 @@ export function buildModelFlow(store: ExplorerProjectStore, selection: string): 
     visible = new Set(nodes.has(selection) ? [selection] : []);
     title = nodes.get(selection)?.element.name ?? "Selected element";
     // Traverse each direction separately so sibling-only branches stay outside this scope.
-    for (const reverse of [false, true]) {
-      const adjacency = new Map<string, string[]>();
-      for (const edge of edges.values()) {
-        const from = reverse ? edge.target : edge.source;
-        const to = reverse ? edge.source : edge.target;
-        const targets = adjacency.get(from) ?? [];
-        targets.push(to);
-        adjacency.set(from, targets);
-      }
+    for (const adjacency of [outgoing, incoming]) {
       const visited = new Set<string>();
       const queue = [selection];
       for (let index = 0; index < queue.length; index++) {
@@ -111,10 +120,15 @@ export function buildModelFlow(store: ExplorerProjectStore, selection: string): 
       }
     }
   }
-  const visibleEdges = [...edges.values()].filter(edge => visible.has(edge.source) && visible.has(edge.target));
+  const visibleEdges = edges.filter(edge => visible.has(edge.source) && visible.has(edge.target));
   const childCapabilities = new Set(visibleEdges.filter(edge => edge.label === "derive" && nodes.get(edge.source)?.type === "capability").map(edge => edge.target));
   return { id: selection, title,
     nodes: [...nodes].filter(([id]) => visible.has(id)).map(([id, node]) => ({ ...node, root: node.type === "capability" && !childCapabilities.has(id) })),
     edges: visibleEdges,
   };
+}
+
+/** Uncached adapter for callers that do not retain a snapshot's prepared topology. */
+export function buildModelFlow(store: ExplorerProjectStore, selection: string): ElementFlowData {
+  return selectModelFlow(prepareModelFlow(store), selection, store.project.root_label);
 }

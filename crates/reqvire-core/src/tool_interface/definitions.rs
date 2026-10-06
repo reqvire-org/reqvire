@@ -807,10 +807,12 @@ mod tests {
     fn catalog_validation_reuses_definitions_after_warmup() {
         let args = json!({"short":true});
         for enabled in [false, true] {
-            validate_tool_arguments("reqvire.search", &args, enabled).unwrap();
+            validate_tool_arguments("reqvire.search", &args, enabled)
+                .expect("test fixture operation should succeed");
             let before = CATALOG_BUILDS.with(Cell::get);
             for _ in 0..20 {
-                validate_tool_arguments("reqvire.search", &args, enabled).unwrap();
+                validate_tool_arguments("reqvire.search", &args, enabled)
+                    .expect("test fixture operation should succeed");
                 assert!(validate_tool_arguments("reqvire.not_a_tool", &args, enabled).is_err());
             }
             assert_eq!(
@@ -825,11 +827,12 @@ mod tests {
     fn cached_catalogs_preserve_mode_schemas_and_diagnostics() {
         for enabled in [false, true] {
             let definitions = tool_definitions(enabled);
-            let names: Vec<_> = definitions
-                .iter()
-                .map(|tool| tool["name"].as_str().unwrap())
-                .collect();
-            assert_eq!(names.contains(&"reqvire.add_element"), enabled);
+            assert_eq!(
+                definitions
+                    .iter()
+                    .any(|tool| tool["name"] == "reqvire.add_element"),
+                enabled
+            );
             for (name, args, diagnostic) in [
                 (
                     "reqvire.not_a_tool",
@@ -868,7 +871,8 @@ mod tests {
                 ),
             ] {
                 assert_eq!(
-                    validate_tool_arguments(name, &args, enabled).unwrap_err(),
+                    validate_tool_arguments(name, &args, enabled)
+                        .expect_err("test fixture operation should fail"),
                     diagnostic
                 );
             }

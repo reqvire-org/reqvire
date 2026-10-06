@@ -5,38 +5,41 @@ use std::{fs, path::PathBuf, process::Command};
 
 #[test]
 fn rejected_taxonomy_mutations_preserve_mcp_accepted_state() {
-    let workspace = tempfile::tempdir().unwrap();
+    let workspace = tempfile::tempdir().expect("test fixture operation should succeed");
     struct RestoreDirectory(PathBuf);
     impl Drop for RestoreDirectory {
         fn drop(&mut self) {
-            std::env::set_current_dir(&self.0).unwrap();
+            std::env::set_current_dir(&self.0).expect("test fixture operation should succeed");
         }
     }
-    let _restore = RestoreDirectory(std::env::current_dir().unwrap());
+    let _restore =
+        RestoreDirectory(std::env::current_dir().expect("test fixture operation should succeed"));
     assert!(Command::new("git")
         .args(["init", "-q"])
         .current_dir(workspace.path())
         .status()
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .success());
     fs::write(
         workspace.path().join("Concepts.md"),
         include_str!("../../../tests/test-concept-elements/fixtures/Projection.md.fixture"),
     )
-    .unwrap();
-    std::env::set_current_dir(workspace.path()).unwrap();
-    let exclusions = ExclusionSetBuilder::new().build().unwrap();
+    .expect("write test fixture");
+    std::env::set_current_dir(workspace.path()).expect("test fixture operation should succeed");
+    let exclusions = ExclusionSetBuilder::new()
+        .build()
+        .expect("test fixture operation should succeed");
     let tools = ReqvireToolRegistry::new(true, &exclusions);
-    let before = fs::read("Concepts.md").unwrap();
+    let before = fs::read("Concepts.md").expect("read test fixture");
     let revision = tools
         .call_tool("reqvire.model_revision", &json!({}))
-        .unwrap();
+        .expect("test fixture operation should succeed");
     let element = tools
         .call_tool(
             "reqvire.read_element",
             &json!({"name": "Projection Parent"}),
         )
-        .unwrap();
+        .expect("test fixture operation should succeed");
     for dry_run in [false, true] {
         for (tool, args) in [
             (
@@ -56,11 +59,11 @@ fn rejected_taxonomy_mutations_preserve_mcp_accepted_state() {
                 format!("{error:?}").contains("Concept taxonomy cycle"),
                 "{error:?}"
             );
-            assert_eq!(fs::read("Concepts.md").unwrap(), before);
+            assert_eq!(fs::read("Concepts.md").expect("read test fixture"), before);
             assert_eq!(
                 tools
                     .call_tool("reqvire.model_revision", &json!({}))
-                    .unwrap(),
+                    .expect("test fixture operation should succeed"),
                 revision
             );
             assert_eq!(
@@ -69,7 +72,7 @@ fn rejected_taxonomy_mutations_preserve_mcp_accepted_state() {
                         "reqvire.read_element",
                         &json!({"name": "Projection Parent"})
                     )
-                    .unwrap(),
+                    .expect("test fixture operation should succeed"),
                 element
             );
         }
@@ -78,7 +81,7 @@ fn rejected_taxonomy_mutations_preserve_mcp_accepted_state() {
     assert_ne!(
         tools
             .call_tool("reqvire.model_revision", &json!({}))
-            .unwrap(),
+            .expect("test fixture operation should succeed"),
         revision
     );
 }

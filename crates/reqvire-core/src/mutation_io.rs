@@ -94,16 +94,16 @@ pub fn model() -> Option<Arc<ModelManager>> {
 }
 impl Context {
     fn file(&self, path: &Path) -> Option<&Arc<Vec<u8>>> {
-        match self.overlay.get(path) {
-            Some(entry) => entry.as_ref().map(|entry| &entry.bytes),
-            None => self.files.files.get(path),
-        }
+        self.overlay.get(path).map_or_else(
+            || self.files.files.get(path),
+            |entry| entry.as_ref().map(|entry| &entry.bytes),
+        )
     }
     fn executable(&self, path: &Path) -> bool {
-        match self.overlay.get(path) {
-            Some(entry) => entry.as_ref().is_some_and(|entry| entry.executable),
-            None => self.files.executable.contains(path),
-        }
+        self.overlay.get(path).map_or_else(
+            || self.files.executable.contains(path),
+            |entry| entry.as_ref().is_some_and(|entry| entry.executable),
+        )
     }
     fn paths(&self) -> impl Iterator<Item = &PathBuf> {
         self.files
@@ -299,7 +299,7 @@ mod tests {
     use super::*;
 
     fn fixture() -> (tempfile::TempDir, SnapshotFiles) {
-        let directory = tempfile::tempdir().unwrap();
+        let directory = tempfile::tempdir().expect("test fixture operation should succeed");
         let root = directory.path().to_path_buf();
         let files = SnapshotFiles {
             root: root.clone(),
@@ -316,11 +316,20 @@ mod tests {
     fn read_scope_shares_accepted_file_map_entries() {
         let (_directory, files) = fixture();
         let path = files.root.join("a.txt");
-        let original = files.files.get(&path).unwrap();
+        let original = files
+            .files
+            .get(&path)
+            .expect("test fixture operation should succeed");
         let _scope = files.enter(None);
         CONTEXT.with(|slot| {
             let slot = slot.borrow();
-            let entry = slot.as_ref().unwrap().files.files.get(&path).unwrap();
+            let entry = slot
+                .as_ref()
+                .expect("test fixture operation should succeed")
+                .files
+                .files
+                .get(&path)
+                .expect("test fixture operation should succeed");
             assert!(
                 std::ptr::eq(original, entry),
                 "read entry must not clone the file map"
@@ -333,7 +342,7 @@ mod tests {
         let (_directory, files) = fixture();
         let accepted = Arc::new(ModelManager::new());
         let _scope = files.enter(Some(Arc::clone(&accepted)));
-        let loaded = model().unwrap();
+        let loaded = model().expect("test fixture operation should succeed");
         assert!(
             std::ptr::eq(&accepted.graph_registry, &loaded.graph_registry),
             "read scope must not clone the accepted registry"
@@ -346,26 +355,34 @@ mod tests {
         let a = files.root.join("a.txt");
         let moved = files.root.join("nested/moved.txt");
         let copied = files.root.join("nested/copied.txt");
-        std::fs::write(&a, b"external edit").unwrap();
+        std::fs::write(&a, b"external edit").expect("write test fixture");
         let scope = files.enter(None);
-        assert_eq!(read(&a).unwrap(), b"accepted");
-        write(&a, b"candidate").unwrap();
-        assert_eq!(read(&a).unwrap(), b"candidate");
-        rename(&a, &moved).unwrap();
+        assert_eq!(
+            read(&a).expect("test fixture operation should succeed"),
+            b"accepted"
+        );
+        write(&a, b"candidate").expect("test fixture operation should succeed");
+        assert_eq!(
+            read(&a).expect("test fixture operation should succeed"),
+            b"candidate"
+        );
+        rename(&a, &moved).expect("test fixture operation should succeed");
         assert!(!is_file(&a));
         assert!(
             read(&a).is_err(),
             "a tombstone must not read the external file"
         );
         assert!(is_dir(files.root.join("nested")));
-        copy(&moved, &copied).unwrap();
+        copy(&moved, &copied).expect("test fixture operation should succeed");
         assert_eq!(
-            paths_under(&files.root).unwrap(),
+            paths_under(&files.root).expect("test fixture operation should succeed"),
             vec![copied.clone(), moved.clone()]
         );
-        remove_file(&moved).unwrap();
+        remove_file(&moved).expect("test fixture operation should succeed");
         assert!(remove_file(&moved).is_err());
-        let (prepared, changed) = scope.prepared().unwrap();
+        let (prepared, changed) = scope
+            .prepared()
+            .expect("test fixture operation should succeed");
         assert_eq!(changed, BTreeSet::from([a.clone(), copied.clone(), moved]));
         assert!(!prepared.files.contains_key(&a));
         assert!(!prepared.executable.contains(&a));
@@ -373,12 +390,17 @@ mod tests {
         assert!(prepared.executable.contains(&copied));
         assert_eq!(files.files[&a].as_slice(), b"accepted");
         assert!(files.executable.contains(&a));
-        assert_eq!(std::fs::read(&a).unwrap(), b"external edit");
+        assert_eq!(
+            std::fs::read(&a).expect("read test fixture"),
+            b"external edit"
+        );
         assert!(!copied.exists());
         let scope = prepared.enter(None);
-        remove_dir_all(files.root.join("nested")).unwrap();
+        remove_dir_all(files.root.join("nested")).expect("test fixture operation should succeed");
         assert!(!is_dir(files.root.join("nested")));
-        assert!(paths_under(&files.root).unwrap().is_empty());
+        assert!(paths_under(&files.root)
+            .expect("test fixture operation should succeed")
+            .is_empty());
         drop(scope);
         assert!(
             prepared.files.contains_key(&copied),
@@ -391,17 +413,35 @@ mod tests {
         let (_directory, files) = fixture();
         let a = files.root.join("a.txt");
         let scope = files.enter(None);
-        assert_eq!(read(&a).unwrap(), b"accepted");
+        assert_eq!(
+            read(&a).expect("test fixture operation should succeed"),
+            b"accepted"
+        );
         assert!(scope.prepared().is_none());
         {
             let _scope = files.enter(None);
-            write(&a, b"discard me").unwrap();
-            let denied = write(files.root.parent().unwrap().join("outside"), b"denied");
-            assert_eq!(denied.unwrap_err().kind(), io::ErrorKind::PermissionDenied);
+            write(&a, b"discard me").expect("test fixture operation should succeed");
+            let denied = write(
+                files
+                    .root
+                    .parent()
+                    .expect("fixture path has a parent")
+                    .join("outside"),
+                b"denied",
+            );
+            assert_eq!(
+                denied
+                    .expect_err("test fixture operation should fail")
+                    .kind(),
+                io::ErrorKind::PermissionDenied
+            );
             assert!(write(files.root.join(".git/config"), b"denied").is_err());
         }
         let scope = files.enter(None);
-        assert_eq!(read(&a).unwrap(), b"accepted");
+        assert_eq!(
+            read(&a).expect("test fixture operation should succeed"),
+            b"accepted"
+        );
         assert!(scope.prepared().is_none());
     }
 
@@ -409,7 +449,7 @@ mod tests {
     fn only_explicit_startup_capture_reads_uncaptured_dependencies() {
         let (_directory, files) = fixture();
         let dependency = files.root.join("external.ttl");
-        std::fs::write(&dependency, b"captured RDF").unwrap();
+        std::fs::write(&dependency, b"captured RDF").expect("write test fixture");
         {
             let _scope = files.enter(None);
             assert!(read(&dependency).is_err());
@@ -418,13 +458,21 @@ mod tests {
         let capture = files.enter(None);
         capture.capture_dependencies();
         assert!(is_file(&dependency));
-        assert_eq!(read(&dependency).unwrap(), b"captured RDF");
-        let (captured, changed) = capture.prepared().unwrap();
+        assert_eq!(
+            read(&dependency).expect("test fixture operation should succeed"),
+            b"captured RDF"
+        );
+        let (captured, changed) = capture
+            .prepared()
+            .expect("test fixture operation should succeed");
         assert!(changed.is_empty(), "dependency capture is not a mutation");
         assert!(!files.files.contains_key(&dependency));
-        std::fs::write(&dependency, b"external change").unwrap();
+        std::fs::write(&dependency, b"external change").expect("write test fixture");
         let scope = captured.enter(None);
-        assert_eq!(read(&dependency).unwrap(), b"captured RDF");
+        assert_eq!(
+            read(&dependency).expect("test fixture operation should succeed"),
+            b"captured RDF"
+        );
         assert!(scope.prepared().is_none());
     }
 }

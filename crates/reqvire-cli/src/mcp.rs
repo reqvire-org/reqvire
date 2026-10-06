@@ -28,7 +28,7 @@ use std::pin::Pin;
 use std::sync::Arc;
 use tokio::sync::{RwLock, Semaphore};
 
-pub(crate) fn capacity_error() -> McpError {
+pub fn capacity_error() -> McpError {
     McpError::new(
         ErrorCode(-32000),
         "MCP request capacity exhausted; retry later",
@@ -43,6 +43,18 @@ pub type PostWriteHook = Arc<
         + Send
         + Sync,
 >;
+
+#[derive(Clone, Copy)]
+pub struct McpOptions<'a> {
+    pub enable_mutations: bool,
+    pub enable_commits: bool,
+    pub enable_github: bool,
+    pub github_remote: &'a str,
+    pub with_size_estimates: bool,
+}
+
+#[cfg(test)]
+type BeforeDispatch = Arc<dyn Fn(&str, &Value) + Send + Sync>;
 
 #[derive(Debug, Deserialize)]
 struct RpcRequest {
@@ -71,7 +83,7 @@ struct ReqvireMcpServer {
     session: Option<Arc<std::sync::Mutex<crate::mcp_session::MutationSession>>>,
     worktrees: Option<Arc<crate::mcp_worktrees::Worktrees>>,
     #[cfg(test)]
-    before_dispatch: Option<Arc<dyn Fn(&str, &Value) + Send + Sync>>,
+    before_dispatch: Option<BeforeDispatch>,
 }
 
 impl ReqvireMcpServer {
@@ -128,8 +140,7 @@ impl ReqvireMcpServer {
             } else {
                 &self.control_capacity
             };
-            let permit = budget
-                .clone()
+            let permit = Arc::clone(budget)
                 .try_acquire_owned()
                 .map_err(|_| capacity_error())?;
             let worktrees = Arc::clone(worktrees);
@@ -148,14 +159,12 @@ impl ReqvireMcpServer {
             // reserve capacity before creating a blocking job or waiting for a
             // controlled write. Size it from the host's available parallelism;
             // parsing/validation/query work can consume a full CPU per request.
-            let capacity = self
-                .read_capacity
-                .clone()
+            let capacity = Arc::clone(&self.read_capacity)
                 .try_acquire_owned()
                 .map_err(|_| capacity_error())?;
             // A fair shared gate allows independent reads, without racing a
             // controlled write or starving an already queued writer.
-            let gate = self.write_lock.clone().read_owned().await;
+            let gate = Arc::clone(&self.write_lock).read_owned().await;
             let server = self.clone();
             let method = method.to_owned();
             return tokio::task::spawn_blocking(move || {
@@ -490,16 +499,19 @@ impl rmcp::Service<RoleServer> for ReqvireMcpTransport {
     }
 }
 pub async fn serve_http(
-    enable_mutations: bool,
-    enable_commits: bool,
-    enable_github: bool,
-    github_remote: &str,
-    with_size_estimates: bool,
+    options: McpOptions<'_>,
     excluded_filename_patterns: &GlobSet,
     host: &str,
     port: u16,
     http_access: &HttpAccess,
 ) -> Result<(), ReqvireError> {
+    let McpOptions {
+        enable_mutations,
+        enable_commits,
+        enable_github,
+        github_remote,
+        with_size_estimates,
+    } = options;
     let worktrees = if enable_mutations {
         crate::mcp_session::require_clean(&std::env::current_dir()?)?;
         Some(crate::mcp_worktrees::Worktrees::start(
@@ -595,9 +607,13 @@ where
 {
     mount_service_with_post_write_hook(
         router,
-        enable_mutations,
-        false,
-        with_size_estimates,
+        McpOptions {
+            enable_mutations,
+            enable_commits: false,
+            with_size_estimates,
+            enable_github: false,
+            github_remote: "origin",
+        },
         excluded_filename_patterns,
         write_lock,
         None,
@@ -607,9 +623,7 @@ where
 
 pub fn mount_service_with_post_write_hook<S>(
     router: axum::Router<S>,
-    enable_mutations: bool,
-    enable_commits: bool,
-    with_size_estimates: bool,
+    options: McpOptions<'_>,
     excluded_filename_patterns: &GlobSet,
     write_lock: Arc<RwLock<()>>,
     post_write_hook: Option<PostWriteHook>,
@@ -619,9 +633,9 @@ where
     S: Clone + Send + Sync + 'static,
 {
     let server = ReqvireMcpServer::new_with_write_lock(
-        enable_mutations,
-        enable_commits,
-        with_size_estimates,
+        options.enable_mutations,
+        options.enable_commits,
+        options.with_size_estimates,
         excluded_filename_patterns,
         write_lock,
         post_write_hook,
@@ -1036,7 +1050,7 @@ mod tests {
     fn read_only_adapter_reuses_local_catalog() {
         let exclusions = reqvire::exclusions::ExclusionSetBuilder::new()
             .build()
-            .unwrap();
+            .expect("test fixture operation should succeed");
         let server = ReqvireMcpServer::new_with_write_lock(
             false,
             false,
@@ -1045,33 +1059,37 @@ mod tests {
             Arc::new(RwLock::new(())),
             None,
         )
-        .unwrap();
+        .expect("test fixture operation should succeed");
         let expected = server
             .call_handler_unlocked("tools/list", json!({}))
-            .unwrap();
+            .expect("test fixture operation should succeed");
         let before = crate::mcp_worktrees::local_catalog_build_count();
         for _ in 0..3 {
             assert_eq!(
                 server
                     .call_handler_unlocked("tools/list", json!({}))
-                    .unwrap(),
+                    .expect("test fixture operation should succeed"),
                 expected
             );
             server
                 .call_handler_unlocked("resources/list", json!({}))
-                .unwrap();
+                .expect("test fixture operation should succeed");
             let contract = server
                 .call_handler_unlocked(
                     "tools/call",
                     json!({"name":"reqvire.tool_contract","arguments":{}}),
                 )
-                .unwrap();
+                .expect("test fixture operation should succeed");
             assert_eq!(contract["structuredContent"]["tools"], expected["tools"]);
             let resource = server
                 .call_handler_unlocked("resources/read", json!({"uri":"reqvire://tools/contract"}))
-                .unwrap();
-            let resource_contract: Value =
-                serde_json::from_str(resource["contents"][0]["text"].as_str().unwrap()).unwrap();
+                .expect("test fixture operation should succeed");
+            let resource_contract: Value = serde_json::from_str(
+                resource["contents"][0]["text"]
+                    .as_str()
+                    .expect("expected a string in the test response"),
+            )
+            .expect("expected a string in the test response");
             assert_eq!(resource_contract["tools"], expected["tools"]);
         }
         assert_eq!(

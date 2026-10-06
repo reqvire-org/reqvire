@@ -5,7 +5,7 @@ import { mountOntologyGraph, type OntologyGraphRendererHandle } from "../lib/ont
 import { useStore } from "../store/StoreContext";
 import type { OntologyGraphData, OntologyGraphNode } from "../store/types";
 import { ViewFrame } from "./ViewFrame";
-import { GraphCanvasFrame, GraphCanvasNotice, GraphCanvasSurface, GraphRoute, Spinner, useLatestRef } from "@ds";
+import { Button, GraphCanvasFrame, GraphCanvasNotice, GraphCanvasSurface, GraphRoute, Spinner, useLatestRef } from "@ds";
 
 declare global {
   interface Window {
@@ -23,11 +23,13 @@ export function OntologiesView(_: Partial<ExplorerViewProps> = {}) {
   const { store } = useStore();
   const ui = useExplorerUiState();
   const graphData = store.ontology?.graph_data;
+  const contextKey = JSON.stringify([store.project.workspace_root, store.project.worktree_id]);
   const activeFilters = useMemo(() => [...ui.ontologyFilters], [ui.ontologyFilters]);
 
   if (graphData && (graphData.nodes?.length ?? 0) > 0) {
     return (
       <OntologyGraphRenderer
+        key={contextKey}
         graphData={graphData}
         activeFilters={activeFilters}
       />
@@ -77,10 +79,11 @@ function OntologyGraphRenderer({
       try {
         const renderer = mountOntologyGraph(container, graphData, {
           onSelect: (node: OntologyGraphNode | null) => setOntologySelectionIdRef.current(node?.id ?? null),
+          initialFilters: activeFiltersRef.current,
+          onLayoutState: state => setNotice(state === "pending" ? "Laying out ontology..." : state === "failed" ? "Ontology layout failed." : null),
         });
         rendererRef.current = renderer;
         window.syncOntologyGraphFilters?.(activeFiltersRef.current);
-        setNotice(null);
       } catch (error) {
         console.error("[Reqvire Ontologies] Sigma/Graphology renderer failed", error);
         setNotice("Ontology graph renderer failed. Check the browser console for details.");
@@ -105,7 +108,7 @@ function OntologyGraphRenderer({
   return (
     <ViewFrame testId="ontologies">
       <GraphRoute>
-        <GraphCanvasFrame aria-label="Ontology graph explorer">
+        <GraphCanvasFrame aria-label="Ontology graph explorer" aria-busy={notice === "Loading ontology graph..." || notice === "Laying out ontology..."}>
           <GraphCanvasSurface
             ref={containerRef}
             id="ontology-graph-container"
@@ -115,8 +118,9 @@ function OntologyGraphRenderer({
           />
           {notice ? (
             <GraphCanvasNotice>
-              {notice === "Loading ontology graph..." ? <Spinner label={notice} /> : null}
+              {notice === "Loading ontology graph..." || notice === "Laying out ontology..." ? <Spinner label={notice} /> : null}
               <span>{notice}</span>
+              {notice === "Ontology layout failed." ? <Button size="sm" onClick={() => rendererRef.current?.resetLayout()}>Retry layout</Button> : null}
             </GraphCanvasNotice>
           ) : null}
         </GraphCanvasFrame>

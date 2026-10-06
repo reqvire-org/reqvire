@@ -1,6 +1,7 @@
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useLiveStore } from "./useLiveStore";
+import { ManifestStoreClient } from "./manifestRefresh";
 import { chunkResponse, manifestResponse, smallStore, wireSnapshot } from "../test/liveStoreFixtures";
 
 beforeEach(() => {
@@ -331,6 +332,198 @@ describe("worktree selection", () => {
     await tick();
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(a.store);
     expect(storage).not.toHaveBeenCalled();
+  });
+
+  it.each([false, true])("releases removed contexts after switching away (live refresh: %s)", async live => {
+    const { a, b, fetchMock, transport } = contexts();
+    if (!live) delete window.reqvireLiveRefresh;
+    const prepare = vi.spyOn(ManifestStoreClient.prototype, "prepare");
+    let listed = ["a", "b"];
+    fetchMock.mockImplementation(async (url, init) => url === "/api/worktrees"
+      ? Response.json({ original_worktree_id: "a", worktrees: listed.map(worktree_id => ({ worktree_id, branch: worktree_id })) })
+      : transport(url, init));
+    const hook = renderHook(() => useLiveStore()); await tick();
+    const initialClient = prepare.mock.contexts.at(-1);
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    const cachedB = prepare.mock.contexts.at(-1);
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
+
+    listed = ["b"];
+    await act(async () => { await hook.result.current.refreshWorktrees(); });
+    fetchMock.mockClear();
+    act(() => hook.result.current.selectWorktree("a")); await tick();
+    expect(prepare.mock.contexts.at(-1)).not.toBe(initialClient);
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(a.store);
+    const downloaded = fetchMock.mock.calls.filter(([url]) => url.includes("/chunks"))
+      .flatMap(([, init]) => JSON.parse(String(init?.body)).hashes);
+    expect(new Set(downloaded)).toEqual(new Set(a.chunks.keys()));
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    expect(prepare.mock.contexts.at(-1)).toBe(cachedB);
+  });
+
+  it("keeps an absent displayed client through a failed switch, then releases it after success", async () => {
+    const { a, b, fetchMock, transport } = contexts();
+    const prepare = vi.spyOn(ManifestStoreClient.prototype, "prepare");
+    const hook = renderHook(() => useLiveStore()); await tick();
+    const initialClient = prepare.mock.contexts.at(-1);
+    let rejectLoad = true;
+    fetchMock.mockImplementation(async (url, init) => {
+      if (url === "/api/worktrees") return Response.json({ original_worktree_id: "a", worktrees: [{ worktree_id: "b", branch: "feature" }] });
+      if (url === "/api/worktrees/load" && rejectLoad) return Response.json({ error: "Unavailable" }, { status: 503 });
+      return transport(url, init);
+    });
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    expect(hook.result.current.refreshError).toBe("Unavailable");
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toBe(a.store);
+    rejectLoad = false;
+    act(() => hook.result.current.selectWorktree("a")); await tick();
+    expect(prepare.mock.contexts.at(-1)).toBe(initialClient);
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
+    act(() => hook.result.current.selectWorktree("a")); await tick();
+    expect(prepare.mock.contexts.at(-1)).not.toBe(initialClient);
+  });
+
+  it.each(["http error", "error payload", "malformed", "missing identity", "duplicate identity"])("keeps inactive caches after inventory %s", async failure => {
+    const { fetchMock, transport } = contexts();
+    const prepare = vi.spyOn(ManifestStoreClient.prototype, "prepare");
+    const hook = renderHook(() => useLiveStore()); await tick();
+    const originalChoices = hook.result.current.worktrees;
+    const initialClient = prepare.mock.contexts.at(-1);
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    fetchMock.mockImplementation(async (url, init) => {
+      if (url !== "/api/worktrees") return transport(url, init);
+      if (failure === "http error") return Response.json({ error: "Git failed", worktrees: [] }, { status: 503 });
+      if (failure === "error payload") return Response.json({ error: "Git failed", worktrees: [] });
+      if (failure === "missing identity") return Response.json({ worktrees: [] });
+      if (failure === "duplicate identity") return Response.json({ original_worktree_id: "a", worktrees: [
+        { worktree_id: "b", branch: "first" }, { worktree_id: "b", branch: "second" },
+      ] });
+      return Response.json({ original_worktree_id: "a", worktrees: [{ branch: "broken" }] });
+    });
+    await act(async () => { await hook.result.current.refreshWorktrees(); });
+    expect(hook.result.current.refreshError).toBeTruthy();
+    expect(hook.result.current.worktrees).toBe(originalChoices);
+    act(() => hook.result.current.selectWorktree("a")); await tick();
+    expect(prepare.mock.contexts.at(-1)).toBe(initialClient);
+  });
+
+  it("keeps clients created after a delayed inventory began until a newer inventory confirms removal", async () => {
+    const { fetchMock, transport } = contexts();
+    const prepare = vi.spyOn(ManifestStoreClient.prototype, "prepare");
+    const hook = renderHook(() => useLiveStore()); await tick();
+    let release!: (response: Response) => void;
+    fetchMock.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
+    let pending!: Promise<void>;
+    act(() => { pending = hook.result.current.refreshWorktrees(); });
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    const cachedB = prepare.mock.contexts.at(-1);
+    act(() => hook.result.current.selectWorktree("a")); await tick();
+    const onlyA = () => Response.json({ original_worktree_id: "a", worktrees: [{ worktree_id: "a", branch: "main" }] });
+    await act(async () => { release(onlyA()); await pending; });
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    expect(prepare.mock.contexts.at(-1)).toBe(cachedB);
+
+    act(() => hook.result.current.selectWorktree("a")); await tick();
+    fetchMock.mockImplementation(async (url, init) => url === "/api/worktrees" ? onlyA() : transport(url, init));
+    await act(async () => { await hook.result.current.refreshWorktrees(); });
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    expect(prepare.mock.contexts.at(-1)).not.toBe(cachedB);
+  });
+
+  it.each(["superseded", "timed out"])("discards a late %s inventory without pruning", async failure => {
+    const { fetchMock } = contexts();
+    const prepare = vi.spyOn(ManifestStoreClient.prototype, "prepare");
+    const hook = renderHook(() => useLiveStore()); await tick();
+    const cachedA = prepare.mock.contexts.at(-1);
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    const timeout = new AbortController();
+    vi.spyOn(AbortSignal, "timeout").mockReturnValueOnce(timeout.signal);
+    let release!: (response: Response) => void;
+    fetchMock.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
+    let pending!: Promise<void>;
+    act(() => { pending = hook.result.current.refreshWorktrees(); });
+    if (failure === "superseded") await act(async () => { await hook.result.current.refreshWorktrees(); });
+    else timeout.abort(new DOMException("Inventory timed out", "TimeoutError"));
+    const choices = hook.result.current.worktrees;
+    await act(async () => {
+      release(Response.json({ original_worktree_id: "a", worktrees: [] }));
+      await pending;
+    });
+    expect(hook.result.current.worktrees).toBe(choices);
+    act(() => hook.result.current.selectWorktree("a")); await tick();
+    expect(prepare.mock.contexts.at(-1)).toBe(cachedA);
+  });
+
+  it("retains a selected client during a pending request and a listed unavailable client", async () => {
+    const { b, fetchMock, transport } = contexts();
+    const prepare = vi.spyOn(ManifestStoreClient.prototype, "prepare");
+    const hook = renderHook(() => useLiveStore()); await tick();
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    const cachedB = prepare.mock.contexts.at(-1);
+    act(() => hook.result.current.selectWorktree("a")); await tick();
+    let release!: (response: Response) => void;
+    let hold = true;
+    let listed = ["a"];
+    fetchMock.mockImplementation(async (url, init) => {
+      if (url === "/api/worktrees") return Response.json({ original_worktree_id: "a", worktrees: listed.map(worktree_id => ({
+        worktree_id, branch: worktree_id, available: worktree_id !== "b", explorer_available: worktree_id !== "b",
+      })) });
+      if (hold && url.includes("/manifest") && url.includes("worktree_id=b")) {
+        hold = false;
+        return new Promise(resolve => { release = resolve; });
+      }
+      return transport(url, init);
+    });
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    expect(hook.result.current.switching).toBe(true);
+    await act(async () => { await hook.result.current.refreshWorktrees(); });
+    listed = ["a", "b"];
+    await act(async () => { await hook.result.current.refreshWorktrees(); });
+    await act(async () => { release(manifestResponse(b)); }); await tick();
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
+    act(() => hook.result.current.selectWorktree("a")); await tick();
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    expect(prepare.mock.contexts.at(-1)).toBe(cachedB);
+  });
+
+  it("retires successive removed context caches without loading unselected branches", async () => {
+    const { a, fetchMock } = contexts();
+    delete window.reqvireLiveRefresh;
+    const prepare = vi.spyOn(ManifestStoreClient.prototype, "prepare");
+    const snapshots = new Map([["a", a]]);
+    fetchMock.mockImplementation(async (url, init = {}) => {
+      const parsed = new URL(url, window.location.origin);
+      if (parsed.pathname === "/api/worktrees/load") return Response.json({});
+      if (parsed.pathname === "/api/worktrees") return Response.json({ original_worktree_id: "a", worktrees: [...snapshots.keys()]
+        .map(worktree_id => ({ worktree_id, branch: "shared-branch-label" })) });
+      const snapshot = snapshots.get(parsed.searchParams.get("worktree_id")!)!;
+      return parsed.pathname.endsWith("/manifest") ? manifestResponse(snapshot) : chunkResponse(snapshot, init);
+    });
+    const hook = renderHook(() => useLiveStore()); await tick();
+    const cachedA = prepare.mock.contexts.at(-1);
+    const retired = new Map<string, unknown>();
+    // Fixture size exercises repeated retire/recreate cycles; it is not a cache limit.
+    for (let index = 0; index < 20; index++) {
+      const id = `context-${index}`;
+      for (const recreated of [false, true]) {
+        const store = smallStore();
+        const snapshot = wireSnapshot({ ...store, project: { ...store.project, worktree_id: id },
+          elements: [{ ...store.elements[0], content: recreated ? "Recreated" : "Original" }] });
+        snapshots.set(id, snapshot);
+        act(() => hook.result.current.selectWorktree(id)); await tick();
+        expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(snapshot.store);
+        const client = prepare.mock.contexts.at(-1);
+        if (recreated) expect(client).not.toBe(retired.get(id));
+        else retired.set(id, client);
+        act(() => hook.result.current.selectWorktree("a")); await tick();
+        expect(prepare.mock.contexts.at(-1)).toBe(cachedA);
+        snapshots.delete(id);
+        fetchMock.mockClear();
+        await act(async () => { await hook.result.current.refreshWorktrees(); });
+        expect(fetchMock.mock.calls.map(([url]) => url)).toEqual(["/api/worktrees"]);
+      }
+    }
   });
 });
 

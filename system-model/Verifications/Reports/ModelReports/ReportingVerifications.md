@@ -1153,7 +1153,7 @@ This test verifies that the `traces` command filter options work correctly when 
 - System shall support `--filter-name=<regex>` for filtering by verification name pattern
 - System shall support `--filter-type=<type>` for filtering by verification type
 - Multiple filters shall be combinable using AND logic
-- JSON output shall include verification ID, directly verified requirements, and complete trace tree structure
+- JSON output shall include verification ID, directly verified requirements, and the normalized trace graph defined by Verification Trace Tree Construction
 
 ##### Test Criteria
 1. **Basic JSON Output**
@@ -1163,7 +1163,10 @@ This test verifies that the `traces` command filter options work correctly when 
    - JSON contains `files` object grouping verifications by source file
    - each verification includes `identifier`, `name`, `type`
    - each verification includes `directly_verified_requirements` array
-   - each verification includes `trace_tree` with nested requirement structure
+   - each verification includes `trace_graph` with unique nodes and labelled edges, including owning capability ancestry
+   - layered reconvergent graphs retain every distinct edge, direct flags, and unique requirement totals without nested subtree copies; exercise multiple direct starts, duplicate relations, shuffled input order, orphan/objective exclusion, unresolved targets, cycles, and a deep chain in unit tests
+   - deterministic expansion and inspected-relation counts remain proportional to the reachable graph on 20- and 40-layer fixtures; do not use timing thresholds
+   - end-to-end CLI output and exported Project Store traces match for a reconvergent model; expected nodes and edges are derived independently from the fixture, and existing filter/output-file behavior remains intact
 
 2. **Specific Verification Filter**
    Command: `reqvire traces --filter-id="specifications/Verifications/ValidationTests.md#invalid-relations-test"`
@@ -1194,5 +1197,8 @@ This test verifies that the `traces` command filter options work correctly when 
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
+  * satisfiedBy: [check_graph.py](../../../../tests/test-verification-traces/check_graph.py)
+  * satisfiedBy: [verification_trace.rs](../../../../crates/reqvire-core/src/verification_trace.rs)
   * verify: [CLI Traces Command](../../../Interfaces/CLI/Commands.md#cli-traces-command)
+  * verify: [Trace Projection Data Generation](../../../Reports/ModelReports/ReportingRequirements.md#trace-projection-data-generation)
 ---

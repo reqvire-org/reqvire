@@ -890,7 +890,7 @@ WHEN a client requests a comment on a pull request in the pinned repository, the
 
 WHEN an MCP request targets an admitted worktree context, the system SHALL route it to that context's isolated worker and apply the shared context boundary to model reads, mutations, resources, prompts, and repository operations.
 
-IF mutation recovery fails while the worker retains a valid accepted snapshot, the system SHALL keep supported reads of that snapshot available with recovery diagnostics and SHALL reject further writes and publication until the context is recovered through normal admission.
+IF mutation recovery fails while the worker retains a valid accepted snapshot, the system SHALL keep supported reads of that snapshot available with recovery diagnostics and SHALL reject further writes and publication until the context is recovered through normal admission or verified reconciliation of its recorded commit outcome.
 
 #### Metadata
   * type: requirement
@@ -904,4 +904,23 @@ IF mutation recovery fails while the worker retains a valid accepted snapshot, t
   * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
   * definedBy: [MCP Worktree Worker Sessions Specification](Specifications.md#mcp-worktree-worker-sessions-specification)
   * derivedFrom: [MCP Worktree Context Isolation](#mcp-worktree-context-isolation)
+---
+
+### MCP Commit Outcome Reconciliation
+
+WHEN automatic or explicit local commit publication is interrupted in an owned context, the system SHALL verify the local Git outcome, complete index publication and accept the exact validated published candidate without repeating the ref side effect, or report confirmed non-publication with rollback for an automatic mutation and retained pending edits for an explicit commit.
+
+#### Metadata
+  * type: requirement
+
+#### Concept References
+  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
+
+#### Relations
+  * definedBy: [MCP Commit Outcome Reconciliation Specification](Specifications.md#mcp-commit-outcome-reconciliation-specification)
+  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
+  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
+  * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * verifiedBy: [MCP Accepted Change Commit Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-accepted-change-commit-verification)
 ---

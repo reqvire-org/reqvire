@@ -50,6 +50,9 @@ fi
 python3 "$TEST_SCRIPT_DIR/../test-serve-command/scripts/check-store.py" "$EXPORT_DIR/assets/project-store.js" \
     --requirement-text "Test Requirement" --evidence-text "export command evidence"
 
+node "$TEST_SCRIPT_DIR/check-forceatlas-worker.mjs" "$EXPORT_DIR" > "$TEST_DIR/forceatlas-worker.txt"
+diff -u "$TEST_SCRIPT_DIR/expected/forceatlas-worker.txt" "$TEST_DIR/forceatlas-worker.txt"
+
 # Test 3: ontologies.ttl exists
 if [ ! -f "$EXPORT_DIR/ontologies.ttl" ]; then
     echo "❌ FAILED: ontologies.ttl not found in export output"

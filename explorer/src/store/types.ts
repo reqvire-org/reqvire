@@ -14,7 +14,7 @@
  */
 
 /** Must match `SCHEMA_VERSION` in crates/reqvire-core/src/html/store.rs. */
-export const EXPECTED_SCHEMA_VERSION = "2026-06-30.project-store.v4";
+export const EXPECTED_SCHEMA_VERSION = "2026-10-06.project-store.v5";
 
 export interface ProjectStoreProject {
   worktree_id?: string;
@@ -273,19 +273,25 @@ export interface TraceVerification {
   directly_verified_count?: number;
   total_requirements_in_tree?: number;
   directly_verified_requirements?: string[];
-  trace_tree?: TraceTree;
+  trace_graph?: TraceGraph;
 }
 
-export interface TraceTree {
-  requirements: TraceRequirementNode[];
+export interface TraceGraph {
+  nodes: TraceNode[];
+  edges: TraceEdge[];
 }
 
-export interface TraceRequirementNode {
+export interface TraceEdge {
+  source: string;
+  relation_type: string;
+  target: string;
+}
+
+export interface TraceNode {
   id: string;
   name: string;
   type: string;
   is_directly_verified: boolean;
-  children: TraceRequirementNode[];
 }
 
 export interface TraceFileEntry {

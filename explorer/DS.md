@@ -635,15 +635,30 @@ npm run build
 
 Runs in sequence:
 
-1. **`npm run lint`** — generated artifact, adherence, and style checks (see Lint section below)
-2. **`npm run generate:icons`** — derives favicon/app-icon PNG/ICO outputs
-   from `design-system/assets/logo-mark.svg` into ignored `.vite/generated-assets/`
-3. **`tsc --noEmit`** — TypeScript type check
-4. **`npm run build:ds-bundle`** — emits generated standalone DS kit artifacts
-   outside tracked source
-5. **`vite build`** — emits `dist/` with deterministic asset names (`assets/explorer.js`, `assets/explorer.css`)
+1. **`npm run check`** — all generated artifact, adherence, style, and CSS ownership
+   guards, followed by the TypeScript check (`npm run typecheck`).
+2. **`npm run build:app`** — generates browser icons from
+   `design-system/assets/logo-mark.svg` into ignored `.vite/generated-assets/`,
+   then runs Vite to emit `dist/` with deterministic entry names
+   (`assets/explorer.js`, `assets/explorer.css`).
 
-The build fails at the first failing step. All steps must pass before `dist/` is emitted.
+The default build fails at the first failing step. The application consumes
+design-system source through `@ds`; it does not need `design-system/dist-kit`.
+
+Use `npm run build:all` for a checked application build plus the standalone kit.
+Checks run once before both artifacts. `npm run check`, `npm run build:app`, and
+`npm run build:ds-bundle` are composable stages; the two bundle-only commands do
+not run checks. CI runs the checks before those stages and makes Cargo embed
+the resulting `dist` without requesting another frontend build. Explicit
+`REQVIRE_BUILD_EXPLORER=1` Cargo invocations still run the checked default build.
+
+From the repository root, `make explorer` installs dependencies when the
+successful-install receipt is absent or older than `package.json` or
+`package-lock.json`, then runs the checked application build. An unchanged
+installation is reused; checks and bundling still run. `make explorer-deps`
+performs only that dependency setup. To force reinstall after changing Node
+or npm configuration, remove `explorer/node_modules/.reqvire-deps.stamp`
+before running Make again. Failed installation leaves no success receipt.
 
 ### Showcase dev/build
 
@@ -673,6 +688,81 @@ Configured in `design-system/vite.bundle.config.ts`. Produces standalone kit
 artifacts from `design-system/index.ts`. React and ReactDOM are external
 globals. These files are generated outputs and are **not** tracked source. They
 are also **not** part of the application bundle that `vite build` produces.
+
+### ForceAtlas browser profiling
+
+From the repository root, export a current Project Store, then run:
+
+```sh
+./target/debug/reqvire export --output /tmp/reqvire-profile-seed
+node explorer/scripts/profile-forceatlas.mjs \
+  /tmp/reqvire-profile-seed/assets/project-store.js /tmp/reqvire-forceatlas-profile
+```
+
+Use new output directories. The profiler builds an isolated Explorer with
+instrumentation around the actual Model Graph and Ontologies layout calls.
+It records main-thread preparation and coordinate application, worker-request
+wall time (including startup, transport, and computation), browser timer/frame
+gaps and progress during pending work, visible/input dimensions, source hashes,
+and coordinate checksums in `results.json`. Three runs per graph include a new
+document and two route reentries; fixtures cover the current model, bounded
+100–2,000-node trees, a denser graph, and hidden ontology nodes. Timings are
+diagnostic observations; timer/frame gaps include the surrounding renderer task.
+The probe checks topology dimensions, finite coordinates, and cold/warm parity
+without timing thresholds. Larger fixtures must permit both timer and frame
+progress while the worker is pending. It requires the shared test browser configuration
+(`REQVIRE_TEST_BROWSER`, `CHROME_BIN`, or Chrome/Chromium on PATH).
+`FORCEATLAS_PROFILE_SIZES=100 FORCEATLAS_PROFILE_TRIALS=1` provides a smaller run.
+
+Synchronous phase counters separate projection/index preparation, seed positions,
+graph population, palette/glyph resolution, Sigma startup, and accepted-coordinate,
+baseline, overlap, focus, and refresh work. Phase wall times are inclusive: nested
+phases such as palette resolution within graph population must not be summed.
+Counters cover startup through 350 ms after accepted layout, including scheduled
+focus-animation completion. Palette counts describe instrumented direct API
+invocations; CSS token aliases can require additional underlying style reads.
+The probe records focus animation target counts, rendered coordinates/stable
+baselines, and a checksum of rendered node/edge colors, sizes, labels, types,
+visibility, glyphs, and curvature. This checks visual attributes,
+without claiming pixel/rendering parity. Seed and instrumentation hashes make
+before/after comparisons reproducible.
+
+Set `FORCEATLAS_PROFILE_SIGMA=1` for diagnostic counters around the actual
+Sigma process, render, full/partial refresh, resize, clear, and label calls,
+plus WebGL shader, buffer, texture, draw, and readback submissions. The probe
+also checks every node's finite Sigma display-cache coordinates and records
+their checksum, the actual WebGL renderer identity, document long tasks, calls
+lasting at least 2 ms, and the intervals containing the largest timer/frame
+gaps. Calls from a retired renderer/context cannot contribute to its route
+replacement's counters. Direct WebGL timings measure synchronous submission;
+they do not measure asynchronous GPU execution. Sigma counters include internal
+graph-event and image-atlas refreshes; they differ from the explicit caller
+refresh counter. Nested counters remain inclusive.
+
+`FORCEATLAS_PROFILE_TRACE=1` enables those counters and captures a Chrome trace
+per fixture/renderer, covering its cold and warm runs. Traces include renderer,
+worker, GPU, compositor, and task events, with `reqvire:` phase/layout markers
+for correlation. Trace completion has a bounded wait. Use
+`FORCEATLAS_PROFILE_FIXTURES=current-model` to limit this larger diagnostic
+capture. Compare traced results for correctness and attribution separately from
+untraced timings: tracing adds overhead. Output directories retain the profiler
+and browser-driver source snapshots and their hashes alongside renderer and
+seed hashes.
+
+For a saved baseline, set `FORCEATLAS_PROFILE_SOURCE_ROOT` to a directory
+containing the repository-relative copies of the two renderer source files.
+The isolated diagnostic build substitutes only those sources and records their
+actual hashes; their other imports still use the current checkout. This enables
+controlled comparisons without replacing files in the shared working tree.
+
+The shared browser driver defaults to SwiftShader. For a native GPU probe, set
+`FORCEATLAS_PROFILE_GPU=native`; this selects headless ANGLE/Vulkan using
+Chrome's [documented native GPU flags](https://developer.chrome.com/blog/supercharge-web-ai-testing).
+The profiler requires a working application WebGL context and rejects a software
+renderer fallback using its unmasked renderer identity. A launch flag alone
+does not establish hardware use. Host driver/device compatibility still governs
+whether this mode works; a failed native probe does not provide native timing
+evidence. The ordinary shell browser checks retain their SwiftShader default.
 
 ---
 

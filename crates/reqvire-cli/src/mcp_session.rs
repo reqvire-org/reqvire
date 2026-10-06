@@ -9,7 +9,7 @@ use std::{
     fs::{self, File, OpenOptions},
     io::Write,
     path::{Path, PathBuf},
-    process::{Command, Stdio},
+    process::Command,
     sync::Arc,
 };
 
@@ -27,12 +27,19 @@ pub struct MutationSession {
     exclusions: ExclusionSet,
     options: ModelBuildOptions,
     recovery_error: Option<String>,
+    recovery_attempt: Option<RecoveryAttempt>,
     enable_commits: bool,
     #[cfg(unix)]
     track_file_mode: bool,
 }
+struct RecoveryAttempt {
+    commit: String,
+    files: SnapshotFiles,
+    changed: BTreeSet<PathBuf>,
+    original_index: Vec<u8>,
+}
 /// Immutable inputs and identity pinned when a worker read is admitted.
-pub(crate) struct ReadSnapshot {
+pub struct ReadSnapshot {
     files: SnapshotFiles,
     model: Arc<ModelManager>,
     metadata: Value,
@@ -70,38 +77,62 @@ impl ReadSnapshot {
 fn error(message: impl Into<String>) -> ReqvireError {
     ReqvireError::ProcessError(message.into())
 }
+
+#[cfg(test)]
+thread_local! {
+    static GIT_TIMEOUT: std::cell::Cell<std::time::Duration> = const {
+        std::cell::Cell::new(std::time::Duration::from_secs(30))
+    };
+}
+
+#[cfg(test)]
+pub fn with_git_timeout<T>(timeout: std::time::Duration, call: impl FnOnce() -> T) -> T {
+    struct Reset(std::time::Duration);
+    impl Drop for Reset {
+        fn drop(&mut self) {
+            GIT_TIMEOUT.with(|value| value.set(self.0));
+        }
+    }
+    let _reset = Reset(GIT_TIMEOUT.with(|value| value.replace(timeout)));
+    call()
+}
 pub fn git(
     root: &Path,
     args: &[&str],
     input: Option<&[u8]>,
     index: Option<&Path>,
 ) -> Result<Vec<u8>, ReqvireError> {
+    git_result(root, args, input, index).map_err(|failure| failure.error)
+}
+
+fn git_result(
+    root: &Path,
+    args: &[&str],
+    input: Option<&[u8]>,
+    index: Option<&Path>,
+) -> Result<Vec<u8>, crate::mcp_process::Failure> {
     let mut command = Command::new("git");
     command
         .current_dir(root)
         .args(args)
-        .env("GIT_LITERAL_PATHSPECS", "1")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
+        .env("GIT_LITERAL_PATHSPECS", "1");
     if let Some(index) = index {
         command.env("GIT_INDEX_FILE", index);
     }
-    let mut child = command.spawn()?;
-    if let Some(input) = input {
-        child
-            .stdin
-            .take()
-            .ok_or_else(|| error("Git stdin unavailable"))?
-            .write_all(input)?;
-    }
-    let output = child.wait_with_output()?;
-    if !output.status.success() {
-        return Err(error(format!(
-            "MCP Git operation {} failed: {}",
-            args[0],
-            String::from_utf8_lossy(&output.stderr).trim()
-        )));
+    #[cfg(test)]
+    let timeout = GIT_TIMEOUT.with(std::cell::Cell::get);
+    #[cfg(not(test))]
+    let timeout = std::time::Duration::from_secs(30);
+    let output = crate::mcp_process::run_binary(command, input, timeout, None)?;
+    if !output.success {
+        return Err(crate::mcp_process::Failure {
+            error: error(format!(
+                "MCP Git operation {} failed: {}",
+                args.first().unwrap_or(&"operation"),
+                String::from_utf8_lossy(&output.stderr).trim()
+            )),
+            outcome_unknown: false,
+        });
     }
     Ok(output.stdout)
 }
@@ -113,7 +144,7 @@ pub fn git_text(root: &Path, args: &[&str]) -> Result<String, ReqvireError> {
 }
 
 /// One checkout observation, never retained across requests or state transitions.
-pub(crate) struct GitCheckout {
+pub struct GitCheckout {
     branch: Option<String>,
     head: Option<String>,
 }
@@ -132,13 +163,15 @@ impl GitCheckout {
             }
             // An unborn named branch has no resolvable HEAD. Preserve its label
             // for read-only metadata; it cannot match a mutation session's HEAD.
-            Err(failure) => match git_text(root, &["symbolic-ref", "--quiet", "HEAD"]) {
-                Ok(branch) => Ok(Self {
-                    branch: Some(branch),
-                    head: None,
-                }),
-                Err(_) => Err(failure),
-            },
+            Err(failure) => git_text(root, &["symbolic-ref", "--quiet", "HEAD"]).map_or(
+                Err(failure),
+                |branch| {
+                    Ok(Self {
+                        branch: Some(branch),
+                        head: None,
+                    })
+                },
+            ),
         }
     }
     pub(crate) fn branch_name(&self) -> &str {
@@ -164,6 +197,7 @@ impl GitObservation {
         let bytes = git(
             root,
             &[
+                "--no-optional-locks",
                 "status",
                 "--porcelain=v2",
                 "--branch",
@@ -462,6 +496,7 @@ impl MutationSession {
             exclusions: exclusions.clone(),
             options,
             recovery_error: None,
+            recovery_attempt: None,
             enable_commits,
             #[cfg(unix)]
             track_file_mode,
@@ -586,7 +621,19 @@ impl MutationSession {
         }
         let revision = reqvire::model_fingerprint(&candidate.graph_registry.get_all_elements())?;
         self.check_head()?;
-        let commit = self.persist_candidate(&candidate_files, &changed, tool)?;
+        let (commit, reconciled) = match self.persist_candidate(&candidate_files, &changed, tool) {
+            Ok(commit) => (commit, false),
+            Err(failure) => {
+                let Some(attempt) = &self.recovery_attempt else {
+                    return Err(failure);
+                };
+                let commit = attempt.commit.clone();
+                // Persistence has released its index lock. Observe and verify
+                // the recorded publication instead of repeating update-ref.
+                self.resolve_recorded_commit(&commit)?;
+                (Some(commit), true)
+            }
+        };
         if let Some(commit) = &commit {
             self.head = commit.clone();
         }
@@ -616,6 +663,9 @@ impl MutationSession {
                 .and_then(Value::as_object_mut),
         ) {
             content.insert("commit".into(), Value::String(commit));
+            if reconciled {
+                content.insert("reconciled".into(), Value::Bool(true));
+            }
             result["content"] = serde_json::json!([{ "type": "text", "text": serde_json::to_string_pretty(content)? }]);
         }
         Ok((Ok(result), true))
@@ -635,15 +685,24 @@ impl MutationSession {
             "dirty": dirty, "available": writable.is_ok() || self.recovery_error.is_some(),
             "writes_available": writable.is_ok(), "recovery_required": self.recovery_error.is_some(),
             "diagnostic": self.recovery_error.clone().or_else(|| writable.err().map(|e| e.to_string())),
+            "recovery_attempt": self.recovery_attempt.as_ref().map(|attempt| serde_json::json!({
+                "accepted_head":self.head, "attempted_commit":attempt.commit,
+                "affected_paths":attempt.changed.iter().filter_map(|p|p.strip_prefix(&self.root).ok()).collect::<Vec<_>>(),
+                "reconcile_tool":"reqvire.git.reconcile",
+            })),
             "model_source":"accepted_snapshot", "git_source":"live_observation",
         });
         status
             .as_object_mut()
             .expect("context status object")
-            .extend(live.as_object().unwrap().clone());
+            .extend(
+                live.as_object()
+                    .expect("live context status is an object")
+                    .clone(),
+            );
         status
     }
-    fn pending_paths(&self) -> &BTreeSet<PathBuf> {
+    const fn pending_paths(&self) -> &BTreeSet<PathBuf> {
         &self.pending_paths
     }
     pub fn explicit_commit(&mut self, message: &str) -> Result<Value, ReqvireError> {
@@ -662,7 +721,7 @@ impl MutationSession {
         drop(scope);
         let mut publication = self.prepare_commit(&files, &changed, message)?;
         self.check_head()?;
-        git(
+        if let Err(failure) = git_result(
             &self.root,
             &[
                 "update-ref",
@@ -674,7 +733,28 @@ impl MutationSession {
             ],
             None,
             None,
-        )?;
+        ) {
+            if failure.outcome_unknown {
+                // The owned process has stopped. An unchanged branch confirms
+                // failure; pending accepted edits remain available to commit.
+                if self.ref_at_accepted_head() {
+                    return Err(error(format!(
+                        "Explicit commit was not published; pending changes retained: {}",
+                        failure.error
+                    )));
+                }
+                let reason = format!(
+                    "Explicit commit ref publication failed for {}: accepted HEAD {}, attempted commit {}; {}; further writes disabled",
+                    self.branch, self.head, publication.commit, failure.error
+                );
+                self.recovery_error = Some(reason);
+                self.record_attempt(&publication, &files, &changed);
+                let commit = publication.commit.clone();
+                drop(publication);
+                return self.resolve_recorded_commit(&commit);
+            }
+            return Err(failure.error);
+        }
         if let Err(failure) = fs::rename(&publication.index_lock.path, &publication.index_path) {
             // Compare-and-swap rollback never overwrites a subsequent external ref update.
             if git(
@@ -704,8 +784,255 @@ impl MutationSession {
         let _scope = self.files.enter(Some(Arc::clone(&self.model)));
         call(&self.model)
     }
+    /// Complete only the recorded publication. Never issue another ref update.
+    pub fn reconcile_commit(&mut self, commit: &str, dry_run: bool) -> Result<Value, ReqvireError> {
+        let attempt = self.recovery_attempt.as_ref().filter(|_| self.recovery_error.is_some())
+            .ok_or_else(|| error("No recorded unknown-outcome commit to reconcile; use normal admission for other recovery failures"))?;
+        if commit != attempt.commit {
+            return Err(error(
+                "Reconciliation requires the exact recorded attempted_commit",
+            ));
+        }
+        self.verify_attempt_checkout(attempt)?;
+        let parents = git_text(&self.root, &["rev-list", "--parents", "-n", "1", commit])?;
+        if parents != format!("{commit} {}", self.head) {
+            return Err(error(
+                "Attempted commit does not have the accepted HEAD as its sole parent",
+            ));
+        }
+        let changed = git(
+            &self.root,
+            &[
+                "diff-tree",
+                "--no-commit-id",
+                "--name-only",
+                "-r",
+                "-z",
+                &self.head,
+                commit,
+            ],
+            None,
+            None,
+        )?;
+        let changed: BTreeSet<_> = nul_paths(&self.root, &changed)?;
+        if changed != attempt.changed {
+            return Err(error(
+                "Attempted commit's affected paths differ from the recorded candidate",
+            ));
+        }
+        let scope = attempt.files.enter(None);
+        let mut model = ModelManager::new();
+        model.parse_and_validate_with_options(None, &self.exclusions, self.options)?;
+        drop(scope);
+        let revision = reqvire::model_fingerprint(&model.graph_registry.get_all_elements())?;
+        self.verify_attempt_files(attempt)?;
+
+        let index_path = self
+            .root
+            .join(git_text(&self.root, &["rev-parse", "--git-path", "index"])?);
+        let mut lock = IndexLock {
+            file: OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(index_path.with_file_name("index.lock"))?,
+            path: index_path.with_file_name("index.lock"),
+            published: false,
+        };
+        let old_index = tempfile::NamedTempFile::new()?;
+        fs::write(old_index.path(), &attempt.original_index)?;
+        let current_index = fs::read(&index_path)?;
+        let merged = tempfile::NamedTempFile::new()?;
+        fs::write(merged.path(), &current_index)?;
+        let expected = tempfile::NamedTempFile::new()?.into_temp_path();
+        fs::remove_file(&expected)?;
+        git(&self.root, &["read-tree", commit], None, Some(&expected))?;
+        let before = index_entries(&self.root, old_index.path())?;
+        let current = index_entries(&self.root, merged.path())?;
+        let target = index_entries(&self.root, &expected)?;
+        for path in before
+            .keys()
+            .chain(current.keys())
+            .chain(attempt.changed.iter())
+        {
+            if attempt.changed.contains(path) {
+                if current.get(path) != before.get(path) && current.get(path) != target.get(path) {
+                    return Err(error(format!(
+                        "Affected index entry changed outside the attempt: {}",
+                        path.display()
+                    )));
+                }
+            } else if current.get(path) != before.get(path) {
+                return Err(error("Unrelated index entries changed after the attempt; preserve and resolve them before reconciliation"));
+            }
+        }
+        let mut entries = Vec::new();
+        for path in &attempt.changed {
+            let relative = path
+                .strip_prefix(&self.root)
+                .map_err(|e| error(e.to_string()))?
+                .to_str()
+                .ok_or_else(|| error("Non-UTF8 reconciliation path"))?;
+            let expected_entry = if let Some(bytes) = attempt.files.files.get(path) {
+                let oid = String::from_utf8(git(
+                    &self.root,
+                    &["hash-object", "--stdin"],
+                    Some(bytes),
+                    None,
+                )?)
+                .map_err(|e| error(e.to_string()))?;
+                let mode = if attempt.files.executable.contains(path) {
+                    "100755"
+                } else {
+                    "100644"
+                };
+                format!("{mode} {} 0\t{relative}", oid.trim())
+            } else {
+                format!("0 {}\t{relative}", "0".repeat(self.head.len()))
+            };
+            if attempt.files.files.contains_key(path)
+                && target.get(path) != Some(&vec![expected_entry.as_bytes().to_vec()])
+            {
+                return Err(error(
+                    "Attempted commit content or mode differs from the recorded candidate",
+                ));
+            }
+            if !attempt.files.files.contains_key(path) && target.contains_key(path) {
+                return Err(error("Attempted commit retained a recorded deletion"));
+            }
+            entries.extend_from_slice(expected_entry.as_bytes());
+            entries.push(0);
+        }
+        git(
+            &self.root,
+            &["update-index", "-z", "--index-info"],
+            Some(&entries),
+            Some(merged.path()),
+        )?;
+        self.verify_attempt_checkout(attempt)?;
+        self.verify_attempt_files(attempt)?;
+        let result = serde_json::json!({"outcome":if dry_run {"ready"} else {"completed"},
+            "dry_run":dry_run, "old_head":self.head, "head":commit, "commit":commit,
+            "changed_files":attempt.changed.iter().filter_map(|p|p.strip_prefix(&self.root).ok()).collect::<Vec<_>>()});
+        if dry_run {
+            return Ok(result);
+        }
+        lock.file.write_all(&fs::read(merged.path())?)?;
+        lock.file.sync_all()?;
+        fs::rename(&lock.path, &index_path)?;
+        lock.published = true;
+        // Final observation cannot import an external checkout into accepted state.
+        self.verify_attempt_checkout(attempt)?;
+        let model_changed = self.files.files != attempt.files.files
+            || self.files.executable != attempt.files.executable;
+        self.files = attempt.files.clone();
+        self.committed_files = self.files.clone();
+        self.pending_paths.clear();
+        self.head = commit.to_owned();
+        // Explicit commits accept the same files/model that were already
+        // published by mutations; preserve their model identity.
+        if model_changed {
+            self.model = Arc::new(model);
+        }
+        self.model_revision = revision;
+        self.recovery_attempt = None;
+        self.recovery_error = None;
+        reqvire::model_cache::invalidate();
+        Ok(result)
+    }
+    fn ref_at_accepted_head(&self) -> bool {
+        GitCheckout::read(&self.root).is_ok_and(|observed| {
+            observed.branch.as_deref() == Some(&self.branch)
+                && observed.head.as_deref() == Some(&self.head)
+        })
+    }
+    fn resolve_recorded_commit(&mut self, commit: &str) -> Result<Value, ReqvireError> {
+        match self.reconcile_commit(commit, false) {
+            Ok(mut result) => {
+                result["reconciled"] = Value::Bool(true);
+                Ok(result)
+            }
+            Err(failure) => {
+                let reason = format!(
+                    "{}; automatic reconciliation failed: {failure}",
+                    self.recovery_error.as_deref().unwrap_or_default()
+                );
+                self.recovery_error = Some(reason.clone());
+                Err(error(reason))
+            }
+        }
+    }
+    fn verify_attempt_checkout(&self, attempt: &RecoveryAttempt) -> Result<(), ReqvireError> {
+        let observed = GitCheckout::read(&self.root)?;
+        if observed.branch.as_deref() != Some(&self.branch)
+            || observed.head.as_deref() != Some(&attempt.commit)
+        {
+            return Err(error(
+                "Reconciliation requires the owned branch at the exact recorded attempted commit",
+            ));
+        }
+        for marker in [
+            "MERGE_HEAD",
+            "CHERRY_PICK_HEAD",
+            "REVERT_HEAD",
+            "rebase-merge",
+            "rebase-apply",
+        ] {
+            let path = git_text(&self.root, &["rev-parse", "--git-path", marker])?;
+            if self.root.join(path).exists() {
+                return Err(error(
+                    "Finish the in-progress Git operation before reconciliation",
+                ));
+            }
+        }
+        Ok(())
+    }
+    fn verify_attempt_files(&self, attempt: &RecoveryAttempt) -> Result<(), ReqvireError> {
+        for path in attempt.files.files.keys().chain(attempt.changed.iter()) {
+            ensure_regular_destination(&self.root, path)?;
+            match attempt.files.files.get(path) {
+                Some(bytes) => {
+                    let metadata = fs::symlink_metadata(path)?;
+                    if !metadata.is_file() || fs::read(path)? != **bytes {
+                        return Err(error(format!(
+                            "Worktree content differs from the recorded candidate: {}",
+                            path.display()
+                        )));
+                    }
+                    #[cfg(unix)]
+                    if self.track_file_mode {
+                        use std::os::unix::fs::PermissionsExt;
+                        if (metadata.permissions().mode() & 0o100 != 0)
+                            != attempt.files.executable.contains(path)
+                        {
+                            return Err(error(
+                                "Worktree executable mode differs from the recorded candidate",
+                            ));
+                        }
+                    }
+                }
+                None => match fs::symlink_metadata(path) {
+                    Ok(_) => return Err(error("Worktree retained a recorded deletion")),
+                    Err(failure) if failure.kind() == std::io::ErrorKind::NotFound => {}
+                    Err(failure) => return Err(failure.into()),
+                },
+            }
+        }
+        let untracked = git(
+            &self.root,
+            &["ls-files", "--others", "--exclude-standard", "-z"],
+            None,
+            None,
+        )?;
+        if nul_paths(&self.root, &untracked)?
+            .iter()
+            .any(|p| !attempt.files.files.contains_key(p))
+        {
+            return Err(error("Untracked files outside the recorded candidate must be preserved and resolved before reconciliation"));
+        }
+        Ok(())
+    }
     fn prepare_commit(
-        &mut self,
+        &self,
         files: &SnapshotFiles,
         changed: &BTreeSet<PathBuf>,
         message: &str,
@@ -791,7 +1118,21 @@ impl MutationSession {
             commit,
             index_path,
             index_lock,
+            original_index: old_index,
         })
+    }
+    fn record_attempt(
+        &mut self,
+        publication: &PreparedCommit,
+        files: &SnapshotFiles,
+        changed: &BTreeSet<PathBuf>,
+    ) {
+        self.recovery_attempt = Some(RecoveryAttempt {
+            commit: publication.commit.clone(),
+            files: files.clone(),
+            changed: changed.clone(),
+            original_index: publication.original_index.clone(),
+        });
     }
     fn persist_candidate(
         &mut self,
@@ -842,7 +1183,7 @@ impl MutationSession {
             }
             self.check_head()?;
             if let Some(publication) = &mut publication {
-                git(
+                git_result(
                     &self.root,
                     &[
                         "update-ref",
@@ -854,7 +1195,16 @@ impl MutationSession {
                     ],
                     None,
                     None,
-                )?;
+                )
+                .map_err(|failure| {
+                    if failure.outcome_unknown && !self.ref_at_accepted_head() {
+                        self.record_attempt(publication, files, changed);
+                    }
+                    error(format!(
+                    "Git ref publication failed for {}: accepted HEAD {}, attempted commit {}; {}",
+                    self.branch, self.head, publication.commit, failure.error
+                ))
+                })?;
                 advanced = true;
                 fs::rename(&publication.index_lock.path, &publication.index_path)?;
                 publication.index_lock.published = true;
@@ -862,6 +1212,13 @@ impl MutationSession {
             Ok::<_, ReqvireError>(())
         })();
         if let Err(failure) = result {
+            if self.recovery_attempt.is_some() {
+                let reason = format!(
+                    "MCP mutation failed: {failure}; outcome unknown; further writes disabled"
+                );
+                self.recovery_error = Some(reason.clone());
+                return Err(error(reason));
+            }
             let recovery = (|| {
                 let advanced_commit = publication.as_ref().filter(|_| advanced).map(|p| &p.commit);
                 let expected = advanced_commit.unwrap_or(&self.head);
@@ -902,7 +1259,7 @@ impl MutationSession {
 }
 // Deliberately explicit: a new read-only tool may still depend on live Git or
 // filesystem state and needs an audit before it can run during recovery.
-pub(crate) fn snapshot_read(tool: &str) -> bool {
+pub fn snapshot_read(tool: &str) -> bool {
     matches!(
         tool,
         "reqvire.workspace_status"
@@ -944,6 +1301,39 @@ struct PreparedCommit {
     commit: String,
     index_path: PathBuf,
     index_lock: IndexLock,
+    original_index: Vec<u8>,
+}
+fn nul_paths(root: &Path, bytes: &[u8]) -> Result<BTreeSet<PathBuf>, ReqvireError> {
+    bytes
+        .split(|b| *b == 0)
+        .filter(|entry| !entry.is_empty())
+        .map(|entry| {
+            std::str::from_utf8(entry)
+                .map(|path| root.join(path))
+                .map_err(|e| error(e.to_string()))
+        })
+        .collect()
+}
+fn index_entries(
+    root: &Path,
+    index: &Path,
+) -> Result<BTreeMap<PathBuf, Vec<Vec<u8>>>, ReqvireError> {
+    let mut result: BTreeMap<PathBuf, Vec<Vec<u8>>> = BTreeMap::new();
+    for entry in git(root, &["ls-files", "--stage", "-z"], None, Some(index))?
+        .split(|b| *b == 0)
+        .filter(|entry| !entry.is_empty())
+    {
+        let (_, path) = entry.split_at(
+            entry
+                .iter()
+                .position(|b| *b == b'\t')
+                .ok_or_else(|| error("Invalid index entry"))?
+                + 1,
+        );
+        let path = root.join(std::str::from_utf8(path).map_err(|e| error(e.to_string()))?);
+        result.entry(path).or_default().push(entry.to_vec());
+    }
+    Ok(result)
 }
 struct IndexLock {
     file: File,

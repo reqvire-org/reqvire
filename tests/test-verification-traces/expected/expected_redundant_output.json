@@ -11,34 +11,53 @@
             "specifications/SystemRequirements.md#oauth-implementation",
             "specifications/SystemRequirements.md#session-management"
           ],
-          "trace_tree": {
-            "requirements": [
+          "directly_verified_count": 2,
+          "total_requirements_in_tree": 3,
+          "trace_graph": {
+            "nodes": [
+              {
+                "id": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md",
+                "name": "Test Capability Test Verification Traces Specifications Capabilities Md",
+                "type": "capability",
+                "is_directly_verified": false
+              },
+              {
+                "id": "specifications/Capabilities.md#user-authentication",
+                "name": "User Authentication",
+                "type": "requirement",
+                "is_directly_verified": false
+              },
               {
                 "id": "specifications/SystemRequirements.md#oauth-implementation",
                 "name": "OAuth Implementation",
                 "type": "requirement",
-                "is_directly_verified": true,
-                "children": [
-                  {
-                    "id": "specifications/Capabilities.md#user-authentication",
-                    "name": "User Authentication",
-                    "type": "requirement",
-                    "is_directly_verified": false,
-                    "children": []
-                  }
-                ]
+                "is_directly_verified": true
               },
               {
                 "id": "specifications/SystemRequirements.md#session-management",
                 "name": "Session Management",
                 "type": "requirement",
-                "is_directly_verified": true,
-                "children": []
+                "is_directly_verified": true
+              }
+            ],
+            "edges": [
+              {
+                "source": "specifications/Capabilities.md#user-authentication",
+                "relation_type": "specify",
+                "target": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md"
+              },
+              {
+                "source": "specifications/SystemRequirements.md#oauth-implementation",
+                "relation_type": "derivedFrom",
+                "target": "specifications/Capabilities.md#user-authentication"
+              },
+              {
+                "source": "specifications/SystemRequirements.md#session-management",
+                "relation_type": "derivedFrom",
+                "target": "specifications/SystemRequirements.md#oauth-implementation"
               }
             ]
-          },
-          "directly_verified_count": 2,
-          "total_requirements_in_tree": 3
+          }
         },
         {
           "identifier": "specifications/Verifications/Tests.md#session-timeout-test",
@@ -48,35 +67,53 @@
           "directly_verified_requirements": [
             "specifications/SystemRequirements.md#session-management"
           ],
-          "trace_tree": {
-            "requirements": [
+          "directly_verified_count": 1,
+          "total_requirements_in_tree": 3,
+          "trace_graph": {
+            "nodes": [
+              {
+                "id": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md",
+                "name": "Test Capability Test Verification Traces Specifications Capabilities Md",
+                "type": "capability",
+                "is_directly_verified": false
+              },
+              {
+                "id": "specifications/Capabilities.md#user-authentication",
+                "name": "User Authentication",
+                "type": "requirement",
+                "is_directly_verified": false
+              },
+              {
+                "id": "specifications/SystemRequirements.md#oauth-implementation",
+                "name": "OAuth Implementation",
+                "type": "requirement",
+                "is_directly_verified": false
+              },
               {
                 "id": "specifications/SystemRequirements.md#session-management",
                 "name": "Session Management",
                 "type": "requirement",
-                "is_directly_verified": true,
-                "children": [
-                  {
-                    "id": "specifications/SystemRequirements.md#oauth-implementation",
-                    "name": "OAuth Implementation",
-                    "type": "requirement",
-                    "is_directly_verified": false,
-                    "children": [
-                      {
-                        "id": "specifications/Capabilities.md#user-authentication",
-                        "name": "User Authentication",
-                        "type": "requirement",
-                        "is_directly_verified": false,
-                        "children": []
-                      }
-                    ]
-                  }
-                ]
+                "is_directly_verified": true
+              }
+            ],
+            "edges": [
+              {
+                "source": "specifications/Capabilities.md#user-authentication",
+                "relation_type": "specify",
+                "target": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md"
+              },
+              {
+                "source": "specifications/SystemRequirements.md#oauth-implementation",
+                "relation_type": "derivedFrom",
+                "target": "specifications/Capabilities.md#user-authentication"
+              },
+              {
+                "source": "specifications/SystemRequirements.md#session-management",
+                "relation_type": "derivedFrom",
+                "target": "specifications/SystemRequirements.md#oauth-implementation"
               }
             ]
-          },
-          "directly_verified_count": 1,
-          "total_requirements_in_tree": 3
+          }
         },
         {
           "identifier": "specifications/Verifications/Tests.md#encryption-coverage-test",
@@ -86,27 +123,42 @@
           "directly_verified_requirements": [
             "specifications/SystemRequirements.md#encryption-implementation"
           ],
-          "trace_tree": {
-            "requirements": [
+          "directly_verified_count": 1,
+          "total_requirements_in_tree": 2,
+          "trace_graph": {
+            "nodes": [
+              {
+                "id": "specifications/Capabilities.md#data-protection",
+                "name": "Data Protection",
+                "type": "requirement",
+                "is_directly_verified": false
+              },
+              {
+                "id": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md",
+                "name": "Test Capability Test Verification Traces Specifications Capabilities Md",
+                "type": "capability",
+                "is_directly_verified": false
+              },
               {
                 "id": "specifications/SystemRequirements.md#encryption-implementation",
                 "name": "Encryption Implementation",
                 "type": "requirement",
-                "is_directly_verified": true,
-                "children": [
-                  {
-                    "id": "specifications/Capabilities.md#data-protection",
-                    "name": "Data Protection",
-                    "type": "requirement",
-                    "is_directly_verified": false,
-                    "children": []
-                  }
-                ]
+                "is_directly_verified": true
+              }
+            ],
+            "edges": [
+              {
+                "source": "specifications/Capabilities.md#data-protection",
+                "relation_type": "specify",
+                "target": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md"
+              },
+              {
+                "source": "specifications/SystemRequirements.md#encryption-implementation",
+                "relation_type": "derivedFrom",
+                "target": "specifications/Capabilities.md#data-protection"
               }
             ]
-          },
-          "directly_verified_count": 1,
-          "total_requirements_in_tree": 2
+          }
         },
         {
           "identifier": "specifications/Verifications/Tests.md#coverage-calculation-test",
@@ -117,34 +169,53 @@
             "specifications/SystemRequirements.md#coverage-calculator",
             "specifications/SystemRequirements.md#coverage-report-generator"
           ],
-          "trace_tree": {
-            "requirements": [
+          "directly_verified_count": 2,
+          "total_requirements_in_tree": 3,
+          "trace_graph": {
+            "nodes": [
+              {
+                "id": "specifications/Capabilities.md#coverage-reports",
+                "name": "Coverage Reports",
+                "type": "requirement",
+                "is_directly_verified": false
+              },
+              {
+                "id": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md",
+                "name": "Test Capability Test Verification Traces Specifications Capabilities Md",
+                "type": "capability",
+                "is_directly_verified": false
+              },
               {
                 "id": "specifications/SystemRequirements.md#coverage-calculator",
                 "name": "Coverage Calculator",
                 "type": "requirement",
-                "is_directly_verified": true,
-                "children": [
-                  {
-                    "id": "specifications/Capabilities.md#coverage-reports",
-                    "name": "Coverage Reports",
-                    "type": "requirement",
-                    "is_directly_verified": false,
-                    "children": []
-                  }
-                ]
+                "is_directly_verified": true
               },
               {
                 "id": "specifications/SystemRequirements.md#coverage-report-generator",
                 "name": "Coverage Report Generator",
                 "type": "requirement",
-                "is_directly_verified": true,
-                "children": []
+                "is_directly_verified": true
+              }
+            ],
+            "edges": [
+              {
+                "source": "specifications/Capabilities.md#coverage-reports",
+                "relation_type": "specify",
+                "target": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md"
+              },
+              {
+                "source": "specifications/SystemRequirements.md#coverage-calculator",
+                "relation_type": "derivedFrom",
+                "target": "specifications/Capabilities.md#coverage-reports"
+              },
+              {
+                "source": "specifications/SystemRequirements.md#coverage-report-generator",
+                "relation_type": "derivedFrom",
+                "target": "specifications/SystemRequirements.md#coverage-calculator"
               }
             ]
-          },
-          "directly_verified_count": 2,
-          "total_requirements_in_tree": 3
+          }
         },
         {
           "identifier": "specifications/Verifications/Tests.md#security-analysis",
@@ -154,19 +225,31 @@
           "directly_verified_requirements": [
             "specifications/Capabilities.md#data-protection"
           ],
-          "trace_tree": {
-            "requirements": [
+          "directly_verified_count": 1,
+          "total_requirements_in_tree": 1,
+          "trace_graph": {
+            "nodes": [
               {
                 "id": "specifications/Capabilities.md#data-protection",
                 "name": "Data Protection",
                 "type": "requirement",
-                "is_directly_verified": true,
-                "children": []
+                "is_directly_verified": true
+              },
+              {
+                "id": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md",
+                "name": "Test Capability Test Verification Traces Specifications Capabilities Md",
+                "type": "capability",
+                "is_directly_verified": false
+              }
+            ],
+            "edges": [
+              {
+                "source": "specifications/Capabilities.md#data-protection",
+                "relation_type": "specify",
+                "target": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md"
               }
             ]
-          },
-          "directly_verified_count": 1,
-          "total_requirements_in_tree": 1
+          }
         },
         {
           "identifier": "specifications/Verifications/Tests.md#code-inspection",
@@ -176,27 +259,42 @@
           "directly_verified_requirements": [
             "specifications/SystemRequirements.md#oauth-implementation"
           ],
-          "trace_tree": {
-            "requirements": [
+          "directly_verified_count": 1,
+          "total_requirements_in_tree": 2,
+          "trace_graph": {
+            "nodes": [
+              {
+                "id": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md",
+                "name": "Test Capability Test Verification Traces Specifications Capabilities Md",
+                "type": "capability",
+                "is_directly_verified": false
+              },
+              {
+                "id": "specifications/Capabilities.md#user-authentication",
+                "name": "User Authentication",
+                "type": "requirement",
+                "is_directly_verified": false
+              },
               {
                 "id": "specifications/SystemRequirements.md#oauth-implementation",
                 "name": "OAuth Implementation",
                 "type": "requirement",
-                "is_directly_verified": true,
-                "children": [
-                  {
-                    "id": "specifications/Capabilities.md#user-authentication",
-                    "name": "User Authentication",
-                    "type": "requirement",
-                    "is_directly_verified": false,
-                    "children": []
-                  }
-                ]
+                "is_directly_verified": true
+              }
+            ],
+            "edges": [
+              {
+                "source": "specifications/Capabilities.md#user-authentication",
+                "relation_type": "specify",
+                "target": "specifications/Capabilities.md#test-capability-test-verification-traces-specifications-capabilities-md"
+              },
+              {
+                "source": "specifications/SystemRequirements.md#oauth-implementation",
+                "relation_type": "derivedFrom",
+                "target": "specifications/Capabilities.md#user-authentication"
               }
             ]
-          },
-          "directly_verified_count": 1,
-          "total_requirements_in_tree": 2
+          }
         }
       ]
     }

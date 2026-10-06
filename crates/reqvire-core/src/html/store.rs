@@ -13,7 +13,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
-const SCHEMA_VERSION: &str = "2026-06-30.project-store.v4";
+const SCHEMA_VERSION: &str = "2026-10-06.project-store.v5";
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ExplorerProjectStore {
@@ -1652,7 +1652,10 @@ ext:UnusedTerm a owl:Class ;
         let source = test_semantic_index_with_external_subset();
         let (visible, metadata) = explorer_visible_semantic_index(
             &source,
-            source.used_external_subset_block().unwrap().as_ref(),
+            source
+                .used_external_subset_block()
+                .expect("test fixture operation should succeed")
+                .as_ref(),
         );
         let graph_data = build_graph_data(&visible);
         let graph_node_ids = graph_data
@@ -1708,7 +1711,10 @@ ext:UnusedTerm a owl:Class ;
         let source = test_semantic_index_with_external_subset();
         let (visible, _metadata) = explorer_visible_semantic_index(
             &source,
-            source.used_external_subset_block().unwrap().as_ref(),
+            source
+                .used_external_subset_block()
+                .expect("test fixture operation should succeed")
+                .as_ref(),
         );
         let graph_data = build_graph_data(&visible);
         let docs = build_search_documents(&[], &[], &BTreeMap::new(), &graph_data);

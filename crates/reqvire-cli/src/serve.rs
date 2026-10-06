@@ -41,14 +41,14 @@ pub struct ServeState {
 }
 
 impl ServeState {
-    fn worktrees(&self) -> Option<&Arc<crate::mcp_worktrees::Worktrees>> {
+    const fn worktrees(&self) -> Option<&Arc<crate::mcp_worktrees::Worktrees>> {
         match &self.runtime {
             RuntimeSource::Worktrees(worktrees) => Some(worktrees),
             RuntimeSource::Local(_) => None,
         }
     }
 
-    fn has_worktrees(&self) -> bool {
+    const fn has_worktrees(&self) -> bool {
         self.worktrees().is_some()
     }
 
@@ -68,22 +68,19 @@ fn prepare_runtime(
     root: &Path,
     executable: &Path,
     enable_mcp: bool,
-    mcp_enable_mutations: bool,
-    mcp_enable_commits: bool,
-    mcp_enable_github: bool,
-    mcp_github_remote: &str,
+    options: mcp::McpOptions<'_>,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<RuntimeSource, ReqvireError> {
-    if enable_mcp && mcp_enable_mutations {
+    if enable_mcp && options.enable_mutations {
         Ok(RuntimeSource::Worktrees(
             crate::mcp_worktrees::Worktrees::start(
                 root,
                 executable,
-                mcp_enable_commits,
+                options.enable_commits,
                 false,
                 true,
-                mcp_enable_github,
-                mcp_github_remote,
+                options.enable_github,
+                options.github_remote,
             )?,
         ))
     } else if crate::mcp_process::git(root, &["rev-parse", "--git-common-dir"]).is_ok() {
@@ -113,10 +110,7 @@ pub async fn serve_explorer(
     host: &str,
     port: u16,
     enable_mcp: bool,
-    mcp_enable_mutations: bool,
-    mcp_enable_commits: bool,
-    mcp_enable_github: bool,
-    mcp_github_remote: &str,
+    options: mcp::McpOptions<'_>,
     excluded_filename_patterns: &GlobSet,
     http_access: &crate::mcp_http::HttpAccess,
 ) -> Result<(), ReqvireError> {
@@ -124,10 +118,7 @@ pub async fn serve_explorer(
         &std::env::current_dir()?,
         &std::env::current_exe()?,
         enable_mcp,
-        mcp_enable_mutations,
-        mcp_enable_commits,
-        mcp_enable_github,
-        mcp_github_remote,
+        options,
         excluded_filename_patterns,
     )?;
     let listener = tokio::net::TcpListener::bind((crate::mcp_http::listener_hostname(host), port))
@@ -141,7 +132,7 @@ pub async fn serve_explorer(
     let state = ServeState {
         excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
         runtime,
-        live_refresh: enable_mcp && mcp_enable_mutations,
+        live_refresh: enable_mcp && options.enable_mutations,
         write_lock: Arc::new(RwLock::new(())),
     };
     let mut app = explorer_routes();
@@ -156,7 +147,7 @@ pub async fn serve_explorer(
             Box::pin(async move { refresh_runtime_assets(&refresh_state, model).await })
                 as Pin<Box<dyn std::future::Future<Output = Result<(), ReqvireError>> + Send>>
         });
-        app = if let Some(worktrees) = state.worktrees().filter(|_| mcp_enable_mutations) {
+        app = if let Some(worktrees) = state.worktrees().filter(|_| options.enable_mutations) {
             mcp::mount_worktrees(
                 app,
                 Arc::clone(worktrees),
@@ -166,9 +157,7 @@ pub async fn serve_explorer(
         } else {
             mcp::mount_service_with_post_write_hook(
                 app,
-                mcp_enable_mutations,
-                mcp_enable_commits,
-                false,
+                options,
                 excluded_filename_patterns,
                 Arc::clone(&state.write_lock),
                 state.live_refresh.then_some(post_write_hook),
@@ -216,8 +205,9 @@ fn explorer_routes() -> Router<ServeState> {
 async fn serve_worktrees(State(state): State<ServeState>) -> Response<Body> {
     match state.runtime {
         RuntimeSource::Worktrees(worktrees) => {
-            match tokio::task::spawn_blocking(move || worktrees.browser_inventory()).await {
-                Ok(value) => {
+            (tokio::task::spawn_blocking(move || worktrees.browser_inventory()).await).map_or_else(
+                |_| response_with_status(StatusCode::SERVICE_UNAVAILABLE),
+                |value| {
                     let failed = value.get("error").is_some();
                     let mut response =
                         runtime_bytes_response("application/json", value.to_string().into_bytes());
@@ -225,9 +215,8 @@ async fn serve_worktrees(State(state): State<ServeState>) -> Response<Body> {
                         *response.status_mut() = StatusCode::SERVICE_UNAVAILABLE;
                     }
                     response
-                }
-                Err(_) => response_with_status(StatusCode::SERVICE_UNAVAILABLE),
-            }
+                },
+            )
         }
         RuntimeSource::Local(_) => response_with_status(StatusCode::NOT_FOUND),
     }
@@ -266,7 +255,7 @@ async fn load_worktree(
         .body(Body::from(
             serde_json::json!({"worktree_id":requested,"error":value}).to_string(),
         ))
-        .unwrap()
+        .expect("response uses a valid status and static headers")
 }
 async fn selected_context(
     state: &ServeState,
@@ -309,7 +298,7 @@ async fn snapshot_for(state: &ServeState, uri: &Uri) -> Result<Arc<RuntimeSnapsh
 fn context_error(uri: &Uri, error: ReqvireError) -> Response<Body> {
     Response::builder().status(StatusCode::SERVICE_UNAVAILABLE)
         .header(header::CONTENT_TYPE,"application/json").header(header::CACHE_CONTROL,"no-store")
-        .body(Body::from(serde_json::json!({"error":error.to_string(),"worktree_id":crate::mcp_worktrees::parse_selector(uri.query()).ok().flatten()}).to_string())).unwrap()
+        .body(Body::from(serde_json::json!({"error":error.to_string(),"worktree_id":crate::mcp_worktrees::parse_selector(uri.query()).ok().flatten()}).to_string())).expect("response uses a valid status and static headers")
 }
 fn shell_response(method: Method, uri: &Uri, worktrees: bool) -> Response<Body> {
     if !worktrees {
@@ -811,11 +800,11 @@ mod tests {
             .map(std::path::PathBuf::from)
             .unwrap_or_else(|| {
                 std::env::current_exe()
-                    .unwrap()
+                    .expect("test fixture operation should succeed")
                     .parent()
-                    .unwrap()
+                    .expect("fixture path has a parent")
                     .parent()
-                    .unwrap()
+                    .expect("fixture path has a parent")
                     .join("reqvire")
             });
         for (mcp, mutations, commits) in [
@@ -824,10 +813,12 @@ mod tests {
             (true, true, false),
             (true, true, true),
         ] {
-            let temp = tempfile::tempdir().unwrap();
+            let temp = tempfile::tempdir().expect("test fixture operation should succeed");
             let root = temp.path().join("repo");
-            std::fs::create_dir(&root).unwrap();
-            let git = |args: &[&str]| crate::mcp_process::git(&root, args).unwrap();
+            std::fs::create_dir(&root).expect("test fixture operation should succeed");
+            let git = |args: &[&str]| {
+                crate::mcp_process::git(&root, args).expect("fixture Git command should succeed")
+            };
             git(&["init", "-qb", "main"]);
             git(&["config", "user.name", "Startup Test"]);
             git(&["config", "user.email", "startup@example.invalid"]);
@@ -835,7 +826,7 @@ mod tests {
                 root.join("Model.md"),
                 include_str!("../../../tests/test-cache-integration/fixtures/model.md.txt"),
             )
-            .unwrap();
+            .expect("write test fixture");
             git(&["add", "."]);
             git(&["commit", "-qm", "baseline"]);
             let mut state = state(mutations);
@@ -843,13 +834,16 @@ mod tests {
                 &root,
                 &executable,
                 mcp,
-                mutations,
-                commits,
-                false,
-                "origin",
+                mcp::McpOptions {
+                    enable_mutations: mutations,
+                    enable_commits: commits,
+                    enable_github: false,
+                    github_remote: "origin",
+                    with_size_estimates: false,
+                },
                 &state.excluded_filename_patterns,
             )
-            .unwrap();
+            .expect("test fixture operation should succeed");
             assert!(
                 state.local_runtime().is_err(),
                 "worker-backed startup cannot retain a fallback snapshot"
@@ -859,30 +853,40 @@ mod tests {
                     .worktrees()
                     .expect("original context is worker-backed"),
             );
-            let context = manager.published_browser_context(None).unwrap();
-            let accepted = context.runtime().unwrap();
-            let expected: Value =
-                serde_json::from_str(&accepted.assets.project_store_json).unwrap();
+            let context = manager
+                .published_browser_context(None)
+                .expect("test fixture operation should succeed");
+            let accepted = context
+                .runtime()
+                .expect("test fixture operation should succeed");
+            let expected: Value = serde_json::from_str(&accepted.assets.project_store_json)
+                .expect("test fixture operation should succeed");
             assert_eq!(expected["project"]["worktree_id"], manager.original);
             assert_eq!(expected["project"]["branch"], "main");
             let app = explorer_routes().with_state(state);
             let get = |path: &str| {
-                app.clone()
-                    .oneshot(Request::builder().uri(path).body(Body::empty()).unwrap())
+                app.clone().oneshot(
+                    Request::builder()
+                        .uri(path)
+                        .body(Body::empty())
+                        .expect("build test HTTP request"),
+                )
             };
             let store = get("/api/project-store").await.unwrap();
             assert_eq!(store.status(), StatusCode::OK);
-            let store: Value = serde_json::from_str(&body(store).await).unwrap();
+            let store: Value = serde_json::from_str(&body(store).await)
+                .expect("test fixture operation should succeed");
             assert_eq!(store["store"], expected);
             assert_eq!(store["revision"], accepted.live.revision);
             let manifest = get("/api/project-store/manifest").await.unwrap();
             assert_eq!(manifest.status(), StatusCode::OK);
             let manifest = body(manifest).await;
             assert_eq!(manifest, accepted.live.manifest_json);
-            let manifest: Value = serde_json::from_str(&manifest).unwrap();
+            let manifest: Value =
+                serde_json::from_str(&manifest).expect("test fixture operation should succeed");
             let hashes: Vec<_> = manifest["sections"]
                 .as_object()
-                .unwrap()
+                .expect("expected an object in the test response")
                 .values()
                 .flat_map(|section| {
                     section["hashes"]
@@ -895,7 +899,11 @@ mod tests {
                 revision: accepted.live.revision.clone(),
                 hashes: hashes
                     .iter()
-                    .map(|v| v.as_str().unwrap().to_owned())
+                    .map(|v| {
+                        v.as_str()
+                            .expect("expected a string in the test response")
+                            .to_owned()
+                    })
                     .collect(),
             };
             let chunks = app
@@ -908,14 +916,17 @@ mod tests {
                         .body(Body::from(
                             json!({"revision":request.revision,"hashes":hashes}).to_string(),
                         ))
-                        .unwrap(),
+                        .expect("build test HTTP request"),
                 )
                 .await
                 .unwrap();
             assert_eq!(chunks.status(), StatusCode::OK);
             assert_eq!(
                 body(chunks).await,
-                accepted.live.chunks_json(&request).unwrap()
+                accepted
+                    .live
+                    .chunks_json(&request)
+                    .expect("test fixture operation should succeed")
             );
             let seed = get("/assets/project-store.js").await.unwrap();
             assert_eq!(seed.status(), StatusCode::OK);
@@ -926,7 +937,12 @@ mod tests {
             assert_eq!(ontology.status(), StatusCode::OK);
             assert_eq!(body(ontology).await, accepted.assets.ontologies_ttl);
             assert!(
-                Arc::ptr_eq(&accepted, &context.runtime().unwrap()),
+                Arc::ptr_eq(
+                    &accepted,
+                    &context
+                        .runtime()
+                        .expect("test fixture operation should succeed")
+                ),
                 "unchanged initial reads must reuse the published snapshot"
             );
             assert!(git(&["status", "--porcelain"]).is_empty());
@@ -935,62 +951,75 @@ mod tests {
 
     #[tokio::test]
     async fn read_only_worktree_routes_do_not_require_mcp_or_ownership() {
-        let temp = tempfile::tempdir().unwrap();
+        let temp = tempfile::tempdir().expect("test fixture operation should succeed");
         let root = temp.path().join("repo");
         let second = temp.path().join("second");
         let invalid = temp.path().join("invalid");
-        std::fs::create_dir(&root).unwrap();
-        let git = |args: &[&str]| crate::mcp_process::git(&root, args).unwrap();
+        std::fs::create_dir(&root).expect("test fixture operation should succeed");
+        let git = |args: &[&str]| {
+            crate::mcp_process::git(&root, args).expect("fixture Git command should succeed")
+        };
         git(&["init", "-qb", "main"]);
         git(&["config", "user.name", "Read Test"]);
         git(&["config", "user.email", "read@example.invalid"]);
         let model = include_str!("../../../tests/test-cache-integration/fixtures/model.md.txt");
-        std::fs::write(root.join("Model.md"), model).unwrap();
-        std::fs::write(root.join("shared.txt"), "original bytes").unwrap();
+        std::fs::write(root.join("Model.md"), model).expect("write test fixture");
+        std::fs::write(root.join("shared.txt"), "original bytes").expect("write test fixture");
         git(&["add", "."]);
         git(&["commit", "-qm", "baseline"]);
-        git(&["worktree", "add", "-qb", "second", second.to_str().unwrap()]);
+        git(&[
+            "worktree",
+            "add",
+            "-qb",
+            "second",
+            second.to_str().expect("fixture path is UTF-8"),
+        ]);
         git(&[
             "worktree",
             "add",
             "-qb",
             "invalid",
-            invalid.to_str().unwrap(),
+            invalid.to_str().expect("fixture path is UTF-8"),
         ]);
         std::fs::write(
             second.join("Model.md"),
             model.replace("Cache Subject", "Other Subject"),
         )
-        .unwrap();
-        std::fs::write(second.join("shared.txt"), "second bytes").unwrap();
+        .expect("write test fixture");
+        std::fs::write(second.join("shared.txt"), "second bytes").expect("write test fixture");
         std::fs::write(
             invalid.join("Model.md"),
             model.replace("capability", "invalid-type"),
         )
-        .unwrap();
+        .expect("write test fixture");
         std::fs::write(
             root.join("Model.md"),
             model.replace("Cache Subject", "Dirty Subject"),
         )
-        .unwrap();
+        .expect("write test fixture");
         let executable = std::env::var_os("REQVIRE_TEST_BIN")
             .map(std::path::PathBuf::from)
             .unwrap_or_else(|| {
                 std::env::current_exe()
-                    .unwrap()
+                    .expect("test fixture operation should succeed")
                     .parent()
-                    .unwrap()
+                    .expect("fixture path has a parent")
                     .parent()
-                    .unwrap()
+                    .expect("fixture path has a parent")
                     .join(format!("reqvire{}", std::env::consts::EXE_SUFFIX))
             });
-        let contexts =
-            crate::mcp_worktrees::Worktrees::start_read_only(&root, &executable).unwrap();
+        let contexts = crate::mcp_worktrees::Worktrees::start_read_only(&root, &executable)
+            .expect("test fixture operation should succeed");
         let inventory = contexts.browser_inventory();
-        let rows = inventory["worktrees"].as_array().unwrap();
+        let rows = inventory["worktrees"]
+            .as_array()
+            .expect("expected an array in the test response");
         assert_eq!(rows.len(), 3);
         assert!(rows.iter().all(|row| row["owned"] == false));
-        let unavailable = rows.iter().find(|row| row["branch"] == "invalid").unwrap();
+        let unavailable = rows
+            .iter()
+            .find(|row| row["branch"] == "invalid")
+            .expect("test fixture operation should succeed");
         assert_eq!(
             unavailable["state"], "unloaded",
             "inventory must not validate other models"
@@ -1002,22 +1031,30 @@ mod tests {
             ("main", "Dirty Subject", "original bytes"),
             ("second", "Other Subject", "second bytes"),
         ] {
-            let id = rows.iter().find(|row| row["branch"] == branch).unwrap()["worktree_id"]
+            let id = rows
+                .iter()
+                .find(|row| row["branch"] == branch)
+                .expect("test fixture operation should succeed")["worktree_id"]
                 .as_str()
-                .unwrap();
+                .expect("expected a string in the test response");
             let get = |path: String| {
-                app.clone()
-                    .oneshot(Request::builder().uri(path).body(Body::empty()).unwrap())
+                app.clone().oneshot(
+                    Request::builder()
+                        .uri(path)
+                        .body(Body::empty())
+                        .expect("build test HTTP request"),
+                )
             };
             let response = get(format!("/api/project-store?worktree_id={id}"))
                 .await
                 .unwrap();
             assert_eq!(response.status(), StatusCode::OK);
-            let store: Value = serde_json::from_str(&body(response).await).unwrap();
+            let store: Value = serde_json::from_str(&body(response).await)
+                .expect("test fixture operation should succeed");
             assert_eq!(store["store"]["project"]["branch"], branch);
             assert!(store["store"]["elements"]
                 .as_array()
-                .unwrap()
+                .expect("expected an array in the test response")
                 .iter()
                 .any(|e| e["name"] == name));
             let seed = body(
@@ -1044,17 +1081,20 @@ mod tests {
             second.join("Model.md"),
             model.replace("Cache Subject", "Fresh Subject"),
         )
-        .unwrap();
-        let id = rows.iter().find(|row| row["branch"] == "second").unwrap()["worktree_id"]
+        .expect("write test fixture");
+        let id = rows
+            .iter()
+            .find(|row| row["branch"] == "second")
+            .expect("test fixture operation should succeed")["worktree_id"]
             .as_str()
-            .unwrap();
+            .expect("expected a string in the test response");
         let response = app
             .clone()
             .oneshot(
                 Request::builder()
                     .uri(format!("/api/project-store?worktree_id={id}"))
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("build test HTTP request"),
             )
             .await
             .unwrap();
@@ -1067,7 +1107,7 @@ mod tests {
                     .uri("/api/worktrees/load")
                     .header(header::CONTENT_TYPE, "application/json")
                     .body(Body::from(json!({"worktree_id":id}).to_string()))
-                    .unwrap(),
+                    .expect("build test HTTP request"),
             )
             .await
             .unwrap();
@@ -1078,37 +1118,49 @@ mod tests {
                 Request::builder()
                     .uri(format!("/api/project-store?worktree_id={id}"))
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("build test HTTP request"),
             )
             .await
             .unwrap();
         assert!(body(response).await.contains("Fresh Subject"));
-        for id in ["unknown", unavailable["worktree_id"].as_str().unwrap()] {
+        for id in [
+            "unknown",
+            unavailable["worktree_id"]
+                .as_str()
+                .expect("expected a string in the test response"),
+        ] {
             let response = app
                 .clone()
                 .oneshot(
                     Request::builder()
                         .uri(format!("/api/project-store?worktree_id={id}"))
                         .body(Body::empty())
-                        .unwrap(),
+                        .expect("build test HTTP request"),
                 )
                 .await
                 .unwrap();
             assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
         }
         let shell = app
-            .oneshot(Request::builder().uri("/").body(Body::empty()).unwrap())
+            .oneshot(
+                Request::builder()
+                    .uri("/")
+                    .body(Body::empty())
+                    .expect("build test HTTP request"),
+            )
             .await
             .unwrap();
         assert!(body(shell)
             .await
             .contains("window.reqvireWorktreeRouting = true"));
         assert_eq!(git(&["branch", "--show-current"]), "main");
-        assert!(!std::fs::read_dir(root.join(".git")).unwrap().any(|e| e
-            .unwrap()
-            .file_name()
-            .to_string_lossy()
-            .starts_with("reqvire-mcp-worktree")));
+        assert!(!std::fs::read_dir(root.join(".git"))
+            .expect("read test fixture")
+            .any(|e| e
+                .expect("test fixture operation should succeed")
+                .file_name()
+                .to_string_lossy()
+                .starts_with("reqvire-mcp-worktree")));
     }
 
     #[cfg(unix)]
@@ -1259,10 +1311,12 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
 
     #[tokio::test]
     async fn worktree_routes_publish_only_the_selected_snapshot_and_asset_boundary() {
-        let temp = tempfile::tempdir().unwrap();
+        let temp = tempfile::tempdir().expect("test fixture operation should succeed");
         let root = temp.path().join("repo");
-        std::fs::create_dir(&root).unwrap();
-        let git = |args: &[&str]| crate::mcp_process::git(&root, args).unwrap();
+        std::fs::create_dir(&root).expect("test fixture operation should succeed");
+        let git = |args: &[&str]| {
+            crate::mcp_process::git(&root, args).expect("fixture Git command should succeed")
+        };
         git(&["init", "-qb", "main"]);
         git(&["config", "user.name", "Runtime Test"]);
         git(&["config", "user.email", "runtime@example.invalid"]);
@@ -1270,19 +1324,19 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
             root.join("Model.md"),
             include_str!("../../../tests/test-cache-integration/fixtures/model.md.txt"),
         )
-        .unwrap();
-        std::fs::write(root.join("shared.txt"), "original bytes").unwrap();
+        .expect("write test fixture");
+        std::fs::write(root.join("shared.txt"), "original bytes").expect("write test fixture");
         git(&["add", "."]);
         git(&["commit", "-qm", "baseline"]);
         let executable = std::env::var_os("REQVIRE_TEST_BIN")
             .map(std::path::PathBuf::from)
             .unwrap_or_else(|| {
                 std::env::current_exe()
-                    .unwrap()
+                    .expect("test fixture operation should succeed")
                     .parent()
-                    .unwrap()
+                    .expect("fixture path has a parent")
                     .parent()
-                    .unwrap()
+                    .expect("fixture path has a parent")
                     .join(format!("reqvire{}", std::env::consts::EXE_SUFFIX))
             });
         let manager = crate::mcp_worktrees::Worktrees::start(
@@ -1294,18 +1348,18 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
             false,
             "origin",
         )
-        .unwrap();
-        let created=manager.handle("tools/call",json!({"name":"reqvire.worktree.create","arguments":{"branch":"second","base_ref":"main"}})).unwrap();
+        .expect("test fixture operation should succeed");
+        let created=manager.handle("tools/call",json!({"name":"reqvire.worktree.create","arguments":{"branch":"second","base_ref":"main"}})).expect("test fixture operation should succeed");
         assert_ne!(created["isError"], true, "{created}");
         let id = created["structuredContent"]["worktree_id"]
             .as_str()
-            .unwrap();
+            .expect("expected a string in the test response");
         let other_root = std::path::PathBuf::from(
             created["structuredContent"]["workspace_root"]
                 .as_str()
-                .unwrap(),
+                .expect("expected a string in the test response"),
         );
-        std::fs::write(other_root.join("shared.txt"), "second bytes").unwrap();
+        std::fs::write(other_root.join("shared.txt"), "second bytes").expect("write test fixture");
         let mut state = state(true);
         state.runtime = RuntimeSource::Worktrees(Arc::clone(&manager));
         let app = explorer_routes().with_state(state);
@@ -1314,14 +1368,19 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
             (id, "second", "second bytes"),
         ] {
             let get = |path: String| {
-                app.clone()
-                    .oneshot(Request::builder().uri(path).body(Body::empty()).unwrap())
+                app.clone().oneshot(
+                    Request::builder()
+                        .uri(path)
+                        .body(Body::empty())
+                        .expect("build test HTTP request"),
+                )
             };
             let store = get(format!("/api/project-store?worktree_id={selected}"))
                 .await
                 .unwrap();
             assert_eq!(store.status(), StatusCode::OK);
-            let store: Value = serde_json::from_str(&body(store).await).unwrap();
+            let store: Value = serde_json::from_str(&body(store).await)
+                .expect("test fixture operation should succeed");
             assert_eq!(store["store"]["project"]["branch"], branch);
             assert_eq!(store["store"]["project"]["worktree_id"], selected);
             assert_eq!(
@@ -1369,7 +1428,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
                             .method(method)
                             .uri(format!("{path}?worktree_id=missing"))
                             .body(Body::empty())
-                            .unwrap(),
+                            .expect("build test HTTP request"),
                     )
                     .await
                     .unwrap();
@@ -1382,13 +1441,13 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
                 Request::builder()
                     .uri("/api/project-store")
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("build test HTTP request"),
             )
             .await
             .unwrap();
         assert_eq!(
-            serde_json::from_str::<Value>(&body(original).await).unwrap()["store"]["project"]
-                ["branch"],
+            serde_json::from_str::<Value>(&body(original).await)
+                .expect("test fixture operation should succeed")["store"]["project"]["branch"],
             "main"
         );
         let inventory = app
@@ -1397,29 +1456,33 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
                 Request::builder()
                     .uri("/api/worktrees")
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("build test HTTP request"),
             )
             .await
             .unwrap();
         assert!(body(inventory).await.contains(id));
-        let dirty_root = root.parent().unwrap().join("dirty-selection");
+        let dirty_root = root
+            .parent()
+            .expect("fixture path has a parent")
+            .join("dirty-selection");
         git(&[
             "worktree",
             "add",
             "-qb",
             "dirty-selection",
-            dirty_root.to_str().unwrap(),
+            dirty_root.to_str().expect("fixture path is UTF-8"),
         ]);
-        std::fs::write(dirty_root.join("untracked.txt"), "must not discard").unwrap();
+        std::fs::write(dirty_root.join("untracked.txt"), "must not discard")
+            .expect("write test fixture");
         let inventory = manager.browser_inventory();
         let target = inventory["worktrees"]
             .as_array()
-            .unwrap()
+            .expect("expected an array in the test response")
             .iter()
             .find(|r| r["branch"] == "dirty-selection")
-            .unwrap()["worktree_id"]
+            .expect("expected an array in the test response")["worktree_id"]
             .as_str()
-            .unwrap();
+            .expect("expected a string in the test response");
         let response = app
             .clone()
             .oneshot(
@@ -1428,17 +1491,17 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
                     .uri("/api/worktrees/load")
                     .header(header::CONTENT_TYPE, "application/json")
                     .body(Body::from(json!({"worktree_id":target}).to_string()))
-                    .unwrap(),
+                    .expect("build test HTTP request"),
             )
             .await
             .unwrap();
         assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
         assert!(body(response).await.contains("clean"));
         assert_eq!(
-            std::fs::read_to_string(dirty_root.join("untracked.txt")).unwrap(),
+            std::fs::read_to_string(dirty_root.join("untracked.txt")).expect("read test fixture"),
             "must not discard"
         );
-        std::fs::remove_file(dirty_root.join("untracked.txt")).unwrap();
+        std::fs::remove_file(dirty_root.join("untracked.txt")).expect("remove test fixture");
         let response = app
             .clone()
             .oneshot(
@@ -1447,7 +1510,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
                     .uri("/api/worktrees/load")
                     .header(header::CONTENT_TYPE, "application/json")
                     .body(Body::from(json!({"worktree_id":target}).to_string()))
-                    .unwrap(),
+                    .expect("build test HTTP request"),
             )
             .await
             .unwrap();
@@ -1455,13 +1518,13 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
         #[cfg(unix)]
         {
             std::os::unix::fs::symlink(root.join("shared.txt"), other_root.join("escape.txt"))
-                .unwrap();
+                .expect("test fixture operation should succeed");
             let response = app
                 .oneshot(
                     Request::builder()
                         .uri(format!("/escape.txt?worktree_id={id}"))
                         .body(Body::empty())
-                        .unwrap(),
+                        .expect("build test HTTP request"),
                 )
                 .await
                 .unwrap();
@@ -1472,7 +1535,14 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
     #[tokio::test]
     async fn manifest_headers_conditional_variants_and_head_are_consistent() {
         let state = state(true);
-        let expected = Arc::clone(&state.local_runtime().unwrap().lock().await.snapshot);
+        let expected = Arc::clone(
+            &state
+                .local_runtime()
+                .expect("test fixture operation should succeed")
+                .lock()
+                .await
+                .snapshot,
+        );
         let app = explorer_routes().with_state(state);
         let etag = format!("\"{}\"", expected.live.revision);
         for (condition, status) in [
@@ -1582,7 +1652,14 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
     #[tokio::test]
     async fn superseded_manifest_conflicts_but_captured_snapshot_remains_immutable() {
         let state = state(true);
-        let captured = Arc::clone(&state.local_runtime().unwrap().lock().await.snapshot);
+        let captured = Arc::clone(
+            &state
+                .local_runtime()
+                .expect("test fixture operation should succeed")
+                .lock()
+                .await
+                .snapshot,
+        );
         let manifest: Value =
             serde_json::from_str(&captured.live.manifest_json).expect("parse generated JSON");
         let hash = manifest["sections"]["elements"]["hashes"][0]
@@ -1593,7 +1670,12 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
             revision: captured.live.revision.clone(),
             hashes: vec![hash.clone()],
         };
-        state.local_runtime().unwrap().lock().await.snapshot = snapshot("updated");
+        state
+            .local_runtime()
+            .expect("test fixture operation should succeed")
+            .lock()
+            .await
+            .snapshot = snapshot("updated");
         let captured_response: Value = serde_json::from_str(
             &captured
                 .live
@@ -1629,15 +1711,19 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
         let state = state(true);
         let revision = state
             .local_runtime()
-            .unwrap()
+            .expect("test fixture operation should succeed")
             .lock()
             .await
             .snapshot
             .live
             .revision
             .clone();
-        state.local_runtime().unwrap().lock().await.refresh_error =
-            Some("Failed runtime generation".into());
+        state
+            .local_runtime()
+            .expect("test fixture operation should succeed")
+            .lock()
+            .await
+            .refresh_error = Some("Failed runtime generation".into());
         let app = explorer_routes().with_state(state.clone());
         let response = app
             .clone()
@@ -1665,7 +1751,12 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
             .await
             .unwrap();
         assert!(body(seed).await.contains("initial"));
-        state.local_runtime().unwrap().lock().await.refresh_error = None;
+        state
+            .local_runtime()
+            .expect("test fixture operation should succeed")
+            .lock()
+            .await
+            .refresh_error = None;
         let response = app
             .oneshot(
                 Request::builder()

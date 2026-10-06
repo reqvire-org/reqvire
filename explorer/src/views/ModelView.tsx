@@ -3,7 +3,7 @@ import { useExplorerUiState, type ModelMode } from "../state/ExplorerUiState";
 import { ElementFlow, Icon, RouteLayout, SegmentedControl, WorkspaceShell } from "@ds";
 import { useStore } from "../store/StoreContext";
 import { flowLayoutEngine } from "../workers/flowLayoutEngine";
-import { buildModelFlow } from "../lib/modelFlow";
+import { selectModelFlow } from "../lib/modelFlow";
 import { routeForContent, routeForResource } from "../router/routes";
 import { FilesView } from "./FilesView";
 import { KnowledgeGraphView } from "./GraphLibraryViews";
@@ -28,8 +28,9 @@ export function ModelView({ onOpenElement }: { onOpenElement: (id: string) => vo
 
 function ModelFlowView({ onOpenElement }: { onOpenElement: (id: string) => void }) {
   const ui = useExplorerUiState();
-  const { store, elementById } = useStore();
-  const data = useMemo(() => buildModelFlow(store, ui.modelSelectionId), [store, ui.modelSelectionId]);
+  const { store, elementById, getModelFlowIndex } = useStore();
+  const data = useMemo(() => selectModelFlow(getModelFlowIndex(), ui.modelSelectionId, store.project.root_label),
+    [getModelFlowIndex, store.project.root_label, ui.modelSelectionId]);
   return <ViewFrame testId="model">
     <RouteLayout>
       <WorkspaceShell rootLabel="Model" currentLabel="Flow" breadcrumbLabel="Model flow breadcrumbs"

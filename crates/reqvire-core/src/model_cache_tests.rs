@@ -32,7 +32,7 @@ type Observer = Arc<dyn Fn(&str) + Send + Sync>;
 static OBSERVER: Mutex<Option<Observer>> = Mutex::new(None);
 static BUILDS: AtomicUsize = AtomicUsize::new(0);
 
-pub(crate) fn checkpoint(phase: &str) {
+pub fn checkpoint(phase: &str) {
     if phase == "build-start" {
         BUILDS.fetch_add(1, Ordering::SeqCst);
     }
@@ -222,20 +222,22 @@ fn candidate() -> thread::JoinHandle<Result<Arc<ModelManager>, ReqvireError>> {
 
 case!(read_models_share_identity_and_survive_later_publication, {
     let _workspace = Workspace::new();
-    let first = load().unwrap();
-    let second = load().unwrap();
+    let first = load().expect("test fixture operation should succeed");
+    let second = load().expect("test fixture operation should succeed");
     assert!(
         std::ptr::eq(&first.graph_registry, &second.graph_registry),
         "cache hits must share graph/page storage, not clone it"
     );
-    let readers: Vec<_> = (0..4).map(|_| thread::spawn(|| load().unwrap())).collect();
+    let readers: Vec<_> = (0..4)
+        .map(|_| thread::spawn(|| load().expect("test fixture operation should succeed")))
+        .collect();
     for reader in readers {
-        let model = reader.join().unwrap();
+        let model = reader.join().expect("test worker should complete");
         assert!(std::ptr::eq(&first.graph_registry, &model.graph_registry));
     }
     assert_eq!(builds(), 1);
-    std::fs::write("Model.md", MODEL.replace("alpha", "bravo")).unwrap();
-    let next = load().unwrap();
+    std::fs::write("Model.md", MODEL.replace("alpha", "bravo")).expect("write test fixture");
+    let next = load().expect("test fixture operation should succeed");
     assert!(!std::ptr::eq(&first.graph_registry, &next.graph_registry));
     assert!(content(&next).contains("bravo"));
     assert!(content(&first).contains("alpha"));
@@ -245,8 +247,8 @@ case!(read_models_share_identity_and_survive_later_publication, {
 
 case!(one_semantic_index_per_resolved_model_build, {
     let _workspace = Workspace::new();
-    std::fs::write("Ontology.md", ONTOLOGY).unwrap();
-    std::fs::write("external.ttl", EXTERNAL).unwrap();
+    std::fs::write("Ontology.md", ONTOLOGY).expect("write test fixture");
+    std::fs::write("external.ttl", EXTERNAL).expect("write test fixture");
     for lenient in [false, true] {
         for with_size_estimates in [false, true] {
             let before = index_builds();
@@ -263,17 +265,30 @@ case!(one_semantic_index_per_resolved_model_build, {
                 1,
                 "one index for validation and RDF capture"
             );
-            let store = model.semantic_store.as_ref().unwrap();
+            let store = model
+                .semantic_store
+                .as_ref()
+                .expect("test fixture operation should succeed");
             assert!(std::ptr::eq(
-                model.semantic_index().unwrap(),
+                model
+                    .semantic_index()
+                    .expect("test fixture operation should succeed"),
                 store.index().as_ref()
             ));
-            let assets = crate::explorer_runtime::build_runtime_assets(&model).unwrap();
-            let escaped_json = assets.project_store_json
-                .replace('<', "\\u003c").replace('>', "\\u003e").replace('&', "\\u0026")
-                .replace('\u{2028}', "\\u2028").replace('\u{2029}', "\\u2029");
-            assert!(assets.project_store_js == format!("window.reqvireProjectStore = {escaped_json};\n"),
-                "seed must reuse the serialized JSON instead of serializing the store again");
+            let assets = crate::explorer_runtime::build_runtime_assets(&model)
+                .expect("test fixture operation should succeed");
+            let escaped_json = assets
+                .project_store_json
+                .replace('<', "\\u003c")
+                .replace('>', "\\u003e")
+                .replace('&', "\\u0026")
+                .replace('\u{2028}', "\\u2028")
+                .replace('\u{2029}', "\\u2029");
+            assert!(
+                assets.project_store_js
+                    == format!("window.reqvireProjectStore = {escaped_json};\n"),
+                "seed must reuse the serialized JSON instead of serializing the store again"
+            );
             assert_eq!(store.initialized_store_count(), 0);
             assert_eq!(labels(&model), ["\"Label alpha\""]);
             load_cached_model(
@@ -283,7 +298,7 @@ case!(one_semantic_index_per_resolved_model_build, {
                     with_size_estimates,
                 },
             )
-            .unwrap();
+            .expect("test fixture operation should succeed");
             assert_eq!(
                 index_builds() - before,
                 1,
@@ -297,35 +312,43 @@ case!(
     semantic_failures_retain_diagnostics_and_reparse_clears_old_state,
     {
         let _workspace = Workspace::new();
-        std::fs::write("Queries.md", QUERIES).unwrap();
+        std::fs::write("Queries.md", QUERIES).expect("write test fixture");
         let mut model = ModelManager::new();
-        model.parse_and_validate(None, &patterns(&[])).unwrap();
+        model
+            .parse_and_validate(None, &patterns(&[]))
+            .expect("test fixture operation should succeed");
         assert_eq!(index_builds(), 1);
         let captured = model.clone();
 
         let invalid = QUERIES.replace("?item a item:Item", "?item a item:Unknown");
-        std::fs::write("Queries.md", &invalid).unwrap();
-        let error = model.parse_and_validate(None, &patterns(&[])).unwrap_err();
+        std::fs::write("Queries.md", &invalid).expect("write test fixture");
+        let error = model
+            .parse_and_validate(None, &patterns(&[]))
+            .expect_err("test fixture operation should fail");
         assert!(
             model.semantic_store.is_none(),
             "strict failure cannot expose a query store"
         );
         let report = model
             .semantic_index()
-            .unwrap()
+            .expect("test fixture operation should succeed")
             .query_validation_report(None, None, vec![error.to_string()])
-            .unwrap();
+            .expect("test fixture operation should succeed");
         assert_eq!(report["valid"], false);
         assert!(report["queries"][0]["diagnostics"]
             .to_string()
             .contains("Unknown"));
         assert_eq!(index_builds(), 2);
-        assert!(captured.semantic_index().unwrap().diagnostics.is_empty());
+        assert!(captured
+            .semantic_index()
+            .expect("test fixture operation should succeed")
+            .diagnostics
+            .is_empty());
 
         let before = index_builds();
         let report = crate::tool_interface::ReqvireToolRegistry::new(true, &patterns(&[]))
             .call_tool("reqvire.semantic.queries.validate", &serde_json::json!({}))
-            .unwrap();
+            .expect("test fixture operation should succeed");
         assert_eq!(report["valid"], false);
         assert!(report["queries"][0]["diagnostics"]
             .to_string()
@@ -339,13 +362,17 @@ case!(
         let before = index_builds();
         model
             .parse_and_validate_with_mode(None, &patterns(&[]), true)
-            .unwrap();
-        assert!(!model.semantic_index().unwrap().diagnostics.is_empty());
+            .expect("test fixture operation should succeed");
+        assert!(!model
+            .semantic_index()
+            .expect("test fixture operation should succeed")
+            .diagnostics
+            .is_empty());
         assert_eq!(
             model
                 .semantic_store
                 .as_ref()
-                .unwrap()
+                .expect("test fixture operation should succeed")
                 .initialized_store_count(),
             0
         );
@@ -355,12 +382,18 @@ case!(
             "lenient invalid construction shares its index"
         );
 
-        std::fs::write("Queries.md", QUERIES).unwrap();
+        std::fs::write("Queries.md", QUERIES).expect("write test fixture");
         let before = index_builds();
-        model.parse_and_validate(None, &patterns(&[])).unwrap();
-        assert!(model.semantic_index().unwrap().diagnostics.is_empty());
+        model
+            .parse_and_validate(None, &patterns(&[]))
+            .expect("test fixture operation should succeed");
+        assert!(model
+            .semantic_index()
+            .expect("test fixture operation should succeed")
+            .diagnostics
+            .is_empty());
         assert_eq!(index_builds() - before, 1);
-        std::fs::write("Duplicate.md", QUERIES).unwrap();
+        std::fs::write("Duplicate.md", QUERIES).expect("write test fixture");
         assert!(model.parse_and_validate(None, &patterns(&[])).is_err());
         assert!(
             model.semantic_index().is_none(),
@@ -372,35 +405,41 @@ case!(
 
 case!(mutation_candidates_build_fresh_semantic_indexes, {
     let _workspace = Workspace::new();
-    std::fs::write("Queries.md", QUERIES).unwrap();
-    let model = load().unwrap();
+    std::fs::write("Queries.md", QUERIES).expect("write test fixture");
+    let model = load().expect("test fixture operation should succeed");
     let mut candidate = model.graph_registry.clone();
     let query = candidate
         .nodes
         .get_mut("Queries.md#item-lookup")
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .element
         .semantic_query
         .as_mut()
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .query
         .as_mut()
-        .unwrap();
+        .expect("test fixture operation should succeed");
     query.content = query
         .content
         .replace("?item a item:Item", "?item a item:Unknown");
     let before = index_builds();
-    let errors = candidate.validate_semantic_contracts_in_memory().unwrap();
+    let errors = candidate
+        .validate_semantic_contracts_in_memory()
+        .expect("test fixture operation should succeed");
     assert!(errors.iter().any(|e| e.to_string().contains("Unknown")));
     assert_eq!(index_builds() - before, 1);
-    assert!(model.semantic_index().unwrap().diagnostics.is_empty());
+    assert!(model
+        .semantic_index()
+        .expect("test fixture operation should succeed")
+        .diagnostics
+        .is_empty());
 
     let mut removed = model.graph_registry.clone();
     removed.nodes.remove("Queries.md#item-ontology");
     let before = index_builds();
     assert!(!removed
         .validate_semantic_contracts_after_removal("Queries.md#item-ontology")
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .is_empty());
     assert_eq!(index_builds() - before, 1);
 
@@ -413,7 +452,7 @@ case!(mutation_candidates_build_fresh_semantic_indexes, {
                 "file": "Queries.md", "override_existing": true, "content": invalid,
             }),
         )
-        .unwrap_err();
+        .expect_err("test fixture operation should fail");
     assert!(
         error
             .diagnostics()
@@ -425,46 +464,60 @@ case!(mutation_candidates_build_fresh_semantic_indexes, {
         index_builds() > before,
         "mutation must validate changed candidate"
     );
-    assert_eq!(std::fs::read_to_string("Queries.md").unwrap(), QUERIES);
-    assert!(model.semantic_index().unwrap().diagnostics.is_empty());
+    assert_eq!(
+        std::fs::read_to_string("Queries.md").expect("read test fixture"),
+        QUERIES
+    );
+    assert!(model
+        .semantic_index()
+        .expect("test fixture operation should succeed")
+        .diagnostics
+        .is_empty());
 });
 
 case!(external_edit_after_validation_does_not_mix_captured_rdf, {
     let _workspace = Workspace::new();
-    std::fs::write("Ontology.md", ONTOLOGY).unwrap();
-    std::fs::write("external.ttl", EXTERNAL).unwrap();
-    *OBSERVER.lock().unwrap() = Some(Arc::new(|phase| {
+    std::fs::write("Ontology.md", ONTOLOGY).expect("write test fixture");
+    std::fs::write("external.ttl", EXTERNAL).expect("write test fixture");
+    *OBSERVER.lock().expect("test lock should not be poisoned") = Some(Arc::new(|phase| {
         if phase == "semantic-validated" {
-            std::fs::write("external.ttl", EXTERNAL.replace("alpha", "omega")).unwrap();
+            std::fs::write("external.ttl", EXTERNAL.replace("alpha", "omega"))
+                .expect("write test fixture");
         }
     }));
     let mut model = ModelManager::new();
-    model.parse_and_validate(None, &patterns(&[])).unwrap();
+    model
+        .parse_and_validate(None, &patterns(&[]))
+        .expect("test fixture operation should succeed");
     assert_eq!(
         labels(&model),
         ["\"Label alpha\""],
         "RDF must use the validated dependency"
     );
     assert_eq!(index_builds(), 1);
-    *OBSERVER.lock().unwrap() = None;
-    assert_eq!(labels(&load().unwrap()), ["\"Label omega\""]);
+    *OBSERVER.lock().expect("test lock should not be poisoned") = None;
+    assert_eq!(
+        labels(&load().expect("test fixture operation should succeed")),
+        ["\"Label omega\""]
+    );
 });
 
 case!(external_edit_after_validation_retries_with_fresh_index, {
     let _workspace = Workspace::new();
-    std::fs::write("Ontology.md", ONTOLOGY).unwrap();
-    std::fs::write("external.ttl", EXTERNAL).unwrap();
+    std::fs::write("Ontology.md", ONTOLOGY).expect("write test fixture");
+    std::fs::write("external.ttl", EXTERNAL).expect("write test fixture");
     let changed = AtomicBool::new(false);
-    *OBSERVER.lock().unwrap() = Some(Arc::new(move |phase| {
+    *OBSERVER.lock().expect("test lock should not be poisoned") = Some(Arc::new(move |phase| {
         if phase == "semantic-validated" && !changed.swap(true, Ordering::SeqCst) {
-            std::fs::write("external.ttl", EXTERNAL.replace("alpha", "omega")).unwrap();
+            std::fs::write("external.ttl", EXTERNAL.replace("alpha", "omega"))
+                .expect("write test fixture");
         }
     }));
     let model = load().expect("retry changed dependency");
     assert_eq!(labels(&model), ["\"Label omega\""]);
     assert_eq!(builds(), 2, "changed dependency supersedes first attempt");
     assert_eq!(index_builds(), 2, "each attempt builds its own index once");
-    load().unwrap();
+    load().expect("test fixture operation should succeed");
     assert_eq!(index_builds(), 2);
 });
 
@@ -673,10 +726,19 @@ fn concurrent_builds(invalid: bool) {
     let count = builds();
     assert!(results.iter().all(|result| result.is_err() == invalid));
     if !invalid {
-        let shared = results[0].as_ref().unwrap();
+        let shared = results[0]
+            .as_ref()
+            .expect("test fixture operation should succeed");
         for result in &results[1..] {
-            assert!(Arc::ptr_eq(shared, result.as_ref().unwrap()),
-                "single-flight waiters must share the completed model");
+            assert!(
+                Arc::ptr_eq(
+                    shared,
+                    result
+                        .as_ref()
+                        .expect("test fixture operation should succeed")
+                ),
+                "single-flight waiters must share the completed model"
+            );
         }
     }
     if invalid {

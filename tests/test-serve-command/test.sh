@@ -34,9 +34,20 @@ set -e
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Use non-default host and random port to test custom options
+# Ask the OS for an unused port rather than probing an unrelated service in a
+# fixed random range. Every listener is still started by the command under test.
+available_port() {
+    python3 - <<'PY'
+import socket
+with socket.socket() as listener:
+    listener.bind(('127.0.0.1', 0))
+    print(listener.getsockname()[1])
+PY
+}
+
+# Use a non-default host and port to test custom options.
 TEST_HOST="127.0.0.1"
-TEST_PORT=$((8000 + RANDOM % 1000))
+TEST_PORT="$(available_port)"
 SERVER_BIN="${REAL_REQVIRE_BIN:-$REQVIRE_BIN}"
 
 # Check initialization before listener startup, including rejected admission.
@@ -122,7 +133,8 @@ if [ "$STORE_CODE" != "200" ]; then
     exit 1
 fi
 
-python3 "$TEST_DIR/scripts/check-store.py" "$STORE_FILE"
+"$REQVIRE_BIN" traces --output "$TEST_DIR/output/traces.json"
+python3 "$TEST_DIR/scripts/check-store.py" "$STORE_FILE" --traces-json "$TEST_DIR/output/traces.json"
 
 # Exercise the compiled bundle and its real browser URL serialization, using
 # the same temporary Git workspace and golden-file comparisons as other E2Es.
@@ -199,7 +211,7 @@ fi
 PLAIN_PID="$SERVE_PID"
 
 # Test 8: Embedded MCP endpoint can mutate the workspace and the served datastore refreshes.
-MCP_PORT=$((9000 + RANDOM % 1000))
+MCP_PORT="$(available_port)"
 MCP_PROTOCOL_VERSION="2025-11-25"
 MCP_CONTENT="$(cat "${TEST_DIR}/fixtures/serve-embedded-mcp-added-requirement.md.txt")"
 
@@ -326,7 +338,7 @@ kill -0 "$SERVE_PID" "$PLAIN_PID" || {
 }
 
 # Test 10: Read-only MCP exposes branch snapshot reads, without periodic live refresh.
-READ_ONLY_PORT=$((11000 + RANDOM % 1000))
+READ_ONLY_PORT="$(available_port)"
 "$SERVER_BIN" serve --host "$TEST_HOST" --port "$READ_ONLY_PORT" --enable-mcp \
     > "$TEST_DIR/serve_read_only_output.log" 2>&1 &
 READ_ONLY_PID=$!

@@ -1,3 +1,4 @@
+import { ROOT_PATH, MODEL_ROOT_PATH, RESOURCE_ROOT_PATH, displayName, dirname, type TreeFolder } from "../lib/fileTrees";
 import { prepareThesaurus, filterThesaurusSchemes, thesaurusAncestorIds, type ThesaurusSchemeTree } from "../lib/thesaurus";
 import type { ThesaurusConceptItem } from "@ds";
 import { useWorktreeUrl } from "../store/worktreeUrls";
@@ -41,7 +42,7 @@ import type {
 } from "../store/types";
 import { ONTOLOGY_LAYER_FILTERS, useExplorerUiState, type CoverageSectionId } from "../state/ExplorerUiState";
 import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
-import { buildTraceFiles, type TraceFileNode } from "../lib/traces";
+import type { TraceFileNode } from "../lib/traces";
 
 interface ExplorerSidePaneProps {
   activeView: ViewId;
@@ -54,21 +55,6 @@ interface ExplorerSidePaneProps {
   onOpenSourceRoute?: (hash: string) => void;
   onOpenOntologyNode: (id: string) => void;
 }
-
-interface TreeFolder {
-  path: string;
-  name: string;
-  selectionId?: string;
-  folders: TreeFolder[];
-  files: ProjectStoreFile[];
-  resources: ProjectStoreResource[];
-}
-
-const ROOT_PATH = "__root__";
-const MODEL_ROOT_PATH = "__model__";
-const RESOURCE_ROOT_PATH = "__resources__";
-const MODEL_WORKTREE_ROOT = "__model_worktree__";
-const RESOURCE_WORKTREE_ROOT = "__resource_worktree__";
 
 interface TracePaneVerification {
   id: string;
@@ -100,23 +86,7 @@ export function ExplorerSidePane({
   onOpenSourceRoute,
   onOpenOntologyNode,
 }: ExplorerSidePaneProps) {
-  const { store, elementById } = useStore();
   const ui = useExplorerUiState();
-  const tree = useMemo(
-    () => buildFileTree(store),
-    [store],
-  );
-  const filteredTree = useMemo(
-    () => filterFileTree(tree, ui.modelTreeQuery, elementById),
-    [elementById, tree, ui.modelTreeQuery],
-  );
-  const traceFiles = useMemo(() => buildTraceFiles(store), [store]);
-  const projectRootLabel = projectTreeRootLabel(store);
-  const traceTree = useMemo(() => buildTraceFileTree(traceFiles, projectRootLabel), [projectRootLabel, traceFiles]);
-  const filteredTraceTree = useMemo(
-    () => filterTraceFileTree(traceTree, ui.traceTreeQuery),
-    [traceTree, ui.traceTreeQuery],
-  );
   const graphModelActive = activeView === "model" && ui.modelMode === "graph";
   const showProjectTree = (activeView === "model" || activeView === "files") && !graphModelActive;
   const title = graphModelActive ? "Graph Explorer" : `${VIEW_TITLES[activeView]} Explorer`;
@@ -139,32 +109,39 @@ export function ExplorerSidePane({
         onOpenElement={onOpenElement}
         onOpenOntologyNode={onOpenOntologyNode}
       />
-      {activeView === "traces" && (
-        <PaneTree aria-label="Verification trace tree" id="trace-tree">
-          <TraceTreeFolderNode folder={filteredTraceTree} depth={0} query={ui.traceTreeQuery} />
-        </PaneTree>
-      )}
-      {activeView === "traces" ? <TraceTreeSummary files={traceFiles} /> : null}
-      {showProjectTree && (
-        <PaneTree aria-label="Project tree">
-          {filteredTree.folders.map((folder) => (
-            <TreeFolderNode
-              key={folder.path}
-              folder={folder}
-              activeView={activeView}
-              elementById={elementById}
-              onNavigate={onNavigate}
-              onOpenElement={onOpenElement}
-              sourceBrowsing={sourceBrowsing}
-              onOpenSourceRoute={onOpenSourceRoute}
-              depth={0}
-              query={ui.modelTreeQuery}
-            />
-          ))}
-        </PaneTree>
-      )}
+      {activeView === "traces" ? <TracePaneContents /> : null}
+      {showProjectTree && <ProjectTreeContents activeView={activeView} onNavigate={onNavigate}
+        onOpenElement={onOpenElement} sourceBrowsing={sourceBrowsing} onOpenSourceRoute={onOpenSourceRoute} />}
       {showProjectTree && activeView === "model" ? <ModelTreeSummary /> : null}
     </SidePaneFrame>
+  );
+}
+
+function ProjectTreeContents({
+  activeView, onNavigate, onOpenElement, sourceBrowsing = false, onOpenSourceRoute,
+}: Pick<ExplorerSidePaneProps, "activeView" | "onNavigate" | "onOpenElement" | "sourceBrowsing" | "onOpenSourceRoute">) {
+  const { elementById, getProjectFileTree } = useStore();
+  const ui = useExplorerUiState();
+  const tree = getProjectFileTree();
+  const filteredTree = useMemo(() => filterFileTree(tree, ui.modelTreeQuery, elementById),
+    [tree, ui.modelTreeQuery, elementById]);
+  return (
+    <PaneTree aria-label="Project tree">
+      {filteredTree.folders.map((folder) => (
+        <TreeFolderNode
+          key={folder.path}
+          folder={folder}
+          activeView={activeView}
+          elementById={elementById}
+          onNavigate={onNavigate}
+          onOpenElement={onOpenElement}
+          sourceBrowsing={sourceBrowsing}
+          onOpenSourceRoute={onOpenSourceRoute}
+          depth={0}
+          query={ui.modelTreeQuery}
+        />
+      ))}
+    </PaneTree>
   );
 }
 
@@ -1179,147 +1156,6 @@ function useOpenWhenSelectionEnters(
   }, [hasSelectedDescendant, setOpen]);
 }
 
-function buildFileTree(store: ExplorerProjectStore): TreeFolder {
-  const root: TreeFolder = { path: ROOT_PATH, name: "Workspace", folders: [], files: [], resources: [] };
-  const modelRoot: TreeFolder = {
-    path: MODEL_ROOT_PATH,
-    name: "Model",
-    selectionId: "__root__",
-    folders: [],
-    files: [],
-    resources: [],
-  };
-  root.folders.push(modelRoot);
-  const worktrees = projectWorktrees(store);
-  const modelFolders = new Map<string, TreeFolder>([
-    [ROOT_PATH, root],
-    [MODEL_ROOT_PATH, modelRoot],
-  ]);
-  const modelWorktreeRoots = new Map(
-    worktrees.map((worktree) => {
-      const folder: TreeFolder = {
-        path: `${MODEL_WORKTREE_ROOT}/${worktree.key}`,
-        name: worktree.label,
-        selectionId: worktree.prefix ? `folder:${worktree.prefix}` : "__root__",
-        folders: [],
-        files: [],
-        resources: [],
-      };
-      modelRoot.folders.push(folder);
-      modelFolders.set(folder.path, folder);
-      return [worktree.key, folder] as const;
-    }),
-  );
-
-  for (const file of store.files) {
-    const worktree = worktreeForPath(worktrees, file.path);
-    const worktreeRoot = modelWorktreeRoots.get(worktree.key) ?? modelRoot;
-    const relativeFolder = stripWorktreePrefix(file.parent_folder || "", worktree.prefix);
-    ensureVirtualFolder(relativeFolder, modelFolders, worktreeRoot, worktreeRoot.path, worktree.prefix, "model").files.push(file);
-  }
-
-  if (store.resources.length > 0) {
-    const resourceRoot: TreeFolder = {
-      path: RESOURCE_ROOT_PATH,
-      name: "Resources",
-      selectionId: "resource-root",
-      folders: [],
-      files: [],
-      resources: [],
-    };
-    root.folders.push(resourceRoot);
-    const resourceFolders = new Map<string, TreeFolder>([[RESOURCE_ROOT_PATH, resourceRoot]]);
-    const resourceWorktreeRoots = new Map(
-      worktrees.map((worktree) => {
-        const folder: TreeFolder = {
-          path: `${RESOURCE_WORKTREE_ROOT}/${worktree.key}`,
-          name: worktree.label,
-          selectionId: worktree.prefix ? `resource-folder:${worktree.prefix}` : "resource-root",
-          folders: [],
-          files: [],
-          resources: [],
-        };
-        resourceRoot.folders.push(folder);
-        resourceFolders.set(folder.path, folder);
-        return [worktree.key, folder] as const;
-      }),
-    );
-    for (const resource of store.resources) {
-      if (!resource.file_path) {
-        ensureVirtualFolder("External", resourceFolders, resourceRoot, RESOURCE_ROOT_PATH, "", "resource").resources.push(resource);
-        continue;
-      }
-      const worktree = worktreeForPath(worktrees, resource.file_path);
-      const worktreeRoot = resourceWorktreeRoots.get(worktree.key) ?? resourceRoot;
-      const relativeFolder = stripWorktreePrefix(dirname(resource.file_path), worktree.prefix);
-      ensureVirtualFolder(relativeFolder, resourceFolders, worktreeRoot, worktreeRoot.path, worktree.prefix, "resource").resources.push(resource);
-    }
-    for (const folder of resourceFolders.values()) {
-      folder.folders.sort((a, b) => a.name.localeCompare(b.name));
-      folder.resources.sort((a, b) => resourceLabel(a).localeCompare(resourceLabel(b)));
-    }
-  }
-
-  for (const folder of modelFolders.values()) {
-    folder.folders.sort((a, b) => a.name.localeCompare(b.name));
-    folder.files.sort((a, b) =>
-      displayName(a.display_path || a.path).localeCompare(displayName(b.display_path || b.path)),
-    );
-  }
-
-  return root;
-}
-
-interface ProjectWorktree {
-  key: string;
-  label: string;
-  prefix: string;
-}
-
-function projectWorktrees(store: ExplorerProjectStore): ProjectWorktree[] {
-  const source = store.project.eligible_git_worktrees.length > 0
-    ? store.project.eligible_git_worktrees
-    : [{ workspace_relative_root: "." }];
-  const worktrees = source.map((worktree, index) => {
-    const prefix = normalizeWorkspaceRelativeRoot(worktree.workspace_relative_root);
-    const fallbackName = index === 0
-      ? store.project.repository || basename(store.project.workspace_root) || store.project.name
-      : "";
-    const label = prefix ? displayName(prefix) : fallbackName || "workspace";
-    const key = prefix || label || `worktree-${index + 1}`;
-    return { key, label, prefix };
-  });
-
-  return worktrees.sort((a, b) => b.prefix.length - a.prefix.length || a.label.localeCompare(b.label));
-}
-
-function normalizeWorkspaceRelativeRoot(path: string | null | undefined) {
-  const normalized = (path || "").replaceAll("\\", "/").replace(/^\/+|\/+$/g, "");
-  return normalized === "." ? "" : normalized;
-}
-
-function basename(path: string | null | undefined) {
-  const normalized = normalizeWorkspaceRelativeRoot(path);
-  if (!normalized) return "";
-  return displayName(normalized);
-}
-
-function worktreeForPath(worktrees: ProjectWorktree[], path: string): ProjectWorktree {
-  const normalized = normalizeWorkspaceRelativeRoot(path);
-  return worktrees.find((worktree) =>
-    worktree.prefix === "" ||
-    normalized === worktree.prefix ||
-    normalized.startsWith(`${worktree.prefix}/`)
-  ) ?? worktrees[0];
-}
-
-function stripWorktreePrefix(path: string, prefix: string) {
-  const normalized = normalizeWorkspaceRelativeRoot(path);
-  if (!prefix) return normalized;
-  if (normalized === prefix) return "";
-  return normalized.startsWith(`${prefix}/`) ? normalized.slice(prefix.length + 1) : normalized;
-}
-
 function filterFileTree(
   folder: TreeFolder,
   query: string,
@@ -1420,6 +1256,21 @@ function filterTraceFile(file: TracePaneFile, query: string): TracePaneFile | nu
   return verifications.length > 0 ? { ...file, verifications } : null;
 }
 
+function TracePaneContents() {
+  const { store, getTraceFiles } = useStore();
+  const { traceTreeQuery } = useExplorerUiState();
+  const files = getTraceFiles();
+  const rootLabel = projectTreeRootLabel(store);
+  const tree = useMemo(() => buildTraceFileTree(files, rootLabel), [files, rootLabel]);
+  const filtered = useMemo(() => filterTraceFileTree(tree, traceTreeQuery), [tree, traceTreeQuery]);
+  return <>
+    <PaneTree aria-label="Verification trace tree" id="trace-tree">
+      <TraceTreeFolderNode folder={filtered} depth={0} query={traceTreeQuery} />
+    </PaneTree>
+    <TraceTreeSummary files={files} />
+  </>;
+}
+
 function buildTraceFileTree(files: TraceFileNode[], rootLabel: string): TracePaneFolder {
   const root: TracePaneFolder = { path: ROOT_PATH, name: rootLabel, folders: [], files: [] };
   const byPath = new Map<string, TracePaneFolder>([[ROOT_PATH, root]]);
@@ -1486,35 +1337,6 @@ function traceFolderContainsPath(folder: TracePaneFolder, path: string): boolean
     folder.folders.some((child) => traceFolderContainsPath(child, path));
 }
 
-function ensureVirtualFolder(
-  relativePath: string,
-  byPath: Map<string, TreeFolder>,
-  root: TreeFolder,
-  rootPath: string,
-  actualPrefix: string,
-  kind: "model" | "resource",
-): TreeFolder {
-  const normalized = normalizeWorkspaceRelativeRoot(relativePath);
-  if (!normalized) return root;
-  const path = `${rootPath}/${normalized}`;
-  const existing = byPath.get(path);
-  if (existing) return existing;
-  const parentPath = dirname(normalized);
-  const parent = ensureVirtualFolder(parentPath, byPath, root, rootPath, actualPrefix, kind);
-  const actualPath = [actualPrefix, normalized].filter(Boolean).join("/");
-  const folder: TreeFolder = {
-    path,
-    name: displayName(normalized),
-    selectionId: kind === "model" ? `folder:${actualPath}` : `resource-folder:${actualPath}`,
-    folders: [],
-    files: [],
-    resources: [],
-  };
-  byPath.set(path, folder);
-  parent.folders.push(folder);
-  return folder;
-}
-
 function treeFolderChildCount(folder: TreeFolder) {
   return folder.folders.length + folder.files.length + folder.resources.length;
 }
@@ -1526,23 +1348,8 @@ function folderSelectionId(path: string) {
   return `folder:${path}`;
 }
 
-function resourceLabel(resource: ProjectStoreResource) {
-  return resource.display || displayName(resource.file_path || resource.target);
-}
-
-function displayName(path: string) {
-  const normalized = path.replace(/\\/g, "/").replace(/\/$/, "");
-  return normalized.split("/").pop() || normalized || "Project";
-}
-
 function textMatches(query: string, ...values: Array<string | null | undefined>) {
   return values.some((value) => value?.toLowerCase().includes(query));
-}
-
-function dirname(path: string) {
-  const normalized = path.replace(/\\/g, "/").replace(/\/$/, "");
-  const index = normalized.lastIndexOf("/");
-  return index > 0 ? normalized.slice(0, index) : "";
 }
 
 function humanize(value: string) {

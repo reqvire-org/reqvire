@@ -284,25 +284,30 @@ mod tests {
                 "numbers":[-0.0, 1.0, 1e-20, 9223372036854775807_i64], "empty":[], "null":null,
             }),
         };
-        let assets = ExplorerRuntimeAssets::from_store(&counted, "ontology 測定".into()).unwrap();
+        let assets = ExplorerRuntimeAssets::from_store(&counted, "ontology 測定".into())
+            .expect("test fixture operation should succeed");
         assert_eq!(
             visits.get(),
             1,
             "seed and full JSON must serialize the store once"
         );
         assert_eq!(
-            serde_json::from_str::<Value>(&assets.project_store_json).unwrap(),
+            serde_json::from_str::<Value>(&assets.project_store_json)
+                .expect("test fixture operation should succeed"),
             counted.store
         );
         let seed = assets
             .project_store_js
             .strip_prefix("window.reqvireProjectStore = ")
-            .unwrap()
+            .expect("test fixture operation should succeed")
             .strip_suffix(";\n")
-            .unwrap();
+            .expect("test fixture operation should succeed");
         assert!(!seed.contains(['<', '>', '&', '\u{2028}', '\u{2029}']));
         assert!(seed.contains("\\u003c/script\\u003e\\u0026\\u2028\\u2029"));
-        assert_eq!(serde_json::from_str::<Value>(seed).unwrap(), counted.store);
+        assert_eq!(
+            serde_json::from_str::<Value>(seed).expect("test fixture operation should succeed"),
+            counted.store
+        );
         assert_eq!(assets.ontologies_ttl, "ontology 測定");
     }
 }

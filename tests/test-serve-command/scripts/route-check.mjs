@@ -1,7 +1,26 @@
 import { withBrowser, waitFor } from "../../browser.mjs";
 
 const [baseUrl, profile] = process.argv.slice(2);
-await withBrowser(profile, async ({ evaluate, navigate: navigatePage }) => {
+await withBrowser(profile, async ({ evaluate, navigate: navigatePage, rpc }) => {
+  await rpc("Page.addScriptToEvaluateOnNewDocument", { source: `(${(() => {
+    const NativeWorker = window.Worker;
+    window.__forceAtlasWorkers = { active: 0, maximum: 0, started: 0 };
+    window.Worker = class extends NativeWorker {
+      constructor(url, options) {
+        super(url, options);
+        this.tracked = String(url).includes("forceAtlasLayout.worker-");
+        if (this.tracked) {
+          window.__forceAtlasWorkers.started++;
+          window.__forceAtlasWorkers.active++;
+          window.__forceAtlasWorkers.maximum = Math.max(window.__forceAtlasWorkers.maximum, window.__forceAtlasWorkers.active);
+        }
+      }
+      terminate() {
+        if (this.tracked) { window.__forceAtlasWorkers.active--; this.tracked = false; }
+        return super.terminate();
+      }
+    };
+  }).toString()})();` });
   let navigationCount = 0;
   async function navigate(route) {
     await navigatePage(`${baseUrl}/?route-e2e=${++navigationCount}${route}`);
@@ -109,6 +128,31 @@ await withBrowser(profile, async ({ evaluate, navigate: navigatePage }) => {
         && workers.every(entry => new URL(entry.name).origin === location.origin);
     }, original);
   });
+  for (const kind of ["Model Graph", "Ontologies"]) {
+    await run(`${kind} packaged ForceAtlas worker`, async () => {
+      await navigate(kind === "Model Graph" ? "#/model" : "#/ontologies");
+      if (kind === "Model Graph") await evaluate(() => [...document.querySelectorAll('[aria-label="Model layout"] button')]
+        .find(button => button.textContent.trim() === "Graph").click());
+      const ready = () => evaluate(() => {
+        if (document.body.textContent.includes("layout failed.")) throw new Error("ForceAtlas worker failed");
+        const surface = document.querySelector('[data-testid="kg-sigma-canvas"], #ontology-graph-container');
+        return Boolean(surface?.querySelector("canvas")) && surface.closest('[aria-busy]')?.getAttribute("aria-busy") === "false";
+      });
+      await waitFor(ready);
+      if (kind === "Ontologies") {
+        await evaluate(() => { for (let i = 0; i < 10; i++) window.resetOntologyGraphLayout(); });
+        await waitFor(ready);
+      }
+      const result = await evaluate(() => {
+        const workers = performance.getEntriesByType("resource").filter(entry => entry.name.includes("forceAtlasLayout.worker-"));
+        return workers.length > 0 && workers.every(entry => new URL(entry.name).origin === location.origin)
+          && window.__forceAtlasWorkers.started > 0 && window.__forceAtlasWorkers.maximum === 1 && window.__forceAtlasWorkers.active === 0;
+      });
+      await evaluate(() => { location.hash = "#/files"; });
+      await waitFor(() => evaluate(() => !document.querySelector("canvas")));
+      return result && await evaluate(() => window.__forceAtlasWorkers.active === 0);
+    });
+  }
   console.log("completed");
   if (failed) process.exitCode = 1;
 });

@@ -40,7 +40,7 @@ struct CapturedQueryStores {
 }
 
 impl CapturedQueryStores {
-    fn new(parts: SemanticStoreTurtleParts) -> Self {
+    const fn new(parts: SemanticStoreTurtleParts) -> Self {
         Self {
             parts,
             authored: OnceLock::new(),
@@ -88,7 +88,7 @@ impl fmt::Debug for SemanticModelStore {
 
 impl SemanticModelStore {
     /// Read the semantic index accepted with this snapshot.
-    pub fn index(&self) -> &Arc<SemanticIndex> {
+    pub const fn index(&self) -> &Arc<SemanticIndex> {
         &self.index
     }
 
@@ -313,8 +313,11 @@ mod tests {
         let mut registry = GraphRegistry::new();
         for prefix in ["alpha", "beta"] {
             let content = format!("### {prefix}\n#### Metadata\n  * type: ontology\n  * ontology_base: https://example.test/{prefix}\n  * ontology_prefix: {prefix}\n#### Ontology\n```turtle\n@prefix {prefix}: <https://example.test/{prefix}#> .\n@prefix owl: <http://www.w3.org/2002/07/owl#> .\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n<https://example.test/{prefix}> a owl:Ontology .\n{prefix}:Local a owl:Class ; rdfs:subClassOf <https://example.test/external#{prefix}> .\n```\n");
-            let element = crate::parser::parse_single_element(&content, "model.md").unwrap();
-            registry.register_element(element, "model.md").unwrap();
+            let element = crate::parser::parse_single_element(&content, "model.md")
+                .expect("test fixture operation should succeed");
+            registry
+                .register_element(element, "model.md")
+                .expect("test fixture operation should succeed");
         }
         let mut index = build_semantic_index(&registry);
         let content = "@prefix ext: <https://example.test/external#> .\n@prefix owl: <http://www.w3.org/2002/07/owl#> .\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\next:alpha a owl:Class ; rdfs:label \"Alpha external\" ; rdfs:subClassOf ext:Support .\next:beta a owl:Class ; rdfs:label \"Beta external\" .\next:Support a owl:Class ; rdfs:label \"Support\" .\next:Unused a owl:Class ; rdfs:label \"Unused\" .\n";
@@ -354,7 +357,7 @@ mod tests {
                 &[SemanticExportLayer::ExternalUsed],
                 namespace,
             )
-            .unwrap()
+            .expect("test fixture operation should succeed")
     }
 
     fn triple_set(turtle: &str) -> std::collections::BTreeSet<String> {
@@ -367,16 +370,19 @@ mod tests {
     #[test]
     fn external_subset_is_shared_by_capture_exports_visibility_and_explorer() {
         let (registry, index) = external_fixture();
-        let expected = index.with_external_visibility(true).unwrap();
+        let expected = index
+            .with_external_visibility(true)
+            .expect("test fixture operation should succeed");
         let expected_export = index
             .serialize_export_layers(
                 SemanticExportFormat::Turtle,
                 &[SemanticExportLayer::ExternalUsed],
                 None,
             )
-            .unwrap();
+            .expect("test fixture operation should succeed");
         let before = SUBSET_DERIVATIONS.get();
-        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index)).unwrap();
+        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index))
+            .expect("test fixture operation should succeed");
         assert_eq!(SUBSET_DERIVATIONS.get() - before, 1);
         let mut model = crate::model::ModelManager::new();
         model.graph_registry = registry;
@@ -386,15 +392,20 @@ mod tests {
                 triple_set(&subset_export(&snapshot, None)),
                 triple_set(&expected_export)
             );
-            let visible = snapshot.index_with_external_visibility(true).unwrap();
+            let visible = snapshot
+                .index_with_external_visibility(true)
+                .expect("test fixture operation should succeed");
             assert_eq!(
-                serde_json::to_value(&visible).unwrap(),
-                serde_json::to_value(&expected).unwrap()
+                serde_json::to_value(&visible).expect("test fixture operation should succeed"),
+                serde_json::to_value(&expected).expect("test fixture operation should succeed")
             );
             for full in [false, true] {
-                snapshot.store(full, true).unwrap();
+                snapshot
+                    .store(full, true)
+                    .expect("test fixture operation should succeed");
             }
-            let runtime = crate::explorer_runtime::build_runtime_assets(&model).unwrap();
+            let runtime = crate::explorer_runtime::build_runtime_assets(&model)
+                .expect("test fixture operation should succeed");
             assert!(runtime.project_store_json.contains("Alpha external"));
             assert!(!runtime.project_store_json.contains("Unused\""));
         }
@@ -408,7 +419,8 @@ mod tests {
     #[test]
     fn external_subset_filtered_exports_have_independent_inputs() {
         let (registry, index) = external_fixture();
-        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index)).unwrap();
+        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index))
+            .expect("test fixture operation should succeed");
         let whole = subset_export(&snapshot, None);
         for namespace in ["alpha", "beta", "alpha"] {
             let before = SUBSET_DERIVATIONS.get();
@@ -451,19 +463,20 @@ mod tests {
                         full,
                         index
                             .serialize_with_options_and_filter(format, full, true, None)
-                            .unwrap(),
+                            .expect("test fixture operation should succeed"),
                     )
                 })
             })
             .collect();
         let before = SUBSET_DERIVATIONS.get();
-        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index)).unwrap();
+        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index))
+            .expect("test fixture operation should succeed");
         for _ in 0..2 {
             for (format, full, content) in &expected {
                 assert_eq!(
                     &snapshot
                         .serialize_with_options_and_filter(*format, *full, true, None)
-                        .unwrap(),
+                        .expect("test fixture operation should succeed"),
                     content
                 );
             }
@@ -482,7 +495,7 @@ mod tests {
                     true,
                     Some(&format!("https://example.test/{namespace}")),
                 )
-                .unwrap();
+                .expect("test fixture operation should succeed");
             assert_eq!(SUBSET_DERIVATIONS.get() - before, 1);
             assert!(content.contains(if namespace == "alpha" {
                 "Alpha external"
@@ -500,7 +513,8 @@ mod tests {
     #[test]
     fn external_subset_concurrent_readers_do_not_rederive() {
         let (registry, index) = external_fixture();
-        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index)).unwrap();
+        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index))
+            .expect("test fixture operation should succeed");
         let expected = triple_set(&subset_export(&snapshot, None));
         std::thread::scope(|scope| {
             let threads: Vec<_> = (0..4)
@@ -509,14 +523,18 @@ mod tests {
                     scope.spawn(move || {
                         let before = SUBSET_DERIVATIONS.get();
                         let output = subset_export(&snapshot, None);
-                        snapshot.index_with_external_visibility(true).unwrap();
-                        snapshot.store(true, true).unwrap();
+                        snapshot
+                            .index_with_external_visibility(true)
+                            .expect("test fixture operation should succeed");
+                        snapshot
+                            .store(true, true)
+                            .expect("test fixture operation should succeed");
                         (triple_set(&output), SUBSET_DERIVATIONS.get() - before)
                     })
                 })
                 .collect();
             for thread in threads {
-                let (output, derivations) = thread.join().unwrap();
+                let (output, derivations) = thread.join().expect("test worker should complete");
                 assert_eq!(output, expected);
                 assert_eq!(derivations, 0, "snapshot clone must share derived subset");
             }
@@ -526,16 +544,17 @@ mod tests {
     #[test]
     fn external_subset_failed_and_edited_candidates_preserve_accepted_snapshot() {
         let (registry, index) = external_fixture();
-        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index)).unwrap();
+        let snapshot = SemanticModelStore::from_index(&registry, Arc::new(index))
+            .expect("test fixture operation should succeed");
         let accepted = subset_export(&snapshot, None);
         let mut invalid = snapshot.index().as_ref().clone();
         invalid.model_context_turtle = "invalid turtle".into();
         let invalid = Arc::new(invalid);
-        let first = SemanticModelStore::from_index(&registry, invalid.clone())
-            .unwrap_err()
+        let first = SemanticModelStore::from_index(&registry, Arc::clone(&invalid))
+            .expect_err("test fixture operation should fail")
             .to_string();
         let second = SemanticModelStore::from_index(&registry, invalid)
-            .unwrap_err()
+            .expect_err("test fixture operation should fail")
             .to_string();
         assert_eq!(first, second);
         assert!(first.contains("model"), "{first}");
@@ -544,7 +563,8 @@ mod tests {
         block.content = block.content.replace("Alpha external", "Edited external");
         block.quads = parse_test_quads(&block.content);
         let before = SUBSET_DERIVATIONS.get();
-        let candidate = SemanticModelStore::from_index(&registry, Arc::new(edited)).unwrap();
+        let candidate = SemanticModelStore::from_index(&registry, Arc::new(edited))
+            .expect("test fixture operation should succeed");
         assert_eq!(SUBSET_DERIVATIONS.get() - before, 1);
         assert!(subset_export(&candidate, None).contains("Edited external"));
         assert_eq!(
@@ -588,19 +608,19 @@ mod tests {
                 observed.fetch_add(1, Ordering::SeqCst);
             });
             let barrier = Arc::new(std::sync::Barrier::new(4));
-            let workers: Vec<_> = (0..4)
-                .map(|_| {
-                    let cloned = snapshot.clone();
-                    let barrier = Arc::clone(&barrier);
-                    std::thread::spawn(move || {
-                        barrier.wait();
-                        cloned
-                            .store(true, false)
-                            .map(|store| store as *const Store as usize)
-                            .map_err(|error| error.to_string())
-                    })
-                })
-                .collect();
+            let mut workers = Vec::new();
+            // Start all barrier participants before waiting for any worker.
+            for _ in 0..4 {
+                let cloned = snapshot.clone();
+                let barrier = Arc::clone(&barrier);
+                workers.push(std::thread::spawn(move || {
+                    barrier.wait();
+                    cloned
+                        .store(true, false)
+                        .map(|store| store as *const Store as usize)
+                        .map_err(|error| error.to_string())
+                }));
+            }
             let results: Vec<_> = workers
                 .into_iter()
                 .map(|w| w.join().expect("query worker"))
@@ -612,8 +632,7 @@ mod tests {
             if fail {
                 assert!(results[0]
                     .as_ref()
-                    .err()
-                    .expect("load error")
+                    .expect_err("load error")
                     .contains("authored model graph"));
                 assert!(snapshot.store(true, false).is_err());
                 assert_eq!(starts.load(Ordering::SeqCst), 1);
@@ -631,7 +650,8 @@ mod tests {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let mut snapshot = empty_snapshot()?;
         let mut parts = parts_with_raw_external();
-        let content = "<https://example.test/used> <https://example.test/p> <https://example.test/o> .";
+        let content =
+            "<https://example.test/used> <https://example.test/p> <https://example.test/o> .";
         parts.external_used_subset = Some(SemanticBlock {
             kind: crate::semantic_contract::SemanticBlockKind::ExternalOntology,
             source: "reqvire:external-used-subset".into(),

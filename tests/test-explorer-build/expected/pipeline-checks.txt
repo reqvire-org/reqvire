@@ -1,0 +1,8 @@
+PASS pipeline-build
+PASS pipeline-check
+PASS pipeline-build:app
+PASS pipeline-build:ds-bundle
+PASS pipeline-build:all
+PASS pipeline-stops-on-failure
+PASS make-dependency-reuse-and-retry
+PASS ci-builds-and-checks-once

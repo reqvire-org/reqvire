@@ -410,14 +410,9 @@ impl GithubAccess {
                             "https://{}/{}/pull/{}#issuecomment-",
                             repo.host, repo.name, number
                         );
-                        if let Some(id) = url
+                        url
                             .strip_prefix(&prefix)
-                            .and_then(|id| id.parse::<u64>().ok())
-                        {
-                            json!({"outcome":"completed","pr_number":pr["number"],"pr_url":pr["url"],"comment_id":id,"comment_url":url})
-                        } else {
-                            json!({"outcome":"unknown","pr_number":pr["number"],"pr_url":pr["url"],"error":"Comment may have been posted; confirm the target PR before retrying"})
-                        }
+                            .and_then(|id| id.parse::<u64>().ok()).map_or_else(|| json!({"outcome":"unknown","pr_number":pr["number"],"pr_url":pr["url"],"error":"Comment may have been posted; confirm the target PR before retrying"}), |id| json!({"outcome":"completed","pr_number":pr["number"],"pr_url":pr["url"],"comment_id":id,"comment_url":url}))
                     }
                     Ok(out) if is_definite_rejection(&out) => {
                         return Err(error(publication_failure(&out)))
@@ -713,11 +708,13 @@ mod tests {
     #[test]
     fn startup_accepts_a_slow_executable_within_the_production_deadline() {
         let fixture = Fixture::new();
-        let script = fs::read_to_string(&fixture.gh).unwrap().replace(
-            "import os, runpy\n",
-            "import os, runpy, sys, time\nif sys.argv[1:] == ['--version']: time.sleep(0.4)\n",
-        );
-        fs::write(&fixture.gh, script).unwrap();
+        let script = fs::read_to_string(&fixture.gh)
+            .expect("read test fixture")
+            .replace(
+                "import os, runpy\n",
+                "import os, runpy, sys, time\nif sys.argv[1:] == ['--version']: time.sleep(0.4)\n",
+            );
+        fs::write(&fixture.gh, script).expect("write test fixture");
         let access = fixture.access();
         assert!(access.available(), "{}", access.status());
         assert_eq!(access.check_timeout, CHECK_TIMEOUT);
@@ -730,7 +727,11 @@ mod tests {
         fixture.scenario(json!({"timeout":"auth status"}));
         let access = fixture.access_with_check_timeout(Duration::from_secs(2));
         assert!(!access.available());
-        assert!(access.reason.as_deref().unwrap().contains("timed out"));
+        assert!(access
+            .reason
+            .as_deref()
+            .expect("test fixture operation should succeed")
+            .contains("timed out"));
         let calls = fixture.calls();
         assert!(
             calls
@@ -901,7 +902,7 @@ mod tests {
             .expect("validated worktree context invariant");
         let error = access
             .execute(&fixture.root, "reqvire.github.pr.create", &args, &status)
-            .unwrap_err();
+            .expect_err("test fixture operation should fail");
         assert!(error.to_string().contains("#7"));
         // Stacked PRs use an explicit existing feature branch as their base.
         fs::remove_file(fixture.state.join("prs.json"))
@@ -976,7 +977,7 @@ mod tests {
         fixture.scenario(json!({"fail":"pr comment"}));
         let failure = access
             .execute(&fixture.root, "reqvire.github.pr.comment", &args, &status)
-            .unwrap_err()
+            .expect_err("test fixture operation should fail")
             .to_string();
         assert!(!failure.contains("secret-token"));
         assert!(failure.contains("permission"));

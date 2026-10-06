@@ -109,12 +109,12 @@ pub struct WorkerOptions {
     #[serde(default = "available_parallelism")]
     pub read_parallelism: usize,
 }
-pub(crate) fn available_parallelism() -> usize {
+pub fn available_parallelism() -> usize {
     std::thread::available_parallelism()
         .map(usize::from)
         .unwrap_or(1)
 }
-pub(crate) fn parallel_read(method: &str, params: &Value) -> bool {
+pub fn parallel_read(method: &str, params: &Value) -> bool {
     match method {
         "tools/call" => params["name"].as_str().is_some_and(|name| {
             name != "reqvire.tool_contract" && crate::mcp_session::snapshot_read(name)
@@ -203,7 +203,7 @@ pub fn run() -> Result<(), ReqvireError> {
         }
         ready["status"] = read_status(Ok(observed));
         emit(&ready)?;
-        for line in lines {
+        for line in lines.by_ref() {
             let mut final_observation = None;
             let parsed = serde_json::from_str::<Value>(&line?);
             let id = parsed
@@ -247,6 +247,7 @@ pub fn run() -> Result<(), ReqvireError> {
             response["request_id"] = id.unwrap_or(Value::Null);
             emit(&response)?;
         }
+        drop(lines);
         return Ok(());
     }
     let session = match MutationSession::start(
@@ -268,7 +269,7 @@ pub fn run() -> Result<(), ReqvireError> {
     let sequence = Arc::new(AtomicU64::new(0));
     let capacity = Arc::new(tokio::sync::Semaphore::new(options.read_parallelism.max(1)));
     let mut readers: Vec<std::thread::JoinHandle<()>> = Vec::new();
-    for line in lines {
+    for line in lines.by_ref() {
         let request: Value = match serde_json::from_str(&line?) {
             Ok(value) => value,
             Err(failure) => {
@@ -281,7 +282,7 @@ pub fn run() -> Result<(), ReqvireError> {
         if operation == "rpc"
             && parallel_read(request["method"].as_str().unwrap_or(""), &request["params"])
         {
-            let permit = match capacity.clone().try_acquire_owned() {
+            let permit = match Arc::clone(&capacity).try_acquire_owned() {
                 Ok(permit) => permit,
                 Err(_) => {
                     emit(
@@ -290,8 +291,8 @@ pub fn run() -> Result<(), ReqvireError> {
                     continue;
                 }
             };
-            let session = session.clone();
-            let sequence = sequence.clone();
+            let session = Arc::clone(&session);
+            let sequence = Arc::clone(&sequence);
             let exclusions = exclusions.clone();
             let estimates = options.with_size_estimates;
             readers.push(std::thread::spawn(move || {
@@ -321,10 +322,10 @@ pub fn run() -> Result<(), ReqvireError> {
                 let mut response = rpc_result(result);
                 let current = session.blocking_read();
                 let status = current.status();
-                response["read_status"] = match &snapshot {
-                    Ok(snapshot) => snapshot.status(status.clone()),
-                    Err(_) => status.clone(),
-                };
+                response["read_status"] = snapshot.as_ref().map_or_else(
+                    |_| status.clone(),
+                    |snapshot| snapshot.status(status.clone()),
+                );
                 response["status"] = status;
                 response["sequence"] = json!(sequence.fetch_add(1, Ordering::SeqCst) + 1);
                 response["request_id"] = request["request_id"].clone();
@@ -351,6 +352,24 @@ pub fn run() -> Result<(), ReqvireError> {
                 Ok(value) => json!({"result":value}),
                 Err(failure) => json!({"error":failure.to_string()}),
             },
+            "reconcile" => {
+                let accepted_model = session.model();
+                match session.reconcile_commit(
+                    request["attempted_commit"].as_str().unwrap_or(""),
+                    request["dry_run"].as_bool().unwrap_or(true),
+                ) {
+                    Ok(value) => {
+                        let applied = value["outcome"] == "completed"
+                            && !Arc::ptr_eq(&accepted_model, &session.model());
+                        let mut response = json!({"result":value});
+                        if applied {
+                            runtime_result(&session, &options, &mut response);
+                        }
+                        response
+                    }
+                    Err(failure) => json!({"error":failure.to_string()}),
+                }
+            }
             "runtime" => {
                 let mut value = json!({});
                 runtime_result(&session, &options, &mut value);
@@ -379,6 +398,7 @@ pub fn run() -> Result<(), ReqvireError> {
         drop(session);
         emit(&response)?;
     }
+    drop(lines);
     for reader in readers {
         let _ = reader.join();
     }
@@ -396,13 +416,14 @@ fn dispatch_rpc(
         exclusions,
     )
     .ok_or_else(|| rmcp::ErrorData::internal_error("Missing worker result", None))?;
-    if let Some(failure) = response.get("error") {
-        Err(serde_json::from_value(failure.clone()).unwrap_or_else(|_| {
-            rmcp::ErrorData::internal_error("Worker operation failed", Some(failure.clone()))
-        }))
-    } else {
-        Ok(response["result"].clone())
-    }
+    response.get("error").map_or_else(
+        || Ok(response["result"].clone()),
+        |failure| {
+            Err(serde_json::from_value(failure.clone()).unwrap_or_else(|_| {
+                rmcp::ErrorData::internal_error("Worker operation failed", Some(failure.clone()))
+            }))
+        },
+    )
 }
 fn rpc_result(result: Result<Value, rmcp::ErrorData>) -> Value {
     match result {
@@ -429,17 +450,23 @@ mod tests {
         let name_address = name.as_ptr();
         let ontology = "owned ontology content".repeat(32);
         let ontology_address = ontology.as_ptr();
-        let store = Value::Object([("name".into(), Value::String(name))].into_iter().collect());
+        let store = Value::Object(std::iter::once(("name".into(), Value::String(name))).collect());
         let wire = runtime_value(ExplorerRuntimeData {
             project_store: store,
             ontologies_ttl: ontology,
         });
         assert_eq!(
-            wire["project_store"]["name"].as_str().unwrap().as_ptr(),
+            wire["project_store"]["name"]
+                .as_str()
+                .expect("expected a string in the test response")
+                .as_ptr(),
             name_address
         );
         assert_eq!(
-            wire["ontologies_ttl"].as_str().unwrap().as_ptr(),
+            wire["ontologies_ttl"]
+                .as_str()
+                .expect("expected a string in the test response")
+                .as_ptr(),
             ontology_address
         );
     }

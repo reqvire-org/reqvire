@@ -139,37 +139,46 @@ fn shared_snapshot_bookkeeping(commits: bool) {
                 json!({"structuredContent":{}})
             })
         });
-        (result.unwrap(), changed)
+        (
+            result.expect("test fixture operation should succeed"),
+            changed,
+        )
     }
     fn pending(session: &MutationSession) -> Value {
         session.status()["pending_changes"].clone()
     }
 
-    std::fs::write("asset.txt", "asset").unwrap();
+    std::fs::write("asset.txt", "asset").expect("write test fixture");
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
-        std::fs::write("mode-source.txt", MODEL).unwrap();
-        std::fs::write("mode-plain.txt", MODEL).unwrap();
+        std::fs::write("mode-source.txt", MODEL).expect("write test fixture");
+        std::fs::write("mode-plain.txt", MODEL).expect("write test fixture");
         std::fs::set_permissions("mode-source.txt", std::fs::Permissions::from_mode(0o755))
-            .unwrap();
+            .expect("test fixture operation should succeed");
     }
     git_test(&["add", "."]);
     git_test(&["commit", "-qm", "snapshot assets"]);
     let initial_head = git_test(&["rev-parse", "HEAD"]);
     let (server, _, _) = server_with_commits(false, commits);
-    let mut session = server.session.as_ref().unwrap().lock().unwrap();
+    let mut session = server
+        .session
+        .as_ref()
+        .expect("test fixture operation should succeed")
+        .lock()
+        .expect("test lock should not be poisoned");
     let first = session.model();
     let again = session.model();
     assert!(Arc::ptr_eq(&first, &again));
-    std::fs::write("unrelated.txt", "keep staged").unwrap();
+    std::fs::write("unrelated.txt", "keep staged").expect("write test fixture");
     git_test(&["add", "unrelated.txt"]);
     let unrelated = git_test(&["ls-files", "--stage", "unrelated.txt"]);
     // status() may refresh Git's stat cache; tracked entries must stay intact.
     let index = git_test(&["ls-files", "--stage"]);
     let changed_source = MODEL.replace("alpha", "bravo");
     let (result, changed) = prepared(&mut session, true, false, || {
-        mutation_io::write("Model.md", &changed_source).unwrap();
+        mutation_io::write("Model.md", &changed_source)
+            .expect("test fixture operation should succeed");
     });
     assert_ne!(result["isError"], true, "{result}");
     assert!(changed);
@@ -178,13 +187,13 @@ fn shared_snapshot_bookkeeping(commits: bool) {
     assert!(first
         .graph_registry
         .get_element_by_name("Cache Subject")
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .content
         .contains("alpha"));
     assert!(accepted
         .graph_registry
         .get_element_by_name("Cache Subject")
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .content
         .contains("bravo"));
     let expected = if commits {
@@ -195,19 +204,22 @@ fn shared_snapshot_bookkeeping(commits: bool) {
     assert_eq!(pending(&session), expected);
     for (persists, reject) in [(false, false), (true, true)] {
         let (_, published) = prepared(&mut session, persists, reject, || {
-            mutation_io::write("Model.md", MODEL).unwrap();
+            mutation_io::write("Model.md", MODEL).expect("test fixture operation should succeed");
         });
         assert!(!published);
         assert!(Arc::ptr_eq(&session.model(), &accepted));
         assert_eq!(pending(&session), expected);
-        assert_eq!(std::fs::read_to_string("Model.md").unwrap(), changed_source);
+        assert_eq!(
+            std::fs::read_to_string("Model.md").expect("read test fixture"),
+            changed_source
+        );
     }
     let (failure, changed) = prepared(&mut session, true, false, || {
         mutation_io::write(
             "Model.md",
             "# Elements\n\n### Invalid\n\n#### Metadata\n  * type: unsupported-type\n",
         )
-        .unwrap();
+        .expect("test fixture operation should succeed");
     });
     assert_eq!(failure["isError"], true, "{failure}");
     assert!(!changed);
@@ -215,26 +227,27 @@ fn shared_snapshot_bookkeeping(commits: bool) {
     assert_eq!(pending(&session), expected);
 
     // Revert accepted bytes without importing an intervening external edit.
-    std::fs::write("Model.md", "outside accepted snapshot").unwrap();
+    std::fs::write("Model.md", "outside accepted snapshot").expect("write test fixture");
     let (_, changed) = prepared(&mut session, true, false, || {
         assert_eq!(
-            mutation_io::read_to_string("Model.md").unwrap(),
+            mutation_io::read_to_string("Model.md").expect("test fixture operation should succeed"),
             changed_source
         );
-        mutation_io::write("Model.md", MODEL).unwrap();
+        mutation_io::write("Model.md", MODEL).expect("test fixture operation should succeed");
     });
     assert!(changed);
     assert_eq!(pending(&session), json!([]));
     assert!(accepted
         .graph_registry
         .get_element_by_name("Cache Subject")
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .content
         .contains("bravo"));
     #[cfg(unix)]
     {
         let (_, changed) = prepared(&mut session, true, false, || {
-            mutation_io::copy("mode-source.txt", "Model.md").unwrap();
+            mutation_io::copy("mode-source.txt", "Model.md")
+                .expect("test fixture operation should succeed");
         });
         assert!(
             changed,
@@ -249,13 +262,15 @@ fn shared_snapshot_bookkeeping(commits: bool) {
             }
         );
         let (_, changed) = prepared(&mut session, true, false, || {
-            mutation_io::copy("mode-plain.txt", "Model.md").unwrap();
+            mutation_io::copy("mode-plain.txt", "Model.md")
+                .expect("test fixture operation should succeed");
         });
         assert!(changed);
         assert_eq!(pending(&session), json!([]));
     }
     let (_, changed) = prepared(&mut session, true, false, || {
-        mutation_io::rename("asset.txt", "moved.txt").unwrap();
+        mutation_io::rename("asset.txt", "moved.txt")
+            .expect("test fixture operation should succeed");
     });
     assert!(changed);
     assert_eq!(
@@ -267,12 +282,13 @@ fn shared_snapshot_bookkeeping(commits: bool) {
         }
     );
     let (_, changed) = prepared(&mut session, true, false, || {
-        mutation_io::rename("moved.txt", "asset.txt").unwrap();
+        mutation_io::rename("moved.txt", "asset.txt")
+            .expect("test fixture operation should succeed");
     });
     assert!(changed);
     assert_eq!(pending(&session), json!([]));
     let (_, changed) = prepared(&mut session, true, false, || {
-        mutation_io::remove_file("asset.txt").unwrap();
+        mutation_io::remove_file("asset.txt").expect("test fixture operation should succeed");
     });
     assert!(changed);
     assert_eq!(
@@ -284,7 +300,7 @@ fn shared_snapshot_bookkeeping(commits: bool) {
         }
     );
     let (_, changed) = prepared(&mut session, true, false, || {
-        mutation_io::write("asset.txt", b"asset").unwrap();
+        mutation_io::write("asset.txt", b"asset").expect("test fixture operation should succeed");
     });
     assert!(changed);
     assert_eq!(pending(&session), json!([]));
@@ -293,15 +309,19 @@ fn shared_snapshot_bookkeeping(commits: bool) {
         assert_eq!(git_test(&["ls-files", "--stage"]), index);
     }
     let (_, changed) = prepared(&mut session, true, false, || {
-        mutation_io::write("Model.md", &changed_source).unwrap();
+        mutation_io::write("Model.md", &changed_source)
+            .expect("test fixture operation should succeed");
     });
     assert!(changed);
-    let result = session.explicit_commit("commit accepted changes").unwrap();
+    let result = session
+        .explicit_commit("commit accepted changes")
+        .expect("test fixture operation should succeed");
     assert_eq!(
         result["outcome"],
         if commits { "no_op" } else { "completed" }
     );
     assert_eq!(pending(&session), json!([]));
+    drop(session);
     assert_eq!(
         git_test(&["ls-files", "--stage", "unrelated.txt"]),
         unrelated
@@ -315,6 +335,645 @@ case!(shared_snapshot_bookkeeping_without_commits, {
 case!(shared_snapshot_bookkeeping_with_commits, {
     shared_snapshot_bookkeeping(true);
 });
+
+#[cfg(unix)]
+#[allow(clippy::unwrap_used, clippy::significant_drop_tightening)]
+fn reconcile_published_fixture_commit(head: &str, paths: &[&str]) {
+    // Operator repair is selective: finish the verified commit's index
+    // publication, without another commit, retry, or whole-index reset.
+    std::fs::remove_file(".git/hooks/reference-transaction").unwrap();
+    std::fs::remove_file("ref-effects").unwrap(); // fixture-only hook evidence
+    let mut args = vec!["restore", "--staged", "--source", head, "--"];
+    args.extend_from_slice(paths);
+    git_test(&args);
+    assert_eq!(git_test(&["rev-parse", "HEAD"]), head);
+    assert_eq!(git_test(&["status", "--porcelain"]), "");
+}
+
+#[cfg(unix)]
+case!(
+    explicit_commit_timeout_with_external_files_retains_snapshot_reads,
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let (server, _, _) = server_with_commits(false, false);
+        let mut session = server
+            .session
+            .as_ref()
+            .expect("test fixture operation should succeed")
+            .lock()
+            .expect("test lock should not be poisoned");
+        let before = session.status();
+        let (result, changed) = session.execute(true, "reqvire.add_element", || {
+            reqvire::mutation_io::write("asset.bin", [0, 255, 128])
+                .expect("test fixture operation should succeed");
+            Ok(json!({"structuredContent":{}}))
+        });
+        assert_ne!(
+            result.expect("test fixture operation should succeed")["isError"],
+            true
+        );
+        assert!(changed);
+        let accepted = session.model();
+        let pending_before = session.status()["pending_changes"].clone();
+        let index_before = std::fs::read(".git/index").expect("read test fixture");
+        std::fs::write(".git/hooks/reference-transaction", "#!/usr/bin/env python3\nimport sys, time\nfrom pathlib import Path\nif sys.argv[1] == 'committed':\n    with Path('ref-effects').open('a') as f: f.write('one\\n')\n    time.sleep(1)\n").expect("write test fixture");
+        std::fs::set_permissions(
+            ".git/hooks/reference-transaction",
+            std::fs::Permissions::from_mode(0o755),
+        )
+        .expect("test fixture operation should succeed");
+        let failure = crate::mcp_session::with_git_timeout(Duration::from_millis(250), || {
+            session.explicit_commit("ambiguous commit")
+        })
+        .expect_err("test fixture operation should fail")
+        .to_string();
+        assert!(failure.contains("outcome may be unknown"), "{failure}");
+        assert_ne!(git_test(&["rev-parse", "HEAD"]), before["head"]);
+        let status = session.status();
+        assert_eq!(status["head"], before["head"]);
+        assert_eq!(status["available"], true);
+        assert_eq!(status["writes_available"], false);
+        assert_eq!(status["recovery_required"], true);
+        assert!(Arc::ptr_eq(&accepted, &session.model()));
+        assert_eq!(status["pending_changes"], pending_before);
+        assert_eq!(
+            std::fs::read(".git/index").expect("read test fixture"),
+            index_before
+        );
+        assert_eq!(
+            std::fs::read("asset.bin").expect("read test fixture"),
+            [0, 255, 128]
+        );
+        assert!(!std::path::Path::new(".git/index.lock").exists());
+        assert!(session.capture_read("reqvire.search").is_ok());
+        assert!(session
+            .explicit_commit("must not retry")
+            .expect_err("test fixture operation should fail")
+            .to_string()
+            .contains("recovery"));
+        assert_eq!(
+            std::fs::read_to_string("ref-effects").expect("read test fixture"),
+            "one\n"
+        );
+        let published_head = git_test(&["rev-parse", "HEAD"]);
+        assert!(failure.contains(&format!("attempted commit {published_head}")));
+        assert!(failure.contains(&format!(
+            "accepted HEAD {}",
+            before["head"]
+                .as_str()
+                .expect("expected a string in the test response")
+        )));
+        assert_eq!(git_test(&["rev-parse", "HEAD^"]), before["head"]);
+        assert_eq!(
+            crate::mcp_session::git(
+                std::path::Path::new("."),
+                &["show", "HEAD:asset.bin"],
+                None,
+                None
+            )
+            .expect("fixture Git command should succeed"),
+            [0, 255, 128]
+        );
+        drop(session);
+        drop(server);
+        reconcile_published_fixture_commit(&published_head, &["asset.bin"]);
+        let (reopened, _, _) = server_with_commits(false, false);
+        let repaired = reopened
+            .session
+            .as_ref()
+            .expect("test fixture operation should succeed")
+            .lock()
+            .expect("test lock should not be poisoned");
+        assert_eq!(repaired.status()["head"], published_head);
+        assert_eq!(repaired.status()["recovery_required"], false);
+        assert_eq!(repaired.status()["writes_available"], true);
+        assert_eq!(repaired.status()["pending_changes"], json!([]));
+        let read = repaired
+            .capture_read("reqvire.read_element")
+            .expect("test fixture operation should succeed");
+        drop(repaired);
+        assert_eq!(
+            read.execute(|| Ok(json!(reqvire::mutation_io::read("asset.bin")
+                .expect("test fixture operation should succeed"))))
+                .expect("test fixture operation should succeed"),
+            json!([0, 255, 128])
+        );
+    }
+);
+
+#[cfg(unix)]
+case!(
+    automatic_commit_timeout_with_external_files_requires_recovery,
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let (server, _, _) = server_with_commits(false, true);
+        let mut session = server
+            .session
+            .as_ref()
+            .expect("test fixture operation should succeed")
+            .lock()
+            .expect("test lock should not be poisoned");
+        let before = session.status();
+        let accepted = session.model();
+        let index_before = std::fs::read(".git/index").expect("read test fixture");
+        std::fs::write(".git/hooks/reference-transaction", "#!/usr/bin/env python3\nimport sys, time\nfrom pathlib import Path\nif sys.argv[1] == 'committed':\n    with Path('ref-effects').open('a') as f: f.write('one\\n')\n    time.sleep(1)\n").expect("write test fixture");
+        std::fs::set_permissions(
+            ".git/hooks/reference-transaction",
+            std::fs::Permissions::from_mode(0o755),
+        )
+        .expect("test fixture operation should succeed");
+        let changed_source = MODEL.replace("alpha", "candidate");
+        let (result, changed) =
+            crate::mcp_session::with_git_timeout(Duration::from_millis(250), || {
+                session.execute(true, "reqvire.add_element", || {
+                    reqvire::mutation_io::write("Model.md", changed_source.as_bytes())
+                        .expect("test fixture operation should succeed");
+                    Ok(json!({"structuredContent":{}}))
+                })
+            });
+        let failure = result.expect("test fixture operation should succeed");
+        assert_eq!(failure["isError"], true, "{failure}");
+        assert!(!changed);
+        assert!(
+            failure.to_string().contains("outcome may be unknown"),
+            "{failure}"
+        );
+        assert_ne!(git_test(&["rev-parse", "HEAD"]), before["head"]);
+        let status = session.status();
+        assert_eq!(status["head"], before["head"]);
+        assert_eq!(status["available"], true);
+        assert_eq!(status["writes_available"], false);
+        assert_eq!(status["recovery_required"], true);
+        assert_eq!(status["model_revision"], before["model_revision"]);
+        assert_eq!(status["pending_changes"], before["pending_changes"]);
+        assert!(Arc::ptr_eq(&accepted, &session.model()));
+        assert_eq!(
+            std::fs::read(".git/index").expect("read test fixture"),
+            index_before
+        );
+        assert!(!std::path::Path::new(".git/index.lock").exists());
+        assert_eq!(
+            std::fs::read_to_string("Model.md").expect("read test fixture"),
+            changed_source
+        );
+        let snapshot = session
+            .capture_read("reqvire.read_element")
+            .expect("test fixture operation should succeed");
+        let captured = snapshot
+            .execute(|| {
+                Ok(json!(reqvire::mutation_io::read_to_string("Model.md")
+                    .expect("test fixture operation should succeed")))
+            })
+            .expect("test fixture operation should succeed");
+        assert_eq!(captured, MODEL);
+        assert!(session
+            .explicit_commit("must not retry")
+            .expect_err("test fixture operation should fail")
+            .to_string()
+            .contains("recovery"));
+        assert_eq!(
+            std::fs::read_to_string("ref-effects").expect("read test fixture"),
+            "one\n"
+        );
+        let published_head = git_test(&["rev-parse", "HEAD"]);
+        assert!(failure
+            .to_string()
+            .contains(&format!("attempted commit {published_head}")));
+        assert!(failure.to_string().contains(&format!(
+            "accepted HEAD {}",
+            before["head"]
+                .as_str()
+                .expect("expected a string in the test response")
+        )));
+        assert_eq!(git_test(&["rev-parse", "HEAD^"]), before["head"]);
+        assert_eq!(
+            crate::mcp_session::git(
+                std::path::Path::new("."),
+                &["show", "HEAD:Model.md"],
+                None,
+                None
+            )
+            .expect("fixture Git command should succeed"),
+            changed_source.as_bytes()
+        );
+        drop(session);
+        drop(server);
+        reconcile_published_fixture_commit(&published_head, &["Model.md"]);
+        let (reopened, _, _) = server_with_commits(false, true);
+        let repaired = reopened
+            .session
+            .as_ref()
+            .expect("test fixture operation should succeed")
+            .lock()
+            .expect("test lock should not be poisoned");
+        assert_eq!(repaired.status()["head"], published_head);
+        assert_eq!(repaired.status()["recovery_required"], false);
+        assert_eq!(repaired.status()["writes_available"], true);
+        let read = repaired
+            .capture_read("reqvire.read_element")
+            .expect("test fixture operation should succeed");
+        drop(repaired);
+        assert_eq!(
+            read.execute(|| Ok(json!(reqvire::mutation_io::read_to_string("Model.md")
+                .expect("test fixture operation should succeed"))))
+                .expect("test fixture operation should succeed"),
+            changed_source
+        );
+    }
+);
+
+#[cfg(unix)]
+fn reconcile_unknown_commit(commits: bool, blocked: bool) {
+    use crate::mcp_session::{git, with_git_timeout};
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::path::Path::new(".");
+    std::fs::write("obsolete.bin", [1, 2]).expect("write deleted fixture asset");
+    std::fs::write("unrelated.bin", [3, 4]).expect("write unrelated fixture asset");
+    // Git tracks the owner-execute bit. Preserve other native execute bits
+    // without interpreting them as a different committed executable mode.
+    std::fs::set_permissions("unrelated.bin", std::fs::Permissions::from_mode(0o654))
+        .expect("group-executable fixture permissions");
+    git_test(&["add", "obsolete.bin", "unrelated.bin"]);
+    git_test(&["commit", "-qm", "asset baseline"]);
+    let (server, _, _) = server_with_commits(false, commits);
+    let mut session = server
+        .session
+        .as_ref()
+        .expect("owned session")
+        .lock()
+        .expect("session lock");
+    let captured = session
+        .capture_read("reqvire.read_element")
+        .expect("capture baseline read");
+    let initial = session.status();
+    // Stage unrelated bytes without changing accepted physical content. This
+    // pre-existing index entry must survive reconciliation exactly.
+    let unrelated_oid = String::from_utf8(
+        git(
+            root,
+            &["hash-object", "-w", "--stdin"],
+            Some(b"staged only"),
+            None,
+        )
+        .expect("hash staged fixture"),
+    )
+    .expect("Git object ID");
+    git_test(&[
+        "update-index",
+        "--cacheinfo",
+        &format!("100644,{},unrelated.bin", unrelated_oid.trim()),
+    ]);
+    let unrelated = git_test(&["ls-files", "--stage", "unrelated.bin"]);
+    let index_before = std::fs::read(".git/index").expect("index before publication");
+    let changed_source = MODEL.replace("Cache Subject", "Recovered Subject");
+    let asset = "odd\n[asset]*.bin";
+    let publish = |session: &mut crate::mcp_session::MutationSession| {
+        session.execute(true, "reqvire.add_element", || {
+            reqvire::mutation_io::write("Model.md", &changed_source)
+                .expect("prepare candidate source");
+            reqvire::mutation_io::write(asset, [0, 255, 128]).expect("prepare binary asset");
+            reqvire::mutation_io::remove_file("obsolete.bin").expect("prepare asset deletion");
+            Ok(json!({"structuredContent":{}}))
+        })
+    };
+    if !commits {
+        let (result, changed) = publish(&mut session);
+        assert_ne!(result.expect("accepted mutation")["isError"], true);
+        assert!(changed);
+    }
+    let before = session.status();
+    let accepted = session.model();
+    std::fs::write(".git/hooks/reference-transaction", "#!/usr/bin/env python3\nimport sys,time\nfrom pathlib import Path\nif sys.argv[1]=='committed':\n    with Path('.git/ref-effects').open('a') as f: f.write('one\\n')\n    time.sleep(1)\n").expect("install post-publication stall");
+    std::fs::set_permissions(
+        ".git/hooks/reference-transaction",
+        std::fs::Permissions::from_mode(0o755),
+    )
+    .expect("executable hook");
+    if blocked {
+        // An unrelated file prevents automatic adoption. Resolve this evidence
+        // afterward to exercise the explicit recovery tool's verification.
+        std::fs::write("reconciliation-blocker", "external work")
+            .expect("block automatic reconciliation");
+    }
+    with_git_timeout(Duration::from_millis(250), || {
+        if commits {
+            let (result, changed) = publish(&mut session);
+            let result = result.expect("tool result");
+            assert_eq!(result["isError"] == true, blocked);
+            assert_eq!(changed, !blocked);
+            if !blocked {
+                assert_eq!(result["structuredContent"]["reconciled"], true);
+            }
+        } else {
+            let result = session.explicit_commit("recorded attempt");
+            if blocked {
+                result.expect_err("external files prevent automatic reconciliation");
+            } else {
+                assert_eq!(
+                    result.expect("automatically resolved commit")["reconciled"],
+                    true
+                );
+            }
+        }
+    });
+    let commit = git_test(&["rev-parse", "HEAD"]);
+    if blocked {
+        std::fs::remove_file("reconciliation-blocker").expect("resolve external evidence");
+        let status = session.status();
+        assert_eq!(status["recovery_attempt"]["attempted_commit"], commit);
+        assert_eq!(status["head"], before["head"]);
+        assert!(Arc::ptr_eq(&accepted, &session.model()));
+        assert_eq!(
+            std::fs::read(".git/index").expect("unchanged index"),
+            index_before
+        );
+        assert!(session
+            .reconcile_commit(&format!("{commit}^"), false)
+            .is_err());
+        // External edits of affected and unrelated entries must never be erased.
+        std::fs::write("Model.md", b"external edit").expect("inject physical mismatch");
+        assert!(session.reconcile_commit(&commit, false).is_err());
+        assert_eq!(
+            std::fs::read("Model.md").expect("external edit retained"),
+            b"external edit"
+        );
+        std::fs::write("Model.md", &changed_source).expect("restore intended candidate");
+        let external_oid = git_test(&["hash-object", "-w", "Model.md"]);
+        git_test(&[
+            "update-index",
+            "--cacheinfo",
+            &format!("100644,{external_oid},unrelated.bin"),
+        ]);
+        let externally_staged = std::fs::read(".git/index").expect("external index state");
+        assert!(session.reconcile_commit(&commit, false).is_err());
+        assert_eq!(
+            std::fs::read(".git/index").expect("external staging retained"),
+            externally_staged
+        );
+        std::fs::write(".git/index", &index_before).expect("restore recorded index fixture");
+        git_test(&[
+            "update-index",
+            "--add",
+            "--cacheinfo",
+            &format!("100644,{external_oid},{asset}"),
+        ]);
+        let affected_edit = std::fs::read(".git/index").expect("affected external index state");
+        assert!(session.reconcile_commit(&commit, false).is_err());
+        assert_eq!(
+            std::fs::read(".git/index").expect("affected staging retained"),
+            affected_edit
+        );
+        std::fs::write(".git/index", &index_before).expect("restore recorded index fixture");
+        // A moved checkout, new untracked source, symlink, or changed executable
+        // mode is an operator decision, not permission to adopt physical files.
+        let head_file = std::fs::read(".git/HEAD").expect("record symbolic HEAD");
+        std::fs::write(".git/HEAD", "ref: refs/heads/other\n").expect("inject checkout mismatch");
+        assert!(session.reconcile_commit(&commit, false).is_err());
+        std::fs::write(".git/HEAD", head_file).expect("restore owned checkout fixture");
+        let branch_path = std::path::Path::new(".git").join(git_test(&["symbolic-ref", "HEAD"]));
+        std::fs::write(
+            &branch_path,
+            format!("{}\n", before["head"].as_str().expect("accepted HEAD")),
+        )
+        .expect("inject moved branch tip");
+        assert!(session.reconcile_commit(&commit, false).is_err());
+        std::fs::write(&branch_path, format!("{commit}\n")).expect("restore recorded tip fixture");
+        std::fs::write(".git/MERGE_HEAD", format!("{commit}\n")).expect("inject merge state");
+        assert!(session.reconcile_commit(&commit, false).is_err());
+        std::fs::remove_file(".git/MERGE_HEAD").expect("resolve merge fixture");
+        std::fs::write("unexpected.md", "invalid model").expect("inject untracked source");
+        assert!(session.reconcile_commit(&commit, false).is_err());
+        std::fs::remove_file("unexpected.md").expect("resolve untracked fixture");
+        std::fs::set_permissions(asset, std::fs::Permissions::from_mode(0o755))
+            .expect("inject mode mismatch");
+        assert!(session.reconcile_commit(&commit, false).is_err());
+        std::fs::set_permissions(asset, std::fs::Permissions::from_mode(0o644))
+            .expect("restore candidate mode");
+        std::fs::remove_file(asset).expect("replace candidate with symlink");
+        std::os::unix::fs::symlink("unrelated.bin", asset).expect("inject symlink mismatch");
+        assert!(session.reconcile_commit(&commit, false).is_err());
+        std::fs::remove_file(asset).expect("resolve symlink fixture");
+        std::fs::write(asset, [0, 255, 128]).expect("restore candidate asset");
+        std::fs::write(".git/index.lock", b"other writer").expect("simulate occupied index");
+        assert!(session.reconcile_commit(&commit, false).is_err());
+        assert_eq!(
+            std::fs::read(".git/index.lock").expect("external lock retained"),
+            b"other writer"
+        );
+        std::fs::remove_file(".git/index.lock").expect("release fixture lock");
+        let ready = session
+            .reconcile_commit(&commit, true)
+            .expect("verified preview");
+        assert_eq!(ready["outcome"], "ready");
+        assert_eq!(
+            std::fs::read(".git/index").expect("preview index unchanged"),
+            index_before
+        );
+        assert_eq!(session.status()["writes_available"], false);
+        assert_eq!(session.status()["head"], before["head"]);
+        let result = session
+            .reconcile_commit(&commit, false)
+            .expect("apply verified attempt");
+        assert_eq!(result["outcome"], "completed");
+    } else if !commits {
+        assert!(Arc::ptr_eq(&accepted, &session.model()));
+        assert_eq!(session.status()["model_revision"], before["model_revision"]);
+    }
+    assert_eq!(session.status()["head"], commit);
+    assert_eq!(session.status()["writes_available"], true);
+    assert_eq!(session.status()["recovery_required"], false);
+    assert_eq!(session.status()["pending_changes"], json!([]));
+    assert_eq!(
+        git_test(&["ls-files", "--stage", "unrelated.bin"]),
+        unrelated
+    );
+    assert_eq!(
+        std::fs::metadata("unrelated.bin")
+            .expect("preserved native permissions")
+            .permissions()
+            .mode()
+            & 0o777,
+        0o654
+    );
+    assert_eq!(
+        git_test(&["diff", "--name-only", "--cached"]),
+        "unrelated.bin"
+    );
+    assert_eq!(git_test(&["rev-parse", "HEAD^"]), initial["head"]);
+    assert_eq!(
+        std::fs::read_to_string(".git/ref-effects").expect("hook effect count"),
+        "one\n"
+    );
+    assert!(!std::path::Path::new(".git/index.lock").exists());
+    assert!(!std::path::Path::new("obsolete.bin").exists());
+    assert!(
+        session.reconcile_commit(&commit, false).is_err(),
+        "no repeated reconciliation"
+    );
+    let read = session
+        .capture_read("reqvire.read_element")
+        .expect("capture reconciled read");
+    drop(session);
+    assert_eq!(
+        captured
+            .execute(|| Ok(json!(
+                reqvire::mutation_io::read_to_string("Model.md").expect("old captured source")
+            )))
+            .expect("old read result"),
+        json!(MODEL)
+    );
+    assert_eq!(
+        read.execute(|| Ok(json!(
+            reqvire::mutation_io::read_to_string("Model.md").expect("new captured source")
+        )))
+        .expect("new read result"),
+        json!(changed_source)
+    );
+    assert_eq!(
+        read.execute(|| Ok(json!(
+            reqvire::mutation_io::read(asset).expect("captured binary asset")
+        )))
+        .expect("binary read result"),
+        json!([0, 255, 128])
+    );
+}
+
+#[cfg(unix)]
+case!(automatic_commit_reconciliation_is_verified_and_selective, {
+    reconcile_unknown_commit(true, true);
+});
+#[cfg(unix)]
+case!(explicit_commit_reconciliation_is_verified_and_selective, {
+    reconcile_unknown_commit(false, true);
+});
+
+#[cfg(unix)]
+case!(automatic_commit_timeout_reconciles_selective_index, {
+    reconcile_unknown_commit(true, false);
+});
+#[cfg(unix)]
+case!(explicit_commit_timeout_reconciles_selective_index, {
+    reconcile_unknown_commit(false, false);
+});
+
+#[cfg(unix)]
+case!(
+    automatic_commit_timeout_before_ref_publication_rolls_back,
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let (server, _, _) = server_with_commits(false, true);
+        let mut session = server
+            .session
+            .as_ref()
+            .expect("owned session")
+            .lock()
+            .expect("session lock");
+        let before = session.status();
+        let accepted = session.model();
+        let index = std::fs::read(".git/index").expect("record index");
+        std::fs::write(".git/hooks/reference-transaction", "#!/usr/bin/env python3\nimport sys,time\nfrom pathlib import Path\nif sys.argv[1]=='prepared':\n    with Path('.git/ref-effects').open('a') as f: f.write('one\\n')\n    time.sleep(1)\n").expect("install pre-publication stall");
+        std::fs::set_permissions(
+            ".git/hooks/reference-transaction",
+            std::fs::Permissions::from_mode(0o755),
+        )
+        .expect("hook executable");
+        let (result, changed) =
+            crate::mcp_session::with_git_timeout(Duration::from_millis(250), || {
+                session.execute(true, "reqvire.add_element", || {
+                    reqvire::mutation_io::write(
+                        "Model.md",
+                        MODEL.replace("Cache Subject", "Unpublished Subject"),
+                    )
+                    .expect("prepare candidate");
+                    Ok(json!({"structuredContent":{}}))
+                })
+            });
+        assert_eq!(result.expect("confirmed failure envelope")["isError"], true);
+        assert!(!changed);
+        let status = session.status();
+        assert_eq!(status["recovery_attempt"], Value::Null);
+        assert_eq!(status["recovery_required"], false);
+        assert_eq!(status["writes_available"], true);
+        assert_eq!(status["head"], before["head"]);
+        assert_eq!(git_test(&["rev-parse", "HEAD"]), before["head"]);
+        assert_eq!(std::fs::read(".git/index").expect("retained index"), index);
+        assert_eq!(status["model_revision"], before["model_revision"]);
+        assert_eq!(status["pending_changes"], before["pending_changes"]);
+        assert!(Arc::ptr_eq(&accepted, &session.model()));
+        assert_eq!(
+            session
+                .explicit_commit("nothing to commit")
+                .expect("writable session")["outcome"],
+            "no_op"
+        );
+        assert_eq!(
+            std::fs::read_to_string("Model.md").expect("restored source"),
+            MODEL
+        );
+        assert_eq!(
+            std::fs::read_to_string(".git/ref-effects").expect("single hook effect"),
+            "one\n"
+        );
+        assert!(!std::path::Path::new(".git/index.lock").exists());
+        drop(session);
+    }
+);
+
+#[cfg(unix)]
+case!(
+    explicit_commit_timeout_before_ref_publication_keeps_pending_edits,
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let (server, _, _) = server_with_commits(false, false);
+        let mut session = server
+            .session
+            .as_ref()
+            .expect("owned session")
+            .lock()
+            .expect("session lock");
+        let source = MODEL.replace("Cache Subject", "Pending Subject");
+        let (result, changed) = session.execute(true, "reqvire.add_element", || {
+            reqvire::mutation_io::write("Model.md", &source).expect("prepare pending source");
+            Ok(json!({"structuredContent":{}}))
+        });
+        assert_ne!(result.expect("accepted mutation")["isError"], true);
+        assert!(changed);
+        let before = session.status();
+        let accepted = session.model();
+        let index = std::fs::read(".git/index").expect("record index");
+        std::fs::write(".git/hooks/reference-transaction", "#!/usr/bin/env python3\nimport sys,time\nfrom pathlib import Path\nif sys.argv[1]=='prepared':\n    with Path('.git/ref-effects').open('a') as f: f.write('one\\n')\n    time.sleep(1)\n").expect("install pre-publication stall");
+        std::fs::set_permissions(
+            ".git/hooks/reference-transaction",
+            std::fs::Permissions::from_mode(0o755),
+        )
+        .expect("hook executable");
+        let failure = crate::mcp_session::with_git_timeout(Duration::from_millis(250), || {
+            session.explicit_commit("unpublished attempt")
+        })
+        .expect_err("commit not published");
+        assert!(failure.to_string().contains("not published"), "{failure}");
+        let status = session.status();
+        assert_eq!(status["recovery_attempt"], Value::Null);
+        assert_eq!(status["recovery_required"], false);
+        assert_eq!(status["writes_available"], true);
+        assert_eq!(status["head"], before["head"]);
+        assert_eq!(status["model_revision"], before["model_revision"]);
+        assert_eq!(status["pending_changes"], before["pending_changes"]);
+        assert_eq!(git_test(&["rev-parse", "HEAD"]), before["head"]);
+        assert_eq!(std::fs::read(".git/index").expect("retained index"), index);
+        assert_eq!(
+            std::fs::read_to_string("Model.md").expect("pending source"),
+            source
+        );
+        assert!(Arc::ptr_eq(&accepted, &session.model()));
+        drop(session);
+        assert_eq!(
+            std::fs::read_to_string(".git/ref-effects").expect("single hook effect"),
+            "one\n"
+        );
+        assert!(!std::path::Path::new(".git/index.lock").exists());
+    }
+);
 
 case!(rejected_core_mutation_does_not_invoke_refresh_hook, {
     let (server, calls, diagnostic) = server(false);
@@ -501,11 +1160,13 @@ case!(read_during_write_gate_cannot_publish_partial_persistence, {
 case!(mutation_startup_rejects_dirty_worktree_before_listening, {
     std::fs::write("Model.md", format!("{MODEL}\n")).expect("ownership test assertion");
     let error = serve_http(
-        true,
-        false,
-        false,
-        "origin",
-        false,
+        McpOptions {
+            enable_mutations: true,
+            enable_commits: false,
+            enable_github: false,
+            github_remote: "origin",
+            with_size_estimates: false,
+        },
         &reqvire::exclusions::ExclusionSetBuilder::new()
             .build()
             .expect("ownership test assertion"),
@@ -1467,23 +2128,40 @@ async fn recovery_snapshot_reads(commits: bool) {
     // Exercise the RMCP conversion and actual HTTP response serialization, not
     // just call_handler: ReadResourceResult can discard extension metadata.
     {
-        use axum::{body::{to_bytes, Body}, http::Request};
+        use axum::{
+            body::{to_bytes, Body},
+            http::Request,
+        };
         use tower::ServiceExt;
-        let app = mount_server(axum::Router::new(), server.clone(), &HttpAccess::new(&[], &[]));
-        let request = Request::builder().method("POST").uri("/mcp")
+        let app = mount_server(
+            axum::Router::new(),
+            server.clone(),
+            &HttpAccess::new(&[], &[]),
+        );
+        let request = Request::builder()
+            .method("POST")
+            .uri("/mcp")
             .header("host", "127.0.0.1:8081")
             .header("content-type", "application/json")
             .header("accept", "application/json, text/event-stream")
             .header("mcp-protocol-version", "2025-11-25")
-            .body(Body::from(json!({"jsonrpc":"2.0", "id":42,
-                "method":"resources/read", "params":{"uri":"reqvire://workspace/status"}}).to_string()))
+            .body(Body::from(
+                json!({"jsonrpc":"2.0", "id":42,
+                "method":"resources/read", "params":{"uri":"reqvire://workspace/status"}})
+                .to_string(),
+            ))
             .expect("HTTP request");
         let response = app.oneshot(request).await.expect("HTTP router");
         assert_eq!(response.status(), axum::http::StatusCode::OK);
-        let bytes = to_bytes(response.into_body(), usize::MAX).await.expect("HTTP body");
+        let bytes = to_bytes(response.into_body(), usize::MAX)
+            .await
+            .expect("HTTP body");
         let wire: Value = serde_json::from_slice(&bytes).expect("JSON-RPC response");
         assert_eq!(wire["result"]["contents"], resource["contents"]);
-        assert_eq!(wire["result"]["_meta"], resource["_meta"], "metadata lost on HTTP wire: {wire}");
+        assert_eq!(
+            wire["result"]["_meta"], resource["_meta"],
+            "metadata lost on HTTP wire: {wire}"
+        );
     }
     for params in [
         add(OTHER, false),
@@ -1553,11 +2231,11 @@ fn read_only_server() -> ReqvireMcpServer {
         false,
         &reqvire::exclusions::ExclusionSetBuilder::new()
             .build()
-            .unwrap(),
+            .expect("test fixture operation should succeed"),
         Arc::new(RwLock::new(())),
         None,
     )
-    .unwrap();
+    .expect("test fixture operation should succeed");
     // Deterministic five-client tests also run on single-CPU CI hosts.
     server.read_capacity = Arc::new(Semaphore::new(5));
     server
@@ -1581,13 +2259,16 @@ async fn http_rpc(app: axum::Router, id: usize, method: &str, params: Value) -> 
                 .body(Body::from(
                     json!({"jsonrpc":"2.0","id":id,"method":method,"params":params}).to_string(),
                 ))
-                .unwrap(),
+                .expect("build test HTTP request"),
         )
         .await
         .unwrap();
     assert_eq!(response.status(), axum::http::StatusCode::OK);
-    let bytes = to_bytes(response.into_body(), usize::MAX).await.unwrap();
-    let wire: Value = serde_json::from_slice(&bytes).unwrap();
+    let bytes = to_bytes(response.into_body(), usize::MAX)
+        .await
+        .expect("test fixture operation should succeed");
+    let wire: Value =
+        serde_json::from_slice(&bytes).expect("test fixture operation should succeed");
     assert_eq!(wire["id"], id, "response correlation: {wire}");
     wire
 }
@@ -1601,17 +2282,21 @@ case!(
         let (entered_tx, entered_rx) = mpsc::channel();
         let (ping_tx, ping_rx) = mpsc::channel();
         let started = Arc::new(tokio::sync::Notify::new());
-        let hook_barrier = barrier.clone();
-        let hook_started = started.clone();
+        let hook_barrier = Arc::clone(&barrier);
+        let hook_started = Arc::clone(&started);
         server.before_dispatch = Some(Arc::new(move |_, _| {
-            entered_tx.send(std::thread::current().id()).unwrap();
+            entered_tx
+                .send(std::thread::current().id())
+                .expect("send test worker message");
             hook_started.notify_one();
             let (lock, ready) = &*hook_barrier;
             let (released, timeout) = ready
-                .wait_timeout_while(lock.lock().unwrap(), Duration::from_secs(5), |released| {
-                    !*released
-                })
-                .unwrap();
+                .wait_timeout_while(
+                    lock.lock().expect("test lock should not be poisoned"),
+                    Duration::from_secs(5),
+                    |released| !*released,
+                )
+                .expect("test lock should not be poisoned");
             assert!(
                 *released && !timeout.timed_out(),
                 "dispatch barrier did not release"
@@ -1631,7 +2316,7 @@ case!(
             }
             let live = ping_rx.recv_timeout(Duration::from_millis(500)).is_ok();
             let (lock, ready) = &*barrier;
-            *lock.lock().unwrap() = true;
+            *lock.lock().expect("test lock should not be poisoned") = true;
             ready.notify_all();
             // Keep the receiver alive until every handler has left its hook.
             (threads.len(), live, entered_rx)
@@ -1657,14 +2342,14 @@ case!(
             let _ = ping_tx.send(());
         });
         while let Some(result) = clients.join_next().await {
-            let wire = result.unwrap();
+            let wire = result.expect("test fixture operation should succeed");
             assert_ne!(wire["result"]["isError"], true, "{wire}");
             assert!(wire["result"]["structuredContent"]
                 .to_string()
                 .contains("Cache Subject"));
         }
-        ping.await.unwrap();
-        let (overlap, live, _receiver) = coordinator.join().unwrap();
+        ping.await.expect("test fixture operation should succeed");
+        let (overlap, live, _receiver) = coordinator.join().expect("test worker should complete");
         assert_eq!(
             overlap, 5,
             "five reads must enter dispatch before any is released"
@@ -1686,7 +2371,7 @@ async fn read_wave(app: axum::Router, method: &str, params: Value) -> Vec<Value>
     }
     let mut values = Vec::new();
     while let Some(value) = clients.join_next().await {
-        values.push(value.unwrap()["result"].clone());
+        values.push(value.expect("test fixture operation should succeed")["result"].clone());
     }
     values
 }
@@ -1737,25 +2422,25 @@ case!(read_only_parallel_payloads_and_source_refresh, {
         .iter()
         .all(|v| *v == oracle));
 
-    std::fs::write("Model.md", MODEL.replace("alpha", "omega")).unwrap();
+    std::fs::write("Model.md", MODEL.replace("alpha", "omega")).expect("write test fixture");
     let params = json!({"name":"reqvire.read_element","arguments":{"name":"Cache Subject"}});
     let fresh = read_wave(app.clone(), "tools/call", params.clone()).await;
     assert!(fresh.iter().all(|v| v["structuredContent"]["content"]
         .as_str()
-        .unwrap()
+        .expect("expected a string in the test response")
         .contains("omega")));
     std::fs::write(
         "Model.md",
         format!("{MODEL}\n### Invalid\n\n#### Metadata\n  * type: unsupported-type\n"),
     )
-    .unwrap();
+    .expect("write test fixture");
     let failed = read_wave(app.clone(), "tools/call", params.clone()).await;
     assert!(failed.iter().all(|v| v["isError"] == true), "{failed:?}");
-    std::fs::write("Model.md", MODEL).unwrap();
+    std::fs::write("Model.md", MODEL).expect("write test fixture");
     let recovered = read_wave(app, "tools/call", params).await;
     assert!(recovered.iter().all(|v| v["structuredContent"]["content"]
         .as_str()
-        .unwrap()
+        .expect("expected a string in the test response")
         .contains("alpha")));
 });
 
@@ -1765,15 +2450,17 @@ case!(read_only_capacity_cancellation_and_writer_priority, {
     server.read_capacity = Arc::new(Semaphore::new(2));
     let barrier = Arc::new((StdMutex::new(false), Condvar::new()));
     let (entered_tx, mut entered_rx) = tokio::sync::mpsc::unbounded_channel();
-    let hook_barrier = barrier.clone();
+    let hook_barrier = Arc::clone(&barrier);
     server.before_dispatch = Some(Arc::new(move |_, _| {
         let _ = entered_tx.send(());
         let (lock, ready) = &*hook_barrier;
         let (released, _) = ready
-            .wait_timeout_while(lock.lock().unwrap(), Duration::from_secs(5), |released| {
-                !*released
-            })
-            .unwrap();
+            .wait_timeout_while(
+                lock.lock().expect("test lock should not be poisoned"),
+                Duration::from_secs(5),
+                |released| !*released,
+            )
+            .expect("test lock should not be poisoned");
         assert!(*released, "test must release dispatch barrier");
     }));
     let request = json!({"name":"reqvire.search","arguments":{}});
@@ -1788,8 +2475,8 @@ case!(read_only_capacity_cancellation_and_writer_priority, {
     for _ in 0..2 {
         tokio::time::timeout(Duration::from_secs(2), entered_rx.recv())
             .await
-            .unwrap()
-            .unwrap();
+            .expect("receive test worker response")
+            .expect("receive test worker response");
     }
     let app = mount_server(
         axum::Router::new(),
@@ -1800,15 +2487,20 @@ case!(read_only_capacity_cancellation_and_writer_priority, {
     assert_eq!(rejected["error"]["code"], -32000, "{rejected}");
     assert_eq!(rejected["error"]["data"]["retryable"], true);
     assert!(entered_rx.try_recv().is_err(), "overload reached dispatch");
-    let cancelled = readers.pop().unwrap();
+    let cancelled = readers
+        .pop()
+        .expect("test fixture operation should succeed");
     cancelled.abort();
-    assert!(cancelled.await.unwrap_err().is_cancelled());
+    assert!(cancelled
+        .await
+        .expect_err("test fixture operation should fail")
+        .is_cancelled());
     assert_eq!(
         server.read_capacity.available_permits(),
         0,
         "running cancellation released capacity early"
     );
-    let mut writer = Box::pin(server.write_lock.clone().write_owned());
+    let mut writer = Box::pin(Arc::clone(&server.write_lock).write_owned());
     assert!(
         writer
             .as_mut()
@@ -1818,11 +2510,16 @@ case!(read_only_capacity_cancellation_and_writer_priority, {
     );
     {
         let (lock, ready) = &*barrier;
-        *lock.lock().unwrap() = true;
+        *lock.lock().expect("test lock should not be poisoned") = true;
         ready.notify_all();
     }
     assert_ne!(
-        readers.pop().unwrap().await.unwrap().unwrap()["isError"],
+        readers
+            .pop()
+            .expect("test fixture operation should succeed")
+            .await
+            .expect("test fixture operation should succeed")
+            .expect("test fixture operation should succeed")["isError"],
         true
     );
     tokio::time::timeout(Duration::from_secs(2), async {
@@ -1831,7 +2528,7 @@ case!(read_only_capacity_cancellation_and_writer_priority, {
         }
     })
     .await
-    .unwrap();
+    .expect("test fixture operation should succeed");
     let mut late_read = Box::pin(server.call_handler("tools/call", request.clone(), false));
     assert!(
         late_read
@@ -1852,16 +2549,17 @@ case!(read_only_capacity_cancellation_and_writer_priority, {
         entered_rx.try_recv().is_err(),
         "read dispatched through exclusive gate"
     );
-    std::fs::write("Model.md", "partially persisted invalid model").unwrap();
+    std::fs::write("Model.md", "partially persisted invalid model").expect("write test fixture");
     let mut after = Box::pin(server.call_handler("tools/call", request, false));
     assert!(after
         .as_mut()
         .poll(&mut Context::from_waker(Waker::noop()))
         .is_pending());
-    std::fs::write("Model.md", MODEL.replace("Cache Subject", "Final Subject")).unwrap();
+    std::fs::write("Model.md", MODEL.replace("Cache Subject", "Final Subject"))
+        .expect("write test fixture");
     reqvire::model_cache::invalidate();
     drop(gate);
-    let result = after.await.unwrap();
+    let result = after.await.expect("test fixture operation should succeed");
     assert_ne!(result["isError"], true, "{result}");
     assert!(result.to_string().contains("Final Subject"));
     assert_eq!(server.read_capacity.available_permits(), 2);
@@ -1873,10 +2571,13 @@ case!(read_only_failure_and_panic_release_dispatch_guards, {
     let denied = server
         .call_handler("tools/call", add(OTHER, false), true)
         .await
-        .unwrap_err();
+        .expect_err("test fixture operation should fail");
     assert_eq!(denied.code, ErrorCode(-32602));
     assert_eq!(server.read_capacity.available_permits(), 1);
-    assert_eq!(std::fs::read_to_string("Model.md").unwrap(), MODEL);
+    assert_eq!(
+        std::fs::read_to_string("Model.md").expect("read test fixture"),
+        MODEL
+    );
     let missing = server
         .call_handler(
             "tools/call",
@@ -1884,7 +2585,7 @@ case!(read_only_failure_and_panic_release_dispatch_guards, {
             false,
         )
         .await
-        .unwrap();
+        .expect("test fixture operation should succeed");
     assert_eq!(missing["isError"], true);
     assert_eq!(server.read_capacity.available_permits(), 1);
     assert!(server
@@ -1896,7 +2597,7 @@ case!(read_only_failure_and_panic_release_dispatch_guards, {
     let failure = server
         .call_handler("tools/list", json!({}), false)
         .await
-        .unwrap_err();
+        .expect_err("test fixture operation should fail");
     assert!(failure.message.contains("MCP read failed"), "{failure}");
     assert_eq!(server.read_capacity.available_permits(), 1);
     assert!(server.write_lock.try_write().is_ok());
@@ -1904,7 +2605,7 @@ case!(read_only_failure_and_panic_release_dispatch_guards, {
     let result = server
         .call_handler("tools/list", json!({}), false)
         .await
-        .unwrap();
+        .expect("test fixture operation should succeed");
     assert!(result["tools"].is_array());
 });
 
@@ -1913,15 +2614,15 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         .map(std::path::PathBuf::from)
         .unwrap_or_else(|| {
             std::env::current_exe()
-                .unwrap()
+                .expect("test fixture operation should succeed")
                 .parent()
-                .unwrap()
+                .expect("fixture path has a parent")
                 .parent()
-                .unwrap()
+                .expect("fixture path has a parent")
                 .join(format!("reqvire{}", std::env::consts::EXE_SUFFIX))
         });
     let worktrees = crate::mcp_worktrees::Worktrees::start(
-        &std::env::current_dir().unwrap(),
+        &std::env::current_dir().expect("test fixture operation should succeed"),
         &executable,
         commits,
         false,
@@ -1929,11 +2630,14 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         false,
         "origin",
     )
-    .unwrap();
-    let original = worktrees.browser_context(None).unwrap().metadata();
+    .expect("test fixture operation should succeed");
+    let original = worktrees
+        .browser_context(None)
+        .expect("test fixture operation should succeed")
+        .metadata();
     let exclusions = reqvire::exclusions::ExclusionSetBuilder::new()
         .build()
-        .unwrap();
+        .expect("test fixture operation should succeed");
     // This is the same HTTP mount used by standalone MCP and embedded Serve.
     let app = mount_worktrees(
         axum::Router::new(),
@@ -1941,7 +2645,7 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         &exclusions,
         &HttpAccess::new(&[], &[]),
     )
-    .unwrap();
+    .expect("test fixture operation should succeed");
     let single = http_rpc(
         app.clone(),
         1,
@@ -1957,15 +2661,19 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
     assert!(created.get("error").is_none(), "{created}");
     assert_ne!(created["result"]["isError"], true, "{created}");
     let child = created["result"]["structuredContent"].clone();
-    let root = std::env::current_dir().unwrap();
-    let child_root = std::path::PathBuf::from(child["workspace_root"].as_str().unwrap());
+    let root = std::env::current_dir().expect("test fixture operation should succeed");
+    let child_root = std::path::PathBuf::from(
+        child["workspace_root"]
+            .as_str()
+            .expect("expected a string in the test response"),
+    );
     let git_state = |path: &std::path::Path| {
         [vec!["rev-parse", "HEAD"], vec!["status", "--porcelain=v1"]].map(|args| {
             let output = Command::new("git")
                 .current_dir(path)
                 .args(args)
                 .output()
-                .unwrap();
+                .expect("test fixture operation should succeed");
             assert!(output.status.success());
             output.stdout
         })
@@ -1982,7 +2690,7 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         assert!(
             result["structuredContent"]["error"]["message"]
                 .as_str()
-                .unwrap()
+                .expect("expected a string in the test response")
                 .contains(diagnostic),
             "{wire}"
         );
@@ -2013,8 +2721,8 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         for id in [&original["worktree_id"], &child["worktree_id"]] {
             assert!(omitted["result"]["structuredContent"]["error"]["message"]
                 .as_str()
-                .unwrap()
-                .contains(id.as_str().unwrap()));
+                .expect("expected a string in the test response")
+                .contains(id.as_str().expect("expected a string in the test response")));
         }
         let mut unknown_args = args.clone();
         unknown_args["worktree_id"] = json!("unknown-context");
@@ -2081,9 +2789,12 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         }
     }
     assert_eq!([git_state(&root), git_state(&child_root)], before);
-    assert_eq!(std::fs::read_to_string("Model.md").unwrap(), MODEL);
     assert_eq!(
-        std::fs::read_to_string(child_root.join("Model.md")).unwrap(),
+        std::fs::read_to_string("Model.md").expect("read test fixture"),
+        MODEL
+    );
+    assert_eq!(
+        std::fs::read_to_string(child_root.join("Model.md")).expect("read test fixture"),
         MODEL
     );
     let removed = http_rpc(
@@ -2104,7 +2815,9 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
     assert_tool_error(
         &stale,
         "reqvire.search",
-        child["worktree_id"].as_str().unwrap(),
+        child["worktree_id"]
+            .as_str()
+            .expect("expected a string in the test response"),
     );
     let remaining = http_rpc(
         app,
@@ -2129,13 +2842,13 @@ case!(owned_http_selector_errors_with_commits, {
 #[cfg(unix)]
 async fn owned_http_reads_overlap_writes(commits: bool) {
     use std::os::unix::fs::PermissionsExt;
-    let barrier = tempfile::tempdir().unwrap();
+    let barrier = tempfile::tempdir().expect("test fixture operation should succeed");
     let real_git = Command::new("sh")
         .args(["-c", "command -v git"])
         .output()
-        .unwrap();
+        .expect("test fixture operation should succeed");
     let real_git = String::from_utf8(real_git.stdout)
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .trim()
         .to_owned();
     let shim = barrier.path().join("git");
@@ -2158,30 +2871,31 @@ os.execv({git},[{git},*sys.argv[1:]])
             git = json!(real_git)
         ),
     )
-    .unwrap();
-    std::fs::set_permissions(&shim, std::fs::Permissions::from_mode(0o755)).unwrap();
+    .expect("write test fixture");
+    std::fs::set_permissions(&shim, std::fs::Permissions::from_mode(0o755))
+        .expect("test fixture operation should succeed");
     // Each case runs in its own process, so this cannot change another test's PATH.
     std::env::set_var(
         "PATH",
         format!(
             "{}:{}",
             barrier.path().display(),
-            std::env::var("PATH").unwrap()
+            std::env::var("PATH").expect("test fixture operation should succeed")
         ),
     );
     let executable = std::env::var_os("REQVIRE_TEST_BIN")
         .map(std::path::PathBuf::from)
         .unwrap_or_else(|| {
             std::env::current_exe()
-                .unwrap()
+                .expect("test fixture operation should succeed")
                 .parent()
-                .unwrap()
+                .expect("fixture path has a parent")
                 .parent()
-                .unwrap()
+                .expect("fixture path has a parent")
                 .join("reqvire")
         });
     let worktrees = crate::mcp_worktrees::Worktrees::start(
-        &std::env::current_dir().unwrap(),
+        &std::env::current_dir().expect("test fixture operation should succeed"),
         &executable,
         commits,
         false,
@@ -2189,12 +2903,14 @@ os.execv({git},[{git},*sys.argv[1:]])
         false,
         "origin",
     )
-    .unwrap();
-    let original = worktrees.browser_context(None).unwrap();
+    .expect("test fixture operation should succeed");
+    let original = worktrees
+        .browser_context(None)
+        .expect("test fixture operation should succeed");
     let before = original.metadata();
     let mut server = read_only_server();
     server.enable_mutations = true;
-    server.worktrees = Some(worktrees.clone());
+    server.worktrees = Some(Arc::clone(&worktrees));
     server.read_capacity = Arc::new(Semaphore::new(1));
     server.control_capacity = Arc::new(Semaphore::new(1));
     let app = mount_server(
@@ -2205,9 +2921,10 @@ os.execv({git},[{git},*sys.argv[1:]])
     let arm = || {
         let _ = std::fs::remove_file(barrier.path().join("release"));
         let _ = std::fs::remove_file(barrier.path().join("entered"));
-        std::fs::write(barrier.path().join("armed"), "").unwrap();
+        std::fs::write(barrier.path().join("armed"), "").expect("write test fixture");
     };
-    let release = || std::fs::write(barrier.path().join("release"), "").unwrap();
+    let release =
+        || std::fs::write(barrier.path().join("release"), "").expect("write test fixture");
     async fn entered(base: &std::path::Path, stage: &str) {
         tokio::time::timeout(Duration::from_secs(3), async {
             while !base.join("entered").exists() {
@@ -2217,13 +2934,13 @@ os.execv({git},[{git},*sys.argv[1:]])
         .await
         .unwrap_or_else(|_| panic!("worker did not enter held read: {stage}"));
         // The held Git child still waits, but later publication may observe Git.
-        std::fs::remove_file(base.join("armed")).unwrap();
+        std::fs::remove_file(base.join("armed")).expect("remove test fixture");
     }
     async fn response(job: tokio::task::JoinHandle<Value>) -> Value {
         tokio::time::timeout(Duration::from_secs(3), job)
             .await
             .expect("worker response timed out")
-            .unwrap()
+            .expect("test fixture operation should succeed")
     }
     arm();
     let mut old = tokio::spawn(http_rpc(
@@ -2262,7 +2979,9 @@ os.execv({git},[{git},*sys.argv[1:]])
     );
     let accepted = original.metadata();
     assert_ne!(accepted["model_revision"], before["model_revision"]);
-    let runtime = original.runtime().unwrap();
+    let runtime = original
+        .runtime()
+        .expect("test fixture operation should succeed");
     release();
     let old = response(old).await;
     let metadata = &old["result"]["_meta"]["reqvire/context"];
@@ -2281,7 +3000,12 @@ os.execv({git},[{git},*sys.argv[1:]])
         original.metadata()["model_revision"],
         accepted["model_revision"]
     );
-    assert!(Arc::ptr_eq(&runtime, &original.runtime().unwrap()));
+    assert!(Arc::ptr_eq(
+        &runtime,
+        &original
+            .runtime()
+            .expect("test fixture operation should succeed")
+    ));
 
     // The asynchronous caller can disappear; the actual dispatched read still
     // owns admission until it finishes. Control operations retain their lane.
@@ -2316,7 +3040,7 @@ os.execv({git},[{git},*sys.argv[1:]])
         }
     })
     .await
-    .unwrap();
+    .expect("test fixture operation should succeed");
     assert_eq!(
         original.metadata()["model_revision"],
         accepted["model_revision"]
@@ -2336,7 +3060,9 @@ os.execv({git},[{git},*sys.argv[1:]])
     let id = branch["result"]["structuredContent"]["worktree_id"]
         .as_str()
         .expect("branch created");
-    let secondary = worktrees.browser_context(Some(id)).unwrap();
+    let secondary = worktrees
+        .browser_context(Some(id))
+        .expect("test fixture operation should succeed");
     arm();
     let pending = tokio::spawn(http_rpc(
         app.clone(),
@@ -2378,7 +3104,7 @@ os.execv({git},[{git},*sys.argv[1:]])
     assert!(Command::new("git")
         .args(["commit", "--allow-empty", "-qm", "External HEAD change"])
         .status()
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .success());
     let reopened = response(tokio::spawn(http_rpc(
         app.clone(),

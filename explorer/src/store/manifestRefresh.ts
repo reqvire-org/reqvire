@@ -34,16 +34,19 @@ function object(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function freezeJson(value: unknown): void {
+function freezeJson(value: unknown, deeplyFrozen: WeakSet<object>): void {
   const pending: unknown[] = [value];
-  const visited = new WeakSet<object>();
+  const visited = new Set<object>();
   while (pending.length) {
     const current = pending.pop();
-    if (typeof current !== "object" || current === null || visited.has(current)) continue;
+    if (typeof current !== "object" || current === null || deeplyFrozen.has(current) || visited.has(current)) continue;
     visited.add(current);
     for (const child of Object.values(current)) pending.push(child);
     Object.freeze(current);
   }
+  // Trust a subtree only after the complete walk succeeds. Object.isFrozen
+  // alone says nothing about descendants of an externally supplied seed.
+  for (const current of visited) deeplyFrozen.add(current);
 }
 
 function validateManifest(value: unknown): StoreManifest {
@@ -88,6 +91,7 @@ export class ManifestStoreClient {
   private manifest?: StoreManifest;
   private store?: ExplorerProjectStore;
   private chunks: ReadonlyMap<string, unknown> = new Map();
+  private readonly deeplyFrozen = new WeakSet<object>();
 
   constructor(store?: ExplorerProjectStore, seed?: { revision: string; manifest: unknown }, private readonly worktreeId?: string) {
     if (worktreeId && store?.project.worktree_id !== worktreeId) return;
@@ -113,8 +117,8 @@ export class ManifestStoreClient {
       // The seed and its manifest arrive together in one generated script.
       // Associate its already-loaded values with the server's wire hashes;
       // reserializing parsed floats would not preserve the original JSON bytes.
-      freezeJson(store);
-      freezeJson(manifest);
+      freezeJson(store, this.deeplyFrozen);
+      freezeJson(manifest, this.deeplyFrozen);
       this.revision = seed.revision;
       this.manifest = manifest;
       this.store = store;
@@ -198,8 +202,8 @@ export class ManifestStoreClient {
       signal.throwIfAborted();
       // UI consumers share unchanged records with the content-addressed cache.
       // Protect that identity from incidental renderer mutations.
-      freezeJson(result.store);
-      freezeJson(manifest);
+      freezeJson(result.store, this.deeplyFrozen);
+      freezeJson(manifest, this.deeplyFrozen);
       return { revision, manifest, result, chunks: staged, recoveryRequired };
     }
     throw new Error("The model kept changing during refresh; will retry automatically.");

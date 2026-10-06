@@ -1547,7 +1547,7 @@ impl GraphRegistry {
                         .iter()
                         .enumerate()
                         .min_by_key(|(_, id)| *id)
-                        .unwrap()
+                        .expect("active target belongs to the non-empty traversal path")
                         .0;
                     cycle.rotate_left(first);
                     cycle.push(cycle[0].clone());
@@ -1761,7 +1761,14 @@ impl GraphRegistry {
                 if !seen.insert(key) {
                     continue;
                 }
-                if kind == "http://www.w3.org/ns/shacl#targetNode" && semantic_index.queries.iter().any(|q| q.iri == iri && q.diagnostics.is_empty()) { continue; }
+                if kind == "http://www.w3.org/ns/shacl#targetNode"
+                    && semantic_index
+                        .queries
+                        .iter()
+                        .any(|q| q.iri == iri && q.diagnostics.is_empty())
+                {
+                    continue;
+                }
                 if owl_reserved::is_reserved_vocabulary_iri(iri) {
                     continue;
                 }
@@ -2035,7 +2042,9 @@ impl GraphRegistry {
         let Some(contract) = self.nodes.get(contract_id) else {
             return Vec::new();
         };
-        if !contract.element.element_type.is_semantic_contract() && !contract.element.element_type.is_semantic_query() {
+        if !contract.element.element_type.is_semantic_contract()
+            && !contract.element.element_type.is_semantic_query()
+        {
             return Vec::new();
         }
 

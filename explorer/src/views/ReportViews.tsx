@@ -12,7 +12,6 @@ import type { ExplorerViewProps } from "./types/ExplorerViewProps";
 import { useExplorerUiState } from "../state/ExplorerUiState";
 import type {
   ProjectStoreElement,
-  TraceRequirementNode,
 } from "../store/types";
 import { ViewFrame } from "./ViewFrame";
 import { routeForContent } from "../router/routes";
@@ -60,7 +59,7 @@ import {
   type ElementRole,
 } from "@ds";
 import { coverageDrilldownItems, COVERAGE_SOURCE_LABELS } from "../lib/coverage";
-import { buildTraceFiles, type TraceFileNode, type TraceVerificationNode } from "../lib/traces";
+import { type TraceFileNode, type TraceVerificationNode } from "../lib/traces";
 
 /*
  * Report-projection views (Traces and Coverage).
@@ -130,20 +129,14 @@ export function TracesView({
 }: {
   onOpenElement: (id: string) => void;
 } & Partial<ExplorerViewProps>) {
-  const { store } = useStore();
+  const { store, elementIndex: elementById, getTraceFiles } = useStore();
   const {
     traceFilePath,
     setTraceFilePath,
     traceSelectionId,
     setTraceSelectionId: setSelectedId,
   } = useExplorerUiState();
-  const elementById = useMemo(
-    () => new Map(store.elements.map((element) => [element.id, element])),
-    [store.elements],
-  );
-  const traceFiles = useMemo(() => {
-    return buildTraceFiles(store);
-  }, [store]);
+  const traceFiles = getTraceFiles();
   const selectedFile = useMemo(
     () => traceFiles.find((file) => file.file === traceFilePath) ?? traceFiles[0],
     [traceFilePath, traceFiles],
@@ -198,7 +191,7 @@ function TraceRows({
 }: {
   file: TraceFileNode | undefined;
   contextId: string;
-  elementById: Map<string, ProjectStoreElement>;
+  elementById: ReadonlyMap<string, ProjectStoreElement>;
   onOpenElement: (id: string) => void;
   onSelect: (id: string) => void;
   selectedVerificationId: string | null;
@@ -271,14 +264,14 @@ const TraceRollupDiagram = memo(function TraceRollupDiagram({
 }: {
   contextId: string;
   verification: TraceVerificationNode;
-  elementById: Map<string, ProjectStoreElement>;
+  elementById: ReadonlyMap<string, ProjectStoreElement>;
   onOpenElement: (id: string) => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [prepared, setPrepared] = useState<{
     contextId: string;
     verification: TraceVerificationNode;
-    elementById: Map<string, ProjectStoreElement>;
+    elementById: ReadonlyMap<string, ProjectStoreElement>;
     model: TraceRollupMermaidModel;
     release: () => void;
   } | null>(null);
@@ -405,7 +398,7 @@ interface TraceRollupMermaidModel {
 
 function buildTraceRollupMermaidModel(
   verification: TraceVerificationNode,
-  elementById: Map<string, ProjectStoreElement>,
+  elementById: ReadonlyMap<string, ProjectStoreElement>,
 ): TraceRollupMermaidModel {
   const nodeClickTargets = new Map<string, string>();
   const code = buildTraceRollupMermaid(verification, elementById, nodeClickTargets);
@@ -414,7 +407,7 @@ function buildTraceRollupMermaidModel(
 
 function buildTraceRollupMermaid(
   verification: TraceVerificationNode,
-  elementById: Map<string, ProjectStoreElement>,
+  elementById: ReadonlyMap<string, ProjectStoreElement>,
   nodeClickTargets = new Map<string, string>(),
 ): string {
   const elements = new Map<string, TraceDiagramElement>();
@@ -437,24 +430,13 @@ function buildTraceRollupMermaid(
     type: "verification",
   });
 
-  const addRequirementNode = (node: TraceRequirementNode) => {
-    addElement({
-      id: node.id,
-      name: node.name,
-      type: node.type,
-    });
-    if (node.is_directly_verified) {
-      addEdge(verification.id, "verifies", node.id);
+  if (verification.traceGraph) {
+    for (const node of verification.traceGraph.nodes) {
+      addElement({ id: node.id, name: node.name, type: node.type });
+      if (node.is_directly_verified) addEdge(verification.id, "verifies", node.id);
     }
-    for (const child of node.children ?? []) {
-      addRequirementNode(child);
-      addEdge(node.id, "derivedFrom", child.id);
-    }
-  };
-
-  if (verification.traceTree?.requirements.length) {
-    for (const requirement of verification.traceTree.requirements) {
-      addRequirementNode(requirement);
+    for (const edge of verification.traceGraph.edges) {
+      addEdge(edge.source, edge.relation_type, edge.target);
     }
   } else {
     for (const requirementId of verification.requirementIds) {
@@ -571,7 +553,7 @@ function spaRouteForElement(id: string): string {
 
 export function __testBuildTraceRollupMermaid(
   verification: TraceVerificationNode,
-  elementById: Map<string, ProjectStoreElement>,
+  elementById: ReadonlyMap<string, ProjectStoreElement>,
 ) {
   return buildTraceRollupMermaid(verification, elementById);
 }

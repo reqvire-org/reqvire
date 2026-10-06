@@ -41,25 +41,39 @@ export function useLiveStore() {
   const requestRef = useRef<AbortController | null>(null);
   const mountedRef = useRef(false);
   const inventoryRequestRef = useRef<AbortController | null>(null);
+  const inventoryRef = useRef<{ ids: Set<string>; observedClients: WeakSet<ManifestStoreClient> } | null>(null);
   const refreshWorktrees = useCallback(async () => {
     if (!worktreeRouting) return;
     inventoryRequestRef.current?.abort();
     const controller = new AbortController(); inventoryRequestRef.current = controller;
+    // An inventory cannot establish removal of a client created after it began.
+    // Weak identities also let evicted clients and their snapshots be collected.
+    const observedClients = new WeakSet(clients.values());
     try {
-      const response = await fetch("/api/worktrees", { cache: "no-store", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]) });
+      const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]);
+      const response = await fetch("/api/worktrees", { cache: "no-store", signal });
       if (!response.ok) throw new Error("Branch choices are unavailable.");
       const data: unknown = await response.json();
+      signal.throwIfAborted();
+      if (typeof data === "object" && data !== null && "error" in data) {
+        throw new Error(typeof data.error === "string" ? data.error : "Branch choices are unavailable.");
+      }
       if (typeof data !== "object" || data === null || !("worktrees" in data) || !Array.isArray(data.worktrees)
+        || !("original_worktree_id" in data) || typeof data.original_worktree_id !== "string" || !data.original_worktree_id
         || !data.worktrees.every((item: unknown) => typeof item === "object" && item !== null
-          && "worktree_id" in item && typeof item.worktree_id === "string" && "branch" in item && typeof item.branch === "string")) {
+          && "worktree_id" in item && typeof item.worktree_id === "string" && item.worktree_id
+          && "branch" in item && typeof item.branch === "string")) {
         throw new Error("Invalid branch inventory.");
       }
+      const ids = new Set((data.worktrees as WorktreeChoice[]).map(item => item.worktree_id));
+      if (ids.size !== data.worktrees.length) throw new Error("Invalid branch inventory.");
       if (!mountedRef.current || controller.signal.aborted) return;
+      inventoryRef.current = { ids, observedClients };
       setWorktrees(data.worktrees as WorktreeChoice[]); setInventoryError(null);
     } catch (error) {
       if (mountedRef.current && !controller.signal.aborted) setInventoryError(error instanceof Error ? error.message : String(error));
     }
-  }, [worktreeRouting]);
+  }, [clients, worktreeRouting]);
   const selectWorktree = useCallback((id: string) => {
     if (!worktreeRouting) return;
     requestRef.current?.abort(); requestRef.current = null;
@@ -142,6 +156,17 @@ export function useLiveStore() {
     window.addEventListener("popstate", onPopState);
     return () => { window.removeEventListener("popstate", onPopState); inventoryRequestRef.current?.abort(); };
   }, [worktreeRouting, refreshWorktrees]);
+
+  useEffect(() => {
+    const inventory = inventoryRef.current;
+    if (!inventory) return;
+    for (const [id, cachedClient] of clients) {
+      if (id === displayedRef.current || id === selectedWorktree) continue;
+      if ((id === undefined || !inventory.ids.has(id)) && inventory.observedClients.has(cachedClient)) {
+        clients.delete(id);
+      }
+    }
+  }, [clients, result, selectedWorktree, worktrees]);
 
   return { result, automaticRefresh: Boolean(live), refreshError: refreshError ?? inventoryError, worktreeRouting, worktrees,
     recoveryWarning: recovery.required && recovery.context === displayedRef.current

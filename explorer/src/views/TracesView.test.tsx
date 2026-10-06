@@ -4,6 +4,8 @@ import { ExplorerUiStateProvider } from "../state/ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
 import type { ExplorerProjectStore } from "../store/types";
+import { ExplorerSidePane } from "../components/ExplorerSidePane";
+import * as traceProjection from "../lib/traces";
 import { TracesView } from "./ReportViews";
 
 const onOpenElement = vi.fn();
@@ -15,10 +17,13 @@ function fixture(label: string, context = "original", parent = false): ExplorerP
     traces: { files: { [file]: { verifications: [{
       identifier: `${file}#verification`, name: "Shared Verification", file,
       directly_verified_count: 1, total_requirements_in_tree: parent ? 2 : 1,
-      trace_tree: { requirements: [{
-        id: `${file}#requirement`, name: label, type: "requirement", is_directly_verified: true,
-        children: parent ? [{ id: `${file}#parent`, name: "Added Parent", type: "requirement", is_directly_verified: false, children: [] }] : [],
-      }] },
+      trace_graph: {
+        nodes: [
+          { id: `${file}#requirement`, name: label, type: "requirement", is_directly_verified: true },
+          ...(parent ? [{ id: `${file}#parent`, name: "Added Parent", type: "requirement", is_directly_verified: false }] : []),
+        ],
+        edges: parent ? [{ source: `${file}#requirement`, relation_type: "derivedFrom", target: `${file}#parent` }] : [],
+      },
     }] } } },
   };
 }
@@ -43,9 +48,72 @@ function renderer() {
   window.mermaid = { render: renderMermaid } as unknown as typeof window.mermaid;
   return renderMermaid;
 }
-afterEach(() => { vi.unstubAllGlobals(); });
+afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
 describe("trace snapshot ownership", () => {
+  it("renders each shared ancestor once with all split/merge and capability edges", async () => {
+    const renderMermaid = renderer();
+    const store = fixture("Leaf");
+    const file = "system-model/Specifications.md";
+    const id = (name: string) => `${file}#${name}`;
+    const trace = store.traces.files[file].verifications[0];
+    const topology = [
+      ["leaf", "derivedFrom", "left"], ["leaf", "derivedFrom", "right"],
+      ["left", "derivedFrom", "root"], ["right", "derivedFrom", "root"],
+      ["root", "specify", "capability"], ["capability", "derivedFrom", "capability-root"],
+    ];
+    trace.directly_verified_count = 2;
+    trace.total_requirements_in_tree = 4;
+    trace.directly_verified_requirements = [id("leaf"), id("root")];
+    trace.trace_graph = {
+      nodes: ["leaf", "left", "right", "root", "capability", "capability-root"].map(name => ({
+        id: id(name), name, type: name.startsWith("capability") ? "capability" : "requirement",
+        is_directly_verified: name === "leaf" || name === "root",
+      })),
+      edges: topology.map(([source, relation_type, target]) => ({ source: id(source), relation_type, target: id(target) })),
+    };
+    render(view(store));
+    await waitFor(() => expect(renderMermaid).toHaveBeenCalled());
+    const code = renderMermaid.mock.calls.at(-1)![1];
+    const identifiers = new Map<string, string>();
+    for (const name of ["Shared Verification", ...trace.trace_graph.nodes.map(node => node.name)]) {
+      const lines = code.split("\n").filter(line => line.includes(`["${name}"]:::`));
+      expect(lines).toHaveLength(1);
+      identifiers.set(name, lines[0].trim().split("[")[0]);
+    }
+    const expectedEdges = [
+      ...topology, ["Shared Verification", "verifies", "leaf"], ["Shared Verification", "verifies", "root"],
+    ].map(([source, relation, target]) => `${identifiers.get(source)} -->|${relation}| ${identifiers.get(target)};`);
+    expect(code.split("\n").filter(line => line.includes("-->|" )).map(line => line.trim()).sort()).toEqual(expectedEdges.sort());
+    expect(screen.getByText("4 in tree")).toBeTruthy();
+    expect(screen.getByText("2 requirements")).toBeTruthy();
+  });
+
+  it("shares lazy grouping between the sidebar and report across coverage refreshes", async () => {
+    renderer();
+    const build = vi.spyOn(traceProjection, "buildTraceFiles");
+    const initial = fixture("Old Requirement");
+    const scene = (store: ExplorerProjectStore, opened: boolean) =>
+      <StoreProvider store={store} schemaMismatch={null}>
+        <ExplorerUiStateProvider>
+          <ExplorerSidePane activeView={opened ? "traces" : "model"} open onToggle={vi.fn()}
+            onNavigate={vi.fn()} onOpenElement={onOpenElement} onOpenOntologyNode={vi.fn()} />
+          {opened && <TracesView onOpenElement={onOpenElement} />}
+        </ExplorerUiStateProvider>
+      </StoreProvider>;
+    const { rerender } = render(scene(initial, false));
+    expect(build).not.toHaveBeenCalled();
+    rerender(scene(initial, true));
+    await screen.findByText("old diagram");
+    expect(screen.getByLabelText("Verification trace tree")).toBeTruthy();
+    expect(build).toHaveBeenCalledTimes(1);
+    rerender(scene({ ...initial, coverage: { ...initial.coverage } }, true));
+    expect(build).toHaveBeenCalledTimes(1);
+    rerender(scene(fixture("New Requirement"), true));
+    await screen.findByText("new diagram");
+    expect(build).toHaveBeenCalledTimes(2);
+  });
+
   for (const context of ["original", "other-branch"]) {
     it(`updates an existing verification for ${context}`, async () => {
       const renderMermaid = renderer();

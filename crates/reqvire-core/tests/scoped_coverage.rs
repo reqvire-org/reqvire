@@ -62,7 +62,11 @@ fn index_allocations(report: &CoverageReport, registry: &GraphRegistry) -> (usiz
     ALLOCATIONS.with(|counter| counter.set(Some((0, 0))));
     let index = report.scope_index(registry);
     std::hint::black_box(&index);
-    ALLOCATIONS.with(|counter| counter.replace(None).unwrap())
+    ALLOCATIONS.with(|counter| {
+        counter
+            .replace(None)
+            .expect("test fixture operation should succeed")
+    })
 }
 
 fn relate(source: &mut Element, name: &'static str, target: &str) {
@@ -123,10 +127,14 @@ fn flat_fixture(branches: usize, evidence_bytes: usize) -> GraphRegistry {
         relate(&mut verification, "verify", &requirement_id);
         relate(&mut verification, "satisfiedBy", &evidence);
         for element in [capability, requirement, verification] {
-            registry.register_element(element, "model.md").unwrap();
+            registry
+                .register_element(element, "model.md")
+                .expect("test fixture operation should succeed");
         }
     }
-    registry.register_element(root, "model.md").unwrap();
+    registry
+        .register_element(root, "model.md")
+        .expect("test fixture operation should succeed");
     registry
 }
 
@@ -167,15 +175,32 @@ fn compact_scope_index_does_not_copy_evidence() {
 
 fn assert_scope_parity(registry: &GraphRegistry, expected_scopes: &Value) -> Value {
     let report = generate_coverage_report(registry);
-    let index = serde_json::to_value(report.scope_index(registry)).unwrap();
+    let index = serde_json::to_value(report.scope_index(registry))
+        .expect("test fixture operation should succeed");
     assert_eq!(
-        index.as_object().unwrap().len(),
-        expected_scopes.as_object().unwrap().len()
+        index
+            .as_object()
+            .expect("expected an object in the test response")
+            .len(),
+        expected_scopes
+            .as_object()
+            .expect("expected an object in the test response")
+            .len()
     );
-    for (name, scope) in expected_scopes.as_object().unwrap() {
-        let compact = &index[scope["capability_identifier"].as_str().unwrap()];
-        let detailed =
-            serde_json::to_value(report.clone().with_scope(registry, Some(name)).unwrap()).unwrap();
+    for (name, scope) in expected_scopes
+        .as_object()
+        .expect("expected an object in the test response")
+    {
+        let compact = &index[scope["capability_identifier"]
+            .as_str()
+            .expect("expected a string in the test response")];
+        let detailed = serde_json::to_value(
+            report
+                .clone()
+                .with_scope(registry, Some(name))
+                .expect("test fixture operation should succeed"),
+        )
+        .expect("test fixture operation should succeed");
         assert_eq!(&compact["scope"], scope, "membership for {name}");
         assert_eq!(
             compact["scope"], detailed["scope"],
@@ -196,9 +221,13 @@ fn assert_scope_parity(registry: &GraphRegistry, expected_scopes: &Value) -> Val
         ] {
             let count: usize = detailed[field]["files"]
                 .as_object()
-                .unwrap()
+                .expect("expected an object in the test response")
                 .values()
-                .map(|rows| rows.as_array().unwrap().len())
+                .map(|rows| {
+                    rows.as_array()
+                        .expect("expected an array in the test response")
+                        .len()
+                })
                 .sum();
             assert_eq!(compact["summary"][field], json!(count), "{name}: {field}");
         }
@@ -211,38 +240,45 @@ fn assert_scope_parity(registry: &GraphRegistry, expected_scopes: &Value) -> Val
 fn compact_scopes_preserve_shared_subjects_and_global_contract_evidence() {
     let fixture =
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/test-scoped-coverage");
-    let workspace = tempfile::tempdir().unwrap();
+    let workspace = tempfile::tempdir().expect("test fixture operation should succeed");
     for directory in ["specifications", "evidence"] {
-        fs::create_dir(workspace.path().join(directory)).unwrap();
-        for entry in fs::read_dir(fixture.join(directory)).unwrap() {
-            let entry = entry.unwrap();
+        fs::create_dir(workspace.path().join(directory))
+            .expect("test fixture operation should succeed");
+        for entry in fs::read_dir(fixture.join(directory)).expect("read test fixture") {
+            let entry = entry.expect("test fixture operation should succeed");
             fs::copy(
                 entry.path(),
                 workspace.path().join(directory).join(entry.file_name()),
             )
-            .unwrap();
+            .expect("test fixture operation should succeed");
         }
     }
     assert!(Command::new("git")
         .args(["init", "-q"])
         .current_dir(workspace.path())
         .status()
-        .unwrap()
+        .expect("test fixture operation should succeed")
         .success());
     struct RestoreDirectory(PathBuf);
     impl Drop for RestoreDirectory {
         fn drop(&mut self) {
-            std::env::set_current_dir(&self.0).unwrap();
+            std::env::set_current_dir(&self.0).expect("test fixture operation should succeed");
         }
     }
-    let _restore = RestoreDirectory(std::env::current_dir().unwrap());
-    std::env::set_current_dir(workspace.path()).unwrap();
-    let exclusions = ExclusionSetBuilder::new().build().unwrap();
-    let scopes: Value =
-        serde_json::from_str(&fs::read_to_string(fixture.join("expected/scopes.json")).unwrap())
-            .unwrap();
+    let _restore =
+        RestoreDirectory(std::env::current_dir().expect("test fixture operation should succeed"));
+    std::env::set_current_dir(workspace.path()).expect("test fixture operation should succeed");
+    let exclusions = ExclusionSetBuilder::new()
+        .build()
+        .expect("test fixture operation should succeed");
+    let scopes: Value = serde_json::from_str(
+        &fs::read_to_string(fixture.join("expected/scopes.json")).expect("read test fixture"),
+    )
+    .expect("read test fixture");
     let mut model = ModelManager::new();
-    model.parse_and_validate(None, &exclusions).unwrap();
+    model
+        .parse_and_validate(None, &exclusions)
+        .expect("test fixture operation should succeed");
     let initial = assert_scope_parity(&model.graph_registry, &scopes);
     let alpha_id = "specifications/Capabilities.md#alpha-root";
     let alpha = &initial[alpha_id]["summary"];
@@ -263,7 +299,8 @@ fn compact_scopes_preserve_shared_subjects_and_global_contract_evidence() {
             ["implementation_coverage_percentage"],
         0.0
     );
-    let whole = serde_json::to_value(generate_coverage_report(&model.graph_registry)).unwrap();
+    let whole = serde_json::to_value(generate_coverage_report(&model.graph_registry))
+        .expect("test fixture operation should succeed");
     assert_eq!(whole["summary"]["orphaned_verifications"], 1);
     assert_eq!(alpha["orphaned_verifications"], 0);
     assert_eq!(alpha["total_terminal_requirements"], 3);
@@ -273,8 +310,10 @@ fn compact_scopes_preserve_shared_subjects_and_global_contract_evidence() {
         fixture.join("fixtures/BetaWithoutEvidence.md"),
         "specifications/Beta.md",
     )
-    .unwrap();
-    model.parse_and_validate(None, &exclusions).unwrap();
+    .expect("test fixture operation should succeed");
+    model
+        .parse_and_validate(None, &exclusions)
+        .expect("test fixture operation should succeed");
     let changed = assert_scope_parity(&model.graph_registry, &scopes);
     assert_eq!(
         changed[alpha_id]["summary"]["coverage_sources"]["contract_consumer_rollup"],

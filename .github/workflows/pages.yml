@@ -45,8 +45,6 @@ jobs:
         run: cd explorer && npm run build
 
       - name: Build Reqvire binary
-        env:
-          REQVIRE_BUILD_EXPLORER: "1"
         run: cargo build --release --locked
 
       - name: Export Explorer site

@@ -45,3 +45,4 @@ reqvire.worktree.create
 reqvire.worktree.open
 reqvire.worktree.remove
 reqvire.git.commit
+reqvire.git.reconcile

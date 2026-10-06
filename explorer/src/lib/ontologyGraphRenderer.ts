@@ -1,7 +1,7 @@
 // @ts-nocheck
 import Graph from "graphology";
 import Sigma from "sigma";
-import forceAtlas2 from "graphology-layout-forceatlas2";
+import { ForceAtlasLayoutOwner } from "../workers/forceAtlasLayoutOwner";
 import { createDrawCurvedEdgeLabel, createEdgeCurveProgram, indexParallelEdgesIndex } from "@sigma/edge-curve";
 import { createNodeImageProgram } from "@sigma/node-image";
 import { EdgeProgram } from "sigma/rendering";
@@ -24,9 +24,12 @@ export function mountOntologyGraph(
   ontologyGraphData: OntologyGraphData,
   options: {
     onSelect?: (node: OntologyGraphNode | null) => void;
+    initialFilters?: readonly string[];
+    onLayoutState?: (state: "pending" | "ready" | "failed") => void;
   } = {},
 ): OntologyGraphRendererHandle {
     const onSelect = options.onSelect;
+    const layoutOwner = new ForceAtlasLayoutOwner();
     ontologyGraphData = {
         nodes: ontologyGraphData?.nodes ?? [],
         edges: ontologyGraphData?.edges ?? [],
@@ -474,7 +477,8 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         link._ontologyConstructs = edgeConstructValues(link);
         link._ontologyLayers = edgeLayerValues(link);
     });
-    let visibleNodeIds = new Set(nodes.map(node => node.id));
+    if (options.initialFilters) updateFilterState(options.initialFilters);
+    let visibleNodeIds = computeVisibleNodeIds();
     let selectedNodeId = null;
 
     let graph = null;
@@ -498,7 +502,8 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         });
     }
 
-    renderOntologyGraph();
+    try { renderOntologyGraph(); }
+    catch (error) { layoutOwner.cancel(); renderer?.kill(); throw error; }
 
     function renderOntologyGraph() {
         if (!container) {
@@ -747,6 +752,9 @@ function createSubclassTriangleEdgeProgram(options = {}) {
             if (!visibleNodeIds.has(event.node)) {
                 return;
             }
+            layoutOwner.cancel();
+            cancelFocusedOntologyLayoutAnimation();
+            options.onLayoutState?.('ready');
             setGraphCursor('grabbing');
             isDraggingNode = true;
             draggedNodeId = event.node;
@@ -839,89 +847,41 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         }
     }
 
-    function clampLayoutValue(value, minimum, maximum) {
-        return Math.max(minimum, Math.min(maximum, value));
-    }
-
-    function forceAtlasProfile(nodeCount, edgeCount, averageNodeSize) {
-        const nodes = Math.max(1, nodeCount);
-        const density = edgeCount / nodes;
-        const sizePressure = clampLayoutValue((averageNodeSize - 6) / 10, 0, 1.4);
-        return {
-            iterations: nodes > 650 ? 170 : nodes > 350 ? 180 : 200,
-            gravity: clampLayoutValue(
-                1.45 + Math.log10(Math.max(10, nodes)) * 0.48 + Math.min(density, 8) * 0.04,
-                1.5,
-                3.2
-            ),
-            scalingRatio: clampLayoutValue(
-                5 + Math.sqrt(nodes) * 0.14 + sizePressure * 1.5 - Math.min(density, 8) * 0.35,
-                5,
-                13
-            ),
-            slowDown: nodes > 650 ? 2.3 : 2
-        };
-    }
-
-    function applyOntologyLayout() {
-        try {
-            const layoutGraph = new Graph({ type: 'directed', multi: true, allowSelfLoops: true });
-            let totalNodeSize = 0;
-            nodes.forEach(nodeData => {
-                if (!visibleNodeIds.has(nodeData.id) || !graph.hasNode(nodeData.id)) return;
-                const attributes = graph.getNodeAttributes(nodeData.id);
-                const size = numericAttribute(attributes.size, sigmaNodeSize(nodeData));
-                totalNodeSize += size;
-                layoutGraph.addNode(nodeData.id, {
-                    x: numericAttribute(attributes.x, nodeData.x || 0),
-                    y: numericAttribute(attributes.y, nodeData.y || 0),
-                    size
-                });
+    function applyOntologyLayout(fit = false) {
+        const layoutGraph = new Graph({ type: 'directed', multi: true, allowSelfLoops: true });
+        nodes.forEach(nodeData => {
+            if (!visibleNodeIds.has(nodeData.id) || !graph.hasNode(nodeData.id)) return;
+            const attributes = graph.getNodeAttributes(nodeData.id);
+            layoutGraph.addNode(nodeData.id, {
+                x: numericAttribute(nodeData.x, 0),
+                y: numericAttribute(nodeData.y, 0),
+                size: numericAttribute(attributes.size, sigmaNodeSize(nodeData))
             });
-            links.forEach((linkData, index) => {
-                if (!isEdgeVisible(linkData)) return;
-                const sourceId = endpointId(linkData.source);
-                const targetId = endpointId(linkData.target);
-                if (!layoutGraph.hasNode(sourceId) || !layoutGraph.hasNode(targetId)) return;
-                layoutGraph.addDirectedEdgeWithKey(`l${index}`, sourceId, targetId);
-            });
-            const profile = forceAtlasProfile(
-                layoutGraph.order,
-                layoutGraph.size,
-                layoutGraph.order ? totalNodeSize / layoutGraph.order : 0
-            );
-            const settings = forceAtlas2.inferSettings(layoutGraph);
-            forceAtlas2.assign(layoutGraph, {
-                iterations: profile.iterations,
-                settings: {
-                    ...settings,
-                    adjustSizes: true,
-                    barnesHutOptimize: true,
-                    gravity: profile.gravity,
-                    scalingRatio: profile.scalingRatio,
-                    slowDown: profile.slowDown
-                }
-            });
-            layoutGraph.forEachNode((nodeId, attributes) => {
-                graph.mergeNodeAttributes(nodeId, {
-                    x: numericAttribute(attributes.x, 0),
-                    y: numericAttribute(attributes.y, 0)
-                });
-            });
-            separateOverlappingSigmaNodes();
-        } catch {
-            // Keep deterministic initial positions if layout cannot run.
-        }
+        });
+        links.forEach((linkData, index) => {
+            if (!isEdgeVisible(linkData)) return;
+            const sourceId = endpointId(linkData.source);
+            const targetId = endpointId(linkData.target);
+            if (!layoutGraph.hasNode(sourceId) || !layoutGraph.hasNode(targetId)) return;
+            layoutGraph.addDirectedEdgeWithKey(`l${index}`, sourceId, targetId);
+        });
+        options.onLayoutState?.('pending');
+        layoutOwner.run(layoutGraph, positions => {
+            applyOntologyLayoutPositions(positions);
+            runFocusedOntologyLayout();
+            if (fit) fitOntologyGraph();
+            options.onLayoutState?.('ready');
+        }, () => options.onLayoutState?.('failed'));
     }
 
     function recordOntologyLayoutBaseline() {
         if (!graph) return;
-        graph.forEachNode((nodeId, attributes) => {
-            graph.mergeNodeAttributes(nodeId, {
+        graph.updateEachNodeAttributes((_nodeId, attributes) => {
+            return Object.assign(attributes, {
                 baseX: numericAttribute(attributes.x, 0),
                 baseY: numericAttribute(attributes.y, 0)
             });
-        });
+        }, { attributes: ['baseX', 'baseY'] });
     }
 
     function numericAttribute(value, fallback) {
@@ -954,9 +914,20 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         if (!graph) return null;
         const targets = {};
         nodeIds.forEach(nodeId => {
-            const target = stableOntologyNodePosition(nodeId);
-            if (target) targets[nodeId] = target;
+            addOntologyAnimationTarget(targets, nodeId, stableOntologyNodePosition(nodeId));
         });
+        return animateOntologyTargets(targets, onComplete);
+    }
+
+    function addOntologyAnimationTarget(targets, nodeId, target) {
+        if (!target || !graph?.hasNode(nodeId)) return;
+        const attributes = graph.getNodeAttributes(nodeId);
+        if (attributes.x !== target.x || attributes.y !== target.y) {
+            targets[nodeId] = target;
+        }
+    }
+
+    function animateOntologyTargets(targets, onComplete) {
         if (!Object.keys(targets).length) return null;
         return animateNodes(graph, targets, {
             duration: 250,
@@ -978,16 +949,9 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         const targets = {};
         restoreNodeIds.forEach(id => {
             if (focusedIds.has(id)) return;
-            const target = stableOntologyNodePosition(id);
-            if (target) targets[id] = target;
+            addOntologyAnimationTarget(targets, id, stableOntologyNodePosition(id));
         });
-        const animateTargets = () => {
-            if (!Object.keys(targets).length) return null;
-            return animateNodes(graph, targets, {
-                duration: 250,
-                easing: 'quadraticOut'
-            }, onComplete);
-        };
+        const animateTargets = () => animateOntologyTargets(targets, onComplete);
         if (ids.length < 2 || ids.length > 120) {
             return animateTargets();
         }
@@ -1053,10 +1017,10 @@ function createSubclassTriangleEdgeProgram(options = {}) {
             const x = attributes.x + shift.x;
             const y = attributes.y + shift.y;
             const edgeStretch = id === nodeId ? 1 : 1.35;
-            targets[id] = {
+            addOntologyAnimationTarget(targets, id, {
                 x: center.x + (x - center.x) * edgeStretch,
                 y: center.y + (y - center.y) * edgeStretch
-            };
+            });
         });
         return animateTargets();
     }
@@ -1084,19 +1048,28 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         refreshOntologyRenderer();
     }
 
-    function separateOverlappingSigmaNodes() {
+    function applyOntologyLayoutPositions(positions) {
+        const positionsById = new Map(positions.map(position => [position.id, position]));
         const seen = new Map();
-        graph.forEachNode((nodeId, attributes) => {
-            const key = `${Math.round(attributes.x * 10)}:${Math.round(attributes.y * 10)}`;
-            const count = seen.get(key) || 0;
-            seen.set(key, count + 1);
-            if (count > 0) {
-                graph.mergeNodeAttributes(nodeId, {
-                    x: attributes.x + Math.cos(count) * count * 0.12,
-                    y: attributes.y + Math.sin(count) * count * 0.12
-                });
+        // Publish final coordinates and baselines together. Separate bulk
+        // events would make Sigma revisit every node for each publication.
+        graph.updateEachNodeAttributes((nodeId, attributes) => {
+            const position = positionsById.get(nodeId);
+            if (position) Object.assign(attributes, { x: position.x, y: position.y });
+            if (visibleNodeIds.has(nodeId)) {
+                const key = `${Math.round(attributes.x * 10)}:${Math.round(attributes.y * 10)}`;
+                const count = seen.get(key) || 0;
+                seen.set(key, count + 1);
+                if (count > 0) {
+                    attributes.x += Math.cos(count) * count * 0.12;
+                    attributes.y += Math.sin(count) * count * 0.12;
+                }
             }
-        });
+            return Object.assign(attributes, {
+                baseX: numericAttribute(attributes.x, 0),
+                baseY: numericAttribute(attributes.y, 0)
+            });
+        }, { attributes: positions.length ? ['x', 'y', 'baseX', 'baseY'] : ['baseX', 'baseY'] });
     }
 
     function sigmaNodeSize(nodeData) {
@@ -2481,7 +2454,7 @@ ${body}
             renderInspector(nodeById.get(selectedNodeId));
         }
         runFocusedOntologyLayout();
-        refreshOntologyRenderer();
+        applyOntologyLayout();
     }
 
     window.filterOntologyGraph = function (query) {
@@ -2562,7 +2535,6 @@ ${body}
         if (search) search.value = '';
         renderInspector(selected);
         runFocusedOntologyLayout({ centerSelection: true });
-        refreshOntologyRenderer();
     };
 
     window.clearOntologySelection = function () {
@@ -2576,27 +2548,20 @@ ${body}
         if (title) title.textContent = 'Node Inspector';
         if (body) renderOntologyEmptyState(body);
         runFocusedOntologyLayout();
-        refreshOntologyRenderer();
     };
 
-    window.fitOntologyGraph = function () {
+    function fitOntologyGraph() {
         if (!renderer || !graph) return;
         renderer.getCamera().animatedReset({ duration: 250 });
-    };
+    }
+    window.fitOntologyGraph = fitOntologyGraph;
 
     window.resetOntologyGraphLayout = function () {
         if (!graph) return;
         assignInitialSigmaPositions(nodes);
-        nodes.forEach(nodeData => {
-            if (graph.hasNode(nodeData.id)) {
-                graph.mergeNodeAttributes(nodeData.id, { x: nodeData.x, y: nodeData.y });
-            }
-        });
-        applyOntologyLayout();
-        recordOntologyLayoutBaseline();
         cancelFocusedOntologyLayoutAnimation();
+        applyOntologyLayout(true);
         refreshOntologyRenderer();
-        window.fitOntologyGraph();
     };
 
     function refreshOntologyRenderer() {
@@ -2732,7 +2697,7 @@ ${body}
         applyGraphFilters();
     };
 
-    window.syncOntologyGraphFilters = function (activeValues) {
+    function updateFilterState(activeValues) {
         const activeSet = new Set(activeValues || []);
         const next = {
             role: new Set(['ontology-term', 'shacl-shape', 'resource', 'external-reference']),
@@ -2753,20 +2718,31 @@ ${body}
         const sameValues = (left, right) => left.size === right.size
             && [...left].every(value => right.has(value));
         if (Object.keys(next).every(key => sameValues(filterState[key], next[key]))
-            && sameValues(relationFilterState, nextRelations)) return;
+            && sameValues(relationFilterState, nextRelations)) return false;
         Object.assign(filterState, next);
         relationFilterState = nextRelations;
-        applyGraphFilters();
+        return true;
+    }
+
+    window.syncOntologyGraphFilters = function (activeValues) {
+        if (updateFilterState(activeValues)) applyGraphFilters();
     };
 
-    applyGraphFilters();
-    const fitTimer = window.setTimeout(window.fitOntologyGraph, 550);
+    const ownedControls = {
+        filterOntologyGraph: window.filterOntologyGraph,
+        focusOntologyNode: window.focusOntologyNode,
+        clearOntologySelection: window.clearOntologySelection,
+        fitOntologyGraph: window.fitOntologyGraph,
+        resetOntologyGraphLayout: window.resetOntologyGraphLayout,
+        setOntologyGraphFilter: window.setOntologyGraphFilter,
+        syncOntologyGraphFilters: window.syncOntologyGraphFilters,
+    };
     const resizeHandler = () => refreshOntologyRenderer();
     window.addEventListener('resize', resizeHandler);
 
     return {
         destroy() {
-            window.clearTimeout(fitTimer);
+            layoutOwner.cancel();
             if (suppressStageClearTimer) {
                 window.clearTimeout(suppressStageClearTimer);
                 suppressStageClearTimer = null;
@@ -2777,28 +2753,24 @@ ${body}
                 setGraphCursor('');
                 renderer.kill();
             }
-            delete window.filterOntologyGraph;
-            delete window.focusOntologyNode;
-            delete window.clearOntologySelection;
-            delete window.fitOntologyGraph;
-            delete window.resetOntologyGraphLayout;
-            delete window.setOntologyGraphFilter;
-            delete window.syncOntologyGraphFilters;
+            Object.entries(ownedControls).forEach(([name, control]) => {
+                if (window[name] === control) delete window[name];
+            });
         },
         filter(query) {
-            window.filterOntologyGraph?.(query);
+            ownedControls.filterOntologyGraph?.(query);
         },
         focusNode(nodeId) {
-            window.focusOntologyNode?.(nodeId);
+            ownedControls.focusOntologyNode?.(nodeId);
         },
         clearSelection() {
-            window.clearOntologySelection?.();
+            ownedControls.clearOntologySelection?.();
         },
         resetLayout() {
-            window.resetOntologyGraphLayout?.();
+            ownedControls.resetOntologyGraphLayout?.();
         },
         setFilter(category, value, active) {
-            window.setOntologyGraphFilter?.(category, value, active);
+            ownedControls.setOntologyGraphFilter?.(category, value, active);
         }
     };
 }

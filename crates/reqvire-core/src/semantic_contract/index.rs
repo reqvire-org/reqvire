@@ -178,17 +178,17 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
 
 // Keep validation artifacts paired with their index for this build only. They are
 // dropped after validation instead of becoming a second persisted model payload.
-pub(crate) struct SemanticIndexBuild {
+pub struct SemanticIndexBuild {
     pub(crate) index: SemanticIndex,
     pub(crate) compiled_shapes: Vec<CompiledShapesBlock>,
 }
 
-pub(crate) struct CompiledShapesBlock {
+pub struct CompiledShapesBlock {
     pub(crate) source: String,
     pub(crate) registry: shacl::ShaclRegistry,
 }
 
-pub(crate) fn build_semantic_index_with_shapes(registry: &GraphRegistry) -> SemanticIndexBuild {
+pub fn build_semantic_index_with_shapes(registry: &GraphRegistry) -> SemanticIndexBuild {
     #[cfg(test)]
     INDEX_BUILD_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
     let mut blocks = Vec::new();
@@ -229,8 +229,15 @@ pub(crate) fn build_semantic_index_with_shapes(registry: &GraphRegistry) -> Sema
             crate::parser::extract_single_fenced_subsection(&element.content, "Ontology");
         let shapes = crate::parser::extract_single_fenced_subsection(&element.content, "Shapes");
         let query = if element.element_type.is_semantic_query() {
-            element.semantic_query.as_ref().and_then(|source|source.query.clone()).into_iter().collect()
-        } else { crate::parser::extract_single_fenced_subsection(&element.content, "Query") };
+            element
+                .semantic_query
+                .as_ref()
+                .and_then(|source| source.query.clone())
+                .into_iter()
+                .collect()
+        } else {
+            crate::parser::extract_single_fenced_subsection(&element.content, "Query")
+        };
 
         validate_semantic_sections(element, &ontology, &shapes, &query, &mut diagnostics);
 
@@ -341,7 +348,8 @@ pub(crate) fn build_semantic_index_with_shapes(registry: &GraphRegistry) -> Sema
                     });
                 }
 
-                shape_references.extend(shape_iri_references_from_registry(element, &shacl_registry));
+                shape_references
+                    .extend(shape_iri_references_from_registry(element, &shacl_registry));
                 compiled_shapes.push(CompiledShapesBlock {
                     source: block.source.clone(),
                     registry: shacl_registry,
@@ -352,9 +360,12 @@ pub(crate) fn build_semantic_index_with_shapes(registry: &GraphRegistry) -> Sema
         }
 
         if element.element_type.is_concept_family() {
-            if let Some(block) =
-                build_generated_concept_block(registry, element, &concept_relations, &mut diagnostics)
-            {
+            if let Some(block) = build_generated_concept_block(
+                registry,
+                element,
+                &concept_relations,
+                &mut diagnostics,
+            ) {
                 blocks.push(block);
             }
         }

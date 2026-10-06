@@ -130,9 +130,12 @@ mod tests {
         let store = json!({"numbers":[-0.0, 1.0, 1e-20, 1e20, 33.3, 66.7,
             9223372036854775807_i64], "text":"</script> 測定 &\u{2028}",
             "empty":[], "unknown":{"nested":[true,null,{"key":"value"}]}});
-        let previous: Value = serde_json::from_str(&store.to_string()).unwrap();
-        let direct = LiveStore::new(&store, "ontology").unwrap();
-        let through_json = LiveStore::new(&previous, "ontology").unwrap();
+        let previous: Value = serde_json::from_str(&store.to_string())
+            .expect("test fixture operation should succeed");
+        let direct =
+            LiveStore::new(&store, "ontology").expect("test fixture operation should succeed");
+        let through_json =
+            LiveStore::new(&previous, "ontology").expect("test fixture operation should succeed");
         assert_eq!(direct.chunks, through_json.chunks);
         assert_eq!(direct.manifest_json, through_json.manifest_json);
         assert_eq!(direct.revision, through_json.revision);

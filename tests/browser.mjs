@@ -137,7 +137,8 @@ export function browserConnection(socket, timeout = 15000) {
   };
 }
 
-export async function openBrowser(profile) {
+export async function openBrowser(profile, { gpuBackend = 'swiftshader' } = {}) {
+  if (!['swiftshader', 'native'].includes(gpuBackend)) throw new Error(`Unknown browser GPU backend: ${gpuBackend}`);
   const browser = resolveBrowser();
   // Only remove profiles we created; never reuse/delete a caller's existing one.
   await mkdir(profile);
@@ -154,8 +155,11 @@ export async function openBrowser(profile) {
   try {
     child = spawn(browser, [
       '--headless', '--no-sandbox', '--disable-dev-shm-usage',
-      '--use-gl=angle', '--use-angle=swiftshader-webgl', '--enable-unsafe-swiftshader',
-      '--ozone-platform=headless', '--disable-vulkan',
+      '--use-gl=angle',
+      ...(gpuBackend === 'swiftshader'
+        ? ['--use-angle=swiftshader-webgl', '--enable-unsafe-swiftshader', '--disable-vulkan']
+        : ['--enable-gpu', '--use-angle=vulkan', '--enable-features=Vulkan', '--disable-vulkan-surface']),
+      '--ozone-platform=headless',
       '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0',
       '--disable-background-networking', '--disable-background-timer-throttling',
       '--disable-renderer-backgrounding', `--user-data-dir=${profile}`, 'about:blank',
@@ -209,8 +213,8 @@ export async function openBrowser(profile) {
   }
 }
 
-export async function withBrowser(profile, check) {
-  const browser = await openBrowser(profile);
+export async function withBrowser(profile, check, options) {
+  const browser = await openBrowser(profile, options);
   let failure;
   try { return await check(browser); }
   catch (error) { failure = error; throw error; }

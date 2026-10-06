@@ -114,7 +114,9 @@ pub fn load_cached_model(
     excluded_filename_patterns: &GlobSet,
     options: ModelBuildOptions,
 ) -> Result<Arc<ModelManager>, ReqvireError> {
-    if let Some(model) = crate::mutation_io::model() { return Ok(model); }
+    if let Some(model) = crate::mutation_io::model() {
+        return Ok(model);
+    }
     for _ in 0..MAX_BUILD_ATTEMPTS {
         let generation = MODEL_CACHE
             .lock()
@@ -146,7 +148,7 @@ pub fn load_cached_model(
                         options.lenient,
                         options.with_size_estimates
                     );
-                    return Ok(cached.model.clone());
+                    return Ok(Arc::clone(&cached.model));
                 }
                 continue;
             }
@@ -234,7 +236,7 @@ pub fn load_cached_model(
                 state.entry = Some(Arc::new(CachedModel {
                     key,
                     inputs,
-                    model: model.clone(),
+                    model: Arc::clone(model),
                 }));
             }
             Outcome::Complete(Arc::new(result))

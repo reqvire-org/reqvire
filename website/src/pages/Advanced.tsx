@@ -52,7 +52,7 @@ export default function Advanced() {
           items={[
             {
               name: "reqvire traces",
-              desc: "Generates upward trace trees from verifications to owning capability roots and identifies redundant verify relations.",
+              desc: "Generates upward trace graphs from verifications to owning capability roots, preserving shared ancestors and every relation.",
             },
             {
               name: "reqvire change-impact",

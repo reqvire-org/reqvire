@@ -1,5 +1,5 @@
 {
-  "schema_version": "2026-06-30.project-store.v4",
+  "schema_version": "2026-10-06.project-store.v5",
   "project": {
     "name": "Scoped coverage example",
     "root_label": "coverage-example",
@@ -1373,52 +1373,114 @@
             "identifier": "specifications/Verifications.md#shared-check",
             "name": "Shared Check",
             "total_requirements_in_tree": 5,
-            "trace_tree": {
-              "requirements": [
+            "trace_graph": {
+              "edges": [
                 {
-                  "children": [
-                    {
-                      "children": [],
-                      "id": "specifications/Alpha.md#alpha-parent",
-                      "is_directly_verified": false,
-                      "name": "Alpha Parent",
-                      "type": "requirement"
-                    }
-                  ],
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Alpha.md#alpha-gap",
+                  "target": "specifications/Alpha.md#alpha-parent"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Alpha.md#alpha-implemented",
+                  "target": "specifications/Alpha.md#alpha-middle"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Alpha.md#alpha-middle",
+                  "target": "specifications/Alpha.md#alpha-parent"
+                },
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Alpha.md#alpha-parent",
+                  "target": "specifications/Capabilities.md#shared-branch"
+                },
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Beta.md#beta-consumer",
+                  "target": "specifications/Capabilities.md#beta-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-left",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-right",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-left"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-right"
+                }
+              ],
+              "nodes": [
+                {
                   "id": "specifications/Alpha.md#alpha-gap",
                   "is_directly_verified": true,
                   "name": "Alpha Gap",
                   "type": "requirement"
                 },
                 {
-                  "children": [
-                    {
-                      "children": [
-                        {
-                          "children": [],
-                          "id": "specifications/Alpha.md#alpha-parent",
-                          "is_directly_verified": false,
-                          "name": "Alpha Parent",
-                          "type": "requirement"
-                        }
-                      ],
-                      "id": "specifications/Alpha.md#alpha-middle",
-                      "is_directly_verified": false,
-                      "name": "Alpha Middle",
-                      "type": "requirement"
-                    }
-                  ],
                   "id": "specifications/Alpha.md#alpha-implemented",
                   "is_directly_verified": true,
                   "name": "Alpha Implemented",
                   "type": "requirement"
                 },
                 {
-                  "children": [],
+                  "id": "specifications/Alpha.md#alpha-middle",
+                  "is_directly_verified": false,
+                  "name": "Alpha Middle",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Alpha.md#alpha-parent",
+                  "is_directly_verified": false,
+                  "name": "Alpha Parent",
+                  "type": "requirement"
+                },
+                {
                   "id": "specifications/Beta.md#beta-consumer",
                   "is_directly_verified": true,
                   "name": "Beta Consumer",
                   "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-left",
+                  "is_directly_verified": false,
+                  "name": "Alpha Left",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-right",
+                  "is_directly_verified": false,
+                  "name": "Alpha Right",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-root",
+                  "is_directly_verified": false,
+                  "name": "Alpha Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#beta-root",
+                  "is_directly_verified": false,
+                  "name": "Beta Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#shared-branch",
+                  "is_directly_verified": false,
+                  "name": "Shared Branch",
+                  "type": "capability"
                 }
               ]
             },
@@ -1433,22 +1495,75 @@
             "identifier": "specifications/Verifications.md#gap-check",
             "name": "Gap Check",
             "total_requirements_in_tree": 2,
-            "trace_tree": {
-              "requirements": [
+            "trace_graph": {
+              "edges": [
                 {
-                  "children": [
-                    {
-                      "children": [],
-                      "id": "specifications/Alpha.md#alpha-parent",
-                      "is_directly_verified": false,
-                      "name": "Alpha Parent",
-                      "type": "requirement"
-                    }
-                  ],
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Alpha.md#alpha-gap",
+                  "target": "specifications/Alpha.md#alpha-parent"
+                },
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Alpha.md#alpha-parent",
+                  "target": "specifications/Capabilities.md#shared-branch"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-left",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-right",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-left"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-right"
+                }
+              ],
+              "nodes": [
+                {
                   "id": "specifications/Alpha.md#alpha-gap",
                   "is_directly_verified": true,
                   "name": "Alpha Gap",
                   "type": "requirement"
+                },
+                {
+                  "id": "specifications/Alpha.md#alpha-parent",
+                  "is_directly_verified": false,
+                  "name": "Alpha Parent",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-left",
+                  "is_directly_verified": false,
+                  "name": "Alpha Left",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-right",
+                  "is_directly_verified": false,
+                  "name": "Alpha Right",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-root",
+                  "is_directly_verified": false,
+                  "name": "Alpha Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#shared-branch",
+                  "is_directly_verified": false,
+                  "name": "Shared Branch",
+                  "type": "capability"
                 }
               ]
             },
@@ -1463,14 +1578,64 @@
             "identifier": "specifications/Verifications.md#parent-review",
             "name": "Parent Review",
             "total_requirements_in_tree": 1,
-            "trace_tree": {
-              "requirements": [
+            "trace_graph": {
+              "edges": [
                 {
-                  "children": [],
+                  "relation_type": "specify",
+                  "source": "specifications/Alpha.md#alpha-parent",
+                  "target": "specifications/Capabilities.md#shared-branch"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-left",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-right",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-left"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-right"
+                }
+              ],
+              "nodes": [
+                {
                   "id": "specifications/Alpha.md#alpha-parent",
                   "is_directly_verified": true,
                   "name": "Alpha Parent",
                   "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-left",
+                  "is_directly_verified": false,
+                  "name": "Alpha Left",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-right",
+                  "is_directly_verified": false,
+                  "name": "Alpha Right",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-root",
+                  "is_directly_verified": false,
+                  "name": "Alpha Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#shared-branch",
+                  "is_directly_verified": false,
+                  "name": "Shared Branch",
+                  "type": "capability"
                 }
               ]
             },
@@ -1486,21 +1651,54 @@
             "identifier": "specifications/Verifications.md#shared-proof",
             "name": "Shared Proof",
             "total_requirements_in_tree": 2,
-            "trace_tree": {
-              "requirements": [
+            "trace_graph": {
+              "edges": [
                 {
-                  "children": [],
+                  "relation_type": "specify",
+                  "source": "specifications/Alpha.md#alpha-contract-owner",
+                  "target": "specifications/Capabilities.md#alpha-left"
+                },
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Beta.md#beta-gap",
+                  "target": "specifications/Capabilities.md#beta-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-left",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                }
+              ],
+              "nodes": [
+                {
                   "id": "specifications/Alpha.md#alpha-contract-owner",
                   "is_directly_verified": true,
                   "name": "Alpha Contract Owner",
                   "type": "requirement"
                 },
                 {
-                  "children": [],
                   "id": "specifications/Beta.md#beta-gap",
                   "is_directly_verified": true,
                   "name": "Beta Gap",
                   "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-left",
+                  "is_directly_verified": false,
+                  "name": "Alpha Left",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-root",
+                  "is_directly_verified": false,
+                  "name": "Alpha Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#beta-root",
+                  "is_directly_verified": false,
+                  "name": "Beta Root",
+                  "type": "capability"
                 }
               ]
             },
@@ -1515,22 +1713,75 @@
             "identifier": "specifications/Verifications.md#middle-demonstration",
             "name": "Middle Demonstration",
             "total_requirements_in_tree": 2,
-            "trace_tree": {
-              "requirements": [
+            "trace_graph": {
+              "edges": [
                 {
-                  "children": [
-                    {
-                      "children": [],
-                      "id": "specifications/Alpha.md#alpha-parent",
-                      "is_directly_verified": false,
-                      "name": "Alpha Parent",
-                      "type": "requirement"
-                    }
-                  ],
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Alpha.md#alpha-middle",
+                  "target": "specifications/Alpha.md#alpha-parent"
+                },
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Alpha.md#alpha-parent",
+                  "target": "specifications/Capabilities.md#shared-branch"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-left",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-right",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-left"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-right"
+                }
+              ],
+              "nodes": [
+                {
                   "id": "specifications/Alpha.md#alpha-middle",
                   "is_directly_verified": true,
                   "name": "Alpha Middle",
                   "type": "requirement"
+                },
+                {
+                  "id": "specifications/Alpha.md#alpha-parent",
+                  "is_directly_verified": false,
+                  "name": "Alpha Parent",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-left",
+                  "is_directly_verified": false,
+                  "name": "Alpha Left",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-right",
+                  "is_directly_verified": false,
+                  "name": "Alpha Right",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-root",
+                  "is_directly_verified": false,
+                  "name": "Alpha Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#shared-branch",
+                  "is_directly_verified": false,
+                  "name": "Shared Branch",
+                  "type": "capability"
                 }
               ]
             },
@@ -1545,14 +1796,26 @@
             "identifier": "specifications/Verifications.md#beta-analysis",
             "name": "Beta Analysis",
             "total_requirements_in_tree": 1,
-            "trace_tree": {
-              "requirements": [
+            "trace_graph": {
+              "edges": [
                 {
-                  "children": [],
+                  "relation_type": "specify",
+                  "source": "specifications/Beta.md#beta-gap",
+                  "target": "specifications/Capabilities.md#beta-root"
+                }
+              ],
+              "nodes": [
+                {
                   "id": "specifications/Beta.md#beta-gap",
                   "is_directly_verified": true,
                   "name": "Beta Gap",
                   "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#beta-root",
+                  "is_directly_verified": false,
+                  "name": "Beta Root",
+                  "type": "capability"
                 }
               ]
             },

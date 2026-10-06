@@ -1548,7 +1548,11 @@ pub fn compute_change_impact(
             let mut visited = BTreeSet::new();
             visited.insert(id.clone());
             let change_impact_tree = build_change_impact_tree_with_consumers(
-                current, id.to_string(), &mut visited, None, &consumers,
+                current,
+                id.to_string(),
+                &mut visited,
+                None,
+                &consumers,
             );
 
             report.changed.push(ChangedElement {
@@ -1702,7 +1706,11 @@ pub fn compute_change_impact(
         let mut visited = BTreeSet::new();
         visited.insert(id.clone());
         let change_impact_tree = build_change_impact_tree_with_consumers(
-            current, id.to_string(), &mut visited, None, &consumers,
+            current,
+            id.to_string(),
+            &mut visited,
+            None,
+            &consumers,
         );
         report.added.push(AddedElement {
             element_id: id.clone(),
@@ -2148,14 +2156,20 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         }
         let mut registry = GraphRegistry::new();
         for element in elements {
-            registry.register_element(element, "test.md").unwrap();
+            registry
+                .register_element(element, "test.md")
+                .expect("test fixture operation should succeed");
         }
         registry
     }
 
     fn edit_reference_contracts(registry: &mut GraphRegistry) {
         for id in ["contract-0", "contract-1"] {
-            let element = &mut registry.nodes.get_mut(id).unwrap().element;
+            let element = &mut registry
+                .nodes
+                .get_mut(id)
+                .expect("test fixture operation should succeed")
+                .element;
             element.add_content("changed contract");
             element.freeze_content();
         }
@@ -2168,7 +2182,8 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
             let mut current = previous.clone();
             edit_reference_contracts(&mut current);
             REFERENCE_CONSUMER_WORK.with(|count| count.set((0, 0)));
-            let report = compute_change_impact(&current, &previous).unwrap();
+            let report = compute_change_impact(&current, &previous)
+                .expect("test fixture operation should succeed");
             assert_eq!(report.changed.len(), 2);
             REFERENCE_CONSUMER_WORK.with(|count| {
                 assert_eq!(
@@ -2192,14 +2207,23 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
             }
             // Newly added roots reuse the same per-report index as changed roots.
             let added = create_element("added", "Added Root", "new");
-            current.register_element(added, "test.md").unwrap();
+            current
+                .register_element(added, "test.md")
+                .expect("test fixture operation should succeed");
             REFERENCE_CONSUMER_WORK.with(|count| count.set((0, 0)));
-            let report = compute_change_impact(&current, &previous).unwrap();
+            let report = compute_change_impact(&current, &previous)
+                .expect("test fixture operation should succeed");
             assert_eq!(report.added.len(), 1);
             REFERENCE_CONSUMER_WORK.with(|count| assert_eq!(count.get(), (size + 3, size * 2)));
-            let mut moved = current.nodes.remove("contract-1").unwrap().element;
+            let mut moved = current
+                .nodes
+                .remove("contract-1")
+                .expect("test fixture operation should succeed")
+                .element;
             moved.identifier = "relocated-contract-1".into();
-            current.register_element(moved, "test.md").unwrap();
+            current
+                .register_element(moved, "test.md")
+                .expect("test fixture operation should succeed");
             for node in current.nodes.values_mut() {
                 for reference in &mut node.element.contract_references {
                     if reference.target.as_str() == "contract-1" {
@@ -2210,7 +2234,8 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
                 }
             }
             REFERENCE_CONSUMER_WORK.with(|count| count.set((0, 0)));
-            let relocated = compute_change_impact(&current, &previous).unwrap();
+            let relocated = compute_change_impact(&current, &previous)
+                .expect("test fixture operation should succeed");
             assert_eq!(relocated.relocated.len(), 1);
             assert!(relocated
                 .changed
@@ -2231,17 +2256,25 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
             target: ContractBindingTarget::ElementIdentifier("contract-0".into()),
             content_hash: None,
         });
-        current.register_element(binder, "test.md").unwrap();
+        current
+            .register_element(binder, "test.md")
+            .expect("test fixture operation should succeed");
         let verification = create_typed_element(
             "check",
             "Shared Check",
             "test",
             ElementType::Verification(VerificationType::Test),
         );
-        current.register_element(verification, "test.md").unwrap();
+        current
+            .register_element(verification, "test.md")
+            .expect("test fixture operation should succeed");
         for id in ["consumer-000", "consumer-001"] {
             add_relation(
-                &mut current.nodes.get_mut(id).unwrap().element,
+                &mut current
+                    .nodes
+                    .get_mut(id)
+                    .expect("test fixture operation should succeed")
+                    .element,
                 relation_type("verifiedBy"),
                 "check",
             );
@@ -2249,7 +2282,11 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         // One consumer also appears in ordinary downstream traversal. Its explicit
         // reference edge must survive even though it is no longer expanded there.
         add_relation(
-            &mut current.nodes.get_mut("contract-0").unwrap().element,
+            &mut current
+                .nodes
+                .get_mut("contract-0")
+                .expect("test fixture operation should succeed")
+                .element,
             relation_type("define"),
             "consumer-000",
         );
@@ -2282,7 +2319,11 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         // Reports normally follow validation; the low-level traversal still guards
         // a cycle in unvalidated input instead of recurring indefinitely.
         add_relation(
-            &mut current.nodes.get_mut("consumer-000").unwrap().element,
+            &mut current
+                .nodes
+                .get_mut("consumer-000")
+                .expect("test fixture operation should succeed")
+                .element,
             relation_type("definedBy"),
             "contract-0",
         );
@@ -2303,31 +2344,33 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         let previous = reference_consumer_fixture(2, false);
         let mut current = previous.clone();
         edit_reference_contracts(&mut current);
-        let report = compute_change_impact(&current, &previous).unwrap();
+        let report = compute_change_impact(&current, &previous)
+            .expect("test fixture operation should succeed");
         let mut reordered = reference_consumer_fixture(2, true);
         edit_reference_contracts(&mut reordered);
         assert_eq!(
             report.to_json("", "head", "base"),
             compute_change_impact(&reordered, &previous)
-                .unwrap()
+                .expect("test fixture operation should succeed")
                 .to_json("", "head", "base")
         );
         let before = report.to_json("", "head", "base");
         current
             .nodes
             .get_mut("consumer-000")
-            .unwrap()
+            .expect("test fixture operation should succeed")
             .element
             .contract_references
             .clear();
         current.nodes.remove("consumer-001");
-        let edited = compute_change_impact(&current, &previous).unwrap();
+        let edited = compute_change_impact(&current, &previous)
+            .expect("test fixture operation should succeed");
         for id in ["contract-0", "contract-1"] {
             let change = edited
                 .changed
                 .iter()
                 .find(|change| change.element_id == id)
-                .unwrap();
+                .expect("test fixture operation should succeed");
             assert!(change
                 .change_impact_tree
                 .relations
@@ -2337,7 +2380,7 @@ ex:VerificationCoverage reqvire:mapsToConcept concept:VerificationCoverage .
         assert_eq!(report.to_json("", "head", "base"), before);
         assert_eq!(
             compute_change_impact(&reordered, &previous)
-                .unwrap()
+                .expect("test fixture operation should succeed")
                 .to_json("", "head", "base"),
             before
         );

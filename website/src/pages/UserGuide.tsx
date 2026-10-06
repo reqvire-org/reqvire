@@ -52,7 +52,7 @@ npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlo
             { cmd: "reqvire lint --auditable", desc: "Report remediation-ready structural findings." },
             { cmd: "reqvire search", desc: "Filter the model by type, file, name, content, relations, and governance metadata." },
             { cmd: "reqvire model", desc: "Emit the ontology/concept/capability-rooted model view as structured JSON." },
-            { cmd: "reqvire traces", desc: "Generate verification trace trees from verifications to owning capability roots." },
+            { cmd: "reqvire traces", desc: "Generate verification trace graphs from verifications to owning capability roots." },
             { cmd: "reqvire coverage", desc: "Report verification coverage and requirement implementation coverage." },
             { cmd: "reqvire change-impact", desc: "Analyze review impact from changed model content and relations." },
           ]}
@@ -222,6 +222,12 @@ reqvire collect "Capability Requirement" --direction UPSTREAM --json --output co
           Commands that still support human-readable review output keep their
           selectable JSON mode for automation.
         </p>
+        <p className="text-zinc-600 mb-4">
+          Each verification in a traces report includes a <code>trace_graph</code>
+          {" "}with unique nodes and labelled edges. Shared ancestors appear once
+          while preserving every path to owning capabilities. Direct and total
+          requirement counts exclude capability nodes.
+        </p>
         <CodeBlock>{`reqvire model
 reqvire model --output reports/model.json
 reqvire model --from "API Authentication"
@@ -311,6 +317,18 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           Updates preserve navigation without restarting the server or
           interrupting MCP access. Failed updates keep the last valid view and
           retry automatically. External file edits require a server restart.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          If a commit times out, MCP checks local Git automatically. A verified
+          published commit is reconciled and returned as success without repeating
+          the commit. Confirmed non-publication returns an error: an automatic
+          mutation rolls back its changes, while <code>reqvire.git.commit</code>{" "}
+          keeps accepted pending edits uncommitted. If verification cannot complete,
+          the accepted snapshot remains readable and writes are disabled. Resolve
+          conflicting evidence, then use <code>reqvire.git.reconcile</code> with the
+          recorded <code>attempted_commit</code>; preview is the default, and{" "}
+          <code>dry_run: false</code> applies verified recovery. Repair a stalled
+          Git hook before committing again; reconciliation does not fix the hook.
         </p>
         <p className="text-zinc-600 mb-4">
           The branch picker at the top of the left pane is available with plain

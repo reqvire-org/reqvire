@@ -7,7 +7,10 @@
   "description": "Native static SPA Explorer shell for the Reqvire Project Store (Task-49 scaffold).",
   "scripts": {
     "dev": "npm run generate:icons && vite",
-    "build": "npm run lint && npm run generate:icons && tsc --noEmit && npm run build:ds-bundle && vite build",
+    "check": "npm run lint && npm run typecheck",
+    "build": "npm run check && npm run build:app",
+    "build:app": "npm run generate:icons && vite build",
+    "build:all": "npm run check && npm run build:app && npm run build:ds-bundle",
     "build:ds-bundle": "vite build --config design-system/vite.bundle.config.ts",
     "dev:showcase": "npm run lint && npm run generate:icons && vite --config design-system/vite.showcase.config.ts",
     "build:showcase": "npm run lint && npm run generate:icons && vite build --config design-system/vite.showcase.config.ts",

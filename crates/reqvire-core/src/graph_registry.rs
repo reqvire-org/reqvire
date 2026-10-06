@@ -176,7 +176,9 @@ mod tests {
                             add_relation(&mut element, "derive", target);
                         }
                     }
-                    registry.register_element(element, "file.md").unwrap();
+                    registry
+                        .register_element(element, "file.md")
+                        .expect("test fixture operation should succeed");
                 }
 
                 let mut counts = Vec::new();
@@ -184,11 +186,14 @@ mod tests {
                     if iteration % 2 == 0 {
                         registry.build_relation_graph();
                     } else {
-                        registry.populate_size_estimates().unwrap();
+                        registry
+                            .populate_size_estimates()
+                            .expect("test fixture operation should succeed");
                     }
                     // Count *all* stored payloads/edges, including any hidden in
                     // target copies. Top-level registry.len() conceals the bug.
-                    let serialized = serde_json::to_value(&registry.nodes).unwrap();
+                    let serialized = serde_json::to_value(&registry.nodes)
+                        .expect("test fixture operation should succeed");
                     let mut pending = vec![&serialized];
                     let (mut payloads, mut relations) = (0, 0);
                     while let Some(value) = pending.pop() {
@@ -226,20 +231,30 @@ mod tests {
             "https://example.org/evidence",
             None,
         )
-        .unwrap();
+        .expect("test fixture operation should succeed");
         child.relations.push(external);
-        registry.register_element(child, "file.md").unwrap();
+        registry
+            .register_element(child, "file.md")
+            .expect("test fixture operation should succeed");
         registry
             .register_element(make_element("file.md#parent", "Parent"), "file.md")
-            .unwrap();
+            .expect("test fixture operation should succeed");
         let exclusions = crate::exclusions::ExclusionSetBuilder::new()
             .build()
-            .unwrap();
+            .expect("test fixture operation should succeed");
 
         registry.refresh_relation_context(&exclusions);
         let expected = vec![("derive".to_string(), "file.md#child".to_string())];
-        assert_eq!(registry.list_relations("file.md#parent").unwrap(), expected);
-        assert!(registry.list_relations("file.md#child").unwrap().is_empty());
+        assert_eq!(
+            registry
+                .list_relations("file.md#parent")
+                .expect("test fixture operation should succeed"),
+            expected
+        );
+        assert!(registry
+            .list_relations("file.md#child")
+            .expect("test fixture operation should succeed")
+            .is_empty());
         let child_relation = &registry.nodes["file.md#child"].element.relations[0];
         assert!(child_relation.user_created);
         assert_eq!(
@@ -250,9 +265,13 @@ mod tests {
         assert!(!inverse.user_created);
         assert_eq!(inverse.relation_type.name, "derive");
 
-        let first = serde_json::to_value(&registry.nodes).unwrap();
+        let first =
+            serde_json::to_value(&registry.nodes).expect("test fixture operation should succeed");
         registry.refresh_relation_context(&exclusions);
-        assert_eq!(serde_json::to_value(&registry.nodes).unwrap(), first);
+        assert_eq!(
+            serde_json::to_value(&registry.nodes).expect("test fixture operation should succeed"),
+            first
+        );
     }
 
     #[test]
@@ -265,17 +284,25 @@ mod tests {
         add_relation(&mut a, "derive", "file.md#b");
         add_relation(&mut b, "derive", "file.md#a");
         for element in [a, b, c] {
-            accepted.add_element(element).unwrap();
+            accepted
+                .add_element(element)
+                .expect("test fixture operation should succeed");
         }
         accepted.build_relation_graph();
-        let original = serde_json::to_value(&accepted.nodes).unwrap();
-        let original_report = serde_json::to_value(accepted.get_impact_tree("file.md#a")).unwrap();
+        let original =
+            serde_json::to_value(&accepted.nodes).expect("test fixture operation should succeed");
+        let original_report = serde_json::to_value(accepted.get_impact_tree("file.md#a"))
+            .expect("test fixture operation should succeed");
         let mut candidate = accepted.clone();
         candidate
             .move_element_to_location("file.md#b", "other.md")
-            .unwrap();
+            .expect("test fixture operation should succeed");
         candidate.update_identifier("file.md#b", "other.md#renamed");
-        let edited = &mut candidate.nodes.get_mut("other.md#renamed").unwrap().element;
+        let edited = &mut candidate
+            .nodes
+            .get_mut("other.md#renamed")
+            .expect("test fixture operation should succeed")
+            .element;
         edited.content = "Candidate content".into();
         edited.freeze_content();
 
@@ -292,7 +319,8 @@ mod tests {
             }]
         });
         assert_eq!(
-            serde_json::to_value(candidate.get_impact_tree("file.md#a")).unwrap(),
+            serde_json::to_value(candidate.get_impact_tree("file.md#a"))
+                .expect("test fixture operation should succeed"),
             expected_report
         );
         assert_eq!(
@@ -306,10 +334,10 @@ mod tests {
 
         candidate
             .remove_relation("file.md#a", "other.md#renamed", "derive")
-            .unwrap();
+            .expect("test fixture operation should succeed");
         candidate
             .add_relation("file.md#a", "other.md#c", "derive")
-            .unwrap();
+            .expect("test fixture operation should succeed");
         assert!(candidate
             .add_relation("file.md#a", "other.md#c", "derive")
             .is_err());
@@ -318,16 +346,27 @@ mod tests {
             relinked.relations[0].element_node.element.identifier,
             "other.md#c"
         );
-        candidate.remove_element("other.md#c").unwrap();
+        candidate
+            .remove_element("other.md#c")
+            .expect("test fixture operation should succeed");
         assert!(candidate.get_impact_tree("file.md#a").relations.is_empty());
-        candidate.remove_element("other.md#renamed").unwrap();
+        candidate
+            .remove_element("other.md#renamed")
+            .expect("test fixture operation should succeed");
         candidate.build_relation_graph();
-        assert!(candidate.list_relations("file.md#a").unwrap().is_empty());
+        assert!(candidate
+            .list_relations("file.md#a")
+            .expect("test fixture operation should succeed")
+            .is_empty());
         assert!(candidate.nodes["file.md#a"].element.relations.is_empty());
 
-        assert_eq!(serde_json::to_value(&accepted.nodes).unwrap(), original);
         assert_eq!(
-            serde_json::to_value(accepted.get_impact_tree("file.md#a")).unwrap(),
+            serde_json::to_value(&accepted.nodes).expect("test fixture operation should succeed"),
+            original
+        );
+        assert_eq!(
+            serde_json::to_value(accepted.get_impact_tree("file.md#a"))
+                .expect("test fixture operation should succeed"),
             original_report
         );
     }

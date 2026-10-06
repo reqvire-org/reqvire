@@ -13,4 +13,6 @@ resources literal percent: PASS
 literal percent generated navigation: PASS
 malformed percent fallback: PASS
 Model Flow packaged worker: PASS
+Model Graph packaged ForceAtlas worker: PASS
+Ontologies packaged ForceAtlas worker: PASS
 completed

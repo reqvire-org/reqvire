@@ -1,7 +1,7 @@
 import type {
   ExplorerProjectStore,
   ProjectStoreElement,
-  TraceTree,
+  TraceGraph,
 } from "../store/types";
 
 export interface TraceVerificationNode {
@@ -11,7 +11,7 @@ export interface TraceVerificationNode {
   directCount: number;
   totalCount: number;
   requirementIds: string[];
-  traceTree?: TraceTree;
+  traceGraph?: TraceGraph;
   verificationType?: string;
 }
 
@@ -27,7 +27,7 @@ export function isVerification(element: ProjectStoreElement): boolean {
   );
 }
 
-export function buildTraceFiles(store: ExplorerProjectStore): TraceFileNode[] {
+export function buildTraceFiles(store: Pick<ExplorerProjectStore, "traces" | "elements" | "relations">): TraceFileNode[] {
   const files = store.traces?.files ?? {};
   const entries = Object.entries(files).sort((a, b) => a[0].localeCompare(b[0]));
   if (entries.length > 0) {
@@ -40,7 +40,7 @@ export function buildTraceFiles(store: ExplorerProjectStore): TraceFileNode[] {
         directCount: verification.directly_verified_count ?? 0,
         totalCount: verification.total_requirements_in_tree ?? 0,
         requirementIds: verification.directly_verified_requirements ?? [],
-        traceTree: verification.trace_tree,
+        traceGraph: verification.trace_graph,
         verificationType: verification.type,
       })),
     }));

@@ -1,0 +1,4 @@
+PASS 20-layers/cli-topology-counts-and-determinism
+PASS 20-layers/export-cli-parity
+PASS 40-layers/cli-topology-counts-and-determinism
+PASS 40-layers/export-cli-parity

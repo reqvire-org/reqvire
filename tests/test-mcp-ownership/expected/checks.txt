@@ -7,6 +7,7 @@ PASS serve/commit-option-accepted
 PASS serve/commits-require-embedded-mcp
 PASS mcp/commits-disabled/dirty-startup
 PASS mcp/commits-disabled/exclusive-owner
+PASS mcp/commits-disabled/reconcile-contract
 PASS mcp/commits-disabled/preview-and-rejection
 PASS mcp/commits-disabled/external-edit-not-imported
 PASS mcp/commits-disabled/persist-and-commit-policy
@@ -20,6 +21,7 @@ PASS mcp/commits-disabled/restart-same-branch
 PASS mcp/commits-disabled/external-head-rejected
 PASS mcp/commits-enabled/dirty-startup
 PASS mcp/commits-enabled/exclusive-owner
+PASS mcp/commits-enabled/reconcile-contract
 PASS mcp/commits-enabled/preview-and-rejection
 PASS mcp/commits-enabled/external-edit-not-imported
 PASS mcp/commits-enabled/persist-and-commit-policy
@@ -32,6 +34,7 @@ PASS mcp/commits-enabled/restart-same-branch
 PASS mcp/commits-enabled/external-head-rejected
 PASS serve/commits-disabled/dirty-startup
 PASS serve/commits-disabled/exclusive-owner
+PASS serve/commits-disabled/reconcile-contract
 PASS serve/commits-disabled/preview-and-rejection
 PASS serve/commits-disabled/external-edit-not-imported
 PASS serve/commits-disabled/persist-and-commit-policy
@@ -46,6 +49,7 @@ PASS serve/commits-disabled/restart-same-branch
 PASS serve/commits-disabled/external-head-rejected
 PASS serve/commits-enabled/dirty-startup
 PASS serve/commits-enabled/exclusive-owner
+PASS serve/commits-enabled/reconcile-contract
 PASS serve/commits-enabled/preview-and-rejection
 PASS serve/commits-enabled/external-edit-not-imported
 PASS serve/commits-enabled/persist-and-commit-policy

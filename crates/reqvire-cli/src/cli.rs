@@ -1352,11 +1352,13 @@ pub async fn handle_command(
     }) = args.command
     {
         return mcp::serve_http(
-            enable_mutations,
-            enable_commits,
-            enable_github,
-            github_remote.as_deref().unwrap_or("origin"),
-            with_size_estimates,
+            mcp::McpOptions {
+                enable_mutations,
+                enable_commits,
+                enable_github,
+                github_remote: github_remote.as_deref().unwrap_or("origin"),
+                with_size_estimates,
+            },
             excluded_filename_patterns,
             &host,
             port,
@@ -1383,10 +1385,13 @@ pub async fn handle_command(
             &host,
             port,
             enable_mcp,
-            mcp_enable_mutations,
-            mcp_enable_commits,
-            mcp_enable_github,
-            mcp_github_remote.as_deref().unwrap_or("origin"),
+            mcp::McpOptions {
+                enable_mutations: mcp_enable_mutations,
+                enable_commits: mcp_enable_commits,
+                enable_github: mcp_enable_github,
+                github_remote: mcp_github_remote.as_deref().unwrap_or("origin"),
+                with_size_estimates: false,
+            },
             excluded_filename_patterns,
             &crate::mcp_http::HttpAccess::new(&allowed_origins, &allowed_hosts),
         )
@@ -3104,7 +3109,7 @@ fn run_query_command(
                 let parent = path
                     .parent()
                     .filter(|p| !p.as_os_str().is_empty())
-                    .unwrap_or(std::path::Path::new("."));
+                    .unwrap_or_else(|| std::path::Path::new("."));
                 let mut temp = tempfile::NamedTempFile::new_in(parent)?;
                 temp.write_all(record.content.as_bytes())?;
                 temp.as_file().sync_all()?;

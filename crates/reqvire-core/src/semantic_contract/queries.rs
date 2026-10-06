@@ -380,10 +380,12 @@ pub(super) fn index_queries(registry: &GraphRegistry, index: &mut SemanticIndex)
                 Some(value[1..value.len() - 1].to_owned())
             } else {
                 value.split_once(':').and_then(|(prefix, local)| {
-                    prefixes
-                        .get(prefix)
-                        .filter(|v| v.len() == 1)
-                        .map(|v| format!("{}{local}", v.first().unwrap()))
+                    prefixes.get(prefix).filter(|v| v.len() == 1).map(|v| {
+                        format!(
+                            "{}{local}",
+                            v.first().expect("prefix has exactly one namespace")
+                        )
+                    })
                 })
             };
             match iri.filter(|i| NamedNode::new(i.as_str()).is_ok()) {
@@ -655,7 +657,10 @@ pub(crate) fn rewrite_iri_tokens(text: &str, mappings: &BTreeMap<String, String>
     let mut i = 0;
     while i < text.len() {
         let rest = &text[i..];
-        let ch = rest.chars().next().unwrap();
+        let ch = rest
+            .chars()
+            .next()
+            .expect("remaining token starts at a UTF-8 character");
         if ch == '#' {
             let length = rest.find('\n').unwrap_or(rest.len());
             output.push_str(&rest[..length]);
@@ -672,13 +677,21 @@ pub(crate) fn rewrite_iri_tokens(text: &str, mappings: &BTreeMap<String, String>
                 if text[i..].starts_with('\\') {
                     i += 1;
                     if i < text.len() {
-                        i += text[i..].chars().next().unwrap().len_utf8();
+                        i += text[i..]
+                            .chars()
+                            .next()
+                            .expect("remaining token starts at a UTF-8 character")
+                            .len_utf8();
                     }
                 } else if text[i..].starts_with(&delimiter) {
                     i += delimiter.len();
                     break;
                 } else {
-                    i += text[i..].chars().next().unwrap().len_utf8();
+                    i += text[i..]
+                        .chars()
+                        .next()
+                        .expect("remaining token starts at a UTF-8 character")
+                        .len_utf8();
                 }
             }
             output.push_str(&text[start..i]);

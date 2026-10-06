@@ -25,8 +25,11 @@ ex:Property sh:path ex:name ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCou
 "#;
 
 fn put(registry: &mut GraphRegistry, content: &str) {
-    let element = parse_single_element(content, FILE).unwrap();
-    registry.register_element(element, FILE).unwrap();
+    let element =
+        parse_single_element(content, FILE).expect("test fixture operation should succeed");
+    registry
+        .register_element(element, FILE)
+        .expect("test fixture operation should succeed");
 }
 
 fn put_shapes(registry: &mut GraphRegistry, number: usize, shapes: &str) {
@@ -49,8 +52,12 @@ fn fixture(blocks: usize) -> GraphRegistry {
     for number in 0..blocks {
         put_shapes(&mut registry, number, VALID_SHAPES);
     }
-    let exclusions = ExclusionSetBuilder::new().build().unwrap();
-    let (errors, _) = registry.build_relations(&exclusions).unwrap();
+    let exclusions = ExclusionSetBuilder::new()
+        .build()
+        .expect("test fixture operation should succeed");
+    let (errors, _) = registry
+        .build_relations(&exclusions)
+        .expect("test fixture operation should succeed");
     assert!(errors.is_empty(), "{errors:?}");
     registry
 }
@@ -82,24 +89,31 @@ fn references(index: &SemanticIndex) -> Vec<(String, String, String)> {
 
 #[test]
 fn shacl_build_compiles_each_block_once_in_all_validation_paths() {
-    let exclusions = ExclusionSetBuilder::new().build().unwrap();
+    let exclusions = ExclusionSetBuilder::new()
+        .build()
+        .expect("test fixture operation should succeed");
     for blocks in [1, 2, 4] {
         let mut registry = fixture(blocks);
         let index = once_per_block(blocks, || build_semantic_index(&registry));
         assert!(index.diagnostics.is_empty(), "{:?}", index.diagnostics);
         assert_eq!(index.shape_references.len(), blocks * 2);
-        let (errors, validated_index) =
-            once_per_block(blocks, || registry.build_relations(&exclusions).unwrap());
+        let (errors, validated_index) = once_per_block(blocks, || {
+            registry
+                .build_relations(&exclusions)
+                .expect("test fixture operation should succeed")
+        });
         assert!(errors.is_empty(), "{errors:?}");
         assert_eq!(references(&index), references(&validated_index));
         let errors = once_per_block(blocks, || {
-            registry.validate_semantic_contracts_in_memory().unwrap()
+            registry
+                .validate_semantic_contracts_in_memory()
+                .expect("test fixture operation should succeed")
         });
         assert!(errors.is_empty(), "{errors:?}");
         let errors = once_per_block(blocks, || {
             registry
                 .validate_semantic_contracts_after_removal("model.md#unrelated")
-                .unwrap()
+                .expect("test fixture operation should succeed")
         });
         assert!(errors.is_empty(), "{errors:?}");
     }
@@ -116,7 +130,9 @@ fn shacl_build_edited_candidates_do_not_reuse_accepted_shapes_or_ontology() {
         &VALID_SHAPES.replace("sh:path ex:name", "sh:path ex:missing"),
     );
     let errors = once_per_block(1, || {
-        edited.validate_semantic_contracts_in_memory().unwrap()
+        edited
+            .validate_semantic_contracts_in_memory()
+            .expect("test fixture operation should succeed")
     });
     assert_eq!(errors.len(), 1, "{errors:?}");
     assert_eq!(errors[0].to_string(), "Invalid markdown structure: Semantic reference not found: semantic contract 'model.md#contract-0' references sh:path <https://example.org/model#missing>, but no ontology element declares this IRI. Update or remove the SHACL reference before deleting or editing the declaring ontology.");
@@ -129,14 +145,14 @@ fn shacl_build_edited_candidates_do_not_reuse_accepted_shapes_or_ontology() {
     let errors = once_per_block(1, || {
         removed
             .validate_semantic_contracts_after_removal("model.md#vocabulary")
-            .unwrap()
+            .expect("test fixture operation should succeed")
     });
     assert_eq!(errors.len(), 1, "{errors:?}");
     assert_eq!(errors[0].to_string(), "Invalid markdown structure: Semantic reference not found: semantic contract 'model.md#contract-0' references sh:path <https://example.org/model#name>, but no ontology element declares this IRI. Removed declaration source: model.md#vocabulary. Update or remove the SHACL reference before deleting or editing the declaring ontology.");
 
     assert!(once_per_block(1, || accepted
         .validate_semantic_contracts_in_memory()
-        .unwrap())
+        .expect("test fixture operation should succeed"))
     .is_empty());
     assert_eq!(
         references(&build_semantic_index(&accepted)),
@@ -162,7 +178,9 @@ fn shacl_build_malformed_shapes_keep_sanity_diagnostics_and_provenance() {
         let index = once_per_block(1, || build_semantic_index(&registry));
         assert!(!index.diagnostics.is_empty(), "{shapes}");
         let errors = once_per_block(1, || {
-            registry.validate_semantic_contracts_in_memory().unwrap()
+            registry
+                .validate_semantic_contracts_in_memory()
+                .expect("test fixture operation should succeed")
         });
         let expected_errors: Vec<_> = index.diagnostics.iter().map(|diagnostic| {
             assert_eq!(diagnostic.source, "model.md#contract-0");
