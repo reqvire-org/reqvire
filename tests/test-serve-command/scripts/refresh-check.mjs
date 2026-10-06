@@ -302,8 +302,16 @@ try {
       await main.evaluate(fault => { window.reqvireChunkFault = fault; }, fault);
       await edit(marker);
       await waitFor(() => main.evaluate((start, fault) => window.reqvireManifestTraffic.slice(start).some(entry => entry.fault === fault), trafficStart, fault));
-      await rendered(main, "Refresh failed", true, '[role="alert"]');
+      await rendered(main, "Couldn’t refresh model", true, '.ux-worktree-load-dialog');
+      assert.equal(await main.evaluate(() => [...document.querySelectorAll('[data-product-pattern="shell-main"] [role="alert"]')]
+        .some(node => node.textContent.includes("Refresh failed"))), false);
       assert.equal(await main.evaluate(() => window.reqvireLiveRefresh.revision), before);
+      const retainedUrl = await main.evaluate(() => location.href);
+      assert.equal(await main.evaluate(previous => window.reqvireProjectStore.elements
+        .some(element => element.content.includes(`Live source marker ${previous}.`)), previous), true);
+      await main.evaluate(() => document.querySelector('.ux-worktree-load-dialog button').click());
+      assert.equal(await main.evaluate(() => location.href), retainedUrl);
+      assert.equal(await main.evaluate(() => Boolean(document.querySelector('.ux-worktree-load-dialog'))), false);
       await rendered(main, `Live source marker ${previous}.`, true, '[role="dialog"]');
       await sameDocument(main);
       await rendered(main, `Live source marker ${marker}.`, true, '[role="dialog"]');

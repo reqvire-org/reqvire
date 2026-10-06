@@ -116,6 +116,8 @@ interface ExplorerUiState {
   setThesaurusQuery: (query: string) => void;
   coverageScopeId: string | null;
   setCoverageScopeId: (id: string | null) => void;
+  coverageTreeQuery: string;
+  setCoverageTreeQuery: (query: string) => void;
   coverageProjection: CoverageProjection;
   coverageNotice: string | null;
   traceFilePath: string | null;
@@ -161,6 +163,7 @@ export function ExplorerUiStateProvider({ children, worktreeRouting = false }: {
   const [searchElementTypes, setSearchElementTypes] = useState(() => new Set<string>(searchElementTypeKeys));
   const [thesaurusQuery, setThesaurusQuery] = useState("");
   const [traceTreeQuery, setTraceTreeQuery] = useState("");
+  const [coverageTreeQuery, setCoverageTreeQuery] = useState("");
 
   const value = useMemo<ExplorerUiState>(
     () => ({
@@ -200,12 +203,15 @@ export function ExplorerUiStateProvider({ children, worktreeRouting = false }: {
       setThesaurusQuery,
       traceTreeQuery,
       setTraceTreeQuery,
+      coverageTreeQuery,
+      setCoverageTreeQuery,
     }),
     [
       coverageState,
       selectionState,
       thesaurusQuery,
       traceTreeQuery,
+      coverageTreeQuery,
       modelTreeQuery,
       modelOverlays,
       modelTypeKeys,

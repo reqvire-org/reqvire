@@ -1,11 +1,8 @@
-import { cx } from "@linaria/atomic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../../components/core/Icon";
 import { ElementIcon } from "../../components/data/ElementIcon";
 import { TreeItem } from "../../components/navigation/TreeItem";
 import { PaneTree, PaneTreeNode } from "../side-pane";
-
-import { paneSectionLabelClass } from "../side-pane/classes";
 
 export interface CoverageNavigationScope {
   identifier: string;
@@ -17,11 +14,15 @@ export interface CoverageNavigationProps {
   scopes: readonly CoverageNavigationScope[];
   selectedId: string | null;
   onSelect: (identifier: string | null) => void;
+  /** Case-insensitive name/identifier quick filter; retains the Whole Model root and match ancestors. */
+  query?: string;
 }
 
 /** Navigation consumes a published, ordered hierarchy; it does not evaluate coverage. */
-export function CoverageNavigation({ scopes, selectedId, onSelect }: CoverageNavigationProps) {
+export function CoverageNavigation({ scopes, selectedId, onSelect, query = "" }: CoverageNavigationProps) {
   const [closed, setClosed] = useState<ReadonlySet<string>>(() => new Set());
+  const [filteredClosed, setFilteredClosed] = useState<ReadonlySet<string>>(() => new Set());
+  const filter = query.trim().toLowerCase();
   const rows = useRef(new Map<string, HTMLDivElement>());
   const hierarchy = useMemo(() => {
     const ancestors: string[] = [];
@@ -44,8 +45,24 @@ export function CoverageNavigation({ scopes, selectedId, onSelect }: CoverageNav
     });
   }, [hierarchy, selectedId]);
 
-  const visible = hierarchy.filter(scope => !scope.parents.some(id => closed.has(id)));
-  const toggle = (id: string) => setClosed(previous => {
+  // Search disclosure is temporary: clearing the query restores ordinary disclosure state.
+  useEffect(() => { setFilteredClosed(new Set()); }, [filter, hierarchy, selectedId]);
+  const matches = useMemo(() => {
+    if (!filter) return null;
+    const ids = new Set([""]);
+    for (const scope of hierarchy) {
+      if (!scope.identifier || !(scope.name.toLowerCase().includes(filter) || scope.identifier.toLowerCase().includes(filter))) continue;
+      ids.add(scope.identifier);
+      for (const parent of scope.parents) ids.add(parent);
+    }
+    return ids;
+  }, [filter, hierarchy]);
+  const activeClosed = filter ? filteredClosed : closed;
+  const matchingHierarchy = hierarchy.filter(scope => !matches || matches.has(scope.identifier));
+  const visible = matchingHierarchy.map((scope, index) => ({ ...scope,
+    expandable: (matchingHierarchy[index + 1]?.depth ?? 0) > scope.depth,
+  })).filter(scope => !scope.parents.some(id => activeClosed.has(id)));
+  const toggle = (id: string) => (filter ? setFilteredClosed : setClosed)(previous => {
     const next = new Set(previous);
     if (next.has(id)) next.delete(id);
     else next.add(id);
@@ -53,19 +70,17 @@ export function CoverageNavigation({ scopes, selectedId, onSelect }: CoverageNav
   });
   const focus = (id?: string) => { if (id !== undefined) rows.current.get(id)?.focus(); };
 
-  return <>
-    <div className={cx(paneSectionLabelClass)}>Capabilities</div>
-      <PaneTree aria-label="Coverage capabilities">
+  return <PaneTree aria-label="Coverage capabilities">
         {visible.map((scope, index) => <PaneTreeNode key={scope.identifier}>
           <TreeItem role="treeitem" aria-label={scope.name} aria-level={scope.depth + 1}
             aria-selected={(selectedId ?? "") === scope.identifier}
-            aria-expanded={scope.expandable ? !closed.has(scope.identifier) : undefined}
+            aria-expanded={scope.expandable ? !activeClosed.has(scope.identifier) : undefined}
             tabIndex={0} data-capability-id={scope.identifier || undefined}
             data-coverage-whole-model={scope.identifier === "" || undefined}
             ref={node => { if (node) rows.current.set(scope.identifier, node); else rows.current.delete(scope.identifier); }}
             label={scope.name} icon={scope.identifier ? <ElementIcon type="capability" size="sm" /> : <Icon name="network" />}
             kind="element" depth={scope.depth} expandable={scope.expandable}
-            open={!closed.has(scope.identifier)} selected={(selectedId ?? "") === scope.identifier}
+            open={!activeClosed.has(scope.identifier)} selected={(selectedId ?? "") === scope.identifier}
             onSelect={() => onSelect(scope.identifier || null)} onToggle={() => toggle(scope.identifier)}
             onKeyDown={event => {
               if (event.key === "Enter" || event.key === " ") onSelect(scope.identifier || null);
@@ -74,15 +89,14 @@ export function CoverageNavigation({ scopes, selectedId, onSelect }: CoverageNav
               else if (event.key === "Home") focus(visible[0]?.identifier);
               else if (event.key === "End") focus(visible.at(-1)?.identifier);
               else if (event.key === "ArrowRight" && scope.expandable) {
-                if (closed.has(scope.identifier)) toggle(scope.identifier);
+                if (activeClosed.has(scope.identifier)) toggle(scope.identifier);
                 else focus(visible[index + 1]?.identifier);
               } else if (event.key === "ArrowLeft") {
-                if (scope.expandable && !closed.has(scope.identifier)) toggle(scope.identifier);
+                if (scope.expandable && !activeClosed.has(scope.identifier)) toggle(scope.identifier);
                 else focus(scope.parents.at(-1));
               } else return;
               event.preventDefault();
             }} />
         </PaneTreeNode>)}
-      </PaneTree>
-  </>;
+      </PaneTree>;
 }

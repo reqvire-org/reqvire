@@ -267,6 +267,23 @@ responsive behavior. Application views and showcase fixtures consume their
 public APIs. User-resized pane geometry remains runtime state; the design
 system defines how controls fill that space.
 
+`AppShell` owns the pane-aligned header. Its leading segment groups the brand
+and optional `headerContext`, and shares the expanded pane's live width and
+divider. The bounded context control aligns to the segment's right inset;
+extra width separates it from the brand. View tabs follow that segment during
+pointer and keyboard resizing;
+header actions stay at the right edge. A minimum leading width keeps branding
+and context usable when the pane collapses. Constrained headers use a second
+scrollable navigation row, aligned with the pane until a narrow viewport needs
+the full row. Production and the real Explorer mock consume this same pattern.
+
+`WorktreeLoadDialog` owns the shared loading/error presentation. Its refresh
+variant reports the displayed branch and retry policy in the same dismissible
+modal, with no duplicate refresh-error banner. The application owns dismissal
+and suppresses repeated dialogs for the same unresolved failure while retaining
+the accepted model and automatic refresh. Patterns previews use the exported
+dialog for both worktree-selection and refresh errors.
+
 Controls in the same pane must use its shared horizontal insets and fill the
 available control column. Avoid independent width caps that make a picker
 shorter than its neighboring filter. Referencing a spacing token in an
@@ -539,6 +556,14 @@ showcase-local fixtures. It must not import store hooks, router state, or app
 containers. The full-app mock harness is isolated to
 `design-system/showcase/MockShell.tsx`, which injects fixture data and renders
 `src/App`.
+
+Coverage uses the same `PaneSearchForm` quick-filter treatment as the Model
+explorer, followed by `CoverageNavigation` without an extra section heading.
+The application owns the query; the navigation pattern retains matching names
+or identifiers, their ancestors and Whole Model, with temporary search
+disclosure. Filtering changes navigation visibility without changing scope,
+coverage data or selection URLs. Mocks exercise this production behavior with
+model-derived fixture hierarchies.
 
 Mocks use the application's existing Explorer navigation. Its Traces route
 composes the native `TraceFlow` preview through application view slots for the

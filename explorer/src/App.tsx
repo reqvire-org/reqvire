@@ -63,6 +63,15 @@ export function App({ viewOverrides }: AppProps = {}) {
 /** Shared application composition; the showcase supplies fixture snapshots in place of HTTP. */
 export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: ReturnType<typeof useLiveStore> }) {
   const { result, refreshError } = live;
+  const displayedWorktree = result.ok ? result.store.project.worktree_id : undefined;
+  const [dismissedRefresh, setDismissedRefresh] = useState<{ context?: string; error: string } | null>(null);
+  useEffect(() => {
+    if (!refreshError || dismissedRefresh?.context !== displayedWorktree) setDismissedRefresh(null);
+  }, [refreshError, displayedWorktree, dismissedRefresh?.context]);
+  const selectingWorktree = Boolean(live.switching || live.worktreeSelectionError);
+  const showRefreshError = Boolean(refreshError && !selectingWorktree
+    && !(dismissedRefresh?.context === displayedWorktree && dismissedRefresh?.error === refreshError));
+  const blocked = selectingWorktree || showRefreshError;
   const worktreeSelector = live.worktreeRouting ? <WorktreeSelector density="compact"
     value={live.selectedWorktree}
     displayedValue={result.ok ? result.store.project.worktree_id : undefined}
@@ -86,14 +95,16 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
           {(live.switching || live.worktreeSelectionError) && <WorktreeLoadDialog
             branch={live.worktrees.find(item => item.worktree_id === live.selectedWorktree)?.branch ?? live.selectedWorktree ?? "Selected worktree"}
             error={live.worktreeSelectionError} onDismiss={live.dismissWorktreeError} /> }
+          {showRefreshError && <WorktreeLoadDialog operation="refresh"
+            branch={result.store.project.branch ?? "Displayed model"} error={refreshError}
+            retryAutomatically={live.automaticRefresh}
+            onDismiss={() => { if (refreshError) setDismissedRefresh({ context: displayedWorktree, error: refreshError }); }} />}
           <ExplorerShell
             viewOverrides={viewOverrides}
             schemaMismatch={result.schemaMismatch}
-            refreshError={live.worktreeSelectionError ? null : refreshError}
             recoveryWarning={live.recoveryWarning}
-            automaticRefresh={live.automaticRefresh}
             worktreeSelector={worktreeSelector}
-            worktreeBlocked={Boolean(live.switching || live.worktreeSelectionError)}
+            worktreeBlocked={blocked}
             worktreeId={result.store.project.worktree_id}
           />
         </ExplorerUiStateProvider>
@@ -103,11 +114,9 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
   );
 }
 
-function ExplorerShell({ schemaMismatch, refreshError, recoveryWarning, automaticRefresh, viewOverrides, worktreeSelector, worktreeId, worktreeBlocked }: AppProps & {
+function ExplorerShell({ schemaMismatch, recoveryWarning, viewOverrides, worktreeSelector, worktreeId, worktreeBlocked }: AppProps & {
   recoveryWarning?: string | null;
   schemaMismatch: string | null;
-  refreshError: string | null;
-  automaticRefresh: boolean;
   worktreeSelector?: ReactNode;
   worktreeId?: string;
   worktreeBlocked?: boolean;
@@ -281,9 +290,8 @@ function ExplorerShell({ schemaMismatch, refreshError, recoveryWarning, automati
       onToggleLeftPane={toggleLeftPane}
       onLeftPaneResizePointerDown={handleLeftPaneResizePointerDown}
       onLeftPaneResizeKeyDown={handleLeftPaneResizeKeyDown}
-      mainWarning={[recoveryWarning, refreshError
-        ? `Refresh failed: ${refreshError}. Keeping the last valid view. ${automaticRefresh ? "Will retry automatically." : "Select a branch to retry."}`
-        : schemaMismatch ? `Store schema mismatch: ${schemaMismatch}` : navigationNotice].filter(Boolean).join(" ") || null}
+      mainWarning={[recoveryWarning, schemaMismatch ? `Store schema mismatch: ${schemaMismatch}` : navigationNotice]
+        .filter(Boolean).join(" ") || null}
       sidePane={
         viewOverride ? viewOverride.sidePane({ open: leftPaneOpen, onToggle: toggleLeftPane }) : <ExplorerSidePane
           activeView={sidePaneView}

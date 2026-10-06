@@ -4,6 +4,17 @@ import { WorktreeLoadDialog } from "./WorktreeLoadDialog";
 
 afterEach(cleanup);
 describe("WorktreeLoadDialog", () => {
+  it("shares dismissible error presentation for refresh failures and explains automatic retry", () => {
+    const onDismiss = vi.fn();
+    render(<WorktreeLoadDialog branch="main" operation="refresh" error="Connection lost"
+      retryAutomatically onDismiss={onDismiss} />);
+    const dialog = screen.getByRole("dialog", { name: "Couldn’t refresh model" });
+    expect(screen.getByRole("alert").textContent).toBe("Connection lost");
+    expect(screen.getByText("Showing the last valid model. Refresh will retry automatically.")).toBeTruthy();
+    fireEvent.keyDown(dialog, { key: "Escape" });
+    expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
   it("focuses a centered loading modal and prevents pending dismissal", () => {
     const onDismiss = vi.fn();
     const trigger = document.createElement("button"); document.body.append(trigger); trigger.focus();

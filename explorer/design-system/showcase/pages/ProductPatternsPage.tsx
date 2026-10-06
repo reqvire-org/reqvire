@@ -227,7 +227,7 @@ function Section({ title, desc, children }: { title: string; desc?: string; chil
 }
 
 export function ProductPatternsPage() {
-  const [worktreeLoad, setWorktreeLoad] = useState<"pending" | "error" | null>(null);
+  const [worktreeLoad, setWorktreeLoad] = useState<"pending" | "error" | "refresh" | null>(null);
   useEffect(() => {
     if (worktreeLoad !== "pending") return;
     const timer = setTimeout(() => setWorktreeLoad(null), 1500);
@@ -285,7 +285,7 @@ export function ProductPatternsPage() {
     <div className="showcase-page showcase-page--wide">
       <Section
         title="Explorer Shell"
-        desc="App shell, chrome, side pane, workspace area, and detail rail composed with neutral placeholder regions."
+        desc="Shared shell with pane-aligned branding and branch control, view navigation, and workspace. The real Explorer mock supports pane resizing and collapse with this same header."
       >
         <div className="showcase-shell-demo">
           <AppShell
@@ -329,8 +329,12 @@ export function ProductPatternsPage() {
         />
         <Button onClick={() => setWorktreeLoad("pending")}>Preview worktree loading</Button>
         <Button onClick={() => setWorktreeLoad("error")}>Preview worktree error</Button>
+        <Button onClick={() => setWorktreeLoad("refresh")}>Preview refresh error</Button>
         {worktreeLoad && <WorktreeLoadDialog branch="coverage-review"
-          error={worktreeLoad === "error" ? "The selected worktree could not be loaded." : null}
+          operation={worktreeLoad === "refresh" ? "refresh" : "selection"}
+          retryAutomatically={worktreeLoad === "refresh"}
+          error={worktreeLoad === "error" ? "The selected worktree could not be loaded."
+            : worktreeLoad === "refresh" ? "The server connection is unavailable." : null}
           onDismiss={() => setWorktreeLoad(null)} />}
       </Section>
 

@@ -16,10 +16,12 @@ const baseUX = css`
 export interface WorktreeLoadDialogProps {
   branch: string;
   error?: string | null;
+  operation?: "selection" | "refresh";
+  retryAutomatically?: boolean;
   onDismiss: () => void;
 }
 /** Blocks pending context adoption; failures return to the retained model on dismissal. */
-export function WorktreeLoadDialog({ branch, error, onDismiss }: WorktreeLoadDialogProps) {
+export function WorktreeLoadDialog({ branch, error, operation = "selection", retryAutomatically = false, onDismiss }: WorktreeLoadDialogProps) {
   const titleId = useId();
   const dialog = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -36,9 +38,15 @@ export function WorktreeLoadDialog({ branch, error, onDismiss }: WorktreeLoadDia
         }
       }}>
       <ModalBody className="ux-worktree-load-body">
-        <ModalTitle id={titleId}>{error ? "Couldn’t load worktree" : "Loading worktree"}</ModalTitle>
+        <ModalTitle id={titleId}>{error
+          ? operation === "refresh" ? "Couldn’t refresh model" : "Couldn’t load worktree"
+          : "Loading worktree"}</ModalTitle>
         <p>{branch}</p>
-        {error ? <><p role="alert">{error}</p><Button onClick={onDismiss}>Close</Button></>
+        {error ? <><p role="alert">{error}</p>
+          {operation === "refresh" && <p>{retryAutomatically
+            ? "Showing the last valid model. Refresh will retry automatically."
+            : "Showing the last valid model. Select a branch to retry."}</p>}
+          <Button onClick={onDismiss}>Close</Button></>
           : <Spinner size="md" label={`Loading ${branch}`} />}
       </ModalBody>
     </ModalContent>

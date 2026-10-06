@@ -135,6 +135,11 @@ describe("Explorer worktree navigation", () => {
       expect(selector.closest('[data-product-pattern-slot="header-context"]')).toBeTruthy();
       const brand = header.querySelector('[data-product-pattern-slot="brand"]')!;
       expect(brand.nextElementSibling?.contains(selector)).toBe(true);
+      const leading = header.querySelector('[data-product-pattern-slot="header-leading"]')!;
+      expect(leading.contains(brand)).toBe(true);
+      expect(leading.contains(selector)).toBe(true);
+      expect(leading.nextElementSibling).toBe(navigation);
+      expect(header.getAttribute("data-align-pane")).toBe("true");
       expect(selector.closest('[data-product-pattern-slot="start-pane"]')).toBeNull();
       expect(selector.textContent).toBe("main");
       fireEvent.click(screen.getByRole("button", { name: "Collapse explorer" }));
@@ -163,8 +168,25 @@ describe("Explorer worktree navigation", () => {
       const accepted = vi.mocked(liveStore.useLiveStore).mock.results.at(-1)!.value;
       vi.mocked(liveStore.useLiveStore).mockReturnValue({ ...accepted, refreshError: "Connection lost" });
       view.rerender(<App />);
-      expect(screen.getByText(/MCP recovery required: showing the last accepted model/).textContent)
-        .toContain("Refresh failed: Connection lost");
+      expect(screen.getByText(/MCP recovery required: showing the last accepted model/)).toBeTruthy();
+      expect(screen.getByRole("dialog", { name: "Couldn’t refresh model" })).toBeTruthy();
+      expect(within(screen.getByRole("dialog", { name: "Couldn’t refresh model" })).getByRole("alert").textContent)
+        .toBe("Connection lost");
+      expect(screen.queryByText(/Refresh failed:/)).toBeNull();
+      const url = location.href;
+      fireEvent.click(screen.getByRole("button", { name: "Close" }));
+      expect(screen.queryByRole("dialog")).toBeNull();
+      expect(view.container.querySelector('[data-product-pattern="app-shell"]')?.hasAttribute("inert")).toBe(false);
+      expect(location.href).toBe(url);
+      expect(screen.getByText(/MCP recovery required: showing the last accepted model/)).toBeTruthy();
+      // Repeated polling failure must not reopen a dismissed diagnostic.
+      view.rerender(<App />);
+      expect(screen.queryByRole("dialog")).toBeNull();
+      vi.mocked(liveStore.useLiveStore).mockReturnValue({ ...accepted, refreshError: null });
+      view.rerender(<App />);
+      vi.mocked(liveStore.useLiveStore).mockReturnValue({ ...accepted, refreshError: "Connection lost" });
+      view.rerender(<App />);
+      expect(screen.getByRole("dialog", { name: "Couldn’t refresh model" })).toBeTruthy();
     } finally {
       view.unmount();
       window.history.replaceState(null, "", "/");

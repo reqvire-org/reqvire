@@ -457,7 +457,9 @@ While Explorer served by an embedded MCP server with mutations enabled is visibl
 
 When a newer manifest is available, the system shall download only missing chunks, verify their content integrity, and adopt the complete compatible snapshot atomically with its revision.
 
-If a refresh request fails, the system shall preserve the displayed valid snapshot, expose the failure, and recover when a subsequent automatic request succeeds.
+If a refresh request fails, the system shall preserve the displayed valid snapshot, expose the failure through the shared dismissible error dialog, and recover when a subsequent automatic request succeeds.
+
+When a user dismisses a refresh error, the system SHALL retain the displayed model, navigation and refresh policy without a duplicate refresh-error banner or repeated dialog for the same unresolved failure.
 
 #### Metadata
   * type: requirement
@@ -510,6 +512,8 @@ When a user activates the left tree's Whole Model root, the system SHALL clear c
 When a user selects a capability, the system SHALL show its full scoped summary and drill-down, followed by detailed issues for that same scope.
 
 While displaying a capability scope, the system SHALL identify it by authored name and provide an alphabetically ordered capability tree with canonical identifier selection.
+
+When a user filters the capability tree, the system SHALL match capability names or identifiers, retain matching ancestors and the Whole Model root, and preserve the current scope and dashboard.
 
 While displaying orphan diagnostics, the system SHALL use only the whole-model report and explain their absence from capability-scoped dashboards.
 
@@ -663,6 +667,8 @@ WHEN Explorer is served, the system SHALL let each browser tab select any local 
 
 #### Details
 While displaying a served Explorer view, the system SHALL keep the branch picker visible in the shared header beside the Reqvire brand independently of left-pane state.
+
+When a user resizes the expanded left pane, the system SHALL align the header's brand-and-picker segment divider and view navigation with its live boundary while retaining header actions at the right edge.
 
 While preparing a newly selected worktree, the system SHALL show a blocking loading dialog over the retained model. If preparation fails, the system SHALL show the error and allow dismissal to the retained model; successful preparation SHALL close the dialog and render the new model.
 

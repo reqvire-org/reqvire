@@ -28,10 +28,68 @@ function expand(name: string) {
 describe("showcase application coverage", () => {
   beforeEach(() => {
     localStorage.clear();
+    localStorage.setItem("reqvire-explorer-theme", "light");
     Element.prototype.scrollIntoView = vi.fn();
     vi.stubGlobal("Worker", class { postMessage() {} terminate() {} });
   });
   afterEach(() => vi.unstubAllGlobals());
+
+  it("uses the pane-aligned shared header while resizing and collapsing the real Explorer mock", () => {
+    history.replaceState(null, "", "/?tab=mocks&example=coverage#/coverage?scope=");
+    localStorage.setItem("reqvire:explorer:left-pane-width", "380");
+    const view = render(<MockShell example="coverage" />);
+    try {
+      const shell = view.container.querySelector<HTMLElement>('[data-product-pattern="app-shell"]')!;
+      const leading = shell.querySelector('[data-product-pattern-slot="header-leading"]')!;
+      const picker = screen.getByRole("combobox", { name: "Branch" });
+      const navigation = screen.getByRole("navigation", { name: "Explorer views" });
+      expect(leading.contains(picker)).toBe(true);
+      expect(leading.nextElementSibling).toBe(navigation);
+      const resizer = screen.getByRole("separator", { name: "Resize explorer pane" });
+      const url = location.href;
+      fireEvent.keyDown(resizer, { key: "ArrowRight", shiftKey: true });
+      expect(resizer.getAttribute("aria-valuenow")).toBe("420");
+      expect(shell.getAttribute("style")).toContain("--ux-left-pane-width: 420px");
+      expect(localStorage.getItem("reqvire:explorer:left-pane-width")).toBe("420");
+      expect(location.href).toBe(url);
+      fireEvent.click(screen.getByRole("button", { name: "Collapse explorer" }));
+      expect(screen.getByRole("combobox", { name: "Branch" })).toBe(picker);
+      expect(leading.contains(picker)).toBe(true);
+      expect(screen.getByRole("button", { name: "Search" })).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Help" })).toBeTruthy();
+      fireEvent.click(screen.getByRole("button", { name: "Expand explorer" }));
+      expect(resizer.getAttribute("aria-valuenow")).toBe("420");
+      expect(location.href).toBe(url);
+    } finally { view.unmount(); history.replaceState(null, "", "/"); }
+  });
+
+  it("uses the Model quick-filter pattern for capability navigation without changing scope or report", () => {
+    history.replaceState(null, "", "/?tab=mocks&example=coverage#/coverage?scope=");
+    const view = render(<MockShell example="coverage" />);
+    try {
+      selectCapability("Alpha Root");
+      const explorer = screen.getByRole("complementary", { name: "Explorer navigation" });
+      expect(within(explorer).queryByText("Capabilities", { exact: true })).toBeNull();
+      const search = within(explorer).getByRole("searchbox", { name: "Filter capability tree" });
+      const url = location.href;
+      const heading = screen.getByRole("heading", { name: "Alpha Root" });
+      const metric = screen.getByText("1 / 3 terminal requirements covered");
+      fireEvent.change(search, { target: { value: "shared" } });
+      const names = () => within(screen.getByRole("tree", { name: "Coverage capabilities" })).getAllByRole("treeitem")
+        .map(row => row.getAttribute("aria-label"));
+      expect(names()).toEqual(["Whole Model", "Alpha Root", "Alpha Left", "Shared Branch"]);
+      expect(screen.getByRole("treeitem", { name: "Alpha Root" }).getAttribute("aria-selected")).toBe("true");
+      expect(location.href).toBe(url);
+      expect(screen.getByRole("heading", { name: "Alpha Root" })).toBe(heading);
+      expect(screen.getByText("1 / 3 terminal requirements covered")).toBe(metric);
+      fireEvent.change(search, { target: { value: "no match" } });
+      expect(names()).toEqual(["Whole Model"]);
+      expect(location.href).toBe(url);
+      fireEvent.change(search, { target: { value: "" } });
+      expect(names()).toContain("Beta Root");
+      expect(location.href).toBe(url);
+    } finally { view.unmount(); history.replaceState(null, "", "/"); }
+  });
 
   it("previews branch labels and unavailable choices in Patterns", () => {
     const view = render(<ProductPatternsPage />);

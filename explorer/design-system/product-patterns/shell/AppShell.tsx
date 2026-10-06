@@ -32,7 +32,7 @@ export interface ShellActionItem {
 
 export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
   brandLabel?: ReactNode;
-  /** Persistent context control immediately after the brand, independent of side panes. */
+  /** Persistent context control after the brand, within the pane-aligned header segment. */
   headerContext?: ReactNode;
   /** Context controls below the persistent navigation header. */
   toolbar?: ReactNode;
@@ -151,23 +151,35 @@ const shellSkinX = css`
 `;
 
 const headerBaseUX = css`
+  --ux-header-leading-min-width: calc(var(--space-32) * 2 + var(--space-16));
+  --ux-header-leading-width: var(--ux-header-leading-min-width);
   z-index: var(--z-sticky);
   display: flex;
   flex: 0 0 var(--app-header-height);
   align-items: stretch;
   height: var(--app-header-height);
 
-  @media (max-width: 900px) {
-    padding-right: 0;
+  &[data-align-pane="true"] {
+    --ux-header-leading-width: max(var(--ux-current-left-width), var(--ux-header-leading-min-width));
   }
 
   &[data-has-context="true"] {
-    @media (max-width: 1100px) {
-      display: grid;
-      flex-basis: auto;
-      grid-template-columns: auto minmax(0, 1fr) auto;
-      height: auto;
+    --ux-header-leading-min-width: calc(var(--space-32) * 4 + var(--space-16));
+    @media (max-width: 600px) {
+      --ux-header-leading-min-width: calc(var(--space-32) * 3);
     }
+  }
+
+  @media (max-width: 1100px) {
+    display: grid;
+    flex-basis: auto;
+    grid-template-columns: var(--ux-header-leading-width) minmax(0, 1fr);
+    grid-template-rows: var(--app-header-height) var(--control-lg);
+    height: auto;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 `;
 
@@ -184,29 +196,37 @@ const headerSkinX = css`
   background: var(--bg-surface);
 `;
 
-const brandClass = css`
-  --ux-brand-min-w: 160px;
+const headerLeadingClass = css`
   display: flex;
-  flex: 0 0 var(--ux-current-left-width);
+  flex: 0 0 var(--ux-header-leading-width);
+  align-items: flex-start;
+  width: var(--ux-header-leading-width);
+  min-width: var(--ux-header-leading-min-width);
+  box-sizing: border-box;
+  border-right: var(--border-w) solid var(--border-subtle);
+
+  @media (max-width: 1100px) {
+    grid-column: 1;
+    grid-row: 1 / -1;
+  }
+
+  @media (max-width: 640px) {
+    grid-row: 1;
+    width: min(100%, var(--ux-header-leading-width));
+  }
+`;
+
+const brandClass = css`
+  display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: var(--space-5);
   box-sizing: border-box;
-  border-right: var(--border-w) solid var(--border-subtle);
+  height: var(--app-header-height);
   padding: 0 var(--space-10);
 
-  @media (max-width: 900px) {
-    flex-basis: auto;
-    width: auto;
-    min-width: var(--ux-brand-min-w);
-  }
-
   &[data-has-context="true"] {
-    flex: 0 0 auto;
-    width: auto;
-    min-width: 0;
-    border-right: 0;
     padding-right: var(--space-6);
-    height: var(--app-header-height);
 
     @media (max-width: 600px) {
       padding-inline: var(--space-6);
@@ -228,21 +248,14 @@ const brandMarkClass = css`
 
 const headerContextClass = css`
   display: flex;
-  flex: 0 1 calc(var(--space-32) * 4);
+  flex: 1 1 auto;
   align-items: center;
-  min-width: calc(var(--space-32) * 2);
-  max-width: calc(var(--space-32) * 4);
+  min-width: 0;
+  margin-left: auto;
+  max-width: calc(var(--space-32) * 4 + var(--space-6));
+  height: var(--app-header-height);
+  box-sizing: border-box;
   padding-right: var(--space-6);
-`;
-
-const headerContextTabsClass = css`
-  padding-left: var(--space-4);
-  @media (max-width: 1100px) {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    min-height: var(--control-lg);
-    padding-inline: var(--space-6);
-  }
 `;
 
 const brandNameClass = css`
@@ -268,6 +281,16 @@ const headerTabsClass = css`
   --ds-tabs-h: 100%;
   --ds-tabs-border-bottom: 0;
   --ds-tab-h: 100%;
+
+  @media (max-width: 1100px) {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  @media (max-width: 640px) {
+    grid-column: 1 / -1;
+    padding-inline: var(--space-6);
+  }
 `;
 
 const headerActionsClass = css`
@@ -279,6 +302,12 @@ const headerActionsClass = css`
 
   @media (max-width: 900px) {
     padding-right: var(--space-6);
+  }
+
+  @media (max-width: 1100px) {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-end;
   }
 `;
 
@@ -383,6 +412,7 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
       <ShellHeader
         brandLabel={brandLabel}
         context={headerContext}
+        alignPane={sidePane != null}
         navigationItems={navigationItems}
         activeNavigationValue={activeNavigationValue}
         headerActions={headerActions}
@@ -433,6 +463,7 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
 function ShellHeader({
   brandLabel,
   context,
+  alignPane,
   navigationItems,
   activeNavigationValue,
   headerActions,
@@ -440,6 +471,7 @@ function ShellHeader({
 }: {
   brandLabel: ReactNode;
   context?: ReactNode;
+  alignPane: boolean;
   navigationItems: ShellNavigationItem[];
   activeNavigationValue?: string;
   headerActions: ShellActionItem[];
@@ -453,13 +485,16 @@ function ShellHeader({
   }));
 
   return (
-    <header data-product-pattern="shell-header" data-has-context={context != null || undefined} className={cx(headerBaseUX, headerSkinX)}>
-      <div data-product-pattern-slot="brand" data-has-context={context != null || undefined} className={cx(brandClass)}>
-        <BrandMark className={cx(brandMarkClass)} decorative />
-        {brandLabel != null ? <span className={cx(brandNameClass)}>{brandLabel}</span> : null}
+    <header data-product-pattern="shell-header" data-has-context={context != null || undefined}
+      data-align-pane={alignPane || undefined} className={cx(headerBaseUX, headerSkinX)}>
+      <div data-product-pattern-slot="header-leading" className={cx(headerLeadingClass)}>
+        <div data-product-pattern-slot="brand" data-has-context={context != null || undefined} className={cx(brandClass)}>
+          <BrandMark className={cx(brandMarkClass)} decorative />
+          {brandLabel != null ? <span className={cx(brandNameClass)}>{brandLabel}</span> : null}
+        </div>
+        {context != null ? <div data-product-pattern-slot="header-context" className={cx(headerContextClass)}>{context}</div> : null}
       </div>
-      {context != null ? <div data-product-pattern-slot="header-context" className={cx(headerContextClass)}>{context}</div> : null}
-      <nav className={cx(headerTabsClass, context != null && headerContextTabsClass)} aria-label="Explorer views">
+      <nav className={cx(headerTabsClass)} aria-label="Explorer views">
         <Tabs
           items={tabItems}
           value={activeNavigationValue}
@@ -468,7 +503,7 @@ function ShellHeader({
         />
       </nav>
       {headerActions.length > 0 ? (
-        <div className={cx(headerActionsClass)}>
+        <div data-product-pattern-slot="header-actions" className={cx(headerActionsClass)}>
           {headerActions.map((action) => (
             <IconButton
               key={action.id}

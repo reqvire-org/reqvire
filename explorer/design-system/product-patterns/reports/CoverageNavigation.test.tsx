@@ -10,6 +10,40 @@ const scopes = [
 ];
 
 describe("Coverage navigation", () => {
+  it("filters names and identifiers with ancestors while preserving selection and disclosure", () => {
+    const input = structuredClone(scopes);
+    const select = vi.fn();
+    const view = render(<CoverageNavigation scopes={input} selectedId="cap#other" onSelect={select} />);
+    fireEvent.keyDown(screen.getByRole("treeitem", { name: "Root" }), { key: "ArrowLeft" });
+    view.rerender(<CoverageNavigation scopes={input} selectedId="cap#other" onSelect={select} query="  nEsTeD  " />);
+    expect(screen.getAllByRole("treeitem").map(row => row.getAttribute("aria-label")))
+      .toEqual(["Whole Model", "Root", "Child", "Nested"]);
+    expect(screen.getByRole("treeitem", { name: "Root" }).getAttribute("aria-expanded")).toBe("true");
+    fireEvent.keyDown(screen.getByRole("treeitem", { name: "Child" }), { key: "ArrowLeft" });
+    expect(screen.queryByRole("treeitem", { name: "Nested" })).toBeNull();
+    view.rerender(<CoverageNavigation scopes={input} selectedId="cap#other" onSelect={select} query="CAP#NESTED" />);
+    expect(screen.getByRole("treeitem", { name: "Nested" })).toBeTruthy();
+    view.rerender(<CoverageNavigation scopes={input} selectedId="cap#other" onSelect={select} query="" />);
+    expect(screen.queryByRole("treeitem", { name: "Child" })).toBeNull();
+    expect(screen.getByRole("treeitem", { name: "Other" }).getAttribute("aria-selected")).toBe("true");
+    expect(select).not.toHaveBeenCalled();
+    expect(input).toEqual(scopes);
+  });
+
+  it("keeps Whole Model available for unmatched and empty filters without empty disclosures", () => {
+    const select = vi.fn();
+    const view = render(<CoverageNavigation scopes={scopes} selectedId="cap#nested" onSelect={select} query="missing" />);
+    const whole = screen.getByRole("treeitem", { name: "Whole Model" });
+    expect(screen.getAllByRole("treeitem")).toEqual([whole]);
+    expect(whole.hasAttribute("aria-expanded")).toBe(false);
+    fireEvent.click(whole);
+    expect(select).toHaveBeenLastCalledWith(null);
+    view.rerender(<CoverageNavigation scopes={scopes} selectedId={null} onSelect={select} query="Other" />);
+    expect(screen.getByRole("treeitem", { name: "Other" }).hasAttribute("aria-expanded")).toBe(false);
+    view.rerender(<CoverageNavigation scopes={[]} selectedId={null} onSelect={select} query="Nested" />);
+    expect(screen.getAllByRole("treeitem")).toEqual([whole]);
+  });
+
   it("selects canonical capabilities and identifies the selected item", () => {
     const select = vi.fn();
     const view = render(<CoverageNavigation scopes={scopes} selectedId={null} onSelect={select} />);

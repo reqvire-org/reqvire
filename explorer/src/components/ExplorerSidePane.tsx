@@ -103,6 +103,7 @@ export function ExplorerSidePane({
       {activeView === "thesaurus" && <ThesaurusSearch />}
       {showProjectTree && <ProjectTreeSearch />}
       {activeView === "traces" && <TraceTreeSearch />}
+      {activeView === "coverage" && <CoverageTreeSearch />}
       <ExplorerViewControls
         activeView={activeView}
         onOpenElement={onOpenElement}
@@ -258,6 +259,21 @@ function TraceTreeSearch() {
   );
 }
 
+function CoverageTreeSearch() {
+  const ui = useExplorerUiState();
+
+  return (
+    <PaneSearchForm
+      searchInputId="coverage-tree-search"
+      inputLabel="Filter capability tree"
+      placeholder="Filter capabilities..."
+      value={ui.coverageTreeQuery}
+      onQueryChange={ui.setCoverageTreeQuery}
+      onSubmit={(event) => event.preventDefault()}
+    />
+  );
+}
+
 function ExplorerViewControls({
   activeView,
   onOpenElement,
@@ -378,10 +394,9 @@ function ExplorerViewControls({
   }
 
   if (activeView === "coverage") {
-    return <PaneControlSection aria-label="Coverage explorer">
-      <CoverageNavigation key={JSON.stringify([store.project.workspace_root, store.project.worktree_id])}
-        scopes={coverageScopes} selectedId={ui.coverageScopeId} onSelect={ui.setCoverageScopeId} />
-    </PaneControlSection>;
+    return <CoverageNavigation key={JSON.stringify([store.project.workspace_root, store.project.worktree_id])}
+      scopes={coverageScopes} selectedId={ui.coverageScopeId} onSelect={ui.setCoverageScopeId}
+      query={ui.coverageTreeQuery} />;
   }
 
   if (activeView === "search") {
