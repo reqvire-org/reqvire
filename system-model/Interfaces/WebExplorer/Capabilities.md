@@ -666,9 +666,9 @@ The system shall ensure color consistency between:
 WHEN Explorer is served, the system SHALL let each browser tab select any local branch through one branch picker and load only the requested context under the server's existing read-only or mutation-enabled admission rules, without switching existing Git checkouts or changing another client's context.
 
 #### Details
-While displaying a served Explorer view, the system SHALL keep the branch picker visible in the shared header beside the Reqvire brand independently of left-pane state.
+While displaying a served Explorer view, the system SHALL keep the branch picker visible at the far right of the shared header, after Search, theme and Help, independently of left-pane state.
 
-When a user resizes the expanded left pane, the system SHALL align the header's brand-and-picker segment divider and view navigation with its live boundary while retaining header actions at the right edge.
+When a user resizes the expanded left pane, the system SHALL align the header's brand segment divider and view navigation with its live boundary while retaining header actions and the branch picker at the right edge.
 
 While preparing a newly selected worktree, the system SHALL show a blocking loading dialog over the retained model. If preparation fails, the system SHALL show the error and allow dismissal to the retained model; successful preparation SHALL close the dialog and render the new model.
 

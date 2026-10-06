@@ -72,7 +72,7 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
   const showRefreshError = Boolean(refreshError && !selectingWorktree
     && !(dismissedRefresh?.context === displayedWorktree && dismissedRefresh?.error === refreshError));
   const blocked = selectingWorktree || showRefreshError;
-  const worktreeSelector = live.worktreeRouting ? <WorktreeSelector density="compact"
+  const worktreeSelector = live.worktreeRouting ? <WorktreeSelector density="compact" menuAlign="end"
     value={live.selectedWorktree}
     displayedValue={result.ok ? result.store.project.worktree_id : undefined}
     choices={live.worktrees.map(item => ({ id: item.worktree_id, branch: item.branch, root: item.workspace_root, available: item.available && (item.explorer_available || item.owned === false) }))}

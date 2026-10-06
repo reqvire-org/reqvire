@@ -43,7 +43,9 @@ describe("showcase application coverage", () => {
       const leading = shell.querySelector('[data-product-pattern-slot="header-leading"]')!;
       const picker = screen.getByRole("combobox", { name: "Branch" });
       const navigation = screen.getByRole("navigation", { name: "Explorer views" });
-      expect(leading.contains(picker)).toBe(true);
+      const trailing = shell.querySelector('[data-product-pattern-slot="header-trailing"]')!;
+      expect(leading.contains(picker)).toBe(false);
+      expect(trailing.lastElementChild?.contains(picker)).toBe(true);
       expect(leading.nextElementSibling).toBe(navigation);
       const resizer = screen.getByRole("separator", { name: "Resize explorer pane" });
       const url = location.href;
@@ -54,7 +56,7 @@ describe("showcase application coverage", () => {
       expect(location.href).toBe(url);
       fireEvent.click(screen.getByRole("button", { name: "Collapse explorer" }));
       expect(screen.getByRole("combobox", { name: "Branch" })).toBe(picker);
-      expect(leading.contains(picker)).toBe(true);
+      expect(trailing.lastElementChild?.contains(picker)).toBe(true);
       expect(screen.getByRole("button", { name: "Search" })).toBeTruthy();
       expect(screen.getByRole("button", { name: "Help" })).toBeTruthy();
       fireEvent.click(screen.getByRole("button", { name: "Expand explorer" }));

@@ -32,7 +32,7 @@ export interface ShellActionItem {
 
 export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
   brandLabel?: ReactNode;
-  /** Persistent context control after the brand, within the pane-aligned header segment. */
+  /** Persistent context control at the far right, after header actions. */
   headerContext?: ReactNode;
   /** Context controls below the persistent navigation header. */
   toolbar?: ReactNode;
@@ -164,9 +164,8 @@ const headerBaseUX = css`
   }
 
   &[data-has-context="true"] {
-    --ux-header-leading-min-width: calc(var(--space-32) * 4 + var(--space-16));
     @media (max-width: 600px) {
-      --ux-header-leading-min-width: calc(var(--space-32) * 3);
+      --ux-header-leading-min-width: calc(var(--space-10) + var(--space-6) * 2);
     }
   }
 
@@ -226,8 +225,6 @@ const brandClass = css`
   padding: 0 var(--space-10);
 
   &[data-has-context="true"] {
-    padding-right: var(--space-6);
-
     @media (max-width: 600px) {
       padding-inline: var(--space-6);
       > span { display: none; }
@@ -248,14 +245,35 @@ const brandMarkClass = css`
 
 const headerContextClass = css`
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   align-items: center;
-  min-width: 0;
-  margin-left: auto;
-  max-width: calc(var(--space-32) * 4 + var(--space-6));
+  width: calc(var(--space-32) * 4 + var(--space-10));
+  min-width: calc(var(--space-32) * 2 + var(--space-6));
+  max-width: calc(var(--space-32) * 4 + var(--space-10));
   height: var(--app-header-height);
   box-sizing: border-box;
-  padding-right: var(--space-6);
+  padding-right: var(--space-10);
+
+  @media (max-width: 900px) {
+    padding-right: var(--space-6);
+  }
+
+  @media (max-width: 600px) {
+    width: clamp(calc(var(--space-32) * 2 + var(--space-6)), 32vw, calc(var(--space-32) * 3 + var(--space-6)));
+    max-width: calc(var(--space-32) * 3 + var(--space-6));
+  }
+`;
+
+const headerTrailingClass = css`
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  min-width: 0;
+
+  @media (max-width: 1100px) {
+    grid-column: 2;
+    grid-row: 1;
+  }
 `;
 
 const brandNameClass = css`
@@ -300,15 +318,14 @@ const headerActionsClass = css`
   gap: var(--space-2);
   padding: 0 var(--space-10) 0 var(--space-4);
 
+  &[data-has-context="true"] {
+    padding-right: var(--space-4);
+  }
+
   @media (max-width: 900px) {
     padding-right: var(--space-6);
   }
 
-  @media (max-width: 1100px) {
-    grid-column: 2;
-    grid-row: 1;
-    justify-content: flex-end;
-  }
 `;
 
 const mainClass = css`
@@ -492,7 +509,6 @@ function ShellHeader({
           <BrandMark className={cx(brandMarkClass)} decorative />
           {brandLabel != null ? <span className={cx(brandNameClass)}>{brandLabel}</span> : null}
         </div>
-        {context != null ? <div data-product-pattern-slot="header-context" className={cx(headerContextClass)}>{context}</div> : null}
       </div>
       <nav className={cx(headerTabsClass)} aria-label="Explorer views">
         <Tabs
@@ -502,8 +518,9 @@ function ShellHeader({
           variant="underline"
         />
       </nav>
-      {headerActions.length > 0 ? (
-        <div data-product-pattern-slot="header-actions" className={cx(headerActionsClass)}>
+      {(headerActions.length > 0 || context != null) && <div data-product-pattern-slot="header-trailing" className={cx(headerTrailingClass)}>
+        {headerActions.length > 0 ? <div data-product-pattern-slot="header-actions"
+          data-has-context={context != null || undefined} className={cx(headerActionsClass)}>
           {headerActions.map((action) => (
             <IconButton
               key={action.id}
@@ -516,8 +533,9 @@ function ShellHeader({
               <Icon name={action.icon} />
             </IconButton>
           ))}
-        </div>
-      ) : null}
+        </div> : null}
+        {context != null ? <div data-product-pattern-slot="header-context" className={cx(headerContextClass)}>{context}</div> : null}
+      </div>}
     </header>
   );
 }

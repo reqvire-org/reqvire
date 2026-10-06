@@ -105,7 +105,7 @@ describe("Explorer worktree navigation", () => {
     } finally { view.unmount(); }
   });
 
-  it("keeps the compact branch picker after the brand in the shared header across navigation and pane collapse", () => {
+  it("keeps the compact branch picker last in the shared header across navigation and pane collapse", () => {
     window.history.replaceState(null, "", "/?worktree_id=original#/model");
     localStorage.setItem("reqvire-explorer-theme", "light");
     const selectWorktree = vi.fn();
@@ -134,11 +134,20 @@ describe("Explorer worktree navigation", () => {
       expect(header).toBeTruthy();
       expect(selector.closest('[data-product-pattern-slot="header-context"]')).toBeTruthy();
       const brand = header.querySelector('[data-product-pattern-slot="brand"]')!;
-      expect(brand.nextElementSibling?.contains(selector)).toBe(true);
       const leading = header.querySelector('[data-product-pattern-slot="header-leading"]')!;
+      const trailing = header.querySelector('[data-product-pattern-slot="header-trailing"]')!;
+      const actions = header.querySelector('[data-product-pattern-slot="header-actions"]')!;
+      const context = header.querySelector('[data-product-pattern-slot="header-context"]')!;
       expect(leading.contains(brand)).toBe(true);
-      expect(leading.contains(selector)).toBe(true);
+      expect(leading.contains(selector)).toBe(false);
       expect(leading.nextElementSibling).toBe(navigation);
+      expect(header.lastElementChild).toBe(trailing);
+      expect(trailing.lastElementChild).toBe(context);
+      expect(context.previousElementSibling).toBe(actions);
+      expect(context.contains(selector)).toBe(true);
+      fireEvent.click(selector);
+      expect(screen.getByRole("listbox", { name: "Branches" }).parentElement?.getAttribute("data-align")).toBe("end");
+      fireEvent.keyDown(selector, { key: "Escape" });
       expect(header.getAttribute("data-align-pane")).toBe("true");
       expect(selector.closest('[data-product-pattern-slot="start-pane"]')).toBeNull();
       expect(selector.textContent).toBe("main");

@@ -15,13 +15,14 @@ The **Explorer** is the read/navigate surface over that graph. It is one applica
 
 > **Design intent.** The reference screenshots show *what exists and the direction* — not a pixel target. This system keeps the structure and semantics (the modes, the element-type color code, the sidebar + canvas + top-tab shell) and **elevates the craft**: warm product surfaces, slate text ramps, a rose chrome accent, Geist type, a 4px spacing grid, restrained elevation, and a clean component set.
 
-The shared `AppShell` aligns its brand/branch segment and view tabs with the
-expanded Explorer pane during resizing. Header actions stay at the right edge.
-The branch control aligns to its segment's right inset, leaving space after the
-brand. Collapse retains a usable brand and branch control, and constrained widths
-reflow navigation. The real Explorer mock exercises this same shell. Coverage
-starts its pane with the Model-style quick filter above the Whole Model tree,
-without a separate Capabilities heading.
+The shared `AppShell` aligns its brand segment and view tabs with the expanded
+Explorer pane during resizing. Header actions stay at the right edge, followed
+by the branch control last at the far right. Its menu opens inward from the
+trigger's right edge. Collapse retains a usable brand and branch control, and
+constrained widths reflow navigation. The real Explorer mock exercises this same
+shell. Coverage starts its pane with the Model-style quick filter above the Whole
+Model tree, without a separate Capabilities heading. Coverage issue rows show
+their type badge on the right without a duplicate leading element icon.
 
 ## Sources
 

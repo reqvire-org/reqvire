@@ -70,6 +70,10 @@ const compactMenuClass = css`
   width: max(100%, calc(var(--space-32) * 5));
   max-width: calc(100vw - var(--space-32));
   box-sizing: border-box;
+  &[data-align="end"] {
+    left: auto;
+    right: 0;
+  }
 `;
 const listClass = css`
   max-height: min(50vh, calc(var(--control-lg) * 7));
@@ -103,6 +107,8 @@ const optionTextClass = css`
 
 export interface WorktreeSelectorProps {
   density?: "default" | "compact";
+  /** Anchor the expanded compact menu to the trigger's start or end edge. */
+  menuAlign?: "start" | "end";
   value?: string;
   displayedValue?: string;
   choices: { id: string; branch: string; root: string; available: boolean }[];
@@ -112,7 +118,7 @@ export interface WorktreeSelectorProps {
   onOpen: () => void;
 }
 /** The trigger identifies the adopted snapshot; choosing a target does not relabel it. */
-export function WorktreeSelector({ density = "default", value, displayedValue, choices, branch, pending, onChange, onOpen }: WorktreeSelectorProps) {
+export function WorktreeSelector({ density = "default", menuAlign = "start", value, displayedValue, choices, branch, pending, onChange, onOpen }: WorktreeSelectorProps) {
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -184,7 +190,7 @@ export function WorktreeSelector({ density = "default", value, displayedValue, c
       <span className={cx(nameClass)}>{branch || "Choose branch"}</span>
       <Icon name="chevron-down" />
     </button>
-    {open && <div className={cx(menuClass, density === "compact" && compactMenuClass)}>
+    {open && <div data-align={menuAlign} className={cx(menuClass, density === "compact" && compactMenuClass)}>
       <div className={cx(headingClass)}>Switch branch</div>
       <ul id={id} role="listbox" aria-label="Branches" className={cx(listClass)}>
         {choices.map(choice => <li key={choice.id} id={optionId(choice.id)} role="option" data-worktree-id={choice.id}

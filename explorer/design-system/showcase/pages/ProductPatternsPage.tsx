@@ -285,12 +285,12 @@ export function ProductPatternsPage() {
     <div className="showcase-page showcase-page--wide">
       <Section
         title="Explorer Shell"
-        desc="Shared shell with pane-aligned branding and branch control, view navigation, and workspace. The real Explorer mock supports pane resizing and collapse with this same header."
+        desc="Shared shell with pane-aligned branding and view tabs, and a branch control at the far right after header actions. The real Explorer mock supports pane resizing and collapse with this same header."
       >
         <div className="showcase-shell-demo">
           <AppShell
             brandLabel="REQVIRE"
-            headerContext={<WorktreeSelector density="compact" value={worktreeId} choices={SHOWCASE_WORKTREES}
+            headerContext={<WorktreeSelector density="compact" menuAlign="end" value={worktreeId} choices={SHOWCASE_WORKTREES}
               branch={SHOWCASE_WORKTREES.find(choice => choice.id === worktreeId)?.branch}
               onChange={setWorktreeId} onOpen={() => {}} />}
             navigationItems={[...SHELL_PATTERN_NAVIGATION]}

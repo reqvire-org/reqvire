@@ -41,9 +41,10 @@ try {
     const selector = document.querySelector('.ux-worktree-selector [role="combobox"]');
     return Boolean(navigation && selector
       && navigation.querySelectorAll('[role="tab"]').length === 5
-      && selector.closest('[data-product-pattern-slot="header-context"]')?.previousElementSibling?.getAttribute('data-product-pattern-slot') === 'brand'
+      && selector.closest('[data-product-pattern-slot="header-context"]')?.previousElementSibling?.getAttribute('data-product-pattern-slot') === 'header-actions'
+      && selector.closest('[data-product-pattern-slot="header-trailing"]')?.lastElementChild?.contains(selector)
       && selector.closest('[data-product-pattern="shell-header"]'));
-  }), 'Worktree picker must follow the brand in the shared header and preserve Explorer navigation');
+  }), 'Worktree picker must be last after header actions and preserve Explorer navigation');
   await browser.evaluate(() => document.querySelector('button[aria-label="Collapse explorer"]').click());
   assert(await browser.evaluate(() => Boolean(document.querySelector('[data-product-pattern="shell-header"] [role="combobox"]'))), 'Collapsed pane hid the worktree picker');
   await browser.evaluate(() => document.querySelector('button[aria-label="Expand explorer"]').click());

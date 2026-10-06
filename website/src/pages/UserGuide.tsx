@@ -347,7 +347,7 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           Git hook before committing again; reconciliation does not fix the hook.
         </p>
         <p className="text-zinc-600 mb-4">
-          The branch picker beside Reqvire in the shared header is available with plain
+          The branch picker at the far right of the shared header, after Search, theme and Help, is available with plain
           serving and read-only MCP too, and stays visible when the left pane is collapsed. It lists every local branch in the startup
           repository and loads only the branch you select, reusing its worktree or
           creating an isolated managed worktree. Each tab can browse a different model; its URL

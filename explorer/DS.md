@@ -267,15 +267,18 @@ responsive behavior. Application views and showcase fixtures consume their
 public APIs. User-resized pane geometry remains runtime state; the design
 system defines how controls fill that space.
 
-`AppShell` owns the pane-aligned header. Its leading segment groups the brand
-and optional `headerContext`, and shares the expanded pane's live width and
-divider. The bounded context control aligns to the segment's right inset;
-extra width separates it from the brand. View tabs follow that segment during
-pointer and keyboard resizing;
-header actions stay at the right edge. A minimum leading width keeps branding
-and context usable when the pane collapses. Constrained headers use a second
-scrollable navigation row, aligned with the pane until a narrow viewport needs
-the full row. Production and the real Explorer mock consume this same pattern.
+`AppShell` owns the pane-aligned header. Its leading brand segment shares the
+expanded pane's live width and divider. View tabs follow that segment during
+pointer and keyboard resizing. Header actions and optional `headerContext`
+stay at the right edge, with the context control last. The compact branch picker
+uses bounded responsive sizing and `menuAlign="end"` to open inward from its
+right edge. A minimum leading width keeps branding usable when the pane
+collapses. Constrained headers use a second scrollable navigation row, aligned
+with the pane until a narrow viewport needs the full row. Production and the
+real Explorer mock consume this same pattern.
+
+`CoverageGapRowButton` shows the name and source path with a trailing type
+badge. It omits a duplicate leading element icon in all four Coverage issue lists.
 
 `WorktreeLoadDialog` owns the shared loading/error presentation. Its refresh
 variant reports the displayed branch and retry policy in the same dismissible

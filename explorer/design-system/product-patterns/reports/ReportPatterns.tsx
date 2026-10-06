@@ -1357,7 +1357,6 @@ export function CoverageGapRowButton({
 }: CoverageGapRowButtonProps) {
   return (
     <button type="button" className={cx("coverage-gap-row", className)} {...props}>
-      <ElementIcon type={type} family={family} size="sm" />
       <span className="coverage-gap-row__copy">
         <span className="coverage-gap-row__title">{title}</span>
         <span className="coverage-gap-row__file">{file}</span>
