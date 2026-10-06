@@ -24,7 +24,6 @@ use rmcp::{
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::future::Future;
-use std::pin::Pin;
 use std::sync::Arc;
 use tokio::sync::{RwLock, Semaphore};
 
@@ -35,14 +34,6 @@ pub fn capacity_error() -> McpError {
         Some(json!({"retryable":true})),
     )
 }
-
-pub type PostWriteHook = Arc<
-    dyn Fn(
-            Option<Arc<reqvire::ModelManager>>,
-        ) -> Pin<Box<dyn Future<Output = Result<(), ReqvireError>> + Send>>
-        + Send
-        + Sync,
->;
 
 #[derive(Clone, Copy)]
 pub struct McpOptions<'a> {
@@ -73,65 +64,35 @@ struct ToolCallParams {
 
 #[derive(Clone)]
 struct ReqvireMcpServer {
-    enable_mutations: bool,
     with_size_estimates: bool,
     excluded_filename_patterns: Arc<GlobSet>,
     write_lock: Arc<RwLock<()>>,
-    post_write_hook: Option<PostWriteHook>,
     read_capacity: Arc<Semaphore>,
     control_capacity: Arc<Semaphore>,
-    session: Option<Arc<std::sync::Mutex<crate::mcp_session::MutationSession>>>,
     worktrees: Option<Arc<crate::mcp_worktrees::Worktrees>>,
     #[cfg(test)]
     before_dispatch: Option<BeforeDispatch>,
 }
 
 impl ReqvireMcpServer {
-    fn new_with_write_lock(
-        enable_mutations: bool,
-        enable_commits: bool,
+    fn read_only(
         with_size_estimates: bool,
         excluded_filename_patterns: &GlobSet,
         write_lock: Arc<RwLock<()>>,
-        post_write_hook: Option<PostWriteHook>,
-    ) -> Result<Self, ReqvireError> {
-        if enable_commits && !enable_mutations {
-            return Err(ReqvireError::ProcessError(
-                "--enable-commits requires --enable-mutations".into(),
-            ));
-        }
-        let session = if enable_mutations {
-            Some(Arc::new(std::sync::Mutex::new(
-                crate::mcp_session::MutationSession::start(
-                    excluded_filename_patterns,
-                    with_size_estimates,
-                    enable_commits,
-                )?,
-            )))
-        } else {
-            None
-        };
-        Ok(Self {
-            enable_mutations,
+    ) -> Self {
+        Self {
             with_size_estimates,
             excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
             write_lock,
-            post_write_hook,
             read_capacity: Arc::new(Semaphore::new(crate::mcp_worker::available_parallelism())),
             control_capacity: Arc::new(Semaphore::new(crate::mcp_worker::available_parallelism())),
-            session,
             worktrees: None,
             #[cfg(test)]
             before_dispatch: None,
-        })
+        }
     }
 
-    async fn call_handler(
-        &self,
-        method: &str,
-        params: Value,
-        serialize: bool,
-    ) -> Result<Value, McpError> {
+    async fn call_handler(&self, method: &str, params: Value) -> Result<Value, McpError> {
         if let Some(worktrees) = &self.worktrees {
             // Separate budgets let control operations progress even when all
             // read slots are occupied; both queues remain bounded.
@@ -154,75 +115,26 @@ impl ReqvireMcpServer {
                 McpError::internal_error(format!("Worktree request failed: {e}"), None)
             })?;
         }
-        if !self.enable_mutations {
-            // All clients share this budget. There is no extra admission queue:
-            // reserve capacity before creating a blocking job or waiting for a
-            // controlled write. Size it from the host's available parallelism;
-            // parsing/validation/query work can consume a full CPU per request.
-            let capacity = Arc::clone(&self.read_capacity)
-                .try_acquire_owned()
-                .map_err(|_| capacity_error())?;
-            // A fair shared gate allows independent reads, without racing a
-            // controlled write or starving an already queued writer.
-            let gate = Arc::clone(&self.write_lock).read_owned().await;
-            let server = self.clone();
-            let method = method.to_owned();
-            return tokio::task::spawn_blocking(move || {
-                // Keep both guards inside the job. Dropping the async waiter
-                // cannot release them while synchronous work is still running.
-                let (_capacity, _gate) = (capacity, gate);
-                server.call_handler_unlocked(&method, params)
-            })
-            .await
-            .map_err(|error| {
-                McpError::internal_error(format!("MCP read failed: {error}"), None)
-            })?;
-        }
-        // These handlers obtain their model after dispatch. They must wait for
-        // a controlled write rather than scan a partially persisted workspace.
-        if serialize || matches!(method, "tools/call" | "resources/read") {
-            let _guard = self.write_lock.write().await;
-            let should_refresh_runtime =
-                method == "tools/call" && request_refreshes_runtime_after_write(&params);
-            let (result, persisted) = if let Some(session) = &self.session {
-                let name = params
-                    .get("name")
-                    .and_then(Value::as_str)
-                    .unwrap_or(method)
-                    .to_string();
-                session
-                    .lock()
-                    .map_err(|_| McpError::internal_error("MCP session lock poisoned", None))?
-                    .execute(should_refresh_runtime, &name, || {
-                        self.call_handler_unlocked(method, params)
-                    })
-            } else {
-                (self.call_handler_unlocked(method, params), false)
-            };
-            let succeeded = result
-                .as_ref()
-                .is_ok_and(|value| value.get("isError").and_then(Value::as_bool) != Some(true));
-            if succeeded && persisted {
-                if let Some(post_write_hook) = &self.post_write_hook {
-                    let model = self
-                        .session
-                        .as_ref()
-                        .map(|s| s.lock().expect("session lock").model());
-                    post_write_hook(model)
-                        .await
-                        .map_err(|error| {
-                            McpError::internal_error(
-                                format!(
-                                    "MCP mutation succeeded but Explorer runtime refresh failed: {error}"
-                                ),
-                                None,
-                            )
-                        })?;
-                }
-            }
-            return result;
-        }
-        self.call_handler_unlocked(method, params)
+        // All clients share this budget. There is no extra admission queue:
+        // reserve capacity before creating a blocking job or waiting for a
+        // controlled write. Size it from the host's available parallelism;
+        // parsing/validation/query work can consume a full CPU per request.
+        let capacity = Arc::clone(&self.read_capacity)
+            .try_acquire_owned()
+            .map_err(|_| capacity_error())?;
+        // A fair shared gate allows independent reads, without racing a
+        // controlled write or starving an already queued writer.
+        let gate = Arc::clone(&self.write_lock).read_owned().await;
+        let server = self.clone();
+        let method = method.to_owned();
+        tokio::task::spawn_blocking(move || {
+            // Keep both guards inside the job. Dropping the async waiter
+            // cannot release them while synchronous work is still running.
+            let (_capacity, _gate) = (capacity, gate);
+            server.call_handler_unlocked(&method, params)
+        })
+        .await
+        .map_err(|error| McpError::internal_error(format!("MCP read failed: {error}"), None))?
     }
 
     fn call_handler_unlocked(&self, method: &str, params: Value) -> Result<Value, McpError> {
@@ -230,10 +142,7 @@ impl ReqvireMcpServer {
         if let Some(hook) = &self.before_dispatch {
             hook(method, &params);
         }
-        if !self.enable_mutations
-            && method == "tools/call"
-            && params["name"] == "reqvire.worktree.list"
-        {
+        if method == "tools/call" && params["name"] == "reqvire.worktree.list" {
             let args = &params["arguments"];
             if !args.as_object().is_some_and(serde_json::Map::is_empty) {
                 return Err(McpError::invalid_params(
@@ -249,10 +158,7 @@ impl ReqvireMcpServer {
                 Err(e) => tool_error("reqvire.worktree.list", e),
             });
         }
-        if !self.enable_mutations
-            && method == "resources/read"
-            && params["uri"] == "reqvire://tools/contract"
-        {
+        if method == "resources/read" && params["uri"] == "reqvire://tools/contract" {
             let contract = self.call_handler_unlocked(
                 "tools/call",
                 json!({"name":"reqvire.tool_contract","arguments":{}}),
@@ -269,7 +175,7 @@ impl ReqvireMcpServer {
                 "method": method,
                 "params": params
             }),
-            self.enable_mutations,
+            false,
             self.with_size_estimates,
             self.excluded_filename_patterns.as_ref(),
         )
@@ -288,7 +194,7 @@ impl ReqvireMcpServer {
             .get("result")
             .cloned()
             .ok_or_else(|| McpError::internal_error("MCP response missing result", None))?;
-        if !self.enable_mutations && (method == "tools/list" || contract) {
+        if method == "tools/list" || contract {
             let definition = crate::mcp_worktrees::local_definitions()[0].clone();
             if method == "tools/list" {
                 result["tools"]
@@ -330,7 +236,7 @@ impl ServerHandler for ReqvireMcpServer {
         _context: RequestContext<RoleServer>,
     ) -> impl Future<Output = Result<ListToolsResult, McpError>> + MaybeSendFuture + '_ {
         async move {
-            let result = self.call_handler("tools/list", json!({}), false).await?;
+            let result = self.call_handler("tools/list", json!({})).await?;
             let tools = serde_json::from_value::<Vec<Tool>>(
                 result.get("tools").cloned().unwrap_or_else(|| json!([])),
             )
@@ -349,7 +255,6 @@ impl ServerHandler for ReqvireMcpServer {
                 .arguments
                 .map(Value::Object)
                 .unwrap_or_else(|| json!({}));
-            let serialize = request_requires_write_tool(&request.name, Some(&arguments));
             let result = self
                 .call_handler(
                     "tools/call",
@@ -357,7 +262,6 @@ impl ServerHandler for ReqvireMcpServer {
                         "name": request.name.as_ref(),
                         "arguments": arguments
                     }),
-                    serialize,
                 )
                 .await?;
             serde_json::from_value::<CallToolResult>(result)
@@ -371,9 +275,7 @@ impl ServerHandler for ReqvireMcpServer {
         _context: RequestContext<RoleServer>,
     ) -> impl Future<Output = Result<ListResourcesResult, McpError>> + MaybeSendFuture + '_ {
         async move {
-            let result = self
-                .call_handler("resources/list", json!({}), false)
-                .await?;
+            let result = self.call_handler("resources/list", json!({})).await?;
             serde_json::from_value::<ListResourcesResult>(result)
                 .map_err(|error| McpError::internal_error(error.to_string(), None))
         }
@@ -386,7 +288,7 @@ impl ServerHandler for ReqvireMcpServer {
     ) -> impl Future<Output = Result<ReadResourceResult, McpError>> + MaybeSendFuture + '_ {
         async move {
             let result = self
-                .call_handler("resources/read", json!({ "uri": request.uri }), false)
+                .call_handler("resources/read", json!({ "uri": request.uri }))
                 .await?;
             serde_json::from_value::<ReadResourceResult>(result)
                 .map_err(|error| McpError::internal_error(error.to_string(), None))
@@ -401,7 +303,7 @@ impl ServerHandler for ReqvireMcpServer {
     {
         async move {
             let value = self
-                .call_handler("resources/templates/list", json!({}), false)
+                .call_handler("resources/templates/list", json!({}))
                 .await?;
             serde_json::from_value(value).map_err(|e| McpError::internal_error(e.to_string(), None))
         }
@@ -413,7 +315,7 @@ impl ServerHandler for ReqvireMcpServer {
         _context: RequestContext<RoleServer>,
     ) -> impl Future<Output = Result<ListPromptsResult, McpError>> + MaybeSendFuture + '_ {
         async move {
-            let result = self.call_handler("prompts/list", json!({}), false).await?;
+            let result = self.call_handler("prompts/list", json!({})).await?;
             let prompts = serde_json::from_value::<Vec<Prompt>>(
                 result.get("prompts").cloned().unwrap_or_else(|| json!([])),
             )
@@ -443,7 +345,6 @@ impl ServerHandler for ReqvireMcpServer {
                         "name": request.name,
                         "arguments": arguments
                     }),
-                    false,
                 )
                 .await?;
             serde_json::from_value::<GetPromptResult>(result)
@@ -468,7 +369,7 @@ impl rmcp::Service<RoleServer> for ReqvireMcpTransport {
         if let rmcp::model::ClientRequest::ReadResourceRequest(request) = request {
             let mut value = self
                 .0
-                .call_handler("resources/read", json!({"uri":request.params.uri}), false)
+                .call_handler("resources/read", json!({"uri":request.params.uri}))
                 .await?;
             let metadata = value
                 .as_object_mut()
@@ -526,7 +427,7 @@ pub async fn serve_http(
     } else {
         None
     };
-    let server = server_with_worktrees(worktrees, with_size_estimates, excluded_filename_patterns)?;
+    let server = server_with_worktrees(worktrees, with_size_estimates, excluded_filename_patterns);
     if !enable_mutations {
         shared_validate_startup_with_options(excluded_filename_patterns, with_size_estimates)?;
     }
@@ -561,13 +462,12 @@ pub async fn serve_http(
 
 #[cfg(test)]
 pub fn router(
-    enable_mutations: bool,
     with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
     http_access: &HttpAccess,
-) -> Result<axum::Router, ReqvireError> {
-    router_with_write_lock(
-        enable_mutations,
+) -> axum::Router {
+    mount_read_only(
+        axum::Router::new(),
         with_size_estimates,
         excluded_filename_patterns,
         Arc::new(RwLock::new(())),
@@ -575,90 +475,29 @@ pub fn router(
     )
 }
 
-#[cfg(test)]
-pub fn router_with_write_lock(
-    enable_mutations: bool,
-    with_size_estimates: bool,
-    excluded_filename_patterns: &GlobSet,
-    write_lock: Arc<RwLock<()>>,
-    http_access: &HttpAccess,
-) -> Result<axum::Router, ReqvireError> {
-    mount_service(
-        axum::Router::new(),
-        enable_mutations,
-        with_size_estimates,
-        excluded_filename_patterns,
-        write_lock,
-        http_access,
-    )
-}
-
-#[cfg(test)]
-pub fn mount_service<S>(
+pub fn mount_read_only<S: Clone + Send + Sync + 'static>(
     router: axum::Router<S>,
-    enable_mutations: bool,
     with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
     write_lock: Arc<RwLock<()>>,
     http_access: &HttpAccess,
-) -> Result<axum::Router<S>, ReqvireError>
-where
-    S: Clone + Send + Sync + 'static,
-{
-    mount_service_with_post_write_hook(
+) -> axum::Router<S> {
+    mount_server(
         router,
-        McpOptions {
-            enable_mutations,
-            enable_commits: false,
-            with_size_estimates,
-            enable_github: false,
-            github_remote: "origin",
-        },
-        excluded_filename_patterns,
-        write_lock,
-        None,
+        ReqvireMcpServer::read_only(with_size_estimates, excluded_filename_patterns, write_lock),
         http_access,
     )
-}
-
-pub fn mount_service_with_post_write_hook<S>(
-    router: axum::Router<S>,
-    options: McpOptions<'_>,
-    excluded_filename_patterns: &GlobSet,
-    write_lock: Arc<RwLock<()>>,
-    post_write_hook: Option<PostWriteHook>,
-    http_access: &HttpAccess,
-) -> Result<axum::Router<S>, ReqvireError>
-where
-    S: Clone + Send + Sync + 'static,
-{
-    let server = ReqvireMcpServer::new_with_write_lock(
-        options.enable_mutations,
-        options.enable_commits,
-        options.with_size_estimates,
-        excluded_filename_patterns,
-        write_lock,
-        post_write_hook,
-    )?;
-    Ok(mount_server(router, server, http_access))
 }
 
 fn server_with_worktrees(
     worktrees: Option<Arc<crate::mcp_worktrees::Worktrees>>,
     with_size_estimates: bool,
     exclusions: &GlobSet,
-) -> Result<ReqvireMcpServer, ReqvireError> {
-    let mut server = ReqvireMcpServer::new_with_write_lock(
-        false,
-        false,
-        with_size_estimates,
-        exclusions,
-        Arc::new(RwLock::new(())),
-        None,
-    )?;
-    server.enable_mutations = worktrees.is_some();
+) -> ReqvireMcpServer {
+    let mut server =
+        ReqvireMcpServer::read_only(with_size_estimates, exclusions, Arc::new(RwLock::new(())));
     server.worktrees = worktrees;
-    Ok(server)
+    server
 }
 pub fn mount_worktrees<S: Clone + Send + Sync + 'static>(
     router: axum::Router<S>,
@@ -668,7 +507,7 @@ pub fn mount_worktrees<S: Clone + Send + Sync + 'static>(
 ) -> Result<axum::Router<S>, ReqvireError> {
     Ok(mount_server(
         router,
-        server_with_worktrees(Some(worktrees), false, exclusions)?,
+        server_with_worktrees(Some(worktrees), false, exclusions),
         access,
     ))
 }
@@ -1051,15 +890,7 @@ mod tests {
         let exclusions = reqvire::exclusions::ExclusionSetBuilder::new()
             .build()
             .expect("test fixture operation should succeed");
-        let server = ReqvireMcpServer::new_with_write_lock(
-            false,
-            false,
-            false,
-            &exclusions,
-            Arc::new(RwLock::new(())),
-            None,
-        )
-        .expect("test fixture operation should succeed");
+        let server = ReqvireMcpServer::read_only(false, &exclusions, Arc::new(RwLock::new(())));
         let expected = server
             .call_handler_unlocked("tools/list", json!({}))
             .expect("test fixture operation should succeed");

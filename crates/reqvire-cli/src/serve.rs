@@ -2,9 +2,7 @@ use crate::live_store::ChunkRequest;
 use crate::mcp;
 use reqvire::exclusions::ExclusionSet as GlobSet;
 use std::path::Path;
-use std::pin::Pin;
 use std::sync::Arc;
-use tokio::sync::{Mutex, RwLock};
 
 use axum::body::Body;
 use axum::extract::State;
@@ -17,27 +15,20 @@ use reqvire::error::ReqvireError;
 use reqvire::explorer_runtime::{
     build_runtime_data, embedded_asset, index_html, is_workspace_asset_path,
 };
-use reqvire::{model_cache, ModelBuildOptions};
+use reqvire::ModelBuildOptions;
 
 use crate::mcp_worktrees::PublishedRuntime as RuntimeSnapshot;
-
-struct RuntimeState {
-    snapshot: Arc<RuntimeSnapshot>,
-    refresh_error: Option<String>,
-}
 
 #[derive(Clone)]
 enum RuntimeSource {
     Worktrees(Arc<crate::mcp_worktrees::Worktrees>),
-    Local(Arc<Mutex<RuntimeState>>),
+    Local(Arc<RuntimeSnapshot>),
 }
 
 #[derive(Clone)]
 pub struct ServeState {
-    excluded_filename_patterns: Arc<GlobSet>,
     runtime: RuntimeSource,
     live_refresh: bool,
-    write_lock: Arc<RwLock<()>>,
 }
 
 impl ServeState {
@@ -52,7 +43,7 @@ impl ServeState {
         self.worktrees().is_some()
     }
 
-    fn local_runtime(&self) -> Result<&Mutex<RuntimeState>, ReqvireError> {
+    fn local_runtime(&self) -> Result<&Arc<RuntimeSnapshot>, ReqvireError> {
         match &self.runtime {
             RuntimeSource::Local(runtime) => Ok(runtime),
             RuntimeSource::Worktrees(_) => Err(ReqvireError::ProcessError(
@@ -98,10 +89,7 @@ fn prepare_runtime(
             },
         )?;
         let snapshot = RuntimeSnapshot::new(build_runtime_data(&model, None)?)?;
-        Ok(RuntimeSource::Local(Arc::new(Mutex::new(RuntimeState {
-            snapshot: Arc::new(snapshot),
-            refresh_error: None,
-        }))))
+        Ok(RuntimeSource::Local(Arc::new(snapshot)))
     }
 }
 
@@ -130,10 +118,8 @@ pub async fn serve_explorer(
         .map_err(|e| ReqvireError::ProcessError(e.to_string()))?
         .port();
     let state = ServeState {
-        excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
         runtime,
         live_refresh: enable_mcp && options.enable_mutations,
-        write_lock: Arc::new(RwLock::new(())),
     };
     let mut app = explorer_routes();
 
@@ -141,12 +127,6 @@ pub async fn serve_explorer(
         let http_access = http_access
             .for_listener(host, port)
             .map_err(ReqvireError::ProcessError)?;
-        let refresh_state = state.clone();
-        let post_write_hook: mcp::PostWriteHook = Arc::new(move |model| {
-            let refresh_state = refresh_state.clone();
-            Box::pin(async move { refresh_runtime_assets(&refresh_state, model).await })
-                as Pin<Box<dyn std::future::Future<Output = Result<(), ReqvireError>> + Send>>
-        });
         app = if let Some(worktrees) = state.worktrees().filter(|_| options.enable_mutations) {
             mcp::mount_worktrees(
                 app,
@@ -155,14 +135,13 @@ pub async fn serve_explorer(
                 &http_access,
             )?
         } else {
-            mcp::mount_service_with_post_write_hook(
+            mcp::mount_read_only(
                 app,
-                options,
+                options.with_size_estimates,
                 excluded_filename_patterns,
-                Arc::clone(&state.write_lock),
-                state.live_refresh.then_some(post_write_hook),
+                Arc::new(tokio::sync::RwLock::new(())),
                 &http_access,
-            )?
+            )
         };
     }
     let app = app.with_state(state);
@@ -293,7 +272,7 @@ async fn snapshot_for(state: &ServeState, uri: &Uri) -> Result<Arc<RuntimeSnapsh
             "Worktree selection is unavailable on this server".into(),
         ));
     }
-    Ok(Arc::clone(&state.local_runtime()?.lock().await.snapshot))
+    Ok(Arc::clone(state.local_runtime()?))
 }
 fn context_error(uri: &Uri, error: ReqvireError) -> Response<Body> {
     Response::builder().status(StatusCode::SERVICE_UNAVAILABLE)
@@ -453,48 +432,6 @@ async fn runtime_asset_response(
     }
 }
 
-/// Called only after an embedded MCP write, while the MCP workspace write gate
-/// is held. Browser requests read the published snapshot without model I/O.
-async fn refresh_runtime_assets(
-    state: &ServeState,
-    accepted: Option<Arc<reqvire::ModelManager>>,
-) -> Result<(), ReqvireError> {
-    let runtime = state.local_runtime()?;
-    let exclusions = Arc::clone(&state.excluded_filename_patterns);
-    let result = tokio::task::spawn_blocking(move || {
-        let model = if let Some(model) = accepted {
-            model
-        } else {
-            model_cache::load_cached_model(
-                exclusions.as_ref(),
-                ModelBuildOptions {
-                    lenient: false,
-                    with_size_estimates: false,
-                },
-            )?
-        };
-        RuntimeSnapshot::new(build_runtime_data(&model, None)?).map(Arc::new)
-    })
-    .await
-    .map_err(|error| ReqvireError::ProcessError(format!("Runtime refresh task failed: {error}")))
-    .and_then(|result| result);
-
-    let mut published = runtime.lock().await;
-    match result {
-        Ok(snapshot) => {
-            published.snapshot = snapshot;
-            published.refresh_error = None;
-            drop(published);
-            Ok(())
-        }
-        Err(error) => {
-            published.refresh_error = Some(error.to_string());
-            drop(published);
-            Err(error)
-        }
-    }
-}
-
 async fn serve_live_store(
     State(state): State<ServeState>,
     method: Method,
@@ -532,49 +469,34 @@ async fn live_response(
     } else {
         false
     };
-    let error = match &state.runtime {
-        RuntimeSource::Worktrees(_) => None,
-        RuntimeSource::Local(runtime) => runtime.lock().await.refresh_error.clone(),
-    };
     let revision = &snapshot.live.revision;
     let etag = format!("\"{revision}\"");
-    let (status, body) = error.map_or_else(
-        || {
-            if headers
-                .get(header::IF_NONE_MATCH)
-                .and_then(|value| value.to_str().ok())
-                .is_some_and(|value| {
-                    value.split(',').any(|candidate| {
-                        let candidate = candidate
-                            .trim()
-                            .strip_prefix("W/")
-                            .unwrap_or_else(|| candidate.trim());
-                        candidate == etag || candidate == "*"
-                    })
-                })
-            {
-                (StatusCode::NOT_MODIFIED, String::new())
-            } else if method == Method::HEAD {
-                (StatusCode::OK, String::new())
-            } else if manifest {
-                (StatusCode::OK, snapshot.live.manifest_json.clone())
-            } else {
-                (
-                    StatusCode::OK,
-                    format!(
-                        "{{\"revision\":\"{revision}\",\"store\":{}}}",
-                        snapshot.assets.project_store_json
-                    ),
-                )
-            }
-        },
-        |error| {
-            (
-                StatusCode::SERVICE_UNAVAILABLE,
-                serde_json::json!({ "revision": revision, "error": error }).to_string(),
-            )
-        },
-    );
+    let (status, body) = if headers
+        .get(header::IF_NONE_MATCH)
+        .and_then(|value| value.to_str().ok())
+        .is_some_and(|value| {
+            value.split(',').any(|candidate| {
+                let candidate = candidate
+                    .trim()
+                    .strip_prefix("W/")
+                    .unwrap_or_else(|| candidate.trim());
+                candidate == etag || candidate == "*"
+            })
+        }) {
+        (StatusCode::NOT_MODIFIED, String::new())
+    } else if method == Method::HEAD {
+        (StatusCode::OK, String::new())
+    } else if manifest {
+        (StatusCode::OK, snapshot.live.manifest_json.clone())
+    } else {
+        (
+            StatusCode::OK,
+            format!(
+                "{{\"revision\":\"{revision}\",\"store\":{}}}",
+                snapshot.assets.project_store_json
+            ),
+        )
+    };
     let mut response = Response::builder();
     if recovery_required {
         response = response.header("X-Reqvire-Recovery-Required", "true");
@@ -770,18 +692,75 @@ mod tests {
 
     fn state(live_refresh: bool) -> ServeState {
         ServeState {
-            excluded_filename_patterns: Arc::new(
-                reqvire::exclusions::ExclusionSetBuilder::new()
-                    .build()
-                    .expect("build test configuration"),
-            ),
-            runtime: RuntimeSource::Local(Arc::new(Mutex::new(RuntimeState {
-                snapshot: snapshot("initial"),
-                refresh_error: None,
-            }))),
+            runtime: RuntimeSource::Local(snapshot("initial")),
             live_refresh,
-            write_lock: Arc::new(RwLock::new(())),
         }
+    }
+
+    fn worker_state() -> (
+        tempfile::TempDir,
+        ServeState,
+        Arc<crate::mcp_worktrees::Context>,
+    ) {
+        let directory = tempfile::tempdir().expect("worker fixture directory");
+        let root = directory.path();
+        for args in [
+            vec!["init", "-qb", "main"],
+            vec!["config", "user.name", "Serve Test"],
+            vec!["config", "user.email", "serve@example.invalid"],
+        ] {
+            assert!(std::process::Command::new("git")
+                .current_dir(root)
+                .args(args)
+                .status()
+                .expect("fixture Git")
+                .success());
+        }
+        std::fs::write(
+            root.join("Model.md"),
+            include_str!("../../../tests/test-cache-integration/fixtures/model.md.txt"),
+        )
+        .expect("worker source");
+        for args in [vec!["add", "."], vec!["commit", "-qm", "baseline"]] {
+            assert!(std::process::Command::new("git")
+                .current_dir(root)
+                .args(args)
+                .status()
+                .expect("fixture Git")
+                .success());
+        }
+        let executable = std::env::var_os("REQVIRE_TEST_BIN")
+            .map(std::path::PathBuf::from)
+            .unwrap_or_else(|| {
+                std::env::current_exe()
+                    .expect("test executable")
+                    .parent()
+                    .expect("deps directory")
+                    .parent()
+                    .expect("target directory")
+                    .join(format!("reqvire{}", std::env::consts::EXE_SUFFIX))
+            });
+        let manager = crate::mcp_worktrees::Worktrees::start(
+            root,
+            &executable,
+            false,
+            false,
+            true,
+            false,
+            "origin",
+        )
+        .expect("production worktree worker");
+        let context = manager
+            .published_browser_context(None)
+            .expect("original context");
+        (
+            directory,
+            ServeState {
+                runtime: RuntimeSource::Worktrees(manager),
+                live_refresh: true,
+            },
+            context,
+        )
     }
 
     async fn body(response: Response<Body>) -> String {
@@ -841,7 +820,9 @@ mod tests {
                     github_remote: "origin",
                     with_size_estimates: false,
                 },
-                &state.excluded_filename_patterns,
+                &reqvire::exclusions::ExclusionSetBuilder::new()
+                    .build()
+                    .expect("startup exclusions"),
             )
             .expect("test fixture operation should succeed");
             assert!(
@@ -1535,14 +1516,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
     #[tokio::test]
     async fn manifest_headers_conditional_variants_and_head_are_consistent() {
         let state = state(true);
-        let expected = Arc::clone(
-            &state
-                .local_runtime()
-                .expect("test fixture operation should succeed")
-                .lock()
-                .await
-                .snapshot,
-        );
+        let expected = Arc::clone(state.local_runtime().expect("local snapshot"));
         let app = explorer_routes().with_state(state);
         let etag = format!("\"{}\"", expected.live.revision);
         for (condition, status) in [
@@ -1592,23 +1566,40 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
     }
 
     #[tokio::test]
-    async fn revision_reads_do_not_wait_for_the_mcp_write_gate() {
-        let state = state(true);
-        let _write_guard = state.write_lock.write().await;
-        let app = explorer_routes().with_state(state.clone());
+    async fn revision_reads_do_not_wait_for_the_worker_control_gate() {
+        let (_directory, state, context) = worker_state();
+        let (held, acquired) = std::sync::mpsc::channel();
+        let (release, released) = std::sync::mpsc::channel();
+        let holding = std::thread::spawn(move || {
+            let _gate = context.test_control_gate();
+            held.send(()).expect("gate held");
+            released
+                .recv_timeout(std::time::Duration::from_secs(3))
+                .expect("release gate");
+        });
+        acquired
+            .recv_timeout(std::time::Duration::from_secs(3))
+            .expect("control gate acquired");
+        let app = explorer_routes().with_state(state);
         let response = tokio::time::timeout(
             std::time::Duration::from_millis(500),
             app.oneshot(
                 Request::builder()
                     .uri("/api/project-store/manifest")
                     .body(Body::empty())
-                    .expect("build valid test HTTP request"),
+                    .expect("manifest request"),
             ),
         )
-        .await
-        .expect("manifest read should finish while the model gate is held")
-        .unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
+        .await;
+        release.send(()).expect("release worker gate");
+        holding.join().expect("control gate thread");
+        assert_eq!(
+            response
+                .expect("manifest reads published data without the worker gate")
+                .expect("HTTP response")
+                .status(),
+            StatusCode::OK
+        );
     }
 
     #[tokio::test]
@@ -1651,15 +1642,8 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
 
     #[tokio::test]
     async fn superseded_manifest_conflicts_but_captured_snapshot_remains_immutable() {
-        let state = state(true);
-        let captured = Arc::clone(
-            &state
-                .local_runtime()
-                .expect("test fixture operation should succeed")
-                .lock()
-                .await
-                .snapshot,
-        );
+        let (_directory, state, context) = worker_state();
+        let captured = context.runtime().expect("captured worker runtime");
         let manifest: Value =
             serde_json::from_str(&captured.live.manifest_json).expect("parse generated JSON");
         let hash = manifest["sections"]["elements"]["hashes"][0]
@@ -1670,12 +1654,13 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
             revision: captured.live.revision.clone(),
             hashes: vec![hash.clone()],
         };
-        state
-            .local_runtime()
-            .expect("test fixture operation should succeed")
-            .lock()
-            .await
-            .snapshot = snapshot("updated");
+        let manager = state.worktrees().expect("worker-backed routes");
+        let content = include_str!("../../../tests/test-cache-integration/fixtures/other.md.txt")
+            .split_once("# Elements\n\n")
+            .expect("fixture header")
+            .1;
+        let result = manager.handle("tools/call", json!({"name":"reqvire.add_element","arguments":{"file":"Model.md","content":content}})).expect("production mutation");
+        assert_ne!(result["isError"], true, "{result}");
         let captured_response: Value = serde_json::from_str(
             &captured
                 .live
@@ -1686,7 +1671,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
         assert!(captured_response["chunks"][&hash]
             .as_str()
             .expect("expected a JSON string")
-            .contains("initial"));
+            .contains("Cache Subject"));
         let app = explorer_routes().with_state(state);
         let response = app
             .oneshot(
@@ -1707,66 +1692,61 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
     }
 
     #[tokio::test]
-    async fn refresh_diagnostics_preserve_assets_and_clear_without_advancing_revision() {
-        let state = state(true);
-        let revision = state
-            .local_runtime()
-            .expect("test fixture operation should succeed")
-            .lock()
-            .await
-            .snapshot
-            .live
-            .revision
-            .clone();
-        state
-            .local_runtime()
-            .expect("test fixture operation should succeed")
-            .lock()
-            .await
-            .refresh_error = Some("Failed runtime generation".into());
+    async fn worker_runtime_diagnostics_preserve_accepted_model_and_recover_at_same_revision() {
+        let (_directory, state, context) = worker_state();
+        let captured = context.runtime().expect("initial worker runtime");
+        let revision = captured.live.revision.clone();
+        context
+            .publish_test_response(
+                json!({"runtime":{"project_store":[],"ontologies_ttl":"invalid"}}),
+            )
+            .expect("reject malformed runtime publication");
         let app = explorer_routes().with_state(state.clone());
+        for uri in ["/api/project-store/manifest", "/assets/project-store.js"] {
+            let response = app
+                .clone()
+                .oneshot(
+                    Request::builder()
+                        .uri(uri)
+                        .header(header::IF_NONE_MATCH, format!("\"{revision}\""))
+                        .body(Body::empty())
+                        .expect("runtime request"),
+                )
+                .await
+                .expect("HTTP response");
+            assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+            assert!(body(response)
+                .await
+                .contains("Explorer store must be an object"));
+        }
+        let read = state
+            .worktrees()
+            .expect("worker routes")
+            .handle(
+                "tools/call",
+                json!({"name":"reqvire.search","arguments":{}}),
+            )
+            .expect("accepted model read");
+        assert_ne!(read["isError"], true, "{read}");
+        assert!(read.to_string().contains("Cache Subject"));
+        assert!(captured.assets.project_store_json.contains("Cache Subject"));
+        context
+            .test_refresh_runtime()
+            .expect("regenerate accepted worker runtime");
+        assert_eq!(
+            context.runtime().expect("recovered runtime").live.revision,
+            revision
+        );
         let response = app
-            .clone()
             .oneshot(
                 Request::builder()
                     .uri("/api/project-store/manifest")
                     .header(header::IF_NONE_MATCH, format!("\"{revision}\""))
                     .body(Body::empty())
-                    .expect("build valid test HTTP request"),
+                    .expect("manifest request"),
             )
             .await
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
-        let diagnostic: Value =
-            serde_json::from_str(&body(response).await).expect("parse generated JSON");
-        assert_eq!(diagnostic["revision"], revision);
-        let seed = app
-            .clone()
-            .oneshot(
-                Request::builder()
-                    .uri("/assets/project-store.js")
-                    .body(Body::empty())
-                    .expect("build valid test HTTP request"),
-            )
-            .await
-            .unwrap();
-        assert!(body(seed).await.contains("initial"));
-        state
-            .local_runtime()
-            .expect("test fixture operation should succeed")
-            .lock()
-            .await
-            .refresh_error = None;
-        let response = app
-            .oneshot(
-                Request::builder()
-                    .uri("/api/project-store/manifest")
-                    .header(header::IF_NONE_MATCH, format!("\"{revision}\""))
-                    .body(Body::empty())
-                    .expect("build valid test HTTP request"),
-            )
-            .await
-            .unwrap();
+            .expect("HTTP response");
         assert_eq!(response.status(), StatusCode::NOT_MODIFIED);
     }
 }

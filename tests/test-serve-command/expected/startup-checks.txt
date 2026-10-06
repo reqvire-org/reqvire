@@ -9,5 +9,8 @@ PASS auto-commits
 PASS auto-commits-invalid
 PASS auto-commits-dirty
 PASS aggregate
+PASS aggregate-read-only-mcp
+PASS aggregate-writable-rejected
 PASS aggregate-invalid
+PASS aggregate-read-only-mcp-invalid
 PASS no-eligible-worktree

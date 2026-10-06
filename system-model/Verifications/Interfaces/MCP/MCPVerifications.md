@@ -91,19 +91,20 @@ Verify that long-lived MCP tools apply the core cache freshness/publication cont
 - Move HEAD externally while an accepted read is held, then explicitly reopen the unavailable context. Confirm old callers fail with their original context identity, retained browser/read handles cannot retain ownership, and new admission uses the clean current HEAD without replacing the old caller's result with a new-context response.
 - After external checkout changes, resource and prompt admission errors retain context diagnostics in protocol errors rather than returning malformed successful resource/prompt payloads.
 - A superseded pre-write build cannot replace the model used for post-write MCP evidence or Explorer runtime generation. Generated store and ontology artifacts agree with the accepted post-write model under the existing runtime projection.
-- Successful persisted mutations invoke the existing post-write runtime refresh lifecycle with commits disabled or enabled. Preview requests, no-op executions, JSON-RPC errors, and tool results with `isError: true` do not invoke it, change published assets/revision, or clear a previous runtime-refresh diagnostic.
-- A runtime-generation failure after a successful persisted mutation preserves the last valid Explorer snapshot and the existing diagnostic behavior; it remains distinct from a rejected mutation with no write.
+- Construct mutation adapter regressions through the production worktree manager and actual workers under both commit policies. Successful persisted mutations rebuild and publish the selected runtime once. Preview requests, no-op executions, JSON-RPC errors, and tool results with `isError: true` perform no runtime build, change no published assets/revision, and do not clear a previous runtime diagnostic.
+- A runtime-generation or parent payload-publication failure after a successful persisted mutation preserves the last valid Explorer snapshot internally and reports runtime unavailability, while accepted model reads and their revision/HEAD/pending paths remain available. Context diagnostics survive HTTP resource/tool metadata serialization. A subsequent valid worker runtime publication clears the diagnostic without changing identical runtime content's revision.
+- Read-only aggregate workspace adapters retain model reads and workspace-relative child paths, omit mutation tools, reject mutation calls, and preserve child source/index bytes without writable ownership.
 - Ordinary manifest/chunk requests keep reading the published snapshot without triggering source scans or builds. External edits become visible to read-only MCP model reads under the core contract; mutation-enabled reads retain the accepted snapshot; this change does not add external-edit polling to Explorer's publication lifecycle.
 - Tool names, request arguments, structured-result field names, SHA-256 model revision encoding, and Explorer manifest/chunk/ETag contracts remain compatible with the existing interface specifications.
 - Count worker Git observations separately from model/runtime construction. Confirm unchanged read-only loads retain entry and exit checkout checks while using the exit observation for response metadata, failed/invalid loads do not publish a runtime, and restoring valid sources permits a fresh load. A branch change during an accepted mutation-mode read must be visible in its final physical status without changing the accepted model identity.
 
 ##### Required Evidence
-- Extend the existing cache/MCP/serve suites with real server requests and committed expected results. Observe cache builds through internal test instrumentation or logs, and observe post-write hook invocation directly; unchanged assets alone cannot prove that an unnecessary rebuild did not run.
+- Extend the existing cache/MCP/serve suites with real server requests and committed expected results. Observe cache builds through internal test instrumentation or logs, and count the actual worker runtime-construction entry point per request phase; unchanged assets alone cannot prove that an unnecessary rebuild did not run.
 - Use controlled barriers for read/write races and a mutation rejected by core validation that returns an MCP tool error inside a successful JSON-RPC response.
 - Compare MCP graph/query results and generated Explorer artifacts from the accepted model while preserving existing last-valid-snapshot and browser refresh assertions. Keep the existing browser wire-hash verification unchanged.
 
 ##### Evidence Scope
-The HTTP suite exercises read-only source freshness separately from authoritative mutation-mode runtime publication. Adapter tests exercise branch/worktree ownership, commit publication and failure recovery without requiring a listening socket. Executing the HTTP suite remains necessary to establish transport-visible outcomes.
+The HTTP suite exercises read-only source freshness separately from authoritative mutation-mode runtime publication. Adapter tests use the production worktree manager and actual workers for ownership and publication without requiring a listening socket. Isolated mutation-session tests own detailed persistence/rollback and commit-reconciliation fault injection, using the same worker RPC dispatcher. Executing the HTTP suite remains necessary to establish transport-visible outcomes.
 
 #### Metadata
   * type: test-verification
@@ -111,6 +112,7 @@ The HTTP suite exercises read-only source freshness separately from authoritativ
 #### Relations
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
   * satisfiedBy: [model_cache_tests.rs](../../../../crates/reqvire-core/src/model_cache_tests.rs)
   * satisfiedBy: [test.sh](../../../../tests/test-cache-integration/test.sh)
   * satisfiedBy: [check_git_observations.py](../../../../tests/test-mcp-ownership/check_git_observations.py)
@@ -282,6 +284,7 @@ Expected checks:
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
   * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * verify: [MCP Mutation Execution Flow](../../../Interfaces/MCP/Tools.md#mcp-mutation-execution-flow)
   * satisfiedBy: [mutation_io.rs](../../../../crates/reqvire-core/src/mutation_io.rs)
@@ -781,6 +784,7 @@ Verify that MCP worker sessions implement the shared context boundary on success
 
 #### Relations
   * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
@@ -867,6 +871,7 @@ Verify the successful and rejected paths of mcp accepted change commit.
 
 #### Relations
   * satisfiedBy: [mcp_cache_tests.rs](../../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
   * verify: [MCP Commit Outcome Reconciliation](../../../Interfaces/MCP/Tools.md#mcp-commit-outcome-reconciliation)

@@ -404,7 +404,7 @@ pub fn run() -> Result<(), ReqvireError> {
     }
     Ok(())
 }
-fn dispatch_rpc(
+pub fn dispatch_rpc(
     request: &Value,
     estimates: bool,
     exclusions: &reqvire::exclusions::ExclusionSet,

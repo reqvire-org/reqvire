@@ -390,6 +390,7 @@ Regression execution passes for coordinated construction, superseded publication
 #### Relations
   * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
   * satisfiedBy: [mcp_cache_tests.rs](../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
+  * satisfiedBy: [mcp_session_tests.rs](../../../crates/reqvire-cli/src/mcp_session_tests.rs)
   * satisfiedBy: [semantic_store.rs](../../../crates/reqvire-core/src/semantic_store.rs)
   * satisfiedBy: [model_cache_tests.rs](../../../crates/reqvire-core/src/model_cache_tests.rs)
   * verify: [In-Memory Model Build Cache](../../ModelStructure/ModelManagement.md#in-memory-model-build-cache)

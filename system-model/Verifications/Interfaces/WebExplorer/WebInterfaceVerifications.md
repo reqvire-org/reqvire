@@ -680,7 +680,7 @@ This test verifies that the serve command starts an HTTP server for the embedded
 - Runtime data responses include no-store cache control to avoid stale browser datastores after mutation.
 - `reqvire serve --enable-mutations` without `--enable-mcp` fails CLI argument validation
 - Runtime-generation verbose output is suppressed (quiet mode active)
-- Count original model and runtime builds during actual CLI startup: one of each for plain, read-only MCP, and writable serving with either commit policy. Reject an invalid original model before listener startup and reject dirty writable admission before any model/runtime build. Exercise aggregate workspaces outside Git with eligible child repositories, plus invalid and empty workspaces. Use a deliberately invalid listener address to inspect the startup pipeline without requiring a socket.
+- Count original model and runtime builds during actual CLI startup: one of each for plain, read-only MCP, and writable serving with either commit policy. Reject an invalid original model before listener startup and reject dirty writable admission before any model/runtime build. Exercise aggregate workspaces outside Git with eligible child repositories in plain and read-only MCP modes; reject writable aggregate admission before model/runtime construction. Include invalid aggregates and empty workspaces. Use a deliberately invalid listener address to inspect the startup pipeline without requiring a socket.
 
 #### Metadata
   * type: test-verification
@@ -706,11 +706,11 @@ Browser traffic assertions and missing/corrupt chunk injection must recognize wo
 - The manifest revision and chunk hashes match independent SHA-256 calculations over the exact transferred UTF-8 JSON text. Array order, repeated references, empty arrays, Unicode, numeric representations, unknown sections, and deletions survive manifest reconstruction.
 - Chunk batches contain only requested chunks and deduplicate repeated requests. Invalid hashes, oversized requests, absent chunks, and superseded revisions return their specified errors.
 - A captured snapshot retains its original chunks after a newer snapshot is published; an HTTP request using the superseded revision returns `409`.
-- Manifest reads return the cached snapshot while the MCP workspace write gate is held. Valid deeply nested generated JSON does not gain an additional manifest-construction depth limit.
+- Manifest reads return the cached snapshot while the actual parent worker control gate is held. Valid deeply nested generated JSON does not gain an additional manifest-construction depth limit.
 - Manifest HEAD responses have no body and retain revision headers. Strong, weak, list, and wildcard conditional tags return the expected statuses; unsupported methods on the full-store route return `405`, and missing API paths return `404`.
 - Generated seed data, the full JSON store, and the manifest revision agree after mutations, and generated ontology data remains available.
 - Verify context labels exist before worker serialization, the pipe carries a structured store rather than nested JSON text, and parent publication consumes the owned runtime payload. Count store serialization work for seed/full JSON and preserve the exact existing manifest/chunk goldens. Exercise script-sensitive characters, Unicode, numeric values, deep nesting, context identity, and failed-runtime retention through the publication boundary.
-- Cached refresh diagnostics return `503` while retaining the valid seed and revision; clearing a diagnostic permits a matching conditional `304` without advancing that revision.
+- Failed parent runtime publication returns `503` for manifest and seed endpoints while retaining the last valid captured snapshot and accepted MCP model reads. Regenerating the runtime from accepted worker inputs clears the diagnostic and permits a matching conditional `304` without advancing identical runtime content's revision.
 - Plain serving and read-only embedded MCP expose snapshot APIs for branch selection but do not advertise periodic live refresh.
 - The same server processes remain alive and one initialized MCP client can issue successful reads after each runtime refresh without reinitialization.
 
@@ -718,7 +718,7 @@ Browser traffic assertions and missing/corrupt chunk injection must recognize wo
 - Use the standard serve shell suite's temporary Git workspace, fixture files, expected output, and real headless browser driver.
 - Exercise updates through mutation-enabled embedded MCP and use plain and read-only embedded MCP servers to check refresh gating.
 - Compare conditional live responses and revisions, independently hash a manifest and returned raw chunk text, check the served seed against the full JSON store, and verify continued MCP reads.
-- Run the `live_store::tests` and `serve::tests` modules in the CLI Rust unit suite for reconstruction, deduplication, request errors, immutable captured snapshots, held-write-gate reads, deeply nested generated JSON, and cached-error recovery.
+- Run the `live_store::tests` and `serve::tests` modules in the CLI Rust unit suite for reconstruction, deduplication, request errors, deeply nested generated JSON, and actual worker-backed immutable snapshot publication, held-control-gate reads, and cached-error recovery.
 - Pin representative serialized chunk, ontology, and manifest bytes and their pre-extraction SHA-256 values. After consolidation into the shared core primitive, require identical bytes, digests, ETags, and the existing manifest protocol; keep the fixture values independent of the production helper.
 - Check that existing Rust Explorer hashing and model revision callers use the one shared core primitive and that the CLI no longer has a second SHA-256/hexadecimal implementation. The existing browser verifier remains independent and validates the unchanged wire contract.
 - The existing `live_store::tests` module pins an independently calculated complete manifest and revision, including hashes for Unicode/numeric chunks and ontology bytes. The existing serve and browser refresh suites verify the shared primitive's wire compatibility through the same runtime and protocol.

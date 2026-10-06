@@ -307,7 +307,7 @@ mod tests {
             "http://plain.example:80",
         ]
         .map(|value| value.parse().expect("parse configured test origin"));
-        crate::mcp::router(false, false, &exclusions, &HttpAccess::new(&origins, &[])).expect("read-only router")
+        crate::mcp::router(false, &exclusions, &HttpAccess::new(&origins, &[]))
     }
 
     fn request(method: &str, origin: Option<&str>) -> Request<Body> {
@@ -579,9 +579,8 @@ mod tests {
             .build()
             .expect("build test exclusions");
         let explorer = axum::Router::new().fallback(|| async { "explorer" });
-        let router = crate::mcp::mount_service(
+        let router = crate::mcp::mount_read_only(
             explorer,
-            false,
             false,
             &exclusions,
             std::sync::Arc::new(tokio::sync::RwLock::new(())),
@@ -591,7 +590,7 @@ mod tests {
                     .expect("parse valid test value")],
                 &[],
             ),
-        ).expect("read-only router");
+        );
         let response = router
             .clone()
             .oneshot(request("POST", Some("https://app.example")))
@@ -625,7 +624,7 @@ mod tests {
         let exclusions = ExclusionSetBuilder::new()
             .build()
             .expect("build test exclusions");
-        let router = crate::mcp::router(false, false, &exclusions, &HttpAccess::default()).expect("read-only router");
+        let router = crate::mcp::router(false, &exclusions, &HttpAccess::default());
         for origin in [
             None,
             Some("http://localhost:5173"),
@@ -684,16 +683,15 @@ mod tests {
             .build()
             .expect("build test exclusions");
         if embedded {
-            crate::mcp::mount_service(
+            crate::mcp::mount_read_only(
                 axum::Router::new().fallback(|| async { "explorer" }),
-                false,
                 false,
                 &exclusions,
                 std::sync::Arc::new(tokio::sync::RwLock::new(())),
                 &access,
-            ).expect("read-only router")
+            )
         } else {
-            crate::mcp::router(false, false, &exclusions, &access).expect("read-only router")
+            crate::mcp::router(false, &exclusions, &access)
         }
     }
 

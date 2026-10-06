@@ -89,8 +89,11 @@ aggregate = fixtures / "aggregate"
 repo(aggregate / "first", "First Root")
 repo(aggregate / "second", "Second Root")
 check("aggregate", aggregate, [], 1, 1, "Failed to start server")
+check("aggregate-read-only-mcp", aggregate, ["--enable-mcp"], 1, 1, "Failed to start server")
+check("aggregate-writable-rejected", aggregate, ["--enable-mcp", "--enable-mutations"], 0, 0, "Git rev-parse failed")
 (aggregate / "second" / "Model.md").write_text("# Elements\n\n### Broken\n\n#### Metadata\n  * type: invalid-type\n")
 check("aggregate-invalid", aggregate, [], 1, 0, "invalid-type")
+check("aggregate-read-only-mcp-invalid", aggregate, ["--enable-mcp"], 1, 0, "invalid-type")
 empty = fixtures / "empty"
 empty.mkdir()
 check("no-eligible-worktree", empty, [], 1, 0, "Git")

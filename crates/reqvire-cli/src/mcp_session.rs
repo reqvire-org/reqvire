@@ -1,4 +1,7 @@
 //! Git ownership and publication boundary for mutation-enabled MCP.
+#[cfg(test)]
+#[path = "mcp_session_tests.rs"]
+mod tests;
 use reqvire::{
     error::ReqvireError, exclusions::ExclusionSet, mutation_io::SnapshotFiles, ModelBuildOptions,
     ModelManager,

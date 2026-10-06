@@ -289,6 +289,18 @@ impl Context {
             request,
         )
     }
+    #[cfg(test)]
+    pub(super) fn publish_test_response(&self, mut response: Value) -> Result<(), ReqvireError> {
+        self.update(&mut response)
+    }
+    #[cfg(test)]
+    pub(super) fn test_control_gate(&self) -> impl Drop + '_ {
+        self.worker.lock().expect("worktree lock poisoned")
+    }
+    #[cfg(test)]
+    pub(super) fn test_refresh_runtime(&self) -> Result<Value, ReqvireError> {
+        self.request(&json!({"operation":"runtime"}))
+    }
     fn read_request(&self, request: &Value) -> Result<Value, ReqvireError> {
         let worker = self
             .worker
