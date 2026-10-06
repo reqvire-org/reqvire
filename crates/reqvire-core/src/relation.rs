@@ -751,13 +751,19 @@ pub fn validate_relation_element_types(
         "use" => {
             matches!(
                 (source_type, target_type),
-                (ElementType::SemanticContract | ElementType::SemanticQuery, ElementType::Ontology)
+                (
+                    ElementType::SemanticContract | ElementType::SemanticQuery,
+                    ElementType::Ontology
+                )
             )
         }
         "usedBy" => {
             matches!(
                 (source_type, target_type),
-                (ElementType::Ontology, ElementType::SemanticContract | ElementType::SemanticQuery)
+                (
+                    ElementType::Ontology,
+                    ElementType::SemanticContract | ElementType::SemanticQuery
+                )
             )
         }
         "broader" | "narrower" | "related" => {

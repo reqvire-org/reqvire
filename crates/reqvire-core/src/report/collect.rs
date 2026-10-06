@@ -338,7 +338,7 @@ fn collect_upstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Strin
             chain
         }
         ElementType::SemanticQuery => {
-            let mut chain=vec![start_id.to_owned()];
+            let mut chain = vec![start_id.to_owned()];
             chain.extend(registry.semantic_contract_used_ontology_context(start_id));
             chain
         }
@@ -600,10 +600,10 @@ fn semantic_contracts_using_ontology(registry: &GraphRegistry, ontology_id: &str
         for rel in &ontology.relations {
             if rel.relation_type.name == "usedBy" {
                 if let relation::LinkType::Identifier(target_id) = &rel.target.link {
-                    if registry
-                        .get_element(target_id)
-                        .is_some_and(|element| element.element_type.is_semantic_contract() || element.element_type.is_semantic_query())
-                        && seen.insert(target_id.clone())
+                    if registry.get_element(target_id).is_some_and(|element| {
+                        element.element_type.is_semantic_contract()
+                            || element.element_type.is_semantic_query()
+                    }) && seen.insert(target_id.clone())
                     {
                         contracts.push(target_id.clone());
                     }
@@ -613,7 +613,8 @@ fn semantic_contracts_using_ontology(registry: &GraphRegistry, ontology_id: &str
     }
 
     for element in registry.get_all_elements() {
-        if !element.element_type.is_semantic_contract() && !element.element_type.is_semantic_query() {
+        if !element.element_type.is_semantic_contract() && !element.element_type.is_semantic_query()
+        {
             continue;
         }
         let uses_ontology = element.relations.iter().any(|rel| {

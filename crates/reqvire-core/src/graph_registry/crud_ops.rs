@@ -1,5 +1,5 @@
-use crate::mutation_io as fs;
 use super::*;
+use crate::mutation_io as fs;
 
 fn normalize_folder_path(path: &str) -> String {
     path.trim_matches('/')
@@ -1981,8 +1981,7 @@ impl GraphRegistry {
 
         // Remove all relations pointing to this element from graph structure
         for node in self.nodes.values_mut() {
-            node.relations
-                .retain(|rel| rel.target_id != element_id);
+            node.relations.retain(|rel| rel.target_id != element_id);
         }
 
         // Remove all relations pointing to this element from element's own relations list
@@ -2057,9 +2056,10 @@ impl GraphRegistry {
             .expect("node not found in registry");
 
         // Check if relation already exists
-        let relation_exists = source_node.relations.iter().any(|rel| {
-            rel.target_id == target_id && rel.relation_trigger == relation_type
-        });
+        let relation_exists = source_node
+            .relations
+            .iter()
+            .any(|rel| rel.target_id == target_id && rel.relation_trigger == relation_type);
 
         if relation_exists {
             return Err(ReqvireError::ProcessError(format!(
@@ -2096,9 +2096,9 @@ impl GraphRegistry {
             .expect("node not found in registry");
         let initial_count = source_node.relations.len();
 
-        source_node.relations.retain(|rel| {
-            !(rel.target_id == target_id && rel.relation_trigger == relation_type)
-        });
+        source_node
+            .relations
+            .retain(|rel| !(rel.target_id == target_id && rel.relation_trigger == relation_type));
 
         if source_node.relations.len() == initial_count {
             return Err(ReqvireError::ProcessError(format!(
@@ -2281,7 +2281,9 @@ impl GraphRegistry {
         // Determine target type: element name, external URL, or internal path
         let is_external_url = crate::utils::is_external_url(target);
         let is_internal_path = !is_external_url
-            && (target.ends_with(".md") || target.contains('/') || crate::mutation_io::exists(git_root.join(target)));
+            && (target.ends_with(".md")
+                || target.contains('/')
+                || crate::mutation_io::exists(git_root.join(target)));
 
         // Resolve target and create relation components
         let (target_display_name, relation_target_link, target_id_for_check, element_id_opt) =

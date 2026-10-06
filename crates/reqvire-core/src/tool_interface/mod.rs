@@ -20,8 +20,8 @@ use std::process::Command;
 mod arg_helpers;
 use arg_helpers::{
     bool_arg, current_dir_path, current_dir_string, eligible_git_worktrees_state, git_state,
-    load_model_with_options, model_fingerprint, parse_json_string, required_string_arg,
-    string_arg, string_array_arg, usize_arg,
+    load_model_with_options, model_fingerprint, parse_json_string, required_string_arg, string_arg,
+    string_array_arg, usize_arg,
 };
 
 mod definitions;

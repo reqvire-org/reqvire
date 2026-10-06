@@ -48,7 +48,9 @@ pub fn extract_shape_references(quads: &[Quad]) -> Vec<shacl::ReferencedIri> {
 }
 
 /// Extracts ontology references without recompiling an existing SHACL registry.
-pub fn extract_compiled_shape_references(registry: &shacl::ShaclRegistry) -> Vec<shacl::ReferencedIri> {
+pub fn extract_compiled_shape_references(
+    registry: &shacl::ShaclRegistry,
+) -> Vec<shacl::ReferencedIri> {
     let mut references = Vec::new();
     for reference in registry.referenced_iris() {
         let iri = reference.iri.as_str();
@@ -121,7 +123,9 @@ ex:Shape
         let compiled_references = extract_compiled_shape_references(&registry);
         assert_eq!(
             references.iter().collect::<std::collections::HashSet<_>>(),
-            compiled_references.iter().collect::<std::collections::HashSet<_>>()
+            compiled_references
+                .iter()
+                .collect::<std::collections::HashSet<_>>()
         );
         let values = references
             .iter()

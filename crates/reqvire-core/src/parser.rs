@@ -402,12 +402,17 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                 if content_fence == 0 {
                     content_fence = length;
                     if current_subsection == SubSection::Other("Query".to_owned()) {
-                        if let Some(element)=&mut current_element {element.query_line_number=Some(line_num+1);}
+                        if let Some(element) = &mut current_element {
+                            element.query_line_number = Some(line_num + 1);
+                        }
                     }
+                } else if length >= content_fence && trimmed.chars().all(|c| c == '`') {
+                    content_fence = 0;
                 }
-                else if length >= content_fence && trimmed.chars().all(|c| c == '`') { content_fence = 0; }
             }
-            if let Some(element) = &mut current_element { element.add_content(&format!("{}\n", line)); }
+            if let Some(element) = &mut current_element {
+                element.add_content(&format!("{}\n", line));
+            }
             continue;
         }
 
@@ -1169,12 +1174,17 @@ pub fn parse_elements(
                 if content_fence == 0 {
                     content_fence = length;
                     if current_subsection == SubSection::Other("Query".to_owned()) {
-                        if let Some(element)=&mut current_element {element.query_line_number=Some(line_num+1);}
+                        if let Some(element) = &mut current_element {
+                            element.query_line_number = Some(line_num + 1);
+                        }
                     }
+                } else if length >= content_fence && trimmed.chars().all(|c| c == '`') {
+                    content_fence = 0;
                 }
-                else if length >= content_fence && trimmed.chars().all(|c| c == '`') { content_fence = 0; }
             }
-            if let Some(element) = &mut current_element { element.add_content(&format!("{}\n", line)); }
+            if let Some(element) = &mut current_element {
+                element.add_content(&format!("{}\n", line));
+            }
             continue;
         }
 

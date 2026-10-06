@@ -8,9 +8,9 @@
 use crate::diff::{generate_file_diff, render_file_diffs, FileDiff};
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
+use crate::mutation_io as fs;
 use crate::workspace;
 use log::debug;
-use crate::mutation_io as fs;
 
 /// Result of formatting operation
 #[derive(Debug)]

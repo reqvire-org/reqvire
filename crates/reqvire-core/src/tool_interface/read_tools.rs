@@ -198,8 +198,7 @@ pub fn sparql_tool(
     let semantic_store = model.semantic_store.as_ref().ok_or_else(|| {
         ReqvireError::ProcessError("Parsed model is missing semantic RDF query state".to_string())
     })?;
-    let visible_index =
-        semantic_index_with_external_visibility(semantic_store, include_external)?;
+    let visible_index = semantic_index_with_external_visibility(semantic_store, include_external)?;
     let external_metadata = semantic_contract::external_materialization_metadata(
         semantic_store.index(),
         &visible_index,

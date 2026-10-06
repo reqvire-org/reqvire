@@ -59,12 +59,12 @@ pub const ELEMENT_TYPES: &[&str] = &[
     "verification-objective",     // ElementType::VerificationObjective
     "source",                     // ContractType::Source
     "semantic-query",
-    "semantic-contract",          // ElementType::SemanticContract
-    "constraint",                 // ContractType::Constraint
-    "behavior",                   // ContractType::Behavior
-    "specification",              // ContractType::Specification
-    "state",                      // ContractType::State
-    "input-output",               // ContractType::InputOutput
+    "semantic-contract", // ElementType::SemanticContract
+    "constraint",        // ContractType::Constraint
+    "behavior",          // ContractType::Behavior
+    "specification",     // ContractType::Specification
+    "state",             // ContractType::State
+    "input-output",      // ContractType::InputOutput
 ];
 
 /// Element type aliases that are also accepted (mapped to canonical types)
@@ -521,7 +521,9 @@ impl ElementType {
         )
     }
 
-    pub const fn is_semantic_query(&self) -> bool { matches!(self, Self::SemanticQuery) }
+    pub const fn is_semantic_query(&self) -> bool {
+        matches!(self, Self::SemanticQuery)
+    }
 
     pub const fn is_semantic_contract(&self) -> bool {
         matches!(self, Self::SemanticContract)
@@ -665,8 +667,13 @@ impl Element {
 
         self.content = trimmed.to_string();
         self.hash_impact_content = utils::hash_content(&normalized);
-        self.semantic_query = self.element_type.is_semantic_query().then(|| crate::semantic_contract::queries::QuerySource::parse(&self.content));
-        if self.element_type.is_semantic_query() { self.hash_impact_content = utils::hash_content(&self.content); }
+        self.semantic_query = self
+            .element_type
+            .is_semantic_query()
+            .then(|| crate::semantic_contract::queries::QuerySource::parse(&self.content));
+        if self.element_type.is_semantic_query() {
+            self.hash_impact_content = utils::hash_content(&self.content);
+        }
         self.populate_ontology();
         self.populate_semantic_contract();
         self.populate_concept_scheme();

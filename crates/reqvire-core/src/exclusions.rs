@@ -18,7 +18,9 @@ impl ExclusionSet {
 
     /// Reload workspace policy, preserving only explicitly supplied extra rules.
     pub(crate) fn refreshed(&self) -> Self {
-        if crate::mutation_io::active() { return self.clone(); }
+        if crate::mutation_io::active() {
+            return self.clone();
+        }
         let mut current = crate::config::get_excluded_filename_patterns_glob_set();
         current.globs.extend(self.additional.iter().cloned());
         current.additional = self.additional.clone();

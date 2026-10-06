@@ -305,7 +305,12 @@ fn apply_ontology_aware_rewrites(
                 &document_rewrites,
             )
         } else if node.element.element_type.is_semantic_query() {
-            if !query_context.iter().any(|id| affected_ontology_elements.contains(id)) { continue; }
+            if !query_context
+                .iter()
+                .any(|id| affected_ontology_elements.contains(id))
+            {
+                continue;
+            }
             rewrite_query_vocabulary(&node.element, &term_rewrites)
         } else if node.element.element_type.is_semantic_contract() {
             if term_rewrites.is_empty() {
@@ -1414,8 +1419,8 @@ pub fn move_folder(
     workspace_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use crate::utils;
     use crate::mutation_io as fs;
+    use crate::utils;
 
     let absolute_source = current_dir.join(source_folder);
     let source_folder_normalized = normalize_folder_arg(
@@ -1518,8 +1523,12 @@ pub fn move_folder(
 
     if !dry_run {
         let paths = crate::mutation_io::paths_under(&source_abs).unwrap_or_else(|| {
-            walkdir::WalkDir::new(&source_abs).into_iter().filter_map(Result::ok)
-                .filter(|entry| entry.file_type().is_file()).map(|entry| entry.into_path()).collect()
+            walkdir::WalkDir::new(&source_abs)
+                .into_iter()
+                .filter_map(Result::ok)
+                .filter(|entry| entry.file_type().is_file())
+                .map(|entry| entry.into_path())
+                .collect()
         });
         for old_abs in &paths {
             let old_relative = old_abs
@@ -1602,7 +1611,9 @@ fn prune_empty_parent_dirs(
     git_root: &Path,
     target_abs: &Path,
 ) -> Result<(), ReqvireError> {
-    if crate::mutation_io::active() { return Ok(()); }
+    if crate::mutation_io::active() {
+        return Ok(());
+    }
     let mut current = dir.to_path_buf();
     while current != git_root && current.starts_with(git_root) && !target_abs.starts_with(&current)
     {

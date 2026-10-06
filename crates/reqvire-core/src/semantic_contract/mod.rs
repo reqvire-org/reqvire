@@ -1683,7 +1683,14 @@ impl SemanticIndex {
                 .collect()
         };
         if selected_layers.contains(&SemanticExportLayer::Queries) {
-            for query in &self.queries { if !query.diagnostics.is_empty() { return Err(ReqvireError::ProcessError(format!("Cannot export invalid query '{}'",query.name))); } }
+            for query in &self.queries {
+                if !query.diagnostics.is_empty() {
+                    return Err(ReqvireError::ProcessError(format!(
+                        "Cannot export invalid query '{}'",
+                        query.name
+                    )));
+                }
+            }
         }
         let has_model = selected_layers.contains(&SemanticExportLayer::Model);
         if has_model && namespace_base.is_some_and(|value| !value.trim().is_empty()) {
@@ -1755,7 +1762,9 @@ impl SemanticIndex {
             )?;
         }
 
-        if layers.contains(&SemanticExportLayer::Queries) { output.push_str(&self.queries_turtle()); }
+        if layers.contains(&SemanticExportLayer::Queries) {
+            output.push_str(&self.queries_turtle());
+        }
         if layers.contains(&SemanticExportLayer::Shapes) {
             append_blocks_turtle(
                 &mut output,
@@ -1890,8 +1899,8 @@ impl SemanticIndex {
 
 mod export;
 mod index;
-pub mod queries;
 mod prefixes;
+pub mod queries;
 mod vocabulary;
 
 use export::*;

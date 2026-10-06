@@ -978,10 +978,14 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
             coverage_source: state.source.to_string(),
             is_terminal: state.is_terminal,
             aggregate_leaf_requirements: count_leaf_requirements(
-                subtree.iter(), &verified_leaf_ids, &unverified_leaf_ids,
+                subtree.iter(),
+                &verified_leaf_ids,
+                &unverified_leaf_ids,
             ),
-            aggregate_verified_leaf_requirements: subtree.iter()
-                .filter(|id| verified_leaf_ids.contains(*id)).count(),
+            aggregate_verified_leaf_requirements: subtree
+                .iter()
+                .filter(|id| verified_leaf_ids.contains(*id))
+                .count(),
             aggregate_terminal_requirements: state.terminal_requirements,
             aggregate_covered_terminal_requirements: state.covered_terminal_requirements,
             direct_evidence: direct_satisfaction

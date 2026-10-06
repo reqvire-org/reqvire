@@ -303,8 +303,11 @@ pub fn scan_markdown_files(
         Some(commit_id) => scan_markdown_files_from_commit(commit_id, excluded_filename_patterns),
         None => {
             if let Some(files) = crate::mutation_io::paths_under(&std::env::current_dir()?) {
-                return Ok(files.into_iter().filter(|p| p.extension().is_some_and(|e| e == "md"))
-                    .filter(|p| !is_to_be_ignored(p, excluded_filename_patterns)).collect());
+                return Ok(files
+                    .into_iter()
+                    .filter(|p| p.extension().is_some_and(|e| e == "md"))
+                    .filter(|p| !is_to_be_ignored(p, excluded_filename_patterns))
+                    .collect());
             }
             let mut files = Vec::new();
             let workspace_scope = workspace::WorkspaceScope::discover()?;
