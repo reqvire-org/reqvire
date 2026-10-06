@@ -60,8 +60,10 @@ function OntologyGraphRenderer({
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rendererRef = useRef<OntologyGraphRendererHandle | null>(null);
+  const rendererSelectionRef = useRef<string | null>(null);
   const activeFiltersRef = useRef(activeFilters);
-  const { setOntologySelectionId } = useExplorerUiState();
+  const { ontologySelectionId, setOntologySelectionId } = useExplorerUiState();
+  const selectionRef = useLatestRef(ontologySelectionId);
   const setOntologySelectionIdRef = useLatestRef(setOntologySelectionId);
   const [notice, setNotice] = useState<string | null>("Loading ontology graph...");
 
@@ -78,12 +80,16 @@ function OntologyGraphRenderer({
       buildTimer = window.setTimeout(() => {
       try {
         const renderer = mountOntologyGraph(container, graphData, {
-          onSelect: (node: OntologyGraphNode | null) => setOntologySelectionIdRef.current(node?.id ?? null),
+          onSelect: (node: OntologyGraphNode | null) => {
+            rendererSelectionRef.current = node?.id ?? null;
+            setOntologySelectionIdRef.current(node?.id ?? null);
+          },
           initialFilters: activeFiltersRef.current,
           onLayoutState: state => setNotice(state === "pending" ? "Laying out ontology..." : state === "failed" ? "Ontology layout failed." : null),
         });
         rendererRef.current = renderer;
         window.syncOntologyGraphFilters?.(activeFiltersRef.current);
+        if (selectionRef.current) renderer.focusNode(selectionRef.current);
       } catch (error) {
         console.error("[Reqvire Ontologies] Sigma/Graphology renderer failed", error);
         setNotice("Ontology graph renderer failed. Check the browser console for details.");
@@ -98,12 +104,19 @@ function OntologyGraphRenderer({
       }
       rendererRef.current?.destroy();
       rendererRef.current = null;
+      rendererSelectionRef.current = null;
     };
-  }, [graphData, setOntologySelectionIdRef]);
+  }, [graphData, setOntologySelectionIdRef, selectionRef]);
 
   useEffect(() => {
     window.syncOntologyGraphFilters?.(activeFilters);
   }, [activeFilters]);
+
+  useEffect(() => {
+    if (rendererSelectionRef.current === ontologySelectionId) return;
+    if (ontologySelectionId) rendererRef.current?.focusNode(ontologySelectionId);
+    else rendererRef.current?.clearSelection();
+  }, [ontologySelectionId]);
 
   return (
     <ViewFrame testId="ontologies">

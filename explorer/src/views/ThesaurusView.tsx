@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { ThesaurusExplorer } from "@ds";
 import { useStore } from "../store/StoreContext";
 import { useExplorerUiState } from "../state/ExplorerUiState";
@@ -10,11 +9,6 @@ export function ThesaurusView({ onOpenElement }: { onOpenElement?: (id: string) 
   const { thesaurusSelectionId, setThesaurusSelectionId } = ui;
   const concepts = prepareThesaurus(store.thesaurus).concepts;
   const selectedId = thesaurusSelectionId;
-
-  useEffect(() => {
-    if (thesaurusSelectionId && concepts.some((concept) => concept.id === thesaurusSelectionId)) return;
-    setThesaurusSelectionId(concepts[0]?.id ?? null);
-  }, [concepts, setThesaurusSelectionId, thesaurusSelectionId]);
 
   return (
     <ThesaurusExplorer

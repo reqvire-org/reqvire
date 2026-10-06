@@ -229,7 +229,7 @@ describe("trace flow showcase", () => {
     expect(within(detail).getByRole("heading", { name: "Ontology Construct Classification" })).toBeTruthy();
     fireEvent.keyDown(within(detail).getAllByRole("button", { name: "Close" })[0], { key: "Escape" });
     await waitFor(() => expect(screen.getAllByRole("dialog")).toEqual([overlay]));
-    expect(window.location.hash).toBe("#/model");
+    expect(window.location.hash).toContain("#/model?selected=");
     expect(card.closest(".react-flow")).toBe(renderer);
     fireEvent.click(within(overlay).getByRole("button", { name: "100%" }));
     const region = within(overlay).getByRole("region", { name: "Model flow" });
@@ -339,7 +339,7 @@ describe("trace flow showcase", () => {
     fireEvent.change(filter, { target: { value: "Ontology Construct Classification" } });
     fireEvent.click(within(tree).getByText("Ontology Construct Classification"));
     expect(screen.queryByRole("dialog")).toBeNull();
-    expect(window.location.hash).toBe("#/model");
+    expect(window.location.hash).toContain("#/model?selected=");
     const flow = screen.getByRole("region", { name: "Model flow" });
     expect(within(flow).getByRole("heading", { name: "Ontology Construct Classification" })).toBeTruthy();
     await waitFor(() => expect(within(flow).queryByRole("article", { name: "Property Projection" })).toBeNull());
@@ -371,7 +371,7 @@ describe("trace flow showcase", () => {
     expect(within(await screen.findByRole("dialog")).getByText("verifiedBy", { exact: true })).toBeTruthy();
     fireEvent.click(within(screen.getByRole("dialog")).getAllByRole("button", { name: "Close" })[0]);
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(window.location.hash).toBe("#/model");
+    expect(window.location.hash).toContain("#/model?selected=");
     expect(screen.getByRole("button", { name: "Flow" }).getAttribute("aria-pressed")).toBe("true");
     fireEvent.click(within(flow).getByRole("button", { name: "Left to right" }));
     await waitFor(() => expect(flow.getAttribute("aria-busy")).toBe("false"));
@@ -395,7 +395,7 @@ describe("trace flow showcase", () => {
     expect(screen.queryByRole("group", { name: "Example model" })).toBeNull();
     fireEvent.click(screen.getByRole("tab", { name: "Traces" }));
     expect(await screen.findByRole("article", { name: "Ontology Construct Classification" })).toBeTruthy();
-    expect(window.location.hash).toBe("#/traces");
+    expect(window.location.hash).toBe("#/traces?selected=classification-test");
     expect(screen.getAllByRole("navigation", { name: "Explorer views" })).toHaveLength(1);
     expect(screen.getByRole("tab", { name: "Traces" }).getAttribute("aria-selected")).toBe("true");
     fireEvent.click(screen.getByRole("tab", { name: "Model" }));
@@ -477,7 +477,7 @@ describe("trace flow showcase", () => {
     await waitFor(() => expect(window.location.hash).toBe("#/elements/classification"));
     fireEvent.click(within(screen.getByRole("dialog")).getAllByRole("button", { name: "Close" })[0]);
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(window.location.hash).toBe("#/traces");
+    expect(window.location.hash).toBe("#/traces?selected=classification-test");
     expect(getComputedStyle(screen.getByRole("article", { name: "Ontology Construct Classification" }).parentElement!).transform).toBe(position);
     fireEvent.click(within(node).getByRole("link", { name: "Ontology Construct Classification" }));
     fireEvent.click(within(await screen.findByRole("dialog")).getByRole("link", { name: "Open source page" }));
@@ -503,11 +503,12 @@ describe("trace flow showcase", () => {
 
   it("provides long-name, unlinked, filtering, and theme examples", async () => {
     render(<MocksPage />);
+    fireEvent.change(screen.getByRole("searchbox", { name: "Filter trace tree" }), { target: { value: "Built-In External Ontology Vocabulary" } });
     fireEvent.click(screen.getByRole("treeitem", { name: /Built-In External Ontology Vocabulary/ }));
     expect(await screen.findByRole("article", { name: "Built-In External Ontology Source Resolution for Referenced Vocabulary Terms" })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Switch to dark mode" }));
     expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
-    fireEvent.change(screen.getByRole("searchbox", { name: "Filter trace examples" }), { target: { value: "Unlinked" } });
+    fireEvent.change(screen.getByRole("searchbox", { name: "Filter trace tree" }), { target: { value: "Pending Vocabulary" } });
     expect(screen.queryByRole("treeitem", { name: /Ontology Projection Verification/ })).toBeNull();
     fireEvent.keyDown(screen.getByRole("treeitem", { name: /Pending Vocabulary Verification/ }), { key: "Enter" });
     expect(screen.getByText("Test · 0 directly verified · 0 requirements in trace")).toBeTruthy();

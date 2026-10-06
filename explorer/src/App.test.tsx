@@ -77,7 +77,35 @@ describe("Explorer worktree navigation", () => {
     view.unmount();
   });
 
-  it("places a compact branch picker inside the left pane and preserves navigation", () => {
+  it("blocks the retained shell during loading, shows dismissible errors, and adopts success", () => {
+    localStorage.setItem("reqvire-explorer-theme", "light");
+    history.replaceState(null, "", "/?worktree_id=target#/model");
+    const dismissWorktreeError = vi.fn();
+    const live = { result: { ok: true as const, schemaMismatch: null, store: { ...devFixture, project: { ...devFixture.project, worktree_id: "original", branch: "main" } } },
+      refreshError: null as string | null, automaticRefresh: false, worktreeRouting: true, selectedWorktree: "target", switching: true,
+      worktreeSelectionError: null as string | null, dismissWorktreeError, recoveryWarning: null,
+      worktrees: [{ worktree_id: "target", branch: "feature/model", workspace_root: "/target", available: true, explorer_available: true }],
+      selectWorktree: vi.fn(), refreshWorktrees: vi.fn().mockResolvedValue(undefined) };
+    vi.spyOn(liveStore, "useLiveStore").mockImplementation(() => live);
+    const view = render(<App />);
+    try {
+      expect(screen.getByRole("dialog", { name: "Loading worktree" })).toBeTruthy();
+      expect(screen.getByRole("status", { name: "Loading feature/model" })).toBeTruthy();
+      expect(view.container.querySelector('[data-product-pattern="app-shell"]')?.hasAttribute("inert")).toBe(true);
+      live.switching = false; live.worktreeSelectionError = "Target model invalid"; live.refreshError = live.worktreeSelectionError;
+      view.rerender(<App />);
+      expect(screen.getByRole("alert").textContent).toBe("Target model invalid");
+      fireEvent.click(screen.getByRole("button", { name: "Close" }));
+      expect(dismissWorktreeError).toHaveBeenCalledOnce();
+      live.worktreeSelectionError = null; live.refreshError = null;
+      live.result.store = { ...live.result.store, project: { ...live.result.store.project, worktree_id: "target", branch: "feature/model" } };
+      view.rerender(<App />);
+      expect(screen.queryByRole("dialog", { name: "Loading worktree" })).toBeNull();
+      expect(view.container.querySelector('[data-product-pattern="app-shell"]')?.hasAttribute("inert")).toBe(false);
+    } finally { view.unmount(); }
+  });
+
+  it("keeps the compact branch picker after the brand in the shared header across navigation and pane collapse", () => {
     window.history.replaceState(null, "", "/?worktree_id=original#/model");
     localStorage.setItem("reqvire-explorer-theme", "light");
     const selectWorktree = vi.fn();
@@ -87,6 +115,7 @@ describe("Explorer worktree navigation", () => {
       } },
       recoveryWarning: "MCP recovery required: showing the last accepted model; writes are disabled.",
       refreshError: null, automaticRefresh: true, worktreeRouting: true, selectedWorktree: "original", switching: false,
+    worktreeSelectionError: null, dismissWorktreeError: vi.fn(),
       worktrees: [
         { worktree_id: "original", branch: "main", workspace_root: "/repo", available: true, explorer_available: true },
         { worktree_id: "feature", branch: "feature", workspace_root: "/feature", available: true, explorer_available: true },
@@ -101,8 +130,16 @@ describe("Explorer worktree navigation", () => {
       expect(screen.queryByText(/Refresh failed/)).toBeNull();
       const selector = screen.getByRole("combobox", { name: "Branch" });
       const navigation = screen.getByRole("navigation", { name: "Explorer views" });
-      expect(selector.closest('[data-product-pattern-slot="start-pane"]')).toBeTruthy();
+      const header = selector.closest('[data-product-pattern="shell-header"]')!;
+      expect(header).toBeTruthy();
+      expect(selector.closest('[data-product-pattern-slot="header-context"]')).toBeTruthy();
+      const brand = header.querySelector('[data-product-pattern-slot="brand"]')!;
+      expect(brand.nextElementSibling?.contains(selector)).toBe(true);
+      expect(selector.closest('[data-product-pattern-slot="start-pane"]')).toBeNull();
       expect(selector.textContent).toBe("main");
+      fireEvent.click(screen.getByRole("button", { name: "Collapse explorer" }));
+      expect(screen.getByRole("combobox", { name: "Branch" })).toBe(selector);
+      expect(header.contains(selector)).toBe(true);
       expect(screen.queryByText("Viewing main")).toBeNull();
       expect(screen.queryByText("/repo")).toBeNull();
       for (const name of ["Thesaurus", "Model", "Ontologies", "Traces", "Coverage"]) {
@@ -111,7 +148,7 @@ describe("Explorer worktree navigation", () => {
       expect(screen.getByRole("button", { name: "Search" })).toBeTruthy();
       expect(screen.getByRole("button", { name: "Help" })).toBeTruthy();
       fireEvent.click(within(navigation).getByRole("tab", { name: "Coverage" }));
-      expect(window.location.hash).toBe("#/coverage");
+      expect(window.location.hash).toBe("#/coverage?scope=");
       expect(selector.textContent).toBe("main");
       fireEvent.click(selector);
       fireEvent.click(screen.getByRole("option", { name: /feature/ }));

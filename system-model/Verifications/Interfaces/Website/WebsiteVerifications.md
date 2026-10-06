@@ -69,8 +69,9 @@ Expected checks:
 - Check terminal versus verification-leaf definitions, recursive all-child and all-consumer rules, combined obligations, and the inability of direct parent evidence to override a gap. Check terminal percentage denominators, the zero-terminal scoped example, current source tokens, and partial evidence and blocker fields against representative report output.
 - Confirm that coverage guidance identifies combined hierarchy and contract-consumer cycles as validation errors before reporting, including same-root cycles with direct evidence.
 - Review verification guidance for requirement-only targets, capability roll-up, objective exclusion, shared-verification deduplication within each scope and globally, non-additive submodel verification totals, and whole-model-only orphan diagnostics.
-- Review Explorer guidance for Scope selection beside the Coverage title, the Whole model default, ranked hierarchical capability rows without a display switch, capability and requirement expansion for nested child rows, terminal requirement metrics and element-detail links, verification coverage labels, labelled Binding consumers links identifying requirements responsible for shared contract obligations, blocker counts beside requirement statuses, and access to implementation evidence through requirement element details, coherent dashboard/sidebar counts, and the action that opens whole-model orphan diagnostics.
+- Review Explorer guidance for one complete whole-model or capability-scoped dashboard, detailed scoped issues below the drill-down, no mode selector or View issues action, the selectable Whole Model tree root, scope-only URLs and migration of retired mode links, left capability navigation with alphabetical roots and siblings, keyboard selection and independent disclosure, scoped page titles, ranked hierarchical capability rows without a display switch, capability and requirement expansion for nested child rows, terminal requirement metrics and element-detail links, labelled coverage bars without redundant state text, labelled Binding consumers links identifying requirements responsible for shared contract obligations, blocker counts beside requirement metrics, and access to implementation evidence through requirement element details, coherent dashboard/sidebar counts, and the action that opens whole-model orphan diagnostics.
 - Review semantic-model and submodel guidance for validated ownership, evidence crossing scope without transferring membership, and the distinction between capability-scoped coverage and the submodels command's capability/requirement scope rules.
+- Review the rendered Coverage user guide for scope sharing through the browser URL, Back/Forward restoration, explicit URL precedence, separate branch preferences, and explained fallback when the selected capability becomes unavailable. Verify the Whole Model title and selectable scope root, capabilities nested below it, the persistent header branch picker, and visible compact type/source breakdowns below metrics. Verification types use one bar plus five exact labelled counts including zeros, without a Report details disclosure.
 - Build and inspect the affected public documentation routes, confirm navigation links resolve, and ensure examples and descriptions agree with the implemented feature before publication.
 
 Review artifacts: [Advanced.tsx](../../../../website/src/pages/Advanced.tsx), [UserGuide.tsx](../../../../website/src/pages/UserGuide.tsx).
@@ -147,4 +148,24 @@ This review verifies the documented worktree and publication workflow against im
 #### Relations
   * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
   * verify: [Website Assistant Integration Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-assistant-integration-documentation)
+---
+
+### Website Explorer Trace Flow Documentation Verification
+
+This inspection verifies the Serve Explorer user guide against the native trace rendering contract.
+
+#### Details
+- Review the rendered guide for verification/file selection, native requirement ancestry and owning capability context, direction and branch controls, element-detail/source navigation, and availability in served and exported Explorer.
+- Review shareable view selections, copied/reloaded links, browser history, explicit-link precedence, unavailable-selection fallback and the worktree spinner/success/error-dismissal flow against the shared selection and worktree contracts.
+- Compare the wording with the Explorer Verification Trace Rendering Specification referenced by the owning website requirement and the compiled production trace integration checks.
+- Build the website and inspect the rendered user-guide route before publication.
+
+Review artifact: [UserGuide.tsx](../../../../website/src/pages/UserGuide.tsx).
+
+#### Metadata
+  * type: inspection-verification
+
+#### Relations
+  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
+  * verify: [Website Command and Workflow Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-command-and-workflow-documentation)
 ---

@@ -1,5 +1,5 @@
 import { COVERAGE_PATTERN_ITEMS } from "../fixtures/coverage";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   AppShell,
   Button,
@@ -36,6 +36,7 @@ import {
   TreeItem,
   TypeBadge,
   WorktreeSelector,
+  WorktreeLoadDialog,
   type DetailContractBindingItem,
   type DetailMetaBadge,
   type DetailRelationItem,
@@ -226,6 +227,12 @@ function Section({ title, desc, children }: { title: string; desc?: string; chil
 }
 
 export function ProductPatternsPage() {
+  const [worktreeLoad, setWorktreeLoad] = useState<"pending" | "error" | null>(null);
+  useEffect(() => {
+    if (worktreeLoad !== "pending") return;
+    const timer = setTimeout(() => setWorktreeLoad(null), 1500);
+    return () => clearTimeout(timer);
+  }, [worktreeLoad]);
   const [worktreeId, setWorktreeId] = useState(SHOWCASE_WORKTREES[0].id);
   const [leftPaneOpen, setLeftPaneOpen] = useState(true);
   const [codeExpanded, setCodeExpanded] = useState(true);
@@ -283,6 +290,9 @@ export function ProductPatternsPage() {
         <div className="showcase-shell-demo">
           <AppShell
             brandLabel="REQVIRE"
+            headerContext={<WorktreeSelector density="compact" value={worktreeId} choices={SHOWCASE_WORKTREES}
+              branch={SHOWCASE_WORKTREES.find(choice => choice.id === worktreeId)?.branch}
+              onChange={setWorktreeId} onOpen={() => {}} />}
             navigationItems={[...SHELL_PATTERN_NAVIGATION]}
             activeNavigationValue="workspace"
             headerActions={inertShellActions}
@@ -317,6 +327,11 @@ export function ProductPatternsPage() {
           onChange={setWorktreeId}
           onOpen={() => {}}
         />
+        <Button onClick={() => setWorktreeLoad("pending")}>Preview worktree loading</Button>
+        <Button onClick={() => setWorktreeLoad("error")}>Preview worktree error</Button>
+        {worktreeLoad && <WorktreeLoadDialog branch="coverage-review"
+          error={worktreeLoad === "error" ? "The selected worktree could not be loaded." : null}
+          onDismiss={() => setWorktreeLoad(null)} />}
       </Section>
 
       <Section

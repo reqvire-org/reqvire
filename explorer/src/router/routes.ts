@@ -7,6 +7,7 @@
  * after the first `#`, the inner `#` is preserved as part of the route string.
  */
 
+
 export type ViewId =
   | "model"
   | "thesaurus"
@@ -57,7 +58,7 @@ export const VIEW_TITLES: Record<ViewId, string> = {
 export interface ParsedRoute {
   /** Active base view rendered under any element-detail modal. */
   view: ViewId;
-  /** Path/id param for `files`, `content`, and `resources` routes, or query for `search`. */
+  /** Path/id for content routes, search query, coverage scope, or a workspace selection query string. */
   param: string | null;
   /** Set when the route is an element-detail overlay (`#/elements/<id>`). */
   elementId: string | null;
@@ -71,6 +72,31 @@ export function isViewId(value: string): value is ViewId {
 
 export function routeForView(view: ViewId): string {
   return `#/${view}`;
+}
+
+/** An empty scope explicitly selects Whole model; the legacy bare route resumes preferences. */
+export function routeForCoverage(identifier: string | null): string {
+  return `#/coverage?scope=${encodeURIComponent(identifier ?? "")}`;
+}
+
+/** Workspace selections use stable published identifiers; empty means the view overview. */
+export function routeForSelection(view: "model" | "traces" | "thesaurus" | "ontologies", id: string | null, options: { mode?: string; file?: string | null } = {}): string {
+  const query = new URLSearchParams();
+  if (view === "traces" && !id && options.file) query.set("file", options.file);
+  else query.set("selected", id === "__root__" ? "" : id ?? "");
+  if (view === "model") query.set("mode", options.mode ?? "grid");
+  return `#/${view}?${query}`;
+}
+
+/** A branch choice resumes that context's preferences once its snapshot is available. */
+export function worktreeUrl(currentUrl: string, identifier: string): URL {
+  const url = new URL(currentUrl);
+  url.searchParams.set("worktree_id", identifier);
+  const route = parseHash(url.hash, DEFAULT_VIEW);
+  if (route.elementId) return url;
+  const view = route.view;
+  if (["coverage", "model", "traces", "thesaurus", "ontologies"].includes(view)) url.hash = routeForView(view);
+  return url;
 }
 
 export function routeForElement(identifier: string): string {
@@ -138,6 +164,16 @@ export function parseHash(rawHash: string, previousRoute: PreviousRoute): Parsed
 
   if (hash.startsWith("resources/")) {
     return { view: "resources", param: decodeRouteParameter(hash.slice("resources/".length)), elementId: null };
+  }
+
+  for (const view of ["model", "traces", "thesaurus", "ontologies"] as const) {
+    if (hash === view || hash.startsWith(`${view}?`)) {
+      return { view, param: hash === view ? null : hash.slice(view.length + 1), elementId: null };
+    }
+  }
+
+  if (hash === "coverage" || hash.startsWith("coverage?")) {
+    return { view: "coverage", param: hash === "coverage" ? null : hash.slice("coverage".length + 1), elementId: null };
   }
 
   if (hash === "search" || hash.startsWith("search/") || hash.startsWith("search?")) {

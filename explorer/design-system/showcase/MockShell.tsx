@@ -1,6 +1,6 @@
 /**
  * MockShell — renders the real App shell, router, and providers with fixture data.
- * The Traces route composes the native design-system preview in that same shell.
+ * Traces and Model use the production views with normalized fixture projections.
  * Fixture contexts replace HTTP loading while retaining the application's providers and navigation.
  */
 import { useEffect, useState } from "react";
@@ -8,10 +8,10 @@ import { ExplorerApplication } from "../../src/App";
 import { devFixture } from "../../src/store/devFixture";
 import type { ExplorerProjectStore } from "../../src/store/types";
 import scopedCoverage from "../../src/store/fixtures/scopedCoverage.json";
-import { flowLayoutEngine } from "../../src/workers/flowLayoutEngine";
-import { useTraceFlowMock } from "./TraceFlowMock";
 import { TRACE_CAPABILITY, TRACE_EXAMPLES, traceExampleElements, traceExampleSource } from "./fixtures/traces";
 import { SHOWCASE_WORKTREES } from "./fixtures/productPatterns";
+import { worktreeUrl } from "../../src/router/routes";
+import { writeExplorerUrl } from "../../src/router/location";
 
 /** Feed the same normalized records to the preview and the application's detail workflows. */
 function withTraceElements(base: ExplorerProjectStore): ExplorerProjectStore {
@@ -71,7 +71,20 @@ function withTraceElements(base: ExplorerProjectStore): ExplorerProjectStore {
       if (!requirement.parentIds.length) addRelation(requirement.id, capability.id, "specify");
     }
   }
-  return { ...base, elements, relations, files: [...files.values()], folders: [...folders.values()],
+  const traceFiles: ExplorerProjectStore["traces"]["files"] = {};
+  for (const { trace } of TRACE_EXAMPLES) {
+    (traceFiles[trace.verification.file] ??= { verifications: [] }).verifications.push({
+      identifier: trace.verification.id, name: trace.verification.name, file: trace.verification.file,
+      type: trace.verification.type, directly_verified_count: trace.requirements.filter(node => node.directlyVerified).length,
+      total_requirements_in_tree: trace.requirements.length,
+      directly_verified_requirements: trace.requirements.filter(node => node.directlyVerified).map(node => node.id),
+      trace_graph: {
+        nodes: trace.requirements.map(node => ({ id: node.id, name: node.name, type: "requirement", is_directly_verified: node.directlyVerified })),
+        edges: trace.requirements.flatMap(node => node.parentIds.map(parent => ({ source: node.id, target: parent, relation_type: "derivedFrom" }))),
+      },
+    });
+  }
+  return { ...base, traces: { files: traceFiles }, elements, relations, files: [...files.values()], folders: [...folders.values()],
     summaries: { ...base.summaries, elements: elements.length, relations: relations.length, files: files.size, folders: folders.size },
   };
 }
@@ -90,7 +103,6 @@ function requestedFixture(fallback: string) {
 }
 
 export function MockShell({ example = "model" }: { example?: "model" | "coverage" }) {
-  const traces = useTraceFlowMock(flowLayoutEngine);
   const initialId = example === "coverage" ? "showcase-coverage" : "showcase-main";
   const [worktreeId, setWorktreeId] = useState(() => requestedFixture(initialId));
   useEffect(() => {
@@ -100,12 +112,10 @@ export function MockShell({ example = "model" }: { example?: "model" | "coverage
   }, [initialId]);
   const selectWorktree = (id: string) => {
     if (!fixtureStores.has(id) || id === worktreeId) return;
-    const url = new URL(window.location.href);
-    url.searchParams.set("worktree_id", id);
-    window.history.pushState(null, "", url);
+    writeExplorerUrl(worktreeUrl(window.location.href, id));
     setWorktreeId(id);
   };
-  return <ExplorerApplication viewOverrides={{ traces }} live={{
+  return <ExplorerApplication live={{
     result: { ok: true, schemaMismatch: null, store: fixtureStores.get(worktreeId)! },
     refreshError: null,
     worktreeRouting: true,
@@ -115,6 +125,7 @@ export function MockShell({ example = "model" }: { example?: "model" | "coverage
     selectWorktree,
     refreshWorktrees: async () => {},
     switching: false,
+    worktreeSelectionError: null, dismissWorktreeError: () => {},
     automaticRefresh: false,
     recoveryWarning: null,
   }} />;

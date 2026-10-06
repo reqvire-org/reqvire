@@ -7,10 +7,12 @@ import { ExplorerUiStateProvider, useExplorerUiState } from "../state/ExplorerUi
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
 import {
-  __testBuildTraceRollupMermaid,
   TracesView,
 } from "./ReportViews";
 import { KnowledgeGraphView } from "./GraphLibraryViews";
+import { writeExplorerHash } from "../router/location";
+import { routeForSelection, routeForElement } from "../router/routes";
+import { buildVerificationFlow } from "../lib/traceFlow";
 import { ThesaurusView } from "./ThesaurusView";
 
 const mockSigmaConstruct = vi.hoisted(() => vi.fn());
@@ -89,6 +91,8 @@ function renderWithStore(view: React.ReactElement, store = devFixture) {
 
 describe("native visualization parity views", () => {
   beforeEach(() => {
+    localStorage.clear();
+    window.history.replaceState(null, "", "/#/model");
     mockSigmaConstruct.mockClear();
     mockSigmaKill.mockClear();
     mockSigmaRefresh.mockClear();
@@ -433,6 +437,21 @@ describe("native visualization parity views", () => {
     expect(mockSigmaConstruct).toHaveBeenCalledTimes(1);
   });
 
+  it("retains the graph renderer and layout worker through selection URLs and details", async () => {
+    const id = "system-model/Specifications.md#example-requirement";
+    window.history.replaceState(null, "", `/${routeForSelection("model", null, { mode: "graph" })}`);
+    renderWithStore(<KnowledgeGraphView frameTestId="model-graph" onOpenElement={vi.fn()} />);
+    await waitFor(() => expect(mockSigmaConstruct).toHaveBeenCalledOnce());
+    const selection = routeForSelection("model", id, { mode: "graph" });
+    act(() => writeExplorerHash(selection));
+    act(() => writeExplorerHash(routeForElement(id)));
+    act(() => writeExplorerHash(selection));
+    expect(mockSigmaConstruct).toHaveBeenCalledOnce();
+    expect(mockSigmaKill).not.toHaveBeenCalled();
+    expect(mockForceAtlasEngine).toHaveBeenCalledOnce();
+    expect(mockCameraAnimate).toHaveBeenCalled();
+  });
+
   it("relayouts selected graph neighborhoods with noverlap and animated node positions", async () => {
     renderWithStore(
       <KnowledgeGraphView frameTestId="model-graph" onOpenElement={vi.fn()} />,
@@ -611,12 +630,13 @@ describe("native visualization parity views", () => {
     expect(screen.queryByText("Service Endpoint")).toBeNull();
   });
 
-  it("renders traces as native verification rows", () => {
+  it("renders the selected trace through the native flow pattern", () => {
+    window.history.replaceState(null, "", "/#/traces");
     const { container } = renderWithStore(
       <TracesView onOpenElement={vi.fn()} />,
     );
 
-    expect(screen.getByTestId("trace-rows")).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Verification trace flow" })).toBeTruthy();
     expect(screen.getAllByText("Example Verification").length).toBeGreaterThan(0);
     expect(container.querySelector("iframe")).toBeNull();
   });
@@ -641,8 +661,8 @@ describe("native visualization parity views", () => {
     expect(screen.getByText("Example Verification")).toBeTruthy();
   });
 
-  it("builds per-verification roll-up Mermaid diagrams from normalized trace graphs", () => {
-    const mermaid = __testBuildTraceRollupMermaid(
+  it("builds native roll-up topology from normalized trace graphs", () => {
+    const flow = buildVerificationFlow(
       {
         id: "system-model/Traces.md#verify-api",
         name: "Verify API",
@@ -661,16 +681,11 @@ describe("native visualization parity views", () => {
       },
       new Map(),
     );
+    const graph = flow.graph!;
 
-    expect(mermaid).toContain("graph TD");
-    expect(mermaid).toContain("classDef verification");
-    expect(mermaid).not.toContain("var(--");
-    expect(mermaid).toContain("subgraph");
-    expect(mermaid).toContain("|verifies|");
-    expect(mermaid).toContain("|derivedFrom|");
-    expect(mermaid).toContain("Verify API");
-    expect(mermaid).toContain("API Response");
-    expect(mermaid).toContain("API Root");
+    expect(graph.nodes.map(node => node.element.name)).toEqual(["Verify API", "API Response", "API Root"]);
+    expect(graph.edges.map(edge => edge.label)).toEqual(["verifies", "derivedFrom"]);
+    expect(flow.requirements).toHaveLength(2);
   });
 
   it("uses the Explorer pane search for ontology graph filtering", () => {

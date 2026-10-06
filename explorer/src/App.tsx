@@ -6,7 +6,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
-import { AppShell, WorktreeSelector, type ShellActionItem, type ShellNavigationItem } from "@ds";
+import { AppShell, WorktreeLoadDialog, WorktreeSelector, type ShellActionItem, type ShellNavigationItem } from "@ds";
 import { WorktreeUrlContext } from "./store/worktreeUrls";
 import { useLiveStore } from "./store/useLiveStore";
 import { StoreProvider } from "./store/StoreContext";
@@ -63,7 +63,7 @@ export function App({ viewOverrides }: AppProps = {}) {
 /** Shared application composition; the showcase supplies fixture snapshots in place of HTTP. */
 export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: ReturnType<typeof useLiveStore> }) {
   const { result, refreshError } = live;
-  const toolbar = live.worktreeRouting ? <WorktreeSelector
+  const worktreeSelector = live.worktreeRouting ? <WorktreeSelector density="compact"
     value={live.selectedWorktree}
     displayedValue={result.ok ? result.store.project.worktree_id : undefined}
     choices={live.worktrees.map(item => ({ id: item.worktree_id, branch: item.branch, root: item.workspace_root, available: item.available && (item.explorer_available || item.owned === false) }))}
@@ -74,21 +74,26 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
   /> : undefined;
 
   if (!result.ok) {
-    return <>{toolbar}<MissingStoreNotice reason={result.reason} detail={refreshError ?? result.detail} /></>;
+    return <AppShell headerContext={worktreeSelector} navigationItems={SHELL_NAVIGATION_ITEMS}
+      main={<MissingStoreNotice reason={result.reason} detail={refreshError ?? result.detail} />} />;
   }
 
   return (
     <WorktreeUrlContext.Provider value={result.store.project.worktree_id}>
     <StoreProvider store={result.store} schemaMismatch={result.schemaMismatch}>
       <SearchIndexProvider>
-        <ExplorerUiStateProvider>
+        <ExplorerUiStateProvider worktreeRouting={live.worktreeRouting}>
+          {(live.switching || live.worktreeSelectionError) && <WorktreeLoadDialog
+            branch={live.worktrees.find(item => item.worktree_id === live.selectedWorktree)?.branch ?? live.selectedWorktree ?? "Selected worktree"}
+            error={live.worktreeSelectionError} onDismiss={live.dismissWorktreeError} /> }
           <ExplorerShell
             viewOverrides={viewOverrides}
             schemaMismatch={result.schemaMismatch}
-            refreshError={refreshError}
+            refreshError={live.worktreeSelectionError ? null : refreshError}
             recoveryWarning={live.recoveryWarning}
             automaticRefresh={live.automaticRefresh}
-            toolbar={toolbar}
+            worktreeSelector={worktreeSelector}
+            worktreeBlocked={Boolean(live.switching || live.worktreeSelectionError)}
             worktreeId={result.store.project.worktree_id}
           />
         </ExplorerUiStateProvider>
@@ -98,13 +103,14 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
   );
 }
 
-function ExplorerShell({ schemaMismatch, refreshError, recoveryWarning, automaticRefresh, viewOverrides, toolbar, worktreeId }: AppProps & {
+function ExplorerShell({ schemaMismatch, refreshError, recoveryWarning, automaticRefresh, viewOverrides, worktreeSelector, worktreeId, worktreeBlocked }: AppProps & {
   recoveryWarning?: string | null;
   schemaMismatch: string | null;
   refreshError: string | null;
   automaticRefresh: boolean;
-  toolbar?: ReactNode;
+  worktreeSelector?: ReactNode;
   worktreeId?: string;
+  worktreeBlocked?: boolean;
 }) {
   const { route, navigateView, openElement, closeElement } = useHashRoute();
   const { navigationNotice } = useExplorerUiState();
@@ -113,7 +119,7 @@ function ExplorerShell({ schemaMismatch, refreshError, recoveryWarning, automati
   useEffect(() => {
     if (previousContext.current === worktreeId) return;
     previousContext.current = worktreeId;
-    if (route.elementId) closeElement(true);
+    if (route.elementId) closeElement(true, true);
     setElementDetailHistory([]);
     setOntologyNodeId(null);
   }, [worktreeId, route.elementId, closeElement]);
@@ -257,11 +263,12 @@ function ExplorerShell({ schemaMismatch, refreshError, recoveryWarning, automati
 
   return (
     <AppShell
+      inert={worktreeBlocked || undefined}
       ref={shellRef}
       navigationItems={SHELL_NAVIGATION_ITEMS}
       activeNavigationValue={effectiveHeaderView}
       headerActions={headerActions}
-      sidePaneHeader={toolbar}
+      headerContext={worktreeSelector}
       leftPaneOpen={leftPaneOpen}
       leftPaneResizing={leftPaneResizing}
       leftPaneWidth={leftPaneWidth}
@@ -304,9 +311,9 @@ function ExplorerShell({ schemaMismatch, refreshError, recoveryWarning, automati
         />
       }
     >
-      <HelpModal open={helpOpen} onOpenChange={setHelpOpen} />
+      <HelpModal open={helpOpen && !worktreeBlocked} onOpenChange={setHelpOpen} />
       <ElementDetailModal
-        identifier={contextChanged ? null : route.elementId}
+        identifier={contextChanged || worktreeBlocked ? null : route.elementId}
         onClose={handleCloseElementDetail}
         onOpenElement={handleOpenRelatedElement}
         onOpenOntologyNode={setOntologyNodeId}
@@ -314,7 +321,7 @@ function ExplorerShell({ schemaMismatch, refreshError, recoveryWarning, automati
         previousElementLabel={elementDetailHistory.at(-1)}
       />
       <OntologyNodeDetailModal
-        nodeId={contextChanged ? null : ontologyNodeId}
+        nodeId={contextChanged || worktreeBlocked ? null : ontologyNodeId}
         onClose={() => setOntologyNodeId(null)}
       />
     </AppShell>

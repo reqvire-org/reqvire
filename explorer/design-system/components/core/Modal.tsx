@@ -9,6 +9,7 @@ import {
   type HTMLAttributes,
   type ReactElement,
   type ReactNode,
+  type Ref,
 } from "react";
 import { css, cx } from "@linaria/atomic";
 import { createPortal } from "react-dom";
@@ -37,6 +38,10 @@ const overlayBaseUX = css`
   backdrop-filter: var(--ds-modal-overlay-backdrop-filter);
 `;
 
+const centeredOverlayUX = css`
+  align-items: center;
+`;
+
 const baseUX = css`
   --ds-modal-w: var(--content-max);
   display: flex;
@@ -53,6 +58,10 @@ const baseUX = css`
   svg {
     display: block;
     flex: 0 0 auto;
+  }
+
+  &[data-size="compact"] {
+    --ds-modal-w: calc(var(--space-32) * 14);
   }
 `;
 
@@ -122,14 +131,20 @@ export function Modal({
 }
 
 export function ModalContent({
+  ref,
   className = "",
   children,
   showCloseButton: _showCloseButton,
+  centered = false,
+  size = "default",
   "aria-describedby": ariaDescribedBy,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   children: ReactNode;
   showCloseButton?: boolean;
+  centered?: boolean;
+  size?: "default" | "compact";
+  ref?: Ref<HTMLDivElement>;
 }) {
   const context = useContext(ModalContext);
   if (!context?.open) return null;
@@ -137,13 +152,15 @@ export function ModalContent({
   return createPortal(
     <ModalContentContext.Provider value={context}>
       <div
-        className={cx("ds-modal__overlay", overlayBaseUX)}
+        className={cx("ds-modal__overlay", overlayBaseUX, centered ? centeredOverlayUX : undefined)}
         role="presentation"
         onMouseDown={(event) => {
           if (event.target === event.currentTarget) context.onOpenChange?.(false);
         }}
       >
         <div
+          ref={ref}
+          data-size={size}
           className={cx("ds-modal", baseUX, className)}
           role="dialog"
           aria-modal="true"

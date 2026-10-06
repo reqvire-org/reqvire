@@ -304,6 +304,22 @@ reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
           views, verification traces, coverage reports, resources, and ontology
           explorer output.
         </p>
+        <p className="text-zinc-600 mb-4">
+          In Traces, select a verification to open its interactive flow from
+          directly verified requirements through their ancestors and owning
+          capabilities. Switch between left-to-right and top-to-bottom layouts,
+          expand branches, or open element details and source files from the
+          cards. Select a file to see its verification overview. These controls
+          are also available in exported Explorer.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Selections in Model, Traces, Thesaurus, Ontologies and Coverage have
+          shareable URLs. Copy the address to reopen the same item and worktree,
+          or use reload, Back and Forward to restore earlier selections. Model
+          links also retain the workspace mode; Traces links can identify a
+          verification or file overview. Explicit links override remembered
+          selections. Unavailable items show an overview with an explanation.
+        </p>
         <CodeBlock>{`reqvire serve
 reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
@@ -331,15 +347,18 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           Git hook before committing again; reconciliation does not fix the hook.
         </p>
         <p className="text-zinc-600 mb-4">
-          The branch picker at the top of the left pane is available with plain
-          serving and read-only MCP too. It lists every local branch in the startup
+          The branch picker beside Reqvire in the shared header is available with plain
+          serving and read-only MCP too, and stays visible when the left pane is collapsed. It lists every local branch in the startup
           repository and loads only the branch you select, reusing its worktree or
           creating an isolated managed worktree. Each tab can browse a different model; its URL
           preserves the selection across reload and back/forward navigation.
           A successful switch updates the model, branch label, and asset links
           together and closes old element details. If loading fails or the worktree
           disappears, Explorer keeps the last valid view labelled with its branch
-          and shows an error. Select a branch to retry. Existing checkouts remain
+          and shows an error. During loading, a centered spinner appears over a
+          dimmed, blurred view. On failure, click outside the error dialog, press
+          Escape, or choose Close to return to the retained worktree; select the
+          branch again to retry. Existing checkouts remain
           unchanged. Read-only selection accepts valid uncommitted content and
           checks source freshness through the existing cache. Mutation-enabled
           serving rejects dirty targets before first admission. Reselecting an
@@ -352,13 +371,32 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
 
       <Section title="Coverage in Explorer">
         <p className="text-zinc-600 mb-4">
-          The Coverage view starts with Scope set to Whole model beside the page title. Scope selects
-          any capability subtree and updates all summary tiles, breakdowns, gap
-          lists and sidebar counts together. Capabilities always
-          appear in a hierarchy, with parents above their children. Roots and
-          siblings are ordered by lowest verification coverage first, then
-          implementation coverage, then name. Each subtree stays together so
-          coverage gaps remain visible in context.
+          Coverage opens on Whole Model with progress metrics, compact verification-type
+          and implementation-source breakdowns, capability drill-down and issue lists.
+          Verification types share one proportional bar and an inline legend with all five counts, including zeros.
+          The left pane nests every capability under a selectable Whole Model root. Select
+          that root to clear capability selection and return to the complete model scope.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Select a capability name to show its full scoped dashboard. Its authored name
+          appears in the page title, with scoped metrics and requirement
+          drill-down followed by unverified requirements, unimplemented requirements and
+          unsatisfied test verifications. Empty capabilities keep the same dashboard with
+          zero totals and explanatory empty issue sections. Orphaned verifications appear
+          only in Whole Model because they have no capability membership.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Capability-tree roots and siblings are sorted by name. Its chevrons expand child
+          capabilities without changing selection. Main report rows rank sibling capabilities
+          by verification coverage, then implementation coverage, then name, keeping each
+          subtree together. There is no separate mode selector or View issues page.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Capability selection updates the URL. Copy it to share the complete scoped view,
+          or use Back and Forward to revisit scopes. Explicit scope links override saved
+          preferences; older mode/category links resolve to their scope in the unified view.
+          Branch changes restore that branch&apos;s scope independently. A capability removed
+          during refresh returns to Whole Model with an explanation.
         </p>
         <p className="text-zinc-600 mb-4">
           Expand a capability to see its attached requirements, then expand a
@@ -373,14 +411,14 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           implementation status.
           Select a requirement name to inspect its evidence in element details and follow
           local artifact links to the file-content viewer. Returning to Coverage keeps your selected scope.
-          Verified, Partially verified, and Not verified describe the model's
-          verification coverage; they are coverage labels rather than test execution results.
+          Labelled bars, percentages and counts describe model coverage; they do not imply
+          test execution results. Requirement blocker counts retain diagnostic detail.
         </p>
         <BulletList items={[
           "Opening evidence outside the selected subtree keeps the current scope.",
           "A shared verification is counted once within each scope and once globally. Scope totals need not add up to the whole-model total.",
-          "Orphan verifications belong to the whole-model view. Use View whole model in the Orphaned verifications panel to inspect them.",
-          "Scope is remembered per project and preserved across valid live refreshes. If the selected capability disappears, Explorer returns to Whole model and explains the reset.",
+          "Orphan verifications belong to the whole model. Select Whole Model in the capability tree to inspect them.",
+          "Capability scope is remembered per project/worktree. Valid selections survive refresh; removed capabilities return to Whole Model with an explanation.",
         ]} />
       </Section>
 

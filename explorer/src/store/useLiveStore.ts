@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { loadStore } from "./loadStore";
 import { devFixture } from "./devFixture";
 import { ManifestStoreClient } from "./manifestRefresh";
+import { worktreeUrl } from "../router/routes";
+import { useExplorerLocation, writeExplorerUrl } from "../router/location";
 
 const REFRESH_INTERVAL_MS = 5000;
 export interface WorktreeChoice {
@@ -17,14 +19,20 @@ function requestedWorktree() { return new URL(window.location.href).searchParams
 
 
 export function useLiveStore() {
+  const location = useExplorerLocation();
   const [result, setResult] = useState(() => loadStore(window.reqvireWorktreeRouting ? undefined : devFixture));
   const displayedRef = useRef(result.ok ? result.store.project.worktree_id : undefined);
   displayedRef.current = result.ok ? result.store.project.worktree_id : undefined;
+  const retainedLocation = useRef(location);
+  if (result.ok && (!requestedWorktree() || requestedWorktree() === displayedRef.current)) retainedLocation.current = location;
+  const failedSelection = useRef<string | null>(null);
   const [live] = useState(() => window.reqvireLiveRefresh);
   const [worktreeRouting] = useState(() => Boolean(window.reqvireWorktreeRouting));
   const [selectedWorktree, setSelectedWorktree] = useState(() => worktreeRouting
     ? requestedWorktree() ?? (result.ok ? result.store.project.worktree_id : undefined) : undefined);
   const [selectionVersion, setSelectionVersion] = useState(0);
+  const selectedWorktreeRef = useRef(selectedWorktree);
+  selectedWorktreeRef.current = selectedWorktree;
   const [worktrees, setWorktrees] = useState<WorktreeChoice[]>([]);
   const [inventoryError, setInventoryError] = useState<string | null>(null);
   const [clients] = useState(() => new Map<string | undefined, ManifestStoreClient>([
@@ -77,15 +85,30 @@ export function useLiveStore() {
   const selectWorktree = useCallback((id: string) => {
     if (!worktreeRouting) return;
     requestRef.current?.abort(); requestRef.current = null;
-    const url = new URL(window.location.href); url.searchParams.set("worktree_id", id);
-    window.history.pushState(null, "", url);
+    failedSelection.current = null;
+    writeExplorerUrl(worktreeUrl(window.location.href, id));
+    setRefreshError(null);
     setSelectedWorktree(id);
     setSelectionVersion(version => version + 1);
   }, [worktreeRouting]);
 
+  const dismissWorktreeError = useCallback(() => {
+    const retained = displayedRef.current;
+    if (!retained) return;
+    requestRef.current?.abort(); requestRef.current = null;
+    failedSelection.current = null;
+    const url = new URL(retainedLocation.current);
+    url.searchParams.set("worktree_id", retained);
+    writeExplorerUrl(url, true);
+    setSelectedWorktree(retained);
+    setRefreshError(null);
+    setSelectionVersion(version => version + 1);
+  }, []);
+
 
   const refresh = useCallback(async (loadSelected = false): Promise<void> => {
     if ((!live && !worktreeRouting) || requestRef.current || !mountedRef.current) return;
+    if (selectedWorktree && failedSelection.current === selectedWorktree) return;
     const controller = new AbortController();
     requestRef.current = controller;
     try {
@@ -112,6 +135,7 @@ export function useLiveStore() {
       setRefreshError(null);
     } catch (error: unknown) {
       if (mountedRef.current && !controller.signal.aborted) {
+        if (selectedWorktree && selectedWorktree !== displayedRef.current) failedSelection.current = selectedWorktree;
         setRefreshError(error instanceof Error && error.name === "TimeoutError"
           ? "The server did not respond within 15 seconds."
           : error instanceof Error ? error.message : String(error));
@@ -128,7 +152,7 @@ export function useLiveStore() {
     mountedRef.current = true;
     if (!live && !worktreeRouting) return () => { mountedRef.current = false; };
     const checkVisible = () => {
-      if (document.visibilityState === "visible") void refresh();
+      if (document.visibilityState === "visible") void refresh(worktreeRouting && selectedWorktree !== displayedRef.current);
       else {
         requestRef.current?.abort();
         requestRef.current = null;
@@ -150,7 +174,10 @@ export function useLiveStore() {
     if (!worktreeRouting) return;
     void refreshWorktrees();
     const onPopState = () => {
+      if (requestedWorktree() === selectedWorktreeRef.current) return;
       requestRef.current?.abort(); requestRef.current = null;
+      failedSelection.current = null;
+      setRefreshError(null);
       setSelectedWorktree(requestedWorktree());
     };
     window.addEventListener("popstate", onPopState);
@@ -173,6 +200,8 @@ export function useLiveStore() {
       ? "MCP recovery required: showing the last accepted model; writes are disabled. Local file downloads are unavailable until the worktree is repaired and the server restarted."
       : null,
     selectedWorktree, selectWorktree, refreshWorktrees,
+    dismissWorktreeError,
+    worktreeSelectionError: worktreeRouting && selectedWorktree !== undefined && selectedWorktree !== displayedRef.current ? refreshError : null,
     switching: !refreshError && worktreeRouting && selectedWorktree !== undefined && (!result.ok || selectedWorktree !== result.store.project.worktree_id),
   };
 }

@@ -101,6 +101,8 @@ The system SHALL explain coverage scope selection and ranked hierarchical capabi
   * type: requirement
 
 #### Contract References
+  * [Explorer Shareable Selection Navigation Specification](../WebExplorer/Specifications.md#explorer-shareable-selection-navigation-specification)
+  * [Explorer Worktree Selection Specification](../WebExplorer/Specifications.md#explorer-worktree-selection-specification)
   * [CLI Managed Query Artifacts Specification](../CLI/Specifications.md#cli-managed-query-artifacts-specification)
   * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
@@ -111,6 +113,7 @@ The system SHALL explain coverage scope selection and ranked hierarchical capabi
   * [Explorer Live Store Refresh Input Output](../WebExplorer/Specifications.md#explorer-live-store-refresh-input-output)
   * [Explorer Automatic Store Refresh Specification](../WebExplorer/Specifications.md#explorer-automatic-store-refresh-specification)
   * [CLI Coverage Scope Selection Specification](../CLI/Specifications.md#cli-coverage-scope-selection-specification)
+  * [Explorer Verification Trace Rendering Specification](../WebExplorer/Specifications.md#explorer-verification-trace-rendering-specification)
   * [Explorer Coverage Scope and Display Specification](../WebExplorer/Specifications.md#explorer-coverage-scope-and-display-specification)
   * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
 

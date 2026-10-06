@@ -1,5 +1,12 @@
 """Independent trace topology oracle, exercised through the CLI and static export."""
 import json
+import shutil
+import socket
+import threading
+import time
+import urllib.request
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import subprocess
 import sys
 from pathlib import Path
@@ -51,6 +58,9 @@ for depth in depths:
     add("check", "test-verification", [("derivedFrom", "objective")] + [("verify", name) for name in sorted(direct)])
     add("orphan", "test-verification", [("derivedFrom", "objective")])
     (workspace / "Model.md").write_text("# Elements\n\n" + "".join(records))
+    # Reuse owning semantic fixtures for shared-selection browser checks.
+    for fixture in ("Thesaurus.md", "Ontology.md"):
+        shutil.copyfile(Path(__file__).parents[1] / "test-thesaurus-project-store/specifications" / fixture, workspace / fixture)
 
     def run(*arguments):
         result = subprocess.run([binary, "--workspace", str(workspace), *arguments],
@@ -82,3 +92,51 @@ for depth in depths:
     assert store["schema_version"] == "2026-10-06.project-store.v5"
     assert store["traces"] == report, "export and CLI must share exactly the same trace projection"
     print(f"PASS {depth}-layers/export-cli-parity")
+
+# Exercise the compiled production view against the same independent topology oracle.
+# Use the smaller graph; the 40-layer case above remains a data-size/parity gate.
+workspace = output / f"dag-{depths[0]}"
+with socket.socket() as listener:
+    listener.bind(("127.0.0.1", 0))
+    port = listener.getsockname()[1]
+
+class QuietHandler(SimpleHTTPRequestHandler):
+    def log_message(self, *_args):
+        pass
+
+static = ThreadingHTTPServer(("127.0.0.1", 0), partial(QuietHandler, directory=str(workspace / "export")))
+thread = threading.Thread(target=static.serve_forever, daemon=True)
+thread.start()
+with (output / "serve.log").open("w") as log:
+    server = subprocess.Popen([binary, "--workspace", str(workspace), "serve", "--host", "127.0.0.1", "--port", str(port)], stdout=log, stderr=log)
+    try:
+        url = f"http://127.0.0.1:{port}"
+        deadline = time.monotonic() + 30
+        while True:
+            if server.poll() is not None:
+                raise RuntimeError((output / "serve.log").read_text())
+            try:
+                with urllib.request.urlopen(url, timeout=1) as response:
+                    assert response.status == 200
+                break
+            except OSError:
+                if time.monotonic() > deadline:
+                    raise RuntimeError("Trace browser server did not start")
+                time.sleep(0.05)
+        result = subprocess.run(["node", str(Path(__file__).with_name("browser-flow.mjs")), url,
+                                 f"http://127.0.0.1:{static.server_port}", str(output / "browser-profile"),
+                                 str(workspace / "traces.json")], text=True, capture_output=True, timeout=90)
+        (output / "browser.log").write_text(result.stderr)
+        print(result.stdout, end="")
+        if result.returncode:
+            raise RuntimeError(result.stderr)
+    finally:
+        server.terminate()
+        try:
+            server.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            server.kill()
+            server.wait(timeout=5)
+        static.shutdown()
+        static.server_close()
+        thread.join(timeout=5)

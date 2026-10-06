@@ -17,6 +17,8 @@ export interface TraceFlowRequirement extends TraceFlowElement {
 export interface TraceFlowData {
   verification: TraceFlowElement & { type: string };
   requirements: readonly TraceFlowRequirement[];
+  /** Optional evaluated graph, including capability context and exact relation labels. */
+  graph?: Pick<ElementFlowData, "nodes" | "edges">;
 }
 
 export interface ElementFlowData {
@@ -89,6 +91,7 @@ export function traceFlowNeighborhood(edges: readonly { id: string; source: stri
 
 /** The caller supplies the evaluated trace; disclosure preserves shared paths. */
 export function buildTraceFlowTopology(trace: TraceFlowData, collapsed: ReadonlySet<string> = new Set()) {
+  if (trace.graph) return buildPublishedTraceTopology(trace, collapsed);
   const requirements = new Map<string, TraceFlowRequirement>();
   for (const requirement of trace.requirements) {
     const previous = requirements.get(requirement.id);
@@ -126,6 +129,38 @@ export function buildTraceFlowTopology(trace: TraceFlowData, collapsed: Readonly
     parentCount: new Set(requirements.get(id)?.parentIds).size,
   }));
   return { nodes, edges: links, directCount: direct.length, totalCount: requirements.size };
+}
+
+function buildPublishedTraceTopology(trace: TraceFlowData, collapsed: ReadonlySet<string>): TraceFlowTopology {
+  const graph = trace.graph!;
+  const outgoing = new Map<string, typeof graph.edges[number][]>();
+  for (const edge of graph.edges) {
+    const links = outgoing.get(edge.source) ?? [];
+    links.push(edge);
+    outgoing.set(edge.source, links);
+  }
+  const visible = new Set<string>();
+  const edges: TraceFlowTopology["edges"] = [];
+  const queue = [trace.verification.id];
+  for (let index = 0; index < queue.length; index++) {
+    const id = queue[index];
+    if (visible.has(id)) continue;
+    visible.add(id);
+    if (collapsed.has(id)) continue;
+    for (const edge of outgoing.get(id) ?? []) {
+      edges.push(edge);
+      queue.push(edge.target);
+    }
+  }
+  const requirements = new Map(trace.requirements.map(node => [node.id, node]));
+  return {
+    nodes: graph.nodes.filter(node => visible.has(node.element.id)).map(node => ({
+      ...node, id: node.element.id,
+      parentCount: node.element.id === trace.verification.id ? 0 : new Set(outgoing.get(node.element.id)?.map(edge => edge.target)).size,
+    })),
+    edges, directCount: [...requirements.values()].filter(node => node.directlyVerified).length,
+    totalCount: requirements.size,
+  };
 }
 
 export type TraceFlowDirection = "RIGHT" | "DOWN";

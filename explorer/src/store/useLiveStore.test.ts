@@ -211,6 +211,52 @@ describe("worktree selection", () => {
     vi.stubGlobal("fetch", fetchMock);
     return { a, b, fetchMock, transport };
   }
+  it("retains selection URLs after error dismissal and requires explicit retry", async () => {
+    const { a, b, fetchMock, transport } = contexts();
+    const retained = `/?worktree_id=a#/model?selected=${encodeURIComponent(smallStore().elements[0].id)}&mode=flow`;
+    history.replaceState(null, "", retained);
+    const hook = renderHook(() => useLiveStore()); await tick();
+    fetchMock.mockImplementation(async (url, init) => url === "/api/worktrees/load" && JSON.parse(String(init?.body)).worktree_id === "b"
+      ? Response.json({ error: "Invalid target model" }, { status: 503 }) : transport(url, init));
+    act(() => hook.result.current.selectWorktree("b"));
+    expect(hook.result.current.switching).toBe(true);
+    await tick();
+    expect(hook.result.current.worktreeSelectionError).toBe("Invalid target model");
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(a.store);
+    fetchMock.mockClear(); await tick(20000);
+    expect(fetchMock).not.toHaveBeenCalled();
+    act(() => hook.result.current.dismissWorktreeError()); await tick();
+    expect(location.pathname + location.search + location.hash).toBe(retained);
+    expect(hook.result.current.worktreeSelectionError).toBeNull();
+    expect(hook.result.current.selectedWorktree).toBe("a");
+    expect(hook.result.current.switching).toBe(false);
+    fetchMock.mockImplementation(transport);
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
+    expect(hook.result.current.switching).toBe(false);
+  });
+
+  it("keeps a same-context refresh active during scope-only history traversal", async () => {
+    const { a, fetchMock } = contexts();
+    const hook = renderHook(() => useLiveStore());
+    await tick();
+    let release!: (response: Response) => void;
+    let pendingSignal!: AbortSignal;
+    fetchMock.mockImplementationOnce((_url, init) => {
+      pendingSignal = init!.signal!;
+      return new Promise(resolve => { release = resolve; });
+    });
+    await tick(5000);
+    act(() => {
+      window.history.replaceState(null, "", "/?worktree_id=a#/coverage?scope=");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    });
+    expect(pendingSignal.aborted).toBe(false);
+    await act(async () => { release(new Response(null, { status: 304, headers: { ETag: `"${a.revision}"` } })); });
+    await tick();
+    expect(hook.result.current.refreshError).toBeNull();
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(a.store);
+  });
   it("keeps recovery warnings with the displayed context across failed and successful switches", async () => {
     const { a, b, fetchMock, transport } = contexts();
     fetchMock.mockImplementation(async (url, init) => {
@@ -233,6 +279,22 @@ describe("worktree selection", () => {
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
     expect(hook.result.current.recoveryWarning).toBeNull();
   });
+  it("loads a pending branch when its tab becomes visible", async () => {
+    const { b, fetchMock } = contexts();
+    const hook = renderHook(() => useLiveStore()); await tick();
+    vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
+    act(() => document.dispatchEvent(new Event("visibilitychange")));
+    fetchMock.mockClear();
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(hook.result.current.switching).toBe(true);
+    vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible");
+    act(() => document.dispatchEvent(new Event("visibilitychange"))); await tick();
+    expect(fetchMock.mock.calls.some(([url]) => url === "/api/worktrees/load")).toBe(true);
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
+    expect(hook.result.current.switching).toBe(false);
+  });
+
   it("loads read-only branch selections without enabling periodic refresh", async () => {
     const { a, b, fetchMock } = contexts();
     delete window.reqvireLiveRefresh;

@@ -1,4 +1,6 @@
 export { CoverageDrilldown } from "./CoverageDrilldown";
+export { CoverageNavigation } from "./CoverageNavigation";
+export type { CoverageNavigationProps, CoverageNavigationScope } from "./CoverageNavigation";
 export type { CoverageDrilldownItem, CoverageDrilldownAssessment, CoverageDrilldownTarget } from "./CoverageDrilldown";
 export {
   CoverageBarFrame,

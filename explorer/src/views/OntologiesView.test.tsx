@@ -97,6 +97,7 @@ vi.mock("sigma", () => ({
 }));
 
 function renderWithStore(store: ExplorerProjectStore = devFixture) {
+  localStorage.clear(); window.history.replaceState(null, "", "/#/ontologies");
   setupWebGLMock();
   resetSigmaState();
   return render(

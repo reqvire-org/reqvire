@@ -499,7 +499,23 @@ When an Explorer route identifies a model element, file, source page, or resourc
 When a user selects a coverage scope, the system SHALL consistently display its coverage summaries, evidence, gaps, and navigation counts.
 
 #### Details
-While displaying coverage, the system SHALL present capabilities in a parent-before-child hierarchy with roots and siblings ranked by coverage.
+While displaying capability coverage, the system SHALL present capabilities in a parent-before-child hierarchy with roots and siblings ranked by coverage.
+
+While displaying coverage, the system SHALL retain the shared left capability navigator and header worktree selector beside one complete scope dashboard.
+
+When no capability is selected, the system SHALL show the complete Whole Model dashboard, ranked drill-down and issue sections, with Whole Model selected as the navigation root above all capabilities.
+
+When a user activates the left tree's Whole Model root, the system SHALL clear capability selection and show the whole-model dashboard.
+
+When a user selects a capability, the system SHALL show its full scoped summary and drill-down, followed by detailed issues for that same scope.
+
+While displaying a capability scope, the system SHALL identify it by authored name and provide an alphabetically ordered capability tree with canonical identifier selection.
+
+While displaying orphan diagnostics, the system SHALL use only the whole-model report and explain their absence from capability-scoped dashboards.
+
+When a user opens or returns to a capability scope through browser navigation, the system SHALL reveal that capability within its navigation hierarchy.
+
+When a user selects or opens a coverage scope, the system SHALL retain that selection in a shareable URL and restore it through browser navigation within the selected model context.
 
 When the available coverage panel width changes, the system SHALL adapt the row layout while retaining distinguishable hierarchy levels and aligned verification and implementation values.
 
@@ -513,7 +529,7 @@ While displaying a terminal requirement, the system SHALL communicate its covera
 
 When a requirement has child requirements or binding consumers to inspect, the system SHALL provide a coverage disclosure control.
 
-While displaying verification coverage, the system SHALL label published coverage states as Verified, Partially verified, and Not verified.
+While displaying verification or implementation coverage bars, the system SHALL show metric headings, percentages and counts without redundant visible coverage-state labels, while retaining outstanding requirement blocker counts and accessible metric summaries.
 
 When displaying verification or implementation coverage on a requirement row, the system SHALL use the same colored bars, percentages, and counts as capability coverage rows.
 
@@ -531,6 +547,7 @@ While demonstrating coverage in the showcase, the system SHALL use the same Cove
   * type: requirement
 
 #### Contract Bindings
+  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
   * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
   * [Implementation Coverage Output Structure Specification](../../Reports/ModelReports/Specifications.md#implementation-coverage-output-structure-specification)
 
@@ -539,12 +556,20 @@ While demonstrating coverage in the showcase, the system SHALL use the same Cove
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
   * satisfiedBy: [CoverageDrilldown.tsx](../../../explorer/design-system/product-patterns/reports/CoverageDrilldown.tsx)
+  * satisfiedBy: [CoverageNavigation.tsx](../../../explorer/design-system/product-patterns/reports/CoverageNavigation.tsx)
+  * satisfiedBy: [useCoverageNavigation.ts](../../../explorer/src/state/useCoverageNavigation.ts)
   * satisfiedBy: [ReportPatterns.tsx](../../../explorer/design-system/product-patterns/reports/ReportPatterns.tsx)
+  * satisfiedBy: [TokenVisual.tsx](../../../explorer/design-system/components/data/TokenVisual.tsx)
+  * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
   * satisfiedBy: [PaneControls.tsx](../../../explorer/design-system/product-patterns/side-pane/PaneControls.tsx)
   * satisfiedBy: [MockShell.tsx](../../../explorer/design-system/showcase/MockShell.tsx)
   * satisfiedBy: [ProductPatternsPage.tsx](../../../explorer/design-system/showcase/pages/ProductPatternsPage.tsx)
   * satisfiedBy: [ExplorerSidePane.tsx](../../../explorer/src/components/ExplorerSidePane.tsx)
   * satisfiedBy: [coverage.ts](../../../explorer/src/lib/coverage.ts)
+  * satisfiedBy: [location.ts](../../../explorer/src/router/location.ts)
+  * satisfiedBy: [routes.ts](../../../explorer/src/router/routes.ts)
+  * satisfiedBy: [useHashRoute.ts](../../../explorer/src/router/useHashRoute.ts)
+  * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
   * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
   * satisfiedBy: [loadStore.ts](../../../explorer/src/store/loadStore.ts)
   * satisfiedBy: [types.ts](../../../explorer/src/store/types.ts)
@@ -577,7 +602,7 @@ Detailed route source, concept-scheme grouping, navigation, modal, map rendering
 The system shall expose verification traceability as a specialist Explorer view backed by Project Store trace projections and rendered through the shared Explorer shell.
 
 #### Details
-Detailed route data, left-pane behavior, flow/row rendering, native trace-preview interaction, modal navigation, and trace-data ownership rules shall follow the associated specifications.
+When a verification is selected in served or exported Explorer Traces, the system shall render its evaluated Project Store trace graph through the shared native React Flow/ELK pattern. File selection shall present a compact verification overview. Detailed left-pane behavior, native flow interaction, modal/source navigation, context isolation, and trace-data ownership shall follow the associated specifications.
 
 #### Metadata
   * type: requirement
@@ -592,6 +617,7 @@ Detailed route data, left-pane behavior, flow/row rendering, native trace-previe
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
+  * satisfiedBy: [traceFlow.ts](../../../explorer/src/lib/traceFlow.ts)
   * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/product-patterns/reports/TraceFlow.tsx)
   * satisfiedBy: [flowLayoutEngine.ts](../../../explorer/src/workers/flowLayoutEngine.ts)
   * satisfiedBy: [flowLayout.worker.ts](../../../explorer/src/workers/flowLayout.worker.ts)
@@ -636,6 +662,10 @@ The system shall ensure color consistency between:
 WHEN Explorer is served, the system SHALL let each browser tab select any local branch through one branch picker and load only the requested context under the server's existing read-only or mutation-enabled admission rules, without switching existing Git checkouts or changing another client's context.
 
 #### Details
+While displaying a served Explorer view, the system SHALL keep the branch picker visible in the shared header beside the Reqvire brand independently of left-pane state.
+
+While preparing a newly selected worktree, the system SHALL show a blocking loading dialog over the retained model. If preparation fails, the system SHALL show the error and allow dismissal to the retained model; successful preparation SHALL close the dialog and render the new model.
+
 Selection SHALL resolve the branch to an existing or newly created isolated worktree and atomically adopt its context's model, reports, source content, and assets. Mutation-enabled serving SHALL reject a dirty target before loading a newly admitted context. The same admission, validation, existing cache/invalidation, navigation, and refresh rules SHALL apply regardless of whether the worktree already existed. Branch identity remains visible; reselecting an active context reuses its accepted model under the existing session rules.
 
 #### Metadata
@@ -653,7 +683,9 @@ Selection SHALL resolve the branch to an existing or newly created isolated work
   * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
 
 #### Relations
+  * satisfiedBy: [WorktreeLoadDialog.tsx](../../../explorer/design-system/product-patterns/shell/WorktreeLoadDialog.tsx)
   * satisfiedBy: [WorktreeSelector.tsx](../../../explorer/design-system/product-patterns/shell/WorktreeSelector.tsx)
+  * satisfiedBy: [AppShell.tsx](../../../explorer/design-system/product-patterns/shell/AppShell.tsx)
   * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
   * satisfiedBy: [manifestRefresh.ts](../../../explorer/src/store/manifestRefresh.ts)
   * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
@@ -688,4 +720,89 @@ This requirement implements the Explorer portion of shared worktree isolation an
   * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * specify: [Explorer Worktree Browsing](../InterfacesFeature.md#explorer-worktree-browsing)
   * definedBy: [Explorer Worktree Runtime Isolation Specification](Specifications.md#explorer-worktree-runtime-isolation-specification)
+---
+
+### Explorer Shareable Selection Navigation
+
+When a user selects an item in an Explorer view, the system SHALL expose a shareable URL that restores the same selection within its model context.
+
+#### Details
+The system SHALL restore valid selections through copied links, reload and browser history, apply explicit URL selections before stored preferences, and explain unavailable selections without displaying stale context data.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
+  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
+  * definedBy: [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
+  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
+  * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
+  * satisfiedBy: [routes.ts](../../../explorer/src/router/routes.ts)
+  * satisfiedBy: [useHashRoute.ts](../../../explorer/src/router/useHashRoute.ts)
+  * satisfiedBy: [location.ts](../../../explorer/src/router/location.ts)
+---
+
+### Model Selection Sharing
+
+When a user selects a Model element, file, folder, resource, or graph node, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
+
+#### Relations
+  * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
+  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
+  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
+---
+
+### Trace Selection Sharing
+
+When a user selects a Traces verification or file overview, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
+
+#### Relations
+  * derivedFrom: [Traces View Generation](#traces-view-generation)
+  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
+  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
+---
+
+### Thesaurus Selection Sharing
+
+When a user selects a Thesaurus concept, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
+
+#### Relations
+  * derivedFrom: [Thesaurus View Generation](#thesaurus-view-generation)
+  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
+  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
+---
+
+### Ontology Selection Sharing
+
+When a user selects an Ontologies graph node, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
+
+#### Relations
+  * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
+  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
+  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
 ---

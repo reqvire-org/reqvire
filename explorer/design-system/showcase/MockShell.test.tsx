@@ -8,15 +8,20 @@ vi.mock("../../src/views/GraphLibraryViews", () => ({ KnowledgeGraphView: () => 
 vi.mock("../../src/lib/ontologyGraphRenderer", () => ({ mountOntologyGraph: vi.fn() }));
 
 function selectWorktree(branch: string) {
-  fireEvent.click(screen.getByRole("combobox", { name: "Branch" }));
+  fireEvent.click(screen.getAllByRole("combobox", { name: "Branch" })[0]);
   fireEvent.click(screen.getByRole("option", { name: new RegExp(`^${branch} `) }));
 }
 
 function expectBranch(branch: string) {
-  expect(screen.getByRole("combobox", { name: "Branch" }).textContent).toBe(branch);
+  for (const control of screen.getAllByRole("combobox", { name: "Branch" })) expect(control.textContent).toBe(branch);
 }
 
+function selectCapability(name: string) {
+  fireEvent.click(screen.getByRole("treeitem", { name: "Whole Model" }));
+  fireEvent.click(screen.getByRole("treeitem", { name }));
+}
 function expand(name: string) {
+  if (!screen.queryByRole("button", { name: `Expand ${name}` })) selectCapability(name);
   fireEvent.click(screen.getByRole("button", { name: `Expand ${name}` }));
 }
 
@@ -31,7 +36,7 @@ describe("showcase application coverage", () => {
   it("previews branch labels and unavailable choices in Patterns", () => {
     const view = render(<ProductPatternsPage />);
     try {
-      const selector = screen.getByRole("combobox", { name: "Branch" });
+      const selector = screen.getAllByRole("combobox", { name: "Branch" })[0];
       expectBranch("main");
       fireEvent.click(selector);
       expect(screen.getByRole("option", { name: /archived.*Unavailable/ }).getAttribute("aria-disabled")).toBe("true");
@@ -46,6 +51,10 @@ describe("showcase application coverage", () => {
     localStorage.setItem("reqvire-explorer-theme", "light");
     let view = render(<MockShell />);
     try {
+      expect(screen.getByRole("tree", { name: "Coverage capabilities" })).toBeTruthy();
+      selectCapability("Example Capability");
+      expect(screen.getByRole("treeitem", { name: "Example Capability" })).toBeTruthy();
+      expect(screen.queryByRole("treeitem", { name: "Shared Branch" })).toBeNull();
       expand("Example Capability");
       const requirement = screen.getByRole("article", { name: "Example Requirement" });
       fireEvent.click(within(requirement).getByRole("link", { name: "requirement Example Requirement" }));
@@ -53,9 +62,13 @@ describe("showcase application coverage", () => {
       selectWorktree("coverage-review");
       await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
       expectBranch("coverage-review");
+      expect(screen.getByRole("heading", { name: "Whole Model" })).toBeTruthy();
+      selectCapability("Alpha Root");
+      expect(screen.getByRole("treeitem", { name: "Shared Branch" })).toBeTruthy();
+      expect(screen.queryByRole("treeitem", { name: "Example Capability" })).toBeNull();
       expect(screen.getByRole("article", { name: "Alpha Root" })).toBeTruthy();
       expect(screen.queryByRole("article", { name: "Example Capability" })).toBeNull();
-      expect(window.location.hash).toBe("#/coverage");
+      expect(window.location.hash).toBe("#/coverage?scope=specifications%2FCapabilities.md%23alpha-root");
       expect(new URLSearchParams(window.location.search).get("worktree_id")).toBe("showcase-coverage");
       expect(screen.getByRole("tab", { name: "Coverage" }).getAttribute("aria-selected")).toBe("true");
       view.unmount();
@@ -64,6 +77,8 @@ describe("showcase application coverage", () => {
       expect(screen.getByRole("article", { name: "Alpha Root" })).toBeTruthy();
       selectWorktree("main");
       expectBranch("main");
+      expect(screen.getByRole("treeitem", { name: "Example Capability" })).toBeTruthy();
+      expect(screen.queryByRole("treeitem", { name: "Shared Branch" })).toBeNull();
       expect(screen.getByRole("article", { name: "Example Capability" })).toBeTruthy();
       window.history.back();
       await waitFor(() => expectBranch("coverage-review"));
@@ -82,9 +97,26 @@ describe("showcase application coverage", () => {
     const seed = window.reqvireProjectStore;
     const view = render(<MockShell example="coverage" />);
     try {
-      expect(screen.getByRole("heading", { name: "Coverage" })).toBeTruthy();
+      expect(screen.getByRole("heading", { name: "Whole Model" })).toBeTruthy();
+      fireEvent.click(screen.getByRole("treeitem", { name: "Whole Model" }));
+      const scopeOptions = () => within(screen.getByRole("tree", { name: "Coverage capabilities" })).getAllByRole("treeitem")
+        .map(row => [row.getAttribute("data-capability-id"), row.getAttribute("aria-label"), row.getAttribute("aria-level")]);
+      const expectedScopes = [
+        [null, "Whole Model", "1"],
+        ["specifications/Capabilities.md#alpha-root", "Alpha Root", "2"],
+        ["specifications/Capabilities.md#alpha-left", "Alpha Left", "3"],
+        ["specifications/Capabilities.md#shared-branch", "Shared Branch", "4"],
+        ["specifications/Capabilities.md#alpha-right", "Alpha Right", "3"],
+        ["specifications/Capabilities.md#empty-branch", "Empty Branch", "3"],
+        ["specifications/Capabilities.md#beta-root", "Beta Root", "2"],
+      ];
+      expect(scopeOptions()).toEqual(expectedScopes);
+      expect(screen.queryByRole("combobox", { name: "Scope" })).toBeNull();
+      fireEvent.click(screen.getByRole("treeitem", { name: "Shared Branch" }));
+      expect(screen.getByText("1 / 2 terminal requirements covered")).toBeTruthy();
+      expect(scopeOptions()).toEqual(expectedScopes);
       const scopeId = "specifications/Capabilities.md#alpha-root";
-      fireEvent.change(screen.getByRole("combobox", { name: "Scope" }), { target: { value: scopeId } });
+      fireEvent.click(screen.getByRole("treeitem", { name: "Alpha Root" }));
       expand("Shared Branch");
       expand("Alpha Parent");
       const parent = screen.getByRole("article", { name: "Alpha Parent" });
@@ -92,6 +124,7 @@ describe("showcase application coverage", () => {
       const dialog = await screen.findByRole("dialog");
       expect(within(dialog).getByText("Alpha Parent", { exact: true })).toBeTruthy();
       fireEvent.click(within(dialog).getAllByRole("button", { name: "Close" })[0]);
+      expect(window.location.hash).toBe(`#/coverage?scope=${encodeURIComponent(scopeId)}`);
       expand("Alpha Middle");
       const terminal = screen.getByRole("article", { name: "Alpha Implemented" });
       expect(within(terminal).queryByRole("button")).toBeNull();
@@ -106,7 +139,7 @@ describe("showcase application coverage", () => {
       expect(window.location.hash).toBe("#/content/evidence/alpha.txt");
       expect(screen.queryByRole("dialog")).toBeNull();
       fireEvent.click(screen.getByRole("tab", { name: "Coverage" }));
-      await waitFor(() => expect((screen.getByRole("combobox", { name: "Scope" }) as HTMLSelectElement).value).toBe(scopeId));
+      await waitFor(() => expect(screen.getByRole("treeitem", { name: "Alpha Root" }).getAttribute("aria-selected")).toBe("true"));
       expect(screen.getByText("1 / 3 terminal requirements covered")).toBeTruthy();
     } finally {
       view.unmount();
@@ -128,7 +161,8 @@ describe("showcase application coverage", () => {
       expect(within(capability).getByRole("article", { name: "Example Requirement" })).toBeTruthy();
       const gap = within(capability).getByRole("article", { name: "Unverified Fixture Requirement" });
       expect(within(gap).queryByRole("button")).toBeNull();
-      expect(within(gap).getByText("Not verified", { exact: true })).toBeTruthy();
+      expect(within(gap).queryByText("Not verified", { exact: true })).toBeNull();
+      expect(within(gap).getByRole("group", { name: /^Verification: Not verified;/ })).toBeTruthy();
       expect(within(gap).getByRole("link", { name: "requirement Unverified Fixture Requirement" })).toBeTruthy();
       const terminal = within(capability).getByRole("article", { name: "Example Requirement" });
       expect(within(terminal).queryByRole("button")).toBeNull();

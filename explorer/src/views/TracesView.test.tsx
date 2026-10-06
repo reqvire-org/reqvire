@@ -1,184 +1,166 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useEffect } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { ElkNode } from "elkjs/lib/elk-api";
+import ELK from "elkjs/lib/elk.bundled.js";
+import type { FlowLayoutEngine } from "@ds";
 import { ExplorerUiStateProvider } from "../state/ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
 import type { ExplorerProjectStore } from "../store/types";
 import { ExplorerSidePane } from "../components/ExplorerSidePane";
 import * as traceProjection from "../lib/traces";
+import * as flowProjection from "../lib/traceFlow";
 import { TracesView } from "./ReportViews";
 
+const layoutEngine = vi.hoisted(() => vi.fn());
+vi.mock("../workers/flowLayoutEngine", () => ({ flowLayoutEngine: layoutEngine }));
+// Actual TraceFlow orchestration and cards; browser checks own canvas/worker wiring.
+vi.mock("@xyflow/react", async importOriginal => {
+  const original = await importOriginal<typeof import("@xyflow/react")>();
+  const instance = { setViewport: vi.fn(), zoomIn: vi.fn(), zoomOut: vi.fn(), zoomTo: vi.fn() };
+  return { ...original, Handle: () => null, ReactFlow: ({ nodes, edges, nodeTypes, onInit }: {
+    nodes: { id: string; type: string; data: unknown }[];
+    edges: { id: string; source: string; target: string; label: string }[];
+    nodeTypes: Record<string, React.ComponentType<{ data: unknown }>>;
+    onInit: (flow: unknown) => void;
+  }) => {
+    useEffect(() => { onInit(instance); }, [onInit]);
+    return <div data-testid="flow-canvas">{nodes.map(node => {
+      const Card = nodeTypes[node.type];
+      return <div key={node.id} data-flow-node={node.id}><Card data={node.data} /></div>;
+    })}{edges.map(edge => <span key={edge.id} data-flow-edge={edge.id}
+      data-source={edge.source} data-target={edge.target}>{edge.label}</span>)}</div>;
+  } };
+});
+
+// Worker ownership is tested in-browser; jsdom uses the same ELK engine.
+const elk = new ELK({ algorithms: ["layered"] });
+const testFlowLayoutEngine: FlowLayoutEngine = input => ({ result: elk.layout(input), cancel: () => {} });
+
+const file = "system-model/Specifications.md";
+const verificationId = `${file}#verification`;
 const onOpenElement = vi.fn();
 function fixture(label: string, context = "original", parent = false): ExplorerProjectStore {
-  const file = "system-model/Specifications.md";
+  const nodes = [
+    { id: `${file}#requirement`, name: label, type: "requirement", is_directly_verified: true },
+    ...(parent ? [{ id: `${file}#parent`, name: "Added Parent", type: "requirement", is_directly_verified: false }] : []),
+  ];
   return {
-    ...devFixture,
-    project: { ...devFixture.project, worktree_id: context },
+    ...devFixture, project: { ...devFixture.project, worktree_id: context },
+    elements: [
+      { ...devFixture.elements[0], id: verificationId, name: "Shared Verification", element_type: "test-verification", type_family: "verification", file_path: file },
+      ...nodes.map(node => ({ ...devFixture.elements[0], id: node.id, name: node.name, element_type: node.type, file_path: file })),
+    ],
     traces: { files: { [file]: { verifications: [{
-      identifier: `${file}#verification`, name: "Shared Verification", file,
+      identifier: verificationId, name: "Shared Verification", file, type: "test-verification",
       directly_verified_count: 1, total_requirements_in_tree: parent ? 2 : 1,
-      trace_graph: {
-        nodes: [
-          { id: `${file}#requirement`, name: label, type: "requirement", is_directly_verified: true },
-          ...(parent ? [{ id: `${file}#parent`, name: "Added Parent", type: "requirement", is_directly_verified: false }] : []),
-        ],
-        edges: parent ? [{ source: `${file}#requirement`, relation_type: "derivedFrom", target: `${file}#parent` }] : [],
-      },
+      trace_graph: { nodes, edges: parent ? [{ source: `${file}#requirement`, relation_type: "derivedFrom", target: `${file}#parent` }] : [] },
     }] } } },
   };
 }
 function withSecondTrace(store: ExplorerProjectStore): ExplorerProjectStore {
-  const file = "system-model/Specifications.md";
   const first = fixture("Second Requirement").traces.files[file].verifications[0];
-  return { ...store, traces: { files: { [file]: { verifications: [
-    ...store.traces.files[file].verifications,
-    { ...first, identifier: `${file}#second-verification`, name: "Second Verification" },
-  ] } } } };
+  return { ...store, elements: [...store.elements, { ...store.elements[0], id: `${file}#second-verification`, name: "Second Verification" }],
+    traces: { files: { [file]: { verifications: [
+      ...store.traces.files[file].verifications,
+      { ...first, identifier: `${file}#second-verification`, name: "Second Verification" },
+    ] } } } };
 }
-
 function view(store: ExplorerProjectStore) {
-  return <StoreProvider store={store} schemaMismatch={null}>
-    <ExplorerUiStateProvider><TracesView onOpenElement={onOpenElement} /></ExplorerUiStateProvider>
-  </StoreProvider>;
+  return <StoreProvider store={store} schemaMismatch={null}><ExplorerUiStateProvider>
+    <ExplorerSidePane activeView="traces" open onToggle={vi.fn()} onNavigate={vi.fn()}
+      onOpenElement={onOpenElement} onOpenOntologyNode={vi.fn()} />
+    <TracesView onOpenElement={onOpenElement} />
+  </ExplorerUiStateProvider></StoreProvider>;
 }
-function renderer() {
-  const renderMermaid = vi.fn(async (_id: string, code: string) => ({
-    svg: `<svg data-testid="trace-svg"><text>${code.includes("New Requirement") ? "new diagram" : "old diagram"}</text></svg>`,
-  }));
-  window.mermaid = { render: renderMermaid } as unknown as typeof window.mermaid;
-  return renderMermaid;
-}
-afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+const region = () => screen.getByRole("region", { name: "Verification trace flow" });
+async function ready() { await waitFor(() => expect(region().getAttribute("aria-busy")).toBe("false")); }
+const cards = () => [...region().querySelectorAll("[data-flow-node]")];
+beforeEach(() => {
+  localStorage.clear(); window.history.replaceState(null, "", "/#/traces");
+  layoutEngine.mockReset().mockImplementation(testFlowLayoutEngine); onOpenElement.mockReset();
+  vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
+});
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.restoreAllMocks(); window.history.replaceState(null, "", "/"); });
 
-describe("trace snapshot ownership", () => {
-  it("renders each shared ancestor once with all split/merge and capability edges", async () => {
-    const renderMermaid = renderer();
-    const store = fixture("Leaf");
-    const file = "system-model/Specifications.md";
-    const id = (name: string) => `${file}#${name}`;
-    const trace = store.traces.files[file].verifications[0];
-    const topology = [
-      ["leaf", "derivedFrom", "left"], ["leaf", "derivedFrom", "right"],
-      ["left", "derivedFrom", "root"], ["right", "derivedFrom", "root"],
-      ["root", "specify", "capability"], ["capability", "derivedFrom", "capability-root"],
-    ];
-    trace.directly_verified_count = 2;
-    trace.total_requirements_in_tree = 4;
-    trace.directly_verified_requirements = [id("leaf"), id("root")];
-    trace.trace_graph = {
-      nodes: ["leaf", "left", "right", "root", "capability", "capability-root"].map(name => ({
-        id: id(name), name, type: name.startsWith("capability") ? "capability" : "requirement",
-        is_directly_verified: name === "leaf" || name === "root",
-      })),
-      edges: topology.map(([source, relation_type, target]) => ({ source: id(source), relation_type, target: id(target) })),
-    };
-    render(view(store));
-    await waitFor(() => expect(renderMermaid).toHaveBeenCalled());
-    const code = renderMermaid.mock.calls.at(-1)![1];
-    const identifiers = new Map<string, string>();
-    for (const name of ["Shared Verification", ...trace.trace_graph.nodes.map(node => node.name)]) {
-      const lines = code.split("\n").filter(line => line.includes(`["${name}"]:::`));
-      expect(lines).toHaveLength(1);
-      identifiers.set(name, lines[0].trim().split("[")[0]);
-    }
-    const expectedEdges = [
-      ...topology, ["Shared Verification", "verifies", "leaf"], ["Shared Verification", "verifies", "root"],
-    ].map(([source, relation, target]) => `${identifiers.get(source)} -->|${relation}| ${identifiers.get(target)};`);
-    expect(code.split("\n").filter(line => line.includes("-->|" )).map(line => line.trim()).sort()).toEqual(expectedEdges.sort());
-    expect(screen.getByText("4 in tree")).toBeTruthy();
-    expect(screen.getByText("2 requirements")).toBeTruthy();
+describe("native trace snapshot ownership", () => {
+  it("uses canonical navigation and defers unselected traces", async () => {
+    const prepared = vi.spyOn(flowProjection, "buildVerificationFlow");
+    render(view(withSecondTrace(fixture("Old Requirement")))); await ready();
+    expect(layoutEngine).toHaveBeenCalledTimes(1); expect(prepared).toHaveBeenCalledTimes(1);
+    expect(cards()).toHaveLength(2);
+    fireEvent.click(region().querySelector<HTMLAnchorElement>('a[aria-label="Old Requirement"]')!);
+    expect(onOpenElement).toHaveBeenLastCalledWith(`${file}#requirement`);
+    fireEvent.click(region().querySelector<HTMLAnchorElement>('a[aria-label="Open source for Old Requirement"]')!);
+    expect(window.location.hash).toBe("#/content/system-model/Specifications.md");
+    fireEvent.click(screen.getAllByText("Specifications.md")[0]);
+    expect(screen.getByTestId("trace-rows")).toBeTruthy();
+    expect(screen.queryByRole("region", { name: "Verification trace flow" })).toBeNull();
+    expect(layoutEngine).toHaveBeenCalledTimes(1); expect(prepared).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", { name: "Second Verification" })); await ready();
+    expect(layoutEngine).toHaveBeenCalledTimes(2);
+    expect(cards()[0].getAttribute("data-flow-node")).toBe(`${file}#second-verification`);
   });
-
-  it("shares lazy grouping between the sidebar and report across coverage refreshes", async () => {
-    renderer();
-    const build = vi.spyOn(traceProjection, "buildTraceFiles");
-    const initial = fixture("Old Requirement");
-    const scene = (store: ExplorerProjectStore, opened: boolean) =>
-      <StoreProvider store={store} schemaMismatch={null}>
-        <ExplorerUiStateProvider>
-          <ExplorerSidePane activeView={opened ? "traces" : "model"} open onToggle={vi.fn()}
-            onNavigate={vi.fn()} onOpenElement={onOpenElement} onOpenOntologyNode={vi.fn()} />
-          {opened && <TracesView onOpenElement={onOpenElement} />}
-        </ExplorerUiStateProvider>
-      </StoreProvider>;
-    const { rerender } = render(scene(initial, false));
-    expect(build).not.toHaveBeenCalled();
-    rerender(scene(initial, true));
-    await screen.findByText("old diagram");
-    expect(screen.getByLabelText("Verification trace tree")).toBeTruthy();
-    expect(build).toHaveBeenCalledTimes(1);
-    rerender(scene({ ...initial, coverage: { ...initial.coverage } }, true));
-    expect(build).toHaveBeenCalledTimes(1);
-    rerender(scene(fixture("New Requirement"), true));
-    await screen.findByText("new diagram");
-    expect(build).toHaveBeenCalledTimes(2);
+  it("shares grouping and prepared flow across coverage-only refreshes", async () => {
+    const grouping = vi.spyOn(traceProjection, "buildTraceFiles");
+    const prepared = vi.spyOn(flowProjection, "buildVerificationFlow");
+    const store = fixture("Old Requirement"); const mounted = render(view(store)); await ready();
+    expect(grouping).toHaveBeenCalledTimes(1); expect(prepared).toHaveBeenCalledTimes(1);
+    mounted.rerender(view({ ...store, coverage: { ...store.coverage, summary: { ...store.coverage.summary, total_leaf_requirements: 99 } } })); await ready();
+    expect(grouping).toHaveBeenCalledTimes(1); expect(prepared).toHaveBeenCalledTimes(1);
+    expect(layoutEngine).toHaveBeenCalledTimes(1);
+    mounted.rerender(view(fixture("New Requirement", "original", true))); await ready();
+    expect(grouping).toHaveBeenCalledTimes(2);
+    expect(cards().map(card => card.textContent).join()).toContain("Added Parent");
+    expect(region().textContent).not.toContain("Old Requirement");
   });
-
-  for (const context of ["original", "other-branch"]) {
-    it(`updates an existing verification for ${context}`, async () => {
-      const renderMermaid = renderer();
-      const initial = fixture("Old Requirement");
-      const { rerender } = render(view(initial));
-      await screen.findByText("old diagram");
-      rerender(view(fixture("New Requirement", context, true)));
-      await screen.findByText("new diagram");
-      expect(screen.queryByText("old diagram")).toBeNull();
-      const code = renderMermaid.mock.calls.at(-1)?.[1];
-      expect(code).toContain("Added Parent");
-      expect(code).toContain("derivedFrom");
-      expect(code).not.toContain("Old Requirement");
+  it.each(["original", "replacement"])("replaces reused identifiers and labels on refresh/context %s", async context => {
+    const mounted = render(view(fixture("Old Requirement"))); await ready();
+    mounted.rerender(view(fixture("New Requirement", context, true))); await ready();
+    expect(cards()).toHaveLength(3); expect(region().textContent).toContain("New Requirement");
+    expect(region().textContent).not.toContain("Old Requirement");
+  });
+  it("cancels stale work and rejects its completion after a newer snapshot", async () => {
+    let finish!: (graph: ElkNode) => void; let oldInput!: ElkNode; const cancel = vi.fn();
+    layoutEngine.mockImplementationOnce(input => {
+      oldInput = input;
+      return { result: new Promise<ElkNode>(resolve => { finish = resolve; }), cancel };
     });
-  }
-
-  it("ignores an old asynchronous render completed after a newer snapshot", async () => {
-    const renderMermaid = renderer();
-    let finishOld!: (value: { svg: string }) => void;
-    renderMermaid.mockImplementationOnce(() => new Promise(resolve => { finishOld = resolve; }));
-    const { rerender } = render(view(fixture("Old Requirement")));
-    await waitFor(() => expect(renderMermaid).toHaveBeenCalledTimes(1));
-    rerender(view(fixture("New Requirement", "other-branch")));
-    await screen.findByText("new diagram");
-    await act(async () => { finishOld({ svg: '<svg><text>obsolete delayed diagram</text></svg>' }); });
-    expect(screen.queryByText("obsolete delayed diagram")).toBeNull();
-    expect(screen.getByText("new diagram")).toBeTruthy();
+    const mounted = render(view(fixture("Old Requirement")));
+    await waitFor(() => expect(layoutEngine).toHaveBeenCalledTimes(1));
+    mounted.rerender(view(fixture("New Requirement", "replacement", true))); await ready();
+    expect(cancel).toHaveBeenCalledOnce();
+    await act(async () => finish(await testFlowLayoutEngine(oldInput).result));
+    expect(region().textContent).toContain("New Requirement");
+    expect(region().textContent).not.toContain("Old Requirement"); expect(cards()).toHaveLength(3);
   });
-
-  it("an obsolete render cannot release the replacement's active queue slot", async () => {
-    const renderMermaid = renderer();
-    let finishOld!: (value: { svg: string }) => void;
-    let finishNew!: (value: { svg: string }) => void;
-    renderMermaid.mockImplementationOnce(() => new Promise(resolve => { finishOld = resolve; }));
-    renderMermaid.mockImplementationOnce(() => new Promise(resolve => { finishNew = resolve; }));
-    const { rerender } = render(view(withSecondTrace(fixture("Old Requirement"))));
-    await waitFor(() => expect(renderMermaid).toHaveBeenCalledTimes(1));
-    rerender(view(withSecondTrace(fixture("New Requirement"))));
-    await waitFor(() => expect(renderMermaid).toHaveBeenCalledTimes(2));
-    expect(renderMermaid.mock.calls[1][1]).toContain("New Requirement");
-    await act(async () => {
-      finishOld({ svg: '<svg><text>obsolete delayed diagram</text></svg>' });
-      await new Promise(resolve => setTimeout(resolve, 50));
-    });
-    expect(renderMermaid).toHaveBeenCalledTimes(2);
-    await act(async () => { finishNew({ svg: '<svg><text>new diagram</text></svg>' }); });
-    await waitFor(() => expect(renderMermaid).toHaveBeenCalledTimes(3));
-    expect(renderMermaid.mock.calls[2][1]).toContain("Second Verification");
-    expect(screen.queryByText("obsolete delayed diagram")).toBeNull();
+  it("retains same-context controls but never shows another worktree's pending graph", async () => {
+    const mounted = render(view(fixture("Old Requirement"))); await ready();
+    fireEvent.click(screen.getByRole("button", { name: "Top to bottom" })); await ready();
+    mounted.rerender(view(fixture("New Requirement", "original", true))); await ready();
+    expect(screen.getByRole("button", { name: "Top to bottom" }).getAttribute("aria-pressed")).toBe("true");
+    layoutEngine.mockImplementationOnce(() => ({ result: new Promise(() => {}), cancel: vi.fn() }));
+    mounted.rerender(view(fixture("Other Requirement", "replacement")));
+    await waitFor(() => expect(screen.getByRole("status").textContent).toContain("Loading flow"));
+    expect(screen.queryByTestId("flow-canvas")).toBeNull();
   });
-
-  it("only prepares the latest input when an offscreen trace becomes visible", async () => {
-    const callbacks: IntersectionObserverCallback[] = [];
-    vi.stubGlobal("IntersectionObserver", class {
-      constructor(callback: IntersectionObserverCallback) { callbacks.push(callback); }
-      observe() {}
-      disconnect() {}
-    });
-    const renderMermaid = renderer();
-    const { rerender } = render(view(fixture("Old Requirement")));
-    rerender(view(fixture("New Requirement")));
-    expect(renderMermaid).not.toHaveBeenCalled();
-    act(() => callbacks.at(-1)!([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver));
-    await screen.findByText("new diagram");
-    expect(renderMermaid).toHaveBeenCalledTimes(1);
-    expect(renderMermaid.mock.calls[0][1]).not.toContain("Old Requirement");
+  it("provides retry after a worker failure", async () => {
+    const cancel = vi.fn();
+    layoutEngine.mockImplementationOnce(() => ({ result: Promise.reject(new Error("worker load failed")), cancel }));
+    render(view(fixture("Old Requirement")));
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("Couldn’t lay out"));
+    fireEvent.click(screen.getByRole("button", { name: "Retry" })); await ready();
+    expect(cards()).toHaveLength(2); expect(cancel).toHaveBeenCalledOnce();
+  });
+  it("handles deleted selections and an empty store without mounting a flow", async () => {
+    const store = withSecondTrace(fixture("Old Requirement")); const mounted = render(view(store)); await ready();
+    const second = store.traces.files[file].verifications[1];
+    mounted.rerender(view({ ...store, elements: store.elements.filter(element => element.id !== verificationId),
+      traces: { files: { [file]: { verifications: [second] } } } }));
+    await waitFor(() => expect(screen.getByTestId("trace-rows")).toBeTruthy());
+    expect(screen.queryByRole("region", { name: "Verification trace flow" })).toBeNull();
+    mounted.rerender(view({ ...store, elements: [], traces: { files: {} } }));
+    await waitFor(() => expect(screen.getByText("No verification traces in store.")).toBeTruthy());
   });
 });

@@ -17,6 +17,30 @@ const trace: TraceFlowData = {
 const layoutTrace = (data: TraceFlowData, collapsed?: ReadonlySet<string>, direction?: TraceFlowDirection) => buildTraceFlowGraph(buildTraceFlowTopology(data, collapsed), direction);
 
 describe("native trace flow", () => {
+  it("preserves published capability context and shared paths during disclosure", () => {
+    const data: TraceFlowData = { ...trace, graph: {
+      nodes: [
+        { element: trace.verification, type: trace.verification.type, context: "Verification" },
+        ...trace.requirements.map(element => ({ element, type: "requirement", context: "Requirement" })),
+        { element: { id: "cap", name: "Capability", file: "Capabilities.md" }, type: "capability", context: "Capability context" },
+      ],
+      edges: [
+        ["v", "a", "verifies"], ["v", "b", "verifies"], ["a", "shared", "derivedFrom"],
+        ["b", "shared", "derivedFrom"], ["b", "exclusive", "derivedFrom"], ["shared", "root", "derivedFrom"],
+        ["root", "cap", "specify"], ["root", "cap", "derivedFrom"],
+      ].map(([source, target, label]) => ({ id: JSON.stringify([source, target, label]), source, target, label })),
+    } };
+    const full = buildTraceFlowTopology(data);
+    expect(full.nodes.find(node => node.id === "cap")?.type).toBe("capability");
+    expect(full.edges.filter(edge => edge.target === "cap").map(edge => edge.label)).toEqual(["specify", "derivedFrom"]);
+    expect(full.totalCount).toBe(5);
+    expect(full.directCount).toBe(2);
+    const collapsed = buildTraceFlowTopology(data, new Set(["b"]));
+    expect(collapsed.nodes.map(node => node.id)).toEqual(["v", "a", "b", "shared", "root", "cap"]);
+    expect(collapsed.edges.some(edge => edge.source === "b")).toBe(false);
+    expect(collapsed.totalCount).toBe(5);
+    expect(buildTraceFlowTopology(data, new Set(["root"])).nodes.some(node => node.id === "cap")).toBe(false);
+  });
   it.each(["RIGHT", "DOWN"] as const)("lays out cycles, parallel edges and reflexive relations without losing connections (%s)", async direction => {
     const graph = await buildTraceFlowGraph({ totalCount: 2,
       nodes: ["a", "b"].map(id => ({ id, element: { id, name: id, file: "Model.md" }, type: "requirement", context: "requirement", parentCount: 0 })),

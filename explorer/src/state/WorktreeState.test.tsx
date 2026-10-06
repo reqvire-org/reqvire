@@ -1,5 +1,5 @@
 import { act, cleanup, renderHook } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { type ReactNode } from "react";
 import { ExplorerUiStateProvider, useExplorerUiState } from "./ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
@@ -7,6 +7,8 @@ import { devFixture } from "../store/devFixture";
 import { worktreeUrl } from "../store/worktreeUrls";
 
 afterEach(cleanup);
+
+beforeEach(() => { localStorage.clear(); window.history.replaceState(null, "", "/#/model"); });
 
 describe("worktree navigation and assets", () => {
   it("keeps selections per context and clears unavailable identities on return", () => {

@@ -40,6 +40,13 @@ const nameClass = css`
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
+const compactTriggerClass = css`
+  height: var(--control-sm);
+  gap: var(--space-4);
+  padding-inline: var(--space-4);
+  border-color: transparent;
+  background: transparent;
+`;
 const menuClass = css`
   position: absolute;
   z-index: var(--z-popover);
@@ -57,6 +64,12 @@ const headingClass = css`
   color: var(--text-muted);
   font-size: var(--text-caption);
   font-weight: var(--weight-medium);
+`;
+const compactMenuClass = css`
+  right: auto;
+  width: max(100%, calc(var(--space-32) * 5));
+  max-width: calc(100vw - var(--space-32));
+  box-sizing: border-box;
 `;
 const listClass = css`
   max-height: min(50vh, calc(var(--control-lg) * 7));
@@ -89,6 +102,7 @@ const optionTextClass = css`
 `;
 
 export interface WorktreeSelectorProps {
+  density?: "default" | "compact";
   value?: string;
   displayedValue?: string;
   choices: { id: string; branch: string; root: string; available: boolean }[];
@@ -98,7 +112,7 @@ export interface WorktreeSelectorProps {
   onOpen: () => void;
 }
 /** The trigger identifies the adopted snapshot; choosing a target does not relabel it. */
-export function WorktreeSelector({ value, displayedValue, choices, branch, pending, onChange, onOpen }: WorktreeSelectorProps) {
+export function WorktreeSelector({ density = "default", value, displayedValue, choices, branch, pending, onChange, onOpen }: WorktreeSelectorProps) {
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -159,18 +173,18 @@ export function WorktreeSelector({ value, displayedValue, choices, branch, pendi
     }
   }
 
-  return <div ref={root} className={cx("ux-worktree-selector", selectorClass)} onBlur={event => {
+  return <div ref={root} data-density={density} className={cx("ux-worktree-selector", selectorClass)} onBlur={event => {
     if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
   }}>
     <button ref={trigger} type="button" role="combobox" aria-label="Branch" aria-haspopup="listbox"
       aria-expanded={open} aria-controls={open ? id : undefined} aria-activedescendant={open && active ? optionId(active.id) : undefined}
       aria-busy={pending || undefined} title={[branch, current?.root, pending ? "Loading selected branch…" : "Switch branch"].filter(Boolean).join("\n")}
-      className={cx(triggerClass)} onClick={() => open ? setOpen(false) : reveal()} onKeyDown={keyDown}>
+      className={cx(triggerClass, density === "compact" && compactTriggerClass)} onClick={() => open ? setOpen(false) : reveal()} onKeyDown={keyDown}>
       <Icon name={pending ? "rotate-ccw" : "git-branch"} />
       <span className={cx(nameClass)}>{branch || "Choose branch"}</span>
       <Icon name="chevron-down" />
     </button>
-    {open && <div className={cx(menuClass)}>
+    {open && <div className={cx(menuClass, density === "compact" && compactMenuClass)}>
       <div className={cx(headingClass)}>Switch branch</div>
       <ul id={id} role="listbox" aria-label="Branches" className={cx(listClass)}>
         {choices.map(choice => <li key={choice.id} id={optionId(choice.id)} role="option" data-worktree-id={choice.id}

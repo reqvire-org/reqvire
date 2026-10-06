@@ -4,6 +4,18 @@ import type { CapabilityCoverageDetails, RequirementCoverageDetails, CoveragePro
 
 export type CoverageRow = CapabilityCoverageDetails & { depth: number };
 
+type CapabilityIdentity = { identifier: string; name: string };
+const compareCapabilityNames = (a: CapabilityIdentity, b: CapabilityIdentity) =>
+  a.name.localeCompare(b.name) || a.identifier.localeCompare(b.identifier);
+
+/** List every published scope using the same display parents as the coverage rows. */
+export function coverageScopeOptions(store: ExplorerProjectStore): (CapabilityIdentity & { depth: number })[] {
+  const scopes = Object.values(store.coverage.scope_index).map(entry => ({
+    identifier: entry.scope.capability_identifier, name: entry.scope.capability_name,
+  }));
+  return capabilityHierarchy(store, scopes, compareCapabilityNames);
+}
+
 /** Select already-classified records; membership and totals come from the shared report. */
 export function projectCoverage(coverage: CoverageProjection, scopeId: string | null): CoverageProjection {
   const entry = scopeId ? coverage.scope_index[scopeId] : undefined;
@@ -34,12 +46,15 @@ function selectRecords<T extends { identifier: string }>(section: unknown, ids: 
 
 /** Parent choices affect row order only, never report subjects or coverage evidence. */
 export function coverageRows(store: ExplorerProjectStore, coverage: CoverageProjection): CoverageRow[] {
-  const rows = coverage.capability_coverage.capabilities;
-  const compareName = (a: CapabilityCoverageDetails, b: CapabilityCoverageDetails) =>
-    a.name.localeCompare(b.name) || a.identifier.localeCompare(b.identifier);
   const compareCoverage = (a: CapabilityCoverageDetails, b: CapabilityCoverageDetails) =>
     (a.verification_coverage_percentage ?? 0) - (b.verification_coverage_percentage ?? 0)
-    || (a.implementation_coverage_percentage ?? 0) - (b.implementation_coverage_percentage ?? 0) || compareName(a, b);
+    || (a.implementation_coverage_percentage ?? 0) - (b.implementation_coverage_percentage ?? 0) || compareCapabilityNames(a, b);
+  return capabilityHierarchy(store, coverage.capability_coverage.capabilities, compareCoverage);
+}
+
+function capabilityHierarchy<T extends CapabilityIdentity>(
+  store: ExplorerProjectStore, rows: T[], compare: (a: T, b: T) => number,
+): (T & { depth: number })[] {
   const ids = new Set(rows.map(row => row.identifier));
   const parents = new Map<string, Set<string>>();
   for (const relation of store.relations) {
@@ -54,19 +69,19 @@ export function coverageRows(store: ExplorerProjectStore, coverage: CoverageProj
     choices.add(parent);
     parents.set(child, choices);
   }
-  const roots = rows.filter(row => !parents.has(row.identifier)).sort(compareCoverage);
-  const children = new Map<string, CapabilityCoverageDetails[]>();
+  const roots = rows.filter(row => !parents.has(row.identifier)).sort(compare);
+  const children = new Map<string, T[]>();
   for (const row of rows) {
     const parent = [...(parents.get(row.identifier) ?? [])].sort()[0];
     if (parent) children.set(parent, [...(children.get(parent) ?? []), row]);
   }
-  const result: CoverageRow[] = [];
+  const result: (T & { depth: number })[] = [];
   const visited = new Set<string>();
-  const visit = (row: CapabilityCoverageDetails, depth: number) => {
+  const visit = (row: T, depth: number) => {
     if (visited.has(row.identifier)) return;
     visited.add(row.identifier);
     result.push({ ...row, depth });
-    for (const child of (children.get(row.identifier) ?? []).sort(compareCoverage)) visit(child, depth + 1);
+    for (const child of (children.get(row.identifier) ?? []).sort(compare)) visit(child, depth + 1);
   };
   for (const root of roots) visit(root, 0);
   return result;

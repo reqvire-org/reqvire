@@ -1,4 +1,4 @@
-import type { MouseEvent, HTMLAttributes, ReactNode } from "react";
+import type { MouseEvent, HTMLAttributes, ReactNode, Ref } from "react";
 import { css, cx } from "@linaria/atomic";
 import { Badge } from "../core/Badge";
 
@@ -171,6 +171,7 @@ const elementSkinX = css`
 `;
 
 export type TreeItemProps = Omit<HTMLAttributes<HTMLDivElement>, "style"> & {
+  ref?: Ref<HTMLDivElement>;
   label: ReactNode;
   icon?: ReactNode;
   count?: ReactNode;

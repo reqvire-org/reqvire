@@ -90,6 +90,11 @@ export const ELEMENT_TYPES: Record<ElementType, { color: string; shape: ElementI
 };
 
 export const DESIGN_SYSTEM_COLOR_TOKENS = [
+  "--verification-type-test",
+  "--verification-type-formal-proof",
+  "--verification-type-analysis",
+  "--verification-type-inspection",
+  "--verification-type-demonstration",
   "--accent",
   "--accent-active",
   "--accent-hover",

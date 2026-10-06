@@ -247,6 +247,8 @@ def main():
     for name in ("binary", "workspace", "expected", "fixtures"):
         parser.add_argument("--" + name, required=True)
     args = parser.parse_args()
+    browser_checks_mode = os.environ.get("REQVIRE_COVERAGE_BROWSER_CHECKS", "navigation")
+    require(browser_checks_mode in ("all", "navigation"), "REQVIRE_COVERAGE_BROWSER_CHECKS must be all or navigation")
     root, expected, fixtures = map(Path, (args.workspace, args.expected, args.fixtures))
     output = root / "output"
     scopes = json.loads((expected / "scopes.json").read_text())
@@ -391,12 +393,33 @@ def main():
                 thread = Thread(target=http.serve_forever, daemon=True)
                 thread.start()
                 originals = {path: path.read_bytes() for path in (root / "specifications").glob("*.md")}
+                other = None
                 try:
-                    browser_stdout = run_browser(["node", str(Path(__file__).with_name("browser-check.mjs")),
-                        served.base_url, f"http://127.0.0.1:{http.server_port}", str(output / "browser-profile"),
-                        str(output / "browser-reports.json"), str(fixtures / "Added.md")],
-                        output)
-                    equal(browser_stdout, (expected / "browser.txt").read_text(), "Browser check outcomes")
+                    drivers = [("browser-navigation.mjs", "browser-navigation.txt", str(output / "browser-contexts.json"))]
+                    if browser_checks_mode == "all":
+                        drivers.insert(0, ("browser-check.mjs", "browser.txt", str(fixtures / "Added.md")))
+                    for driver, expected_file, extra in drivers:
+                        if driver == "browser-navigation.mjs":
+                            inventory = served.tool("reqvire.worktree.list")
+                            original = next(row for row in inventory["worktrees"] if row.get("original"))
+                            other = served.tool("reqvire.worktree.create", branch="coverage-links", base_ref="HEAD")
+                            (output / "browser-contexts.json").write_text(json.dumps({
+                                "original": original["worktree_id"], "other": other["worktree_id"],
+                                "roots": {original["worktree_id"]: original["workspace_root"], other["worktree_id"]: other["workspace_root"]},
+                            }))
+                        driver_output = output / Path(driver).stem
+                        driver_output.mkdir(exist_ok=True)
+                        try:
+                            browser_stdout = run_browser(["node", str(Path(__file__).with_name(driver)),
+                                served.base_url, f"http://127.0.0.1:{http.server_port}", str(driver_output / "profile"),
+                                str(output / "browser-reports.json"), extra], driver_output)
+                            equal(browser_stdout, (expected / expected_file).read_text(), "Browser check outcomes")
+                        finally:
+                            for path in (root / "specifications").glob("*.md"):
+                                if path not in originals:
+                                    path.unlink()
+                            for path, content in originals.items():
+                                path.write_bytes(content)
                 finally:
                     http.shutdown()
                     http.server_close()
@@ -406,6 +429,8 @@ def main():
                             path.unlink()
                     for path, content in originals.items():
                         path.write_bytes(content)
+                    if other is not None:
+                        served.tool("reqvire.worktree.remove", worktree_id=other["worktree_id"])
             check("browser-served-exported-and-live-coverage", browser_checks)
 
         with McpServer(args.binary, root, output) as server:

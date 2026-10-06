@@ -68,11 +68,12 @@ export { RelationPill } from "./components/data/RelationPill";
 export type { RelationPillProps } from "./components/data/RelationPill";
 export { Stat, StatRow } from "./components/data/Stat";
 export type { StatProps, StatRowProps } from "./components/data/Stat";
-export { BarMeterFill, ConicSwatch, DonutMeter, TokenSwatch } from "./components/data/TokenVisual";
+export { BarMeterFill, ConicSwatch, DonutMeter, SegmentedMeter, TokenSwatch } from "./components/data/TokenVisual";
 export type {
   BarMeterFillProps,
   ConicSwatchProps,
   DonutMeterProps,
+  SegmentedMeterProps,
   TokenSwatchProps,
 } from "./components/data/TokenVisual";
 export {
@@ -188,6 +189,7 @@ export {
   CoverageCapabilityList,
   CoverageCapabilityRow,
   CoverageControls,
+  CoverageNavigation,
   CoverageDrilldown,
   CoverageDashboard,
   CoverageEmptyNote,
@@ -321,6 +323,8 @@ export type {
   RendererNoticeProps,
   RendererNoticeTone,
   ReportRouteLayoutProps,
+  CoverageNavigationProps,
+  CoverageNavigationScope,
   ResourceDetailCardProps,
   ResourceEmptyStateProps,
   ResourceListItem,
@@ -364,3 +368,6 @@ export type {
 } from "./product-patterns";
 export { WorktreeSelector } from "./product-patterns/shell/WorktreeSelector";
 export type { WorktreeSelectorProps } from "./product-patterns/shell/WorktreeSelector";
+
+export { WorktreeLoadDialog } from "./product-patterns/shell/WorktreeLoadDialog";
+export type { WorktreeLoadDialogProps } from "./product-patterns/shell/WorktreeLoadDialog";

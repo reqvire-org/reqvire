@@ -5,6 +5,7 @@ import { useWorktreeUrl } from "../store/worktreeUrls";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   Button,
+  CoverageNavigation,
   ElementIcon,
   Icon,
   PaneActionRow,
@@ -12,8 +13,6 @@ import {
   PaneControlSection,
   PaneFilterGroup,
   PaneFilterGrid,
-  PaneFilterNavList,
-  PaneFilterNavRow,
   PaneGhostLink,
   PaneLegend,
   PaneNotationLegend,
@@ -33,16 +32,16 @@ import { useStore } from "../store/StoreContext";
 import { routeForContent, routeForResource, VIEW_TITLES, type ViewId } from "../router/routes";
 import type {
   ExplorerProjectStore,
-  CoverageProjection,
   KnowledgeGraphNode,
   OntologyGraphNode,
   ProjectStoreElement,
   ProjectStoreFile,
   ProjectStoreResource,
 } from "../store/types";
-import { ONTOLOGY_LAYER_FILTERS, useExplorerUiState, type CoverageSectionId } from "../state/ExplorerUiState";
+import { ONTOLOGY_LAYER_FILTERS, useExplorerUiState } from "../state/ExplorerUiState";
 import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
 import type { TraceFileNode } from "../lib/traces";
+import { coverageScopeOptions } from "../lib/coverage";
 
 interface ExplorerSidePaneProps {
   activeView: ViewId;
@@ -272,6 +271,8 @@ function ExplorerViewControls({
   const ui = useExplorerUiState();
   const { store, elementById } = useStore();
 
+  const coverageScopes = useMemo(() => activeView === "coverage" ? coverageScopeOptions(store) : [],
+    [activeView, store.coverage.scope_index, store.relations]);
   const thesaurus = useMemo(() => activeView === "thesaurus" ? prepareThesaurus(store.thesaurus) : null, [activeView, store.thesaurus]);
   const filteredThesaurus = useMemo(() => thesaurus ? filterThesaurusSchemes(thesaurus.schemes, ui.thesaurusQuery) : [], [thesaurus, ui.thesaurusQuery]);
   const selectedConceptPath = useMemo(() => thesaurus ? thesaurusAncestorIds(thesaurus, ui.thesaurusSelectionId) : new Set<string>(), [thesaurus, ui.thesaurusSelectionId]);
@@ -377,39 +378,10 @@ function ExplorerViewControls({
   }
 
   if (activeView === "coverage") {
-    const coverage = ui.coverageProjection;
-    const coverageItems = buildCoveragePaneItems(coverage);
-    const summary = isPlainRecord(coverage.summary) ? coverage.summary : {};
-    const coverageSummaryItems = [
-      { label: "Requirements", value: formatSummaryValue(readNumber(summary.total_requirements_in_scope)) },
-      { label: "Leaf reqs", value: formatSummaryValue(readNumber(summary.total_leaf_requirements)) },
-      { label: "Verifications", value: formatSummaryValue(readNumber(summary.total_verifications)) },
-    ];
-    return (
-      <>
-        <PaneControlSection aria-label="Coverage explorer">
-          <PaneFilterGroup label="Coverage">
-            <PaneFilterNavList>
-              {coverageItems.map((item) => (
-                <PaneFilterNavRow
-                  key={item.id}
-                  icon={item.icon}
-                  label={item.label}
-                  count={item.count === undefined ? undefined : formatCompactCount(item.count)}
-                  selected={ui.coverageSectionId === item.id}
-                  onClick={() => {
-                    if (item.id === "orphaned-verifications" && coverage.scope) ui.setCoverageScopeId(null);
-                    ui.setCoverageSectionId(item.id);
-                    navigateCoverageSection(item.id);
-                  }}
-                />
-              ))}
-            </PaneFilterNavList>
-          </PaneFilterGroup>
-        </PaneControlSection>
-        <PaneSummary items={coverageSummaryItems} placement="footer" />
-      </>
-    );
+    return <PaneControlSection aria-label="Coverage explorer">
+      <CoverageNavigation key={JSON.stringify([store.project.workspace_root, store.project.worktree_id])}
+        scopes={coverageScopes} selectedId={ui.coverageScopeId} onSelect={ui.setCoverageScopeId} />
+    </PaneControlSection>;
   }
 
   if (activeView === "search") {
@@ -849,7 +821,6 @@ function TraceTreeFolderNode({
             setOpen((value) => !value);
           }
           ui.setTraceFilePath(null);
-          ui.setTraceSelectionId(null);
         }}
       />
       {expanded && (
@@ -886,17 +857,21 @@ function TraceTreeFileNode({
       setOpen((value) => !value);
     }
     ui.setTraceFilePath(file.path);
-    ui.setTraceSelectionId(null);
   }
 
   function selectVerification(id: string) {
-    ui.setTraceFilePath(file.path);
     ui.setTraceSelectionId(id);
   }
 
   return (
     <PaneTreeNode>
       <TreeItem
+        role="treeitem" tabIndex={0} aria-expanded={expanded} aria-selected={selectedFile && !selectedVerification}
+        title={file.path}
+        onKeyDown={event => {
+          if (event.key === "Enter" || event.key === " ") { event.preventDefault(); selectFile(); }
+          if ((event.key === "ArrowRight" && !expanded) || (event.key === "ArrowLeft" && expanded)) { event.preventDefault(); setOpen(value => !value); }
+        }}
         kind="file"
         label={file.name}
         icon={<Icon name="file" className="file-kind-file" />}
@@ -910,6 +885,10 @@ function TraceTreeFileNode({
       />
       {expanded && file.verifications.map((verification) => (
         <TreeItem
+          role="treeitem" tabIndex={0} aria-selected={selectedVerification === verification.id}
+          onKeyDown={event => {
+            if (event.key === "Enter" || event.key === " ") { event.preventDefault(); selectVerification(verification.id); }
+          }}
           key={verification.id}
           kind="element"
           label={verification.name}
@@ -1414,75 +1393,8 @@ function buildSearchKindCounts(store: ExplorerProjectStore): Record<SearchKind, 
   };
 }
 
-function buildCoveragePaneItems(coverage: CoverageProjection): Array<{
-  id: CoverageSectionId;
-  label: string;
-  count?: number;
-  icon: "pie-chart" | "box" | "file" | "activity" | "x" | "help-circle";
-}> {
-  const summary = isPlainRecord(coverage.summary) ? coverage.summary : {};
-  return [
-    {
-      id: "overview",
-      label: "Overview",
-      count: readNumber(summary.total_requirements_in_scope),
-      icon: "pie-chart",
-    },
-    {
-      id: "capability-coverage",
-      label: "Capability coverage",
-      count: coverageCapabilityCount(coverage.capability_coverage),
-      icon: "box",
-    },
-    {
-      id: "unverified-requirements",
-      label: "Unverified requirements",
-      count: coverageSectionCount(coverage.unverified_leaf_requirements),
-      icon: "file",
-    },
-    {
-      id: "unimplemented-requirements",
-      label: "Unimplemented requirements",
-      count: coverageSectionCount(coverage.uncovered_requirements),
-      icon: "activity",
-    },
-    {
-      id: "unsatisfied-verifications",
-      label: "Unsatisfied verifications",
-      count: coverageSectionCount(coverage.unsatisfied_test_verifications),
-      icon: "x",
-    },
-    {
-      id: "orphaned-verifications",
-      label: coverage.scope ? "Orphans (whole model)" : "Orphaned verifications",
-      count: coverage.scope ? undefined : coverageSectionCount(coverage.orphaned_verifications),
-      icon: "help-circle",
-    },
-  ];
-}
-
-function navigateCoverageSection(section: CoverageSectionId) {
-  window.dispatchEvent(new CustomEvent("reqvire:coverage-navigate", { detail: { section } }));
-}
-
-function coverageSectionCount(section: unknown): number {
-  if (!isPlainRecord(section) || !isPlainRecord(section.files)) return 0;
-  return Object.values(section.files).reduce<number>((count, value) => {
-    return count + (Array.isArray(value) ? value.length : 0);
-  }, 0);
-}
-
-function coverageCapabilityCount(section: unknown): number {
-  if (!isPlainRecord(section) || !Array.isArray(section.capabilities)) return 0;
-  return section.capabilities.length;
-}
-
 function readNumber(value: unknown, fallback = 0): number {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
-}
-
-function isPlainRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
 }
 
 function buildSearchElementTypeOptions(elements: readonly ProjectStoreElement[]) {

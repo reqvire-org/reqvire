@@ -121,6 +121,7 @@ Web requirements define concrete Explorer views, local server behavior, browser 
   * type: capability
 
 #### Relations
+  * derive: [Explorer Selection Sharing](#explorer-selection-sharing)
   * derive: [Explorer Worktree Browsing](#explorer-worktree-browsing)
   * derivedFrom: [System Model Interfaces](#system-model-interfaces)
   * specifiedBy: [Web Interface](InterfacesRequirements.md#web-interface)
@@ -170,4 +171,15 @@ As a **System Engineer**, I want to choose any local branch in Explorer and insp
   * derivedFrom: [Web Explorer Interface](#web-explorer-interface)
   * specifiedBy: [Explorer Worktree Runtime Isolation](WebExplorer/Capabilities.md#explorer-worktree-runtime-isolation)
   * specifiedBy: [Explorer Worktree Selection](WebExplorer/Capabilities.md#explorer-worktree-selection)
+---
+
+### Explorer Selection Sharing
+
+As a **System Engineer**, I want to share a selected model context and item across Explorer views, so that collaborators can open the same selection and browser navigation can restore it.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface](#web-explorer-interface)
 ---

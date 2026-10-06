@@ -25,17 +25,19 @@ await withBrowser(profile, async ({ rpc, evaluate, loadPage, reloadPage, on }) =
     // A fresh document resets route overlays and disclosure state, while
     // retaining persisted scope for the checks that explicitly exercise it.
     await loadPage("about:blank");
-    await loadPage(`${baseUrl}/#/coverage`);
-    await waitFor(() => !!document.querySelector('select[aria-label="Scope"]'));
+    await loadPage(`${baseUrl}/#/coverage?scope=`);
+    await waitFor(() => !!document.querySelector('[aria-label="Coverage mode"]'));
     await evaluate(async () => { await document.fonts.ready; });
   }
   async function select(name) {
-    await evaluate(name => {
-      const input = document.querySelector('select[aria-label="Scope"]');
-      input.value = name ? [...input.options].find(option => option.text === name)?.value : "";
-      input.dispatchEvent(new Event("change", { bubbles: true }));
-    }, name);
-    await waitFor(name => document.querySelector('select[aria-label="Scope"]')?.selectedOptions[0]?.text === (name || "Whole model"), name);
+    const identifier = name ? reports[name].scope.capability_identifier : "";
+    await evaluate(identifier => {
+      const input = identifier ? [...document.querySelectorAll('[data-capability-id]')].find(row => row.dataset.capabilityId === identifier)
+        : document.querySelector('[data-coverage-whole-model]');
+      if (!input) throw new Error(`Missing scope: ${identifier}`);
+      input.click();
+    }, identifier);
+    await waitFor(identifier => (document.querySelector('[data-capability-id][aria-selected="true"]')?.dataset.capabilityId ?? "") === identifier, identifier);
   }
   async function click(text) {
     await evaluate(text => {
@@ -94,19 +96,6 @@ await withBrowser(profile, async ({ rpc, evaluate, loadPage, reloadPage, on }) =
     }, report);
     const errors = await evaluate(report => {
       const failures = [];
-      const pane = document.querySelector('[aria-label="Coverage explorer"]');
-      const sections = [
-        ["unverified-requirements", "unverified_leaf_requirements", "Unverified requirements"],
-        ["unimplemented-requirements", "uncovered_requirements", "Unimplemented requirements"],
-        ["unsatisfied-verifications", "unsatisfied_test_verifications", "Unsatisfied verifications"],
-      ];
-      for (const [id, field, label] of sections) {
-        const names = Object.values(report[field].files).flat().map(row => row.name).sort();
-        const shown = [...document.querySelectorAll(`#coverage-section-${id} .coverage-gap-row__title`)].map(node => node.textContent).sort();
-        if (JSON.stringify(names) !== JSON.stringify(shown)) failures.push(`${id}: ${shown} != ${names}`);
-        const row = [...(pane?.querySelectorAll("button") ?? [])].find(button => button.textContent.includes(label));
-        if (!row?.textContent.includes(String(names.length))) failures.push(`Sidebar ${label}: ${row?.textContent}`);
-      }
       const summary = report.summary;
       const typeLabels = { test: "Test", formal_proof: "Formal proof", analysis: "Analysis", inspection: "Inspection", demonstration: "Demonstration" };
       for (const [kind, label] of Object.entries(typeLabels)) {
@@ -118,19 +107,24 @@ await withBrowser(profile, async ({ rpc, evaluate, loadPage, reloadPage, on }) =
         const row = [...document.querySelectorAll(".coverage-source-row__head")].find(row => row.firstElementChild?.textContent === label);
         if (row?.lastElementChild?.textContent !== String(summary.coverage_sources[source])) failures.push(`Coverage source ${label}`);
       }
-      for (const [label, value] of [["Requirements", summary.total_requirements_in_scope], ["Leaf reqs", summary.total_leaf_requirements], ["Verifications", summary.total_verifications]]) {
-        const row = [...document.querySelectorAll(".ux-pane-summary .ux-summary__item")].find(row => row.querySelector(".ux-summary__label")?.textContent === label);
-        if (row?.querySelector(".ux-summary__value")?.textContent !== String(value)) failures.push(`Sidebar summary ${label}`);
+      const sections = { "unverified-requirements": "unverified_leaf_requirements", "unimplemented-requirements": "uncovered_requirements", "unsatisfied-verifications": "unsatisfied_test_verifications", "orphaned-verifications": "orphaned_verifications" };
+      for (const [id, field] of Object.entries(sections)) {
+        const section = document.getElementById(`coverage-section-${id}`);
+        if (report.scope && id === "orphaned-verifications") {
+          if (section) failures.push("Scoped orphan list must be absent");
+          continue;
+        }
+        const wanted = Object.values(report[field].files).flat().map(row => row.name).sort();
+        const names = [...(section?.querySelectorAll('.coverage-gap-row__title') ?? [])].map(row => row.textContent).sort();
+        if (JSON.stringify(names) !== JSON.stringify(wanted)) failures.push(`${id}: ${names} != ${wanted}`);
       }
-      const capCount = [...(pane?.querySelectorAll("button") ?? [])].find(button => button.textContent.includes("Capability coverage"));
-      if (!capCount?.textContent.includes(String(report.capability_coverage.capabilities.length))) failures.push("Sidebar capability count");
       for (const row of document.querySelectorAll('[data-kind="capability"][data-coverage-depth]')) {
         const name = row.querySelector("a span:last-child")?.textContent;
         const expected = report.capability_coverage.capabilities.find(capability => capability.name === name);
         if (!expected || !row.textContent.includes(`${expected.aggregate_verified_leaf_requirements} / ${expected.aggregate_leaf_requirements}`)
           || !row.textContent.includes(`${expected.aggregate_covered_terminal_requirements} / ${expected.aggregate_terminal_requirements} terminal`)) failures.push(`Capability aggregates ${name}`);
       }
-      if (report.scope && !document.body.textContent.includes("Orphan diagnostics are available for the whole model only")) failures.push("Missing orphan explanation");
+      if (report.scope && document.querySelector('[data-view="coverage"] h1')?.textContent !== report.scope.capability_name) failures.push("Missing explicit scope");
       return failures;
     }, report);
     if (errors.length) throw new Error(errors.join("; "));
@@ -176,12 +170,9 @@ await withBrowser(profile, async ({ rpc, evaluate, loadPage, reloadPage, on }) =
       await assertReport(reports.whole);
       await assertRows(["Alpha Root", "Empty Branch", "Alpha Left", "Shared Branch", "Alpha Right", "Beta Root"], [0, 1, 1, 2, 1, 0]);
       if (await evaluate(() => !!document.querySelector('[aria-label="Display"]'))) throw new Error("Unexpected display selector");
-      if (!await evaluate(() => {
-        const header = document.querySelector(".coverage-header");
-        const title = header.querySelector("h1").getBoundingClientRect();
-        const scope = header.querySelector("select").getBoundingClientRect();
-        return scope.left > title.right && scope.top < title.bottom && scope.bottom >= title.top;
-      })) throw new Error("Scope is not at the right of the Coverage title");
+      if (!await evaluate(() => document.querySelector('.coverage-header h1')?.textContent === "Whole Model"
+        && document.querySelector('[data-coverage-whole-model]')?.getAttribute("aria-selected") === "true"
+        && !document.querySelector('select[aria-label="Scope"]'))) throw new Error("Missing Whole Model navigation");
     });
     await scenario("scope and sidebar parity", async () => {
       for (const name of ["Alpha Root", "Beta Root", "Alpha Left", "Shared Branch", "Empty Branch"]) {
@@ -220,7 +211,7 @@ await withBrowser(profile, async ({ rpc, evaluate, loadPage, reloadPage, on }) =
       await evaluate(() => {
         const gap = document.querySelector('article[aria-label="Alpha Gap"]');
         if (!gap || gap.querySelector("button") || !gap.querySelector("a")) throw new Error("Terminal gap must retain its name link without an expansion action");
-        if (!gap.textContent.includes("VerificationVerified") || !gap.textContent.includes("ImplementationUncovered")) throw new Error("Terminal gap must retain independent verification and implementation labels");
+        if (!gap.textContent.includes("Verification") || !gap.textContent.includes("Implementation") || gap.querySelector(".ux-coverage-drilldown__metric-head strong")) throw new Error("Terminal gap must use labelled coverage bars without redundant status text");
       });
       await click("Expand Alpha Middle");
       await assertTerminalLinks();
@@ -229,7 +220,7 @@ await withBrowser(profile, async ({ rpc, evaluate, loadPage, reloadPage, on }) =
           const row = document.querySelector(`article[aria-label="${name}"] > .ux-coverage-drilldown__row`);
           const bars = [...row.querySelectorAll(".ds-bar")];
           const values = bars.map(bar => [bar.dataset.colorToken, Number(bar.querySelector("rect").getAttribute("width"))]);
-          if (JSON.stringify(values) !== JSON.stringify([["--requirement", 100], ["--resource", implementation]])) {
+          if (JSON.stringify(values) !== JSON.stringify([["--verification", 100], ["--resource", implementation]])) {
             throw new Error(`Incorrect terminal bars for ${name}: ${JSON.stringify(values)}`);
           }
           if (!row.textContent.includes("100% · 1 / 1 leaves") || !row.textContent.includes(`${implementation}% · ${implementation ? 1 : 0} / 1 terminal`)) {
@@ -305,16 +296,16 @@ await withBrowser(profile, async ({ rpc, evaluate, loadPage, reloadPage, on }) =
         && !document.querySelector('[role="dialog"]')
         && document.body.textContent.includes("Synthetic implementation artifact for the alpha fixture."));
       await click("Coverage");
-      await waitFor(() => document.querySelector('select[aria-label="Scope"]')?.selectedOptions[0]?.text === "Alpha Root");
+      await waitFor(() => document.querySelector('[data-capability-id][aria-selected="true"]')?.getAttribute("aria-label") === "Alpha Root");
       await assertReport(reports["Alpha Root"]);
     });
     await scenario("reload and orphan navigation", async () => {
       await select("Alpha Root");
       await reloadPage();
-      await waitFor(() => document.querySelector('select[aria-label="Scope"]')?.selectedOptions[0]?.text === "Alpha Root");
+      await waitFor(() => document.querySelector('[data-capability-id][aria-selected="true"]')?.getAttribute("aria-label") === "Alpha Root");
       await assertRows(["Alpha Root", "Empty Branch", "Alpha Left", "Shared Branch", "Alpha Right"], [0, 1, 1, 2, 1]);
       await assertReport(reports["Alpha Root"]);
-      await click("View whole-model orphan diagnostics");
+      await click("Capabilities");
       await assertReport(reports.whole);
       await waitFor(() => document.querySelector("#coverage-section-orphaned-verifications")?.textContent.includes("Orphan Check"));
     });
@@ -328,10 +319,7 @@ await withBrowser(profile, async ({ rpc, evaluate, loadPage, reloadPage, on }) =
       await assertTerminalLinks();
       await assertCoverageAlignment();
       await waitFor(() => {
-        const panel = document.querySelector(".coverage-controls");
-        const selector = panel.querySelector("select");
-        return selector.getBoundingClientRect().right <= panel.getBoundingClientRect().right
-          && [...document.querySelectorAll(".ux-coverage-drilldown__list li")].every(item => item.scrollWidth <= item.clientWidth)
+        return [...document.querySelectorAll(".ux-coverage-drilldown__list li")].every(item => item.scrollWidth <= item.clientWidth)
           && [...document.querySelectorAll(".ux-coverage-drilldown__row")].every(row => getComputedStyle(row).gridTemplateColumns.split(" ").length === 2);
       });
       await click("Expand explorer");
@@ -350,14 +338,15 @@ await withBrowser(profile, async ({ rpc, evaluate, loadPage, reloadPage, on }) =
     await navigate(servedUrl);
     await select("Alpha Root");
     await tool("reqvire.add_element", { file: "specifications/Added.md", content: await readFile(addedPath, "utf8"), dry_run: false });
-    await waitFor(() => document.body.textContent.includes("1 / 4 terminal requirements covered") && document.querySelector("#coverage-section-unimplemented-requirements")?.textContent.includes("Added Alpha Gap"));
-    await waitFor(() => document.querySelector('select[aria-label="Scope"]')?.selectedOptions[0]?.text === "Alpha Root");
+    await waitFor(() => document.body.textContent.includes("1 / 4 terminal requirements covered"));
+    await waitFor(() => document.querySelector("#coverage-section-unimplemented-requirements")?.textContent.includes("Added Alpha Gap"));
+    await waitFor(() => document.querySelector('[data-capability-id][aria-selected="true"]')?.getAttribute("aria-label") === "Alpha Root");
     await assertRows(["Alpha Root", "Empty Branch", "Alpha Right", "Alpha Left", "Shared Branch"], [0, 1, 1, 1, 2]);
   });
   await run("live refresh removes selected scope with explanation", async () => {
     await select("Empty Branch");
     await tool("reqvire.remove_element", { element_name: "Empty Branch", dry_run: false });
-    await waitFor(() => document.querySelector('select[aria-label="Scope"]')?.value === "" && document.body.textContent.includes("selected capability is no longer available"));
+    await waitFor(() => document.querySelector('[data-coverage-whole-model]')?.getAttribute("aria-selected") === "true" && document.body.textContent.includes("selected capability is no longer available"));
     await waitFor(() => document.body.textContent.includes("2 / 6 terminal requirements covered"));
     await assertRows(["Alpha Root", "Alpha Right", "Alpha Left", "Shared Branch", "Beta Root"], [0, 1, 1, 2, 0]);
   });

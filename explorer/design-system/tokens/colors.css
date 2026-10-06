@@ -170,6 +170,12 @@
     --verification:     var(--color-verification);
     --verification-ink: #2e7d32;
     --verification-tint: color-mix(in oklch, var(--verification) 15%, var(--bg-surface));
+    /* Same verification hue; tonal segments distinguish report subtypes. */
+    --verification-type-test: var(--verification);
+    --verification-type-formal-proof: color-mix(in oklch, var(--verification) 75%, var(--text-strong));
+    --verification-type-analysis: color-mix(in oklch, var(--verification) 45%, var(--text-strong));
+    --verification-type-inspection: color-mix(in oklch, var(--verification) 70%, var(--bg-surface));
+    --verification-type-demonstration: color-mix(in oklch, var(--verification) 45%, var(--bg-surface));
     --verification-objective:     var(--color-verification-objective);
     --verification-objective-ink: #0b3d12;
     --verification-objective-tint: color-mix(in oklch, var(--verification-objective) 15%, var(--bg-surface));

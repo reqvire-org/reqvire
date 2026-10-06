@@ -32,6 +32,8 @@ export interface ShellActionItem {
 
 export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
   brandLabel?: ReactNode;
+  /** Persistent context control immediately after the brand, independent of side panes. */
+  headerContext?: ReactNode;
   /** Context controls below the persistent navigation header. */
   toolbar?: ReactNode;
   navigationItems?: ShellNavigationItem[];
@@ -158,6 +160,15 @@ const headerBaseUX = css`
   @media (max-width: 900px) {
     padding-right: 0;
   }
+
+  &[data-has-context="true"] {
+    @media (max-width: 1100px) {
+      display: grid;
+      flex-basis: auto;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      height: auto;
+    }
+  }
 `;
 
 const sidePaneHeaderClass = css`
@@ -188,6 +199,20 @@ const brandClass = css`
     width: auto;
     min-width: var(--ux-brand-min-w);
   }
+
+  &[data-has-context="true"] {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 0;
+    border-right: 0;
+    padding-right: var(--space-6);
+    height: var(--app-header-height);
+
+    @media (max-width: 600px) {
+      padding-inline: var(--space-6);
+      > span { display: none; }
+    }
+  }
 `;
 
 const brandMarkClass = css`
@@ -199,6 +224,25 @@ const brandMarkClass = css`
   width: var(--space-10);
   height: var(--space-10);
   transform: none;
+`;
+
+const headerContextClass = css`
+  display: flex;
+  flex: 0 1 calc(var(--space-32) * 4);
+  align-items: center;
+  min-width: calc(var(--space-32) * 2);
+  max-width: calc(var(--space-32) * 4);
+  padding-right: var(--space-6);
+`;
+
+const headerContextTabsClass = css`
+  padding-left: var(--space-4);
+  @media (max-width: 1100px) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-height: var(--control-lg);
+    padding-inline: var(--space-6);
+  }
 `;
 
 const brandNameClass = css`
@@ -291,6 +335,7 @@ const collapseSkinX = css`
 export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppShell(
   {
     brandLabel = "REQVIRE",
+    headerContext,
     toolbar,
     navigationItems = [],
     activeNavigationValue,
@@ -337,6 +382,7 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
     >
       <ShellHeader
         brandLabel={brandLabel}
+        context={headerContext}
         navigationItems={navigationItems}
         activeNavigationValue={activeNavigationValue}
         headerActions={headerActions}
@@ -386,12 +432,14 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
 
 function ShellHeader({
   brandLabel,
+  context,
   navigationItems,
   activeNavigationValue,
   headerActions,
   onNavigate,
 }: {
   brandLabel: ReactNode;
+  context?: ReactNode;
   navigationItems: ShellNavigationItem[];
   activeNavigationValue?: string;
   headerActions: ShellActionItem[];
@@ -405,12 +453,13 @@ function ShellHeader({
   }));
 
   return (
-    <header data-product-pattern="shell-header" className={cx(headerBaseUX, headerSkinX)}>
-      <div className={cx(brandClass)}>
+    <header data-product-pattern="shell-header" data-has-context={context != null || undefined} className={cx(headerBaseUX, headerSkinX)}>
+      <div data-product-pattern-slot="brand" data-has-context={context != null || undefined} className={cx(brandClass)}>
         <BrandMark className={cx(brandMarkClass)} decorative />
         {brandLabel != null ? <span className={cx(brandNameClass)}>{brandLabel}</span> : null}
       </div>
-      <nav className={cx(headerTabsClass)} aria-label="Explorer views">
+      {context != null ? <div data-product-pattern-slot="header-context" className={cx(headerContextClass)}>{context}</div> : null}
+      <nav className={cx(headerTabsClass, context != null && headerContextTabsClass)} aria-label="Explorer views">
         <Tabs
           items={tabItems}
           value={activeNavigationValue}

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { useEffect } from "react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
 import { FilesView } from "./FilesView";
@@ -44,6 +44,8 @@ function renderFilesWithStore(store: typeof devFixture, path: string | null = nu
     </StoreProvider>,
   );
 }
+
+beforeEach(() => { localStorage.clear(); window.history.replaceState(null, "", "/#/model"); });
 
 describe("FilesView", () => {
   it("keeps filtering and the selected element current without rebuilding file topology", () => {

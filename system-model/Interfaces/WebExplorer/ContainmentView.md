@@ -22,7 +22,7 @@ Four workspace modes are available:
 
 In Flow, left-tree selection updates the relation scope displayed in the main workspace and keeps the Model route active. Activating an element card's name or body opens the shared element-detail modal. Pointer hover and keyboard focus on a card highlight its full directed paths through splits and merges.
 
-Users switch between Model modes using the shared workspace layout selector. Flow uses the same card-and-connection pattern as the native trace preview, with horizontal/vertical layout, pan/zoom, and source navigation. The project-tree selection scopes Flow to folder/file elements and immediate relation endpoints while retaining their capability ancestry, or the complete directed paths of a selected element, as specified by the Model Browser and Graph Specification.
+Users switch between Model modes using the shared workspace layout selector. Flow uses the same card-and-connection pattern as the native Traces flow, with horizontal/vertical layout, pan/zoom, and source navigation. The project-tree selection scopes Flow to folder/file elements and immediate relation endpoints while retaining their capability ancestry, or the complete directed paths of a selected element, as specified by the Model Browser and Graph Specification.
 
 ## Hierarchy Extraction
 
