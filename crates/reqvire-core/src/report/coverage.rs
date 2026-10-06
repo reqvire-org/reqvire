@@ -381,10 +381,11 @@ impl CoverageReport {
             return Ok(self);
         };
         let identifier = registry
-            .find_element_by_name(name)
+            .select_element(name.trim(), "coverage from")
+            .map(|element| element.identifier.clone())
             .map_err(|error| match error {
                 ReqvireError::MissingElement(_) | ReqvireError::ElementNotFound(_) => {
-                    ReqvireError::ElementNotFound(format!("Coverage capability '{name}' not found"))
+                    ReqvireError::ElementNotFound(format!("Coverage capability '{name}' not found (coverage from; selected model context)"))
                 }
                 other => other,
             })?;
@@ -393,7 +394,7 @@ impl CoverageReport {
             .ok_or_else(|| ReqvireError::ElementNotFound(identifier.clone()))?;
         if !matches!(capability.element_type, element::ElementType::Capability) {
             return Err(ReqvireError::InvalidOperation(format!(
-                "Coverage scope '{name}' must be a capability"
+                "Coverage scope '{name}' must be a capability (coverage from; selected model context)"
             )));
         }
         Ok(self.project_capability(registry, capability))

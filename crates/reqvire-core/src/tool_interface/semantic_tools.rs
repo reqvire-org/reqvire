@@ -281,27 +281,55 @@ pub fn concept_get_tool(
     }
 
     let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
-    let concept = native_concept_items(&model)?.into_iter().find(|item| {
-        iri.as_deref()
-            .is_some_and(|value| item.get("iri").and_then(Value::as_str) == Some(value))
-            || identifier.as_deref().is_some_and(|value| {
+    let selected = if name.is_some() || identifier.is_some() {
+        let element = crate::operations::read_element(
+            &model.graph_registry,
+            identifier.as_deref(),
+            name.as_deref(),
+        )?;
+        if !element.element_type.is_concept_family() {
+            return Err(ReqvireError::InvalidOperation(format!(
+                "concepts.get name/identifier '{}' selects '{}' ({}); expected a native concept or concept-scheme in the selected model context",
+                name.as_deref().or(identifier.as_deref()).unwrap_or_default(), element.identifier, element.element_type.as_str()
+            )));
+        }
+        Some(element.identifier.as_str())
+    } else {
+        None
+    };
+    let items = native_concept_items(&model)?;
+    let by_iri = iri.as_deref().map(|value| items.iter().find(|item| item.get("iri").and_then(Value::as_str) == Some(value))
+        .ok_or_else(|| ReqvireError::ElementNotFound(format!("concepts.get iri '{value}' matched no generated native concept in the selected model context")))
+    ).transpose()?;
+    if let (Some(selected), Some(item)) = (selected, by_iri) {
+        crate::element_selection::require_consistent(
+            (
+                "concepts.get source selector",
+                name.as_deref()
+                    .or(identifier.as_deref())
+                    .unwrap_or_default(),
+                selected,
+            ),
+            (
+                "concepts.get iri",
+                iri.as_deref().unwrap_or_default(),
                 item.get("source_element_identifier")
                     .and_then(Value::as_str)
-                    == Some(value)
-            })
-            || name.as_deref().is_some_and(|value| {
-                item.get("source_element_name").and_then(Value::as_str) == Some(value)
-                    || item.get("pref_label").and_then(Value::as_str) == Some(value)
-            })
-    });
-
-    concept
-        .map(|concept| json!({ "concept": concept }))
-        .ok_or_else(|| {
-            ReqvireError::ProcessError(
-                "No generated native concept matched the requested selector".to_string(),
-            )
+                    .unwrap_or_default(),
+            ),
+        )?;
+    }
+    let concept = by_iri.or_else(|| {
+        items.iter().find(|item| {
+            item.get("source_element_identifier")
+                .and_then(Value::as_str)
+                == selected
         })
+    });
+    concept.map(|concept| json!({ "concept": concept })).ok_or_else(|| ReqvireError::ElementNotFound(format!(
+        "concepts.get selector '{}' matched no generated native concept in the selected model context",
+        name.as_deref().or(identifier.as_deref()).unwrap_or_default()
+    )))
 }
 
 pub fn concept_mappings_list_tool(

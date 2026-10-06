@@ -1,0 +1,12 @@
+PASS cli/remove/name-preview-control
+PASS cli/remove/element_name
+PASS cli/remove/all-identifiers
+PASS cli/move/name-preview-control
+PASS cli/move/element_name
+PASS cli/move/all-identifiers
+PASS cli/rename/name-preview-control
+PASS cli/rename/element_name
+PASS cli/rename/all-identifiers
+PASS cli/crud/ambiguous-subject-atomic
+PASS cli/crud/accepted-identifier-and-stale-rejection
+PASS cli/crud/literal-new-name

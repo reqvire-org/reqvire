@@ -53,7 +53,7 @@ Contract for semantic query discovery.
 #### Details
 The managed query set MUST consist of native authored semantic-query elements in the effective workspace. Discovery MUST use native provenance in the existing semantic index. RDF-only query descriptions from imported or built-in sources MUST remain semantic data. A same-name imported description MUST NOT make native selection ambiguous.
 
-Records MUST expose generated IRI, name, optional purpose, parsed form, resolved Produces sets, ontology context, and source locations, sorted by IRI then name. Name and IRI selectors MUST be exact. A supplied selector MUST resolve exactly one record; unknown and ambiguous selectors MUST fail.
+Records MUST expose generated IRI, name, optional purpose, parsed form, resolved Produces sets, ontology context, and source locations, sorted by IRI then name. Name-based source selectors MUST accept exact native element names or canonical source identifiers through the bound Existing Element Selection Specification and require a native semantic-query element. Explicit IRI selectors remain exact generated query IRIs. Preserve selector mutual exclusion and supplied-selector cardinality; unknown, ambiguous and wrong-type selections MUST fail.
 
 Namespace filtering MUST match namespaces of used ontologies, including inherited context, with the existing normalization between document bases and term namespaces. Matching any used namespace MUST include a query once. Namespace selection MUST be shared by CLI, MCP, and RDF query export.
 
@@ -75,7 +75,7 @@ Contract for semantic query artifact export.
 #### Details
 Rendering MUST emit UTF-8, remove leading and trailing blank lines outside the query document, and end with exactly one LF. It MUST preserve internal characters, comments, prefix order, whitespace, and CR/LF sequences inside multiline literals. Raw artifacts MUST contain only SPARQL. SHA-256 MUST cover the exact emitted bytes.
 
-Export MUST require exactly one exact name or IRI selector. With neither output nor JSON requested, it MUST emit raw SPARQL to stdout. JSON output MUST contain metadata, content, and sha256. File output MUST use an atomic sibling temporary file and rename after successful validation, with only a short stderr diagnostic. JSON and file output MUST be mutually exclusive. A failed selection, validation, or write MUST preserve the existing artifact.
+Export MUST require exactly one name-based source selector or explicit IRI selector. The name-based selector accepts an exact native element name or canonical source identifier through the bound Existing Element Selection Specification; IRI selection retains its existing domain and mutual exclusion. With neither output nor JSON requested, it MUST emit raw SPARQL to stdout. JSON output MUST contain metadata, content, and sha256. File output MUST use an atomic sibling temporary file and rename after successful validation, with only a short stderr diagnostic. JSON and file output MUST be mutually exclusive. A failed selection, validation, or write MUST preserve the existing artifact.
 
 Metadata-only edits, including Produces changes, MUST change the appropriate model revision and impact facts while preserving artifact content and digest when query text is unchanged.
 

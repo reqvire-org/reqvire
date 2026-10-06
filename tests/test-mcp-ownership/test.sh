@@ -11,4 +11,9 @@ python3 "$TEST_SCRIPT_DIR/check_parallel_reads.py" --binary "${REAL_REQVIRE_BIN:
 diff -u "$TEST_SCRIPT_DIR/expected/parallel-reads.txt" "$TEST_DIR/output/parallel-reads.txt" || status=1
 python3 "$TEST_SCRIPT_DIR/check_ownership.py" "$REQVIRE_BIN" "$TEST_DIR" > "$TEST_DIR/output/checks.txt" || status=1
 diff -u "$TEST_SCRIPT_DIR/expected/checks.txt" "$TEST_DIR/output/checks.txt" || status=1
+
+# General existing-element selection: names and canonical identifiers share validation and results.
+SELECTION_SUITE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SELECTION_SUITE_DIR/../run_element_selection_checks.sh"
+run_element_selection_checks mcp "$SELECTION_SUITE_DIR/expected/element-selection.txt" || status=1
 exit "$status"

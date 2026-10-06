@@ -1652,13 +1652,14 @@ pub fn reuse(
     // Find the element by name
     let element = model_manager
         .graph_registry
-        .get_element_by_name(element_name)
+        .resolve_element_reference(element_name, "mutation element_name")?
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!("Element '{}' not found", element_name))
         })?;
 
     let element_id = element.identifier.clone();
     let file_path = element.file_path.clone();
+    let selected_name = element.name.clone();
 
     // Read current file content
     let absolute_file_path = git_root.join(&file_path);
@@ -1672,7 +1673,7 @@ pub fn reuse(
     {
         return Err(ReqvireError::ElementError(format!(
             "ContractBindingEntry '{}' already exists on '{}'",
-            contract_binding_path, element_name
+            contract_binding_path, selected_name
         )));
     }
 
@@ -1685,7 +1686,7 @@ pub fn reuse(
     if in_relations {
         return Err(ReqvireError::CrossSectionDuplicate(format!(
             "Target '{}' already exists in Relations of '{}'. Cannot add to Contract Bindings.",
-            contract_binding_path, element_name
+            contract_binding_path, selected_name
         )));
     }
 
@@ -1699,7 +1700,7 @@ pub fn reuse(
 
     // Find the element in the file and add/update Contract Bindings subsection
     let new_content =
-        add_contract_bindings_to_element(&content, element_name, &relative_contract_binding_str)?;
+        add_contract_bindings_to_element(&content, &selected_name, &relative_contract_binding_str)?;
 
     // Generate diff
     let diff = generate_file_diff(&file_path, &content, &new_content);
@@ -1718,7 +1719,7 @@ pub fn reuse(
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id,
-        element_name: format!("Reused {} to {}", contract_binding_path, element_name),
+        element_name: format!("Reused {} to {}", contract_binding_path, selected_name),
         diffs: vec![diff],
         dry_run,
     })
@@ -1738,13 +1739,14 @@ pub fn remove_contract_bindings(
     // Find the element by name
     let element = model_manager
         .graph_registry
-        .get_element_by_name(element_name)
+        .resolve_element_reference(element_name, "mutation element_name")?
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!("Element '{}' not found", element_name))
         })?;
 
     let element_id = element.identifier.clone();
     let file_path = element.file_path.clone();
+    let selected_name = element.name.clone();
 
     // Read current file content
     let absolute_file_path = git_root.join(&file_path);
@@ -1761,7 +1763,7 @@ pub fn remove_contract_bindings(
     // Remove contract_bindings from element
     let new_content = remove_contract_bindings_from_element(
         &content,
-        element_name,
+        &selected_name,
         &relative_contract_binding_str,
     )?;
 
@@ -1784,7 +1786,7 @@ pub fn remove_contract_bindings(
         element_id,
         element_name: format!(
             "Removed Contract Binding {} from {}",
-            contract_binding_path, element_name
+            contract_binding_path, selected_name
         ),
         diffs: vec![diff],
         dry_run,
@@ -1796,6 +1798,12 @@ fn resolve_contract_bindings_identifier_for_element(
     target_element_file_path: &str,
     contract_bindings_target: &str,
 ) -> Result<String, ReqvireError> {
+    if let Some(element) = model_manager
+        .graph_registry
+        .resolve_element_reference(contract_bindings_target, "bindContract target")?
+    {
+        return Ok(element.identifier.clone());
+    }
     if !contract_bindings_target.contains('#') {
         return Err(ReqvireError::InvalidContractBindingTarget(format!(
             "Invalid contract_bindings target '{}'. Contract Bindings must use reusable element identifiers in the form 'file.md#element-id' or '#element-id'.",
@@ -1857,14 +1865,14 @@ fn update_contract_reference(
 ) -> Result<CrudResult, ReqvireError> {
     let registry = &model_manager.graph_registry;
     let element = registry
-        .get_element_by_name(source)
+        .resolve_element_reference(source, "relation source")?
         .ok_or_else(|| ReqvireError::ElementNotFound(source.into()))?;
     let source_id = element.identifier.clone();
+    let source_name = element.name.clone();
     let file = element.file_path.clone();
     let resolve = |target: &str| -> Result<String, ReqvireError> {
-        if let Some(element) = registry
-            .get_element_by_name(target)
-            .or_else(|| registry.get_element(target))
+        if let Some(element) =
+            registry.resolve_element_reference(target, "referenceContract target")?
         {
             return Ok(element.identifier.clone());
         }
@@ -1941,7 +1949,7 @@ fn update_contract_reference(
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id: source_id,
-        element_name: format!("Updated Contract References for {source}"),
+        element_name: format!("Updated Contract References for {source_name}"),
         diffs: result?,
         dry_run,
     })
@@ -1959,13 +1967,14 @@ pub fn reuse_contract_element_identifier(
 
     let target_element = model_manager
         .graph_registry
-        .get_element_by_name(element_name)
+        .resolve_element_reference(element_name, "mutation element_name")?
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!("Element '{}' not found", element_name))
         })?;
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
+    let selected_name = target_element.name.clone();
     let contract_bindings_identifier = resolve_contract_bindings_identifier_for_element(
         model_manager,
         &file_path,
@@ -2062,7 +2071,7 @@ pub fn reuse_contract_element_identifier(
     {
         return Err(ReqvireError::ElementError(format!(
             "ContractBindingEntry '{}' already exists on '{}'",
-            contract_bindings_target, element_name
+            contract_bindings_identifier, selected_name
         )));
     }
 
@@ -2073,7 +2082,7 @@ pub fn reuse_contract_element_identifier(
     if in_relations {
         return Err(ReqvireError::CrossSectionDuplicate(format!(
             "Target '{}' already exists in Relations of '{}'. Cannot add to Contract Bindings.",
-            contract_bindings_target, element_name
+            contract_bindings_identifier, selected_name
         )));
     }
 
@@ -2106,7 +2115,7 @@ pub fn reuse_contract_element_identifier(
 
     let new_content = add_element_contract_bindings_to_element(
         &content,
-        element_name,
+        &selected_name,
         &contract_binding_display_name,
         &relative_identifier,
     )?;
@@ -2125,7 +2134,7 @@ pub fn reuse_contract_element_identifier(
         element_id,
         element_name: format!(
             "Reused element {} to {}",
-            contract_bindings_target, element_name
+            contract_bindings_identifier, selected_name
         ),
         diffs: vec![diff],
         dry_run,
@@ -2140,21 +2149,10 @@ pub fn reuse_contract_element(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    let contract_bindings_identifier = model_manager
-        .graph_registry
-        .get_element_by_name(contract_bindings_element_name)
-        .ok_or_else(|| {
-            ReqvireError::ElementNotFound(format!(
-                "ContractBindingEntry '{}' not found",
-                contract_bindings_element_name
-            ))
-        })?
-        .identifier
-        .clone();
     reuse_contract_element_identifier(
         model_manager,
         element_name,
-        &contract_bindings_identifier,
+        contract_bindings_element_name,
         git_root,
         dry_run,
     )
@@ -2172,13 +2170,14 @@ pub fn remove_reused_contract_element_identifier(
 
     let target_element = model_manager
         .graph_registry
-        .get_element_by_name(element_name)
+        .resolve_element_reference(element_name, "mutation element_name")?
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!("Element '{}' not found", element_name))
         })?;
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
+    let selected_name = target_element.name.clone();
     let contract_bindings_identifier = resolve_contract_bindings_identifier_for_element(
         model_manager,
         &file_path,
@@ -2216,7 +2215,7 @@ pub fn remove_reused_contract_element_identifier(
 
     let new_content = remove_element_contract_bindings_from_element(
         &content,
-        element_name,
+        &selected_name,
         &contract_binding_display_name,
         &relative_identifier,
     )?;
@@ -2243,7 +2242,7 @@ pub fn remove_reused_contract_element_identifier(
         element_id,
         element_name: format!(
             "Removed Contract Binding element {} from {}",
-            contract_bindings_target, element_name
+            contract_bindings_identifier, selected_name
         ),
         diffs: vec![diff],
         dry_run,
@@ -2258,21 +2257,10 @@ pub fn remove_reused_contract_element(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    let contract_bindings_identifier = model_manager
-        .graph_registry
-        .get_element_by_name(contract_bindings_element_name)
-        .ok_or_else(|| {
-            ReqvireError::ElementNotFound(format!(
-                "ContractBindingEntry '{}' not found",
-                contract_bindings_element_name
-            ))
-        })?
-        .identifier
-        .clone();
     remove_reused_contract_element_identifier(
         model_manager,
         element_name,
-        &contract_bindings_identifier,
+        contract_bindings_element_name,
         git_root,
         dry_run,
     )
@@ -2514,18 +2502,19 @@ pub fn merge_elements(
     // Resolve target element by name
     let target_element = model_manager
         .graph_registry
-        .get_element_by_name(target_name)
+        .resolve_element_reference(target_name, "merge target")?
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!("Target element '{}' not found", target_name))
         })?;
     let target_id = target_element.identifier.clone();
+    let selected_target_name = target_element.name.clone();
 
     // Resolve all source elements (validation is done in graph_registry.merge_elements)
     let mut source_ids = Vec::new();
     for source_name in source_names {
         let source_element = model_manager
             .graph_registry
-            .get_element_by_name(source_name)
+            .resolve_element_reference(source_name, "merge sources")?
             .ok_or_else(|| {
                 ReqvireError::ElementNotFound(format!("Source element '{}' not found", source_name))
             })?;
@@ -2579,9 +2568,13 @@ pub fn merge_elements(
     let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
 
     // Perform the merge in graph_registry
-    model_manager
+    if let Err(error) = model_manager
         .graph_registry
-        .merge_elements(&target_id, &source_ids)?;
+        .merge_elements(&target_id, &source_ids)
+    {
+        model_manager.graph_registry = registry_snapshot;
+        return Err(error);
+    }
 
     if let Err(err) = enforce_single_root_after_mutation(model_manager) {
         model_manager.graph_registry = registry_snapshot;
@@ -2640,7 +2633,7 @@ pub fn merge_elements(
         element_name: format!(
             "Merged {} element(s) into '{}'",
             source_names.len(),
-            target_name
+            selected_target_name
         ),
         diffs,
         dry_run,
@@ -3004,13 +2997,24 @@ pub fn link(
     // Resolve source element by name
     let source_element = model_manager
         .graph_registry
-        .get_element_by_name(source)
+        .resolve_element_reference(source, "relation source")?
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!("Source element '{}' not found", source))
         })?;
 
     let source_id = source_element.identifier.clone();
     let source_name = source_element.name.clone();
+    let selected_target_name = if model_manager
+        .graph_registry
+        .relation_target_is_resource(target, git_root)
+    {
+        target.to_string()
+    } else {
+        model_manager
+            .graph_registry
+            .resolve_element_reference(target, "link target")?
+            .map_or_else(|| target.to_string(), |element| element.name.clone())
+    };
 
     // Track which files were modified before the operation
     let modified_before = snapshot_modified_files(model_manager);
@@ -3054,7 +3058,10 @@ pub fn link(
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id: source_id,
-        element_name: format!("Linked {} {} {}", source_name, relation_type, target),
+        element_name: format!(
+            "Linked {} {} {}",
+            source_name, relation_type, selected_target_name
+        ),
         diffs,
         dry_run,
     })
@@ -3087,7 +3094,7 @@ pub fn relink(
     // Resolve source element by name
     let source_element = model_manager
         .graph_registry
-        .get_element_by_name(source)
+        .resolve_element_reference(source, "relation source")?
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!("Source element '{}' not found", source))
         })?;
@@ -3101,14 +3108,43 @@ pub fn relink(
         ));
     }
 
+    let replacement = if model_manager
+        .graph_registry
+        .relation_target_is_resource(to_target, git_root)
+    {
+        None
+    } else {
+        Some(
+            model_manager
+                .graph_registry
+                .select_element(to_target, "relink to_target")?,
+        )
+    };
+    let replacement_id = replacement.map_or_else(
+        || to_target.to_string(),
+        |element| element.identifier.clone(),
+    );
+    let replacement_name =
+        replacement.map_or_else(|| to_target.to_string(), |element| element.name.clone());
+
     // Validate existing relation type before mutation.
     let from_target_resolved = model_manager
         .graph_registry
-        .get_element_by_name(from_target)
+        .resolve_element_reference(from_target, "relink from_target")?
         .map_or_else(
             || from_target.to_string(),
             |element| element.identifier.clone(),
         );
+
+    if from_target_resolved == replacement_id {
+        return Err(ReqvireError::RelationError(
+            "Relink requires different source and target relation endpoints".into(),
+        ));
+    }
+    let from_target_name = model_manager
+        .graph_registry
+        .get_element(&from_target_resolved)
+        .map_or_else(|| from_target.to_string(), |element| element.name.clone());
 
     let existing_relation = model_manager
         .graph_registry
@@ -3133,6 +3169,19 @@ pub fn relink(
             "Relation mismatch: '{}' -> '{}' exists as '{}', not '{}'",
             source, from_target, existing_relation.relation_type.name, relation_type
         )));
+    }
+
+    if let Some(target) = replacement {
+        if !crate::relation::validate_relation_element_types(
+            relation_type,
+            &source_element.element_type,
+            &target.element_type,
+        ) {
+            return Err(ReqvireError::IncompatibleElementTypes(format!(
+                "Relink to_target '{}' selects '{}' ({}); relation '{}' is incompatible with source '{}' ({})",
+                to_target, target.identifier, target.element_type.as_str(), relation_type, source_id, source_element.element_type.as_str()
+            )));
+        }
     }
 
     let modified_before = snapshot_modified_files(model_manager);
@@ -3185,7 +3234,7 @@ pub fn relink(
         element_id: source_id,
         element_name: format!(
             "Relinked {} {} {} -> {}",
-            source_name, relation_type, from_target, to_target
+            source_name, relation_type, from_target_name, replacement_name
         ),
         diffs,
         dry_run,
@@ -3212,7 +3261,7 @@ pub fn unlink(
     // Resolve source element by name
     let source_element = model_manager
         .graph_registry
-        .get_element_by_name(source)
+        .resolve_element_reference(source, "relation source")?
         .ok_or_else(|| {
             ReqvireError::ElementNotFound(format!("Source element '{}' not found", source))
         })?;
@@ -3222,7 +3271,7 @@ pub fn unlink(
 
     let reference_target = model_manager
         .graph_registry
-        .get_element_by_name(target)
+        .resolve_element_reference(target, "relation target")?
         .map(|element| element.identifier.clone())
         .unwrap_or_else(|| {
             crate::utils::normalize_relation_identifier_for_registry(
@@ -3238,7 +3287,7 @@ pub fn unlink(
         return update_contract_reference(
             model_manager,
             source,
-            Some(&reference_target),
+            Some(target),
             None,
             git_root,
             dry_run,
@@ -3290,13 +3339,16 @@ pub fn unlink(
             // Get fresh source element (in case graph was modified)
             let source_element = model_manager
                 .graph_registry
-                .get_element_by_name(source)
+                .resolve_element_reference(source, "relation source")?
                 .ok_or_else(|| {
                     ReqvireError::ElementNotFound(format!("Source element '{}' not found", source))
                 })?;
 
             // Check if target is an element contract_bindings
-            if let Some(target_element) = model_manager.graph_registry.get_element_by_name(target) {
+            if let Some(target_element) = model_manager
+                .graph_registry
+                .resolve_element_reference(target, "relation target")?
+            {
                 let target_id = &target_element.identifier;
                 let contract_binding_match = source_element
                     .contract_bindings

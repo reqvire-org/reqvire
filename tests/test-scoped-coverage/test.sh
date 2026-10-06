@@ -18,4 +18,9 @@ if ! diff -u "$TEST_SCRIPT_DIR/expected/checks.txt" "$TEST_DIR/output/checks.txt
   echo "FAILED: scoped coverage checks differ (artifacts: $TEST_DIR/output)"
   status=1
 fi
+
+# General existing-element selection: names and canonical identifiers share validation and results.
+SELECTION_SUITE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SELECTION_SUITE_DIR/../run_element_selection_checks.sh"
+run_element_selection_checks coverage "$SELECTION_SUITE_DIR/expected/element-selection.txt" || status=1
 exit "$status"

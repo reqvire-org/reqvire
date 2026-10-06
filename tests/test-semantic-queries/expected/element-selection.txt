@@ -1,0 +1,10 @@
+PASS cli/queries/list/name-control
+PASS cli/queries/list/identifier-parity
+PASS cli/queries/validate/name-control
+PASS cli/queries/validate/identifier-parity
+PASS cli/queries/export/name-control
+PASS cli/queries/export/identifier-parity
+PASS cli/queries/check/name-control
+PASS cli/queries/check/identifier-parity
+PASS cli/queries/selector-help
+PASS cli/queries/explicit-iri-control

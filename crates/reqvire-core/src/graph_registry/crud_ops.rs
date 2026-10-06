@@ -2216,12 +2216,27 @@ impl GraphRegistry {
         Ok(relations)
     }
 
+    pub(crate) fn relation_target_is_resource(&self, target: &str, workspace: &Path) -> bool {
+        if crate::utils::is_external_url(target)
+            || crate::mutation_io::exists(workspace.join(target))
+        {
+            return true;
+        }
+        // A canonical Markdown element identifier is not a file argument, even
+        // when its workspace-relative path contains a slash or is unknown.
+        if self.nodes.contains_key(target) || (target.contains('#') && MD_FILE_RE.is_match(target))
+        {
+            return false;
+        }
+        target.ends_with(".md") || target.contains('/')
+    }
+
     /// Adds a relation to an element with full validation and target resolution
     /// This is the comprehensive method used by CRUD operations
     ///
     /// # Arguments
     /// * `source_id` - Source element identifier
-    /// * `target` - Target (element name, URL, or file path)
+    /// * `target` - Target (exact element name, canonical identifier, URL, or file path)
     /// * `relation_type` - Relation type name
     /// * `git_root` - Git root path for file resolution
     ///
@@ -2280,10 +2295,8 @@ impl GraphRegistry {
 
         // Determine target type: element name, external URL, or internal path
         let is_external_url = crate::utils::is_external_url(target);
-        let is_internal_path = !is_external_url
-            && (target.ends_with(".md")
-                || target.contains('/')
-                || crate::mutation_io::exists(git_root.join(target)));
+        let is_internal_path =
+            !is_external_url && self.relation_target_is_resource(target, git_root);
 
         // Resolve target and create relation components
         let (target_display_name, relation_target_link, target_id_for_check, element_id_opt) =
@@ -2338,9 +2351,14 @@ impl GraphRegistry {
                 )
             } else {
                 // Element name - resolve to get identifier
-                let target_element = self.get_element_by_name(target).ok_or_else(|| {
-                    ReqvireError::ElementNotFound(format!("Target element '{}' not found", target))
-                })?;
+                let target_element = self
+                    .resolve_element_reference(target, "link target")?
+                    .ok_or_else(|| {
+                        ReqvireError::ElementNotFound(format!(
+                            "Target element '{}' not found",
+                            target
+                        ))
+                    })?;
 
                 let target_id = target_element.identifier.clone();
                 let target_display_name = target_element.name.clone();
@@ -2476,7 +2494,7 @@ impl GraphRegistry {
     ///
     /// # Arguments
     /// * `source_id` - Source element identifier
-    /// * `target` - Target (element name, URL, or file path)
+    /// * `target` - Target (exact element name, canonical identifier, URL, or file path)
     ///
     /// # Returns
     /// Tuple of (modified file path, relation type, target display name) or None if no relation found
@@ -2500,7 +2518,9 @@ impl GraphRegistry {
         let source_file_path = source_node.element.file_path.clone();
 
         // Try to resolve target as element name first
-        let target_id_to_find = if let Some(target_element) = self.get_element_by_name(target) {
+        let target_id_to_find = if let Some(target_element) =
+            self.resolve_element_reference(target, "unlink target")?
+        {
             target_element.identifier.clone()
         } else {
             let normalized_target =
@@ -2960,10 +2980,18 @@ impl GraphRegistry {
             Vec<crate::element::ContractBindingEntry>,
             Element,
         )> = Vec::new();
+        let mut selected_sources = FxHashSet::default();
         for source_id in source_ids {
             let source_node = self.nodes.get(source_id).ok_or_else(|| {
                 ReqvireError::ElementNotFound(format!("Source element '{}' not found", source_id))
             })?;
+
+            if !selected_sources.insert(source_id) {
+                return Err(ReqvireError::InvalidOperation(format!(
+                    "Merge sources contains duplicate element '{}' in the selected model context",
+                    source_id
+                )));
+            }
 
             let source_element = &source_node.element;
             let source_file_path = source_element.file_path.clone();
@@ -2989,9 +3017,10 @@ impl GraphRegistry {
             if !target_type.is_merge_compatible(&source_element.element_type) {
                 return Err(ReqvireError::MergeTypeMismatch(format!(
                     "Cannot merge '{}' ({}) into '{}' ({}): type mismatch. \
-                     Elements must be in the same category (requirement/verification/contract/other).",
+                     Elements must be in the same category (requirement/verification/contract/other). \
+                     Merge sources '{}' and target '{}' belong to the selected model context.",
                     source_element.name, source_element.element_type.as_str(),
-                    target_name, target_type.as_str()
+                    target_name, target_type.as_str(), source_id, target_id
                 )));
             }
 

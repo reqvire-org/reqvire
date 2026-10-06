@@ -6,6 +6,7 @@ pub mod containment;
 pub mod crud;
 pub mod diff;
 pub mod element;
+mod element_selection;
 pub mod error;
 pub mod exclusions;
 pub mod explorer_runtime;

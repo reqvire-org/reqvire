@@ -142,6 +142,8 @@ This test verifies atomic relation relink behavior, including hierarchical subgr
    - Run `reqvire relink ... --dry-run --json --output <FILE>`.
    - Assert the output file is written and contains valid JSON.
 
+The owning relink suite appends independent and combined identifier selection for source, old and new targets, including Contract Reference relinks. Compare previews with exact-name controls and unchanged physical/Git state.
+
 #### Metadata
   * type: test-verification
 
@@ -329,6 +331,8 @@ The test shall verify that the `mv` command relocates elements, updates all rela
 - Supports --json output with relation mapping
 - Reports validation and location errors
 - Returns correct exit codes
+
+The owning CRUD suite appends identifier subject preview equality with the exact-name control and unchanged files/index/HEAD.
 
 #### Metadata
   * type: test-verification
@@ -527,6 +531,8 @@ The test shall verify that the `rm` command deletes elements, removes relations,
 - Reports errors for non-existent elements
 - Returns correct exit codes
 
+The owning CRUD suite appends identifier subject preview equality with the exact-name control and unchanged files/index/HEAD.
+
 #### Metadata
   * type: test-verification
 
@@ -580,6 +586,8 @@ The test shall verify that the `rename` command renames elements, updates all re
 - Supports --json output
 - Reports validation errors
 - Returns correct exit codes
+
+The owning CRUD suite appends identifier subject preview/acceptance, stale identifier rejection and ambiguity-before-persistence assertions. A new name resembling an identifier remains literal.
 
 #### Metadata
   * type: test-verification
@@ -949,6 +957,8 @@ The test shall verify that the `link` command adds relations to elements followi
 - External URLs allowed for relations (trace, satisfiedBy, etc.)
 - Non-identifier targets rejected for 'bindContract' with clear identifier-target error message
 
+The owning link/unlink suite appends independent and combined identifier source/target selection for relations and Contract Bindings/References. Identifier binding targets remain controls while contract names must also work.
+
 #### Metadata
   * type: test-verification
 
@@ -976,6 +986,8 @@ Test cases:
 10. **Regression scenario**: multi-source merge keeps target element present and model validates.
 11. **Document-to-elements rejection**: merging a source from `# Element` into a target in `# Elements` fails with explicit manual-migration guidance.
 12. **Single-root rejection**: merge that would create multi-root hierarchy ownership fails with deterministic single-root ownership error output and persists no changes.
+
+The owning merge suite appends identifier selection for the target and each source member, combined selection, mixed-alias duplicate/self rejection, known wrong-type identifiers and atomic late-source rejection.
 
 #### Metadata
   * type: test-verification
@@ -1399,6 +1411,8 @@ The test shall verify that the `unlink` command removes relations from elements 
 - Supports --json structured output and --json --output file output
 - Reports errors for non-existent relations
 - Reports errors for invalid source/target
+
+The owning link/unlink suite appends name/identifier preview equality for relation and Contract Binding/Reference sources and targets with unchanged physical/Git state.
 
 #### Metadata
   * type: test-verification

@@ -48,7 +48,7 @@ This test verifies that the collect command aggregates capability, requirement, 
 - Command shall collect element content and contract_bindings contents
 - Command shall output with source citations
 - Command shall include semantic contracts when collecting downstream from ontology context they use
-- Command shall reject element types other than capability, requirement, or ontology with error
+- Command shall reject element types other than capability, requirement, ontology, semantic-query, concept-scheme, or concept with error
 
 ##### Test Criteria
 1. **Basic Text Output**
@@ -132,6 +132,8 @@ This test verifies that the collect command aggregates capability, requirement, 
     - Requirement DOWNSTREAM does not include capability context
     - Capability UPSTREAM includes parent capabilities only
     - Capability DOWNSTREAM includes child capabilities, requirements that specify each capability, and requirement descendants
+
+The appended element-selection profile compares exact names and canonical identifiers for capability, requirement, ontology, semantic-query, concept-scheme and concept roots in both directions. It requires ambiguity rejection and selector help describing both forms.
 
 #### Metadata
   * type: test-verification
@@ -538,6 +540,8 @@ Comprehensive test verifying model command generates model-centric nested output
    - Nested structure handles circular dependencies gracefully
    - Each element appears at most once in traversal
 
+The appended element-selection profile compares root/nested capability and requirement scopes selected by exact name or canonical identifier, rejects colliding name/identifier interpretations, and checks selector help.
+
 #### Metadata
   * type: test-verification
 
@@ -778,6 +782,8 @@ Expected checks:
 - Check empty capabilities, deterministic membership ordering, invalid explicit selectors, and repeated report generation from an unchanged snapshot.
 - Compare every compact scope entry with its detailed report, including empty scopes, shared verification targets, all verification kinds, and contract consumers outside scope. Repeat after removing external consumer evidence.
 - Measure allocations during compact index generation on flat sibling scopes. Doubling subjects and memberships must not produce quadratic allocation growth, and increasing detailed evidence payload sizes must not increase compact-index allocation in proportion to those payloads. Keep these checks independent of wall-clock timing.
+
+The appended nonvisual element-selection profile compares exact-name and canonical-identifier root/nested capability reports, rejects ambiguity, and distinguishes known wrong-type identifiers from missing elements. The existing membership, evidence and aggregation assertions remain in the owning suite; selector assertions require the same membership, evidence and aggregation under both forms.
 
 #### Metadata
   * type: test-verification
@@ -1069,6 +1075,8 @@ This test verifies that the `submodels` command reports independent capability-r
    Command: `reqvire submodels --from "Missing Root"`
    - exits non-zero
    - error message indicates selected scope was not found
+
+The appended element-selection profile compares exact-name and canonical-identifier capability and requirement scopes, rejects colliding name/identifier interpretations, and checks selector help.
 
 #### Metadata
   * type: test-verification

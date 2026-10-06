@@ -18,10 +18,12 @@ Command-specific rules:
 ### CLI Collect Command Contract Specification
 
 #### Details
+The existing start-element argument accepts an exact name or canonical identifier through the shared element-selection contract. Preserve direction and supported root-family restrictions; do not reinterpret them as selectors.
+
 The `collect` command exposes the report collection contracts as a CLI operation.
 
 Command-specific rules:
-- It must accept a start capability, requirement, or ontology context supported by the collect traversal specification.
+- It must accept a start capability, requirement, ontology, semantic-query, concept-scheme, or concept context supported by the collect traversal specification.
 - It must delegate traversal, contract_bindings inclusion, source citation, and output payload shape to Collect Content Specification and Collect Output Format Specification.
 - It must not define command-local traversal rules.
 
@@ -51,8 +53,8 @@ Command-specific rules:
 Command-line mapping of the shared coverage scope contract.
 
 #### Details
-- `coverage --from <NAME>` selects a capability by its exact model element name, following the existing `--from` naming convention.
-- Accept both root and nested capabilities. Requirement, contract, verification, and unknown names MUST fail with a clear diagnostic and a nonzero exit status; never silently fall back to the whole model.
+- `coverage --from <NAME>` selects a capability by exact name or canonical identifier under the Existing Element Selection Specification. Preserve the `--from` argument name and advertise both forms in help.
+- Accept both root and nested capabilities. Requirement, contract, verification, unknown and ambiguous selections MUST fail with a clear diagnostic and a nonzero exit status; never silently fall back to the whole model.
 - Omission of `--from` preserves whole-model coverage behavior and existing text and JSON report sections.
 - The command MUST delegate scope resolution and coverage projection to the shared reporting operation. CLI code only parses the selector and renders the result.
 - Text and `--json` output MUST report the same scope, counts, classifications, gap membership, and supporting evidence. Scoped text MUST identify the selected capability and explain that orphan diagnostics are available in whole-model coverage.
@@ -101,7 +103,7 @@ containment Generate containment view
 resources Generate resources report
 ontologies Collect ontology elements and semantic-contract SHACL shapes
 submodels Analyze independent capability-rooted submodels and cross-submodel couplings
-collect Collect content from capability, requirement, or ontology context
+collect Collect content from capability, requirement, ontology, semantic-query, concept-scheme, or concept context
 help Print help for commands
 
 Ontologies options:
@@ -173,6 +175,8 @@ Command output is written to stdout for easy redirection to files.
 ### CLI Merge Element Command Contract Specification
 
 #### Details
+The target and every source argument accept exact names or canonical identifiers through the bound element-selection contract. Resolve the complete list before invoking content transformation.
+
 The `merge` command exposes the shared merge-element workflow through the CLI.
 
 Command-specific rules:
@@ -218,6 +222,8 @@ Migrate command behavior:
 ### CLI Model Command Contract Specification
 
 #### Details
+The optional `from` start selector accepts an exact name or canonical identifier under the bound Existing Element Selection Specification. Omission, reverse traversal and type filters retain their existing meanings.
+
 The `model` command behavior is governed by the reused model JSON output contracts.
 
 #### Metadata
@@ -248,6 +254,8 @@ Command-specific rules:
 ### CLI Move Element Command Contract Specification
 
 #### Details
+The existing subject argument accepts an exact name or canonical identifier through the bound element-selection contract. Destination file and placement keep their existing domains.
+
 The `mv` command behavior is governed by the reused move workflow and target-location contracts.
 
 #### Metadata
@@ -323,6 +331,8 @@ Command-specific rules:
 ### CLI Relink Command Contract Specification
 
 #### Details
+Element-valued source, old target and new target arguments accept exact names or canonical identifiers through the bound element-selection contract. Relation names and supported resource endpoints retain their existing domains.
+
 The `relink` command exposes atomic relation target replacement through the CLI.
 
 Command-specific rules:
@@ -357,6 +367,8 @@ Command-specific rules:
 ### CLI Remove Element Command Contract Specification
 
 #### Details
+The existing subject argument accepts an exact name or canonical identifier through the bound element-selection contract before the delete workflow.
+
 The `rm` command exposes the shared delete-element workflow.
 
 Command-specific rules:
@@ -373,6 +385,8 @@ Command-specific rules:
 ### CLI Rename Element Command Contract Specification
 
 #### Details
+The existing subject argument accepts an exact name or canonical identifier through the bound element-selection contract. The replacement name remains a literal new name.
+
 The `rename` command behavior is governed by the reused rename workflow and relation-update contracts.
 
 #### Metadata
@@ -432,6 +446,8 @@ Option rules:
 ### CLI Submodels Command Contract Specification
 
 #### Details
+The existing `from` argument accepts an exact capability or requirement name or canonical identifier under the bound element-selection contract, with unchanged selected-boundary semantics.
+
 The `submodels` command behavior is governed by the reused submodel analysis and output contracts.
 
 #### Metadata
@@ -588,6 +604,8 @@ Mutating command hierarchy safety is governed by the reused validation and atomi
 ### Relation Commands Contract Specification
 
 #### Details
+Element-valued source and target arguments, including Contract Binding and Contract Reference endpoints, accept exact names or canonical identifiers through the bound element-selection contract. Preserve existing argument order, relation/keyword literals and resource-domain detection.
+
 Relation command behavior is governed by the reused relation, contract_bindings, and atomicity contracts.
 
 Command-specific rules:
@@ -628,6 +646,8 @@ Command-specific rules:
 The CLI interface MUST expose managed query operations through shared core contracts.
 
 #### Details
+Existing `name` source selectors accept exact native element names or canonical identifiers under the bound element-selection contract. Explicit IRI selectors, namespace filters and artifact paths retain their existing domains and mutual exclusion.
+
 Query discovery MUST return native authored records sorted by generated IRI then name. Namespace filters MUST match used ontology namespaces. Query validation MUST return per-candidate diagnostics and use the common validation gate. Selectors MUST resolve exactly and reject unknown or ambiguous results. Exported content and hashes MUST come from the shared core renderer. Validation and artifact rendering MUST preserve downstream SERVICE, datasets, and extension functions without executing them.
 Commands MUST be `semantic query list [--json] [--namespace-base IRI] [--name NAME] [--iri IRI]`, `semantic query validate [--json] [--name NAME|--iri IRI]`, `semantic query export (--name NAME|--iri IRI) [--output FILE|--json]`, and `semantic query check (--name NAME|--iri IRI) --artifact FILE [--json]`. Export MUST write raw SPARQL by default and atomically replace output files only after successful validation. Check MUST preserve the file, return failure on missing or stale content, and distinguish I/O errors.
 

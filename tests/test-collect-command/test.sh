@@ -191,4 +191,10 @@ if [ $EXIT_CODE -eq 0 ] || ! echo "$OUTPUT" | grep -qi "invalid direction"; then
   exit 1
 fi
 
+# General existing-element selection: names and canonical identifiers share validation and results.
+SELECTION_SUITE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SELECTION_SUITE_DIR/../run_element_selection_checks.sh"
+if ! run_element_selection_checks collect "$SELECTION_SUITE_DIR/expected/element-selection.txt"; then
+  exit 1
+fi
 exit 0

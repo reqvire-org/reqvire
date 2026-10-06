@@ -117,22 +117,10 @@ fn build_model_report(
 
     // Determine starting elements
     let mut starting_elements = if let Some(name) = root_element_name {
-        // Find element by name
-        let found = registry
-            .nodes
-            .iter()
-            .find(|(_, node)| node.element.name == name);
-
-        match found {
-            Some((id, _)) => vec![id.clone()],
-            None => {
-                eprintln!("❌ Element with name '{}' not found", name);
-                return Err(ReqvireError::ElementError(format!(
-                    "Element with name '{}' not found",
-                    name
-                )));
-            }
-        }
+        vec![registry
+            .select_element(name, "model from")?
+            .identifier
+            .clone()]
     } else if let Some(ref types) = type_filter {
         // Filter by element types
         if reverse {
@@ -180,7 +168,10 @@ fn build_model_report(
         metadata: ModelMetadata {
             total_elements,
             total_relations,
-            filtered_from: root_element_name.map(|s| s.to_string()),
+            filtered_from: root_element_name
+                .and_then(|_| starting_elements.first())
+                .and_then(|id| registry.get_element(id))
+                .map(|element| element.name.clone()),
             direction: if reverse {
                 "Reverse".to_string()
             } else {

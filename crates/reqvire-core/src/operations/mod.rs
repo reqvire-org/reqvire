@@ -57,18 +57,31 @@ pub fn read_element<'a>(
         ));
     }
 
-    identifier.map_or_else(
-        || {
-            registry
-                .get_element_by_name(name.expect("checked above"))
-                .ok_or_else(|| ReqvireError::ElementNotFound("Element not found".to_string()))
-        },
-        |identifier| {
-            registry
-                .get_element(identifier)
-                .ok_or_else(|| ReqvireError::ElementNotFound("Element not found".to_string()))
-        },
-    )
+    let by_name = name
+        .map(|value| registry.select_element(value, "read_element name"))
+        .transpose()?;
+    let by_identifier = identifier
+        .map(|value| {
+            registry.get_element(value).ok_or_else(|| {
+                ReqvireError::ElementNotFound(format!(
+                    "read_element identifier '{value}' not found in the selected model context"
+                ))
+            })
+        })
+        .transpose()?;
+    if let (Some(a), Some(b)) = (by_name, by_identifier) {
+        crate::element_selection::require_consistent(
+            ("read_element name", name.unwrap_or_default(), &a.identifier),
+            (
+                "read_element identifier",
+                identifier.unwrap_or_default(),
+                &b.identifier,
+            ),
+        )?;
+    }
+    by_name
+        .or(by_identifier)
+        .ok_or_else(|| ReqvireError::ElementNotFound("Element not found".into()))
 }
 
 pub fn search_report(

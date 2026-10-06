@@ -298,6 +298,7 @@ The system shall expose model mutation tools only through typed Reqvire core ope
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Create Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#create-element-workflow-specification)
@@ -401,6 +402,7 @@ When a client selects a capability in a coverage tool request, the system SHALL 
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
 
 #### Relations
@@ -508,6 +510,7 @@ Detailed request/result types, shared operation semantics, adapter boundary, dis
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
@@ -923,4 +926,21 @@ WHEN automatic or explicit local commit publication is interrupted in an owned c
   * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
   * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * verifiedBy: [MCP Accepted Change Commit Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-accepted-change-commit-verification)
+---
+
+### MCP Model Evidence Element Selection
+
+When an MCP model-evidence tool selects an existing source element, the system SHALL apply the shared element-selection contract within the requested model context before producing evidence.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/operations/mod.rs)
+  * satisfiedBy: [semantic_tools.rs](../../../crates/reqvire-core/src/tool_interface/semantic_tools.rs)
+  * derivedFrom: [MCP Model Evidence Tools](#mcp-model-evidence-tools)
+  * verifiedBy: [Existing Element Selection Verification](../../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
 ---

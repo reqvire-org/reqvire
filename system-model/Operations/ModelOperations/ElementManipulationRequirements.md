@@ -10,6 +10,9 @@ For hierarchical relinks (`derivedFrom`/`derive`), the operation shall support s
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
 #### Relations
   * definedBy: [Atomic Relink Validity Constraint](Constraints.md#atomic-relink-validity-constraint)
   * definedBy: [Atomic Relation Relink Workflow Specification](Specifications.md#atomic-relation-relink-workflow-specification)
@@ -73,6 +76,9 @@ The system shall provide the capability to delete existing model elements while 
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
 #### Relations
   * definedBy: [Delete Element Workflow Specification](Specifications.md#delete-element-workflow-specification)
   * definedBy: [Orphaned Children Error Message Specification](Specifications.md#orphaned-children-error-message-specification)
@@ -111,6 +117,7 @@ Detailed merge workflow, document-format, type-compatibility, content transforma
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
   * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
 
@@ -138,6 +145,7 @@ The operation shall reject moves into an existing `# Element` file when that mov
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
 
@@ -221,6 +229,9 @@ Implementation details shall follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
 
 #### Relations
   * definedBy: [Rename Element Operation Contract Specification](Specifications.md#rename-element-operation-contract-specification)

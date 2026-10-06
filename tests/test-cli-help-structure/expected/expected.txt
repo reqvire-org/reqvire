@@ -37,7 +37,7 @@ Commands:
     concepts validate Validate standalone concept schemes, concept references, and mappings
   ontologies        Compatibility alias for combined semantic export
   submodels         Analyze independent capability-rooted submodels and cross-submodel couplings
-  collect           Collect content from capability, requirement, ontology, concept-scheme, or concept context
+  collect           Collect content from capability, requirement, ontology, semantic-query, concept-scheme, or concept context
   help               Print this message or the help of the given subcommand(s)
 
 Options:
@@ -117,12 +117,12 @@ TRACES OPTIONS:
       --filter-type <TYPE>      Only include verifications of the given type. Valid: test-verification, analysis-verification, inspection-verification, demonstration-verification
 
 COVERAGE OPTIONS:
-      --from <NAME>             Select a capability subtree by exact name
+      --from <NAME>             Select a capability subtree by exact name or canonical identifier
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 MODEL OPTIONS:
-      --from <NAME>             Start from specific element by name
+      --from <NAME>             Start from specific element by exact name or canonical identifier
       --reverse                 Traverse from leaves to roots (follow backward relations)
       --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
       --with-size-estimates     Include element size estimates in JSON output
@@ -144,28 +144,28 @@ ADD OPTIONS:
       --output <FILE>           Save JSON output to file (requires --json)
 
 RM OPTIONS:
-       <ELEMENT_NAME>           Element name
+       <ELEMENT_NAME>           Exact element name or canonical identifier
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 MV OPTIONS:
-       <ELEMENT_NAME>           Element name
+       <ELEMENT_NAME>           Exact element name or canonical identifier
        <FILE>                   Target file path (relative to workspace root)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 RENAME OPTIONS:
-       <ELEMENT_NAME>           Current element name
+       <ELEMENT_NAME>           Current exact element name or canonical identifier
        <NEW_NAME>               New element name
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 MERGE OPTIONS:
-       <TARGET>                 Target element name (receives merged content)
-       <SOURCES>                One or more source element names to merge into target
+       <TARGET>                 Target exact element name or canonical identifier (receives merged content)
+       <SOURCES>                One or more source element names or canonical identifiers to merge into target
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
@@ -186,25 +186,25 @@ MV FOLDER OPTIONS:
       --output <FILE>           Save JSON output to file (requires --json)
 
 LINK OPTIONS:
-       <SOURCE>                 Source element name
+       <SOURCE>                 Source exact element name or canonical identifier
        <RELATION_TYPE>          Relation type, 'bindContract', or 'referenceContract'. Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, broader, narrower, related, exactMatch, closeMatch, satisfiedBy, satisfy, verifiedBy, verify. Use 'bindContract' to reuse compatible requirement-owned contract elements
-       <TARGET>                 Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement contract_bindings
+       <TARGET>                 Target: exact element name or canonical identifier, internal path, or external URL (for relations); compatible contract name or identifier for bindings
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 UNLINK OPTIONS:
-       <SOURCE>                 Source element name
-       <TARGET>                 Target element name OR file path
+       <SOURCE>                 Source exact element name or canonical identifier
+       <TARGET>                 Target element name or canonical identifier, file path, or URL
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 RELINK OPTIONS:
-       <SOURCE>                 Source element name
+       <SOURCE>                 Source exact element name or canonical identifier
        <RELATION_TYPE>          Relation type to preserve
-       <FROM_TARGET>            Existing target to replace
-       <TO_TARGET>              New target
+       <FROM_TARGET>            Existing target to replace: element name or canonical identifier, file path, or URL
+       <TO_TARGET>              Replacement element name or canonical identifier, file path, or URL
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
@@ -252,12 +252,12 @@ ONTOLOGIES OPTIONS:
       --output <FILE>           Save output to file
 
 SUBMODELS OPTIONS:
-      --from <NAME>             Scope report to a capability subtree or requirement subtree by name
+      --from <NAME>             Scope report to a capability subtree or requirement subtree by exact name or canonical identifier
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 COLLECT OPTIONS:
-       <ELEMENT_NAME>           Name of the capability, requirement, ontology, concept-scheme, or concept element to collect from
+       <ELEMENT_NAME>           Exact name or canonical identifier of the capability, requirement, ontology, semantic-query, concept-scheme, or concept element to collect from
       --direction <DIRECTION>   Traversal direction: UPSTREAM (ancestors) or DOWNSTREAM (descendants)
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)

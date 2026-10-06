@@ -1,0 +1,10 @@
+PASS cli/model/Root Capability/name-control
+PASS cli/model/Root Capability/identifier-parity
+PASS cli/model/Nested Capability/name-control
+PASS cli/model/Nested Capability/identifier-parity
+PASS cli/model/Parent Requirement/name-control
+PASS cli/model/Parent Requirement/identifier-parity
+PASS cli/model/Child Requirement/name-control
+PASS cli/model/Child Requirement/identifier-parity
+PASS cli/model/ambiguous-name-identifier
+PASS cli/model/selector-help

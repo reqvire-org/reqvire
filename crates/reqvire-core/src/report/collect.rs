@@ -88,7 +88,7 @@ pub struct CollectReport {
     pub metadata: CollectMetadata,
 }
 
-/// Generate a collect report for a capability, requirement, ontology, concept-scheme, or concept element.
+/// Generate a collect report for a capability, requirement, ontology, semantic-query, concept-scheme, or concept element.
 pub fn generate_collect_report(
     registry: &GraphRegistry,
     element_name: &str,
@@ -96,27 +96,8 @@ pub fn generate_collect_report(
     json_output: bool,
     direction: CollectDirection,
 ) -> Result<String, ReqvireError> {
-    // Find element by name
-    let element_id = registry
-        .nodes
-        .iter()
-        .find(|(_, node)| node.element.name == element_name)
-        .map(|(id, _)| id.clone());
-
-    let element_id = match element_id {
-        Some(id) => id,
-        None => {
-            return Err(ReqvireError::ElementError(format!(
-                "Element with name '{}' not found",
-                element_name
-            )));
-        }
-    };
-
-    // Get the element
-    let element = registry.get_element(&element_id).ok_or_else(|| {
-        ReqvireError::ElementError(format!("Element '{}' not found in registry", element_id))
-    })?;
+    let element = registry.select_element(element_name, "collect element_name")?;
+    let element_id = element.identifier.clone();
 
     // Validate element type is supported by collect.
     match &element.element_type {
@@ -128,7 +109,7 @@ pub fn generate_collect_report(
         | ElementType::Concept => {}
         _ => {
             return Err(ReqvireError::ElementError(format!(
-                "Element '{}' is not a capability, requirement, ontology, semantic-query, concept-scheme, or concept type (found: {}). Only capability, requirement, ontology, semantic-query, concept-scheme, and concept types are supported.",
+                "Element '{}' is not a capability, requirement, ontology, semantic-query, concept-scheme, or concept type (found: {}). Only capability, requirement, ontology, semantic-query, concept-scheme, and concept types are supported (collect element_name; selected model context).",
                 element_name,
                 element.element_type.as_str()
             )));

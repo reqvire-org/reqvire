@@ -112,7 +112,33 @@ impl Default for GraphRegistry {
     }
 }
 
-impl GraphRegistry {}
+impl GraphRegistry {
+    /// Resolve an existing exact name or canonical identifier in this snapshot.
+    /// Literal-name registration and uniqueness helpers deliberately remain separate.
+    pub fn resolve_element_reference(
+        &self,
+        value: &str,
+        argument: &str,
+    ) -> Result<Option<&Element>, ReqvireError> {
+        let identifier = crate::element_selection::resolve_reference(
+            value,
+            argument,
+            self.nodes
+                .values()
+                .map(|node| (node.element.name.as_str(), node.element.identifier.as_str())),
+        )?;
+        Ok(identifier.and_then(|identifier| self.get_element(identifier)))
+    }
+
+    pub fn select_element(&self, value: &str, argument: &str) -> Result<&Element, ReqvireError> {
+        self.resolve_element_reference(value, argument)?
+            .ok_or_else(|| {
+                ReqvireError::ElementNotFound(format!(
+                    "Element not found: {value} ({argument}; selected model context)"
+                ))
+            })
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -150,6 +176,31 @@ mod tests {
             },
             user_created: true,
         });
+    }
+
+    #[test]
+    fn duplicate_merge_sources_reject_before_changing_the_registry() {
+        let mut registry = GraphRegistry::new();
+        for (id, name) in [("file.md#target", "Target"), ("file.md#source", "Source")] {
+            registry
+                .register_element(make_element(id, name), "file.md")
+                .expect("registered");
+        }
+        let before = serde_json::to_value(&registry.nodes).expect("snapshot");
+        let error = registry
+            .merge_elements(
+                "file.md#target",
+                &["file.md#source".into(), "file.md#source".into()],
+            )
+            .expect_err("duplicate sources");
+        assert!(
+            error.to_string().contains("duplicate") && error.to_string().contains("file.md#source")
+        );
+        assert_eq!(
+            serde_json::to_value(&registry.nodes).expect("snapshot"),
+            before
+        );
+        assert!(registry.modified_files.is_empty());
     }
 
     #[test]

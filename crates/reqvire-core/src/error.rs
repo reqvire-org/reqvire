@@ -136,6 +136,12 @@ pub enum ReqvireError {
     #[error("Missing element: {0}")]
     MissingElement(String),
 
+    #[error("Ambiguous element selection: {0}")]
+    AmbiguousElementSelection(String),
+
+    #[error("Conflicting element selectors: {0}")]
+    ConflictingElementSelectors(String),
+
     #[error("Missing relation target: {0}")]
     MissingRelationTarget(String),
 
@@ -261,6 +267,12 @@ impl Clone for ReqvireError {
             Self::DuplicateElement(error) => Self::DuplicateElement(error.clone()),
             Self::DuplicateSubsection(error) => Self::DuplicateSubsection(error.clone()),
             Self::MissingElement(error) => Self::MissingElement(error.clone()),
+            Self::AmbiguousElementSelection(error) => {
+                Self::AmbiguousElementSelection(error.clone())
+            }
+            Self::ConflictingElementSelectors(error) => {
+                Self::ConflictingElementSelectors(error.clone())
+            }
             Self::MissingRelationTarget(error) => Self::MissingRelationTarget(error.clone()),
             Self::MissingParentRelation(error) => Self::MissingParentRelation(error.clone()),
             Self::InvalidRelationFormat(error) => Self::InvalidRelationFormat(error.clone()),
@@ -330,6 +342,8 @@ impl ReqvireError {
             Self::DuplicateElement(_) => "duplicate_element",
             Self::DuplicateSubsection(_) => "duplicate_subsection",
             Self::MissingElement(_) => "missing_element",
+            Self::AmbiguousElementSelection(_) => "ambiguous_element_selection",
+            Self::ConflictingElementSelectors(_) => "conflicting_element_selectors",
             Self::MissingRelationTarget(_) => "missing_relation_target",
             Self::MissingParentRelation(_) => "missing_parent_relation",
             Self::InvalidRelationFormat(_) => "invalid_relation_format",

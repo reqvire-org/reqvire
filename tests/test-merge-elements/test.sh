@@ -379,4 +379,11 @@ echo ""
 echo "===================================="
 echo "All Merge Elements tests passed"
 echo "===================================="
+
+# General existing-element selection: names and canonical identifiers share validation and results.
+SELECTION_SUITE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SELECTION_SUITE_DIR/../run_element_selection_checks.sh"
+if ! run_element_selection_checks merge "$SELECTION_SUITE_DIR/expected/element-selection.txt"; then
+  exit 1
+fi
 exit 0

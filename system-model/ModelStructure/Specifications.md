@@ -371,13 +371,13 @@ Technical specification for relation link and unlink operations.
 
 #### Details
 **Source Resolution:**
-- Source parameter accepts either an existing internal file path OR an element name
-- Resolution order: first check if source exists as internal file path, if not search for element by name in registry
+- Preserve the supported existing internal-file-path source domain and its current domain-detection precedence. Within the existing-element source domain, accept an exact name or canonical identifier through the bound Existing Element Selection Specification.
 - Source must resolve to an existing element or file; report error if not found
 
 **Target Resolution:**
-- Target parameter must always be an existing element name
-- Target must exist in the element registry; report error if not found
+- Existing-element target selectors accept an exact name or canonical identifier through the shared element-selection contract.
+- Preserve resource, evidence, URL and contract-target domains where the specific relation operation supports them, including their normalization and compatibility rules. A name-or-identifier match does not enable a previously unsupported target domain.
+- Resolve all element endpoints before candidate changes; missing, ambiguous or incompatible targets fail without side effects.
 
 **Link Operation:**
 - Create Relations subsection in source element if doesn't exist

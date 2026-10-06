@@ -82,10 +82,13 @@ Verify the managed semantic query discovery contract through accepted and reject
 #### Details
 Compare CLI/MCP native provenance, ordering, names/IRIs, context namespace filters and query RDF exports. Imported same-name queries stay RDF-only. Verify malformed candidates retain diagnostics, ontology changes impact query users through usedBy, query changes do not propagate back to ontologies, and metadata-only changes affect revisions and impact while leaving artifact hash unchanged.
 
+The owning CLI suite now appends name-versus-source-identifier list/validate assertions. The real standalone/embedded MCP ownership suite appends discovery, validation and content-export parity under both commit policies.
+
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../tests/test-mcp-ownership/test.sh)
   * satisfiedBy: [semantic_queries.rs](../../../crates/reqvire-core/tests/semantic_queries.rs)
   * verify: [MCP Managed Query Artifacts](../../Interfaces/MCP/ManagedQueries.md#mcp-managed-query-artifacts)
   * verify: [CLI Managed Query Artifacts](../../Interfaces/CLI/ManagedQueries.md#cli-managed-query-artifacts)
@@ -100,6 +103,8 @@ Verify the managed semantic query artifact export contract through accepted and 
 
 #### Details
 Compare exact emitted bytes and SHA-256, blank-line trimming, comments, multiline literal CRLF, repeated exports, JSON envelopes and atomic file replacement. Reject invalid selection and conflicting output modes without overwriting files.
+
+The appended CLI profile compares exact-name and canonical source identifier exports, preserving the explicit semantic IRI domain.
 
 #### Metadata
   * type: test-verification
@@ -116,6 +121,8 @@ Verify the managed semantic query artifact drift check contract through accepted
 
 #### Details
 Check matching, stale, missing, and unreadable artifacts. Assert exit status and expected/actual hashes and compare the unchanged artifact bytes.
+
+The appended CLI profile compares matching artifact checks selected by exact name or canonical source identifier, including expected/actual hashes.
 
 #### Metadata
   * type: test-verification

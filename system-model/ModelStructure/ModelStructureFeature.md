@@ -18,6 +18,7 @@ This capability also includes ontology rebasing support for the owned ontology c
   * status: approved
 
 #### Relations
+  * derive: [Existing Element Selection](ElementSelection.md#existing-element-selection)
   * specifiedBy: [Coexistence of Structured and Unstructured Documents](Configuration.md#coexistence-of-structured-and-unstructured-documents)
   * specifiedBy: [Workspace Root Path Authority](ModelManagement.md#workspace-root-path-authority)
   * specifiedBy: [Specification File Identification](StructureAndParsing.md#specification-file-identification)

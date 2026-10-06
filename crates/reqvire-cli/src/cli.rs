@@ -366,10 +366,10 @@ pub enum Commands {
 
     /// Generate verification and implementation coverage report
     #[clap(
-        override_help = "Generate verification and implementation coverage report\n\nCOVERAGE OPTIONS:\n      --from <NAME>              Select a capability subtree by exact name (default: whole model)\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)"
+        override_help = "Generate verification and implementation coverage report\n\nCOVERAGE OPTIONS:\n      --from <NAME>              Select a capability subtree by exact name or canonical identifier (default: whole model)\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)"
     )]
     Coverage {
-        /// Select a capability subtree by exact name
+        /// Select a capability subtree by exact name or canonical identifier
         #[clap(long, value_name = "NAME", help_heading = "COVERAGE OPTIONS")]
         from: Option<String>,
         /// Output results in JSON format
@@ -388,10 +388,10 @@ pub enum Commands {
     /// Use --reverse for leaf-to-root traversal.
     ///
     #[clap(
-        override_help = "Generate model-centric JSON structure with nested relations\n\nBy default, shows ontology roots, concept roots, and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save JSON output to file"
+        override_help = "Generate model-centric JSON structure with nested relations\n\nBy default, shows ontology roots, concept roots, and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by exact name or canonical identifier\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save JSON output to file"
     )]
     Model {
-        /// Start from specific element by name
+        /// Start from specific element by exact name or canonical identifier
         #[clap(long, value_name = "NAME", help_heading = "MODEL OPTIONS")]
         from: Option<String>,
 
@@ -469,10 +469,10 @@ pub enum Commands {
 
     /// Remove element from model
     #[clap(
-        override_help = "Remove element from model\n\nRM OPTIONS:\n       <ELEMENT_NAME>           Element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rm <element-name>"
+        override_help = "Remove element from model\n\nRM OPTIONS:\n       <ELEMENT_NAME>           Exact element name or canonical identifier\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rm <element-name>"
     )]
     Rm {
-        /// Element name
+        /// Exact element name or canonical identifier
         element_name: String,
 
         /// Preview changes without applying
@@ -490,10 +490,10 @@ pub enum Commands {
 
     /// Move element to different location
     #[clap(
-        override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n       <FILE>                   Target file path (relative to workspace root)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv <element-name> <file>"
+        override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Exact element name or canonical identifier\n       <FILE>                   Target file path (relative to workspace root)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv <element-name> <file>"
     )]
     Mv {
-        /// Element name
+        /// Exact element name or canonical identifier
         element_name: String,
 
         /// Target file path (relative to workspace root)
@@ -514,10 +514,10 @@ pub enum Commands {
 
     /// Rename element
     #[clap(
-        override_help = "Rename element\n\nRENAME OPTIONS:\n       <ELEMENT_NAME>           Current element name\n       <NEW_NAME>               New element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rename <element-name> <new-name>"
+        override_help = "Rename element\n\nRENAME OPTIONS:\n       <ELEMENT_NAME>           Current exact element name or canonical identifier\n       <NEW_NAME>               New element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rename <element-name> <new-name>"
     )]
     Rename {
-        /// Current element name
+        /// Current exact element name or canonical identifier
         element_name: String,
 
         /// New element name
@@ -538,13 +538,13 @@ pub enum Commands {
 
     /// Merge multiple elements into target element
     #[clap(
-        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations, contract bindings, and contract references are merged with deduplication; mixed dependency sections are rejected\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Concrete verifications can merge into concrete verifications\n    - Verification objectives can merge only into verification objectives\n    - Contracts can merge into contracts (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
+        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target exact element name or canonical identifier (receives merged content)\n       <SOURCES>...             One or more source element names or canonical identifiers to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations, contract bindings, and contract references are merged with deduplication; mixed dependency sections are rejected\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Concrete verifications can merge into concrete verifications\n    - Verification objectives can merge only into verification objectives\n    - Contracts can merge into contracts (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
     )]
     Merge {
-        /// Target element name (receives merged content)
+        /// Target exact element name or canonical identifier (receives merged content)
         target: String,
 
-        /// One or more source element names to merge into target
+        /// One or more source element names or canonical identifiers to merge into target
         #[clap(required = true, num_args = 1..)]
         sources: Vec<String>,
 
@@ -618,10 +618,10 @@ pub enum Commands {
     /// Add relation, contract binding, or contract reference between elements
     #[clap(
         name = "link",
-        override_help = "Add relation, contract binding, or contract reference between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE>           Relation type, bindContract, or referenceContract\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    define        - Source contract element defines a requirement\n    definedBy     - Source requirement owns a compatible contract element\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    broader       - Source concept has a broader concept\n    narrower      - Source concept has a narrower concept\n    related       - Source concept is related to another concept\n    exactMatch    - Source concept exactly matches an external concept IRI or concept element\n    closeMatch    - Source concept closely matches an external concept IRI or concept element\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source requirement is verified by concrete verification\n    verify        - Source concrete verification verifies a requirement\n\nCONTRACT BINDINGS:\n    Use 'bindContract' keyword to bind compatible requirement-owned contract elements\n\nCONTRACT REFERENCES:\n    Use 'referenceContract' for a contract content dependency used by change impact.\n    A requirement may use Contract Bindings or Contract References, never both.\n\nTARGET TYPES:\n    For referenceContract: requirement-owned contract element name or identifier\n    For relations: element name, internal file path, or external URL (http/https)\n    For bindContract: requirement may reuse compatible requirement-owned source, constraint, behavior, specification, state, or input-output contract element identifiers (file.md#element-id or #element-id). Non-ontology prose uses Concept References; structural ontology uses reqvire:mapsToConcept; semantic contracts use use/usedBy.\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" definedBy \"Invoice Numbering Specification\"\n    reqvire link \"Invoice Numbering Specification\" define \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Traceability\" broader \"Engineering Knowledge\"\n    reqvire link \"Traceability\" related \"Verification Evidence\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"System Requirement\" bindContract \"constraints.md#latency-limit\""
+        override_help = "Add relation, contract binding, or contract reference between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source exact element name or canonical identifier\n       <RELATION_TYPE>           Relation type, bindContract, or referenceContract\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    define        - Source contract element defines a requirement\n    definedBy     - Source requirement owns a compatible contract element\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    broader       - Source concept has a broader concept\n    narrower      - Source concept has a narrower concept\n    related       - Source concept is related to another concept\n    exactMatch    - Source concept exactly matches an external concept IRI or concept element\n    closeMatch    - Source concept closely matches an external concept IRI or concept element\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source requirement is verified by concrete verification\n    verify        - Source concrete verification verifies a requirement\n\nCONTRACT BINDINGS:\n    Use 'bindContract' keyword to bind compatible requirement-owned contract elements\n\nCONTRACT REFERENCES:\n    Use 'referenceContract' for a contract content dependency used by change impact.\n    A requirement may use Contract Bindings or Contract References, never both.\n\nTARGET TYPES:\n    For referenceContract: requirement-owned contract element name or identifier\n    For relations: exact element name or canonical identifier, internal file path, or external URL (http/https)\n    For bindContract: requirement may reuse compatible requirement-owned source, constraint, behavior, specification, state, or input-output contract element names or identifiers (file.md#element-id or #element-id). Non-ontology prose uses Concept References; structural ontology uses reqvire:mapsToConcept; semantic contracts use use/usedBy.\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" definedBy \"Invoice Numbering Specification\"\n    reqvire link \"Invoice Numbering Specification\" define \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Traceability\" broader \"Engineering Knowledge\"\n    reqvire link \"Traceability\" related \"Verification Evidence\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"System Requirement\" bindContract \"constraints.md#latency-limit\""
     )]
     Link {
-        /// Source element name
+        /// Source exact element name or canonical identifier
         source: String,
 
         /// Relation type, 'bindContract', or 'referenceContract'.
@@ -629,7 +629,7 @@ pub enum Commands {
         /// Use 'bindContract' to reuse compatible requirement-owned contract elements
         relation_type: String,
 
-        /// Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement contract_bindings
+        /// Target: exact element name or canonical identifier, internal path, or external URL (for relations); compatible contract name or identifier for bindings
         target: String,
 
         /// Preview changes without applying
@@ -648,13 +648,13 @@ pub enum Commands {
     /// Remove relation, contract binding, or contract reference between elements (auto-detects type)
     #[clap(
         name = "unlink",
-        override_help = "Remove relation, contract binding, or contract reference between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Detects relations, Contract Bindings, and Contract References.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Capability Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
+        override_help = "Remove relation, contract binding, or contract reference between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source exact element name or canonical identifier\n       <TARGET>                 Target element name or canonical identifier, file path, or URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Detects relations, Contract Bindings, and Contract References.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Capability Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
     )]
     Unlink {
-        /// Source element name
+        /// Source exact element name or canonical identifier
         source: String,
 
-        /// Target element name OR file path
+        /// Target element name or canonical identifier, file path, or URL
         target: String,
 
         /// Preview changes without applying
@@ -673,19 +673,19 @@ pub enum Commands {
     /// Replace an existing relation target with a new target in one operation
     #[clap(
         name = "relink",
-        override_help = "Replace an existing relation target with a new target in one operation\n\nRELINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE>          Relation type to preserve\n       <FROM_TARGET>            Existing target to replace\n       <TO_TARGET>              New target\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire relink \"Child Requirement\" derivedFrom \"Old Parent\" \"New Parent\""
+        override_help = "Replace an existing relation target with a new target in one operation\n\nRELINK OPTIONS:\n       <SOURCE>                 Source exact element name or canonical identifier\n       <RELATION_TYPE>          Relation type to preserve\n       <FROM_TARGET>            Existing target to replace: element name or canonical identifier, file path, or URL\n       <TO_TARGET>              Replacement element name or canonical identifier, file path, or URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire relink \"Child Requirement\" derivedFrom \"Old Parent\" \"New Parent\""
     )]
     Relink {
-        /// Source element name
+        /// Source exact element name or canonical identifier
         source: String,
 
         /// Relation type to preserve
         relation_type: String,
 
-        /// Existing target to replace
+        /// Existing target to replace: element name or canonical identifier, file path, or URL
         from_target: String,
 
-        /// New target
+        /// Replacement element name or canonical identifier, file path, or URL
         to_target: String,
 
         /// Preview changes without applying
@@ -818,10 +818,10 @@ pub enum Commands {
 
     /// Analyze independent capability-rooted submodels and cross-submodel couplings
     #[clap(
-        override_help = "Analyze independent capability-rooted submodels and cross-submodel couplings\n\nSUBMODELS OPTIONS:\n      --from <NAME>      Scope report to a capability subtree or requirement subtree by name\n      --json              Output results in JSON output format\n      --output <FILE>     Save JSON output to file (requires --json)"
+        override_help = "Analyze independent capability-rooted submodels and cross-submodel couplings\n\nSUBMODELS OPTIONS:\n      --from <NAME>      Scope report to a capability subtree or requirement subtree by exact name or canonical identifier\n      --json              Output results in JSON output format\n      --output <FILE>     Save JSON output to file (requires --json)"
     )]
     Submodels {
-        /// Scope report to a capability subtree or requirement subtree by name
+        /// Scope report to a capability subtree or requirement subtree by exact name or canonical identifier
         #[clap(long, value_name = "NAME", help_heading = "SUBMODELS OPTIONS")]
         from: Option<String>,
 
@@ -834,12 +834,12 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Collect content from capability, requirement, ontology, concept-scheme, or concept context
+    /// Collect content from capability, requirement, ontology, semantic-query, concept-scheme, or concept context
     #[clap(
-        override_help = "Collect content from capability, requirement, ontology, concept-scheme, or concept context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the capability, requirement, ontology, concept-scheme, or concept element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)\n\nCOLLECTED CONTEXT:\n    Capability/requirement starts include traversed elements, authored concept references, requirement contracts, contract bindings, and contract references.\n    Ontology starts include ontology hierarchy and downstream semantic contracts that use reachable ontology.\n    Concept-scheme/concept starts include thesaurus context through concept hierarchy."
+        override_help = "Collect content from capability, requirement, ontology, semantic-query, concept-scheme, or concept context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Exact name or canonical identifier of the capability, requirement, ontology, semantic-query, concept-scheme, or concept element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)\n\nCOLLECTED CONTEXT:\n    Capability/requirement starts include traversed elements, authored concept references, requirement contracts, contract bindings, and contract references.\n    Ontology starts include ontology hierarchy and downstream semantic contracts that use reachable ontology.\n    Concept-scheme/concept starts include thesaurus context through concept hierarchy."
     )]
     Collect {
-        /// Name of the capability, requirement, ontology, concept-scheme, or concept element to collect from
+        /// Exact name or canonical identifier of the capability, requirement, ontology, semantic-query, concept-scheme, or concept element to collect from
         element_name: String,
 
         /// Traversal direction: UPSTREAM (ancestors) or DOWNSTREAM (descendants)
@@ -1885,7 +1885,9 @@ pub async fn handle_command(
             // Resolve element name to identifier
             let element_id = model_manager
                 .graph_registry
-                .find_element_by_name(&element_name)?;
+                .select_element(element_name.trim(), "rm element_name")?
+                .identifier
+                .clone();
 
             // Call CRUD operation
             let workspace_root = current_dir.clone();
@@ -1911,7 +1913,9 @@ pub async fn handle_command(
             // Resolve element name to identifier
             let element_id = model_manager
                 .graph_registry
-                .find_element_by_name(&element_name)?;
+                .select_element(element_name.trim(), "mv element_name")?
+                .identifier
+                .clone();
 
             // Call CRUD operation
             let workspace_root = current_dir.clone();
@@ -1944,7 +1948,9 @@ pub async fn handle_command(
             // Resolve element name to identifier
             let element_id = model_manager
                 .graph_registry
-                .find_element_by_name(&element_name)?;
+                .select_element(element_name.trim(), "rename element_name")?
+                .identifier
+                .clone();
 
             // Call CRUD operation
             let workspace_root = current_dir.clone();
@@ -3021,6 +3027,7 @@ mod tests {
 pub enum QueryCommands {
     /// List native query artifacts and their source metadata
     List {
+        /// Exact semantic-query source element name or canonical identifier
         #[clap(long, conflicts_with = "iri")]
         name: Option<String>,
         #[clap(long)]
@@ -3032,6 +3039,7 @@ pub enum QueryCommands {
     },
     /// Validate query artifacts without executing them
     Validate {
+        /// Exact semantic-query source element name or canonical identifier
         #[clap(long, conflicts_with = "iri")]
         name: Option<String>,
         #[clap(long)]
@@ -3041,6 +3049,7 @@ pub enum QueryCommands {
     },
     /// Export a standalone SPARQL artifact
     Export {
+        /// Exact semantic-query source element name or canonical identifier
         #[clap(long, required_unless_present = "iri", conflicts_with = "iri")]
         name: Option<String>,
         #[clap(long, required_unless_present = "name")]
@@ -3052,6 +3061,7 @@ pub enum QueryCommands {
     },
     /// Compare a generated query with an existing artifact
     Check {
+        /// Exact semantic-query source element name or canonical identifier
         #[clap(long, required_unless_present = "iri", conflicts_with = "iri")]
         name: Option<String>,
         #[clap(long, required_unless_present = "name")]

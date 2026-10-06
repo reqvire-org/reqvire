@@ -170,6 +170,8 @@ Expected checks:
 - Select unknown, requirement, contract, and verification names and assert a diagnostic plus nonzero exit status without whole-model fallback.
 - Confirm help documents the optional capability selector, and that quoted capability names containing spaces resolve correctly.
 
+The appended element-selection assertions require name/identifier report equality, ambiguity and known wrong-type diagnostics, and help advertising both selector forms. URL navigation is a separate browser verification.
+
 #### Metadata
   * type: test-verification
 

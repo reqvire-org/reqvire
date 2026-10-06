@@ -2,29 +2,37 @@
 
 ### Collect Content Specification
 
-Technical specification for content collection from capability, requirement, and ontology context.
+Technical specification for content collection from capability, requirement, ontology, semantic-query, concept-scheme, and concept context.
 
 #### Details
 **Input Validation:**
-- Element name is required positional argument
+- An existing-element reference, supplied as an exact name or canonical identifier, is required as the positional argument
 - Element must exist in the model
-- Element must be a capability, requirement, or ontology element
+- Element must be a capability, requirement, ontology, semantic-query, concept-scheme, or concept element
 - Error with non-zero exit if element not found or invalid type
 
 **Traversal Rules:**
-- Start from specified capability, requirement, or ontology element
+- Start from specified capability, requirement, ontology, semantic-query, concept-scheme, or concept element
 - When direction is UPSTREAM from a requirement:
  - Traverse requirement `derivedFrom` parents, cross to the owning capability through `specify` or inherited ownership, then traverse capability `derivedFrom` parents
 - When direction is UPSTREAM from a capability:
  - Traverse capability `derivedFrom` parents only
 - When direction is UPSTREAM from an ontology:
  - Traverse ontology `derivedFrom` parents only
+- When direction is UPSTREAM from a semantic query:
+ - Include its authored query content and the ontology context it uses
+- When direction is UPSTREAM from a concept scheme or concept:
+ - Traverse concept-family `derivedFrom` parents within its scheme
 - When direction is DOWNSTREAM from a requirement:
  - Traverse child requirements through `derive` only
 - When direction is DOWNSTREAM from a capability:
  - Traverse child capabilities through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`
 - When direction is DOWNSTREAM from an ontology:
  - Traverse child ontology elements through `derive` and include semantic contracts that use each reachable ontology element through `use`/`usedBy`
+- When direction is DOWNSTREAM from a semantic query:
+ - Include the starting query without executing it
+- When direction is DOWNSTREAM from a concept scheme or concept:
+ - Traverse concept-family children through `derive`
 - Include the starting element in output
 
 **Content Collection:**
@@ -49,7 +57,7 @@ Technical specification for content collection from capability, requirement, and
 
 **Error Handling:**
 - Element not found: Error with message
-- Element not a capability, requirement, or ontology type: Error with message
+- Element not a capability, requirement, ontology, semantic-query, concept-scheme, or concept type: Error with message
 - Contract Bindings file not found: Warning, continue with other content
 - Cyclic Contract Reference dependencies MUST fail model validation before collection. Traversal of valid converging paths MUST deduplicate repeated reference targets.
 
@@ -241,7 +249,7 @@ Shared contract for selecting coverage report subjects while retaining their mod
 - Capability scope includes the selected capability and every descendant reachable through the validated capability hierarchy. Requirement membership follows the capability-to-requirement specification bridge and requirement descendants under the existing submodel resolution contract.
 - Every requirement retains its validated owning capability root. Scope selection MUST not assign a requirement to two independent roots or infer ownership from file location, verification links, contract consumption, or presentation order.
 - Preserve all valid parent relationships. Traverse every hierarchy path and deduplicate by identifier; choosing a display parent MUST not change membership or coverage.
-- An explicit selection that does not resolve to a capability MUST fail with a diagnostic. A capability with no requirements is a valid empty scope.
+- Resolve an explicit capability selector through the Existing Element Selection Specification before projecting coverage. Unknown, ambiguous and non-capability selections MUST fail with a diagnostic. A capability with no requirements is a valid empty scope.
 
 **Coverage evidence invariance**
 - For the same validated model snapshot, an included requirement MUST retain its whole-model verification status, implementation coverage classification, coverage source, and supporting evidence identifiers.
@@ -732,7 +740,7 @@ Cross-internal-boundary dependencies should be modeled as explicit contract bind
 - For scope-scoped report generation, include only couplings where the source or target requirement is inside the selected scope.
 
 **Scope Resolution Rules:**
-- In scope mode, select a capability or requirement by name.
+- In scope mode, select a capability or requirement by exact name or canonical identifier under the Existing Element Selection Specification. Resolution changes neither subtree membership nor coupling rules.
 - Capability scope computes the selected capability subtree through capability hierarchy, then includes requirements that specify those capabilities and their requirement descendants. The selected capability appears as the scoped submodel entry.
 - Requirement scope computes the selected requirement subtree through requirement hierarchy. The selected requirement is excluded from the `submodels` output, and first-level child requirement branches are reported as scoped requirement submodels.
 - If a selected requirement boundary has no children in the induced subtree, `submodels` output is empty.

@@ -21,3 +21,19 @@ The interface consumes the core query contracts for selection, validation, names
   * derivedFrom: [CLI Interface Structure](Commands.md#cli-interface-structure)
   * definedBy: [CLI Managed Query Artifacts Specification](Specifications.md#cli-managed-query-artifacts-specification)
 ---
+
+### CLI Managed Query Element Selection
+
+When a CLI managed-query operation supplies a name-based source selector, the system SHALL accept an exact name or canonical identifier under the shared element-selection contract while preserving explicit query IRI selection.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * derivedFrom: [CLI Managed Query Artifacts](#cli-managed-query-artifacts)
+  * verifiedBy: [Existing Element Selection Verification](../../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
+---

@@ -788,6 +788,8 @@ fn reqvire_error(tool_name: &str, err: ReqvireError) -> Value {
             )
         }
         ReqvireError::DuplicateElement(_) => ("duplicate_element", None),
+        ReqvireError::AmbiguousElementSelection(_) => ("ambiguous_element_selection", None),
+        ReqvireError::ConflictingElementSelectors(_) => ("conflicting_element_selectors", None),
         ReqvireError::ElementNotFound(_) | ReqvireError::MissingElement(_) => {
             ("element_not_found", None)
         }

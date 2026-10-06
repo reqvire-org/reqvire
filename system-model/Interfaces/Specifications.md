@@ -26,6 +26,8 @@ Boundary rules:
 Reqvire operation semantics are expected to be owned by core request/result APIs that can be called by more than one external adapter.
 
 #### Details
+Existing-element arguments MUST use the bound Existing Element Selection Specification before operation-specific type checks or side effects. CLI and MCP adapters retain their public argument names and wrap the same missing, ambiguous, wrong-type and contradictory-selection failures without reimplementing lookup.
+
 Contract rules:
 - A shared operation owns model-loading decisions where applicable, validation gates, report construction, mutation preview/application behavior where applicable, and result evidence for its operation scope.
 - CLI and MCP adapters may add transport-specific parsing, output rendering, protocol metadata, and error wrapping, but must not fork the underlying operation behavior.

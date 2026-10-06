@@ -184,21 +184,63 @@ impl SemanticIndex {
                 "Choose either name or iri".into(),
             ));
         }
+        let selected = name
+            .map(|value| {
+                crate::element_selection::resolve_reference(
+                    value,
+                    "semantic query name",
+                    self.model_context
+                        .nodes
+                        .iter()
+                        .map(|node| (node.label.as_str(), node.identifier.as_str()))
+                        .chain(
+                            self.queries
+                                .iter()
+                                .filter(|_| self.model_context.nodes.is_empty())
+                                .flat_map(|query| {
+                                    query
+                                        .source_elements
+                                        .iter()
+                                        .map(|id| (query.name.as_str(), id.as_str()))
+                                }),
+                        ),
+                )
+            })
+            .transpose()?
+            .flatten();
+        if let Some(identifier) = selected {
+            if let Some(node) = self
+                .model_context
+                .nodes
+                .iter()
+                .find(|node| node.identifier == identifier)
+            {
+                if node.element_type != "semantic-query" {
+                    return Err(ReqvireError::InvalidOperation(format!(
+                        "semantic query name '{}' selects '{}' ({}); expected a semantic-query in the selected model context",
+                        name.unwrap_or_default(), identifier, node.element_type
+                    )));
+                }
+            }
+        }
         let namespace =
             namespace.map(|n| export::export_filter_term_namespace(n, &self.ontology_documents));
         let matches: Vec<_> = self
             .queries
             .iter()
             .filter(|q| {
-                name.is_none_or(|n| q.name == n)
+                (name.is_none()
+                    || selected.is_some_and(|identifier| {
+                        q.source_elements.iter().any(|id| id == identifier)
+                    }))
                     && iri.is_none_or(|i| q.iri == i)
                     && namespace.as_ref().is_none_or(|n| q.namespaces.contains(n))
             })
             .collect();
         if (name.is_some() || iri.is_some()) && matches.len() != 1 {
             return Err(ReqvireError::ProcessError(format!(
-                "Query selector matched {} native queries; expected exactly one",
-                matches.len()
+                "Query selector '{}' matched {} native queries; expected exactly one in the selected model context",
+                name.or(iri).unwrap_or_default(), matches.len()
             )));
         }
         Ok(matches)

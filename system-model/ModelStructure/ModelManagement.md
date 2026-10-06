@@ -334,6 +334,7 @@ When unlinking, the system shall:
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](ElementSelection.md#existing-element-selection-specification)
   * [Contract Bindings Hierarchical Independence Constraint](Constraints.md#contract-bindings-hierarchical-independence-constraint)
   * [Contract Bindings Satisfied Contract Constraint](Constraints.md#contract-bindings-satisfied-contract-constraint)
 

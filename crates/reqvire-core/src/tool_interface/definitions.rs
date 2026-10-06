@@ -49,6 +49,13 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
     catalog(enable_mutations).definitions.clone()
 }
 
+fn element_reference_schema(domain: &str) -> Value {
+    json!({
+        "type": "string",
+        "description": format!("Exact element name or canonical element identifier in the selected model context. {domain}")
+    })
+}
+
 fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
     #[cfg(test)]
     tests::CATALOG_BUILDS.with(|count| count.set(count.get() + 1));
@@ -72,8 +79,8 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
             "reqvire.read_element",
             "Read one authoritative model element by identifier or name.",
             object_schema(vec![
-                ("identifier", json!({ "type": "string" })),
-                ("name", json!({ "type": "string" })),
+                ("identifier", json!({ "type": "string", "description": "Canonical element identifier only; multiple explicit selectors must agree." })),
+                ("name", element_reference_schema("Multiple explicit selectors must select the same element.")),
             ]),
         ),
         read_tool(
@@ -105,7 +112,7 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
             "reqvire.model",
             "Generate model-centric structure.",
             object_schema(vec![
-                ("from", json!({ "type": "string" })),
+                ("from", element_reference_schema("Omit for the whole model; operation-specific root type checks apply.")),
                 ("reverse", json!({ "type": "boolean" })),
                 ("filter_type", json!({ "type": "string" })),
             ]),
@@ -117,10 +124,10 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.collect",
-            "Collect capability, requirement, ontology, concept-scheme, or concept context upstream or downstream.",
+            "Collect capability, requirement, ontology, semantic-query, concept-scheme, or concept context upstream or downstream.",
             required_object_schema(
                 vec![
-                    ("element_name", json!({ "type": "string" })),
+                    ("element_name", element_reference_schema("")),
                     (
                         "direction",
                         json!({ "type": "string", "enum": ["UPSTREAM", "DOWNSTREAM"] }),
@@ -132,7 +139,7 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
         read_tool(
             "reqvire.submodels",
             "Analyze independent capability and requirement submodels.",
-            object_schema(vec![("from", json!({ "type": "string" }))]),
+            object_schema(vec![("from", element_reference_schema("Omit for the whole model; operation-specific root type checks apply."))]),
         ),
         read_tool(
             "reqvire.semantic.export",
@@ -204,8 +211,8 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
             "Read one standalone native concept or concept scheme by IRI, source identifier, or source element name.",
             object_schema(vec![
                 ("iri", json!({ "type": "string" })),
-                ("identifier", json!({ "type": "string" })),
-                ("name", json!({ "type": "string" })),
+                ("identifier", json!({ "type": "string", "description": "Canonical element identifier only; multiple explicit selectors must agree." })),
+                ("name", element_reference_schema("Multiple explicit selectors must select the same element.")),
             ]),
         ),
         read_tool(
@@ -233,7 +240,7 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
             "reqvire.semantic.queries",
             "Discover and validate native SPARQL artifacts without execution.",
             object_schema(vec![
-                ("name", json!({"type":"string"})),
+                ("name", element_reference_schema("Select a semantic-query source element; mutually exclusive with iri.")),
                 ("iri", json!({"type":"string"})),
                 ("namespace_base", json!({"type":"string"})),
                 ("include_content", json!({"type":"boolean", "default":false})),
@@ -243,7 +250,7 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
             "reqvire.semantic.queries.validate",
             "Discover and validate native SPARQL artifacts without execution.",
             object_schema(vec![
-                ("name", json!({"type":"string"})),
+                ("name", element_reference_schema("Select a semantic-query source element; mutually exclusive with iri.")),
                 ("iri", json!({"type":"string"})),
             ]),
         ),
@@ -348,10 +355,7 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
         read_tool(
             "reqvire.coverage",
             "Generate verification and implementation coverage.",
-            object_schema(vec![("from", json!({
-                "type": "string",
-                "description": "Exact capability name selecting its subtree; omitted selects the whole model."
-            }))]),
+            object_schema(vec![("from", element_reference_schema("Select a capability subtree; omitted selects the whole model."))]),
         ),
         read_tool(
             "reqvire.traces",
@@ -429,7 +433,7 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "Remove an element.",
                 required_object_schema(
                     vec![
-                        ("element_name", json!({ "type": "string" })),
+                        ("element_name", element_reference_schema("")),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
                     vec!["element_name"],
@@ -440,7 +444,7 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "Move an element to another file.",
                 required_object_schema(
                     vec![
-                        ("element_name", json!({ "type": "string" })),
+                        ("element_name", element_reference_schema("")),
                         ("file", json!({ "type": "string" })),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
@@ -452,8 +456,8 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "Rename an element.",
                 required_object_schema(
                     vec![
-                        ("element_name", json!({ "type": "string" })),
-                        ("new_name", json!({ "type": "string" })),
+                        ("element_name", element_reference_schema("")),
+                        ("new_name", json!({ "type": "string", "description": "Literal new authored element name." })),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
                     vec!["element_name", "new_name"],
@@ -464,10 +468,10 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "Merge source elements into a target element.",
                 required_object_schema(
                     vec![
-                        ("target", json!({ "type": "string" })),
+                        ("target", element_reference_schema("Select the target receiving merged content; merge type compatibility applies.")),
                         (
                             "sources",
-                            json!({ "type": "array", "items": { "type": "string" } }),
+                            json!({ "type": "array", "items": element_reference_schema("Select a source element to merge.") }),
                         ),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
@@ -504,9 +508,9 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "Add a relation, bindContract implementation obligation, or referenceContract content dependency. A requirement cannot combine Contract Bindings and Contract References.",
                 required_object_schema(
                     vec![
-                        ("source", json!({ "type": "string" })),
+                        ("source", element_reference_schema("")),
                         ("relation_type", json!({ "type": "string" })),
-                        ("target", json!({ "type": "string" })),
+                        ("target", element_reference_schema("Relation endpoints also accept existing file paths and URLs according to relation rules; contracts retain their type checks.")),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
                     vec!["source", "relation_type", "target"],
@@ -517,8 +521,8 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "Remove a relation, contract binding, or contract reference by target.",
                 required_object_schema(
                     vec![
-                        ("source", json!({ "type": "string" })),
-                        ("target", json!({ "type": "string" })),
+                        ("source", element_reference_schema("")),
+                        ("target", element_reference_schema("Relation endpoints also accept existing file paths and URLs according to relation rules; contracts retain their type checks.")),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
                     vec!["source", "target"],
@@ -529,10 +533,10 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "Replace an existing relation or referenceContract target atomically.",
                 required_object_schema(
                     vec![
-                        ("source", json!({ "type": "string" })),
+                        ("source", element_reference_schema("")),
                         ("relation_type", json!({ "type": "string" })),
-                        ("from_target", json!({ "type": "string" })),
-                        ("to_target", json!({ "type": "string" })),
+                        ("from_target", element_reference_schema("Existing relation target; file paths and URLs retain their domains.")),
+                        ("to_target", element_reference_schema("Replacement relation target; file paths and URLs retain their domains.")),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
                     vec!["source", "relation_type", "from_target", "to_target"],
@@ -897,6 +901,69 @@ mod tests {
         assert!(
             validate_tool_arguments("reqvire.workspace_status", &json!({"alien":true}), false)
                 .is_err()
+        );
+    }
+
+    #[test]
+    fn existing_element_discovery_preserves_argument_domains() {
+        let definitions = tool_definitions(true);
+        for (tool, selectors) in [
+            ("reqvire.read_element", vec!["name"]),
+            ("reqvire.model", vec!["from"]),
+            ("reqvire.submodels", vec!["from"]),
+            ("reqvire.coverage", vec!["from"]),
+            ("reqvire.collect", vec!["element_name"]),
+            ("reqvire.concepts.get", vec!["name"]),
+            ("reqvire.semantic.queries", vec!["name"]),
+            ("reqvire.semantic.queries.validate", vec!["name"]),
+            ("reqvire.remove_element", vec!["element_name"]),
+            ("reqvire.move_element", vec!["element_name"]),
+            ("reqvire.rename_element", vec!["element_name"]),
+            ("reqvire.merge_elements", vec!["target", "sources"]),
+            ("reqvire.link", vec!["source", "target"]),
+            ("reqvire.unlink", vec!["source", "target"]),
+            ("reqvire.relink", vec!["source", "from_target", "to_target"]),
+        ] {
+            let definition = definitions
+                .iter()
+                .find(|item| item["name"] == tool)
+                .expect("public tool");
+            for selector in selectors {
+                let property = &definition["inputSchema"]["properties"][selector];
+                let schema = if property["type"] == "array" {
+                    &property["items"]
+                } else {
+                    property
+                };
+                let description = schema["description"]
+                    .as_str()
+                    .expect("selector description");
+                assert!(
+                    description.contains("Exact element name")
+                        && description.contains("canonical element identifier"),
+                    "{tool} {selector}: {description}"
+                );
+            }
+        }
+        let read = definitions
+            .iter()
+            .find(|item| item["name"] == "reqvire.read_element")
+            .expect("read");
+        assert!(
+            read["inputSchema"]["properties"]["identifier"]["description"]
+                .as_str()
+                .expect("explicit ID")
+                .contains("identifier only")
+        );
+        let rename = definitions
+            .iter()
+            .find(|item| item["name"] == "reqvire.rename_element")
+            .expect("rename");
+        assert!(
+            rename["inputSchema"]["properties"]["new_name"]["description"]
+                .as_str()
+                .expect("literal")
+                .contains("Literal")
         );
     }
 }

@@ -81,6 +81,7 @@ WHEN a referenced contract is reached through multiple collection paths, the sys
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Contract Reference Evidence Projection Specification](Specifications.md#contract-reference-evidence-projection-specification)
 
 #### Relations
@@ -234,6 +235,9 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
 #### Relations
   * definedBy: [Model JSON Output Format Contract Specification](Specifications.md#model-json-output-format-contract-specification)
   * derive: [Forward-Only Relation Traversal](#forward-only-relation-traversal)
@@ -296,6 +300,9 @@ Detailed scope resolution, filtered capability/requirement behavior, empty-submo
 
 #### Metadata
   * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
 
 #### Relations
   * definedBy: [Requirement Submodels Report Specification](Specifications.md#requirement-submodels-report-specification)
@@ -546,4 +553,20 @@ When rendering element details, the system SHALL present referenced contracts as
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * satisfiedBy: [collect.rs](../../../crates/reqvire-core/src/report/collect.rs)
   * satisfiedBy: [export.rs](../../../crates/reqvire-core/src/semantic_contract/export.rs)
+---
+
+### Coverage Element Scope Selection
+
+When a coverage operation receives an explicit capability selector, the system SHALL resolve its exact name or canonical identifier through the shared element-selection contract before projecting the report.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * satisfiedBy: [coverage.rs](../../../crates/reqvire-core/src/report/coverage.rs)
+  * derivedFrom: [Scoped Coverage Reporting](#scoped-coverage-reporting)
+  * verifiedBy: [Existing Element Selection Verification](../../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
 ---

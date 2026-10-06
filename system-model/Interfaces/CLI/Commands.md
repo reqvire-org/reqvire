@@ -195,6 +195,7 @@ When a user selects a capability for a coverage command, the system SHALL return
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
 
 #### Relations
@@ -270,6 +271,7 @@ Detailed invocation, source/target argument, output/error, delegation, and ontol
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Merge Content Transformation Behavior](../../Operations/ModelOperations/Behaviors.md#merge-content-transformation-behavior)
   * [Merge Type Compatibility Constraint](../../Operations/ModelOperations/Constraints.md#merge-type-compatibility-constraint)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
@@ -319,6 +321,7 @@ Implementation details shall follow the associated contract specifications. The 
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Model JSON Output Format Contract Specification](../../Reports/ModelReports/Specifications.md#model-json-output-format-contract-specification)
   * [Reverse Relation Traversal Behavior](../../Reports/ModelReports/Behaviors.md#reverse-relation-traversal-behavior)
@@ -368,6 +371,7 @@ The command shall reject moving an element into an existing `# Element` file whe
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
@@ -468,6 +472,7 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Atomic Relation Relink Workflow Specification](../../Operations/ModelOperations/Specifications.md#atomic-relation-relink-workflow-specification)
   * [Atomic Relink Validity Constraint](../../Operations/ModelOperations/Constraints.md#atomic-relink-validity-constraint)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -516,6 +521,7 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -540,6 +546,7 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -622,7 +629,7 @@ The system shall provide a `submodels` command that reports independent capabili
 
 #### Details
 The command shall support:
-- `--from <NAME>` to scope report output to one capability or requirement subtree by name
+- `--from <NAME>` to select one capability or requirement subtree by exact name or canonical identifier under the bound element-selection contract
 - `--json` and `--output <FILE>` for machine-readable output
 - In `--from` mode, selected capability scopes are listed as the scoped capability submodel; selected requirement scopes are treated as boundaries and are not listed as submodel entries
 
@@ -632,6 +639,7 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
 
@@ -760,6 +768,7 @@ When a reference mutation fails validation, the system SHALL preserve the author
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
   * [Relation Operations Specification](../../ModelStructure/Specifications.md#relation-operations-specification)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
@@ -835,4 +844,21 @@ When Reqvire is invoked through its npm package, the system SHALL launch the pac
   * derivedFrom: [CLI interface](../InterfacesRequirements.md#cli-interface)
   * definedBy: [npm CLI Launch Specification](Specifications.md#npm-cli-launch-specification)
   * satisfiedBy: [reqvire.js](../../../npm/reqvire/bin/reqvire.js)
+---
+
+### CLI Collect Element Selection
+
+When a collect command selects an existing root element, the system SHALL resolve an exact name or canonical identifier through the shared element-selection contract before collection.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [collect.rs](../../../crates/reqvire-core/src/report/collect.rs)
+  * derivedFrom: [CLI Collect Command](#cli-collect-command)
+  * verifiedBy: [Existing Element Selection Verification](../../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
 ---

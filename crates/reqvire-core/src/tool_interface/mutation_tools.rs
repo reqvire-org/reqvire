@@ -26,7 +26,12 @@ pub fn remove_element_tool(
     let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let element_id = model
         .graph_registry
-        .find_element_by_name(&required_string_arg(args, "element_name")?)?;
+        .select_element(
+            required_string_arg(args, "element_name")?.trim(),
+            "remove_element element_name",
+        )?
+        .identifier
+        .clone();
     let workspace_root = current_dir_path();
     let result = crud::remove_element(
         &mut model,
@@ -44,7 +49,12 @@ pub fn move_element_tool(
     let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let element_id = model
         .graph_registry
-        .find_element_by_name(&required_string_arg(args, "element_name")?)?;
+        .select_element(
+            required_string_arg(args, "element_name")?.trim(),
+            "move_element element_name",
+        )?
+        .identifier
+        .clone();
     let workspace_root = current_dir_path();
     let result = crud::move_element(
         &mut model,
@@ -65,7 +75,12 @@ pub fn rename_element_tool(
     let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let element_id = model
         .graph_registry
-        .find_element_by_name(&required_string_arg(args, "element_name")?)?;
+        .select_element(
+            required_string_arg(args, "element_name")?.trim(),
+            "rename_element element_name",
+        )?
+        .identifier
+        .clone();
     let workspace_root = current_dir_path();
     let result = crud::rename_element(
         &mut model,

@@ -308,10 +308,13 @@ Expected checks:
 - After successful mutation, subsequent MCP reads observe the refreshed internal graph state.
 - Post-mutation results include validation summary, refreshed model revision, and affected element/submodel metadata.
 
+The MCP ownership suite appends standalone/embedded identifier selection under both commit policies, preview equality, ambiguity/contradictory selector rejection, unchanged files/modes/index/HEAD/accepted revision/runtime, preserved pending writes and later usable operations.
+
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Mutation Tool Safety](../../../Interfaces/MCP/Tools.md#mcp-mutation-tool-safety)
 ---
@@ -426,10 +429,13 @@ Expected checks:
 - Unknown and non-capability names must produce structured errors without a whole-model result.
 - After a model revision changes scoped membership or supporting evidence, repeat the request and assert that the result reflects the new validated snapshot under the existing freshness contract.
 
+The MCP ownership suite appends name/identifier scoped report equality and known wrong-type identifier diagnostics through standalone/embedded servers under both commit policies.
+
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-scoped-coverage/test.sh)
   * verify: [MCP Coverage Scope Selection](../../../Interfaces/MCP/Tools.md#mcp-coverage-scope-selection)
@@ -615,10 +621,13 @@ Expected checks:
 - Verify unknown tool calls, malformed requests, and schema-invalid arguments return standard MCP/JSON-RPC protocol errors.
 - Verify Reqvire parse, validation, and business-logic failures are forwarded as MCP tool execution errors with structured Reqvire error data where available.
 
+The MCP ownership suite appends report/collection/read/native-concept/managed-query name-or-identifier assertions, context and snapshot isolation, type checks and selector discovery. Schema-valid selection errors must retain structured tool errors.
+
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Shared Operation Interfaces](../../../Interfaces/MCP/Tools.md#mcp-shared-operation-interfaces)
 ---

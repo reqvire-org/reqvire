@@ -489,11 +489,14 @@ pub fn generate_submodels_report(
     };
 
     if let Some(from_name) = from_name {
-        let from_id = match registry.find_element_by_name(from_name) {
+        let from_id = match registry
+            .select_element(from_name.trim(), "submodels from")
+            .map(|element| element.identifier.clone())
+        {
             Ok(id) => id,
             Err(ReqvireError::MissingElement(_)) | Err(ReqvireError::ElementNotFound(_)) => {
                 return Err(ReqvireError::ElementNotFound(format!(
-                    "Submodel root '{}' not found",
+                    "Submodel root '{}' not found (submodels from; selected model context)",
                     from_name
                 )));
             }
@@ -596,7 +599,7 @@ pub fn generate_submodels_report(
             };
         } else {
             return Err(ReqvireError::InvalidOperation(format!(
-                "Submodel scope source '{}' must be a capability or requirement",
+                "Submodel scope source '{}' must be a capability or requirement (submodels from; selected model context)",
                 from_name
             )));
         }

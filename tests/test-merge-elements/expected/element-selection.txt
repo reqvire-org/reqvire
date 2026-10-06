@@ -1,0 +1,9 @@
+PASS cli/merge/name-preview-control
+PASS cli/merge/target
+PASS cli/merge/sources-0
+PASS cli/merge/sources-1
+PASS cli/merge/all-identifiers
+PASS cli/merge/mixed-alias-self
+PASS cli/merge/mixed-alias-duplicate
+PASS cli/merge/late-unknown
+PASS cli/merge/identifier-type-check

@@ -76,8 +76,8 @@ Compatibility rules:
 MCP request mapping of the shared coverage scope contract.
 
 #### Details
-- `reqvire.coverage` accepts an optional string argument `from` selecting a capability by its exact model element name.
-- Omitting `from` preserves whole-model behavior. Unknown names and names of non-capability elements produce a structured tool error; never silently return whole-model coverage for an invalid explicit selection.
+- `reqvire.coverage` accepts the existing optional string argument `from`, selecting a capability by exact name or canonical identifier under the Existing Element Selection Specification.
+- Omitting `from` preserves whole-model behavior. Unknown, ambiguous or non-capability selections produce a structured tool error; never silently return whole-model coverage for an invalid explicit selection.
 - The tool MUST invoke the shared coverage operation with the selector and current validated snapshot. It MUST not compute MCP-specific membership, coverage classifications, or aggregates.
 - For the same model snapshot and selector, the structured report payload MUST match other consumers of the shared operation, including scope metadata, evidence identifiers, and whole-model-only orphan semantics. Protocol envelope and revision metadata remain governed by existing MCP contracts.
 - Tool discovery MUST advertise the optional argument. Results need only contain the requested scope, without embedding every available scope.
@@ -94,6 +94,8 @@ MCP request mapping of the shared coverage scope contract.
 The MCP interface is expected to expose read-only model evidence tools grounded in Reqvire core reports and lookup behavior.
 
 #### Details
+Existing-element inputs to `reqvire.read_element`, `reqvire.model`, `reqvire.collect`, `reqvire.submodels` and native concept source lookup MUST follow the Existing Element Selection Specification in the requested context. Existing name-based keys accept both forms; identifier-only and semantic IRI keys retain their declared domains. Type restrictions, mutually exclusive fields and consistent multiple-selector checks apply before dispatch. Search regexes/globs remain filters.
+
 Model evidence tool behavior is inherited from reused Reqvire search, model, containment, collect, submodel, and ontology collection contracts. MCP adds typed request/result schemas, workspace/model revision metadata, and evidence references describing which elements, files, relations, contract_bindings, ontology blocks, and shape blocks were included.
 
 `reqvire.search` tool calls are expected to expose typed request fields equivalent to the stable Reqvire search filters:
@@ -238,6 +240,8 @@ Mutation flow constraints:
 The MCP interface is expected to expose mutation tools only through typed Reqvire operations with explicit safety controls.
 
 #### Details
+Mutation subjects, merge target/sources and element-valued link/unlink/relink or contract-dependency endpoints MUST follow the bound Existing Element Selection Specification. Preserve argument keys and advertise both selector forms. Literal `new_name`, authored add/override content, relation keywords, file/asset paths and supported resource URL domains retain their meanings.
+
 Mutation exposure and safety rules:
 - Mutation tools are omitted from MCP `tools/list` by default.
 - Mutation tools are registered and returned by MCP `tools/list` only when the server is started with `reqvire mcp --enable-mutations`.
@@ -749,6 +753,8 @@ Versioning rules:
 Each MCP tool is expected to have an explicit MCP tool definition and call result contract.
 
 #### Details
+Descriptions for existing-element selector arguments MUST advertise exact-name or canonical-identifier input and permitted types without renaming existing keys. Reject contradictory permitted selector fields and preserve mutually exclusive fields under the shared element-selection contract. Filter and literal fields MUST continue to describe their own domains.
+
 All tools returned by MCP `tools/list` follow this contract:
 - `name`: stable MCP-compatible tool name.
 - `description`: human-readable operation summary grounded in Reqvire behavior.
@@ -995,6 +1001,8 @@ Embedded MCP behavior:
 The MCP interface MUST expose managed query operations through shared core contracts.
 
 #### Details
+Existing name-based source selectors accept exact native element names or canonical identifiers under the bound element-selection contract in the requested context. Explicit query IRIs, namespace filters, query text and artifact paths retain their existing domains and mutual exclusion.
+
 Query discovery MUST return native authored records sorted by generated IRI then name. Namespace filters MUST match used ontology namespaces. Query validation MUST return per-candidate diagnostics and use the common validation gate. Selectors MUST resolve exactly and reject unknown or ambiguous results. Exported content and hashes MUST come from the shared core renderer. Validation and artifact rendering MUST preserve downstream SERVICE, datasets, and extension functions without executing them.
 Tools MUST be `reqvire.semantic.queries` with optional `iri`, `name`, `namespace_base`, and `include_content`, and `reqvire.semantic.queries.validate` with optional `iri` or `name`. `include_content` MUST add content and SHA-256. `reqvire.semantic.export` MUST support the queries layer, including it for omitted or empty layer selection.
 

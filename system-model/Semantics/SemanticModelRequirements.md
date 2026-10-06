@@ -416,6 +416,9 @@ Selection and serialization follow the shared artifact contract.
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Existing Element Selection Specification](../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
 #### Relations
   * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
   * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
@@ -444,4 +447,37 @@ Artifact checks preserve the checked file and report expected and available actu
   * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
   * specify: [Managed SPARQL Query Artifacts](SemanticModelFeature.md#managed-sparql-query-artifacts)
   * definedBy: [Semantic Query Artifact Drift Check Specification](SemanticQuerySpecifications.md#semantic-query-artifact-drift-check-specification)
+---
+
+### Managed Query Drift Check Element Selection
+
+When a managed-query drift check selects an existing source element through a name-based argument, the system SHALL resolve an exact name or canonical identifier through the shared element-selection contract before rendering or reading the artifact.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
+  * derivedFrom: [Semantic Query Artifact Drift Check](#semantic-query-artifact-drift-check)
+  * verifiedBy: [Existing Element Selection Verification](../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
+---
+
+### Managed Query Element Selection
+
+When a managed-query operation selects an existing source element through a name-based argument, the system SHALL resolve an exact name or canonical identifier through the shared element-selection contract and require a native semantic-query element.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * derivedFrom: [Semantic Query Discovery](#semantic-query-discovery)
+  * verifiedBy: [Existing Element Selection Verification](../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
 ---
