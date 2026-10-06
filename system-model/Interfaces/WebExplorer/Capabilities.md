@@ -529,11 +529,11 @@ When a user expands a capability coverage row, the system SHALL reveal its attac
 
 When a requirement specifies a capability and derives from a requirement displayed elsewhere, the system SHALL make its coverage details accessible within that capability's requirement disclosure.
 
-While displaying a terminal requirement, the system SHALL communicate its coverage through the row's status labels and retain its element-detail link.
+While displaying a terminal requirement, the system SHALL communicate its coverage through the row's metrics and accessible status and retain its element-detail link.
 
 When a requirement has child requirements or binding consumers to inspect, the system SHALL provide a coverage disclosure control.
 
-While displaying verification or implementation coverage bars, the system SHALL show metric headings, percentages and counts without redundant visible coverage-state labels, while retaining outstanding requirement blocker counts and accessible metric summaries.
+While displaying verification or implementation coverage bars, the system SHALL show shared column headings beside the Capability coverage title and row percentages and counts without repeating metric names or redundant visible coverage-state labels, while retaining outstanding requirement blocker counts and accessible metric summaries.
 
 When displaying verification or implementation coverage on a requirement row, the system SHALL use the same colored bars, percentages, and counts as capability coverage rows.
 

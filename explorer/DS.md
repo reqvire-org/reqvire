@@ -565,6 +565,15 @@ disclosure. Filtering changes navigation visibility without changing scope,
 coverage data or selection URLs. Mocks exercise this production behavior with
 model-derived fixture hierarchies.
 
+`CoverageDrilldown` owns its section title and the shared Verification and
+Implementation column headers. Its header and every hierarchy row use the same
+column grid and insets; narrow panels move the title above the two metric
+headers. Rows show bars, percentages and counts without repeating metric names.
+Meaningful blocker counts remain alongside implementation counts, while each
+metric keeps its own accessible name and published state. `CoveragePanel`
+omits its header when its content supplies one. Patterns and the real Explorer
+mock consume the same drill-down component.
+
 Mocks use the application's existing Explorer navigation. Its Traces route
 composes the native `TraceFlow` preview through application view slots for the
 side pane and workspace, retaining the shared shell controls. The preview uses

@@ -114,6 +114,9 @@ describe("scoped coverage views", () => {
     expect([...issues.querySelectorAll(".coverage-gap-row__title")].map(node => node.textContent).sort())
       .toEqual(["Alpha Gap", "Alpha Local", "Alpha Parent"]);
     const drilldown = container.querySelector("#coverage-section-capability-coverage")!;
+    expect(within(drilldown as HTMLElement).getAllByText("Verification", { exact: true })).toHaveLength(1);
+    expect(within(drilldown as HTMLElement).getAllByText("Implementation", { exact: true })).toHaveLength(1);
+    expect(within(drilldown as HTMLElement).getByRole("heading", { name: "Capability coverage", level: 2 })).toBeTruthy();
     expect(drilldown.compareDocumentPosition(issues) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(breakdown.compareDocumentPosition(drilldown) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(container.querySelector("#coverage-section-orphaned-verifications")).toBeNull();
@@ -442,6 +445,10 @@ describe("scoped coverage views", () => {
     const parentRow = branch.querySelector("[data-coverage-depth]")!;
     expect(parentRow.textContent).toContain("100% · 2 / 2 leaves");
     expect(parentRow.textContent).toContain("50% · 1 / 2 terminal");
+    expect(within(parentRow as HTMLElement).queryByText("Verification", { exact: true })).toBeNull();
+    expect(within(parentRow as HTMLElement).queryByText("Implementation", { exact: true })).toBeNull();
+    expect(within(parentRow as HTMLElement).getByRole("group", { name: /^Verification: Verified;/ })).toBeTruthy();
+    expect(within(parentRow as HTMLElement).getByRole("group", { name: /^Implementation: Blocked · 1 requirement;/ })).toBeTruthy();
     expect([...parentRow.querySelectorAll("[data-color-token]")].map(bar => [
       bar.getAttribute("data-color-token"), bar.querySelector("rect")?.getAttribute("width"),
     ])).toEqual([["--verification", "100"], ["--resource", "50"]]);

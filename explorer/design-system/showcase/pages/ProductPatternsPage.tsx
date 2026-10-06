@@ -340,10 +340,10 @@ export function ProductPatternsPage() {
 
       <Section
         title="Coverage Drill-down"
-        desc="The same coverage component used by Explorer, with example data. Expand capabilities and parent requirements to inspect their children. Select requirement names in Mocks to inspect evidence through the full application."
+        desc="The same coverage component used by Explorer, with shared Verification and Implementation column headings. Expand capabilities and parent requirements to inspect their children. Select requirement names in Mocks to inspect evidence through the full application."
       >
         <CoverageDashboard>
-          <CoveragePanel title="Capability coverage">
+          <CoveragePanel>
             <CoverageDrilldown items={COVERAGE_PATTERN_ITEMS}
               onInspect={target => pushElementDialog(target.id)} />
           </CoveragePanel>

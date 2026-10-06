@@ -158,7 +158,8 @@ export function CoverageView({ onOpenElement }: {
           ]} /></CoveragePanel>
           <CoveragePanel title="Implementation sources"><CoverageSourceBars values={summary.coverage_sources ?? {}} /></CoveragePanel>
         </CoverageGrid>
-        <CoveragePanel id={coverageSectionDomId("capability-coverage")} title="Capability coverage" span="wide">
+        <CoveragePanel id={coverageSectionDomId("capability-coverage")}
+          title={capabilityRows.length ? undefined : "Capability coverage"} span="wide">
           {capabilityRows.length ? <CoverageDrilldown key={ui.coverageScopeId ?? "whole"} items={capabilityRows}
             onInspect={target => {
               if (target.kind === "element") onOpenElement?.(target.id);

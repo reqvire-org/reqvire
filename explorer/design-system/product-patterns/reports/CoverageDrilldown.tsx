@@ -37,6 +37,7 @@ const baseUX = css`
     min-width: 0;
   }
 
+  .ux-coverage-drilldown__header,
   .ux-coverage-drilldown__row,
   .ux-coverage-drilldown__dependency,
   .ux-coverage-drilldown__dependency-heading {
@@ -49,6 +50,21 @@ const baseUX = css`
   .ux-coverage-drilldown__row {
     padding: var(--space-8) var(--space-6);
     border-radius: var(--radius-md);
+  }
+
+  .ux-coverage-drilldown__header {
+    align-items: baseline;
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-medium);
+  }
+
+  .ux-coverage-drilldown__header h2 {
+    margin: 0;
+    min-width: 0;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
   }
 
   .ux-coverage-drilldown__identity {
@@ -82,6 +98,7 @@ const baseUX = css`
 
   .ux-coverage-drilldown__metric {
     display: flex;
+    align-self: start;
     flex-direction: column;
     gap: var(--space-4);
     min-width: 0;
@@ -98,6 +115,7 @@ const baseUX = css`
   }
 
   .ux-coverage-drilldown__metric strong {
+    margin-left: auto;
     font-weight: var(--weight-medium);
   }
 
@@ -155,6 +173,7 @@ const baseUX = css`
 
 
   @container coverage-drilldown (max-width: 760px) {
+    .ux-coverage-drilldown__header,
     .ux-coverage-drilldown__row,
     .ux-coverage-drilldown__dependency,
     .ux-coverage-drilldown__dependency-heading {
@@ -162,6 +181,7 @@ const baseUX = css`
       gap: var(--space-6);
     }
 
+    .ux-coverage-drilldown__header h2,
     .ux-coverage-drilldown__row > .ux-coverage-drilldown__identity,
     .ux-coverage-drilldown__dependency > .ux-coverage-drilldown__identity,
     .ux-coverage-drilldown__dependency-heading > .ux-coverage-drilldown__identity {
@@ -189,8 +209,13 @@ const skinX = css`
     background: var(--bg-sunken);
   }
 
+  .ux-coverage-drilldown__header,
   .ux-coverage-drilldown__metric {
     color: var(--text-muted);
+  }
+
+  .ux-coverage-drilldown__header h2 {
+    color: var(--text-strong);
   }
 
   .ux-coverage-drilldown__dependency-heading {
@@ -207,8 +232,9 @@ const skinX = css`
 
 `;
 
-export function CoverageDrilldown({ items, initiallyExpanded = [], onInspect }: {
+export function CoverageDrilldown({ items, initiallyExpanded = [], onInspect, title = "Capability coverage" }: {
   items: CoverageDrilldownItem[];
+  title?: ReactNode;
   initiallyExpanded?: string[];
   onInspect: (target: CoverageDrilldownTarget) => void;
 }) {
@@ -245,7 +271,12 @@ export function CoverageDrilldown({ items, initiallyExpanded = [], onInspect }: 
       return next;
     }),
   };
-  return <div className={cx("ux-coverage-drilldown", baseUX, skinX)}>
+  return <div data-product-pattern="coverage-drilldown" className={cx("ux-coverage-drilldown", baseUX, skinX)}>
+    <header className="ux-coverage-drilldown__header">
+      <h2>{title}</h2>
+      <span>Verification</span>
+      <span>Implementation</span>
+    </header>
     {items.map(item => <CoverageBranch key={item.target.id} item={item}
       path={branchKey("", item)} disclosure={disclosure} onInspect={onInspect} />)}
   </div>;
@@ -345,15 +376,12 @@ function CoverageMetric({ label, covered, total, complete, unit, blockingRequire
       ? `Blocked · ${blockingRequirements} ${blockingRequirements === 1 ? "requirement" : "requirements"}`
       : covered > 0 ? "Partial" : "Uncovered";
   return <div className="ux-coverage-drilldown__metric" role="group" aria-label={`${label}: ${status}; ${covered} / ${total} ${unit}`}>
+    <span className="ux-coverage-drilldown__bar"><BarMeterFill value={total ? covered / total * 100 : 0}
+      colorToken={label === "Verification" ? "--verification" : "--resource"} /></span>
     <div className="ux-coverage-drilldown__metric-head">
-      <span>{label}</span>
+      <span>{total ? Math.round(covered / total * 1000) / 10 : 0}% · {covered} / {total} {unit}</span>
       {label === "Implementation" && !complete && blockingRequirements > 0 && <strong>{status}</strong>}
     </div>
-    <>
-      <span className="ux-coverage-drilldown__bar"><BarMeterFill value={total ? covered / total * 100 : 0}
-        colorToken={label === "Verification" ? "--verification" : "--resource"} /></span>
-      <span>{total ? Math.round(covered / total * 1000) / 10 : 0}% · {covered} / {total} {unit}</span>
-    </>
   </div>;
 }
 

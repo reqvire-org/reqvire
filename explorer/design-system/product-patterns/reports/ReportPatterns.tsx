@@ -1142,7 +1142,8 @@ function CoverageDonut({
 }
 
 export interface CoveragePanelProps extends Omit<HTMLAttributes<HTMLElement>, "title" | "style"> {
-  title: ReactNode;
+  /** Omit when the panel's content supplies its own heading, such as CoverageDrilldown. */
+  title?: ReactNode;
   span?: "default" | "wide";
 }
 
@@ -1158,9 +1159,9 @@ export function CoveragePanel({
       className={cx("coverage-panel", span === "wide" ? "coverage-panel--wide" : undefined, className)}
       {...props}
     >
-      <header className="coverage-panel__head">
+      {title != null && <header className="coverage-panel__head">
         <h2>{title}</h2>
-      </header>
+      </header>}
       {children}
     </section>
   );
