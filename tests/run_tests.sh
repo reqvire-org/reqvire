@@ -2,7 +2,7 @@
 set +e
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REAL_REQVIRE_BIN="${REQVIRE_BIN:-$(pwd)/target/debug/reqvire}"
+SOURCE_REQVIRE_BIN="${REQVIRE_BIN:-$(pwd)/target/debug/reqvire}"
 REQVIRE_BIN="$ROOT_DIR/reqvire_timing_wrapper.sh"
 
 now_ms() {
@@ -22,6 +22,7 @@ format_ms() {
 
 SUITE_STARTED_MS="$(now_ms)"
 TMP_DIR="$(mktemp -d -t reqvire-e2e-XXXXXX)" || exit 1
+REAL_REQVIRE_BIN="$TMP_DIR/reqvire"
 ACTIVE_TEST_PID=""
 ACTIVE_FIXTURE=""
 CLEANUP_FAILED=false
@@ -49,6 +50,10 @@ cleanup() {
             rm -rf -- "$ACTIVE_FIXTURE"
         fi
     fi
+    # The executable stays available until every owned process has stopped.
+    if [[ "$CLEANUP_FAILED" == false ]]; then
+        rm -f -- "$REAL_REQVIRE_BIN"
+    fi
     # Completed failed fixtures remain at their reported paths. All successful
     # and interrupted fixtures have gone; remove the run root only when empty.
     rmdir -- "$TMP_DIR" 2>/dev/null || true
@@ -74,7 +79,20 @@ BENCHMARK_TESTS_FILE="$LOG_DIR/tests.tsv"
 : > "$BENCHMARK_INVOCATIONS_FILE"
 : > "$BENCHMARK_TESTS_FILE"
 
-echo "🚀 Reqvire binary: $REAL_REQVIRE_BIN"
+source_executable="$(command -v "$SOURCE_REQVIRE_BIN")"
+if [[ ! -f "$source_executable" || ! -x "$source_executable" ]]; then
+    echo "Reqvire executable not found or not executable: $SOURCE_REQVIRE_BIN" >&2
+    exit 127
+fi
+# Copy once rather than following Cargo's replaceable output for every call.
+# An independent inode also protects against in-place replacement of the source.
+if ! cp -p -- "$source_executable" "$REAL_REQVIRE_BIN"; then
+    echo "Could not capture Reqvire executable: $SOURCE_REQVIRE_BIN" >&2
+    exit 1
+fi
+
+echo "🚀 Reqvire binary: $SOURCE_REQVIRE_BIN"
+echo "📌 Test executable: $REAL_REQVIRE_BIN"
 echo "🗂 Temporary directory: $TMP_DIR"
 echo "📝 Test logs directory: $LOG_DIR"
 

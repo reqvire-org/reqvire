@@ -2,7 +2,7 @@
 
 ### Isolated End-to-End Test Execution
 
-When end-to-end tests are executed, the system SHALL isolate concurrent runs, preserve failure evidence, release completed test resources, and distinguish elapsed run time from accumulated Reqvire invocation time.
+When end-to-end tests are executed, the system SHALL use one fixed executable per run, isolate concurrent runs, preserve failure evidence, release completed test resources, and distinguish elapsed run time from accumulated Reqvire invocation time.
 
 #### Metadata
   * type: requirement

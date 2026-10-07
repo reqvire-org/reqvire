@@ -15,6 +15,7 @@ Verify temporary fixture ownership, independent run evidence, interruption clean
 #### Details
 - Run disposable passing and failing suites through a copy of the real runner and timing wrapper. Assert initialized Git state, successful fixture removal, failed fixture retention at the reported path, and accurate pass/fail exit status and counts.
 - Run the same suite concurrently and assert distinct fixture and log directories with both runs' evidence preserved.
+- Start a run with an executable path containing spaces. Remove that source between calls and replace it with another build before a later suite; every call in the active run MUST retain the captured behavior. A new selected run MUST use the replacement build. Assert cleanup removes the private executable, including runs retaining a failed fixture. Missing or non-executable configured inputs MUST fail before fixture setup and leave no run scratch files.
 - Interrupt an active suite with a child process, a server launched in a separate session, and a child ignoring graceful termination. Assert bounded escalation, no surviving test child, removal of the interrupted fixture, retention of logs, and a signal-derived nonzero result. Confirm unrelated processes remain alive.
 - Make a suite fail during fixture setup and assert it is reported as a failure without running its test body.
 - Make descendant discovery fail during cleanup. Assert that the run fails, retains the affected fixture, does not start another suite, and retries cleanup for the same active process group on exit.

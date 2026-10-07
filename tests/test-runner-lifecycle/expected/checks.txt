@@ -1,6 +1,9 @@
 PASS successful-fixture-cleanup
 PASS failed-fixture-retention
 PASS concurrent-run-isolation
+PASS executable-snapshot-survives-source-replacement
+PASS missing-executable-fails-startup
+PASS non-executable-fails-startup
 PASS interrupted-run-cleanup
 PASS detached-child-interruption
 PASS unresponsive-child-escalation

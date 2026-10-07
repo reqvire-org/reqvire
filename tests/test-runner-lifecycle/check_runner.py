@@ -135,6 +135,39 @@ def concurrency(h):
     assert not h.fixture("first").exists() and not h.fixture("second").exists()
 
 
+def executable_snapshot(h):
+    replacement = h.observations / "replacement build"
+    replacement.write_text('#!/bin/bash\nprintf "replacement invocation\\n"\n')
+    replacement.chmod(0o755)
+    h.suite("test-a-snapshot", '''
+printf '%s\\n' "$REAL_REQVIRE_BIN" > "$RUNNER_OBSERVATIONS/executable"
+[[ "$("$REQVIRE_BIN" --version)" == "stub invocation" ]]
+rm -- "$RUNNER_CONFIGURED_BINARY"
+[[ "$("$REQVIRE_BIN" --version)" == "stub invocation" ]]
+cp -- "$RUNNER_OBSERVATIONS/replacement build" "$RUNNER_CONFIGURED_BINARY"
+[[ "$("$REQVIRE_BIN" --version)" == "stub invocation" ]]
+''')
+    h.suite("test-b-snapshot", '[[ "$("$REQVIRE_BIN" --version)" == "stub invocation" ]]\n')
+    output = h.finish(h.start("snapshot", RUNNER_CONFIGURED_BINARY=str(h.binary)))
+    executable = Path((h.observations / "executable").read_text().strip())
+    assert executable != h.binary and not executable.exists(), "private executable not cleaned up"
+    assert "Tests: 2 passed, 0 failed, 2 total" in output, output
+    h.suite("test-c-next-build", '[[ "$("$REQVIRE_BIN" --version)" == "replacement invocation" ]]\n')
+    h.finish(h.start("next-build", "test-c-next-build"))
+
+
+def invalid_executable(h, missing):
+    h.suite("test-startup", 'touch "$RUNNER_OBSERVATIONS/body-ran"\n')
+    if missing:
+        h.binary.unlink()
+    else:
+        h.binary.chmod(0o644)
+    output = h.finish(h.start("startup", "test-startup"), expected=127)
+    assert "Reqvire executable" in output, output
+    assert not (h.observations / "body-ran").exists(), "test ran without a captured executable"
+    assert not list(h.temp.iterdir()), "failed startup leaked run scratch files"
+
+
 def interruption(h, detached=False, stubborn=False):
     body = '''sleep 60 &
 descendant=$!
@@ -216,6 +249,7 @@ printf '%s\\n' "$!" > "$RUNNER_OBSERVATIONS/child"
         output = h.finish(process, expected=1)
         assert not (h.observations / "next-ran").exists(), "continued after cleanup failure"
         assert h.fixture("cleanup").is_dir(), "cleanup failure fixture was removed"
+        assert reported_path(output, "Test executable").is_file(), "active executable was removed before cleanup completed"
         assert str(h.fixture("cleanup")) in output, output
         assert "Failed to stop test processes" in output, output
         assert (h.observations / "cleanup-attempts").read_text().splitlines() == ["attempt", "attempt"], "exit did not retry the active group"
@@ -268,6 +302,9 @@ for name, function in (
     ("successful-fixture-cleanup", success),
     ("failed-fixture-retention", failure),
     ("concurrent-run-isolation", concurrency),
+    ("executable-snapshot-survives-source-replacement", executable_snapshot),
+    ("missing-executable-fails-startup", lambda h: invalid_executable(h, True)),
+    ("non-executable-fails-startup", lambda h: invalid_executable(h, False)),
     ("interrupted-run-cleanup", interruption),
     ("detached-child-interruption", lambda h: interruption(h, detached=True)),
     ("unresponsive-child-escalation", lambda h: interruption(h, detached=True, stubborn=True)),
