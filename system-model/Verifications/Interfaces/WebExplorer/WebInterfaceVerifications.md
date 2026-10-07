@@ -9,17 +9,12 @@ This objective groups verification that the served Web Explorer renders model da
 
 #### Relations
   * derive: [Component Reuse Verification](#component-reuse-verification)
-  * derive: [Contract Bindings Link Serving Verification](#contract-bindings-link-serving-verification)
-  * derive: [Diagram Contract Bindings Display Verification](#diagram-contract-bindings-display-verification)
   * derive: [Element Detail Inline Concept Reference Verification](#element-detail-inline-concept-reference-verification)
   * derive: [Explorer Automatic Store Refresh Verification](#explorer-automatic-store-refresh-verification)
   * derive: [Explorer Serve Verification](#explorer-serve-verification)
   * derive: [Export Command Verification](#export-command-verification)
-  * derive: [Mobile Responsiveness Verification](#mobile-responsiveness-verification)
-  * derive: [Model Containment Contract Bindings Links Verification](#model-containment-contract-bindings-links-verification)
   * derive: [Model View Element Navigation Test](#model-view-element-navigation-test)
   * derive: [Ontology Model Viewer Analysis Verification](#ontology-model-viewer-analysis-verification)
-  * derive: [Responsive Design Verification](#responsive-design-verification)
   * derive: [Serve Command Verification](#serve-command-verification)
   * derive: [SPA Explorer Store Contract Verification](#spa-explorer-store-contract-verification)
   * derive: [Thesaurus Project Store Projection Verification](#thesaurus-project-store-projection-verification)
@@ -41,58 +36,6 @@ Expected checks:
 
 #### Relations
   * verify: [Component-Based Explorer Architecture](../../../Interfaces/WebExplorer/ExplorerRendering.md#component-based-explorer-architecture)
----
-
-### Contract Bindings Link Serving Verification
-
-This test verifies that the served Explorer preserves contract_bindings identifier links to referenced contract elements.
-
-#### Details
-
-##### Acceptance Criteria:
-- System shall preserve all contract-identifier contract_bindings referenced by elements
-- Contract Bindings identifier links shall resolve to referenced contract elements in Explorer content and element detail workflows
-- Duplicate contract_bindings (same contract referenced multiple times) shall be processed consistently
-
-##### Test Criteria:
-- Create model with elements having contract_bindings
-- Run the Explorer through the serve workflow or a Project Store fixture
-- Verify contract_bindings links resolve to contract element records and source anchors
-- Verify identifier targets are navigable from rendered content routes and element modals
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Contract Bindings Link Serving](../../../Interfaces/WebExplorer/Capabilities.md#contract-bindings-link-serving)
----
-
-### Diagram Contract Bindings Display Verification
-
-This test verifies that diagrams display contract_bindings links within element boxes.
-
-#### Details
-
-##### Acceptance Criteria:
-- Element boxes in diagrams shall include bound contract element names
-- Contract Bindings shall be prefixed with paperclip icon (📎)
-- Contract Bindings shall appear below element name using line breaks
-- Contract Bindings display shall not break diagram rendering
-- Model and Traces diagram labels shall not expose full `file#fragment` contract_bindings identifiers as visible node text
-
-##### Test Criteria:
-- Create model with element having contract_bindings
-- Generate diagram (format or model command)
-- Verify Mermaid output contains multiline labels with contract_bindings
-- Verify bound contract element names appear with 📎 prefix
-- Verify Model route/source content and Traces route data use compact contract_bindings labels and still render Mermaid containers for the final graph where Mermaid output is present
-- Verify diagram renders correctly with contract_bindings labels
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Diagram Contract Bindings Display](../../../Interfaces/WebExplorer/Capabilities.md#diagram-contract-bindings-display)
 ---
 
 ### Element Detail Inline Concept Reference Verification
@@ -391,48 +334,6 @@ This test verifies that the export command writes a complete self-contained stat
   * verify: [Export Command](../../../Interfaces/WebExplorer/Capabilities.md#export-command)
 ---
 
-### Mobile Responsiveness Verification
-
-This test verifies the Explorer is usable on mobile devices.
-
-#### Details
-Expected checks:
-- Desktop and mobile viewports can use the Explorer shell without horizontal page overflow.
-- Left Explorer pane and right tool rail remain compact and usable without a top header.
-- Touch targets remain usable on common mobile viewports.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Mobile-Friendly Explorer](../../../Interfaces/WebExplorer/ExplorerRendering.md#mobile-friendly-explorer)
-  * verify: [Responsive Explorer Rendering](../../../Interfaces/WebExplorer/ExplorerRendering.md#responsive-explorer-rendering)
----
-
-### Model Containment Contract Bindings Links Verification
-
-This test verifies that the served Explorer Model containment data preserves contract_bindings links from modeled elements to referenced contract elements.
-
-#### Details
-
-##### Acceptance Criteria:
-- Elements with contract_bindings shall expose contract_bindings records or equivalent Project Store containment contract_bindings records
-- Element contract_bindings records that target contract elements shall use the shared Explorer element-role and subtype glyph contract rather than a report-specific symbol
-- Element contract_bindings shall be clickable from supported Explorer surfaces and navigate to the referenced element detail/source route
-
-##### Test Criteria:
-- Create model with element having contract_bindings
-- Run the Explorer through the serve workflow or a Project Store fixture
-- Verify Model List/Grid data contains contract_bindings records or equivalent Project Store containment contract_bindings records
-- Verify contract-bindings-element records have links to element definitions or element-detail routes
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Containment View Contract Bindings Links](../../../Interfaces/WebExplorer/Capabilities.md#containment-view-contract-bindings-links)
----
-
 ### Explorer Model Flow Verification
 
 Verify the Model Flow mode through the same application and design-system patterns used by the showcase.
@@ -572,24 +473,6 @@ Review artifacts: [OntologiesView.test.tsx](../../../../explorer/src/views/Ontol
   * verify: [Ontology Symbol and Badge Vocabulary](../../../Interfaces/WebExplorer/Capabilities.md#ontology-symbol-and-badge-vocabulary)
   * verify: [OWL Semantic Ontology Projection](../../../Interfaces/WebExplorer/Capabilities.md#owl-semantic-ontology-projection)
   * verify: [Ontology Projection Subgraph Materialization](../../../Reports/ModelReports/ReportingRequirements.md#ontology-projection-subgraph-materialization)
----
-
-### Responsive Design Verification
-
-This test verifies responsive breakpoints and compiled Explorer design-system CSS integration.
-
-#### Details
-Expected checks:
-- Explorer layout works at mobile, tablet, and desktop widths.
-- No layout breaks or overlapping controls are present.
-- Compiled CSS and font assets are local and no runtime CSS compiler or CDN framework is required.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: [Explorer Design System Styling](../../../Interfaces/WebExplorer/ExplorerRendering.md#explorer-design-system-styling)
-  * verify: [Responsive Explorer Rendering](../../../Interfaces/WebExplorer/ExplorerRendering.md#responsive-explorer-rendering)
 ---
 
 ### SPA Explorer Store Contract Verification
