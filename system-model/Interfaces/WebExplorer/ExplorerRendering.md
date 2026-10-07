@@ -64,4 +64,5 @@ Implementation details shall follow the associated contract specifications.
   * satisfiedBy: [ElementIcon.tsx](../../../explorer/design-system/components/data/ElementIcon.tsx)
   * satisfiedBy: [DetailDialog.tsx](../../../explorer/design-system/product-patterns/detail/DetailDialog.tsx)
   * satisfiedBy: [styles.css](../../../explorer/design-system/styles.css)
+  * verifiedBy: [Explorer Design System Styling Demonstration](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#explorer-design-system-styling-demonstration)
 ---

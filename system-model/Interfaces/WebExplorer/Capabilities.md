@@ -166,6 +166,7 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Containment View Contract Bindings Links Contract Specification](Specifications.md#containment-view-contract-bindings-links-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [containment.rs](../../../crates/reqvire-core/src/containment.rs)
+  * verifiedBy: [Containment Contract Bindings Navigation Demonstration](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#containment-contract-bindings-navigation-demonstration)
 ---
 
 ### Contract Bindings Link Serving
@@ -182,6 +183,7 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Contract Bindings Link Serving Contract Specification](Specifications.md#contract-bindings-link-serving-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
+  * verifiedBy: [Contract Bindings Link Serving Demonstration](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#contract-bindings-link-serving-demonstration)
 ---
 
 ### Diagram Contract Bindings Display
@@ -200,6 +202,7 @@ Implementation details shall follow the associated contract specifications.
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * satisfiedBy: [verification_trace.rs](../../../crates/reqvire-core/src/verification_trace.rs)
+  * verifiedBy: [Diagram Contract Bindings Display Demonstration](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#diagram-contract-bindings-display-demonstration)
 ---
 
 ### Model-Centric View Generation

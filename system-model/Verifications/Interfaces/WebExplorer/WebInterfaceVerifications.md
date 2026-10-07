@@ -9,8 +9,12 @@ This objective groups verification that the served Web Explorer renders model da
 
 #### Relations
   * derive: [Component Reuse Verification](#component-reuse-verification)
+  * derive: [Containment Contract Bindings Navigation Demonstration](#containment-contract-bindings-navigation-demonstration)
+  * derive: [Contract Bindings Link Serving Demonstration](#contract-bindings-link-serving-demonstration)
+  * derive: [Diagram Contract Bindings Display Demonstration](#diagram-contract-bindings-display-demonstration)
   * derive: [Element Detail Inline Concept Reference Verification](#element-detail-inline-concept-reference-verification)
   * derive: [Explorer Automatic Store Refresh Verification](#explorer-automatic-store-refresh-verification)
+  * derive: [Explorer Design System Styling Demonstration](#explorer-design-system-styling-demonstration)
   * derive: [Explorer Serve Verification](#explorer-serve-verification)
   * derive: [Export Command Verification](#export-command-verification)
   * derive: [Model View Element Navigation Test](#model-view-element-navigation-test)
@@ -36,6 +40,75 @@ Expected checks:
 
 #### Relations
   * verify: [Component-Based Explorer Architecture](../../../Interfaces/WebExplorer/ExplorerRendering.md#component-based-explorer-architecture)
+---
+
+### Containment Contract Bindings Navigation Demonstration
+
+Demonstrate that Model containment data retains contract bindings and that users can navigate from an owning element to its bound contract.
+
+#### Details
+
+##### Demonstration Procedure
+- Serve a valid model containing a requirement with bindings to contract elements in both its own Markdown file and another file. Record the owner and target canonical identifiers.
+- Locate the requirement in Model List and Grid, open its element details, and expand Contract Bindings. Confirm both targets retain their authored association and use the shared contract-subtype glyph and label.
+- Follow each binding to the referenced contract details and source. Confirm the displayed element identifier and source anchor match the recorded target, then return to the owning element.
+- Inspect the corresponding Project Store containment records and confirm they preserve the same owner/target identifiers. The data classification `contract-bindings-element` must not replace the visible contract-subtype treatment.
+
+##### Acceptance Criteria
+Every authored binding remains associated with its owner, displays the expected contract name and subtype, and opens the correct contract detail/source from both containment modes. Missing associations, incorrect targets, or broken navigation fail the demonstration. Record the model revision, inspected identifiers, and observed result when performing it.
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [Containment View Contract Bindings Links](../../../Interfaces/WebExplorer/Capabilities.md#containment-view-contract-bindings-links)
+---
+
+### Contract Bindings Link Serving Demonstration
+
+Demonstrate complete, navigable contract-identifier links in a served Explorer snapshot, including contracts shared by multiple requirements.
+
+#### Details
+
+##### Demonstration Procedure
+- Serve a valid model with two requirements binding the same owned specification and another binding targeting a contract in a different Markdown file. Record the contract canonical identifiers.
+- Open the owners through Model, Search, and source-content routes, then follow their contract-binding links through the shared element-detail workflow. Open the same owners from graph views and confirm their detail links resolve to the same contract records.
+- Follow the referenced contracts to their source content and confirm the file and fragment identify the intended definitions.
+- Inspect the served Project Store and confirm each owner's binding is preserved while a shared target has one element record. Reload and repeat navigation for both owners to check that shared-target deduplication does not lose either association.
+
+##### Acceptance Criteria
+All recorded identifier targets are available in the served snapshot and resolve consistently across the supported content, search, graph, and detail workflows. A missing owner association, duplicate target element, wrong source anchor, or failed link fails the demonstration. Record the model revision, visited links, and observed result when performing it.
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [Contract Bindings Link Serving](../../../Interfaces/WebExplorer/Capabilities.md#contract-bindings-link-serving)
+---
+
+### Diagram Contract Bindings Display Demonstration
+
+Demonstrate that generated diagram labels expose readable contract associations and preserve navigation to their identifier targets.
+
+#### Details
+
+##### Demonstration Procedure
+- Use a valid model with a requirement binding two contracts, including a cross-file contract with a long canonical identifier. Generate a Mermaid diagram containing that requirement and display the rendered result.
+- Inspect the node label: contract names appear below the requirement name with the paperclip prefix and multiline formatting, while full `file#fragment` identifiers remain link targets or structured data.
+- Follow each displayed binding to its contract definition and confirm the correct file and source anchor.
+- Inspect corresponding Model, Knowledge Graph, and Traces presentations wherever they display contract-binding labels. Confirm the same compact display names are used and that long identifiers do not widen or clip the visible labels. Native graph presentations retain their existing renderer and element-detail navigation.
+
+##### Acceptance Criteria
+The generated Mermaid output renders the names, paperclip prefixes, multiline labels, and working contract links specified by the diagram contract. Explorer presentations use compact binding labels with correct navigation and readable rendering. Incorrect labels, leaked full identifiers, clipped labels, or broken targets fail the demonstration. Record the model revision, diagram, target identifiers, and observed result when performing it.
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [Diagram Contract Bindings Display](../../../Interfaces/WebExplorer/Capabilities.md#diagram-contract-bindings-display)
 ---
 
 ### Element Detail Inline Concept Reference Verification
@@ -250,6 +323,29 @@ This test verifies production served/exported trace rendering and the shared nat
   * satisfiedBy: [useTraceFlowLayout.test.ts](../../../../explorer/design-system/product-patterns/reports/useTraceFlowLayout.test.ts)
   * satisfiedBy: [TraceFlowViewport.test.tsx](../../../../explorer/design-system/showcase/TraceFlowViewport.test.tsx)
   * satisfiedBy: [TraceFlowMock.test.tsx](../../../../explorer/design-system/showcase/TraceFlowMock.test.tsx)
+---
+
+### Explorer Design System Styling Demonstration
+
+Demonstrate that the built Explorer uses local design-system CSS, fonts, tokens, and shared controls consistently across its views and showcase mock.
+
+#### Details
+
+##### Demonstration Procedure
+- Open the built, served Explorer and the design-system showcase mock. Disable external network access while allowing the local server, reload, and inspect browser network requests for the local compiled Explorer stylesheet and Geist font assets.
+- Visit Model, Ontologies, Traces, Coverage, Search, and source content. Open element details and a worktree-loading/error pattern, and compare typography, warm-neutral surfaces, semantic colors, buttons, tree rows, badges, tabs, and dialogs with the shared showcase patterns in light and dark themes.
+- Resize the desktop viewport and left pane, and collapse/reopen the pane. Confirm the shared controls and graph legends retain consistent styling and usable placement as the available workspace width changes.
+- Confirm the application and mock use the same component/token treatment rather than separate visual implementations.
+
+##### Acceptance Criteria
+The Explorer remains styled after reload with external networking unavailable; required CSS and font requests are local and successful. Shared controls, typography, semantic colors, and responsive desktop layouts match the design-system patterns across the inspected views. Missing assets, inconsistent component styling, or unusable controls fail the demonstration. Record the build/model revision, inspected views and widths, network observations, and result when performing it.
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [Explorer Design System Styling](../../../Interfaces/WebExplorer/ExplorerRendering.md#explorer-design-system-styling)
 ---
 
 ### Explorer Serve Verification
