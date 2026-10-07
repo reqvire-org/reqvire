@@ -738,6 +738,12 @@ The test shall verify that existing model elements can be deleted, all relations
 5. Delete an element leaving other elements in the file
 6. Verify the file is NOT deleted (still contains elements)
 
+**Test Steps - Unrelated Artifact Links During Deletion:**
+1. Validate a model containing a nested requirement file with `satisfiedBy` links to workspace-root `Makefile` and `LICENSE` artifacts and a source file with an extension. Create a decoy source file at the same relative path below the model file's folder, so an incorrect source-relative resolution would select another file. Link the requirement to a disposable verification in another file.
+2. Run a dry-run deletion of that verification. Verify all model/artifact files remain byte-for-byte unchanged and the proposed diff preserves artifact paths without substituting element fragments.
+3. Apply the deletion. Verify the verification and its incoming relations are removed while all unrelated artifact targets and target kinds remain unchanged.
+4. Verify artifact bytes, the accepted Git HEAD, and the index remain unchanged. Load the persisted model in a fresh CLI process and require successful validation.
+
 **Test Steps - Orphaned Children Prevention:**
 1. Create a parent element with child elements having parent hierarchical relations
 2. Attempt to delete the parent element
@@ -773,6 +779,7 @@ The test shall verify that existing model elements can be deleted, all relations
 - Element is completely removed from the source file
 - All incoming relations (relations from other elements to the deleted element) are removed
 - File structure remains valid
+- Remaining artifact relations retain their original file targets in both dry-run diffs and persisted files, including extensionless root artifacts; fresh-process validation succeeds after deletion.
 - Model validation passes
 - No dangling relations remain in the model
 - Files containing only the deleted element are removed
@@ -790,6 +797,7 @@ The test shall verify that existing model elements can be deleted, all relations
 - Delete element with `verify` relations pointing to it
 - Delete element with `satisfiedBy` relations pointing to it
 - Delete element with multiple types of incoming relations
+- Delete a verification referenced by a file containing unrelated extensionless root artifact links and confirm preview/apply preservation and valid persisted source
 - Delete last element in file (triggers file deletion)
 - Delete element leaving other elements (file preserved)
 - Delete parent element with children (single parent - rejected)

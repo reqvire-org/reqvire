@@ -119,6 +119,7 @@ When deleting an element, the system is expected to:
 - Identify all relations from the deleted element (outgoing relations)
 - Remove the complete element section including separators
 - Maintain file structure and formatting after deletion
+- Preserve the target and target kind of every remaining relation when rewriting affected files. Unrelated implementation/evidence file links, including extensionless workspace-root artifacts such as `Makefile` and `LICENSE`, remain file paths rather than becoming same-file element fragments. Resolve normalized artifact targets from the workspace root even when a same-named path exists below the model file's folder. Dry-run diffs must preserve these links just as applied deletion does, and the persisted model must remain valid when loaded again.
 - Provide updates report following Diff Output Format Specification
 
 **Empty File Cleanup:**

@@ -735,8 +735,12 @@ impl GraphRegistry {
                             .unwrap_or_else(|| std::path::Path::new("."))
                             .to_path_buf();
 
+                        // InternalPath targets are workspace-root-relative files.
+                        // Keep that context explicit so extensionless names are
+                        // not interpreted as fragments or resolved below this file.
+                        let absolute_path = format!("/{}", path_str);
                         let relative_link = crate::utils::to_relative_identifier(
-                            relation.target.link.as_str(),
+                            &absolute_path,
                             &current_folder,
                             false,
                         )
