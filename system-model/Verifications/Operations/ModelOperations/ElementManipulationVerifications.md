@@ -244,6 +244,8 @@ This test verifies that graph-backed CRUD commands work across multiple eligible
 12. `rm` removes an element from `repo-a` and leaves no stale indexed element.
 13. The workspace validates after the full cross-repo CRUD sequence.
 
+The `link` result MUST reload in a fresh CLI process with the exact workspace-root-relative artifact target. Its Markdown path MUST resolve from `repo-b/specifications` to the recorded `repo-a` file without an extra source-folder traversal.
+
 **Success Criteria - Non-Git Workspace Rejection:**
 1. `add` rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
 2. `mv` rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
@@ -948,6 +950,11 @@ The test shall verify that the `link` command adds relations to elements followi
 4. Verify operation fails with clear error message
 5. Verify error message states that `bindContract` requires a contract element identifier target
 
+**Test Steps - Canonical Artifact Targets:**
+1. After deleting a verification from the nested artifact-link fixture, preview and apply a new `satisfiedBy` link to an existing extensionless root `NOTICE` file.
+2. Verify preview leaves files unchanged, adds only the intended `../../../NOTICE` target, and preserves existing artifact targets. Apply the link and validate the persisted model in a fresh CLI process.
+3. Through the core registry API, add a cross-repository artifact link and an extensionless root artifact link. Verify their in-memory targets remain workspace-root-relative and adding either link again rejects the duplicate.
+
 **Success Criteria:**
 - Adds relation to source element's Relations subsection (written to file)
 - Does NOT add opposite relation to target element's file (opposite exists in-memory only)
@@ -972,6 +979,8 @@ The owning link/unlink suite appends independent and combined identifier source/
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-link-unlink/test.sh)
+  * satisfiedBy: [check_rm_artifact_links.py](../../../../tests/test-crud-manipulation/check_rm_artifact_links.py)
+  * satisfiedBy: [graph_registry.rs](../../../../crates/reqvire-core/src/graph_registry.rs)
   * verify: [Relation Commands](../../../Interfaces/CLI/Commands.md#relation-commands)
   * verify: [Relation Management Operations](../../../ModelStructure/ModelManagement.md#relation-management-operations)
 ---

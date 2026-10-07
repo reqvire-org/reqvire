@@ -326,6 +326,40 @@ mod tests {
     }
 
     #[test]
+    fn new_artifact_links_store_workspace_relative_targets() {
+        let workspace = tempfile::TempDir::new().expect("create artifact link workspace");
+        let source_file = "repo-b/specifications/B.md";
+        let source_id = "repo-b/specifications/B.md#source";
+        let mut source = make_element(source_id, "Source Requirement");
+        source.file_path = source_file.to_string();
+        let mut registry = GraphRegistry::new();
+        registry
+            .register_element(source, source_file)
+            .expect("register artifact link source");
+
+        for target in ["repo-a/docs/evidence.txt", "NOTICE"] {
+            let artifact = workspace.path().join(target);
+            std::fs::create_dir_all(artifact.parent().expect("artifact parent"))
+                .expect("create artifact folder");
+            std::fs::write(&artifact, "Artifact evidence.\n").expect("write artifact");
+            registry
+                .add_element_relation_full(source_id, target, "satisfiedBy", workspace.path())
+                .expect("add artifact relation");
+            assert!(registry.nodes[source_id]
+                .element
+                .relations
+                .iter()
+                .any(|relation| {
+                    relation.target.link == LinkType::InternalPath(PathBuf::from(target))
+                }));
+            let duplicate = registry
+                .add_element_relation_full(source_id, target, "satisfiedBy", workspace.path())
+                .expect_err("reject duplicate artifact relation");
+            assert!(duplicate.to_string().contains("already exists"));
+        }
+    }
+
+    #[test]
     fn canonical_storage_candidate_edits_keep_reports_current_and_accepted_graph_isolated() {
         let mut accepted = GraphRegistry::new();
         let mut a = make_element("file.md#a", "A");

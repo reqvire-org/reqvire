@@ -347,6 +347,7 @@ Rules for validating and normalizing relation targets during element creation an
 
 **Normalization Rules:**
 - All relation targets must be normalized to workspace-root-relative format before insertion
+- Internal file targets created by `link` or `relink` use the same workspace-root-relative in-memory representation as parsed file targets. Compute source-file-relative paths only when serializing Markdown; extensionless artifact names retain their file classification.
 - All relation targets must reference existing elements in the model
 - External links (http://, https://, etc.) are allowed and not validated
 

@@ -2314,7 +2314,6 @@ impl GraphRegistry {
                 )
             } else if is_internal_path {
                 // Internal file path
-                let source_folder = crate::utils::get_parent_dir(&source_file_path);
                 let target_type = crate::element::ElementType::File;
 
                 if !validate_relation_element_types(relation_type, &source_type, &target_type) {
@@ -2336,10 +2335,9 @@ impl GraphRegistry {
                     )));
                 }
 
-                // Calculate relative path from source file to target
+                // Store the same workspace-relative path as parsed relations.
+                // Source-relative links are computed only during serialization.
                 let target_path = PathBuf::from(target);
-                let relative_path = pathdiff::diff_paths(&target_path, &source_folder)
-                    .unwrap_or_else(|| target_path.clone());
 
                 // Extract filename for display name
                 let display = target_path
@@ -2349,7 +2347,7 @@ impl GraphRegistry {
 
                 (
                     display,
-                    LinkType::InternalPath(relative_path),
+                    LinkType::InternalPath(target_path),
                     target.to_string(),
                     None,
                 )

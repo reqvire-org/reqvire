@@ -14,7 +14,8 @@ ARTIFACTS = {"Makefile": b"all:\n\t@echo retained artifact\n",
              "LICENSE": b"Retained fixture license.\n",
              "src/evidence.rs": b"// Retained implementation evidence.\n"}
 TARGETS = {"../../../" + name for name in ARTIFACTS}
-FILES = ARTIFACTS | {"system-model/Interfaces/WebExplorer/src/evidence.rs": b"// Local decoy, not the evidence target.\n"}
+FILES = ARTIFACTS | {"system-model/Interfaces/WebExplorer/src/evidence.rs": b"// Local decoy, not the evidence target.\n",
+                     "NOTICE": b"Unlinked root artifact for the link regression.\n"}
 results = []
 
 
@@ -102,6 +103,33 @@ check("rm-artifact-links-keeps-artifacts-head-index", lambda: require(
 validation = run("persisted-validation", "validate")
 check("rm-artifact-links-persisted-model-valid", lambda: require(
     validation.returncode == 0, validation.stdout + validation.stderr))
+
+# New links must use the same artifact target representation as parsed links.
+before_link = {path: path.read_bytes() for path in before}
+link_preview = run("new-link-preview", "link", "Retained Requirement", "satisfiedBy", "NOTICE", "--dry-run")
+check("artifact-link-preview-keeps-files", lambda: require(
+    link_preview.returncode == 0 and all(path.read_bytes() == content for path, content in before_link.items()),
+    "link dry-run failed or changed source: " + link_preview.stdout + link_preview.stderr))
+
+
+def new_link_preview_target():
+    require(link_preview.returncode == 0, link_preview.stdout + link_preview.stderr)
+    report = json.loads(link_preview.stdout)
+    relevant = next(item for item in report["diffs"] if item["file_path"] == str(MODEL.relative_to(ROOT)))
+    added = artifact_targets("\n".join(line["content"] for line in relevant["lines"] if line["color"] == "green"))
+    removed = artifact_targets("\n".join(line["content"] for line in relevant["lines"] if line["color"] == "red"))
+    require(added - removed == {"../../../NOTICE"} and not removed - added,
+            f"new link preview targets changed: removed {sorted(removed)}, added {sorted(added)}")
+
+
+check("artifact-link-preview-keeps-new-target", new_link_preview_target)
+new_link = run("new-link-apply", "link", "Retained Requirement", "satisfiedBy", "NOTICE")
+check("artifact-link-apply-keeps-new-target", lambda: require(
+    new_link.returncode == 0 and artifact_targets(MODEL.read_text()) == TARGETS | {"../../../NOTICE"},
+    "new link targets changed: " + MODEL.read_text() + new_link.stderr))
+linked_validation = run("new-link-validation", "validate")
+check("artifact-link-persisted-model-valid", lambda: require(
+    linked_validation.returncode == 0, linked_validation.stdout + linked_validation.stderr))
 (OUTPUT / "rm-artifact-links-checks.txt").write_text("\n".join(results) + "\n")
 print("\n".join(results), flush=True)
 raise SystemExit(0 if all(line.startswith("PASS ") for line in results) else 1)
