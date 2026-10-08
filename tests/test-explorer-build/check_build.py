@@ -140,7 +140,8 @@ def cargo_fresh(rebuild=False):
     def cargo():
         nonlocal cargo_runs
         cargo_runs += 1
-        result = subprocess.run(["cargo", "check", "--offline", "--verbose", "--manifest-path", str(manifest / "Cargo.toml")], env=env, text=True, capture_output=True)
+        # CI enables Cargo colors; keep the verbose output parsed below plain.
+        result = subprocess.run(["cargo", "check", "--offline", "--verbose", "--color", "never", "--manifest-path", str(manifest / "Cargo.toml")], env=env, text=True, capture_output=True)
         (repo / f"cargo-{cargo_runs}.log").write_text(result.stderr)
         require(result.returncode == 0, result.stderr)
         return result.stderr

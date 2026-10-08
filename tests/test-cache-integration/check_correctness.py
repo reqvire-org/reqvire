@@ -167,7 +167,7 @@ class Checks:
                                 value = client.raw_tool(name, **args)
                                 return value, time.perf_counter() - start, attempts
                             except RuntimeError as error:
-                                if ("MCP read capacity exhausted; retry later" not in str(error)
+                                if ("MCP request capacity exhausted; retry later" not in str(error)
                                         or "'retryable': True" not in str(error)
                                         or time.perf_counter() - start > 10):
                                     raise
