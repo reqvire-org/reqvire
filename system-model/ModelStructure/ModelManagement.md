@@ -34,23 +34,35 @@ The system shall process structured documents and relations to extract model-rel
 
 ### In-Memory Model Build Cache
 
-The system shall cache parsed `ModelManager` instances keyed by a fingerprint of the scanned workspace markdown files and the active model build options, so that repeated tool dispatches over an unchanged workspace return a cached model without re-parsing.
+When a completed cached model matches the current construction inputs and requested build mode, the system shall reuse it without repeating Markdown parsing, graph validation, or semantic-store construction.
+
+When an input used to construct or validate the cached model changes, the system shall refresh the affected model state before returning authoritative evidence for the changed inputs.
+
+When concurrent requests need the same uncached model inputs and build mode, the system shall coordinate one model build for those requests.
+
+If input changes or invalidation supersede an in-progress build, the system shall prevent that build from replacing the current cached state.
 
 #### Details
-- The cache key shall combine `ModelBuildOptions` with a sorted map of every scanned `.md` file path to a content fingerprint (`FileFingerprint`) capturing file length and content hash.
-- A cache hit returns a clone of the stored model without re-reading or re-validating any source file.
-- A cache miss rebuilds the model via `parse_and_validate_with_options`, stores the result, and returns a clone.
-- CRUD mutations (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-folder, mv-asset, rm-asset) shall invalidate the cache, forcing a rebuild on the next load.
-- Only the current working tree is cached; git-commit scans bypass the cache and use `parse_and_validate` directly.
-- The cache mutex lock shall be released before rebuild I/O to avoid holding it during parsing.
+- The system shall keep each served model's parsed elements, page content, validation state, and semantic query state consistent with the same completed construction inputs.
+- If a current model cannot be built under the requested validation mode, the system shall report the applicable failure or diagnostics rather than present an older cached model as current.
+- The system shall preserve content-sensitive freshness when a source edit leaves file size and modification time unchanged.
+- The system shall keep cached build modes and workspace scopes distinct.
+- The system shall bypass the current-workspace cache for historical Git-commit model builds.
 
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Ignore Files Specification](Specifications.md#ignore-files-specification)
+  * [Workspace Scope Specification](Specifications.md#workspace-scope-specification)
+  * [Local External Ontology Source Specification](../Semantics/SemanticModelSpecifications.md#local-external-ontology-source-specification)
+
 #### Relations
   * definedBy: [In-Memory Model Build Cache Specification](Specifications.md#in-memory-model-build-cache-specification)
   * derivedFrom: [Efficient Processing](#efficient-processing)
+  * satisfiedBy: [exclusions.rs](../../crates/reqvire-core/src/exclusions.rs)
   * satisfiedBy: [model_cache.rs](../../crates/reqvire-core/src/model_cache.rs)
+  * satisfiedBy: [model_inputs.rs](../../crates/reqvire-core/src/model_inputs.rs)
   * satisfiedBy: [arg_helpers.rs](../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
   * verifiedBy: [In-Memory Model Build Cache Verification](../Verifications/ModelStructure/ParsingVerifications.md#in-memory-model-build-cache-verification)
 ---

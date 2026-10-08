@@ -11,6 +11,7 @@ use crate::element::{
     RequirementGovernanceMetadata, SizeEstimate, CONTRACT_BINDINGS_SECTION,
 };
 use crate::error::ReqvireError;
+use crate::exclusions::ExclusionSet as GlobSet;
 use crate::git_commands;
 use crate::relation::{
     self, get_hierarchical_relation_types, LinkType, CONTRACT_RELATIONS,
@@ -18,7 +19,6 @@ use crate::relation::{
 };
 use crate::semantic_contract;
 use crate::Relation;
-use globset::GlobSet;
 use o_kernel::rdf::{subject_iri, term_iri};
 use o_kernel::vocab::reserved as owl_reserved;
 use o_kernel::{ontology, shacl};

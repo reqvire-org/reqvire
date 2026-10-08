@@ -5,9 +5,8 @@
 //! embedded bundle.
 
 use crate::error::ReqvireError;
-use crate::graph_registry::GraphRegistry;
 use crate::html::store::{build_project_store, project_store_javascript};
-use crate::semantic_contract::build_semantic_index;
+use crate::model::ModelManager;
 
 include!(concat!(env!("OUT_DIR"), "/explorer_bundle_manifest.rs"));
 
@@ -18,11 +17,17 @@ pub struct ExplorerRuntimeAssets {
     pub ontologies_ttl: String,
 }
 
-pub fn build_runtime_assets(
-    registry: &GraphRegistry,
-) -> Result<ExplorerRuntimeAssets, ReqvireError> {
-    let semantic_index = build_semantic_index(registry);
-    let project_store = build_project_store(registry, &semantic_index);
+pub fn build_runtime_assets(model: &ModelManager) -> Result<ExplorerRuntimeAssets, ReqvireError> {
+    // Use the semantic state accepted with this graph. Re-reading external
+    // ontology files here could mix two different source observations.
+    let semantic_index = &model
+        .semantic_store
+        .as_ref()
+        .ok_or_else(|| {
+            ReqvireError::ProcessError("Explorer assets require a completed model build".to_owned())
+        })?
+        .index;
+    let project_store = build_project_store(&model.graph_registry, semantic_index);
     let project_store_js = project_store_javascript(&project_store)?;
     let project_store_json = serde_json::to_string(&project_store)?;
     let ontologies_ttl = semantic_index.to_turtle_string()?;

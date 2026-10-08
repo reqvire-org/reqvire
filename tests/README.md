@@ -15,6 +15,13 @@ The runner copies each suite into a temporary Git workspace. Keep fixtures and
 expected output in the suite directory, and link its `test.sh` from the owning
 system-model verification using `satisfiedBy`.
 
+Run `./tests/run_all.sh test-model-revision-hashing` for the canonical model
+revision contract. It uses Python 3's standard library to call the real HTTP MCP
+server, compares fixed canonical byte/digest fixtures, and checks field changes,
+ordering, excluded inputs, and agreement across fingerprint-bearing tools.
+Responses and server logs are retained in the test workspace's `output` directory.
+Explorer wire hashes and live refresh remain covered by the existing serve suite.
+
 The serve suite runs the compiled Explorer in headless Chrome or Chromium. It
 requires Node.js 24 and a browser executable. Set `REQVIRE_TEST_BROWSER` to that
 executable, or install `chromium`, `chromium-browser`, or `google-chrome` on PATH.

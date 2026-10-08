@@ -1997,7 +1997,7 @@ pub(super) fn resolve_external_source_path(
         .map_err(|error| error.to_string())?;
 
     let root_relative = git_root.join(source_path);
-    if root_relative.exists() {
+    if crate::model_inputs::exists(&root_relative) {
         return Ok(root_relative);
     }
 
@@ -2047,7 +2047,7 @@ pub(super) fn build_external_ontology_block(
         }
     };
 
-    let content = match std::fs::read_to_string(&path) {
+    let content = match crate::model_inputs::read_to_string(&path) {
         Ok(content) => content,
         Err(error) => {
             diagnostics.push(SemanticDiagnostic {

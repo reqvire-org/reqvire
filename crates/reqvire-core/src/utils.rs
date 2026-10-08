@@ -1,7 +1,8 @@
 use crate::error::ReqvireError;
+use crate::exclusions::ExclusionSet as GlobSet;
 use crate::git_commands;
 use crate::workspace;
-use globset::{Glob, GlobMatcher, GlobSet};
+use globset::{Glob, GlobMatcher};
 use log::debug;
 use pathdiff::diff_paths;
 use regex::Regex;
@@ -536,8 +537,11 @@ pub fn normalize_identifier(identifier: &str, base_path: &Path) -> Result<String
                 workspace_root.display()
             ))
         })?
-        .to_string_lossy()
-        .into_owned();
+        .to_str()
+        .ok_or_else(|| {
+            ReqvireError::PathError(format!("Identifier path is not UTF-8: {full_path:?}"))
+        })?
+        .to_owned();
 
     // 5) Re-reuse the fragment, if present
     let final_result = match fragment_opt {
@@ -806,8 +810,8 @@ mod tests {
             }
         }
 
-        fn get_excluded_filename_patterns_glob_set(&self) -> globset::GlobSet {
-            let mut builder = globset::GlobSetBuilder::new();
+        fn get_excluded_filename_patterns_glob_set(&self) -> crate::exclusions::ExclusionSet {
+            let mut builder = crate::exclusions::ExclusionSetBuilder::new();
             for pattern in &self.paths.excluded_filename_patterns {
                 if let Ok(glob) = globset::Glob::new(pattern) {
                     builder.add(glob);

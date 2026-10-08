@@ -5,13 +5,14 @@ set -uo pipefail
 #
 # Verifies (see system-model/Verifications/ModelStructure/ParsingVerifications.md
 # "In-Memory Model Build Cache Verification"):
-#   1. Two identical reads over an unchanged workspace return equal results
-#      (cache hit, no re-parse).
+#   1. Two identical reads over an unchanged workspace return equal results.
 #   2. A CRUD write (reqvire.add_element) invalidates the cache so a subsequent
 #      search reflects the newly added element.
 #   3. Modifying a .md file on disk changes the fingerprint and forces a rebuild
 #      so new content is reflected.
-#   4. The CLI `change-impact --git-commit` path bypasses the cache entirely.
+#   4. The CLI `change-impact --git-commit` path completes successfully.
+#   5. Issue #73 correctness checks observe actual builds, input freshness, and
+#      embedded Explorer publication (check_correctness.py).
 #
 # This script is self-contained: helpers are inlined and fixtures are copied
 # from sibling test directories, mirroring tests/test-mcp-server/test.sh.
@@ -183,12 +184,12 @@ run_http_mcp_sequence "$HTTP_PORT" "$TEST_DIR/output/mcp-cache-hit.json" \
 LINE_1_STRUCT="$(json_line "$TEST_DIR/output/mcp-cache-hit.json" 1 | jq -c '.result.structuredContent')"
 LINE_2_STRUCT="$(json_line "$TEST_DIR/output/mcp-cache-hit.json" 2 | jq -c '.result.structuredContent')"
 if [ "$LINE_1_STRUCT" != "$LINE_2_STRUCT" ]; then
-  fail "two identical read_element calls should return equal structuredContent (cache hit)"
+  fail "two identical read_element calls should return equal structuredContent"
 fi
 jq -e '.result.structuredContent.name == "Test Requirement Alpha"' <(json_line "$TEST_DIR/output/mcp-cache-hit.json" 1) >/dev/null \
   || fail "first cached read should resolve Test Requirement Alpha" "$TEST_DIR/output/mcp-cache-hit.json"
 
-echo "✅ cache hit: identical reads returned equal results"
+echo "✅ read consistency: identical reads returned equal results"
 
 # ----------------------------------------------------------------------------
 # 2. CRUD invalidation: add_element succeeds and invalidates the cache.
@@ -242,7 +243,7 @@ stop_http_mcp
 trap - EXIT
 
 # ----------------------------------------------------------------------------
-# 5. CLI bypasses cache: change-impact --git-commit HEAD runs standalone.
+# 5. Historical change-impact command completes (cache bypass is observed in core tests).
 # ----------------------------------------------------------------------------
 
 set +e
@@ -252,9 +253,17 @@ CLI_EXIT=$?
 set -e
 
 if [ "$CLI_EXIT" -ne 0 ]; then
-  fail "change-impact --git-commit HEAD should exit 0 (bypasses cache)" "$TEST_DIR/output/cli-change-impact.stderr"
+  fail "change-impact --git-commit HEAD should exit 0" "$TEST_DIR/output/cli-change-impact.stderr"
 fi
 
-echo "✅ cli bypass: change-impact --git-commit HEAD completed"
+echo "✅ historical command: change-impact --git-commit HEAD completed"
 
-exit 0
+status=0
+python3 "$TEST_SCRIPT_DIR/check_correctness.py" \
+  --binary "$REQVIRE_BIN" --workspace "$TEST_DIR" || status=$?
+if ! diff -u "$TEST_SCRIPT_DIR/expected/correctness.txt" \
+    "$TEST_DIR/output/correctness/checks.txt"; then
+  echo "❌ FAILED: cache correctness results differ from expected output"
+  status=1
+fi
+exit "$status"

@@ -85,6 +85,32 @@ elementId["Element Name<br/>📎 Deterministic Output Specification"]
   * define: [Diagram Contract Bindings Display](Capabilities.md#diagram-contract-bindings-display)
 ---
 
+### Explorer Automatic Store Refresh Specification
+
+#### Details
+- Enable live refresh only when the mutation-enabled embedded MCP server's seed advertises it. Plain serving, read-only embedded MCP, static exports, and development fixtures do not poll the live API.
+- While the document is visible, request the manifest every five seconds using the committed revision in `If-None-Match`. Check immediately on mount and when visibility returns. Suspend periodic requests while hidden and prevent overlapping active checks.
+- Refresh is automatic; the shell has no manual Refresh action or background-job status polling.
+- Associate a valid initial seed manifest with its already loaded store values after checking the manifest revision and section correspondence. An invalid advertisement leaves the refresh cache and cursor empty so a complete current snapshot is fetched instead of accepting an ungrounded `304`.
+- Verify a changed manifest's exact UTF-8 SHA-256 against its quoted revision `ETag`, its protocol, and its chunk-reference syntax. A `304` requires the matching committed revision and retains the existing store object and derived indexes.
+- Reuse chunks referenced by the committed manifest and request only missing unique hashes in batches of at most 512. Validate each response's revision, exact requested hash set, and raw chunk-text SHA-256 before parsing chunk contents.
+- Assemble all current sections in manifest order and validate the complete candidate with the shared store loader before publication. Required array sections contain object records with string `path` identifiers for files/folders or string `id` identifiers for the other record families. Known object sections reject nulls and arrays; refreshed stores require the expected schema version, while unknown future sections remain supported.
+- Preparation does not advance the published revision, mutate the committed cache, or change the displayed store. Only the still-mounted consumer that owns the uncancelled request commits the complete prepared store and its revision together.
+- A chunk `409` discards that attempt's staged data and requests a new manifest, with at most three complete attempts per refresh check. Partial downloads from different revisions are not combined. Exhausted attempts retain the valid view and retry on a later automatic check.
+- Live stores and manifests are deeply frozen to protect shared cached values from renderer mutation. Unchanged chunks and whole unchanged sections retain object identity; a successful commit retains only chunks referenced by the newly published manifest so deleted and historic content does not accumulate.
+- A successful changed store replaces the current snapshot without remounting the shell or UI-state provider, reloading the page, or changing the hash route. Existing selection, modal context, filters, and layout remain available where their targets still exist; deleted targets use the existing missing-record behavior.
+- Derived element lookups, search indexes, file views, and other store consumers adopt the new snapshot.
+- Failed requests, missing or corrupt chunks, unsupported manifests, incompatible stores, and server refresh errors retain the valid view, committed revision, and cache, and show a diagnostic indicating automatic retry. A later successful refresh or matching `304` clears the diagnostic.
+- Each check has a 15-second timeout covering manifest and chunk retrieval. Timeout releases the active request so a later automatic check can retry. Hiding the document aborts and releases its request immediately; late aborted responses cannot replace a newer committed store.
+- Unmount cancels requests, visibility listeners, and timers. Effect cleanup, including React StrictMode replay, cannot publish abandoned work.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Explorer Automatic Store Refresh](Capabilities.md#explorer-automatic-store-refresh)
+---
+
 ### Explorer Branding Specification
 
 Specification for Reqvire branding elements in the served Explorer.
@@ -164,6 +190,44 @@ The design-system styling contract provides:
 
 #### Relations
   * define: [Explorer Design System Styling](ExplorerRendering.md#explorer-design-system-styling)
+---
+
+### Explorer Live Store Refresh Input Output
+
+#### Details
+Availability and initial seed:
+- Only `reqvire serve --enable-mcp --enable-mutations` exposes the live manifest, chunk, and full-store routes below. Plain serving, read-only embedded MCP, static exports, and development fixtures do not advertise live refresh or expose these APIs.
+- The served `assets/project-store.js` initializes `window.reqvireProjectStore` and advertises `window.reqvireLiveRefresh = { "revision": "<manifest hash>", "manifest": <manifest> }` from the same captured snapshot.
+- Generated runtime assets and live API responses use `Cache-Control: no-store`. Missing API routes return `404` rather than the SPA fallback shell; unsupported methods on existing live routes return `405`.
+
+Manifest and content addressing:
+- `GET /api/project-store/manifest` returns the serialized complete manifest with protocol `reqvire-manifest.v1`, a `sections` object, and `ontology_hash`.
+- Section names match `^[a-z][a-z0-9_]*$`; additional compatible sections are supported by the browser.
+- Each top-level Project Store array is described by `{ "kind": "array", "hashes": ["<item hash>", ...] }`. Hash order and repeated references reproduce the complete current array; empty arrays have empty hash lists.
+- Every other top-level value is described by `{ "kind": "value", "hash": "<value hash>" }`. Derived object projections are whole-value chunks rather than nested patches.
+- Apply the bound SHA-256 Hash Encoding Specification through the shared core primitive to produce chunk identifiers from the exact UTF-8 bytes of serialized JSON text. Identical text shares one chunk. Compute `ontology_hash` through the same primitive over the generated ontology artifact's UTF-8 bytes.
+- Compute the revision through that same primitive over the exact UTF-8 serialized manifest, including `ontology_hash`; carry it in a quoted `ETag`, rather than in the manifest body. An unchanged manifest retains the revision, while changed content, array order, deletions, or ontology content can change it.
+- Consolidating the existing Rust hashing implementation into the core primitive preserves all serialized bytes, hashes, ETags, and `reqvire-manifest.v1` behavior. Explorer continues to own serialization, chunking, publication, and refresh; no parallel snapshot or hashing service is introduced.
+- Model revision canonical encoding is not applied to Explorer payloads. The manifest revision remains the fingerprint of generated wire bytes, independently of the parsed-element `model_fingerprint`.
+- Matching `If-None-Match` values return `304` with an empty body and the current `ETag`. Conditional matching accepts a quoted tag, a weak tag, a matching tag in a comma-separated list, or `*`. GET and HEAD read the already generated manifest; HEAD returns no body.
+- The complete manifest describes the latest store independently of previously missed revisions. A client can reuse matching chunks and assemble current arrays directly, including renamed, reordered, added, and deleted records, without a mutation log or a patch chain.
+
+Chunk retrieval:
+- The read-only `POST /api/project-store/chunks` accepts JSON `{ "revision": "<manifest hash>", "hashes": ["<chunk hash>", ...] }`. The hash list contains at most 512 entries.
+- A successful response is JSON `{ "revision": "<captured manifest hash>", "chunks": { "<chunk hash>": "<raw JSON text>", ... } }`, containing only requested chunks and deduplicating repeated hash requests.
+- Raw JSON text is transported as a JSON string so the browser verifies the original UTF-8 content before parsing it. Reserializing parsed browser values is not an integrity check because it can change number representations.
+- A request captures one immutable published snapshot for the complete batch. If the validated requested revision differs from that snapshot, the response is `409`; the client requests the latest manifest. The server does not retain old revisions to satisfy stale requests.
+- Invalid hash syntax or a list exceeding 512 entries returns `400`; a requested hash absent from the matching current snapshot returns `404`. These error responses carry a JSON `error` diagnostic.
+
+Full-store compatibility and publication errors:
+- `GET /api/project-store` remains available with JSON `{ "revision": "<manifest hash>", "store": <Project Store> }`, the same revision `ETag`, conditional `304` behavior, and bodyless HEAD support. Automatic browser refresh uses the manifest/chunk routes rather than this full-store response.
+- A cached post-write refresh failure makes manifest and full-store requests return `503` with JSON `{ "revision": "<last valid revision>", "error": "<diagnostic>" }`, retaining the last valid assets, chunks, and revision. HEAD returns the same failure status without a body. A later successful publication clears the diagnostic.
+
+#### Metadata
+  * type: input-output
+
+#### Relations
+  * define: [Served Explorer Runtime Freshness](Capabilities.md#served-explorer-runtime-freshness)
 ---
 
 ### Explorer Mermaid Diagram Style Specification
@@ -844,9 +908,10 @@ Serve command behavior:
 ### Served Explorer Runtime Freshness Specification
 
 #### Details
-
 - Generate the initial runtime snapshot from the validated startup model. Refresh runtime data only after successful embedded MCP write mutations with `serve --enable-mcp --enable-mutations`.
+- A successful write requires the tool result to indicate success, including absence of `isError: true`, and the request to use its persisted execution mode. JSON-RPC transport success alone does not qualify. Rejected mutations and previews neither invoke the post-write rebuild nor replace the published snapshot or clear a previous refresh diagnostic.
 - Retain the immediate post-write hook and shared MCP workspace write gate so runtime generation occurs after completed writes and never reads partial mutation updates. Synchronous model loading and runtime generation run outside the asynchronous request executor.
+- Obtain the complete model for generation through the shared core cache contract or a completed startup/post-write model satisfying that contract. Graph, pages, semantic index, and dependency observations come from one accepted model generation; an older in-progress build cannot replace a newer mutation's generation. Do not introduce a separate Explorer source-cache identity.
 - Generate the Project Store JavaScript, JSON store, ontology artifact, complete manifest, immutable JSON chunks, and manifest-derived revision once per successful runtime rebuild, then publish them together as one immutable snapshot. Keep the published revision, manifest, and chunks in memory.
 - Each response retains the immutable snapshot it captured even if a newer snapshot is published while the response is being prepared. Publication replaces one snapshot reference rather than changing individual assets in place.
 - Runtime data and conditional live requests read the last published snapshot without model-source scans, fingerprint checks, validation, generation, or acquiring the MCP workspace write gate. No runtime request schedules a rebuild or detects external edits.
@@ -859,70 +924,6 @@ Serve command behavior:
 
 #### Relations
   * define: [Served Explorer Runtime Freshness](Capabilities.md#served-explorer-runtime-freshness)
----
-
-### Explorer Live Store Refresh Input Output
-
-#### Details
-
-Availability and initial seed:
-- Only `reqvire serve --enable-mcp --enable-mutations` exposes the live manifest, chunk, and full-store routes below. Plain serving, read-only embedded MCP, static exports, and development fixtures do not advertise live refresh or expose these APIs.
-- The served `assets/project-store.js` initializes `window.reqvireProjectStore` and advertises `window.reqvireLiveRefresh = { "revision": "<manifest hash>", "manifest": <manifest> }` from the same captured snapshot.
-- Generated runtime assets and live API responses use `Cache-Control: no-store`. Missing API routes return `404` rather than the SPA fallback shell; unsupported methods on existing live routes return `405`.
-
-Manifest and content addressing:
-- `GET /api/project-store/manifest` returns the serialized complete manifest with protocol `reqvire-manifest.v1`, a `sections` object, and `ontology_hash`.
-- Section names match `^[a-z][a-z0-9_]*$`; additional compatible sections are supported by the browser.
-- Each top-level Project Store array is described by `{ "kind": "array", "hashes": ["<item hash>", ...] }`. Hash order and repeated references reproduce the complete current array; empty arrays have empty hash lists.
-- Every other top-level value is described by `{ "kind": "value", "hash": "<value hash>" }`. Derived object projections are whole-value chunks rather than nested patches.
-- A chunk identifier is the lowercase 64-character SHA-256 digest of the exact UTF-8 bytes of its serialized JSON text. Identical text shares one chunk. `ontology_hash` is SHA-256 of the generated ontology artifact's UTF-8 bytes.
-- The revision is SHA-256 of the exact UTF-8 serialized manifest, including `ontology_hash`; it is carried in a quoted `ETag`, rather than in the manifest body. An unchanged manifest therefore retains the revision, while changed content, array order, deletions, or ontology content can change it.
-- Matching `If-None-Match` values return `304` with an empty body and the current `ETag`. Conditional matching accepts a quoted tag, a weak tag, a matching tag in a comma-separated list, or `*`. GET and HEAD read the already generated manifest; HEAD returns no body.
-- The complete manifest describes the latest store independently of previously missed revisions. A client can reuse matching chunks and assemble current arrays directly, including renamed, reordered, added, and deleted records, without a mutation log or a patch chain.
-
-Chunk retrieval:
-- The read-only `POST /api/project-store/chunks` accepts JSON `{ "revision": "<manifest hash>", "hashes": ["<chunk hash>", ...] }`. The hash list contains at most 512 entries.
-- A successful response is JSON `{ "revision": "<captured manifest hash>", "chunks": { "<chunk hash>": "<raw JSON text>", ... } }`, containing only requested chunks and deduplicating repeated hash requests.
-- Raw JSON text is transported as a JSON string so the browser verifies the original UTF-8 content before parsing it. Reserializing parsed browser values is not an integrity check because it can change number representations.
-- A request captures one immutable published snapshot for the complete batch. If the validated requested revision differs from that snapshot, the response is `409`; the client requests the latest manifest. The server does not retain old revisions to satisfy stale requests.
-- Invalid hash syntax or a list exceeding 512 entries returns `400`; a requested hash absent from the matching current snapshot returns `404`. These error responses carry a JSON `error` diagnostic.
-
-Full-store compatibility and publication errors:
-- `GET /api/project-store` remains available with JSON `{ "revision": "<manifest hash>", "store": <Project Store> }`, the same revision `ETag`, conditional `304` behavior, and bodyless HEAD support. Automatic browser refresh uses the manifest/chunk routes rather than this full-store response.
-- A cached post-write refresh failure makes manifest and full-store requests return `503` with JSON `{ "revision": "<last valid revision>", "error": "<diagnostic>" }`, retaining the last valid assets, chunks, and revision. HEAD returns the same failure status without a body. A later successful publication clears the diagnostic.
-
-#### Metadata
-  * type: input-output
-
-#### Relations
-  * define: [Served Explorer Runtime Freshness](Capabilities.md#served-explorer-runtime-freshness)
----
-
-### Explorer Automatic Store Refresh Specification
-
-#### Details
-
-- Enable live refresh only when the mutation-enabled embedded MCP server's seed advertises it. Plain serving, read-only embedded MCP, static exports, and development fixtures do not poll the live API.
-- While the document is visible, request the manifest every five seconds using the committed revision in `If-None-Match`. Check immediately on mount and when visibility returns. Suspend periodic requests while hidden and prevent overlapping active checks.
-- Refresh is automatic; the shell has no manual Refresh action or background-job status polling.
-- Associate a valid initial seed manifest with its already loaded store values after checking the manifest revision and section correspondence. An invalid advertisement leaves the refresh cache and cursor empty so a complete current snapshot is fetched instead of accepting an ungrounded `304`.
-- Verify a changed manifest's exact UTF-8 SHA-256 against its quoted revision `ETag`, its protocol, and its chunk-reference syntax. A `304` requires the matching committed revision and retains the existing store object and derived indexes.
-- Reuse chunks referenced by the committed manifest and request only missing unique hashes in batches of at most 512. Validate each response's revision, exact requested hash set, and raw chunk-text SHA-256 before parsing chunk contents.
-- Assemble all current sections in manifest order and validate the complete candidate with the shared store loader before publication. Required array sections contain object records with string `path` identifiers for files/folders or string `id` identifiers for the other record families. Known object sections reject nulls and arrays; refreshed stores require the expected schema version, while unknown future sections remain supported.
-- Preparation does not advance the published revision, mutate the committed cache, or change the displayed store. Only the still-mounted consumer that owns the uncancelled request commits the complete prepared store and its revision together.
-- A chunk `409` discards that attempt's staged data and requests a new manifest, with at most three complete attempts per refresh check. Partial downloads from different revisions are not combined. Exhausted attempts retain the valid view and retry on a later automatic check.
-- Live stores and manifests are deeply frozen to protect shared cached values from renderer mutation. Unchanged chunks and whole unchanged sections retain object identity; a successful commit retains only chunks referenced by the newly published manifest so deleted and historic content does not accumulate.
-- A successful changed store replaces the current snapshot without remounting the shell or UI-state provider, reloading the page, or changing the hash route. Existing selection, modal context, filters, and layout remain available where their targets still exist; deleted targets use the existing missing-record behavior.
-- Derived element lookups, search indexes, file views, and other store consumers adopt the new snapshot.
-- Failed requests, missing or corrupt chunks, unsupported manifests, incompatible stores, and server refresh errors retain the valid view, committed revision, and cache, and show a diagnostic indicating automatic retry. A later successful refresh or matching `304` clears the diagnostic.
-- Each check has a 15-second timeout covering manifest and chunk retrieval. Timeout releases the active request so a later automatic check can retry. Hiding the document aborts and releases its request immediately; late aborted responses cannot replace a newer committed store.
-- Unmount cancels requests, visibility listeners, and timers. Effect cleanup, including React StrictMode replay, cannot publish abandoned work.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Explorer Automatic Store Refresh](Capabilities.md#explorer-automatic-store-refresh)
 ---
 
 ### Thesaurus View Generation Contract Specification

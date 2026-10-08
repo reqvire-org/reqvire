@@ -106,6 +106,7 @@ Detailed engine, graph composition, graph-role metadata, query-form result shape
 
 #### Contract Bindings
   * [Semantic Relation Family Projection Specification](../../Reports/ModelReports/Specifications.md#semantic-relation-family-projection-specification)
+  * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
 
 #### Relations
   * definedBy: [MCP Semantic Query Tools Specification](Specifications.md#mcp-semantic-query-tools-specification)
@@ -227,6 +228,9 @@ The system shall serialize mutation execution per workspace when the MCP transpo
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
+
 #### Relations
   * definedBy: [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
@@ -244,12 +248,16 @@ Detailed preview, execution, diagnostics, changed-file reporting, affected-scope
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
+
 #### Relations
   * definedBy: [MCP Mutation Execution Flow Specification](Specifications.md#mcp-mutation-execution-flow-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/tool_interface/mod.rs)
   * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
   * verifiedBy: [MCP Mutation Execution Flow Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-mutation-execution-flow-verification)
 ---
@@ -283,6 +291,7 @@ The system shall expose mutation tools only through typed Reqvire core operation
   * [Relation Operations Specification](../../ModelStructure/Specifications.md#relation-operations-specification)
   * [Atomic Relation Relink Workflow Specification](../../Operations/ModelOperations/Specifications.md#atomic-relation-relink-workflow-specification)
   * [Relation Consistency Maintenance Contract Specification](../../Operations/ModelOperations/Specifications.md#relation-consistency-maintenance-contract-specification)
+  * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
 
 #### Relations
   * definedBy: [MCP Mutation Tool Safety Specification](Specifications.md#mcp-mutation-tool-safety-specification)
@@ -424,17 +433,21 @@ The system shall keep MCP server cached model state subordinate to Reqvire sourc
 - The MCP server shall keep cached model state subordinate to Reqvire core parsing.
 - The MCP server shall report enough revision state for clients to reason about cache freshness.
 - The MCP server shall refresh stale model state before returning authoritative model evidence.
+- When active exclusion configuration or a model construction dependency changes, the MCP server shall apply the updated inputs on subsequent model reads without requiring a server restart.
+- The MCP server shall use the shared core cache correctness and publication guarantees for model reads and post-mutation synchronization.
 
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
+  * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
+
 #### Relations
-  * definedBy: [MCP Server State and Cache Specification](Specifications.md#mcp-server-state-and-cache-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [model_cache.rs](../../../crates/reqvire-core/src/model_cache.rs)
   * satisfiedBy: [arg_helpers.rs](../../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
-  * verifiedBy: [MCP Server State and Cache Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-server-state-and-cache-verification)
 ---
 
 ### MCP Shared Operation Interfaces
@@ -516,8 +529,10 @@ Detailed schema-source, semantic evidence, mutation/error result, versioning, an
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
+
 #### Relations
-  * definedBy: [MCP Structured Payload Contracts Specification](Specifications.md#mcp-structured-payload-contracts-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * verifiedBy: [MCP Structured Payload Contracts Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-structured-payload-contracts-verification)
@@ -575,10 +590,9 @@ The system shall expose MCP-only workspace/session tools for workspace status, t
 
 #### Contract Bindings
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+  * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
 
 #### Relations
-  * definedBy: [MCP Workspace Session Tools Specification](Specifications.md#mcp-workspace-session-tools-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * verifiedBy: [MCP Workspace Session Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-workspace-session-tools-verification)
 ---

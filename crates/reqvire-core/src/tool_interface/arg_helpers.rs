@@ -137,24 +137,6 @@ pub(crate) fn current_dir_string() -> String {
     current_dir_path().to_string_lossy().to_string()
 }
 
-pub(crate) fn model_fingerprint(model: &ModelManager) -> String {
-    let mut hasher = std::collections::hash_map::DefaultHasher::new();
-    let mut elements = model.graph_registry.get_all_elements();
-    elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
-    for element in elements {
-        element.identifier.hash(&mut hasher);
-        element.name.hash(&mut hasher);
-        element.element_type.as_str().hash(&mut hasher);
-        element.content.hash(&mut hasher);
-        element.file_path.hash(&mut hasher);
-        for relation in &element.relations {
-            relation.relation_type.name.hash(&mut hasher);
-            relation.target.link.as_str().hash(&mut hasher);
-        }
-        for contract_bindings in &element.contract_bindings {
-            contract_bindings.target.as_str().hash(&mut hasher);
-        }
-    }
-
-    format!("{:016x}", hasher.finish())
+pub(crate) fn model_fingerprint(model: &ModelManager) -> Result<String, ReqvireError> {
+    crate::model_revision::fingerprint(&model.graph_registry.get_all_elements())
 }

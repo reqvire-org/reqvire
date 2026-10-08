@@ -47,7 +47,7 @@ impl Iterator for FileReaderIterator<'_> {
                         Err(e) => Err(e),
                     }
                 }
-                None => fs::read_to_string(&file)
+                None => crate::model_inputs::read_to_string(&file)
                     .map(|content| (file, filename_str, content))
                     .map_err(ReqvireError::IoError),
             }
@@ -56,7 +56,7 @@ impl Iterator for FileReaderIterator<'_> {
 }
 /// Reads a file's content
 pub fn read_file(path: &Path) -> Result<String, ReqvireError> {
-    fs::read_to_string(path).map_err(ReqvireError::IoError)
+    crate::model_inputs::read_to_string(path).map_err(ReqvireError::IoError)
 }
 
 /// Write content to a file, creating parent directories if needed

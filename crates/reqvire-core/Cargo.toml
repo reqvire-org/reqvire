@@ -36,6 +36,7 @@ serde_json = { workspace = true }
 
 # Performance
 rustc-hash = { workspace = true }
+sha2 = { workspace = true }
 oxigraph = { workspace = true }
 o-kernel = { workspace = true }
 

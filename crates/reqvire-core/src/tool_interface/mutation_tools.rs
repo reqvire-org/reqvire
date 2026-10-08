@@ -16,9 +16,6 @@ pub(crate) fn add_element_tool(
         bool_arg(args, "dry_run", false),
         bool_arg(args, "override_existing", false),
     )?;
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }
 
@@ -37,9 +34,6 @@ pub(crate) fn remove_element_tool(
         &workspace_root,
         bool_arg(args, "dry_run", false),
     )?;
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }
 
@@ -61,9 +55,6 @@ pub(crate) fn move_element_tool(
         &workspace_root,
         bool_arg(args, "dry_run", false),
     )?;
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }
 
@@ -83,9 +74,6 @@ pub(crate) fn rename_element_tool(
         &workspace_root,
         bool_arg(args, "dry_run", false),
     )?;
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }
 
@@ -102,9 +90,6 @@ pub(crate) fn merge_elements_tool(
         &workspace_root,
         bool_arg(args, "dry_run", false),
     )?;
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }
 
@@ -124,9 +109,6 @@ pub(crate) fn move_file_tool(
         bool_arg(args, "dry_run", false),
         bool_arg(args, "squash", false),
     )?;
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }
 
@@ -144,9 +126,6 @@ pub(crate) fn move_folder_tool(
         &workspace_root,
         bool_arg(args, "dry_run", false),
     )?;
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }
 
@@ -183,9 +162,6 @@ pub(crate) fn link_tool(
             bool_arg(args, "dry_run", false),
         )?
     };
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }
 
@@ -201,9 +177,6 @@ pub(crate) fn unlink_tool(
         &current_dir_path(),
         bool_arg(args, "dry_run", false),
     )?;
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }
 
@@ -221,9 +194,6 @@ pub(crate) fn relink_tool(
         &current_dir_path(),
         bool_arg(args, "dry_run", false),
     )?;
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }
 
@@ -239,9 +209,6 @@ pub(crate) fn move_asset_tool(
         &current_dir_path(),
         bool_arg(args, "dry_run", false),
     )?;
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }
 
@@ -256,8 +223,5 @@ pub(crate) fn remove_asset_tool(
         &current_dir_path(),
         bool_arg(args, "dry_run", false),
     )?;
-    if !bool_arg(args, "dry_run", false) {
-        crate::model_cache::invalidate();
-    }
     parse_json_string(render_crud_json(&result))
 }

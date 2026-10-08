@@ -1,5 +1,5 @@
-use globset::GlobSet;
 use reqvire::error::{ReqvireError, ValidationDiagnostic};
+use reqvire::exclusions::ExclusionSet as GlobSet;
 use reqvire::mcp_prompts::{prompt_definitions_json, prompt_get_result_json};
 use reqvire::tool_interface::{
     request_requires_write_tool, resource_definitions as shared_resource_definitions,
@@ -77,12 +77,17 @@ impl ReqvireMcpServer {
         params: Value,
         serialize: bool,
     ) -> Result<Value, McpError> {
-        if serialize {
+        // These handlers obtain their model after dispatch. They must wait for
+        // a controlled write rather than scan a partially persisted workspace.
+        if serialize || matches!(method, "tools/call" | "resources/read") {
             let _guard = self.write_lock.lock().await;
             let should_refresh_runtime =
                 method == "tools/call" && request_refreshes_runtime_after_write(&params);
             let result = self.call_handler_unlocked(method, params);
-            if result.is_ok() && should_refresh_runtime {
+            let succeeded = result
+                .as_ref()
+                .is_ok_and(|value| value.get("isError").and_then(Value::as_bool) != Some(true));
+            if succeeded && should_refresh_runtime {
                 if let Some(post_write_hook) = &self.post_write_hook {
                     post_write_hook()
                         .await
@@ -761,7 +766,9 @@ mod tests {
             }),
             false,
             false,
-            &globset::GlobSetBuilder::new().build().unwrap(),
+            &reqvire::exclusions::ExclusionSetBuilder::new()
+                .build()
+                .unwrap(),
         )
         .unwrap();
 
@@ -778,3 +785,7 @@ mod tests {
             .contains("element_name"));
     }
 }
+
+#[cfg(test)]
+#[path = "mcp_cache_tests.rs"]
+mod cache_correctness_tests;

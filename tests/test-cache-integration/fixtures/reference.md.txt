@@ -1,0 +1,12 @@
+# Elements
+
+### Cache Requirement
+
+The system shall preserve valid references during writes.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Cache Subject](Model.md#cache-subject)
+---

@@ -1,0 +1,17 @@
+# Elements
+
+### Alpha
+
+First.
+
+#### Metadata
+  * type: capability
+---
+
+### Omega
+
+Last.
+
+#### Metadata
+  * type: capability
+---

@@ -1,0 +1,27 @@
+# Elements
+
+### Cache Ontology
+
+Cache dependency freshness.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/cache
+  * ontology_prefix: local
+
+#### External Ontology
+  * prefix: ext
+  * namespace: https://example.test/external#
+  * resource: https://example.test/external
+  * source: external.ttl
+  * format: turtle
+
+#### Ontology
+```turtle
+@prefix local: <https://example.test/cache#> .
+@prefix ext: <https://example.test/external#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+<https://example.test/cache> a owl:Ontology .
+local:Resource a owl:Class ; rdfs:subClassOf ext:ExternalResource .
+```

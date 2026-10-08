@@ -237,28 +237,44 @@ examples/**
 
 ### In-Memory Model Build Cache Specification
 
+Correctness contract for reusable current-workspace model construction.
+
 #### Details
-The cache is a static `Mutex<Option<CachedModel>>` global holding the most recently built `ModelManager` together with the `CacheKey` that produced it.
 
-**Cache key:**
-- `options: ModelBuildOptions` — the full build-option struct (including `lenient` and `with_size_estimates`). Two different option sets always produce different keys.
-- `files: BTreeMap<PathBuf, FileFingerprint>` — a sorted map of every scanned markdown file to its content fingerprint.
-- `FileFingerprint = { len: u64, content_hash: String }` — file byte length plus a content hash of the file contents.
+##### Stable construction identity
+- Cache identity describes construction inputs, not the runtime state of objects used to inspect them. Identical effective inputs retain the same identity across requests, worker threads, matcher cloning, and matcher reconstruction.
+- Identity includes the effective workspace root and eligible Git worktree scope, available worktree `HEAD` and dirty state, implementation and operation-contract versions, all `ModelBuildOptions` including `lenient` and `with_size_estimates`, effective exclusion rules, the selected Markdown source inventory, and the dependency observations described below.
+- Retain normalized effective pattern strings and matching options alongside the compiled exclusion matcher. Use deterministic ordering and remove duplicate rules where the bound ignore contract's any-match semantics make order and repetition irrelevant. Preserve existing pattern interpretation and worktree-relative scope.
+- Compiled matcher debug output, regex scratch state, thread identifiers, allocation identity, and pattern count alone are not exclusion identity. Hashing those unstable or incomplete values does not make them suitable keys.
 
-**Fingerprint computation:**
-- Files are discovered by scanning the same markdown files the parser would consider (`utils::scan_markdown_files`), using the same exclusion patterns.
-- For each file, contents are read and hashed. Added, removed, or modified files change the fingerprint and force a rebuild.
+##### Source and dependency freshness
+- Discover the same eligible Markdown files and apply the same active exclusion policy as the authoritative parser. Record workspace-root-relative paths and content-sensitive fingerprints of complete source bytes, including page content. Added, removed, moved, or edited sources change the construction inputs.
+- Observe creation, modification, and removal of the bound ignore contract's applicable configuration files. Reload their effective policy before selecting files, validating paths, or accepting a cache hit. Configuration detection and the matcher used for construction belong to the same observation; a new configuration identity cannot accompany an old matcher. Nested ignore files remain outside the existing root-only policy.
+- Track non-Markdown dependencies consumed by model construction, including full local external ontology sources in Turtle/TTL, RDF/XML, and JSON-LD. Their resolved paths and content changes participate in freshness even when no Markdown or public model revision changes. Built-in external sources are covered by the binary version.
+- Track existence, readability, workspace eligibility, and path-resolution observations where validation depends on them, including local evidence/resource targets and missing dependencies. Where an input's bytes contribute to a cached result, track those bytes; existence-only validation does not require hashing unrelated artifact contents.
+- Dependency tracking includes paths considered by resolution fallback, so creation or removal of a higher-priority source cannot leave a previously selected fallback cached. Preserve the bound workspace and external-source path semantics.
+- Refresh source inventory and dependency observations before accepting reuse. A warm dependency set can guide these checks, but changed model declarations require discovery of their new dependency set. A continuously dirty worktree is not evidence that dependency inputs are unchanged.
+- File length and modification time alone cannot establish freshness. Equal-length edits with preserved timestamps remain detectable. This contract retains the current file-content hash algorithm and does not substitute parsed-element revisions or generated-artifact hashes for source-cache identity.
 
-**Load path (`load_cached_model`):**
-1. Compute the fingerprint and key.
-2. Lock the cache and compare keys. On a match, clone and return the stored model without re-parsing.
-3. On a miss, release the lock, rebuild via `ModelManager::parse_and_validate_with_options`, then store a clone of the rebuilt model under the new key and return the clone.
+##### Reuse, rebuild, and publication
+1. Observe current workspace scope, exclusion configuration, build options, sources, and known dependencies. Freshness checking may read files; a cache hit avoids repeated parsing, graph validation, and semantic-store construction.
+2. Reuse only a completed model matching those inputs and the requested build mode. Never satisfy a strict request with a lenient model or return size estimates from another build mode.
+3. Coordinate concurrent misses for identical inputs and build mode so one build supplies their completed model or applicable failure. Cache lookup/publication locks are not held during parsing or dependency I/O; waiting for a shared build does not require publishing partially built state.
+4. Associate the candidate and its identity with the inputs actually consumed. Check that relevant observations and the workspace invalidation generation still permit publication. If they changed during construction, discard the superseded candidate and retry from fresh inputs or report that a stable current model could not be obtained; retries are bounded.
+5. Publish parsed graph, pages, semantic index/query stores, and applicable validation state together. A read holds one completed model throughout its operation; later builds or mutations do not modify that captured model in place.
+- Failed construction releases waiting requests with the applicable error/diagnostics and permits later recovery. An older valid entry may be retained internally, but cannot be returned as authoritative evidence for newer invalid inputs. Lenient behavior remains governed by the requested validation mode.
+- Source observations do not turn unrelated external filesystem writes into atomic transactions. Detected changes during construction cannot be silently accepted as a matching candidate; controlled Reqvire writes use the owning operation's serialization and persistence guarantees.
 
-**Invalidation (`invalidate`):**
-- Clears the stored entry, forcing the next `load_cached_model` call to rebuild. Called after every CRUD write in `tool_interface.rs` (add, move, rename, remove, merge, relink, link, unlink, mv-file, mv-folder, mv-asset, rm-asset).
+##### Controlled writes and boundaries
+- Successful persisted mutations invalidate affected source observations before subsequent dependent reads. Invalidation also supersedes older in-progress builds so they cannot repopulate current cache state after the write.
+- Reuse of a completed post-write core model is permitted only after its graph, pages, semantic state, dependency observations, and source identity agree with persisted inputs. Otherwise rebuild through the same core construction path. An updated graph with a stale semantic store is not publishable.
+- Preview requests and rejected operations that leave sources unchanged do not publish a mutation candidate. If an error follows any persisted change, invalidate affected state and report the error; never preserve a cache hit by assuming that every failed operation wrote nothing.
+- This cache covers current-workspace construction only. Historical Git-commit builds bypass it.
+- Subsystems loading current-workspace models reuse this construction contract through their consuming requirements. Subsystems generating or publishing derived artifacts own their output snapshots, output hashes, refresh triggers, and delivery lifecycle; source-cache freshness alone does not trigger artifact publication.
+- Shared-reference return types, cache capacity/eviction, incremental parsing, filesystem watchers, path memoization, and latency targets are later implementation/performance choices. They cannot weaken the correctness rules above.
 
-**Scope:**
-- Only the current working tree is cached. Git-commit history scans (`parse_and_validate`) bypass the cache entirely.
+##### Required verification evidence
+Observe actual build/reuse events or instrumented build counts independently of response equality and elapsed time. Tests must distinguish reuse, invalidation, superseded publication, and successful recovery; instrumentation need not add public interface fields.
 
 #### Metadata
   * type: specification

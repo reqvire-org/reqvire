@@ -26,7 +26,7 @@ pub(crate) fn workspace_status(
         "size_estimates_enabled": with_size_estimates,
         "model": {
             "valid": true,
-            "fingerprint": model_fingerprint(&model),
+            "fingerprint": model_fingerprint(&model)?,
             "element_count": model.graph_registry.nodes.len(),
             "file_count": files.len()
         }
@@ -49,7 +49,7 @@ pub(crate) fn model_revision(
         "mcp_protocol_version": MCP_PROTOCOL_VERSION,
         "tool_contract_version": TOOL_CONTRACT_VERSION,
         "size_estimates_enabled": with_size_estimates,
-        "model_fingerprint": model_fingerprint(&model)
+        "model_fingerprint": model_fingerprint(&model)?
     }))
 }
 
@@ -279,7 +279,7 @@ pub(crate) fn sparql_tool(
         );
         object.insert(
             "model_fingerprint".to_string(),
-            json!(model_fingerprint(&model)),
+            json!(model_fingerprint(&model)?),
         );
         object.insert("graph_layers".to_string(), json!(graph_layers));
     }

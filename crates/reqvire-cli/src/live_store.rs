@@ -3,9 +3,9 @@
 use axum::http::StatusCode;
 use reqvire::error::ReqvireError;
 use reqvire::explorer_runtime::ExplorerRuntimeAssets;
+use reqvire::hashing::sha256_hex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, HashMap};
 
 pub const MAX_CHUNK_BATCH: usize = 512;
@@ -38,10 +38,7 @@ pub struct LiveStore {
 }
 
 fn content_hash(content: &str) -> String {
-    Sha256::digest(content.as_bytes())
-        .iter()
-        .map(|byte| format!("{byte:02x}"))
-        .collect()
+    sha256_hex(content.as_bytes())
 }
 
 fn valid_hash(hash: &str) -> bool {
@@ -163,6 +160,16 @@ mod tests {
             "empty": [], "project": {"name": "café"}, "extra": null,
         });
         let live = snapshot(store.clone(), "ontology");
+        // Independent golden bytes pin the Explorer protocol across extraction
+        // of SHA-256 into core. Model revision framing must never enter here.
+        assert_eq!(
+            live.manifest_json,
+            include_str!("../tests/fixtures/live-store-manifest.json").trim_end()
+        );
+        assert_eq!(
+            live.revision,
+            "c93e908d4702c6c90e66f936b9dfbcd128e97ee5175554f1aae1c0782e519cf0"
+        );
         assert_eq!(live.revision, content_hash(&live.manifest_json));
         let manifest: Value = serde_json::from_str(&live.manifest_json).unwrap();
         let mut recovered = serde_json::Map::new();

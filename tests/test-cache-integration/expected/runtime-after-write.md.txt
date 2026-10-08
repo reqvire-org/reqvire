@@ -1,0 +1,18 @@
+# Elements
+
+### Cache Subject
+
+Source marker omega.
+
+#### Metadata
+  * type: capability
+---
+
+### Other Subject
+
+Another capability.
+
+#### Metadata
+  * type: capability
+---
+

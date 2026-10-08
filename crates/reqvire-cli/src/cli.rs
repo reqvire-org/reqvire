@@ -1,12 +1,12 @@
 use crate::mcp;
 use crate::serve;
 use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
-use globset::GlobSet;
 use log::info;
 use reqvire::crud;
 use reqvire::diff::{render_crud_json, render_crud_result};
 use reqvire::element::Element;
 use reqvire::error::ReqvireError;
+use reqvire::exclusions::ExclusionSet as GlobSet;
 use reqvire::explorer_runtime;
 use reqvire::format::{format_files, render_diff, render_diff_json};
 use reqvire::git_commands;
@@ -1650,8 +1650,7 @@ pub async fn handle_command(
             // Enable quiet mode for serve command runtime generation.
             reqvire::utils::enable_quiet_mode();
 
-            let explorer_assets =
-                explorer_runtime::build_runtime_assets(&model_manager.graph_registry)?;
+            let explorer_assets = explorer_runtime::build_runtime_assets(&model_manager)?;
 
             // Start HTTP server (runs until Ctrl-C)
             info!("Starting HTTP server at http://{}:{}/", host, port);
@@ -1670,8 +1669,7 @@ pub async fn handle_command(
         Some(Commands::Export { output }) => {
             reqvire::utils::enable_quiet_mode();
 
-            let explorer_assets =
-                explorer_runtime::build_runtime_assets(&model_manager.graph_registry)?;
+            let explorer_assets = explorer_runtime::build_runtime_assets(&model_manager)?;
 
             let output_dir = std::path::Path::new(&output);
             explorer_runtime::export_to_dir(&explorer_assets, output_dir)?;
@@ -2686,7 +2684,8 @@ fn print_impact_tree(node: &reqvire::graph_registry::ElementNode, depth: usize) 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use globset::{Glob, GlobSet, GlobSetBuilder};
+    use globset::Glob;
+    use reqvire::exclusions::{ExclusionSet as GlobSet, ExclusionSetBuilder as GlobSetBuilder};
 
     fn build_glob_set(patterns: &[String]) -> GlobSet {
         let mut builder = GlobSetBuilder::new();

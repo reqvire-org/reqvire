@@ -239,6 +239,80 @@ pub enum ReqvireError {
     },
 }
 
+// Concurrent cache waiters receive the same error category and diagnostics.
+// OS and JSON errors own non-Clone internals; reconstruct their display payload.
+impl Clone for ReqvireError {
+    fn clone(&self) -> Self {
+        match self {
+            Self::IoError(error) => Self::IoError(
+                error
+                    .raw_os_error()
+                    .map(std::io::Error::from_raw_os_error)
+                    .unwrap_or_else(|| std::io::Error::new(error.kind(), error.to_string())),
+            ),
+            Self::GitCommandError(error) => Self::GitCommandError(error.clone()),
+            Self::InvalidIdentifier(error) => Self::InvalidIdentifier(error.clone()),
+            Self::RelationError(error) => Self::RelationError(error.clone()),
+            Self::ElementError(error) => Self::ElementError(error.clone()),
+            Self::CircularDependencyError(error) => Self::CircularDependencyError(error.clone()),
+            Self::DuplicateElement(error) => Self::DuplicateElement(error.clone()),
+            Self::DuplicateSubsection(error) => Self::DuplicateSubsection(error.clone()),
+            Self::MissingElement(error) => Self::MissingElement(error.clone()),
+            Self::MissingRelationTarget(error) => Self::MissingRelationTarget(error.clone()),
+            Self::MissingParentRelation(error) => Self::MissingParentRelation(error.clone()),
+            Self::InvalidRelationFormat(error) => Self::InvalidRelationFormat(error.clone()),
+            Self::InvalidMetadataFormat(error) => Self::InvalidMetadataFormat(error.clone()),
+            Self::InvalidMarkdownStructure(error) => Self::InvalidMarkdownStructure(error.clone()),
+            Self::DuplicateRelation(error) => Self::DuplicateRelation(error.clone()),
+            Self::UnsupportedRelationType(error) => Self::UnsupportedRelationType(error.clone()),
+            Self::IncompatibleElementTypes(error) => Self::IncompatibleElementTypes(error.clone()),
+            Self::MixedHierarchicalRelations(error) => {
+                Self::MixedHierarchicalRelations(error.clone())
+            }
+            Self::PathError(error) => Self::PathError(error.clone()),
+            Self::InvalidRegex(error) => Self::InvalidRegex(error.clone()),
+            Self::InvalidGlob(error) => Self::InvalidGlob(error.clone()),
+            Self::ProcessError(error) => Self::ProcessError(error.clone()),
+            Self::ElementMoveError(error) => Self::ElementMoveError(error.clone()),
+            Self::LocationNotFound(error) => Self::LocationNotFound(error.clone()),
+            Self::LocationAlreadyExists(error) => Self::LocationAlreadyExists(error.clone()),
+            Self::InvalidPath(error) => Self::InvalidPath(error.clone()),
+            Self::ValidationError(error) => Self::ValidationError(error.clone()),
+            Self::SerializationError(error) => Self::SerializationError(error.clone()),
+            Self::SerdeJsonError(error) => Self::SerdeJsonError(
+                <serde_json::Error as serde::de::Error>::custom(error.to_string()),
+            ),
+            Self::InvalidContractBindingFormat(error) => {
+                Self::InvalidContractBindingFormat(error.clone())
+            }
+            Self::MissingContractBindingTarget(error) => {
+                Self::MissingContractBindingTarget(error.clone())
+            }
+            Self::InvalidContractBindingTarget(error) => {
+                Self::InvalidContractBindingTarget(error.clone())
+            }
+            Self::InvalidContractBindingScope(error) => {
+                Self::InvalidContractBindingScope(error.clone())
+            }
+            Self::DuplicateContractBinding(error) => Self::DuplicateContractBinding(error.clone()),
+            Self::CrossSectionDuplicate(error) => Self::CrossSectionDuplicate(error.clone()),
+            Self::ElementNotFound(error) => Self::ElementNotFound(error.clone()),
+            Self::MergeTypeMismatch(error) => Self::MergeTypeMismatch(error.clone()),
+            Self::MergeCrossSectionDuplicate(error) => {
+                Self::MergeCrossSectionDuplicate(error.clone())
+            }
+            Self::InvalidOperation(error) => Self::InvalidOperation(error.clone()),
+            Self::ValidationDiagnostics {
+                diagnostics,
+                related_errors,
+            } => Self::ValidationDiagnostics {
+                diagnostics: diagnostics.clone(),
+                related_errors: related_errors.clone(),
+            },
+        }
+    }
+}
+
 impl ReqvireError {
     /// Returns a stable, machine-readable diagnostic code for this error variant.
     pub fn diagnostic_code(&self) -> &'static str {
