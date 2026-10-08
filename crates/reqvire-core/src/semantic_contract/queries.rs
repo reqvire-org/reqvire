@@ -1,5 +1,6 @@
 //! Native, non-executing SPARQL artifacts. All delivery surfaces share this index.
 use super::*;
+use crate::parser::{opening_code_fence, CodeFence};
 use oxigraph::model::{Literal, NamedNode, Quad};
 use spargebra::{algebra::*, term::*, Query, SparqlParser};
 
@@ -21,15 +22,16 @@ impl QuerySource {
         };
         let mut section = "";
         let mut sections = BTreeSet::new();
-        let mut fence = 0;
+        let mut fence = CodeFence::default();
         let mut language = String::new();
         let mut text = String::new();
         let mut line_number = 0;
         let mut purpose = String::new();
         for (i, line) in content.split_inclusive('\n').enumerate() {
             let trimmed = line.trim();
-            if fence > 0 {
-                if trimmed.len() >= fence && trimmed.chars().all(|c| c == '`') {
+            if fence.is_open() {
+                fence.consume(trimmed);
+                if !fence.is_open() {
                     if section == "Query" {
                         if source.query.is_some() {
                             source
@@ -42,7 +44,6 @@ impl QuerySource {
                             line_number,
                         });
                     }
-                    fence = 0;
                 } else {
                     text.push_str(line);
                 }
@@ -60,9 +61,9 @@ impl QuerySource {
                 }
                 continue;
             }
-            if trimmed.starts_with("```") {
-                fence = trimmed.chars().take_while(|c| *c == '`').count();
-                language = trimmed[fence..].trim().to_owned();
+            if let Some((_, information)) = opening_code_fence(trimmed) {
+                fence.consume(trimmed);
+                language = information.to_owned();
                 text.clear();
                 line_number = i + 1;
                 continue;
@@ -94,7 +95,7 @@ impl QuerySource {
                 _ => {}
             }
         }
-        if fence > 0 {
+        if fence.is_open() {
             source.diagnostics.push("Unclosed Query fence".into());
         }
         if sections.contains("Produces") && source.produces.is_empty() {

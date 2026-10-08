@@ -718,3 +718,28 @@ CLI and MCP mutations MUST share the same model operations and validation. The `
 #### Metadata
   * type: specification
 ---
+
+### Fenced Code Content Preservation Specification
+
+#### Details
+These rules define the backtick-fence behavior shared by model-file parsing, single-element add/override parsing, reserved-subsection discovery, semantic-query extraction and Markdown formatting.
+
+##### Fence Boundaries
+- An opening fence MUST contain at least three consecutive backticks. Optional language information MAY follow, but the information string MUST NOT contain backticks.
+- An opening fence MAY appear after surrounding whitespace, an unordered list marker (`*`, `-`, `+`) or an ordered list marker (one to nine digits followed by `.` or `)`). List markers MUST be followed by a space or tab. Indented and nested list examples MUST be recognized.
+- A closing fence MUST contain at least as many consecutive backticks as the opening fence and otherwise only surrounding whitespace. Shorter runs, list-prefixed runs and runs with trailing non-whitespace text MUST remain literal code content.
+- Element headings, reserved subsection headings, metadata, relations, concept references, separators and HTML-details markers inside an open fence MUST NOT be interpreted as model structure.
+- Structural parsing MUST resume after the matching closing fence so actual metadata, relations and later referenced elements remain visible.
+
+##### Source Preservation
+- Parsing MUST retain the fence and its literal content without rewriting the code.
+- Add, override and `format --fix` MUST preserve code-block bytes, including indentation, blank lines and literal headings, while normalizing model structure outside the fence.
+- Reserved-subsection discovery MUST ignore list-fenced examples before real Ontology and Query subsections. Extracted blocks MUST retain their language and source location; semantic-query exports MUST retain their document bytes.
+- Fence state MUST remain separate from existing HTML-details handling so a fence-like line inside an HTML-details block cannot hide later elements.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Fenced Code Content Preservation](StructureAndParsing.md#fenced-code-content-preservation)
+---

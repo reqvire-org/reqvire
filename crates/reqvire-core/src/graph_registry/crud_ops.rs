@@ -842,20 +842,12 @@ impl GraphRegistry {
     fn ensure_blank_lines_before_subsections(content: &str) -> String {
         let mut result = String::new();
         let mut in_details = false;
-        let mut fence = 0;
+        let mut fence = crate::parser::CodeFence::default();
 
         for raw_line in content.split_inclusive('\n') {
             let line = raw_line.trim_end_matches(['\r', '\n']);
             let trimmed = line.trim();
-            if !in_details && (fence > 0 || trimmed.starts_with("```")) {
-                if trimmed.starts_with("```") {
-                    let length = trimmed.chars().take_while(|c| *c == '`').count();
-                    if fence == 0 {
-                        fence = length;
-                    } else if length >= fence && trimmed.chars().all(|c| c == '`') {
-                        fence = 0;
-                    }
-                }
+            if !in_details && fence.consume(trimmed) {
                 result.push_str(raw_line);
                 continue;
             }

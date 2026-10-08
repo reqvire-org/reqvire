@@ -59,10 +59,66 @@ pub struct ParsedExternalOntologySource {
     pub line_number: usize,
 }
 
+/// Recognize a backtick fence, including one introduced by a Markdown list item.
+pub(crate) fn opening_code_fence(line: &str) -> Option<(usize, &str)> {
+    let mut text = line.trim();
+    loop {
+        let bytes = text.as_bytes();
+        let marker_end = if matches!(bytes.first(), Some(b'*' | b'-' | b'+')) {
+            1
+        } else {
+            let digits = bytes
+                .iter()
+                .take_while(|byte| byte.is_ascii_digit())
+                .count();
+            if (1..=9).contains(&digits) && matches!(bytes.get(digits), Some(b'.' | b')')) {
+                digits + 1
+            } else {
+                break;
+            }
+        };
+        if !matches!(bytes.get(marker_end), Some(b' ' | b'\t')) {
+            break;
+        }
+        text = text[marker_end..].trim_start();
+    }
+    let length = text.bytes().take_while(|byte| *byte == b'`').count();
+    let information = &text[length..];
+    (length >= 3 && !information.contains('`')).then_some((length, information.trim()))
+}
+
+/// Shared fence boundaries for file, mutation, subsection, and query parsing.
+#[derive(Default)]
+pub(crate) struct CodeFence {
+    length: usize,
+}
+
+impl CodeFence {
+    pub(crate) fn is_open(&self) -> bool {
+        self.length > 0
+    }
+
+    /// Consume openings, literal code lines and matching closings.
+    pub(crate) fn consume(&mut self, line: &str) -> bool {
+        let text = line.trim();
+        if self.is_open() {
+            if text.len() >= self.length && text.bytes().all(|byte| byte == b'`') {
+                self.length = 0;
+            }
+            return true;
+        }
+        if let Some((length, _)) = opening_code_fence(text) {
+            self.length = length;
+            return true;
+        }
+        false
+    }
+}
+
 /// Real subsection headings, excluding fenced examples and details content.
 fn subsection_headers(content: &str) -> Vec<(usize, &str)> {
     let mut headers = Vec::new();
-    let mut fence = 0;
+    let mut fence = CodeFence::default();
     let mut details = false;
     for (i, line) in content.lines().enumerate() {
         let t = line.trim();
@@ -72,18 +128,11 @@ fn subsection_headers(content: &str) -> Vec<(usize, &str)> {
             }
             continue;
         }
-        if fence > 0 {
-            if t.len() >= fence && t.chars().all(|c| c == '`') {
-                fence = 0;
-            }
+        if fence.consume(t) {
             continue;
         }
         if t.starts_with("<details") {
             details = true;
-            continue;
-        }
-        if t.starts_with("```") {
-            fence = t.chars().take_while(|c| *c == '`').count();
             continue;
         }
         if let Some(name) = t.strip_prefix("#### ") {
@@ -102,30 +151,32 @@ pub fn extract_single_fenced_subsection(content: &str, subsection: &str) -> Vec<
             continue;
         }
         let end = headers.get(n + 1).map_or(lines.len(), |(i, _)| *i);
-        let mut fence = 0;
+        let mut fence = CodeFence::default();
         let mut language = String::new();
         let mut text = String::new();
         let mut line_number = 0;
         for (i, line) in lines.iter().enumerate().take(end).skip(start + 1) {
             let t = line.trim();
-            if fence == 0 && t.starts_with("```") {
-                fence = t.chars().take_while(|c| *c == '`').count();
-                language = t[fence..].trim().to_owned();
+            let was_open = fence.is_open();
+            let in_code = fence.consume(t);
+            if !was_open && in_code {
+                if let Some((_, information)) = opening_code_fence(t) {
+                    language = information.to_owned();
+                }
                 line_number = i + 1;
-            } else if fence > 0 && t.len() >= fence && t.chars().all(|c| c == '`') {
+            } else if was_open && !fence.is_open() {
                 blocks.push(FencedBlock {
                     language: language.clone(),
                     content: text.trim_end().to_owned(),
                     line_number,
                 });
-                fence = 0;
                 text.clear();
-            } else if fence > 0 {
+            } else if in_code {
                 text.push_str(line);
                 text.push('\n');
             }
         }
-        if fence > 0 {
+        if fence.is_open() {
             blocks.push(FencedBlock {
                 language,
                 content: text.trim_end().to_owned(),
@@ -393,21 +444,14 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
     let mut in_details_block = false;
     let mut found_header = false;
 
-    let mut content_fence = 0;
+    let mut content_fence = CodeFence::default();
     for (line_num, line) in content.split_terminator('\n').enumerate() {
         let trimmed = line.trim();
-        if !in_details_block && (content_fence > 0 || trimmed.starts_with("```")) {
-            if trimmed.starts_with("```") {
-                let length = trimmed.chars().take_while(|c| *c == '`').count();
-                if content_fence == 0 {
-                    content_fence = length;
-                    if current_subsection == SubSection::Other("Query".to_owned()) {
-                        if let Some(element) = &mut current_element {
-                            element.query_line_number = Some(line_num + 1);
-                        }
-                    }
-                } else if length >= content_fence && trimmed.chars().all(|c| c == '`') {
-                    content_fence = 0;
+        let was_open = content_fence.is_open();
+        if !in_details_block && content_fence.consume(trimmed) {
+            if !was_open && current_subsection == SubSection::Other("Query".to_owned()) {
+                if let Some(element) = &mut current_element {
+                    element.query_line_number = Some(line_num + 1);
                 }
             }
             if let Some(element) = &mut current_element {
@@ -1165,21 +1209,14 @@ pub fn parse_elements(
     // File element order tracking
     let mut file_element_counter: usize = 0;
 
-    let mut content_fence = 0;
+    let mut content_fence = CodeFence::default();
     for (line_num, line) in content.split_terminator('\n').enumerate() {
         let trimmed = line.trim();
-        if !in_details_block && (content_fence > 0 || trimmed.starts_with("```")) {
-            if trimmed.starts_with("```") {
-                let length = trimmed.chars().take_while(|c| *c == '`').count();
-                if content_fence == 0 {
-                    content_fence = length;
-                    if current_subsection == SubSection::Other("Query".to_owned()) {
-                        if let Some(element) = &mut current_element {
-                            element.query_line_number = Some(line_num + 1);
-                        }
-                    }
-                } else if length >= content_fence && trimmed.chars().all(|c| c == '`') {
-                    content_fence = 0;
+        let was_open = content_fence.is_open();
+        if !in_details_block && content_fence.consume(trimmed) {
+            if !was_open && current_subsection == SubSection::Other("Query".to_owned()) {
+                if let Some(element) = &mut current_element {
+                    element.query_line_number = Some(line_num + 1);
                 }
             }
             if let Some(element) = &mut current_element {

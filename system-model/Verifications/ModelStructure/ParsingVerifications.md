@@ -204,6 +204,40 @@ This test verifies that the system correctly extracts and parses element subsect
   * verify: [Reserved Subsections Support](../../ModelStructure/StructureAndParsing.md#reserved-subsections-support)
 ---
 
+### Fenced Code Block Parsing Verification
+
+Verify that literal Markdown examples in fenced code cannot alter model structure and that list-introduced fences do not hide following elements or reserved subsections.
+
+#### Details
+
+##### Acceptance Criteria
+- Bare backtick fences, fences introduced by unordered list markers, ordered list markers and nested lists are recognized with or without language information.
+- Element headings, Metadata, Relations, Concept References and separators inside fenced code remain literal content; they cannot create elements, change types or introduce relations.
+- Real metadata and relations following a closing fence are parsed, and later elements remain addressable.
+- Closing fences require the same delimiter, at least the opening length, and no trailing non-whitespace text. Shorter fences and backtick runs with trailing text cannot end the block.
+- File parsing and single-element add/override parsing produce the same element type, relations and retained code content.
+- Running `format --fix` on every fence example preserves the fenced code byte-for-byte, retains actual element types and relations, and produces a model that validates successfully.
+- Reserved-subsection discovery still finds actual ontology/query blocks after list-fenced examples and retains their language, source line and exported bytes.
+- The RED reproduction uses three list-introduced fences with irregular indentation, followed by a referenced element; validation succeeds and every following element is discovered.
+
+##### Test Criteria
+1. Validate a bare-fence control containing fake headings, metadata and relations, then assert only the authored real elements and relations are reported.
+2. Repeat for unordered markers, ordered markers, nested lists and the three-fence RED pattern; require successful validation and exact expected element names/types.
+3. Exercise longer delimiters, shorter apparent closers and trailing-text apparent closers; assert normal parsing resumes only at the matching closing fence.
+4. Add an element containing list-fenced examples through the CLI, then override it; verify retained code content, type and relations through JSON output.
+5. Put list-fenced examples before real Ontology and Query subsections; verify successful semantic validation, source locations and exact query export.
+6. Run `format --fix` for each fence example, compare the resulting code block against its original bytes with `diff -u`, then validate and inspect the formatted model.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
+  * satisfiedBy: [fenced_code.py](../../../tests/test-parsing-functionality/fenced_code.py)
+  * satisfiedBy: [test.sh](../../../tests/test-parsing-functionality/test.sh)
+  * verify: [Fenced Code Content Preservation](../../ModelStructure/StructureAndParsing.md#fenced-code-content-preservation)
+---
+
 ### Fragment Normalization Test
 
 This test verifies that the system correctly normalizes element name fragments according to GitHub's fragment identifier rules for use in Element IDs and cross-references.
