@@ -7,6 +7,8 @@ use std::time::{Duration, Instant};
 
 const MODEL: &str = include_str!("../../../tests/test-cache-integration/fixtures/model.md.txt");
 const OTHER: &str = include_str!("../../../tests/test-cache-integration/fixtures/other.md.txt");
+#[cfg(unix)]
+const HOOK_TIMEOUT: Duration = Duration::from_secs(2);
 
 fn isolated(name: &str, test: impl FnOnce()) {
     if std::env::var("REQVIRE_MCP_CACHE_TEST_CHILD").as_deref() == Ok(name) {
@@ -44,7 +46,7 @@ fn isolated(name: &str, test: impl FnOnce()) {
         .stderr(std::process::Stdio::piped())
         .spawn()
         .expect("spawn isolated test process");
-    let deadline = Instant::now() + Duration::from_secs(20);
+    let deadline = Instant::now() + Duration::from_secs(60);
     while child.try_wait().expect("check child test status").is_none() {
         if Instant::now() >= deadline {
             child.kill().expect("terminate timed-out child test");
@@ -124,6 +126,27 @@ fn git_test(args: &[&str]) -> String {
         .trim()
         .to_string()
 }
+
+#[cfg(unix)]
+fn install_stalled_reference_hook(phase: &str, evidence: &str) {
+    use std::os::unix::fs::PermissionsExt;
+    // Avoid Python startup racing the Git timeout after HEAD publication but
+    // before the evidence write. The stall also outlasts the isolated test's
+    // watchdog, so only subprocess timeout handling can finish the operation.
+    std::fs::write(
+        ".git/hooks/reference-transaction",
+        format!(
+            "#!/bin/sh\nif [ \"$1\" = '{phase}' ]; then\n    printf 'one\\n' >> '{evidence}'\n    exec sleep 120\nfi\n"
+        ),
+    )
+    .expect("install reference transaction stall");
+    std::fs::set_permissions(
+        ".git/hooks/reference-transaction",
+        std::fs::Permissions::from_mode(0o755),
+    )
+    .expect("executable reference transaction hook");
+}
+
 fn shared_snapshot_bookkeeping(commits: bool) {
     use crate::mcp_session::MutationSession;
     use reqvire::mutation_io;
@@ -354,7 +377,6 @@ fn reconcile_published_fixture_commit(head: &str, paths: &[&str]) {
 case!(
     explicit_commit_timeout_with_external_files_retains_snapshot_reads,
     {
-        use std::os::unix::fs::PermissionsExt;
         let server = fixture(false);
         let mut session = server
             .session
@@ -374,17 +396,13 @@ case!(
         let accepted = session.model();
         let pending_before = session.status()["pending_changes"].clone();
         let index_before = std::fs::read(".git/index").expect("read test fixture");
-        std::fs::write(".git/hooks/reference-transaction", "#!/usr/bin/env python3\nimport sys, time\nfrom pathlib import Path\nif sys.argv[1] == 'committed':\n    with Path('ref-effects').open('a') as f: f.write('one\\n')\n    time.sleep(1)\n").expect("write test fixture");
-        std::fs::set_permissions(
-            ".git/hooks/reference-transaction",
-            std::fs::Permissions::from_mode(0o755),
-        )
-        .expect("test fixture operation should succeed");
-        let failure = crate::mcp_session::with_git_timeout(Duration::from_millis(250), || {
+        install_stalled_reference_hook("committed", "ref-effects");
+        let failure = crate::mcp_session::with_git_timeout(HOOK_TIMEOUT, || {
             session.explicit_commit("ambiguous commit")
         })
         .expect_err("test fixture operation should fail")
         .to_string();
+        assert!(failure.contains("timed out"), "{failure}");
         assert!(failure.contains("outcome may be unknown"), "{failure}");
         assert_ne!(git_test(&["rev-parse", "HEAD"]), before["head"]);
         let status = session.status();
@@ -461,7 +479,6 @@ case!(
 case!(
     automatic_commit_timeout_with_external_files_requires_recovery,
     {
-        use std::os::unix::fs::PermissionsExt;
         let server = fixture(true);
         let mut session = server
             .session
@@ -470,24 +487,19 @@ case!(
         let before = session.status();
         let accepted = session.model();
         let index_before = std::fs::read(".git/index").expect("read test fixture");
-        std::fs::write(".git/hooks/reference-transaction", "#!/usr/bin/env python3\nimport sys, time\nfrom pathlib import Path\nif sys.argv[1] == 'committed':\n    with Path('ref-effects').open('a') as f: f.write('one\\n')\n    time.sleep(1)\n").expect("write test fixture");
-        std::fs::set_permissions(
-            ".git/hooks/reference-transaction",
-            std::fs::Permissions::from_mode(0o755),
-        )
-        .expect("test fixture operation should succeed");
+        install_stalled_reference_hook("committed", "ref-effects");
         let changed_source = MODEL.replace("alpha", "candidate");
-        let (result, changed) =
-            crate::mcp_session::with_git_timeout(Duration::from_millis(250), || {
-                session.execute(true, "reqvire.add_element", || {
-                    reqvire::mutation_io::write("Model.md", changed_source.as_bytes())
-                        .expect("test fixture operation should succeed");
-                    Ok(json!({"structuredContent":{}}))
-                })
-            });
+        let (result, changed) = crate::mcp_session::with_git_timeout(HOOK_TIMEOUT, || {
+            session.execute(true, "reqvire.add_element", || {
+                reqvire::mutation_io::write("Model.md", changed_source.as_bytes())
+                    .expect("test fixture operation should succeed");
+                Ok(json!({"structuredContent":{}}))
+            })
+        });
         let failure = result.expect("test fixture operation should succeed");
         assert_eq!(failure["isError"], true, "{failure}");
         assert!(!changed);
+        assert!(failure.to_string().contains("timed out"), "{failure}");
         assert!(
             failure.to_string().contains("outcome may be unknown"),
             "{failure}"
@@ -630,19 +642,14 @@ fn reconcile_unknown_commit(commits: bool, blocked: bool) {
     }
     let before = session.status();
     let accepted = session.model();
-    std::fs::write(".git/hooks/reference-transaction", "#!/usr/bin/env python3\nimport sys,time\nfrom pathlib import Path\nif sys.argv[1]=='committed':\n    with Path('.git/ref-effects').open('a') as f: f.write('one\\n')\n    time.sleep(1)\n").expect("install post-publication stall");
-    std::fs::set_permissions(
-        ".git/hooks/reference-transaction",
-        std::fs::Permissions::from_mode(0o755),
-    )
-    .expect("executable hook");
+    install_stalled_reference_hook("committed", ".git/ref-effects");
     if blocked {
         // An unrelated file prevents automatic adoption. Resolve this evidence
         // afterward to exercise the explicit recovery tool's verification.
         std::fs::write("reconciliation-blocker", "external work")
             .expect("block automatic reconciliation");
     }
-    with_git_timeout(Duration::from_millis(250), || {
+    with_git_timeout(HOOK_TIMEOUT, || {
         if commits {
             let (result, changed) = publish(&mut session);
             let result = result.expect("tool result");
@@ -847,29 +854,22 @@ case!(explicit_commit_timeout_reconciles_selective_index, {
 case!(
     automatic_commit_timeout_before_ref_publication_rolls_back,
     {
-        use std::os::unix::fs::PermissionsExt;
         let server = fixture(true);
         let mut session = server.session.lock().expect("session lock");
         let before = session.status();
         let accepted = session.model();
         let index = std::fs::read(".git/index").expect("record index");
-        std::fs::write(".git/hooks/reference-transaction", "#!/usr/bin/env python3\nimport sys,time\nfrom pathlib import Path\nif sys.argv[1]=='prepared':\n    with Path('.git/ref-effects').open('a') as f: f.write('one\\n')\n    time.sleep(1)\n").expect("install pre-publication stall");
-        std::fs::set_permissions(
-            ".git/hooks/reference-transaction",
-            std::fs::Permissions::from_mode(0o755),
-        )
-        .expect("hook executable");
-        let (result, changed) =
-            crate::mcp_session::with_git_timeout(Duration::from_millis(250), || {
-                session.execute(true, "reqvire.add_element", || {
-                    reqvire::mutation_io::write(
-                        "Model.md",
-                        MODEL.replace("Cache Subject", "Unpublished Subject"),
-                    )
-                    .expect("prepare candidate");
-                    Ok(json!({"structuredContent":{}}))
-                })
-            });
+        install_stalled_reference_hook("prepared", ".git/ref-effects");
+        let (result, changed) = crate::mcp_session::with_git_timeout(HOOK_TIMEOUT, || {
+            session.execute(true, "reqvire.add_element", || {
+                reqvire::mutation_io::write(
+                    "Model.md",
+                    MODEL.replace("Cache Subject", "Unpublished Subject"),
+                )
+                .expect("prepare candidate");
+                Ok(json!({"structuredContent":{}}))
+            })
+        });
         assert_eq!(result.expect("confirmed failure envelope")["isError"], true);
         assert!(!changed);
         let status = session.status();
@@ -905,7 +905,6 @@ case!(
 case!(
     explicit_commit_timeout_before_ref_publication_keeps_pending_edits,
     {
-        use std::os::unix::fs::PermissionsExt;
         let server = fixture(false);
         let mut session = server.session.lock().expect("session lock");
         let source = MODEL.replace("Cache Subject", "Pending Subject");
@@ -918,13 +917,8 @@ case!(
         let before = session.status();
         let accepted = session.model();
         let index = std::fs::read(".git/index").expect("record index");
-        std::fs::write(".git/hooks/reference-transaction", "#!/usr/bin/env python3\nimport sys,time\nfrom pathlib import Path\nif sys.argv[1]=='prepared':\n    with Path('.git/ref-effects').open('a') as f: f.write('one\\n')\n    time.sleep(1)\n").expect("install pre-publication stall");
-        std::fs::set_permissions(
-            ".git/hooks/reference-transaction",
-            std::fs::Permissions::from_mode(0o755),
-        )
-        .expect("hook executable");
-        let failure = crate::mcp_session::with_git_timeout(Duration::from_millis(250), || {
+        install_stalled_reference_hook("prepared", ".git/ref-effects");
+        let failure = crate::mcp_session::with_git_timeout(HOOK_TIMEOUT, || {
             session.explicit_commit("unpublished attempt")
         })
         .expect_err("commit not published");

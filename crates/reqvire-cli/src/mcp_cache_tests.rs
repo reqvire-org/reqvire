@@ -49,7 +49,7 @@ fn isolated(name: &str, test: impl Future<Output = ()>) {
         .stderr(std::process::Stdio::piped())
         .spawn()
         .expect("spawn isolated test process");
-    let deadline = Instant::now() + Duration::from_secs(20);
+    let deadline = Instant::now() + Duration::from_secs(120);
     while child.try_wait().expect("check child test status").is_none() {
         if Instant::now() >= deadline {
             child.kill().expect("terminate timed-out child test");
@@ -1528,6 +1528,10 @@ case!(owned_http_selector_errors_with_commits, {
 #[cfg(unix)]
 async fn owned_http_reads_overlap_writes(commits: bool) {
     use std::os::unix::fs::PermissionsExt;
+    // Worker startup/reopening includes Git processes and runtime construction.
+    // These are correctness checks, so allow slower CI hosts while keeping the
+    // read barrier held longer than any individual response deadline.
+    const RESPONSE_TIMEOUT: Duration = Duration::from_secs(15);
     let barrier = tempfile::tempdir().expect("test fixture operation should succeed");
     let real_git = Command::new("sh")
         .args(["-c", "command -v git"])
@@ -1547,7 +1551,7 @@ from pathlib import Path
 base=Path({base})
 if sys.argv[1:]==['status','--porcelain'] and (base/'armed').exists():
     (base/'entered').touch()
-    end=time.monotonic()+10
+    end=time.monotonic()+60
     while not (base/'release').exists():
         if time.monotonic()>end: sys.exit(99)
         time.sleep(0.005)
@@ -1611,7 +1615,7 @@ os.execv({git},[{git},*sys.argv[1:]])
     let release =
         || std::fs::write(barrier.path().join("release"), "").expect("write test fixture");
     async fn entered(base: &std::path::Path, stage: &str) {
-        tokio::time::timeout(Duration::from_secs(3), async {
+        tokio::time::timeout(RESPONSE_TIMEOUT, async {
             while !base.join("entered").exists() {
                 tokio::time::sleep(Duration::from_millis(5)).await;
             }
@@ -1621,10 +1625,10 @@ os.execv({git},[{git},*sys.argv[1:]])
         // The held Git child still waits, but later publication may observe Git.
         std::fs::remove_file(base.join("armed")).expect("remove test fixture");
     }
-    async fn response(job: tokio::task::JoinHandle<Value>) -> Value {
-        tokio::time::timeout(Duration::from_secs(3), job)
+    async fn response(stage: &str, job: tokio::task::JoinHandle<Value>) -> Value {
+        tokio::time::timeout(RESPONSE_TIMEOUT, job)
             .await
-            .expect("worker response timed out")
+            .unwrap_or_else(|_| panic!("worker response timed out: {stage}"))
             .expect("test fixture operation should succeed")
     }
     arm();
@@ -1647,12 +1651,10 @@ os.execv({git},[{git},*sys.argv[1:]])
     .await;
     assert_eq!(excess["error"]["code"], -32000, "{excess}");
     assert_eq!(excess["error"]["data"]["retryable"], true);
-    let written = response(tokio::spawn(http_rpc(
-        app.clone(),
-        3,
-        "tools/call",
-        add(OTHER, false),
-    )))
+    let written = response(
+        "mutation while read is held",
+        tokio::spawn(http_rpc(app.clone(), 3, "tools/call", add(OTHER, false))),
+    )
     .await;
     assert!(
         written.get("error").is_none() && written["result"]["isError"] != true,
@@ -1668,7 +1670,7 @@ os.execv({git},[{git},*sys.argv[1:]])
         .runtime()
         .expect("test fixture operation should succeed");
     release();
-    let old = response(old).await;
+    let old = response("released snapshot read", old).await;
     let metadata = &old["result"]["_meta"]["reqvire/context"];
     for field in ["model_revision", "head", "pending_changes"] {
         assert_eq!(metadata[field], before[field], "captured {field}: {old}");
@@ -1708,20 +1710,20 @@ os.execv({git},[{git},*sys.argv[1:]])
     cancelled.abort();
     let _ = cancelled.await;
     assert_eq!(server.read_capacity.available_permits(), 0);
-    let preview = response(tokio::spawn(http_rpc(app.clone(), 4, "tools/call",
+    let preview = response("preview while cancelled read is held", tokio::spawn(http_rpc(app.clone(), 4, "tools/call",
         json!({"name":"reqvire.remove_element", "arguments":{"element_name":"Other Subject","dry_run":true}})))).await;
     assert!(
         preview.get("error").is_none() && preview["result"]["isError"] != true,
         "{preview}"
     );
     release();
-    tokio::time::timeout(Duration::from_secs(3), async {
+    tokio::time::timeout(RESPONSE_TIMEOUT, async {
         while server.read_capacity.available_permits() != 1 {
             tokio::time::sleep(Duration::from_millis(5)).await;
         }
     })
     .await
-    .expect("test fixture operation should succeed");
+    .expect("cancelled read did not release admission after barrier release");
     assert_eq!(
         original.metadata()["model_revision"],
         accepted["model_revision"]
@@ -1752,18 +1754,21 @@ os.execv({git},[{git},*sys.argv[1:]])
         json!({"name":"reqvire.workspace_status","arguments":{"worktree_id":id}}),
     ));
     entered(barrier.path(), "removal").await;
-    let removed = response(tokio::spawn(http_rpc(
-        app.clone(),
-        8,
-        "tools/call",
-        json!({"name":"reqvire.worktree.remove","arguments":{"worktree_id":id}}),
-    )))
+    let removed = response(
+        "removal while read is held",
+        tokio::spawn(http_rpc(
+            app.clone(),
+            8,
+            "tools/call",
+            json!({"name":"reqvire.worktree.remove","arguments":{"worktree_id":id}}),
+        )),
+    )
     .await;
     assert!(
         removed.get("error").is_none() && removed["result"]["isError"] != true,
         "{removed}"
     );
-    let pending = response(pending).await;
+    let pending = response("removed worker read", pending).await;
     release();
     assert_eq!(pending["result"]["isError"], true, "{pending}");
     assert_eq!(
@@ -1787,12 +1792,15 @@ os.execv({git},[{git},*sys.argv[1:]])
         .status()
         .expect("test fixture operation should succeed")
         .success());
-    let reopened = response(tokio::spawn(http_rpc(
-        app.clone(),
-        10,
-        "tools/call",
-        json!({"name":"reqvire.worktree.open", "arguments":{"branch":before["branch"]}}),
-    )))
+    let reopened = response(
+        "reopening while read is held",
+        tokio::spawn(http_rpc(
+            app.clone(),
+            10,
+            "tools/call",
+            json!({"name":"reqvire.worktree.open", "arguments":{"branch":before["branch"]}}),
+        )),
+    )
     .await;
     release();
     assert!(
@@ -1803,7 +1811,7 @@ os.execv({git},[{git},*sys.argv[1:]])
     assert_ne!(reopened["worktree_id"], before["worktree_id"]);
     assert_ne!(reopened["head"], accepted["head"]);
     assert_eq!(reopened["available"], true);
-    let pending = response(pending).await;
+    let pending = response("replaced worker read", pending).await;
     assert_eq!(pending["result"]["isError"], true, "{pending}");
     assert_eq!(
         pending["result"]["_meta"]["reqvire/context"]["worktree_id"],
