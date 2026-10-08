@@ -1,6 +1,11 @@
+import { ROOT_PATH, MODEL_ROOT_PATH, RESOURCE_ROOT_PATH, displayName, dirname, type TreeFolder } from "../lib/fileTrees";
+import { prepareThesaurus, filterThesaurusSchemes, thesaurusAncestorIds, type ThesaurusSchemeTree } from "../lib/thesaurus";
+import type { ThesaurusConceptItem } from "@ds";
+import { useWorktreeUrl } from "../store/worktreeUrls";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   Button,
+  CoverageNavigation,
   ElementIcon,
   Icon,
   PaneActionRow,
@@ -8,8 +13,6 @@ import {
   PaneControlSection,
   PaneFilterGroup,
   PaneFilterGrid,
-  PaneFilterNavList,
-  PaneFilterNavRow,
   PaneGhostLink,
   PaneLegend,
   PaneNotationLegend,
@@ -35,9 +38,10 @@ import type {
   ProjectStoreFile,
   ProjectStoreResource,
 } from "../store/types";
-import { ONTOLOGY_LAYER_FILTERS, useExplorerUiState, type CoverageSectionId } from "../state/ExplorerUiState";
+import { ONTOLOGY_LAYER_FILTERS, useExplorerUiState } from "../state/ExplorerUiState";
 import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
-import { buildTraceFiles, type TraceFileNode } from "../lib/traces";
+import type { TraceFileNode } from "../lib/traces";
+import { coverageScopeOptions } from "../lib/coverage";
 
 interface ExplorerSidePaneProps {
   activeView: ViewId;
@@ -50,21 +54,6 @@ interface ExplorerSidePaneProps {
   onOpenSourceRoute?: (hash: string) => void;
   onOpenOntologyNode: (id: string) => void;
 }
-
-interface TreeFolder {
-  path: string;
-  name: string;
-  selectionId?: string;
-  folders: TreeFolder[];
-  files: ProjectStoreFile[];
-  resources: ProjectStoreResource[];
-}
-
-const ROOT_PATH = "__root__";
-const MODEL_ROOT_PATH = "__model__";
-const RESOURCE_ROOT_PATH = "__resources__";
-const MODEL_WORKTREE_ROOT = "__model_worktree__";
-const RESOURCE_WORKTREE_ROOT = "__resource_worktree__";
 
 interface TracePaneVerification {
   id: string;
@@ -96,23 +85,7 @@ export function ExplorerSidePane({
   onOpenSourceRoute,
   onOpenOntologyNode,
 }: ExplorerSidePaneProps) {
-  const { store, elementById } = useStore();
   const ui = useExplorerUiState();
-  const tree = useMemo(
-    () => buildFileTree(store),
-    [store],
-  );
-  const filteredTree = useMemo(
-    () => filterFileTree(tree, ui.modelTreeQuery, elementById),
-    [elementById, tree, ui.modelTreeQuery],
-  );
-  const traceFiles = useMemo(() => buildTraceFiles(store), [store]);
-  const projectRootLabel = projectTreeRootLabel(store);
-  const traceTree = useMemo(() => buildTraceFileTree(traceFiles, projectRootLabel), [projectRootLabel, traceFiles]);
-  const filteredTraceTree = useMemo(
-    () => filterTraceFileTree(traceTree, ui.traceTreeQuery),
-    [traceTree, ui.traceTreeQuery],
-  );
   const graphModelActive = activeView === "model" && ui.modelMode === "graph";
   const showProjectTree = (activeView === "model" || activeView === "files") && !graphModelActive;
   const title = graphModelActive ? "Graph Explorer" : `${VIEW_TITLES[activeView]} Explorer`;
@@ -130,37 +103,45 @@ export function ExplorerSidePane({
       {activeView === "thesaurus" && <ThesaurusSearch />}
       {showProjectTree && <ProjectTreeSearch />}
       {activeView === "traces" && <TraceTreeSearch />}
+      {activeView === "coverage" && <CoverageTreeSearch />}
       <ExplorerViewControls
         activeView={activeView}
         onOpenElement={onOpenElement}
         onOpenOntologyNode={onOpenOntologyNode}
       />
-      {activeView === "traces" && (
-        <PaneTree aria-label="Verification trace tree" id="trace-tree">
-          <TraceTreeFolderNode folder={filteredTraceTree} depth={0} query={ui.traceTreeQuery} />
-        </PaneTree>
-      )}
-      {activeView === "traces" ? <TraceTreeSummary files={traceFiles} /> : null}
-      {showProjectTree && (
-        <PaneTree aria-label="Project tree">
-          {filteredTree.folders.map((folder) => (
-            <TreeFolderNode
-              key={folder.path}
-              folder={folder}
-              activeView={activeView}
-              elementById={elementById}
-              onNavigate={onNavigate}
-              onOpenElement={onOpenElement}
-              sourceBrowsing={sourceBrowsing}
-              onOpenSourceRoute={onOpenSourceRoute}
-              depth={0}
-              query={ui.modelTreeQuery}
-            />
-          ))}
-        </PaneTree>
-      )}
+      {activeView === "traces" ? <TracePaneContents /> : null}
+      {showProjectTree && <ProjectTreeContents activeView={activeView} onNavigate={onNavigate}
+        onOpenElement={onOpenElement} sourceBrowsing={sourceBrowsing} onOpenSourceRoute={onOpenSourceRoute} />}
       {showProjectTree && activeView === "model" ? <ModelTreeSummary /> : null}
     </SidePaneFrame>
+  );
+}
+
+function ProjectTreeContents({
+  activeView, onNavigate, onOpenElement, sourceBrowsing = false, onOpenSourceRoute,
+}: Pick<ExplorerSidePaneProps, "activeView" | "onNavigate" | "onOpenElement" | "sourceBrowsing" | "onOpenSourceRoute">) {
+  const { elementById, getProjectFileTree } = useStore();
+  const ui = useExplorerUiState();
+  const tree = getProjectFileTree();
+  const filteredTree = useMemo(() => filterFileTree(tree, ui.modelTreeQuery, elementById),
+    [tree, ui.modelTreeQuery, elementById]);
+  return (
+    <PaneTree aria-label="Project tree">
+      {filteredTree.folders.map((folder) => (
+        <TreeFolderNode
+          key={folder.path}
+          folder={folder}
+          activeView={activeView}
+          elementById={elementById}
+          onNavigate={onNavigate}
+          onOpenElement={onOpenElement}
+          sourceBrowsing={sourceBrowsing}
+          onOpenSourceRoute={onOpenSourceRoute}
+          depth={0}
+          query={ui.modelTreeQuery}
+        />
+      ))}
+    </PaneTree>
   );
 }
 
@@ -278,6 +259,21 @@ function TraceTreeSearch() {
   );
 }
 
+function CoverageTreeSearch() {
+  const ui = useExplorerUiState();
+
+  return (
+    <PaneSearchForm
+      searchInputId="coverage-tree-search"
+      inputLabel="Filter capability tree"
+      placeholder="Filter capabilities..."
+      value={ui.coverageTreeQuery}
+      onQueryChange={ui.setCoverageTreeQuery}
+      onSubmit={(event) => event.preventDefault()}
+    />
+  );
+}
+
 function ExplorerViewControls({
   activeView,
   onOpenElement,
@@ -287,8 +283,15 @@ function ExplorerViewControls({
   onOpenElement: (id: string) => void;
   onOpenOntologyNode: (id: string) => void;
 }) {
+  const contextualUrl = useWorktreeUrl();
   const ui = useExplorerUiState();
   const { store, elementById } = useStore();
+
+  const coverageScopes = useMemo(() => activeView === "coverage" ? coverageScopeOptions(store) : [],
+    [activeView, store.coverage.scope_index, store.relations]);
+  const thesaurus = useMemo(() => activeView === "thesaurus" ? prepareThesaurus(store.thesaurus) : null, [activeView, store.thesaurus]);
+  const filteredThesaurus = useMemo(() => thesaurus ? filterThesaurusSchemes(thesaurus.schemes, ui.thesaurusQuery) : [], [thesaurus, ui.thesaurusQuery]);
+  const selectedConceptPath = useMemo(() => thesaurus ? thesaurusAncestorIds(thesaurus, ui.thesaurusSelectionId) : new Set<string>(), [thesaurus, ui.thesaurusSelectionId]);
 
   const graphControlsActive = (activeView === "model" && ui.modelMode === "graph");
   const graphTypeOptions = useMemo(
@@ -365,8 +368,7 @@ function ExplorerViewControls({
   if (activeView === "traces") return null;
 
   if (activeView === "thesaurus") {
-    const thesaurusTree = buildThesaurusPaneTree(store);
-    const filteredTree = filterThesaurusPaneTree(thesaurusTree, ui.thesaurusQuery);
+    const thesaurusTree = thesaurus?.schemes ?? [];
     const conceptCount = thesaurusTree.reduce((total, scheme) => total + scheme.concepts.length, 0);
     const summaryItems = [
       { label: "Schemes", value: formatSummaryValue(thesaurusTree.length) },
@@ -375,10 +377,11 @@ function ExplorerViewControls({
     return (
       <>
         <PaneTree aria-label="Concept hierarchy" id="thesaurus-tree">
-          {filteredTree.map((scheme) => (
+          {filteredThesaurus.map((scheme) => (
             <ThesaurusSchemeTreeNode
               key={scheme.id}
               scheme={scheme}
+              selectedPath={selectedConceptPath}
               selectedId={ui.thesaurusSelectionId}
               query={ui.thesaurusQuery}
               onSelectConcept={ui.setThesaurusSelectionId}
@@ -391,38 +394,9 @@ function ExplorerViewControls({
   }
 
   if (activeView === "coverage") {
-    const coverageItems = buildCoveragePaneItems(store);
-    const coverage = isPlainRecord(store.coverage) ? store.coverage : {};
-    const summary = isPlainRecord(coverage.summary) ? coverage.summary : {};
-    const coverageSummaryItems = [
-      { label: "Requirements", value: formatSummaryValue(readNumber(summary.total_requirements_in_scope)) },
-      { label: "Leaf reqs", value: formatSummaryValue(readNumber(summary.total_leaf_requirements)) },
-      { label: "Verifications", value: formatSummaryValue(readNumber(summary.total_verifications)) },
-    ];
-    return (
-      <>
-        <PaneControlSection aria-label="Coverage explorer">
-          <PaneFilterGroup label="Coverage">
-            <PaneFilterNavList>
-              {coverageItems.map((item) => (
-                <PaneFilterNavRow
-                  key={item.id}
-                  icon={item.icon}
-                  label={item.label}
-                  count={formatCompactCount(item.count)}
-                  selected={ui.coverageSectionId === item.id}
-                  onClick={() => {
-                    ui.setCoverageSectionId(item.id);
-                    navigateCoverageSection(item.id);
-                  }}
-                />
-              ))}
-            </PaneFilterNavList>
-          </PaneFilterGroup>
-        </PaneControlSection>
-        <PaneSummary items={coverageSummaryItems} placement="footer" />
-      </>
-    );
+    return <CoverageNavigation key={JSON.stringify([store.project.workspace_root, store.project.worktree_id])}
+      scopes={coverageScopes} selectedId={ui.coverageScopeId} onSelect={ui.setCoverageScopeId}
+      query={ui.coverageTreeQuery} />;
   }
 
   if (activeView === "search") {
@@ -523,7 +497,7 @@ function ExplorerViewControls({
             <PaneActionRow>
               {store.ontology.ttl_href ? (
                 <PaneGhostLink
-                  href={store.ontology.ttl_href}
+                  href={contextualUrl(store.ontology.ttl_href)}
                   title="Download the exported ontology as Turtle (ontologies.ttl)"
                 >
                   <Icon name="download" />
@@ -564,6 +538,9 @@ function ExplorerViewControls({
           <PaneFilterGrid columns="two">
             <div>
               <PaneFilterGroup label="Types">
+                <ToggleRow label="Semantic query" colorToken="--ontology" variant="filter"
+                  on={ui.ontologyFilters.has("semantic-query")}
+                  onToggle={() => ui.toggleOntologyFilter("semantic-query")} />
                 <PaneLegend
                   rows={[
                     { id: "class", label: "Class", colorToken: ontologyColorToken("class") },
@@ -757,6 +734,7 @@ function TreeFolderNode({
             <TreeResourceNode
               key={resource.id}
               resource={resource}
+              activeView={activeView}
               sourceBrowsing={sourceBrowsing}
               onOpenSourceRoute={onOpenSourceRoute}
               depth={depth + 1}
@@ -784,11 +762,13 @@ function TreeFolderNode({
 
 function TreeResourceNode({
   resource,
+  activeView,
   sourceBrowsing,
   onOpenSourceRoute,
   depth,
 }: {
   resource: ProjectStoreResource;
+  activeView: ViewId;
   sourceBrowsing: boolean;
   onOpenSourceRoute?: (hash: string) => void;
   depth: number;
@@ -802,6 +782,7 @@ function TreeResourceNode({
       onOpenSourceRoute?.(route);
       return;
     }
+    if (activeView === "model" && ui.modelMode === "flow") return;
     window.location.hash = route;
   }
 
@@ -855,7 +836,6 @@ function TraceTreeFolderNode({
             setOpen((value) => !value);
           }
           ui.setTraceFilePath(null);
-          ui.setTraceSelectionId(null);
         }}
       />
       {expanded && (
@@ -892,17 +872,21 @@ function TraceTreeFileNode({
       setOpen((value) => !value);
     }
     ui.setTraceFilePath(file.path);
-    ui.setTraceSelectionId(null);
   }
 
   function selectVerification(id: string) {
-    ui.setTraceFilePath(file.path);
     ui.setTraceSelectionId(id);
   }
 
   return (
     <PaneTreeNode>
       <TreeItem
+        role="treeitem" tabIndex={0} aria-expanded={expanded} aria-selected={selectedFile && !selectedVerification}
+        title={file.path}
+        onKeyDown={event => {
+          if (event.key === "Enter" || event.key === " ") { event.preventDefault(); selectFile(); }
+          if ((event.key === "ArrowRight" && !expanded) || (event.key === "ArrowLeft" && expanded)) { event.preventDefault(); setOpen(value => !value); }
+        }}
         kind="file"
         label={file.name}
         icon={<Icon name="file" className="file-kind-file" />}
@@ -916,6 +900,10 @@ function TraceTreeFileNode({
       />
       {expanded && file.verifications.map((verification) => (
         <TreeItem
+          role="treeitem" tabIndex={0} aria-selected={selectedVerification === verification.id}
+          onKeyDown={event => {
+            if (event.key === "Enter" || event.key === " ") { event.preventDefault(); selectVerification(verification.id); }
+          }}
           key={verification.id}
           kind="element"
           label={verification.name}
@@ -979,6 +967,7 @@ function TreeFileNode({
       return;
     }
     if (activeView === "files") onNavigate("model");
+    if (ui.modelMode === "flow") return;
     onOpenElement(elementId);
   }
 
@@ -1026,37 +1015,25 @@ function sourceRouteForElement(element: ProjectStoreElement) {
   return element.source_anchor;
 }
 
-interface ThesaurusPaneConcept {
-  id: string;
-  label: string;
-  parentId: string | null;
-  schemeId: string;
-  description: string;
-}
-
-interface ThesaurusPaneScheme {
-  id: string;
-  label: string;
-  concepts: ThesaurusPaneConcept[];
-}
-
 function ThesaurusSchemeTreeNode({
   scheme,
+  selectedPath,
   selectedId,
   query,
   onSelectConcept,
 }: {
-  scheme: ThesaurusPaneScheme;
+  scheme: ThesaurusSchemeTree;
+  selectedPath: ReadonlySet<string>;
   selectedId: string | null;
   query: string;
   onSelectConcept: (id: string | null) => void;
 }) {
-  const hasSelectedDescendant = selectedId ? scheme.concepts.some((concept) => concept.id === selectedId) : false;
+  const hasSelectedDescendant = selectedId ? scheme.byId.has(selectedId) : false;
   const [open, setOpen] = useState(hasSelectedDescendant || scheme.concepts.length <= 8);
 
   useOpenWhenSelectionEnters(hasSelectedDescendant, setOpen);
 
-  const children = thesaurusTopLevelConcepts(scheme.concepts);
+  const children = scheme.roots;
   const expanded = Boolean(query.trim()) || open;
 
   return (
@@ -1083,7 +1060,8 @@ function ThesaurusSchemeTreeNode({
         <ThesaurusConceptTreeNode
           key={concept.id}
           concept={concept}
-          concepts={scheme.concepts}
+          childrenById={scheme.childrenById}
+          selectedPath={selectedPath}
           selectedId={selectedId}
           query={query}
           onSelectConcept={onSelectConcept}
@@ -1096,21 +1074,23 @@ function ThesaurusSchemeTreeNode({
 
 function ThesaurusConceptTreeNode({
   concept,
-  concepts,
+  childrenById,
+  selectedPath,
   selectedId,
   query,
   onSelectConcept,
   depth,
 }: {
-  concept: ThesaurusPaneConcept;
-  concepts: readonly ThesaurusPaneConcept[];
+  concept: ThesaurusConceptItem;
+  childrenById: ReadonlyMap<string, ThesaurusConceptItem[]>;
+  selectedPath: ReadonlySet<string>;
   selectedId: string | null;
   query: string;
   onSelectConcept: (id: string | null) => void;
   depth: number;
 }) {
-  const children = concepts.filter((candidate) => candidate.parentId === concept.id);
-  const hasSelectedDescendant = selectedId ? conceptTreeContains(concepts, concept.id, selectedId) : false;
+  const children = childrenById.get(concept.id) ?? [];
+  const hasSelectedDescendant = selectedPath.has(concept.id);
   const [open, setOpen] = useState(depth < 2 || hasSelectedDescendant);
   const expanded = Boolean(query.trim()) || open;
 
@@ -1134,13 +1114,14 @@ function ThesaurusConceptTreeNode({
           }
           onSelectConcept(concept.id);
         }}
-        title={concept.description || concept.label}
+        title={concept.definition || concept.scopeNote || concept.label}
       />
       {expanded && children.map((child) => (
         <ThesaurusConceptTreeNode
           key={child.id}
           concept={child}
-          concepts={concepts}
+          childrenById={childrenById}
+          selectedPath={selectedPath}
           selectedId={selectedId}
           query={query}
           onSelectConcept={onSelectConcept}
@@ -1167,147 +1148,6 @@ function useOpenWhenSelectionEnters(
     }
     previouslyHadSelectedDescendant.current = hasSelectedDescendant;
   }, [hasSelectedDescendant, setOpen]);
-}
-
-function buildFileTree(store: ExplorerProjectStore): TreeFolder {
-  const root: TreeFolder = { path: ROOT_PATH, name: "Workspace", folders: [], files: [], resources: [] };
-  const modelRoot: TreeFolder = {
-    path: MODEL_ROOT_PATH,
-    name: "Model",
-    selectionId: "__root__",
-    folders: [],
-    files: [],
-    resources: [],
-  };
-  root.folders.push(modelRoot);
-  const worktrees = projectWorktrees(store);
-  const modelFolders = new Map<string, TreeFolder>([
-    [ROOT_PATH, root],
-    [MODEL_ROOT_PATH, modelRoot],
-  ]);
-  const modelWorktreeRoots = new Map(
-    worktrees.map((worktree) => {
-      const folder: TreeFolder = {
-        path: `${MODEL_WORKTREE_ROOT}/${worktree.key}`,
-        name: worktree.label,
-        selectionId: worktree.prefix ? `folder:${worktree.prefix}` : "__root__",
-        folders: [],
-        files: [],
-        resources: [],
-      };
-      modelRoot.folders.push(folder);
-      modelFolders.set(folder.path, folder);
-      return [worktree.key, folder] as const;
-    }),
-  );
-
-  for (const file of store.files) {
-    const worktree = worktreeForPath(worktrees, file.path);
-    const worktreeRoot = modelWorktreeRoots.get(worktree.key) ?? modelRoot;
-    const relativeFolder = stripWorktreePrefix(file.parent_folder || "", worktree.prefix);
-    ensureVirtualFolder(relativeFolder, modelFolders, worktreeRoot, worktreeRoot.path, worktree.prefix, "model").files.push(file);
-  }
-
-  if (store.resources.length > 0) {
-    const resourceRoot: TreeFolder = {
-      path: RESOURCE_ROOT_PATH,
-      name: "Resources",
-      selectionId: "resource-root",
-      folders: [],
-      files: [],
-      resources: [],
-    };
-    root.folders.push(resourceRoot);
-    const resourceFolders = new Map<string, TreeFolder>([[RESOURCE_ROOT_PATH, resourceRoot]]);
-    const resourceWorktreeRoots = new Map(
-      worktrees.map((worktree) => {
-        const folder: TreeFolder = {
-          path: `${RESOURCE_WORKTREE_ROOT}/${worktree.key}`,
-          name: worktree.label,
-          selectionId: worktree.prefix ? `resource-folder:${worktree.prefix}` : "resource-root",
-          folders: [],
-          files: [],
-          resources: [],
-        };
-        resourceRoot.folders.push(folder);
-        resourceFolders.set(folder.path, folder);
-        return [worktree.key, folder] as const;
-      }),
-    );
-    for (const resource of store.resources) {
-      if (!resource.file_path) {
-        ensureVirtualFolder("External", resourceFolders, resourceRoot, RESOURCE_ROOT_PATH, "", "resource").resources.push(resource);
-        continue;
-      }
-      const worktree = worktreeForPath(worktrees, resource.file_path);
-      const worktreeRoot = resourceWorktreeRoots.get(worktree.key) ?? resourceRoot;
-      const relativeFolder = stripWorktreePrefix(dirname(resource.file_path), worktree.prefix);
-      ensureVirtualFolder(relativeFolder, resourceFolders, worktreeRoot, worktreeRoot.path, worktree.prefix, "resource").resources.push(resource);
-    }
-    for (const folder of resourceFolders.values()) {
-      folder.folders.sort((a, b) => a.name.localeCompare(b.name));
-      folder.resources.sort((a, b) => resourceLabel(a).localeCompare(resourceLabel(b)));
-    }
-  }
-
-  for (const folder of modelFolders.values()) {
-    folder.folders.sort((a, b) => a.name.localeCompare(b.name));
-    folder.files.sort((a, b) =>
-      displayName(a.display_path || a.path).localeCompare(displayName(b.display_path || b.path)),
-    );
-  }
-
-  return root;
-}
-
-interface ProjectWorktree {
-  key: string;
-  label: string;
-  prefix: string;
-}
-
-function projectWorktrees(store: ExplorerProjectStore): ProjectWorktree[] {
-  const source = store.project.eligible_git_worktrees.length > 0
-    ? store.project.eligible_git_worktrees
-    : [{ workspace_relative_root: "." }];
-  const worktrees = source.map((worktree, index) => {
-    const prefix = normalizeWorkspaceRelativeRoot(worktree.workspace_relative_root);
-    const fallbackName = index === 0
-      ? store.project.repository || basename(store.project.workspace_root) || store.project.name
-      : "";
-    const label = prefix ? displayName(prefix) : fallbackName || "workspace";
-    const key = prefix || label || `worktree-${index + 1}`;
-    return { key, label, prefix };
-  });
-
-  return worktrees.sort((a, b) => b.prefix.length - a.prefix.length || a.label.localeCompare(b.label));
-}
-
-function normalizeWorkspaceRelativeRoot(path: string | null | undefined) {
-  const normalized = (path || "").replaceAll("\\", "/").replace(/^\/+|\/+$/g, "");
-  return normalized === "." ? "" : normalized;
-}
-
-function basename(path: string | null | undefined) {
-  const normalized = normalizeWorkspaceRelativeRoot(path);
-  if (!normalized) return "";
-  return displayName(normalized);
-}
-
-function worktreeForPath(worktrees: ProjectWorktree[], path: string): ProjectWorktree {
-  const normalized = normalizeWorkspaceRelativeRoot(path);
-  return worktrees.find((worktree) =>
-    worktree.prefix === "" ||
-    normalized === worktree.prefix ||
-    normalized.startsWith(`${worktree.prefix}/`)
-  ) ?? worktrees[0];
-}
-
-function stripWorktreePrefix(path: string, prefix: string) {
-  const normalized = normalizeWorkspaceRelativeRoot(path);
-  if (!prefix) return normalized;
-  if (normalized === prefix) return "";
-  return normalized.startsWith(`${prefix}/`) ? normalized.slice(prefix.length + 1) : normalized;
 }
 
 function filterFileTree(
@@ -1410,6 +1250,21 @@ function filterTraceFile(file: TracePaneFile, query: string): TracePaneFile | nu
   return verifications.length > 0 ? { ...file, verifications } : null;
 }
 
+function TracePaneContents() {
+  const { store, getTraceFiles } = useStore();
+  const { traceTreeQuery } = useExplorerUiState();
+  const files = getTraceFiles();
+  const rootLabel = projectTreeRootLabel(store);
+  const tree = useMemo(() => buildTraceFileTree(files, rootLabel), [files, rootLabel]);
+  const filtered = useMemo(() => filterTraceFileTree(tree, traceTreeQuery), [tree, traceTreeQuery]);
+  return <>
+    <PaneTree aria-label="Verification trace tree" id="trace-tree">
+      <TraceTreeFolderNode folder={filtered} depth={0} query={traceTreeQuery} />
+    </PaneTree>
+    <TraceTreeSummary files={files} />
+  </>;
+}
+
 function buildTraceFileTree(files: TraceFileNode[], rootLabel: string): TracePaneFolder {
   const root: TracePaneFolder = { path: ROOT_PATH, name: rootLabel, folders: [], files: [] };
   const byPath = new Map<string, TracePaneFolder>([[ROOT_PATH, root]]);
@@ -1476,35 +1331,6 @@ function traceFolderContainsPath(folder: TracePaneFolder, path: string): boolean
     folder.folders.some((child) => traceFolderContainsPath(child, path));
 }
 
-function ensureVirtualFolder(
-  relativePath: string,
-  byPath: Map<string, TreeFolder>,
-  root: TreeFolder,
-  rootPath: string,
-  actualPrefix: string,
-  kind: "model" | "resource",
-): TreeFolder {
-  const normalized = normalizeWorkspaceRelativeRoot(relativePath);
-  if (!normalized) return root;
-  const path = `${rootPath}/${normalized}`;
-  const existing = byPath.get(path);
-  if (existing) return existing;
-  const parentPath = dirname(normalized);
-  const parent = ensureVirtualFolder(parentPath, byPath, root, rootPath, actualPrefix, kind);
-  const actualPath = [actualPrefix, normalized].filter(Boolean).join("/");
-  const folder: TreeFolder = {
-    path,
-    name: displayName(normalized),
-    selectionId: kind === "model" ? `folder:${actualPath}` : `resource-folder:${actualPath}`,
-    folders: [],
-    files: [],
-    resources: [],
-  };
-  byPath.set(path, folder);
-  parent.folders.push(folder);
-  return folder;
-}
-
 function treeFolderChildCount(folder: TreeFolder) {
   return folder.folders.length + folder.files.length + folder.resources.length;
 }
@@ -1516,23 +1342,8 @@ function folderSelectionId(path: string) {
   return `folder:${path}`;
 }
 
-function resourceLabel(resource: ProjectStoreResource) {
-  return resource.display || displayName(resource.file_path || resource.target);
-}
-
-function displayName(path: string) {
-  const normalized = path.replace(/\\/g, "/").replace(/\/$/, "");
-  return normalized.split("/").pop() || normalized || "Project";
-}
-
 function textMatches(query: string, ...values: Array<string | null | undefined>) {
   return values.some((value) => value?.toLowerCase().includes(query));
-}
-
-function dirname(path: string) {
-  const normalized = path.replace(/\\/g, "/").replace(/\/$/, "");
-  const index = normalized.lastIndexOf("/");
-  return index > 0 ? normalized.slice(0, index) : "";
 }
 
 function humanize(value: string) {
@@ -1552,6 +1363,7 @@ const ELEMENT_TYPE_ORDER = [
   "demonstration-verification",
   "specification",
   "semantic-contract",
+  "semantic-query",
   "ontology",
   "concept-scheme",
   "concept",
@@ -1596,76 +1408,8 @@ function buildSearchKindCounts(store: ExplorerProjectStore): Record<SearchKind, 
   };
 }
 
-function buildCoveragePaneItems(store: ExplorerProjectStore): Array<{
-  id: CoverageSectionId;
-  label: string;
-  count: number;
-  icon: "pie-chart" | "box" | "file" | "activity" | "x" | "help-circle";
-}> {
-  const coverage = isPlainRecord(store.coverage) ? store.coverage : {};
-  const summary = isPlainRecord(coverage.summary) ? coverage.summary : {};
-  return [
-    {
-      id: "overview",
-      label: "Overview",
-      count: readNumber(summary.total_requirements_in_scope, store.elements.length),
-      icon: "pie-chart",
-    },
-    {
-      id: "capability-coverage",
-      label: "Capability coverage",
-      count: coverageCapabilityCount(coverage.capability_coverage),
-      icon: "box",
-    },
-    {
-      id: "unverified-requirements",
-      label: "Unverified requirements",
-      count: coverageSectionCount(coverage.unverified_leaf_requirements),
-      icon: "file",
-    },
-    {
-      id: "unimplemented-requirements",
-      label: "Unimplemented requirements",
-      count: coverageSectionCount(coverage.uncovered_requirements),
-      icon: "activity",
-    },
-    {
-      id: "unsatisfied-verifications",
-      label: "Unsatisfied verifications",
-      count: coverageSectionCount(coverage.unsatisfied_test_verifications),
-      icon: "x",
-    },
-    {
-      id: "orphaned-verifications",
-      label: "Orphaned verifications",
-      count: coverageSectionCount(coverage.orphaned_verifications),
-      icon: "help-circle",
-    },
-  ];
-}
-
-function navigateCoverageSection(section: CoverageSectionId) {
-  window.dispatchEvent(new CustomEvent("reqvire:coverage-navigate", { detail: { section } }));
-}
-
-function coverageSectionCount(section: unknown): number {
-  if (!isPlainRecord(section) || !isPlainRecord(section.files)) return 0;
-  return Object.values(section.files).reduce<number>((count, value) => {
-    return count + (Array.isArray(value) ? value.length : 0);
-  }, 0);
-}
-
-function coverageCapabilityCount(section: unknown): number {
-  if (!isPlainRecord(section) || !Array.isArray(section.capabilities)) return 0;
-  return section.capabilities.length;
-}
-
 function readNumber(value: unknown, fallback = 0): number {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
-}
-
-function isPlainRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
 }
 
 function buildSearchElementTypeOptions(elements: readonly ProjectStoreElement[]) {
@@ -1689,141 +1433,6 @@ function buildSearchElementTypeOptions(elements: readonly ProjectStoreElement[])
     const rightRank = elementTypeRank(right.type, right.family);
     return leftRank - rightRank || left.type.localeCompare(right.type);
   });
-}
-
-function buildThesaurusPaneTree(store: ExplorerProjectStore): ThesaurusPaneScheme[] {
-  const graphNodes = store.ontology.graph_data?.nodes ?? [];
-  const graphEdges = store.ontology.graph_data?.edges ?? [];
-  const conceptNodes = graphNodes
-    .filter(isConceptGraphNode)
-    .sort((left, right) => conceptGraphLabel(left).localeCompare(conceptGraphLabel(right)));
-  const schemeIds = new Set(graphNodes.filter(isConceptSchemeGraphNode).map((node) => node.id));
-
-  const conceptIds = new Set(conceptNodes.map((node) => node.id));
-  const parentByConcept = new Map<string, string>();
-  for (const edge of graphEdges) {
-    if (edge.label === "broader" && conceptIds.has(edge.source) && conceptIds.has(edge.target)) {
-      parentByConcept.set(edge.source, edge.target);
-    }
-  }
-
-  const schemeById = new Map<string, ThesaurusPaneScheme>();
-  for (const node of conceptNodes) {
-    const schemeId = node.scheme_iri;
-    const schemeLabel = node.scheme_label;
-    if (!schemeId || !schemeLabel || !schemeIds.has(schemeId)) continue;
-    const scheme = ensureThesaurusPaneScheme(schemeById, schemeId, schemeLabel);
-    scheme.concepts.push({
-      id: node.id,
-      label: conceptGraphLabel(node),
-      parentId: parentByConcept.get(node.id) ?? null,
-      schemeId,
-      description: conceptGraphDescription(node),
-    });
-  }
-
-  return sortThesaurusPaneSchemes(Array.from(schemeById.values()).filter((scheme) => scheme.concepts.length > 0));
-}
-
-function filterThesaurusPaneTree(
-  schemes: readonly ThesaurusPaneScheme[],
-  query: string,
-): ThesaurusPaneScheme[] {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) return [...schemes];
-
-  return schemes
-    .map((scheme) => {
-      const included = new Set<string>();
-      const byId = new Map(scheme.concepts.map((concept) => [concept.id, concept]));
-      for (const concept of scheme.concepts) {
-        if (!thesaurusConceptMatches(concept, normalized)) continue;
-        included.add(concept.id);
-        let parentId = concept.parentId;
-        while (parentId) {
-          included.add(parentId);
-          parentId = byId.get(parentId)?.parentId ?? null;
-        }
-      }
-      return {
-        ...scheme,
-        concepts: scheme.concepts.filter((concept) => included.has(concept.id)),
-      };
-    })
-    .filter((scheme) => scheme.concepts.length > 0);
-}
-
-function ensureThesaurusPaneScheme(
-  schemeById: Map<string, ThesaurusPaneScheme>,
-  id: string,
-  label: string,
-): ThesaurusPaneScheme {
-  const existing = schemeById.get(id);
-  if (existing) return existing;
-  const scheme = { id, label, concepts: [] };
-  schemeById.set(id, scheme);
-  return scheme;
-}
-
-function sortThesaurusPaneSchemes(schemes: ThesaurusPaneScheme[]) {
-  return schemes
-    .map((scheme) => ({
-      ...scheme,
-      concepts: [...scheme.concepts].sort((left, right) => {
-        const leftDepth = thesaurusConceptDepth(scheme.concepts, left.id);
-        const rightDepth = thesaurusConceptDepth(scheme.concepts, right.id);
-        return leftDepth - rightDepth || left.label.localeCompare(right.label);
-      }),
-    }))
-    .sort((left, right) => left.label.localeCompare(right.label));
-}
-
-function isConceptGraphNode(node: OntologyGraphNode) {
-  return node.semantic_type === "skos-concept";
-}
-
-function isConceptSchemeGraphNode(node: OntologyGraphNode) {
-  return node.semantic_type === "skos-concept-scheme";
-}
-
-function conceptGraphLabel(node: OntologyGraphNode) {
-  return firstConceptLiteralValue(node, "prefLabel") || node.label;
-}
-
-function conceptGraphDescription(node: OntologyGraphNode) {
-  return firstConceptLiteralValue(node, "definition") || firstConceptLiteralValue(node, "scopeNote") || node.comment;
-}
-
-function firstConceptLiteralValue(node: OntologyGraphNode, predicateSuffix: string) {
-  return (node.literal_values ?? []).find((value) => value.predicate.endsWith(predicateSuffix))?.value ?? "";
-}
-
-function thesaurusConceptDepth(concepts: readonly ThesaurusPaneConcept[], id: string) {
-  const parentById = new Map(concepts.map((concept) => [concept.id, concept.parentId]));
-  let depth = 0;
-  let current = parentById.get(id);
-  const seen = new Set<string>([id]);
-  while (current && !seen.has(current)) {
-    seen.add(current);
-    depth += 1;
-    current = parentById.get(current) ?? null;
-  }
-  return depth;
-}
-
-function conceptTreeContains(concepts: readonly ThesaurusPaneConcept[], rootId: string, targetId: string): boolean {
-  if (rootId === targetId) return true;
-  const children = concepts.filter((concept) => concept.parentId === rootId);
-  return children.some((child) => conceptTreeContains(concepts, child.id, targetId));
-}
-
-function thesaurusConceptMatches(concept: ThesaurusPaneConcept, query: string) {
-  return concept.label.toLowerCase().includes(query) || concept.description.toLowerCase().includes(query);
-}
-
-function thesaurusTopLevelConcepts(concepts: readonly ThesaurusPaneConcept[]) {
-  const ids = new Set(concepts.map((concept) => concept.id));
-  return concepts.filter((concept) => concept.parentId === null || !ids.has(concept.parentId));
 }
 
 function elementTypeRank(type: string, family: string) {
@@ -1866,6 +1475,7 @@ function searchKindColorToken(kind: SearchKind): DesignSystemColorToken {
 function ontologyColorToken(value: string): DesignSystemColorToken {
   const colors: Record<string, DesignSystemColorToken> = {
     class: "--rdf-class",
+    "semantic-query": "--ontology",
     "object-property": "--rdf-objprop",
     "datatype-property": "--rdf-dtprop",
     "rdf-property": "--rdf-rdfprop",

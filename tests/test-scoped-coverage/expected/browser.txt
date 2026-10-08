@@ -1,0 +1,12 @@
+served defaults: PASS
+served scope and sidebar parity: PASS
+served hierarchy and evidence navigation: PASS
+served reload and orphan navigation: PASS
+served narrow coverage controls: PASS
+exported defaults: PASS
+exported scope and sidebar parity: PASS
+exported hierarchy and evidence navigation: PASS
+exported reload and orphan navigation: PASS
+exported narrow coverage controls: PASS
+live refresh preserves scope and hierarchy: PASS
+live refresh removes selected scope with explanation: PASS

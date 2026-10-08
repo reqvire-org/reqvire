@@ -160,10 +160,51 @@ and signature before the request reaches protected application logic.`}</CodeBlo
         </div>
       </Section>
 
+      <Section title="Contract References">
+        <p className="text-zinc-600 mb-4">
+          Contract dependency is the umbrella term for Contract Bindings and
+          Contract References. A Contract Reference declares a content dependency
+          that propagates change impact without contributing to the contract
+          owner's implementation fulfillment.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Contract References must be acyclic. Reqvire rejects circular chains,
+          including loops through contract bindings or requirement ancestry,
+          before reporting or saving edits, and identifies the dependency path.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Use Contract References when a requirement depends on a contract's content
+          for review, such as documentation describing an API. Contract changes reach
+          the referencing requirement, its descendants, verifications, and artifacts
+          through change impact. The documentation's implementation does not fulfill
+          the API contract owner's obligation.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          A requirement can declare Contract Bindings or Contract References. Using
+          both sections on the same requirement is a validation error, even for
+          different contracts. Separate documentation and implementation requirements
+          when they have different responsibilities. References target the same six
+          requirement-owned contract types as bindings and may stay within a hierarchy.
+        </p>
+        <CodeBlock>{`### Error Response Documentation
+
+The system SHALL document endpoint error responses.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Error Response Specification](Specifications.md#error-response-specification)
+
+#### Relations
+  * specify: [API Documentation](Capabilities.md#api-documentation)
+  * satisfiedBy: [Errors page](../website/errors.html)`}</CodeBlock>
+      </Section>
+
       <Section title="Contract Bindings">
         <p className="text-zinc-600 mb-4">
-          Contract Bindings makes cross-boundary requirement contracts
-          explicit. Concept references bind prose to curated SKOS concepts;
+          Contract Bindings assign shared implementation obligations across
+          requirement subgraphs. Concept references bind prose to curated SKOS concepts;
           semantic-contract dependencies use structural ontology through
           constrainedBy/constrain and use/usedBy. A requirement can reuse a
           one-way contract dependency from a compatible requirement-owned
@@ -176,12 +217,12 @@ and signature before the request reaches protected application logic.`}</CodeBlo
               desc: "Capabilities, requirements, contracts, and verifications bind prose to SKOS concepts with Concept References.",
             },
             {
-              name: "Reused contract context",
-              desc: "Requirements reuse specifications, constraints, behaviors, states, and input-output contracts owned by requirement subgraphs. Semantic contracts are linked through constrainedBy/constrain.",
+              name: "Shared implementation obligations",
+              desc: "Requirements bind source, specification, constraint, behavior, state, and input-output contracts owned by other requirements. Semantic contracts are linked through constrainedBy/constrain.",
             },
             {
               name: "One-way flow",
-              desc: "The consuming requirement declares that its subgraph must fulfill the bound contract. Reciprocal cross-submodel reuse is rejected because it hides the intended dependency direction.",
+              desc: "The consuming requirement declares the bound obligation for itself and its requirement descendants. Reciprocal cross-submodel reuse is rejected because it hides the intended dependency direction.",
             },
             {
               name: "Review impact",
@@ -189,6 +230,29 @@ and signature before the request reaches protected application logic.`}</CodeBlo
             },
           ]}
         />
+        <p className="text-zinc-600 mt-5 mb-4">
+          Place each binding on the requirement responsible for implementing
+          the obligation. Bind individual child requirements when their
+          implementations fulfill it independently and need separate coverage
+          tracking. Bind a parent when the obligation applies to its entire
+          requirement subtree and fulfillment is intentionally assessed through
+          that subtree's implementation roll-up. Sharing an ancestor alone is
+          not a reason to move bindings upward.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          For example, if Order Error Responses and Payment Error Responses
+          independently implement a shared error-schema contract, bind each
+          child requirement. An unrelated API Metrics sibling does not acquire
+          that obligation. A parent binding is appropriate when the parent's
+          entire requirement subtree implements the shared obligation and is
+          assessed together.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Descendants inherit a parent's binding and cannot repeat it. Siblings
+          can bind the same contract independently when no ancestor already
+          binds it, provided each binding satisfies the ownership and dependency
+          direction rules.
+        </p>
         <div className="mt-5">
           <CodeBlock>{`### API Consumer Token Handling
 
@@ -262,7 +326,7 @@ reqvire search --filter-owner "Identity Team"`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           Folders and files are physical containment only. They should make the
           model easy to browse, but authoritative semantics come from metadata,
-          relations, and Contract Bindings.
+          relations, and contract dependencies.
         </p>
         <CodeBlock>{`system-model/
   Product/

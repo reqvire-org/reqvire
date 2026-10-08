@@ -1,0 +1,546 @@
+{
+  "Terminal Done": {
+    "identifier": "specifications/Model.md#terminal-done",
+    "name": "Terminal Done",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/a.txt"
+    ],
+    "evidence": [
+      "evidence/a.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Terminal Gap": {
+    "identifier": "specifications/Model.md#terminal-gap",
+    "name": "Terminal Gap",
+    "is_terminal": true,
+    "coverage_source": "uncovered",
+    "direct_evidence": [],
+    "evidence": [],
+    "contributing_requirements": [],
+    "blocking_requirements": [
+      "specifications/Model.md#terminal-gap"
+    ],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 0
+  },
+  "Unused Owner": {
+    "identifier": "specifications/Model.md#unused-owner",
+    "name": "Unused Owner",
+    "is_terminal": true,
+    "coverage_source": "uncovered",
+    "direct_evidence": [],
+    "evidence": [],
+    "contributing_requirements": [],
+    "blocking_requirements": [
+      "specifications/Model.md#unused-owner"
+    ],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 1,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 0
+  },
+  "Unused Done": {
+    "identifier": "specifications/Model.md#unused-done",
+    "name": "Unused Done",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/b.txt"
+    ],
+    "evidence": [
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Tree Root": {
+    "identifier": "specifications/Model.md#tree-root",
+    "name": "Tree Root",
+    "is_terminal": false,
+    "coverage_source": "requirement_rollup",
+    "direct_evidence": [],
+    "evidence": [
+      "evidence/a.txt",
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [
+      "specifications/Model.md#tree-middle",
+      "specifications/Model.md#tree-other"
+    ],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 2,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 2,
+    "aggregate_covered_terminal_requirements": 2
+  },
+  "Tree Middle": {
+    "identifier": "specifications/Model.md#tree-middle",
+    "name": "Tree Middle",
+    "is_terminal": false,
+    "coverage_source": "requirement_rollup",
+    "direct_evidence": [],
+    "evidence": [
+      "evidence/a.txt",
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [
+      "specifications/Model.md#tree-a",
+      "specifications/Model.md#tree-shared"
+    ],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 2,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 2,
+    "aggregate_covered_terminal_requirements": 2
+  },
+  "Tree Other": {
+    "identifier": "specifications/Model.md#tree-other",
+    "name": "Tree Other",
+    "is_terminal": false,
+    "coverage_source": "requirement_rollup",
+    "direct_evidence": [],
+    "evidence": [
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [
+      "specifications/Model.md#tree-shared"
+    ],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Tree A": {
+    "identifier": "specifications/Model.md#tree-a",
+    "name": "Tree A",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/a.txt"
+    ],
+    "evidence": [
+      "evidence/a.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Tree Shared": {
+    "identifier": "specifications/Model.md#tree-shared",
+    "name": "Tree Shared",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/b.txt"
+    ],
+    "evidence": [
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Parent With Evidence": {
+    "identifier": "specifications/Model.md#parent-with-evidence",
+    "name": "Parent With Evidence",
+    "is_terminal": false,
+    "coverage_source": "uncovered",
+    "direct_evidence": [
+      "evidence/parent.txt"
+    ],
+    "evidence": [
+      "evidence/parent.txt"
+    ],
+    "contributing_requirements": [
+      "specifications/Model.md#missing-child"
+    ],
+    "blocking_requirements": [
+      "specifications/Model.md#missing-child"
+    ],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 0
+  },
+  "Missing Child": {
+    "identifier": "specifications/Model.md#missing-child",
+    "name": "Missing Child",
+    "is_terminal": true,
+    "coverage_source": "uncovered",
+    "direct_evidence": [],
+    "evidence": [],
+    "contributing_requirements": [],
+    "blocking_requirements": [
+      "specifications/Model.md#missing-child"
+    ],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 0
+  },
+  "Mixed Owner": {
+    "identifier": "specifications/Model.md#mixed-owner",
+    "name": "Mixed Owner",
+    "is_terminal": false,
+    "coverage_source": "uncovered",
+    "direct_evidence": [],
+    "evidence": [
+      "evidence/a.txt",
+      "evidence/b.txt",
+      "evidence/parent.txt"
+    ],
+    "contributing_requirements": [
+      "specifications/Model.md#other-consumer",
+      "specifications/Model.md#partial-consumer"
+    ],
+    "blocking_requirements": [
+      "specifications/Model.md#missing-consumer-child",
+      "specifications/Model.md#partial-consumer"
+    ],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 3,
+    "aggregate_covered_terminal_requirements": 2
+  },
+  "Partial Consumer": {
+    "identifier": "specifications/Model.md#partial-consumer",
+    "name": "Partial Consumer",
+    "is_terminal": false,
+    "coverage_source": "uncovered",
+    "direct_evidence": [
+      "evidence/parent.txt"
+    ],
+    "evidence": [
+      "evidence/a.txt",
+      "evidence/parent.txt"
+    ],
+    "contributing_requirements": [
+      "specifications/Model.md#consumer-child",
+      "specifications/Model.md#missing-consumer-child"
+    ],
+    "blocking_requirements": [
+      "specifications/Model.md#missing-consumer-child"
+    ],
+    "aggregate_leaf_requirements": 2,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 2,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Consumer Child": {
+    "identifier": "specifications/Model.md#consumer-child",
+    "name": "Consumer Child",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/a.txt"
+    ],
+    "evidence": [
+      "evidence/a.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Missing Consumer Child": {
+    "identifier": "specifications/Model.md#missing-consumer-child",
+    "name": "Missing Consumer Child",
+    "is_terminal": true,
+    "coverage_source": "uncovered",
+    "direct_evidence": [],
+    "evidence": [],
+    "contributing_requirements": [],
+    "blocking_requirements": [
+      "specifications/Model.md#missing-consumer-child"
+    ],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 0
+  },
+  "Other Consumer": {
+    "identifier": "specifications/Model.md#other-consumer",
+    "name": "Other Consumer",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/b.txt"
+    ],
+    "evidence": [
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Complete Owner": {
+    "identifier": "specifications/Model.md#complete-owner",
+    "name": "Complete Owner",
+    "is_terminal": false,
+    "coverage_source": "contract_consumer_rollup",
+    "direct_evidence": [],
+    "evidence": [
+      "evidence/a.txt",
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [
+      "specifications/Model.md#complete-consumer"
+    ],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 1,
+    "aggregate_terminal_requirements": 2,
+    "aggregate_covered_terminal_requirements": 2
+  },
+  "Complete Consumer": {
+    "identifier": "specifications/Model.md#complete-consumer",
+    "name": "Complete Consumer",
+    "is_terminal": false,
+    "coverage_source": "requirement_rollup",
+    "direct_evidence": [],
+    "evidence": [
+      "evidence/a.txt",
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [
+      "specifications/Model.md#complete-consumer-a",
+      "specifications/Model.md#complete-consumer-b"
+    ],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 2,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 2,
+    "aggregate_covered_terminal_requirements": 2
+  },
+  "Complete Consumer A": {
+    "identifier": "specifications/Model.md#complete-consumer-a",
+    "name": "Complete Consumer A",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/a.txt"
+    ],
+    "evidence": [
+      "evidence/a.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Complete Consumer B": {
+    "identifier": "specifications/Model.md#complete-consumer-b",
+    "name": "Complete Consumer B",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/b.txt"
+    ],
+    "evidence": [
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Both Complete": {
+    "identifier": "specifications/Model.md#both-complete",
+    "name": "Both Complete",
+    "is_terminal": false,
+    "coverage_source": "combined_rollup",
+    "direct_evidence": [],
+    "evidence": [
+      "evidence/a.txt",
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [
+      "specifications/Model.md#both-child",
+      "specifications/Model.md#both-consumer"
+    ],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 2,
+    "aggregate_covered_terminal_requirements": 2
+  },
+  "Both Child": {
+    "identifier": "specifications/Model.md#both-child",
+    "name": "Both Child",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/a.txt"
+    ],
+    "evidence": [
+      "evidence/a.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Both Consumer": {
+    "identifier": "specifications/Model.md#both-consumer",
+    "name": "Both Consumer",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/b.txt"
+    ],
+    "evidence": [
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Both Child Gap": {
+    "identifier": "specifications/Model.md#both-child-gap",
+    "name": "Both Child Gap",
+    "is_terminal": false,
+    "coverage_source": "uncovered",
+    "direct_evidence": [
+      "evidence/parent.txt"
+    ],
+    "evidence": [
+      "evidence/b.txt",
+      "evidence/parent.txt"
+    ],
+    "contributing_requirements": [
+      "specifications/Model.md#both-missing-child",
+      "specifications/Model.md#good-consumer"
+    ],
+    "blocking_requirements": [
+      "specifications/Model.md#both-missing-child"
+    ],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 2,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Both Missing Child": {
+    "identifier": "specifications/Model.md#both-missing-child",
+    "name": "Both Missing Child",
+    "is_terminal": true,
+    "coverage_source": "uncovered",
+    "direct_evidence": [],
+    "evidence": [],
+    "contributing_requirements": [],
+    "blocking_requirements": [
+      "specifications/Model.md#both-missing-child"
+    ],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 0
+  },
+  "Good Consumer": {
+    "identifier": "specifications/Model.md#good-consumer",
+    "name": "Good Consumer",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/b.txt"
+    ],
+    "evidence": [
+      "evidence/b.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Both Consumer Gap": {
+    "identifier": "specifications/Model.md#both-consumer-gap",
+    "name": "Both Consumer Gap",
+    "is_terminal": false,
+    "coverage_source": "uncovered",
+    "direct_evidence": [],
+    "evidence": [
+      "evidence/a.txt"
+    ],
+    "contributing_requirements": [
+      "specifications/Model.md#good-child",
+      "specifications/Model.md#missing-consumer"
+    ],
+    "blocking_requirements": [
+      "specifications/Model.md#missing-consumer"
+    ],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 2,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Good Child": {
+    "identifier": "specifications/Model.md#good-child",
+    "name": "Good Child",
+    "is_terminal": true,
+    "coverage_source": "direct_satisfied",
+    "direct_evidence": [
+      "evidence/a.txt"
+    ],
+    "evidence": [
+      "evidence/a.txt"
+    ],
+    "contributing_requirements": [],
+    "blocking_requirements": [],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 1
+  },
+  "Missing Consumer": {
+    "identifier": "specifications/Model.md#missing-consumer",
+    "name": "Missing Consumer",
+    "is_terminal": true,
+    "coverage_source": "uncovered",
+    "direct_evidence": [],
+    "evidence": [],
+    "contributing_requirements": [],
+    "blocking_requirements": [
+      "specifications/Model.md#missing-consumer"
+    ],
+    "aggregate_leaf_requirements": 1,
+    "aggregate_verified_leaf_requirements": 0,
+    "aggregate_terminal_requirements": 1,
+    "aggregate_covered_terminal_requirements": 0
+  }
+}

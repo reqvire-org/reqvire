@@ -34,7 +34,9 @@ This command collects:
 The JSON structure includes:
 - **`element`**: The target element's content, metadata, and type
 - **`ancestors`**: Array of upstream trace elements from root to target
-- **`contract_bindings`**: Specifications, constraints, behaviors, states, and input-output contracts refining the context; semantic contracts are reached through explicit `constrain`/`constrainedBy` relations
+- **`contract_bindings`**: Requirement-owned contracts whose obligations the consuming requirement implements.
+- **`contract_references`**: Requirement-owned contracts needed for content and change-impact context, without implementation fulfillment.
+- Semantic contracts are reached through explicit `constrain`/`constrainedBy` relations. Both ordinary contract dependency kinds are included as context; collection does not change their coverage meaning.
 - **`documents`**: Related markdown documentation files with content
 - **`citations`**: Source file paths and anchors for traceability
 - **`relations`**: verifiedBy, satisfiedBy, and definedBy links to other elements

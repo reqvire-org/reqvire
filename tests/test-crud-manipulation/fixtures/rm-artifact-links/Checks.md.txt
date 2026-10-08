@@ -1,0 +1,21 @@
+# Elements
+
+### Deletion Verification Objective
+
+Group the disposable check.
+
+#### Metadata
+  * type: verification-objective
+---
+
+### Disposable Verification
+
+Demonstrate the retained requirement.
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [Deletion Verification Objective](#deletion-verification-objective)
+  * verify: [Retained Requirement](../Interfaces/WebExplorer/Capabilities.md#retained-requirement)
+---

@@ -1,8 +1,8 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
-import { forwardRef } from "react";
+import { Children, forwardRef } from "react";
 import { css, cx } from "@linaria/atomic";
 import { Icon } from "../../components/core/Icon";
-import { BarMeterFill, ConicSwatch, DonutMeter } from "../../components/data/TokenVisual";
+import { BarMeterFill, ConicSwatch, DonutMeter, TokenSwatch } from "../../components/data/TokenVisual";
 import { ElementIcon } from "../../components/data/ElementIcon";
 import { TypeBadge } from "../../components/data/TypeBadge";
 import type { DesignSystemColorToken } from "../../palette";
@@ -276,10 +276,12 @@ const coverageDashboardBaseUX = css`
   min-width: 0;
   min-height: 0;
   flex-direction: column;
-  gap: var(--space-12);
+  gap: var(--space-8);
+  container-type: inline-size;
+  container-name: coverage-dashboard;
   overflow: auto;
   height: 100%;
-  padding: var(--space-16);
+  padding: var(--space-12);
 
   [data-product-pattern="app-shell"] [data-view="coverage"] & {
     width: 100%;
@@ -289,7 +291,8 @@ const coverageDashboardBaseUX = css`
   .coverage-header {
     display: flex;
     scroll-margin-top: var(--space-12);
-    align-items: flex-start;
+    align-items: flex-end;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--space-10);
     padding-bottom: var(--space-10);
@@ -328,13 +331,51 @@ const coverageDashboardBaseUX = css`
     gap: var(--space-8);
   }
 
+  .coverage-controls {
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--space-8);
+  }
+
+  .coverage-controls__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-width: 100%;
+    font-size: var(--text-caption);
+  }
+
+  .coverage-controls select {
+    max-width: 100%;
+    min-height: var(--control-md);
+    padding: var(--space-4) var(--space-6);
+    border: var(--border-w) solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    font: inherit;
+  }
+
   .coverage-kpi-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .coverage-kpi-grid[data-metric-count="3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .coverage-grid,
   .coverage-gap-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .coverage-grid[data-compact="true"] {
+    .coverage-bar-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4) var(--space-8);
+    }
   }
 
   .coverage-panel--wide {
@@ -345,8 +386,8 @@ const coverageDashboardBaseUX = css`
     display: flex;
     scroll-margin-top: var(--space-12);
     flex-direction: column;
-    gap: var(--space-8);
-    padding: var(--space-10);
+    gap: var(--space-4);
+    padding: var(--space-6);
     transition:
       background-color var(--dur-fast) var(--ease-standard),
       border-color var(--dur-fast) var(--ease-standard),
@@ -362,6 +403,30 @@ const coverageDashboardBaseUX = css`
     display: flex;
     align-items: center;
     gap: var(--space-5);
+  }
+
+  .coverage-capability-row[data-coverage-indent="1"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 1);
+  }
+
+  .coverage-capability-row[data-coverage-indent="2"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 2);
+  }
+
+  .coverage-capability-row[data-coverage-indent="3"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 3);
+  }
+
+  .coverage-capability-row[data-coverage-indent="4"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 4);
+  }
+
+  .coverage-capability-row[data-coverage-indent="5"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 5);
+  }
+
+  .coverage-capability-row[data-coverage-indent="6"] .coverage-capability-row__title {
+    padding-inline-start: calc(var(--space-8) * 6);
   }
 
   .coverage-panel__head {
@@ -384,8 +449,8 @@ const coverageDashboardBaseUX = css`
   .coverage-kpi {
     display: flex;
     align-items: center;
-    gap: var(--space-8);
-    padding: var(--space-8);
+    gap: var(--space-6);
+    padding: var(--space-6);
     min-width: 0;
   }
 
@@ -398,8 +463,8 @@ const coverageDashboardBaseUX = css`
   }
 
   .coverage-donut {
-    width: clamp(var(--space-24), 5vw, calc(var(--space-32) + var(--space-10)));
-    height: clamp(var(--space-24), 5vw, calc(var(--space-32) + var(--space-10)));
+    width: var(--space-24);
+    height: var(--space-24);
   }
 
   .coverage-donut::after,
@@ -410,20 +475,13 @@ const coverageDashboardBaseUX = css`
   }
 
   .coverage-donut::after {
-    width: calc(100% - var(--space-8));
-    height: calc(100% - var(--space-8));
+    width: calc(100% - var(--space-6));
+    height: calc(100% - var(--space-6));
   }
 
   .coverage-breakdown__pie::after {
     width: calc(100% - var(--space-10));
     height: calc(100% - var(--space-10));
-  }
-
-  .coverage-donut__center {
-    z-index: var(--z-local-base);
-    grid-area: 1 / 1;
-    font-size: var(--text-sm);
-    font-weight: var(--weight-bold);
   }
 
   .coverage-kpi__copy,
@@ -439,7 +497,24 @@ const coverageDashboardBaseUX = css`
     gap: var(--space-2);
   }
 
+  .coverage-kpi__heading {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .coverage-kpi__value {
+    flex: none;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
   .coverage-kpi__label {
+    min-width: 0;
+    overflow-wrap: anywhere;
     font-size: var(--text-sm);
     font-weight: var(--weight-semibold);
   }
@@ -463,6 +538,24 @@ const coverageDashboardBaseUX = css`
 
   .coverage-breakdown[data-has-pie="true"] {
     grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .coverage-breakdown[data-has-bar="true"] {
+    gap: var(--space-6);
+    .coverage-breakdown__legend {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-4) var(--space-8);
+    }
+    .coverage-legend-row {
+      gap: var(--space-3);
+      font-size: var(--text-caption);
+      strong { font-variant-numeric: tabular-nums; }
+    }
+    .coverage-legend-row span:nth-child(2) {
+      overflow: visible;
+      text-overflow: clip;
+    }
   }
 
   .coverage-breakdown__pie {
@@ -509,14 +602,14 @@ const coverageDashboardBaseUX = css`
 
   .coverage-source-row,
   .coverage-labeled-bar {
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
   .coverage-bar {
     display: block;
     overflow: hidden;
     width: 100%;
-    height: var(--space-3);
+    height: var(--space-2);
     border-radius: var(--radius-pill);
   }
 
@@ -624,10 +717,21 @@ const coverageDashboardBaseUX = css`
     margin: 0;
   }
 
-  @media (max-width: 1200px) {
-    .coverage-kpi-grid,
+  @container coverage-dashboard (max-width: 900px) {
+    .coverage-kpi-grid[data-metric-count="4"] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @container coverage-dashboard (max-width: 640px) {
+    .coverage-kpi-grid[data-metric-count],
     .coverage-grid,
-    .coverage-gap-grid,
+    .coverage-gap-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 1200px) {
     .coverage-capability-row,
     .coverage-capability-row__bars {
       grid-template-columns: minmax(0, 1fr);
@@ -637,6 +741,11 @@ const coverageDashboardBaseUX = css`
 
 const coverageDashboardSkinX = css`
   background: var(--bg-surface);
+
+  .coverage-controls select {
+    background: var(--bg-surface);
+    color: var(--text-body);
+  }
 
   .coverage-header {
     border-bottom: var(--border-w) solid var(--border-subtle);
@@ -648,7 +757,7 @@ const coverageDashboardSkinX = css`
   .coverage-title-block h1,
   .coverage-panel__head h2,
   .coverage-gap-list__head h3,
-  .coverage-donut__center,
+  .coverage-kpi__value,
   .coverage-kpi__label,
   .coverage-capability-row__title,
   .coverage-gap-row__title,
@@ -925,10 +1034,12 @@ export function CoverageHeader({
   id,
   title,
   eyebrow,
+  controls,
 }: {
   id?: string;
   title: ReactNode;
   eyebrow: ReactNode;
+  controls?: ReactNode;
 }) {
   return (
     <header id={id} className="coverage-header">
@@ -936,6 +1047,7 @@ export function CoverageHeader({
         <span className="coverage-eyebrow">{eyebrow}</span>
         <h1>{title}</h1>
       </div>
+      {controls}
     </header>
   );
 }
@@ -943,9 +1055,11 @@ export function CoverageHeader({
 export function CoverageEmptyState({
   title,
   children,
+  actions,
 }: {
   title: ReactNode;
   children: ReactNode;
+  actions?: ReactNode;
 }) {
   return (
     <div className="coverage-empty">
@@ -953,6 +1067,7 @@ export function CoverageEmptyState({
       <div>
         <h2>{title}</h2>
         <p>{children}</p>
+        {actions}
       </div>
     </div>
   );
@@ -960,15 +1075,15 @@ export function CoverageEmptyState({
 
 export function CoverageKpiGrid({ children }: { children: ReactNode }) {
   return (
-    <section className="coverage-kpi-grid" aria-label="Coverage summary">
+    <section className="coverage-kpi-grid" aria-label="Coverage summary" data-metric-count={Children.toArray(children).length}>
       {children}
     </section>
   );
 }
 
-export function CoverageGrid({ children }: { children: ReactNode }) {
+export function CoverageGrid({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
   return (
-    <section className="coverage-grid" aria-label="Coverage breakdown">
+    <section className="coverage-grid" aria-label="Coverage breakdown" data-compact={compact || undefined}>
       {children}
     </section>
   );
@@ -997,11 +1112,12 @@ export function CoverageKpiCard({
 }) {
   return (
     <div className="coverage-kpi">
-      <CoverageDonut percent={ringPercent} token={token}>
-        {shown}
-      </CoverageDonut>
+      <CoverageDonut percent={ringPercent} token={token} />
       <div className="coverage-kpi__copy">
-        <span className="coverage-kpi__label">{label}</span>
+        <div className="coverage-kpi__heading">
+          <span className="coverage-kpi__label">{label}</span>
+          <strong className="coverage-kpi__value">{shown}</strong>
+        </div>
         <span className="coverage-kpi__detail">{detail}</span>
       </div>
     </div>
@@ -1011,11 +1127,9 @@ export function CoverageKpiCard({
 function CoverageDonut({
   percent,
   token,
-  children,
 }: {
   percent: number;
   token: DesignSystemColorToken;
-  children: ReactNode;
 }) {
   return (
     <DonutMeter
@@ -1023,14 +1137,13 @@ function CoverageDonut({
       percent={percent}
       colorToken={token}
       aria-hidden="true"
-    >
-      <span className="coverage-donut__center">{children}</span>
-    </DonutMeter>
+    />
   );
 }
 
 export interface CoveragePanelProps extends Omit<HTMLAttributes<HTMLElement>, "title" | "style"> {
-  title: ReactNode;
+  /** Omit when the panel's content supplies its own heading, such as CoverageDrilldown. */
+  title?: ReactNode;
   span?: "default" | "wide";
 }
 
@@ -1046,9 +1159,9 @@ export function CoveragePanel({
       className={cx("coverage-panel", span === "wide" ? "coverage-panel--wide" : undefined, className)}
       {...props}
     >
-      <header className="coverage-panel__head">
+      {title != null && <header className="coverage-panel__head">
         <h2>{title}</h2>
-      </header>
+      </header>}
       {children}
     </section>
   );
@@ -1056,14 +1169,17 @@ export function CoveragePanel({
 
 export function CoverageBreakdownFrame({
   pie,
+  bar,
   children,
 }: {
   pie?: ReactNode;
+  bar?: ReactNode;
   children: ReactNode;
 }) {
   return (
-    <div className="coverage-breakdown" data-has-pie={pie ? "true" : undefined}>
+    <div className="coverage-breakdown" data-has-pie={pie ? "true" : undefined} data-has-bar={bar ? "true" : undefined}>
       {pie}
+      {bar}
       <div className="coverage-breakdown__legend">{children}</div>
     </div>
   );
@@ -1087,14 +1203,17 @@ export function CoverageLegendRow({
   label,
   value,
   type,
+  colorToken,
 }: {
   label: ReactNode;
   value: ReactNode;
   type: string;
+  colorToken?: DesignSystemColorToken;
 }) {
   return (
     <div className="coverage-legend-row">
-      <ElementIcon className="coverage-legend-row__icon" type={type} size="sm" />
+      {colorToken ? <TokenSwatch className="coverage-legend-row__icon" colorToken={colorToken} aria-hidden="true" />
+        : <ElementIcon className="coverage-legend-row__icon" type={type} size="sm" />}
       <span>{label}</span>
       <strong>{value}</strong>
     </div>
@@ -1129,21 +1248,52 @@ export function CoverageCapabilityList({ children }: { children: ReactNode }) {
   return <div className="coverage-capability-list">{children}</div>;
 }
 
+const coverageScopeControl = css`
+  width: 100%;
+  min-width: 0;
+  .coverage-controls__field { display: flex; flex-direction: column; gap: var(--space-4); font-size: var(--text-caption); }
+  select { width: 100%; min-width: 0; min-height: var(--control-md); padding: var(--space-4) var(--space-6);
+    border: var(--border-w) solid var(--border-subtle); border-radius: var(--radius-md);
+    background: var(--bg-surface); color: var(--text-strong); font: inherit; }
+`;
+
+export function CoverageControls({ scope, onScopeChange, scopes, disabled = false }: {
+  scope: string;
+  onScopeChange: (scope: string) => void;
+  scopes: { identifier: string; name: string; depth?: number }[];
+  disabled?: boolean;
+}) {
+  return <div className={cx("coverage-controls", coverageScopeControl)}>
+    <label className="coverage-controls__field">Scope
+      <select aria-label="Scope" value={scope} disabled={disabled} onChange={event => onScopeChange(event.target.value)}>
+        <option value="">Whole model</option>
+        {scopes.map(({ identifier, name, depth = 0 }) => <option key={identifier} value={identifier}
+          aria-label={`${name}, level ${depth + 1}`}>
+          {depth ? `${"\u00a0\u00a0".repeat(depth)}↳ ${name}` : name}
+        </option>)}
+      </select>
+    </label>
+  </div>;
+}
+
 export interface CoverageCapabilityRowProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "name" | "style"> {
   name: ReactNode;
   mark?: ReactNode;
   children: ReactNode;
+  depth?: number;
 }
 
 export function CoverageCapabilityRow({
   name,
   mark,
   children,
+  depth = 0,
   className = "",
   ...props
 }: CoverageCapabilityRowProps) {
   return (
-    <button type="button" className={cx("coverage-capability-row", className)} {...props}>
+    <button type="button" className={cx("coverage-capability-row", className)}
+      data-coverage-depth={depth} data-coverage-indent={Math.min(Math.max(0, depth), 6)} {...props}>
       <div className="coverage-capability-row__title">
         <ElementIcon type="capability" size="sm" />
         <span>{name}</span>
@@ -1207,7 +1357,6 @@ export function CoverageGapRowButton({
 }: CoverageGapRowButtonProps) {
   return (
     <button type="button" className={cx("coverage-gap-row", className)} {...props}>
-      <ElementIcon type={type} family={family} size="sm" />
       <span className="coverage-gap-row__copy">
         <span className="coverage-gap-row__title">{title}</span>
         <span className="coverage-gap-row__file">{file}</span>

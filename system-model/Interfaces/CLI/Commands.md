@@ -125,7 +125,7 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
   * [Collect Output Format Specification](../../Reports/ModelReports/Specifications.md#collect-output-format-specification)
 
@@ -151,7 +151,7 @@ The `containment` command shall:
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [ContainmentView](../WebExplorer/ContainmentView.md#containmentview)
   * [Model Browser and Graph Specification](../WebExplorer/Specifications.md#model-browser-and-graph-specification)
@@ -185,6 +185,22 @@ Implementation details shall follow the associated contract specifications.
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Verification Coverage Report Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#verification-coverage-report-test)
+---
+
+### CLI Coverage Scope Selection
+
+When a user selects a capability for a coverage command, the system SHALL return the shared coverage report for that capability subtree.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
+
+#### Relations
+  * derivedFrom: [CLI Coverage Command](#cli-coverage-command)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
 ---
 
 ### CLI Diff Output
@@ -255,6 +271,7 @@ Detailed invocation, source/target argument, output/error, delegation, and ontol
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Merge Content Transformation Behavior](../../Operations/ModelOperations/Behaviors.md#merge-content-transformation-behavior)
   * [Merge Type Compatibility Constraint](../../Operations/ModelOperations/Constraints.md#merge-type-compatibility-constraint)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
@@ -304,6 +321,7 @@ Implementation details shall follow the associated contract specifications. The 
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Model JSON Output Format Contract Specification](../../Reports/ModelReports/Specifications.md#model-json-output-format-contract-specification)
   * [Reverse Relation Traversal Behavior](../../Reports/ModelReports/Behaviors.md#reverse-relation-traversal-behavior)
@@ -353,6 +371,7 @@ The command shall reject moving an element into an existing `# Element` file whe
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
@@ -429,7 +448,7 @@ Detailed layer names, default layer behavior, Turtle/JSON-LD serialization, name
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
 
@@ -453,12 +472,15 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [Atomic Relation Relink Workflow Specification](../../Operations/ModelOperations/Specifications.md#atomic-relation-relink-workflow-specification)
   * [Atomic Relink Validity Constraint](../../Operations/ModelOperations/Constraints.md#atomic-relink-validity-constraint)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * definedBy: [CLI Relink Command Contract Specification](Specifications.md#cli-relink-command-contract-specification)
   * definedBy: [Mutating Command Hierarchy Safety Contract Specification](Specifications.md#mutating-command-hierarchy-safety-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -499,6 +521,7 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -523,6 +546,7 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -557,12 +581,15 @@ Implementation details shall follow the associated contract specifications.
 The system shall provide a unified search function, activated by the `search` root command, which shall search and report on model elements with comprehensive filtering capabilities.
 
 #### Details
+WHEN a caller requests contract-reference filtering, the system SHALL apply the shared search presence and target-filter semantics.
+
 Implementation details shall follow the associated contract specifications. Search JSON shall expose parsed semantic ADT fields for ontology elements and semantic-contract elements when full results are requested.
 
 #### Metadata
   * type: requirement
 
 #### Contract Bindings
+  * [SearchFiltering](../../Reports/ModelReports/SearchFiltering.md#searchfiltering)
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
@@ -602,7 +629,7 @@ The system shall provide a `submodels` command that reports independent capabili
 
 #### Details
 The command shall support:
-- `--from <NAME>` to scope report output to one capability or requirement subtree by name
+- `--from <NAME>` to select one capability or requirement subtree by exact name or canonical identifier under the bound element-selection contract
 - `--json` and `--output <FILE>` for machine-readable output
 - In `--from` mode, selected capability scopes are listed as the scoped capability submodel; selected requirement scopes are treated as boundaries and are not listed as submodel entries
 
@@ -612,6 +639,7 @@ Implementation details shall follow the associated contract specifications.
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
 
@@ -625,25 +653,41 @@ Implementation details shall follow the associated contract specifications.
 
 ### CLI Traces Command
 
-The system shall provide a `traces` command that generates and outputs upward trace trees for verification elements, showing the complete requirement hierarchy and owning capability context.
+When verification traces are requested through the CLI, the system SHALL expose the shared upward trace report with its requirement hierarchy and owning capability context.
 
 #### Details
-Implementation details shall follow the associated contract specifications.
+The system SHALL obtain trace results and filter diagnostics from the shared trace operation.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
+  * [Type Validation Error Behavior](../../Operations/Validation/Behaviors.md#type-validation-error-behavior)
+
+#### Relations
+  * definedBy: [CLI Traces Command Contract Specification](Specifications.md#cli-traces-command-contract-specification)
+  * derive: [CLI Traces Result Presentation](#cli-traces-result-presentation)
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
+  * verifiedBy: [Verification Traces Filter Options Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#verification-traces-filter-options-test)
+---
+
+### CLI Traces Result Presentation
+
+When the shared trace operation returns a report, the system SHALL serialize it as JSON to the selected output destination.
 
 #### Metadata
   * type: requirement
 
 #### Contract Bindings
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
-  * [Type Validation Error Behavior](../../Operations/Validation/Behaviors.md#type-validation-error-behavior)
 
 #### Relations
-  * definedBy: [CLI Traces Command Contract Specification](Specifications.md#cli-traces-command-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * definedBy: [CLI Traces Result Presentation Specification](Specifications.md#cli-traces-result-presentation-specification)
+  * derivedFrom: [CLI Traces Command](#cli-traces-command)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
-  * verifiedBy: [Verification Traces Filter Options Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#verification-traces-filter-options-test)
 ---
 
 ### Detailed Error Handling and Logging
@@ -713,15 +757,19 @@ Implementation details shall follow the associated contract specifications.
 
 ### Relation Commands
 
-The system shall provide unified CLI commands for relation and contract_bindings management: link and unlink.
+The system SHALL provide unified CLI commands for relation, Contract Binding, and Contract Reference management.
 
 #### Details
-Implementation details shall follow the associated contract specifications.
+When a user links or unlinks a Contract Reference, the system SHALL apply the reference mutation contract through the shared model-operation implementation.
+
+When a reference mutation fails validation, the system SHALL preserve the authored files.
 
 #### Metadata
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
   * [Relation Operations Specification](../../ModelStructure/Specifications.md#relation-operations-specification)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
@@ -783,4 +831,34 @@ Implementation details shall follow the associated contract specifications.
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
+---
+
+### npm CLI Distribution
+
+When Reqvire is invoked through its npm package, the system SHALL launch the packaged native CLI for the supported platform and safely reuse its extraction cache across concurrent invocations.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [CLI interface](../InterfacesRequirements.md#cli-interface)
+  * definedBy: [npm CLI Launch Specification](Specifications.md#npm-cli-launch-specification)
+  * satisfiedBy: [reqvire.js](../../../npm/reqvire/bin/reqvire.js)
+---
+
+### CLI Collect Element Selection
+
+When a collect command selects an existing root element, the system SHALL resolve an exact name or canonical identifier through the shared element-selection contract before collection.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [collect.rs](../../../crates/reqvire-core/src/report/collect.rs)
+  * derivedFrom: [CLI Collect Command](#cli-collect-command)
+  * verifiedBy: [Existing Element Selection Verification](../../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
 ---

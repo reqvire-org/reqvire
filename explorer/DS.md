@@ -260,6 +260,50 @@ Do not use absolute positioning for ordinary page, panel, card, toolbar, form,
 or list layout. If a layout can be expressed with flex or grid, use flex or
 grid.
 
+### Control sizing ownership
+
+Shared primitives and product patterns own control sizing, density, and
+responsive behavior. Application views and showcase fixtures consume their
+public APIs. User-resized pane geometry remains runtime state; the design
+system defines how controls fill that space.
+
+`AppShell` owns the pane-aligned header. Its leading brand segment shares the
+expanded pane's live width and divider. View tabs follow that segment during
+pointer and keyboard resizing. Header actions and optional `headerContext`
+stay at the right edge, with the context control last. The compact branch picker
+uses bounded responsive sizing and `menuAlign="end"` to open inward from its
+right edge. A minimum leading width keeps branding usable when the pane
+collapses. Constrained headers use a second scrollable navigation row, aligned
+with the pane until a narrow viewport needs the full row. Production and the
+real Explorer mock consume this same pattern.
+
+`CoverageGapRowButton` shows the name and source path with a trailing type
+badge. It omits a duplicate leading element icon in all four Coverage issue lists.
+
+`WorktreeLoadDialog` owns the shared loading/error presentation. Its refresh
+variant reports the displayed branch and retry policy in the same dismissible
+modal, with no duplicate refresh-error banner. The compact modal has a
+left-aligned status heading and labelled Branch row. A separate explanation
+precedes the complete diagnostic in a wrapping, selectable, keyboard-scrollable
+region. The dismissal footer remains visible with long errors and constrained
+viewports. The application owns dismissal
+and suppresses repeated dialogs for the same unresolved failure while retaining
+the accepted model and automatic refresh. Patterns previews use the exported
+dialog for loading, connection errors, long validation errors and refresh errors.
+
+Controls in the same pane must use its shared horizontal insets and fill the
+available control column. Avoid independent width caps that make a picker
+shorter than its neighboring filter. Referencing a spacing token in an
+arbitrary `max-width` calculation does not establish a shared sizing rule.
+Use intrinsic/flexible sizing by default; introduce an intentional constraint
+through the owning component API or a semantic sizing token when needed.
+
+Review sizing in the real shell mock, including pane resizing, rather than
+compensating with application or showcase styling. Existing token, CSS
+ownership, and architecture guards complement that review; passing them does
+not prove visual alignment. Cosmetic corrections do not need individual
+system-model verification criteria or tests.
+
 ### Design file hygiene
 
 Every design-system example, mock, and translated production surface should
@@ -437,6 +481,7 @@ on its root element unless noted.
 | `Icon` | Lucide-geometry SVG icons. Props: `name` (see `ICON_NAMES`), `size`, `className` |
 | `IconButton` | Icon-only button wrapper — `tone`: secondary / ghost; `size`: `sm` / `md`; optional active state |
 | `Modal` | In-house portal-backed dialog overlay. Sub-components: `ModalContent`, `ModalHeader`, `ModalTitle`, `ModalDescription`, `ModalBody`, `ModalFooter`, `ModalClose` |
+| `ExpandableViewport` | Inline/full-page canvas frame that preserves its mounted children, contains keyboard focus, restores trigger focus, and leaves shared detail modals above the expanded view |
 
 ### Data (`components/data/`)
 
@@ -519,6 +564,43 @@ containers. The full-app mock harness is isolated to
 `design-system/showcase/MockShell.tsx`, which injects fixture data and renders
 `src/App`.
 
+Coverage uses the same `PaneSearchForm` quick-filter treatment as the Model
+explorer, followed by `CoverageNavigation` without an extra section heading.
+The application owns the query; the navigation pattern retains matching names
+or identifiers, their ancestors and Whole Model, with temporary search
+disclosure. Filtering changes navigation visibility without changing scope,
+coverage data or selection URLs. Mocks exercise this production behavior with
+model-derived fixture hierarchies.
+
+`CoverageDrilldown` owns its section title and the shared Verification and
+Implementation column headers. Its header and every hierarchy row use the same
+column grid and insets; narrow panels move the title above the two metric
+headers. Rows show bars, percentages and counts without repeating metric names.
+Meaningful blocker counts remain alongside implementation counts, while each
+metric keeps its own accessible name and published state. `CoveragePanel`
+omits its header when its content supplies one. Patterns and the real Explorer
+mock consume the same drill-down component.
+
+Mocks use the application's existing Explorer navigation. Its Traces route
+composes the native `TraceFlow` preview through application view slots for the
+side pane and workspace, retaining the shared shell controls. The preview uses
+showcase-local trace fixtures and the exported design-system pattern.
+Trace cards open the real application element-detail modal from their names or
+bodies. Hover and keyboard focus accent the complete directed path, including
+all splits and merges; pinning a path preserves that highlight on pointer exit.
+Model's Flow mode composes the same canvas through `ElementFlow`, with a
+capability-first top-to-bottom layout and corresponding inverse relation labels.
+The application supplies the `layoutEngine` callback to both patterns. It starts a real Web Worker on demand and returns a result promise and cancel callback; the pattern cancels its previous task on topology/direction changes and teardown. Worker code stays in `src/`, with no same-thread production fallback.
+Its project-tree selection scopes the data supplied by the application while
+keeping the Model workspace active. Card name/body activation opens the shared
+element-detail modal; source and focus controls keep their own actions. The
+renderer wrapper must accept pointer input for card clicks and path hover even
+when canvas node dragging and selection are disabled.
+Both flows expose Expand flow through `ExpandableViewport`; the same mounted
+canvas fills the page while preserving direction, disclosure, and path focus.
+Element details use the shared modal layer above it. Close or Escape restores
+the embedded view and focus on its expand control.
+
 Showcase primitive pages demonstrate primitives only. They may show states,
 props, and generic composition mechanics, but they must not present product
 vocabulary or product compositions as raw primitive examples. Product concepts
@@ -594,15 +676,30 @@ npm run build
 
 Runs in sequence:
 
-1. **`npm run lint`** — generated artifact, adherence, and style checks (see Lint section below)
-2. **`npm run generate:icons`** — derives favicon/app-icon PNG/ICO outputs
-   from `design-system/assets/logo-mark.svg` into ignored `.vite/generated-assets/`
-3. **`tsc --noEmit`** — TypeScript type check
-4. **`npm run build:ds-bundle`** — emits generated standalone DS kit artifacts
-   outside tracked source
-5. **`vite build`** — emits `dist/` with deterministic asset names (`assets/explorer.js`, `assets/explorer.css`)
+1. **`npm run check`** — all generated artifact, adherence, style, and CSS ownership
+   guards, followed by the TypeScript check (`npm run typecheck`).
+2. **`npm run build:app`** — generates browser icons from
+   `design-system/assets/logo-mark.svg` into ignored `.vite/generated-assets/`,
+   then runs Vite to emit `dist/` with deterministic entry names
+   (`assets/explorer.js`, `assets/explorer.css`).
 
-The build fails at the first failing step. All steps must pass before `dist/` is emitted.
+The default build fails at the first failing step. The application consumes
+design-system source through `@ds`; it does not need `design-system/dist-kit`.
+
+Use `npm run build:all` for a checked application build plus the standalone kit.
+Checks run once before both artifacts. `npm run check`, `npm run build:app`, and
+`npm run build:ds-bundle` are composable stages; the two bundle-only commands do
+not run checks. CI runs the checks before those stages and makes Cargo embed
+the resulting `dist` without requesting another frontend build. Explicit
+`REQVIRE_BUILD_EXPLORER=1` Cargo invocations still run the checked default build.
+
+From the repository root, `make explorer` installs dependencies when the
+successful-install receipt is absent or older than `package.json` or
+`package-lock.json`, then runs the checked application build. An unchanged
+installation is reused; checks and bundling still run. `make explorer-deps`
+performs only that dependency setup. To force reinstall after changing Node
+or npm configuration, remove `explorer/node_modules/.reqvire-deps.stamp`
+before running Make again. Failed installation leaves no success receipt.
 
 ### Showcase dev/build
 
@@ -610,6 +707,11 @@ The build fails at the first failing step. All steps must pass before `dist/` is
 npm run dev:showcase
 npm run build:showcase
 ```
+
+The development command compiles source changes on demand; it does not require
+a prior build. Open `?tab=mocks#/traces` or select **Mocks → Traces** for the native
+trace preview. The build command emits the static showcase in
+`design-system/dist-showcase/`.
 
 Both commands run `npm run lint` first, then generate browser icons and start
 or build the Vite showcase. This is intentional: showcase pages exercise the
@@ -627,6 +729,81 @@ Configured in `design-system/vite.bundle.config.ts`. Produces standalone kit
 artifacts from `design-system/index.ts`. React and ReactDOM are external
 globals. These files are generated outputs and are **not** tracked source. They
 are also **not** part of the application bundle that `vite build` produces.
+
+### ForceAtlas browser profiling
+
+From the repository root, export a current Project Store, then run:
+
+```sh
+./target/debug/reqvire export --output /tmp/reqvire-profile-seed
+node explorer/scripts/profile-forceatlas.mjs \
+  /tmp/reqvire-profile-seed/assets/project-store.js /tmp/reqvire-forceatlas-profile
+```
+
+Use new output directories. The profiler builds an isolated Explorer with
+instrumentation around the actual Model Graph and Ontologies layout calls.
+It records main-thread preparation and coordinate application, worker-request
+wall time (including startup, transport, and computation), browser timer/frame
+gaps and progress during pending work, visible/input dimensions, source hashes,
+and coordinate checksums in `results.json`. Three runs per graph include a new
+document and two route reentries; fixtures cover the current model, bounded
+100–2,000-node trees, a denser graph, and hidden ontology nodes. Timings are
+diagnostic observations; timer/frame gaps include the surrounding renderer task.
+The probe checks topology dimensions, finite coordinates, and cold/warm parity
+without timing thresholds. Larger fixtures must permit both timer and frame
+progress while the worker is pending. It requires the shared test browser configuration
+(`REQVIRE_TEST_BROWSER`, `CHROME_BIN`, or Chrome/Chromium on PATH).
+`FORCEATLAS_PROFILE_SIZES=100 FORCEATLAS_PROFILE_TRIALS=1` provides a smaller run.
+
+Synchronous phase counters separate projection/index preparation, seed positions,
+graph population, palette/glyph resolution, Sigma startup, and accepted-coordinate,
+baseline, overlap, focus, and refresh work. Phase wall times are inclusive: nested
+phases such as palette resolution within graph population must not be summed.
+Counters cover startup through 350 ms after accepted layout, including scheduled
+focus-animation completion. Palette counts describe instrumented direct API
+invocations; CSS token aliases can require additional underlying style reads.
+The probe records focus animation target counts, rendered coordinates/stable
+baselines, and a checksum of rendered node/edge colors, sizes, labels, types,
+visibility, glyphs, and curvature. This checks visual attributes,
+without claiming pixel/rendering parity. Seed and instrumentation hashes make
+before/after comparisons reproducible.
+
+Set `FORCEATLAS_PROFILE_SIGMA=1` for diagnostic counters around the actual
+Sigma process, render, full/partial refresh, resize, clear, and label calls,
+plus WebGL shader, buffer, texture, draw, and readback submissions. The probe
+also checks every node's finite Sigma display-cache coordinates and records
+their checksum, the actual WebGL renderer identity, document long tasks, calls
+lasting at least 2 ms, and the intervals containing the largest timer/frame
+gaps. Calls from a retired renderer/context cannot contribute to its route
+replacement's counters. Direct WebGL timings measure synchronous submission;
+they do not measure asynchronous GPU execution. Sigma counters include internal
+graph-event and image-atlas refreshes; they differ from the explicit caller
+refresh counter. Nested counters remain inclusive.
+
+`FORCEATLAS_PROFILE_TRACE=1` enables those counters and captures a Chrome trace
+per fixture/renderer, covering its cold and warm runs. Traces include renderer,
+worker, GPU, compositor, and task events, with `reqvire:` phase/layout markers
+for correlation. Trace completion has a bounded wait. Use
+`FORCEATLAS_PROFILE_FIXTURES=current-model` to limit this larger diagnostic
+capture. Compare traced results for correctness and attribution separately from
+untraced timings: tracing adds overhead. Output directories retain the profiler
+and browser-driver source snapshots and their hashes alongside renderer and
+seed hashes.
+
+For a saved baseline, set `FORCEATLAS_PROFILE_SOURCE_ROOT` to a directory
+containing the repository-relative copies of the two renderer source files.
+The isolated diagnostic build substitutes only those sources and records their
+actual hashes; their other imports still use the current checkout. This enables
+controlled comparisons without replacing files in the shared working tree.
+
+The shared browser driver defaults to SwiftShader. For a native GPU probe, set
+`FORCEATLAS_PROFILE_GPU=native`; this selects headless ANGLE/Vulkan using
+Chrome's [documented native GPU flags](https://developer.chrome.com/blog/supercharge-web-ai-testing).
+The profiler requires a working application WebGL context and rejects a software
+renderer fallback using its unmasked renderer identity. A launch flag alone
+does not establish hardware use. Host driver/device compatibility still governs
+whether this mode works; a failed native probe does not provide native timing
+evidence. The ordinary shell browser checks retain their SwiftShader default.
 
 ---
 
@@ -1109,12 +1286,15 @@ No JavaScript color recalculation needed.
 
 ## Dependencies
 
-The design system itself has no runtime dependencies beyond React and ReactDOM.
+The primitive layer uses React and ReactDOM. The Thesaurus map and native
+`TraceFlow` and `ElementFlow` product patterns use the workspace's `@xyflow/react` dependency.
 The application workspace dependencies relevant to the design system:
 
 | Package | Role |
 |---------|------|
 | `react`, `react-dom` | Component runtime |
+| `@xyflow/react` | Interactive Thesaurus, Model Flow, and verification trace canvases |
+| `elkjs` | Application-owned worker for layered flow layout, connection routing, and label placement; React Flow renders the design-system cards |
 | `@linaria/atomic`, `@linaria/core`, `@linaria/react` | Component-scoped CSS authoring |
 | `@wyw-in-js/babel-preset`, `@wyw-in-js/vite` | Linaria/WyW extraction in dev + build |
 | `@vitejs/plugin-react` | JSX transform for dev + build |

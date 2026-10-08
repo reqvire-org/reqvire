@@ -12,6 +12,7 @@ import {
   ModalHeader,
   ModalTitle,
 } from "../../components/core/Modal";
+import { CodeBody, CODE_PREVIEW_FALLBACK_CLASS } from "../content/CodePreviewFrame";
 import { CodeRef } from "../../components/data/CodeRef";
 import { TypeBadge } from "../../components/data/TypeBadge";
 
@@ -65,7 +66,7 @@ export interface OntologyDetailNode {
   full_uri?: string;
   ontology_document?: string;
   layer?: "authored" | "concepts" | "reqvire-context" | "external-source";
-  source_kind?: "ontology" | "shape" | "concepts" | "model-context" | "external-ontology";
+  source_kind?: "ontology" | "shape" | "concepts" | "model-context" | "external-ontology" | "query";
   comment?: string;
   rdf_types?: string[];
   sources?: OntologyDetailSource[];
@@ -76,6 +77,14 @@ export interface OntologyDetailNode {
   literal_values?: { predicate?: string; value?: string; source?: OntologyDetailSource }[];
   slot_facets?: OntologyDetailSlotFacet[];
   constructs?: OntologyDetailConstruct[];
+  query?: {
+    form: string;
+    text: string;
+    ontologies: OntologyDetailSource[];
+    vocabulary: OntologyDetailTerm[];
+    produces_properties: OntologyDetailTerm[];
+    produces_families: OntologyDetailTerm[];
+  };
 }
 
 interface OntologyDetailDialogFrameProps {
@@ -751,7 +760,7 @@ export function OntologyNodeDetailDialog({
                     onOpenSource(primarySource);
                   }}
                 >
-                  <Icon name="external-link" className={cx(iconSmUX)} /> Open ontology source
+                  <Icon name="external-link" className={cx(iconSmUX)} /> {node.query ? "Open query source" : "Open ontology source"}
                 </a>
               ) : (
                 <span />
@@ -797,6 +806,25 @@ export function OntologyNodeDetailContent({
         ) : null}
       </section>
       <main className={cx(ontologyColumnUX)}>
+        {node.query ? (
+          <>
+            <Section title={`Query · ${node.query.form}`}>
+              <CodeBody><pre className={CODE_PREVIEW_FALLBACK_CLASS}><code>{node.query.text}</code></pre></CodeBody>
+            </Section>
+            <Section title="Used ontologies">
+              <OntologySourceList sources={node.query.ontologies} onOpenSource={onOpenSource} />
+            </Section>
+            {node.query.vocabulary.length ? (
+              <Section title="Referenced vocabulary"><OntologyTermList terms={node.query.vocabulary} emptyLabel="" /></Section>
+            ) : null}
+            {node.query.produces_properties.length ? (
+              <Section title="Produces properties"><OntologyTermList terms={node.query.produces_properties} emptyLabel="" /></Section>
+            ) : null}
+            {node.query.produces_families.length ? (
+              <Section title="Produces families"><OntologyTermList terms={node.query.produces_families} emptyLabel="" /></Section>
+            ) : null}
+          </>
+        ) : null}
         <OntologyPropertyUsages node={node} nodes={nodes} />
         {isPropertyNode(node) && ((node.domain?.length ?? 0) > 0 || (node.range?.length ?? 0) > 0) ? (
           <Section title="Domain / range">
@@ -1207,6 +1235,7 @@ function ontologyNodeKind(node: OntologyDetailNode) {
 }
 
 function ontologyNodeProvenance(node: OntologyDetailNode) {
+  if (node.source_kind === "query") return "Authored query";
   if (node.layer === "external-source" || node.source_kind === "external-ontology") {
     return "External used subset";
   }

@@ -6,6 +6,7 @@ hide the remaining regressions. Logs and responses live outside each worktree.
 """
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import difflib
 import importlib.util
 import json
@@ -14,6 +15,7 @@ from pathlib import Path
 import socket
 import subprocess
 import traceback
+import time
 import urllib.error
 import urllib.request
 
@@ -26,7 +28,7 @@ spec.loader.exec_module(revision_e2e)
 
 
 class Server(revision_e2e.McpServer):
-    def __init__(self, binary, workspace, output, mode, name):
+    def __init__(self, binary, workspace, output, mode, name, mutations=False, commits=False, extra_args=(), environment=None, embedded_mcp=True):
         self.output = output / name
         self.output.mkdir()
         self.log = (self.output / "server.log").open("w")
@@ -37,13 +39,14 @@ class Server(revision_e2e.McpServer):
             port = listener.getsockname()[1]
         self.base = f"http://127.0.0.1:{port}"
         self.url = self.base + "/mcp"
-        options = ["--enable-mcp"] if mode == "serve" else []
+        options = ["--enable-mcp"] if mode == "serve" and embedded_mcp else []
         self.process = subprocess.Popen(
             [binary, mode, "--host", "127.0.0.1", "--port", str(port),
-             "--enable-mutations", *options], cwd=workspace,
+             *(["--enable-mutations"] if mutations else []),
+             *(["--enable-commits"] if commits else []), *options, *extra_args], cwd=workspace,
             stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True,
             env={**os.environ, "TOKIO_WORKER_THREADS": "4",
-                 "RUST_LOG": "reqvire::model=debug,reqvire::model_cache=debug,reqvire::utils=debug"})
+                 "RUST_LOG": "reqvire::model=debug,reqvire::model_cache=debug,reqvire::utils=debug", **(environment or {})})
 
     def counts(self):
         log = (self.output / "server.log").read_text()
@@ -51,8 +54,8 @@ class Server(revision_e2e.McpServer):
                 "scans": log.count("Scanning for markdown files in:"),
                 "loads": log.count("model cache hit (") + log.count("model cache miss (")}
 
-    def raw_tool(self, name, **arguments):
-        return self.rpc("tools/call", {"name": name, "arguments": arguments})
+    def raw_tool(self, tool_name, **arguments):
+        return self.rpc("tools/call", {"name": tool_name, "arguments": arguments})
 
     def http(self, path, data=None):
         request = urllib.request.Request(self.base + path,
@@ -118,10 +121,10 @@ class Checks:
             dest.write_text(self.fixture(fixture))
         return path
 
-    def server(self, workspace, mode=None):
+    def server(self, workspace, mode=None, mutations=False):
         self.serial += 1
         return Server(self.binary, workspace, self.output, mode or self.mode,
-                      f"{workspace.name}-{self.serial}")
+                      f"{workspace.name}-{self.serial}", mutations=mutations)
 
     def names(self, server):
         result = server.tool("reqvire.search")
@@ -137,6 +140,78 @@ class Checks:
             for _ in range(12):
                 server.tool("reqvire.workspace_status")
             self.equal("regex/unchanged-reads-do-not-build", server.counts()["builds"] - before, 0)
+
+    def parallel_reads(self):
+        path = self.workspace("parallel", {"Model.md": "model.md.txt"})
+        with self.server(path) as server:
+            # Each client has its own request counter and response log. Sharing
+            # McpServer.rpc across threads would race IDs in the test itself.
+            clients = []
+            for i in range(5):
+                client = object.__new__(Server)
+                client.url = server.url
+                client.session = None
+                client.request_id = 1000 * (i + 1)
+                client.output = server.output / f"client-{i}"
+                client.output.mkdir()
+                clients.append(client)
+            samples = {}
+            with ThreadPoolExecutor(max_workers=5) as pool:
+                def wave(label, name, args=None):
+                    args = args or {}
+                    def call(client):
+                        start = time.perf_counter()
+                        attempts = 0
+                        while True:
+                            try:
+                                value = client.raw_tool(name, **args)
+                                return value, time.perf_counter() - start, attempts
+                            except RuntimeError as error:
+                                if ("MCP request capacity exhausted; retry later" not in str(error)
+                                        or "'retryable': True" not in str(error)
+                                        or time.perf_counter() - start > 10):
+                                    raise
+                                attempts += 1
+                                time.sleep(min(0.005 * attempts, 0.1))
+                    start = time.perf_counter()
+                    results = list(pool.map(call, clients))
+                    samples[label] = {"five_client_seconds": [r[1] for r in results],
+                                      "busy_retries": [r[2] for r in results],
+                                      "total_seconds": time.perf_counter() - start}
+                    return [r[0] for r in results]
+
+                (path / "Model.md").write_text(self.fixture("model.md.txt").replace("alpha", "omega"))
+                before = server.counts()["builds"]
+                cold = wave("cold", "reqvire.search")
+                self.equal("parallel/cold-single-build", server.counts()["builds"] - before, 1)
+                oracle = server.raw_tool("reqvire.search")
+                self.check("parallel/cold-complete-payloads", all(r == oracle for r in cold)
+                           and "omega" in json.dumps(oracle))
+                tools = [
+                    ("reqvire.workspace_status", {}), ("reqvire.search", {}),
+                    ("reqvire.read_element", {"name": "Cache Subject"}),
+                    ("reqvire.coverage", {}), ("reqvire.lint", {}), ("reqvire.traces", {}),
+                    ("reqvire.semantic.sparql", {"query": "ASK { ?s ?p ?o }"}),
+                ]
+                for name, args in tools:
+                    oracle = server.raw_tool(name, **args)
+                    serial = []
+                    for _ in range(5):
+                        start = time.perf_counter()
+                        value = server.raw_tool(name, **args)
+                        serial.append(time.perf_counter() - start)
+                        assert value == oracle and not value.get("isError"), value
+                    results = wave(name, name, args)
+                    samples[name]["single_client_seconds"] = serial
+                    self.check("parallel/" + name, all(r == oracle for r in results))
+                (path / "Broken.md").write_text(self.fixture("broken.md.txt"))
+                failures = wave("invalid", "reqvire.search")
+                self.check("parallel/invalid-inputs-reject", all(r.get("isError") for r in failures))
+                (path / "Broken.md").unlink()
+                repaired = wave("repair", "reqvire.search")
+                oracle = server.raw_tool("reqvire.search")
+                self.check("parallel/repair-recovers", all(r == oracle and not r.get("isError") for r in repaired))
+            (server.output / "parallel-timings.json").write_text(json.dumps(samples, indent=2) + "\n")
 
     def ignores(self):
         for filename in (".reqvireignore", ".gitignore"):
@@ -293,13 +368,17 @@ class Checks:
 
     def runtime(self):
         path = self.workspace("runtime", {"Model.md": "model.md.txt"})
-        with self.server(path) as server:
+        for args in (("config", "user.email", "test@example.invalid"), ("config", "user.name", "MCP Test"), ("add", "."), ("commit", "-qm", "runtime baseline")):
+            subprocess.run(["git", *args], cwd=path, check=True)
+        with self.server(path, mutations=True) as server:
+            initial_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=path)
+            initial_index = subprocess.check_output(["git", "ls-files", "--stage"], cwd=path)
             server.tool("reqvire.search")
             initial = server.http("/api/project-store/manifest")
             model = path / "Model.md"
             original = model.read_text()
             model.write_text(original.replace("alpha", "omega"))
-            self.check("runtime/external-edit-visible-to-mcp", "omega" in json.dumps(server.tool("reqvire.read_element", name="Cache Subject")))
+            self.check("runtime/external-edit-not-imported", "alpha" in json.dumps(server.tool("reqvire.read_element", name="Cache Subject")))
             counts = server.counts()
             self.equal("runtime/no-external-polling", server.http("/api/project-store/manifest"), initial)
             self.equal("runtime/manifest-does-not-load-model", server.counts(), counts)
@@ -307,7 +386,7 @@ class Checks:
             counts = server.counts()["loads"]
             preview = server.raw_tool("reqvire.add_element", **add)
             self.equal("runtime/preview-success", preview.get("isError", False), False)
-            self.equal("runtime/preview-no-refresh-load", server.counts()["loads"] - counts, 1)
+            self.equal("runtime/preview-no-refresh-load", server.counts()["loads"] - counts, 0)
             self.equal("runtime/preview-keeps-assets", server.http("/api/project-store/manifest"), initial)
             self.golden_file("runtime/preview-keeps-file", model, "runtime-before-write.md.txt")
             # Duplicate names pass argument validation but fail core mutation validation:
@@ -316,15 +395,18 @@ class Checks:
             rejected = server.raw_tool("reqvire.add_element", file="Model.md",
                 content=original.split("# Elements\n\n", 1)[1], dry_run=False)
             self.equal("runtime/rejected-is-tool-error", rejected.get("isError", False), True)
-            self.equal("runtime/rejected-no-refresh-load", server.counts()["loads"] - counts, 1)
+            self.equal("runtime/rejected-no-refresh-load", server.counts()["loads"] - counts, 0)
             self.equal("runtime/rejected-keeps-assets", server.http("/api/project-store/manifest"), initial)
             self.golden_file("runtime/rejected-keeps-file", model, "runtime-before-write.md.txt")
             add["dry_run"] = False
-            server.tool("reqvire.add_element", **add)
+            result = server.tool("reqvire.add_element", **add)
             self.golden_file("runtime/success-persists-file", model, "runtime-after-write.md.txt")
+            self.check("runtime/default-omits-commit", "commit" not in result)
+            self.equal("runtime/default-keeps-head", subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=path).decode(), initial_head.decode())
+            self.equal("runtime/default-keeps-index", subprocess.check_output(["git", "ls-files", "--stage"], cwd=path).decode(), initial_index.decode())
             status, store = server.http("/api/project-store")
             self.equal("runtime/success-status", status, 200)
-            self.check("runtime/success-publishes-new-graph", "Other Subject" in store and "omega" in store)
+            self.check("runtime/success-publishes-new-graph", "Other Subject" in store and "alpha" in store)
             self.equal("runtime/post-write-search", self.names(server), ["Cache Subject", "Other Subject"])
             query = 'ASK { ?s <https://www.reqvire.org/ontology#elementName> "Other Subject" }'
             self.equal("runtime/post-write-sparql", server.tool("reqvire.semantic.sparql", query=query).get("boolean"), True)
@@ -339,7 +421,7 @@ class Checks:
 
     def run(self):
         for self.mode in ("mcp", "serve"):
-            cases = [self.unchanged, self.ignores, self.dependencies, self.resolution, self.evidence, self.source_changes]
+            cases = [self.unchanged, self.parallel_reads, self.ignores, self.dependencies, self.resolution, self.evidence, self.source_changes]
             if self.mode == "serve":
                 cases.append(self.runtime)
             for case in cases:
@@ -347,6 +429,7 @@ class Checks:
                     case()
                 except Exception:
                     details = traceback.format_exc()
+                    print(details, flush=True)
                     self.check(case.__name__ + "/harness-error", False, details, "scenario completes")
         (self.output / "results.json").write_text(json.dumps(self.results, indent=2) + "\n")
         (self.output / "checks.txt").write_text("".join(

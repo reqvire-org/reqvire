@@ -371,4 +371,10 @@ if ! echo "$MISSING_OUTPUT" | grep -qi "Submodel root 'Missing Root' not found";
   exit 1
 fi
 
+# General existing-element selection: names and canonical identifiers share validation and results.
+SELECTION_SUITE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SELECTION_SUITE_DIR/../run_element_selection_checks.sh"
+if ! run_element_selection_checks submodels "$SELECTION_SUITE_DIR/expected/element-selection.txt"; then
+  exit 1
+fi
 exit 0

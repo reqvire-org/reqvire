@@ -1,0 +1,24 @@
+# Elements
+
+### Artifact Link Capability
+
+Preserve unrelated evidence links during deletion.
+
+#### Metadata
+  * type: capability
+---
+
+### Retained Requirement
+
+The system shall retain the existing evidence targets.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Artifact Link Capability](#artifact-link-capability)
+  * satisfiedBy: [Makefile](../../../Makefile)
+  * satisfiedBy: [LICENSE](../../../LICENSE)
+  * satisfiedBy: [evidence.rs](../../../src/evidence.rs)
+  * verifiedBy: [Disposable Verification](../../Verifications/Checks.md#disposable-verification)
+---

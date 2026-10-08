@@ -35,6 +35,190 @@ impl GraphRegistry {
         Ok(errors)
     }
 
+    /// Validate informational contract edges independently from fulfillment edges.
+    pub(crate) fn validate_contract_references(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        let mut errors = Vec::new();
+        let mut nodes: Vec<_> = self.nodes.values().collect();
+        nodes.sort_by_key(|node| &node.element.identifier);
+        for node in nodes {
+            let element = &node.element;
+            let invalid = |message: String| {
+                ReqvireError::InvalidContractReference(format!(
+                    "Element '{}' (file: {}): {message}",
+                    element.name, element.file_path
+                ))
+            };
+            if !element.contract_references.is_empty() && !element.contract_bindings.is_empty() {
+                errors.push(invalid("Contract Bindings and Contract References cannot coexist on the same element, including when targets differ".into()));
+            }
+            let mut seen = FxHashSet::default();
+            for reference in &element.contract_references {
+                if !element.element_type.is_requirement() {
+                    errors.push(invalid(
+                        "Only requirements may author Contract References".into(),
+                    ));
+                    break;
+                }
+                let crate::element::ContractBindingTarget::ElementIdentifier(identifier) =
+                    &reference.target
+                else {
+                    errors.push(invalid(
+                        "Contract References require element identifiers".into(),
+                    ));
+                    continue;
+                };
+                if !seen.insert(identifier) {
+                    errors.push(invalid(format!(
+                        "Duplicate Contract References target '{identifier}'"
+                    )));
+                }
+                if element
+                    .relations
+                    .iter()
+                    .any(|relation| relation.target.link.as_str() == identifier)
+                {
+                    errors.push(invalid(format!(
+                        "Target '{identifier}' appears in both Relations and Contract References"
+                    )));
+                }
+                match self.get_element(identifier) {
+                    None => errors.push(invalid(format!(
+                        "Missing Contract References target '{identifier}'"
+                    ))),
+                    Some(target) if !target.element_type.is_requirement_contract() => {
+                        errors.push(invalid(format!(
+                            "Contract References target '{}' must be a requirement-owned contract",
+                            target.name
+                        )));
+                    }
+                    Some(target) if self.get_requirement_contract_owner(identifier).is_none() => {
+                        let owners = self
+                            .get_contract_owners(identifier)
+                            .iter()
+                            .filter_map(|id| self.get_element(id))
+                            .map(|owner| {
+                                format!("'{}' ({})", owner.name, owner.element_type.as_str())
+                            })
+                            .collect::<Vec<_>>();
+                        let owners = if owners.is_empty() {
+                            "none".to_string()
+                        } else {
+                            owners.join(", ")
+                        };
+                        errors.push(invalid(format!(
+                            "Contract References target '{}' ({identifier}) must have exactly one requirement owner; found: {owners}",
+                            target.name
+                        )));
+                    }
+                    Some(_) => {}
+                }
+            }
+        }
+        errors.extend(self.validate_contract_reference_cycles());
+        Ok(errors)
+    }
+
+    /// Content dependency direction is consumer -> contract owner and child -> parent.
+    /// This graph validates references; it is not an implementation coverage graph.
+    fn validate_contract_reference_cycles(&self) -> Vec<ReqvireError> {
+        let mut dependencies: BTreeMap<String, BTreeMap<String, String>> = self
+            .nodes
+            .values()
+            .filter(|node| node.element.element_type.is_requirement())
+            .map(|node| (node.element.identifier.clone(), BTreeMap::new()))
+            .collect();
+        let requirement_ids: BTreeSet<_> = dependencies.keys().cloned().collect();
+        let mut references = BTreeSet::new();
+        for (id, edges) in &mut dependencies {
+            let element = &self.nodes[id].element;
+            for relation in &element.relations {
+                if relation.relation_type.name == "derivedFrom" {
+                    if let LinkType::Identifier(parent) = &relation.target.link {
+                        if requirement_ids.contains(parent) {
+                            edges.insert(parent.clone(), "parent requirement".to_string());
+                        }
+                    }
+                }
+            }
+            for (kind, entries) in [
+                ("Contract Bindings", &element.contract_bindings),
+                ("Contract References", &element.contract_references),
+            ] {
+                for entry in entries {
+                    let crate::element::ContractBindingTarget::ElementIdentifier(contract) =
+                        &entry.target
+                    else {
+                        continue;
+                    };
+                    let owners = self.get_defining_requirements(contract);
+                    if let [owner] = owners.as_slice() {
+                        edges.insert(owner.clone(), format!("{kind}: {contract}"));
+                        if kind == "Contract References" {
+                            references.insert((id.clone(), owner.clone()));
+                        }
+                    }
+                }
+            }
+        }
+
+        let mut cycles = BTreeSet::new();
+        for (source, owner) in references {
+            // A reference closes a cycle exactly when its owner can already reach
+            // its consumer. Search per reference so a different cycle in the same
+            // component cannot hide this edge behind a completed DFS branch.
+            let mut previous = BTreeMap::from([(owner.clone(), None)]);
+            let mut pending = std::collections::VecDeque::from([owner.clone()]);
+            while let Some(current) = pending.pop_front() {
+                if current == source {
+                    break;
+                }
+                if let Some(edges) = dependencies.get(&current) {
+                    for next in edges.keys() {
+                        if !previous.contains_key(next) {
+                            previous.insert(next.clone(), Some(current.clone()));
+                            pending.push_back(next.clone());
+                        }
+                    }
+                }
+            }
+            if !previous.contains_key(&source) {
+                continue;
+            }
+            let mut cycle = vec![source.clone()];
+            let mut current = source;
+            while let Some(Some(parent)) = previous.get(&current) {
+                cycle.push(parent.clone());
+                current.clone_from(parent);
+            }
+            cycle.reverse();
+            // Rotate the open cycle to its smallest identifier, then close it.
+            // Multiple reference edges in the same cycle produce one diagnostic.
+            let start = cycle
+                .iter()
+                .enumerate()
+                .min_by_key(|(_, id)| *id)
+                .map_or(0, |(index, _)| index);
+            cycle.rotate_left(start);
+            cycle.push(cycle[0].clone());
+            cycles.insert(cycle);
+        }
+        cycles
+            .into_iter()
+            .map(|cycle| {
+                let mut description = cycle[0].clone();
+                for edge in cycle.windows(2) {
+                    description.push_str(&format!(
+                        " -[{}]-> {}",
+                        dependencies[&edge[0]][&edge[1]], edge[1]
+                    ));
+                }
+                ReqvireError::CircularDependencyError(format!(
+                    "Contract References dependency cycle: {description}"
+                ))
+            })
+            .collect()
+    }
+
     /// Validates relations for target existence and element type compatibility.
     pub(super) fn validate_relations(
         &self,
@@ -268,7 +452,7 @@ impl GraphRegistry {
         log::debug!("Validating concrete verification objective parents...");
         let mut errors = Vec::new();
 
-        let mut sorted_nodes: Vec<&ElementNode> = self.nodes.values().collect();
+        let mut sorted_nodes: Vec<&RegistryNode> = self.nodes.values().collect();
         sorted_nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
 
         for element_node in sorted_nodes {
@@ -312,7 +496,7 @@ impl GraphRegistry {
         let mut visited = FxHashSet::default();
 
         // Check for circular dependencies - but be less strict about what constitutes a cycle
-        let mut sorted_nodes: Vec<&ElementNode> = self.nodes.values().collect();
+        let mut sorted_nodes: Vec<&RegistryNode> = self.nodes.values().collect();
         sorted_nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
 
         for element_node in &sorted_nodes {
@@ -324,6 +508,8 @@ impl GraphRegistry {
                 &mut errors,
             );
         }
+
+        errors.extend(self.validate_requirement_fulfillment_cycles());
 
         // Check for missing requirement parent relations.
         for element_node in &sorted_nodes {
@@ -619,7 +805,7 @@ impl GraphRegistry {
         debug!("Validating contract_bindings targets...");
         let mut errors = Vec::new();
 
-        let mut sorted_nodes: Vec<&ElementNode> = self.nodes.values().collect();
+        let mut sorted_nodes: Vec<&RegistryNode> = self.nodes.values().collect();
         sorted_nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
 
         for element_node in sorted_nodes {
@@ -1291,7 +1477,92 @@ impl GraphRegistry {
             }
         }
 
+        errors.extend(self.validate_concept_taxonomy_cycles());
         Ok(errors)
+    }
+
+    /// Check SKOS taxonomy independently from requirement dependency propagation.
+    /// `broader` and `narrower` declarations share canonical child-to-parent edges.
+    pub(crate) fn validate_concept_taxonomy_cycles(&self) -> Vec<ReqvireError> {
+        let mut adjacency: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+        for node in self.nodes.values() {
+            let element = &node.element;
+            if !element.element_type.is_concept() {
+                continue;
+            }
+            let source = &element.identifier;
+            adjacency.entry(source.clone()).or_default();
+            // Relations are authoritative during mutations; derived concept payloads
+            // may still describe the accepted model until candidate publication.
+            for relation in &element.relations {
+                let reverse = match relation.relation_type.name {
+                    "broader" => false,
+                    "narrower" => true,
+                    _ => continue,
+                };
+                let LinkType::Identifier(target) = &relation.target.link else {
+                    continue;
+                };
+                let Some(target) = self.resolve_concept_element_id(target) else {
+                    continue;
+                };
+                let (child, parent) = if reverse {
+                    (target, source.clone())
+                } else {
+                    (source.clone(), target)
+                };
+                adjacency.entry(parent.clone()).or_default();
+                adjacency.entry(child).or_default().insert(parent);
+            }
+        }
+        let adjacency: BTreeMap<_, Vec<_>> = adjacency
+            .into_iter()
+            .map(|(id, parents)| (id, parents.into_iter().collect()))
+            .collect();
+        let mut completed = FxHashSet::default();
+        let mut active = FxHashMap::default();
+        let mut path = Vec::new();
+        let mut cycles = BTreeSet::new();
+        // Iterative DFS visits each canonical edge once, including reconvergent DAGs.
+        for root in adjacency.keys() {
+            if completed.contains(root) {
+                continue;
+            }
+            active.insert(root.clone(), 0);
+            path.push(root.clone());
+            let mut stack = vec![(root.clone(), 0)];
+            while let Some((id, next)) = stack.last_mut() {
+                if *next == adjacency[id].len() {
+                    completed.insert(id.clone());
+                    active.remove(id);
+                    path.pop();
+                    stack.pop();
+                    continue;
+                }
+                let target = adjacency[id][*next].clone();
+                *next += 1;
+                if let Some(&start) = active.get(&target) {
+                    let mut cycle = path[start..].to_vec();
+                    let first = cycle
+                        .iter()
+                        .enumerate()
+                        .min_by_key(|(_, id)| *id)
+                        .expect("active target belongs to the non-empty traversal path")
+                        .0;
+                    cycle.rotate_left(first);
+                    cycle.push(cycle[0].clone());
+                    cycles.insert(cycle);
+                } else if !completed.contains(&target) {
+                    active.insert(target.clone(), path.len());
+                    path.push(target.clone());
+                    stack.push((target, 0));
+                }
+            }
+        }
+        cycles.into_iter().map(|cycle| ReqvireError::CircularDependencyError(format!(
+            "Concept taxonomy cycle (child --broader--> parent): {}. Remove a broader/narrower edge to make the taxonomy acyclic.",
+            cycle.join(" --broader--> ")
+        ))).collect()
     }
 
     pub(super) fn validate_governance_metadata(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
@@ -1377,8 +1648,17 @@ impl GraphRegistry {
         &self,
         removed_declaration_source: Option<&str>,
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
+        let semantic_build = semantic_contract::build_semantic_index_with_shapes(self);
+        self.validate_semantic_contracts_with_build(&semantic_build, removed_declaration_source)
+    }
+
+    pub(super) fn validate_semantic_contracts_with_build(
+        &self,
+        semantic_build: &semantic_contract::SemanticIndexBuild,
+        removed_declaration_source: Option<&str>,
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
+        let semantic_index = &semantic_build.index;
         let mut errors = Vec::new();
-        let semantic_index = semantic_contract::build_semantic_index(self);
         for diagnostic in &semantic_index.diagnostics {
             errors.push(ReqvireError::InvalidMarkdownStructure(format!(
                 "File {}: semantic model element '{}' at line {}: {}",
@@ -1401,17 +1681,17 @@ impl GraphRegistry {
         }
 
         errors.extend(self.validate_semantic_contract_shape_alignment(
-            &semantic_index,
+            semantic_build,
             removed_declaration_source,
         ));
 
-        errors.extend(self.validate_semantic_contract_shape_prefixes(&semantic_index));
+        errors.extend(self.validate_semantic_contract_shape_prefixes(semantic_index));
 
         errors.extend(self.validate_concept_references(removed_declaration_source));
 
-        errors.extend(self.validate_maps_to_concept_targets(&semantic_index));
+        errors.extend(self.validate_maps_to_concept_targets(semantic_index));
 
-        for (iri, declarations) in semantic_index.ontology_declarations {
+        for (iri, declarations) in &semantic_index.ontology_declarations {
             let authored_declarations: Vec<_> = declarations
                 .iter()
                 .filter(|declaration| !declaration.external)
@@ -1457,32 +1737,36 @@ impl GraphRegistry {
 
     fn validate_semantic_contract_shape_alignment(
         &self,
-        semantic_index: &semantic_contract::SemanticIndex,
+        semantic_build: &semantic_contract::SemanticIndexBuild,
         removed_declaration_source: Option<&str>,
     ) -> Vec<ReqvireError> {
+        let semantic_index = &semantic_build.index;
         let mut errors = Vec::new();
         let mut seen = BTreeSet::new();
 
-        for block in &semantic_index.blocks {
-            if !matches!(block.kind, semantic_contract::SemanticBlockKind::Shapes) {
-                continue;
-            }
-
+        for block in &semantic_build.compiled_shapes {
             let context = self.semantic_contract_used_ontology_context(&block.source);
             if context.is_empty() {
                 continue;
             }
             let context: BTreeSet<String> = context.into_iter().collect();
             let domain_index = semantic_index.shacl_domain_ontology_index(&context);
-            let registry = shacl::ShaclRegistry::parse(&block.quads);
             let aligner = shacl::OntologyAligner::new(&domain_index);
 
-            for alignment_error in aligner.cross_check_shapes(&registry.compiled_shapes) {
+            for alignment_error in aligner.cross_check_shapes(&block.registry.compiled_shapes) {
                 let Some((iri, kind)) = ontology::alignment_reference(&alignment_error) else {
                     continue;
                 };
                 let key = (block.source.clone(), kind.to_string(), iri.to_string());
                 if !seen.insert(key) {
+                    continue;
+                }
+                if kind == "http://www.w3.org/ns/shacl#targetNode"
+                    && semantic_index
+                        .queries
+                        .iter()
+                        .any(|q| q.iri == iri && q.diagnostics.is_empty())
+                {
                     continue;
                 }
                 if owl_reserved::is_reserved_vocabulary_iri(iri) {
@@ -1754,11 +2038,13 @@ impl GraphRegistry {
         errors
     }
 
-    fn semantic_contract_used_ontology_context(&self, contract_id: &str) -> Vec<String> {
+    pub(crate) fn semantic_contract_used_ontology_context(&self, contract_id: &str) -> Vec<String> {
         let Some(contract) = self.nodes.get(contract_id) else {
             return Vec::new();
         };
-        if !contract.element.element_type.is_semantic_contract() {
+        if !contract.element.element_type.is_semantic_contract()
+            && !contract.element.element_type.is_semantic_query()
+        {
             return Vec::new();
         }
 
@@ -1935,17 +2221,12 @@ impl GraphRegistry {
                     continue;
                 }
 
-                // Use relation metadata to traverse in canonical direction only
-                let should_traverse = if let Some(_opposite) = relation.relation_type.opposite {
-                    // For bidirectional relations, only traverse in one canonical direction
-                    // to avoid detecting the same logical cycle twice
-                    // Traverse if this relation type is "lexicographically smaller" than its opposite
-                    // or if this is the primary direction for this relation type
-                    relation.relation_type.name < relation.relation_type.opposite.unwrap_or("")
-                } else {
-                    // For unidirectional relations, always traverse
-                    true
-                };
+                // Traverse unidirectional relations, or the lexicographically smaller
+                // direction of a bidirectional pair, so each logical cycle is visited once.
+                let should_traverse = relation
+                    .relation_type
+                    .opposite
+                    .is_none_or(|opposite| relation.relation_type.name < opposite);
 
                 if should_traverse {
                     if let Some(target_element) = self.get_element(target_id) {

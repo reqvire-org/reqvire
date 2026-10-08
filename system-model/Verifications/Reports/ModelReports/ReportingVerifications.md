@@ -12,6 +12,7 @@ This objective groups verification that Reqvire reporting commands expose collec
   * derive: [Capability Coverage Rollup Test](#capability-coverage-rollup-test)
   * derive: [CLI Collect Command Test](#cli-collect-command-test)
   * derive: [CLI JSON File Output Test](#cli-json-file-output-test)
+  * derive: [Concept Relation Projection Verification](#concept-relation-projection-verification)
   * derive: [Containment Hierarchy Extraction Test](#containment-hierarchy-extraction-test)
   * derive: [Containment View Design Documents Test](#containment-view-design-documents-test)
   * derive: [Containment View JSON Output Test](#containment-view-json-output-test)
@@ -47,7 +48,7 @@ This test verifies that the collect command aggregates capability, requirement, 
 - Command shall collect element content and contract_bindings contents
 - Command shall output with source citations
 - Command shall include semantic contracts when collecting downstream from ontology context they use
-- Command shall reject element types other than capability, requirement, or ontology with error
+- Command shall reject element types other than capability, requirement, ontology, semantic-query, concept-scheme, or concept with error
 
 ##### Test Criteria
 1. **Basic Text Output**
@@ -131,6 +132,8 @@ This test verifies that the collect command aggregates capability, requirement, 
     - Requirement DOWNSTREAM does not include capability context
     - Capability UPSTREAM includes parent capabilities only
     - Capability DOWNSTREAM includes child capabilities, requirements that specify each capability, and requirement descendants
+
+The appended element-selection profile compares exact names and canonical identifiers for capability, requirement, ontology, semantic-query, concept-scheme and concept roots in both directions. It requires ambiguity rejection and selector help describing both forms.
 
 #### Metadata
   * type: test-verification
@@ -537,6 +540,8 @@ Comprehensive test verifying model command generates model-centric nested output
    - Nested structure handles circular dependencies gracefully
    - Each element appears at most once in traversal
 
+The appended element-selection profile compares root/nested capability and requirement scopes selected by exact name or canonical identifier, rejects colliding name/identifier interpretations, and checks selector help.
+
 #### Metadata
   * type: test-verification
 
@@ -611,6 +616,30 @@ This test verifies that the search command correctly filters by multiple element
   * verify: [Comma-Separated Type Filter Parsing](../../../Reports/ModelReports/ReportingRequirements.md#comma-separated-type-filter-parsing)
 ---
 
+### Concept Relation Projection Verification
+
+This verification checks native concept projection correctness, acyclic taxonomy, and bounded normalization work.
+
+#### Details
+- Count registry-element and authored-link visits during semantic construction for increasing sparse concept graphs, including unrelated elements. Normalization visits each input element and link once, independently of the number of concepts emitted; use operation counts rather than timing thresholds.
+- Compare generated taxonomy inverses and symmetric related/mapping facts against explicit expected RDF, including singly authored edges, consistent reciprocal declarations, isolated concepts, external mappings, and cross-scheme associations whose endpoints retain their own namespaces.
+- Reorder registration and authored links and require identical deterministic Turtle; compare JSON-LD concept facts with the same expected relationships. Projection must leave authored payloads unchanged.
+- Rebuild edited and invalid candidates and confirm no stale inverse relationships leak into the new index or alter an earlier accepted index. Existing validation continues to reject missing targets and cross-scheme taxonomy.
+- Reject self, two-concept, and longer mixed-alias taxonomy cycles with a deterministic closed path. Preserve consistent reciprocal aliases, symmetric associations, and acyclic diamonds. Check both declaration orders and a deep taxonomy chain without recursive stack growth.
+- Reject cycle-creating CLI and MCP-dispatch link and element-replacement mutations in normal and dry-run modes; source bytes and accepted revision/read results remain unchanged. A valid mutation after rejection still succeeds. Model validation and semantic export reject the same cycle, and removing its closing edge restores valid output.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [concept_projection_tests.rs](../../../../crates/reqvire-core/src/semantic_contract/concept_projection_tests.rs)
+  * satisfiedBy: [test.sh](../../../../tests/test-concept-elements/test.sh)
+  * satisfiedBy: [check-taxonomy.py](../../../../tests/test-concept-elements/check-taxonomy.py)
+  * satisfiedBy: [concept_taxonomy.rs](../../../../crates/reqvire-core/tests/concept_taxonomy.rs)
+  * verify: [Concept Relation Projection Materialization](../../../Reports/ModelReports/ReportingRequirements.md#concept-relation-projection-materialization)
+  * verify: [Native Concept Taxonomy Cycle Validation](../../../Operations/Validation/ValidationRequirements.md#native-concept-taxonomy-cycle-validation)
+---
+
 ### Ontology Semantic Export Verification
 
 This verification shall prove that semantic ontology export materializes authored ontology, SHACL, generated document ownership, external-subset, reserved-vocabulary, and full projection semantics according to the reporting requirements.
@@ -627,6 +656,9 @@ Expected checks:
 - Verify built-in external ontology sources follow the same used-subset export rule as local external sources: referenced built-in terms are materialized when external-inclusive export is requested, and unused built-in terms are omitted.
 - Verify validation rejects SHACL or ontology references to built-in external ontology terms that are not present in the registered built-in source.
 - Verify unused external ontology dependency terms do not appear in external-inclusive semantic export.
+- Count one used-subset derivation during semantic snapshot construction and no further derivations for repeated Explorer generation, external visibility, query-store initialization, and unfiltered exports, including concurrent readers and snapshot clones.
+- Compare snapshot-backed exports and external visibility with independently derived results, preserving source metadata, declaration markers, support terms, and omission of unused terms. Namespace-filtered exports derive once per operation from the filtered input and do not affect subsequent whole-snapshot reads.
+- Verify edited external RDF builds a fresh subset while prior snapshot reads remain unchanged. Derivation errors must reject the candidate before publication; repaired candidates must succeed independently.
 - Verify imported external ontology terms do not receive Reqvire-generated `rdfs:isDefinedBy` ownership links.
 - Verify full semantic export contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements, plus generated ontology projection graph, projection, construct, symbol, source/provenance, member, and subject/object/predicate facts for direct-authored constructs.
 - Verify full semantic export materializes relation-family projection facts from runtime ontology `reqvire:RelationRule` metadata, including `contract_bindings` normalized as `reqvire:bindsContract` and `reqvire:boundByContract`.
@@ -639,6 +671,7 @@ Expected checks:
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-ontologies-command/test.sh)
+  * satisfiedBy: [semantic_store.rs](../../../../crates/reqvire-core/src/semantic_store.rs)
   * verify: [External Vocabulary Exposure Policy](../../../Reports/ModelReports/ReportingRequirements.md#external-vocabulary-exposure-policy)
   * verify: [Ontology Collection Output](../../../Reports/ModelReports/ReportingRequirements.md#ontology-collection-output)
   * verify: [Ontology Projection Subgraph Materialization](../../../Reports/ModelReports/ReportingRequirements.md#ontology-projection-subgraph-materialization)
@@ -731,6 +764,35 @@ Test cases:
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
   * verify: [Reverse Relation Traversal](../../../Reports/ModelReports/ReportingRequirements.md#reverse-relation-traversal)
+---
+
+### Scoped Coverage Semantics Verification
+
+This verification establishes scope membership, evidence preservation, and aggregation correctness for coverage reports.
+
+#### Details
+Expected checks:
+- Use two independent capability roots, nested capabilities, and a capability reachable through multiple valid parent paths within one root. Resolve requirement membership through capability specification and requirement hierarchy; assert distinct identifiers, retention of all valid paths, and no reassignment across roots.
+- Compare omitted scope, each root scope, and a nested capability scope. Scoped subject sets must match the validated hierarchy, while omitted scope retains existing whole-model report behavior.
+- Include a requirement that owns a contract and has no direct satisfaction, plus a directly satisfied consumer in the other root. The owner's scoped classification, coverage source, and evidence identifiers must equal its whole-model result while excluding the consumer from scoped membership and totals. Removing the consumer's satisfaction must remove that evidence in both reports.
+- Compare every included requirement's verification status, implementation source, direct and supporting artifact identifiers, required contributions, blockers, verification leaf status, and implementation terminal status against the same snapshot's whole-model report. Include direct terminal satisfaction, complete child and consumer rollups, and incomplete parents retaining partial evidence.
+- Include one verification targeting requirements in both roots and several targets within one root. Count it once in each relevant scope and once globally. Exclude verification objectives, retain evidence-satisfaction classification, and preserve requirement-derived capability roll-up.
+- Include an orphaned concrete verification in report input. Whole-model diagnostics include it; capability-scoped membership excludes it and exposes the whole-model-only orphan marker.
+- Reconcile summaries, percentages, type/source counts, gaps, and capability roll-ups with distinct scoped subject sets. Implementation percentages count terminal requirements separately from all-requirement classifications and verification leaves. Multiple hierarchy paths and overlapping parent/child roll-ups must not inflate totals.
+- Check empty capabilities, deterministic membership ordering, invalid explicit selectors, and repeated report generation from an unchanged snapshot.
+- Compare every compact scope entry with its detailed report, including empty scopes, shared verification targets, all verification kinds, and contract consumers outside scope. Repeat after removing external consumer evidence.
+- Measure allocations during compact index generation on flat sibling scopes. Doubling subjects and memberships must not produce quadratic allocation growth, and increasing detailed evidence payload sizes must not increase compact-index allocation in proportion to those payloads. Keep these checks independent of wall-clock timing.
+
+The appended nonvisual element-selection profile compares exact-name and canonical-identifier root/nested capability reports, rejects ambiguity, and distinguishes known wrong-type identifiers from missing elements. The existing membership, evidence and aggregation assertions remain in the owning suite; selector assertions require the same membership, evidence and aggregation under both forms.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Reporting, Search, Coverage, and Model Export Verification Objective](#reporting-search-coverage-and-model-export-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-scoped-coverage/test.sh)
+  * satisfiedBy: [scoped_coverage.rs](../../../../crates/reqvire-core/tests/scoped_coverage.rs)
+  * verify: [Scoped Coverage Reporting](../../../Reports/ModelReports/ReportingRequirements.md#scoped-coverage-reporting)
 ---
 
 ### Search Command Tests
@@ -1014,6 +1076,8 @@ This test verifies that the `submodels` command reports independent capability-r
    - exits non-zero
    - error message indicates selected scope was not found
 
+The appended element-selection profile compares exact-name and canonical-identifier capability and requirement scopes, rejects colliding name/identifier interpretations, and checks selector help.
+
 #### Metadata
   * type: test-verification
 
@@ -1038,7 +1102,7 @@ This test verifies that the system correctly generates verification coverage rep
 - Coverage report shall list unverified leaf requirements with details
 - Coverage report shall list satisfied evidence-backed verifications (`test-verification` and `formal-proof-verification`) with `satisfiedBy` relations
 - Coverage report shall list unsatisfied evidence-backed verifications (`test-verification` and `formal-proof-verification`) without `satisfiedBy` relations
-- Coverage report shall list orphaned verifications (verifications without any verify relations to capabilities or requirements)
+- Coverage report shall list orphaned verifications (verifications without any `verify` relations to requirements)
 - Coverage report shall show orphaned verifications count and percentage in summary section
 - Non-evidence-backed verification elements (analysis, inspection, demonstration) are considered satisfied by default (no satisfiedBy required)
 - JSON output shall be valid and machine-readable
@@ -1097,7 +1161,7 @@ This test verifies that the `traces` command filter options work correctly when 
 - System shall support `--filter-name=<regex>` for filtering by verification name pattern
 - System shall support `--filter-type=<type>` for filtering by verification type
 - Multiple filters shall be combinable using AND logic
-- JSON output shall include verification ID, directly verified requirements, and complete trace tree structure
+- JSON output shall include verification ID, directly verified requirements, and the normalized trace graph defined by Verification Trace Tree Construction
 
 ##### Test Criteria
 1. **Basic JSON Output**
@@ -1107,7 +1171,10 @@ This test verifies that the `traces` command filter options work correctly when 
    - JSON contains `files` object grouping verifications by source file
    - each verification includes `identifier`, `name`, `type`
    - each verification includes `directly_verified_requirements` array
-   - each verification includes `trace_tree` with nested requirement structure
+   - each verification includes `trace_graph` with unique nodes and labelled edges, including owning capability ancestry
+   - layered reconvergent graphs retain every distinct edge, direct flags, and unique requirement totals without nested subtree copies; exercise multiple direct starts, duplicate relations, shuffled input order, orphan/objective exclusion, unresolved targets, cycles, and a deep chain in unit tests
+   - deterministic expansion and inspected-relation counts remain proportional to the reachable graph on 20- and 40-layer fixtures; do not use timing thresholds
+   - end-to-end CLI output and exported Project Store traces match for a reconvergent model; expected nodes and edges are derived independently from the fixture, and existing filter/output-file behavior remains intact
 
 2. **Specific Verification Filter**
    Command: `reqvire traces --filter-id="specifications/Verifications/ValidationTests.md#invalid-relations-test"`
@@ -1138,5 +1205,8 @@ This test verifies that the `traces` command filter options work correctly when 
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
+  * satisfiedBy: [check_graph.py](../../../../tests/test-verification-traces/check_graph.py)
+  * satisfiedBy: [verification_trace.rs](../../../../crates/reqvire-core/src/verification_trace.rs)
   * verify: [CLI Traces Command](../../../Interfaces/CLI/Commands.md#cli-traces-command)
+  * verify: [Trace Projection Data Generation](../../../Reports/ModelReports/ReportingRequirements.md#trace-projection-data-generation)
 ---

@@ -7,7 +7,7 @@ The system shall define a dedicated AI-assistant skills submodel that provides i
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Contract Specification](../../ModelStructure/Specifications.md#contract-specification)
   * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
@@ -116,6 +116,10 @@ Instruction contract details shall follow the associated contract specification.
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-syseng/SKILL.md)
+  * satisfiedBy: [VerificationAlignment.md](../../../codex-skills/reqvire-syseng/references/VerificationAlignment.md)
+  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/syseng/SKILL.md)
+  * satisfiedBy: [VerificationAlignment.md](../../../claude-plugins/skills/syseng/reference/VerificationAlignment.md)
   * definedBy: [AI Skills Instruction Contract Specification](#ai-skills-instruction-contract-specification)
   * derivedFrom: [AI Assistant Skill-Guided Reqvire Modeling](#ai-assistant-skill-guided-reqvire-modeling)
 ---
@@ -130,8 +134,10 @@ Artifact contract details shall follow the associated contract specification.
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [MCP Prompt Guidance Specification](../../Interfaces/MCP/Specifications.md#mcp-prompt-guidance-specification)
+  * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
+  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
 
 #### Relations
   * definedBy: [AI Skills Markdown Artifact Specification](#ai-skills-markdown-artifact-specification)
@@ -181,6 +187,9 @@ Instruction contract rules:
 - Skill workflows run validation and lint after meaningful model updates.
 - Cross-submodel refactors require explicit human confirmation before changing boundaries.
 - Verification guidance distinguishes verification coverage from implementation coverage.
+- Guidance MUST use contract dependency as the umbrella term for Contract Bindings and Contract References, retaining the specific names for their distinct authoring sections and semantics.
+- Guidance MUST distinguish contract ownership through `definedBy`, shared implementation obligations through Contract Bindings, and content dependencies through Contract References. A service, report, view, or document consuming another requirement's contract MUST be assessed by its responsibility for fulfillment rather than by dependency alone.
+- Guidance MUST place bindings on the requirements responsible for the obligation, preserve the mutual exclusion of binding and reference sections on one requirement, and preserve acyclic dependencies including mixed reference, binding, and ancestry paths.
 - Model-refactor examples include correct and incorrect examples where that improves assistant behavior.
 
 #### Metadata
@@ -205,6 +214,8 @@ Artifact contract rules:
 - Codex concept-authoring skill artifacts live under `codex-skills/reqvire-concept-authoring`.
 - Claude concept-authoring skill artifacts live under `claude-plugins/skills/concept-authoring`.
 - Equivalent guidance should stay synchronized between Codex and Claude skill artifacts.
+- Authoring, refactoring, collection, search, and audit references MUST describe both contract dependency kinds consistently. Reference examples MUST use requirement-owned contract elements, retain change-impact visibility, and exclude references from implementation fulfillment and evidence.
+- Mutation examples MUST cover `referenceContract`, removal through `unlink`, and rejected mixed-section edits. Search examples MUST use the dedicated binding/reference filters with normalized target identifier globs.
 - CLI command references shall match supported report output modes. JSON-only `model`, `containment`, `resources`, and `traces` commands emit JSON to stdout without `--json` and accept `--output <file>` directly. Shared flag guidance shall distinguish these commands from commands whose file output requires `--json`.
 - Assistant artifact changes should preserve MBSE workflow guidance and verification-aligned change sequencing.
 - Ontology-authoring guidance should distinguish generic labels/descriptions from ontology slots: `rdfs:label` and `rdfs:comment` are appropriate for optional presentation metadata, while true domain concepts, canonical authored tokens, parser fields, interface enum values, report kinds, controlled-vocabulary payloads, and queryable domain meanings remain declared ontology properties even when their local names end with `Name` or `Meaning`.

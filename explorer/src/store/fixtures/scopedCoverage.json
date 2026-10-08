@@ -1,0 +1,3949 @@
+{
+  "schema_version": "2026-10-06.project-store.v5",
+  "project": {
+    "name": "Scoped coverage example",
+    "root_label": "coverage-example",
+    "workspace_root": "/examples/coverage",
+    "repository": null,
+    "branch": "showcase",
+    "eligible_git_worktrees": [
+      {
+        "root": "/examples/coverage",
+        "workspace_relative_root": "",
+        "head": null,
+        "dirty": true
+      }
+    ]
+  },
+  "folders": [
+    {
+      "path": "",
+      "parent": null,
+      "children": [
+        "specifications"
+      ]
+    },
+    {
+      "path": "specifications",
+      "parent": "",
+      "children": [
+        "specifications/Alpha.md",
+        "specifications/Beta.md",
+        "specifications/Capabilities.md",
+        "specifications/Verifications.md"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "specifications/Alpha.md",
+      "display_path": "specifications/Alpha.md",
+      "markdown_content": "# Elements\n\n### Alpha Contract Owner\n\nThe system SHALL define the exchange format for alpha data.\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * definedBy: [Exchange Format](#exchange-format)\n  * specify: [Alpha Left](Capabilities.md#alpha-left)\n  * verifiedBy: [Shared Proof](Verifications.md#shared-proof)\n---\n\n### Alpha Local\n\nThe system SHALL provide a local alpha service.\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * specify: [Alpha Root](Capabilities.md#alpha-root)\n---\n\n### Alpha Parent\n\nThe system SHALL provide the shared alpha service.\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * definedBy: [Shared Service Format](#shared-service-format)\n  * derive: [Alpha Gap](#alpha-gap)\n  * derive: [Alpha Middle](#alpha-middle)\n  * satisfiedBy: [parent.txt](../evidence/parent.txt)\n  * specify: [Shared Branch](Capabilities.md#shared-branch)\n  * verifiedBy: [Parent Review](Verifications.md#parent-review)\n---\n\n### Alpha Gap\n\nThe system SHALL record shared alpha failures.\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * derivedFrom: [Alpha Parent](#alpha-parent)\n  * verifiedBy: [Gap Check](Verifications.md#gap-check)\n  * verifiedBy: [Shared Check](Verifications.md#shared-check)\n---\n\n### Alpha Middle\n\nThe system SHALL process shared alpha requests.\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * derive: [Alpha Implemented](#alpha-implemented)\n  * derivedFrom: [Alpha Parent](#alpha-parent)\n  * verifiedBy: [Middle Demonstration](Verifications.md#middle-demonstration)\n---\n\n### Alpha Implemented\n\nThe system SHALL return a status for a shared alpha request.\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * derivedFrom: [Alpha Middle](#alpha-middle)\n  * satisfiedBy: [README.md](../evidence/README.md)\n  * satisfiedBy: [alpha.txt](../evidence/alpha.txt)\n  * satisfiedBy: [SKILL.md](../evidence/implementation/SKILL.md)\n  * satisfiedBy: [AnalyzeCoverage.md](../evidence/skills/AnalyzeCoverage.md)\n  * satisfiedBy: [AnalyzeModel.md](../evidence/skills/AnalyzeModel.md)\n  * satisfiedBy: [ChangeImpact.md](../evidence/skills/ChangeImpact.md)\n  * satisfiedBy: [Lint.md](../evidence/skills/Lint.md)\n  * satisfiedBy: [SKILL.md](../evidence/skills/SKILL.md)\n  * verifiedBy: [Shared Check](Verifications.md#shared-check)\n---\n\n### Exchange Format\n\nAn exchange record contains a nonempty text value.\n\n#### Metadata\n  * type: specification\n\n#### Relations\n  * define: [Alpha Contract Owner](#alpha-contract-owner)\n---\n\n### Shared Service Format\n\nA shared service response contains a status value.\n\n#### Metadata\n  * type: specification\n\n#### Relations\n  * define: [Alpha Parent](#alpha-parent)\n---\n\n",
+      "parent_folder": "specifications",
+      "element_ids": [
+        "specifications/Alpha.md#alpha-contract-owner",
+        "specifications/Alpha.md#alpha-local",
+        "specifications/Alpha.md#alpha-parent",
+        "specifications/Alpha.md#alpha-gap",
+        "specifications/Alpha.md#alpha-middle",
+        "specifications/Alpha.md#alpha-implemented",
+        "specifications/Alpha.md#exchange-format",
+        "specifications/Alpha.md#shared-service-format"
+      ],
+      "resource_ids": []
+    },
+    {
+      "path": "specifications/Beta.md",
+      "display_path": "specifications/Beta.md",
+      "markdown_content": "# Elements\n\n### Beta Consumer\n\nThe system SHALL consume alpha exchange records.\n\n#### Metadata\n  * type: requirement\n\n#### Contract Bindings\n  * [Exchange Format](Alpha.md#exchange-format)\n\n#### Relations\n  * satisfiedBy: [beta.txt](../evidence/beta.txt)\n  * specify: [Beta Root](Capabilities.md#beta-root)\n  * verifiedBy: [Shared Check](Verifications.md#shared-check)\n---\n\n### Beta Gap\n\nThe system SHALL record rejected beta records.\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * specify: [Beta Root](Capabilities.md#beta-root)\n  * verifiedBy: [Beta Analysis](Verifications.md#beta-analysis)\n  * verifiedBy: [Shared Proof](Verifications.md#shared-proof)\n---\n\n",
+      "parent_folder": "specifications",
+      "element_ids": [
+        "specifications/Beta.md#beta-consumer",
+        "specifications/Beta.md#beta-gap"
+      ],
+      "resource_ids": []
+    },
+    {
+      "path": "specifications/Capabilities.md",
+      "display_path": "specifications/Capabilities.md",
+      "markdown_content": "# Elements\n\n### Alpha Root\n\nAbility to provide the alpha services.\n\n#### Metadata\n  * type: capability\n\n#### Relations\n  * derive: [Alpha Left](#alpha-left)\n  * derive: [Alpha Right](#alpha-right)\n  * derive: [Empty Branch](#empty-branch)\n  * specifiedBy: [Alpha Local](Alpha.md#alpha-local)\n---\n\n### Alpha Left\n\nAbility to provide the left alpha services.\n\n#### Metadata\n  * type: capability\n\n#### Relations\n  * derive: [Shared Branch](#shared-branch)\n  * derivedFrom: [Alpha Root](#alpha-root)\n  * specifiedBy: [Alpha Contract Owner](Alpha.md#alpha-contract-owner)\n---\n\n### Shared Branch\n\nAbility to provide services shared by both alpha branches.\n\n#### Metadata\n  * type: capability\n\n#### Relations\n  * derivedFrom: [Alpha Left](#alpha-left)\n  * derivedFrom: [Alpha Right](#alpha-right)\n  * specifiedBy: [Alpha Parent](Alpha.md#alpha-parent)\n---\n\n### Alpha Right\n\nAbility to provide the right alpha services.\n\n#### Metadata\n  * type: capability\n\n#### Relations\n  * derive: [Shared Branch](#shared-branch)\n  * derivedFrom: [Alpha Root](#alpha-root)\n---\n\n### Empty Branch\n\nAbility reserved for future alpha services.\n\n#### Metadata\n  * type: capability\n\n#### Relations\n  * derivedFrom: [Alpha Root](#alpha-root)\n---\n\n### Beta Root\n\nAbility to provide the independent beta services.\n\n#### Metadata\n  * type: capability\n\n#### Relations\n  * specifiedBy: [Beta Consumer](Beta.md#beta-consumer)\n  * specifiedBy: [Beta Gap](Beta.md#beta-gap)\n---\n\n",
+      "parent_folder": "specifications",
+      "element_ids": [
+        "specifications/Capabilities.md#alpha-root",
+        "specifications/Capabilities.md#alpha-left",
+        "specifications/Capabilities.md#shared-branch",
+        "specifications/Capabilities.md#alpha-right",
+        "specifications/Capabilities.md#empty-branch",
+        "specifications/Capabilities.md#beta-root"
+      ],
+      "resource_ids": []
+    },
+    {
+      "path": "specifications/Verifications.md",
+      "display_path": "specifications/Verifications.md",
+      "markdown_content": "# Elements\n\n### Service Verification Objective\n\nThis objective organizes verification of the alpha and beta services.\n\n#### Metadata\n  * type: verification-objective\n\n#### Relations\n  * derive: [Beta Analysis](#beta-analysis)\n  * derive: [Gap Check](#gap-check)\n  * derive: [Middle Demonstration](#middle-demonstration)\n  * derive: [Orphan Check](#orphan-check)\n  * derive: [Parent Review](#parent-review)\n  * derive: [Shared Check](#shared-check)\n  * derive: [Shared Proof](#shared-proof)\n---\n\n### Beta Analysis\n\nThis analysis checks rejection recording.\n\n#### Details\nAnalyze the outcomes of invalid beta records.\n\n#### Metadata\n  * type: analysis-verification\n\n#### Relations\n  * derivedFrom: [Service Verification Objective](#service-verification-objective)\n  * verify: [Beta Gap](Beta.md#beta-gap)\n---\n\n### Gap Check\n\nThis test checks alpha failure recording.\n\n#### Details\nCheck that rejected shared requests produce a failure record.\n\n#### Metadata\n  * type: test-verification\n\n#### Relations\n  * derivedFrom: [Service Verification Objective](#service-verification-objective)\n  * verify: [Alpha Gap](Alpha.md#alpha-gap)\n---\n\n### Middle Demonstration\n\nThis demonstration checks shared request processing.\n\n#### Details\nDemonstrate processing one shared alpha request.\n\n#### Metadata\n  * type: demonstration-verification\n\n#### Relations\n  * derivedFrom: [Service Verification Objective](#service-verification-objective)\n  * verify: [Alpha Middle](Alpha.md#alpha-middle)\n---\n\n### Orphan Check\n\nThis test is intentionally without a requirement target to exercise orphan diagnostics.\n\n#### Details\nThe fixture preserves an untargeted test as whole-model diagnostic input.\n\n#### Metadata\n  * type: test-verification\n\n#### Relations\n  * derivedFrom: [Service Verification Objective](#service-verification-objective)\n---\n\n### Parent Review\n\nThis inspection checks the shared service definition.\n\n#### Details\nInspect the shared service response format for an explicit status value.\n\n#### Metadata\n  * type: inspection-verification\n\n#### Relations\n  * derivedFrom: [Service Verification Objective](#service-verification-objective)\n  * verify: [Alpha Parent](Alpha.md#alpha-parent)\n---\n\n### Shared Check\n\nThis test checks service responses across both roots.\n\n#### Details\nCheck shared alpha failure records, shared alpha status, and beta exchange consumption.\n\n#### Metadata\n  * type: test-verification\n\n#### Relations\n  * derivedFrom: [Service Verification Objective](#service-verification-objective)\n  * satisfiedBy: [check.txt](../evidence/check.txt)\n  * verify: [Alpha Gap](Alpha.md#alpha-gap)\n  * verify: [Alpha Implemented](Alpha.md#alpha-implemented)\n  * verify: [Beta Consumer](Beta.md#beta-consumer)\n---\n\n### Shared Proof\n\nThis proof checks exchange validity and rejected-record handling across roots.\n\n#### Details\nEstablish that an accepted exchange value is nonempty and rejected beta records are recorded.\n\n#### Metadata\n  * type: formal-proof-verification\n\n#### Relations\n  * derivedFrom: [Service Verification Objective](#service-verification-objective)\n  * satisfiedBy: [proof.txt](../evidence/proof.txt)\n  * verify: [Alpha Contract Owner](Alpha.md#alpha-contract-owner)\n  * verify: [Beta Gap](Beta.md#beta-gap)\n---\n\n",
+      "parent_folder": "specifications",
+      "element_ids": [
+        "specifications/Verifications.md#service-verification-objective",
+        "specifications/Verifications.md#beta-analysis",
+        "specifications/Verifications.md#gap-check",
+        "specifications/Verifications.md#middle-demonstration",
+        "specifications/Verifications.md#orphan-check",
+        "specifications/Verifications.md#parent-review",
+        "specifications/Verifications.md#shared-check",
+        "specifications/Verifications.md#shared-proof"
+      ],
+      "resource_ids": []
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource:evidence/README.md",
+      "kind": "evidence-file",
+      "target": "evidence/README.md",
+      "display": "README.md",
+      "file_path": "evidence/README.md",
+      "source_text": "Synthetic showcase evidence: README.md\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Alpha.md#alpha-implemented"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    },
+    {
+      "id": "resource:evidence/alpha.txt",
+      "kind": "evidence-file",
+      "target": "evidence/alpha.txt",
+      "display": "alpha.txt",
+      "file_path": "evidence/alpha.txt",
+      "source_text": "Synthetic implementation artifact for the alpha fixture.\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Alpha.md#alpha-implemented"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    },
+    {
+      "id": "resource:evidence/beta.txt",
+      "kind": "evidence-file",
+      "target": "evidence/beta.txt",
+      "display": "beta.txt",
+      "file_path": "evidence/beta.txt",
+      "source_text": "Synthetic implementation artifact for the beta fixture.\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Beta.md#beta-consumer"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    },
+    {
+      "id": "resource:evidence/check.txt",
+      "kind": "evidence-file",
+      "target": "evidence/check.txt",
+      "display": "check.txt",
+      "file_path": "evidence/check.txt",
+      "source_text": "Synthetic test evidence for the shared verification fixture.\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Verifications.md#shared-check"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    },
+    {
+      "id": "resource:evidence/implementation/SKILL.md",
+      "kind": "evidence-file",
+      "target": "evidence/implementation/SKILL.md",
+      "display": "SKILL.md",
+      "file_path": "evidence/implementation/SKILL.md",
+      "source_text": "Synthetic showcase evidence: implementation/SKILL.md\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Alpha.md#alpha-implemented"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    },
+    {
+      "id": "resource:evidence/parent.txt",
+      "kind": "evidence-file",
+      "target": "evidence/parent.txt",
+      "display": "parent.txt",
+      "file_path": "evidence/parent.txt",
+      "source_text": "Direct parent evidence does not cover Alpha Gap.\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Alpha.md#alpha-parent"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    },
+    {
+      "id": "resource:evidence/proof.txt",
+      "kind": "evidence-file",
+      "target": "evidence/proof.txt",
+      "display": "proof.txt",
+      "file_path": "evidence/proof.txt",
+      "source_text": "Synthetic proof evidence for the shared verification fixture.\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Verifications.md#shared-proof"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    },
+    {
+      "id": "resource:evidence/skills/AnalyzeCoverage.md",
+      "kind": "evidence-file",
+      "target": "evidence/skills/AnalyzeCoverage.md",
+      "display": "AnalyzeCoverage.md",
+      "file_path": "evidence/skills/AnalyzeCoverage.md",
+      "source_text": "Synthetic showcase evidence: skills/AnalyzeCoverage.md\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Alpha.md#alpha-implemented"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    },
+    {
+      "id": "resource:evidence/skills/AnalyzeModel.md",
+      "kind": "evidence-file",
+      "target": "evidence/skills/AnalyzeModel.md",
+      "display": "AnalyzeModel.md",
+      "file_path": "evidence/skills/AnalyzeModel.md",
+      "source_text": "Synthetic showcase evidence: skills/AnalyzeModel.md\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Alpha.md#alpha-implemented"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    },
+    {
+      "id": "resource:evidence/skills/ChangeImpact.md",
+      "kind": "evidence-file",
+      "target": "evidence/skills/ChangeImpact.md",
+      "display": "ChangeImpact.md",
+      "file_path": "evidence/skills/ChangeImpact.md",
+      "source_text": "Synthetic showcase evidence: skills/ChangeImpact.md\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Alpha.md#alpha-implemented"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    },
+    {
+      "id": "resource:evidence/skills/Lint.md",
+      "kind": "evidence-file",
+      "target": "evidence/skills/Lint.md",
+      "display": "Lint.md",
+      "file_path": "evidence/skills/Lint.md",
+      "source_text": "Synthetic showcase evidence: skills/Lint.md\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Alpha.md#alpha-implemented"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    },
+    {
+      "id": "resource:evidence/skills/SKILL.md",
+      "kind": "evidence-file",
+      "target": "evidence/skills/SKILL.md",
+      "display": "SKILL.md",
+      "file_path": "evidence/skills/SKILL.md",
+      "source_text": "Synthetic showcase evidence: skills/SKILL.md\n",
+      "external_url": null,
+      "referring_element_ids": [
+        "specifications/Alpha.md#alpha-implemented"
+      ],
+      "relation_types": [
+        "satisfiedBy"
+      ]
+    }
+  ],
+  "elements": [
+    {
+      "id": "specifications/Alpha.md#alpha-contract-owner",
+      "name": "Alpha Contract Owner",
+      "element_type": "requirement",
+      "type_family": "requirement",
+      "file_path": "specifications/Alpha.md",
+      "line_number": 14,
+      "source_anchor": "#/content/specifications/Alpha.md#alpha-contract-owner",
+      "content": "The system SHALL define the exchange format for alpha data.",
+      "metadata": {
+        "type": "requirement"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Alpha.md#alpha-gap",
+      "name": "Alpha Gap",
+      "element_type": "requirement",
+      "type_family": "requirement",
+      "file_path": "specifications/Alpha.md",
+      "line_number": 85,
+      "source_anchor": "#/content/specifications/Alpha.md#alpha-gap",
+      "content": "The system SHALL record shared alpha failures.",
+      "metadata": {
+        "type": "requirement"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Alpha.md#alpha-implemented",
+      "name": "Alpha Implemented",
+      "element_type": "requirement",
+      "type_family": "requirement",
+      "file_path": "specifications/Alpha.md",
+      "line_number": 66,
+      "source_anchor": "#/content/specifications/Alpha.md#alpha-implemented",
+      "content": "The system SHALL return a status for a shared alpha request.",
+      "metadata": {
+        "type": "requirement"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Alpha.md#alpha-local",
+      "name": "Alpha Local",
+      "element_type": "requirement",
+      "type_family": "requirement",
+      "file_path": "specifications/Alpha.md",
+      "line_number": 3,
+      "source_anchor": "#/content/specifications/Alpha.md#alpha-local",
+      "content": "The system SHALL provide a local alpha service.",
+      "metadata": {
+        "type": "requirement"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Alpha.md#alpha-middle",
+      "name": "Alpha Middle",
+      "element_type": "requirement",
+      "type_family": "requirement",
+      "file_path": "specifications/Alpha.md",
+      "line_number": 55,
+      "source_anchor": "#/content/specifications/Alpha.md#alpha-middle",
+      "content": "The system SHALL process shared alpha requests.",
+      "metadata": {
+        "type": "requirement"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Alpha.md#alpha-parent",
+      "name": "Alpha Parent",
+      "element_type": "requirement",
+      "type_family": "requirement",
+      "file_path": "specifications/Alpha.md",
+      "line_number": 34,
+      "source_anchor": "#/content/specifications/Alpha.md#alpha-parent",
+      "content": "The system SHALL provide the shared alpha service.",
+      "metadata": {
+        "type": "requirement"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Alpha.md#exchange-format",
+      "name": "Exchange Format",
+      "element_type": "specification",
+      "type_family": "contract",
+      "file_path": "specifications/Alpha.md",
+      "line_number": 26,
+      "source_anchor": "#/content/specifications/Alpha.md#exchange-format",
+      "content": "An exchange record contains a nonempty text value.",
+      "metadata": {
+        "type": "specification"
+      },
+      "governance": {}
+    },
+    {
+      "id": "specifications/Alpha.md#shared-service-format",
+      "name": "Shared Service Format",
+      "element_type": "specification",
+      "type_family": "contract",
+      "file_path": "specifications/Alpha.md",
+      "line_number": 47,
+      "source_anchor": "#/content/specifications/Alpha.md#shared-service-format",
+      "content": "A shared service response contains a status value.",
+      "metadata": {
+        "type": "specification"
+      },
+      "governance": {}
+    },
+    {
+      "id": "specifications/Beta.md#beta-consumer",
+      "name": "Beta Consumer",
+      "element_type": "requirement",
+      "type_family": "requirement",
+      "file_path": "specifications/Beta.md",
+      "line_number": 3,
+      "source_anchor": "#/content/specifications/Beta.md#beta-consumer",
+      "content": "The system SHALL consume alpha exchange records.",
+      "metadata": {
+        "type": "requirement"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Beta.md#beta-gap",
+      "name": "Beta Gap",
+      "element_type": "requirement",
+      "type_family": "requirement",
+      "file_path": "specifications/Beta.md",
+      "line_number": 18,
+      "source_anchor": "#/content/specifications/Beta.md#beta-gap",
+      "content": "The system SHALL record rejected beta records.",
+      "metadata": {
+        "type": "requirement"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Capabilities.md#alpha-left",
+      "name": "Alpha Left",
+      "element_type": "capability",
+      "type_family": "capability",
+      "file_path": "specifications/Capabilities.md",
+      "line_number": 11,
+      "source_anchor": "#/content/specifications/Capabilities.md#alpha-left",
+      "content": "Ability to provide the left alpha services.",
+      "metadata": {
+        "type": "capability"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Capabilities.md#alpha-right",
+      "name": "Alpha Right",
+      "element_type": "capability",
+      "type_family": "capability",
+      "file_path": "specifications/Capabilities.md",
+      "line_number": 22,
+      "source_anchor": "#/content/specifications/Capabilities.md#alpha-right",
+      "content": "Ability to provide the right alpha services.",
+      "metadata": {
+        "type": "capability"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Capabilities.md#alpha-root",
+      "name": "Alpha Root",
+      "element_type": "capability",
+      "type_family": "capability",
+      "file_path": "specifications/Capabilities.md",
+      "line_number": 3,
+      "source_anchor": "#/content/specifications/Capabilities.md#alpha-root",
+      "content": "Ability to provide the alpha services.",
+      "metadata": {
+        "type": "capability"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Capabilities.md#beta-root",
+      "name": "Beta Root",
+      "element_type": "capability",
+      "type_family": "capability",
+      "file_path": "specifications/Capabilities.md",
+      "line_number": 56,
+      "source_anchor": "#/content/specifications/Capabilities.md#beta-root",
+      "content": "Ability to provide the independent beta services.",
+      "metadata": {
+        "type": "capability"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Capabilities.md#empty-branch",
+      "name": "Empty Branch",
+      "element_type": "capability",
+      "type_family": "capability",
+      "file_path": "specifications/Capabilities.md",
+      "line_number": 45,
+      "source_anchor": "#/content/specifications/Capabilities.md#empty-branch",
+      "content": "Ability reserved for future alpha services.",
+      "metadata": {
+        "type": "capability"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Capabilities.md#shared-branch",
+      "name": "Shared Branch",
+      "element_type": "capability",
+      "type_family": "capability",
+      "file_path": "specifications/Capabilities.md",
+      "line_number": 33,
+      "source_anchor": "#/content/specifications/Capabilities.md#shared-branch",
+      "content": "Ability to provide services shared by both alpha branches.",
+      "metadata": {
+        "type": "capability"
+      },
+      "governance": {
+        "owner": " (default)",
+        "priority": "medium (default)",
+        "risk": "low (default)",
+        "status": "approved (default)"
+      }
+    },
+    {
+      "id": "specifications/Verifications.md#beta-analysis",
+      "name": "Beta Analysis",
+      "element_type": "analysis-verification",
+      "type_family": "verification",
+      "file_path": "specifications/Verifications.md",
+      "line_number": 91,
+      "source_anchor": "#/content/specifications/Verifications.md#beta-analysis",
+      "content": "This analysis checks rejection recording.\n\n\n#### Details\nAnalyze the outcomes of invalid beta records.",
+      "metadata": {
+        "type": "analysis-verification"
+      },
+      "governance": {}
+    },
+    {
+      "id": "specifications/Verifications.md#gap-check",
+      "name": "Gap Check",
+      "element_type": "test-verification",
+      "type_family": "verification",
+      "file_path": "specifications/Verifications.md",
+      "line_number": 29,
+      "source_anchor": "#/content/specifications/Verifications.md#gap-check",
+      "content": "This test checks alpha failure recording.\n\n\n#### Details\nCheck that rejected shared requests produce a failure record.",
+      "metadata": {
+        "type": "test-verification"
+      },
+      "governance": {}
+    },
+    {
+      "id": "specifications/Verifications.md#middle-demonstration",
+      "name": "Middle Demonstration",
+      "element_type": "demonstration-verification",
+      "type_family": "verification",
+      "file_path": "specifications/Verifications.md",
+      "line_number": 76,
+      "source_anchor": "#/content/specifications/Verifications.md#middle-demonstration",
+      "content": "This demonstration checks shared request processing.\n\n\n#### Details\nDemonstrate processing one shared alpha request.",
+      "metadata": {
+        "type": "demonstration-verification"
+      },
+      "governance": {}
+    },
+    {
+      "id": "specifications/Verifications.md#orphan-check",
+      "name": "Orphan Check",
+      "element_type": "test-verification",
+      "type_family": "verification",
+      "file_path": "specifications/Verifications.md",
+      "line_number": 106,
+      "source_anchor": "#/content/specifications/Verifications.md#orphan-check",
+      "content": "This test is intentionally without a requirement target to exercise orphan diagnostics.\n\n\n#### Details\nThe fixture preserves an untargeted test as whole-model diagnostic input.",
+      "metadata": {
+        "type": "test-verification"
+      },
+      "governance": {}
+    },
+    {
+      "id": "specifications/Verifications.md#parent-review",
+      "name": "Parent Review",
+      "element_type": "inspection-verification",
+      "type_family": "verification",
+      "file_path": "specifications/Verifications.md",
+      "line_number": 44,
+      "source_anchor": "#/content/specifications/Verifications.md#parent-review",
+      "content": "This inspection checks the shared service definition.\n\n\n#### Details\nInspect the shared service response format for an explicit status value.",
+      "metadata": {
+        "type": "inspection-verification"
+      },
+      "governance": {}
+    },
+    {
+      "id": "specifications/Verifications.md#service-verification-objective",
+      "name": "Service Verification Objective",
+      "element_type": "verification-objective",
+      "type_family": "verification-objective",
+      "file_path": "specifications/Verifications.md",
+      "line_number": 3,
+      "source_anchor": "#/content/specifications/Verifications.md#service-verification-objective",
+      "content": "This objective organizes verification of the alpha and beta services.",
+      "metadata": {
+        "type": "verification-objective"
+      },
+      "governance": {}
+    },
+    {
+      "id": "specifications/Verifications.md#shared-check",
+      "name": "Shared Check",
+      "element_type": "test-verification",
+      "type_family": "verification",
+      "file_path": "specifications/Verifications.md",
+      "line_number": 11,
+      "source_anchor": "#/content/specifications/Verifications.md#shared-check",
+      "content": "This test checks service responses across both roots.\n\n\n#### Details\nCheck shared alpha failure records, shared alpha status, and beta exchange consumption.",
+      "metadata": {
+        "type": "test-verification"
+      },
+      "governance": {}
+    },
+    {
+      "id": "specifications/Verifications.md#shared-proof",
+      "name": "Shared Proof",
+      "element_type": "formal-proof-verification",
+      "type_family": "verification",
+      "file_path": "specifications/Verifications.md",
+      "line_number": 59,
+      "source_anchor": "#/content/specifications/Verifications.md#shared-proof",
+      "content": "This proof checks exchange validity and rejected-record handling across roots.\n\n\n#### Details\nEstablish that an accepted exchange value is nonempty and rejected beta records are recorded.",
+      "metadata": {
+        "type": "formal-proof-verification"
+      },
+      "governance": {}
+    }
+  ],
+  "relations": [
+    {
+      "id": "relation:specifications/Alpha.md#alpha-contract-owner:definedBy:specifications/Alpha.md#exchange-format",
+      "source_id": "specifications/Alpha.md#alpha-contract-owner",
+      "target_id": "specifications/Alpha.md#exchange-format",
+      "target_kind": "element",
+      "relation_type": "definedBy",
+      "canonical_relation_type": "definedBy",
+      "source_relation_types": [
+        "define",
+        "definedBy"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-contract-owner:verifiedBy:specifications/Verifications.md#shared-proof",
+      "source_id": "specifications/Alpha.md#alpha-contract-owner",
+      "target_id": "specifications/Verifications.md#shared-proof",
+      "target_kind": "element",
+      "relation_type": "verifiedBy",
+      "canonical_relation_type": "verifiedBy",
+      "source_relation_types": [
+        "verifiedBy",
+        "verify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-gap:verifiedBy:specifications/Verifications.md#gap-check",
+      "source_id": "specifications/Alpha.md#alpha-gap",
+      "target_id": "specifications/Verifications.md#gap-check",
+      "target_kind": "element",
+      "relation_type": "verifiedBy",
+      "canonical_relation_type": "verifiedBy",
+      "source_relation_types": [
+        "verifiedBy",
+        "verify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-gap:verifiedBy:specifications/Verifications.md#shared-check",
+      "source_id": "specifications/Alpha.md#alpha-gap",
+      "target_id": "specifications/Verifications.md#shared-check",
+      "target_kind": "element",
+      "relation_type": "verifiedBy",
+      "canonical_relation_type": "verifiedBy",
+      "source_relation_types": [
+        "verifiedBy",
+        "verify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-implemented:satisfiedBy:evidence/README.md",
+      "source_id": "specifications/Alpha.md#alpha-implemented",
+      "target_id": "evidence/README.md",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/README.md"
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-implemented:satisfiedBy:evidence/alpha.txt",
+      "source_id": "specifications/Alpha.md#alpha-implemented",
+      "target_id": "evidence/alpha.txt",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/alpha.txt"
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-implemented:satisfiedBy:evidence/implementation/SKILL.md",
+      "source_id": "specifications/Alpha.md#alpha-implemented",
+      "target_id": "evidence/implementation/SKILL.md",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/implementation/SKILL.md"
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-implemented:satisfiedBy:evidence/skills/AnalyzeCoverage.md",
+      "source_id": "specifications/Alpha.md#alpha-implemented",
+      "target_id": "evidence/skills/AnalyzeCoverage.md",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/skills/AnalyzeCoverage.md"
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-implemented:satisfiedBy:evidence/skills/AnalyzeModel.md",
+      "source_id": "specifications/Alpha.md#alpha-implemented",
+      "target_id": "evidence/skills/AnalyzeModel.md",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/skills/AnalyzeModel.md"
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-implemented:satisfiedBy:evidence/skills/ChangeImpact.md",
+      "source_id": "specifications/Alpha.md#alpha-implemented",
+      "target_id": "evidence/skills/ChangeImpact.md",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/skills/ChangeImpact.md"
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-implemented:satisfiedBy:evidence/skills/Lint.md",
+      "source_id": "specifications/Alpha.md#alpha-implemented",
+      "target_id": "evidence/skills/Lint.md",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/skills/Lint.md"
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-implemented:satisfiedBy:evidence/skills/SKILL.md",
+      "source_id": "specifications/Alpha.md#alpha-implemented",
+      "target_id": "evidence/skills/SKILL.md",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/skills/SKILL.md"
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-implemented:verifiedBy:specifications/Verifications.md#shared-check",
+      "source_id": "specifications/Alpha.md#alpha-implemented",
+      "target_id": "specifications/Verifications.md#shared-check",
+      "target_kind": "element",
+      "relation_type": "verifiedBy",
+      "canonical_relation_type": "verifiedBy",
+      "source_relation_types": [
+        "verifiedBy",
+        "verify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-middle:derive:specifications/Alpha.md#alpha-implemented",
+      "source_id": "specifications/Alpha.md#alpha-middle",
+      "target_id": "specifications/Alpha.md#alpha-implemented",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-middle:verifiedBy:specifications/Verifications.md#middle-demonstration",
+      "source_id": "specifications/Alpha.md#alpha-middle",
+      "target_id": "specifications/Verifications.md#middle-demonstration",
+      "target_kind": "element",
+      "relation_type": "verifiedBy",
+      "canonical_relation_type": "verifiedBy",
+      "source_relation_types": [
+        "verifiedBy",
+        "verify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-parent:satisfiedBy:evidence/parent.txt",
+      "source_id": "specifications/Alpha.md#alpha-parent",
+      "target_id": "evidence/parent.txt",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/parent.txt"
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-parent:derive:specifications/Alpha.md#alpha-gap",
+      "source_id": "specifications/Alpha.md#alpha-parent",
+      "target_id": "specifications/Alpha.md#alpha-gap",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-parent:derive:specifications/Alpha.md#alpha-middle",
+      "source_id": "specifications/Alpha.md#alpha-parent",
+      "target_id": "specifications/Alpha.md#alpha-middle",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-parent:definedBy:specifications/Alpha.md#shared-service-format",
+      "source_id": "specifications/Alpha.md#alpha-parent",
+      "target_id": "specifications/Alpha.md#shared-service-format",
+      "target_kind": "element",
+      "relation_type": "definedBy",
+      "canonical_relation_type": "definedBy",
+      "source_relation_types": [
+        "define",
+        "definedBy"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Alpha.md#alpha-parent:verifiedBy:specifications/Verifications.md#parent-review",
+      "source_id": "specifications/Alpha.md#alpha-parent",
+      "target_id": "specifications/Verifications.md#parent-review",
+      "target_kind": "element",
+      "relation_type": "verifiedBy",
+      "canonical_relation_type": "verifiedBy",
+      "source_relation_types": [
+        "verifiedBy",
+        "verify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Beta.md#beta-consumer:satisfiedBy:evidence/beta.txt",
+      "source_id": "specifications/Beta.md#beta-consumer",
+      "target_id": "evidence/beta.txt",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/beta.txt"
+    },
+    {
+      "id": "relation:specifications/Beta.md#beta-consumer:verifiedBy:specifications/Verifications.md#shared-check",
+      "source_id": "specifications/Beta.md#beta-consumer",
+      "target_id": "specifications/Verifications.md#shared-check",
+      "target_kind": "element",
+      "relation_type": "verifiedBy",
+      "canonical_relation_type": "verifiedBy",
+      "source_relation_types": [
+        "verifiedBy",
+        "verify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Beta.md#beta-gap:verifiedBy:specifications/Verifications.md#beta-analysis",
+      "source_id": "specifications/Beta.md#beta-gap",
+      "target_id": "specifications/Verifications.md#beta-analysis",
+      "target_kind": "element",
+      "relation_type": "verifiedBy",
+      "canonical_relation_type": "verifiedBy",
+      "source_relation_types": [
+        "verifiedBy",
+        "verify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Beta.md#beta-gap:verifiedBy:specifications/Verifications.md#shared-proof",
+      "source_id": "specifications/Beta.md#beta-gap",
+      "target_id": "specifications/Verifications.md#shared-proof",
+      "target_kind": "element",
+      "relation_type": "verifiedBy",
+      "canonical_relation_type": "verifiedBy",
+      "source_relation_types": [
+        "verifiedBy",
+        "verify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Capabilities.md#alpha-left:specifiedBy:specifications/Alpha.md#alpha-contract-owner",
+      "source_id": "specifications/Capabilities.md#alpha-left",
+      "target_id": "specifications/Alpha.md#alpha-contract-owner",
+      "target_kind": "element",
+      "relation_type": "specifiedBy",
+      "canonical_relation_type": "specifiedBy",
+      "source_relation_types": [
+        "specifiedBy",
+        "specify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Capabilities.md#alpha-left:derive:specifications/Capabilities.md#shared-branch",
+      "source_id": "specifications/Capabilities.md#alpha-left",
+      "target_id": "specifications/Capabilities.md#shared-branch",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Capabilities.md#alpha-right:derive:specifications/Capabilities.md#shared-branch",
+      "source_id": "specifications/Capabilities.md#alpha-right",
+      "target_id": "specifications/Capabilities.md#shared-branch",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Capabilities.md#alpha-root:specifiedBy:specifications/Alpha.md#alpha-local",
+      "source_id": "specifications/Capabilities.md#alpha-root",
+      "target_id": "specifications/Alpha.md#alpha-local",
+      "target_kind": "element",
+      "relation_type": "specifiedBy",
+      "canonical_relation_type": "specifiedBy",
+      "source_relation_types": [
+        "specifiedBy",
+        "specify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Capabilities.md#alpha-root:derive:specifications/Capabilities.md#alpha-left",
+      "source_id": "specifications/Capabilities.md#alpha-root",
+      "target_id": "specifications/Capabilities.md#alpha-left",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Capabilities.md#alpha-root:derive:specifications/Capabilities.md#alpha-right",
+      "source_id": "specifications/Capabilities.md#alpha-root",
+      "target_id": "specifications/Capabilities.md#alpha-right",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Capabilities.md#alpha-root:derive:specifications/Capabilities.md#empty-branch",
+      "source_id": "specifications/Capabilities.md#alpha-root",
+      "target_id": "specifications/Capabilities.md#empty-branch",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Capabilities.md#beta-root:specifiedBy:specifications/Beta.md#beta-consumer",
+      "source_id": "specifications/Capabilities.md#beta-root",
+      "target_id": "specifications/Beta.md#beta-consumer",
+      "target_kind": "element",
+      "relation_type": "specifiedBy",
+      "canonical_relation_type": "specifiedBy",
+      "source_relation_types": [
+        "specifiedBy",
+        "specify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Capabilities.md#beta-root:specifiedBy:specifications/Beta.md#beta-gap",
+      "source_id": "specifications/Capabilities.md#beta-root",
+      "target_id": "specifications/Beta.md#beta-gap",
+      "target_kind": "element",
+      "relation_type": "specifiedBy",
+      "canonical_relation_type": "specifiedBy",
+      "source_relation_types": [
+        "specifiedBy",
+        "specify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Capabilities.md#shared-branch:specifiedBy:specifications/Alpha.md#alpha-parent",
+      "source_id": "specifications/Capabilities.md#shared-branch",
+      "target_id": "specifications/Alpha.md#alpha-parent",
+      "target_kind": "element",
+      "relation_type": "specifiedBy",
+      "canonical_relation_type": "specifiedBy",
+      "source_relation_types": [
+        "specifiedBy",
+        "specify"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Verifications.md#service-verification-objective:derive:specifications/Verifications.md#beta-analysis",
+      "source_id": "specifications/Verifications.md#service-verification-objective",
+      "target_id": "specifications/Verifications.md#beta-analysis",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Verifications.md#service-verification-objective:derive:specifications/Verifications.md#gap-check",
+      "source_id": "specifications/Verifications.md#service-verification-objective",
+      "target_id": "specifications/Verifications.md#gap-check",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Verifications.md#service-verification-objective:derive:specifications/Verifications.md#middle-demonstration",
+      "source_id": "specifications/Verifications.md#service-verification-objective",
+      "target_id": "specifications/Verifications.md#middle-demonstration",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Verifications.md#service-verification-objective:derive:specifications/Verifications.md#orphan-check",
+      "source_id": "specifications/Verifications.md#service-verification-objective",
+      "target_id": "specifications/Verifications.md#orphan-check",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Verifications.md#service-verification-objective:derive:specifications/Verifications.md#parent-review",
+      "source_id": "specifications/Verifications.md#service-verification-objective",
+      "target_id": "specifications/Verifications.md#parent-review",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Verifications.md#service-verification-objective:derive:specifications/Verifications.md#shared-check",
+      "source_id": "specifications/Verifications.md#service-verification-objective",
+      "target_id": "specifications/Verifications.md#shared-check",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Verifications.md#service-verification-objective:derive:specifications/Verifications.md#shared-proof",
+      "source_id": "specifications/Verifications.md#service-verification-objective",
+      "target_id": "specifications/Verifications.md#shared-proof",
+      "target_kind": "element",
+      "relation_type": "derive",
+      "canonical_relation_type": "derive",
+      "source_relation_types": [
+        "derive",
+        "derivedFrom"
+      ],
+      "authored": true,
+      "generated_opposite": true,
+      "resource_id": null
+    },
+    {
+      "id": "relation:specifications/Verifications.md#shared-check:satisfiedBy:evidence/check.txt",
+      "source_id": "specifications/Verifications.md#shared-check",
+      "target_id": "evidence/check.txt",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/check.txt"
+    },
+    {
+      "id": "relation:specifications/Verifications.md#shared-proof:satisfiedBy:evidence/proof.txt",
+      "source_id": "specifications/Verifications.md#shared-proof",
+      "target_id": "evidence/proof.txt",
+      "target_kind": "resource",
+      "relation_type": "satisfiedBy",
+      "canonical_relation_type": "satisfiedBy",
+      "source_relation_types": [
+        "satisfiedBy"
+      ],
+      "authored": true,
+      "generated_opposite": false,
+      "resource_id": "resource:evidence/proof.txt"
+    }
+  ],
+  "contract_bindings": [
+    {
+      "id": "contract_bindings:specifications/Beta.md#beta-consumer:specifications/Alpha.md#exchange-format",
+      "source_id": "specifications/Beta.md#beta-consumer",
+      "target": "specifications/Alpha.md#exchange-format",
+      "target_kind": "element",
+      "resource_id": null,
+      "content_hash": null
+    }
+  ],
+  "concept_refs": [],
+  "thesaurus": {
+    "schemes": [],
+    "concepts": []
+  },
+  "submodels": {
+    "cross_submodel_couplings": [],
+    "submodels": [
+      {
+        "requirement_count": 6,
+        "root_id": "specifications/Capabilities.md#alpha-root",
+        "root_name": "Alpha Root",
+        "root_type": "capability"
+      },
+      {
+        "requirement_count": 2,
+        "root_id": "specifications/Capabilities.md#beta-root",
+        "root_name": "Beta Root",
+        "root_type": "capability"
+      }
+    ],
+    "summary": {
+      "total_cross_submodel_couplings": 0,
+      "total_requirements": 8,
+      "total_submodels": 2
+    }
+  },
+  "traces": {
+    "files": {
+      "specifications/Verifications.md": {
+        "verifications": [
+          {
+            "directly_verified_count": 3,
+            "directly_verified_requirements": [
+              "specifications/Alpha.md#alpha-gap",
+              "specifications/Alpha.md#alpha-implemented",
+              "specifications/Beta.md#beta-consumer"
+            ],
+            "file": "specifications/Verifications.md",
+            "identifier": "specifications/Verifications.md#shared-check",
+            "name": "Shared Check",
+            "total_requirements_in_tree": 5,
+            "trace_graph": {
+              "edges": [
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Alpha.md#alpha-gap",
+                  "target": "specifications/Alpha.md#alpha-parent"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Alpha.md#alpha-implemented",
+                  "target": "specifications/Alpha.md#alpha-middle"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Alpha.md#alpha-middle",
+                  "target": "specifications/Alpha.md#alpha-parent"
+                },
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Alpha.md#alpha-parent",
+                  "target": "specifications/Capabilities.md#shared-branch"
+                },
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Beta.md#beta-consumer",
+                  "target": "specifications/Capabilities.md#beta-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-left",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-right",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-left"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-right"
+                }
+              ],
+              "nodes": [
+                {
+                  "id": "specifications/Alpha.md#alpha-gap",
+                  "is_directly_verified": true,
+                  "name": "Alpha Gap",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Alpha.md#alpha-implemented",
+                  "is_directly_verified": true,
+                  "name": "Alpha Implemented",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Alpha.md#alpha-middle",
+                  "is_directly_verified": false,
+                  "name": "Alpha Middle",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Alpha.md#alpha-parent",
+                  "is_directly_verified": false,
+                  "name": "Alpha Parent",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Beta.md#beta-consumer",
+                  "is_directly_verified": true,
+                  "name": "Beta Consumer",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-left",
+                  "is_directly_verified": false,
+                  "name": "Alpha Left",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-right",
+                  "is_directly_verified": false,
+                  "name": "Alpha Right",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-root",
+                  "is_directly_verified": false,
+                  "name": "Alpha Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#beta-root",
+                  "is_directly_verified": false,
+                  "name": "Beta Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#shared-branch",
+                  "is_directly_verified": false,
+                  "name": "Shared Branch",
+                  "type": "capability"
+                }
+              ]
+            },
+            "type": "test-verification"
+          },
+          {
+            "directly_verified_count": 1,
+            "directly_verified_requirements": [
+              "specifications/Alpha.md#alpha-gap"
+            ],
+            "file": "specifications/Verifications.md",
+            "identifier": "specifications/Verifications.md#gap-check",
+            "name": "Gap Check",
+            "total_requirements_in_tree": 2,
+            "trace_graph": {
+              "edges": [
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Alpha.md#alpha-gap",
+                  "target": "specifications/Alpha.md#alpha-parent"
+                },
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Alpha.md#alpha-parent",
+                  "target": "specifications/Capabilities.md#shared-branch"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-left",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-right",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-left"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-right"
+                }
+              ],
+              "nodes": [
+                {
+                  "id": "specifications/Alpha.md#alpha-gap",
+                  "is_directly_verified": true,
+                  "name": "Alpha Gap",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Alpha.md#alpha-parent",
+                  "is_directly_verified": false,
+                  "name": "Alpha Parent",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-left",
+                  "is_directly_verified": false,
+                  "name": "Alpha Left",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-right",
+                  "is_directly_verified": false,
+                  "name": "Alpha Right",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-root",
+                  "is_directly_verified": false,
+                  "name": "Alpha Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#shared-branch",
+                  "is_directly_verified": false,
+                  "name": "Shared Branch",
+                  "type": "capability"
+                }
+              ]
+            },
+            "type": "test-verification"
+          },
+          {
+            "directly_verified_count": 1,
+            "directly_verified_requirements": [
+              "specifications/Alpha.md#alpha-parent"
+            ],
+            "file": "specifications/Verifications.md",
+            "identifier": "specifications/Verifications.md#parent-review",
+            "name": "Parent Review",
+            "total_requirements_in_tree": 1,
+            "trace_graph": {
+              "edges": [
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Alpha.md#alpha-parent",
+                  "target": "specifications/Capabilities.md#shared-branch"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-left",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-right",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-left"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-right"
+                }
+              ],
+              "nodes": [
+                {
+                  "id": "specifications/Alpha.md#alpha-parent",
+                  "is_directly_verified": true,
+                  "name": "Alpha Parent",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-left",
+                  "is_directly_verified": false,
+                  "name": "Alpha Left",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-right",
+                  "is_directly_verified": false,
+                  "name": "Alpha Right",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-root",
+                  "is_directly_verified": false,
+                  "name": "Alpha Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#shared-branch",
+                  "is_directly_verified": false,
+                  "name": "Shared Branch",
+                  "type": "capability"
+                }
+              ]
+            },
+            "type": "inspection-verification"
+          },
+          {
+            "directly_verified_count": 2,
+            "directly_verified_requirements": [
+              "specifications/Alpha.md#alpha-contract-owner",
+              "specifications/Beta.md#beta-gap"
+            ],
+            "file": "specifications/Verifications.md",
+            "identifier": "specifications/Verifications.md#shared-proof",
+            "name": "Shared Proof",
+            "total_requirements_in_tree": 2,
+            "trace_graph": {
+              "edges": [
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Alpha.md#alpha-contract-owner",
+                  "target": "specifications/Capabilities.md#alpha-left"
+                },
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Beta.md#beta-gap",
+                  "target": "specifications/Capabilities.md#beta-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-left",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                }
+              ],
+              "nodes": [
+                {
+                  "id": "specifications/Alpha.md#alpha-contract-owner",
+                  "is_directly_verified": true,
+                  "name": "Alpha Contract Owner",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Beta.md#beta-gap",
+                  "is_directly_verified": true,
+                  "name": "Beta Gap",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-left",
+                  "is_directly_verified": false,
+                  "name": "Alpha Left",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-root",
+                  "is_directly_verified": false,
+                  "name": "Alpha Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#beta-root",
+                  "is_directly_verified": false,
+                  "name": "Beta Root",
+                  "type": "capability"
+                }
+              ]
+            },
+            "type": "formal-proof-verification"
+          },
+          {
+            "directly_verified_count": 1,
+            "directly_verified_requirements": [
+              "specifications/Alpha.md#alpha-middle"
+            ],
+            "file": "specifications/Verifications.md",
+            "identifier": "specifications/Verifications.md#middle-demonstration",
+            "name": "Middle Demonstration",
+            "total_requirements_in_tree": 2,
+            "trace_graph": {
+              "edges": [
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Alpha.md#alpha-middle",
+                  "target": "specifications/Alpha.md#alpha-parent"
+                },
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Alpha.md#alpha-parent",
+                  "target": "specifications/Capabilities.md#shared-branch"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-left",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#alpha-right",
+                  "target": "specifications/Capabilities.md#alpha-root"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-left"
+                },
+                {
+                  "relation_type": "derivedFrom",
+                  "source": "specifications/Capabilities.md#shared-branch",
+                  "target": "specifications/Capabilities.md#alpha-right"
+                }
+              ],
+              "nodes": [
+                {
+                  "id": "specifications/Alpha.md#alpha-middle",
+                  "is_directly_verified": true,
+                  "name": "Alpha Middle",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Alpha.md#alpha-parent",
+                  "is_directly_verified": false,
+                  "name": "Alpha Parent",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-left",
+                  "is_directly_verified": false,
+                  "name": "Alpha Left",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-right",
+                  "is_directly_verified": false,
+                  "name": "Alpha Right",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#alpha-root",
+                  "is_directly_verified": false,
+                  "name": "Alpha Root",
+                  "type": "capability"
+                },
+                {
+                  "id": "specifications/Capabilities.md#shared-branch",
+                  "is_directly_verified": false,
+                  "name": "Shared Branch",
+                  "type": "capability"
+                }
+              ]
+            },
+            "type": "demonstration-verification"
+          },
+          {
+            "directly_verified_count": 1,
+            "directly_verified_requirements": [
+              "specifications/Beta.md#beta-gap"
+            ],
+            "file": "specifications/Verifications.md",
+            "identifier": "specifications/Verifications.md#beta-analysis",
+            "name": "Beta Analysis",
+            "total_requirements_in_tree": 1,
+            "trace_graph": {
+              "edges": [
+                {
+                  "relation_type": "specify",
+                  "source": "specifications/Beta.md#beta-gap",
+                  "target": "specifications/Capabilities.md#beta-root"
+                }
+              ],
+              "nodes": [
+                {
+                  "id": "specifications/Beta.md#beta-gap",
+                  "is_directly_verified": true,
+                  "name": "Beta Gap",
+                  "type": "requirement"
+                },
+                {
+                  "id": "specifications/Capabilities.md#beta-root",
+                  "is_directly_verified": false,
+                  "name": "Beta Root",
+                  "type": "capability"
+                }
+              ]
+            },
+            "type": "analysis-verification"
+          }
+        ]
+      }
+    }
+  },
+  "coverage": {
+    "capability_coverage": {
+      "capabilities": [
+        {
+          "aggregate_covered_requirements": 3,
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 3,
+          "aggregate_requirements": 5,
+          "aggregate_terminal_requirements": 2,
+          "aggregate_verified_leaf_requirements": 3,
+          "identifier": "specifications/Capabilities.md#alpha-left",
+          "implementation_coverage_percentage": 50.0,
+          "implementation_covered": false,
+          "local_covered_requirements": 1,
+          "local_covered_terminal_requirements": 0,
+          "local_leaf_requirements": 1,
+          "local_requirements": 1,
+          "local_terminal_requirements": 0,
+          "local_verified_leaf_requirements": 1,
+          "mark": "partial",
+          "name": "Alpha Left",
+          "verification_coverage_percentage": 100.0
+        },
+        {
+          "aggregate_covered_requirements": 2,
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 2,
+          "aggregate_requirements": 4,
+          "aggregate_terminal_requirements": 2,
+          "aggregate_verified_leaf_requirements": 2,
+          "identifier": "specifications/Capabilities.md#alpha-right",
+          "implementation_coverage_percentage": 50.0,
+          "implementation_covered": false,
+          "local_covered_requirements": 0,
+          "local_covered_terminal_requirements": 0,
+          "local_leaf_requirements": 0,
+          "local_requirements": 0,
+          "local_terminal_requirements": 0,
+          "local_verified_leaf_requirements": 0,
+          "mark": "partial",
+          "name": "Alpha Right",
+          "verification_coverage_percentage": 100.0
+        },
+        {
+          "aggregate_covered_requirements": 3,
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 4,
+          "aggregate_requirements": 6,
+          "aggregate_terminal_requirements": 3,
+          "aggregate_verified_leaf_requirements": 3,
+          "identifier": "specifications/Capabilities.md#alpha-root",
+          "implementation_coverage_percentage": 33.33,
+          "implementation_covered": false,
+          "local_covered_requirements": 0,
+          "local_covered_terminal_requirements": 0,
+          "local_leaf_requirements": 1,
+          "local_requirements": 1,
+          "local_terminal_requirements": 1,
+          "local_verified_leaf_requirements": 0,
+          "mark": "partial",
+          "name": "Alpha Root",
+          "verification_coverage_percentage": 75.0
+        },
+        {
+          "aggregate_covered_requirements": 1,
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 2,
+          "aggregate_requirements": 2,
+          "aggregate_terminal_requirements": 2,
+          "aggregate_verified_leaf_requirements": 2,
+          "identifier": "specifications/Capabilities.md#beta-root",
+          "implementation_coverage_percentage": 50.0,
+          "implementation_covered": false,
+          "local_covered_requirements": 1,
+          "local_covered_terminal_requirements": 1,
+          "local_leaf_requirements": 2,
+          "local_requirements": 2,
+          "local_terminal_requirements": 2,
+          "local_verified_leaf_requirements": 2,
+          "mark": "partial",
+          "name": "Beta Root",
+          "verification_coverage_percentage": 100.0
+        },
+        {
+          "aggregate_covered_requirements": 0,
+          "aggregate_covered_terminal_requirements": 0,
+          "aggregate_leaf_requirements": 0,
+          "aggregate_requirements": 0,
+          "aggregate_terminal_requirements": 0,
+          "aggregate_verified_leaf_requirements": 0,
+          "identifier": "specifications/Capabilities.md#empty-branch",
+          "implementation_coverage_percentage": 0.0,
+          "implementation_covered": false,
+          "local_covered_requirements": 0,
+          "local_covered_terminal_requirements": 0,
+          "local_leaf_requirements": 0,
+          "local_requirements": 0,
+          "local_terminal_requirements": 0,
+          "local_verified_leaf_requirements": 0,
+          "mark": "not-applicable",
+          "name": "Empty Branch",
+          "verification_coverage_percentage": 0.0
+        },
+        {
+          "aggregate_covered_requirements": 2,
+          "aggregate_covered_terminal_requirements": 1,
+          "aggregate_leaf_requirements": 2,
+          "aggregate_requirements": 4,
+          "aggregate_terminal_requirements": 2,
+          "aggregate_verified_leaf_requirements": 2,
+          "identifier": "specifications/Capabilities.md#shared-branch",
+          "implementation_coverage_percentage": 50.0,
+          "implementation_covered": false,
+          "local_covered_requirements": 2,
+          "local_covered_terminal_requirements": 1,
+          "local_leaf_requirements": 2,
+          "local_requirements": 4,
+          "local_terminal_requirements": 2,
+          "local_verified_leaf_requirements": 2,
+          "mark": "partial",
+          "name": "Shared Branch",
+          "verification_coverage_percentage": 100.0
+        }
+      ]
+    },
+    "covered_requirements": {
+      "files": {
+        "specifications/Alpha.md": [
+          {
+            "aggregate_covered_terminal_requirements": 1,
+            "aggregate_leaf_requirements": 1,
+            "aggregate_terminal_requirements": 1,
+            "aggregate_verified_leaf_requirements": 1,
+            "blocking_requirements": [],
+            "contributing_requirements": [
+              "specifications/Beta.md#beta-consumer"
+            ],
+            "coverage_source": "contract_consumer_rollup",
+            "direct_evidence": [],
+            "evidence": [
+              "evidence/beta.txt"
+            ],
+            "identifier": "specifications/Alpha.md#alpha-contract-owner",
+            "is_terminal": false,
+            "name": "Alpha Contract Owner"
+          },
+          {
+            "aggregate_covered_terminal_requirements": 1,
+            "aggregate_leaf_requirements": 1,
+            "aggregate_terminal_requirements": 1,
+            "aggregate_verified_leaf_requirements": 1,
+            "blocking_requirements": [],
+            "contributing_requirements": [],
+            "coverage_source": "direct_satisfied",
+            "direct_evidence": [
+              "evidence/README.md",
+              "evidence/alpha.txt",
+              "evidence/implementation/SKILL.md",
+              "evidence/skills/AnalyzeCoverage.md",
+              "evidence/skills/AnalyzeModel.md",
+              "evidence/skills/ChangeImpact.md",
+              "evidence/skills/Lint.md",
+              "evidence/skills/SKILL.md"
+            ],
+            "evidence": [
+              "evidence/README.md",
+              "evidence/alpha.txt",
+              "evidence/implementation/SKILL.md",
+              "evidence/skills/AnalyzeCoverage.md",
+              "evidence/skills/AnalyzeModel.md",
+              "evidence/skills/ChangeImpact.md",
+              "evidence/skills/Lint.md",
+              "evidence/skills/SKILL.md"
+            ],
+            "identifier": "specifications/Alpha.md#alpha-implemented",
+            "is_terminal": true,
+            "name": "Alpha Implemented"
+          },
+          {
+            "aggregate_covered_terminal_requirements": 1,
+            "aggregate_leaf_requirements": 1,
+            "aggregate_terminal_requirements": 1,
+            "aggregate_verified_leaf_requirements": 1,
+            "blocking_requirements": [],
+            "contributing_requirements": [
+              "specifications/Alpha.md#alpha-implemented"
+            ],
+            "coverage_source": "requirement_rollup",
+            "direct_evidence": [],
+            "evidence": [
+              "evidence/README.md",
+              "evidence/alpha.txt",
+              "evidence/implementation/SKILL.md",
+              "evidence/skills/AnalyzeCoverage.md",
+              "evidence/skills/AnalyzeModel.md",
+              "evidence/skills/ChangeImpact.md",
+              "evidence/skills/Lint.md",
+              "evidence/skills/SKILL.md"
+            ],
+            "identifier": "specifications/Alpha.md#alpha-middle",
+            "is_terminal": false,
+            "name": "Alpha Middle"
+          }
+        ],
+        "specifications/Beta.md": [
+          {
+            "aggregate_covered_terminal_requirements": 1,
+            "aggregate_leaf_requirements": 1,
+            "aggregate_terminal_requirements": 1,
+            "aggregate_verified_leaf_requirements": 1,
+            "blocking_requirements": [],
+            "contributing_requirements": [],
+            "coverage_source": "direct_satisfied",
+            "direct_evidence": [
+              "evidence/beta.txt"
+            ],
+            "evidence": [
+              "evidence/beta.txt"
+            ],
+            "identifier": "specifications/Beta.md#beta-consumer",
+            "is_terminal": true,
+            "name": "Beta Consumer"
+          }
+        ]
+      }
+    },
+    "orphaned_verifications": {
+      "files": {
+        "specifications/Verifications.md": [
+          {
+            "identifier": "specifications/Verifications.md#orphan-check",
+            "name": "Orphan Check",
+            "satisfied_by": [],
+            "verification_type": "test-verification"
+          }
+        ]
+      }
+    },
+    "satisfied_test_verifications": {
+      "files": {
+        "specifications/Verifications.md": [
+          {
+            "identifier": "specifications/Verifications.md#shared-check",
+            "name": "Shared Check",
+            "satisfied_by": [
+              "evidence/check.txt"
+            ],
+            "verification_type": "test-verification"
+          },
+          {
+            "identifier": "specifications/Verifications.md#shared-proof",
+            "name": "Shared Proof",
+            "satisfied_by": [
+              "evidence/proof.txt"
+            ],
+            "verification_type": "formal-proof-verification"
+          }
+        ]
+      }
+    },
+    "scope_index": {
+      "specifications/Capabilities.md#alpha-left": {
+        "scope": {
+          "capability_identifier": "specifications/Capabilities.md#alpha-left",
+          "capability_ids": [
+            "specifications/Capabilities.md#alpha-left",
+            "specifications/Capabilities.md#shared-branch"
+          ],
+          "capability_name": "Alpha Left",
+          "kind": "capability",
+          "orphaned_verifications_scope": "whole_model_only",
+          "requirement_ids": [
+            "specifications/Alpha.md#alpha-contract-owner",
+            "specifications/Alpha.md#alpha-gap",
+            "specifications/Alpha.md#alpha-implemented",
+            "specifications/Alpha.md#alpha-middle",
+            "specifications/Alpha.md#alpha-parent"
+          ],
+          "verification_ids": [
+            "specifications/Verifications.md#gap-check",
+            "specifications/Verifications.md#middle-demonstration",
+            "specifications/Verifications.md#parent-review",
+            "specifications/Verifications.md#shared-check",
+            "specifications/Verifications.md#shared-proof"
+          ]
+        },
+        "summary": {
+          "coverage_sources": {
+            "combined_rollup": 0,
+            "contract_consumer_rollup": 1,
+            "direct_satisfied": 1,
+            "requirement_rollup": 1
+          },
+          "covered_requirements": 3,
+          "covered_terminal_requirements": 1,
+          "implementation_coverage_percentage": 50.0,
+          "leaf_requirements_coverage_percentage": 100.0,
+          "orphaned_verifications": 0,
+          "orphaned_verifications_percentage": 0.0,
+          "satisfied_test_verifications": 2,
+          "test_verifications_satisfaction_percentage": 66.67,
+          "total_leaf_requirements": 3,
+          "total_requirements_in_scope": 5,
+          "total_terminal_requirements": 2,
+          "total_test_verifications": 3,
+          "total_verifications": 5,
+          "uncovered_requirements": 2,
+          "uncovered_terminal_requirements": 1,
+          "unsatisfied_test_verifications": 1,
+          "unverified_leaf_requirements": 0,
+          "verification_types": {
+            "analysis": 0,
+            "demonstration": 1,
+            "formal_proof": 1,
+            "inspection": 1,
+            "test": 2
+          },
+          "verified_leaf_requirements": 3
+        }
+      },
+      "specifications/Capabilities.md#alpha-right": {
+        "scope": {
+          "capability_identifier": "specifications/Capabilities.md#alpha-right",
+          "capability_ids": [
+            "specifications/Capabilities.md#alpha-right",
+            "specifications/Capabilities.md#shared-branch"
+          ],
+          "capability_name": "Alpha Right",
+          "kind": "capability",
+          "orphaned_verifications_scope": "whole_model_only",
+          "requirement_ids": [
+            "specifications/Alpha.md#alpha-gap",
+            "specifications/Alpha.md#alpha-implemented",
+            "specifications/Alpha.md#alpha-middle",
+            "specifications/Alpha.md#alpha-parent"
+          ],
+          "verification_ids": [
+            "specifications/Verifications.md#gap-check",
+            "specifications/Verifications.md#middle-demonstration",
+            "specifications/Verifications.md#parent-review",
+            "specifications/Verifications.md#shared-check"
+          ]
+        },
+        "summary": {
+          "coverage_sources": {
+            "combined_rollup": 0,
+            "contract_consumer_rollup": 0,
+            "direct_satisfied": 1,
+            "requirement_rollup": 1
+          },
+          "covered_requirements": 2,
+          "covered_terminal_requirements": 1,
+          "implementation_coverage_percentage": 50.0,
+          "leaf_requirements_coverage_percentage": 100.0,
+          "orphaned_verifications": 0,
+          "orphaned_verifications_percentage": 0.0,
+          "satisfied_test_verifications": 1,
+          "test_verifications_satisfaction_percentage": 50.0,
+          "total_leaf_requirements": 2,
+          "total_requirements_in_scope": 4,
+          "total_terminal_requirements": 2,
+          "total_test_verifications": 2,
+          "total_verifications": 4,
+          "uncovered_requirements": 2,
+          "uncovered_terminal_requirements": 1,
+          "unsatisfied_test_verifications": 1,
+          "unverified_leaf_requirements": 0,
+          "verification_types": {
+            "analysis": 0,
+            "demonstration": 1,
+            "formal_proof": 0,
+            "inspection": 1,
+            "test": 2
+          },
+          "verified_leaf_requirements": 2
+        }
+      },
+      "specifications/Capabilities.md#alpha-root": {
+        "scope": {
+          "capability_identifier": "specifications/Capabilities.md#alpha-root",
+          "capability_ids": [
+            "specifications/Capabilities.md#alpha-left",
+            "specifications/Capabilities.md#alpha-right",
+            "specifications/Capabilities.md#alpha-root",
+            "specifications/Capabilities.md#empty-branch",
+            "specifications/Capabilities.md#shared-branch"
+          ],
+          "capability_name": "Alpha Root",
+          "kind": "capability",
+          "orphaned_verifications_scope": "whole_model_only",
+          "requirement_ids": [
+            "specifications/Alpha.md#alpha-contract-owner",
+            "specifications/Alpha.md#alpha-gap",
+            "specifications/Alpha.md#alpha-implemented",
+            "specifications/Alpha.md#alpha-local",
+            "specifications/Alpha.md#alpha-middle",
+            "specifications/Alpha.md#alpha-parent"
+          ],
+          "verification_ids": [
+            "specifications/Verifications.md#gap-check",
+            "specifications/Verifications.md#middle-demonstration",
+            "specifications/Verifications.md#parent-review",
+            "specifications/Verifications.md#shared-check",
+            "specifications/Verifications.md#shared-proof"
+          ]
+        },
+        "summary": {
+          "coverage_sources": {
+            "combined_rollup": 0,
+            "contract_consumer_rollup": 1,
+            "direct_satisfied": 1,
+            "requirement_rollup": 1
+          },
+          "covered_requirements": 3,
+          "covered_terminal_requirements": 1,
+          "implementation_coverage_percentage": 33.33,
+          "leaf_requirements_coverage_percentage": 75.0,
+          "orphaned_verifications": 0,
+          "orphaned_verifications_percentage": 0.0,
+          "satisfied_test_verifications": 2,
+          "test_verifications_satisfaction_percentage": 66.67,
+          "total_leaf_requirements": 4,
+          "total_requirements_in_scope": 6,
+          "total_terminal_requirements": 3,
+          "total_test_verifications": 3,
+          "total_verifications": 5,
+          "uncovered_requirements": 3,
+          "uncovered_terminal_requirements": 2,
+          "unsatisfied_test_verifications": 1,
+          "unverified_leaf_requirements": 1,
+          "verification_types": {
+            "analysis": 0,
+            "demonstration": 1,
+            "formal_proof": 1,
+            "inspection": 1,
+            "test": 2
+          },
+          "verified_leaf_requirements": 3
+        }
+      },
+      "specifications/Capabilities.md#beta-root": {
+        "scope": {
+          "capability_identifier": "specifications/Capabilities.md#beta-root",
+          "capability_ids": [
+            "specifications/Capabilities.md#beta-root"
+          ],
+          "capability_name": "Beta Root",
+          "kind": "capability",
+          "orphaned_verifications_scope": "whole_model_only",
+          "requirement_ids": [
+            "specifications/Beta.md#beta-consumer",
+            "specifications/Beta.md#beta-gap"
+          ],
+          "verification_ids": [
+            "specifications/Verifications.md#beta-analysis",
+            "specifications/Verifications.md#shared-check",
+            "specifications/Verifications.md#shared-proof"
+          ]
+        },
+        "summary": {
+          "coverage_sources": {
+            "combined_rollup": 0,
+            "contract_consumer_rollup": 0,
+            "direct_satisfied": 1,
+            "requirement_rollup": 0
+          },
+          "covered_requirements": 1,
+          "covered_terminal_requirements": 1,
+          "implementation_coverage_percentage": 50.0,
+          "leaf_requirements_coverage_percentage": 100.0,
+          "orphaned_verifications": 0,
+          "orphaned_verifications_percentage": 0.0,
+          "satisfied_test_verifications": 2,
+          "test_verifications_satisfaction_percentage": 100.0,
+          "total_leaf_requirements": 2,
+          "total_requirements_in_scope": 2,
+          "total_terminal_requirements": 2,
+          "total_test_verifications": 2,
+          "total_verifications": 3,
+          "uncovered_requirements": 1,
+          "uncovered_terminal_requirements": 1,
+          "unsatisfied_test_verifications": 0,
+          "unverified_leaf_requirements": 0,
+          "verification_types": {
+            "analysis": 1,
+            "demonstration": 0,
+            "formal_proof": 1,
+            "inspection": 0,
+            "test": 1
+          },
+          "verified_leaf_requirements": 2
+        }
+      },
+      "specifications/Capabilities.md#empty-branch": {
+        "scope": {
+          "capability_identifier": "specifications/Capabilities.md#empty-branch",
+          "capability_ids": [
+            "specifications/Capabilities.md#empty-branch"
+          ],
+          "capability_name": "Empty Branch",
+          "kind": "capability",
+          "orphaned_verifications_scope": "whole_model_only",
+          "requirement_ids": [],
+          "verification_ids": []
+        },
+        "summary": {
+          "coverage_sources": {
+            "combined_rollup": 0,
+            "contract_consumer_rollup": 0,
+            "direct_satisfied": 0,
+            "requirement_rollup": 0
+          },
+          "covered_requirements": 0,
+          "covered_terminal_requirements": 0,
+          "implementation_coverage_percentage": 0.0,
+          "leaf_requirements_coverage_percentage": 0.0,
+          "orphaned_verifications": 0,
+          "orphaned_verifications_percentage": 0.0,
+          "satisfied_test_verifications": 0,
+          "test_verifications_satisfaction_percentage": 0.0,
+          "total_leaf_requirements": 0,
+          "total_requirements_in_scope": 0,
+          "total_terminal_requirements": 0,
+          "total_test_verifications": 0,
+          "total_verifications": 0,
+          "uncovered_requirements": 0,
+          "uncovered_terminal_requirements": 0,
+          "unsatisfied_test_verifications": 0,
+          "unverified_leaf_requirements": 0,
+          "verification_types": {
+            "analysis": 0,
+            "demonstration": 0,
+            "formal_proof": 0,
+            "inspection": 0,
+            "test": 0
+          },
+          "verified_leaf_requirements": 0
+        }
+      },
+      "specifications/Capabilities.md#shared-branch": {
+        "scope": {
+          "capability_identifier": "specifications/Capabilities.md#shared-branch",
+          "capability_ids": [
+            "specifications/Capabilities.md#shared-branch"
+          ],
+          "capability_name": "Shared Branch",
+          "kind": "capability",
+          "orphaned_verifications_scope": "whole_model_only",
+          "requirement_ids": [
+            "specifications/Alpha.md#alpha-gap",
+            "specifications/Alpha.md#alpha-implemented",
+            "specifications/Alpha.md#alpha-middle",
+            "specifications/Alpha.md#alpha-parent"
+          ],
+          "verification_ids": [
+            "specifications/Verifications.md#gap-check",
+            "specifications/Verifications.md#middle-demonstration",
+            "specifications/Verifications.md#parent-review",
+            "specifications/Verifications.md#shared-check"
+          ]
+        },
+        "summary": {
+          "coverage_sources": {
+            "combined_rollup": 0,
+            "contract_consumer_rollup": 0,
+            "direct_satisfied": 1,
+            "requirement_rollup": 1
+          },
+          "covered_requirements": 2,
+          "covered_terminal_requirements": 1,
+          "implementation_coverage_percentage": 50.0,
+          "leaf_requirements_coverage_percentage": 100.0,
+          "orphaned_verifications": 0,
+          "orphaned_verifications_percentage": 0.0,
+          "satisfied_test_verifications": 1,
+          "test_verifications_satisfaction_percentage": 50.0,
+          "total_leaf_requirements": 2,
+          "total_requirements_in_scope": 4,
+          "total_terminal_requirements": 2,
+          "total_test_verifications": 2,
+          "total_verifications": 4,
+          "uncovered_requirements": 2,
+          "uncovered_terminal_requirements": 1,
+          "unsatisfied_test_verifications": 1,
+          "unverified_leaf_requirements": 0,
+          "verification_types": {
+            "analysis": 0,
+            "demonstration": 1,
+            "formal_proof": 0,
+            "inspection": 1,
+            "test": 2
+          },
+          "verified_leaf_requirements": 2
+        }
+      }
+    },
+    "summary": {
+      "coverage_sources": {
+        "combined_rollup": 0,
+        "contract_consumer_rollup": 1,
+        "direct_satisfied": 2,
+        "requirement_rollup": 1
+      },
+      "covered_requirements": 4,
+      "covered_terminal_requirements": 2,
+      "implementation_coverage_percentage": 40.0,
+      "leaf_requirements_coverage_percentage": 83.33,
+      "orphaned_verifications": 1,
+      "orphaned_verifications_percentage": 14.29,
+      "satisfied_test_verifications": 2,
+      "test_verifications_satisfaction_percentage": 50.0,
+      "total_leaf_requirements": 6,
+      "total_requirements_in_scope": 8,
+      "total_terminal_requirements": 5,
+      "total_test_verifications": 4,
+      "total_verifications": 7,
+      "uncovered_requirements": 4,
+      "uncovered_terminal_requirements": 3,
+      "unsatisfied_test_verifications": 2,
+      "unverified_leaf_requirements": 1,
+      "verification_types": {
+        "analysis": 1,
+        "demonstration": 1,
+        "formal_proof": 1,
+        "inspection": 1,
+        "test": 3
+      },
+      "verified_leaf_requirements": 5
+    },
+    "uncovered_requirements": {
+      "files": {
+        "specifications/Alpha.md": [
+          {
+            "aggregate_covered_terminal_requirements": 0,
+            "aggregate_leaf_requirements": 1,
+            "aggregate_terminal_requirements": 1,
+            "aggregate_verified_leaf_requirements": 1,
+            "blocking_requirements": [
+              "specifications/Alpha.md#alpha-gap"
+            ],
+            "contributing_requirements": [],
+            "coverage_source": "uncovered",
+            "direct_evidence": [],
+            "evidence": [],
+            "identifier": "specifications/Alpha.md#alpha-gap",
+            "is_terminal": true,
+            "name": "Alpha Gap"
+          },
+          {
+            "aggregate_covered_terminal_requirements": 0,
+            "aggregate_leaf_requirements": 1,
+            "aggregate_terminal_requirements": 1,
+            "aggregate_verified_leaf_requirements": 0,
+            "blocking_requirements": [
+              "specifications/Alpha.md#alpha-local"
+            ],
+            "contributing_requirements": [],
+            "coverage_source": "uncovered",
+            "direct_evidence": [],
+            "evidence": [],
+            "identifier": "specifications/Alpha.md#alpha-local",
+            "is_terminal": true,
+            "name": "Alpha Local"
+          },
+          {
+            "aggregate_covered_terminal_requirements": 1,
+            "aggregate_leaf_requirements": 2,
+            "aggregate_terminal_requirements": 2,
+            "aggregate_verified_leaf_requirements": 2,
+            "blocking_requirements": [
+              "specifications/Alpha.md#alpha-gap"
+            ],
+            "contributing_requirements": [
+              "specifications/Alpha.md#alpha-gap",
+              "specifications/Alpha.md#alpha-middle"
+            ],
+            "coverage_source": "uncovered",
+            "direct_evidence": [
+              "evidence/parent.txt"
+            ],
+            "evidence": [
+              "evidence/README.md",
+              "evidence/alpha.txt",
+              "evidence/implementation/SKILL.md",
+              "evidence/parent.txt",
+              "evidence/skills/AnalyzeCoverage.md",
+              "evidence/skills/AnalyzeModel.md",
+              "evidence/skills/ChangeImpact.md",
+              "evidence/skills/Lint.md",
+              "evidence/skills/SKILL.md"
+            ],
+            "identifier": "specifications/Alpha.md#alpha-parent",
+            "is_terminal": false,
+            "name": "Alpha Parent"
+          }
+        ],
+        "specifications/Beta.md": [
+          {
+            "aggregate_covered_terminal_requirements": 0,
+            "aggregate_leaf_requirements": 1,
+            "aggregate_terminal_requirements": 1,
+            "aggregate_verified_leaf_requirements": 1,
+            "blocking_requirements": [
+              "specifications/Beta.md#beta-gap"
+            ],
+            "contributing_requirements": [],
+            "coverage_source": "uncovered",
+            "direct_evidence": [],
+            "evidence": [],
+            "identifier": "specifications/Beta.md#beta-gap",
+            "is_terminal": true,
+            "name": "Beta Gap"
+          }
+        ]
+      }
+    },
+    "unsatisfied_test_verifications": {
+      "files": {
+        "specifications/Verifications.md": [
+          {
+            "identifier": "specifications/Verifications.md#gap-check",
+            "name": "Gap Check",
+            "satisfied_by": [],
+            "verification_type": "test-verification"
+          },
+          {
+            "identifier": "specifications/Verifications.md#orphan-check",
+            "name": "Orphan Check",
+            "satisfied_by": [],
+            "verification_type": "test-verification"
+          }
+        ]
+      }
+    },
+    "unverified_leaf_requirements": {
+      "files": {
+        "specifications/Alpha.md": [
+          {
+            "identifier": "specifications/Alpha.md#alpha-local",
+            "name": "Alpha Local",
+            "verified_by": []
+          }
+        ]
+      }
+    },
+    "verified_leaf_requirements": {
+      "files": {
+        "specifications/Alpha.md": [
+          {
+            "identifier": "specifications/Alpha.md#alpha-contract-owner",
+            "name": "Alpha Contract Owner",
+            "verified_by": [
+              "specifications/Verifications.md#shared-proof"
+            ]
+          },
+          {
+            "identifier": "specifications/Alpha.md#alpha-gap",
+            "name": "Alpha Gap",
+            "verified_by": [
+              "specifications/Verifications.md#shared-check",
+              "specifications/Verifications.md#gap-check"
+            ]
+          },
+          {
+            "identifier": "specifications/Alpha.md#alpha-implemented",
+            "name": "Alpha Implemented",
+            "verified_by": [
+              "specifications/Verifications.md#shared-check"
+            ]
+          }
+        ],
+        "specifications/Beta.md": [
+          {
+            "identifier": "specifications/Beta.md#beta-consumer",
+            "name": "Beta Consumer",
+            "verified_by": [
+              "specifications/Verifications.md#shared-check"
+            ]
+          },
+          {
+            "identifier": "specifications/Beta.md#beta-gap",
+            "name": "Beta Gap",
+            "verified_by": [
+              "specifications/Verifications.md#shared-proof",
+              "specifications/Verifications.md#beta-analysis"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "ontology": {
+    "blocks": [],
+    "declarations": {},
+    "diagnostics": [],
+    "external_counts": {
+      "available_external_term_declaration_count": 60,
+      "declared_external_source_count": 1,
+      "materialized_external_term_count": 1,
+      "materialized_external_triple_count": 8,
+      "raw_external_triple_count": 254,
+      "used_external_source_count": 0,
+      "visible_external_source_count": 0,
+      "visible_external_term_declaration_count": 0
+    },
+    "external_materialization": "used_subset",
+    "external_sources": [
+      {
+        "builtin": true,
+        "format": "rdfxml",
+        "line_number": 0,
+        "namespace": "http://www.w3.org/2004/02/skos/core#",
+        "owner_identifier": "builtin:skos",
+        "owner_name": "Built-in skos",
+        "prefix": "skos",
+        "resource": "http://www.w3.org/2004/02/skos/core",
+        "source": "builtin:skos.rdf"
+      }
+    ],
+    "graph_data": {
+      "edges": [
+        {
+          "label": "seeAlso",
+          "layer": "external-source",
+          "source": "http://www.w3.org/2004/02/skos/core",
+          "source_kind": "external-ontology",
+          "target": "http://www.w3.org/TR/skos-reference/"
+        }
+      ],
+      "nodes": [
+        {
+          "badges": [],
+          "comment": "None specified.",
+          "constraints": [],
+          "constructs": [],
+          "domain": [],
+          "equivalence_group": "",
+          "full_uri": "http://www.w3.org/2004/02/skos/core",
+          "id": "http://www.w3.org/2004/02/skos/core",
+          "inverse_properties": [],
+          "label": "core",
+          "layer": "external-source",
+          "literal_values": [
+            {
+              "predicate": "contributor",
+              "source": {
+                "file_path": "",
+                "kind": "external-ontology",
+                "line_number": 0,
+                "link": "#/content/reqvire:external-used-subset",
+                "source": "reqvire:external-used-subset",
+                "source_name": "Reqvire used external ontology subset"
+              },
+              "value": "Dave Beckett"
+            },
+            {
+              "predicate": "contributor",
+              "source": {
+                "file_path": "",
+                "kind": "external-ontology",
+                "line_number": 0,
+                "link": "#/content/reqvire:external-used-subset",
+                "source": "reqvire:external-used-subset",
+                "source_name": "Reqvire used external ontology subset"
+              },
+              "value": "Nikki Rogers"
+            },
+            {
+              "predicate": "contributor",
+              "source": {
+                "file_path": "",
+                "kind": "external-ontology",
+                "line_number": 0,
+                "link": "#/content/reqvire:external-used-subset",
+                "source": "reqvire:external-used-subset",
+                "source_name": "Reqvire used external ontology subset"
+              },
+              "value": "Participants in W3C's Semantic Web Deployment Working Group."
+            },
+            {
+              "predicate": "creator",
+              "source": {
+                "file_path": "",
+                "kind": "external-ontology",
+                "line_number": 0,
+                "link": "#/content/reqvire:external-used-subset",
+                "source": "reqvire:external-used-subset",
+                "source_name": "Reqvire used external ontology subset"
+              },
+              "value": "Alistair Miles"
+            },
+            {
+              "predicate": "creator",
+              "source": {
+                "file_path": "",
+                "kind": "external-ontology",
+                "line_number": 0,
+                "link": "#/content/reqvire:external-used-subset",
+                "source": "reqvire:external-used-subset",
+                "source_name": "Reqvire used external ontology subset"
+              },
+              "value": "Sean Bechhofer"
+            },
+            {
+              "predicate": "description",
+              "source": {
+                "file_path": "",
+                "kind": "external-ontology",
+                "line_number": 0,
+                "link": "#/content/reqvire:external-used-subset",
+                "source": "reqvire:external-used-subset",
+                "source_name": "Reqvire used external ontology subset"
+              },
+              "value": "An RDF vocabulary for describing the basic structure and content of concept schemes such as thesauri, classification schemes, subject heading lists, taxonomies, 'folksonomies', other types of controlled vocabulary, and also concept schemes embedded in glossaries and terminologies."
+            },
+            {
+              "predicate": "title",
+              "source": {
+                "file_path": "",
+                "kind": "external-ontology",
+                "line_number": 0,
+                "link": "#/content/reqvire:external-used-subset",
+                "source": "reqvire:external-used-subset",
+                "source_name": "Reqvire used external ontology subset"
+              },
+              "value": "SKOS Vocabulary"
+            }
+          ],
+          "ontology_document": "",
+          "property_chains": [],
+          "range": [],
+          "rdf_types": [],
+          "scheme_iri": "",
+          "scheme_label": "",
+          "semantic_type": "resource",
+          "slot_facets": [],
+          "source_kind": "external-ontology",
+          "sources": [
+            {
+              "file_path": "",
+              "kind": "external-ontology",
+              "line_number": 0,
+              "link": "#/content/reqvire:external-used-subset",
+              "source": "reqvire:external-used-subset",
+              "source_name": "Reqvire used external ontology subset"
+            }
+          ],
+          "type": "generic",
+          "type_evidence": []
+        },
+        {
+          "badges": [],
+          "comment": "None specified.",
+          "constraints": [],
+          "constructs": [],
+          "domain": [],
+          "equivalence_group": "",
+          "full_uri": "http://www.w3.org/TR/skos-reference/",
+          "id": "http://www.w3.org/TR/skos-reference/",
+          "inverse_properties": [],
+          "label": "skos-reference",
+          "layer": "external-source",
+          "literal_values": [],
+          "ontology_document": "",
+          "property_chains": [],
+          "range": [],
+          "rdf_types": [],
+          "scheme_iri": "",
+          "scheme_label": "",
+          "semantic_type": "resource",
+          "slot_facets": [],
+          "source_kind": "external-ontology",
+          "sources": [
+            {
+              "file_path": "",
+              "kind": "external-ontology",
+              "line_number": 0,
+              "link": "#/content/reqvire:external-used-subset",
+              "source": "reqvire:external-used-subset",
+              "source_name": "Reqvire used external ontology subset"
+            }
+          ],
+          "type": "generic",
+          "type_evidence": []
+        }
+      ]
+    },
+    "projection": {
+      "constructs": [],
+      "derivation_mode": "direct-authored",
+      "id": "urn:reqvire:ontology-projection:graph:direct-authored",
+      "projections": []
+    },
+    "shape_references": [],
+    "summary": {
+      "ontology_blocks": 0,
+      "shape_blocks": 0,
+      "total_blocks": 0,
+      "total_quads": 0
+    },
+    "ttl_href": "ontologies.ttl"
+  },
+  "knowledge_graph": {
+    "edges": [
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "definedBy",
+        "source": "specifications/Alpha.md#alpha-contract-owner",
+        "target": "specifications/Alpha.md#exchange-format"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "verifiedBy",
+        "source": "specifications/Alpha.md#alpha-contract-owner",
+        "target": "specifications/Verifications.md#shared-proof"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "verifiedBy",
+        "source": "specifications/Alpha.md#alpha-gap",
+        "target": "specifications/Verifications.md#gap-check"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "verifiedBy",
+        "source": "specifications/Alpha.md#alpha-gap",
+        "target": "specifications/Verifications.md#shared-check"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Alpha.md#alpha-implemented",
+        "target": "resource:evidence/README.md"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Alpha.md#alpha-implemented",
+        "target": "resource:evidence/alpha.txt"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Alpha.md#alpha-implemented",
+        "target": "resource:evidence/implementation/SKILL.md"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Alpha.md#alpha-implemented",
+        "target": "resource:evidence/skills/AnalyzeCoverage.md"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Alpha.md#alpha-implemented",
+        "target": "resource:evidence/skills/AnalyzeModel.md"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Alpha.md#alpha-implemented",
+        "target": "resource:evidence/skills/ChangeImpact.md"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Alpha.md#alpha-implemented",
+        "target": "resource:evidence/skills/Lint.md"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Alpha.md#alpha-implemented",
+        "target": "resource:evidence/skills/SKILL.md"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "verifiedBy",
+        "source": "specifications/Alpha.md#alpha-implemented",
+        "target": "specifications/Verifications.md#shared-check"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Alpha.md#alpha-middle",
+        "target": "specifications/Alpha.md#alpha-implemented"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "verifiedBy",
+        "source": "specifications/Alpha.md#alpha-middle",
+        "target": "specifications/Verifications.md#middle-demonstration"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Alpha.md#alpha-parent",
+        "target": "resource:evidence/parent.txt"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Alpha.md#alpha-parent",
+        "target": "specifications/Alpha.md#alpha-gap"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Alpha.md#alpha-parent",
+        "target": "specifications/Alpha.md#alpha-middle"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "definedBy",
+        "source": "specifications/Alpha.md#alpha-parent",
+        "target": "specifications/Alpha.md#shared-service-format"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "verifiedBy",
+        "source": "specifications/Alpha.md#alpha-parent",
+        "target": "specifications/Verifications.md#parent-review"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Beta.md#beta-consumer",
+        "target": "resource:evidence/beta.txt"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "verifiedBy",
+        "source": "specifications/Beta.md#beta-consumer",
+        "target": "specifications/Verifications.md#shared-check"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "verifiedBy",
+        "source": "specifications/Beta.md#beta-gap",
+        "target": "specifications/Verifications.md#beta-analysis"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "verifiedBy",
+        "source": "specifications/Beta.md#beta-gap",
+        "target": "specifications/Verifications.md#shared-proof"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "specifiedBy",
+        "source": "specifications/Capabilities.md#alpha-left",
+        "target": "specifications/Alpha.md#alpha-contract-owner"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Capabilities.md#alpha-left",
+        "target": "specifications/Capabilities.md#shared-branch"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Capabilities.md#alpha-right",
+        "target": "specifications/Capabilities.md#shared-branch"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "specifiedBy",
+        "source": "specifications/Capabilities.md#alpha-root",
+        "target": "specifications/Alpha.md#alpha-local"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Capabilities.md#alpha-root",
+        "target": "specifications/Capabilities.md#alpha-left"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Capabilities.md#alpha-root",
+        "target": "specifications/Capabilities.md#alpha-right"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Capabilities.md#alpha-root",
+        "target": "specifications/Capabilities.md#empty-branch"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "specifiedBy",
+        "source": "specifications/Capabilities.md#beta-root",
+        "target": "specifications/Beta.md#beta-consumer"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "specifiedBy",
+        "source": "specifications/Capabilities.md#beta-root",
+        "target": "specifications/Beta.md#beta-gap"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "specifiedBy",
+        "source": "specifications/Capabilities.md#shared-branch",
+        "target": "specifications/Alpha.md#alpha-parent"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Verifications.md#service-verification-objective",
+        "target": "specifications/Verifications.md#beta-analysis"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Verifications.md#service-verification-objective",
+        "target": "specifications/Verifications.md#gap-check"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Verifications.md#service-verification-objective",
+        "target": "specifications/Verifications.md#middle-demonstration"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Verifications.md#service-verification-objective",
+        "target": "specifications/Verifications.md#orphan-check"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Verifications.md#service-verification-objective",
+        "target": "specifications/Verifications.md#parent-review"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Verifications.md#service-verification-objective",
+        "target": "specifications/Verifications.md#shared-check"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "derive",
+        "source": "specifications/Verifications.md#service-verification-objective",
+        "target": "specifications/Verifications.md#shared-proof"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Verifications.md#shared-check",
+        "target": "resource:evidence/check.txt"
+      },
+      {
+        "authored": true,
+        "kind": "authored",
+        "label": "satisfiedBy",
+        "source": "specifications/Verifications.md#shared-proof",
+        "target": "resource:evidence/proof.txt"
+      },
+      {
+        "authored": true,
+        "kind": "contract_bindings",
+        "label": "binds contract",
+        "source": "specifications/Beta.md#beta-consumer",
+        "target": "specifications/Alpha.md#exchange-format"
+      }
+    ],
+    "nodes": [
+      {
+        "description": "The system SHALL define the exchange format for alpha data.",
+        "element_type": "requirement",
+        "file_path": "specifications/Alpha.md",
+        "id": "specifications/Alpha.md#alpha-contract-owner",
+        "identifier": "specifications/Alpha.md#alpha-contract-owner",
+        "label": "Alpha Contract Owner",
+        "line_number": 14,
+        "link": "#/content/specifications/Alpha.md#alpha-contract-owner",
+        "node_type": "requirement",
+        "type": "requirement"
+      },
+      {
+        "description": "The system SHALL record shared alpha failures.",
+        "element_type": "requirement",
+        "file_path": "specifications/Alpha.md",
+        "id": "specifications/Alpha.md#alpha-gap",
+        "identifier": "specifications/Alpha.md#alpha-gap",
+        "label": "Alpha Gap",
+        "line_number": 85,
+        "link": "#/content/specifications/Alpha.md#alpha-gap",
+        "node_type": "requirement",
+        "type": "requirement"
+      },
+      {
+        "description": "The system SHALL return a status for a shared alpha request.",
+        "element_type": "requirement",
+        "file_path": "specifications/Alpha.md",
+        "id": "specifications/Alpha.md#alpha-implemented",
+        "identifier": "specifications/Alpha.md#alpha-implemented",
+        "label": "Alpha Implemented",
+        "line_number": 66,
+        "link": "#/content/specifications/Alpha.md#alpha-implemented",
+        "node_type": "requirement",
+        "type": "requirement"
+      },
+      {
+        "description": "The system SHALL provide a local alpha service.",
+        "element_type": "requirement",
+        "file_path": "specifications/Alpha.md",
+        "id": "specifications/Alpha.md#alpha-local",
+        "identifier": "specifications/Alpha.md#alpha-local",
+        "label": "Alpha Local",
+        "line_number": 3,
+        "link": "#/content/specifications/Alpha.md#alpha-local",
+        "node_type": "requirement",
+        "type": "requirement"
+      },
+      {
+        "description": "The system SHALL process shared alpha requests.",
+        "element_type": "requirement",
+        "file_path": "specifications/Alpha.md",
+        "id": "specifications/Alpha.md#alpha-middle",
+        "identifier": "specifications/Alpha.md#alpha-middle",
+        "label": "Alpha Middle",
+        "line_number": 55,
+        "link": "#/content/specifications/Alpha.md#alpha-middle",
+        "node_type": "requirement",
+        "type": "requirement"
+      },
+      {
+        "description": "The system SHALL provide the shared alpha service.",
+        "element_type": "requirement",
+        "file_path": "specifications/Alpha.md",
+        "id": "specifications/Alpha.md#alpha-parent",
+        "identifier": "specifications/Alpha.md#alpha-parent",
+        "label": "Alpha Parent",
+        "line_number": 34,
+        "link": "#/content/specifications/Alpha.md#alpha-parent",
+        "node_type": "requirement",
+        "type": "requirement"
+      },
+      {
+        "description": "An exchange record contains a nonempty text value.",
+        "element_type": "specification",
+        "file_path": "specifications/Alpha.md",
+        "id": "specifications/Alpha.md#exchange-format",
+        "identifier": "specifications/Alpha.md#exchange-format",
+        "label": "Exchange Format",
+        "line_number": 26,
+        "link": "#/content/specifications/Alpha.md#exchange-format",
+        "node_type": "contract",
+        "type": "contract"
+      },
+      {
+        "description": "A shared service response contains a status value.",
+        "element_type": "specification",
+        "file_path": "specifications/Alpha.md",
+        "id": "specifications/Alpha.md#shared-service-format",
+        "identifier": "specifications/Alpha.md#shared-service-format",
+        "label": "Shared Service Format",
+        "line_number": 47,
+        "link": "#/content/specifications/Alpha.md#shared-service-format",
+        "node_type": "contract",
+        "type": "contract"
+      },
+      {
+        "description": "The system SHALL consume alpha exchange records.",
+        "element_type": "requirement",
+        "file_path": "specifications/Beta.md",
+        "id": "specifications/Beta.md#beta-consumer",
+        "identifier": "specifications/Beta.md#beta-consumer",
+        "label": "Beta Consumer",
+        "line_number": 3,
+        "link": "#/content/specifications/Beta.md#beta-consumer",
+        "node_type": "requirement",
+        "type": "requirement"
+      },
+      {
+        "description": "The system SHALL record rejected beta records.",
+        "element_type": "requirement",
+        "file_path": "specifications/Beta.md",
+        "id": "specifications/Beta.md#beta-gap",
+        "identifier": "specifications/Beta.md#beta-gap",
+        "label": "Beta Gap",
+        "line_number": 18,
+        "link": "#/content/specifications/Beta.md#beta-gap",
+        "node_type": "requirement",
+        "type": "requirement"
+      },
+      {
+        "description": "Ability to provide the left alpha services.",
+        "element_type": "capability",
+        "file_path": "specifications/Capabilities.md",
+        "id": "specifications/Capabilities.md#alpha-left",
+        "identifier": "specifications/Capabilities.md#alpha-left",
+        "label": "Alpha Left",
+        "line_number": 11,
+        "link": "#/content/specifications/Capabilities.md#alpha-left",
+        "node_type": "capability",
+        "type": "capability"
+      },
+      {
+        "description": "Ability to provide the right alpha services.",
+        "element_type": "capability",
+        "file_path": "specifications/Capabilities.md",
+        "id": "specifications/Capabilities.md#alpha-right",
+        "identifier": "specifications/Capabilities.md#alpha-right",
+        "label": "Alpha Right",
+        "line_number": 22,
+        "link": "#/content/specifications/Capabilities.md#alpha-right",
+        "node_type": "capability",
+        "type": "capability"
+      },
+      {
+        "description": "Ability to provide the alpha services.",
+        "element_type": "capability",
+        "file_path": "specifications/Capabilities.md",
+        "id": "specifications/Capabilities.md#alpha-root",
+        "identifier": "specifications/Capabilities.md#alpha-root",
+        "label": "Alpha Root",
+        "line_number": 3,
+        "link": "#/content/specifications/Capabilities.md#alpha-root",
+        "node_type": "capability",
+        "type": "capability"
+      },
+      {
+        "description": "Ability to provide the independent beta services.",
+        "element_type": "capability",
+        "file_path": "specifications/Capabilities.md",
+        "id": "specifications/Capabilities.md#beta-root",
+        "identifier": "specifications/Capabilities.md#beta-root",
+        "label": "Beta Root",
+        "line_number": 56,
+        "link": "#/content/specifications/Capabilities.md#beta-root",
+        "node_type": "capability",
+        "type": "capability"
+      },
+      {
+        "description": "Ability reserved for future alpha services.",
+        "element_type": "capability",
+        "file_path": "specifications/Capabilities.md",
+        "id": "specifications/Capabilities.md#empty-branch",
+        "identifier": "specifications/Capabilities.md#empty-branch",
+        "label": "Empty Branch",
+        "line_number": 45,
+        "link": "#/content/specifications/Capabilities.md#empty-branch",
+        "node_type": "capability",
+        "type": "capability"
+      },
+      {
+        "description": "Ability to provide services shared by both alpha branches.",
+        "element_type": "capability",
+        "file_path": "specifications/Capabilities.md",
+        "id": "specifications/Capabilities.md#shared-branch",
+        "identifier": "specifications/Capabilities.md#shared-branch",
+        "label": "Shared Branch",
+        "line_number": 33,
+        "link": "#/content/specifications/Capabilities.md#shared-branch",
+        "node_type": "capability",
+        "type": "capability"
+      },
+      {
+        "description": "This analysis checks rejection recording.",
+        "element_type": "analysis-verification",
+        "file_path": "specifications/Verifications.md",
+        "id": "specifications/Verifications.md#beta-analysis",
+        "identifier": "specifications/Verifications.md#beta-analysis",
+        "label": "Beta Analysis",
+        "line_number": 91,
+        "link": "#/content/specifications/Verifications.md#beta-analysis",
+        "node_type": "verification",
+        "type": "verification"
+      },
+      {
+        "description": "This test checks alpha failure recording.",
+        "element_type": "test-verification",
+        "file_path": "specifications/Verifications.md",
+        "id": "specifications/Verifications.md#gap-check",
+        "identifier": "specifications/Verifications.md#gap-check",
+        "label": "Gap Check",
+        "line_number": 29,
+        "link": "#/content/specifications/Verifications.md#gap-check",
+        "node_type": "verification",
+        "type": "verification"
+      },
+      {
+        "description": "This demonstration checks shared request processing.",
+        "element_type": "demonstration-verification",
+        "file_path": "specifications/Verifications.md",
+        "id": "specifications/Verifications.md#middle-demonstration",
+        "identifier": "specifications/Verifications.md#middle-demonstration",
+        "label": "Middle Demonstration",
+        "line_number": 76,
+        "link": "#/content/specifications/Verifications.md#middle-demonstration",
+        "node_type": "verification",
+        "type": "verification"
+      },
+      {
+        "description": "This test is intentionally without a requirement target to exercise orphan diagnostics.",
+        "element_type": "test-verification",
+        "file_path": "specifications/Verifications.md",
+        "id": "specifications/Verifications.md#orphan-check",
+        "identifier": "specifications/Verifications.md#orphan-check",
+        "label": "Orphan Check",
+        "line_number": 106,
+        "link": "#/content/specifications/Verifications.md#orphan-check",
+        "node_type": "verification",
+        "type": "verification"
+      },
+      {
+        "description": "This inspection checks the shared service definition.",
+        "element_type": "inspection-verification",
+        "file_path": "specifications/Verifications.md",
+        "id": "specifications/Verifications.md#parent-review",
+        "identifier": "specifications/Verifications.md#parent-review",
+        "label": "Parent Review",
+        "line_number": 44,
+        "link": "#/content/specifications/Verifications.md#parent-review",
+        "node_type": "verification",
+        "type": "verification"
+      },
+      {
+        "description": "This objective organizes verification of the alpha and beta services.",
+        "element_type": "verification-objective",
+        "file_path": "specifications/Verifications.md",
+        "id": "specifications/Verifications.md#service-verification-objective",
+        "identifier": "specifications/Verifications.md#service-verification-objective",
+        "label": "Service Verification Objective",
+        "line_number": 3,
+        "link": "#/content/specifications/Verifications.md#service-verification-objective",
+        "node_type": "verification-objective",
+        "type": "verification-objective"
+      },
+      {
+        "description": "This test checks service responses across both roots.",
+        "element_type": "test-verification",
+        "file_path": "specifications/Verifications.md",
+        "id": "specifications/Verifications.md#shared-check",
+        "identifier": "specifications/Verifications.md#shared-check",
+        "label": "Shared Check",
+        "line_number": 11,
+        "link": "#/content/specifications/Verifications.md#shared-check",
+        "node_type": "verification",
+        "type": "verification"
+      },
+      {
+        "description": "This proof checks exchange validity and rejected-record handling across roots.",
+        "element_type": "formal-proof-verification",
+        "file_path": "specifications/Verifications.md",
+        "id": "specifications/Verifications.md#shared-proof",
+        "identifier": "specifications/Verifications.md#shared-proof",
+        "label": "Shared Proof",
+        "line_number": 59,
+        "link": "#/content/specifications/Verifications.md#shared-proof",
+        "node_type": "verification",
+        "type": "verification"
+      },
+      {
+        "description": "evidence/README.md",
+        "element_type": "evidence-file",
+        "file_path": "evidence/README.md",
+        "id": "resource:evidence/README.md",
+        "identifier": "resource:evidence/README.md",
+        "label": "README.md",
+        "line_number": 0,
+        "link": "evidence/README.md",
+        "node_type": "resource",
+        "type": "resource"
+      },
+      {
+        "description": "evidence/alpha.txt",
+        "element_type": "evidence-file",
+        "file_path": "evidence/alpha.txt",
+        "id": "resource:evidence/alpha.txt",
+        "identifier": "resource:evidence/alpha.txt",
+        "label": "alpha.txt",
+        "line_number": 0,
+        "link": "evidence/alpha.txt",
+        "node_type": "resource",
+        "type": "resource"
+      },
+      {
+        "description": "evidence/beta.txt",
+        "element_type": "evidence-file",
+        "file_path": "evidence/beta.txt",
+        "id": "resource:evidence/beta.txt",
+        "identifier": "resource:evidence/beta.txt",
+        "label": "beta.txt",
+        "line_number": 0,
+        "link": "evidence/beta.txt",
+        "node_type": "resource",
+        "type": "resource"
+      },
+      {
+        "description": "evidence/check.txt",
+        "element_type": "evidence-file",
+        "file_path": "evidence/check.txt",
+        "id": "resource:evidence/check.txt",
+        "identifier": "resource:evidence/check.txt",
+        "label": "check.txt",
+        "line_number": 0,
+        "link": "evidence/check.txt",
+        "node_type": "resource",
+        "type": "resource"
+      },
+      {
+        "description": "evidence/implementation/SKILL.md",
+        "element_type": "evidence-file",
+        "file_path": "evidence/implementation/SKILL.md",
+        "id": "resource:evidence/implementation/SKILL.md",
+        "identifier": "resource:evidence/implementation/SKILL.md",
+        "label": "SKILL.md",
+        "line_number": 0,
+        "link": "evidence/implementation/SKILL.md",
+        "node_type": "resource",
+        "type": "resource"
+      },
+      {
+        "description": "evidence/parent.txt",
+        "element_type": "evidence-file",
+        "file_path": "evidence/parent.txt",
+        "id": "resource:evidence/parent.txt",
+        "identifier": "resource:evidence/parent.txt",
+        "label": "parent.txt",
+        "line_number": 0,
+        "link": "evidence/parent.txt",
+        "node_type": "resource",
+        "type": "resource"
+      },
+      {
+        "description": "evidence/proof.txt",
+        "element_type": "evidence-file",
+        "file_path": "evidence/proof.txt",
+        "id": "resource:evidence/proof.txt",
+        "identifier": "resource:evidence/proof.txt",
+        "label": "proof.txt",
+        "line_number": 0,
+        "link": "evidence/proof.txt",
+        "node_type": "resource",
+        "type": "resource"
+      },
+      {
+        "description": "evidence/skills/AnalyzeCoverage.md",
+        "element_type": "evidence-file",
+        "file_path": "evidence/skills/AnalyzeCoverage.md",
+        "id": "resource:evidence/skills/AnalyzeCoverage.md",
+        "identifier": "resource:evidence/skills/AnalyzeCoverage.md",
+        "label": "AnalyzeCoverage.md",
+        "line_number": 0,
+        "link": "evidence/skills/AnalyzeCoverage.md",
+        "node_type": "resource",
+        "type": "resource"
+      },
+      {
+        "description": "evidence/skills/AnalyzeModel.md",
+        "element_type": "evidence-file",
+        "file_path": "evidence/skills/AnalyzeModel.md",
+        "id": "resource:evidence/skills/AnalyzeModel.md",
+        "identifier": "resource:evidence/skills/AnalyzeModel.md",
+        "label": "AnalyzeModel.md",
+        "line_number": 0,
+        "link": "evidence/skills/AnalyzeModel.md",
+        "node_type": "resource",
+        "type": "resource"
+      },
+      {
+        "description": "evidence/skills/ChangeImpact.md",
+        "element_type": "evidence-file",
+        "file_path": "evidence/skills/ChangeImpact.md",
+        "id": "resource:evidence/skills/ChangeImpact.md",
+        "identifier": "resource:evidence/skills/ChangeImpact.md",
+        "label": "ChangeImpact.md",
+        "line_number": 0,
+        "link": "evidence/skills/ChangeImpact.md",
+        "node_type": "resource",
+        "type": "resource"
+      },
+      {
+        "description": "evidence/skills/Lint.md",
+        "element_type": "evidence-file",
+        "file_path": "evidence/skills/Lint.md",
+        "id": "resource:evidence/skills/Lint.md",
+        "identifier": "resource:evidence/skills/Lint.md",
+        "label": "Lint.md",
+        "line_number": 0,
+        "link": "evidence/skills/Lint.md",
+        "node_type": "resource",
+        "type": "resource"
+      },
+      {
+        "description": "evidence/skills/SKILL.md",
+        "element_type": "evidence-file",
+        "file_path": "evidence/skills/SKILL.md",
+        "id": "resource:evidence/skills/SKILL.md",
+        "identifier": "resource:evidence/skills/SKILL.md",
+        "label": "SKILL.md",
+        "line_number": 0,
+        "link": "evidence/skills/SKILL.md",
+        "node_type": "resource",
+        "type": "resource"
+      }
+    ],
+    "submodels": [
+      {
+        "requirement_count": 6,
+        "root_id": "specifications/Capabilities.md#alpha-root",
+        "root_name": "Alpha Root",
+        "root_type": "capability"
+      },
+      {
+        "requirement_count": 2,
+        "root_id": "specifications/Capabilities.md#beta-root",
+        "root_name": "Beta Root",
+        "root_type": "capability"
+      }
+    ],
+    "summary": {
+      "concept_references": 0,
+      "contract_bindings": 1,
+      "elements": 24,
+      "relations": 43,
+      "resources": 12,
+      "submodels": 2
+    }
+  },
+  "search": [
+    {
+      "id": "http://www.w3.org/2004/02/skos/core",
+      "kind": "ontology",
+      "title": "core",
+      "route": "#/ontologies",
+      "text": "http://www.w3.org/2004/02/skos/core http://www.w3.org/2004/02/skos/core resource external-source external-ontology None specified.  Reqvire used external ontology subset  external-ontology reqvire:external-used-subset "
+    },
+    {
+      "id": "http://www.w3.org/TR/skos-reference/",
+      "kind": "ontology",
+      "title": "skos-reference",
+      "route": "#/ontologies",
+      "text": "http://www.w3.org/TR/skos-reference/ http://www.w3.org/TR/skos-reference/ resource external-source external-ontology None specified.  Reqvire used external ontology subset  external-ontology reqvire:external-used-subset "
+    },
+    {
+      "id": "resource:evidence/README.md",
+      "kind": "resource",
+      "title": "README.md",
+      "route": "#/resources/resource:evidence/README.md",
+      "text": "evidence/README.md satisfiedBy"
+    },
+    {
+      "id": "resource:evidence/alpha.txt",
+      "kind": "resource",
+      "title": "alpha.txt",
+      "route": "#/resources/resource:evidence/alpha.txt",
+      "text": "evidence/alpha.txt satisfiedBy"
+    },
+    {
+      "id": "resource:evidence/beta.txt",
+      "kind": "resource",
+      "title": "beta.txt",
+      "route": "#/resources/resource:evidence/beta.txt",
+      "text": "evidence/beta.txt satisfiedBy"
+    },
+    {
+      "id": "resource:evidence/check.txt",
+      "kind": "resource",
+      "title": "check.txt",
+      "route": "#/resources/resource:evidence/check.txt",
+      "text": "evidence/check.txt satisfiedBy"
+    },
+    {
+      "id": "resource:evidence/implementation/SKILL.md",
+      "kind": "resource",
+      "title": "SKILL.md",
+      "route": "#/resources/resource:evidence/implementation/SKILL.md",
+      "text": "evidence/implementation/SKILL.md satisfiedBy"
+    },
+    {
+      "id": "resource:evidence/parent.txt",
+      "kind": "resource",
+      "title": "parent.txt",
+      "route": "#/resources/resource:evidence/parent.txt",
+      "text": "evidence/parent.txt satisfiedBy"
+    },
+    {
+      "id": "resource:evidence/proof.txt",
+      "kind": "resource",
+      "title": "proof.txt",
+      "route": "#/resources/resource:evidence/proof.txt",
+      "text": "evidence/proof.txt satisfiedBy"
+    },
+    {
+      "id": "resource:evidence/skills/AnalyzeCoverage.md",
+      "kind": "resource",
+      "title": "AnalyzeCoverage.md",
+      "route": "#/resources/resource:evidence/skills/AnalyzeCoverage.md",
+      "text": "evidence/skills/AnalyzeCoverage.md satisfiedBy"
+    },
+    {
+      "id": "resource:evidence/skills/AnalyzeModel.md",
+      "kind": "resource",
+      "title": "AnalyzeModel.md",
+      "route": "#/resources/resource:evidence/skills/AnalyzeModel.md",
+      "text": "evidence/skills/AnalyzeModel.md satisfiedBy"
+    },
+    {
+      "id": "resource:evidence/skills/ChangeImpact.md",
+      "kind": "resource",
+      "title": "ChangeImpact.md",
+      "route": "#/resources/resource:evidence/skills/ChangeImpact.md",
+      "text": "evidence/skills/ChangeImpact.md satisfiedBy"
+    },
+    {
+      "id": "resource:evidence/skills/Lint.md",
+      "kind": "resource",
+      "title": "Lint.md",
+      "route": "#/resources/resource:evidence/skills/Lint.md",
+      "text": "evidence/skills/Lint.md satisfiedBy"
+    },
+    {
+      "id": "resource:evidence/skills/SKILL.md",
+      "kind": "resource",
+      "title": "SKILL.md",
+      "route": "#/resources/resource:evidence/skills/SKILL.md",
+      "text": "evidence/skills/SKILL.md satisfiedBy"
+    },
+    {
+      "id": "specifications/Alpha.md",
+      "kind": "file",
+      "title": "specifications/Alpha.md",
+      "route": "#/content/specifications/Alpha.md",
+      "text": "specifications/Alpha.md"
+    },
+    {
+      "id": "specifications/Alpha.md#alpha-contract-owner",
+      "kind": "element",
+      "title": "Alpha Contract Owner",
+      "route": "#/elements/specifications/Alpha.md#alpha-contract-owner",
+      "text": "Alpha Contract Owner requirement The system SHALL define the exchange format for alpha data."
+    },
+    {
+      "id": "specifications/Alpha.md#alpha-gap",
+      "kind": "element",
+      "title": "Alpha Gap",
+      "route": "#/elements/specifications/Alpha.md#alpha-gap",
+      "text": "Alpha Gap requirement The system SHALL record shared alpha failures."
+    },
+    {
+      "id": "specifications/Alpha.md#alpha-implemented",
+      "kind": "element",
+      "title": "Alpha Implemented",
+      "route": "#/elements/specifications/Alpha.md#alpha-implemented",
+      "text": "Alpha Implemented requirement The system SHALL return a status for a shared alpha request."
+    },
+    {
+      "id": "specifications/Alpha.md#alpha-local",
+      "kind": "element",
+      "title": "Alpha Local",
+      "route": "#/elements/specifications/Alpha.md#alpha-local",
+      "text": "Alpha Local requirement The system SHALL provide a local alpha service."
+    },
+    {
+      "id": "specifications/Alpha.md#alpha-middle",
+      "kind": "element",
+      "title": "Alpha Middle",
+      "route": "#/elements/specifications/Alpha.md#alpha-middle",
+      "text": "Alpha Middle requirement The system SHALL process shared alpha requests."
+    },
+    {
+      "id": "specifications/Alpha.md#alpha-parent",
+      "kind": "element",
+      "title": "Alpha Parent",
+      "route": "#/elements/specifications/Alpha.md#alpha-parent",
+      "text": "Alpha Parent requirement The system SHALL provide the shared alpha service."
+    },
+    {
+      "id": "specifications/Alpha.md#exchange-format",
+      "kind": "element",
+      "title": "Exchange Format",
+      "route": "#/elements/specifications/Alpha.md#exchange-format",
+      "text": "Exchange Format specification An exchange record contains a nonempty text value."
+    },
+    {
+      "id": "specifications/Alpha.md#shared-service-format",
+      "kind": "element",
+      "title": "Shared Service Format",
+      "route": "#/elements/specifications/Alpha.md#shared-service-format",
+      "text": "Shared Service Format specification A shared service response contains a status value."
+    },
+    {
+      "id": "specifications/Beta.md",
+      "kind": "file",
+      "title": "specifications/Beta.md",
+      "route": "#/content/specifications/Beta.md",
+      "text": "specifications/Beta.md"
+    },
+    {
+      "id": "specifications/Beta.md#beta-consumer",
+      "kind": "element",
+      "title": "Beta Consumer",
+      "route": "#/elements/specifications/Beta.md#beta-consumer",
+      "text": "Beta Consumer requirement The system SHALL consume alpha exchange records."
+    },
+    {
+      "id": "specifications/Beta.md#beta-gap",
+      "kind": "element",
+      "title": "Beta Gap",
+      "route": "#/elements/specifications/Beta.md#beta-gap",
+      "text": "Beta Gap requirement The system SHALL record rejected beta records."
+    },
+    {
+      "id": "specifications/Capabilities.md",
+      "kind": "file",
+      "title": "specifications/Capabilities.md",
+      "route": "#/content/specifications/Capabilities.md",
+      "text": "specifications/Capabilities.md"
+    },
+    {
+      "id": "specifications/Capabilities.md#alpha-left",
+      "kind": "element",
+      "title": "Alpha Left",
+      "route": "#/elements/specifications/Capabilities.md#alpha-left",
+      "text": "Alpha Left capability Ability to provide the left alpha services."
+    },
+    {
+      "id": "specifications/Capabilities.md#alpha-right",
+      "kind": "element",
+      "title": "Alpha Right",
+      "route": "#/elements/specifications/Capabilities.md#alpha-right",
+      "text": "Alpha Right capability Ability to provide the right alpha services."
+    },
+    {
+      "id": "specifications/Capabilities.md#alpha-root",
+      "kind": "element",
+      "title": "Alpha Root",
+      "route": "#/elements/specifications/Capabilities.md#alpha-root",
+      "text": "Alpha Root capability Ability to provide the alpha services."
+    },
+    {
+      "id": "specifications/Capabilities.md#beta-root",
+      "kind": "element",
+      "title": "Beta Root",
+      "route": "#/elements/specifications/Capabilities.md#beta-root",
+      "text": "Beta Root capability Ability to provide the independent beta services."
+    },
+    {
+      "id": "specifications/Capabilities.md#empty-branch",
+      "kind": "element",
+      "title": "Empty Branch",
+      "route": "#/elements/specifications/Capabilities.md#empty-branch",
+      "text": "Empty Branch capability Ability reserved for future alpha services."
+    },
+    {
+      "id": "specifications/Capabilities.md#shared-branch",
+      "kind": "element",
+      "title": "Shared Branch",
+      "route": "#/elements/specifications/Capabilities.md#shared-branch",
+      "text": "Shared Branch capability Ability to provide services shared by both alpha branches."
+    },
+    {
+      "id": "specifications/Verifications.md",
+      "kind": "file",
+      "title": "specifications/Verifications.md",
+      "route": "#/content/specifications/Verifications.md",
+      "text": "specifications/Verifications.md"
+    },
+    {
+      "id": "specifications/Verifications.md#beta-analysis",
+      "kind": "element",
+      "title": "Beta Analysis",
+      "route": "#/elements/specifications/Verifications.md#beta-analysis",
+      "text": "Beta Analysis analysis-verification This analysis checks rejection recording.\n\n\n#### Details\nAnalyze the outcomes of invalid beta records."
+    },
+    {
+      "id": "specifications/Verifications.md#gap-check",
+      "kind": "element",
+      "title": "Gap Check",
+      "route": "#/elements/specifications/Verifications.md#gap-check",
+      "text": "Gap Check test-verification This test checks alpha failure recording.\n\n\n#### Details\nCheck that rejected shared requests produce a failure record."
+    },
+    {
+      "id": "specifications/Verifications.md#middle-demonstration",
+      "kind": "element",
+      "title": "Middle Demonstration",
+      "route": "#/elements/specifications/Verifications.md#middle-demonstration",
+      "text": "Middle Demonstration demonstration-verification This demonstration checks shared request processing.\n\n\n#### Details\nDemonstrate processing one shared alpha request."
+    },
+    {
+      "id": "specifications/Verifications.md#orphan-check",
+      "kind": "element",
+      "title": "Orphan Check",
+      "route": "#/elements/specifications/Verifications.md#orphan-check",
+      "text": "Orphan Check test-verification This test is intentionally without a requirement target to exercise orphan diagnostics.\n\n\n#### Details\nThe fixture preserves an untargeted test as whole-model diagnostic input."
+    },
+    {
+      "id": "specifications/Verifications.md#parent-review",
+      "kind": "element",
+      "title": "Parent Review",
+      "route": "#/elements/specifications/Verifications.md#parent-review",
+      "text": "Parent Review inspection-verification This inspection checks the shared service definition.\n\n\n#### Details\nInspect the shared service response format for an explicit status value."
+    },
+    {
+      "id": "specifications/Verifications.md#service-verification-objective",
+      "kind": "element",
+      "title": "Service Verification Objective",
+      "route": "#/elements/specifications/Verifications.md#service-verification-objective",
+      "text": "Service Verification Objective verification-objective This objective organizes verification of the alpha and beta services."
+    },
+    {
+      "id": "specifications/Verifications.md#shared-check",
+      "kind": "element",
+      "title": "Shared Check",
+      "route": "#/elements/specifications/Verifications.md#shared-check",
+      "text": "Shared Check test-verification This test checks service responses across both roots.\n\n\n#### Details\nCheck shared alpha failure records, shared alpha status, and beta exchange consumption."
+    },
+    {
+      "id": "specifications/Verifications.md#shared-proof",
+      "kind": "element",
+      "title": "Shared Proof",
+      "route": "#/elements/specifications/Verifications.md#shared-proof",
+      "text": "Shared Proof formal-proof-verification This proof checks exchange validity and rejected-record handling across roots.\n\n\n#### Details\nEstablish that an accepted exchange value is nonempty and rejected beta records are recorded."
+    }
+  ],
+  "summaries": {
+    "elements": 24,
+    "files": 4,
+    "folders": 2,
+    "resources": 12,
+    "relations": 43,
+    "contract_bindings": 1,
+    "concept_refs": 0,
+    "ontology_blocks": 0,
+    "shape_blocks": 0
+  },
+  "routes": {
+    "canonical": [
+      {
+        "id": "model",
+        "pattern": "#/model",
+        "title": "Model"
+      },
+      {
+        "id": "traces",
+        "pattern": "#/traces",
+        "title": "Traces"
+      },
+      {
+        "id": "ontologies",
+        "pattern": "#/ontologies",
+        "title": "Ontologies"
+      },
+      {
+        "id": "coverage",
+        "pattern": "#/coverage",
+        "title": "Coverage"
+      },
+      {
+        "id": "resources",
+        "pattern": "#/resources",
+        "title": "Resources"
+      },
+      {
+        "id": "files",
+        "pattern": "#/files/<path>",
+        "title": "Files"
+      },
+      {
+        "id": "elements",
+        "pattern": "#/elements/<identifier>",
+        "title": "Elements"
+      },
+      {
+        "id": "search",
+        "pattern": "#/search",
+        "title": "Search"
+      }
+    ]
+  }
+}

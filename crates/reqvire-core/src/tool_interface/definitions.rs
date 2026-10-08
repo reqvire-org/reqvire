@@ -1,6 +1,64 @@
 use super::*;
+use std::sync::LazyLock;
+
+struct ToolCatalog {
+    definitions: Vec<Value>,
+    by_name: BTreeMap<String, usize>,
+}
+
+impl ToolCatalog {
+    fn new(enable_mutations: bool) -> Self {
+        let definitions = build_tool_definitions(enable_mutations);
+        let by_name = definitions
+            .iter()
+            .enumerate()
+            .map(|(index, tool)| {
+                (
+                    tool["name"]
+                        .as_str()
+                        .expect("tool definition name")
+                        .to_owned(),
+                    index,
+                )
+            })
+            .collect();
+        Self {
+            definitions,
+            by_name,
+        }
+    }
+
+    fn get(&self, name: &str) -> Option<&Value> {
+        self.by_name
+            .get(name)
+            .map(|index| &self.definitions[*index])
+    }
+}
+
+fn catalog(enable_mutations: bool) -> &'static ToolCatalog {
+    static READ_ONLY: LazyLock<ToolCatalog> = LazyLock::new(|| ToolCatalog::new(false));
+    static MUTATIONS: LazyLock<ToolCatalog> = LazyLock::new(|| ToolCatalog::new(true));
+    if enable_mutations {
+        &MUTATIONS
+    } else {
+        &READ_ONLY
+    }
+}
 
 pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
+    catalog(enable_mutations).definitions.clone()
+}
+
+fn element_reference_schema(domain: &str) -> Value {
+    json!({
+        "type": "string",
+        "description": format!("Exact element name or canonical element identifier in the selected model context. {domain}")
+    })
+}
+
+fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
+    #[cfg(test)]
+    tests::CATALOG_BUILDS.with(|count| count.set(count.get() + 1));
     let mut tools = vec![
         read_tool(
             "reqvire.workspace_status",
@@ -14,15 +72,15 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.model_revision",
-            "Report the current workspace and canonical v1 SHA-256 model revision (64 lowercase hexadecimal characters).",
+            "Report the current workspace and canonical v2 SHA-256 model revision (64 lowercase hexadecimal characters).",
             object_schema(vec![]),
         ),
         read_tool(
             "reqvire.read_element",
             "Read one authoritative model element by identifier or name.",
             object_schema(vec![
-                ("identifier", json!({ "type": "string" })),
-                ("name", json!({ "type": "string" })),
+                ("identifier", json!({ "type": "string", "description": "Canonical element identifier only; multiple explicit selectors must agree." })),
+                ("name", element_reference_schema("Multiple explicit selectors must select the same element.")),
             ]),
         ),
         read_tool(
@@ -46,13 +104,15 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                     "filter_contract_bindings",
                     json!({ "type": "string" }),
                 ),
+                ("has_contract_references", json!({ "type": "boolean" })),
+                ("filter_contract_references", json!({ "type": "string", "description": "Glob matching normalized Contract Reference target identifiers." })),
             ]),
         ),
         read_tool(
             "reqvire.model",
             "Generate model-centric structure.",
             object_schema(vec![
-                ("from", json!({ "type": "string" })),
+                ("from", element_reference_schema("Omit for the whole model; operation-specific root type checks apply.")),
                 ("reverse", json!({ "type": "boolean" })),
                 ("filter_type", json!({ "type": "string" })),
             ]),
@@ -64,10 +124,10 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.collect",
-            "Collect capability, requirement, ontology, concept-scheme, or concept context upstream or downstream.",
+            "Collect capability, requirement, ontology, semantic-query, concept-scheme, or concept context upstream or downstream.",
             required_object_schema(
                 vec![
-                    ("element_name", json!({ "type": "string" })),
+                    ("element_name", element_reference_schema("")),
                     (
                         "direction",
                         json!({ "type": "string", "enum": ["UPSTREAM", "DOWNSTREAM"] }),
@@ -79,7 +139,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         read_tool(
             "reqvire.submodels",
             "Analyze independent capability and requirement submodels.",
-            object_schema(vec![("from", json!({ "type": "string" }))]),
+            object_schema(vec![("from", element_reference_schema("Omit for the whole model; operation-specific root type checks apply."))]),
         ),
         read_tool(
             "reqvire.semantic.export",
@@ -93,7 +153,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                     "layers",
                     json!({
                         "type": "array",
-                        "items": { "type": "string", "enum": ["ontologies", "shapes", "concepts", "model", "external-used", "prefixes"] },
+                        "items": { "type": "string", "enum": ["ontologies", "shapes", "concepts", "model", "external-used", "prefixes", "queries"] },
                         "description": "Semantic export layers to include. Omit or pass an empty array to export all public layers."
                     }),
                 ),
@@ -151,8 +211,8 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             "Read one standalone native concept or concept scheme by IRI, source identifier, or source element name.",
             object_schema(vec![
                 ("iri", json!({ "type": "string" })),
-                ("identifier", json!({ "type": "string" })),
-                ("name", json!({ "type": "string" })),
+                ("identifier", json!({ "type": "string", "description": "Canonical element identifier only; multiple explicit selectors must agree." })),
+                ("name", element_reference_schema("Multiple explicit selectors must select the same element.")),
             ]),
         ),
         read_tool(
@@ -175,6 +235,24 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "format",
                 json!({ "type": "string", "enum": ["turtle", "jsonld"], "default": "turtle" }),
             )]),
+        ),
+        read_tool(
+            "reqvire.semantic.queries",
+            "Discover and validate native SPARQL artifacts without execution.",
+            object_schema(vec![
+                ("name", element_reference_schema("Select a semantic-query source element; mutually exclusive with iri.")),
+                ("iri", json!({"type":"string"})),
+                ("namespace_base", json!({"type":"string"})),
+                ("include_content", json!({"type":"boolean", "default":false})),
+            ]),
+        ),
+        read_tool(
+            "reqvire.semantic.queries.validate",
+            "Discover and validate native SPARQL artifacts without execution.",
+            object_schema(vec![
+                ("name", element_reference_schema("Select a semantic-query source element; mutually exclusive with iri.")),
+                ("iri", json!({"type":"string"})),
+            ]),
         ),
         read_tool(
             "reqvire.semantic.prefixes",
@@ -277,7 +355,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         read_tool(
             "reqvire.coverage",
             "Generate verification and implementation coverage.",
-            object_schema(vec![]),
+            object_schema(vec![("from", element_reference_schema("Select a capability subtree; omitted selects the whole model."))]),
         ),
         read_tool(
             "reqvire.traces",
@@ -355,7 +433,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "Remove an element.",
                 required_object_schema(
                     vec![
-                        ("element_name", json!({ "type": "string" })),
+                        ("element_name", element_reference_schema("")),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
                     vec!["element_name"],
@@ -366,7 +444,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "Move an element to another file.",
                 required_object_schema(
                     vec![
-                        ("element_name", json!({ "type": "string" })),
+                        ("element_name", element_reference_schema("")),
                         ("file", json!({ "type": "string" })),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
@@ -378,8 +456,8 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "Rename an element.",
                 required_object_schema(
                     vec![
-                        ("element_name", json!({ "type": "string" })),
-                        ("new_name", json!({ "type": "string" })),
+                        ("element_name", element_reference_schema("")),
+                        ("new_name", json!({ "type": "string", "description": "Literal new authored element name." })),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
                     vec!["element_name", "new_name"],
@@ -390,10 +468,10 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 "Merge source elements into a target element.",
                 required_object_schema(
                     vec![
-                        ("target", json!({ "type": "string" })),
+                        ("target", element_reference_schema("Select the target receiving merged content; merge type compatibility applies.")),
                         (
                             "sources",
-                            json!({ "type": "array", "items": { "type": "string" } }),
+                            json!({ "type": "array", "items": element_reference_schema("Select a source element to merge.") }),
                         ),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
@@ -427,12 +505,12 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             ),
             mutation_tool(
                 "reqvire.link",
-                "Add a relation or contract_bindings.",
+                "Add a relation, bindContract implementation obligation, or referenceContract content dependency. A requirement cannot combine Contract Bindings and Contract References.",
                 required_object_schema(
                     vec![
-                        ("source", json!({ "type": "string" })),
+                        ("source", element_reference_schema("")),
                         ("relation_type", json!({ "type": "string" })),
-                        ("target", json!({ "type": "string" })),
+                        ("target", element_reference_schema("Relation endpoints also accept existing file paths and URLs according to relation rules; contracts retain their type checks.")),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
                     vec!["source", "relation_type", "target"],
@@ -440,11 +518,11 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             ),
             mutation_tool(
                 "reqvire.unlink",
-                "Remove a relation or contract_bindings.",
+                "Remove a relation, contract binding, or contract reference by target.",
                 required_object_schema(
                     vec![
-                        ("source", json!({ "type": "string" })),
-                        ("target", json!({ "type": "string" })),
+                        ("source", element_reference_schema("")),
+                        ("target", element_reference_schema("Relation endpoints also accept existing file paths and URLs according to relation rules; contracts retain their type checks.")),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
                     vec!["source", "target"],
@@ -452,13 +530,13 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             ),
             mutation_tool(
                 "reqvire.relink",
-                "Replace an existing relation target.",
+                "Replace an existing relation or referenceContract target atomically.",
                 required_object_schema(
                     vec![
-                        ("source", json!({ "type": "string" })),
+                        ("source", element_reference_schema("")),
                         ("relation_type", json!({ "type": "string" })),
-                        ("from_target", json!({ "type": "string" })),
-                        ("to_target", json!({ "type": "string" })),
+                        ("from_target", element_reference_schema("Existing relation target; file paths and URLs retain their domains.")),
+                        ("to_target", element_reference_schema("Replacement relation target; file paths and URLs retain their domains.")),
                         ("dry_run", json!({ "type": "boolean", "default": false })),
                     ],
                     vec!["source", "relation_type", "from_target", "to_target"],
@@ -521,10 +599,8 @@ pub fn validate_tool_arguments(
     arguments: &Value,
     enable_mutations: bool,
 ) -> Result<(), String> {
-    let tools = tool_definitions(enable_mutations);
-    let tool = tools
-        .iter()
-        .find(|tool| tool.get("name").and_then(Value::as_str) == Some(tool_name))
+    let tool = catalog(enable_mutations)
+        .get(tool_name)
         .ok_or_else(|| format!("Unknown tool '{}'", tool_name))?;
     let schema = tool
         .get("inputSchema")
@@ -532,50 +608,12 @@ pub fn validate_tool_arguments(
     validate_object_schema(arguments, schema)
 }
 
-pub(crate) fn tool_exists(name: &str, enable_mutations: bool) -> bool {
-    read_tool_names().contains(&name)
-        || conditional_tool_names().contains(&name)
-        || (enable_mutations && mutation_tool_names().contains(&name))
+pub fn tool_exists(name: &str, enable_mutations: bool) -> bool {
+    catalog(enable_mutations).get(name).is_some()
 }
 
-fn read_tool_names() -> Vec<&'static str> {
-    vec![
-        "reqvire.workspace_status",
-        "reqvire.tool_contract",
-        "reqvire.model_revision",
-        "reqvire.read_element",
-        "reqvire.search",
-        "reqvire.model",
-        "reqvire.containment",
-        "reqvire.collect",
-        "reqvire.submodels",
-        "reqvire.semantic.export",
-        "reqvire.semantic.ontologies",
-        "reqvire.semantic.shapes",
-        "reqvire.semantic.concepts",
-        "reqvire.semantic.model",
-        "reqvire.concepts.list",
-        "reqvire.concepts.get",
-        "reqvire.concept_schemes.list",
-        "reqvire.concept_mappings.list",
-        "reqvire.semantic.graph",
-        "reqvire.semantic.prefixes",
-        "reqvire.semantic.vocabulary",
-        "reqvire.semantic.sparql",
-        "reqvire.lint",
-        "reqvire.coverage",
-        "reqvire.traces",
-        "reqvire.resources",
-        "reqvire.change_impact",
-    ]
-}
-
-fn conditional_tool_names() -> Vec<&'static str> {
-    vec!["reqvire.format"]
-}
-
-pub(crate) fn mutation_tool_names() -> Vec<&'static str> {
-    vec![
+pub const fn mutation_tool_names() -> &'static [&'static str] {
+    &[
         "reqvire.add_element",
         "reqvire.remove_element",
         "reqvire.move_element",
@@ -649,7 +687,7 @@ fn output_schema(name: &str) -> Value {
     let fingerprint = json!({
         "type": "string",
         "pattern": "^[0-9a-f]{64}$",
-        "description": "SHA-256 of canonical parsed-element model encoding reqvire.model-revision.v1. Excludes Git state and external file contents."
+        "description": "SHA-256 of canonical parsed-element model encoding reqvire.model-revision.v2. Excludes Git state and external file contents."
     });
     match name {
         "reqvire.workspace_status" => {
@@ -668,7 +706,7 @@ fn output_schema(name: &str) -> Value {
     schema
 }
 
-pub(crate) fn resource_contents(uri: &str, value: Value) -> Value {
+pub fn resource_contents(uri: &str, value: Value) -> Value {
     let text = serde_json::to_string_pretty(&value).unwrap_or_else(|_| value.to_string());
     json!({
         "contents": [{
@@ -758,4 +796,174 @@ fn validate_property_enum(name: &str, value: &Value, schema: &Value) -> Result<(
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::cell::Cell;
+
+    thread_local! {
+        pub(super) static CATALOG_BUILDS: Cell<usize> = const { Cell::new(0) };
+    }
+
+    #[test]
+    fn catalog_validation_reuses_definitions_after_warmup() {
+        let args = json!({"short":true});
+        for enabled in [false, true] {
+            validate_tool_arguments("reqvire.search", &args, enabled)
+                .expect("test fixture operation should succeed");
+            let before = CATALOG_BUILDS.with(Cell::get);
+            for _ in 0..20 {
+                validate_tool_arguments("reqvire.search", &args, enabled)
+                    .expect("test fixture operation should succeed");
+                assert!(validate_tool_arguments("reqvire.not_a_tool", &args, enabled).is_err());
+            }
+            assert_eq!(
+                CATALOG_BUILDS.with(Cell::get),
+                before,
+                "validation must not rebuild catalogs"
+            );
+        }
+    }
+
+    #[test]
+    fn cached_catalogs_preserve_mode_schemas_and_diagnostics() {
+        for enabled in [false, true] {
+            let definitions = tool_definitions(enabled);
+            assert_eq!(
+                definitions
+                    .iter()
+                    .any(|tool| tool["name"] == "reqvire.add_element"),
+                enabled
+            );
+            for (name, args, diagnostic) in [
+                (
+                    "reqvire.not_a_tool",
+                    json!({}),
+                    "Unknown tool 'reqvire.not_a_tool'",
+                ),
+                (
+                    "reqvire.search",
+                    json!([]),
+                    "Tool arguments must be a JSON object",
+                ),
+                (
+                    "reqvire.search",
+                    json!({"alien":true}),
+                    "Unknown argument 'alien'",
+                ),
+                (
+                    "reqvire.collect",
+                    json!({}),
+                    "Missing required argument 'element_name'",
+                ),
+                (
+                    "reqvire.search",
+                    json!({"short":"yes"}),
+                    "Argument 'short' must be a boolean",
+                ),
+                (
+                    "reqvire.collect",
+                    json!({"element_name":"Root", "direction":"sideways"}),
+                    "Argument 'direction' has unsupported value '\"sideways\"'",
+                ),
+                (
+                    "reqvire.semantic.export",
+                    json!({"layers":[42]}),
+                    "Argument 'layers' must contain only strings",
+                ),
+            ] {
+                assert_eq!(
+                    validate_tool_arguments(name, &args, enabled)
+                        .expect_err("test fixture operation should fail"),
+                    diagnostic
+                );
+            }
+        }
+        assert!(validate_tool_arguments("reqvire.format", &json!({"fix":true}), false).is_err());
+        assert!(validate_tool_arguments("reqvire.format", &json!({"fix":true}), true).is_ok());
+        assert!(validate_tool_arguments(
+            "reqvire.add_element",
+            &json!({"file":"Model.md","content":"content"}),
+            false
+        )
+        .is_err());
+        assert!(validate_tool_arguments(
+            "reqvire.add_element",
+            &json!({"file":"Model.md","content":"content"}),
+            true
+        )
+        .is_ok());
+        // Consumers own their discovery output and cannot mutate the cached schema.
+        let mut altered = tool_definitions(false);
+        altered[0]["inputSchema"]["properties"]["alien"] = json!({"type":"boolean"});
+        assert!(
+            validate_tool_arguments("reqvire.workspace_status", &json!({"alien":true}), false)
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn existing_element_discovery_preserves_argument_domains() {
+        let definitions = tool_definitions(true);
+        for (tool, selectors) in [
+            ("reqvire.read_element", vec!["name"]),
+            ("reqvire.model", vec!["from"]),
+            ("reqvire.submodels", vec!["from"]),
+            ("reqvire.coverage", vec!["from"]),
+            ("reqvire.collect", vec!["element_name"]),
+            ("reqvire.concepts.get", vec!["name"]),
+            ("reqvire.semantic.queries", vec!["name"]),
+            ("reqvire.semantic.queries.validate", vec!["name"]),
+            ("reqvire.remove_element", vec!["element_name"]),
+            ("reqvire.move_element", vec!["element_name"]),
+            ("reqvire.rename_element", vec!["element_name"]),
+            ("reqvire.merge_elements", vec!["target", "sources"]),
+            ("reqvire.link", vec!["source", "target"]),
+            ("reqvire.unlink", vec!["source", "target"]),
+            ("reqvire.relink", vec!["source", "from_target", "to_target"]),
+        ] {
+            let definition = definitions
+                .iter()
+                .find(|item| item["name"] == tool)
+                .expect("public tool");
+            for selector in selectors {
+                let property = &definition["inputSchema"]["properties"][selector];
+                let schema = if property["type"] == "array" {
+                    &property["items"]
+                } else {
+                    property
+                };
+                let description = schema["description"]
+                    .as_str()
+                    .expect("selector description");
+                assert!(
+                    description.contains("Exact element name")
+                        && description.contains("canonical element identifier"),
+                    "{tool} {selector}: {description}"
+                );
+            }
+        }
+        let read = definitions
+            .iter()
+            .find(|item| item["name"] == "reqvire.read_element")
+            .expect("read");
+        assert!(
+            read["inputSchema"]["properties"]["identifier"]["description"]
+                .as_str()
+                .expect("explicit ID")
+                .contains("identifier only")
+        );
+        let rename = definitions
+            .iter()
+            .find(|item| item["name"] == "reqvire.rename_element")
+            .expect("rename");
+        assert!(
+            rename["inputSchema"]["properties"]["new_name"]["description"]
+                .as_str()
+                .expect("literal")
+                .contains("Literal")
+        );
+    }
 }

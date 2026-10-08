@@ -191,21 +191,22 @@ requirement --derivedFrom/derive--> requirement
 ontology --derivedFrom/derive--> ontology
 requirement --specify--> capability
 capability --specifiedBy--> requirement
-capability/requirement --definedBy--> contract
-contract --define--> capability/requirement
+requirement --definedBy--> contract
+contract --define--> requirement
 requirement --verifiedBy--> verification
 verification --verify--> requirement
 requirement --satisfiedBy--> implementation/evidence
 test-verification/formal-proof-verification --satisfiedBy--> evidence
 ```
 
-Contract Bindings are separate from normal relations:
+Contract dependency sections are separate from Relations:
 
 ```text
-requirement --Contract Bindings--> compatible requirement-owned contract
+requirement --Contract Bindings--> shared implementation contract
+requirement --Contract References--> contract content for review
 ```
 
-Contract Bindings are the approved way for requirements to bind compatible requirement-owned contracts across otherwise independent subgraphs.
+Both kinds target compatible requirement-owned contracts. Bindings contribute to owner fulfillment; references retain collection and change-impact context without implementation contributions.
 
 ## Submodel Boundary Rule
 
@@ -217,7 +218,7 @@ Hierarchy should stay inside one logical subgraph:
 - requirement-to-requirement hierarchy stays inside the owning capability subgraph
 - ontology-to-ontology hierarchy stays inside the ontology plane
 
-Cross-subgraph reuse should use contract_bindings, not hierarchy.
+Cross-subgraph contract dependencies use bindings or references according to responsibility, rather than hierarchy.
 
 Avoid cross-submodel requirement hierarchy. If a requirement in one capability needs context from another capability, use concept references for SKOS concepts or reuse a compatible requirement-owned contract instead of creating a parent/child requirement relation across subgraphs.
 
@@ -247,7 +248,7 @@ When adding or moving model content:
 4. Produce a move plan before editing:
    - element/file moves
    - relation rewrites
-   - contract_bindings substitutions
+   - binding/reference substitutions
    - validation risks
 5. Confirm high-risk boundary decisions with the user before bulk moves.
 6. Apply changes in slices with `mv`, `mv-file`, `mv-folder`, `link`, `unlink`, or `relink`.
@@ -263,7 +264,7 @@ When adding or moving model content:
 - Do not force every repo into the example area names.
 - Do not move content only to satisfy a folder pattern when the current graph is valid and understandable.
 - Do not replace graph relations with path naming conventions.
-- Do not remove cross-subgraph relations without preserving required context through contract_bindings.
+- Do not remove cross-subgraph relations without preserving required context through appropriate bindings or references.
 - Do not create a broad capability root only to share ontology.
 
 The goal is clearer navigation and maintainability with graph semantics preserved.

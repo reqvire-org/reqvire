@@ -1,0 +1,26 @@
+PASS cli/collect/Root Capability/UPSTREAM/name-control
+PASS cli/collect/Root Capability/UPSTREAM/identifier-parity
+PASS cli/collect/Root Capability/DOWNSTREAM/name-control
+PASS cli/collect/Root Capability/DOWNSTREAM/identifier-parity
+PASS cli/collect/Child Requirement/UPSTREAM/name-control
+PASS cli/collect/Child Requirement/UPSTREAM/identifier-parity
+PASS cli/collect/Child Requirement/DOWNSTREAM/name-control
+PASS cli/collect/Child Requirement/DOWNSTREAM/identifier-parity
+PASS cli/collect/Item Ontology/UPSTREAM/name-control
+PASS cli/collect/Item Ontology/UPSTREAM/identifier-parity
+PASS cli/collect/Item Ontology/DOWNSTREAM/name-control
+PASS cli/collect/Item Ontology/DOWNSTREAM/identifier-parity
+PASS cli/collect/Item Lookup/UPSTREAM/name-control
+PASS cli/collect/Item Lookup/UPSTREAM/identifier-parity
+PASS cli/collect/Item Lookup/DOWNSTREAM/name-control
+PASS cli/collect/Item Lookup/DOWNSTREAM/identifier-parity
+PASS cli/collect/Sparse Concept Scheme/UPSTREAM/name-control
+PASS cli/collect/Sparse Concept Scheme/UPSTREAM/identifier-parity
+PASS cli/collect/Sparse Concept Scheme/DOWNSTREAM/name-control
+PASS cli/collect/Sparse Concept Scheme/DOWNSTREAM/identifier-parity
+PASS cli/collect/Detailed Concept/UPSTREAM/name-control
+PASS cli/collect/Detailed Concept/UPSTREAM/identifier-parity
+PASS cli/collect/Detailed Concept/DOWNSTREAM/name-control
+PASS cli/collect/Detailed Concept/DOWNSTREAM/identifier-parity
+PASS cli/collect/ambiguous-name-identifier
+PASS cli/collect/selector-help

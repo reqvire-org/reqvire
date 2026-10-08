@@ -32,11 +32,15 @@ export interface ShellActionItem {
 
 export interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
   brandLabel?: ReactNode;
+  /** Persistent context control at the far right, after header actions. */
+  headerContext?: ReactNode;
+  /** Context controls below the persistent navigation header. */
   toolbar?: ReactNode;
   navigationItems?: ShellNavigationItem[];
   activeNavigationValue?: string;
   headerActions?: ShellActionItem[];
   sidePane?: ReactNode;
+  sidePaneHeader?: ReactNode;
   main?: ReactNode;
   detailPane?: ReactNode;
   mainWarning?: ReactNode;
@@ -89,37 +93,6 @@ const shellBaseUX = css`
 
   &.has-right-inspector .ux-inspector-tab {
     display: flex;
-  }
-
-  .ux-side-pane {
-    position: relative;
-    inset: auto;
-    z-index: auto;
-    align-self: stretch;
-    flex: 0 0 var(--ux-current-left-width);
-    width: var(--ux-current-left-width);
-    min-width: 0;
-    min-height: 0;
-    height: 100%;
-  }
-
-  .ux-side-pane.is-collapsed {
-    display: none;
-  }
-
-  .ux-side-content {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  .ux-tree-tab,
-  .ux-pane-chrome-header {
-    display: none;
   }
 
   [data-route-frame] {
@@ -178,15 +151,43 @@ const shellSkinX = css`
 `;
 
 const headerBaseUX = css`
+  --ux-header-leading-min-width: calc(var(--space-32) * 2 + var(--space-16));
+  --ux-header-leading-width: var(--ux-header-leading-min-width);
   z-index: var(--z-sticky);
   display: flex;
   flex: 0 0 var(--app-header-height);
   align-items: stretch;
   height: var(--app-header-height);
 
-  @media (max-width: 900px) {
-    padding-right: 0;
+  &[data-align-pane="true"] {
+    --ux-header-leading-width: max(var(--ux-current-left-width), var(--ux-header-leading-min-width));
   }
+
+  &[data-has-context="true"] {
+    @media (max-width: 600px) {
+      --ux-header-leading-min-width: calc(var(--space-10) + var(--space-6) * 2);
+    }
+  }
+
+  @media (max-width: 1100px) {
+    display: grid;
+    flex-basis: auto;
+    grid-template-columns: var(--ux-header-leading-width) minmax(0, 1fr);
+    grid-template-rows: var(--app-header-height) var(--control-lg);
+    height: auto;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+`;
+
+const sidePaneHeaderClass = css`
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: var(--space-6) var(--side-pane-content-inset-inline) 0;
+  border-right: var(--border-w) solid var(--border-subtle);
+  background: var(--bg-surface);
 `;
 
 const headerSkinX = css`
@@ -194,20 +195,40 @@ const headerSkinX = css`
   background: var(--bg-surface);
 `;
 
-const brandClass = css`
-  --ux-brand-min-w: 160px;
+const headerLeadingClass = css`
   display: flex;
-  flex: 0 0 var(--ux-current-left-width);
+  flex: 0 0 var(--ux-header-leading-width);
+  align-items: flex-start;
+  width: var(--ux-header-leading-width);
+  min-width: var(--ux-header-leading-min-width);
+  box-sizing: border-box;
+  border-right: var(--border-w) solid var(--border-subtle);
+
+  @media (max-width: 1100px) {
+    grid-column: 1;
+    grid-row: 1 / -1;
+  }
+
+  @media (max-width: 640px) {
+    grid-row: 1;
+    width: min(100%, var(--ux-header-leading-width));
+  }
+`;
+
+const brandClass = css`
+  display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: var(--space-5);
   box-sizing: border-box;
-  border-right: var(--border-w) solid var(--border-subtle);
+  height: var(--app-header-height);
   padding: 0 var(--space-10);
 
-  @media (max-width: 900px) {
-    flex-basis: auto;
-    width: auto;
-    min-width: var(--ux-brand-min-w);
+  &[data-has-context="true"] {
+    @media (max-width: 600px) {
+      padding-inline: var(--space-6);
+      > span { display: none; }
+    }
   }
 `;
 
@@ -220,6 +241,39 @@ const brandMarkClass = css`
   width: var(--space-10);
   height: var(--space-10);
   transform: none;
+`;
+
+const headerContextClass = css`
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  width: calc(var(--space-32) * 4 + var(--space-10));
+  min-width: calc(var(--space-32) * 2 + var(--space-6));
+  max-width: calc(var(--space-32) * 4 + var(--space-10));
+  height: var(--app-header-height);
+  box-sizing: border-box;
+  padding-right: var(--space-10);
+
+  @media (max-width: 900px) {
+    padding-right: var(--space-6);
+  }
+
+  @media (max-width: 600px) {
+    width: clamp(calc(var(--space-32) * 2 + var(--space-6)), 32vw, calc(var(--space-32) * 3 + var(--space-6)));
+    max-width: calc(var(--space-32) * 3 + var(--space-6));
+  }
+`;
+
+const headerTrailingClass = css`
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  min-width: 0;
+
+  @media (max-width: 1100px) {
+    grid-column: 2;
+    grid-row: 1;
+  }
 `;
 
 const brandNameClass = css`
@@ -245,6 +299,16 @@ const headerTabsClass = css`
   --ds-tabs-h: 100%;
   --ds-tabs-border-bottom: 0;
   --ds-tab-h: 100%;
+
+  @media (max-width: 1100px) {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  @media (max-width: 640px) {
+    grid-column: 1 / -1;
+    padding-inline: var(--space-6);
+  }
 `;
 
 const headerActionsClass = css`
@@ -254,9 +318,14 @@ const headerActionsClass = css`
   gap: var(--space-2);
   padding: 0 var(--space-10) 0 var(--space-4);
 
+  &[data-has-context="true"] {
+    padding-right: var(--space-4);
+  }
+
   @media (max-width: 900px) {
     padding-right: var(--space-6);
   }
+
 `;
 
 const mainClass = css`
@@ -312,11 +381,13 @@ const collapseSkinX = css`
 export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppShell(
   {
     brandLabel = "REQVIRE",
+    headerContext,
     toolbar,
     navigationItems = [],
     activeNavigationValue,
     headerActions = [],
     sidePane,
+    sidePaneHeader,
     main,
     detailPane,
     mainWarning,
@@ -355,18 +426,20 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
       )}
       {...props}
     >
-      {toolbar ?? (
-        <ShellHeader
-          brandLabel={brandLabel}
-          navigationItems={navigationItems}
-          activeNavigationValue={activeNavigationValue}
-          headerActions={headerActions}
-          onNavigate={onNavigate}
-        />
-      )}
+      <ShellHeader
+        brandLabel={brandLabel}
+        context={headerContext}
+        alignPane={sidePane != null}
+        navigationItems={navigationItems}
+        activeNavigationValue={activeNavigationValue}
+        headerActions={headerActions}
+        onNavigate={onNavigate}
+      />
+      {toolbar}
       <div data-product-pattern-slot="body" className={cx(mainClass)}>
         {sidePane != null ? (
           <ShellPane placement="start" collapsed={!leftPaneOpen}>
+            {sidePaneHeader != null ? <div className={cx(sidePaneHeaderClass)} data-product-pattern-slot="side-pane-header">{sidePaneHeader}</div> : null}
             {sidePane}
           </ShellPane>
         ) : null}
@@ -406,12 +479,16 @@ export const AppShell = forwardRef<HTMLDivElement, AppShellProps>(function AppSh
 
 function ShellHeader({
   brandLabel,
+  context,
+  alignPane,
   navigationItems,
   activeNavigationValue,
   headerActions,
   onNavigate,
 }: {
   brandLabel: ReactNode;
+  context?: ReactNode;
+  alignPane: boolean;
   navigationItems: ShellNavigationItem[];
   activeNavigationValue?: string;
   headerActions: ShellActionItem[];
@@ -425,10 +502,13 @@ function ShellHeader({
   }));
 
   return (
-    <header data-product-pattern="shell-header" className={cx(headerBaseUX, headerSkinX)}>
-      <div className={cx(brandClass)}>
-        <BrandMark className={cx(brandMarkClass)} decorative />
-        {brandLabel != null ? <span className={cx(brandNameClass)}>{brandLabel}</span> : null}
+    <header data-product-pattern="shell-header" data-has-context={context != null || undefined}
+      data-align-pane={alignPane || undefined} className={cx(headerBaseUX, headerSkinX)}>
+      <div data-product-pattern-slot="header-leading" className={cx(headerLeadingClass)}>
+        <div data-product-pattern-slot="brand" data-has-context={context != null || undefined} className={cx(brandClass)}>
+          <BrandMark className={cx(brandMarkClass)} decorative />
+          {brandLabel != null ? <span className={cx(brandNameClass)}>{brandLabel}</span> : null}
+        </div>
       </div>
       <nav className={cx(headerTabsClass)} aria-label="Explorer views">
         <Tabs
@@ -438,8 +518,9 @@ function ShellHeader({
           variant="underline"
         />
       </nav>
-      {headerActions.length > 0 ? (
-        <div className={cx(headerActionsClass)}>
+      {(headerActions.length > 0 || context != null) && <div data-product-pattern-slot="header-trailing" className={cx(headerTrailingClass)}>
+        {headerActions.length > 0 ? <div data-product-pattern-slot="header-actions"
+          data-has-context={context != null || undefined} className={cx(headerActionsClass)}>
           {headerActions.map((action) => (
             <IconButton
               key={action.id}
@@ -452,8 +533,9 @@ function ShellHeader({
               <Icon name={action.icon} />
             </IconButton>
           ))}
-        </div>
-      ) : null}
+        </div> : null}
+        {context != null ? <div data-product-pattern-slot="header-context" className={cx(headerContextClass)}>{context}</div> : null}
+      </div>}
     </header>
   );
 }

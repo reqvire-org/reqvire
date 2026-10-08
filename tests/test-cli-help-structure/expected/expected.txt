@@ -22,21 +22,22 @@ Commands:
   merge             Merge multiple elements into target element
   mv-file           Move entire specification file with all its elements
   mv-folder         Move or rename an entire folder subtree
-  link              Add relation or contract_bindings between elements
-  unlink            Remove relation or contract_bindings between elements (auto-detects type)
+  link              Add relation, contract binding, or contract reference between elements
+  unlink            Remove relation, contract binding, or contract reference between elements (auto-detects type)
   relink            Replace an existing relation target with a new target in one operation
   mv-asset          Move/rename asset file and update all references (Contract Bindings and Relations)
   rm-asset          Remove asset file and remove all references (Contract Bindings and Relations)
   containment       Generate containment view showing folder/file/element hierarchy
   resources         Generate resources report showing files referenced by the model
   semantic          Export semantic RDF layers
+    semantic query  Manage authored SPARQL query artifacts
     semantic export Export selected semantic RDF layers
   concepts          Work with standalone Reqvire concept schemes and thesaurus concepts
     concepts export Export generated SKOS concept scheme/thesaurus triples
     concepts validate Validate standalone concept schemes, concept references, and mappings
   ontologies        Compatibility alias for combined semantic export
   submodels         Analyze independent capability-rooted submodels and cross-submodel couplings
-  collect           Collect content from capability, requirement, ontology, concept-scheme, or concept context
+  collect           Collect content from capability, requirement, ontology, semantic-query, concept-scheme, or concept context
   help               Print this message or the help of the given subcommand(s)
 
 Options:
@@ -49,6 +50,11 @@ SERVE OPTIONS:
       --port <PORT>             Server port
       --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp
       --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint
+      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)
+      --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)
+      --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)
+      --allow-origin <ORIGIN>   Additional MCP browser origin (repeatable; loopback remains allowed)
+      --allow-host <HOST[:PORT]> Additional MCP endpoint host or host:port (repeatable; requires --enable-mcp)
 
 EXPORT OPTIONS:
       --output <OUTPUT>         Output directory
@@ -57,7 +63,12 @@ MCP OPTIONS:
       --host <HOST>             HTTP bind address
       --port <PORT>             HTTP server port
       --enable-mutations        Advertise and allow mutation tools
+      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)
+      --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)
+      --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)
       --with-size-estimates     Include element size estimates in model evidence tools
+      --allow-origin <ORIGIN>   Additional browser origin (repeatable; loopback remains allowed)
+      --allow-host <HOST[:PORT]> Additional endpoint host or host:port (repeatable)
 
 FORMAT OPTIONS:
       --fix                     Apply formatting changes to files
@@ -80,7 +91,7 @@ SEARCH OPTIONS:
       --short                   Output abbreviated format (one-line per element in text, omit fields in JSON)
       --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
       --filter-name <REGEX>     Only include elements whose name matches this regular expression
-      --filter-type <TYPE[,TYPE...]> Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+      --filter-type <TYPE[,TYPE...]> Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
       --filter-status <STATUS[,STATUS...]> Only include requirement-family elements with matching effective status values
       --filter-priority <PRIORITY[,PRIORITY...]> Only include requirement-family elements with matching effective priority values
       --filter-risk <RISK[,RISK...]> Only include requirement-family elements with matching effective risk values
@@ -91,6 +102,8 @@ SEARCH OPTIONS:
       --not-have-relations <LIST> Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
       --has-contract-bindings   Only include elements that have contract_bindings
       --filter-contract-bindings <GLOB> Only include elements with contract_bindings matching this glob pattern (e.g., "*.pdf", "docs/**/*")
+      --has-contract-references Only include elements that have Contract References
+      --filter-contract-references <GLOB> Only include elements with Contract Reference targets matching this glob (e.g., "*#error-response-specification")
 
 CHANGE IMPACT OPTIONS:
       --git-commit <GIT_COMMIT> Git commit hash to use when comparing models
@@ -104,13 +117,14 @@ TRACES OPTIONS:
       --filter-type <TYPE>      Only include verifications of the given type. Valid: test-verification, analysis-verification, inspection-verification, demonstration-verification
 
 COVERAGE OPTIONS:
+      --from <NAME>             Select a capability subtree by exact name or canonical identifier
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 MODEL OPTIONS:
-      --from <NAME>             Start from specific element by name
+      --from <NAME>             Start from specific element by exact name or canonical identifier
       --reverse                 Traverse from leaves to roots (follow backward relations)
-      --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+      --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
       --with-size-estimates     Include element size estimates in JSON output
       --output <FILE>           Save JSON output to file
 
@@ -130,28 +144,28 @@ ADD OPTIONS:
       --output <FILE>           Save JSON output to file (requires --json)
 
 RM OPTIONS:
-       <ELEMENT_NAME>           Element name
+       <ELEMENT_NAME>           Exact element name or canonical identifier
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 MV OPTIONS:
-       <ELEMENT_NAME>           Element name
+       <ELEMENT_NAME>           Exact element name or canonical identifier
        <FILE>                   Target file path (relative to workspace root)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 RENAME OPTIONS:
-       <ELEMENT_NAME>           Current element name
+       <ELEMENT_NAME>           Current exact element name or canonical identifier
        <NEW_NAME>               New element name
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 MERGE OPTIONS:
-       <TARGET>                 Target element name (receives merged content)
-       <SOURCES>                One or more source element names to merge into target
+       <TARGET>                 Target exact element name or canonical identifier (receives merged content)
+       <SOURCES>                One or more source element names or canonical identifiers to merge into target
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
@@ -172,25 +186,25 @@ MV FOLDER OPTIONS:
       --output <FILE>           Save JSON output to file (requires --json)
 
 LINK OPTIONS:
-       <SOURCE>                 Source element name
-       <RELATION_TYPE>          Relation type OR 'bindContract'. Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, broader, narrower, related, exactMatch, closeMatch, satisfiedBy, satisfy, verifiedBy, verify. Use 'bindContract' to reuse compatible requirement-owned contract elements
-       <TARGET>                 Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement contract_bindings
+       <SOURCE>                 Source exact element name or canonical identifier
+       <RELATION_TYPE>          Relation type, 'bindContract', or 'referenceContract'. Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, broader, narrower, related, exactMatch, closeMatch, satisfiedBy, satisfy, verifiedBy, verify. Use 'bindContract' to reuse compatible requirement-owned contract elements
+       <TARGET>                 Target: exact element name or canonical identifier, internal path, or external URL (for relations); compatible contract name or identifier for bindings
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 UNLINK OPTIONS:
-       <SOURCE>                 Source element name
-       <TARGET>                 Target element name OR file path
+       <SOURCE>                 Source exact element name or canonical identifier
+       <TARGET>                 Target element name or canonical identifier, file path, or URL
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 RELINK OPTIONS:
-       <SOURCE>                 Source element name
+       <SOURCE>                 Source exact element name or canonical identifier
        <RELATION_TYPE>          Relation type to preserve
-       <FROM_TARGET>            Existing target to replace
-       <TO_TARGET>              New target
+       <FROM_TARGET>            Existing target to replace: element name or canonical identifier, file path, or URL
+       <TO_TARGET>              Replacement element name or canonical identifier, file path, or URL
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
@@ -216,7 +230,7 @@ RESOURCES OPTIONS:
       --output <FILE>           Save JSON output to file
 
 SEMANTIC EXPORT OPTIONS:
-      --layer <LAYER>           Include layer: ontologies, shapes, concepts, model, external-used, prefixes. Repeatable; omitted means all layers
+      --layer <LAYER>           Include layer: ontologies, shapes, concepts, queries, model, external-used, prefixes. Repeatable; omitted means all layers
       --jsonld                  Output JSON-LD format instead of RDF/Turtle (.ttl)
       --namespace-base <IRI>    Filter clean authored export to one ontology base or term namespace. Cannot be combined with model
       --output <FILE>           Save output to file
@@ -238,12 +252,12 @@ ONTOLOGIES OPTIONS:
       --output <FILE>           Save output to file
 
 SUBMODELS OPTIONS:
-      --from <NAME>             Scope report to a capability subtree or requirement subtree by name
+      --from <NAME>             Scope report to a capability subtree or requirement subtree by exact name or canonical identifier
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 COLLECT OPTIONS:
-       <ELEMENT_NAME>           Name of the capability, requirement, ontology, concept-scheme, or concept element to collect from
+       <ELEMENT_NAME>           Exact name or canonical identifier of the capability, requirement, ontology, semantic-query, concept-scheme, or concept element to collect from
       --direction <DIRECTION>   Traversal direction: UPSTREAM (ancestors) or DOWNSTREAM (descendants)
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)

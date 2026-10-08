@@ -11,6 +11,8 @@ export { BUTTON_SIZE_CLASSES, BUTTON_TONE_CLASSES } from "./components/core/butt
 export type { ButtonSize, ButtonTone } from "./components/core/button_contract";
 export { Card } from "./components/core/Card";
 export type { CardProps } from "./components/core/Card";
+export { ExpandableViewport } from "./components/core/ExpandableViewport";
+export type { ExpandableViewportProps } from "./components/core/ExpandableViewport";
 export { Icon, ICON_NAMES } from "./components/core/Icon";
 export type { IconName, IconProps } from "./components/core/Icon";
 export { IconButton } from "./components/core/IconButton";
@@ -66,11 +68,12 @@ export { RelationPill } from "./components/data/RelationPill";
 export type { RelationPillProps } from "./components/data/RelationPill";
 export { Stat, StatRow } from "./components/data/Stat";
 export type { StatProps, StatRowProps } from "./components/data/Stat";
-export { BarMeterFill, ConicSwatch, DonutMeter, TokenSwatch } from "./components/data/TokenVisual";
+export { BarMeterFill, ConicSwatch, DonutMeter, SegmentedMeter, TokenSwatch } from "./components/data/TokenVisual";
 export type {
   BarMeterFillProps,
   ConicSwatchProps,
   DonutMeterProps,
+  SegmentedMeterProps,
   TokenSwatchProps,
 } from "./components/data/TokenVisual";
 export {
@@ -185,6 +188,9 @@ export {
   CoverageBreakdownPie,
   CoverageCapabilityList,
   CoverageCapabilityRow,
+  CoverageControls,
+  CoverageNavigation,
+  CoverageDrilldown,
   CoverageDashboard,
   CoverageEmptyNote,
   CoverageEmptyState,
@@ -203,6 +209,8 @@ export {
   LabeledCoverageBarFrame,
   ConceptElementDetailContent,
   StoreNotice,
+  TraceFlow,
+  ElementFlow,
   TraceFileGroup,
   TraceFileHeader,
   TraceReportContent,
@@ -315,6 +323,8 @@ export type {
   RendererNoticeProps,
   RendererNoticeTone,
   ReportRouteLayoutProps,
+  CoverageNavigationProps,
+  CoverageNavigationScope,
   ResourceDetailCardProps,
   ResourceEmptyStateProps,
   ResourceListItem,
@@ -333,10 +343,21 @@ export type {
   ShellPaneProps,
   SidePaneFrameProps,
   CoverageCapabilityRowProps,
+  CoverageDrilldownItem,
+  CoverageDrilldownAssessment,
+  CoverageDrilldownTarget,
   CoverageDashboardProps,
   CoverageGapRowButtonProps,
   CoveragePanelProps,
   StoreNoticeProps,
+  TraceFlowProps,
+  ElementFlowProps,
+  ElementFlowData,
+  TraceFlowData,
+  TraceFlowElement,
+  TraceFlowRequirement,
+  FlowLayoutEngine,
+  FlowLayoutTask,
   TraceReportPanelProps,
   ThesaurusConceptItem,
   ThesaurusConceptUsage,
@@ -345,3 +366,8 @@ export type {
   TraceVerificationCardProps,
   WorkspaceToolbarProps,
 } from "./product-patterns";
+export { WorktreeSelector } from "./product-patterns/shell/WorktreeSelector";
+export type { WorktreeSelectorProps } from "./product-patterns/shell/WorktreeSelector";
+
+export { WorktreeLoadDialog } from "./product-patterns/shell/WorktreeLoadDialog";
+export type { WorktreeLoadDialogProps } from "./product-patterns/shell/WorktreeLoadDialog";

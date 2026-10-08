@@ -1,10 +1,14 @@
-import { useState, type ReactNode } from "react";
+import { COVERAGE_PATTERN_ITEMS } from "../fixtures/coverage";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   AppShell,
   Button,
   CodeBody,
   CodePreviewFrame,
   CodeToolbar,
+  CoverageDashboard,
+  CoverageDrilldown,
+  CoveragePanel,
   CODE_PREVIEW_FALLBACK_CLASS,
   DetailDialog,
   DiagramBlockFrame,
@@ -31,6 +35,8 @@ import {
   StoreNotice,
   TreeItem,
   TypeBadge,
+  WorktreeSelector,
+  WorktreeLoadDialog,
   type DetailContractBindingItem,
   type DetailMetaBadge,
   type DetailRelationItem,
@@ -48,6 +54,8 @@ import {
   ONTOLOGY_COMPACT_NODE,
   ONTOLOGY_NODES,
   ONTOLOGY_REQUIREMENT_NODE,
+  SHOWCASE_WORKTREES,
+  SHOWCASE_WORKTREE_DIALOGS,
 } from "../fixtures/productPatterns";
 
 const PRIMARY_DETAIL_ELEMENT_ID = "REQ-DET-042";
@@ -105,6 +113,12 @@ interface ShowcaseDetailElement {
 }
 
 const SHOWCASE_DETAIL_ELEMENTS: Record<string, ShowcaseDetailElement> = {
+  "SPEC-DET-001": {
+    id: "SPEC-DET-001", title: "Coverage Report Specification", elementType: "specification",
+    typeFamily: "contract", sourceHref: "#/content/system-model/Specifications.md",
+    metaBadges: [], content: <p>Coverage reports distinguish verification and implementation evidence.</p>,
+    relations: [], contract_bindings: [],
+  },
   "REQ-DET-042": {
     id: "REQ-DET-042",
     title: "Traceability Coverage Requirement",
@@ -214,6 +228,13 @@ function Section({ title, desc, children }: { title: string; desc?: string; chil
 }
 
 export function ProductPatternsPage() {
+  const [worktreeLoad, setWorktreeLoad] = useState<keyof typeof SHOWCASE_WORKTREE_DIALOGS | null>(null);
+  useEffect(() => {
+    if (worktreeLoad !== "pending") return;
+    const timer = setTimeout(() => setWorktreeLoad(null), 5000);
+    return () => clearTimeout(timer);
+  }, [worktreeLoad]);
+  const [worktreeId, setWorktreeId] = useState(SHOWCASE_WORKTREES[0].id);
   const [leftPaneOpen, setLeftPaneOpen] = useState(true);
   const [codeExpanded, setCodeExpanded] = useState(true);
   const [codeWrapped, setCodeWrapped] = useState(false);
@@ -265,11 +286,14 @@ export function ProductPatternsPage() {
     <div className="showcase-page showcase-page--wide">
       <Section
         title="Explorer Shell"
-        desc="App shell, chrome, side pane, workspace area, and detail rail composed with neutral placeholder regions."
+        desc="Shared shell with pane-aligned branding and view tabs, and a branch control at the far right after header actions. The real Explorer mock supports pane resizing and collapse with this same header."
       >
         <div className="showcase-shell-demo">
           <AppShell
             brandLabel="REQVIRE"
+            headerContext={<WorktreeSelector density="compact" menuAlign="end" value={worktreeId} choices={SHOWCASE_WORKTREES}
+              branch={SHOWCASE_WORKTREES.find(choice => choice.id === worktreeId)?.branch}
+              onChange={setWorktreeId} onOpen={() => {}} />}
             navigationItems={[...SHELL_PATTERN_NAVIGATION]}
             activeNavigationValue="workspace"
             headerActions={inertShellActions}
@@ -294,6 +318,40 @@ export function ProductPatternsPage() {
             detailPane={<ShellDetailRail />}
           />
         </div>
+      </Section>
+
+      <Section title="Worktree Selector" desc="Choose an admitted branch and worktree. Unavailable contexts remain visible and disabled. In Mocks, this control switches the displayed fixture model through the Explorer shell.">
+        <WorktreeSelector
+          value={worktreeId}
+          choices={SHOWCASE_WORKTREES}
+          branch={SHOWCASE_WORKTREES.find(choice => choice.id === worktreeId)?.branch}
+          onChange={setWorktreeId}
+          onOpen={() => {}}
+        />
+      </Section>
+
+      <Section title="Worktree Loading and Errors"
+        desc="The shared Explorer dialog identifies the branch, explains recovery, and keeps full diagnostics readable. The loading preview completes after five seconds; errors support Close, Escape and outside dismissal.">
+        <div className="showcase-row">
+          <Button onClick={() => setWorktreeLoad("pending")}>Preview worktree loading</Button>
+          <Button onClick={() => setWorktreeLoad("connection")}>Preview connection error</Button>
+          <Button onClick={() => setWorktreeLoad("validation")}>Preview validation error</Button>
+          <Button onClick={() => setWorktreeLoad("refresh")}>Preview refresh error</Button>
+        </div>
+        {worktreeLoad && <WorktreeLoadDialog {...SHOWCASE_WORKTREE_DIALOGS[worktreeLoad]}
+          onDismiss={() => setWorktreeLoad(null)} />}
+      </Section>
+
+      <Section
+        title="Coverage Drill-down"
+        desc="The same coverage component used by Explorer, with shared Verification and Implementation column headings. Expand capabilities and parent requirements to inspect their children. Select requirement names in Mocks to inspect evidence through the full application."
+      >
+        <CoverageDashboard>
+          <CoveragePanel>
+            <CoverageDrilldown items={COVERAGE_PATTERN_ITEMS}
+              onInspect={target => pushElementDialog(target.id)} />
+          </CoveragePanel>
+        </CoverageDashboard>
       </Section>
 
       <Section
@@ -446,7 +504,9 @@ export function ProductPatternsPage() {
                 </MarkdownFrame>
               }
               relations={DETAIL_RELATIONS}
-              contract_bindings={DETAIL_ATTACHMENTS}
+              contract_references={[{ id: "reference-coverage-contract", targetId: "SPEC-DET-001",
+                kind: "element", label: "Coverage Report Specification", elementType: "specification",
+                typeFamily: "contract", href: "#/elements/SPEC-DET-001", external: false }]}
               onOpenElement={openElementDialog}
               onOpenResource={() => {}}
             />

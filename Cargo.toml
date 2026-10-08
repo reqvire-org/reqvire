@@ -14,7 +14,7 @@ unwrap_used = "warn"
 clone_on_ref_ptr = "warn"
 
 [workspace.package]
-version = "1.3.0"
+version = "1.3.1"
 edition = "2021"
 rust-version = "1.86"
 license = "Apache-2.0"
@@ -42,6 +42,7 @@ termcolor = "1.4"
 globset = "0.4.16"
 rustc-hash = "2.1"
 difference = "2.0"
+spargebra = "0.4.7"
 oxigraph = { version = "0.5.8", default-features = false }
 o-kernel = { path = "crates/o-kernel" }
 reqvire = { path = "crates/reqvire-core" }

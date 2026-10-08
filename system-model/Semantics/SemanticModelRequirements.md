@@ -115,12 +115,13 @@ Detailed graph-role identification, o-kernel subset construction, metadata prese
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Referenced Graph Subset Construction Specification](../Architecture/OntologyKernelSpecifications.md#referenced-graph-subset-construction-specification)
   * [RDF Term Description Construction Specification](../Architecture/OntologyKernelSpecifications.md#rdf-term-description-construction-specification)
 
 #### Relations
   * definedBy: [External Vocabulary Description Construction Specification](SemanticModelSpecifications.md#external-vocabulary-description-construction-specification)
+  * satisfiedBy: [semantic_store.rs](../../crates/reqvire-core/src/semantic_store.rs)
   * derivedFrom: [Used External Vocabulary Selection](#used-external-vocabulary-selection)
   * specify: [External Ontology Source Management](SemanticModelFeature.md#external-ontology-source-management)
   * verifiedBy: [CLI Ontologies Command Verification](../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
@@ -132,12 +133,12 @@ Detailed graph-role identification, o-kernel subset construction, metadata prese
 The system shall collect ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry into a reusable semantic context, and shall optionally project Reqvire model context and generated ontology construct facts into the same RDF graph.
 
 #### Details
-Detailed block collection, model-layer projection, provenance, parser ownership, and clean-vs-full context rules shall follow the associated specification and contract bindings.
+The system SHALL follow its owned specification and referenced contracts for block collection, model-layer projection, provenance, parser ownership, and clean-vs-full context.
 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Semantic Contract Structure Specification](../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Ontology Kernel RDF Native Boundary Specification](../Architecture/OntologyKernelSpecifications.md#ontology-kernel-rdf-native-boundary-specification)
   * [Ontology Construct Classification Specification](../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
@@ -159,7 +160,7 @@ Detailed block collection, model-layer projection, provenance, parser ownership,
 The system shall apply the o-kernel standards reserved vocabulary registry when validating and exporting Reqvire ontology and semantic-contract RDF.
 
 #### Details
-Detailed validation, export, datatype-position, registry delegation, and non-reserved IRI handling rules shall follow the associated specification and o-kernel contract binding.
+The system SHALL follow its owned specification and referenced o-kernel contract for validation, export, datatype-position handling, registry delegation, and non-reserved IRI handling.
 
 #### Concept References
   * [OWL reserved vocabulary registry](../Thesaurus/Thesaurus.md#owl-reserved-vocabulary-registry)
@@ -169,10 +170,12 @@ Detailed validation, export, datatype-position, registry delegation, and non-res
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Standards Reserved Vocabulary Recognition Specification](../Architecture/OntologyKernelSpecifications.md#standards-reserved-vocabulary-recognition-specification)
 
 #### Relations
+  * satisfiedBy: [validation.rs](../../crates/reqvire-core/src/graph_registry/validation.rs)
+  * satisfiedBy: [owl_reserved.rs](../../crates/o-kernel/src/owl_reserved.rs)
   * definedBy: [OWL Reserved Vocabulary Recognition Specification](SemanticModelSpecifications.md#owl-reserved-vocabulary-recognition-specification)
   * derivedFrom: [Ontology and Shapes Collection](#ontology-and-shapes-collection)
   * specify: [Semantic Model Core](SemanticModelFeature.md#semantic-model-core)
@@ -300,7 +303,7 @@ Detailed export commands, artifact split, deterministic comparison, validation-g
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Runtime Reqvire SHACL Artifact Specification](SemanticModelSpecifications.md#runtime-reqvire-shacl-artifact-specification)
 
 #### Relations
@@ -329,4 +332,152 @@ The artifact is an implementation snapshot for runtime/bootstrap shape-rule need
   * satisfiedBy: [reqvire-shacl.ttl](../../crates/reqvire-core/src/runtime_ontology/reqvire-shacl.ttl)
   * specify: [Runtime Reqvire Ontology Vocabulary](SemanticModelFeature.md#runtime-reqvire-ontology-vocabulary)
   * verifiedBy: [Runtime Reqvire Ontology Artifact Verification](../Verifications/Semantics/SemanticModelVerifications.md#runtime-reqvire-ontology-artifact-verification)
+---
+
+### Semantic Query Authoring
+
+WHEN an author supplies a semantic-query element, the system SHALL preserve its query document and optional output declarations as structured model content.
+
+#### Details
+Authoring grammar, generated identity, source locations, and serialization follow the owned specification.
+
+#### Concept References
+  * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
+
+#### Contract References
+  * [Supported Element Types Specification](../ModelStructure/Specifications.md#supported-element-types-specification)
+  * [Structure and Addressing in Markdown Documents Contract Specification](../ModelStructure/Specifications.md#structure-and-addressing-in-markdown-documents-contract-specification)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * specify: [Managed SPARQL Query Artifacts](SemanticModelFeature.md#managed-sparql-query-artifacts)
+  * definedBy: [Semantic Query Authoring Specification](SemanticQuerySpecifications.md#semantic-query-authoring-specification)
+---
+
+### Semantic Query Context Validation
+
+WHEN validating a semantic query, the system SHALL resolve schema references against its explicitly used ontology context and report invalid query content.
+
+#### Details
+Validation uses parsed syntax roles and the existing model mutation validation gate. Downstream runtime features remain portable without execution.
+
+#### Concept References
+  * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
+
+#### Contract References
+  * [Relation Semantics Specification](../ModelStructure/Specifications.md#relation-semantics-specification)
+  * [External Vocabulary Reference Resolution Specification](SemanticModelSpecifications.md#external-vocabulary-reference-resolution-specification)
+  * [Built-In External Ontology Source Specification](SemanticModelSpecifications.md#built-in-external-ontology-source-specification)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * specify: [Managed SPARQL Query Artifacts](SemanticModelFeature.md#managed-sparql-query-artifacts)
+  * definedBy: [Semantic Query Context Validation Specification](SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
+---
+
+### Semantic Query Discovery
+
+The system SHALL expose native authored semantic queries with their metadata, source provenance, and used ontology namespaces.
+
+#### Details
+Discovery, namespace selection, RDF projection, and CLI/MCP consumers share the native semantic index.
+
+#### Concept References
+  * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
+
+#### Contract References
+  * [Namespace-Scoped Ontology Export Specification](SemanticModelSpecifications.md#namespace-scoped-ontology-export-specification)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * specify: [Managed SPARQL Query Artifacts](SemanticModelFeature.md#managed-sparql-query-artifacts)
+  * definedBy: [Semantic Query Discovery Specification](SemanticQuerySpecifications.md#semantic-query-discovery-specification)
+---
+
+### Semantic Query Artifact Export
+
+WHEN exporting a selected semantic query, the system SHALL produce deterministic standalone SPARQL bytes and their SHA-256 digest.
+
+#### Details
+Selection and serialization follow the shared artifact contract.
+
+#### Concept References
+  * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
+  * specify: [Managed SPARQL Query Artifacts](SemanticModelFeature.md#managed-sparql-query-artifacts)
+  * definedBy: [Semantic Query Artifact Export Specification](SemanticQuerySpecifications.md#semantic-query-artifact-export-specification)
+---
+
+### Semantic Query Artifact Drift Check
+
+WHEN checking a query artifact, the system SHALL compare its bytes with the generated query document and report matching, stale, missing, or unreadable artifacts.
+
+#### Details
+Artifact checks preserve the checked file and report expected and available actual hashes.
+
+#### Concept References
+  * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
+
+#### Contract References
+  * [Semantic Query Artifact Export Specification](SemanticQuerySpecifications.md#semantic-query-artifact-export-specification)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
+  * specify: [Managed SPARQL Query Artifacts](SemanticModelFeature.md#managed-sparql-query-artifacts)
+  * definedBy: [Semantic Query Artifact Drift Check Specification](SemanticQuerySpecifications.md#semantic-query-artifact-drift-check-specification)
+---
+
+### Managed Query Drift Check Element Selection
+
+When a managed-query drift check selects an existing source element through a name-based argument, the system SHALL resolve an exact name or canonical identifier through the shared element-selection contract before rendering or reading the artifact.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
+  * derivedFrom: [Semantic Query Artifact Drift Check](#semantic-query-artifact-drift-check)
+  * verifiedBy: [Existing Element Selection Verification](../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
+---
+
+### Managed Query Element Selection
+
+When a managed-query operation selects an existing source element through a name-based argument, the system SHALL resolve an exact name or canonical identifier through the shared element-selection contract and require a native semantic-query element.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * derivedFrom: [Semantic Query Discovery](#semantic-query-discovery)
+  * verifiedBy: [Existing Element Selection Verification](../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
 ---

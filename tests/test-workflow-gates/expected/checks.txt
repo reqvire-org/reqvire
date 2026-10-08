@@ -1,0 +1,11 @@
+PASS pr-clean-worker
+PASS pr-stale-worker
+PASS pr-build-failure
+PASS pr-test-failure
+PASS release-clean-worker
+PASS release-stale-worker
+PASS release-build-failure
+PASS release-test-failure
+PASS pr-current-revision-policy
+PASS valid-model-gate
+PASS invalid-model-fails-gate

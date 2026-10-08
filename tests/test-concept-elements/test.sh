@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
+cp "$TEST_DIR/fixtures/Projection.md.fixture" "$TEST_DIR/specifications/Projection.md"
+
 set +e
 VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
 VALIDATE_EXIT=$?
@@ -52,6 +54,18 @@ for token in \
     exit 1
   fi
 done
+
+# Compare normalized RDF from the valid projection fixture, including foreign namespaces.
+mkdir -p "$TEST_DIR/output"
+(cd "$TEST_DIR" && "$REQVIRE_BIN" semantic export --layer concepts --jsonld) > "$TEST_DIR/output/projection.jsonld"
+python3 "$TEST_DIR/check-projection.py" "$TEST_DIR/output/projection.jsonld" > "$TEST_DIR/output/projection-relations.txt"
+if ! diff -u "$TEST_DIR/expected/projection-relations.txt" "$TEST_DIR/output/projection-relations.txt"; then
+  echo "FAILED: generated concept relationships differ from canonical endpoint IRIs"
+  exit 1
+fi
+
+python3 "$TEST_DIR/check-taxonomy.py" "$REQVIRE_BIN" "$TEST_DIR" > "$TEST_DIR/output/taxonomy-checks.txt"
+diff -u "$TEST_DIR/expected/taxonomy-checks.txt" "$TEST_DIR/output/taxonomy-checks.txt"
 
 if [ $MODEL_EXIT -ne 0 ]; then
   echo "FAILED: model --filter-type concept-scheme command failed"

@@ -1,4 +1,5 @@
 CARGO_TOML := Cargo.toml
+.DEFAULT_GOAL := explorer
 
 # Extract version from Cargo.toml
 define get_version
@@ -10,14 +11,23 @@ define update_version
 	sed -i 's/^version = ".*"/version = "$(1)"/' $(CARGO_TOML)
 endef
 
-.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major explorer build check clippy fmt-check test e2e
+.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major explorer explorer-deps build check clippy fmt-check test e2e
+
+# Only a successful locked installation creates this receipt. npm ci can leave
+# partial node_modules output on failure, so its hidden lockfile is not a receipt.
+explorer-deps: explorer/node_modules/.reqvire-deps.stamp
+
+explorer/node_modules/.reqvire-deps.stamp: explorer/package.json explorer/package-lock.json
+	rm -f "$@"
+	cd explorer && npm ci
+	touch "$@"
 
 # Build the React/Vite Explorer SPA bundle. The served index.html is
 # this bundle; crates/reqvire-core/build.rs embeds explorer/dist at compile time, so this must
 # run before `cargo build` for the real bundle to be embedded.
-explorer:
+explorer: explorer-deps
 	@echo "Building Explorer SPA bundle..."
-	cd explorer && npm ci && npm run build
+	cd explorer && npm run build
 
 # Build the Explorer bundle, then the Rust workspace (so the bundle is embedded).
 build: explorer
@@ -29,7 +39,7 @@ check:
 
 # Run clippy with workspace lint configuration.
 clippy:
-	cargo clippy --workspace --all-targets
+	cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
 
 # Check formatting without modifying files.
 fmt-check:

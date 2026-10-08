@@ -36,6 +36,47 @@ export default function Ontologies() {
         />
       </Section>
 
+      <Section title="Managed SPARQL Queries">
+        <p className="text-zinc-600 mb-4">
+          Author reusable SELECT, ASK, CONSTRUCT, and DESCRIBE documents as
+          semantic-query elements. Link each query to the ontologies whose vocabulary
+          it uses. The heading names the query; introductory prose describes its purpose.
+        </p>
+        <CodeBlock>{`### Active Items Lookup
+
+Lists items for downstream reporting.
+
+#### Query
+\`\`\`sparql
+PREFIX item: <https://example.org/items#>
+SELECT ?item WHERE { ?item a item:Item }
+\`\`\`
+
+#### Metadata
+  * type: semantic-query
+
+#### Relations
+  * use: [Item Ontology](Ontologies.md#item-ontology)`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Query form and the urn:reqvire:semantic-query identity are generated.
+          Used ontology context includes ancestors and applicable external sources.
+          Declare every SPARQL prefix explicitly. For CONSTRUCT queries, an optional
+          Produces subsection lists property or family entries as CURIEs or absolute
+          IRIs. These describe intended output and are exported as query metadata.
+        </p>
+        <p className="text-zinc-600 mt-4">
+          Validation checks schema vocabulary and syntax. SERVICE, datasets, and
+          custom functions remain available for execution by downstream applications.
+          Artifact operations validate and export the query document without executing it.
+        </p>
+        <p className="text-zinc-600 mt-4">
+          Explorer shows managed queries in the ontology graph with links to their
+          referenced vocabulary and declared outputs. Select a query to inspect its
+          SPARQL text, used ontologies, and source. Use the Semantic query filter to
+          show or hide queries.
+        </p>
+      </Section>
+
       <Section title="Reachability Model">
         <p className="text-zinc-600 mb-4">
           Reqvire keeps ontology orthogonal to capability and requirement

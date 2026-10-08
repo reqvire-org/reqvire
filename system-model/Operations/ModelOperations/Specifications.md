@@ -5,6 +5,8 @@
 Detailed workflow for atomically relinking an existing relation target.
 
 #### Details
+Resolve element-valued source, old target and new target arguments by exact name or canonical identifier through the bound element-selection contract against the same pre-operation snapshot. Preserve the supported target domains and relation-type compatibility rules.
+
 When relinking a relation, the system is expected to:
 - Resolve source element and both targets (`old-target`, `new-target`) in the current model.
 - Verify that the source currently has the specified relation to `old-target`.
@@ -102,6 +104,8 @@ When creating a new element, the system is expected to:
 Detailed workflow for deleting existing model elements.
 
 #### Details
+Resolve the subject by exact name or canonical identifier through the bound element-selection contract before orphan checks or candidate changes.
+
 When deleting an element, the system is expected to:
 - Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)
 - Reject the operation if any child would become orphaned
@@ -115,6 +119,7 @@ When deleting an element, the system is expected to:
 - Identify all relations from the deleted element (outgoing relations)
 - Remove the complete element section including separators
 - Maintain file structure and formatting after deletion
+- Preserve the target and target kind of every remaining relation when rewriting affected files. Unrelated implementation/evidence file links, including extensionless workspace-root artifacts such as `Makefile` and `LICENSE`, remain file paths rather than becoming same-file element fragments. Resolve normalized artifact targets from the workspace root even when a same-named path exists below the model file's folder. Dry-run diffs must preserve these links just as applied deletion does, and the persisted model must remain valid when loaded again.
 - Provide updates report following Diff Output Format Specification
 
 **Empty File Cleanup:**
@@ -139,8 +144,8 @@ Detailed workflow for merging multiple source elements into a target element.
 
 #### Details
 When merging elements, the system is expected to:
-- Accept target element name (must exist in the model)
-- Accept one or more source element names (must exist in the model)
+- Resolve the target and each source by exact name or canonical identifier through the bound Existing Element Selection Specification before transforming any content.
+- Apply existing duplicate-source and self-merge rules to the resolved identities, including mixed name/identifier aliases.
 - Validate type compatibility following clearly defined rules in Merge Type Compatibility Constraint
 - Transform and merge content following clearly defined rules in Merge Content Transformation Behavior
 - Preserve target element's metadata (discard source metadata)
@@ -178,6 +183,8 @@ For single-element-to-elements merge direction:
 Detailed workflow for moving existing model elements to different file locations.
 
 #### Details
+Resolve the subject by exact name or canonical identifier through the bound element-selection contract. Destination paths and placement retain their existing meanings.
+
 When moving an element, the system is expected to:
 - Validate the target location using path validation rules
 - Create target file if it does not exist (subject to validation constraints)
@@ -340,6 +347,7 @@ Rules for validating and normalizing relation targets during element creation an
 
 **Normalization Rules:**
 - All relation targets must be normalized to workspace-root-relative format before insertion
+- Internal file targets created by `link` or `relink` use the same workspace-root-relative in-memory representation as parsed file targets. Compute source-file-relative paths only when serializing Markdown; extensionless artifact names retain their file classification.
 - All relation targets must reference existing elements in the model
 - External links (http://, https://, etc.) are allowed and not validated
 
@@ -358,7 +366,8 @@ Rules for validating and normalizing relation targets during element creation an
 
 #### Details
 When renaming an element, the system is expected to:
-- Accept the current element name and the new element name
+- Select the existing subject by exact name or canonical identifier through the bound Existing Element Selection Specification.
+- Keep the new element name literal, including text that resembles another element identifier; it does not select or copy that element.
 - Validate that the current element exists in the model registry
 - Validate that the new name is globally unique in the model registry
 - Update the element's heading text in the markdown file

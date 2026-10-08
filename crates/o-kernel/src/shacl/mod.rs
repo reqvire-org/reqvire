@@ -31,7 +31,7 @@ const SH_NODE_KINDS: &[(&str, NodeKindVariant)] = &[
     ),
 ];
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Shape {
     Node(NodeShape),
     Property(PropertyShape),
@@ -47,24 +47,24 @@ pub enum TargetIdentifier {
     ImplicitClass(NamedOrBlankNode),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AstPath {
     Iri(NamedNode),
     Inverse(NamedNode),
-    Sequence(Vec<AstPath>),
-    Alternative(Vec<AstPath>),
-    ZeroOrMore(Box<AstPath>),
-    OneOrMore(Box<AstPath>),
-    ZeroOrOne(Box<AstPath>),
+    Sequence(Vec<Self>),
+    Alternative(Vec<Self>),
+    ZeroOrMore(Box<Self>),
+    OneOrMore(Box<Self>),
+    ZeroOrOne(Box<Self>),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AstConstraint {
     pub predicate: NamedNode,
     pub value: Term,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NodeShape {
     pub id: NamedOrBlankNode,
     pub targets: Vec<TargetIdentifier>,
@@ -75,7 +75,7 @@ pub struct NodeShape {
     pub ignored_properties: Vec<NamedNode>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PropertyShape {
     pub id: NamedOrBlankNode,
     pub path: Option<AstPath>,
@@ -97,7 +97,7 @@ impl ReferencedIri {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SyntaxConstraint {
     Class {
         class_node: NamedOrBlankNode,
@@ -311,7 +311,7 @@ pub struct OntologyAligner<'a> {
 }
 
 impl<'a> OntologyAligner<'a> {
-    pub fn new(ontology: &'a DomainOntologyIndex) -> Self {
+    pub const fn new(ontology: &'a DomainOntologyIndex) -> Self {
         Self { ontology }
     }
 
@@ -480,8 +480,23 @@ pub struct ShaclRegistry {
     pub diagnostics: Vec<ShaclParseIssue>,
 }
 
+/// Per-thread instrumentation for consumers' build-reuse regression tests.
+#[cfg(feature = "test-support")]
+#[doc(hidden)]
+pub mod test_support {
+    std::thread_local! {
+        pub(super) static PARSE_COUNT: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+    }
+
+    pub fn parse_count() -> usize {
+        PARSE_COUNT.get()
+    }
+}
+
 impl ShaclRegistry {
     pub fn parse(quads: &[Quad]) -> Self {
+        #[cfg(feature = "test-support")]
+        test_support::PARSE_COUNT.set(test_support::PARSE_COUNT.get() + 1);
         let mut parser = ShaclParser::new(quads);
         parser.parse()
     }
@@ -521,15 +536,120 @@ impl ShaclRegistry {
     }
 }
 
-struct ShaclParser<'a> {
+#[cfg(test)]
+mod lookup_work {
+    std::thread_local! {
+        pub(super) static COUNT: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+    }
+
+    pub(super) fn add(amount: usize) {
+        COUNT.set(COUNT.get() + amount);
+    }
+}
+
+#[derive(Default)]
+struct SubjectQuads<'a> {
+    ordered: Vec<&'a Quad>,
+    by_predicate: HashMap<&'a str, Vec<&'a Term>>,
+}
+
+// Borrow RDF terms rather than copying their payloads. Per-subject vectors retain
+// input order and duplicates, including identical quads from different graphs.
+struct ShaclGraph<'a> {
     quads: &'a [Quad],
+    subjects: HashMap<&'a NamedOrBlankNode, SubjectQuads<'a>>,
+    property_references: HashSet<NamedOrBlankNode>,
+    #[cfg(test)]
+    scan_lookups: bool,
+}
+
+impl<'a> ShaclGraph<'a> {
+    fn new(quads: &'a [Quad]) -> Self {
+        let mut subjects: HashMap<_, SubjectQuads<'_>> = HashMap::new();
+        let mut property_references = HashSet::new();
+        for quad in quads {
+            let subject = subjects.entry(&quad.subject).or_default();
+            subject.ordered.push(quad);
+            subject
+                .by_predicate
+                .entry(quad.predicate.as_str())
+                .or_default()
+                .push(&quad.object);
+            if quad.predicate.as_str() == SH_PROPERTY {
+                if let Some(target) = term_as_node(&quad.object) {
+                    property_references.insert(target);
+                }
+            }
+        }
+        #[cfg(test)]
+        lookup_work::add(quads.len());
+        Self {
+            quads,
+            subjects,
+            property_references,
+            #[cfg(test)]
+            scan_lookups: false,
+        }
+    }
+
+    fn objects(&self, subject: &NamedOrBlankNode, predicate: &str) -> Vec<&'a Term> {
+        // Retain the previous scan semantics as an independent test oracle.
+        #[cfg(test)]
+        if self.scan_lookups {
+            return self
+                .quads
+                .iter()
+                .filter(|quad| &quad.subject == subject && quad.predicate.as_str() == predicate)
+                .map(|quad| &quad.object)
+                .collect();
+        }
+        let objects = self
+            .subjects
+            .get(subject)
+            .and_then(|quads| quads.by_predicate.get(predicate));
+        #[cfg(test)]
+        lookup_work::add(1 + objects.map_or(0, Vec::len));
+        objects.cloned().unwrap_or_default()
+    }
+
+    fn subject_quads(&self, subject: &NamedOrBlankNode) -> Vec<&'a Quad> {
+        #[cfg(test)]
+        if self.scan_lookups {
+            return self
+                .quads
+                .iter()
+                .filter(|quad| &quad.subject == subject)
+                .collect();
+        }
+        let quads = self.subjects.get(subject).map(|quads| &quads.ordered);
+        #[cfg(test)]
+        lookup_work::add(1 + quads.map_or(0, Vec::len));
+        quads.cloned().unwrap_or_default()
+    }
+
+    fn is_property_reference(&self, id: &NamedOrBlankNode) -> bool {
+        #[cfg(test)]
+        if self.scan_lookups {
+            return self.quads.iter().any(|quad| {
+                quad.predicate.as_str() == SH_PROPERTY
+                    && term_as_node(&quad.object).as_ref() == Some(id)
+            });
+        }
+        #[cfg(test)]
+        lookup_work::add(1);
+        self.property_references.contains(id)
+    }
+}
+
+struct ShaclParser<'a> {
+    graph: ShaclGraph<'a>,
     diagnostics: Vec<ShaclParseIssue>,
 }
 
 impl<'a> ShaclParser<'a> {
     fn new(quads: &'a [Quad]) -> Self {
         Self {
-            quads,
+            graph: ShaclGraph::new(quads),
             diagnostics: Vec::new(),
         }
     }
@@ -562,7 +682,7 @@ impl<'a> ShaclParser<'a> {
 
     fn shape_candidates(&self) -> HashSet<NamedOrBlankNode> {
         let mut candidates = HashSet::new();
-        for quad in self.quads {
+        for quad in self.graph.quads {
             if quad.predicate.as_str() == RDF_TYPE
                 && matches!(
                     term_iri(&quad.object),
@@ -592,12 +712,9 @@ impl<'a> ShaclParser<'a> {
     }
 
     fn is_property_shape(&self, id: &NamedOrBlankNode) -> bool {
-        has_type(self.quads, id, SH_PROPERTY_SHAPE)
-            || !objects_for(self.quads, id, SH_PATH).is_empty()
-            || self.quads.iter().any(|quad| {
-                quad.predicate.as_str() == SH_PROPERTY
-                    && term_as_node(&quad.object).as_ref() == Some(id)
-            })
+        has_type(&self.graph, id, SH_PROPERTY_SHAPE)
+            || !objects_for(&self.graph, id, SH_PATH).is_empty()
+            || self.graph.is_property_reference(id)
     }
 
     fn parse_node_shape(&mut self, id: NamedOrBlankNode) -> NodeShape {
@@ -611,13 +728,13 @@ impl<'a> ShaclParser<'a> {
             constraints,
             raw_constraints,
             property_shapes,
-            is_closed: boolean_object(self.quads, &id, SH_CLOSED).unwrap_or(false),
+            is_closed: boolean_object(&self.graph, &id, SH_CLOSED).unwrap_or(false),
             ignored_properties: self.ignored_properties(&id),
         }
     }
 
     fn parse_property_shape(&mut self, id: NamedOrBlankNode) -> PropertyShape {
-        let path_terms = objects_for(self.quads, &id, SH_PATH);
+        let path_terms = objects_for(&self.graph, &id, SH_PATH);
         let path = match path_terms.as_slice() {
             [] => {
                 self.diagnostics.push(ShaclParseIssue::InvalidPath {
@@ -660,16 +777,16 @@ impl<'a> ShaclParser<'a> {
 
     fn targets(&mut self, id: &NamedOrBlankNode) -> Vec<TargetIdentifier> {
         let mut targets = Vec::new();
-        for term in objects_for(self.quads, id, SH_TARGET_CLASS) {
+        for term in objects_for(&self.graph, id, SH_TARGET_CLASS) {
             match term_as_node(term) {
                 Some(target) => targets.push(TargetIdentifier::Class(target)),
                 None => self.invalid_constraint(id, "sh:targetClass must be an IRI or blank node"),
             }
         }
-        for term in objects_for(self.quads, id, SH_TARGET_NODE) {
+        for term in objects_for(&self.graph, id, SH_TARGET_NODE) {
             targets.push(TargetIdentifier::Node(term.clone()));
         }
-        for term in objects_for(self.quads, id, SH_TARGET_SUBJECTS_OF) {
+        for term in objects_for(&self.graph, id, SH_TARGET_SUBJECTS_OF) {
             match term {
                 Term::NamedNode(target) => {
                     targets.push(TargetIdentifier::SubjectsOf(target.clone()))
@@ -677,7 +794,7 @@ impl<'a> ShaclParser<'a> {
                 _ => self.invalid_constraint(id, "sh:targetSubjectsOf must be an IRI"),
             }
         }
-        for term in objects_for(self.quads, id, SH_TARGET_OBJECTS_OF) {
+        for term in objects_for(&self.graph, id, SH_TARGET_OBJECTS_OF) {
             match term {
                 Term::NamedNode(target) => {
                     targets.push(TargetIdentifier::ObjectsOf(target.clone()))
@@ -685,7 +802,7 @@ impl<'a> ShaclParser<'a> {
                 _ => self.invalid_constraint(id, "sh:targetObjectsOf must be an IRI"),
             }
         }
-        for term in objects_for(self.quads, id, SH_TARGET) {
+        for term in objects_for(&self.graph, id, SH_TARGET) {
             match term_as_node(term) {
                 Some(target) => targets.push(TargetIdentifier::Custom(target)),
                 None => self.invalid_constraint(id, "sh:target must be an IRI or blank node"),
@@ -696,13 +813,13 @@ impl<'a> ShaclParser<'a> {
 
     fn constraints(&mut self, id: &NamedOrBlankNode) -> Vec<SyntaxConstraint> {
         let mut constraints = Vec::new();
-        for term in objects_for(self.quads, id, SH_CLASS) {
+        for term in objects_for(&self.graph, id, SH_CLASS) {
             match term_as_node(term) {
                 Some(class_node) => constraints.push(SyntaxConstraint::Class { class_node }),
                 None => self.invalid_constraint(id, "sh:class must be an IRI or blank node"),
             }
         }
-        for term in objects_for(self.quads, id, SH_DATATYPE) {
+        for term in objects_for(&self.graph, id, SH_DATATYPE) {
             match term {
                 Term::NamedNode(datatype_iri) => constraints.push(SyntaxConstraint::Datatype {
                     datatype_iri: datatype_iri.clone(),
@@ -710,7 +827,7 @@ impl<'a> ShaclParser<'a> {
                 _ => self.invalid_constraint(id, "sh:datatype must be an IRI"),
             }
         }
-        for term in objects_for(self.quads, id, SH_NODE_KIND) {
+        for term in objects_for(&self.graph, id, SH_NODE_KIND) {
             match term_iri(term).and_then(node_kind_variant) {
                 Some(kind) => constraints.push(SyntaxConstraint::NodeKind { kind }),
                 None => self
@@ -765,17 +882,17 @@ impl<'a> ShaclParser<'a> {
             SH_MAX_INCLUSIVE,
             SyntaxConstraint::MaxInclusive,
         );
-        for term in objects_for(self.quads, id, SH_PATTERN) {
+        for term in objects_for(&self.graph, id, SH_PATTERN) {
             match literal_string(term) {
                 Some(expression) => constraints.push(SyntaxConstraint::Pattern {
                     expression,
-                    flags: literal_object(self.quads, id, SH_FLAGS),
+                    flags: literal_object(&self.graph, id, SH_FLAGS),
                 }),
                 None => self.invalid_constraint(id, "sh:pattern must be a literal"),
             }
         }
-        for term in objects_for(self.quads, id, SH_LANGUAGE_IN) {
-            match rdf_list_terms(self.quads, term) {
+        for term in objects_for(&self.graph, id, SH_LANGUAGE_IN) {
+            match rdf_list_terms(&self.graph, term) {
                 Ok(terms) => {
                     let mut languages = Vec::new();
                     for item in terms {
@@ -792,7 +909,7 @@ impl<'a> ShaclParser<'a> {
                 Err(message) => self.invalid_constraint(id, &message),
             }
         }
-        for value in boolean_objects(self.quads, id, SH_UNIQUE_LANG) {
+        for value in boolean_objects(&self.graph, id, SH_UNIQUE_LANG) {
             constraints.push(SyntaxConstraint::UniqueLang(value));
         }
         self.push_property_iri(id, &mut constraints, SH_EQUALS, |property_iri| {
@@ -822,21 +939,21 @@ impl<'a> ShaclParser<'a> {
         for shape_id in self.shape_refs(id, SH_QUALIFIED_VALUE_SHAPE) {
             constraints.push(SyntaxConstraint::QualifiedValueShape {
                 shape_id,
-                min_count: first_u32_object(self.quads, id, SH_QUALIFIED_MIN_COUNT),
-                max_count: first_u32_object(self.quads, id, SH_QUALIFIED_MAX_COUNT),
+                min_count: first_u32_object(&self.graph, id, SH_QUALIFIED_MIN_COUNT),
+                max_count: first_u32_object(&self.graph, id, SH_QUALIFIED_MAX_COUNT),
             });
         }
-        for term in objects_for(self.quads, id, SH_HAS_VALUE) {
+        for term in objects_for(&self.graph, id, SH_HAS_VALUE) {
             constraints.push(SyntaxConstraint::HasValue(term.clone()));
         }
-        for term in objects_for(self.quads, id, SH_IN) {
-            match rdf_list_terms(self.quads, term) {
+        for term in objects_for(&self.graph, id, SH_IN) {
+            match rdf_list_terms(&self.graph, term) {
                 Ok(values) => constraints.push(SyntaxConstraint::In(values)),
                 Err(message) => self.invalid_constraint(id, &format!("sh:in {message}")),
             }
         }
         for sparql_node in self.shape_refs(id, SH_SPARQL) {
-            for term in objects_for(self.quads, &sparql_node, SH_SELECT) {
+            for term in objects_for(&self.graph, &sparql_node, SH_SELECT) {
                 match literal_string(term) {
                     Some(query) => constraints.push(SyntaxConstraint::Sparql { query }),
                     None => self.invalid_constraint(id, "sh:sparql sh:select must be a literal"),
@@ -847,11 +964,10 @@ impl<'a> ShaclParser<'a> {
     }
 
     fn raw_constraints(&self, id: &NamedOrBlankNode) -> Vec<AstConstraint> {
-        self.quads
-            .iter()
-            .filter(|quad| {
-                &quad.subject == id && is_raw_constraint_predicate(quad.predicate.as_str())
-            })
+        self.graph
+            .subject_quads(id)
+            .into_iter()
+            .filter(|quad| is_raw_constraint_predicate(quad.predicate.as_str()))
             .map(|quad| AstConstraint {
                 predicate: quad.predicate.clone(),
                 value: quad.object.clone(),
@@ -864,10 +980,10 @@ impl<'a> ShaclParser<'a> {
             Term::NamedNode(iri) => Ok(AstPath::Iri(iri.clone())),
             Term::BlankNode(_) => {
                 let node = term_as_node(term).expect("blank term is node");
-                if let Some(inverse) = first_named_object(self.quads, &node, SH_INVERSE_PATH) {
+                if let Some(inverse) = first_named_object(&self.graph, &node, SH_INVERSE_PATH) {
                     return Ok(AstPath::Inverse(inverse));
                 }
-                if let Ok(sequence) = rdf_list_terms(self.quads, term) {
+                if let Ok(sequence) = rdf_list_terms(&self.graph, term) {
                     let mut elements = Vec::new();
                     for item in sequence {
                         elements.push(self.parse_path(&item)?);
@@ -875,9 +991,9 @@ impl<'a> ShaclParser<'a> {
                     return Ok(AstPath::Sequence(elements));
                 }
                 if let Some(alternative) =
-                    objects_for(self.quads, &node, SH_ALTERNATIVE_PATH).first()
+                    objects_for(&self.graph, &node, SH_ALTERNATIVE_PATH).first()
                 {
-                    let alternatives = rdf_list_terms(self.quads, alternative)?
+                    let alternatives = rdf_list_terms(&self.graph, alternative)?
                         .into_iter()
                         .map(|item| self.parse_path(&item))
                         .collect::<Result<Vec<_>, _>>()?;
@@ -891,7 +1007,7 @@ impl<'a> ShaclParser<'a> {
                     (SH_ONE_OR_MORE_PATH, AstPath::OneOrMore),
                     (SH_ZERO_OR_ONE_PATH, AstPath::ZeroOrOne),
                 ] {
-                    if let Some(inner) = objects_for(self.quads, &node, predicate).first() {
+                    if let Some(inner) = objects_for(&self.graph, &node, predicate).first() {
                         let parsed = self.parse_path(inner)?;
                         if matches!(parsed, AstPath::Sequence(_)) {
                             return Err("SHACL path repetition operators must wrap exactly one path element".to_string());
@@ -914,7 +1030,7 @@ impl<'a> ShaclParser<'a> {
         predicate: &'static str,
     ) -> Vec<NamedOrBlankNode> {
         let mut refs = Vec::new();
-        for term in objects_for(self.quads, id, predicate) {
+        for term in objects_for(&self.graph, id, predicate) {
             match term_as_node(term) {
                 Some(shape_id) => refs.push(shape_id),
                 None => self
@@ -930,8 +1046,8 @@ impl<'a> ShaclParser<'a> {
 
     fn ignored_properties(&mut self, id: &NamedOrBlankNode) -> Vec<NamedNode> {
         let mut ignored = Vec::new();
-        for term in objects_for(self.quads, id, SH_IGNORED_PROPERTIES) {
-            match rdf_list_terms(self.quads, term) {
+        for term in objects_for(&self.graph, id, SH_IGNORED_PROPERTIES) {
+            match rdf_list_terms(&self.graph, term) {
                 Ok(terms) => {
                     for item in terms {
                         match item {
@@ -956,7 +1072,7 @@ impl<'a> ShaclParser<'a> {
         predicate: &'static str,
         builder: fn(u32) -> SyntaxConstraint,
     ) {
-        for term in objects_for(self.quads, id, predicate) {
+        for term in objects_for(&self.graph, id, predicate) {
             match parse_u32(term) {
                 Some(value) => constraints.push(builder(value)),
                 None => self.invalid_constraint(
@@ -971,13 +1087,13 @@ impl<'a> ShaclParser<'a> {
     }
 
     fn push_term(
-        &mut self,
+        &self,
         id: &NamedOrBlankNode,
         constraints: &mut Vec<SyntaxConstraint>,
         predicate: &'static str,
         builder: fn(Term) -> SyntaxConstraint,
     ) {
-        for term in objects_for(self.quads, id, predicate) {
+        for term in objects_for(&self.graph, id, predicate) {
             constraints.push(builder(term.clone()));
         }
     }
@@ -989,7 +1105,7 @@ impl<'a> ShaclParser<'a> {
         predicate: &'static str,
         builder: impl Fn(NamedNode) -> SyntaxConstraint,
     ) {
-        for term in objects_for(self.quads, id, predicate) {
+        for term in objects_for(&self.graph, id, predicate) {
             match term {
                 Term::NamedNode(iri) => constraints.push(builder(iri.clone())),
                 _ => self.invalid_constraint(
@@ -1007,8 +1123,8 @@ impl<'a> ShaclParser<'a> {
         predicate: &'static str,
         builder: fn(Vec<NamedOrBlankNode>) -> SyntaxConstraint,
     ) {
-        for term in objects_for(self.quads, id, predicate) {
-            match rdf_list_terms(self.quads, term) {
+        for term in objects_for(&self.graph, id, predicate) {
+            match rdf_list_terms(&self.graph, term) {
                 Ok(terms) => {
                     let mut shapes = Vec::new();
                     for item in terms {
@@ -1070,27 +1186,21 @@ fn term_as_node(term: &Term) -> Option<NamedOrBlankNode> {
 }
 
 fn objects_for<'a>(
-    graph: &'a [Quad],
+    graph: &ShaclGraph<'a>,
     subject: &NamedOrBlankNode,
     predicate: &str,
 ) -> Vec<&'a Term> {
-    graph
-        .iter()
-        .filter(|quad| &quad.subject == subject && quad.predicate.as_str() == predicate)
-        .map(|quad| &quad.object)
-        .collect()
+    graph.objects(subject, predicate)
 }
 
-fn has_type(graph: &[Quad], subject: &NamedOrBlankNode, type_iri: &str) -> bool {
-    graph.iter().any(|quad| {
-        &quad.subject == subject
-            && quad.predicate.as_str() == RDF_TYPE
-            && term_iri(&quad.object) == Some(type_iri)
-    })
+fn has_type(graph: &ShaclGraph<'_>, subject: &NamedOrBlankNode, type_iri: &str) -> bool {
+    objects_for(graph, subject, RDF_TYPE)
+        .into_iter()
+        .any(|term| term_iri(term) == Some(type_iri))
 }
 
 fn first_named_object(
-    graph: &[Quad],
+    graph: &ShaclGraph<'_>,
     subject: &NamedOrBlankNode,
     predicate: &str,
 ) -> Option<NamedNode> {
@@ -1102,7 +1212,11 @@ fn first_named_object(
         })
 }
 
-fn first_u32_object(graph: &[Quad], subject: &NamedOrBlankNode, predicate: &str) -> Option<u32> {
+fn first_u32_object(
+    graph: &ShaclGraph<'_>,
+    subject: &NamedOrBlankNode,
+    predicate: &str,
+) -> Option<u32> {
     objects_for(graph, subject, predicate)
         .into_iter()
         .find_map(parse_u32)
@@ -1126,20 +1240,32 @@ fn literal_string(term: &Term) -> Option<String> {
     }
 }
 
-fn literal_object(graph: &[Quad], subject: &NamedOrBlankNode, predicate: &str) -> Option<String> {
+fn literal_object(
+    graph: &ShaclGraph<'_>,
+    subject: &NamedOrBlankNode,
+    predicate: &str,
+) -> Option<String> {
     objects_for(graph, subject, predicate)
         .into_iter()
         .find_map(literal_string)
 }
 
-fn boolean_objects(graph: &[Quad], subject: &NamedOrBlankNode, predicate: &str) -> Vec<bool> {
+fn boolean_objects(
+    graph: &ShaclGraph<'_>,
+    subject: &NamedOrBlankNode,
+    predicate: &str,
+) -> Vec<bool> {
     objects_for(graph, subject, predicate)
         .into_iter()
         .filter_map(boolean_term)
         .collect()
 }
 
-fn boolean_object(graph: &[Quad], subject: &NamedOrBlankNode, predicate: &str) -> Option<bool> {
+fn boolean_object(
+    graph: &ShaclGraph<'_>,
+    subject: &NamedOrBlankNode,
+    predicate: &str,
+) -> Option<bool> {
     boolean_objects(graph, subject, predicate)
         .into_iter()
         .next()
@@ -1156,7 +1282,7 @@ fn boolean_term(term: &Term) -> Option<bool> {
     }
 }
 
-fn rdf_list_terms(graph: &[Quad], head: &Term) -> Result<Vec<Term>, String> {
+fn rdf_list_terms(graph: &ShaclGraph<'_>, head: &Term) -> Result<Vec<Term>, String> {
     let mut terms = Vec::new();
     let mut seen = HashSet::new();
     let mut cursor = head.clone();
@@ -1336,6 +1462,22 @@ mod tests {
             .collect()
     }
 
+    fn parse_checked(quads: &[Quad]) -> ShaclRegistry {
+        let indexed = ShaclRegistry::parse(quads);
+        let mut scan_parser = ShaclParser::new(quads);
+        scan_parser.graph.scan_lookups = true;
+        let scanned = scan_parser.parse();
+        assert_eq!(indexed.compiled_shapes, scanned.compiled_shapes);
+        // Candidate discovery has always used a HashSet: cross-shape diagnostic
+        // order is unspecified, but codes, subjects, predicates and text must match.
+        let mut indexed_diagnostics = indexed.diagnostics.clone();
+        let mut scanned_diagnostics = scanned.diagnostics;
+        indexed_diagnostics.sort_by_key(ShaclParseIssue::message);
+        scanned_diagnostics.sort_by_key(ShaclParseIssue::message);
+        assert_eq!(indexed_diagnostics, scanned_diagnostics);
+        indexed
+    }
+
     fn iri(local: &str) -> NamedNode {
         NamedNode::new(format!("{EX}{local}")).expect("test IRI should be valid")
     }
@@ -1360,6 +1502,160 @@ mod tests {
         targets.iter().any(
             |target| matches!(target, TargetIdentifier::ObjectsOf(value) if value == &iri(local)),
         )
+    }
+
+    #[test]
+    fn shacl_lookup_work_scales_with_independent_shapes() {
+        let mut measurements = Vec::new();
+        for count in [16, 32, 64] {
+            let mut turtle = String::from(
+                "@prefix ex: <https://example.org/model#> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n",
+            );
+            for number in 0..count {
+                turtle.push_str(&format!(
+                    "ex:S{number} a sh:NodeShape ; sh:property ex:P{number} .\n\
+                     ex:P{number} sh:path ex:value ; sh:minCount 1 ; sh:maxCount 2 .\n"
+                ));
+            }
+            let quads = parse_turtle(&turtle);
+            let before = lookup_work::COUNT.get();
+            let registry = ShaclRegistry::parse(&quads);
+            let work = lookup_work::COUNT.get() - before;
+            assert_eq!(registry.compiled_shapes.len(), count * 2);
+            assert!(registry.diagnostics.is_empty());
+            measurements.push(work);
+        }
+        eprintln!("SHACL lookup work for 16/32/64 shape pairs: {measurements:?}");
+        for pair in measurements.windows(2) {
+            assert!(
+                pair[1] <= pair[0] * 22 / 10,
+                "quadratic lookup growth: {measurements:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn shacl_lookups_preserve_duplicate_paths_and_constraint_order() {
+        let mut quads = parse_turtle(
+            r#"
+@prefix ex: <https://example.org/model#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+ex:Owner sh:property ex:MissingPath .
+ex:Property sh:path ex:value ; sh:minCount 2, 1 ; sh:maxCount 1 .
+"#,
+        );
+        let path = quads
+            .iter()
+            .find(|quad| quad.predicate.as_str() == SH_PATH)
+            .expect("expected a string in the test response")
+            .clone();
+        quads.push(path.clone());
+        let mut named_graph_path = path;
+        named_graph_path.graph_name = iri("graph").into();
+        quads.push(named_graph_path);
+        let min = quads
+            .iter()
+            .find(|quad| quad.predicate.as_str() == SH_MIN_COUNT)
+            .expect("expected a string in the test response")
+            .clone();
+        quads.push(min);
+        let registry = parse_checked(&quads);
+        let Shape::Property(property) = &registry.compiled_shapes[&node("Property")] else {
+            panic!("property shape");
+        };
+        assert_eq!(property.path, None, "duplicate path must not disappear");
+        assert_eq!(
+            property.constraints,
+            vec![
+                SyntaxConstraint::MinCount(2),
+                SyntaxConstraint::MinCount(1),
+                SyntaxConstraint::MinCount(2),
+                SyntaxConstraint::MaxCount(1)
+            ]
+        );
+        let raw: Vec<_> = property
+            .raw_constraints
+            .iter()
+            .map(|constraint| (constraint.predicate.as_str(), constraint.value.to_string()))
+            .collect();
+        let expected_raw: Vec<_> = quads
+            .iter()
+            .filter(|quad| {
+                quad.subject == node("Property")
+                    && matches!(quad.predicate.as_str(), SH_MIN_COUNT | SH_MAX_COUNT)
+            })
+            .map(|quad| (quad.predicate.as_str(), quad.object.to_string()))
+            .collect();
+        assert_eq!(raw, expected_raw);
+        assert!(
+            matches!(
+                registry.compiled_shapes[&node("MissingPath")],
+                Shape::Property(_)
+            ),
+            "reference-only property shape is still discovered"
+        );
+        let messages = registry.diagnostics_as_messages();
+        assert_eq!(
+            messages
+                .iter()
+                .filter(|message| message.contains("exactly one sh:path"))
+                .count(),
+            2
+        );
+        assert_eq!(
+            messages
+                .iter()
+                .filter(|message| message.contains("sh:maxCount must be greater"))
+                .count(),
+            1
+        );
+    }
+
+    #[test]
+    fn shacl_lookups_preserve_malformed_and_cyclic_list_errors() {
+        for (list, duplicate_first, expected) in [
+            ("_:list rdf:first ex:a ; rdf:rest _:list .", false, "cycle"),
+            (
+                "_:list rdf:first ex:a, ex:b ; rdf:rest rdf:nil .",
+                false,
+                "exactly one rdf:first and rdf:rest",
+            ),
+            (
+                "_:list rdf:first ex:a .",
+                false,
+                "exactly one rdf:first and rdf:rest",
+            ),
+            (
+                "_:list rdf:first ex:a ; rdf:rest rdf:nil .",
+                true,
+                "exactly one rdf:first and rdf:rest",
+            ),
+        ] {
+            let mut quads = parse_turtle(&format!(
+                "@prefix ex: <https://example.org/model#> .\n\
+                 @prefix sh: <http://www.w3.org/ns/shacl#> .\n\
+                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+                 ex:Shape a sh:NodeShape ; sh:in _:list .\n{list}"
+            ));
+            if duplicate_first {
+                let first = quads
+                    .iter()
+                    .find(|quad| quad.predicate.as_str() == RDF_FIRST)
+                    .expect("expected a string in the test response")
+                    .clone();
+                quads.push(first);
+            }
+            let registry = parse_checked(&quads);
+            let messages = registry.diagnostics_as_messages();
+            assert_eq!(messages.len(), 1, "{messages:?}");
+            assert!(messages[0].contains(expected), "{messages:?}");
+            let Shape::Node(shape) = &registry.compiled_shapes[&node("Shape")] else {
+                panic!("node shape");
+            };
+            assert!(shape.constraints.is_empty());
+            assert_eq!(shape.raw_constraints.len(), 1);
+            assert!(matches!(shape.raw_constraints[0].value, Term::BlankNode(_)));
+        }
     }
 
     #[test]
@@ -1393,7 +1689,7 @@ ex:InvoiceNumberShape
 "#,
         );
 
-        let registry = ShaclRegistry::parse(&quads);
+        let registry = parse_checked(&quads);
         assert_eq!(registry.diagnostics_as_messages(), Vec::<String>::new());
         assert_eq!(registry.compiled_shapes.len(), 2);
 
@@ -1429,7 +1725,8 @@ ex:InvoiceNumberShape
             .raw_constraints
             .iter()
             .any(|constraint| constraint.predicate.as_str() == SH_DATATYPE
-                && constraint.value == Term::NamedNode(NamedNode::new(XSD_STRING).unwrap())));
+                && constraint.value
+                    == Term::NamedNode(NamedNode::new(XSD_STRING).expect("valid XSD string IRI"))));
         assert!(number_shape
             .raw_constraints
             .iter()
@@ -1437,7 +1734,7 @@ ex:InvoiceNumberShape
         assert!(number_shape
             .constraints
             .contains(&SyntaxConstraint::Datatype {
-                datatype_iri: NamedNode::new(XSD_STRING).unwrap(),
+                datatype_iri: NamedNode::new(XSD_STRING).expect("valid XSD string IRI"),
             }));
         assert!(number_shape
             .constraints
@@ -1486,7 +1783,7 @@ ex:ComplexPropertyShape
 "#,
         );
 
-        let registry = ShaclRegistry::parse(&quads);
+        let registry = parse_checked(&quads);
         assert_eq!(registry.diagnostics_as_messages(), Vec::<String>::new());
 
         let Shape::Node(status_shape) = registry
@@ -1538,7 +1835,7 @@ ex:MissingPathShape
 "#,
         );
 
-        let messages = ShaclRegistry::parse(&quads).diagnostics_as_messages();
+        let messages = parse_checked(&quads).diagnostics_as_messages();
         assert!(
             messages
                 .iter()
@@ -1573,7 +1870,7 @@ ex:NumberShape
 "#,
         );
 
-        let registry = ShaclRegistry::parse(&quads);
+        let registry = parse_checked(&quads);
         assert_eq!(registry.diagnostics_as_messages(), Vec::<String>::new());
 
         let mut domain = DomainOntologyIndex::default();
@@ -1608,7 +1905,7 @@ ex:LayerShape
 "#,
         );
 
-        let registry = ShaclRegistry::parse(&shacl_quads);
+        let registry = parse_checked(&shacl_quads);
         assert_eq!(registry.diagnostics_as_messages(), Vec::<String>::new());
 
         let domain = DomainOntologyIndex::from_quads(&ontology_quads);
@@ -1638,7 +1935,7 @@ ex:BadPropertyShape
 "#,
         );
 
-        let registry = ShaclRegistry::parse(&quads);
+        let registry = parse_checked(&quads);
         assert_eq!(registry.diagnostics_as_messages(), Vec::<String>::new());
         let errors = OntologyAligner::new(&DomainOntologyIndex::default())
             .cross_check_shapes(&registry.compiled_shapes);

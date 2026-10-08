@@ -1,0 +1,7 @@
+PASS cli/coverage/Root Capability/name-control
+PASS cli/coverage/Root Capability/identifier-parity
+PASS cli/coverage/Nested Capability/name-control
+PASS cli/coverage/Nested Capability/identifier-parity
+PASS cli/coverage/ambiguous-name-identifier
+PASS cli/coverage/identifier-type-check
+PASS cli/coverage/selector-help

@@ -54,6 +54,9 @@ Reqvire adapter behavior:
 - Pass ontology graphs of interest and internal raw external dependency graphs to the o-kernel referenced graph subset construction service.
 - Treat reference extraction, support context, annotation context, RDF list closure, and bounded expansion as o-kernel standard external ontology dependency subset profile behavior.
 - Preserve external source metadata and external declaration markers on constructed terms.
+- Derive the used external subset once while completing a semantic snapshot and retain its RDF and materialization metadata for query-store capture, Explorer visibility, and unfiltered exports. Concurrent readers and snapshot clones must reuse that completed result without rereading sources.
+- Keep the accepted semantic index immutable with its captured subset. Edited candidates and namespace-filtered exports derive from their own inputs; a filtered export derives its subset once for that export operation and must not use the unfiltered snapshot's result.
+- Reject snapshot construction if subset derivation fails; do not publish a partial result or change an existing accepted snapshot. A repaired candidate builds independent derived state.
 - Keep constructed subset triples out of authored Markdown ontology, semantic-contract, requirement, and contract blocks.
 - Forward constructed used external vocabulary content to reporting exposure policy; this requirement does not define public visibility by itself.
 
@@ -218,6 +221,8 @@ Semantic context construction:
 - Collect parser-extracted ontology `#### Ontology` and semantic-contract `#### Shapes` fenced RDF blocks from the graph registry.
 - Consume parser-extracted local `#### External Ontology` source records when adding external dependency graphs.
 - Use the reusable semantic index built for ontology and semantic-contract validation so RDF parsing is performed once per block.
+- Compile each parsed Shapes block once per semantic build. Reuse that compiled SHACL registry for sanity diagnostics, reference extraction, and ontology alignment within the same build, preserving source provenance and diagnostic ordering.
+- Build edited and removal candidates from their own current blocks and ontology context; compiled SHACL state must not be reused across candidates or retained as a second serialized model representation.
 - Preserve source element identifier, source name, file path, section kind, and line number in the semantic index.
 - Keep authored Markdown as the source of truth; semantic context construction must not mutate authored ontology or semantic-contract blocks.
 - Semantic model construction must not rescan element Markdown to parse reserved subsection grammar; only the model parser owns that grammar.

@@ -38,9 +38,9 @@ export default function SemanticModel() {
           ))}
         </ul>
         <p className="text-zinc-600 mt-4">
-          Concept references bind prose to SKOS concepts. Reused Contract
-          Context brings reusable requirement-owned contracts into scope without
-          forcing unrelated concerns into the same hierarchy.
+          Concept references bind prose to SKOS concepts. Contract Bindings
+          express shared implementation obligations, while Contract References
+          identify contract content that a requirement depends on for review.
         </p>
       </Section>
 
@@ -53,7 +53,7 @@ export default function SemanticModel() {
             },
             {
               name: "Requirement ownership",
-              desc: "A requirement resolves to exactly one owning capability. Top-level requirements use specify; child requirements inherit ownership through requirement hierarchy.",
+              desc: "A requirement resolves to exactly one owning capability root. Top-level requirements use specify; child requirements inherit ownership through requirement hierarchy.",
             },
             {
               name: "Contract ownership",
@@ -67,12 +67,30 @@ export default function SemanticModel() {
         />
       </Section>
 
+      <Section title="Report Scope Is Not Ownership">
+        <p className="text-zinc-600 mb-4">
+          Scoped coverage follows the validated hierarchy from a selected
+          capability through descendant capabilities and requirements. Multiple
+          parent paths within one independent root are preserved and subject
+          IDs are deduplicated. Choosing a scope does not assign requirements
+          to a different root. A shared verification may belong to several
+          reports because its membership follows its requirement targets.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Coverage uses the full model's evidence before selecting the reported
+          subjects. An external contract consumer can remain evidence for an
+          included requirement without entering the scope's subject counts.
+          Read more about <Link to="/implementation-coverage" className="text-blue-600 hover:underline">implementation coverage</Link>
+          {" "}and <Link to="/submodels" className="text-blue-600 hover:underline">submodel boundaries</Link>.
+        </p>
+      </Section>
+
       <Section title="Submodels and Semantic References">
         <p className="text-zinc-600 mb-4">
           Capability-rooted submodels are intentionally independent. A capability
-          can own its operational meaning, the requirements that specify it, and
-          the contracts and verifications that prove it without becoming part
-          of one universal hierarchy.
+          organizes its operational meaning and specifying requirements;
+          requirements own contracts and receive verification links. These
+          submodels do not need one universal hierarchy.
         </p>
         <div className="space-y-4">
           <div className="border border-zinc-200 rounded-lg p-4">
@@ -87,15 +105,18 @@ export default function SemanticModel() {
           </div>
           <div className="border border-zinc-200 rounded-lg p-4">
             <h4 className="font-semibold text-zinc-900 mb-1">
-              Reused contract context
+              Contract Bindings
             </h4>
             <p className="text-sm text-zinc-600">
               Requirements reuse requirement-owned contracts such as
               specifications, constraints, behaviors, states, and input/output
-              definitions. The consuming requirement declares that its subgraph
-              must fulfill the bound contract across that requirement, its
-              child requirements, and the contracts that detail those
-              obligations. Semantic contracts are linked through constrainedBy.
+              definitions. A binding applies to the consuming requirement and
+              its requirement descendants. Bind individual children for
+              independently implemented obligations; bind a parent when the
+              obligation applies to its entire requirement subtree and is
+              assessed through that subtree's implementation roll-up. Unrelated
+              sibling requirements do not inherit a child's binding. Semantic
+              contracts are linked through constrainedBy.
             </p>
           </div>
           <div className="border border-zinc-200 rounded-lg p-4">
@@ -103,12 +124,11 @@ export default function SemanticModel() {
               Fulfillment evidence
             </h4>
             <p className="text-sm text-zinc-600">
-              The contract binding creates the contract dependency; fulfillment is
-              shown by satisfied requirements, child requirement coverage, and
-              verifications linked to evidence. Trace and change-impact views
-              keep that dependency visible so affected contracts, requirements,
-              contracts, verifications, and implementation artifacts can be
-              reviewed and hardened after changes.
+              A contract owner's implementation fulfillment depends on all of
+              its required children and binding consumers being implementation-covered.
+              Terminal requirements need direct satisfiedBy evidence. Trace and
+              change-impact views show which requirements, contracts,
+              verifications, and implementation artifacts need review after changes.
             </p>
           </div>
           <div className="border border-zinc-200 rounded-lg p-4">
@@ -116,7 +136,7 @@ export default function SemanticModel() {
               One-way dependency flow
             </h4>
             <p className="text-sm text-zinc-600">
-              Reused contract context flow between capability-rooted subgraphs is
+              Contract Binding flow between capability-rooted subgraphs is
               one-directional. If two submodels reuse contracts from each other in
               both directions, the boundary becomes ambiguous, so validation
               rejects that pattern and forces the dependency direction to be
@@ -124,6 +144,21 @@ export default function SemanticModel() {
             </p>
           </div>
         </div>
+      </Section>
+
+      <Section title="Contract References">
+        <p className="text-zinc-600 mb-4">
+          Contract References must be acyclic. Reqvire rejects circular chains,
+          including loops through contract bindings or requirement ancestry,
+          before reporting or saving edits, and identifies the dependency path.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Contract References connect a requirement to contract content it depends
+          on for change-impact review. Contract edits propagate to the referencing
+          requirement; reference consumers do not fulfill the contract owner's
+          implementation obligation. Each requirement chooses either Contract
+          Bindings or Contract References, including when targets differ.
+        </p>
       </Section>
 
       <Section title="Element Types">

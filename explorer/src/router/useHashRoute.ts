@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { useExplorerLocation, writeExplorerHash } from "./location";
 import {
   DEFAULT_VIEW,
   parseHash,
@@ -22,36 +23,17 @@ export function useHashRoute() {
     param: null,
   });
 
-  const read = useCallback((): ParsedRoute => {
-    const parsed = parseHash(
-      typeof window !== "undefined" ? window.location.hash : "",
-      lastBaseRouteRef.current,
-    );
-    if (!parsed.elementId) {
-      lastBaseRouteRef.current = { view: parsed.view, param: parsed.param };
-    }
-    return parsed;
-  }, []);
-
-  const [route, setRoute] = useState<ParsedRoute>(read);
-
-  const applyHash = useCallback(
-    (hash: string) => {
-      window.location.hash = hash;
-      setRoute(read());
-    },
-    [read],
-  );
+  const location = useExplorerLocation();
+  const route = parseHash(new URL(location).hash, lastBaseRouteRef.current);
+  if (!route.elementId) lastBaseRouteRef.current = { view: route.view, param: route.param };
+  const applyHash = useCallback((hash: string) => writeExplorerHash(hash), []);
 
   useEffect(() => {
-    const onHashChange = () => setRoute(read());
-    window.addEventListener("hashchange", onHashChange);
     // Normalize an empty initial hash to the default route.
     if (!window.location.hash) {
-      window.location.replace(routeForView(DEFAULT_VIEW));
+      writeExplorerHash(routeForView(DEFAULT_VIEW), true);
     }
-    return () => window.removeEventListener("hashchange", onHashChange);
-  }, [read]);
+  }, []);
 
   const navigateView = useCallback(
     (view: ViewId) => {
@@ -67,14 +49,18 @@ export function useHashRoute() {
     [applyHash],
   );
 
-  const closeElement = useCallback(() => {
-    applyHash(routeForBase(lastBaseRouteRef.current));
-  }, [applyHash]);
+  const closeElement = useCallback((replace = false, resetSelection = false) => {
+    const base = lastBaseRouteRef.current;
+    const hash = resetSelection && ["coverage", "model", "traces", "thesaurus", "ontologies"].includes(base.view)
+      ? routeForView(base.view) : routeForBase(base);
+    writeExplorerHash(hash, replace);
+  }, []);
 
   return { route, navigateView, openElement, closeElement };
 }
 
 function routeForBase(route: Pick<ParsedRoute, "view" | "param">) {
+  if (["coverage", "model", "traces", "thesaurus", "ontologies"].includes(route.view) && route.param !== null) return `#/${route.view}?${route.param}`;
   if (route.view === "content" && route.param) return routeForContent(route.param);
   if (route.view === "files" && route.param) return routeForFile(route.param);
   if (route.view === "resources" && route.param) return routeForResource(route.param);

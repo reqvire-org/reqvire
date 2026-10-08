@@ -57,7 +57,8 @@ These requirements should have `definedBy` relations to the specifications they 
 
 For each specification contract_bindings, ask:
 - Does this requirement *define* this specification? → Use `definedBy`
-- Does this requirement *reference* or *depend on* this specification? → Keep as `Contract Bindings`
+- Does this requirement implement an obligation delegated by the specification? → Use `Contract Bindings`
+- Does it only consume the specification as input or review context? → Use `Contract References`
 
 Convert contract_bindings to relations using link and unlink commands:
 
@@ -70,7 +71,7 @@ reqvire link "API Authorization Specification" "definedBy" "Authorization System
 ```
 
 **When to keep contract_bindings:**
-- Requirement references but doesn't define the specification
+- Requirement is responsible for fulfilling the shared implementation obligation
 - Specification is defined by a different requirement
 - The binding requirement is OUTSIDE the owner's derivation hierarchy
 - The contract_bindings target is a contract element identifier owned by another requirement
@@ -127,7 +128,7 @@ Look for specification elements with empty relations. For each:
 
 1. Find which requirement asks for this specification to be defined
 2. Change the contract_bindings to a `definedBy` relation on that requirement
-3. Keep contract_bindings on other requirements that just reference (don't define) the specification
+3. Keep bindings on responsible implementation consumers; use Contract References for consumers that only need the specification as input or review context
 
 ## Merging Duplicate Requirements
 
@@ -221,11 +222,11 @@ The system shall implement API Access Authorization following clearly defined sp
   * definedBy: [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
 ```
 
-Referencing requirement (keeps contract_bindings):
+Implementing consumer (keeps Contract Bindings):
 ```markdown
 ### Add IP to Whitelist
 
-The system shall allow adding IPs to whitelist.
+When adding an IP to the whitelist, the system SHALL enforce the shared environment limits.
 
 #### Contract Bindings
   * [Environment Limits](../Specifications/Constraints.md#environment-limits)
@@ -249,7 +250,7 @@ reqvire format --fix --with-full-relations
 The format command ensures:
 - Consistent markdown structure
 - Proper element separator lines (`---`)
-- Correct subsection ordering (Metadata, Relations, Details, Contract Bindings)
+- Correct subsection ordering (Metadata, Relations, Details, and the applicable contract dependency section)
 - Clean whitespace and indentation
 
 ## Two-Phase Consolidate Workflow

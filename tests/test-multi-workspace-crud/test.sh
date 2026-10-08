@@ -112,6 +112,9 @@ fi
 (cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" link "Repo B Link Source Requirement" satisfiedBy repo-a/docs/evidence.txt) > "$TEST_DIR/output/link.txt" 2>&1 \
   || fail "link should add a relation from repo B to a repo A path" "$TEST_DIR/output/link.txt"
 
+grep -Fqx '  * satisfiedBy: [evidence.txt](../../repo-a/docs/evidence.txt)' "$CRUD_WORKSPACE/repo-b/specifications/B.md" \
+  || fail "cross-repo link must resolve from the source folder without repeated traversal" "$CRUD_WORKSPACE/repo-b/specifications/B.md"
+
 (cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" search --json --filter-name "Repo B Link Source Requirement") > "$TEST_DIR/output/link-search.json" 2>&1 \
   || fail "search after cross-repo link should run" "$TEST_DIR/output/link-search.json"
 jq -e '.files[].elements[] | select(.name == "Repo B Link Source Requirement") | .relations[]? | select(.relation_type == "satisfiedBy" and .target.target == "repo-a/docs/evidence.txt")' "$TEST_DIR/output/link-search.json" >/dev/null \

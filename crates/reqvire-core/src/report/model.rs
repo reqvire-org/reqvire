@@ -5,6 +5,7 @@ use crate::graph_registry::GraphRegistry;
 use crate::relation;
 use rustc_hash::FxHashSet;
 use serde::Serialize;
+use std::collections::BTreeSet;
 
 /// Model-centric report with nested element structure
 #[derive(Debug, Serialize)]
@@ -14,7 +15,7 @@ pub struct ModelCentricReport {
 }
 
 /// Direction of traversal for model report
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TraversalDirection {
     Forward, // Root to leaves through canonical traversal relations.
     Reverse, // Leaves to roots (derivedFrom, satisfy, verify)
@@ -32,6 +33,8 @@ pub struct ModelCentricElement {
     pub size_estimate: Option<SizeEstimate>,
     pub relations: Vec<ModelCentricRelation>,
     pub contract_bindings: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub contract_references: Vec<String>,
     #[serde(skip)]
     pub contract_bindings_labels: Vec<String>,
 }
@@ -114,22 +117,10 @@ fn build_model_report(
 
     // Determine starting elements
     let mut starting_elements = if let Some(name) = root_element_name {
-        // Find element by name
-        let found = registry
-            .nodes
-            .iter()
-            .find(|(_, node)| node.element.name == name);
-
-        match found {
-            Some((id, _)) => vec![id.clone()],
-            None => {
-                eprintln!("❌ Element with name '{}' not found", name);
-                return Err(ReqvireError::ElementError(format!(
-                    "Element with name '{}' not found",
-                    name
-                )));
-            }
-        }
+        vec![registry
+            .select_element(name, "model from")?
+            .identifier
+            .clone()]
     } else if let Some(ref types) = type_filter {
         // Filter by element types
         if reverse {
@@ -177,7 +168,10 @@ fn build_model_report(
         metadata: ModelMetadata {
             total_elements,
             total_relations,
-            filtered_from: root_element_name.map(|s| s.to_string()),
+            filtered_from: root_element_name
+                .and_then(|_| starting_elements.first())
+                .and_then(|id| registry.get_element(id))
+                .map(|element| element.name.clone()),
             direction: if reverse {
                 "Reverse".to_string()
             } else {
@@ -342,6 +336,13 @@ fn build_element_recursive(
         relations,
         contract_bindings,
         contract_bindings_labels,
+        contract_references: element
+            .contract_references
+            .iter()
+            .map(|entry| entry.target.as_str())
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .collect(),
     })
 }
 

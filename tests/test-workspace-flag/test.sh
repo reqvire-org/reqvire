@@ -107,7 +107,7 @@ fi
 
 MCP_OUTPUT="$TEST_DIR/output/mcp-workspace.jsonl"
 MCP_PORT="$(pick_port)"
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$TEST_DIR" mcp --host 127.0.0.1 --port "$MCP_PORT") > "$MCP_OUTPUT.stdout" 2>"$MCP_OUTPUT.stderr" &
+(cd "$OUTSIDE_DIR" && exec "$REQVIRE_BIN" --workspace "$TEST_DIR" mcp --host 127.0.0.1 --port "$MCP_PORT") > "$MCP_OUTPUT.stdout" 2>"$MCP_OUTPUT.stderr" &
 MCP_PID=$!
 trap 'kill "$MCP_PID" >/dev/null 2>&1 || true; wait "$MCP_PID" >/dev/null 2>&1 || true' EXIT
 

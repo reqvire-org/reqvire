@@ -1,7 +1,6 @@
 use crate::mcp;
 use crate::serve;
 use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
-use log::info;
 use reqvire::crud;
 use reqvire::diff::{render_crud_json, render_crud_result};
 use reqvire::element::Element;
@@ -40,11 +39,94 @@ pub struct Args {
     pub command: Option<Commands>,
 }
 
+#[derive(clap::Args, Debug)]
+pub struct SearchArgs {
+    /// Output results in JSON format
+    #[clap(long, help_heading = "SEARCH OPTIONS")]
+    json: bool,
+
+    /// Save JSON output to file (requires --json)
+    #[clap(long, value_name = "FILE", help_heading = "SEARCH OPTIONS")]
+    output: Option<String>,
+
+    /// Output abbreviated format (one-line per element in text, omit fields in JSON)
+    #[clap(long, help_heading = "SEARCH OPTIONS")]
+    short: bool,
+
+    /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
+    #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
+    filter_file: Option<String>,
+
+    /// Only include elements whose name matches this regular expression
+    #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
+    filter_name: Option<String>,
+
+    /// Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+    #[clap(long, value_name = "TYPE[,TYPE...]", help_heading = "SEARCH OPTIONS")]
+    filter_type: Option<String>,
+
+    /// Only include requirement-family elements with matching effective status values
+    #[clap(
+        long,
+        value_name = "STATUS[,STATUS...]",
+        help_heading = "SEARCH OPTIONS"
+    )]
+    filter_status: Option<String>,
+
+    /// Only include requirement-family elements with matching effective priority values
+    #[clap(
+        long,
+        value_name = "PRIORITY[,PRIORITY...]",
+        help_heading = "SEARCH OPTIONS"
+    )]
+    filter_priority: Option<String>,
+
+    /// Only include requirement-family elements with matching effective risk values
+    #[clap(long, value_name = "RISK[,RISK...]", help_heading = "SEARCH OPTIONS")]
+    filter_risk: Option<String>,
+
+    /// Only include requirement-family elements whose effective owner matches this regular expression
+    #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
+    filter_owner: Option<String>,
+
+    /// Only include elements whose content matches this regular expression
+    #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
+    filter_content: Option<String>,
+
+    /// Only include elements whose parent file page content matches this regular expression
+    #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
+    filter_page_content: Option<String>,
+
+    /// Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")
+    #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
+    have_relations: Option<String>,
+
+    /// Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
+    #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
+    not_have_relations: Option<String>,
+
+    /// Only include elements that have contract_bindings
+    #[clap(long, help_heading = "SEARCH OPTIONS")]
+    has_contract_bindings: bool,
+
+    /// Only include elements with contract_bindings matching this glob pattern (e.g., "*.pdf", "docs/**/*")
+    #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
+    filter_contract_bindings: Option<String>,
+
+    /// Only include elements that have Contract References
+    #[clap(long, help_heading = "SEARCH OPTIONS")]
+    has_contract_references: bool,
+
+    /// Only include elements with Contract Reference targets matching this glob (e.g., "*#error-response-specification")
+    #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
+    filter_contract_references: Option<String>,
+}
+
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Serve the embedded Explorer UI via HTTP server
     #[clap(
-        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>             Bind address (default: localhost)\n      --port <PORT>             Server port (default: 8080)\n      --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint"
+        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>             Bind address (default: localhost)\n      --port <PORT>             Server port (default: 8080)\n      --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint\n      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)\n      --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)\n      --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; requires --enable-mcp)\n      --allow-host <HOST[:PORT]>  Additional MCP endpoint hostname (repeatable; requires --enable-mcp)"
     )]
     Serve {
         /// Bind address
@@ -66,6 +148,49 @@ pub enum Commands {
             help_heading = "SERVE OPTIONS"
         )]
         mcp_enable_mutations: bool,
+
+        /// Commit successful mutations automatically (default: false; requires --enable-mutations)
+        #[clap(
+            long = "enable-commits",
+            requires = "mcp_enable_mutations",
+            help_heading = "SERVE OPTIONS"
+        )]
+        mcp_enable_commits: bool,
+
+        /// Enable same-repository GitHub publication (requires --enable-mutations)
+        #[clap(
+            long = "enable-github",
+            requires = "mcp_enable_mutations",
+            help_heading = "SERVE OPTIONS"
+        )]
+        mcp_enable_github: bool,
+
+        /// Configured publication remote (default: origin; requires --enable-github)
+        #[clap(
+            long = "github-remote",
+            requires = "mcp_enable_github",
+            value_name = "NAME",
+            help_heading = "SERVE OPTIONS"
+        )]
+        mcp_github_remote: Option<String>,
+
+        /// Additional MCP browser origin (repeatable; loopback remains allowed)
+        #[clap(
+            long = "allow-origin",
+            value_name = "ORIGIN",
+            requires = "enable_mcp",
+            help_heading = "SERVE OPTIONS"
+        )]
+        allowed_origins: Vec<crate::mcp_http::AllowedOrigin>,
+
+        /// Additional MCP endpoint host or host:port (repeatable; requires --enable-mcp)
+        #[clap(
+            long = "allow-host",
+            value_name = "HOST[:PORT]",
+            requires = "enable_mcp",
+            help_heading = "SERVE OPTIONS"
+        )]
+        allowed_hosts: Vec<crate::mcp_http::AllowedHost>,
     },
 
     /// Export the Explorer SPA as a static site to a directory
@@ -86,7 +211,7 @@ pub enum Commands {
     /// Start Reqvire MCP server
     #[clap(
         name = "mcp",
-        override_help = "Start Reqvire MCP Streamable HTTP server\n\nMCP OPTIONS:\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --with-size-estimates     Include element size estimates in model evidence tools"
+        override_help = "Start Reqvire MCP Streamable HTTP server\n\nMCP OPTIONS:\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)\n      --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)\n      --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)\n      --with-size-estimates     Include element size estimates in model evidence tools\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; loopback remains allowed)\n      --allow-host <HOST[:PORT]>  Additional endpoint hostname (repeatable)"
     )]
     Mcp {
         /// HTTP bind address
@@ -101,9 +226,42 @@ pub enum Commands {
         #[clap(long, help_heading = "MCP OPTIONS")]
         enable_mutations: bool,
 
+        /// Commit successful mutations automatically (default: false; requires --enable-mutations)
+        #[clap(long, requires = "enable_mutations", help_heading = "MCP OPTIONS")]
+        enable_commits: bool,
+
+        /// Enable same-repository GitHub publication (requires --enable-mutations)
+        #[clap(long, requires = "enable_mutations", help_heading = "MCP OPTIONS")]
+        enable_github: bool,
+
+        /// Configured publication remote (default: origin; requires --enable-github)
+        #[clap(
+            long,
+            requires = "enable_github",
+            value_name = "NAME",
+            help_heading = "MCP OPTIONS"
+        )]
+        github_remote: Option<String>,
+
         /// Include element size estimates in model evidence tools
         #[clap(long, help_heading = "MCP OPTIONS")]
         with_size_estimates: bool,
+
+        /// Additional browser origin (repeatable; loopback remains allowed)
+        #[clap(
+            long = "allow-origin",
+            value_name = "ORIGIN",
+            help_heading = "MCP OPTIONS"
+        )]
+        allowed_origins: Vec<crate::mcp_http::AllowedOrigin>,
+
+        /// Additional endpoint host or host:port (repeatable)
+        #[clap(
+            long = "allow-host",
+            value_name = "HOST[:PORT]",
+            help_heading = "MCP OPTIONS"
+        )]
+        allowed_hosts: Vec<crate::mcp_http::AllowedHost>,
     },
 
     /// Format and normalize requirements files. By default, shows preview without applying changes
@@ -162,81 +320,9 @@ pub enum Commands {
 
     /// Search and filter model elements with comprehensive filtering options
     #[clap(
-        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)"
+        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)\n      --has-contract-bindings          Only include elements that have Contract Bindings\n      --filter-contract-bindings <GLOB> Match Contract Binding target identifiers\n      --has-contract-references        Only include elements that have Contract References\n      --filter-contract-references <GLOB> Match Contract Reference target identifiers"
     )]
-    Search {
-        /// Output results in JSON format
-        #[clap(long, help_heading = "SEARCH OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "SEARCH OPTIONS")]
-        output: Option<String>,
-
-        /// Output abbreviated format (one-line per element in text, omit fields in JSON)
-        #[clap(long, help_heading = "SEARCH OPTIONS")]
-        short: bool,
-
-        /// Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
-        #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
-        filter_file: Option<String>,
-
-        /// Only include elements whose name matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
-        filter_name: Option<String>,
-
-        /// Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
-        #[clap(long, value_name = "TYPE[,TYPE...]", help_heading = "SEARCH OPTIONS")]
-        filter_type: Option<String>,
-
-        /// Only include requirement-family elements with matching effective status values
-        #[clap(
-            long,
-            value_name = "STATUS[,STATUS...]",
-            help_heading = "SEARCH OPTIONS"
-        )]
-        filter_status: Option<String>,
-
-        /// Only include requirement-family elements with matching effective priority values
-        #[clap(
-            long,
-            value_name = "PRIORITY[,PRIORITY...]",
-            help_heading = "SEARCH OPTIONS"
-        )]
-        filter_priority: Option<String>,
-
-        /// Only include requirement-family elements with matching effective risk values
-        #[clap(long, value_name = "RISK[,RISK...]", help_heading = "SEARCH OPTIONS")]
-        filter_risk: Option<String>,
-
-        /// Only include requirement-family elements whose effective owner matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
-        filter_owner: Option<String>,
-
-        /// Only include elements whose content matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
-        filter_content: Option<String>,
-
-        /// Only include elements whose parent file page content matches this regular expression
-        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
-        filter_page_content: Option<String>,
-
-        /// Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")
-        #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
-        have_relations: Option<String>,
-
-        /// Only include elements that do NOT have ALL specified relations (comma-separated, e.g., "verifiedBy")
-        #[clap(long, value_name = "LIST", help_heading = "SEARCH OPTIONS")]
-        not_have_relations: Option<String>,
-
-        /// Only include elements that have contract_bindings
-        #[clap(long, help_heading = "SEARCH OPTIONS")]
-        has_contract_bindings: bool,
-
-        /// Only include elements with contract_bindings matching this glob pattern (e.g., "*.pdf", "docs/**/*")
-        #[clap(long, value_name = "GLOB", help_heading = "SEARCH OPTIONS")]
-        filter_contract_bindings: Option<String>,
-    },
+    Search(Box<SearchArgs>),
 
     /// Analyze change impact and provide report
     #[clap(
@@ -280,9 +366,12 @@ pub enum Commands {
 
     /// Generate verification and implementation coverage report
     #[clap(
-        override_help = "Generate verification and implementation coverage report\n\nCOVERAGE OPTIONS:\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)"
+        override_help = "Generate verification and implementation coverage report\n\nCOVERAGE OPTIONS:\n      --from <NAME>              Select a capability subtree by exact name or canonical identifier (default: whole model)\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)"
     )]
     Coverage {
+        /// Select a capability subtree by exact name or canonical identifier
+        #[clap(long, value_name = "NAME", help_heading = "COVERAGE OPTIONS")]
+        from: Option<String>,
         /// Output results in JSON format
         #[clap(long, help_heading = "COVERAGE OPTIONS")]
         json: bool,
@@ -299,10 +388,10 @@ pub enum Commands {
     /// Use --reverse for leaf-to-root traversal.
     ///
     #[clap(
-        override_help = "Generate model-centric JSON structure with nested relations\n\nBy default, shows ontology roots, concept roots, and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save JSON output to file"
+        override_help = "Generate model-centric JSON structure with nested relations\n\nBy default, shows ontology roots, concept roots, and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by exact name or canonical identifier\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save JSON output to file"
     )]
     Model {
-        /// Start from specific element by name
+        /// Start from specific element by exact name or canonical identifier
         #[clap(long, value_name = "NAME", help_heading = "MODEL OPTIONS")]
         from: Option<String>,
 
@@ -310,7 +399,7 @@ pub enum Commands {
         #[clap(long, help_heading = "MODEL OPTIONS")]
         reverse: bool,
 
-        /// Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+        /// Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, concept-scheme, concept, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, verification-objective, source, semantic-query, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
         #[clap(long, value_name = "TYPE", help_heading = "MODEL OPTIONS")]
         filter_type: Option<String>,
 
@@ -380,10 +469,10 @@ pub enum Commands {
 
     /// Remove element from model
     #[clap(
-        override_help = "Remove element from model\n\nRM OPTIONS:\n       <ELEMENT_NAME>           Element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rm <element-name>"
+        override_help = "Remove element from model\n\nRM OPTIONS:\n       <ELEMENT_NAME>           Exact element name or canonical identifier\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rm <element-name>"
     )]
     Rm {
-        /// Element name
+        /// Exact element name or canonical identifier
         element_name: String,
 
         /// Preview changes without applying
@@ -401,10 +490,10 @@ pub enum Commands {
 
     /// Move element to different location
     #[clap(
-        override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n       <FILE>                   Target file path (relative to workspace root)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv <element-name> <file>"
+        override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Exact element name or canonical identifier\n       <FILE>                   Target file path (relative to workspace root)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv <element-name> <file>"
     )]
     Mv {
-        /// Element name
+        /// Exact element name or canonical identifier
         element_name: String,
 
         /// Target file path (relative to workspace root)
@@ -425,10 +514,10 @@ pub enum Commands {
 
     /// Rename element
     #[clap(
-        override_help = "Rename element\n\nRENAME OPTIONS:\n       <ELEMENT_NAME>           Current element name\n       <NEW_NAME>               New element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rename <element-name> <new-name>"
+        override_help = "Rename element\n\nRENAME OPTIONS:\n       <ELEMENT_NAME>           Current exact element name or canonical identifier\n       <NEW_NAME>               New element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rename <element-name> <new-name>"
     )]
     Rename {
-        /// Current element name
+        /// Current exact element name or canonical identifier
         element_name: String,
 
         /// New element name
@@ -449,13 +538,13 @@ pub enum Commands {
 
     /// Merge multiple elements into target element
     #[clap(
-        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and contract_bindings are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Concrete verifications can merge into concrete verifications\n    - Verification objectives can merge only into verification objectives\n    - Contracts can merge into contracts (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
+        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target exact element name or canonical identifier (receives merged content)\n       <SOURCES>...             One or more source element names or canonical identifiers to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations, contract bindings, and contract references are merged with deduplication; mixed dependency sections are rejected\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Concrete verifications can merge into concrete verifications\n    - Verification objectives can merge only into verification objectives\n    - Contracts can merge into contracts (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
     )]
     Merge {
-        /// Target element name (receives merged content)
+        /// Target exact element name or canonical identifier (receives merged content)
         target: String,
 
-        /// One or more source element names to merge into target
+        /// One or more source element names or canonical identifiers to merge into target
         #[clap(required = true, num_args = 1..)]
         sources: Vec<String>,
 
@@ -526,21 +615,21 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Add relation or contract_bindings between elements
+    /// Add relation, contract binding, or contract reference between elements
     #[clap(
         name = "link",
-        override_help = "Add relation or contract_bindings between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or bindContract>  Relation type OR 'bindContract' keyword for contract_bindings\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    define        - Source contract element defines a requirement\n    definedBy     - Source requirement owns a compatible contract element\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    broader       - Source concept has a broader concept\n    narrower      - Source concept has a narrower concept\n    related       - Source concept is related to another concept\n    exactMatch    - Source concept exactly matches an external concept IRI or concept element\n    closeMatch    - Source concept closely matches an external concept IRI or concept element\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source requirement is verified by concrete verification\n    verify        - Source concrete verification verifies a requirement\n\nCONTRACT BINDINGS:\n    Use 'bindContract' keyword to bind compatible requirement-owned contract elements\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For bindContract: requirement may reuse compatible requirement-owned source, constraint, behavior, specification, state, or input-output contract element identifiers (file.md#element-id or #element-id). Non-ontology prose uses Concept References; structural ontology uses reqvire:mapsToConcept; semantic contracts use use/usedBy.\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" definedBy \"Invoice Numbering Specification\"\n    reqvire link \"Invoice Numbering Specification\" define \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Traceability\" broader \"Engineering Knowledge\"\n    reqvire link \"Traceability\" related \"Verification Evidence\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"System Requirement\" bindContract \"constraints.md#latency-limit\""
+        override_help = "Add relation, contract binding, or contract reference between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source exact element name or canonical identifier\n       <RELATION_TYPE>           Relation type, bindContract, or referenceContract\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    define        - Source contract element defines a requirement\n    definedBy     - Source requirement owns a compatible contract element\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    broader       - Source concept has a broader concept\n    narrower      - Source concept has a narrower concept\n    related       - Source concept is related to another concept\n    exactMatch    - Source concept exactly matches an external concept IRI or concept element\n    closeMatch    - Source concept closely matches an external concept IRI or concept element\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source requirement is verified by concrete verification\n    verify        - Source concrete verification verifies a requirement\n\nCONTRACT BINDINGS:\n    Use 'bindContract' keyword to bind compatible requirement-owned contract elements\n\nCONTRACT REFERENCES:\n    Use 'referenceContract' for a contract content dependency used by change impact.\n    A requirement may use Contract Bindings or Contract References, never both.\n\nTARGET TYPES:\n    For referenceContract: requirement-owned contract element name or identifier\n    For relations: exact element name or canonical identifier, internal file path, or external URL (http/https)\n    For bindContract: requirement may reuse compatible requirement-owned source, constraint, behavior, specification, state, or input-output contract element names or identifiers (file.md#element-id or #element-id). Non-ontology prose uses Concept References; structural ontology uses reqvire:mapsToConcept; semantic contracts use use/usedBy.\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" definedBy \"Invoice Numbering Specification\"\n    reqvire link \"Invoice Numbering Specification\" define \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Traceability\" broader \"Engineering Knowledge\"\n    reqvire link \"Traceability\" related \"Verification Evidence\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"System Requirement\" bindContract \"constraints.md#latency-limit\""
     )]
     Link {
-        /// Source element name
+        /// Source exact element name or canonical identifier
         source: String,
 
-        /// Relation type OR 'bindContract'.
+        /// Relation type, 'bindContract', or 'referenceContract'.
         /// Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, broader, narrower, related, exactMatch, closeMatch, satisfiedBy, satisfy, verifiedBy, verify.
         /// Use 'bindContract' to reuse compatible requirement-owned contract elements
         relation_type: String,
 
-        /// Target: element name, internal path, or external URL (for relations); compatible contract element identifier for requirement contract_bindings
+        /// Target: exact element name or canonical identifier, internal path, or external URL (for relations); compatible contract name or identifier for bindings
         target: String,
 
         /// Preview changes without applying
@@ -556,16 +645,16 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Remove relation or contract_bindings between elements (auto-detects type)
+    /// Remove relation, contract binding, or contract reference between elements (auto-detects type)
     #[clap(
         name = "unlink",
-        override_help = "Remove relation or contract_bindings between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Searches relations first, then contract_bindings.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Capability Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
+        override_help = "Remove relation, contract binding, or contract reference between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source exact element name or canonical identifier\n       <TARGET>                 Target element name or canonical identifier, file path, or URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Detects relations, Contract Bindings, and Contract References.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Capability Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
     )]
     Unlink {
-        /// Source element name
+        /// Source exact element name or canonical identifier
         source: String,
 
-        /// Target element name OR file path
+        /// Target element name or canonical identifier, file path, or URL
         target: String,
 
         /// Preview changes without applying
@@ -584,19 +673,19 @@ pub enum Commands {
     /// Replace an existing relation target with a new target in one operation
     #[clap(
         name = "relink",
-        override_help = "Replace an existing relation target with a new target in one operation\n\nRELINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE>          Relation type to preserve\n       <FROM_TARGET>            Existing target to replace\n       <TO_TARGET>              New target\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire relink \"Child Requirement\" derivedFrom \"Old Parent\" \"New Parent\""
+        override_help = "Replace an existing relation target with a new target in one operation\n\nRELINK OPTIONS:\n       <SOURCE>                 Source exact element name or canonical identifier\n       <RELATION_TYPE>          Relation type to preserve\n       <FROM_TARGET>            Existing target to replace: element name or canonical identifier, file path, or URL\n       <TO_TARGET>              Replacement element name or canonical identifier, file path, or URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire relink \"Child Requirement\" derivedFrom \"Old Parent\" \"New Parent\""
     )]
     Relink {
-        /// Source element name
+        /// Source exact element name or canonical identifier
         source: String,
 
         /// Relation type to preserve
         relation_type: String,
 
-        /// Existing target to replace
+        /// Existing target to replace: element name or canonical identifier, file path, or URL
         from_target: String,
 
-        /// New target
+        /// Replacement element name or canonical identifier, file path, or URL
         to_target: String,
 
         /// Preview changes without applying
@@ -729,10 +818,10 @@ pub enum Commands {
 
     /// Analyze independent capability-rooted submodels and cross-submodel couplings
     #[clap(
-        override_help = "Analyze independent capability-rooted submodels and cross-submodel couplings\n\nSUBMODELS OPTIONS:\n      --from <NAME>      Scope report to a capability subtree or requirement subtree by name\n      --json              Output results in JSON output format\n      --output <FILE>     Save JSON output to file (requires --json)"
+        override_help = "Analyze independent capability-rooted submodels and cross-submodel couplings\n\nSUBMODELS OPTIONS:\n      --from <NAME>      Scope report to a capability subtree or requirement subtree by exact name or canonical identifier\n      --json              Output results in JSON output format\n      --output <FILE>     Save JSON output to file (requires --json)"
     )]
     Submodels {
-        /// Scope report to a capability subtree or requirement subtree by name
+        /// Scope report to a capability subtree or requirement subtree by exact name or canonical identifier
         #[clap(long, value_name = "NAME", help_heading = "SUBMODELS OPTIONS")]
         from: Option<String>,
 
@@ -745,12 +834,12 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Collect content from capability, requirement, ontology, concept-scheme, or concept context
+    /// Collect content from capability, requirement, ontology, semantic-query, concept-scheme, or concept context
     #[clap(
-        override_help = "Collect content from capability, requirement, ontology, concept-scheme, or concept context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the capability, requirement, ontology, concept-scheme, or concept element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)\n\nCOLLECTED CONTEXT:\n    Capability/requirement starts include traversed elements, authored concept references, requirement contracts, and contract_bindings.\n    Ontology starts include ontology hierarchy and downstream semantic contracts that use reachable ontology.\n    Concept-scheme/concept starts include thesaurus context through concept hierarchy."
+        override_help = "Collect content from capability, requirement, ontology, semantic-query, concept-scheme, or concept context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Exact name or canonical identifier of the capability, requirement, ontology, semantic-query, concept-scheme, or concept element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)\n\nCOLLECTED CONTEXT:\n    Capability/requirement starts include traversed elements, authored concept references, requirement contracts, contract bindings, and contract references.\n    Ontology starts include ontology hierarchy and downstream semantic contracts that use reachable ontology.\n    Concept-scheme/concept starts include thesaurus context through concept hierarchy."
     )]
     Collect {
-        /// Name of the capability, requirement, ontology, concept-scheme, or concept element to collect from
+        /// Exact name or canonical identifier of the capability, requirement, ontology, semantic-query, concept-scheme, or concept element to collect from
         element_name: String,
 
         /// Traversal direction: UPSTREAM (ancestors) or DOWNSTREAM (descendants)
@@ -782,12 +871,17 @@ pub enum Commands {
 
 #[derive(Subcommand, Debug)]
 pub enum SemanticCommands {
+    /// Manage authored SPARQL query artifacts
+    Query {
+        #[clap(subcommand)]
+        command: QueryCommands,
+    },
     /// Export selected semantic RDF layers
     #[clap(
-        override_help = "Export selected semantic RDF layers\n\nSEMANTIC EXPORT OPTIONS:\n      --layer <LAYER>            Include layer: ontologies, shapes, concepts, model, external-used, prefixes. Repeatable; omitted means all layers\n      --jsonld                   Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --namespace-base <IRI>     Filter clean authored export to one ontology base or term namespace. Cannot be combined with model\n      --output <FILE>            Save output to file"
+        override_help = "Export selected semantic RDF layers\n\nSEMANTIC EXPORT OPTIONS:\n      --layer <LAYER>            Include layer: ontologies, shapes, concepts, queries, model, external-used, prefixes. Repeatable; omitted means all layers\n      --jsonld                   Output JSON-LD RDF format instead of RDF/Turtle (.ttl)\n      --namespace-base <IRI>     Filter clean authored export to one ontology base or term namespace. Cannot be combined with model\n      --output <FILE>            Save output to file"
     )]
     Export {
-        /// Include layer: ontologies, shapes, concepts, model, external-used, prefixes. Repeatable; omitted means all layers
+        /// Include layer: ontologies, shapes, concepts, queries, model, external-used, prefixes. Repeatable; omitted means all layers
         #[clap(
             long,
             value_enum,
@@ -812,6 +906,7 @@ pub enum SemanticCommands {
 
 #[derive(Clone, Debug, ValueEnum)]
 pub enum SemanticLayerArg {
+    Queries,
     Ontologies,
     Shapes,
     Concepts,
@@ -823,12 +918,13 @@ pub enum SemanticLayerArg {
 impl From<SemanticLayerArg> for SemanticExportLayer {
     fn from(value: SemanticLayerArg) -> Self {
         match value {
-            SemanticLayerArg::Ontologies => SemanticExportLayer::Ontologies,
-            SemanticLayerArg::Shapes => SemanticExportLayer::Shapes,
-            SemanticLayerArg::Concepts => SemanticExportLayer::Concepts,
-            SemanticLayerArg::Model => SemanticExportLayer::Model,
-            SemanticLayerArg::ExternalUsed => SemanticExportLayer::ExternalUsed,
-            SemanticLayerArg::Prefixes => SemanticExportLayer::Prefixes,
+            SemanticLayerArg::Queries => Self::Queries,
+            SemanticLayerArg::Ontologies => Self::Ontologies,
+            SemanticLayerArg::Shapes => Self::Shapes,
+            SemanticLayerArg::Concepts => Self::Concepts,
+            SemanticLayerArg::Model => Self::Model,
+            SemanticLayerArg::ExternalUsed => Self::ExternalUsed,
+            SemanticLayerArg::Prefixes => Self::Prefixes,
         }
     }
 }
@@ -873,15 +969,15 @@ impl Args {
         // Check if help was requested before parsing
         let args: Vec<String> = std::env::args().collect();
         if args.len() > 1 && (args[1] == "--help" || args[1] == "-h" || args[1] == "help") {
-            let cmd = Args::command();
+            let cmd = Self::command();
             print_custom_help(&cmd);
             std::process::exit(0);
         }
-        Args::parse()
+        Self::parse()
     }
 
     pub fn print_help() {
-        let cmd = Args::command();
+        let cmd = Self::command();
         print_custom_help(&cmd);
     }
 }
@@ -945,9 +1041,9 @@ fn print_custom_help(cmd: &clap::Command) {
             .map(|s| s.to_string())
             .unwrap_or_default();
 
+        println!("  {:<17} {}", name, about);
         // Check if this command has subcommands (like verifications)
         if subcommand.has_subcommands() {
-            println!("  {:<17} {}", name, about);
             // List nested subcommands indented
             for nested in subcommand.get_subcommands() {
                 let nested_name = format!("{} {}", name, nested.get_name());
@@ -957,8 +1053,6 @@ fn print_custom_help(cmd: &clap::Command) {
                     .unwrap_or_default();
                 println!("    {:<15} {}", nested_name, nested_about);
             }
-        } else {
-            println!("  {:<17} {}", name, about);
         }
     }
     println!("  help               Print this message or the help of the given subcommand(s)");
@@ -1124,13 +1218,21 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
     }
 }
 
-fn wants_json(args: &Args) -> bool {
+const fn wants_json(args: &Args) -> bool {
     match &args.command {
+        Some(Commands::Semantic {
+            command: SemanticCommands::Query { command },
+        }) => match command {
+            QueryCommands::List { json, .. }
+            | QueryCommands::Validate { json, .. }
+            | QueryCommands::Export { json, .. }
+            | QueryCommands::Check { json, .. } => *json,
+        },
         Some(Commands::Format { json, .. }) => *json,
         Some(Commands::Migrate { json, .. }) => *json,
         Some(Commands::Validate { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
-        Some(Commands::Search { json, .. }) => *json,
+        Some(Commands::Search(search)) => search.json,
         Some(Commands::Traces { .. }) => true,
         Some(Commands::Coverage { json, .. }) => *json,
         Some(Commands::Model { .. }) => true,
@@ -1163,7 +1265,7 @@ fn handle_json_output(json_content: &str, output: &Option<String>) -> Result<(),
     Ok(())
 }
 
-fn semantic_export_format(jsonld: bool) -> SemanticExportFormat {
+const fn semantic_export_format(jsonld: bool) -> SemanticExportFormat {
     if jsonld {
         SemanticExportFormat::JsonLd
     } else {
@@ -1203,7 +1305,7 @@ pub async fn handle_command(
             Commands::Format { output, json, .. } => (output.is_some(), *json),
             Commands::Migrate { output, json, .. } => (output.is_some(), *json),
             Commands::Validate { output, json, .. } => (output.is_some(), *json),
-            Commands::Search { output, json, .. } => (output.is_some(), *json),
+            Commands::Search(search) => (search.output.is_some(), search.json),
             Commands::ChangeImpact { output, json, .. } => (output.is_some(), *json),
             Commands::Traces { output, .. } => (output.is_some(), true),
             Commands::Coverage { output, json, .. } => (output.is_some(), *json),
@@ -1241,15 +1343,57 @@ pub async fn handle_command(
         host,
         port,
         enable_mutations,
+        enable_commits,
+        enable_github,
+        github_remote,
         with_size_estimates,
+        allowed_origins,
+        allowed_hosts,
     }) = args.command
     {
         return mcp::serve_http(
-            enable_mutations,
-            with_size_estimates,
+            mcp::McpOptions {
+                enable_mutations,
+                enable_commits,
+                enable_github,
+                github_remote: github_remote.as_deref().unwrap_or("origin"),
+                with_size_estimates,
+            },
             excluded_filename_patterns,
             &host,
             port,
+            &crate::mcp_http::HttpAccess::new(&allowed_origins, &allowed_hosts),
+        )
+        .await
+        .map(|_| 0);
+    }
+
+    if let Some(Commands::Serve {
+        host,
+        port,
+        enable_mcp,
+        mcp_enable_mutations,
+        mcp_enable_commits,
+        mcp_enable_github,
+        mcp_github_remote,
+        allowed_origins,
+        allowed_hosts,
+    }) = args.command
+    {
+        reqvire::utils::enable_quiet_mode();
+        return serve::serve_explorer(
+            &host,
+            port,
+            enable_mcp,
+            mcp::McpOptions {
+                enable_mutations: mcp_enable_mutations,
+                enable_commits: mcp_enable_commits,
+                enable_github: mcp_enable_github,
+                github_remote: mcp_github_remote.as_deref().unwrap_or("origin"),
+                with_size_estimates: false,
+            },
+            excluded_filename_patterns,
+            &crate::mcp_http::HttpAccess::new(&allowed_origins, &allowed_hosts),
         )
         .await
         .map(|_| 0);
@@ -1279,6 +1423,31 @@ pub async fn handle_command(
 
     let json_output = wants_json(&args);
 
+    if let Some(Commands::Semantic {
+        command:
+            SemanticCommands::Query {
+                command: QueryCommands::Validate { name, iri, json },
+            },
+    }) = &args.command
+    {
+        let index = model_manager
+            .semantic_index()
+            .map(std::borrow::Cow::Borrowed)
+            .unwrap_or_else(|| {
+                std::borrow::Cow::Owned(semantic_contract::build_semantic_index(
+                    &model_manager.graph_registry,
+                ))
+            });
+        let model_errors = parse_result
+            .as_ref()
+            .err()
+            .map(|e| vec![e.to_string()])
+            .unwrap_or_default();
+        let report =
+            index.query_validation_report(name.as_deref(), iri.as_deref(), model_errors)?;
+        print_query_validation_report(&report, *json)?;
+        return Ok(if report["valid"] == true { 0 } else { 1 });
+    }
     // Handle validation failures for all commands (including validate)
     match &parse_result {
         Err(ReqvireError::ValidationError(errors)) => {
@@ -1325,24 +1494,27 @@ pub async fn handle_command(
             }
             Ok(0)
         }
-        Some(Commands::Search {
-            json,
-            output,
-            short,
-            filter_file,
-            filter_name,
-            filter_type,
-            filter_status,
-            filter_priority,
-            filter_risk,
-            filter_owner,
-            filter_content,
-            filter_page_content,
-            have_relations,
-            not_have_relations,
-            has_contract_bindings,
-            filter_contract_bindings,
-        }) => {
+        Some(Commands::Search(search)) => {
+            let SearchArgs {
+                json,
+                output,
+                short,
+                filter_file,
+                filter_name,
+                filter_type,
+                filter_status,
+                filter_priority,
+                filter_risk,
+                filter_owner,
+                filter_content,
+                filter_page_content,
+                have_relations,
+                not_have_relations,
+                has_contract_bindings,
+                filter_contract_bindings,
+                has_contract_references,
+                filter_contract_references,
+            } = *search;
             // Build search filters
             let filters = reqvire::search::SearchFilters::new(
                 filter_file.as_deref(),
@@ -1358,6 +1530,10 @@ pub async fn handle_command(
                 not_have_relations.as_deref(),
                 has_contract_bindings,
                 filter_contract_bindings.as_deref(),
+            )?
+            .with_contract_references(
+                has_contract_references,
+                filter_contract_references.as_deref(),
             )?;
 
             // Generate search report
@@ -1539,8 +1715,9 @@ pub async fn handle_command(
 
             Ok(0)
         }
-        Some(Commands::Coverage { json, output }) => {
-            let coverage_report = operations::coverage_report(&model_manager.graph_registry);
+        Some(Commands::Coverage { from, json, output }) => {
+            let coverage_report =
+                operations::scoped_coverage_report(&model_manager.graph_registry, from.as_deref())?;
             if json {
                 handle_json_output(&coverage_report.to_json_string(), &output)?;
             } else {
@@ -1641,31 +1818,6 @@ pub async fn handle_command(
 
             Ok(0)
         }
-        Some(Commands::Serve {
-            host,
-            port,
-            enable_mcp,
-            mcp_enable_mutations,
-        }) => {
-            // Enable quiet mode for serve command runtime generation.
-            reqvire::utils::enable_quiet_mode();
-
-            let explorer_assets = explorer_runtime::build_runtime_assets(&model_manager)?;
-
-            // Start HTTP server (runs until Ctrl-C)
-            info!("Starting HTTP server at http://{}:{}/", host, port);
-            serve::serve_explorer(
-                explorer_assets,
-                &host,
-                port,
-                enable_mcp,
-                mcp_enable_mutations,
-                excluded_filename_patterns,
-            )
-            .await?;
-
-            Ok(0)
-        }
         Some(Commands::Export { output }) => {
             reqvire::utils::enable_quiet_mode();
 
@@ -1733,7 +1885,9 @@ pub async fn handle_command(
             // Resolve element name to identifier
             let element_id = model_manager
                 .graph_registry
-                .find_element_by_name(&element_name)?;
+                .select_element(element_name.trim(), "rm element_name")?
+                .identifier
+                .clone();
 
             // Call CRUD operation
             let workspace_root = current_dir.clone();
@@ -1759,7 +1913,9 @@ pub async fn handle_command(
             // Resolve element name to identifier
             let element_id = model_manager
                 .graph_registry
-                .find_element_by_name(&element_name)?;
+                .select_element(element_name.trim(), "mv element_name")?
+                .identifier
+                .clone();
 
             // Call CRUD operation
             let workspace_root = current_dir.clone();
@@ -1792,7 +1948,9 @@ pub async fn handle_command(
             // Resolve element name to identifier
             let element_id = model_manager
                 .graph_registry
-                .find_element_by_name(&element_name)?;
+                .select_element(element_name.trim(), "rename element_name")?
+                .identifier
+                .clone();
 
             // Call CRUD operation
             let workspace_root = current_dir.clone();
@@ -1856,8 +2014,7 @@ pub async fn handle_command(
                 excluded_filename_patterns,
                 &current_dir,
                 &workspace_root,
-                dry_run,
-                squash,
+                crud::MoveFileOptions { dry_run, squash },
             )?;
 
             // Output result
@@ -2047,8 +2204,14 @@ pub async fn handle_command(
             Ok(0)
         }
         Some(Commands::Semantic { command }) => {
-            let index = semantic_contract::build_semantic_index(&model_manager.graph_registry);
+            let semantic_store = model_manager
+                .semantic_store
+                .as_ref()
+                .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?;
             match command {
+                SemanticCommands::Query { command } => {
+                    return run_query_command(semantic_store.index(), command);
+                }
                 SemanticCommands::Export {
                     layer,
                     jsonld,
@@ -2060,7 +2223,7 @@ pub async fn handle_command(
                         .into_iter()
                         .map(SemanticExportLayer::from)
                         .collect::<Vec<_>>();
-                    let output_content = index.serialize_export_layers(
+                    let output_content = semantic_store.serialize_export_layers(
                         format,
                         &layers,
                         namespace_base.as_deref(),
@@ -2076,7 +2239,9 @@ pub async fn handle_command(
                 include_mappings,
                 output,
             } => {
-                let index = semantic_contract::build_semantic_index(&model_manager.graph_registry);
+                let index = model_manager
+                    .semantic_index()
+                    .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?;
                 let format = semantic_export_format(jsonld);
                 let output_content = index.serialize_concepts(format, include_mappings)?;
                 write_or_print_semantic_output(output.as_ref(), output_content)?;
@@ -2104,13 +2269,16 @@ pub async fn handle_command(
             namespace_base,
             output,
         }) => {
-            let index = semantic_contract::build_semantic_index(&model_manager.graph_registry);
+            let semantic_store = model_manager
+                .semantic_store
+                .as_ref()
+                .ok_or_else(|| ReqvireError::ProcessError("Missing semantic index".into()))?;
             let format = if jsonld {
                 SemanticExportFormat::JsonLd
             } else {
                 SemanticExportFormat::Turtle
             };
-            let output_content = index.serialize_with_options_and_filter(
+            let output_content = semantic_store.serialize_with_options_and_filter(
                 format,
                 full,
                 include_external,
@@ -2177,7 +2345,9 @@ pub async fn handle_command(
             run_sout(&model_manager.graph_registry)?;
             Ok(0)
         }
-        Some(Commands::Mcp { .. }) => unreachable!("MCP command is handled before model parsing"),
+        Some(Commands::Mcp { .. } | Commands::Serve { .. }) => {
+            unreachable!("Server commands are handled before model parsing")
+        }
         None => {
             // This case is handled at the beginning of handle_command
             unreachable!("Command is None but should have been handled earlier");
@@ -2700,18 +2870,104 @@ mod tests {
     }
 
     #[test]
+    fn mcp_cors_cli_accepts_repeated_origins() {
+        for command in [
+            vec!["reqvire", "mcp"],
+            vec!["reqvire", "serve", "--enable-mcp"],
+        ] {
+            let mut args = command;
+            args.extend([
+                "--allow-origin",
+                "https://app.example",
+                "--allow-origin",
+                "http://192.0.2.10:3000",
+            ]);
+            assert!(Args::try_parse_from(args).is_ok());
+        }
+    }
+
+    #[test]
+    fn mcp_cors_cli_rejects_invalid_origins_and_missing_embedded_endpoint() {
+        for prefix in [
+            vec!["reqvire", "mcp"],
+            vec!["reqvire", "serve", "--enable-mcp"],
+        ] {
+            for value in [
+                "*",
+                "null",
+                "https://app.example/path",
+                "https://app.example:65536",
+            ] {
+                let mut args = prefix.clone();
+                args.extend(["--allow-origin", value]);
+                let error = Args::try_parse_from(args)
+                    .expect_err("reject invalid MCP origin configuration");
+                assert_eq!(error.kind(), clap::error::ErrorKind::ValueValidation);
+            }
+        }
+        let error =
+            Args::try_parse_from(["reqvire", "serve", "--allow-origin", "https://app.example"])
+                .expect_err("reject invalid MCP origin configuration");
+        assert_eq!(
+            error.kind(),
+            clap::error::ErrorKind::MissingRequiredArgument
+        );
+    }
+
+    #[test]
+    fn mcp_host_cli_accepts_aliases_and_rejects_invalid_configuration() {
+        for prefix in [
+            vec!["reqvire", "mcp"],
+            vec!["reqvire", "serve", "--enable-mcp"],
+        ] {
+            let mut args = prefix.clone();
+            args.extend([
+                "--host",
+                "0.0.0.0",
+                "--allow-host",
+                "mcp.example",
+                "--allow-host",
+                "192.0.2.50:8081",
+            ]);
+            assert!(Args::try_parse_from(args).is_ok());
+            for invalid in [
+                "*",
+                "0.0.0.0",
+                "https://mcp.example",
+                "mcp.example/path",
+                "mcp.example:65536",
+            ] {
+                let mut args = prefix.clone();
+                args.extend(["--allow-host", invalid]);
+                assert_eq!(
+                    Args::try_parse_from(args)
+                        .expect_err("reject invalid host")
+                        .kind(),
+                    clap::error::ErrorKind::ValueValidation
+                );
+            }
+        }
+        assert_eq!(
+            Args::try_parse_from(["reqvire", "serve", "--allow-host", "mcp.example"])
+                .expect_err("require embedded MCP")
+                .kind(),
+            clap::error::ErrorKind::MissingRequiredArgument
+        );
+    }
+
+    #[test]
     fn test_cli_parsing_subcommand() {
-        let args = Args::parse_from(&["reqvire", "serve", "--host", "127.0.0.1", "--port", "9000"]);
+        let args = Args::parse_from(["reqvire", "serve", "--host", "127.0.0.1", "--port", "9000"]);
         assert!(matches!(
             args.command,
-            Some(Commands::Serve { host, port, enable_mcp, mcp_enable_mutations })
+            Some(Commands::Serve { host, port, enable_mcp, mcp_enable_mutations, .. })
                 if host == "127.0.0.1" && port == 9000 && !enable_mcp && !mcp_enable_mutations
         ));
     }
 
     #[test]
     fn parses_serve_with_embedded_mcp() {
-        let args = Args::parse_from(&["reqvire", "serve", "--enable-mcp", "--enable-mutations"]);
+        let args = Args::parse_from(["reqvire", "serve", "--enable-mcp", "--enable-mutations"]);
         assert!(matches!(
             args.command,
             Some(Commands::Serve {
@@ -2754,7 +3010,7 @@ mod tests {
 
     #[test]
     fn workspace_flag_is_global() {
-        let args = Args::parse_from(&["reqvire", "--workspace", "/tmp", "validate"]);
+        let args = Args::parse_from(["reqvire", "--workspace", "/tmp", "validate"]);
         assert_eq!(args.workspace, Some(PathBuf::from("/tmp")));
         assert!(matches!(args.command, Some(Commands::Validate { .. })));
     }
@@ -2762,7 +3018,182 @@ mod tests {
     #[test]
     fn apply_workspace_rejects_missing_directory() {
         let missing = PathBuf::from("/definitely/not/a/reqvire/workspace");
-        let err = apply_workspace(Some(&missing)).unwrap_err();
+        let err = apply_workspace(Some(&missing)).expect_err("expected the operation to fail");
         assert!(err.to_string().contains("Failed to resolve workspace"));
     }
+}
+
+#[derive(Subcommand, Debug)]
+pub enum QueryCommands {
+    /// List native query artifacts and their source metadata
+    List {
+        /// Exact semantic-query source element name or canonical identifier
+        #[clap(long, conflicts_with = "iri")]
+        name: Option<String>,
+        #[clap(long)]
+        iri: Option<String>,
+        #[clap(long)]
+        namespace_base: Option<String>,
+        #[clap(long)]
+        json: bool,
+    },
+    /// Validate query artifacts without executing them
+    Validate {
+        /// Exact semantic-query source element name or canonical identifier
+        #[clap(long, conflicts_with = "iri")]
+        name: Option<String>,
+        #[clap(long)]
+        iri: Option<String>,
+        #[clap(long)]
+        json: bool,
+    },
+    /// Export a standalone SPARQL artifact
+    Export {
+        /// Exact semantic-query source element name or canonical identifier
+        #[clap(long, required_unless_present = "iri", conflicts_with = "iri")]
+        name: Option<String>,
+        #[clap(long, required_unless_present = "name")]
+        iri: Option<String>,
+        #[clap(long, conflicts_with = "json")]
+        output: Option<std::path::PathBuf>,
+        #[clap(long)]
+        json: bool,
+    },
+    /// Compare a generated query with an existing artifact
+    Check {
+        /// Exact semantic-query source element name or canonical identifier
+        #[clap(long, required_unless_present = "iri", conflicts_with = "iri")]
+        name: Option<String>,
+        #[clap(long, required_unless_present = "name")]
+        iri: Option<String>,
+        #[clap(long)]
+        artifact: std::path::PathBuf,
+        #[clap(long)]
+        json: bool,
+    },
+}
+
+fn run_query_command(
+    index: &semantic_contract::SemanticIndex,
+    command: QueryCommands,
+) -> Result<i32, ReqvireError> {
+    match command {
+        QueryCommands::List {
+            name,
+            iri,
+            namespace_base,
+            json,
+        } => {
+            let records =
+                index.select_queries(name.as_deref(), iri.as_deref(), namespace_base.as_deref())?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&records)?);
+            } else {
+                for record in records {
+                    println!(
+                        "{}\t{}\t{}",
+                        record.iri,
+                        record.query_form.as_deref().unwrap_or("invalid"),
+                        record.name
+                    );
+                }
+            }
+        }
+        QueryCommands::Validate { name, iri, json } => {
+            let report =
+                index.query_validation_report(name.as_deref(), iri.as_deref(), Vec::new())?;
+            print_query_validation_report(&report, json)?;
+            return Ok(if report["valid"] == true { 0 } else { 1 });
+        }
+        QueryCommands::Export {
+            name,
+            iri,
+            output,
+            json,
+        } => {
+            let records = index.select_queries(name.as_deref(), iri.as_deref(), None)?;
+            let record = records[0];
+            let envelope = record.artifact()?;
+            if let Some(path) = output {
+                use std::io::Write;
+                let parent = path
+                    .parent()
+                    .filter(|p| !p.as_os_str().is_empty())
+                    .unwrap_or_else(|| std::path::Path::new("."));
+                let mut temp = tempfile::NamedTempFile::new_in(parent)?;
+                temp.write_all(record.content.as_bytes())?;
+                temp.as_file().sync_all()?;
+                temp.persist(&path).map_err(|e| {
+                    ReqvireError::ProcessError(format!("Cannot write {}: {}", path.display(), e))
+                })?;
+                eprintln!("Wrote {}", path.display());
+            } else if json {
+                println!("{}", serde_json::to_string_pretty(&envelope)?);
+            } else {
+                print!("{}", record.content);
+            }
+        }
+        QueryCommands::Check {
+            name,
+            iri,
+            artifact,
+            json,
+        } => {
+            let records = index.select_queries(name.as_deref(), iri.as_deref(), None)?;
+            let expected = records[0].artifact()?;
+            let (status, actual) = match std::fs::read(&artifact) {
+                Ok(bytes) => (
+                    if bytes == records[0].content.as_bytes() {
+                        "matching"
+                    } else {
+                        "stale"
+                    },
+                    Some(reqvire::hashing::sha256_hex(&bytes)),
+                ),
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => ("missing", None),
+                Err(error) => {
+                    return Err(ReqvireError::ProcessError(format!(
+                        "Cannot read {}: {}",
+                        artifact.display(),
+                        error
+                    )))
+                }
+            };
+            let result = serde_json::json!({"status":status,"expected_sha256":expected["sha256"],"actual_sha256":actual});
+            if json {
+                println!("{}", serde_json::to_string_pretty(&result)?);
+            } else {
+                println!("{}", result);
+            }
+            return Ok(if status == "matching" { 0 } else { 1 });
+        }
+    }
+    Ok(0)
+}
+
+fn print_query_validation_report(
+    report: &serde_json::Value,
+    json: bool,
+) -> Result<(), ReqvireError> {
+    if json {
+        println!("{}", serde_json::to_string_pretty(report)?);
+    } else {
+        for query in report["queries"].as_array().into_iter().flatten() {
+            let valid = query["diagnostics"]
+                .as_array()
+                .is_some_and(|d| d.is_empty());
+            println!(
+                "{}: {}",
+                query["name"].as_str().unwrap_or_default(),
+                if valid { "valid" } else { "invalid" }
+            );
+            for diagnostic in query["diagnostics"].as_array().into_iter().flatten() {
+                eprintln!("{}", diagnostic);
+            }
+        }
+        for error in report["model_errors"].as_array().into_iter().flatten() {
+            eprintln!("{}", error.as_str().unwrap_or_default());
+        }
+    }
+    Ok(())
 }

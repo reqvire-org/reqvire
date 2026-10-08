@@ -47,7 +47,7 @@ start_http_mcp() {
   local port="$1"
   local output_prefix="$2"
   shift 2
-  (cd "$TEST_DIR" && "$REQVIRE_BIN" mcp --host 127.0.0.1 --port "$port" "$@") > "${output_prefix}.stdout" 2> "${output_prefix}.stderr" &
+  (cd "$TEST_DIR" && exec "$REQVIRE_BIN" mcp --host 127.0.0.1 --port "$port" "$@") > "${output_prefix}.stdout" 2> "${output_prefix}.stderr" &
   HTTP_MCP_PID=$!
 }
 
@@ -163,6 +163,14 @@ workflow_author_concepts_prompt_request() {
 
 workflow_model_quality_audit_prompt_request() {
   jq -n -c '{jsonrpc:"2.0",id:56,method:"prompts/get",params:{name:"reqvire.workflow.model_quality_audit",arguments:{question:"Audit model quality",scope:"MCP interface"}}}'
+}
+
+semantic_contract_context_prompt_request() {
+  jq -n -c '{jsonrpc:"2.0",id:57,method:"prompts/get",params:{name:"reqvire.semantic.contract_context_search"}}'
+}
+
+workflow_verify_coverage_prompt_request() {
+  jq -n -c '{jsonrpc:"2.0",id:58,method:"prompts/get",params:{name:"reqvire.workflow.verify_coverage"}}'
 }
 
 unknown_prompt_request() {
@@ -689,7 +697,9 @@ run_http_mcp_sequence "$DEFAULT_PORT" "$PROMPTS_OUTPUT" \
   "$(workflow_refactor_model_structure_prompt_request)" \
   "$(semantic_author_ontology_contract_prompt_request)" \
   "$(workflow_author_concepts_prompt_request)" \
-  "$(workflow_model_quality_audit_prompt_request)" || fail "new MCP prompt request sequence failed"
+  "$(workflow_model_quality_audit_prompt_request)" \
+  "$(semantic_contract_context_prompt_request)" \
+  "$(workflow_verify_coverage_prompt_request)" || fail "new MCP prompt request sequence failed"
 stop_http_mcp
 trap - EXIT
 
@@ -715,7 +725,7 @@ assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.comm
 assert_jq_line "$DEFAULT_OUTPUT" 2 'all(.result.tools[]; (.name|type=="string") and (.description|type=="string") and (.inputSchema.type=="object") and (.outputSchema|type=="object") and (.annotations|type=="object"))' "each tool has MCP tool contract fields"
 assert_jq_line "$DEFAULT_OUTPUT" 2 'all(.result.tools[]; ((.inputSchema.properties // {}) | has("json") | not) and ((.inputSchema.properties // {}) | has("output") | not))' "tool schemas omit CLI transport options"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.search") | .inputSchema.properties | has("filter_status") and has("filter_priority") and has("filter_risk") and has("filter_owner")' "search tool schema advertises governance metadata filters"
-assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.semantic.export") | .inputSchema.properties.layers.items.enum == ["ontologies","shapes","concepts","model","external-used","prefixes"]' "semantic export schema advertises canonical layers"
+assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.semantic.export") | .inputSchema.properties.layers.items.enum == ["ontologies","shapes","concepts","model","external-used","prefixes","queries"]' "semantic export schema advertises canonical layers"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.semantic.prefixes") | .inputSchema.properties.include_external.default == false' "semantic prefixes schema advertises include_external flag"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.semantic.vocabulary") | .inputSchema.properties.include_external.default == false' "semantic vocabulary schema advertises include_external flag"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.semantic.vocabulary") | .inputSchema.properties | has("ontology_document") and has("ontology_base")' "semantic vocabulary schema advertises ontology document filters"
@@ -778,6 +788,20 @@ assert_jq_line "$PROMPTS_OUTPUT" 4 '.result.messages[0].content.text | contains(
 assert_jq_line "$PROMPTS_OUTPUT" 5 '.result.messages[0].content.text | contains("reqvire.semantic.vocabulary") and contains("ontology_base") and contains("ontology_prefix") and contains("SHACL") and contains("use") and contains("constrain") and contains("semantic-contract") and contains("governance metadata") and contains("implementation satisfaction")' "ontology/contract authoring prompt includes semantic, SHACL, and ontology guardrail rules"
 assert_jq_line "$PROMPTS_OUTPUT" 6 '.result.messages[0].content.text | contains("concept-scheme") and contains("concept") and contains("SKOS") and contains("broader") and contains("related") and contains("Concept References") and contains("reqvire:mapsToConcept") and contains("concept_id") and contains("names collide")' "concept authoring prompt includes native SKOS, identity, and naming rules"
 assert_jq_line "$PROMPTS_OUTPUT" 7 '.result.messages[0].content.text | contains("validation evidence") and contains("reqvire.lint") and contains("reqvire.coverage") and contains("redundant verification") and contains("safe auto-fix") and contains("manual-review")' "model quality prompt includes validation, lint, coverage, and audit buckets"
+# Retrieved prompt text must preserve the distinction used by model coverage.
+assert_contract_dependency_guidance() {
+  assert_jq_line "$1" "$2" '.result.messages[0].content.text | contains("Contract Bindings") and contains("shared implementation obligations") and contains("Contract References") and contains("content dependencies") and contains("change impact") and contains("only binding consumers contribute")' "contract dependency guidance in $3"
+}
+assert_contract_dependency_guidance "$DEFAULT_OUTPUT" 26 "model exploration"
+assert_contract_dependency_guidance "$DEFAULT_OUTPUT" 27 "change-impact review"
+for prompt_line in 1 2 4 7 8 9; do
+  assert_contract_dependency_guidance "$PROMPTS_OUTPUT" "$prompt_line" "workflow prompt $prompt_line"
+done
+for prompt_line in 2 4; do
+  assert_jq_line "$PROMPTS_OUTPUT" "$prompt_line" '.result.messages[0].content.text | contains("referenceContract") and contains("cannot contain both") and contains("acyclic")' "authoring and refactoring preserve contract dependency constraints"
+done
+assert_jq_line "$PROMPTS_OUTPUT" 8 '.result.messages[0].content.text | contains("referencesContract") and contains("bindsContract")' "semantic context includes both dependency predicates"
+assert_jq_line "$PROMPTS_OUTPUT" 9 '.result.messages[0].content.text | contains("terminal requirements") and contains("verification leaves") and contains("satisfiedBy")' "coverage prompt separates terminal implementation from leaf verification"
 assert_jq_line "$DEFAULT_OUTPUT" 29 '.result.structuredContent.include_external == true and (.result.structuredContent.content | contains("MCP external code datatype")) and (.result.structuredContent.content | contains("ext:ExternalCode")) and (.result.structuredContent.content | contains("MCP external resource") | not) and (.result.structuredContent.content | contains("MCP JSON-LD external resource") | not) and (.result.structuredContent.content | contains("MCP RDF/XML external resource") | not) and (.result.structuredContent.content | contains("ext:ExternalResource") | not) and (.result.structuredContent.content | contains("jsonext:JsonExternalResource") | not) and (.result.structuredContent.content | contains("rdfext:RdfExternalResource") | not)' "semantic export external-used layer materializes only used external subset triples"
 assert_jq_line "$DEFAULT_OUTPUT" 29 '.result.structuredContent.include_external == true and (.result.structuredContent.content | contains("ext:ExternalCode rdfs:isDefinedBy") | not)' "semantic export external-used layer does not generate isDefinedBy for external terms"
 assert_jq_line "$DEFAULT_OUTPUT" 29 '.result.structuredContent.include_external == true and (.result.structuredContent.ontology_declarations["https://example.test/mcp-external#ExternalCode"][] | select(.external == true))' "semantic export external-used layer marks used external declaration"
@@ -844,11 +868,14 @@ assert_jq_line "$SIZE_OUTPUT" 3 '.result.structuredContent.size_estimate.content
 assert_jq_line "$SIZE_OUTPUT" 4 '[.result.structuredContent.elements[]? | .. | objects | select(has("identifier") and has("name"))] as $elements | ($elements | length) > 0 and all($elements[]; (.size_estimate.content_bytes | type == "number") and (.size_estimate.rendered_context_bytes | type == "number") and (.size_estimate.estimated_tokens | type == "number"))' "model tool includes size estimates when enabled"
 assert_jq_line "$SIZE_OUTPUT" 5 '.result.contents[0].text | fromjson | .size_estimates_enabled == true' "workspace status resource reports size estimates enabled"
 
+printf '/output/\n' >> "$TEST_DIR/.git/info/exclude"
+(cd "$TEST_DIR" && git add specifications docs && git commit -qm "Prepare MCP mutation fixture") || fail "commit clean mutation fixture"
 DRY_RUN_OUTPUT="$TEST_DIR/output/mcp-mutation-dry-run.jsonl"
 ADD_CONTENT="$(< "$TEST_SCRIPT_DIR/fixtures/mcp-added-requirement.md")"
 DRY_RUN_PORT="$(pick_port)"
 DRY_RUN_OUTPUT_PREFIX="$TEST_DIR/output/mcp-mutation-dry-run"
-start_http_mcp "$DRY_RUN_PORT" "$DRY_RUN_OUTPUT_PREFIX" --enable-mutations
+PREVIEW_HEAD="$(git -C "$TEST_DIR" rev-parse HEAD)"
+start_http_mcp "$DRY_RUN_PORT" "$DRY_RUN_OUTPUT_PREFIX" --enable-mutations --enable-commits
 trap stop_http_mcp EXIT
 wait_for_http_mcp "$DRY_RUN_PORT" "$TEST_DIR/output/mcp-mutation-dry-run-init.json" || fail "dry-run MCP HTTP server did not start" "${DRY_RUN_OUTPUT_PREFIX}.stderr"
 run_http_mcp_sequence "$DRY_RUN_PORT" "$DRY_RUN_OUTPUT" \
@@ -866,10 +893,11 @@ if grep -q "MCP Added Requirement" "$TEST_DIR/specifications/Requirements.md"; t
   fail "dry-run mutation modified the fixture file"
 fi
 
+[ "$(git -C "$TEST_DIR" rev-parse HEAD)" = "$PREVIEW_HEAD" ] || fail "preview created a commit"
 MUTATION_OUTPUT="$TEST_DIR/output/mcp-mutation-execute.jsonl"
 MUTATION_PORT="$(pick_port)"
 MUTATION_OUTPUT_PREFIX="$TEST_DIR/output/mcp-mutation-execute"
-start_http_mcp "$MUTATION_PORT" "$MUTATION_OUTPUT_PREFIX" --enable-mutations
+start_http_mcp "$MUTATION_PORT" "$MUTATION_OUTPUT_PREFIX" --enable-mutations --enable-commits
 trap stop_http_mcp EXIT
 wait_for_http_mcp "$MUTATION_PORT" "$TEST_DIR/output/mcp-mutation-execute-init.json" || fail "mutation MCP HTTP server did not start" "${MUTATION_OUTPUT_PREFIX}.stderr"
 run_http_mcp_sequence "$MUTATION_PORT" "$MUTATION_OUTPUT" \
@@ -879,6 +907,10 @@ run_http_mcp_sequence "$MUTATION_PORT" "$MUTATION_OUTPUT" \
 stop_http_mcp
 trap - EXIT
 
+MUTATION_HEAD="$(git -C "$TEST_DIR" rev-parse HEAD)"
+[ "$(git -C "$TEST_DIR" rev-parse HEAD^)" = "$PREVIEW_HEAD" ] || fail "mutation must create exactly one commit"
+assert_jq_line "$MUTATION_OUTPUT" 2 ".result.structuredContent.commit == \"$MUTATION_HEAD\"" "mutation returns accepted commit"
+[ -z "$(git -C "$TEST_DIR" status --porcelain)" ] || fail "mutation must leave its fixture clean"
 assert_jq_line "$MUTATION_OUTPUT" 2 '.result.structuredContent.dry_run == false and (.result.structuredContent.diffs | length) >= 1' "executing mutation returns persisted diffs"
 grep -q "MCP Added Requirement" "$TEST_DIR/specifications/Requirements.md" || fail "executing mutation did not update the fixture file"
 assert_jq_line "$MUTATION_OUTPUT" 3 '.result.structuredContent.name == "MCP Added Requirement"' "post-mutation read observes refreshed model state"
@@ -943,7 +975,7 @@ stop_http_mcp
 
 HTTP_MUTATION_PORT="$(pick_port)"
 HTTP_MUTATION_OUTPUT_PREFIX="$TEST_DIR/output/mcp-http-mutations"
-start_http_mcp "$HTTP_MUTATION_PORT" "$HTTP_MUTATION_OUTPUT_PREFIX" --enable-mutations
+start_http_mcp "$HTTP_MUTATION_PORT" "$HTTP_MUTATION_OUTPUT_PREFIX" --enable-mutations --enable-commits
 wait_for_http_mcp "$HTTP_MUTATION_PORT" "$TEST_DIR/output/mcp-http-mutations-init.json" || fail "HTTP mutation MCP server did not start" "${HTTP_MUTATION_OUTPUT_PREFIX}.stderr"
 
 http_mcp_call "$HTTP_MUTATION_PORT" "$(tools_list_request)" "$TEST_DIR/output/mcp-http-mutation-tools.json" || fail "HTTP mutation tools/list request failed"
@@ -960,6 +992,7 @@ HTTP_CONCURRENT_CONTENT_B="$(< "$TEST_SCRIPT_DIR/fixtures/http-concurrent-requir
 HTTP_CONCURRENT_REQUEST_A="$(jq -n -c --arg content "$HTTP_CONCURRENT_CONTENT_A" '{jsonrpc:"2.0",id:11,method:"tools/call",params:{name:"reqvire.add_element",arguments:{file:"specifications/Requirements.md",content:$content,dry_run:false}}}')"
 HTTP_CONCURRENT_REQUEST_B="$(jq -n -c --arg content "$HTTP_CONCURRENT_CONTENT_B" '{jsonrpc:"2.0",id:12,method:"tools/call",params:{name:"reqvire.add_element",arguments:{file:"specifications/Requirements.md",content:$content,dry_run:false}}}')"
 
+CONCURRENT_HEAD="$(git -C "$TEST_DIR" rev-parse HEAD)"
 http_mcp_call "$HTTP_MUTATION_PORT" "$HTTP_CONCURRENT_REQUEST_A" "$TEST_DIR/output/mcp-http-concurrent-a.json" &
 HTTP_CURL_PID_A=$!
 http_mcp_call "$HTTP_MUTATION_PORT" "$HTTP_CONCURRENT_REQUEST_B" "$TEST_DIR/output/mcp-http-concurrent-b.json" &
@@ -967,6 +1000,7 @@ HTTP_CURL_PID_B=$!
 wait "$HTTP_CURL_PID_A" || fail "first concurrent HTTP mutation failed" "$TEST_DIR/output/mcp-http-concurrent-a.json"
 wait "$HTTP_CURL_PID_B" || fail "second concurrent HTTP mutation failed" "$TEST_DIR/output/mcp-http-concurrent-b.json"
 
+[ "$(git -C "$TEST_DIR" rev-list --count "$CONCURRENT_HEAD..HEAD")" = 2 ] || fail "concurrent mutations must create two sequential commits"
 jq -e '.result.structuredContent.dry_run == false' "$TEST_DIR/output/mcp-http-concurrent-a.json" >/dev/null \
   || fail "first concurrent HTTP mutation should execute" "$TEST_DIR/output/mcp-http-concurrent-a.json"
 jq -e '.result.structuredContent.dry_run == false' "$TEST_DIR/output/mcp-http-concurrent-b.json" >/dev/null \

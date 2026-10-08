@@ -1,21 +1,17 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { useSelectionNavigation } from "./useSelectionNavigation";
 import { useStore } from "../store/StoreContext";
 import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
+import { useCoverageNavigation } from "./useCoverageNavigation";
+import type { CoverageProjection } from "../store/types";
 
-export type ModelMode = "list" | "grid" | "graph";
+export type ModelMode = "list" | "grid" | "graph" | "flow";
 export type ModelSelectionId = "__root__" | `folder:${string}` | `file:${string}` | string;
 export type GraphOverlayKey = "cross" | "verification" | "trace";
-export type CoverageSectionId =
-  | "overview"
-  | "capability-coverage"
-  | "unverified-requirements"
-  | "unimplemented-requirements"
-  | "unsatisfied-verifications"
-  | "orphaned-verifications";
-
 export const MODEL_DEFAULT_OVERLAYS = ["cross", "verification", "trace"] as const;
 
 export const ONTOLOGY_NODE_ROLES = [
+  "semantic-query",
   "class",
   "object-property",
   "datatype-property",
@@ -59,6 +55,7 @@ export const ONTOLOGY_LAYER_FILTERS = [
 ] as const;
 
 export const ONTOLOGY_DEFAULT_FILTERS = [
+  "semantic-query",
   "layer-authored",
   "layer-concepts",
   "ontology-term",
@@ -84,6 +81,7 @@ export const ONTOLOGY_DEFAULT_FILTERS = [
 ] as const;
 
 interface ExplorerUiState {
+  navigationNotice: string | null;
   modelMode: ModelMode;
   setModelMode: (mode: ModelMode) => void;
   modelSelectionId: ModelSelectionId;
@@ -116,8 +114,12 @@ interface ExplorerUiState {
   setThesaurusSelectionId: (id: string | null) => void;
   thesaurusQuery: string;
   setThesaurusQuery: (query: string) => void;
-  coverageSectionId: CoverageSectionId;
-  setCoverageSectionId: (id: CoverageSectionId) => void;
+  coverageScopeId: string | null;
+  setCoverageScopeId: (id: string | null) => void;
+  coverageTreeQuery: string;
+  setCoverageTreeQuery: (query: string) => void;
+  coverageProjection: CoverageProjection;
+  coverageNotice: string | null;
   traceFilePath: string | null;
   setTraceFilePath: (path: string | null) => void;
   traceSelectionId: string | null;
@@ -128,8 +130,10 @@ interface ExplorerUiState {
 
 const ExplorerUiStateContext = createContext<ExplorerUiState | null>(null);
 
-export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
+export function ExplorerUiStateProvider({ children, worktreeRouting = false }: { children: ReactNode; worktreeRouting?: boolean }) {
   const { store } = useStore();
+  const coverageState = useCoverageNavigation(store, worktreeRouting);
+  const selectionState = useSelectionNavigation(worktreeRouting);
   const searchElementTypeKeys = useMemo(
     () => Array.from(new Set(store.elements.map((element) => element.element_type).filter(Boolean))).sort(),
     [store.elements],
@@ -145,8 +149,6 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
       ).sort(),
     [store.knowledge_graph.nodes],
   );
-  const [modelMode, setModelMode] = useState<ModelMode>("grid");
-  const [modelSelectionId, setModelSelectionId] = useState<ModelSelectionId>("__root__");
   const [modelTreeQuery, setModelTreeQuery] = useState("");
   const [modelTypes, setModelTypes] = useState(() => new Set<string>(modelTypeKeys));
   const [modelOverlays, setModelOverlays] = useState<Set<GraphOverlayKey>>(
@@ -159,21 +161,15 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
   const [ontologyLayoutNonce, setOntologyLayoutNonce] = useState(0);
   const [searchKinds, setSearchKinds] = useState(() => new Set<SearchKind>(SEARCH_KINDS));
   const [searchElementTypes, setSearchElementTypes] = useState(() => new Set<string>(searchElementTypeKeys));
-  const [knowledgeGraphSelectionId, setKnowledgeGraphSelectionId] = useState<string | null>(null);
-  const [ontologySelectionId, setOntologySelectionId] = useState<string | null>(null);
-  const [thesaurusSelectionId, setThesaurusSelectionId] = useState<string | null>(null);
   const [thesaurusQuery, setThesaurusQuery] = useState("");
-  const [coverageSectionId, setCoverageSectionId] = useState<CoverageSectionId>("overview");
-  const [traceFilePath, setTraceFilePath] = useState<string | null>(null);
-  const [traceSelectionId, setTraceSelectionId] = useState<string | null>(null);
   const [traceTreeQuery, setTraceTreeQuery] = useState("");
+  const [coverageTreeQuery, setCoverageTreeQuery] = useState("");
 
   const value = useMemo<ExplorerUiState>(
     () => ({
-      modelMode,
-      setModelMode,
-      modelSelectionId,
-      setModelSelectionId,
+      ...coverageState,
+      ...selectionState,
+      navigationNotice: selectionState.selectionNotice,
       modelTreeQuery,
       setModelTreeQuery,
       modelTypes,
@@ -203,34 +199,19 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
         setSearchKinds(new Set(SEARCH_KINDS));
         setSearchElementTypes(new Set(searchElementTypeKeys));
       },
-      knowledgeGraphSelectionId,
-      setKnowledgeGraphSelectionId,
-      ontologySelectionId,
-      setOntologySelectionId,
-      thesaurusSelectionId,
-      setThesaurusSelectionId,
       thesaurusQuery,
       setThesaurusQuery,
-      coverageSectionId,
-      setCoverageSectionId,
-      traceFilePath,
-      setTraceFilePath,
-      traceSelectionId,
-      setTraceSelectionId,
       traceTreeQuery,
       setTraceTreeQuery,
+      coverageTreeQuery,
+      setCoverageTreeQuery,
     }),
     [
-      knowledgeGraphSelectionId,
-      ontologySelectionId,
-      thesaurusSelectionId,
+      coverageState,
+      selectionState,
       thesaurusQuery,
-      coverageSectionId,
-      traceFilePath,
-      traceSelectionId,
       traceTreeQuery,
-      modelMode,
-      modelSelectionId,
+      coverageTreeQuery,
       modelTreeQuery,
       modelOverlays,
       modelTypeKeys,

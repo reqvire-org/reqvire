@@ -619,12 +619,12 @@ export function ThesaurusExplorer({
   onOpenConcept,
 }: ThesaurusExplorerProps) {
   const conceptById = new Map(concepts.map((concept) => [concept.id, concept]));
-  const selected = selectedId ? conceptById.get(selectedId) : concepts[0];
+  const selected = selectedId ? conceptById.get(selectedId) : undefined;
   const activeSchemeId = selected?.schemeId ?? concepts[0]?.schemeId ?? "";
   const activeSchemeLabel = selected?.schemeLabel ?? concepts[0]?.schemeLabel ?? "Thesaurus";
   const schemeConcepts = concepts.filter((concept) => concept.schemeId === activeSchemeId);
 
-  if (!selected) {
+  if (!concepts.length) {
     return (
       <RouteFrame viewId="thesaurus">
         <RouteLayout>
@@ -656,7 +656,7 @@ export function ThesaurusExplorer({
             <ThesaurusSchemeMap
               concepts={schemeConcepts}
               schemeLabel={activeSchemeLabel}
-              selectedId={selected.id}
+              selectedId={selected?.id ?? ""}
               onSelect={onSelectConcept}
               onOpenConcept={onOpenConcept}
             />

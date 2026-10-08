@@ -1,0 +1,14 @@
+served URL precedence and explicit whole-model dashboard: PASS
+served scope history and copied-link reload: PASS
+served detail and view return retain the complete scoped dashboard: PASS
+served scoped summaries issues and keyboard root reset: PASS
+served retired view links migrate to scope-only dashboards: PASS
+served invalid and non-capability scope fallback: PASS
+served worktree scopes are isolated and traversable: PASS
+served refreshed scope removal restores the full whole-model dashboard: PASS
+exported URL precedence and explicit whole-model dashboard: PASS
+exported scope history and copied-link reload: PASS
+exported detail and view return retain the complete scoped dashboard: PASS
+exported scoped summaries issues and keyboard root reset: PASS
+exported retired view links migrate to scope-only dashboards: PASS
+exported invalid and non-capability scope fallback: PASS

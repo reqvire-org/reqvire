@@ -1,3 +1,4 @@
+import { worktreeUrl } from "./worktreeUrls";
 import { sha256 } from "@noble/hashes/sha2.js";
 import { bytesToHex } from "@noble/hashes/utils.js";
 import { loadStoreCandidate, type StoreLoadResult } from "./loadStore";
@@ -16,6 +17,7 @@ export interface StoreManifest {
 }
 
 export interface PreparedStore {
+  recoveryRequired: boolean;
   revision: string;
   manifest: StoreManifest;
   result: Extract<StoreLoadResult, { ok: true }>;
@@ -32,16 +34,19 @@ function object(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function freezeJson(value: unknown): void {
+function freezeJson(value: unknown, deeplyFrozen: WeakSet<object>): void {
   const pending: unknown[] = [value];
-  const visited = new WeakSet<object>();
+  const visited = new Set<object>();
   while (pending.length) {
     const current = pending.pop();
-    if (typeof current !== "object" || current === null || visited.has(current)) continue;
+    if (typeof current !== "object" || current === null || deeplyFrozen.has(current) || visited.has(current)) continue;
     visited.add(current);
     for (const child of Object.values(current)) pending.push(child);
     Object.freeze(current);
   }
+  // Trust a subtree only after the complete walk succeeds. Object.isFrozen
+  // alone says nothing about descendants of an externally supplied seed.
+  for (const current of visited) deeplyFrozen.add(current);
 }
 
 function validateManifest(value: unknown): StoreManifest {
@@ -81,12 +86,15 @@ async function httpError(response: Response): Promise<Error> {
 /** Preparation never changes the published revision or cache. The hook commits
  * only if its mounted, visible consumer still owns the request. */
 export class ManifestStoreClient {
+  recoveryRequired = false;
   private revision?: string;
   private manifest?: StoreManifest;
   private store?: ExplorerProjectStore;
   private chunks: ReadonlyMap<string, unknown> = new Map();
+  private readonly deeplyFrozen = new WeakSet<object>();
 
-  constructor(store?: ExplorerProjectStore, seed?: { revision: string; manifest: unknown }) {
+  constructor(store?: ExplorerProjectStore, seed?: { revision: string; manifest: unknown }, private readonly worktreeId?: string) {
+    if (worktreeId && store?.project.worktree_id !== worktreeId) return;
     if (!store || !seed) return;
     try {
       const manifest = validateManifest(seed.manifest);
@@ -109,8 +117,8 @@ export class ManifestStoreClient {
       // The seed and its manifest arrive together in one generated script.
       // Associate its already-loaded values with the server's wire hashes;
       // reserializing parsed floats would not preserve the original JSON bytes.
-      freezeJson(store);
-      freezeJson(manifest);
+      freezeJson(store, this.deeplyFrozen);
+      freezeJson(manifest, this.deeplyFrozen);
       this.revision = seed.revision;
       this.manifest = manifest;
       this.store = store;
@@ -121,19 +129,21 @@ export class ManifestStoreClient {
     }
   }
 
-  async prepare(signal: AbortSignal): Promise<PreparedStore | null> {
+  async prepare(signal: AbortSignal, force = false): Promise<PreparedStore | null> {
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       signal.throwIfAborted();
-      const response = await fetch("/api/project-store/manifest", {
+      const response = await fetch(worktreeUrl("/api/project-store/manifest", this.worktreeId), {
         cache: "no-store",
-        headers: this.revision ? { "If-None-Match": `"${this.revision}"` } : {},
+        headers: this.revision && !force ? { "If-None-Match": `"${this.revision}"` } : {},
         signal,
       });
       signal.throwIfAborted();
+      const recoveryRequired = response.headers.get("X-Reqvire-Recovery-Required") === "true";
       if (response.status === 304) {
         if (!this.revision || response.headers.get("etag") !== `"${this.revision}"`) {
           throw new Error("Invalid unchanged refresh response.");
         }
+        this.recoveryRequired = recoveryRequired;
         return null;
       }
       if (!response.ok) throw await httpError(response);
@@ -151,7 +161,7 @@ export class ManifestStoreClient {
       let superseded = false;
       for (let start = 0; start < missing.length; start += CHUNK_BATCH_SIZE) {
         const batch = missing.slice(start, start + CHUNK_BATCH_SIZE);
-        const chunksResponse = await fetch("/api/project-store/chunks", {
+        const chunksResponse = await fetch(worktreeUrl("/api/project-store/chunks", this.worktreeId), {
           method: "POST", cache: "no-store", signal,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ revision, hashes: batch }),
@@ -188,17 +198,19 @@ export class ManifestStoreClient {
       const result = loadStoreCandidate(Object.fromEntries(entries));
       if (!result.ok) throw new Error(result.detail ?? result.reason);
       if (result.schemaMismatch) throw new Error(result.schemaMismatch);
+      if (this.worktreeId && result.store.project.worktree_id !== this.worktreeId) throw new Error("The server returned a different worktree context.");
       signal.throwIfAborted();
       // UI consumers share unchanged records with the content-addressed cache.
       // Protect that identity from incidental renderer mutations.
-      freezeJson(result.store);
-      freezeJson(manifest);
-      return { revision, manifest, result, chunks: staged };
+      freezeJson(result.store, this.deeplyFrozen);
+      freezeJson(manifest, this.deeplyFrozen);
+      return { revision, manifest, result, chunks: staged, recoveryRequired };
     }
     throw new Error("The model kept changing during refresh; will retry automatically.");
   }
 
   commit(next: PreparedStore): void {
+    this.recoveryRequired = next.recoveryRequired;
     this.revision = next.revision;
     this.manifest = next.manifest;
     this.store = next.result.store;

@@ -46,7 +46,7 @@ impl GraphRegistry {
 
         self.nodes.insert(
             element_id,
-            ElementNode {
+            RegistryNode {
                 element,
                 relations: Vec::new(),
             },
@@ -55,26 +55,30 @@ impl GraphRegistry {
         Ok(())
     }
 
-    /// Build relations and validate graph structure
-    pub fn build_relations(
-        &mut self,
-        excluded_filename_patterns: &GlobSet,
-    ) -> Result<Vec<ReqvireError>, ReqvireError> {
-        debug!("GraphRegistry: Building relations and validating graph structure");
-
+    /// Rebuild normalized graph edges and inverse relations before validation.
+    pub(crate) fn refresh_relation_context(&mut self, excluded_filename_patterns: &GlobSet) {
         // Normalize any non-canonical relation references before validation:
         // keep canonical full identifiers in-memory and keep markdown rendering compact
         // through serialization-time relative-link conversion.
         self.normalize_element_relation_targets();
-
-        // First build the relation graph
-        self.build_relation_graph();
 
         // Add missing opposites
         self.propagate_missing_opposites(excluded_filename_patterns);
 
         // Populate element_id for all relations
         self.populate_relation_element_ids();
+
+        // Adjacency must include generated inverse relations on the first build.
+        self.build_relation_graph();
+    }
+
+    /// Resolve and validate the graph, retaining the index used for semantic validation.
+    pub fn build_relations(
+        &mut self,
+        excluded_filename_patterns: &GlobSet,
+    ) -> Result<(Vec<ReqvireError>, semantic_contract::SemanticIndex), ReqvireError> {
+        debug!("GraphRegistry: Building relations and validating graph structure");
+        self.refresh_relation_context(excluded_filename_patterns);
 
         // Materialize namespace-derived concept payload fields after relation
         // resolution so JSON evidence and generated RDF use the same SKOS IRIs.
@@ -97,6 +101,7 @@ impl GraphRegistry {
 
         // Validate contract_bindings exist
         errors.extend(self.validate_contract_bindings()?);
+        errors.extend(self.validate_contract_references()?);
 
         // Validate legacy contract relation names before the stricter
         // contract-element ownership checks.
@@ -124,9 +129,10 @@ impl GraphRegistry {
         errors.extend(self.validate_cross_section_duplicates()?);
 
         // Validate semantic-contract reserved sections, declarations, and references
-        errors.extend(self.validate_semantic_contracts(None)?);
+        let semantic_build = semantic_contract::build_semantic_index_with_shapes(self);
+        errors.extend(self.validate_semantic_contracts_with_build(&semantic_build, None)?);
 
-        Ok(errors)
+        Ok((errors, semantic_build.index))
     }
 
     /// Populate optional element-level size estimates for JSON evidence consumers.
@@ -169,10 +175,10 @@ impl GraphRegistry {
                                 .resolve_relation_identifier(&source_node.element, target_id)
                                 .unwrap_or_else(|| target_id.to_string());
 
-                            if let Some(target_node) = self.nodes.get(&resolved_target) {
-                                relation_nodes.push(RelationNode {
+                            if self.nodes.contains_key(&resolved_target) {
+                                relation_nodes.push(RelationEdge {
                                     relation_trigger: relation.relation_type.name.to_string(),
-                                    element_node: target_node.clone(),
+                                    target_id: resolved_target,
                                 });
                             }
                         }

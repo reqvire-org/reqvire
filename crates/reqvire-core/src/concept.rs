@@ -1,4 +1,4 @@
-pub(crate) fn concept_local_name(name: &str) -> String {
+pub fn concept_local_name(name: &str) -> String {
     let mut local = String::new();
     for part in name
         .split(|ch: char| !ch.is_ascii_alphanumeric())

@@ -10,11 +10,17 @@ A contract element can only be bound to a requirement if that requirement has NO
 - Cannot reuse to any parent (ancestor) of that requirement via derivedFrom chain
 - Cannot reuse to any child (descendant) of that requirement via derive chain
 
-**Upstream contract_bindings propagation:**
+**Binding placement:**
+Contract bindings MUST be placed at the requirement level responsible for implementing the bound obligation.
+
+- Bind individual child requirements when their implementations fulfill the obligation independently and require separate coverage tracking.
+- Bind a parent requirement when the obligation applies to its entire requirement subtree and fulfillment is intentionally assessed through that subtree's implementation roll-up.
+- A shared ancestor alone is not a reason to move bindings upward.
+
+**Downstream contract_bindings propagation:**
 If a contract binding (contract identifier) is already bound to an ancestor requirement in the derivation hierarchy, descendants cannot reuse the same target:
 - Contract Bindings propagate downstream through the derivedFrom chain
 - Re-bindContract at a descendant level is redundant
-- Only the highest-level requirement in a hierarchy branch should reuse
 
 Only requirements in a separate branch of the hierarchy (no derivedFrom chain connecting them to the owner or existing reuser) may reuse the contract.
 

@@ -29,7 +29,7 @@ function Section({ title, desc, children }: { title: string; desc?: string; chil
 
 const ELEMENT_ROLES = [
   "capability", "requirement", "contract", "source", "constraint",
-  "behavior", "state", "input-output", "specification", "semantic-contract",
+  "behavior", "state", "input-output", "specification", "semantic-contract", "semantic-query",
   "verification-objective", "test-verification", "formal-proof-verification",
   "analysis-verification", "inspection-verification", "demonstration-verification",
   "verification", "ontology", "resource",

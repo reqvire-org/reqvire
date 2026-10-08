@@ -1,7 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { parseHash, routeForElement, routeForResource, routeForView } from "./routes";
+import { parseHash, routeForCoverage, routeForSelection, routeForElement, routeForResource, routeForView, worktreeUrl } from "./routes";
 
 describe("parseHash", () => {
+  it("round-trips view selections with reserved characters and keeps them under overlays", () => {
+    const id = "model/Scope ü +&?%.md#child";
+    for (const view of ["model", "traces", "thesaurus", "ontologies"] as const) {
+      const hash = routeForSelection(view, id, { mode: view === "model" ? "flow" : undefined });
+      const parsed = parseHash(hash, "model");
+      expect(new URLSearchParams(parsed.param!).get("selected")).toBe(id);
+      expect(parseHash(routeForElement("other.md#element"), parsed).param).toBe(parsed.param);
+      expect(worktreeUrl(`https://example.test/?worktree_id=a${hash}`, "b").hash).toBe(`#/${view}`);
+    }
+    expect(new URLSearchParams(parseHash(routeForSelection("traces", null, { file: id }), "model").param!).get("file")).toBe(id);
+  });
+
+
   it("defaults empty hash to model", () => {
     expect(parseHash("", "model")).toEqual({
       view: "model",
@@ -19,6 +32,29 @@ describe("parseHash", () => {
     expect(parseHash("#/model", "model").view).toBe("model");
     expect(parseHash("#/knowledge-graph", "model").view).toBe("model");
     expect(parseHash("#/ontologies", "model").view).toBe("ontologies");
+  });
+
+  it("round-trips explicit coverage scopes, including Whole model and reserved characters", () => {
+    const id = "specifications/Scope ü +&?%.md#child";
+    expect(routeForCoverage(id)).toBe(`#/coverage?scope=${encodeURIComponent(id)}`);
+    expect(new URLSearchParams(parseHash(routeForCoverage(id), "model").param!).get("scope")).toBe(id);
+    expect(new URLSearchParams(parseHash(routeForCoverage(null), "model").param!).get("scope")).toBe("");
+    expect(parseHash("#/coverage", "model").param).toBeNull();
+    expect(parseHash("#/coverage?other=value", "model").param).toBe("other=value");
+  });
+
+  it("retains coverage scope beneath element overlays", () => {
+    expect(parseHash(routeForElement("a.md#element"), { view: "coverage", param: "scope=b.md%23scope&mode=issues&issue=unimplemented-requirements" }))
+      .toEqual({ view: "coverage", param: "scope=b.md%23scope&mode=issues&issue=unimplemented-requirements", elementId: "a.md#element" });
+  });
+
+  it("resumes the target worktree scope without carrying the previous scope", () => {
+    const url = worktreeUrl(`https://example.test/export/index.html?theme=dark&worktree_id=a${routeForCoverage("a.md#capability")}`, "b");
+    expect(url.pathname).toBe("/export/index.html");
+    expect(url.searchParams.get("theme")).toBe("dark");
+    expect(url.searchParams.get("worktree_id")).toBe("b");
+    expect(url.hash).toBe("#/coverage");
+    expect(worktreeUrl("https://example.test/#/content/a.md", "b").hash).toBe("#/content/a.md");
   });
 
   it("treats element routes as overlays over the previous view", () => {

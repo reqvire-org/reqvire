@@ -1,0 +1,536 @@
+PASS mcp/commits-disabled/model/Root Capability/name-control
+PASS mcp/commits-disabled/model/Root Capability/identifier-parity
+PASS mcp/commits-disabled/model/Nested Capability/name-control
+PASS mcp/commits-disabled/model/Nested Capability/identifier-parity
+PASS mcp/commits-disabled/model/Parent Requirement/name-control
+PASS mcp/commits-disabled/model/Parent Requirement/identifier-parity
+PASS mcp/commits-disabled/model/Child Requirement/name-control
+PASS mcp/commits-disabled/model/Child Requirement/identifier-parity
+PASS mcp/commits-disabled/submodels/Root Capability/name-control
+PASS mcp/commits-disabled/submodels/Root Capability/identifier-parity
+PASS mcp/commits-disabled/submodels/Nested Capability/name-control
+PASS mcp/commits-disabled/submodels/Nested Capability/identifier-parity
+PASS mcp/commits-disabled/submodels/Parent Requirement/name-control
+PASS mcp/commits-disabled/submodels/Parent Requirement/identifier-parity
+PASS mcp/commits-disabled/submodels/Child Requirement/name-control
+PASS mcp/commits-disabled/submodels/Child Requirement/identifier-parity
+PASS mcp/commits-disabled/coverage/Root Capability/name-control
+PASS mcp/commits-disabled/coverage/Root Capability/identifier-parity
+PASS mcp/commits-disabled/coverage/Nested Capability/name-control
+PASS mcp/commits-disabled/coverage/Nested Capability/identifier-parity
+PASS mcp/commits-disabled/collect/Root Capability/UPSTREAM/name-control
+PASS mcp/commits-disabled/collect/Root Capability/UPSTREAM/identifier-parity
+PASS mcp/commits-disabled/collect/Root Capability/DOWNSTREAM/name-control
+PASS mcp/commits-disabled/collect/Root Capability/DOWNSTREAM/identifier-parity
+PASS mcp/commits-disabled/collect/Child Requirement/UPSTREAM/name-control
+PASS mcp/commits-disabled/collect/Child Requirement/UPSTREAM/identifier-parity
+PASS mcp/commits-disabled/collect/Child Requirement/DOWNSTREAM/name-control
+PASS mcp/commits-disabled/collect/Child Requirement/DOWNSTREAM/identifier-parity
+PASS mcp/commits-disabled/collect/Item Ontology/UPSTREAM/name-control
+PASS mcp/commits-disabled/collect/Item Ontology/UPSTREAM/identifier-parity
+PASS mcp/commits-disabled/collect/Item Ontology/DOWNSTREAM/name-control
+PASS mcp/commits-disabled/collect/Item Ontology/DOWNSTREAM/identifier-parity
+PASS mcp/commits-disabled/collect/Item Lookup/UPSTREAM/name-control
+PASS mcp/commits-disabled/collect/Item Lookup/UPSTREAM/identifier-parity
+PASS mcp/commits-disabled/collect/Item Lookup/DOWNSTREAM/name-control
+PASS mcp/commits-disabled/collect/Item Lookup/DOWNSTREAM/identifier-parity
+PASS mcp/commits-disabled/collect/Sparse Concept Scheme/UPSTREAM/name-control
+PASS mcp/commits-disabled/collect/Sparse Concept Scheme/UPSTREAM/identifier-parity
+PASS mcp/commits-disabled/collect/Sparse Concept Scheme/DOWNSTREAM/name-control
+PASS mcp/commits-disabled/collect/Sparse Concept Scheme/DOWNSTREAM/identifier-parity
+PASS mcp/commits-disabled/collect/Detailed Concept/UPSTREAM/name-control
+PASS mcp/commits-disabled/collect/Detailed Concept/UPSTREAM/identifier-parity
+PASS mcp/commits-disabled/collect/Detailed Concept/DOWNSTREAM/name-control
+PASS mcp/commits-disabled/collect/Detailed Concept/DOWNSTREAM/identifier-parity
+PASS mcp/commits-disabled/queries/list/name-control
+PASS mcp/commits-disabled/queries/list/identifier-parity
+PASS mcp/commits-disabled/queries/validate/name-control
+PASS mcp/commits-disabled/queries/validate/identifier-parity
+PASS mcp/commits-disabled/queries/export/name-control
+PASS mcp/commits-disabled/queries/export/identifier-parity
+PASS mcp/commits-disabled/read-element/name-control
+PASS mcp/commits-disabled/read-element/identifier-parity
+PASS mcp/commits-disabled/native/Sparse Concept Scheme/name-control
+PASS mcp/commits-disabled/native/Sparse Concept Scheme/identifier-parity
+PASS mcp/commits-disabled/native/Detailed Concept/name-control
+PASS mcp/commits-disabled/native/Detailed Concept/identifier-parity
+PASS mcp/commits-disabled/discovery/reqvire.coverage
+PASS mcp/commits-disabled/discovery/reqvire.collect
+PASS mcp/commits-disabled/discovery/reqvire.rename_element
+PASS mcp/commits-disabled/discovery/reqvire.semantic.queries
+PASS mcp/commits-disabled/remove/name-preview-control
+PASS mcp/commits-disabled/remove/element_name
+PASS mcp/commits-disabled/remove/all-identifiers
+PASS mcp/commits-disabled/move/name-preview-control
+PASS mcp/commits-disabled/move/element_name
+PASS mcp/commits-disabled/move/all-identifiers
+PASS mcp/commits-disabled/rename/name-preview-control
+PASS mcp/commits-disabled/rename/element_name
+PASS mcp/commits-disabled/rename/all-identifiers
+PASS mcp/commits-disabled/merge/name-preview-control
+PASS mcp/commits-disabled/merge/target
+PASS mcp/commits-disabled/merge/sources-0
+PASS mcp/commits-disabled/merge/sources-1
+PASS mcp/commits-disabled/merge/all-identifiers
+PASS mcp/commits-disabled/link/name-preview-control
+PASS mcp/commits-disabled/link/source
+PASS mcp/commits-disabled/link/target
+PASS mcp/commits-disabled/link/all-identifiers
+PASS mcp/commits-disabled/cross-file-link/name-preview-control
+PASS mcp/commits-disabled/cross-file-link/source
+PASS mcp/commits-disabled/cross-file-link/target
+PASS mcp/commits-disabled/cross-file-link/all-identifiers
+PASS mcp/commits-disabled/unlink/name-preview-control
+PASS mcp/commits-disabled/unlink/source
+PASS mcp/commits-disabled/unlink/target
+PASS mcp/commits-disabled/unlink/all-identifiers
+PASS mcp/commits-disabled/relink/name-preview-control
+PASS mcp/commits-disabled/relink/source
+PASS mcp/commits-disabled/relink/from_target
+PASS mcp/commits-disabled/relink/to_target
+PASS mcp/commits-disabled/relink/all-identifiers
+PASS mcp/commits-disabled/binding/name-preview-control
+PASS mcp/commits-disabled/binding/source
+PASS mcp/commits-disabled/binding/all-identifiers
+PASS mcp/commits-disabled/binding/target-name
+PASS mcp/commits-disabled/reference/name-preview-control
+PASS mcp/commits-disabled/reference/source
+PASS mcp/commits-disabled/reference/target
+PASS mcp/commits-disabled/reference/all-identifiers
+PASS mcp/commits-disabled/binding-unlink/name-preview-control
+PASS mcp/commits-disabled/binding-unlink/source
+PASS mcp/commits-disabled/binding-unlink/target
+PASS mcp/commits-disabled/binding-unlink/all-identifiers
+PASS mcp/commits-disabled/reference-unlink/name-preview-control
+PASS mcp/commits-disabled/reference-unlink/source
+PASS mcp/commits-disabled/reference-unlink/target
+PASS mcp/commits-disabled/reference-unlink/all-identifiers
+PASS mcp/commits-disabled/reference-relink/name-preview-control
+PASS mcp/commits-disabled/reference-relink/source
+PASS mcp/commits-disabled/reference-relink/from_target
+PASS mcp/commits-disabled/reference-relink/to_target
+PASS mcp/commits-disabled/reference-relink/all-identifiers
+PASS mcp/commits-disabled/ambiguous-read/unchanged-state
+PASS mcp/commits-disabled/ambiguous-write/unchanged-state
+PASS mcp/commits-disabled/ambiguous-apply/unchanged-state
+PASS mcp/commits-disabled/unknown-write/unchanged-state
+PASS mcp/commits-disabled/contradictory-read/unchanged-state
+PASS mcp/commits-disabled/late-unknown-merge/unchanged-state
+PASS mcp/commits-disabled/consistent-explicit-selectors-control
+PASS mcp/commits-disabled/native-contradictory-selectors
+PASS mcp/commits-disabled/merge/identifier-type-check
+PASS mcp/commits-disabled/merge/mixed-alias-self
+PASS mcp/commits-disabled/merge/mixed-alias-duplicate
+PASS mcp/commits-disabled/identifier-type-check
+PASS mcp/commits-disabled/explicit-query-iri-control
+PASS mcp/commits-disabled/pattern-filter-control
+PASS mcp/commits-disabled/identifier-uses-accepted-snapshot
+PASS mcp/commits-disabled/later-write-and-pending-state-control
+PASS mcp/commits-disabled/accepted-identifier-and-stale-rejection
+PASS mcp/commits-enabled/model/Root Capability/name-control
+PASS mcp/commits-enabled/model/Root Capability/identifier-parity
+PASS mcp/commits-enabled/model/Nested Capability/name-control
+PASS mcp/commits-enabled/model/Nested Capability/identifier-parity
+PASS mcp/commits-enabled/model/Parent Requirement/name-control
+PASS mcp/commits-enabled/model/Parent Requirement/identifier-parity
+PASS mcp/commits-enabled/model/Child Requirement/name-control
+PASS mcp/commits-enabled/model/Child Requirement/identifier-parity
+PASS mcp/commits-enabled/submodels/Root Capability/name-control
+PASS mcp/commits-enabled/submodels/Root Capability/identifier-parity
+PASS mcp/commits-enabled/submodels/Nested Capability/name-control
+PASS mcp/commits-enabled/submodels/Nested Capability/identifier-parity
+PASS mcp/commits-enabled/submodels/Parent Requirement/name-control
+PASS mcp/commits-enabled/submodels/Parent Requirement/identifier-parity
+PASS mcp/commits-enabled/submodels/Child Requirement/name-control
+PASS mcp/commits-enabled/submodels/Child Requirement/identifier-parity
+PASS mcp/commits-enabled/coverage/Root Capability/name-control
+PASS mcp/commits-enabled/coverage/Root Capability/identifier-parity
+PASS mcp/commits-enabled/coverage/Nested Capability/name-control
+PASS mcp/commits-enabled/coverage/Nested Capability/identifier-parity
+PASS mcp/commits-enabled/collect/Root Capability/UPSTREAM/name-control
+PASS mcp/commits-enabled/collect/Root Capability/UPSTREAM/identifier-parity
+PASS mcp/commits-enabled/collect/Root Capability/DOWNSTREAM/name-control
+PASS mcp/commits-enabled/collect/Root Capability/DOWNSTREAM/identifier-parity
+PASS mcp/commits-enabled/collect/Child Requirement/UPSTREAM/name-control
+PASS mcp/commits-enabled/collect/Child Requirement/UPSTREAM/identifier-parity
+PASS mcp/commits-enabled/collect/Child Requirement/DOWNSTREAM/name-control
+PASS mcp/commits-enabled/collect/Child Requirement/DOWNSTREAM/identifier-parity
+PASS mcp/commits-enabled/collect/Item Ontology/UPSTREAM/name-control
+PASS mcp/commits-enabled/collect/Item Ontology/UPSTREAM/identifier-parity
+PASS mcp/commits-enabled/collect/Item Ontology/DOWNSTREAM/name-control
+PASS mcp/commits-enabled/collect/Item Ontology/DOWNSTREAM/identifier-parity
+PASS mcp/commits-enabled/collect/Item Lookup/UPSTREAM/name-control
+PASS mcp/commits-enabled/collect/Item Lookup/UPSTREAM/identifier-parity
+PASS mcp/commits-enabled/collect/Item Lookup/DOWNSTREAM/name-control
+PASS mcp/commits-enabled/collect/Item Lookup/DOWNSTREAM/identifier-parity
+PASS mcp/commits-enabled/collect/Sparse Concept Scheme/UPSTREAM/name-control
+PASS mcp/commits-enabled/collect/Sparse Concept Scheme/UPSTREAM/identifier-parity
+PASS mcp/commits-enabled/collect/Sparse Concept Scheme/DOWNSTREAM/name-control
+PASS mcp/commits-enabled/collect/Sparse Concept Scheme/DOWNSTREAM/identifier-parity
+PASS mcp/commits-enabled/collect/Detailed Concept/UPSTREAM/name-control
+PASS mcp/commits-enabled/collect/Detailed Concept/UPSTREAM/identifier-parity
+PASS mcp/commits-enabled/collect/Detailed Concept/DOWNSTREAM/name-control
+PASS mcp/commits-enabled/collect/Detailed Concept/DOWNSTREAM/identifier-parity
+PASS mcp/commits-enabled/queries/list/name-control
+PASS mcp/commits-enabled/queries/list/identifier-parity
+PASS mcp/commits-enabled/queries/validate/name-control
+PASS mcp/commits-enabled/queries/validate/identifier-parity
+PASS mcp/commits-enabled/queries/export/name-control
+PASS mcp/commits-enabled/queries/export/identifier-parity
+PASS mcp/commits-enabled/read-element/name-control
+PASS mcp/commits-enabled/read-element/identifier-parity
+PASS mcp/commits-enabled/native/Sparse Concept Scheme/name-control
+PASS mcp/commits-enabled/native/Sparse Concept Scheme/identifier-parity
+PASS mcp/commits-enabled/native/Detailed Concept/name-control
+PASS mcp/commits-enabled/native/Detailed Concept/identifier-parity
+PASS mcp/commits-enabled/discovery/reqvire.coverage
+PASS mcp/commits-enabled/discovery/reqvire.collect
+PASS mcp/commits-enabled/discovery/reqvire.rename_element
+PASS mcp/commits-enabled/discovery/reqvire.semantic.queries
+PASS mcp/commits-enabled/remove/name-preview-control
+PASS mcp/commits-enabled/remove/element_name
+PASS mcp/commits-enabled/remove/all-identifiers
+PASS mcp/commits-enabled/move/name-preview-control
+PASS mcp/commits-enabled/move/element_name
+PASS mcp/commits-enabled/move/all-identifiers
+PASS mcp/commits-enabled/rename/name-preview-control
+PASS mcp/commits-enabled/rename/element_name
+PASS mcp/commits-enabled/rename/all-identifiers
+PASS mcp/commits-enabled/merge/name-preview-control
+PASS mcp/commits-enabled/merge/target
+PASS mcp/commits-enabled/merge/sources-0
+PASS mcp/commits-enabled/merge/sources-1
+PASS mcp/commits-enabled/merge/all-identifiers
+PASS mcp/commits-enabled/link/name-preview-control
+PASS mcp/commits-enabled/link/source
+PASS mcp/commits-enabled/link/target
+PASS mcp/commits-enabled/link/all-identifiers
+PASS mcp/commits-enabled/cross-file-link/name-preview-control
+PASS mcp/commits-enabled/cross-file-link/source
+PASS mcp/commits-enabled/cross-file-link/target
+PASS mcp/commits-enabled/cross-file-link/all-identifiers
+PASS mcp/commits-enabled/unlink/name-preview-control
+PASS mcp/commits-enabled/unlink/source
+PASS mcp/commits-enabled/unlink/target
+PASS mcp/commits-enabled/unlink/all-identifiers
+PASS mcp/commits-enabled/relink/name-preview-control
+PASS mcp/commits-enabled/relink/source
+PASS mcp/commits-enabled/relink/from_target
+PASS mcp/commits-enabled/relink/to_target
+PASS mcp/commits-enabled/relink/all-identifiers
+PASS mcp/commits-enabled/binding/name-preview-control
+PASS mcp/commits-enabled/binding/source
+PASS mcp/commits-enabled/binding/all-identifiers
+PASS mcp/commits-enabled/binding/target-name
+PASS mcp/commits-enabled/reference/name-preview-control
+PASS mcp/commits-enabled/reference/source
+PASS mcp/commits-enabled/reference/target
+PASS mcp/commits-enabled/reference/all-identifiers
+PASS mcp/commits-enabled/binding-unlink/name-preview-control
+PASS mcp/commits-enabled/binding-unlink/source
+PASS mcp/commits-enabled/binding-unlink/target
+PASS mcp/commits-enabled/binding-unlink/all-identifiers
+PASS mcp/commits-enabled/reference-unlink/name-preview-control
+PASS mcp/commits-enabled/reference-unlink/source
+PASS mcp/commits-enabled/reference-unlink/target
+PASS mcp/commits-enabled/reference-unlink/all-identifiers
+PASS mcp/commits-enabled/reference-relink/name-preview-control
+PASS mcp/commits-enabled/reference-relink/source
+PASS mcp/commits-enabled/reference-relink/from_target
+PASS mcp/commits-enabled/reference-relink/to_target
+PASS mcp/commits-enabled/reference-relink/all-identifiers
+PASS mcp/commits-enabled/ambiguous-read/unchanged-state
+PASS mcp/commits-enabled/ambiguous-write/unchanged-state
+PASS mcp/commits-enabled/ambiguous-apply/unchanged-state
+PASS mcp/commits-enabled/unknown-write/unchanged-state
+PASS mcp/commits-enabled/contradictory-read/unchanged-state
+PASS mcp/commits-enabled/late-unknown-merge/unchanged-state
+PASS mcp/commits-enabled/consistent-explicit-selectors-control
+PASS mcp/commits-enabled/native-contradictory-selectors
+PASS mcp/commits-enabled/merge/identifier-type-check
+PASS mcp/commits-enabled/merge/mixed-alias-self
+PASS mcp/commits-enabled/merge/mixed-alias-duplicate
+PASS mcp/commits-enabled/identifier-type-check
+PASS mcp/commits-enabled/explicit-query-iri-control
+PASS mcp/commits-enabled/pattern-filter-control
+PASS mcp/commits-enabled/identifier-uses-accepted-snapshot
+PASS mcp/commits-enabled/later-write-and-pending-state-control
+PASS mcp/commits-enabled/accepted-identifier-and-stale-rejection
+PASS serve/commits-disabled/model/Root Capability/name-control
+PASS serve/commits-disabled/model/Root Capability/identifier-parity
+PASS serve/commits-disabled/model/Nested Capability/name-control
+PASS serve/commits-disabled/model/Nested Capability/identifier-parity
+PASS serve/commits-disabled/model/Parent Requirement/name-control
+PASS serve/commits-disabled/model/Parent Requirement/identifier-parity
+PASS serve/commits-disabled/model/Child Requirement/name-control
+PASS serve/commits-disabled/model/Child Requirement/identifier-parity
+PASS serve/commits-disabled/submodels/Root Capability/name-control
+PASS serve/commits-disabled/submodels/Root Capability/identifier-parity
+PASS serve/commits-disabled/submodels/Nested Capability/name-control
+PASS serve/commits-disabled/submodels/Nested Capability/identifier-parity
+PASS serve/commits-disabled/submodels/Parent Requirement/name-control
+PASS serve/commits-disabled/submodels/Parent Requirement/identifier-parity
+PASS serve/commits-disabled/submodels/Child Requirement/name-control
+PASS serve/commits-disabled/submodels/Child Requirement/identifier-parity
+PASS serve/commits-disabled/coverage/Root Capability/name-control
+PASS serve/commits-disabled/coverage/Root Capability/identifier-parity
+PASS serve/commits-disabled/coverage/Nested Capability/name-control
+PASS serve/commits-disabled/coverage/Nested Capability/identifier-parity
+PASS serve/commits-disabled/collect/Root Capability/UPSTREAM/name-control
+PASS serve/commits-disabled/collect/Root Capability/UPSTREAM/identifier-parity
+PASS serve/commits-disabled/collect/Root Capability/DOWNSTREAM/name-control
+PASS serve/commits-disabled/collect/Root Capability/DOWNSTREAM/identifier-parity
+PASS serve/commits-disabled/collect/Child Requirement/UPSTREAM/name-control
+PASS serve/commits-disabled/collect/Child Requirement/UPSTREAM/identifier-parity
+PASS serve/commits-disabled/collect/Child Requirement/DOWNSTREAM/name-control
+PASS serve/commits-disabled/collect/Child Requirement/DOWNSTREAM/identifier-parity
+PASS serve/commits-disabled/collect/Item Ontology/UPSTREAM/name-control
+PASS serve/commits-disabled/collect/Item Ontology/UPSTREAM/identifier-parity
+PASS serve/commits-disabled/collect/Item Ontology/DOWNSTREAM/name-control
+PASS serve/commits-disabled/collect/Item Ontology/DOWNSTREAM/identifier-parity
+PASS serve/commits-disabled/collect/Item Lookup/UPSTREAM/name-control
+PASS serve/commits-disabled/collect/Item Lookup/UPSTREAM/identifier-parity
+PASS serve/commits-disabled/collect/Item Lookup/DOWNSTREAM/name-control
+PASS serve/commits-disabled/collect/Item Lookup/DOWNSTREAM/identifier-parity
+PASS serve/commits-disabled/collect/Sparse Concept Scheme/UPSTREAM/name-control
+PASS serve/commits-disabled/collect/Sparse Concept Scheme/UPSTREAM/identifier-parity
+PASS serve/commits-disabled/collect/Sparse Concept Scheme/DOWNSTREAM/name-control
+PASS serve/commits-disabled/collect/Sparse Concept Scheme/DOWNSTREAM/identifier-parity
+PASS serve/commits-disabled/collect/Detailed Concept/UPSTREAM/name-control
+PASS serve/commits-disabled/collect/Detailed Concept/UPSTREAM/identifier-parity
+PASS serve/commits-disabled/collect/Detailed Concept/DOWNSTREAM/name-control
+PASS serve/commits-disabled/collect/Detailed Concept/DOWNSTREAM/identifier-parity
+PASS serve/commits-disabled/queries/list/name-control
+PASS serve/commits-disabled/queries/list/identifier-parity
+PASS serve/commits-disabled/queries/validate/name-control
+PASS serve/commits-disabled/queries/validate/identifier-parity
+PASS serve/commits-disabled/queries/export/name-control
+PASS serve/commits-disabled/queries/export/identifier-parity
+PASS serve/commits-disabled/read-element/name-control
+PASS serve/commits-disabled/read-element/identifier-parity
+PASS serve/commits-disabled/native/Sparse Concept Scheme/name-control
+PASS serve/commits-disabled/native/Sparse Concept Scheme/identifier-parity
+PASS serve/commits-disabled/native/Detailed Concept/name-control
+PASS serve/commits-disabled/native/Detailed Concept/identifier-parity
+PASS serve/commits-disabled/discovery/reqvire.coverage
+PASS serve/commits-disabled/discovery/reqvire.collect
+PASS serve/commits-disabled/discovery/reqvire.rename_element
+PASS serve/commits-disabled/discovery/reqvire.semantic.queries
+PASS serve/commits-disabled/remove/name-preview-control
+PASS serve/commits-disabled/remove/element_name
+PASS serve/commits-disabled/remove/all-identifiers
+PASS serve/commits-disabled/move/name-preview-control
+PASS serve/commits-disabled/move/element_name
+PASS serve/commits-disabled/move/all-identifiers
+PASS serve/commits-disabled/rename/name-preview-control
+PASS serve/commits-disabled/rename/element_name
+PASS serve/commits-disabled/rename/all-identifiers
+PASS serve/commits-disabled/merge/name-preview-control
+PASS serve/commits-disabled/merge/target
+PASS serve/commits-disabled/merge/sources-0
+PASS serve/commits-disabled/merge/sources-1
+PASS serve/commits-disabled/merge/all-identifiers
+PASS serve/commits-disabled/link/name-preview-control
+PASS serve/commits-disabled/link/source
+PASS serve/commits-disabled/link/target
+PASS serve/commits-disabled/link/all-identifiers
+PASS serve/commits-disabled/cross-file-link/name-preview-control
+PASS serve/commits-disabled/cross-file-link/source
+PASS serve/commits-disabled/cross-file-link/target
+PASS serve/commits-disabled/cross-file-link/all-identifiers
+PASS serve/commits-disabled/unlink/name-preview-control
+PASS serve/commits-disabled/unlink/source
+PASS serve/commits-disabled/unlink/target
+PASS serve/commits-disabled/unlink/all-identifiers
+PASS serve/commits-disabled/relink/name-preview-control
+PASS serve/commits-disabled/relink/source
+PASS serve/commits-disabled/relink/from_target
+PASS serve/commits-disabled/relink/to_target
+PASS serve/commits-disabled/relink/all-identifiers
+PASS serve/commits-disabled/binding/name-preview-control
+PASS serve/commits-disabled/binding/source
+PASS serve/commits-disabled/binding/all-identifiers
+PASS serve/commits-disabled/binding/target-name
+PASS serve/commits-disabled/reference/name-preview-control
+PASS serve/commits-disabled/reference/source
+PASS serve/commits-disabled/reference/target
+PASS serve/commits-disabled/reference/all-identifiers
+PASS serve/commits-disabled/binding-unlink/name-preview-control
+PASS serve/commits-disabled/binding-unlink/source
+PASS serve/commits-disabled/binding-unlink/target
+PASS serve/commits-disabled/binding-unlink/all-identifiers
+PASS serve/commits-disabled/reference-unlink/name-preview-control
+PASS serve/commits-disabled/reference-unlink/source
+PASS serve/commits-disabled/reference-unlink/target
+PASS serve/commits-disabled/reference-unlink/all-identifiers
+PASS serve/commits-disabled/reference-relink/name-preview-control
+PASS serve/commits-disabled/reference-relink/source
+PASS serve/commits-disabled/reference-relink/from_target
+PASS serve/commits-disabled/reference-relink/to_target
+PASS serve/commits-disabled/reference-relink/all-identifiers
+PASS serve/commits-disabled/ambiguous-read/unchanged-state
+PASS serve/commits-disabled/ambiguous-write/unchanged-state
+PASS serve/commits-disabled/ambiguous-apply/unchanged-state
+PASS serve/commits-disabled/unknown-write/unchanged-state
+PASS serve/commits-disabled/contradictory-read/unchanged-state
+PASS serve/commits-disabled/late-unknown-merge/unchanged-state
+PASS serve/commits-disabled/consistent-explicit-selectors-control
+PASS serve/commits-disabled/native-contradictory-selectors
+PASS serve/commits-disabled/merge/identifier-type-check
+PASS serve/commits-disabled/merge/mixed-alias-self
+PASS serve/commits-disabled/merge/mixed-alias-duplicate
+PASS serve/commits-disabled/identifier-type-check
+PASS serve/commits-disabled/explicit-query-iri-control
+PASS serve/commits-disabled/pattern-filter-control
+PASS serve/commits-disabled/identifier-uses-accepted-snapshot
+PASS serve/commits-disabled/later-write-and-pending-state-control
+PASS serve/commits-disabled/accepted-identifier-and-stale-rejection
+PASS serve/commits-enabled/model/Root Capability/name-control
+PASS serve/commits-enabled/model/Root Capability/identifier-parity
+PASS serve/commits-enabled/model/Nested Capability/name-control
+PASS serve/commits-enabled/model/Nested Capability/identifier-parity
+PASS serve/commits-enabled/model/Parent Requirement/name-control
+PASS serve/commits-enabled/model/Parent Requirement/identifier-parity
+PASS serve/commits-enabled/model/Child Requirement/name-control
+PASS serve/commits-enabled/model/Child Requirement/identifier-parity
+PASS serve/commits-enabled/submodels/Root Capability/name-control
+PASS serve/commits-enabled/submodels/Root Capability/identifier-parity
+PASS serve/commits-enabled/submodels/Nested Capability/name-control
+PASS serve/commits-enabled/submodels/Nested Capability/identifier-parity
+PASS serve/commits-enabled/submodels/Parent Requirement/name-control
+PASS serve/commits-enabled/submodels/Parent Requirement/identifier-parity
+PASS serve/commits-enabled/submodels/Child Requirement/name-control
+PASS serve/commits-enabled/submodels/Child Requirement/identifier-parity
+PASS serve/commits-enabled/coverage/Root Capability/name-control
+PASS serve/commits-enabled/coverage/Root Capability/identifier-parity
+PASS serve/commits-enabled/coverage/Nested Capability/name-control
+PASS serve/commits-enabled/coverage/Nested Capability/identifier-parity
+PASS serve/commits-enabled/collect/Root Capability/UPSTREAM/name-control
+PASS serve/commits-enabled/collect/Root Capability/UPSTREAM/identifier-parity
+PASS serve/commits-enabled/collect/Root Capability/DOWNSTREAM/name-control
+PASS serve/commits-enabled/collect/Root Capability/DOWNSTREAM/identifier-parity
+PASS serve/commits-enabled/collect/Child Requirement/UPSTREAM/name-control
+PASS serve/commits-enabled/collect/Child Requirement/UPSTREAM/identifier-parity
+PASS serve/commits-enabled/collect/Child Requirement/DOWNSTREAM/name-control
+PASS serve/commits-enabled/collect/Child Requirement/DOWNSTREAM/identifier-parity
+PASS serve/commits-enabled/collect/Item Ontology/UPSTREAM/name-control
+PASS serve/commits-enabled/collect/Item Ontology/UPSTREAM/identifier-parity
+PASS serve/commits-enabled/collect/Item Ontology/DOWNSTREAM/name-control
+PASS serve/commits-enabled/collect/Item Ontology/DOWNSTREAM/identifier-parity
+PASS serve/commits-enabled/collect/Item Lookup/UPSTREAM/name-control
+PASS serve/commits-enabled/collect/Item Lookup/UPSTREAM/identifier-parity
+PASS serve/commits-enabled/collect/Item Lookup/DOWNSTREAM/name-control
+PASS serve/commits-enabled/collect/Item Lookup/DOWNSTREAM/identifier-parity
+PASS serve/commits-enabled/collect/Sparse Concept Scheme/UPSTREAM/name-control
+PASS serve/commits-enabled/collect/Sparse Concept Scheme/UPSTREAM/identifier-parity
+PASS serve/commits-enabled/collect/Sparse Concept Scheme/DOWNSTREAM/name-control
+PASS serve/commits-enabled/collect/Sparse Concept Scheme/DOWNSTREAM/identifier-parity
+PASS serve/commits-enabled/collect/Detailed Concept/UPSTREAM/name-control
+PASS serve/commits-enabled/collect/Detailed Concept/UPSTREAM/identifier-parity
+PASS serve/commits-enabled/collect/Detailed Concept/DOWNSTREAM/name-control
+PASS serve/commits-enabled/collect/Detailed Concept/DOWNSTREAM/identifier-parity
+PASS serve/commits-enabled/queries/list/name-control
+PASS serve/commits-enabled/queries/list/identifier-parity
+PASS serve/commits-enabled/queries/validate/name-control
+PASS serve/commits-enabled/queries/validate/identifier-parity
+PASS serve/commits-enabled/queries/export/name-control
+PASS serve/commits-enabled/queries/export/identifier-parity
+PASS serve/commits-enabled/read-element/name-control
+PASS serve/commits-enabled/read-element/identifier-parity
+PASS serve/commits-enabled/native/Sparse Concept Scheme/name-control
+PASS serve/commits-enabled/native/Sparse Concept Scheme/identifier-parity
+PASS serve/commits-enabled/native/Detailed Concept/name-control
+PASS serve/commits-enabled/native/Detailed Concept/identifier-parity
+PASS serve/commits-enabled/discovery/reqvire.coverage
+PASS serve/commits-enabled/discovery/reqvire.collect
+PASS serve/commits-enabled/discovery/reqvire.rename_element
+PASS serve/commits-enabled/discovery/reqvire.semantic.queries
+PASS serve/commits-enabled/remove/name-preview-control
+PASS serve/commits-enabled/remove/element_name
+PASS serve/commits-enabled/remove/all-identifiers
+PASS serve/commits-enabled/move/name-preview-control
+PASS serve/commits-enabled/move/element_name
+PASS serve/commits-enabled/move/all-identifiers
+PASS serve/commits-enabled/rename/name-preview-control
+PASS serve/commits-enabled/rename/element_name
+PASS serve/commits-enabled/rename/all-identifiers
+PASS serve/commits-enabled/merge/name-preview-control
+PASS serve/commits-enabled/merge/target
+PASS serve/commits-enabled/merge/sources-0
+PASS serve/commits-enabled/merge/sources-1
+PASS serve/commits-enabled/merge/all-identifiers
+PASS serve/commits-enabled/link/name-preview-control
+PASS serve/commits-enabled/link/source
+PASS serve/commits-enabled/link/target
+PASS serve/commits-enabled/link/all-identifiers
+PASS serve/commits-enabled/cross-file-link/name-preview-control
+PASS serve/commits-enabled/cross-file-link/source
+PASS serve/commits-enabled/cross-file-link/target
+PASS serve/commits-enabled/cross-file-link/all-identifiers
+PASS serve/commits-enabled/unlink/name-preview-control
+PASS serve/commits-enabled/unlink/source
+PASS serve/commits-enabled/unlink/target
+PASS serve/commits-enabled/unlink/all-identifiers
+PASS serve/commits-enabled/relink/name-preview-control
+PASS serve/commits-enabled/relink/source
+PASS serve/commits-enabled/relink/from_target
+PASS serve/commits-enabled/relink/to_target
+PASS serve/commits-enabled/relink/all-identifiers
+PASS serve/commits-enabled/binding/name-preview-control
+PASS serve/commits-enabled/binding/source
+PASS serve/commits-enabled/binding/all-identifiers
+PASS serve/commits-enabled/binding/target-name
+PASS serve/commits-enabled/reference/name-preview-control
+PASS serve/commits-enabled/reference/source
+PASS serve/commits-enabled/reference/target
+PASS serve/commits-enabled/reference/all-identifiers
+PASS serve/commits-enabled/binding-unlink/name-preview-control
+PASS serve/commits-enabled/binding-unlink/source
+PASS serve/commits-enabled/binding-unlink/target
+PASS serve/commits-enabled/binding-unlink/all-identifiers
+PASS serve/commits-enabled/reference-unlink/name-preview-control
+PASS serve/commits-enabled/reference-unlink/source
+PASS serve/commits-enabled/reference-unlink/target
+PASS serve/commits-enabled/reference-unlink/all-identifiers
+PASS serve/commits-enabled/reference-relink/name-preview-control
+PASS serve/commits-enabled/reference-relink/source
+PASS serve/commits-enabled/reference-relink/from_target
+PASS serve/commits-enabled/reference-relink/to_target
+PASS serve/commits-enabled/reference-relink/all-identifiers
+PASS serve/commits-enabled/ambiguous-read/unchanged-state
+PASS serve/commits-enabled/ambiguous-write/unchanged-state
+PASS serve/commits-enabled/ambiguous-apply/unchanged-state
+PASS serve/commits-enabled/unknown-write/unchanged-state
+PASS serve/commits-enabled/contradictory-read/unchanged-state
+PASS serve/commits-enabled/late-unknown-merge/unchanged-state
+PASS serve/commits-enabled/consistent-explicit-selectors-control
+PASS serve/commits-enabled/native-contradictory-selectors
+PASS serve/commits-enabled/merge/identifier-type-check
+PASS serve/commits-enabled/merge/mixed-alias-self
+PASS serve/commits-enabled/merge/mixed-alias-duplicate
+PASS serve/commits-enabled/identifier-type-check
+PASS serve/commits-enabled/explicit-query-iri-control
+PASS serve/commits-enabled/pattern-filter-control
+PASS serve/commits-enabled/identifier-uses-accepted-snapshot
+PASS serve/commits-enabled/later-write-and-pending-state-control
+PASS serve/commits-enabled/accepted-identifier-and-stale-rejection
+PASS mcp/commits-disabled/two-context-setup-control
+PASS mcp/commits-disabled/two-context/origin/identifier-parity
+PASS mcp/commits-disabled/two-context/child/identifier-parity
+PASS mcp/commits-disabled/foreign-context-identifier-rejected
+PASS mcp/commits-enabled/two-context-setup-control
+PASS mcp/commits-enabled/two-context/origin/identifier-parity
+PASS mcp/commits-enabled/two-context/child/identifier-parity
+PASS mcp/commits-enabled/foreign-context-identifier-rejected
+PASS serve/commits-disabled/two-context-setup-control
+PASS serve/commits-disabled/two-context/origin/identifier-parity
+PASS serve/commits-disabled/two-context/child/identifier-parity
+PASS serve/commits-disabled/foreign-context-identifier-rejected
+PASS serve/commits-enabled/two-context-setup-control
+PASS serve/commits-enabled/two-context/origin/identifier-parity
+PASS serve/commits-enabled/two-context/child/identifier-parity
+PASS serve/commits-enabled/foreign-context-identifier-rejected
+PASS mcp/readonly/fresh-name-control
+PASS mcp/readonly/fresh-identifier-parity
+PASS serve/readonly/fresh-name-control
+PASS serve/readonly/fresh-identifier-parity

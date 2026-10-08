@@ -173,7 +173,26 @@ pub(super) fn authored_ontology_subject_definition_edges(
 }
 
 pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
+    build_semantic_index_with_shapes(registry).index
+}
+
+// Keep validation artifacts paired with their index for this build only. They are
+// dropped after validation instead of becoming a second persisted model payload.
+pub struct SemanticIndexBuild {
+    pub(crate) index: SemanticIndex,
+    pub(crate) compiled_shapes: Vec<CompiledShapesBlock>,
+}
+
+pub struct CompiledShapesBlock {
+    pub(crate) source: String,
+    pub(crate) registry: shacl::ShaclRegistry,
+}
+
+pub fn build_semantic_index_with_shapes(registry: &GraphRegistry) -> SemanticIndexBuild {
+    #[cfg(test)]
+    INDEX_BUILD_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
     let mut blocks = Vec::new();
+    let mut compiled_shapes = Vec::new();
     let mut external_blocks = Vec::new();
     let mut external_sources = Vec::new();
     let mut diagnostics = Vec::new();
@@ -203,11 +222,22 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
         external_sources.push(source);
     }
 
-    for element in registry.get_all_elements() {
+    let elements = registry.get_all_elements();
+    let concept_relations = ConceptRelationIndex::build(registry, &elements);
+    for element in elements {
         let ontology =
             crate::parser::extract_single_fenced_subsection(&element.content, "Ontology");
         let shapes = crate::parser::extract_single_fenced_subsection(&element.content, "Shapes");
-        let query = crate::parser::extract_single_fenced_subsection(&element.content, "Query");
+        let query = if element.element_type.is_semantic_query() {
+            element
+                .semantic_query
+                .as_ref()
+                .and_then(|source| source.query.clone())
+                .into_iter()
+                .collect()
+        } else {
+            crate::parser::extract_single_fenced_subsection(&element.content, "Query")
+        };
 
         validate_semantic_sections(element, &ontology, &shapes, &query, &mut diagnostics);
 
@@ -318,15 +348,24 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
                     });
                 }
 
-                shape_references.extend(shape_iri_references_from_quads(element, &block.quads));
+                shape_references
+                    .extend(shape_iri_references_from_registry(element, &shacl_registry));
+                compiled_shapes.push(CompiledShapesBlock {
+                    source: block.source.clone(),
+                    registry: shacl_registry,
+                });
                 blocks.push(block);
             }
             continue;
         }
 
         if element.element_type.is_concept_family() {
-            if let Some(block) = build_generated_concept_block(registry, element, &mut diagnostics)
-            {
+            if let Some(block) = build_generated_concept_block(
+                registry,
+                element,
+                &concept_relations,
+                &mut diagnostics,
+            ) {
                 blocks.push(block);
             }
         }
@@ -344,6 +383,7 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
     let ontology_projection = build_ontology_projection(registry, &blocks);
 
     let mut index = SemanticIndex {
+        queries: Vec::new(),
         summary: SemanticIndexSummary {
             ontology_blocks,
             shape_blocks,
@@ -364,17 +404,22 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
         },
         model_context_turtle: String::new(),
     };
+    super::queries::index_queries(registry, &mut index);
     index.model_context = build_model_context_graph(registry, &index);
     index.model_context_turtle = build_model_context_turtle(registry, &index);
-    index
+    SemanticIndexBuild {
+        index,
+        compiled_shapes,
+    }
 }
 
-pub(super) fn build_generated_concept_block(
+fn build_generated_concept_block(
     registry: &GraphRegistry,
     element: &Element,
+    concept_relations: &ConceptRelationIndex<'_>,
     diagnostics: &mut Vec<SemanticDiagnostic>,
 ) -> Option<SemanticBlock> {
-    let content = match generated_concept_turtle(registry, element) {
+    let content = match generated_concept_turtle(registry, element, concept_relations) {
         Ok(Some(content)) => content,
         Ok(None) => return None,
         Err(message) => {
@@ -412,9 +457,10 @@ pub(super) fn build_generated_concept_block(
     })
 }
 
-pub(super) fn generated_concept_turtle(
+fn generated_concept_turtle(
     registry: &GraphRegistry,
     element: &Element,
+    concept_relations: &ConceptRelationIndex<'_>,
 ) -> Result<Option<String>, String> {
     if element.element_type.is_concept_scheme() {
         let Some(scheme) = &element.concept_scheme else {
@@ -503,14 +549,19 @@ pub(super) fn generated_concept_turtle(
                 turtle_literal(&example.value)
             ));
         }
-        for (predicate, object) in normalized_concept_relation_objects(registry, element, &prefix) {
+        for (predicate, object) in
+            concept_relations.objects(&element.identifier, &prefix, &namespace)
+        {
             turtle.push_str(&format!(" ;\n  skos:{} {}", predicate, object));
         }
         turtle.push_str(" .\n");
-        for (subject, predicate, object) in
-            external_symmetric_concept_relation_triples(element, &prefix)
+        for (iri, predicate) in concept_relations
+            .external_inverses
+            .get(element.identifier.as_str())
+            .into_iter()
+            .flatten()
         {
-            turtle.push_str(&format!("{} skos:{} {} .\n", subject, predicate, object));
+            turtle.push_str(&format!("<{}> skos:{} {} .\n", iri, predicate, subject));
         }
         return Ok(Some(turtle));
     }
@@ -547,129 +598,119 @@ pub(super) fn concept_scheme_context<'a>(
     registry.concept_scheme_context_element(&element.identifier)
 }
 
-pub(super) fn normalized_concept_relation_objects(
-    registry: &GraphRegistry,
-    element: &Element,
-    prefix: &str,
-) -> BTreeSet<(String, String)> {
-    let mut output = BTreeSet::new();
-    let current_id = element.identifier.as_str();
-
-    for candidate in registry.get_all_elements() {
-        let Some(concept) = candidate.concept.as_ref() else {
-            continue;
-        };
-        let candidate_id = candidate.identifier.as_str();
-
-        for link in &concept.broader {
-            if candidate_id == current_id {
-                output.insert((
-                    "broader".to_string(),
-                    concept_link_object(registry, prefix, &link.target, &link.label),
-                ));
-            }
-            if concept_link_target_element(registry, &link.target)
-                .is_some_and(|target| target.identifier.as_str() == current_id)
-            {
-                output.insert(("narrower".to_string(), concept_curie(prefix, candidate)));
-            }
-        }
-
-        for link in &concept.narrower {
-            if candidate_id == current_id {
-                output.insert((
-                    "narrower".to_string(),
-                    concept_link_object(registry, prefix, &link.target, &link.label),
-                ));
-            }
-            if concept_link_target_element(registry, &link.target)
-                .is_some_and(|target| target.identifier.as_str() == current_id)
-            {
-                output.insert(("broader".to_string(), concept_curie(prefix, candidate)));
-            }
-        }
-
-        append_symmetric_concept_relation_objects(
-            registry,
-            &mut output,
-            current_id,
-            candidate,
-            "related",
-            &concept.related,
-            prefix,
-        );
-        append_symmetric_concept_relation_objects(
-            registry,
-            &mut output,
-            current_id,
-            candidate,
-            "exactMatch",
-            &concept.exact_match,
-            prefix,
-        );
-        append_symmetric_concept_relation_objects(
-            registry,
-            &mut output,
-            current_id,
-            candidate,
-            "closeMatch",
-            &concept.close_match,
-            prefix,
-        );
-    }
-
-    output
+/// One build's normalized concept neighborhoods. Identifiers borrow the immutable
+/// input registry; this index is dropped after its concept blocks are materialized.
+#[derive(Default)]
+struct ConceptRelationIndex<'a> {
+    relations: FxHashMap<&'a str, BTreeSet<(&'static str, ConceptRelationTarget<'a>)>>,
+    names: FxHashMap<&'a str, (Option<String>, String)>,
+    external_inverses: FxHashMap<&'a str, BTreeSet<(&'a str, &'static str)>>,
 }
 
-pub(super) fn append_symmetric_concept_relation_objects(
-    registry: &GraphRegistry,
-    output: &mut BTreeSet<(String, String)>,
-    current_id: &str,
-    candidate: &Element,
-    predicate: &str,
-    links: &[crate::element::ConceptLink],
-    prefix: &str,
-) {
-    let candidate_id = candidate.identifier.as_str();
-    for link in links {
-        if candidate_id == current_id {
-            output.insert((
-                predicate.to_string(),
-                concept_link_object(registry, prefix, &link.target, &link.label),
-            ));
-        }
-        if concept_link_target_element(registry, &link.target)
-            .is_some_and(|target| target.identifier.as_str() == current_id)
-        {
-            output.insert((predicate.to_string(), concept_curie(prefix, candidate)));
-        }
-    }
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum ConceptRelationTarget<'a> {
+    Local(&'a str),
+    External(&'a str),
+    UnresolvedLabel(&'a str),
 }
 
-pub(super) fn external_symmetric_concept_relation_triples(
-    element: &Element,
-    prefix: &str,
-) -> BTreeSet<(String, String, String)> {
-    let mut triples = BTreeSet::new();
-    let Some(concept) = element.concept.as_ref() else {
-        return triples;
-    };
-    let object = concept_curie(prefix, element);
-    for (predicate, links) in [
-        ("exactMatch", &concept.exact_match),
-        ("closeMatch", &concept.close_match),
-    ] {
-        for link in links {
-            if link.target.starts_with("http://") || link.target.starts_with("https://") {
-                triples.insert((
-                    format!("<{}>", link.target),
-                    predicate.to_string(),
-                    object.clone(),
-                ));
+impl<'a> ConceptRelationIndex<'a> {
+    fn build(registry: &'a GraphRegistry, elements: &[&'a Element]) -> Self {
+        let mut index = Self::default();
+        for &element in elements {
+            #[cfg(test)]
+            CONCEPT_NORMALIZATION_WORK.with(|count| {
+                let (elements, links) = count.get();
+                count.set((elements + 1, links));
+            });
+            let Some(concept) = &element.concept else {
+                continue;
+            };
+            let source = element.identifier.as_str();
+            index.names.insert(
+                source,
+                (
+                    concept_namespace_context(registry, element).map(|(_, namespace)| namespace),
+                    concept_local_name(&element.name),
+                ),
+            );
+            for (predicate, inverse, links) in [
+                ("broader", "narrower", &concept.broader),
+                ("narrower", "broader", &concept.narrower),
+                ("related", "related", &concept.related),
+                ("exactMatch", "exactMatch", &concept.exact_match),
+                ("closeMatch", "closeMatch", &concept.close_match),
+            ] {
+                for link in links {
+                    #[cfg(test)]
+                    CONCEPT_NORMALIZATION_WORK.with(|count| {
+                        let (elements, links) = count.get();
+                        count.set((elements, links + 1));
+                    });
+                    let target = if link.target.starts_with("http://")
+                        || link.target.starts_with("https://")
+                    {
+                        if matches!(predicate, "exactMatch" | "closeMatch") {
+                            index
+                                .external_inverses
+                                .entry(source)
+                                .or_default()
+                                .insert((&link.target, predicate));
+                        }
+                        ConceptRelationTarget::External(&link.target)
+                    } else if let Some(target) = concept_link_target_element(registry, &link.target)
+                    {
+                        index
+                            .relations
+                            .entry(&target.identifier)
+                            .or_default()
+                            .insert((inverse, ConceptRelationTarget::Local(source)));
+                        ConceptRelationTarget::Local(&target.identifier)
+                    } else {
+                        // Preserve lenient-build output; normal validation rejects this target.
+                        ConceptRelationTarget::UnresolvedLabel(&link.label)
+                    };
+                    index
+                        .relations
+                        .entry(source)
+                        .or_default()
+                        .insert((predicate, target));
+                }
             }
         }
+        index
     }
-    triples
+
+    fn objects(
+        &self,
+        source: &str,
+        prefix: &str,
+        namespace: &str,
+    ) -> BTreeSet<(&'static str, String)> {
+        self.relations
+            .get(source)
+            .into_iter()
+            .flatten()
+            .filter_map(|(predicate, target)| {
+                let object = match target {
+                    ConceptRelationTarget::Local(id) => {
+                        let (target_namespace, local_name) = self.names.get(id)?;
+                        match target_namespace.as_deref() {
+                            Some(target_namespace) if target_namespace != namespace => {
+                                format!("<{target_namespace}{local_name}>")
+                            }
+                            _ => format!("{prefix}:{local_name}"),
+                        }
+                    }
+                    ConceptRelationTarget::External(iri) => format!("<{iri}>"),
+                    ConceptRelationTarget::UnresolvedLabel(label) => {
+                        format!("{prefix}:{}", concept_local_name(label))
+                    }
+                };
+                Some((*predicate, object))
+            })
+            .collect()
+    }
 }
 
 pub(super) fn concept_link_target_element<'a>(
@@ -975,13 +1016,13 @@ pub(super) fn validate_semantic_sections(
         });
     }
 
-    if has_query_section {
+    if has_query_section && !element.element_type.is_semantic_query() {
         diagnostics.push(SemanticDiagnostic {
             source: element.identifier.clone(),
             file_path: element.file_path.clone(),
             line_number: query_line_number,
             message: format!(
-                "Element '{}' is type '{}' and must not contain a #### Query section. No Reqvire element type currently supports this reserved subsection.",
+                "Element '{}' is type '{}' and must not contain a #### Query section. Query belongs on semantic-query elements.",
                 element.name,
                 element.element_type.as_str()
             ),
@@ -1308,12 +1349,12 @@ pub(super) fn push_ontology_term_declaration(
     });
 }
 
-pub(super) fn shape_iri_references_from_quads(
+fn shape_iri_references_from_registry(
     element: &Element,
-    quads: &[Quad],
+    registry: &shacl::ShaclRegistry,
 ) -> Vec<ShapeIriReference> {
     let mut references = BTreeSet::new();
-    for reference in ontology::extract_shape_references(quads) {
+    for reference in ontology::extract_compiled_shape_references(registry) {
         let iri = reference.iri.as_str();
         let kind = reference.predicate_label();
         references.insert(ShapeIriReference {
@@ -1325,3 +1366,12 @@ pub(super) fn shape_iri_references_from_quads(
 
     references.into_iter().collect()
 }
+
+#[cfg(test)]
+thread_local! {
+    static CONCEPT_NORMALIZATION_WORK: std::cell::Cell<(usize, usize)> = const { std::cell::Cell::new((0, 0)) };
+}
+
+#[cfg(test)]
+#[path = "concept_projection_tests.rs"]
+mod concept_projection_tests;

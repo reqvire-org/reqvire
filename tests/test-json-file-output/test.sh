@@ -95,6 +95,7 @@ test_json_output "search" "search.json" true search
 verify_content_matches "search" "search.json" true search
 
 test_json_output "traces" "traces.json" false traces
+verify_content_matches "traces" "traces.json" false traces
 
 test_json_output "coverage" "coverage.json" true coverage
 

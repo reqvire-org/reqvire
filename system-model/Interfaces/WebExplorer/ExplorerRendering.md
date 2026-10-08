@@ -10,7 +10,6 @@ The system shall provide a mobile-friendly Explorer interface accessible on smar
 #### Relations
   * derive: [Responsive Explorer Rendering](#responsive-explorer-rendering)
   * derivedFrom: [Web Interface](../InterfacesRequirements.md#web-interface)
-  * verifiedBy: [Mobile Responsiveness Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#mobile-responsiveness-verification)
 ---
 
 ### Component-Based Explorer Architecture
@@ -47,7 +46,6 @@ Implementation details shall follow the associated contract specifications.
   * derivedFrom: [Mobile-Friendly Explorer](#mobile-friendly-explorer)
   * satisfiedBy: [index.html](../../../explorer/index.html)
   * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
-  * verifiedBy: [Responsive Design Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#responsive-design-verification)
 ---
 
 ### Explorer Design System Styling
@@ -66,5 +64,5 @@ Implementation details shall follow the associated contract specifications.
   * satisfiedBy: [ElementIcon.tsx](../../../explorer/design-system/components/data/ElementIcon.tsx)
   * satisfiedBy: [DetailDialog.tsx](../../../explorer/design-system/product-patterns/detail/DetailDialog.tsx)
   * satisfiedBy: [styles.css](../../../explorer/design-system/styles.css)
-  * verifiedBy: [Responsive Design Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#responsive-design-verification)
+  * verifiedBy: [Explorer Design System Styling Demonstration](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#explorer-design-system-styling-demonstration)
 ---

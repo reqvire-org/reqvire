@@ -46,6 +46,7 @@ const ARRAY_SECTIONS = [
   "elements",
   "relations",
   "contract_bindings",
+  "contract_references",
   "concept_refs",
   "search",
 ] as const;
@@ -98,7 +99,66 @@ export function validateStore(candidate: unknown): string[] {
       problems.push(`section "${section}" must be an object`);
     }
   }
+  if (isRecord(seed.coverage)) {
+    const index = seed.coverage.scope_index;
+    if (!isRecord(index)) problems.push("coverage.scope_index must be an object");
+    else for (const [identifier, entry] of Object.entries(index)) {
+      const scope = isRecord(entry) && isRecord(entry.scope) ? entry.scope : null;
+      const summary = isRecord(entry) && isRecord(entry.summary) ? entry.summary : null;
+      const membershipValid = scope && ["capability_ids", "requirement_ids", "verification_ids"].every(key => {
+        const ids = scope[key];
+        return Array.isArray(ids) && ids.every(id => typeof id === "string") && new Set(ids).size === ids.length;
+      });
+      if (!scope || scope.kind !== "capability" || scope.capability_identifier !== identifier
+        || typeof scope.capability_name !== "string" || scope.orphaned_verifications_scope !== "whole_model_only"
+        || !membershipValid || !(scope.capability_ids as string[]).includes(identifier)
+        || !summary || typeof summary.total_requirements_in_scope !== "number"
+        || Object.values(summary).some(value => typeof value === "number" && (!Number.isFinite(value) || value < 0))) {
+        problems.push(`coverage.scope_index entry "${identifier}" is malformed`);
+      }
+    }
+  }
+  if (isRecord(seed.coverage)) {
+    for (const sectionName of ["covered_requirements", "uncovered_requirements"]) {
+      const section = seed.coverage[sectionName];
+      if (!isRecord(section) || !isRecord(section.files)) {
+        problems.push(`coverage.${sectionName}.files must be an object`);
+        continue;
+      }
+      for (const rows of Object.values(section.files)) {
+        if (!Array.isArray(rows) || rows.some(row => !isRecord(row)
+          || typeof row.identifier !== "string" || typeof row.name !== "string"
+          || typeof row.is_terminal !== "boolean" || !validCoverageAggregates(row)
+          || !["direct_satisfied", "requirement_rollup", "contract_consumer_rollup", "combined_rollup", "uncovered"].includes(String(row.coverage_source))
+          || ["direct_evidence", "evidence", "contributing_requirements", "blocking_requirements"].some(key =>
+            !Array.isArray(row[key]) || !row[key].every(value => typeof value === "string")))) {
+          problems.push(`coverage.${sectionName} contains a malformed requirement record`);
+        }
+      }
+    }
+    const capabilities = isRecord(seed.coverage.capability_coverage) ? seed.coverage.capability_coverage.capabilities : null;
+    if (!Array.isArray(capabilities) || capabilities.some(row => !isRecord(row)
+      || typeof row.identifier !== "string" || typeof row.name !== "string"
+      || typeof row.implementation_covered !== "boolean" || !validCoverageAggregates(row))) {
+      problems.push("coverage.capability_coverage must contain capability aggregate metrics");
+    }
+  }
   return problems;
+}
+
+function validCoverageAggregates(row: Record<string, unknown>): boolean {
+  return [
+    ["aggregate_verified_leaf_requirements", "aggregate_leaf_requirements"],
+    ["aggregate_covered_terminal_requirements", "aggregate_terminal_requirements"],
+  ].every(([coveredKey, totalKey]) => {
+    const covered = row[coveredKey], total = row[totalKey];
+    return typeof covered === "number" && Number.isInteger(covered) && covered >= 0
+      && typeof total === "number" && Number.isInteger(total) && total >= covered;
+  });
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export function loadStore(devFixture?: ExplorerProjectStore): StoreLoadResult {

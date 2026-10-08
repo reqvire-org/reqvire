@@ -133,7 +133,7 @@ def main():
             digest = (expected / f"{name}.sha256").read_text().strip()
             if hashlib.sha256(data).hexdigest() != digest:
                 raise RuntimeError(f"Corrupt canonical fixture: {name}")
-            check(f"canonical-v1-{name}", actual == digest, actual, digest)
+            check(f"canonical-v2-{name}", actual == digest, actual, digest)
 
         def write(text):
             model_file.write_text(text, encoding="utf-8")

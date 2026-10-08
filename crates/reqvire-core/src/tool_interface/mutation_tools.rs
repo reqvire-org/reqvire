@@ -1,10 +1,10 @@
 use super::*;
 
-pub(crate) fn add_element_tool(
+pub fn add_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let workspace_root = current_dir_path();
     let result = crud::add_element(
         &mut model,
@@ -19,14 +19,19 @@ pub(crate) fn add_element_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn remove_element_tool(
+pub fn remove_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let element_id = model
         .graph_registry
-        .find_element_by_name(&required_string_arg(args, "element_name")?)?;
+        .select_element(
+            required_string_arg(args, "element_name")?.trim(),
+            "remove_element element_name",
+        )?
+        .identifier
+        .clone();
     let workspace_root = current_dir_path();
     let result = crud::remove_element(
         &mut model,
@@ -37,14 +42,19 @@ pub(crate) fn remove_element_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn move_element_tool(
+pub fn move_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let element_id = model
         .graph_registry
-        .find_element_by_name(&required_string_arg(args, "element_name")?)?;
+        .select_element(
+            required_string_arg(args, "element_name")?.trim(),
+            "move_element element_name",
+        )?
+        .identifier
+        .clone();
     let workspace_root = current_dir_path();
     let result = crud::move_element(
         &mut model,
@@ -58,14 +68,19 @@ pub(crate) fn move_element_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn rename_element_tool(
+pub fn rename_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let element_id = model
         .graph_registry
-        .find_element_by_name(&required_string_arg(args, "element_name")?)?;
+        .select_element(
+            required_string_arg(args, "element_name")?.trim(),
+            "rename_element element_name",
+        )?
+        .identifier
+        .clone();
     let workspace_root = current_dir_path();
     let result = crud::rename_element(
         &mut model,
@@ -77,11 +92,11 @@ pub(crate) fn rename_element_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn merge_elements_tool(
+pub fn merge_elements_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let workspace_root = current_dir_path();
     let result = crud::merge_elements(
         &mut model,
@@ -93,11 +108,11 @@ pub(crate) fn merge_elements_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn move_file_tool(
+pub fn move_file_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let workspace_root = current_dir_path();
     let result = crud::move_file(
         &mut model,
@@ -106,17 +121,19 @@ pub(crate) fn move_file_tool(
         excluded_filename_patterns,
         &workspace_root,
         &workspace_root,
-        bool_arg(args, "dry_run", false),
-        bool_arg(args, "squash", false),
+        crud::MoveFileOptions {
+            dry_run: bool_arg(args, "dry_run", false),
+            squash: bool_arg(args, "squash", false),
+        },
     )?;
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn move_folder_tool(
+pub fn move_folder_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let workspace_root = current_dir_path();
     let result = crud::move_folder(
         &mut model,
@@ -129,11 +146,11 @@ pub(crate) fn move_folder_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn link_tool(
+pub fn link_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let source = required_string_arg(args, "source")?;
     let relation_type = required_string_arg(args, "relation_type")?;
     let target = required_string_arg(args, "target")?;
@@ -165,11 +182,11 @@ pub(crate) fn link_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn unlink_tool(
+pub fn unlink_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let result = crud::unlink(
         &mut model,
         &required_string_arg(args, "source")?,
@@ -180,11 +197,11 @@ pub(crate) fn unlink_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn relink_tool(
+pub fn relink_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let result = crud::relink(
         &mut model,
         &required_string_arg(args, "source")?,
@@ -197,11 +214,11 @@ pub(crate) fn relink_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn move_asset_tool(
+pub fn move_asset_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let result = crud::mv_asset(
         &mut model,
         &required_string_arg(args, "old_path")?,
@@ -212,11 +229,11 @@ pub(crate) fn move_asset_tool(
     parse_json_string(render_crud_json(&result))
 }
 
-pub(crate) fn remove_asset_tool(
+pub fn remove_asset_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let mut model = load_model(excluded_filename_patterns)?;
+    let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
     let result = crud::rm_asset(
         &mut model,
         &required_string_arg(args, "file_path")?,

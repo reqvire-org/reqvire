@@ -11,7 +11,7 @@ const advancedPages = [
   {
     name: "Implementation Coverage",
     href: "/implementation-coverage",
-    desc: "Requirement implementation evidence, satisfiedBy links, contract-bindings contract coverage, and JSON report shape.",
+    desc: "Requirement implementation evidence, capability-scoped coverage across CLI, MCP, and Explorer, and external contract evidence.",
   },
   {
     name: "Submodels and Subgraphs",
@@ -52,11 +52,11 @@ export default function Advanced() {
           items={[
             {
               name: "reqvire traces",
-              desc: "Generates upward trace trees from verifications to owning capability roots and identifies redundant verify relations.",
+              desc: "Generates upward trace graphs from verifications to owning capability roots, preserving shared ancestors and every relation.",
             },
             {
               name: "reqvire change-impact",
-              desc: "Shows elements that need review because requirements, contracts, contract bindings, verification links, or semantic dependencies changed.",
+              desc: "Shows elements that need review because requirements, contracts, Contract Bindings, Contract References, verification links, or semantic dependencies changed.",
             },
             {
               name: "reqvire semantic",
@@ -76,6 +76,7 @@ export default function Advanced() {
             "Verify leaf requirements where possible and let coverage roll up through the hierarchy.",
             "Use satisfiedBy for implementation and evidence artifacts, not as a substitute for verification scope.",
             "Model cross-subgraph contract reuse with one-way Contract Bindings.",
+            "Use Contract References for content dependencies such as documentation that must be reviewed when a contract changes; they do not contribute to the contract owner's implementation coverage.",
             "Run validate, lint, coverage, traces, submodels, and change-impact before high-risk reviews.",
           ]}
         />

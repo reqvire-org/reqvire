@@ -19,7 +19,8 @@ Analyze verification and implementation coverage to identify gaps.
    - Extract total leaf requirements count (verification scope)
    - Calculate verification percentage
    - Identify unverified requirements count
-   - Extract implementation scope count (`requirement` elements only; excludes `capability`)
+   - Extract implementation terminal counts and recursive requirement completeness separately; capabilities receive roll-up rather than direct satisfaction
+   - Compare `direct_satisfied`, requirement roll-up, contract-consumer roll-up, and combined roll-up sources
 
 4. **Identify unverified leaf requirements:**
 
@@ -65,6 +66,9 @@ Analyze verification and implementation coverage to identify gaps.
 
 - Focus on leaf requirements for verification
 - Parent requirements inherit coverage from children
-- Implementation coverage does not include `capability`; capability coverage rolls up from requirements that specify capabilities
+- A terminal requirement has neither requirement children nor required binding consumers and needs direct `satisfiedBy` evidence. A parent or contract owner requires all immediate children and binding consumers to be covered recursively; direct parent evidence does not override gaps.
+- Contract References add no fulfillment dependency, terminal unit, blocker, or implementation evidence. A reporting or documentation consumer must not make the producer implemented.
+- Inspect binding meaning before treating consumers as implementation contributors. Convert context-only dependencies to references while retaining change-impact visibility; do not add artifact links just to preserve coverage figures.
+- Capabilities receive verification and implementation coverage through requirement/capability roll-up. Contracts themselves are not coverage units.
 - Use the `reqvire:syseng` skill to create missing verifications
 - Run `reqvire coverage` after adding verifications to confirm improvement

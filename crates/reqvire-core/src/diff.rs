@@ -7,7 +7,7 @@
 
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
-use std::fs;
+use crate::mutation_io as fs;
 use std::path::Path;
 
 /// Represents a diff for a single file
@@ -289,19 +289,18 @@ pub fn generate_crud_diffs(
         let full_path = git_root.join(file_path);
 
         // Get original content if file exists
-        let original_content = if full_path.exists() {
+        let original_content = if crate::mutation_io::exists(&full_path) {
             fs::read_to_string(&full_path)?
         } else {
             String::new()
         };
 
         // Generate new content from registry
-        let new_content = if let Some(sections) = grouped_elements.get(file_path) {
-            registry.generate_file_markdown(file_path, sections, false)
-        } else {
-            // File was deleted or emptied
-            String::new()
-        };
+        let new_content = grouped_elements
+            .get(file_path)
+            .map_or_else(String::new, |sections| {
+                registry.generate_file_markdown(file_path, sections, false)
+            });
 
         // Generate diff
         let diff = generate_file_diff(file_path, &original_content, &new_content);

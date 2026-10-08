@@ -335,7 +335,7 @@ export const relationEndpointBaseUX = css`
   display: inline-flex;
   justify-self: start;
   min-width: 0;
-  max-width: min(100%, var(--ux-detail-chip-link-max-w));
+  max-width: min(100%, var(--ux-detail-chip-link-max-w, 100%));
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-1) var(--space-3);

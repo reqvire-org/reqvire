@@ -20,12 +20,9 @@ Propagation categories and relation impact rules are defined by the Reqvire rela
 When bindContract or removing contract binding via CLI commands, the system shall resolve contract_bindings targets as contract-element identifiers.
 
 #### Details
-The resolution follows this order:
+The source requirement and existing contract target use the bound Existing Element Selection Specification. Targets accept exact names and canonical identifiers while retaining already supported contract-identifier normalization. Conflicting name/identifier matches fail as ambiguous rather than receiving identifier precedence.
 
-1. **Identifier Parse**: Parse target input as an element identifier (for example `file.md#contract-id`).
-2. **Identifier Normalization**: Resolve and normalize identifier to full internal identifier format.
-3. **Type Validation**: Confirm target element type is a Contract type (`constraint`, `behavior`, `specification`).
-4. **Error Handling**: If parsing or resolution fails, report a clear error message indicating that a contract identifier target is required.
+After selection, require a compatible `source`, `constraint`, `behavior`, `specification`, `state` or `input-output` contract with the ownership and scope required by the Contract Bindings contracts. Paths and external URLs do not become reusable contracts. Preserve link/unlink detection, idempotency and atomic rejection behavior.
 
 #### Metadata
   * type: behavior

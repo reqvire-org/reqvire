@@ -1,0 +1,9 @@
+PASS git-observations/accepted-read-call-budget
+PASS git-observations/runtime-metadata-call-budget
+PASS git-observations/read-only-load-call-budget
+PASS git-observations/live-dirty-and-unavailable-metadata
+PASS git-observations/checkout-changes-without-commits
+PASS git-observations/checkout-changes-with-commits
+PASS git-observations/read-only-invalid-reload-and-branch-race
+PASS git-observations/commit-preparation-head-race
+PASS git-observations/accepted-read-final-status-is-fresh

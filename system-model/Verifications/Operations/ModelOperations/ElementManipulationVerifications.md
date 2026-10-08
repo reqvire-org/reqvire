@@ -142,6 +142,8 @@ This test verifies atomic relation relink behavior, including hierarchical subgr
    - Run `reqvire relink ... --dry-run --json --output <FILE>`.
    - Assert the output file is written and contains valid JSON.
 
+The owning relink suite appends independent and combined identifier selection for source, old and new targets, including Contract Reference relinks. Compare previews with exact-name controls and unchanged physical/Git state.
+
 #### Metadata
   * type: test-verification
 
@@ -242,6 +244,8 @@ This test verifies that graph-backed CRUD commands work across multiple eligible
 12. `rm` removes an element from `repo-a` and leaves no stale indexed element.
 13. The workspace validates after the full cross-repo CRUD sequence.
 
+The `link` result MUST reload in a fresh CLI process with the exact workspace-root-relative artifact target. Its Markdown path MUST resolve from `repo-b/specifications` to the recorded `repo-a` file without an extra source-folder traversal.
+
 **Success Criteria - Non-Git Workspace Rejection:**
 1. `add` rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
 2. `mv` rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
@@ -329,6 +333,8 @@ The test shall verify that the `mv` command relocates elements, updates all rela
 - Supports --json output with relation mapping
 - Reports validation and location errors
 - Returns correct exit codes
+
+The owning CRUD suite appends identifier subject preview equality with the exact-name control and unchanged files/index/HEAD.
 
 #### Metadata
   * type: test-verification
@@ -527,6 +533,8 @@ The test shall verify that the `rm` command deletes elements, removes relations,
 - Reports errors for non-existent elements
 - Returns correct exit codes
 
+The owning CRUD suite appends identifier subject preview equality with the exact-name control and unchanged files/index/HEAD.
+
 #### Metadata
   * type: test-verification
 
@@ -580,6 +588,8 @@ The test shall verify that the `rename` command renames elements, updates all re
 - Supports --json output
 - Reports validation errors
 - Returns correct exit codes
+
+The owning CRUD suite appends identifier subject preview/acceptance, stale identifier rejection and ambiguity-before-persistence assertions. A new name resembling an identifier remains literal.
 
 #### Metadata
   * type: test-verification
@@ -730,6 +740,12 @@ The test shall verify that existing model elements can be deleted, all relations
 5. Delete an element leaving other elements in the file
 6. Verify the file is NOT deleted (still contains elements)
 
+**Test Steps - Unrelated Artifact Links During Deletion:**
+1. Validate a model containing a nested requirement file with `satisfiedBy` links to workspace-root `Makefile` and `LICENSE` artifacts and a source file with an extension. Create a decoy source file at the same relative path below the model file's folder, so an incorrect source-relative resolution would select another file. Link the requirement to a disposable verification in another file.
+2. Run a dry-run deletion of that verification. Verify all model/artifact files remain byte-for-byte unchanged and the proposed diff preserves artifact paths without substituting element fragments.
+3. Apply the deletion. Verify the verification and its incoming relations are removed while all unrelated artifact targets and target kinds remain unchanged.
+4. Verify artifact bytes, the accepted Git HEAD, and the index remain unchanged. Load the persisted model in a fresh CLI process and require successful validation.
+
 **Test Steps - Orphaned Children Prevention:**
 1. Create a parent element with child elements having parent hierarchical relations
 2. Attempt to delete the parent element
@@ -765,6 +781,7 @@ The test shall verify that existing model elements can be deleted, all relations
 - Element is completely removed from the source file
 - All incoming relations (relations from other elements to the deleted element) are removed
 - File structure remains valid
+- Remaining artifact relations retain their original file targets in both dry-run diffs and persisted files, including extensionless root artifacts; fresh-process validation succeeds after deletion.
 - Model validation passes
 - No dangling relations remain in the model
 - Files containing only the deleted element are removed
@@ -782,6 +799,7 @@ The test shall verify that existing model elements can be deleted, all relations
 - Delete element with `verify` relations pointing to it
 - Delete element with `satisfiedBy` relations pointing to it
 - Delete element with multiple types of incoming relations
+- Delete a verification referenced by a file containing unrelated extensionless root artifact links and confirm preview/apply preservation and valid persisted source
 - Delete last element in file (triggers file deletion)
 - Delete element leaving other elements (file preserved)
 - Delete parent element with children (single parent - rejected)
@@ -932,6 +950,11 @@ The test shall verify that the `link` command adds relations to elements followi
 4. Verify operation fails with clear error message
 5. Verify error message states that `bindContract` requires a contract element identifier target
 
+**Test Steps - Canonical Artifact Targets:**
+1. After deleting a verification from the nested artifact-link fixture, preview and apply a new `satisfiedBy` link to an existing extensionless root `NOTICE` file.
+2. Verify preview leaves files unchanged, adds only the intended `../../../NOTICE` target, and preserves existing artifact targets. Apply the link and validate the persisted model in a fresh CLI process.
+3. Through the core registry API, add a cross-repository artifact link and an extensionless root artifact link. Verify their in-memory targets remain workspace-root-relative and adding either link again rejects the duplicate.
+
 **Success Criteria:**
 - Adds relation to source element's Relations subsection (written to file)
 - Does NOT add opposite relation to target element's file (opposite exists in-memory only)
@@ -949,11 +972,15 @@ The test shall verify that the `link` command adds relations to elements followi
 - External URLs allowed for relations (trace, satisfiedBy, etc.)
 - Non-identifier targets rejected for 'bindContract' with clear identifier-target error message
 
+The owning link/unlink suite appends independent and combined identifier source/target selection for relations and Contract Bindings/References. Identifier binding targets remain controls while contract names must also work.
+
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-link-unlink/test.sh)
+  * satisfiedBy: [check_rm_artifact_links.py](../../../../tests/test-crud-manipulation/check_rm_artifact_links.py)
+  * satisfiedBy: [graph_registry.rs](../../../../crates/reqvire-core/src/graph_registry.rs)
   * verify: [Relation Commands](../../../Interfaces/CLI/Commands.md#relation-commands)
   * verify: [Relation Management Operations](../../../ModelStructure/ModelManagement.md#relation-management-operations)
 ---
@@ -976,6 +1003,8 @@ Test cases:
 10. **Regression scenario**: multi-source merge keeps target element present and model validates.
 11. **Document-to-elements rejection**: merging a source from `# Element` into a target in `# Elements` fails with explicit manual-migration guidance.
 12. **Single-root rejection**: merge that would create multi-root hierarchy ownership fails with deterministic single-root ownership error output and persists no changes.
+
+The owning merge suite appends identifier selection for the target and each source member, combined selection, mixed-alias duplicate/self rejection, known wrong-type identifiers and atomic late-source rejection.
 
 #### Metadata
   * type: test-verification
@@ -1399,6 +1428,8 @@ The test shall verify that the `unlink` command removes relations from elements 
 - Supports --json structured output and --json --output file output
 - Reports errors for non-existent relations
 - Reports errors for invalid source/target
+
+The owning link/unlink suite appends name/identifier preview equality for relation and Contract Binding/Reference sources and targets with unchanged physical/Git state.
 
 #### Metadata
   * type: test-verification

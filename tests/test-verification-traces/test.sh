@@ -150,4 +150,7 @@ if [ $LEGACY_EXIT -eq 0 ]; then
     exit 1
 fi
 
+python3 "$TEST_SCRIPT_DIR/check_graph.py" "$REQVIRE_BIN" "$TEST_DIR/output/graphs" > "$TEST_DIR/graph-checks.txt"
+diff -u "$TEST_SCRIPT_DIR/expected/graph-checks.txt" "$TEST_DIR/graph-checks.txt"
+
 exit 0

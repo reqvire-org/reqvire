@@ -420,7 +420,7 @@ reqvire:contractBindingsHierarchyIndependenceRule a reqvire:ValidationRule ;
   reqvire:validationSeverity "error" ;
   reqvire:validationCondition "An element reuses a contract already available through owner hierarchy or ancestor contract_bindings propagation." ;
   reqvire:validationOutcome "Validation fails because the contract_bindings is redundant or hides the intended dependency boundary." ;
-  reqvire:validationRepair "Remove the redundant contract_bindings or reuse the contract at the highest valid boundary." .
+  reqvire:validationRepair "Remove redundant contract_bindings and place bindings at requirements responsible for implementing the obligation. Bind a parent only when the obligation applies to its entire requirement subtree." .
 
 reqvire:contractBindingsSubgraphDirectionRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "contract-bindings-subgraph-direction" ;

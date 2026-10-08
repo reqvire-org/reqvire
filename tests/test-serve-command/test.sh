@@ -32,10 +32,27 @@
 
 set -e
 
-# Use non-default host and random port to test custom options
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Ask the OS for an unused port rather than probing an unrelated service in a
+# fixed random range. Every listener is still started by the command under test.
+available_port() {
+    python3 - <<'PY'
+import socket
+with socket.socket() as listener:
+    listener.bind(('127.0.0.1', 0))
+    print(listener.getsockname()[1])
+PY
+}
+
+# Use a non-default host and port to test custom options.
 TEST_HOST="127.0.0.1"
-TEST_PORT=$((8000 + RANDOM % 1000))
+TEST_PORT="$(available_port)"
 SERVER_BIN="${REAL_REQVIRE_BIN:-$REQVIRE_BIN}"
+
+# Check initialization before listener startup, including rejected admission.
+python3 "$TEST_SCRIPT_DIR/scripts/startup-check.py" "$REQVIRE_BIN" "$TEST_DIR/output/startup"
+diff -u "$TEST_SCRIPT_DIR/expected/startup-checks.txt" "$TEST_DIR/output/startup/checks.txt"
 
 # Start serve command in background with non-default host and port
 cd "$TEST_DIR"
@@ -57,7 +74,6 @@ stop_server() {
 # Function to cleanup server on exit
 cleanup() {
     stop_server
-    rm -rf "${TEST_DIR}"
 }
 trap cleanup EXIT
 
@@ -69,10 +85,6 @@ for i in {1..20}; do
         break
     fi
     if [ $i -eq 20 ]; then
-        if grep -qi "Operation not permitted" "${TEST_DIR}/serve_output.log"; then
-            echo "⚠ SKIPPED: Serve test cannot bind in this environment"
-            exit 0
-        fi
         echo "❌ FAILED: Server did not start within 10 seconds"
         cat "${TEST_DIR}/serve_output.log"
         exit 1
@@ -114,36 +126,19 @@ if ! echo "$CONTENT" | grep -q '<div id="root"></div>' || ! echo "$CONTENT" | gr
     exit 1
 fi
 
-STORE_RESPONSE=$(curl -s -w "\n%{http_code}" "http://$TEST_HOST:$TEST_PORT/assets/project-store.js")
-STORE_CODE=$(echo "$STORE_RESPONSE" | tail -n1)
-STORE_CONTENT=$(echo "$STORE_RESPONSE" | sed '$d')
-if [ "$STORE_CODE" != "200" ] || ! echo "$STORE_CONTENT" | grep -q "reqvireProjectStore"; then
+STORE_FILE="$TEST_DIR/output/project-store.js"
+STORE_CODE=$(curl -sS -o "$STORE_FILE" -w '%{http_code}' "http://$TEST_HOST:$TEST_PORT/assets/project-store.js")
+if [ "$STORE_CODE" != "200" ]; then
     echo "❌ FAILED: Project Store data asset was not served"
     exit 1
 fi
 
-if ! echo "$STORE_CONTENT" | grep -q '"path": "specifications/Requirements.md"'; then
-    echo "❌ FAILED: Project Store is missing modeled source file records"
-    exit 1
-fi
+"$REQVIRE_BIN" traces --output "$TEST_DIR/output/traces.json"
+python3 "$TEST_DIR/scripts/check-store.py" "$STORE_FILE" --traces-json "$TEST_DIR/output/traces.json"
 
 # Exercise the compiled bundle and its real browser URL serialization, using
 # the same temporary Git workspace and golden-file comparisons as other E2Es.
-BROWSER_BIN="${REQVIRE_TEST_BROWSER:-}"
-if [ -z "$BROWSER_BIN" ]; then
-    for candidate in chromium chromium-browser google-chrome; do
-        if command -v "$candidate" >/dev/null 2>&1; then
-            BROWSER_BIN=$(command -v "$candidate")
-            break
-        fi
-    done
-fi
-if [ -z "$BROWSER_BIN" ]; then
-    echo "FAILED: Browser route E2E requires Chrome/Chromium; set REQVIRE_TEST_BROWSER to its executable"
-    exit 1
-fi
-
-if ! timeout -k 5s 45s node "$TEST_DIR/scripts/route-check.mjs" "$BROWSER_BIN" \
+if ! timeout -k 5s 45s node "$TEST_SCRIPT_DIR/scripts/route-check.mjs" \
     "http://$TEST_HOST:$TEST_PORT" "$TEST_DIR/browser-profile" \
     > "$TEST_DIR/browser-routes.txt" 2> "$TEST_DIR/browser-routes.log"; then
     echo "FAILED: Served Explorer browser route checks failed"
@@ -154,23 +149,6 @@ fi
 if ! diff -u "$TEST_DIR/expected/browser-routes.txt" "$TEST_DIR/browser-routes.txt"; then
     echo "FAILED: Served Explorer browser route results do not match expected"
     cat "$TEST_DIR/browser-routes.log"
-    exit 1
-fi
-
-if echo "$STORE_CONTENT" | grep -q '"path": "scripts/evidence.sh"'; then
-    echo "❌ FAILED: Project Store included a resource-only evidence file in the model tree"
-    exit 1
-fi
-
-if ! echo "$STORE_CONTENT" | grep -q '"file_path": "scripts/evidence.sh"' ||
-   ! echo "$STORE_CONTENT" | grep -q '"id": "resource:scripts/evidence.sh"' ||
-   ! echo "$STORE_CONTENT" | grep -q 'serve command evidence'; then
-    echo "❌ FAILED: Project Store did not include the existing graph-referenced evidence file as a resource"
-    exit 1
-fi
-
-if echo "$STORE_CONTENT" | grep -q '"path": "notes/unrelated.md"'; then
-    echo "❌ FAILED: Project Store included an unrelated repository file in the model tree"
     exit 1
 fi
 
@@ -233,10 +211,19 @@ fi
 PLAIN_PID="$SERVE_PID"
 
 # Test 8: Embedded MCP endpoint can mutate the workspace and the served datastore refreshes.
-MCP_PORT=$((9000 + RANDOM % 1000))
+MCP_PORT="$(available_port)"
 MCP_PROTOCOL_VERSION="2025-11-25"
 MCP_CONTENT="$(cat "${TEST_DIR}/fixtures/serve-embedded-mcp-added-requirement.md.txt")"
 
+cat >> "$TEST_DIR/.git/info/exclude" <<'EOF'
+/*.log
+/output/
+/browser-*.txt
+/browser-profile/
+/serve_mcp_*.json
+/serve_mcp_project_store.*
+/read_only_store.js
+EOF
 "$SERVER_BIN" serve --host "$TEST_HOST" --port "$MCP_PORT" --enable-mcp --enable-mutations > "${TEST_DIR}/serve_mcp_output.log" 2>&1 &
 SERVE_PID=$!
 
@@ -247,10 +234,6 @@ for i in {1..20}; do
         break
     fi
     if [ $i -eq 20 ]; then
-        if grep -qi "Operation not permitted" "${TEST_DIR}/serve_mcp_output.log"; then
-            echo "⚠ SKIPPED: Embedded MCP serve test cannot bind in this environment"
-            exit 0
-        fi
         echo "❌ FAILED: Embedded MCP server did not start within 10 seconds"
         cat "${TEST_DIR}/serve_mcp_output.log"
         exit 1
@@ -293,6 +276,8 @@ if ! jq -e '[.result.tools[].name] | index("reqvire.add_element") != null and in
     exit 1
 fi
 
+MCP_HEAD_BEFORE="$(git -C "$TEST_DIR" rev-parse HEAD)"
+git -C "$TEST_DIR" ls-files --stage > "$TEST_DIR/output/index-before-mutation"
 curl -sS -o "${TEST_DIR}/serve_mcp_mutation.json" \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json, text/event-stream' \
@@ -300,9 +285,18 @@ curl -sS -o "${TEST_DIR}/serve_mcp_mutation.json" \
   --data "$MCP_MUTATION_REQUEST" \
   "http://$TEST_HOST:$MCP_PORT/mcp"
 
-if ! jq -e '.result.structuredContent.dry_run == false and (.result.structuredContent.diffs | length) >= 1' "${TEST_DIR}/serve_mcp_mutation.json" >/dev/null; then
+if ! jq -e '.result.structuredContent | .dry_run == false and (.diffs | length) >= 1 and (has("commit") | not)' "${TEST_DIR}/serve_mcp_mutation.json" >/dev/null; then
     echo "❌ FAILED: Embedded MCP mutation did not execute"
     cat "${TEST_DIR}/serve_mcp_mutation.json"
+    exit 1
+fi
+if [ "$(git -C "$TEST_DIR" rev-parse HEAD)" != "$MCP_HEAD_BEFORE" ]; then
+    echo "FAILED: Embedded mutation without --enable-commits changed HEAD"
+    exit 1
+fi
+git -C "$TEST_DIR" ls-files --stage > "$TEST_DIR/output/index-after-mutation"
+if ! diff -u "$TEST_DIR/output/index-before-mutation" "$TEST_DIR/output/index-after-mutation"; then
+    echo "FAILED: Embedded mutation without --enable-commits changed index contents"
     exit 1
 fi
 
@@ -325,7 +319,7 @@ if ! grep -q "Serve Embedded MCP Added Requirement" "${TEST_DIR}/serve_mcp_proje
 fi
 
 # Test 9: Embedded MCP browser freshness, conditional revisions, and visibility.
-if ! timeout -k 5s 240s node "$TEST_DIR/scripts/refresh-check.mjs" "$BROWSER_BIN" \
+if ! timeout -k 5s 240s node "$TEST_SCRIPT_DIR/scripts/refresh-check.mjs" \
     "http://$TEST_HOST:$TEST_PORT" "http://$TEST_HOST:$MCP_PORT" "$TEST_DIR" "$SERVER_BIN" \
     > "$TEST_DIR/browser-refresh.txt" 2> "$TEST_DIR/browser-refresh.log"; then
     echo "FAILED: Served Explorer live refresh checks failed"
@@ -343,8 +337,8 @@ kill -0 "$SERVE_PID" "$PLAIN_PID" || {
     exit 1
 }
 
-# Test 10: Embedded MCP without mutation authorization advertises no live API.
-READ_ONLY_PORT=$((11000 + RANDOM % 1000))
+# Test 10: Read-only MCP exposes branch snapshot reads, without periodic live refresh.
+READ_ONLY_PORT="$(available_port)"
 "$SERVER_BIN" serve --host "$TEST_HOST" --port "$READ_ONLY_PORT" --enable-mcp \
     > "$TEST_DIR/serve_read_only_output.log" 2>&1 &
 READ_ONLY_PID=$!
@@ -364,10 +358,10 @@ if grep -q 'window.reqvireLiveRefresh' "$TEST_DIR/read_only_store.js"; then
     echo "FAILED: Read-only embedded MCP advertised mutation-only refresh"
     exit 1
 fi
-for api_path in project-store project-store/manifest project-store/chunks; do
+for api_path in worktrees project-store project-store/manifest; do
     HTTP_CODE=$(curl -sS -o /dev/null -w '%{http_code}' "http://$TEST_HOST:$READ_ONLY_PORT/api/$api_path")
-    if [ "$HTTP_CODE" != "404" ]; then
-        echo "FAILED: Read-only embedded MCP exposed /api/$api_path"
+    if [ "$HTTP_CODE" != "200" ]; then
+        echo "FAILED: Read-only branch snapshot route /api/$api_path returned $HTTP_CODE"
         exit 1
     fi
 done

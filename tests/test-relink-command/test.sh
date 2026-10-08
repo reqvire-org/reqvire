@@ -176,3 +176,10 @@ assert_file_matches \
 rm -f "$BEFORE_MULTIROOT"
 
 echo "All relink command tests passed"
+
+# General existing-element selection: names and canonical identifiers share validation and results.
+SELECTION_SUITE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SELECTION_SUITE_DIR/../run_element_selection_checks.sh"
+if ! run_element_selection_checks relink "$SELECTION_SUITE_DIR/expected/element-selection.txt"; then
+  exit 1
+fi

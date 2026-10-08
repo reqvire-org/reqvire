@@ -17,7 +17,7 @@ use std::sync::{Arc, Condvar, Mutex};
 struct CachedModel {
     key: CacheKey,
     inputs: Inputs,
-    model: ModelManager,
+    model: Arc<ModelManager>,
 }
 
 #[derive(Clone, Eq, PartialEq)]
@@ -53,7 +53,7 @@ struct Flight {
 
 #[derive(Clone)]
 enum Outcome {
-    Complete(Arc<Result<ModelManager, ReqvireError>>),
+    Complete(Arc<Result<Arc<ModelManager>, ReqvireError>>),
     Retry,
 }
 
@@ -113,7 +113,10 @@ fn capture(
 pub fn load_cached_model(
     excluded_filename_patterns: &GlobSet,
     options: ModelBuildOptions,
-) -> Result<ModelManager, ReqvireError> {
+) -> Result<Arc<ModelManager>, ReqvireError> {
+    if let Some(model) = crate::mutation_io::model() {
+        return Ok(model);
+    }
     for _ in 0..MAX_BUILD_ATTEMPTS {
         let generation = MODEL_CACHE
             .lock()
@@ -145,7 +148,7 @@ pub fn load_cached_model(
                         options.lenient,
                         options.with_size_estimates
                     );
-                    return Ok(cached.model.clone());
+                    return Ok(Arc::clone(&cached.model));
                 }
                 continue;
             }
@@ -218,7 +221,7 @@ pub fn load_cached_model(
         let mut model = ModelManager::new();
         let result = model
             .parse_and_validate_with_options(None, &exclusions, options)
-            .map(|_| model);
+            .map(|_| Arc::new(model));
         #[cfg(test)]
         tests::checkpoint("built");
         let inputs = observation_guard.finish();
@@ -233,7 +236,7 @@ pub fn load_cached_model(
                 state.entry = Some(Arc::new(CachedModel {
                     key,
                     inputs,
-                    model: model.clone(),
+                    model: Arc::clone(model),
                 }));
             }
             Outcome::Complete(Arc::new(result))
@@ -320,4 +323,4 @@ fn supersede(state: &mut CacheState) {
 
 #[cfg(test)]
 #[path = "model_cache_tests.rs"]
-mod tests;
+pub(crate) mod tests;

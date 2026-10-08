@@ -49,7 +49,7 @@ The Reqvire adapter shall ask the semantic index for parsed RDF quads from the o
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [SHACL Ontology Alignment Specification](../../Architecture/OntologyKernelSpecifications.md#shacl-ontology-alignment-specification)
   * [SHACL Structural Parser Registry Specification](../../Architecture/OntologyKernelSpecifications.md#shacl-structural-parser-registry-specification)
   * [Standards Reserved Vocabulary Recognition Specification](../../Architecture/OntologyKernelSpecifications.md#standards-reserved-vocabulary-recognition-specification)
@@ -198,23 +198,32 @@ Implementation details shall follow the associated contract specifications.
   * [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
 
 #### Relations
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * definedBy: [Integrated Validation Contract Specification](Specifications.md#integrated-validation-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
 ---
 
 ### Internal Consistency Validator
 
-The system shall implement a consistency validator that verifies logical coherence within the model, including checking for circular dependencies, orphaned elements, inconsistent relationship patterns, and element name uniqueness, with detailed error reporting.
+The system SHALL validate internal model consistency according to its consistency validation specification.
 
 #### Details
-Implementation details shall follow the associated contract specifications.
+When evaluating requirement dependencies, the system SHALL reject circular fulfillment dependencies according to its bound relation semantics.
+
+When a model mutation creates circular fulfillment dependencies, the system SHALL reject the candidate before persisting source changes.
 
 #### Metadata
   * type: requirement
 
+#### Contract Bindings
+  * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
+
 #### Relations
   * definedBy: [Internal Consistency Validator Contract Specification](Specifications.md#internal-consistency-validator-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
+  * satisfiedBy: [fulfillment.rs](../../../crates/reqvire-core/src/graph_registry/fulfillment.rs)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
@@ -249,6 +258,25 @@ The system shall validate relation types against a defined vocabulary and provid
   * satisfiedBy: [relation.rs](../../../crates/reqvire-core/src/relation.rs)
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
   * verifiedBy: [Same-File Fragment Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#same-file-fragment-relations-test)
+---
+
+### Native Concept Taxonomy Cycle Validation
+
+The system shall reject cycles formed by native concept `broader` and `narrower` relations before accepting model reads or persisting mutations.
+
+#### Details
+Canonical direction, reciprocal aliases, cycle diagnostics, and candidate rejection shall follow the associated specification.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * constrainedBy: [Validation Rule Diagnostic Shape](../../Ontologies/BehaviorValidationOperations.md#validation-rule-diagnostic-shape)
+  * definedBy: [Native Concept Taxonomy Cycle Validation Specification](Specifications.md#native-concept-taxonomy-cycle-validation-specification)
+  * derivedFrom: [Relation Type Validation](#relation-type-validation)
+  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
+  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
+  * verifiedBy: [Concept Relation Projection Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#concept-relation-projection-verification)
 ---
 
 ### Native Concept Taxonomy Scheme Boundary Validation
@@ -361,6 +389,7 @@ The system shall preserve validation diagnostics as structured data before rende
   * type: requirement
 
 #### Relations
+  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
   * definedBy: [Structured Validation Diagnostic Contract Specification](Specifications.md#structured-validation-diagnostic-contract-specification)
   * derivedFrom: [Validation Error Handling](#validation-error-handling)
 ---

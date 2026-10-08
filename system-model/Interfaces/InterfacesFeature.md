@@ -54,6 +54,8 @@ MCP requirements define concrete protocol behavior while reusing the same model 
 
 #### Relations
   * derive: [MCP Semantic Query Interface](#mcp-semantic-query-interface)
+  * derive: [MCP Worktree Model Management](#mcp-worktree-model-management)
+  * derive: [MCP Change Publication](#mcp-change-publication)
   * derivedFrom: [System Model Interfaces](#system-model-interfaces)
   * specifiedBy: [MCP Interface](InterfacesRequirements.md#mcp-interface)
 ---
@@ -119,6 +121,65 @@ Web requirements define concrete Explorer views, local server behavior, browser 
   * type: capability
 
 #### Relations
+  * derive: [Explorer Selection Sharing](#explorer-selection-sharing)
+  * derive: [Explorer Worktree Browsing](#explorer-worktree-browsing)
   * derivedFrom: [System Model Interfaces](#system-model-interfaces)
   * specifiedBy: [Web Interface](InterfacesRequirements.md#web-interface)
+---
+
+### MCP Worktree Model Management
+
+As an **AI Tool Integrator**, I want to manage independent model branches through Git worktrees behind one MCP endpoint, so that concurrent model work stays isolated without switching the original checkout.
+
+#### Metadata
+  * type: capability
+
+#### Concept References
+  * [MCP Worktree Context](../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Relations
+  * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
+  * specifiedBy: [MCP Worktree Model Sessions](MCP/Tools.md#mcp-worktree-model-sessions)
+---
+
+### MCP Change Publication
+
+As a **System Engineer**, I want an MCP client to commit accepted model changes and publish them to a branch and pull request in the same repository, so that model work can be reviewed through the existing GitHub workflow.
+
+#### Metadata
+  * type: capability
+
+#### Concept References
+  * [Model Change Publication](../Thesaurus/Thesaurus.md#model-change-publication)
+
+#### Relations
+  * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
+  * specifiedBy: [MCP Model Change Publication](MCP/Tools.md#mcp-model-change-publication)
+---
+
+### Explorer Worktree Browsing
+
+As a **System Engineer**, I want to choose any local branch in Explorer and inspect its model independently in each browser tab, so that I can compare concurrent work without switching an existing Git checkout or another client's context. Worktrees provide the isolated model workspaces behind this single branch-browsing experience.
+
+#### Metadata
+  * type: capability
+
+#### Concept References
+  * [MCP Worktree Context](../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface](#web-explorer-interface)
+  * specifiedBy: [Explorer Worktree Runtime Isolation](WebExplorer/Capabilities.md#explorer-worktree-runtime-isolation)
+  * specifiedBy: [Explorer Worktree Selection](WebExplorer/Capabilities.md#explorer-worktree-selection)
+---
+
+### Explorer Selection Sharing
+
+As a **System Engineer**, I want to share a selected model context and item across Explorer views, so that collaborators can open the same selection and browser navigation can restore it.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface](#web-explorer-interface)
 ---

@@ -158,6 +158,29 @@ Expected checks:
   * verify: [CLI Ontologies Command](../../../Interfaces/CLI/Commands.md#cli-ontologies-command)
 ---
 
+### CLI Scoped Coverage Verification
+
+This verification checks the coverage scope command interface against the shared reporting contract.
+
+#### Details
+Expected checks:
+- Run `coverage` without a selector and compare existing whole-model text and JSON output expectations.
+- Run `coverage --from <NAME>` and `coverage --from <NAME> --json` for a root, a nested capability, and an empty capability. Compare scoped subjects, classifications, evidence, counts, and gaps with the shared report result.
+- Check that selected-capability metadata and the whole-model-only orphan explanation are present in their respective output formats.
+- Select unknown, requirement, contract, and verification names and assert a diagnostic plus nonzero exit status without whole-model fallback.
+- Confirm help documents the optional capability selector, and that quoted capability names containing spaces resolve correctly.
+
+The appended element-selection assertions require name/identifier report equality, ambiguity and known wrong-type diagnostics, and help advertising both selector forms. URL navigation is a separate browser verification.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [CLI Interface Verification Objective](#cli-interface-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-scoped-coverage/test.sh)
+  * verify: [CLI Coverage Scope Selection](../../../Interfaces/CLI/Commands.md#cli-coverage-scope-selection)
+---
+
 ### CLI Size Estimate JSON Option Verification
 
 This verification shall prove that the CLI size-estimate option is JSON-only and enables element size estimates for supported commands.
@@ -196,4 +219,41 @@ Expected checks:
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-workspace-flag/test.sh)
   * verify: [Explicit Workspace Selection](../../../Interfaces/CLI/Commands.md#explicit-workspace-selection)
+---
+
+### CLI Traces Result Presentation Verification
+
+Verify that trace-report presentation fulfills the CLI output obligation independently of the referenced core algorithm.
+
+#### Details
+- Run the traces command without output selection and parse the stdout report as JSON.
+- Run the same command with a file destination and compare parsed file content with stdout content from the same model and filters.
+- Confirm successful file output and valid JSON use the shared JSON output behavior.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [CLI Interface Verification Objective](#cli-interface-verification-objective)
+  * verify: [CLI Traces Result Presentation](../../../Interfaces/CLI/Commands.md#cli-traces-result-presentation)
+  * satisfiedBy: [test.sh](../../../../tests/test-json-file-output/test.sh)
+---
+
+### npm Concurrent Launch Verification
+
+Verify packaged CLI invocation and atomic extraction under concurrent first use.
+
+#### Details
+- Launch sixteen copies of the actual npm launcher against a fixture archive with synchronized extraction. All invocations must complete and preserve their argument/output values; one complete executable remains cached and invocation-owned temporary directories are removed.
+- Warm-cache launches skip extraction. Distinct versions remain isolated.
+- Fail extraction after writing partial output, assert no executable is published and temporary output is cleaned, then retry successfully. A concurrent failed extractor must not damage a successful publisher.
+- Check missing archives, unsupported platforms, native nonzero exit status, termination signals, and arguments containing spaces.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [CLI Interface Verification Objective](#cli-interface-verification-objective)
+  * verify: [npm CLI Distribution](../../../Interfaces/CLI/Commands.md#npm-cli-distribution)
+  * satisfiedBy: [test.sh](../../../../tests/test-npm-launcher/test.sh)
 ---

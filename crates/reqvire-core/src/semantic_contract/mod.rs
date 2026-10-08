@@ -37,7 +37,7 @@ pub enum OntologyTermRole {
 }
 
 impl OntologyTermRole {
-    pub fn conflicts_with(self, other: Self) -> bool {
+    pub const fn conflicts_with(self, other: Self) -> bool {
         matches!(
             (self, other),
             (
@@ -128,7 +128,7 @@ pub enum SemanticBlockKind {
 }
 
 impl SemanticBlockKind {
-    pub fn as_str(&self) -> &'static str {
+    pub const fn as_str(&self) -> &'static str {
         match self {
             Self::Ontology => "ontology",
             Self::Shapes => "shapes",
@@ -231,7 +231,7 @@ pub enum OntologyProjectionDerivationMode {
 }
 
 impl OntologyProjectionDerivationMode {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::DirectAuthored => "direct-authored",
         }
@@ -252,7 +252,7 @@ pub enum OntologyConstructFamily {
 }
 
 impl OntologyConstructFamily {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::PropertyDomainRange => "property-domain-range",
             Self::SubclassMembership => "subclass-membership",
@@ -284,7 +284,7 @@ pub enum OntologyConstructKind {
 }
 
 impl OntologyConstructKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::PropertyDomain => "property-domain",
             Self::PropertyRange => "property-range",
@@ -311,7 +311,7 @@ pub enum OntologyProjectionTermKind {
 }
 
 impl OntologyProjectionTermKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::Iri => "iri",
             Self::BlankNode => "blank-node",
@@ -382,7 +382,7 @@ pub enum OntologyPropertyCharacteristic {
 }
 
 impl OntologyPropertyCharacteristic {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::Functional => "functional",
             Self::InverseFunctional => "inverse-functional",
@@ -412,7 +412,7 @@ pub enum OntologyRestrictionKind {
 }
 
 impl OntologyRestrictionKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::Universal => "universal",
             Self::Existential => "existential",
@@ -438,7 +438,7 @@ pub enum OntologyClassExpressionKind {
 }
 
 impl OntologyClassExpressionKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::Intersection => "intersection",
             Self::Union => "union",
@@ -455,7 +455,7 @@ pub enum OntologyShapeOverlayKind {
 }
 
 impl OntologyShapeOverlayKind {
-    fn as_str(self) -> &'static str {
+    const fn as_str(self) -> &'static str {
         match self {
             Self::NodeShape => "node-shape",
             Self::PropertyShape => "property-shape",
@@ -540,6 +540,7 @@ pub struct ModelContextEdge {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct SemanticIndex {
+    pub queries: Vec<queries::QueryRecord>,
     pub blocks: Vec<SemanticBlock>,
     pub external_blocks: Vec<SemanticBlock>,
     pub external_sources: Vec<ExternalOntologySource>,
@@ -562,6 +563,7 @@ pub enum SemanticExportFormat {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SemanticExportLayer {
+    Queries,
     Ontologies,
     Shapes,
     Concepts,
@@ -573,6 +575,7 @@ pub enum SemanticExportLayer {
 impl SemanticExportLayer {
     pub fn default_layers() -> Vec<Self> {
         vec![
+            Self::Queries,
             Self::Ontologies,
             Self::Shapes,
             Self::Concepts,
@@ -582,8 +585,9 @@ impl SemanticExportLayer {
         ]
     }
 
-    pub fn as_str(&self) -> &'static str {
+    pub const fn as_str(&self) -> &'static str {
         match self {
+            Self::Queries => "queries",
             Self::Ontologies => "ontologies",
             Self::Shapes => "shapes",
             Self::Concepts => "concepts",
@@ -611,7 +615,7 @@ impl ExternalOntologyFormat {
         }
     }
 
-    fn display_name(self) -> &'static str {
+    const fn display_name(self) -> &'static str {
         match self {
             Self::Turtle => "Turtle",
             Self::RdfXml => "RDF/XML",
@@ -619,7 +623,7 @@ impl ExternalOntologyFormat {
         }
     }
 
-    fn language(self) -> &'static str {
+    const fn language(self) -> &'static str {
         match self {
             Self::Turtle => "turtle",
             Self::RdfXml => "rdfxml",
@@ -646,7 +650,7 @@ struct TurtlePrefixMapBuilder {
 }
 
 impl TurtlePrefixMapBuilder {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             by_prefix: BTreeMap::new(),
             prefix_by_namespace: BTreeMap::new(),
@@ -822,6 +826,7 @@ impl SemanticIndex {
             .flat_map(|document| document.element_identifiers.iter().cloned())
             .collect();
 
+        index.queries.retain(|q| q.namespaces.contains(&namespace));
         index.blocks.retain(|block| match block.kind {
             SemanticBlockKind::Ontology => {
                 retained_sources.contains(&block.source)
@@ -871,8 +876,21 @@ impl SemanticIndex {
         &mut self,
         include_external: bool,
     ) -> Result<(), ReqvireError> {
+        let subset = if include_external {
+            self.used_external_subset_block()?
+        } else {
+            None
+        };
+        self.apply_external_visibility_with_subset(include_external, subset);
+        Ok(())
+    }
+
+    pub(crate) fn apply_external_visibility_with_subset(
+        &mut self,
+        include_external: bool,
+        used_subset_block: Option<SemanticBlock>,
+    ) {
         if include_external {
-            let used_subset_block = self.used_external_subset_block()?;
             let used_terms = used_subset_block
                 .as_ref()
                 .map(materialized_external_subjects)
@@ -894,7 +912,7 @@ impl SemanticIndex {
                 });
                 !declarations.is_empty()
             });
-            return Ok(());
+            return;
         }
 
         self.external_blocks.clear();
@@ -903,7 +921,6 @@ impl SemanticIndex {
             declarations.retain(|declaration| !declaration.external);
             !declarations.is_empty()
         });
-        Ok(())
     }
 
     pub fn reachable_ontology_context_quads(
@@ -987,13 +1004,13 @@ impl SemanticIndex {
         for declaration in self.ontology_documents_for_context(&context) {
             prefixes
                 .entry(declaration.ontology_prefix.clone())
-                .or_insert(declaration.term_namespace.clone());
+                .or_insert_with(|| declaration.term_namespace.clone());
         }
 
         for source in self.external_sources_for_context(&context) {
             prefixes
                 .entry(source.prefix.clone())
-                .or_insert(source.namespace.clone());
+                .or_insert_with(|| source.namespace.clone());
         }
 
         prefixes
@@ -1257,7 +1274,9 @@ impl SemanticIndex {
         registry: &GraphRegistry,
     ) -> Result<String, ReqvireError> {
         let prefix_map = self.turtle_prefix_map(true)?;
-        build_generated_model_turtle(registry, self, &prefix_map)
+        let mut output = build_generated_model_turtle(registry, self, &prefix_map)?;
+        output.push_str(&self.queries_turtle());
+        Ok(output)
     }
 
     pub fn to_raw_external_turtle_string(&self) -> Result<String, ReqvireError> {
@@ -1309,6 +1328,19 @@ impl SemanticIndex {
     pub fn to_turtle_string_with_external(
         &self,
         include_external: bool,
+    ) -> Result<String, ReqvireError> {
+        let subset = if include_external {
+            self.used_external_subset_block()?
+        } else {
+            None
+        };
+        self.to_turtle_string_with_subset(include_external, subset.as_ref())
+    }
+
+    fn to_turtle_string_with_subset(
+        &self,
+        include_external: bool,
+        subset: Option<&SemanticBlock>,
     ) -> Result<String, ReqvireError> {
         let prefix_map = self.turtle_prefix_map(include_external)?;
         let mut output = String::new();
@@ -1363,11 +1395,7 @@ impl SemanticIndex {
         }
 
         if include_external {
-            let used_external_subset_turtle = self.to_used_external_subset_turtle_string()?;
-            let used_external_subset_quads = quads_from_turtle(
-                &used_external_subset_turtle,
-                "used external ontology subset projection",
-            )?;
+            let used_external_subset_quads = subset.map_or(&[][..], |block| block.quads.as_slice());
             let used_external_subset_quads =
                 unique_quads(used_external_subset_quads.iter(), &mut seen_quads);
             if !used_external_subset_quads.is_empty() {
@@ -1396,6 +1424,19 @@ impl SemanticIndex {
     pub fn to_jsonld_string_with_external(
         &self,
         include_external: bool,
+    ) -> Result<String, ReqvireError> {
+        let subset = if include_external {
+            self.used_external_subset_block()?
+        } else {
+            None
+        };
+        self.to_jsonld_string_with_subset(include_external, subset.as_ref())
+    }
+
+    fn to_jsonld_string_with_subset(
+        &self,
+        include_external: bool,
+        subset: Option<&SemanticBlock>,
     ) -> Result<String, ReqvireError> {
         let prefix_map = self.turtle_prefix_map(include_external)?;
         let mut serializer = RdfSerializer::from_format(RdfFormat::JsonLd {
@@ -1438,11 +1479,7 @@ impl SemanticIndex {
         }
 
         if include_external {
-            let used_external_subset_turtle = self.to_used_external_subset_turtle_string()?;
-            let used_external_subset_quads = quads_from_turtle(
-                &used_external_subset_turtle,
-                "used external ontology subset projection",
-            )?;
+            let used_external_subset_quads = subset.map_or(&[][..], |block| block.quads.as_slice());
             for quad in unique_quads(used_external_subset_quads.iter(), &mut seen_quads) {
                 serializer.serialize_quad(quad.as_ref())?;
             }
@@ -1467,8 +1504,22 @@ impl SemanticIndex {
         &self,
         include_external: bool,
     ) -> Result<String, ReqvireError> {
+        let subset = if include_external {
+            self.used_external_subset_block()?
+        } else {
+            None
+        };
+        self.to_full_turtle_string_with_subset(include_external, subset.as_ref())
+    }
+
+    fn to_full_turtle_string_with_subset(
+        &self,
+        include_external: bool,
+        subset: Option<&SemanticBlock>,
+    ) -> Result<String, ReqvireError> {
         let prefix_map = self.turtle_prefix_map(include_external)?;
-        let mut output = self.to_turtle_string_with_external(include_external)?;
+        let mut output = self.to_turtle_string_with_subset(include_external, subset)?;
+        output.push_str(&self.queries_turtle());
         output.push_str(&self.model_context_turtle);
         output.push_str(&build_semantic_term_context_turtle(self));
         output.push_str(&build_ontology_projection_turtle(self));
@@ -1484,7 +1535,20 @@ impl SemanticIndex {
         &self,
         include_external: bool,
     ) -> Result<String, ReqvireError> {
-        let turtle = self.to_full_turtle_string_with_external(include_external)?;
+        let subset = if include_external {
+            self.used_external_subset_block()?
+        } else {
+            None
+        };
+        self.to_full_jsonld_string_with_subset(include_external, subset.as_ref())
+    }
+
+    fn to_full_jsonld_string_with_subset(
+        &self,
+        include_external: bool,
+        subset: Option<&SemanticBlock>,
+    ) -> Result<String, ReqvireError> {
+        let turtle = self.to_full_turtle_string_with_subset(include_external, subset)?;
         let mut serializer = RdfSerializer::from_format(RdfFormat::JsonLd {
             profile: JsonLdProfileSet::empty(),
         })
@@ -1517,18 +1581,33 @@ impl SemanticIndex {
         full: bool,
         include_external: bool,
     ) -> Result<String, ReqvireError> {
+        let subset = if include_external {
+            self.used_external_subset_block()?
+        } else {
+            None
+        };
+        self.serialize_with_subset(format, full, include_external, subset.as_ref())
+    }
+
+    fn serialize_with_subset(
+        &self,
+        format: SemanticExportFormat,
+        full: bool,
+        include_external: bool,
+        subset: Option<&SemanticBlock>,
+    ) -> Result<String, ReqvireError> {
         match (format, full) {
             (SemanticExportFormat::Turtle, false) => {
-                self.to_turtle_string_with_external(include_external)
+                self.to_turtle_string_with_subset(include_external, subset)
             }
             (SemanticExportFormat::JsonLd, false) => {
-                self.to_jsonld_string_with_external(include_external)
+                self.to_jsonld_string_with_subset(include_external, subset)
             }
             (SemanticExportFormat::Turtle, true) => {
-                self.to_full_turtle_string_with_external(include_external)
+                self.to_full_turtle_string_with_subset(include_external, subset)
             }
             (SemanticExportFormat::JsonLd, true) => {
-                self.to_full_jsonld_string_with_external(include_external)
+                self.to_full_jsonld_string_with_subset(include_external, subset)
             }
         }
     }
@@ -1540,14 +1619,36 @@ impl SemanticIndex {
         include_external: bool,
         namespace_base: Option<&str>,
     ) -> Result<String, ReqvireError> {
+        self.serialize_with_options_and_filter_with_subset(
+            format,
+            full,
+            include_external,
+            namespace_base,
+            Self::used_external_subset_block,
+        )
+    }
+
+    pub(crate) fn serialize_with_options_and_filter_with_subset(
+        &self,
+        format: SemanticExportFormat,
+        full: bool,
+        include_external: bool,
+        namespace_base: Option<&str>,
+        subset: impl FnOnce(&Self) -> Result<Option<SemanticBlock>, ReqvireError>,
+    ) -> Result<String, ReqvireError> {
         if full && namespace_base.is_some_and(|value| !value.trim().is_empty()) {
             return Err(ReqvireError::ProcessError(
                 "--namespace-base filters clean authored semantic exports; it cannot be combined with --full model-context projection.".to_string(),
             ));
         }
 
-        self.with_namespace_base_filter(namespace_base)?
-            .serialize_with_options(format, full, include_external)
+        let index = self.with_namespace_base_filter(namespace_base)?;
+        let subset = if include_external {
+            subset(&index)?
+        } else {
+            None
+        };
+        index.serialize_with_subset(format, full, include_external, subset.as_ref())
     }
 
     pub fn serialize_export_layers(
@@ -1555,6 +1656,21 @@ impl SemanticIndex {
         format: SemanticExportFormat,
         layers: &[SemanticExportLayer],
         namespace_base: Option<&str>,
+    ) -> Result<String, ReqvireError> {
+        self.serialize_export_layers_with_subset(
+            format,
+            layers,
+            namespace_base,
+            Self::used_external_subset_block,
+        )
+    }
+
+    pub(crate) fn serialize_export_layers_with_subset(
+        &self,
+        format: SemanticExportFormat,
+        layers: &[SemanticExportLayer],
+        namespace_base: Option<&str>,
+        subset: impl FnOnce(&Self) -> Result<Option<SemanticBlock>, ReqvireError>,
     ) -> Result<String, ReqvireError> {
         let selected_layers = if layers.is_empty() {
             SemanticExportLayer::default_layers()
@@ -1566,6 +1682,16 @@ impl SemanticIndex {
                 .into_iter()
                 .collect()
         };
+        if selected_layers.contains(&SemanticExportLayer::Queries) {
+            for query in &self.queries {
+                if !query.diagnostics.is_empty() {
+                    return Err(ReqvireError::ProcessError(format!(
+                        "Cannot export invalid query '{}'",
+                        query.name
+                    )));
+                }
+            }
+        }
         let has_model = selected_layers.contains(&SemanticExportLayer::Model);
         if has_model && namespace_base.is_some_and(|value| !value.trim().is_empty()) {
             return Err(ReqvireError::ProcessError(
@@ -1575,7 +1701,12 @@ impl SemanticIndex {
 
         let include_external = selected_layers.contains(&SemanticExportLayer::ExternalUsed);
         let mut index = self.with_namespace_base_filter(namespace_base)?;
-        index.apply_external_visibility(include_external)?;
+        let used_subset = if include_external {
+            subset(&index)?
+        } else {
+            None
+        };
+        index.apply_external_visibility_with_subset(include_external, used_subset);
         let turtle = index.to_export_layers_turtle_string(&selected_layers)?;
         serialize_turtle_as_format(&turtle, format, "Semantic layered export")
     }
@@ -1631,6 +1762,9 @@ impl SemanticIndex {
             )?;
         }
 
+        if layers.contains(&SemanticExportLayer::Queries) {
+            output.push_str(&self.queries_turtle());
+        }
         if layers.contains(&SemanticExportLayer::Shapes) {
             append_blocks_turtle(
                 &mut output,
@@ -1703,7 +1837,16 @@ impl SemanticIndex {
         }
 
         if include_external {
-            append_used_external_subset_turtle(self, &mut output, &mut seen_quads, &prefix_map)?;
+            // External blocks were replaced by the completed subset before this
+            // private serializer was entered. Do not derive from that subset again.
+            for block in &self.external_blocks {
+                append_external_subset_quads(
+                    &block.quads,
+                    &mut output,
+                    &mut seen_quads,
+                    &prefix_map,
+                )?;
+            }
         }
 
         Ok(output)
@@ -1757,6 +1900,7 @@ impl SemanticIndex {
 mod export;
 mod index;
 mod prefixes;
+pub mod queries;
 mod vocabulary;
 
 use export::*;
@@ -1764,7 +1908,13 @@ use index::*;
 
 pub use export::external_materialization_metadata;
 pub(crate) use export::materialized_external_subjects;
+#[cfg(test)]
+pub(crate) use export::SUBSET_DERIVATIONS;
 pub use index::build_semantic_index;
+pub(crate) use index::{build_semantic_index_with_shapes, SemanticIndexBuild};
+#[cfg(test)]
+pub(crate) static INDEX_BUILD_COUNT: std::sync::atomic::AtomicUsize =
+    std::sync::atomic::AtomicUsize::new(0);
 pub(crate) use prefixes::{parse_turtle_prefix_declarations, parse_turtle_prefix_line};
 
 #[cfg(test)]
@@ -1907,6 +2057,7 @@ ext:UnusedTerm a owl:Class ;
 "#;
 
         SemanticIndex {
+            queries: Vec::new(),
             blocks: Vec::new(),
             external_blocks: vec![external_block(raw_external)],
             external_sources: vec![ExternalOntologySource {
@@ -1975,16 +2126,20 @@ ext:UnusedTerm a owl:Class ;
     }
 
     fn materialized_triples(index: &SemanticIndex) -> BTreeSet<(String, String, String)> {
-        parse_test_quads(&index.to_used_external_subset_turtle_string().unwrap())
-            .into_iter()
-            .map(|quad| {
-                (
-                    quad.subject.to_string(),
-                    quad.predicate.to_string(),
-                    quad.object.to_string(),
-                )
-            })
-            .collect()
+        parse_test_quads(
+            &index
+                .to_used_external_subset_turtle_string()
+                .expect("materialized triples: expected success"),
+        )
+        .into_iter()
+        .map(|quad| {
+            (
+                quad.subject.to_string(),
+                quad.predicate.to_string(),
+                quad.object.to_string(),
+            )
+        })
+        .collect()
     }
 
     #[test]
@@ -2096,6 +2251,7 @@ ext:UnusedTerm a owl:Class ;
     fn generated_model_turtle_declares_builtin_prefixes_when_it_uses_them() {
         let registry = GraphRegistry::new();
         let index = SemanticIndex {
+            queries: Vec::new(),
             blocks: Vec::new(),
             external_blocks: Vec::new(),
             external_sources: Vec::new(),
@@ -2176,6 +2332,7 @@ concept:TraceabilityConstruct a owl:Class ;
 "#;
 
         let index = SemanticIndex {
+            queries: Vec::new(),
             blocks: vec![ontology_block(authored)],
             external_blocks: vec![external_block],
             external_sources: vec![source],

@@ -15,7 +15,7 @@ pub struct ErrorContext {
 }
 
 impl ErrorContext {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             file: None,
             line: None,
@@ -29,12 +29,12 @@ impl ErrorContext {
         self
     }
 
-    pub fn with_line(mut self, line: usize) -> Self {
+    pub const fn with_line(mut self, line: usize) -> Self {
         self.line = Some(line);
         self
     }
 
-    pub fn with_column(mut self, column: usize) -> Self {
+    pub const fn with_column(mut self, column: usize) -> Self {
         self.column = Some(column);
         self
     }
@@ -136,6 +136,12 @@ pub enum ReqvireError {
     #[error("Missing element: {0}")]
     MissingElement(String),
 
+    #[error("Ambiguous element selection: {0}")]
+    AmbiguousElementSelection(String),
+
+    #[error("Conflicting element selectors: {0}")]
+    ConflictingElementSelectors(String),
+
     #[error("Missing relation target: {0}")]
     MissingRelationTarget(String),
 
@@ -188,7 +194,7 @@ pub enum ReqvireError {
     InvalidPath(String),
 
     #[error("Validation failed with {} errors", .0.len())]
-    ValidationError(Vec<ReqvireError>),
+    ValidationError(Vec<Self>),
 
     #[error("Serialization error: {0}")]
     SerializationError(String),
@@ -210,6 +216,9 @@ pub enum ReqvireError {
 
     #[error("Duplicate contract_bindings: {0}")]
     DuplicateContractBinding(String),
+
+    #[error("Invalid contract_references: {0}")]
+    InvalidContractReference(String),
 
     #[error("Cross-section duplicate: {0}")]
     CrossSectionDuplicate(String),
@@ -235,7 +244,7 @@ pub enum ReqvireError {
     #[error("Validation failed with {} errors", .diagnostics.len())]
     ValidationDiagnostics {
         diagnostics: Vec<ValidationDiagnostic>,
-        related_errors: Vec<ReqvireError>,
+        related_errors: Vec<Self>,
     },
 }
 
@@ -258,6 +267,12 @@ impl Clone for ReqvireError {
             Self::DuplicateElement(error) => Self::DuplicateElement(error.clone()),
             Self::DuplicateSubsection(error) => Self::DuplicateSubsection(error.clone()),
             Self::MissingElement(error) => Self::MissingElement(error.clone()),
+            Self::AmbiguousElementSelection(error) => {
+                Self::AmbiguousElementSelection(error.clone())
+            }
+            Self::ConflictingElementSelectors(error) => {
+                Self::ConflictingElementSelectors(error.clone())
+            }
             Self::MissingRelationTarget(error) => Self::MissingRelationTarget(error.clone()),
             Self::MissingParentRelation(error) => Self::MissingParentRelation(error.clone()),
             Self::InvalidRelationFormat(error) => Self::InvalidRelationFormat(error.clone()),
@@ -295,6 +310,7 @@ impl Clone for ReqvireError {
                 Self::InvalidContractBindingScope(error.clone())
             }
             Self::DuplicateContractBinding(error) => Self::DuplicateContractBinding(error.clone()),
+            Self::InvalidContractReference(error) => Self::InvalidContractReference(error.clone()),
             Self::CrossSectionDuplicate(error) => Self::CrossSectionDuplicate(error.clone()),
             Self::ElementNotFound(error) => Self::ElementNotFound(error.clone()),
             Self::MergeTypeMismatch(error) => Self::MergeTypeMismatch(error.clone()),
@@ -315,48 +331,51 @@ impl Clone for ReqvireError {
 
 impl ReqvireError {
     /// Returns a stable, machine-readable diagnostic code for this error variant.
-    pub fn diagnostic_code(&self) -> &'static str {
+    pub const fn diagnostic_code(&self) -> &'static str {
         match self {
-            ReqvireError::IoError(_) => "io_error",
-            ReqvireError::GitCommandError(_) => "git_command_error",
-            ReqvireError::InvalidIdentifier(_) => "invalid_identifier",
-            ReqvireError::RelationError(_) => "relation_error",
-            ReqvireError::ElementError(_) => "element_error",
-            ReqvireError::CircularDependencyError(_) => "circular_dependency",
-            ReqvireError::DuplicateElement(_) => "duplicate_element",
-            ReqvireError::DuplicateSubsection(_) => "duplicate_subsection",
-            ReqvireError::MissingElement(_) => "missing_element",
-            ReqvireError::MissingRelationTarget(_) => "missing_relation_target",
-            ReqvireError::MissingParentRelation(_) => "missing_parent_relation",
-            ReqvireError::InvalidRelationFormat(_) => "invalid_relation_format",
-            ReqvireError::InvalidMetadataFormat(_) => "invalid_metadata_format",
-            ReqvireError::InvalidMarkdownStructure(_) => "invalid_markdown_structure",
-            ReqvireError::DuplicateRelation(_) => "duplicate_relation",
-            ReqvireError::UnsupportedRelationType(_) => "unsupported_relation_type",
-            ReqvireError::IncompatibleElementTypes(_) => "incompatible_element_types",
-            ReqvireError::MixedHierarchicalRelations(_) => "mixed_hierarchical_relations",
-            ReqvireError::PathError(_) => "path_error",
-            ReqvireError::InvalidRegex(_) => "invalid_regex",
-            ReqvireError::InvalidGlob(_) => "invalid_glob",
-            ReqvireError::ProcessError(_) => "process_error",
-            ReqvireError::ElementMoveError(_) => "element_move_error",
-            ReqvireError::LocationNotFound(_) => "location_not_found",
-            ReqvireError::LocationAlreadyExists(_) => "location_already_exists",
-            ReqvireError::InvalidPath(_) => "invalid_path",
-            ReqvireError::ValidationError(_) => "validation_failed",
-            ReqvireError::SerializationError(_) => "serialization_error",
-            ReqvireError::SerdeJsonError(_) => "serialization_error",
-            ReqvireError::InvalidContractBindingFormat(_) => "invalid_contract_binding_format",
-            ReqvireError::MissingContractBindingTarget(_) => "missing_contract_binding_target",
-            ReqvireError::InvalidContractBindingTarget(_) => "invalid_contract_binding_target",
-            ReqvireError::InvalidContractBindingScope(_) => "invalid_contract_binding_scope",
-            ReqvireError::DuplicateContractBinding(_) => "duplicate_contract_binding",
-            ReqvireError::CrossSectionDuplicate(_) => "cross_section_duplicate",
-            ReqvireError::ElementNotFound(_) => "element_not_found",
-            ReqvireError::MergeTypeMismatch(_) => "merge_type_mismatch",
-            ReqvireError::MergeCrossSectionDuplicate(_) => "merge_cross_section_duplicate",
-            ReqvireError::InvalidOperation(_) => "invalid_operation",
-            ReqvireError::ValidationDiagnostics { .. } => "validation_failed",
+            Self::IoError(_) => "io_error",
+            Self::GitCommandError(_) => "git_command_error",
+            Self::InvalidIdentifier(_) => "invalid_identifier",
+            Self::RelationError(_) => "relation_error",
+            Self::ElementError(_) => "element_error",
+            Self::CircularDependencyError(_) => "circular_dependency",
+            Self::DuplicateElement(_) => "duplicate_element",
+            Self::DuplicateSubsection(_) => "duplicate_subsection",
+            Self::MissingElement(_) => "missing_element",
+            Self::AmbiguousElementSelection(_) => "ambiguous_element_selection",
+            Self::ConflictingElementSelectors(_) => "conflicting_element_selectors",
+            Self::MissingRelationTarget(_) => "missing_relation_target",
+            Self::MissingParentRelation(_) => "missing_parent_relation",
+            Self::InvalidRelationFormat(_) => "invalid_relation_format",
+            Self::InvalidMetadataFormat(_) => "invalid_metadata_format",
+            Self::InvalidMarkdownStructure(_) => "invalid_markdown_structure",
+            Self::DuplicateRelation(_) => "duplicate_relation",
+            Self::UnsupportedRelationType(_) => "unsupported_relation_type",
+            Self::IncompatibleElementTypes(_) => "incompatible_element_types",
+            Self::MixedHierarchicalRelations(_) => "mixed_hierarchical_relations",
+            Self::PathError(_) => "path_error",
+            Self::InvalidRegex(_) => "invalid_regex",
+            Self::InvalidGlob(_) => "invalid_glob",
+            Self::ProcessError(_) => "process_error",
+            Self::ElementMoveError(_) => "element_move_error",
+            Self::LocationNotFound(_) => "location_not_found",
+            Self::LocationAlreadyExists(_) => "location_already_exists",
+            Self::InvalidPath(_) => "invalid_path",
+            Self::ValidationError(_) => "validation_failed",
+            Self::SerializationError(_) => "serialization_error",
+            Self::SerdeJsonError(_) => "serialization_error",
+            Self::InvalidContractBindingFormat(_) => "invalid_contract_binding_format",
+            Self::MissingContractBindingTarget(_) => "missing_contract_binding_target",
+            Self::InvalidContractBindingTarget(_) => "invalid_contract_binding_target",
+            Self::InvalidContractBindingScope(_) => "invalid_contract_binding_scope",
+            Self::DuplicateContractBinding(_) => "duplicate_contract_binding",
+            Self::InvalidContractReference(_) => "invalid_contract_reference",
+            Self::CrossSectionDuplicate(_) => "cross_section_duplicate",
+            Self::ElementNotFound(_) => "element_not_found",
+            Self::MergeTypeMismatch(_) => "merge_type_mismatch",
+            Self::MergeCrossSectionDuplicate(_) => "merge_cross_section_duplicate",
+            Self::InvalidOperation(_) => "invalid_operation",
+            Self::ValidationDiagnostics { .. } => "validation_failed",
         }
     }
 
@@ -373,9 +392,9 @@ impl ReqvireError {
     /// Constructs a `ValidationDiagnostics` error from a flat list of validation
     /// errors, deriving structured diagnostics while preserving the legacy
     /// `related_errors` list for backward-compatible text rendering.
-    pub fn validation_diagnostics(errors: Vec<ReqvireError>) -> Self {
-        let diagnostics = ReqvireError::errors_to_diagnostics(&errors);
-        ReqvireError::ValidationDiagnostics {
+    pub fn validation_diagnostics(errors: Vec<Self>) -> Self {
+        let diagnostics = Self::errors_to_diagnostics(&errors);
+        Self::ValidationDiagnostics {
             diagnostics,
             related_errors: errors,
         }
@@ -384,19 +403,19 @@ impl ReqvireError {
     /// Flattens a list of validation errors into structured diagnostics.
     /// Nested `ValidationError` / `ValidationDiagnostics` wrappers are expanded
     /// so each leaf error becomes one diagnostic.
-    pub fn errors_to_diagnostics(errors: &[ReqvireError]) -> Vec<ValidationDiagnostic> {
+    pub fn errors_to_diagnostics(errors: &[Self]) -> Vec<ValidationDiagnostic> {
         let mut out = Vec::new();
         for err in errors {
             match err {
-                ReqvireError::ValidationError(inner) => {
-                    out.extend(ReqvireError::errors_to_diagnostics(inner));
+                Self::ValidationError(inner) => {
+                    out.extend(Self::errors_to_diagnostics(inner));
                 }
-                ReqvireError::ValidationDiagnostics {
+                Self::ValidationDiagnostics {
                     diagnostics,
                     related_errors,
                 } => {
                     out.extend(diagnostics.iter().cloned());
-                    out.extend(ReqvireError::errors_to_diagnostics(related_errors));
+                    out.extend(Self::errors_to_diagnostics(related_errors));
                 }
                 other => out.push(other.to_diagnostic()),
             }
@@ -407,8 +426,8 @@ impl ReqvireError {
     /// Returns the structured diagnostics for this error if it carries them.
     pub fn diagnostics(&self) -> Vec<ValidationDiagnostic> {
         match self {
-            ReqvireError::ValidationError(errors) => ReqvireError::errors_to_diagnostics(errors),
-            ReqvireError::ValidationDiagnostics { diagnostics, .. } => diagnostics.clone(),
+            Self::ValidationError(errors) => Self::errors_to_diagnostics(errors),
+            Self::ValidationDiagnostics { diagnostics, .. } => diagnostics.clone(),
             _ => Vec::new(),
         }
     }

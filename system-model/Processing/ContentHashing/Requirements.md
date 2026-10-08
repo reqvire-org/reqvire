@@ -14,9 +14,10 @@ When a Reqvire consumer requests a content fingerprint, the system shall compute
 
 ### Stable Model Revision Fingerprinting
 
-When a consumer requests a model revision, the system shall fingerprint the defined parsed-element state using a versioned canonical encoding and the shared SHA-256 primitive.
+When a consumer requests a model revision, the system SHALL fingerprint the defined parsed-element state using a versioned canonical encoding and the shared SHA-256 primitive.
 
-While the canonical inputs and encoding version remain unchanged, the system shall return the same model revision across machines and tool builds.
+#### Details
+While the canonical inputs and encoding version remain unchanged, the system SHALL return the same model revision across machines and tool builds.
 
 #### Concept References
   * [Element](../../Thesaurus/Thesaurus.md#element)
@@ -28,6 +29,7 @@ While the canonical inputs and encoding version remain unchanged, the system sha
   * type: requirement
 
 #### Contract Bindings
+  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
   * [SHA-256 Hash Encoding Specification](Specifications.md#sha-256-hash-encoding-specification)
 
 #### Relations

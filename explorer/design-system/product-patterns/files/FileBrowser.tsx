@@ -18,7 +18,7 @@ import { TypeBadge } from "../../components/data/TypeBadge";
 import { RouteLayout, RoutePanel } from "../shell";
 
 export type FileBrowserLayout = "list" | "grid";
-export type FileBrowserMode = FileBrowserLayout | "graph";
+export type FileBrowserMode = FileBrowserLayout | "graph" | "flow";
 export type FileBrowserSortKey = "name" | "type" | "elements" | "path";
 export type FileBrowserSortDirection = "asc" | "desc";
 export type FileBrowserItemKind = "folder" | "file";
@@ -637,6 +637,7 @@ export function FileBrowserToolbar({
             { value: "list", label: "List", icon: <Icon name="list" /> },
             { value: "grid", label: "Grid", icon: <Icon name="layout-grid" /> },
             { value: "graph", label: "Graph", icon: <Icon name="git-branch" /> },
+            { value: "flow", label: "Flow", icon: <Icon name="network" /> },
           ]}
         />
       </div>

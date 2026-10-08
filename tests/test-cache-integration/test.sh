@@ -8,8 +8,8 @@ set -uo pipefail
 #   1. Two identical reads over an unchanged workspace return equal results.
 #   2. A CRUD write (reqvire.add_element) invalidates the cache so a subsequent
 #      search reflects the newly added element.
-#   3. Modifying a .md file on disk changes the fingerprint and forces a rebuild
-#      so new content is reflected.
+#   3. In read-only mode, modifying a .md file on disk changes the fingerprint
+#      and forces a rebuild so new content is reflected.
 #   4. The CLI `change-impact --git-commit` path completes successfully.
 #   5. Issue #73 correctness checks observe actual builds, input freshness, and
 #      embedded Explorer publication (check_correctness.py).
@@ -63,7 +63,7 @@ start_http_mcp() {
   local port="$1"
   local output_prefix="$2"
   shift 2
-  (cd "$TEST_DIR" && "$REQVIRE_BIN" mcp --host 127.0.0.1 --port "$port" "$@") > "${output_prefix}.stdout" 2> "${output_prefix}.stderr" &
+  (cd "$TEST_DIR" && exec "$REQVIRE_BIN" mcp --host 127.0.0.1 --port "$port" "$@") > "${output_prefix}.stdout" 2> "${output_prefix}.stderr" &
   HTTP_MCP_PID=$!
 }
 
@@ -82,6 +82,7 @@ wait_for_http_mcp() {
   request="$(init_request)"
 
   for _ in $(seq 1 50); do
+    kill -0 "$HTTP_MCP_PID" >/dev/null 2>&1 || return 1
     if curl -sS -o "$output_file" \
       -H 'Content-Type: application/json' \
       -H 'Accept: application/json, text/event-stream' \
@@ -152,6 +153,10 @@ add_element_request() {
 # ----------------------------------------------------------------------------
 
 mkdir -p "$TEST_DIR/output"
+python3 "$TEST_SCRIPT_DIR/check_process_lifecycle.py" > "$TEST_DIR/output/process-lifecycle.txt" \
+  || fail "timing wrapper process cleanup failed" "$TEST_DIR/output/process-lifecycle.txt"
+diff -u "$TEST_SCRIPT_DIR/expected/process-lifecycle.txt" "$TEST_DIR/output/process-lifecycle.txt" \
+  || fail "timing wrapper process cleanup results differ"
 cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/specifications" "$TEST_DIR/"
 cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/docs" "$TEST_DIR/"
 ADD_CONTENT="$(< "$TEST_SCRIPT_DIR/../test-mcp-server/fixtures/mcp-added-requirement.md")"
@@ -160,7 +165,9 @@ ADD_CONTENT="$(< "$TEST_SCRIPT_DIR/../test-mcp-server/fixtures/mcp-added-require
 # Start the MCP HTTP server with mutations enabled.
 # ----------------------------------------------------------------------------
 
-HTTP_PORT="$(pick_port)"
+printf '/output/\n/correctness/\n' >> "$TEST_DIR/.git/info/exclude"
+(cd "$TEST_DIR" && git add specifications docs && git commit -qm "Prepare MCP mutation fixture") || fail "commit clean mutation fixture"
+HTTP_PORT="$(pick_port)" || fail "could not allocate MCP listener port"
 HTTP_OUTPUT_PREFIX="$TEST_DIR/output/mcp-cache"
 start_http_mcp "$HTTP_PORT" "$HTTP_OUTPUT_PREFIX" --enable-mutations
 trap stop_http_mcp EXIT
@@ -195,10 +202,19 @@ echo "✅ read consistency: identical reads returned equal results"
 # 2. CRUD invalidation: add_element succeeds and invalidates the cache.
 # ----------------------------------------------------------------------------
 
+HEAD_BEFORE_ADD="$(git -C "$TEST_DIR" rev-parse HEAD)"
+git -C "$TEST_DIR" ls-files --stage > "$TEST_DIR/output/index-before-add"
 http_mcp_call "$HTTP_PORT" "$(add_element_request "$ADD_CONTENT")" "$TEST_DIR/output/mcp-cache-add.json" \
   || fail "add_element request failed" "$TEST_DIR/output/mcp-cache-add.json"
 jq -e '.result.structuredContent.dry_run == false' "$TEST_DIR/output/mcp-cache-add.json" >/dev/null \
   || fail "add_element should execute (dry_run false)" "$TEST_DIR/output/mcp-cache-add.json"
+[ "$(git -C "$TEST_DIR" rev-parse HEAD)" = "$HEAD_BEFORE_ADD" ] \
+  || fail "mutation without --enable-commits must leave HEAD unchanged"
+git -C "$TEST_DIR" ls-files --stage > "$TEST_DIR/output/index-after-add"
+diff -u "$TEST_DIR/output/index-before-add" "$TEST_DIR/output/index-after-add" \
+  || fail "mutation without --enable-commits must leave the index unchanged"
+jq -e '.result.structuredContent | has("commit") | not' "$TEST_DIR/output/mcp-cache-add.json" >/dev/null \
+  || fail "mutation without --enable-commits must omit commit" "$TEST_DIR/output/mcp-cache-add.json"
 
 # ----------------------------------------------------------------------------
 # 3. Rebuild after invalidate: search reflects the newly added element.
@@ -216,6 +232,19 @@ echo "✅ invalidation: search reflects added element"
 # 4. Fingerprint rebuild: append a .md file change and observe it.
 # ----------------------------------------------------------------------------
 
+stop_http_mcp
+start_http_mcp "$HTTP_PORT" "$TEST_DIR/output/mcp-read-only-cache"
+wait_for_http_mcp "$HTTP_PORT" "$TEST_DIR/output/mcp-read-only-init.json" || fail "read-only MCP server did not start"
+http_mcp_call "$HTTP_PORT" "$(tools_list_request)" "$TEST_DIR/output/mcp-read-only-tools.json" \
+  || fail "read-only tools/list failed"
+jq -e '[.result.tools[].name] | index("reqvire.search") != null and index("reqvire.add_element") == null' \
+  "$TEST_DIR/output/mcp-read-only-tools.json" >/dev/null \
+  || fail "replacement MCP server must be read-only" "$TEST_DIR/output/mcp-read-only-tools.json"
+http_mcp_call "$HTTP_PORT" "$(search_request)" "$TEST_DIR/output/mcp-read-only-before-disk.json" \
+  || fail "read-only cache warmup failed"
+jq -e '[.result.structuredContent.files[].elements[].name] | index("MCP Added Requirement") != null and index("Fingerprint Rebuild Requirement") == null' \
+  "$TEST_DIR/output/mcp-read-only-before-disk.json" >/dev/null \
+  || fail "read-only cache warmup should reflect the persisted model" "$TEST_DIR/output/mcp-read-only-before-disk.json"
 cat >> "$TEST_DIR/specifications/Requirements.md" <<'EOF'
 
 ### Fingerprint Rebuild Requirement

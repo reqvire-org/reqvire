@@ -1,0 +1,10 @@
+PASS cli/relink/name-preview-control
+PASS cli/relink/source
+PASS cli/relink/from_target
+PASS cli/relink/to_target
+PASS cli/relink/all-identifiers
+PASS cli/reference-relink/name-preview-control
+PASS cli/reference-relink/source
+PASS cli/reference-relink/from_target
+PASS cli/reference-relink/to_target
+PASS cli/reference-relink/all-identifiers

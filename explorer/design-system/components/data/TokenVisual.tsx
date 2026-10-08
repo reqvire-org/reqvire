@@ -26,6 +26,10 @@ export interface BarMeterFillProps extends Omit<HTMLAttributes<HTMLSpanElement>,
   colorToken: DesignSystemColorToken;
 }
 
+export interface SegmentedMeterProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
+  segments: readonly { label: string; value: number; colorToken: DesignSystemColorToken }[];
+}
+
 const tokenSwatchUX = css`
   display: inline-flex;
   width: var(--ds-token-swatch-size, var(--space-6));
@@ -135,6 +139,16 @@ const colorTokenSkinX = css`
   .ds-token-segment[data-color-token="--verification-tint"] { --ds-token-color: var(--verification-tint); }
   &[data-color-token="--verification-ink"],
   .ds-token-segment[data-color-token="--verification-ink"] { --ds-token-color: var(--verification-ink); }
+  &[data-color-token="--verification-type-test"],
+  .ds-token-segment[data-color-token="--verification-type-test"] { --ds-token-color: var(--verification-type-test); }
+  &[data-color-token="--verification-type-formal-proof"],
+  .ds-token-segment[data-color-token="--verification-type-formal-proof"] { --ds-token-color: var(--verification-type-formal-proof); }
+  &[data-color-token="--verification-type-analysis"],
+  .ds-token-segment[data-color-token="--verification-type-analysis"] { --ds-token-color: var(--verification-type-analysis); }
+  &[data-color-token="--verification-type-inspection"],
+  .ds-token-segment[data-color-token="--verification-type-inspection"] { --ds-token-color: var(--verification-type-inspection); }
+  &[data-color-token="--verification-type-demonstration"],
+  .ds-token-segment[data-color-token="--verification-type-demonstration"] { --ds-token-color: var(--verification-type-demonstration); }
   &[data-color-token="--ontology"],
   .ds-token-segment[data-color-token="--ontology"] { --ds-token-color: var(--ontology); }
   &[data-color-token="--ontology-tint"],
@@ -272,6 +286,16 @@ const barUX = css`
   }
 `;
 
+const segmentedMeterUX = css`
+  width: 100%;
+  height: var(--space-5);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--bg-sunken);
+  svg { display: block; width: 100%; height: 100%; }
+  rect { fill: var(--ds-token-color); stroke: var(--bg-surface); stroke-width: var(--border-w); }
+`;
+
 function clampPercent(value: number) {
   return Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0));
 }
@@ -355,4 +379,23 @@ export function BarMeterFill({
       </svg>
     </span>
   );
+}
+
+/** Relative shares; labels and exact counts should also be presented in the surrounding legend. */
+export function SegmentedMeter({ segments, className = "", ...props }: SegmentedMeterProps) {
+  const values = segments.map(segment => Number.isFinite(segment.value) ? Math.max(0, segment.value) : 0);
+  const total = values.reduce((sum, value) => sum + value, 0) || 1;
+  let offset = 0;
+  return <div data-meter="segmented" className={cx("ds-segmented-meter", segmentedMeterUX, colorTokenSkinX, className)} {...props}>
+    <svg viewBox="0 0 100 1" preserveAspectRatio="none" aria-hidden="true">
+      {segments.map((segment, index) => {
+        const width = values[index] / total * 100;
+        const x = offset; offset += width;
+        return values[index] > 0 ? <rect key={segment.label} className="ds-token-segment" data-color-token={segment.colorToken}
+          data-segment-label={segment.label} data-segment-value={values[index]} x={x} y="0" width={width} height="1" vectorEffect="non-scaling-stroke">
+          <title>{segment.label}: {values[index]}</title>
+        </rect> : null;
+      })}
+    </svg>
+  </div>;
 }

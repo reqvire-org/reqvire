@@ -28,6 +28,7 @@ The system shall provide transport-neutral Reqvire core operations that are reus
   * type: requirement
 
 #### Contract Bindings
+  * [Existing Element Selection Specification](../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [MCP Contract Layer Boundary Specification](MCP/Specifications.md#mcp-contract-layer-boundary-specification)
 
 #### Relations

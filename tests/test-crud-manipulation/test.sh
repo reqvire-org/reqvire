@@ -889,6 +889,22 @@ echo "✓ InternalPath files protected: src/code1.rs and src/code2.rs unchanged"
 echo "✓ Specification files moved correctly with relations intact"
 echo ""
 
+# General existing-element selection: names and canonical identifiers share validation and results.
+SELECTION_SUITE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SELECTION_SUITE_DIR/../run_element_selection_checks.sh"
+if ! run_element_selection_checks crud "$SELECTION_SUITE_DIR/expected/element-selection.txt"; then
+  exit 1
+fi
+
+# A removed verification rewrites its referring file without changing evidence targets.
+artifact_link_status=0
+python3 "$TEST_SCRIPT_DIR/check_rm_artifact_links.py" || artifact_link_status=$?
+if ! diff -u "$TEST_SCRIPT_DIR/expected/rm-artifact-links-checks.txt" "$TEST_DIR/output/rm-artifact-links-checks.txt"; then
+  artifact_link_status=1
+fi
+if [[ "$artifact_link_status" -ne 0 ]]; then
+  exit "$artifact_link_status"
+fi
 echo "===================================="
 echo "✓ All tests passed"
 echo "===================================="

@@ -496,11 +496,10 @@ impl GraphRegistry {
         // If no root elements found, group by file path as fallback
         if requirements_by_root.is_empty() {
             for element in &all_elements {
-                let root_folder = if let Some(slash_pos) = element.file_path.find('/') {
-                    element.file_path[..slash_pos].to_string()
-                } else {
-                    "root".to_string()
-                };
+                let root_folder = element.file_path.find('/').map_or_else(
+                    || "root".to_string(),
+                    |slash_pos| element.file_path[..slash_pos].to_string(),
+                );
                 requirements_by_root
                     .entry(root_folder)
                     .or_insert_with(Vec::new)

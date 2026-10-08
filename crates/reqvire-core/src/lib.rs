@@ -6,6 +6,7 @@ pub mod containment;
 pub mod crud;
 pub mod diff;
 pub mod element;
+mod element_selection;
 pub mod error;
 pub mod exclusions;
 pub mod explorer_runtime;
@@ -23,6 +24,9 @@ pub mod model;
 pub mod model_cache;
 mod model_inputs;
 pub(crate) mod model_revision;
+pub mod mutation_io;
+/// Canonical content revision shared by CLI sessions and model evidence adapters.
+pub use model_revision::fingerprint as model_fingerprint;
 pub mod ontology_graph;
 pub mod operations;
 pub mod parser;

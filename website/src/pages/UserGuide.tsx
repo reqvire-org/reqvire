@@ -45,14 +45,14 @@ npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlo
       <Section title="Core Commands">
         <CommandList
           items={[
-            { cmd: "reqvire validate", desc: "Parse and validate model structure, relations, Contract Bindings, ontology, and semantic contracts." },
+            { cmd: "reqvire validate", desc: "Parse and validate model structure, relations, Contract Bindings, Contract References, ontology, and semantic contracts." },
             { cmd: "reqvire format", desc: "Preview canonical formatting, ordering, and relation layout." },
             { cmd: "reqvire format --fix", desc: "Apply formatting fixes." },
             { cmd: "reqvire lint", desc: "Find model quality issues such as redundant relations and cross-boundary hierarchy problems." },
             { cmd: "reqvire lint --auditable", desc: "Report remediation-ready structural findings." },
             { cmd: "reqvire search", desc: "Filter the model by type, file, name, content, relations, and governance metadata." },
             { cmd: "reqvire model", desc: "Emit the ontology/concept/capability-rooted model view as structured JSON." },
-            { cmd: "reqvire traces", desc: "Generate verification trace trees from verifications to owning capability roots." },
+            { cmd: "reqvire traces", desc: "Generate verification trace graphs from verifications to owning capability roots." },
             { cmd: "reqvire coverage", desc: "Report verification coverage and requirement implementation coverage." },
             { cmd: "reqvire change-impact", desc: "Analyze review impact from changed model content and relations." },
           ]}
@@ -78,6 +78,27 @@ reqvire lint --json --output lint-report.json
 reqvire change-impact --json --output impact.json
 reqvire semantic export --layer ontologies --output ontologies.ttl
 reqvire semantic export --jsonld --output semantic-graph.jsonld`}</CodeBlock>
+      </Section>
+
+      <Section title="Managed Query Artifacts">
+        <p className="text-zinc-600 mb-4">
+          Discover native queries, validate their vocabulary context, and export
+          standalone SPARQL for downstream tools. Namespace filtering selects the
+          ontologies a query uses. Use the exact name or generated IRI from discovery
+          to select one artifact.
+        </p>
+        <CodeBlock>{`reqvire semantic query list --json
+reqvire semantic query list --namespace-base https://example.org/items
+reqvire semantic query validate --json
+reqvire semantic query export --name "Active Items Lookup" --output active-items.sparql
+reqvire semantic query export --name "Active Items Lookup" --json
+reqvire semantic query check --name "Active Items Lookup" --artifact active-items.sparql
+reqvire semantic export --layer queries --output queries.ttl`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          JSON export includes the exact content and SHA-256 digest. Check compares
+          the complete file and fails for stale or missing artifacts without rewriting
+          them. File export replaces an artifact atomically after validation.
+        </p>
       </Section>
 
       <Section title="Working with Elements">
@@ -131,16 +152,17 @@ reqvire rm-asset docs/obsolete-auth-flow.pdf --dry-run`}</CodeBlock>
         </div>
       </Section>
 
-      <Section title="Linking and Contract Bindings">
+      <Section title="Linking and Contract Dependencies">
         <p className="text-zinc-600 mb-4">
-          The link and unlink commands manage both relations and Reused Contract
-          Context. Reused context uses the `bindContract` command form so
-          cross-subgraph contract dependencies stay visible.
+          The link and unlink commands manage relations, Contract Bindings,
+          and Contract References. Use the dependency form that matches the
+          consuming requirement's responsibility.
         </p>
         <CodeBlock>{`reqvire link "Authentication" "specifiedBy" "Authentication Requirement"
 reqvire link "Authentication Requirement" "verifiedBy" "Auth Test Case"
 reqvire link "System Requirement" "satisfiedBy" "src/auth/login.rs"
 reqvire link "Performance Requirement" bindContract "#rate-limiting-constraint"
+reqvire link "API Documentation" referenceContract "Error Response Specification"
 
 reqvire unlink "Authentication Requirement" "Auth Test Case"
 reqvire unlink "Performance Requirement" "#rate-limiting-constraint"
@@ -148,6 +170,12 @@ reqvire relink "Child Requirement" "derivedFrom" "Old Parent" "New Parent"
 
 reqvire link "Password Login Requirement" "derivedFrom" "Authentication Requirement" --dry-run
 reqvire relink "Child Requirement" "derivedFrom" "Old Parent" "New Parent" --json`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          Use <code>bindContract</code> for an implementation obligation and
+          <code> referenceContract</code> for a content dependency that should
+          propagate change impact. A requirement cannot contain both dependency
+          sections. The unlink command detects either kind by its target.
+        </p>
       </Section>
 
       <Section title="Validation, Formatting, and Linting">
@@ -173,7 +201,9 @@ reqvire lint --json --output reports/lint.json`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           Search is the fastest way to inspect a large model. Collect gathers an
           element and related upstream or downstream context with source
-          citations, including contract bindings.
+          citations, including contracts reached through ownership, Contract
+          Bindings, and Contract References. Repeated contract targets are
+          included once.
         </p>
         <CodeBlock>{`reqvire search --filter-type requirement --short
 reqvire search --filter-type capability,requirement --filter-name ".*auth.*"
@@ -192,6 +222,12 @@ reqvire collect "Capability Requirement" --direction UPSTREAM --json --output co
           Commands that still support human-readable review output keep their
           selectable JSON mode for automation.
         </p>
+        <p className="text-zinc-600 mb-4">
+          Each verification in a traces report includes a <code>trace_graph</code>
+          {" "}with unique nodes and labelled edges. Shared ancestors appear once
+          while preserving every path to owning capabilities. Direct and total
+          requirement counts exclude capability nodes.
+        </p>
         <CodeBlock>{`reqvire model
 reqvire model --output reports/model.json
 reqvire model --from "API Authentication"
@@ -207,6 +243,30 @@ reqvire resources --output reports/resources.json
 reqvire submodels
 reqvire submodels --from "API Authentication"
 reqvire submodels --json --output reports/submodels.json`}</CodeBlock>
+      </Section>
+
+      <Section title="Scoped Coverage">
+        <p className="text-zinc-600 mb-4">
+          Coverage defaults to the whole model. Use <code>--from</code> with an
+          exact capability name to report its subtree. Both root and nested
+          capabilities are supported; the selected capability itself is
+          included. In this example, Alpha Root is a root capability and
+          Shared Branch is a nested capability. Substitute your model's names.
+        </p>
+        <CodeBlock>{`reqvire coverage
+reqvire coverage --json
+reqvire coverage --from "Alpha Root"
+reqvire coverage --from "Alpha Root" --json
+reqvire coverage --from "Shared Branch"
+reqvire coverage --from "Shared Branch" --json`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Names are case-sensitive. An unknown name or a requirement name is
+          an error, with no whole-model fallback. Text and JSON report the
+          same scope. Requirement classifications and evidence are retained
+          from the complete model; external evidence does not enter the
+          selected subject counts. A capability without requirements reports
+          an empty scope with zero counts.
+        </p>
       </Section>
 
       <Section title="Change Impact Workflow">
@@ -244,6 +304,22 @@ reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
           views, verification traces, coverage reports, resources, and ontology
           explorer output.
         </p>
+        <p className="text-zinc-600 mb-4">
+          In Traces, select a verification to open its interactive flow from
+          directly verified requirements through their ancestors and owning
+          capabilities. Switch between left-to-right and top-to-bottom layouts,
+          expand branches, or open element details and source files from the
+          cards. Select a file to see its verification overview. These controls
+          are also available in exported Explorer.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Selections in Model, Traces, Thesaurus, Ontologies and Coverage have
+          shareable URLs. Copy the address to reopen the same item and worktree,
+          or use reload, Back and Forward to restore earlier selections. Model
+          links also retain the workspace mode; Traces links can identify a
+          verification or file overview. Explicit links override remembered
+          selections. Unavailable items show an overview with an explanation.
+        </p>
         <CodeBlock>{`reqvire serve
 reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
@@ -258,6 +334,92 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           interrupting MCP access. Failed updates keep the last valid view and
           retry automatically. External file edits require a server restart.
         </p>
+        <p className="text-zinc-600 mb-4">
+          If a commit times out, MCP checks local Git automatically. A verified
+          published commit is reconciled and returned as success without repeating
+          the commit. Confirmed non-publication returns an error: an automatic
+          mutation rolls back its changes, while <code>reqvire.git.commit</code>{" "}
+          keeps accepted pending edits uncommitted. If verification cannot complete,
+          the accepted snapshot remains readable and writes are disabled. Resolve
+          conflicting evidence, then use <code>reqvire.git.reconcile</code> with the
+          recorded <code>attempted_commit</code>; preview is the default, and{" "}
+          <code>dry_run: false</code> applies verified recovery. Repair a stalled
+          Git hook before committing again; reconciliation does not fix the hook.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          The branch picker at the far right of the shared header, after Search, theme and Help, is available with plain
+          serving and read-only MCP too, and stays visible when the left pane is collapsed. It lists every local branch in the startup
+          repository and loads only the branch you select, reusing its worktree or
+          creating an isolated managed worktree. Each tab can browse a different model; its URL
+          preserves the selection across reload and back/forward navigation.
+          A successful switch updates the model, branch label, and asset links
+          together and closes old element details. If loading fails or the worktree
+          disappears, Explorer keeps the last valid view labelled with its branch
+          and shows an error. During loading, a centered spinner appears over a
+          dimmed, blurred view. On failure, click outside the error dialog, press
+          Escape, or choose Close to return to the retained worktree; select the
+          branch again to retry. Existing checkouts remain
+          unchanged. Read-only selection accepts valid uncommitted content and
+          checks source freshness through the existing cache. Mutation-enabled
+          serving rejects dirty targets before first admission. Reselecting an
+          active mutation context reuses its accepted model, including its own
+          uncommitted changes. Unchanged data stays cached across switches, and
+          prepared worktrees survive shutdown. Exported pages contain only their
+          exported snapshot.
+        </p>
+      </Section>
+
+      <Section title="Coverage in Explorer">
+        <p className="text-zinc-600 mb-4">
+          Coverage opens on Whole Model with progress metrics, compact verification-type
+          and implementation-source breakdowns, capability drill-down and issue lists.
+          Verification types share one proportional bar and an inline legend with all five counts, including zeros.
+          The left pane nests every capability under a selectable Whole Model root. Select
+          that root to clear capability selection and return to the complete model scope.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Select a capability name to show its full scoped dashboard. Its authored name
+          appears in the page title, with scoped metrics and requirement
+          drill-down followed by unverified requirements, unimplemented requirements and
+          unsatisfied test verifications. Empty capabilities keep the same dashboard with
+          zero totals and explanatory empty issue sections. Orphaned verifications appear
+          only in Whole Model because they have no capability membership.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Capability-tree roots and siblings are sorted by name. Its chevrons expand child
+          capabilities without changing selection. Main report rows rank sibling capabilities
+          by verification coverage, then implementation coverage, then name, keeping each
+          subtree together. There is no separate mode selector or View issues page.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Capability selection updates the URL. Copy it to share the complete scoped view,
+          or use Back and Forward to revisit scopes. Explicit scope links override saved
+          preferences; older mode/category links resolve to their scope in the unified view.
+          Branch changes restore that branch&apos;s scope independently. A capability removed
+          during refresh returns to Whole Model with an explanation.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Expand a capability to see its attached requirements, then expand a
+          requirement to see its immediate children and their coverage status.
+          Rows with children or binding consumers expand one level at a time.
+          Terminal requirements show their coverage metrics directly in the row.
+          Each capability provides access to its attached requirements, including
+          requirements whose parent appears under another capability.
+          Binding consumers lists
+          requirements responsible for implementing the owner's shared contract obligations.
+          Blocker counts accompany the requirement's
+          implementation status.
+          Select a requirement name to inspect its evidence in element details and follow
+          local artifact links to the file-content viewer. Returning to Coverage keeps your selected scope.
+          Labelled bars, percentages and counts describe model coverage; they do not imply
+          test execution results. Requirement blocker counts retain diagnostic detail.
+        </p>
+        <BulletList items={[
+          "Opening evidence outside the selected subtree keeps the current scope.",
+          "A shared verification is counted once within each scope and once globally. Scope totals need not add up to the whole-model total.",
+          "Orphan verifications belong to the whole model. Select Whole Model in the capability tree to inspect them.",
+          "Capability scope is remembered per project/worktree. Valid selections survive refresh; removed capabilities return to Whole Model with an explanation.",
+        ]} />
       </Section>
 
       <Section title="Ignore Files">

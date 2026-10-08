@@ -56,12 +56,11 @@ Required Rust test coverage:
 - Verify referenced graph subset tests are colocated with seed, reference, closure, and construct modules or submodules.
 - Verify `prelude` re-exports stable public types without exposing private module internals.
 
-This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
-
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [lib.rs](../../../crates/o-kernel/src/lib.rs)
   * verify: [O-Kernel Physical Module Architecture](../../Architecture/OntologyKernelRequirements.md#o-kernel-physical-module-architecture)
 ---
 
@@ -77,12 +76,11 @@ Required Rust test coverage:
 - Verify configured annotation predicates include labels, comments, preferred labels, definitions, and descriptions for selected and support terms.
 - Verify construction returns generic direct/support/annotation classification metadata without source-location, output-surface, or application external-source assumptions.
 
-This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
-
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [mod.rs](../../../crates/o-kernel/src/describe/mod.rs)
   * verify: [RDF Term Description Construction](../../Architecture/OntologyKernelRequirements.md#rdf-term-description-construction)
 ---
 
@@ -101,12 +99,11 @@ Required Rust unit-test coverage:
 - Verify output metadata distinguishes seed, directly referenced, support, annotation, list-closure, and depth-boundary triples.
 - Verify the service returns generic RDF-native subset data without application source locations, element identifiers, graph-layer names, or presentation payloads.
 
-This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
-
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [mod.rs](../../../crates/o-kernel/src/subset/mod.rs)
   * verify: [Referenced Graph Subset Construction](../../Architecture/OntologyKernelRequirements.md#referenced-graph-subset-construction)
 ---
 
@@ -145,13 +142,16 @@ Required Rust test coverage:
 - Verify SHACL ontology alignment accepts declared classes, properties, datatypes, and target nodes from a supplied ontology index.
 - Verify SHACL ontology alignment reports generic undeclared class, property, datatype, target-node, and invalid inverse-path diagnostics without application source-document assumptions.
 - Verify `sh:hasValue` and `sh:in` values are preserved without requiring every listed value IRI to be declared as an ontology term.
-
-This verification remains unsatisfied until the code refactor creates and links the o-kernel Rust test target.
+- Verify reference extraction from a compiled registry matches extraction from RDF quads, including filtering of built-in datatypes and reserved path vocabulary.
+- Compare complete compiled shapes and diagnostics with scan-based lookup behavior for recursive paths, typed/raw constraints, property-shape discovery, duplicate facts, and malformed or cyclic RDF lists. Preserve input order, blank-node identity, and duplicate cardinality errors.
+- Count parser lookup work on proportionally growing independent shape graphs and confirm that doubling the graph does not cause quadratic growth in subject/predicate lookup work.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [mod.rs](../../../crates/o-kernel/src/shacl/mod.rs)
+  * satisfiedBy: [mod.rs](../../../crates/o-kernel/src/ontology/mod.rs)
   * verify: [SHACL Ontology Alignment](../../Architecture/OntologyKernelRequirements.md#shacl-ontology-alignment)
   * verify: [SHACL Structural Parser Registry](../../Architecture/OntologyKernelRequirements.md#shacl-structural-parser-registry)
 ---

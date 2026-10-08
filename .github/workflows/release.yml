@@ -35,16 +35,18 @@ jobs:
           node-version: "24"
 
       - name: Install Explorer dependencies
-        # crates/reqvire-core/build.rs embeds explorer/dist and only builds it when
-        # REQVIRE_BUILD_EXPLORER=1 is set for the cargo invocation.
         run: cd explorer && npm ci
 
-      - name: Lint Explorer SPA
-        run: cd explorer && npm run lint
+      - name: Build checked Explorer SPA bundle
+        # All Cargo profiles/targets below embed this job's checked bundle.
+        run: cd explorer && npm run build
+
+      - name: Build host CLI for Rust worker tests
+        run: cargo build --locked --bin reqvire
 
       - name: Test
         env:
-          REQVIRE_BUILD_EXPLORER: "1"
+          REQVIRE_TEST_BIN: ${{ github.workspace }}/target/debug/reqvire
         run: |
           if [[ "$RUNNER_OS" == "macOS" ]]; then
             # on macOS skip our two tmpdir‐symlink tests
@@ -57,8 +59,6 @@ jobs:
           fi
         
       - name: Build Binary
-        env:
-          REQVIRE_BUILD_EXPLORER: "1"
         run: |
           if [[ "$RUNNER_OS" == "macOS" ]]; then
             if [[ "$(uname -m)" == "arm64" ]]; then
@@ -130,7 +130,7 @@ jobs:
         # The Rust binaries already embed this bundle. The npm package also
         # ships the built dist so package contents make the Explorer payload
         # explicit and npm publish fails if the bundle is missing.
-        run: cd explorer && npm ci && npm run lint && npm run build
+        run: cd explorer && npm ci && npm run build
 
       - name: Download All Archives
         uses: actions/download-artifact@v6

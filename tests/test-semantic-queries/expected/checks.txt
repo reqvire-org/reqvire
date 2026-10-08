@@ -1,0 +1,19 @@
+PASS discovery-and-context-filter
+PASS artifacts-selection-and-drift
+PASS four-forms-and-portable-runtime-features
+PASS syntax-schema-role-and-produces-rejections
+PASS atomic-add-and-override
+PASS-exact-bytes-and-metadata-independent-hash
+PASS-query-rdf-layer
+PASS-candidate-validation-diagnostics
+PASS-ontology-rebase-query-and-produces
+PASS-ontology-context-ancestor-boundary
+PASS-imported-vocabulary-and-native-provenance
+PASS-inverse-usedBy-context
+PASS-runtime-datasets-base-and-literal-headings
+PASS-query-grammar-and-export-failure-atomicity
+PASS-explorer-query-graph-projection
+PASS-produces-property-kinds-and-families
+PASS-multiple-used-ontology-namespaces
+PASS-ontology-query-change-impact-direction
+PASS-move-rename-and-used-ontology-removal

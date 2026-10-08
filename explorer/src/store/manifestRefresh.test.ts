@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ManifestStoreClient } from "./manifestRefresh";
 import { chunkResponse, manifestResponse, smallStore, wireHash, wireSnapshot } from "../test/liveStoreFixtures";
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
 function server(initial = smallStore()) {
   const seed = wireSnapshot(initial);
@@ -90,6 +90,91 @@ describe("manifest refresh transactions", () => {
     await client.prepare(signal());
     await client.prepare(signal());
     expect(fetchMock.mock.calls.every(([, init]) => new Headers(init?.headers).get("If-None-Match") === `"${seed.revision}"`)).toBe(true);
+  });
+
+  it.each([64, 256])("does not walk already frozen records during %i-record refreshes", async count => {
+    const initial = structuredClone(smallStore());
+    initial.elements = Array.from({ length: count }, (_, index) => ({
+      ...initial.elements[0], id: `record-${index}`, metadata: { marker: String(index) },
+    }));
+    const { client, update } = server(initial);
+    const reused = new Set<object>(initial.elements.slice(1).flatMap(record => [record, record.metadata]));
+    const enumerate = vi.spyOn(Object, "values");
+    const freeze = vi.spyOn(Object, "freeze");
+
+    for (const marker of ["first update", "second update"]) {
+      update({ ...initial, elements: [
+        { ...initial.elements[0], metadata: { marker } }, ...initial.elements.slice(1),
+      ] });
+      enumerate.mockClear();
+      freeze.mockClear();
+      const next = (await client.prepare(signal()))!;
+      const revisited = enumerate.mock.calls.filter(([value]) => reused.has(value)).length;
+      const refrozen = freeze.mock.calls.filter(([value]) => reused.has(value as object)).length;
+      expect({ revisited, refrozen }).toEqual({ revisited: 0, refrozen: 0 });
+      expect(next.result.store.elements.slice(1).every((record, index) => record === initial.elements[index + 1])).toBe(true);
+      expect(next.result.store.files).toBe(initial.files);
+      expect(next.result.store.elements[0].metadata.marker).toBe(marker);
+      expect(() => { next.result.store.elements[0].metadata.marker = "Changed"; }).toThrow(TypeError);
+      client.commit(next);
+    }
+  });
+
+  it("deep-freezes descendants even when seed containers are already shallow-frozen", async () => {
+    const initial = structuredClone(smallStore());
+    Object.freeze(initial.elements[0]);
+    Object.freeze(initial.elements);
+    Object.freeze(initial);
+    expect(Object.isFrozen(initial.elements[0].metadata)).toBe(false);
+    const { client, update } = server(initial);
+    expect(() => { initial.elements[0].metadata.changed = "Mutation"; }).toThrow(TypeError);
+
+    update({ ...initial, elements: [{ ...initial.elements[0], content: "Changed" }, initial.elements[1]] });
+    const next = (await client.prepare(signal()))!;
+    expect(() => { next.result.store.elements[0].metadata.changed = "Mutation"; }).toThrow(TypeError);
+    expect(next.result.store.elements[1]).toBe(initial.elements[1]);
+  });
+
+  it("does not reuse abandoned chunks when the same revision is prepared again", async () => {
+    const initial = structuredClone(smallStore());
+    const { client, seed, update, fetchMock } = server(initial);
+    const latest = update({ ...initial, elements: [
+      { ...initial.elements[0], metadata: { marker: "Pending" } }, initial.elements[1],
+    ] });
+    const abandoned = (await client.prepare(signal()))!;
+    const next = (await client.prepare(signal()))!;
+    expect(abandoned.result.store.elements[0]).not.toBe(next.result.store.elements[0]);
+    expect(next.result.store.elements[1]).toBe(initial.elements[1]);
+    expect(() => { next.result.store.elements[0].metadata.marker = "Mutation"; }).toThrow(TypeError);
+    const requests = fetchMock.mock.calls.filter(([url]) => url.endsWith("/chunks"))
+      .map(([, init]) => JSON.parse(String(init?.body)));
+    expect(requests).toHaveLength(2);
+    expect(requests[0]).toEqual(requests[1]);
+    expect(requests[0].revision).toBe(latest.revision);
+    expect(fetchMock.mock.calls.filter(([url]) => url.endsWith("/manifest")).every(([, init]) =>
+      new Headers(init?.headers).get("If-None-Match") === `"${seed.revision}"`)).toBe(true);
+    client.commit(next);
+    expect(await client.prepare(signal())).toBeNull();
+  });
+
+  it("rejects wrong-context chunks without changing the committed snapshot", async () => {
+    const initial = { ...smallStore(), project: { ...smallStore().project, worktree_id: "selected" } };
+    const seed = wireSnapshot(initial);
+    const client = new ManifestStoreClient(initial, seed.seed, "selected");
+    let latest = wireSnapshot({ ...initial, project: { ...initial.project, worktree_id: "other" } });
+    const fetchMock = vi.fn(async (url: string, init: RequestInit = {}) =>
+      new URL(url, "http://localhost").pathname.endsWith("/manifest")
+        ? manifestResponse(latest) : chunkResponse(latest, init));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(client.prepare(signal())).rejects.toThrow("different worktree context");
+    latest = wireSnapshot({ ...initial, elements: [{ ...initial.elements[0], content: "Accepted update" }] });
+    const next = (await client.prepare(signal()))!;
+    expect(next.result.store.project).toBe(initial.project);
+    expect(next.result.store.elements[0].content).toBe("Accepted update");
+    expect(() => { next.result.store.elements[0].metadata.changed = "Mutation"; }).toThrow(TypeError);
+    expect(fetchMock.mock.calls.filter(([url]) => url.includes("/manifest")).every(([, init]) =>
+      new Headers(init?.headers).get("If-None-Match") === `"${seed.revision}"`)).toBe(true);
+    expect(fetchMock.mock.calls.every(([url]) => new URL(url, "http://localhost").searchParams.get("worktree_id") === "selected")).toBe(true);
   });
 
   it("recovers from an invalid seed manifest by fetching all required chunks", async () => {

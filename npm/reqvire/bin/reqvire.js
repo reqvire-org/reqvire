@@ -51,20 +51,41 @@ if (!fs.existsSync(archivePath)) {
 }
 
 if (!fs.existsSync(binaryPath)) {
-  fs.rmSync(cacheDir, { recursive: true, force: true });
-  fs.mkdirSync(cacheDir, { recursive: true });
+  // Every invocation owns its extraction. Publish the complete executable with
+  // an atomic no-overwrite link; a competing publisher keeps its winning inode.
+  let staging;
+  try {
+    fs.mkdirSync(cacheDir, { recursive: true });
+    staging = fs.mkdtempSync(path.join(path.dirname(cacheDir), ".extract-"));
+    const extract = childProcess.spawnSync("tar", ["-xzf", archivePath, "-C", staging], {
+      stdio: "inherit"
+    });
+    if (extract.error) throw extract.error;
+    if (extract.status !== 0) {
+      throw new Error(`Reqvire archive extraction failed (${extract.signal || extract.status})`);
+    }
 
-  const extract = childProcess.spawnSync("tar", ["-xzf", archivePath, "-C", cacheDir], {
-    stdio: "inherit"
-  });
-
-  if (extract.status !== 0) {
-    process.exit(extract.status || 1);
+    const extractedPath = path.join(staging, selected.extracted);
+    if (!fs.lstatSync(extractedPath).isFile()) {
+      throw new Error("Reqvire archive does not contain a regular native executable");
+    }
+    fs.chmodSync(extractedPath, 0o755);
+    try {
+      fs.linkSync(extractedPath, binaryPath);
+    } catch (error) {
+      if (error.code !== "EEXIST") throw error;
+      if (!fs.lstatSync(binaryPath).isFile()) {
+        throw new Error(`Invalid Reqvire executable cache: ${binaryPath}`);
+      }
+      fs.accessSync(binaryPath, fs.constants.X_OK);
+    }
+  } catch (error) {
+    console.error(error.message);
+    process.exitCode = 1;
+  } finally {
+    if (staging) fs.rmSync(staging, { recursive: true, force: true });
   }
-
-  const extractedPath = path.join(cacheDir, selected.extracted);
-  fs.renameSync(extractedPath, binaryPath);
-  fs.chmodSync(binaryPath, 0o755);
+  if (process.exitCode) process.exit(process.exitCode);
 }
 
 const result = childProcess.spawnSync(binaryPath, process.argv.slice(2), {

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Graph from "graphology";
 import Sigma from "sigma";
 import { animateNodes } from "sigma/utils";
-import forceAtlas2 from "graphology-layout-forceatlas2";
+import { ForceAtlasLayoutOwner } from "../workers/forceAtlasLayoutOwner";
 import noverlap from "graphology-layout-noverlap";
 import { useStore } from "../store/StoreContext";
 import type { ExplorerViewProps } from "./types/ExplorerViewProps";
@@ -10,15 +10,17 @@ import { useExplorerUiState } from "../state/ExplorerUiState";
 import type { KnowledgeGraphNode, KnowledgeGraphProjection } from "../store/types";
 import { ViewFrame } from "./ViewFrame";
 import {
+  Button,
   cssVar,
   GraphCanvasFrame,
   GraphCanvasNotice,
   GraphCanvasSurface,
   GraphRoute,
-  roleColorValue,
+  roleColorToken,
   Spinner,
   useLatestRef,
 } from "@ds";
+import type { DesignSystemColorToken } from "@ds";
 
 type GraphEdge = NonNullable<KnowledgeGraphProjection["edges"]>[number] & {
   relCategory?: RelationCategory;
@@ -43,13 +45,6 @@ type GraphNodeAttributes = {
   hidden?: unknown;
 };
 
-type ForceAtlasProfile = {
-  iterations: number;
-  gravity: number;
-  scalingRatio: number;
-  slowDown: number;
-};
-
 type RelationCategory =
   | "derive"
   | "specify"
@@ -66,17 +61,10 @@ function nodeKind(node: KnowledgeGraphNode): string {
   return node.element_type || node.node_type || node.type || "other";
 }
 
-function roleColor(kind: string) {
-  return {
-    fill: roleColorValue(kind),
-    border: roleColorValue(kind, "ink"),
-  };
-}
-
 function relationCategory(edge: { label?: unknown; kind?: unknown }): RelationCategory {
   const label = String(edge.label || "").toLowerCase();
   const kind = String(edge.kind || "").toLowerCase();
-  if (kind === "contract_bindings" || label === "binds contract") return "bind";
+  if (kind === "contract_bindings" || kind === "contract_references" || label === "binds contract") return "bind";
   if (kind === "concept-reference" || label === "conceptref") return "concept-reference";
   if (label.includes("derive")) return "derive";
   if (label.includes("specif")) return "specify";
@@ -93,6 +81,7 @@ function displayEdgeLabel(edge: Pick<GraphEdge, "label" | "kind">): string {
   if (kind === "contract_bindings" || label.toLowerCase() === "binds contract") {
     return "contract binding";
   }
+  if (kind === "contract_references") return "contract reference";
   return label;
 }
 
@@ -119,22 +108,6 @@ function nodeLabelLimit(node: KnowledgeGraphNode) {
 function nodeSize(node: KnowledgeGraphNode, degreeByNode: Map<string, number>) {
   const degree = degreeByNode.get(node.id) ?? 0;
   return Math.min(16, 4 + Math.sqrt(degree + 1) * 1.6);
-}
-
-function clamp(value: number, minimum: number, maximum: number) {
-  return Math.max(minimum, Math.min(maximum, value));
-}
-
-function forceAtlasProfile(nodeCount: number, edgeCount: number, averageNodeSize: number): ForceAtlasProfile {
-  const nodes = Math.max(1, nodeCount);
-  const density = edgeCount / nodes;
-  const sizePressure = clamp((averageNodeSize - 6) / 10, 0, 1.4);
-  return {
-    iterations: nodes > 650 ? 170 : nodes > 350 ? 180 : 200,
-    gravity: clamp(1.45 + Math.log10(Math.max(10, nodes)) * 0.48 + Math.min(density, 8) * 0.04, 1.5, 3.2),
-    scalingRatio: clamp(5 + Math.sqrt(nodes) * 0.14 + sizePressure * 1.5 - Math.min(density, 8) * 0.35, 5, 13),
-    slowDown: nodes > 650 ? 2.3 : 2,
-  };
 }
 
 function dimNodeColor(color: string, alpha: number) {
@@ -172,16 +145,16 @@ function sigmaLabelSettings() {
   } as const;
 }
 
-function edgeColor(edge: { label?: unknown; kind?: unknown; relCategory?: unknown }) {
+function edgeColor(edge: { label?: unknown; kind?: unknown; relCategory?: unknown }, resolve: typeof cssVar = cssVar) {
   const category = typeof edge.relCategory === "string"
     ? edge.relCategory as RelationCategory
     : relationCategory(edge);
-  if (category === "concept-reference") return cssVar("--concept-reference");
-  if (category === "bind") return cssVar("--edge-bind");
-  if (category === "derive") return cssVar("--edge-derive");
-  if (category === "satisfy" || category === "verify") return cssVar("--edge-satisfy");
-  if (category === "trace") return cssVar("--edge-trace");
-  return cssVar("--edge-default");
+  if (category === "concept-reference") return resolve("--concept-reference");
+  if (category === "bind") return resolve("--edge-bind");
+  if (category === "derive") return resolve("--edge-derive");
+  if (category === "satisfy" || category === "verify") return resolve("--edge-satisfy");
+  if (category === "trace") return resolve("--edge-trace");
+  return resolve("--edge-default");
 }
 
 function isOpenableGraphNode(node: KnowledgeGraphNode | null | undefined): node is KnowledgeGraphNode {
@@ -411,6 +384,7 @@ export function KnowledgeGraphView({
   onOpenElement?: (id: string) => void;
 } & Partial<ExplorerViewProps>) {
   const { store } = useStore();
+  const contextKey = JSON.stringify([store.project.workspace_root, store.project.worktree_id]);
   const {
     modelTypes: activeTypes,
     modelOverlays: activeOverlays,
@@ -419,11 +393,12 @@ export function KnowledgeGraphView({
   } = useExplorerUiState();
   const { nodes, nodeById, edges, degreeByNode, edgeAdjacency } = useMemo(
     () => buildGraphData(store.knowledge_graph),
-    [store.knowledge_graph],
+    [store.knowledge_graph, contextKey],
   );
   const containerRef = useRef<HTMLDivElement | null>(null);
   const graphRef = useRef<Graph | null>(null);
   const rendererRef = useRef<Sigma | null>(null);
+  const requestLayoutRef = useRef<(() => void) | null>(null);
   const selectedRef = useRef<string | null>(null);
   const hoveredRef = useRef<string | null>(null);
   const layoutAnimationRef = useRef<(() => void) | null>(null);
@@ -511,6 +486,7 @@ export function KnowledgeGraphView({
       if (graph.hasEdge(key)) graph.setEdgeAttribute(key, "hidden", !visibleEdge(edge));
     });
     runFocusedLayout();
+    requestLayoutRef.current?.();
     renderer?.refresh();
   }, [activeTypes, activeOverlays, edges, nodes]);
 
@@ -521,6 +497,7 @@ export function KnowledgeGraphView({
       return undefined;
     }
 
+    const layoutOwner = new ForceAtlasLayoutOwner();
     let graph: Graph | null = null;
     let renderer: Sigma | null = null;
     let suppressNextStageClear = false;
@@ -553,6 +530,13 @@ export function KnowledgeGraphView({
     try {
       const positionedNodes = nodes.map((node) => ({ ...node }));
       assignInitialPositions(positionedNodes);
+      // Reuse each canonical token within this synchronous construction only.
+      // Interaction reducers continue to resolve the current palette directly.
+      const constructionColors = new Map<DesignSystemColorToken, string>();
+      const constructionColor: typeof cssVar = token => {
+        if (!constructionColors.has(token)) constructionColors.set(token, cssVar(token));
+        return constructionColors.get(token)!;
+      };
       graph = new Graph({ type: "directed", multi: true, allowSelfLoops: true });
       positionedNodes.forEach((node) => {
         const kind = nodeKind(node);
@@ -566,7 +550,7 @@ export function KnowledgeGraphView({
           x: positioned.x,
           y: positioned.y,
           size: nodeSize(node, degreeByNode),
-          color: roleColor(kind).fill,
+          color: constructionColor(roleColorToken(kind)),
           hidden: !visibleNode(node),
         });
       });
@@ -575,19 +559,18 @@ export function KnowledgeGraphView({
           ...edge,
           type: "arrow",
           label: displayEdgeLabel(edge),
-          size: edge.kind === "contract_bindings" || edge.kind === "concept-reference" ? 0.8 : 1.1,
-          color: edgeColor(edge),
+          size: edge.kind === "contract_bindings" || edge.kind === "contract_references" || edge.kind === "concept-reference" ? 0.8 : 1.1,
+          color: edgeColor(edge, constructionColor),
           hidden: !visibleEdge(edge),
         });
       });
-      try {
+      const requestLayout = () => {
+        if (!graph) return;
         const layoutGraph = new Graph({ type: "directed", multi: true, allowSelfLoops: true });
-        let totalNodeSize = 0;
         positionedNodes.forEach((node) => {
           if (!visibleNode(node)) return;
           const positioned = node as KnowledgeGraphNode & { x: number; y: number };
           const size = nodeSize(node, degreeByNode);
-          totalNodeSize += size;
           layoutGraph.addNode(node.id, {
             x: positioned.x,
             y: positioned.y,
@@ -600,32 +583,26 @@ export function KnowledgeGraphView({
           }
           layoutGraph.addDirectedEdgeWithKey(`e${index}`, edge.source, edge.target);
         });
-        const profile = forceAtlasProfile(
-          layoutGraph.order,
-          layoutGraph.size,
-          layoutGraph.order ? totalNodeSize / layoutGraph.order : 0,
-        );
-        const settings = forceAtlas2.inferSettings(layoutGraph);
-        forceAtlas2.assign(layoutGraph, {
-          iterations: profile.iterations,
-          settings: {
-            ...settings,
-            adjustSizes: true,
-            barnesHutOptimize: true,
-            gravity: profile.gravity,
-            scalingRatio: profile.scalingRatio,
-            slowDown: profile.slowDown,
-          },
+        setNotice("Laying out graph...");
+        layoutOwner.run(layoutGraph, positions => {
+          if (!graph) return;
+          if (positions.length) {
+            const positionsById = new Map(positions.map(position => [position.id, position]));
+            graph.updateEachNodeAttributes((id, attributes) => {
+              const position = positionsById.get(id);
+              return position ? Object.assign(attributes, {
+                x: position.x, y: position.y, baseX: position.x, baseY: position.y,
+              }) : attributes;
+            }, { attributes: ["x", "y", "baseX", "baseY"] });
+          }
+          runFocusedLayout();
+          setNotice(null);
+        }, error => {
+          console.warn("[Reqvire KG] ForceAtlas2 layout failed", error);
+          setNotice("Graph layout failed.");
         });
-        layoutGraph.forEachNode((nodeId, attributes) => {
-          graph?.mergeNodeAttributes(nodeId, {
-            x: numericAttribute(attributes.x, 0),
-            y: numericAttribute(attributes.y, 0),
-          });
-        });
-      } catch (error) {
-        console.warn("[Reqvire KG] ForceAtlas2 layout failed", error);
-      }
+      };
+      requestLayoutRef.current = requestLayout;
       graph.forEachNode((id, attributes) => {
         graph?.mergeNodeAttributes(id, {
           baseX: numericAttribute(attributes.x, 0),
@@ -792,7 +769,7 @@ export function KnowledgeGraphView({
       });
       graphRef.current = graph;
       rendererRef.current = renderer;
-      setNotice(null);
+      requestLayout();
 
       renderer.on("clickNode", (event) => {
         if (suppressNextNodeClick) {
@@ -836,6 +813,8 @@ export function KnowledgeGraphView({
           return;
         }
         setGraphCursor("grabbing");
+        layoutOwner.cancel();
+        setNotice(null);
         isDraggingNode = true;
         draggedNodeId = event.node;
         dragMovedNode = false;
@@ -884,6 +863,7 @@ export function KnowledgeGraphView({
       renderer.on("upStage", handleNodeDragEnd);
       renderer.getCamera().animatedReset({ duration: 250 });
     } catch (error) {
+      layoutOwner.cancel();
       console.error("[Reqvire KG] Sigma/Graphology renderer failed", error);
       setNotice("Graph renderer failed. Check the browser console for details.");
     }
@@ -891,6 +871,8 @@ export function KnowledgeGraphView({
     });
 
     return () => {
+      layoutOwner.cancel();
+      requestLayoutRef.current = null;
       window.cancelAnimationFrame(frameId);
       if (buildTimer !== null) {
         window.clearTimeout(buildTimer);
@@ -916,11 +898,11 @@ export function KnowledgeGraphView({
       graph = null;
       renderer = null;
     };
-  }, [degreeByNode, edgeAdjacency, edges, nodeById, nodes, setSelectedId]);
+  }, [contextKey, degreeByNode, edgeAdjacency, edges, nodeById, nodes, setSelectedId]);
 
   const graph = (
     <GraphRoute embedded={embedded}>
-      <GraphCanvasFrame>
+      <GraphCanvasFrame aria-busy={notice === "Loading graph..." || notice === "Laying out graph..."}>
         <GraphCanvasSurface
           ref={containerRef}
           data-testid="kg-sigma-canvas"
@@ -929,8 +911,9 @@ export function KnowledgeGraphView({
         />
         {notice ? (
           <GraphCanvasNotice>
-            {notice === "Loading graph..." ? <Spinner label={notice} /> : null}
+            {notice === "Loading graph..." || notice === "Laying out graph..." ? <Spinner label={notice} /> : null}
             <span>{notice}</span>
+            {notice === "Graph layout failed." ? <Button size="sm" onClick={() => requestLayoutRef.current?.()}>Retry layout</Button> : null}
           </GraphCanvasNotice>
         ) : null}
       </GraphCanvasFrame>
