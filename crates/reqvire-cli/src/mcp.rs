@@ -811,9 +811,18 @@ fn reqvire_error(tool_name: &str, err: ReqvireError) -> Value {
         _ => ("reqvire_error", None),
     };
 
+    let mut message = err.to_string();
+    for diagnostic in err
+        .diagnostics()
+        .iter()
+        .filter(|diagnostic| !diagnostic.guidance.is_empty())
+    {
+        message.push('\n');
+        message.push_str(&diagnostic.to_string());
+    }
     let mut error = json!({
         "code": code,
-        "message": err.to_string(),
+        "message": message,
         "tool": tool_name,
         "recoverability": recoverability_hint(code),
         "related_errors": related_errors
@@ -825,25 +834,16 @@ fn reqvire_error(tool_name: &str, err: ReqvireError) -> Value {
 }
 
 fn diagnostic_to_value(diagnostic: &ValidationDiagnostic) -> Value {
-    let mut value = json!({
-        "code": diagnostic.code,
-        "message": diagnostic.message,
-    });
-    if let Some(context) = &diagnostic.context {
-        let mut ctx = serde_json::Map::new();
-        if let Some(file) = &context.file {
-            ctx.insert("file".to_string(), Value::String(file.clone()));
-        }
-        if let Some(line) = context.line {
-            ctx.insert("line".to_string(), Value::Number(line.into()));
-        }
-        if let Some(column) = context.column {
-            ctx.insert("column".to_string(), Value::Number(column.into()));
-        }
-        if let Some(element_id) = &context.element_id {
-            ctx.insert("element_id".to_string(), Value::String(element_id.clone()));
-        }
-        value["context"] = Value::Object(ctx);
+    let mut value =
+        serde_json::to_value(diagnostic).expect("validation diagnostic is serializable");
+    // Preserve the existing omission of absent source-context fields.
+    if let Some(context) = value.get_mut("context").and_then(Value::as_object_mut) {
+        context.retain(|_, value| !value.is_null());
+    } else {
+        value
+            .as_object_mut()
+            .expect("diagnostic object")
+            .remove("context");
     }
     value
 }

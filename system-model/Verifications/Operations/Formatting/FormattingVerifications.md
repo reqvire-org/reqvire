@@ -279,6 +279,30 @@ This test verifies that the --with-full-relations flag correctly inserts all reg
   * verify: [Full Relations Insertion](../../../Operations/Formatting/FormattingRequirements.md#full-relations-insertion)
 ---
 
+### Prose Link Formatting Repair Boundary Verification
+
+Representative automated verification that formatting preserves author decisions for a specification's prohibited prose link. One fixture scenario covers preview/fix, source-type-appropriate guidance, and an explicit valid repair using unified diffs.
+
+#### Details
+
+##### Acceptance Criteria
+- Formatting does not silently turn a prohibited prose hyperlink into a relation, contract dependency, or Concept Reference.
+- Responses preserve shared repair guidance and actual source/target context, including source-type-appropriate literal Markdown examples.
+
+##### Test Criteria
+1. Format one specification fixture containing a prohibited prose link in preview and fix modes. Require shared-rule rejection and unchanged source files, with no inferred relation, dependency, ownership transfer, or copied target content.
+2. Require the shared diagnostic code, occurrence, resolved target, and non-empty guidance directing the contract dependency to the responsible requirement.
+3. Apply an explicit repair using readable domain wording. Require formatting and validation to succeed and match the resulting file against a checked-in expected fixture.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Formatting and Relation Normalization Verification Objective](#formatting-and-relation-normalization-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
+  * verify: [Format Consistency Enforcement](../../../Operations/Formatting/FormattingRequirements.md#format-consistency-enforcement)
+---
+
 ### Relation Ordering Verification
 
 This test verifies that the format command sorts relations alphabetically for deterministic output.

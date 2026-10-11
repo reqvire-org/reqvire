@@ -56,7 +56,9 @@ Deduplication rules for format fix operations.
 **Contract Bindings subsection:**
 - Duplicate contract_bindings (same target path or identifier) are removed, keeping first occurrence
 
-**Cross-section duplicates are NOT removed** - these require user decision and are reported by validation.
+**Shared duplicate classification:**
+- Apply the classification referenced by the owning requirement. `format --fix` removes valid within-section duplicates according to the rules above.
+- Cross-section duplicates are semantic errors and are not automatically removed. Report the shared validation diagnostic and preserve both declarations until the author chooses a valid repair.
 
 #### Metadata
   * type: behavior

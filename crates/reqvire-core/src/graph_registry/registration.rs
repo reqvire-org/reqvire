@@ -86,6 +86,7 @@ impl GraphRegistry {
 
         // Validate relations
         let mut errors = self.validate_relations(excluded_filename_patterns)?;
+        errors.extend(self.validate_model_element_prose_links());
 
         // Validate authored element type metadata
         errors.extend(self.validate_element_type_metadata()?);

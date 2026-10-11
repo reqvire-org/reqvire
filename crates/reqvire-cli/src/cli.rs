@@ -1181,11 +1181,13 @@ fn print_custom_help(cmd: &clap::Command) {
 struct ValidationResult {
     errors: Vec<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    diagnostics: Vec<reqvire::ValidationDiagnostic>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     migration_candidates: Vec<migrations::MigrationCandidate>,
 }
 
 /// Helper function to print validation results
-fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
+pub(crate) fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
     let migration_plan = migrations::candidates_for_validation_errors(errors);
 
     if json_output {
@@ -1193,6 +1195,7 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
         error_strings.sort(); // Sort for deterministic output
         let json_result = ValidationResult {
             errors: error_strings,
+            diagnostics: ReqvireError::errors_to_diagnostics(errors),
             migration_candidates: migration_plan.candidates,
         };
         println!(
@@ -1218,7 +1221,7 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
     }
 }
 
-const fn wants_json(args: &Args) -> bool {
+pub(crate) const fn wants_json(args: &Args) -> bool {
     match &args.command {
         Some(Commands::Semantic {
             command: SemanticCommands::Query { command },
@@ -1241,6 +1244,13 @@ const fn wants_json(args: &Args) -> bool {
         Some(Commands::Link { json, .. }) => *json,
         Some(Commands::Unlink { json, .. }) => *json,
         Some(Commands::Relink { json, .. }) => *json,
+        Some(Commands::Add { json, .. })
+        | Some(Commands::Rm { json, .. })
+        | Some(Commands::Mv { json, .. })
+        | Some(Commands::Rename { json, .. })
+        | Some(Commands::Merge { json, .. })
+        | Some(Commands::MvFile { json, .. })
+        | Some(Commands::MvFolder { json, .. }) => *json,
         Some(Commands::MvAsset { json, .. }) => *json,
         Some(Commands::RmAsset { json, .. }) => *json,
         Some(Commands::Containment { .. }) => true,
@@ -1438,13 +1448,30 @@ pub async fn handle_command(
                     &model_manager.graph_registry,
                 ))
             });
+        let diagnostics: Vec<_> = parse_result
+            .as_ref()
+            .err()
+            .map(ReqvireError::diagnostics)
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|diagnostic| !diagnostic.guidance.is_empty())
+            .collect();
         let model_errors = parse_result
             .as_ref()
             .err()
-            .map(|e| vec![e.to_string()])
+            .map(|e| {
+                if diagnostics.is_empty() {
+                    vec![e.to_string()]
+                } else {
+                    diagnostics.iter().map(ToString::to_string).collect()
+                }
+            })
             .unwrap_or_default();
-        let report =
+        let mut report =
             index.query_validation_report(name.as_deref(), iri.as_deref(), model_errors)?;
+        if !diagnostics.is_empty() {
+            report["diagnostics"] = serde_json::to_value(diagnostics)?;
+        }
         print_query_validation_report(&report, *json)?;
         return Ok(if report["valid"] == true { 0 } else { 1 });
     }
@@ -1462,6 +1489,7 @@ pub async fn handle_command(
             if json_output {
                 let json_result = ValidationResult {
                     errors: vec![e.to_string()],
+                    diagnostics: e.diagnostics(),
                     migration_candidates: Vec::new(),
                 };
                 println!(
@@ -1484,6 +1512,7 @@ pub async fn handle_command(
             if json {
                 let json_result = ValidationResult {
                     errors: vec![],
+                    diagnostics: Vec::new(),
                     migration_candidates: Vec::new(),
                 };
                 let json_str =
@@ -2251,6 +2280,7 @@ pub async fn handle_command(
                 if json {
                     let json_result = ValidationResult {
                         errors: vec![],
+                        diagnostics: Vec::new(),
                         migration_candidates: Vec::new(),
                     };
                     let json_str = serde_json::to_string_pretty(&json_result)

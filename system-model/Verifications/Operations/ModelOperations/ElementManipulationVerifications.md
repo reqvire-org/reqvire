@@ -1015,6 +1015,34 @@ The owning merge suite appends identifier selection for the target and each sour
   * verify: [Merge Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#merge-element-operation)
 ---
 
+### Model Mutation Validation Gate Verification
+
+Representative automated verification of complete-candidate validation through CLI create, CLI override dry-run, and MCP override operations. Fixture-backed E2E assertions compare results and source files with expected output using unified diffs.
+
+#### Details
+
+##### Acceptance Criteria
+- Graph-backed mutations and supported dry runs use the shared rule contracts on candidate content, identifiers, membership, ownership, and canonical relations.
+- Invalid candidates preserve authored source bytes and the accepted graph, including changes to otherwise untouched elements affected by the mutation.
+- CLI and MCP entry points retain shared structured diagnostics, guidance, and applicable repair examples.
+
+##### Test Criteria
+1. Start with a valid model. Submit a CLI create containing a prohibited prose link; require rejection, structured source/target context and repair guidance, and unchanged model files.
+2. Submit a CLI override dry-run containing the same violation; require rejection rather than a successful preview and preserve source files.
+3. Create an otherwise valid target element that makes an untouched prose destination resolve to a model element. Require complete-candidate rejection and preservation of all source files.
+4. Submit an MCP override containing a prohibited prose link. Require shared structured guidance, unchanged source files, and preservation of the accepted model fingerprint and content.
+5. After rejected creates/overrides, submit an explicit repair with readable prose and a valid Contract Reference. Require success, match the resulting file against a checked-in expected fixture, and validate the persisted model when reloaded.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Element Mutation and File Operation Verification Objective](#element-mutation-and-file-operation-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-crud-override/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * verify: [Element Manipulation Operations](../../../ModelStructure/ModelManagement.md#element-manipulation-operations)
+---
+
 ### Move Element Test
 
 The test shall verify that existing model elements can be moved to different locations, all relations referencing the moved element are automatically updated, target locations are created if needed, and empty source files are removed when no elements remain.

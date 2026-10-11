@@ -836,6 +836,12 @@ fn validate_model_after_mutation(
     errors.extend(
         model_manager
             .graph_registry
+            .validate_model_element_prose_links(),
+    );
+
+    errors.extend(
+        model_manager
+            .graph_registry
             .validate_contract_references()?,
     );
     errors.extend(
@@ -892,6 +898,7 @@ fn validate_contract_bindings_candidate(
     }
 
     let mut errors = candidate.validate_semantic_contracts_in_memory()?;
+    errors.extend(candidate.validate_model_element_prose_links());
     errors.extend(candidate.validate_contract_references()?);
     errors.extend(candidate.validate_requirement_fulfillment_cycles());
     if errors.is_empty() {

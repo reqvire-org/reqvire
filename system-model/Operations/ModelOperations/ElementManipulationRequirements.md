@@ -25,13 +25,17 @@ For hierarchical relinks (`derivedFrom`/`derive`), the operation shall support s
 
 ### CRUD Semantic Contract Mutation Validation
 
-The system shall validate semantic-contract reference integrity before persisting graph-backed CRUD mutations.
+WHEN a graph-backed CRUD mutation changes model content or relations, the system SHALL invoke shared semantic-contract validation and reject invalid candidates before persistence.
 
 #### Details
-When a CRUD mutation changes model elements or relations, the system shall reject the candidate model before persistence if any semantic-contract Shapes reference becomes undeclared by all ontology elements or is declared only outside the contract's explicit ontology-use context.
+The mutation boundary shall preserve shared validation diagnostics and enrich them with the removed declaration source when known.
 
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Semantic Contract Shape Validation Specification](../Validation/Specifications.md#semantic-contract-shape-validation-specification)
+  * [Structured Validation Diagnostic Contract Specification](../Validation/Specifications.md#structured-validation-diagnostic-contract-specification)
 
 #### Relations
   * definedBy: [CRUD Semantic Contract Validation Specification](Specifications.md#crud-semantic-contract-validation-specification)

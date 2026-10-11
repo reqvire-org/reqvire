@@ -37,7 +37,7 @@ Output behavior:
 Candidate semantic-contract validation for graph-backed CRUD mutations.
 
 #### Details
-Before any graph-backed CRUD mutation persists model files, the system is expected to validate the mutated in-memory model for dangling semantic-contract references.
+Before any graph-backed CRUD mutation persists model files, invoke the shared semantic-contract validator on the complete candidate through the model-operation validation gate. The owning requirement's Contract References supply schema-reference rules and diagnostics; this contract owns their mutation-time invocation and contextual enrichment.
 
 This pre-persistence validation applies to graph-backed mutation commands:
 - `add`
@@ -52,22 +52,11 @@ This pre-persistence validation applies to graph-backed mutation commands:
 - `unlink`
 - `relink`
 
-When a mutation would leave a `Shapes` reference to an IRI that is not declared by any ontology `Ontology`, the command is expected to fail before flushing changes. The error is expected to include:
-- the referencing semantic-contract identifier
-- the reference kind, such as `sh:path`, `sh:targetClass`, or `sh:class`
-- the missing IRI
-- fix guidance to update/remove the SHACL reference or restore the declaration
+Reject the operation before flushing changes when the shared validator reports an invalid candidate. Preserve its referencing contract, reference kind, target IRI, declaration context, and repair guidance in the response.
 
-When the mutation removed the ontology element that previously declared the missing IRI, the error is expected to include the removed declaration source identifier.
+If comparison with the accepted model identifies an ontology element removed by this mutation as the prior declaration source, add that removed source identifier to the diagnostic. Do not use the prior declaration to make the candidate valid.
 
-The command is expected not to persist source-file changes when this validation fails.
-
-When a mutation would leave a `Shapes` reference to an IRI that is declared by an ontology element outside the semantic contract's explicit ontology-use graph, the command is expected to fail before flushing changes. The error is expected to include:
-- the referencing semantic-contract identifier
-- the reference kind, such as `sh:path`, `sh:targetClass`, or `sh:class`
-- the referenced IRI
-- the declaring ontology identifier
-- guidance to add a `use` relation to the declaring ontology, move the declaration into the semantic contract's explicit ontology-use graph, or update/remove the reference
+Rejection preserves authored files and accepted state according to the model-operation gate. Apply the same checks to supported dry runs and CLI/MCP entry points.
 
 #### Metadata
   * type: specification
@@ -109,7 +98,7 @@ Resolve the subject by exact name or canonical identifier through the bound elem
 When deleting an element, the system is expected to:
 - Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)
 - Reject the operation if any child would become orphaned
-- Validate the candidate model before persistence and reject deletion when removing the element would leave semantic-contract SHACL references to ontology terms that are no longer declared anywhere
+- Invoke the shared candidate validation gate before persistence and reject deletion if the remaining model violates the referenced semantic-contract validation rules
 - Report semantic deletion blockers with the referencing semantic-contract identifier, reference kind, missing IRI, and the deleted element/semantic contract that removed the declaration when known
 - Provide clear error message listing orphaned children with resolution guidance
 - Allow deletion if children have other parent hierarchical relations

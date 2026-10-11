@@ -52,6 +52,10 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
 - Display changes with sequential line numbering that reflects final file positions
 - Provide context lines with proper line number continuity
 
+**Semantic Repair Boundary:**
+- Consume the prose-link classification and guidance referenced by the owning requirement. Formatting must not silently move an invalid prose link into a relation, Contract Binding, Contract Reference, or Concept Reference, because the valid repair depends on author intent and source/target compatibility.
+- Preserve the shared diagnostic and repair examples when reporting such a violation. Formatting normalization must not make the invalid dependency appear valid by changing its label or choosing a relation automatically.
+
 #### Metadata
   * type: specification
 ---

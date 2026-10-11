@@ -448,6 +448,9 @@ Detailed semantic context consumption, serialization choices, command/API flags,
 #### Metadata
   * type: requirement
 
+#### Contract References
+  * [Ontology and Shapes Collection Specification](../../Semantics/SemanticModelSpecifications.md#ontology-and-shapes-collection-specification)
+
 #### Relations
   * satisfiedBy: [export.rs](../../../crates/reqvire-core/src/semantic_contract/export.rs)
   * satisfiedBy: [semantic_tools.rs](../../../crates/reqvire-core/src/tool_interface/semantic_tools.rs)

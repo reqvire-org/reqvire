@@ -358,6 +358,15 @@ Each graph-backed operation specification is expected to define:
 
 Concrete command names, flags, output fields, file paths, workflow steps, and persistence behavior belong in these operation specifications or behavior contracts.
 
+##### Shared Validation Gate
+- Before any graph-backed mutation persists files or publishes accepted state, invoke shared model validation on the complete resulting candidate. Consume the shared rule and diagnostic contracts referenced by the owning requirement; operation contracts own invocation, atomic rejection, and persistence rather than redefining those rules.
+- Apply this gate to create, content replacement or override, remove, move, rename, merge, file and folder moves, link, unlink, and relink. CLI and MCP entry points use the same operation-level gate; supported dry runs validate identically without writing files.
+- Use candidate content, element membership, identifiers, ownership, and canonical relations. Do not validate against the accepted snapshot or stale derived concept payloads. Apply the shared identifier normalization before lookup and duplicate detection.
+- Validate changes to otherwise untouched elements when candidate membership or addressing makes their existing prose destinations resolve to model elements. Creation, replacement, moves, renames, and merges cannot bypass prose-link validation by checking only submitted text.
+- Reject invalid relation endpoints, requirement fulfillment or taxonomy cycles, contract dependencies, SHACL references, query context, and authored prose links through the shared validators. An invalid contract-owner type must fail before persistence. Local operation rules may add constraints without weakening shared validation.
+- Rejection preserves all authored source bytes and the accepted graph; invalid dry runs must not report successful edits. Subsequent valid operations must not observe candidate changes from a rejected transaction.
+- Return the shared structured diagnostics, guidance, and repair examples without reducing them to a generic mutation failure. Source and target context must describe the candidate occurrence that caused rejection.
+
 #### Metadata
   * type: specification
 
@@ -671,17 +680,17 @@ Contract dependency is the umbrella term for Contract Bindings and Contract Refe
 
 A requirement MUST author references under `#### Contract References`, using Markdown-link list entries with the same workspace-relative identifier normalization as Contract Bindings. Same-file and cross-file identifiers MUST resolve to contracts authored in multi-element files or the existing single-element contract format.
 
-Fragment-only and file-qualified reference identifiers MUST use the shared relation-target fragment normalization before target lookup and duplicate detection. Within `Model.md`, `#Error-Response-Specification` and `Model.md#Error-Response-Specification` MUST resolve to the same canonical contract identifier as `#error-response-specification`. Parsing and mutation commands MUST apply the same normalization.
+Fragment-only and file-qualified reference identifiers MUST use the shared relation-target fragment normalization before target lookup and duplicate detection. Within `Model.md`, `#Error-Response-Specification` and `Model.md#Error-Response-Specification` MUST resolve to the same canonical contract identifier as `#error-response-specification`.
 
 A reference MUST target an existing `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` element owned by exactly one requirement through `define`/`definedBy`. Only requirements MAY author Contract References. File paths, external URLs, unowned contracts, and other element types MUST be rejected as reference targets.
 
-Ownership validation MUST check both the distinct owner count and the owner's requirement type in the candidate model. Editing a referenced contract's owner to another element type MUST fail before persistence, with a diagnostic identifying the invalid ownership and referenced contract.
+Ownership validation MUST check both the distinct owner count and the owner's requirement type in the supplied model snapshot. Invalid ownership MUST produce a diagnostic identifying the owner and referenced contract.
 
 Contract Bindings and Contract References MUST be mutually exclusive on each element. An element containing entries in both sections MUST be rejected, including when the sections target different contracts. Duplicate normalized targets within Contract References MUST be rejected by validation. A target appearing in both Contract References and Relations MUST be rejected as a redundant declaration.
 
 Contract References MUST form acyclic requirement dependencies. For cycle validation, a requirement depends on its immediate parent requirements and on the owners of its explicitly referenced or bound contracts. Each authored dependency is considered in this direction; generated inverse relations MUST NOT create artificial cycles. A reference MUST be rejected if the referenced contract owner can reach the referencing requirement through these dependencies, including a reference to a contract owned by the source itself. This includes reciprocal references, longer reference chains, and cycles combining references with bindings or requirement ancestry. Diagnostics MUST identify the participating requirements and contract targets.
 
-Acyclic references within a requirement hierarchy and between capability roots MUST remain valid. Reference-cycle validation MUST run before publishing reports and before persisting any mutation, including link, relink, create, override, hierarchy or ownership edits, and merge. Invalid candidate models MUST leave authored files unchanged.
+Acyclic references within a requirement hierarchy and between capability roots MUST remain valid. Evaluate reference cycles against the supplied model snapshot's current ownership, references, bindings, and requirement ancestry.
 
 Implementation assessment MUST exclude reference edges from required contributions, terminal classification, implementation evidence, blockers, and capability roll-up. A contract owner with only reference consumers remains terminal unless it has requirement children or binding consumers. An implemented documentation requirement referencing its contract MUST NOT make the owner implementation-covered.
 

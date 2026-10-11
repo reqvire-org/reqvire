@@ -38,6 +38,7 @@ async fn main() {
     }
 
     // Run `handle_command` and get exit code
+    let json_output = cli::wants_json(&args);
     let exit_code = handle_command(args, &get_excluded_filename_patterns_glob_set())
         .await
         .unwrap_or_else(|e| {
@@ -52,6 +53,10 @@ async fn main() {
                     }
                 }
                 ReqvireError::ValidationDiagnostics { related_errors, .. } => {
+                    if json_output {
+                        cli::print_validation_results(&related_errors, true);
+                        return 1;
+                    }
                     let mut messages: Vec<String> =
                         related_errors.iter().map(|err| err.to_string()).collect();
                     messages.sort();

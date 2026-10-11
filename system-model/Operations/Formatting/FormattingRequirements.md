@@ -24,6 +24,9 @@ The system shall provide formatting capability to ensure consistent formatting i
 #### Metadata
   * type: requirement
 
+#### Contract References
+  * [Model Element Prose Link Validation Specification](../Validation/Specifications.md#model-element-prose-link-validation-specification)
+
 #### Relations
   * definedBy: [Format Consistency Specification](Specifications.md#format-consistency-specification)
   * derive: [Document Structure Normalization](#document-structure-normalization)
@@ -72,10 +75,13 @@ The system shall remove duplicate entries within the same subsection during form
 #### Details
 A behavior defines the detailed deduplication rules.
 
-This operation only removes within-section duplicates (entries repeated in the same Relations or Contract Bindings subsection). Cross-section duplicates are semantic errors that require user resolution.
+The system shall consume shared duplicate classification and preserve semantic errors for an explicit author decision.
 
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Cross-Section Duplicate Constraint](../Validation/Constraints.md#cross-section-duplicate-constraint)
 
 #### Relations
   * definedBy: [Format Duplicate Removal Behavior](Behaviors.md#format-duplicate-removal-behavior)

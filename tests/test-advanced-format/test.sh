@@ -323,4 +323,13 @@ assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_TestNoPageHeader.md" T
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/expected_ContractBindingTest.md" ContractBindingTest.md "ContractBindingTest.md does not match expected output (contract bindings display name not preserved)"
 
 # No cleanup needed - temporary directory will be deleted
+PROSE_STATUS=0
+python3 "$TEST_SCRIPT_DIR/../prose_links.py" format "$REQVIRE_BIN" "$TEST_DIR" \
+  > "$TEST_DIR/output/prose-link-checks.txt" 2> "$TEST_DIR/output/prose-link-checks.stderr" || PROSE_STATUS=$?
+if [ "$PROSE_STATUS" -ne 0 ]; then
+  cat "$TEST_DIR/output/prose-link-checks.stderr"
+fi
+diff -u "$TEST_SCRIPT_DIR/expected/prose-link-checks.txt" "$TEST_DIR/output/prose-link-checks.txt" || exit 1
+[ "$PROSE_STATUS" -eq 0 ] || exit 1
+
 exit 0

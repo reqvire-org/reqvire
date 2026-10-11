@@ -7,13 +7,14 @@ The system SHALL expose managed semantic query discovery, validation, and artifa
 #### Details
 The interface consumes the core query contracts for selection, validation, namespace filtering, and deterministic rendering.
 
-#### Contract References
-  * [Semantic Query Discovery Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-discovery-specification)
-  * [Semantic Query Context Validation Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
-  * [Semantic Query Artifact Export Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-artifact-export-specification)
-
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Integrated Validation Contract Specification](../../Operations/Validation/Specifications.md#integrated-validation-contract-specification)
+  * [Semantic Query Artifact Export Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-artifact-export-specification)
+  * [Semantic Query Context Validation Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
+  * [Semantic Query Discovery Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-discovery-specification)
 
 #### Relations
   * satisfiedBy: [semantic_tools.rs](../../../crates/reqvire-core/src/tool_interface/semantic_tools.rs)

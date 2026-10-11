@@ -362,7 +362,7 @@ Authoring grammar, generated identity, source locations, and serialization follo
 WHEN validating a semantic query, the system SHALL resolve schema references against its explicitly used ontology context and report invalid query content.
 
 #### Details
-Validation uses parsed syntax roles and the existing model mutation validation gate. Downstream runtime features remain portable without execution.
+Validation uses parsed syntax roles. Downstream runtime features remain portable without execution.
 
 #### Concept References
   * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
@@ -386,7 +386,7 @@ Validation uses parsed syntax roles and the existing model mutation validation g
 The system SHALL expose native authored semantic queries with their metadata, source provenance, and used ontology namespaces.
 
 #### Details
-Discovery, namespace selection, RDF projection, and CLI/MCP consumers share the native semantic index.
+Discovery, namespace selection, and RDF projection use the native semantic index.
 
 #### Concept References
   * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
@@ -416,8 +416,10 @@ Selection and serialization follow the shared artifact contract.
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Existing Element Selection Specification](../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Integrated Validation Contract Specification](../Operations/Validation/Specifications.md#integrated-validation-contract-specification)
+  * [Semantic Query Context Validation Specification](SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
 
 #### Relations
   * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
@@ -436,11 +438,13 @@ Artifact checks preserve the checked file and report expected and available actu
 #### Concept References
   * [Semantic Query](../Thesaurus/Thesaurus.md#semantic-query)
 
-#### Contract References
-  * [Semantic Query Artifact Export Specification](SemanticQuerySpecifications.md#semantic-query-artifact-export-specification)
-
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Integrated Validation Contract Specification](../Operations/Validation/Specifications.md#integrated-validation-contract-specification)
+  * [Semantic Query Artifact Export Specification](SemanticQuerySpecifications.md#semantic-query-artifact-export-specification)
+  * [Semantic Query Context Validation Specification](SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
 
 #### Relations
   * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)

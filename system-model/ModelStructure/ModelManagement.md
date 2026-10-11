@@ -123,8 +123,25 @@ All manipulation operations shall:
 - Update or remove affected relations automatically
 - Preserve traceability where appropriate
 
+WHEN a model operation produces a changed candidate, the system SHALL invoke shared model validation and reject invalid candidates before source persistence or accepted-state publication.
+
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Contract Reference Semantics Specification](Specifications.md#contract-reference-semantics-specification)
+  * [Cross-Section Duplicate Constraint](../Operations/Validation/Constraints.md#cross-section-duplicate-constraint)
+  * [Single Root Hierarchy Ownership Constraint](../Operations/Validation/Constraints.md#single-root-hierarchy-ownership-constraint)
+  * [Contract Bindings Scope Validation Contract Specification](../Operations/Validation/Specifications.md#contract-bindings-scope-validation-contract-specification)
+  * [Contract Bindings Target Validation Contract Specification](../Operations/Validation/Specifications.md#contract-bindings-target-validation-contract-specification)
+  * [Internal Consistency Validator Contract Specification](../Operations/Validation/Specifications.md#internal-consistency-validator-contract-specification)
+  * [Model Element Prose Link Validation Specification](../Operations/Validation/Specifications.md#model-element-prose-link-validation-specification)
+  * [Native Concept Taxonomy Cycle Validation Specification](../Operations/Validation/Specifications.md#native-concept-taxonomy-cycle-validation-specification)
+  * [Native Concept Taxonomy Scheme Boundary Validation Specification](../Operations/Validation/Specifications.md#native-concept-taxonomy-scheme-boundary-validation-specification)
+  * [Relation Element Type Validator Contract Specification](../Operations/Validation/Specifications.md#relation-element-type-validator-contract-specification)
+  * [Semantic Contract Shape Validation Specification](../Operations/Validation/Specifications.md#semantic-contract-shape-validation-specification)
+  * [Structured Validation Diagnostic Contract Specification](../Operations/Validation/Specifications.md#structured-validation-diagnostic-contract-specification)
+  * [Semantic Query Context Validation Specification](../Semantics/SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
 
 #### Relations
   * definedBy: [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
@@ -447,7 +464,7 @@ When a requirement declares a Contract Reference, the system SHALL resolve and r
 
 WHEN equivalent fragment-only and file-qualified Contract Reference identifiers are supplied, the system SHALL resolve them to the same canonical contract target.
 
-If a Contract Reference has an invalid source, target, ownership, or duplicate declaration, then the system SHALL report the invalid declaration before publishing a validated model.
+If a Contract Reference has an invalid source, target, ownership, or duplicate declaration, then the system SHALL report the invalid declaration.
 
 If a requirement declares both Contract Bindings and Contract References, then the system SHALL reject the element even when their targets differ.
 

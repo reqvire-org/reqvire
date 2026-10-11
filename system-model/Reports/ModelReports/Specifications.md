@@ -542,7 +542,7 @@ The ontology collection output defines how Reqvire exposes semantic model core c
 
 #### Details
 The output must:
-- Consume the reusable semantic context built by [Ontology and Shapes Collection](../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection).
+- Consume the reusable semantic context built by ontology and shapes collection.
 - Emit RDF/Turtle by default, preserving collected RDF graph content with source comments while using one deterministic top-level `@prefix` declaration block and compact prefixed names where the prefixed name is Turtle-safe.
 - Emit JSON-LD when requested by the selected output mode.
 - Include generated `rdfs:isDefinedBy` links from authored named ontology resources to their generated ontology document IRI as part of the default semantic export.

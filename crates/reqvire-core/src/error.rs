@@ -12,6 +12,8 @@ pub struct ErrorContext {
     pub line: Option<usize>,
     pub column: Option<usize>,
     pub element_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub element_type: Option<String>,
 }
 
 impl ErrorContext {
@@ -21,6 +23,7 @@ impl ErrorContext {
             line: None,
             column: None,
             element_id: None,
+            element_type: None,
         }
     }
 
@@ -43,6 +46,11 @@ impl ErrorContext {
         self.element_id = Some(element_id.into());
         self
     }
+
+    pub fn with_element_type(mut self, element_type: impl Into<String>) -> Self {
+        self.element_type = Some(element_type.into());
+        self
+    }
 }
 
 impl Default for ErrorContext {
@@ -61,6 +69,38 @@ pub struct ValidationDiagnostic {
     pub code: &'static str,
     pub message: String,
     pub context: Option<ErrorContext>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub target: Option<DiagnosticTarget>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link: Option<DiagnosticLink>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub guidance: Vec<RepairGuidance>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+/// Resolved target and, for an owned contract, its requirement owner.
+pub struct DiagnosticTarget {
+    pub element_id: String,
+    pub element_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+/// Visible hyperlink label and its authored Markdown destination.
+pub struct DiagnosticLink {
+    pub text: String,
+    pub destination: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+/// One ordered repair step with an optional literal Markdown template.
+pub struct RepairGuidance {
+    pub message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub section: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub example: Option<String>,
 }
 
 impl ValidationDiagnostic {
@@ -69,6 +109,9 @@ impl ValidationDiagnostic {
             code,
             message: message.into(),
             context: None,
+            target: None,
+            link: None,
+            guidance: Vec::new(),
         }
     }
 
@@ -95,6 +138,9 @@ impl std::fmt::Display for ValidationDiagnostic {
                 if let Some(element_id) = &ctx.element_id {
                     parts.push(format!("element={}", element_id));
                 }
+                if let Some(element_type) = &ctx.element_type {
+                    parts.push(format!("type={}", element_type));
+                }
                 if parts.is_empty() {
                     write!(f, "[{}] {}", self.code, self.message)
                 } else {
@@ -102,13 +148,33 @@ impl std::fmt::Display for ValidationDiagnostic {
                 }
             }
             None => write!(f, "[{}] {}", self.code, self.message),
+        }?;
+        if let Some(target) = &self.target {
+            write!(
+                f,
+                "\n  target: {} (type: {}",
+                target.element_id, target.element_type
+            )?;
+            if let Some(owner) = &target.owner {
+                write!(f, "; owner: {}", owner)?;
+            }
+            write!(f, ")")?;
         }
+        for (index, step) in self.guidance.iter().enumerate() {
+            write!(f, "\n  repair {}: {}", index + 1, step.message)?;
+            if let Some(example) = &step.example {
+                write!(f, "\n{}", example)?;
+            }
+        }
+        Ok(())
     }
 }
 
 /// Custom error types for the Reqvire application
 #[derive(Error, Debug)]
 pub enum ReqvireError {
+    #[error("{0}")]
+    ModelElementLinkInProse(Box<ValidationDiagnostic>),
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
 
@@ -253,6 +319,9 @@ pub enum ReqvireError {
 impl Clone for ReqvireError {
     fn clone(&self) -> Self {
         match self {
+            Self::ModelElementLinkInProse(diagnostic) => {
+                Self::ModelElementLinkInProse(diagnostic.clone())
+            }
             Self::IoError(error) => Self::IoError(
                 error
                     .raw_os_error()
@@ -333,6 +402,7 @@ impl ReqvireError {
     /// Returns a stable, machine-readable diagnostic code for this error variant.
     pub const fn diagnostic_code(&self) -> &'static str {
         match self {
+            Self::ModelElementLinkInProse(_) => "model-element-link-in-prose",
             Self::IoError(_) => "io_error",
             Self::GitCommandError(_) => "git_command_error",
             Self::InvalidIdentifier(_) => "invalid_identifier",
@@ -382,11 +452,10 @@ impl ReqvireError {
     /// Builds a [`ValidationDiagnostic`] from this error with a stable code and
     /// the human-readable message from `Display`.
     pub fn to_diagnostic(&self) -> ValidationDiagnostic {
-        ValidationDiagnostic {
-            code: self.diagnostic_code(),
-            message: self.to_string(),
-            context: None,
+        if let Self::ModelElementLinkInProse(diagnostic) = self {
+            return *diagnostic.clone();
         }
+        ValidationDiagnostic::new(self.diagnostic_code(), self.to_string())
     }
 
     /// Constructs a `ValidationDiagnostics` error from a flat list of validation
@@ -414,8 +483,11 @@ impl ReqvireError {
                     diagnostics,
                     related_errors,
                 } => {
-                    out.extend(diagnostics.iter().cloned());
-                    out.extend(Self::errors_to_diagnostics(related_errors));
+                    if diagnostics.is_empty() {
+                        out.extend(Self::errors_to_diagnostics(related_errors));
+                    } else {
+                        out.extend(diagnostics.iter().cloned());
+                    }
                 }
                 other => out.push(other.to_diagnostic()),
             }

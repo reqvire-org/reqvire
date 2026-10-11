@@ -462,6 +462,15 @@ diff -u "$TEST_SCRIPT_DIR/expected/fenced-code-checks.txt" "$TEST_DIR/output/fen
 # ==================================
 # Final Result
 # ==================================
+PROSE_STATUS=0
+python3 "$TEST_SCRIPT_DIR/../prose_links.py" read "$REQVIRE_BIN" "$TEST_DIR" \
+  > "$TEST_DIR/output/prose-link-checks.txt" 2> "$TEST_DIR/output/prose-link-checks.stderr" || PROSE_STATUS=$?
+if [ "$PROSE_STATUS" -ne 0 ]; then
+  cat "$TEST_DIR/output/prose-link-checks.stderr"
+fi
+diff -u "$TEST_SCRIPT_DIR/expected/prose-link-checks.txt" "$TEST_DIR/output/prose-link-checks.txt" || exit 1
+[ "$PROSE_STATUS" -eq 0 ] || exit 1
+
 echo ""
 echo "✅ All fragment normalization tests passed"
 exit 0

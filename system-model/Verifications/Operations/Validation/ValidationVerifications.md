@@ -384,6 +384,64 @@ This verification test checks that Reqvire correctly identifies and reports inva
   * verify: [Validation Error Handling](../../../Operations/Validation/ValidationRequirements.md#validation-error-handling)
 ---
 
+### Model Element Prose Link Validation Test
+
+Representative automated verification of the shared authored prose-link rule and its actionable diagnostics. A small fixture suite compares structured diagnostics, results, and authored files with expected output using unified diffs.
+
+#### Details
+
+##### Acceptance Criteria
+- Shared validation rejects hyperlinks in authored model-element prose when their destinations resolve to model elements in the supplied snapshot.
+- Structured declarations, literal code examples, generated Explorer concept links, external URLs, and non-element file or document targets do not produce this diagnostic.
+- Diagnostics identify the source occurrence, source and target types, and resolved target, and include non-empty structured repair guidance consistent with valid relation, contract dependency, and Concept Reference semantics.
+
+##### Validation Test Criteria
+1. Validate one combined control fixture containing Relations, Contract References, Concept References, fenced/indented/inline code, escaped Markdown, external URLs, evidence assets, unstructured documents, and a non-element anchor. Require successful validation and unchanged source files.
+2. Reject one requirement fixture containing an inline specification link in the main body and a reference-style native concept link in Details. Require both occurrences to resolve against the complete registry even when the target file follows the source file. An existing Contract Reference must not excuse the prose link.
+3. Reject a file-only link to a single-element specification from prose in a `# Element` source document.
+4. Match stable structured diagnostic fields against expected fixtures. Require source and target identities/types, exact occurrence lines, link text/destination, non-empty repair guidance, and preservation of context and guidance in text output. Contract guidance must identify the owner, show actual source-relative References/Bindings alternatives, explain review versus implementation and the one-section constraint; native concept guidance must show the applicable Concept References example.
+5. Reject a capability's prose link to a specification. Its guidance must direct the dependency to the responsible requirement rather than propose a dependency section on the capability.
+
+#### Concept References
+  * [Concept Reference](../../../Thesaurus/Thesaurus.md#concept-reference)
+  * [Contract Dependency](../../../Thesaurus/Thesaurus.md#contract-dependency)
+  * [Element](../../../Thesaurus/Thesaurus.md#element)
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Validation and Semantic Integrity Verification Objective](#validation-and-semantic-integrity-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-parsing-functionality/test.sh)
+  * verify: [Model Element Prose Link Validation](../../../Operations/Validation/ValidationRequirements.md#model-element-prose-link-validation)
+  * verify: [Structured Validation Diagnostics](../../../Operations/Validation/ValidationRequirements.md#structured-validation-diagnostics)
+---
+
+### Model Read Validation Gate Verification
+
+Representative automated verification of the model-load gate using the shared prose-link rule. Fixture-backed E2E assertions compare results and source files with expected output using unified diffs.
+
+#### Details
+
+##### Acceptance Criteria
+- Disk-loaded models are accepted only after complete element collection and shared validation succeed.
+- Invalid model reads publish neither authoritative reports nor an accepted snapshot and do not modify authored files.
+- Shared diagnostics and repair guidance reach text and structured consumers without being replaced by a generic command failure.
+
+##### Test Criteria
+1. Require a valid model report to succeed directly without a separate prior validation invocation.
+2. Load a requirement containing a prohibited prose link through a model-dependent report command. Require rejection with the shared diagnostic code and no authoritative output artifact.
+3. Compare source files against the input fixture after failed reads. The disk-validation cases also require complete-registry resolution and preservation of structured and text diagnostics with repair guidance.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Validation and Semantic Integrity Verification Objective](#validation-and-semantic-integrity-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-parsing-functionality/test.sh)
+  * verify: [Integrated Validation](../../../Operations/Validation/ValidationRequirements.md#integrated-validation)
+---
+
 ### Native Concept Taxonomy Scheme Boundary Validation Test
 
 This verification proves that native concept taxonomy does not cross `concept-scheme` roots while cross-scheme concept association and mapping relations remain valid authoring channels.

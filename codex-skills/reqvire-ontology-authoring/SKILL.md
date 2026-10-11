@@ -13,6 +13,29 @@ change-impact workflows, or broader model refactoring. This skill may update
 semantic contracts and ontology links that constrain those elements, but should
 not replace the system-engineering workflow for changing their behavior.
 
+## DO NOT DO
+
+- Do not put inline or reference-style hyperlinks to any model element in authored element prose, including the body, Details, or other prose subsections. This includes native concepts, self-links, and file-only links to single-element `# Element` documents. Changing the label or adding a structural declaration does not make the prose hyperlink valid.
+- Do not use prose hyperlinks as dependency or traceability declarations, copy another specification into prose, or duplicate its owner's obligation. Write readable domain words and declare the intended relationship explicitly.
+- Do not add Contract References or Contract Bindings to capabilities, contracts, or verifications. Place a contract dependency on the responsible or owning requirement: References for change-impact review, Bindings for an independent implementation obligation. A requirement may use only one of these sections; decompose meaningful obligations when different dependency kinds are needed.
+- Do not reuse a contract by transferring `definedBy` ownership or adding a hierarchy edge to it. Select a relation or dependency that is valid for the source and target types.
+- Do not bind terminology by linking a concept in prose. Use `#### Concept References` to the native concept on a permitted source type. Ontology and semantic-contract elements cannot author that section: use compatible Turtle/ontology-import or ontology-use/requirement-constraint channels, and `reqvire:mapsToConcept` for applicable structural-to-concept bridges.
+
+Links in Relations, Contract References, Contract Bindings, and Concept References use their own validation rules. Literal code examples, structured RDF/query payloads, external URLs, evidence assets, unstructured documents, and anchors that do not resolve to model elements are outside this prose-link prohibition. Classification depends on the current model registry, not a directory name or `.md` extension.
+
+When `model-element-link-in-prose` is reported, follow the diagnostic's source occurrence, resolved target and owner, and ordered `guidance` entries. Remove the actual hyperlink first; select the appropriate structural repair without guessing its intent. Use the actual target name and source-relative destination in declarations, then validate again. Disk loading and complete CRUD candidates enforce the same rule before persistence, including untouched prose whose destination becomes a model element after an edit; formatting cannot choose or silently apply a semantic repair.
+
+Example for a requirement that needs a specification as review context:
+
+```markdown
+Command ingress routes commands through the owning service.
+
+#### Contract References
+  * [Command Specification](Specifications.md#command-specification)
+```
+
+The declaration belongs to the requirement; capability or specification prose uses plain domain wording and leaves the dependency on that requirement.
+
 ## Reqvire Operations for Ontology Authoring
 
 Use Reqvire as the source-of-truth runtime when authoring or changing OWL/RDFS

@@ -1001,6 +1001,7 @@ Embedded MCP behavior:
 The MCP interface MUST expose managed query operations through shared core contracts.
 
 #### Details
+Invoke the shared model-load gate referenced by the owning requirement for model-dependent query operations, preserving each tool's diagnostic mode and the core validator's per-candidate diagnostics and repair guidance. Artifact publication requires successful shared validation; diagnostic responses do not mark malformed candidates as valid models.
 Existing name-based source selectors accept exact native element names or canonical identifiers under the bound element-selection contract in the requested context. Explicit query IRIs, namespace filters, query text and artifact paths retain their existing domains and mutual exclusion.
 
 Query discovery MUST return native authored records sorted by generated IRI then name. Namespace filters MUST match used ontology namespaces. Query validation MUST return per-candidate diagnostics and use the common validation gate. Selectors MUST resolve exactly and reject unknown or ambiguous results. Exported content and hashes MUST come from the shared core renderer. Validation and artifact rendering MUST preserve downstream SERVICE, datasets, and extension functions without executing them.

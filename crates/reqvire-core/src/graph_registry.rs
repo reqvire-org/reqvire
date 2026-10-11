@@ -29,6 +29,7 @@ mod crud_ops;
 mod fulfillment;
 mod hierarchy;
 mod ontology_context;
+mod prose_links;
 mod registration;
 mod validation;
 

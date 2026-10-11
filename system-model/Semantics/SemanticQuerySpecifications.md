@@ -31,13 +31,13 @@ The query MUST be parsed using the SPARQL parser without an implicit workspace b
 
 Validation MUST traverse parsed graph patterns, subqueries, property paths, CONSTRUCT templates, expressions, inline values, and literal datatypes. Explicit class terms (including objects of rdf:type), predicates, and literal datatypes MUST resolve with the correct role in the used context, including existing reserved language vocabulary. Data-instance, GRAPH, dataset, and DESCRIBE-target IRIs MUST remain data identifiers. Variable schema positions MUST be accepted. A term used in a schema role MUST be checked even when it also appears in a data role.
 
-Syntax-valid SERVICE, SERVICE SILENT, FROM, FROM NAMED, and custom function calls MUST be preserved. Validation and artifact operations MUST NOT execute query content or require endpoints, datasets, or functions to be available.
+Syntax-valid SERVICE, SERVICE SILENT, FROM, FROM NAMED, and custom function calls MUST be preserved. Validation MUST NOT execute query content or require endpoints, datasets, or functions to be available.
 
 Produces CURIEs MUST resolve against the used context and its applicable prefix registry. Unknown or ambiguous prefixes, wrong-role terms, undeclared families, and out-of-context declarations MUST fail validation. Produces MUST NOT inject prefixes into SPARQL.
 
 Resolved query schema terms and Produces terms MUST participate in semantic term-reference projection and used-external-vocabulary selection.
 
-Diagnostics MUST identify the source element, file, location, and violated rule. Validate-all MUST retain malformed native candidates and report their diagnostics alongside other query candidates. The ordinary model validation gate MUST continue to govern every persisted mutation and artifact export.
+Diagnostics MUST identify the source element, file, location, and violated rule. Validation over a supplied set of query elements MUST retain malformed native candidates and report their diagnostics alongside other query elements.
 
 #### Metadata
   * type: specification
@@ -59,7 +59,7 @@ Namespace filtering MUST match namespaces of used ontologies, including inherite
 
 The `queries` RDF layer MUST expose query resources using reqvire:SemanticQuery, queryName, queryText, queryPurpose, queryForm, queryMaterializesProperty, and queryMaterializesFamily. Query records MUST include queryElement source linkage, used ontology dependencies through use, and filePath/lineNumber provenance. Omitted or empty public layer selections MUST include queries. Namespace-filtered query exports MUST retain the complete selected record even though its generated subject is a URN. Ontology exports MUST contain the generic vocabulary; query resources belong to the queries layer.
 
-CLI and MCP MUST reuse the shared resolver, validator, renderer, and index. Query content inclusion MUST expose the exact artifact text and digest. Query operations MUST preserve the existing model validation gate.
+Query content inclusion MUST expose the exact artifact text and digest from the shared core renderer and native semantic index.
 
 #### Metadata
   * type: specification
@@ -75,7 +75,9 @@ Contract for semantic query artifact export.
 #### Details
 Rendering MUST emit UTF-8, remove leading and trailing blank lines outside the query document, and end with exactly one LF. It MUST preserve internal characters, comments, prefix order, whitespace, and CR/LF sequences inside multiline literals. Raw artifacts MUST contain only SPARQL. SHA-256 MUST cover the exact emitted bytes.
 
-Export MUST require exactly one name-based source selector or explicit IRI selector. The name-based selector accepts an exact native element name or canonical source identifier through the bound Existing Element Selection Specification; IRI selection retains its existing domain and mutual exclusion. With neither output nor JSON requested, it MUST emit raw SPARQL to stdout. JSON output MUST contain metadata, content, and sha256. File output MUST use an atomic sibling temporary file and rename after successful validation, with only a short stderr diagnostic. JSON and file output MUST be mutually exclusive. A failed selection, validation, or write MUST preserve the existing artifact.
+Export MUST consume the shared model-load and query-context validators referenced by the owning requirement before publishing content or replacing an artifact. Preserve their rule diagnostics and guidance. Artifact operations MUST NOT execute query content or require downstream endpoints, datasets, or functions to be available.
+
+Export MUST require exactly one name-based source selector or explicit IRI selector. The name-based selector accepts an exact native element name or canonical source identifier through the referenced element-selection contract; IRI selection retains its existing domain and mutual exclusion. With neither output nor JSON requested, it MUST emit raw SPARQL to stdout. JSON output MUST contain metadata, content, and sha256. File output MUST use an atomic sibling temporary file and rename after successful validation, with only a short stderr diagnostic. JSON and file output MUST be mutually exclusive. A failed selection, validation, or write MUST preserve the existing artifact.
 
 Metadata-only edits, including Produces changes, MUST change the appropriate model revision and impact facts while preserving artifact content and digest when query text is unchanged.
 
